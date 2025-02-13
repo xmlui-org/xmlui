@@ -2,8 +2,11 @@ import type { CSSProperties } from "react";
 import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import styles from "./HtmlTags.module.scss";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { LocalLink } from "../Link/LinkNative";
 import { Heading } from "../Heading/HeadingNative";
+import { Text } from "../Text/TextNative";
 
 export const HtmlAMd = createMetadata({
   status: "experimental",
@@ -410,11 +413,11 @@ export const htmlCodeTagRenderer = createComponentRenderer(
   "code",
   HtmlCodeMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue));
     return (
-      <code style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="code">
         {renderChild(node.children)}
-      </code>
+      </Text>
     );
   },
 );
@@ -1667,11 +1670,11 @@ export const htmlPreTagRenderer = createComponentRenderer(
   "pre",
   HtmlPreMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <pre style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="codefence">
         {renderChild(node.children)}
-      </pre>
+      </Text>
     );
   },
 );
@@ -1888,11 +1891,11 @@ export const htmlSmallTagRenderer = createComponentRenderer(
   "small",
   HtmlSmallMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <small style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="small">
         {renderChild(node.children)}
-      </small>
+      </Text>
     );
   },
 );
@@ -1960,11 +1963,11 @@ export const htmlStrongTagRenderer = createComponentRenderer(
   "strong",
   HtmlStrongMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <strong style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="strong">
         {renderChild(node.children)}
-      </strong>
+      </Text>
     );
   },
 );
@@ -1979,11 +1982,11 @@ export const htmlSubTagRenderer = createComponentRenderer(
   "sub",
   HtmlSubMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <sub style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="sub">
         {renderChild(node.children)}
-      </sub>
+      </Text>
     );
   },
 );
@@ -2040,6 +2043,7 @@ export const HtmlTableMd = createMetadata({
     frame: d("Specifies which parts of the table frame to render"),
     rules: d("Specifies which rules to draw between cells"),
   },
+  themeVars: parseScssVar(styles.themeVarsTable),
 });
 
 export const htmlTableTagRenderer = createComponentRenderer(
@@ -2050,14 +2054,15 @@ export const htmlTableTagRenderer = createComponentRenderer(
     return (
       <table
         style={layoutCss}
+        className={styles.htmlTable}
         border={extractValue(node.props.border)}
         cellPadding={extractValue(node.props.cellPadding)}
         cellSpacing={extractValue(node.props.cellSpacing)}
         summary={extractValue(node.props.summary)}
         width={extractValue(node.props.width)}
         align={extractValue(node.props.align)}
-        frame={extractValue(node.props.frame)}
-        rules={extractValue(node.props.rules)}
+        /* frame={extractValue(node.props.frame)} // this is deprecated */
+        /* rules={extractValue(node.props.rules)} // this is deprecated */
         {...renderedProps}
       >
         {renderChild(node.children)}
@@ -2070,6 +2075,7 @@ export const HtmlTbodyMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `tbody` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsTbody),
 });
 
 export const htmlTbodyTagRenderer = createComponentRenderer(
@@ -2078,7 +2084,7 @@ export const htmlTbodyTagRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, layoutCss }) => {
     const renderedProps = resolveProps(node, extractValue);
     return (
-      <tbody style={layoutCss} {...renderedProps}>
+      <tbody style={layoutCss} className={styles.htmlTbody} {...renderedProps}>
         {renderChild(node.children)}
       </tbody>
     );
@@ -2100,6 +2106,7 @@ export const HtmlTdMd = createMetadata({
     height: d("Specifies the height of the cell"),
     width: d("Specifies the width of the cell"),
   },
+  themeVars: parseScssVar(styles.themeVarsTd),
 });
 
 export const htmlTdTagRenderer = createComponentRenderer(
@@ -2110,6 +2117,7 @@ export const htmlTdTagRenderer = createComponentRenderer(
     return (
       <td
         style={layoutCss}
+        className={styles.htmlTd}
         align={extractValue(node.props.align)}
         colSpan={extractValue(node.props.colSpan)}
         headers={extractValue(node.props.headers)}
@@ -2178,7 +2186,7 @@ export const htmlTextareaTagRenderer = createComponentRenderer(
         style={layoutCss}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, false)}
         cols={extractValue.asOptionalNumber(node.props.cols)}
-        dirName={extractValue(node.props.dirName)}
+        /* dirName={extractValue(node.props.dirName)} // this will take effect when we handle i18n */
         disabled={extractValue.asOptionalBoolean(node.props.disabled, false)}
         form={extractValue(node.props.form)}
         maxLength={extractValue.asOptionalNumber(node.props.maxLength)}
@@ -2202,6 +2210,7 @@ export const HtmlTfootMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `tfoot` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsTfoot),
 });
 
 export const htmlTfootTagRenderer = createComponentRenderer(
@@ -2210,7 +2219,7 @@ export const htmlTfootTagRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, layoutCss }) => {
     const renderedProps = resolveProps(node, extractValue);
     return (
-      <tfoot style={layoutCss} {...renderedProps}>
+      <tfoot style={layoutCss} className={styles.htmlTfoot} {...renderedProps}>
         {renderChild(node.children)}
       </tfoot>
     );
@@ -2231,6 +2240,7 @@ export const HtmlThMd = createMetadata({
       "Specifies whether a header cell is a header for a column, row, or group of columns or rows",
     ),
   },
+  themeVars: parseScssVar(styles.themeVarsTh),
 });
 
 export const htmlThTagRenderer = createComponentRenderer(
@@ -2241,6 +2251,7 @@ export const htmlThTagRenderer = createComponentRenderer(
     return (
       <th
         style={layoutCss}
+        className={styles.htmlTh}
         abbr={extractValue(node.props.abbr)}
         align={extractValue(node.props.align)}
         colSpan={extractValue(node.props.colSpan)}
@@ -2259,6 +2270,7 @@ export const HtmlTheadMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `thead` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsThead),
 });
 
 export const htmlTheadTagRenderer = createComponentRenderer(
@@ -2267,7 +2279,7 @@ export const htmlTheadTagRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, layoutCss }) => {
     const renderedProps = resolveProps(node, extractValue);
     return (
-      <thead style={layoutCss} {...renderedProps}>
+      <thead style={layoutCss} className={styles.htmlThead} {...renderedProps}>
         {renderChild(node.children)}
       </thead>
     );
@@ -2300,6 +2312,7 @@ export const HtmlTrMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `tr` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsTr),
 });
 
 export const htmlTrTagRenderer = createComponentRenderer(
@@ -2308,7 +2321,7 @@ export const htmlTrTagRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, layoutCss }) => {
     const renderedProps = resolveProps(node, extractValue);
     return (
-      <tr style={layoutCss} {...renderedProps}>
+      <tr style={layoutCss} className={styles.htmlTr} {...renderedProps}>
         {renderChild(node.children)}
       </tr>
     );

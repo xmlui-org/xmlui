@@ -49,7 +49,7 @@ function getStringArg(arg: any, defaultValue: string | undefined) {
 
 switch (script) {
   case "build": {
-    const { flatDist, prod, buildMode, withMock, withHostingMetaFiles, withRelativeRoot, withLegacyParser } =
+    const { flatDist, prod, buildMode, withMock, withHostingMetaFiles, withRelativeRoot } =
       argv as any;
 
     build({
@@ -58,7 +58,6 @@ switch (script) {
       withHostingMetaFiles: getBoolArg(withHostingMetaFiles, prod ? false : undefined),
       withRelativeRoot: getBoolArg(withRelativeRoot, prod ? true : undefined),
       flatDist: getBoolArg(flatDist, prod ? true : undefined),
-      withLegacyParser: getBoolArg(withLegacyParser),
     });
     break;
   }
@@ -68,8 +67,8 @@ switch (script) {
     break;
   }
   case "start": {
-    const { port, withMock, withLegacyParser, proxy } = argv as any;
-    start({ port, withMock: getBoolArg(withMock), withLegacyParser: getBoolArg(withLegacyParser), proxy });
+    const { port, withMock, proxy } = argv as any;
+    start({ port, withMock: getBoolArg(withMock), proxy });
     break;
   }
   case "preview": {

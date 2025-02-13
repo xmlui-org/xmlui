@@ -342,6 +342,7 @@ export function createMetadata<
   toneSpecificThemeVars,
   allowArbitraryProps,
   docFolder,
+  isHtmlTag,
 }: ComponentMetadata<TProps, TEvents, TContextVars, TApis>): ComponentMetadata<
   TProps,
   TEvents,
@@ -364,6 +365,7 @@ export function createMetadata<
     toneSpecificThemeVars,
     allowArbitraryProps,
     docFolder,
+    isHtmlTag,
   };
 }
 

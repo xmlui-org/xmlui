@@ -118,7 +118,7 @@ export const textComponentRenderer = createComponentRenderer(
   ({ node, extractValue, layoutCss, renderChild }) => {
     const { variant, maxLines, preserveLinebreaks, ellipses, value, ...variantSpecific } =
       node.props;
-
+    
     const variantSpecificProps: VariantProps = Object.fromEntries(
       Object.entries(variantSpecific)
         .filter(([key, _]) => VariantPropsKeys.includes(key as any))

@@ -101,12 +101,12 @@ test('MaxLines="2" long heading', async ({ page }) => {
   const valueHeadingLong = "Though this long heading does not fit into a single line, please do not break it!";
   const entryPoint = `
   <Fragment>
-    <Heading testId="headingShort" width="200" backgroundColor="yellow">
+    <Heading testId="headingShort" width="200px" backgroundColor="yellow">
       Short
     </Heading>
     <Heading 
       testId="headingLong"
-      width="200" 
+      width="200px" 
       backgroundColor="cyan"
       maxLines="2">
       ${valueHeadingLong}

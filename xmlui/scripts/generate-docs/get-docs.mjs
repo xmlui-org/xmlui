@@ -11,15 +11,23 @@ import { existsSync } from "fs";
 
 // --- Main
 
-await generateExtenionPackages();
-await generateComponents();
+// Prefilter metadata by isHtmlTag
+const filterByProps = { isHtmlTag: true };
+const [components, lightweightComponents] = partitionMetadata(collectedComponentMetadata, filterByProps);
+
+await generateLightweightComponents(lightweightComponents);
+
+await generateComponents(components);
+
+const packagesMetadata = await dynamicallyLoadExtensionPackages();
+await generateExtenionPackages(packagesMetadata);
 
 // --- Helpers
 
-async function generateExtenionPackages() {
+async function generateExtenionPackages(metadata) {
   const extensionsConfig = await loadConfig(join(FOLDERS.script, "extensions-config.json"));
-  const packagesMetadata = await dynamicallyLoadExtensionPackages();
-  for (const packageName in packagesMetadata) {
+  
+  for (const packageName in metadata) {
     const packageFolder = join(FOLDERS.pages, "extension-components", packageName);
 
     if (!existsSync(packageFolder)) {
@@ -27,9 +35,9 @@ async function generateExtenionPackages() {
     }
 
     const extensionGenerator = new DocsGenerator(
-      packagesMetadata[packageName].metadata,
+      metadata[packageName].metadata,
       {
-        sourceFolder: packagesMetadata[packageName].sourceFolder,
+        sourceFolder: metadata[packageName].sourceFolder,
         outFolder: packageFolder,
         examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
       },
@@ -47,7 +55,7 @@ async function generateExtenionPackages() {
   try {
     const extensionPackagesMetafile = join(FOLDERS.pages, "extension-components", "_meta.json");
 
-    const folderNames = Object.fromEntries(Object.keys(packagesMetadata).map((name) => {
+    const folderNames = Object.fromEntries(Object.keys(metadata).map((name) => {
       return [name, name.split("-").map((n) => n[0].toUpperCase() + n.slice(1)).join(" ")];
     }));
     if (existsSync(extensionPackagesMetafile)) {
@@ -59,10 +67,10 @@ async function generateExtenionPackages() {
   }
 }
 
-async function generateComponents() {
+async function generateComponents(metadata) {
   const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
   const metadataGenerator = new DocsGenerator(
-    collectedComponentMetadata,
+    metadata,
     {
       sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
       outFolder: join(FOLDERS.docsRoot, "pages", "components"),
@@ -82,6 +90,20 @@ async function generateComponents() {
 
   await metadataGenerator.generateComponentsSummary();
   await metadataGenerator.generateArticleAndDownloadsLinks();
+}
+
+async function generateLightweightComponents(metadata) {
+  const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
+  const metadataGenerator = new DocsGenerator(
+    metadata,
+    {
+      sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
+      outFolder: join(FOLDERS.docsRoot, "pages", "components"),
+      examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
+    },
+    { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
+  );
+  await metadataGenerator.generateComponentsSummary("Lightweight Components", "lightweight-components.mdx");
 }
 
 async function cleanFolder(folderToClean) {
@@ -162,4 +184,42 @@ async function dynamicallyLoadExtensionPackages() {
     }
   }
   return importedMetadata;
+}
+
+function partitionMetadata(metadata, filterByProps) {
+  const [components, lightweightComponents] = partitionObject(metadata, (compData, c) => {
+    if (!filterByProps || Object.keys(filterByProps).length === 0) {
+      return true;
+    }
+    for (const [propName, propValue] of Object.entries(filterByProps)) {
+      if (compData[propName] === undefined) {
+        return true;
+      }
+      if (compData[propName] === propValue) {
+        return false;
+      }
+    }
+  });
+
+  return [components, lightweightComponents];
+}
+
+/**
+ * Partition an object into two objects based on a discriminator function.
+ * @template T
+ * @param {Record<string, T>} obj Input object to partition
+ * @param {(value: T, key: string) => boolean} discriminator Function to decide partitioning
+ * @returns {[Record<string, T>, Record<string, T>]} An array containing two disjoint objects
+ */
+function partitionObject(obj, discriminator) {
+  return Object.entries(obj).reduce(
+    ([pass, fail], [key, value]) => {
+      if (discriminator(value, key)) {
+        return [{ ...pass, [key]: value }, fail];
+      } else {
+        return [pass, { ...fail, [key]: value }];
+      }
+    },
+    [{}, {}],
+  );
 }

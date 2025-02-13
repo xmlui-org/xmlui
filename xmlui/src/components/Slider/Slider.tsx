@@ -58,6 +58,8 @@ export const SliderMd = createMetadata({
     required: dRequired(),
     readOnly: dReadonly(),
     validationStatus: dValidationStatus(),
+    rangeStyle: d(`This property allows you to apply custom styles to the range element of the slider.`),
+    thumbStyle: d(`This property allows yout top apply custom styles to the thumb elements of the slider.`)
   },
   events: {
     didChange: dDidChange(COMP),
@@ -71,12 +73,12 @@ export const SliderMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`color-bg-track-${COMP}`]: "$color-primary",
-    [`color-bg-range-${COMP}`]: "$color-surface-500",
+    [`color-bg-track-${COMP}`]: "$color-surface-200",
+    [`color-bg-range-${COMP}`]: "$color-primary",
     [`thickness-border-thumb-${COMP}`]: "2px",
     [`style-border-thumb-${COMP}`]: "solid",
-    [`color-border-thumb-${COMP}`]: "$color-surface-200",
-    [`color-bg-thumb-${COMP}`]: "$color-surface-200",
+    [`color-border-thumb-${COMP}`]: "$color-surface-50",
+    [`color-bg-thumb-${COMP}`]: "$color-primary",
     [`shadow-thumb-${COMP}`]: "$shadow-md",
 
     light: {
@@ -125,6 +127,8 @@ export const sliderComponentRenderer = createComponentRenderer(
         labelWidth={extractValue.asOptionalString(node.props.labelWidth)}
         labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
+        rangeStyle={extractValue(node.props?.rangeStyle)}
+        thumbStyle={extractValue(node.props?.thumbStyle)}
       />
     );
   },

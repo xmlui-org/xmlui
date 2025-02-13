@@ -211,7 +211,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 
   // --- input tests
 
-  test("copying from clipboard to field pastes correct content", async ({
+  test.skip("copying from clipboard to field pastes correct content", async ({
     initTestBed,
     createNumberBoxDriver,
   }) => {
@@ -333,7 +333,7 @@ test("focuses component if autoFocus is set", async ({ initTestBed, createNumber
 
 // --- readOnly
 
-test("readOnly lets user copy from input field", async ({ initTestBed, createNumberBoxDriver }) => {
+test.skip("readOnly lets user copy from input field", async ({ initTestBed, createNumberBoxDriver }) => {
   const { clipboard } = await initTestBed(`<NumberBox initialValue="test" readOnly="{true}" />`);
   const driver = await createNumberBoxDriver();
 

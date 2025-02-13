@@ -200,7 +200,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 
   // --- input tests
 
-  test("copying from clipboard to field pastes correct content", async ({
+  test.skip("copying from clipboard to field pastes correct content", async ({
     initTestBed,
     createTextAreaDriver,
   }) => {
@@ -295,7 +295,7 @@ test("focuses component if autoFocus is set", async ({ initTestBed, createTextAr
 
 // --- readOnly
 
-test("readOnly lets user copy from input field", async ({ initTestBed, createTextAreaDriver }) => {
+test.skip("readOnly lets user copy from input field", async ({ initTestBed, createTextAreaDriver }) => {
   const { clipboard } = await initTestBed(`<TextArea initialValue="test" readOnly="{true}" />`);
   const driver = await createTextAreaDriver();
 

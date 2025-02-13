@@ -5,19 +5,16 @@ import { getViteConfig } from "./viteConfig";
 type XmlUiStartOptions = {
   port?: number;
   withMock?: boolean;
-  withLegacyParser?: boolean;
   proxy?: string;
 };
 
 export const start = async ({
   port,
   withMock = true,
-  withLegacyParser = false,
   proxy,
 }: XmlUiStartOptions) => {
   console.log("Starting with options:", {
     withMock,
-    withLegacyParser,
     withProxy: proxy,
   });
 
@@ -38,7 +35,7 @@ export const start = async ({
 
   try {
     const server = await createServer({
-      ...getViteConfig({ withLegacyParser }),
+      ...getViteConfig({ }),
       server: {
         port,
         proxy: proxyDef,
@@ -49,7 +46,6 @@ export const start = async ({
         "process.env.VITE_STANDALONE": process.env.VITE_STANDALONE,
         "process.env.VITE_MOCK_ENABLED": withMock,
         "process.env.VITE_INCLUDE_ALL_COMPONENTS": JSON.stringify("true"),
-        "process.env.VITE_LEGACY_PARSER": withLegacyParser,
       },
     } as InlineConfig);
 
