@@ -112,10 +112,10 @@ test("Break long text", async ({ page }) => {
   const valueTextLong = "This long text does not fit into a viewport with a 200-pixel width.";
   const entryPoint = `
   <Fragment>
-    <Text testId="textShort" width="200" backgroundColor="yellow">
+    <Text testId="textShort" width="200px" backgroundColor="yellow">
       Short
     </Text>
-    <Text testId="textLong" width="200" backgroundColor="cyan">
+    <Text testId="textLong" width="200px" backgroundColor="cyan">
       ${valueTextLong}
     </Text>
   </Fragment>
@@ -137,12 +137,12 @@ test("Ellipses long text", async ({ page }) => {
   const valueTextLong = "Though this long text does not fit into a single line, please do not break it!";
   const entryPoint = `
   <Fragment>
-    <Text testId="textShort" width="200" backgroundColor="yellow">
+    <Text testId="textShort" width="200px" backgroundColor="yellow">
       Short
     </Text>
     <Text 
       testId="textLong"
-      width="200" 
+      width="200px" 
       backgroundColor="cyan"
       maxLines="1">
       ${valueTextLong}
@@ -165,12 +165,12 @@ test("No Ellipses long text", async ({ page }) => {
   const valueTextLong = "Though this long text does not fit into a single line, please do not break it!";
   const entryPoint = `
   <Fragment>
-    <Text testId="textShort" width="200" backgroundColor="yellow">
+    <Text testId="textShort" width="200px" backgroundColor="yellow">
       Short
     </Text>
     <Text 
       testId="textLong"
-      width="200" 
+      width="200px" 
       backgroundColor="cyan"
       maxLines="1"
       ellipses="false">
@@ -194,12 +194,12 @@ test('MaxLines="2" long text', async ({ page }) => {
   const valueTextLong = "Though this long text does not fit into a single line, please do not break it!";
   const entryPoint = `
   <Fragment>
-    <Text testId="textShort" width="200" backgroundColor="yellow">
+    <Text testId="textShort" width="200px" backgroundColor="yellow">
       Short
     </Text>
     <Text 
       testId="textLong"
-      width="200" 
+      width="200px" 
       backgroundColor="cyan"
       maxLines="2">
       ${valueTextLong}
@@ -247,10 +247,10 @@ test("Overflow container dimensions", async ({ page }) => {
   const widthLayoutExpected = 300
   const widthTextExpected = 400;
   const entryPoint = `
-  <VStack testId="layout" height="40" width="${widthLayoutExpected}" backgroundColor="cyan">
+  <VStack testId="layout" height="40" width="${widthLayoutExpected}px" backgroundColor="cyan">
     <Text
       testId="text"
-      width="${widthTextExpected}"
+      width="${widthTextExpected}px"
       backgroundColor="silver" opacity="0.8">
       This text sets its size explicitly bigger than its container.
       As it does not fit into the container's viewport, it overflows.
