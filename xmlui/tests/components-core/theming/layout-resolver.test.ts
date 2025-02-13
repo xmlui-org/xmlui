@@ -1569,4 +1569,20 @@ describe("Layout resolver", () => {
     expect(result.cssProps.flexShrink).toBe(0);
     expect(result.issues.has(PROP)).toBe(false);
   });
+
+  it("whiteSpace: nowrap", () => {
+    const PROP = "whiteSpace";
+    const VALUE = "nowrap";
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps[PROP]).toBe(VALUE);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("whiteSpace (themeVar)", () => {
+    const PROP = "whiteSpace";
+    const VALUE = THEME_ID;
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps[PROP]).toBe(THEME_ID_VALUE);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
 });
