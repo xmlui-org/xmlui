@@ -1,8 +1,7 @@
 import { CSSProperties } from "react";
 import { LayoutContext, NonCssLayoutProps } from "../../abstractions/RendererDefs";
 import { EMPTY_OBJECT } from "../constants";
-import { isEmpty, merge } from "lodash-es";
-import { resolveValue } from "react-hot-toast";
+import { isEmpty } from "lodash-es";
 
 export const THEME_VAR_PREFIX = "xmlui";
 const themeVarCapturesRegex = /(\$[a-zA-Z][a-zA-Z0-9-]*)/g;
@@ -151,6 +150,7 @@ export function resolveLayoutProps(
   collectCss("opacity");
   collectCss("zoom");
   collectCss("cursor");
+  collectCss("whiteSpace");
 
   // --- Content rendering
   const wrapContent = transformLayoutValue("wrapContent");
@@ -405,6 +405,7 @@ export type LayoutProps = {
   // --- Other
   cursor?: string;
   zoom?: string | number;
+  whiteSpace?: string;
 };
 
 // The properties constituting a component's layout
@@ -496,4 +497,5 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   // --- Other
   cursor: [],
   zoom: [],
+  whiteSpace: [],
 };

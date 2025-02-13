@@ -195,6 +195,10 @@ export function compileLayout(
   if (textAlignLast) css.textAlignLast = textAlignLast as any;
   const textWrap = layoutProps?.textWrap?.toString();
   if (textWrap) css.textWrap = textWrap as any;
+  const whiteSpace = layoutProps?.whiteSpace?.toString();
+  if (whiteSpace) {
+    css.whiteSpace = whiteSpace as any;
+  }
 
   // --- Compile content rendering
   const wrapContent = compileWrapContent("wrapContent", layoutProps);
@@ -800,4 +804,5 @@ export type LayoutProps = {
   // --- Other
   cursor?: string;
   zoom?: string | number;
+  whiteSpace?: string;
 };

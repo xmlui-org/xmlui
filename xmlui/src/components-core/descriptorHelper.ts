@@ -66,4 +66,5 @@ export const layoutOptionKeys = [
   "bottom",
   "left",
   "zoom",
+  "whiteSpace"
 ];
