@@ -2510,6 +2510,9 @@ function cleanStyles(nodeProps: any, layoutCss: CSSProperties = {}) {
   if (nodeProps.hasOwnProperty("style")) {
     delete nodeProps["style"];
   }
+  if (nodeProps.hasOwnProperty("class")) {
+    delete nodeProps["class"];
+  }
   return removeEntries(nodeProps, layoutCss);
 }
 
