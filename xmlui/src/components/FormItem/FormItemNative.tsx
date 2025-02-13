@@ -35,7 +35,8 @@ import type { LabelPosition } from "../abstractions";
 import type { FormItemMd } from "./FormItem";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { useValidation, useValidationDisplay } from "./Validations";
-import {Slider} from "../Slider/SliderNative";
+import { Slider } from "../Slider/SliderNative";
+import { ColorPicker } from "../ColorPicker/ColorPickerNative";
 
 type FormControlType =
   | "text"
@@ -51,7 +52,8 @@ type FormControlType =
   | "radioGroup"
   | "custom"
   | "switch"
-  | "slider";
+  | "slider"
+  | "colorpicker";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
   checkbox: "end",
@@ -296,16 +298,29 @@ export const FormItem = memo(function FormItem({
     }
     case "slider": {
       formControl = (
-          <Slider
-              {...rest}
-              value={value}
-              updateState={onStateChange}
-              registerComponentApi={registerComponentApi}
-              enabled={isEnabled}
-              validationStatus={validationStatus}
-              min={validations.minValue}
-              max={validations.maxValue}
-          />
+        <Slider
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+          min={validations.minValue}
+          max={validations.maxValue}
+        />
+      );
+      break;
+    }
+    case "colorpicker": {
+      formControl = (
+        <ColorPicker
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+        />
       );
       break;
     }
