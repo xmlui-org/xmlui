@@ -16,6 +16,9 @@ export const LineChartMd = createMetadata({
     hideX: d(
       "Determines whether the X-axis should be hidden. If set to true, the axis will not be displayed.",
     ),
+    hideTooltip: d(
+      "Determines whether the tooltip should be hidden. If set to true, no tooltip will be shown when hovering over data points.",
+    ),
   },
 });
 
@@ -30,6 +33,7 @@ export const lineChartComponentRenderer = createComponentRenderer(
         dataKeys={extractValue(node.props?.dataKeys)}
         nameKey={extractValue(node.props?.nameKey)}
         hideX={extractValue(node.props?.hideX)}
+        hideTooltip={extractValue(node.props?.hideTooltip)}
       />
     );
   },

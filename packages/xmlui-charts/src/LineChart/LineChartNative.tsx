@@ -9,9 +9,17 @@ export type LineChartProps = {
   nameKey: string;
   style?: React.CSSProperties;
   hideX?: boolean;
+  hideTooltip?: boolean;
 };
 
-export function LineChart({ data, dataKeys = [], nameKey, style, hideX = false }: LineChartProps) {
+export function LineChart({
+  data,
+  dataKeys = [],
+  nameKey,
+  style,
+  hideX = false,
+  hideTooltip = false,
+}: LineChartProps) {
   const colors = useColors(
     {
       name: "color-primary-500",
@@ -34,15 +42,15 @@ export function LineChart({ data, dataKeys = [], nameKey, style, hideX = false }
   const config = useMemo(() => {
     const colorValues = Object.values(colors);
     return Object.assign(
-        {},
-        ...dataKeys.map((key, index) => {
-          return {
-            [key]: {
-              label: key,
-              color: colorValues[index % colorValues.length],
-            },
-          };
-        }),
+      {},
+      ...dataKeys.map((key, index) => {
+        return {
+          [key]: {
+            label: key,
+            color: colorValues[index % colorValues.length],
+          },
+        };
+      }),
     );
   }, [colors, dataKeys]);
 
@@ -65,7 +73,7 @@ export function LineChart({ data, dataKeys = [], nameKey, style, hideX = false }
               });
             }}
           />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+          {!hideTooltip && <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />}
           {Object.keys(config).map((key, index) => (
             <Line
               key={index}
