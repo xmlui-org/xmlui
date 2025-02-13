@@ -4,7 +4,7 @@ import { EMPTY_OBJECT } from "../constants";
 import { isEmpty } from "lodash-es";
 
 export const THEME_VAR_PREFIX = "xmlui";
-const themeVarCapturesRegex = /(\$[a-zA-Z][a-zA-Z0-9-]*)/g;
+const themeVarCapturesRegex = /(\$[a-zA-Z][a-zA-Z0-9-_]*)/g;
 const alignmentRegex = /^(start|end|center)$/;
 const orientationRegex = /^(horizontal|vertical)$/;
 const booleanRegex = /^(true|false)$/;
