@@ -242,6 +242,7 @@ import {
   htmlVideoTagRenderer,
   htmlWbrTagRenderer,
 } from "./HtmlTags/HtmlTags";
+import {colorPickerComponentRenderer} from "./ColorPicker/ColorPicker";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -427,6 +428,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Card !== "false") {
       this.registerCoreComponent(cardComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_ColorPicker !== "false") {
+      this.registerCoreComponent(colorPickerComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_FlowLayout !== "false") {
       this.registerCoreComponent(flowLayoutComponentRenderer);
