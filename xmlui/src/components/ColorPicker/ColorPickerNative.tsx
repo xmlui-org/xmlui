@@ -8,6 +8,7 @@ import type { ValidationStatus } from "../abstractions";
 import { useEvent } from "../../components-core/utils/misc";
 import styles from "./ColorPicker.module.scss";
 import classnames from "classnames";
+import { read } from "fs";
 
 type Props = {
   value?: string;
@@ -25,6 +26,7 @@ type Props = {
   labelWidth?: string;
   labelBreak?: boolean;
   required?: boolean;
+  readOnly?: boolean;
   enabled?: boolean;
   validationStatus?: ValidationStatus;
 };
