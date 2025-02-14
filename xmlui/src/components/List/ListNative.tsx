@@ -218,7 +218,7 @@ const Item = forwardRef(
     const itemType = getItemType(index) || RowType.ITEM;
     return (
       <div
-        style={{ ...style, visibility: "visible" }}
+        style={style}
         ref={forwardedRef}
         className={classnames({
           [styles.row]: itemType === RowType.ITEM,
@@ -235,6 +235,32 @@ const Item = forwardRef(
 );
 
 const ListItemTypeContext = createContext<(index: number) => RowType>((index) => RowType.ITEM);
+
+/**
+ * Virtua's `shift` prop helps maintain scroll position when prepending items (like message history).
+ * Unfortunately it's finicky and must only be `true` when the beginning of the list changes, otherwise
+ * rendering gets broken (see: https://github.com/inokawa/virtua/issues/284).
+ *
+ * Virtua also requires `shift` to be correct on the same render pass when items are updated — so we can't
+ * just use `useEffect` and `useState` to monitor items and update `shift` since those will update _after_ the
+ * render pass. Instead, we use refs to check if the underlying data has changed on each render pass, and
+ * update a `shift` ref in the same pass.
+ *
+ * That's all encapsulated in this handy hook, to keep the logic out of the component.
+ */
+const useShift = (listData: any[], idKey: any) => {
+  const previousListData = useRef<any[] | undefined>()
+  const shouldShift = useRef<boolean>()
+  if (listData !== previousListData.current) {
+    if (listData?.[0]?.[idKey] !== previousListData.current?.[0]?.[idKey]) {
+      shouldShift.current = true
+    } else {
+      shouldShift.current = false
+    }
+    previousListData.current = listData
+  }
+  return shouldShift.current
+}
 
 export const ListNative = forwardRef(function DynamicHeightList(
   {
@@ -298,13 +324,8 @@ export const ListNative = forwardRef(function DynamicHeightList(
     availableGroups,
   });
 
-  const isPrepend = useRef(false);
-  const prevRows = usePrevious(rows);
-  useLayoutEffect(() => {
-    if (prevRows?.length < rows.length) {
-      isPrepend.current = false;
-    }
-  }, [rows.length, prevRows?.length]);
+  const shift = useShift(rows, idKey);
+
 
   const initiallyScrolledToBottom = useRef(false);
   useEffect(() => {
@@ -338,7 +359,6 @@ export const ListNative = forwardRef(function DynamicHeightList(
       !pageInfo.isFetchingPrevPage &&
       !isFetchingPrevPage.current
     ) {
-      isPrepend.current = true;
       isFetchingPrevPage.current = true;
       (async function doFetch() {
         try {
@@ -449,8 +469,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
               <Virtualizer
                 ref={virtualizerRef}
                 scrollRef={scrollElementRef}
-                shift={isPrepend.current}
-                overscan={10}
+                shift={shift}
                 onScroll={onScroll}
                 startMargin={!hasOutsideScroll ? 0 : parentRef.current?.offsetTop || 0}
                 item={Item as CustomItemComponent}
