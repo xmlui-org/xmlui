@@ -75,7 +75,6 @@ import { logoComponentRenderer } from "./Logo/Logo";
 import { radioGroupRenderer } from "./RadioGroup/RadioGroup";
 import { SlotHolder } from "../components-core/Slot";
 import { fileInputRenderer } from "./FileInput/FileInput";
-import { chartRenderer } from "./Chart/Chart";
 import { spinnerComponentRenderer } from "./Spinner/Spinner";
 import { markdownComponentRenderer } from "./Markdown/Markdown";
 import { selectComponentRenderer } from "./Select/Select";
@@ -634,10 +633,6 @@ export class ComponentRegistry {
     this.registerCoreComponent(htmlVarTagRenderer);
     this.registerCoreComponent(htmlVideoTagRenderer);
     this.registerCoreComponent(htmlWbrTagRenderer);
-
-    if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
-      this.registerCoreComponent(chartRenderer);
-    }
 
     this.registerActionFn(apiAction);
     this.registerActionFn(downloadAction);
