@@ -10,6 +10,7 @@ export type LineChartProps = {
   style?: React.CSSProperties;
   hideX?: boolean;
   hideTooltip?: boolean;
+  tickFormatter?: (value: any) => any;
 };
 
 export function LineChart({
@@ -19,6 +20,7 @@ export function LineChart({
   style,
   hideX = false,
   hideTooltip = false,
+  tickFormatter,
 }: LineChartProps) {
   const colors = useColors(
     {
@@ -65,15 +67,11 @@ export function LineChart({
             tickLine={false}
             hide={hideX}
             axisLine={false}
-            tickFormatter={(value) => {
-              const date = new Date(value);
-              return date.toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-              });
-            }}
+            tickFormatter={tickFormatter}
           />
-          {!hideTooltip && <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />}
+          {!hideTooltip && (
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+          )}
           {Object.keys(config).map((key, index) => (
             <Line
               key={index}
