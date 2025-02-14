@@ -48,6 +48,8 @@ $themeVars: ();
     display: inline;
   }
 
+  // codefence/<pre> elements are block level by default
+  // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/pre
   .text.codefence {
     display: block;
   }
