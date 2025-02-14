@@ -16,7 +16,10 @@ export const TableOfContentsMd = createMetadata({
   props: {
     smoothScrolling: d(
       `This property indicates that smooth scrolling is used while scrolling the selected table ` +
-      `of contents items into view.`,
+        `of contents items into view.`,
+    ),
+    maxHeadingLevel: d(
+      `Defines the maximum heading level to include in the table of contents. Headings with a level greater than this value will be excluded.`,
     ),
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -76,6 +79,7 @@ export const tableOfContentsRenderer = createComponentRenderer(
       <TableOfContents
         style={layoutCss}
         smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
+        maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}
       />
     );
   },
