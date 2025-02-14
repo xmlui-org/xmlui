@@ -427,12 +427,25 @@ export const ListNative = forwardRef(function DynamicHeightList(
     }
   });
 
+  const scrollToIndex = useEvent((index) => {
+    virtualizerRef.current?.scrollToIndex(index);
+  });
+
+  const scrollToId = useEvent((id)=>{
+    const index = rows?.findIndex((row)=>row[idKey] === id);
+    if(index >= 0){
+      scrollToIndex(index);
+    }
+  });
+
   useLayoutEffect(() => {
     registerComponentApi?.({
       scrollToBottom,
       scrollToTop,
+      scrollToIndex,
+      scrollToId
     });
-  }, [registerComponentApi, scrollToBottom, scrollToTop]);
+  }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop]);
   const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
 
   return (

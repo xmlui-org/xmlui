@@ -28,15 +28,18 @@ $border-Stack--hover: createThemeVar("border-Stack--hover");
     :global(.display-on-hover){
       transition: opacity .1s;
       opacity: 0;
+      visibility: hidden;
     }
     
     &:has(:global(.dropdown-visible)) :global(.display-on-hover){
       opacity: 1;
+      visibility: visible;
     }
 
     &:hover, &:focus-within{
       :global(.display-on-hover) {
         opacity: 1;
+        visibility: visible;
       }
     }
   }
