@@ -1,4 +1,4 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { ColorPicker } from "./ColorPickerNative";
 import {
@@ -13,6 +13,7 @@ import {
   dLabelPosition,
   dLabelWidth,
   dLostFocus,
+  dReadonly,
   dRequired,
   dSetValueApi,
   dValidationStatus,
@@ -34,6 +35,7 @@ export const ColorPickerMd = createMetadata({
     enabled: dEnabled(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
+    readOnly: dReadonly(),
     validationStatus: dValidationStatus(),
   },
   events: {
@@ -61,6 +63,8 @@ export const colorPickerComponentRenderer = createComponentRenderer(
     registerComponentApi,
     updateState,
   }) => {
+    const enabled = extractValue.asOptionalBoolean(node.props?.enabled, true);
+    const readonly = extractValue.asOptionalBoolean(node.props?.readOnly, false);
     return (
       <ColorPicker
         validationStatus={extractValue(node.props.validationStatus)}
@@ -73,7 +77,7 @@ export const colorPickerComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         style={layoutCss}
         required={extractValue.asOptionalBoolean(node.props?.required)}
-        enabled={extractValue.asOptionalBoolean(node.props?.enabled)}
+        enabled={enabled && !readonly}
         autoFocus={extractValue.asOptionalBoolean(node.props?.autoFocus)}
         label={extractValue(node.props?.label)}
         labelPosition={extractValue(node.props?.labelPosition)}

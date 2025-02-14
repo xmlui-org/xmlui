@@ -188,6 +188,8 @@ import {
   HtmlVarMd,
   HtmlWbrMd,
 } from "./HtmlTags/HtmlTags";
+import { SliderMd } from "./Slider/Slider";
+import { ColorPickerMd } from "./ColorPicker/ColorPicker";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   // --- HTML tags
@@ -310,6 +312,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
   CODE: HtmlCodeMd,
+  ColorPicker: ColorPickerMd,
   Column: ColumnMd,
   ContentSeparator: ContentSeparatorMd,
   DataSource: DataSourceMd,
@@ -365,6 +368,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Redirect: RedirectMd,
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
+  Slider: SliderMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,
