@@ -18,6 +18,10 @@ export const BookmarkMd = createMetadata({
       `The level of the bookmark. The level is used to determine the bookmark's ` +
         `position in the table of contents.`,
     ),
+    title: d("The text content of the bookmark."),
+    omitFromToc: d(
+      "If true, this bookmark will be excluded from the table of contents. Defaults to false.",
+    ),
   },
 });
 
@@ -28,7 +32,12 @@ export const bookmarkComponentRenderer = createComponentRenderer(
     const { node, renderChild, extractValue, layoutContext } = rendererContext;
 
     return (
-      <Bookmark uid={extractValue(node.uid)} level={extractValue(node.props.level)}>
+      <Bookmark
+        uid={extractValue(node.uid)}
+        level={extractValue(node.props.level)}
+        title={extractValue(node.props?.title)}
+        omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
+      >
         {renderChild(node.children, layoutContext)}
       </Bookmark>
     );
