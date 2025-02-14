@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { CSSProperties, Fragment, ReactNode } from "react";
 import React, {
   createContext,
   forwardRef,
@@ -236,6 +236,32 @@ const Item = forwardRef(
 
 const ListItemTypeContext = createContext<(index: number) => RowType>((index) => RowType.ITEM);
 
+/**
+ * Virtua's `shift` prop helps maintain scroll position when prepending items (like message history).
+ * Unfortunately it's finicky and must only be `true` when the beginning of the list changes, otherwise
+ * rendering gets broken (see: https://github.com/inokawa/virtua/issues/284).
+ *
+ * Virtua also requires `shift` to be correct on the same render pass when items are updated — so we can't
+ * just use `useEffect` and `useState` to monitor items and update `shift` since those will update _after_ the
+ * render pass. Instead, we use refs to check if the underlying data has changed on each render pass, and
+ * update a `shift` ref in the same pass.
+ *
+ * That's all encapsulated in this handy hook, to keep the logic out of the component.
+ */
+const useShift = (listData: any[], idKey: any) => {
+  const previousListData = useRef<any[] | undefined>()
+  const shouldShift = useRef<boolean>()
+  if (listData !== previousListData.current) {
+    if (listData?.[0]?.[idKey] !== previousListData.current?.[0]?.[idKey]) {
+      shouldShift.current = true
+    } else {
+      shouldShift.current = false
+    }
+    previousListData.current = listData
+  }
+  return shouldShift.current
+}
+
 export const ListNative = forwardRef(function DynamicHeightList(
   {
     items = EMPTY_ARRAY,
@@ -273,6 +299,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
     style?.flex === undefined;
   const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 
+  const shouldStickToBottom = useRef(scrollAnchor === "bottom");
   const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
   const toggleExpanded = useCallback((id: any, isExpanded: boolean) => {
     setExpanded((prev) => ({ ...prev, [id]: isExpanded }));
@@ -297,44 +324,70 @@ export const ListNative = forwardRef(function DynamicHeightList(
     availableGroups,
   });
 
-  const isPrepend = useRef(false);
-  const prevRows = usePrevious(rows);
-  useLayoutEffect(() => {
-    if (prevRows?.length < rows.length) {
-      isPrepend.current = false;
-    }
-  }, [rows.length, prevRows?.length]);
+  const shift = useShift(rows, idKey);
+
 
   const initiallyScrolledToBottom = useRef(false);
   useEffect(() => {
     if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
       initiallyScrolledToBottom.current = true;
-      virtualizerRef.current?.scrollToIndex(rows.length - 1);
+      requestAnimationFrame(() => {
+        virtualizerRef.current?.scrollToIndex(rows.length - 1, {
+          align: "end",
+        });
+      });
     }
   }, [rows.length, scrollAnchor]);
 
+  useEffect(() => {
+    if (!virtualizerRef.current) return;
+    if (!shouldStickToBottom.current) return;
+    requestAnimationFrame(() => {
+      virtualizerRef.current?.scrollToIndex(rows.length - 1, {
+        align: "end",
+      });
+    });
+  }, [rows]);
+
+  const isFetchingPrevPage = useRef(false);
   const tryToFetchPrevPage = useCallback(() => {
     if (
       virtualizerRef.current &&
       virtualizerRef.current.findStartIndex() < 10 &&
       pageInfo &&
       pageInfo.hasPrevPage &&
-      !pageInfo.isFetchingPrevPage
+      !pageInfo.isFetchingPrevPage &&
+      !isFetchingPrevPage.current
     ) {
-      isPrepend.current = true;
-      requestFetchPrevPage();
+      isFetchingPrevPage.current = true;
+      (async function doFetch() {
+        try {
+          await requestFetchPrevPage();
+        } finally {
+          isFetchingPrevPage.current = false;
+        }
+      })();
     }
   }, [pageInfo, requestFetchPrevPage]);
 
+  const isFetchingNextPage = useRef(false);
   const tryToFetchNextPage = useCallback(() => {
     if (
       virtualizerRef.current &&
       virtualizerRef.current.findEndIndex() + 10 > rows.length &&
       pageInfo &&
       pageInfo.hasNextPage &&
-      !pageInfo.isFetchingNextPage
+      !pageInfo.isFetchingNextPage &&
+      !isFetchingNextPage.current
     ) {
-      requestFetchNextPage();
+      isFetchingNextPage.current = true;
+      (async function doFetch() {
+        try {
+          await requestFetchNextPage();
+        } finally {
+          isFetchingNextPage.current = false;
+        }
+      })();
     }
   }, [rows.length, pageInfo, requestFetchNextPage]);
 
@@ -346,21 +399,42 @@ export const ListNative = forwardRef(function DynamicHeightList(
     }
   }, [rows.length, tryToFetchNextPage, tryToFetchPrevPage]);
 
-  const onScroll = useCallback(() => {
-    if (!virtualizerRef.current) return;
-    tryToFetchPrevPage();
-    tryToFetchNextPage();
-  }, [tryToFetchNextPage, tryToFetchPrevPage]);
+  const onScroll = useCallback(
+    (offset) => {
+      if (!virtualizerRef.current) return;
+      if (scrollAnchor === "bottom") {
+        // The sum may not be 0 because of sub-pixel value when browser's window.devicePixelRatio has decimal value
+        shouldStickToBottom.current =
+          offset - virtualizerRef.current.scrollSize + virtualizerRef.current.viewportSize >= -1.5;
+      }
+      tryToFetchPrevPage();
+      tryToFetchNextPage();
+    },
+    [scrollAnchor, tryToFetchNextPage, tryToFetchPrevPage],
+  );
 
   const scrollToBottom = useEvent(() => {
     if (rows.length) {
-      virtualizerRef.current.scrollToIndex(rows.length - 1);
+      virtualizerRef.current?.scrollToIndex(rows.length - 1, {
+        align: "end",
+      });
     }
   });
 
   const scrollToTop = useEvent(() => {
     if (rows.length) {
-      virtualizerRef.current.scrollToIndex(0);
+      virtualizerRef.current?.scrollToIndex(0);
+    }
+  });
+
+  const scrollToIndex = useEvent((index) => {
+    virtualizerRef.current?.scrollToIndex(index);
+  });
+
+  const scrollToId = useEvent((id)=>{
+    const index = rows?.findIndex((row)=>row[idKey] === id);
+    if(index >= 0){
+      scrollToIndex(index);
     }
   });
 
@@ -368,8 +442,10 @@ export const ListNative = forwardRef(function DynamicHeightList(
     registerComponentApi?.({
       scrollToBottom,
       scrollToTop,
+      scrollToIndex,
+      scrollToId
     });
-  }, [registerComponentApi, scrollToBottom, scrollToTop]);
+  }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop]);
   const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
 
   return (
@@ -394,7 +470,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 <Text>No data available</Text>
               </div>
             ))}
-          {!loading && rows.length > 0 && (
+          {rows.length > 0 && (
             <div
               className={classnames(styles.innerWrapper, {
                 [styles.reverse]: scrollAnchor === "bottom",
@@ -406,7 +482,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
               <Virtualizer
                 ref={virtualizerRef}
                 scrollRef={scrollElementRef}
-                shift={isPrepend.current}
+                shift={shift}
                 onScroll={onScroll}
                 startMargin={!hasOutsideScroll ? 0 : parentRef.current?.offsetTop || 0}
                 item={Item as CustomItemComponent}
@@ -415,11 +491,11 @@ export const ListNative = forwardRef(function DynamicHeightList(
                   const key = row[idKey];
                   switch (row._row_type) {
                     case RowType.SECTION:
-                      return sectionRenderer?.(row, key) || <div key={key} />;
+                      return <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>;
                     case RowType.SECTION_FOOTER:
-                      return sectionFooterRenderer?.(row, key) || <div key={key} />;
+                      return <Fragment key={key}>{sectionFooterRenderer?.(row, key) || <div />}</Fragment>;
                     default:
-                      return itemRenderer(row, key) || <div key={key} />;
+                      return <Fragment key={key}>{itemRenderer(row, key) || <div />}</Fragment>;
                   }
                 })}
               </Virtualizer>

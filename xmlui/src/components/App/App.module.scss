@@ -159,6 +159,9 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
 
   &.noScrollbarGutters {
     scrollbar-gutter: auto;
+    .PagesWrapper{
+        scrollbar-gutter: auto;
+    }
   }
 }
 

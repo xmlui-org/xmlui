@@ -141,20 +141,24 @@ function updateQueriesWithResult(
         draft.pages[draft.pages.length - 1] = draft.pages[draft.pages.length - 1].map(
           (item: any) =>
             item.id === optimisticValue.id && item._initiatorClientTxId === clientTxId
-              ? result
+              ? result || {
+                  ...item,
+                  _optimisticValue: undefined,
+                  _initiatorClientTxId: undefined,
+                }
               : item,
         );
       } else {
         let updated = false;
         draft.pages.forEach((page: any) => {
           page?.forEach((item: any) => {
-            if (item.id === result.id) {
+            if (item.id === result?.id) {
               Object.assign(item, result);
               updated = true;
             }
           });
         });
-        if (!updated) {
+        if (!updated && result) {
           draft.pages[draft.pages.length - 1].push(result);
         }
       }
@@ -162,18 +166,26 @@ function updateQueriesWithResult(
       if (optimisticValue) {
         draft.forEach((item: any, index: number) => {
           if (item.id === optimisticValue.id && item._initiatorClientTxId === clientTxId) {
-            draft[index] = result;
+            draft[index] = result || {
+              ...item,
+              _optimisticValue: undefined,
+              _initiatorClientTxId: undefined,
+            };
           }
         });
       } else {
         let updated = false;
         draft.forEach((item: any, index: number) => {
           if (item.id === result.id) {
-            draft[index] = result;
+            draft[index] = result || {
+              ...item,
+              _optimisticValue: undefined,
+              _initiatorClientTxId: undefined,
+            };
             updated = true;
           }
         });
-        if (!updated) {
+        if (!updated && result) {
           draft.push(result);
         }
       }

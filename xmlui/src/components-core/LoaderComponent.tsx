@@ -82,6 +82,9 @@ export function LoaderComponent({
   // --- Memoizes the action resolution by action definition value
   const memoedLookupSyncCallback: LookupSyncFn = useCallback(
     (action) => {
+      if(!action){
+        return undefined;
+      }
       return lookupSyncCallback(valueExtractor(action), uid);
     },
     [lookupSyncCallback, uid, valueExtractor],
