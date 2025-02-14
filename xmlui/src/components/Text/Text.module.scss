@@ -43,9 +43,13 @@ $themeVars: ();
   padding: 0;
   min-height: fit-content;
 
+  //text inside text should be inline
   .text {
-    //text inside text should be inline
     display: inline;
+  }
+
+  .text.codefence {
+    display: block;
   }
 
   &.abbr {
