@@ -19,7 +19,8 @@ export const TableOfContentsMd = createMetadata({
         `of contents items into view.`,
     ),
     maxHeadingLevel: d(
-      `Defines the maximum heading level to include in the table of contents. Headings with a level greater than this value will be excluded.`,
+      "Defines the maximum heading level to include in the table of contents. Headings " +
+        "with a level greater than this value will be excluded.",
     ),
   },
   themeVars: parseScssVar(styles.themeVars),
