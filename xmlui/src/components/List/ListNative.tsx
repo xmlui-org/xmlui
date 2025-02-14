@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { CSSProperties, Fragment, ReactNode } from "react";
 import React, {
   createContext,
   forwardRef,
@@ -450,6 +450,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 ref={virtualizerRef}
                 scrollRef={scrollElementRef}
                 shift={isPrepend.current}
+                overscan={10}
                 onScroll={onScroll}
                 startMargin={!hasOutsideScroll ? 0 : parentRef.current?.offsetTop || 0}
                 item={Item as CustomItemComponent}
@@ -458,11 +459,11 @@ export const ListNative = forwardRef(function DynamicHeightList(
                   const key = row[idKey];
                   switch (row._row_type) {
                     case RowType.SECTION:
-                      return sectionRenderer?.(row, key) || <div key={key} />;
+                      return <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>;
                     case RowType.SECTION_FOOTER:
-                      return sectionFooterRenderer?.(row, key) || <div key={key} />;
+                      return <Fragment key={key}>{sectionFooterRenderer?.(row, key) || <div />}</Fragment>;
                     default:
-                      return itemRenderer(row, key) || <div key={key} />;
+                      return <Fragment key={key}>{itemRenderer(row, key) || <div />}</Fragment>;
                   }
                 })}
               </Virtualizer>
