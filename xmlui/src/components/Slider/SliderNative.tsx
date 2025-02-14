@@ -70,8 +70,8 @@ export const Slider = forwardRef(
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
     const inputRef = useRef(null);
-
     const [localValue, setLocalValue] = React.useState([]);
+
     useEffect(() => {
       if (typeof value === "object") {
         setLocalValue(value);

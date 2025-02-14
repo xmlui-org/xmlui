@@ -72,7 +72,6 @@ import { TabItemMd } from "./Tabs/TabItem";
 import { FragmentMd } from "../components-core/Fragment";
 import { TreeMd } from "./Tree/TreeComponent";
 import { APICallMd } from "./APICall/APICall";
-import { ChartMd } from "./Chart/Chart";
 import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
 import { IconInfoCardMd } from "./IconInfoCard/IconInfoCard";
@@ -309,7 +308,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Card: CardMd,
   Carousel: CarouselMd,
   ChangeListener: ChangeListenerMd,
-  Chart: ChartMd,
   Checkbox: CheckboxMd,
   CODE: HtmlCodeMd,
   Column: ColumnMd,

@@ -75,7 +75,6 @@ import { logoComponentRenderer } from "./Logo/Logo";
 import { radioGroupRenderer } from "./RadioGroup/RadioGroup";
 import { SlotHolder } from "../components-core/Slot";
 import { fileInputRenderer } from "./FileInput/FileInput";
-import { chartRenderer } from "./Chart/Chart";
 import { spinnerComponentRenderer } from "./Spinner/Spinner";
 import { markdownComponentRenderer } from "./Markdown/Markdown";
 import { selectComponentRenderer } from "./Select/Select";
@@ -147,6 +146,7 @@ import {
   htmlArticleTagRenderer,
   htmlAsideTagRenderer,
   htmlATagRenderer,
+  htmlAbbrTagRenderer,
   htmlAudioTagRenderer,
   htmlBdiTagRenderer,
   htmlBdoTagRenderer,
@@ -242,6 +242,7 @@ import {
   htmlVideoTagRenderer,
   htmlWbrTagRenderer,
 } from "./HtmlTags/HtmlTags";
+import {colorPickerComponentRenderer} from "./ColorPicker/ColorPicker";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -428,6 +429,9 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_Card !== "false") {
       this.registerCoreComponent(cardComponentRenderer);
     }
+    if (process.env.VITE_USED_COMPONENTS_ColorPicker !== "false") {
+      this.registerCoreComponent(colorPickerComponentRenderer);
+    }
     if (process.env.VITE_USED_COMPONENTS_FlowLayout !== "false") {
       this.registerCoreComponent(flowLayoutComponentRenderer);
     }
@@ -530,6 +534,7 @@ export class ComponentRegistry {
     this.registerCoreComponent(backdropComponentRenderer);
 
     this.registerCoreComponent(htmlATagRenderer);
+    this.registerCoreComponent(htmlAbbrTagRenderer);
     this.registerCoreComponent(htmlAddressTagRenderer);
     this.registerCoreComponent(htmlAreaTagRenderer);
     this.registerCoreComponent(htmlArticleTagRenderer);
@@ -628,10 +633,6 @@ export class ComponentRegistry {
     this.registerCoreComponent(htmlVarTagRenderer);
     this.registerCoreComponent(htmlVideoTagRenderer);
     this.registerCoreComponent(htmlWbrTagRenderer);
-
-    if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
-      this.registerCoreComponent(chartRenderer);
-    }
 
     this.registerActionFn(apiAction);
     this.registerActionFn(downloadAction);

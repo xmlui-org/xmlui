@@ -43,9 +43,15 @@ $themeVars: ();
   padding: 0;
   min-height: fit-content;
 
+  //text inside text should be inline
   .text {
-    //text inside text should be inline
     display: inline;
+  }
+
+  // codefence/<pre> elements are block level by default
+  // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/pre
+  .text.codefence {
+    display: block;
   }
 
   &.abbr {

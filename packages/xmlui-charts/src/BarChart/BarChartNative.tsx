@@ -18,6 +18,10 @@ export type BarChartProps = {
   stacked?: boolean;
   dataKeys?: string[];
   style?: React.CSSProperties;
+  hideTickX?: boolean;
+  hideTickY?: boolean;
+  hideX?: boolean;
+  hideY?: boolean;
 };
 
 export function BarChart({
@@ -26,6 +30,10 @@ export function BarChart({
   nameKey,
   stacked = false,
   dataKeys = [],
+  hideTickX = false,
+  hideTickY = false,
+  hideY = false,
+  hideX = false,
   style,
 }: BarChartProps) {
   const colors = useColors(
@@ -65,12 +73,18 @@ export function BarChart({
   return (
     <ResponsiveContainer style={style}>
       <ChartContainer config={config}>
-        <RBarChart accessibilityLayer data={data} layout={layout}>
+        <RBarChart
+          accessibilityLayer
+          data={data}
+          layout={layout}
+          margin={{ left: 10, top: 0, bottom: 0, right: 10 }}
+        >
           <CartesianGrid vertical={true} strokeDasharray="3 3" />
           {layout === "vertical" ? (
             <>
-              <XAxis type="number" axisLine={false} />
+              <XAxis type="number" axisLine={false} hide={hideX} />
               <YAxis
+                hide={hideY}
                 dataKey={nameKey}
                 type="category"
                 interval={"equidistantPreserveStart"}
@@ -98,8 +112,11 @@ export function BarChart({
                     day: "numeric",
                   });
                 }}
+                tick={!hideTickX}
+                height={hideX ? 0 : 30}
+                hide={hideX}
               />
-              <YAxis type="number" axisLine={false} />
+              <YAxis type="number" axisLine={false} tick={!hideTickY} hide={hideY} width={hideY ? 0 : 60} />
             </>
           )}
           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />

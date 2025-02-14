@@ -8,6 +8,9 @@ The `Text` component displays textual information in a number of optional styles
 
 You can learn more about this component in the [Working with Text](/learning/using-components/text) article.
 
+Also note that variants of the `Text` component are also mapped to HtmlTag components.
+See the [variant](#variant) section to check which variant maps to which HtmlTag.
+
 ## Properties
 
 ### `ellipses`
@@ -358,6 +361,28 @@ Available values:
     </App>
   `}
 />
+
+#### HtmlTag Mappings
+
+The table below indicates which Text `variant` maps to which HtmlTag component.
+
+| Variant     | Component |
+| ----------- | --------- |
+| `abbr`      | abbr      |
+| `cite`      | cite      |
+| `code`      | code      |
+| `codefence` | pre       |
+| `deleted`   | del       |
+| `inserted`  | ins       |
+| `keyboard`  | kbd       |
+| `marked`    | mark      |
+| `sample`    | samp      |
+| `sub`       | sub       |
+| `sup`       | sup       |
+| `var`       | var       |
+| `strong`    | strong    |
+| `em`        | em        |
+| `paragraph` | p         |
 
 ## Events
 

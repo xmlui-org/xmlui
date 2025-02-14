@@ -1,8 +1,8 @@
 import {
-  CSSProperties,
-  ForwardedRef,
+  type CSSProperties,
+  type ForwardedRef,
   forwardRef,
-  ReactNode,
+  type ReactNode,
   useContext,
   useEffect,
   useRef,
@@ -30,6 +30,7 @@ export type HeadingProps = {
   ellipses?: boolean;
   title?: string;
   className?: string;
+  [furtherProps: string]: any;
 };
 
 export const Heading = forwardRef(function Heading(
@@ -44,6 +45,7 @@ export const Heading = forwardRef(function Heading(
     preserveLinebreaks,
     ellipses = true,
     className,
+    ...furtherProps
   }: HeadingProps,
   forwardedRef: ForwardedRef<HTMLHeadingElement>,
 ) {
@@ -91,6 +93,7 @@ export const Heading = forwardRef(function Heading(
         [styles.preserveLinebreaks]: preserveLinebreaks,
         [styles.noEllipsis]: !ellipses,
       })}
+      {...furtherProps}
     >
       {anchorId && observeIntersection && (
         <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0 }} />
