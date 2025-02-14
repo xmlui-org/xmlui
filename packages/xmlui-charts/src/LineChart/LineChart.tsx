@@ -19,15 +19,19 @@ export const LineChartMd = createMetadata({
     hideTooltip: d(
       "Determines whether the tooltip should be hidden. If set to true, no tooltip will be shown when hovering over data points.",
     ),
+    tickFormatter: d(
+      "A function that formats the axis tick labels. It receives a tick value and returns a formatted string.",
+    ),
   },
 });
 
 export const lineChartComponentRenderer = createComponentRenderer(
   COMP,
   LineChartMd,
-  ({ extractValue, node, layoutCss }: any) => {
+  ({ extractValue, node, layoutCss, lookupSyncCallback }: any) => {
     return (
       <LineChart
+        tickFormatter={lookupSyncCallback(node.props?.tickFormatter)}
         data={extractValue(node.props?.data)}
         style={layoutCss}
         dataKeys={extractValue(node.props?.dataKeys)}

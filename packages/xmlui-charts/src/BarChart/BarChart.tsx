@@ -34,16 +34,20 @@ export const BarChartMd = createMetadata({
     hideTickY: d(
       "Controls the visibility of the Y-axis ticks. If set to true, tick labels on the Y-axis will be hidden.",
     ),
+    tickFormatter: d(
+      "A function that formats the axis tick labels. It receives a tick value and returns a formatted string.",
+    ),
   },
 });
 
 export const barChartComponentRenderer = createComponentRenderer(
   COMP,
   BarChartMd,
-  ({ extractValue, node, layoutCss }: any) => {
+  ({ extractValue, node, layoutCss, lookupSyncCallback }: any) => {
     return (
       <BarChart
         style={layoutCss}
+        tickFormatter={lookupSyncCallback(node.props?.tickFormatter)}
         data={extractValue(node.props?.data)}
         layout={extractValue(node.props?.layout)}
         nameKey={extractValue(node.props?.nameKey)}

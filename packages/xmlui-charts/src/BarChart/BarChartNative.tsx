@@ -22,6 +22,7 @@ export type BarChartProps = {
   hideTickY?: boolean;
   hideX?: boolean;
   hideY?: boolean;
+  tickFormatter?: (value: any) => any;
 };
 
 export function BarChart({
@@ -34,6 +35,7 @@ export function BarChart({
   hideTickY = false,
   hideY = false,
   hideX = false,
+  tickFormatter = (value) => value,
   style,
 }: BarChartProps) {
   const colors = useColors(
@@ -89,13 +91,7 @@ export function BarChart({
                 type="category"
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
-                tickFormatter={(value) => {
-                  const date = new Date(value);
-                  return date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  });
-                }}
+                tickFormatter={tickFormatter}
               />
             </>
           ) : (
@@ -105,18 +101,18 @@ export function BarChart({
                 type="category"
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
-                tickFormatter={(value) => {
-                  const date = new Date(value);
-                  return date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  });
-                }}
+                tickFormatter={tickFormatter}
                 tick={!hideTickX}
                 height={hideX ? 0 : 30}
                 hide={hideX}
               />
-              <YAxis type="number" axisLine={false} tick={!hideTickY} hide={hideY} width={hideY ? 0 : 60} />
+              <YAxis
+                type="number"
+                axisLine={false}
+                tick={!hideTickY}
+                hide={hideY}
+                width={hideY ? 0 : 60}
+              />
             </>
           )}
           <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
