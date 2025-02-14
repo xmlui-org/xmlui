@@ -159,7 +159,17 @@ export function useTableOfContents() {
   const context = useContext(TableOfContentsContext);
 
   if (!context) {
-    throw new Error("useTableOfContents must be used within a TableOfContentsProvider");
+    throw new Error(`The TableOfContents component can only be used inside a Page component.
+    <App>
+        <Pages>
+          <Page url="/">
+            <Heading>Harry Potter and the Sorcerer's Stone</Heading>
+            <TableOfContents />
+          </Page>
+        </Pages>
+    </App>
+    
+    `);
   }
 
   return context;
