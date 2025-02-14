@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
@@ -7,6 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { LocalLink } from "../Link/LinkNative";
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
+import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
 
 export const HtmlAMd = createMetadata({
   status: "experimental",
@@ -31,7 +31,7 @@ export const htmlATagRenderer = createComponentRenderer(
   "a",
   HtmlAMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <LocalLink
         to={extractValue(node.props.href)}
@@ -55,7 +55,7 @@ export const htmlAbbrTagRenderer = createComponentRenderer(
   "abbr",
   HtmlAbbrMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="abbr">
         {renderChild(node.children)}
@@ -413,7 +413,7 @@ export const htmlCiteTagRenderer = createComponentRenderer(
   "cite",
   HtmlCiteMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="cite">
         {renderChild(node.children)}
@@ -432,7 +432,7 @@ export const htmlCodeTagRenderer = createComponentRenderer(
   "code",
   HtmlCodeMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="code">
         {renderChild(node.children)}
@@ -567,7 +567,7 @@ export const htmlDelTagRenderer = createComponentRenderer(
   "del",
   HtmlDelMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text
         style={layoutCss}
@@ -720,7 +720,7 @@ export const htmlEMTagRenderer = createComponentRenderer(
   "em",
   HtmlEMMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="em">
         {renderChild(node.children)}
@@ -900,7 +900,7 @@ export const htmlH1TagRenderer = createComponentRenderer(
   "h1",
   HtmlH1Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Heading style={layoutCss} {...renderedProps} level="h1">
         {renderChild(node.children)}
@@ -919,7 +919,7 @@ export const htmlH2TagRenderer = createComponentRenderer(
   "h2",
   HtmlH2Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Heading style={layoutCss} {...renderedProps} level="h2">
         {renderChild(node.children)}
@@ -938,7 +938,7 @@ export const htmlH3TagRenderer = createComponentRenderer(
   "h3",
   HtmlH3Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Heading style={layoutCss} {...renderedProps} level="h3">
         {renderChild(node.children)}
@@ -957,7 +957,7 @@ export const htmlH4TagRenderer = createComponentRenderer(
   "h4",
   HtmlH4Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Heading style={layoutCss} {...renderedProps} level="h4">
         {renderChild(node.children)}
@@ -976,7 +976,7 @@ export const htmlH5TagRenderer = createComponentRenderer(
   "h5",
   HtmlH5Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Heading style={layoutCss} {...renderedProps} level="h5">
         {renderChild(node.children)}
@@ -995,7 +995,7 @@ export const htmlH6TagRenderer = createComponentRenderer(
   "h6",
   HtmlH6Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Heading style={layoutCss} {...renderedProps} level="h6">
         {renderChild(node.children)}
@@ -1221,7 +1221,7 @@ export const htmlInsTagRenderer = createComponentRenderer(
   "ins",
   HtmlInsMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text
         style={layoutCss}
@@ -1246,7 +1246,7 @@ export const htmlKbdTagRenderer = createComponentRenderer(
   "kbd",
   HtmlKbdMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="keyboard">
         {renderChild(node.children)}
@@ -1373,7 +1373,7 @@ export const htmlMarkTagRenderer = createComponentRenderer(
   "mark",
   HtmlMarkMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="marked">
         {renderChild(node.children)}
@@ -1625,7 +1625,7 @@ export const htmlPTagRenderer = createComponentRenderer(
   "p",
   HtmlPMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="paragraph">
         {renderChild(node.children)}
@@ -1691,7 +1691,7 @@ export const htmlPreTagRenderer = createComponentRenderer(
   "pre",
   HtmlPreMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="codefence">
         {renderChild(node.children)}
@@ -1836,7 +1836,7 @@ export const htmlSampTagRenderer = createComponentRenderer(
   "samp",
   HtmlSampMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="sample">
         {renderChild(node.children)}
@@ -1912,7 +1912,7 @@ export const htmlSmallTagRenderer = createComponentRenderer(
   "small",
   HtmlSmallMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="small">
         {renderChild(node.children)}
@@ -1984,7 +1984,7 @@ export const htmlStrongTagRenderer = createComponentRenderer(
   "strong",
   HtmlStrongMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="strong">
         {renderChild(node.children)}
@@ -2003,7 +2003,7 @@ export const htmlSubTagRenderer = createComponentRenderer(
   "sub",
   HtmlSubMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="sub">
         {renderChild(node.children)}
@@ -2041,7 +2041,7 @@ export const htmlSupTagRenderer = createComponentRenderer(
   "sup",
   HtmlSupMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="sup">
         {renderChild(node.children)}
@@ -2071,7 +2071,7 @@ export const htmlTableTagRenderer = createComponentRenderer(
   "table",
   HtmlTableMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <table
         style={layoutCss}
@@ -2103,7 +2103,7 @@ export const htmlTbodyTagRenderer = createComponentRenderer(
   "tbody",
   HtmlTbodyMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <tbody style={layoutCss} className={styles.htmlTbody} {...renderedProps}>
         {renderChild(node.children)}
@@ -2134,7 +2134,7 @@ export const htmlTdTagRenderer = createComponentRenderer(
   "td",
   HtmlTdMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <td
         style={layoutCss}
@@ -2238,7 +2238,7 @@ export const htmlTfootTagRenderer = createComponentRenderer(
   "tfoot",
   HtmlTfootMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <tfoot style={layoutCss} className={styles.htmlTfoot} {...renderedProps}>
         {renderChild(node.children)}
@@ -2268,7 +2268,7 @@ export const htmlThTagRenderer = createComponentRenderer(
   "th",
   HtmlThMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <th
         style={layoutCss}
@@ -2298,7 +2298,7 @@ export const htmlTheadTagRenderer = createComponentRenderer(
   "thead",
   HtmlTheadMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <thead style={layoutCss} className={styles.htmlThead} {...renderedProps}>
         {renderChild(node.children)}
@@ -2322,7 +2322,7 @@ export const htmlTimeTagRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, layoutCss }) => {
     const renderedProps = resolveProps(node, extractValue);
     return (
-      <time style={layoutCss} dateTime={extractValue(node.props.dateTime)} {...renderedProps}>
+      <time style={layoutCss} {...renderedProps}>
         {renderChild(node.children)}
       </time>
     );
@@ -2340,7 +2340,7 @@ export const htmlTrTagRenderer = createComponentRenderer(
   "tr",
   HtmlTrMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <tr style={layoutCss} className={styles.htmlTr} {...renderedProps}>
         {renderChild(node.children)}
@@ -2431,7 +2431,7 @@ export const htmlVarTagRenderer = createComponentRenderer(
   "var",
   HtmlCodeMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="var">
         {renderChild(node.children)}
@@ -2519,25 +2519,4 @@ function resolveProps(
     }
     return acc;
   }, {});
-}
-
-/**
- * Removes unnecessary style related properties so only layoutCss contains them.
- * @param nodeProps properties to clean
- * @param layoutCss which style properties to remove
- * @returns only component-specific properties
- */
-function cleanStyles(nodeProps: any, layoutCss: CSSProperties = {}) {
-  if (nodeProps.hasOwnProperty("style")) {
-    delete nodeProps["style"];
-  }
-  if (nodeProps.hasOwnProperty("class")) {
-    delete nodeProps["class"];
-  }
-  return removeEntries(nodeProps, layoutCss);
-}
-
-function removeEntries(sourceObj: Record<string, any>, filterObj: Record<string, any>) {
-  const filterKeys = Object.keys(filterObj);
-  return Object.fromEntries(Object.entries(sourceObj).filter(([key]) => !filterKeys.includes(key)));
 }
