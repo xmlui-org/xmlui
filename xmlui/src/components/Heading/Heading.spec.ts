@@ -8,6 +8,13 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect(driver.component).toBeAttached();
   });
 
+  test("HtmlTag h1 is rendered", async ({ initTestBed, createHeadingDriver }) => {
+    await initTestBed(`<h1 />`);
+    const driver = await createHeadingDriver();
+
+    await expect(driver.component).toBeAttached();
+  });
+
   // --- value
 
   // correct types: string, undefined, null, number, boolean -> everything will be coerced to strings
@@ -317,4 +324,20 @@ test("Heading overflows container dimensions", async ({
 
   expect(widthHeading).toEqual(widthHeadingExpected);
   expect(widthLayout).toEqual(widthLayoutExpected);
+});
+
+test("Heading accepts custom props not immediately used", async ({ initTestBed, createHeadingDriver }) => {
+  await initTestBed(`<Heading custom="test" boolean>Test Heading</Heading>`);
+  const headingDriver = await createHeadingDriver();
+  
+  await expect(headingDriver.component).toHaveAttribute("custom", "test");
+  await expect(headingDriver.component).toHaveAttribute("boolean", "true");
+});
+
+test("HtmlTag h1 accepts custom props not immediately used", async ({ initTestBed, createHeadingDriver }) => {
+  await initTestBed(`<h1 custom="test" boolean>Test Heading</h1>`);
+  const headingDriver = await createHeadingDriver();
+  
+  await expect(headingDriver.component).toHaveAttribute("custom", "test");
+  await expect(headingDriver.component).toHaveAttribute("boolean", "true");
 });

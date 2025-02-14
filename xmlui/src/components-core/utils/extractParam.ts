@@ -1,4 +1,4 @@
-import React from "react";
+import React, { type CSSProperties } from "react";
 import { isPlainObject } from "lodash-es";
 
 import type { ContainerState } from "../rendering/ContainerWrapper";
@@ -7,6 +7,7 @@ import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
 import { LRUCache } from "../utils/LruCache";
+import type { ValueExtractor } from "../../abstractions/RendererDefs";
 
 /**
  * Extract the value of the specified parameter from the given view container state
@@ -155,4 +156,59 @@ export function shouldKeep(
     return true;
   }
   return extractParam(componentState, when, appContext, true);
+}
+
+/**
+ * Resolves props that can either be regular properties or URL resources.
+ * It also removes layoutCss props from regular properties.
+ * @param props Component (rest) props
+ * @param extractValue Value extractor function
+ * @param layoutCss Component styles
+ * @param resourceExtraction URL resource extractor function and array that specifies which props are URL resources
+ * @returns properties that are resolved and cleaned of CSS styles
+ */
+export function resolveAndCleanProps<T extends Record<string, any>>(
+  props: Record<string, any>,
+  extractValue: ValueExtractor,
+  layoutCss: CSSProperties = {},
+  resourceExtraction?: {
+    extractResourceUrl: (url?: string) => string | undefined,
+    resourceProps?: string[]
+  },
+): T {
+  const { extractResourceUrl, resourceProps } = resourceExtraction ?? {};
+  const cleanedProps = cleanStyles(props, layoutCss);
+
+  const resultProps: Record<string, any> = {} as any;
+  const result = Object.keys(cleanedProps).reduce((acc, propName) => {
+    if (resourceProps && extractResourceUrl && resourceProps.includes(propName)) {
+      acc[propName] = extractResourceUrl(cleanedProps[propName]);
+    } else {
+      acc[propName] = extractValue(cleanedProps[propName]);
+    }
+    return acc;
+  }, resultProps);
+
+  return result as T;
+}
+
+/**
+ * Removes unnecessary style related properties so only layoutCss contains them.
+ * @param nodeProps properties to clean
+ * @param layoutCss which style properties to remove
+ * @returns only component-specific properties
+ */
+function cleanStyles(nodeProps: Record<string, any>, layoutCss: CSSProperties = {}) {
+  if (nodeProps.hasOwnProperty("style")) {
+    delete nodeProps["style"];
+  }
+  if (nodeProps.hasOwnProperty("class")) {
+    delete nodeProps["class"];
+  }
+  return removeEntries(nodeProps, layoutCss);
+
+  function removeEntries(sourceObj: Record<string, any>, filterObj: Record<string, any>) {
+    const filterKeys = Object.keys(filterObj);
+    return Object.fromEntries(Object.entries(sourceObj).filter(([key]) => !filterKeys.includes(key)));
+  }
 }

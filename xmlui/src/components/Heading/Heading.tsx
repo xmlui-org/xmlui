@@ -8,6 +8,7 @@ import type { NonCssLayoutProps, ValueExtractor } from "../../abstractions/Rende
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Heading, type HeadingLevel } from "./HeadingNative";
+import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
 
 const COMP = "Heading";
 
@@ -204,14 +205,16 @@ type RenderHeadingPars = {
 };
 
 function renderHeading({ node, extractValue, layoutCss, level, renderChild }: RenderHeadingPars) {
+  const { maxLines, preserveLinebreaks, ellipses, ...restProps } = node.props;
   return (
     <Heading
       uid={node.uid}
       level={(extractValue.asOptionalString(level) ?? "h1") as HeadingLevel}
-      maxLines={extractValue.asOptionalNumber(node.props.maxLines)}
-      preserveLinebreaks={extractValue.asOptionalBoolean(node.props.preserveLinebreaks, false)}
-      ellipses={extractValue.asOptionalBoolean(node.props.ellipses, true)}
+      maxLines={extractValue.asOptionalNumber(maxLines)}
+      preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
+      ellipses={extractValue.asOptionalBoolean(ellipses, true)}
       style={layoutCss}
+      {...resolveAndCleanProps(restProps, extractValue, layoutCss)}
     >
       {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}
     </Heading>

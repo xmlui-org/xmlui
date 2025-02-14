@@ -116,6 +116,7 @@ export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
   ({ node, extractValue, layoutCss, renderChild }) => {
+    // TEMP: Need to use the resolveAndCleanProps function here and handle VariantTypes correctly
     const { variant, maxLines, preserveLinebreaks, ellipses, value, ...variantSpecific } =
       node.props;
     
