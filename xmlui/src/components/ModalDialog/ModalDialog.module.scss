@@ -9,8 +9,8 @@ $themeVars: ();
 }
 
 // --- Theme vars for paddings
-$themeVars: t.appendPaddingVars($themeVars, $component) !global;
-$themeVars: t.appendPaddingVars($themeVars, "overlay-#{$component}") !global;
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, "overlay-#{$component}");
 $padding-ModalDialog: createThemeVar("padding-#{$component}");
 $color-bg-ModalDialog: createThemeVar("Dialog:color-bg-#{$component}");
 $color-bg-overlay-ModalDialog: createThemeVar("Dialog:color-bg-overlay-#{$component}");
@@ -59,7 +59,7 @@ $margin-bottom-title-ModalDialog: createThemeVar("Dialog:margin-bottom-title-#{$
   border-radius: $radius-ModalDialog;
   font-family: $font-family-ModalDialog;
   color: $color-text-ModalDialog;
-  padding: $padding-ModalDialog;
+  @include t.paddingVars($themeVars, $component);
   box-shadow: t.$shadow-spread;
   transform: translate(0);
   width: 90vw;
