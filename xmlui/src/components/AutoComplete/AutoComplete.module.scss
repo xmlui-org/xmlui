@@ -8,6 +8,7 @@ $themeVars: ();
 }
 
 $componentName: "AutoComplete";
+$themeVars: t.composePaddingVars($themeVars, "#{$componentName}-badge");
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
@@ -88,7 +89,7 @@ $componentName: "AutoComplete";
   width: fit-content;
   height: fit-content;
   min-width: 0;
-  padding: createThemeVar("padding-vertical-#{$componentName}-badge") createThemeVar("padding-horizontal-#{$componentName}-badge");
+  @include t.paddingVars($themeVars, "#{$componentName}-badge");
   transition: color 0.2s, background-color 0.2s;
   user-select: none;
   cursor: pointer;

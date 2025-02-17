@@ -6,34 +6,32 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$component: "Text";
 @mixin textVariant($variant) {
-  font-family: createThemeVar("font-family-Text-#{$variant}");
-  font-size: createThemeVar("font-size-Text-#{$variant}");
-  font-weight: createThemeVar("font-weight-Text-#{$variant}");
-  font-style: createThemeVar("font-style-Text-#{$variant}");
-  font-stretch: createThemeVar("font-stretch-Text-#{$variant}");
-  text-decoration-line: createThemeVar('line-decoration-Text-#{$variant}');
-  text-decoration-color: createThemeVar('color-decoration-Text-#{$variant}');
-  text-decoration-style: createThemeVar('style-decoration-Text-#{$variant}');
-  text-decoration-thickness: createThemeVar('thickness-decoration-Text-#{$variant}');
-  text-underline-offset: createThemeVar('offset-decoration-Text-#{$variant}');
-  line-height: createThemeVar("line-height-Text-#{$variant}");
+  $themeVars: t.composePaddingVars($themeVars, "#{$component}-#{$variant}");
+  font-family: createThemeVar("font-family-#{$component}-#{$variant}");
+  font-size: createThemeVar("font-size-#{$component}-#{$variant}");
+  font-weight: createThemeVar("font-weight-#{$component}-#{$variant}");
+  font-style: createThemeVar("font-style-#{$component}-#{$variant}");
+  font-stretch: createThemeVar("font-stretch-#{$component}-#{$variant}");
+  text-decoration-line: createThemeVar('line-decoration-#{$component}-#{$variant}');
+  text-decoration-color: createThemeVar('color-decoration-#{$component}-#{$variant}');
+  text-decoration-style: createThemeVar('style-decoration-#{$component}-#{$variant}');
+  text-decoration-thickness: createThemeVar('thickness-decoration-#{$component}-#{$variant}');
+  text-underline-offset: createThemeVar('offset-decoration-#{$component}-#{$variant}');
+  line-height: createThemeVar("line-height-#{$component}-#{$variant}");
   color: createThemeVar("color-Text-#{$variant}");
-  background-color: createThemeVar("color-bg-Text-#{$variant}");
-  border-radius: createThemeVar("border-radius-Text-#{$variant}");
-  border-color: createThemeVar("color-border-Text-#{$variant}");
-  border-width: createThemeVar("thickness-border-Text-#{$variant}");
-  border-style: createThemeVar("style-border-Text-#{$variant}");
-  // --- Do not collapse these padding properties; they are intentionally expanded
-  margin-top: createThemeVar("margin-top-Text-#{$variant}");
-  margin-bottom: createThemeVar("margin-bottom-Text-#{$variant}");
-  padding-left: createThemeVar("padding-horizontal-Text-#{$variant}");
-  padding-right: createThemeVar("padding-horizontal-Text-#{$variant}");
-  padding-top: createThemeVar("padding-vertical-Text-#{$variant}");
-  padding-bottom: createThemeVar("padding-vertical-Text-#{$variant}");
-  text-transform: createThemeVar("transform-Text-#{$variant}");
-  vertical-align: createThemeVar("align-vertical-Text-#{$variant}");
-  letter-spacing: createThemeVar("letter-spacing-Text-#{$variant}");
+  background-color: createThemeVar("color-bg-#{$component}-#{$variant}");
+  border-radius: createThemeVar("border-radius-#{$component}-#{$variant}");
+  border-color: createThemeVar("color-border-#{$component}-#{$variant}");
+  border-width: createThemeVar("thickness-border-#{$component}-#{$variant}");
+  border-style: createThemeVar("style-border-#{$component}-#{$variant}");
+  @include t.paddingVars($themeVars, "#{$component}-#{$variant}");
+  margin-top: createThemeVar("margin-top-#{$component}-#{$variant}");
+  margin-bottom: createThemeVar("margin-bottom-#{$component}-#{$variant}");
+  text-transform: createThemeVar("transform-#{$component}-#{$variant}");
+  vertical-align: createThemeVar("align-vertical-#{$component}-#{$variant}");
+  letter-spacing: createThemeVar("letter-spacing-#{$component}-#{$variant}");
 }
 
 .text {

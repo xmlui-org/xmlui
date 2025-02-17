@@ -7,35 +7,32 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$color-text-pagination-Table: createThemeVar("color-text-pagination-Table");
-$color-bg-Table: createThemeVar("color-bg-Table");
-$color-text-Table: createThemeVar("color-text-Table");
-$color-bg-row-Table: createThemeVar("color-bg-row-Table");
-$color-bg-row-Table--hover: createThemeVar("color-bg-row-Table--hover");
-$color-bg-selected-Table: createThemeVar("color-bg-selected-Table");
-$color-bg-selected-Table--hover: createThemeVar("color-bg-selected-Table--hover");
-$color-bg-heading-Table: createThemeVar("color-bg-heading-Table");
-$color-bg-heading-Table--hover: createThemeVar("color-bg-heading-Table--hover");
-$color-bg-heading-Table--active: createThemeVar("color-bg-heading-Table--active");
-$padding-horizontal-heading-Table: createThemeVar("padding-horizontal-heading-Table");
-$padding-vertical-heading-Table: createThemeVar("padding-vertical-heading-Table");
-$padding-heading-Table: createThemeVar("padding-heading-Table");
-$padding-horizontal-cell-Table: createThemeVar("padding-horizontal-cell-Table");
-$padding-horizontal-cell-first-Table: createThemeVar("padding-horizontal-cell-first-Table");
-$padding-horizontal-cell-last-Table: createThemeVar("padding-horizontal-cell-last-Table");
-$padding-vertical-cell-Table: createThemeVar("padding-vertical-cell-Table");
-$padding-cell-Table: createThemeVar("padding-cell-Table");
+$component: "Table";
+$color-text-pagination-Table: createThemeVar("color-text-pagination-#{$component}");
+$color-bg-Table: createThemeVar("color-bg-#{$component}");
+$color-text-Table: createThemeVar("color-text-#{$component}");
+$color-bg-row-Table: createThemeVar("color-bg-row-#{$component}");
+$color-bg-row-Table--hover: createThemeVar("color-bg-row-#{$component}--hover");
+$color-bg-selected-Table: createThemeVar("color-bg-selected-#{$component}");
+$color-bg-selected-Table--hover: createThemeVar("color-bg-selected-#{$component}--hover");
+$color-bg-heading-Table: createThemeVar("color-bg-heading-#{$component}");
+$color-bg-heading-Table--hover: createThemeVar("color-bg-heading-#{$component}--hover");
+$color-bg-heading-Table--active: createThemeVar("color-bg-heading-#{$component}--active");
+$themeVars: t.composePaddingVars($themeVars, "heading-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, "cell-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, "cell-first-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, "cell-last-#{$component}");
 $color-border-cell-Table: createThemeVar("color-border-cell-Table");
-$thickness-border-cell-Table: createThemeVar("thickness-border-cell-Table");
-$style-border-cell-Table: createThemeVar("style-border-cell-Table");
-$border-cell-Table: createThemeVar("border-cell-Table");
-$color-bg-pagination-Table: createThemeVar("color-bg-pagination-Table");
-$color-text-heading-Table: createThemeVar("color-text-heading-Table");
-$font-weight-row-Table: createThemeVar("font-weight-row-Table");
-$font-size-row-Table: createThemeVar("font-size-row-Table");
-$font-weight-heading-Table: createThemeVar("font-weight-heading-Table");
-$font-size-heading-Table: createThemeVar("font-size-heading-Table");
-$transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
+$thickness-border-cell-Table: createThemeVar("thickness-border-cell-#{$component}");
+$style-border-cell-Table: createThemeVar("style-border-cell-#{$component}");
+$border-cell-Table: createThemeVar("border-cell-#{$component}");
+$color-bg-pagination-Table: createThemeVar("color-bg-pagination-#{$component}");
+$color-text-heading-Table: createThemeVar("color-text-heading-#{$component}");
+$font-weight-row-Table: createThemeVar("font-weight-row-#{$component}");
+$font-size-row-Table: createThemeVar("font-size-row-#{$component}");
+$font-weight-heading-Table: createThemeVar("font-weight-heading-#{$component}");
+$font-size-heading-Table: createThemeVar("font-size-heading-#{$component}");
+$transform-text-heading-Table: createThemeVar("transform-text-heading-#{$component}");
 
 .wrapper {
   width: 100%;
@@ -63,7 +60,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
   border: none;
   transition: color 0.2s, background-color 0.2s;
   cursor: pointer;
-  padding: $padding-heading-Table;
+  @include t.paddingVars($themeVars, "heading-#{$component}");
 
   .headerContent {
     padding: 0;
@@ -79,10 +76,10 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
     }
 
     &:focus-visible {
-      outline-width: createThemeVar('thickness-outline-heading-Table--focus');
-      outline-color: createThemeVar('color-outline-heading-Table--focus');
-      outline-style: createThemeVar('style-outline-heading-Table--focus');
-      outline-offset: createThemeVar('offset-outline-heading-Table--focus');
+      outline-width: createThemeVar('thickness-outline-heading-#{$component}--focus');
+      outline-color: createThemeVar('color-outline-heading-#{$component}--focus');
+      outline-style: createThemeVar('style-outline-heading-#{$component}--focus');
+      outline-offset: createThemeVar('offset-outline-heading-#{$component}--focus');
 
     }
   }
@@ -97,7 +94,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
   font-size: $font-size-heading-Table;
   color: $color-text-heading-Table;
   font-weight: $font-weight-heading-Table;
-  padding: $padding-heading-Table;
+  @include t.paddingVars($themeVars, "heading-#{$component}");
 }
 
 .headerRow {
@@ -144,11 +141,11 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 
     .columnCell:first-child {
       .headerContent {
-        padding-left: $padding-horizontal-cell-first-Table;
+        @include t.paddingVars($themeVars, "cell-first-#{$component}");
       }
 
       > button {
-        padding-left: $padding-horizontal-cell-first-Table;
+        @include t.paddingVars($themeVars, "cell-first-#{$component}");
 
         .headerContent {
           padding-left: 0;
@@ -158,11 +155,11 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 
     .columnCell:last-child {
       .headerContent {
-        padding-right: $padding-horizontal-cell-last-Table;
+        @include t.paddingVars($themeVars, "cell-last-#{$component}");
       }
 
       > button {
-        padding-right: $padding-horizontal-cell-last-Table;
+        @include t.paddingVars($themeVars, "cell-last-#{$component}");
 
         .headerContent {
           padding-right: 0;
@@ -171,12 +168,12 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
     }
 
     .cell:first-child {
-      padding-left: $padding-horizontal-cell-first-Table;
+      @include t.paddingVars($themeVars, "cell-first-#{$component}");
       border-left: 0;
     }
 
     .cell:last-child {
-      padding-right: $padding-horizontal-cell-last-Table;
+      @include t.paddingVars($themeVars, "cell-last-#{$component}");
       border-right: 0;
     }
   }
@@ -191,6 +188,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 
       .cell {
         background-color: $color-bg-selected-Table;
+
       }
     }
 
@@ -226,9 +224,9 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 }
 
 .cell {
-  padding: $padding-cell-Table;
   overflow: hidden;
   text-overflow: ellipsis;
+  @include t.paddingVars($themeVars, "cell-#{$component}");
 }
 
 .headerWrapper {

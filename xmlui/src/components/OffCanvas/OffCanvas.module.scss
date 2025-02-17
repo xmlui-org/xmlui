@@ -1,7 +1,6 @@
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
-$component: "OffCanvas";
 
 $themeVars: ();
 @function createThemeVar($componentVariable) {
@@ -9,9 +8,8 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$padding-OffCanvas: createThemeVar("padding-#{$component}");
-$padding-horizontal-OffCanvas: createThemeVar("padding-horizontal-#{$component}");
-$padding-vertical-OffCanvas: createThemeVar("padding-vertical-#{$component}");
+$component: "OffCanvas";
+$themeVars: t.composePaddingVars($themeVars, $component);
 $shadow-vertical-OffCanvas: createThemeVar("shadow-vertical-#{$component}");
 $shadow-horizontal-OffCanvas: createThemeVar("shadow-horizontal-#{$component}");
 $color-bg-OffCanvas: createThemeVar("color-bg-#{$component}");
@@ -42,11 +40,7 @@ $margin-bottom-title-OffCanvas: createThemeVar("margin-bottom-title-#{$component
   z-index: 1000;
   transition: transform 0.3s ease;
   width: $width-OffCanvas;
-  padding: $padding-OffCanvas;
-  padding-left: $padding-horizontal-OffCanvas;
-  padding-right: $padding-horizontal-OffCanvas;
-  padding-top: $padding-vertical-OffCanvas;
-  padding-bottom: $padding-vertical-OffCanvas;
+  @include t.paddingVars($themeVars, $component);
   height: 100vh;
 }
 

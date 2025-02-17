@@ -7,41 +7,39 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$radius-NavLink: createThemeVar("radius-NavLink");
-$color-bg-NavLink: createThemeVar("color-bg-NavLink");
-$color-bg-NavLink--hover: createThemeVar("color-bg-NavLink--hover");
-$color-bg-NavLink--hover--active: createThemeVar("color-bg-NavLink--hover--active");
-$color-bg-NavLink--active: createThemeVar("color-bg-NavLink--active");
-$color-bg-NavLink--pressed: createThemeVar("color-bg-NavLink--pressed");
-$color-bg-NavLink--pressed--active: createThemeVar("color-bg-NavLink--pressed--active");
-$padding-horizontal-NavLink: createThemeVar("padding-horizontal-NavLink");
-$padding-vertical-NavLink: createThemeVar("padding-vertical-NavLink");
-$font-size-NavLink: createThemeVar("font-size-NavLink");
-$color-text-NavLink: createThemeVar("color-text-NavLink");
-$color-text-NavLink--hover: createThemeVar("color-text-NavLink--hover");
-$color-text-NavLink--active: createThemeVar("color-text-NavLink--active");
-$color-text-NavLink--hover--active: createThemeVar("color-text-NavLink--hover--active");
-$color-text-NavLink--pressed: createThemeVar("color-text-NavLink--pressed");
-$color-text-NavLink--pressed--active: createThemeVar("color-text-NavLink--pressed--active");
-$color-icon-NavLink: createThemeVar("color-icon-NavLink");
-$font-family-NavLink: createThemeVar("font-family-NavLink");
-$font-weight-NavLink: createThemeVar("font-weight-NavLink");
-$font-weight-NavLink--pressed: createThemeVar("font-weight-NavLink--pressed");
-$font-weight-NavLink--active: createThemeVar("font-weight-NavLink--active");
-$radius-indicator-NavLink: createThemeVar("radius-indicator-NavLink");
-$thickness-indicator-NavLink: createThemeVar("thickness-indicator-NavLink");
-$color-indicator-NavLink: createThemeVar("color-indicator-NavLink");
-$color-indicator-NavLink--hover: createThemeVar("color-indicator-NavLink--hover");
-$color-indicator-NavLink--active: createThemeVar("color-indicator-NavLink--active");
-$color-indicator-NavLink--pressed: createThemeVar("color-indicator-NavLink--pressed");
+$component: "NavLink";
+$radius-NavLink: createThemeVar("radius-#{$component}");
+$color-bg-NavLink: createThemeVar("color-bg-#{$component}");
+$color-bg-NavLink--hover: createThemeVar("color-bg-#{$component}--hover");
+$color-bg-NavLink--hover--active: createThemeVar("color-bg-#{$component}--hover--active");
+$color-bg-NavLink--active: createThemeVar("color-bg-#{$component}--active");
+$color-bg-NavLink--pressed: createThemeVar("color-bg-#{$component}--pressed");
+$color-bg-NavLink--pressed--active: createThemeVar("color-bg-#{$component}--pressed--active");
+$themeVars: t.composePaddingVars($themeVars, $component);
+$font-size-NavLink: createThemeVar("font-size-#{$component}");
+$color-text-NavLink: createThemeVar("color-text-#{$component}");
+$color-text-NavLink--hover: createThemeVar("color-text-#{$component}--hover");
+$color-text-NavLink--active: createThemeVar("color-text-#{$component}--active");
+$color-text-NavLink--hover--active: createThemeVar("color-text-#{$component}--hover--active");
+$color-text-NavLink--pressed: createThemeVar("color-text-#{$component}--pressed");
+$color-text-NavLink--pressed--active: createThemeVar("color-text-#{$component}--pressed--active");
+$color-icon-NavLink: createThemeVar("color-icon-#{$component}");
+$font-family-NavLink: createThemeVar("font-family-#{$component}");
+$font-weight-NavLink: createThemeVar("font-weight-#{$component}");
+$font-weight-NavLink--pressed: createThemeVar("font-weight-#{$component}--pressed");
+$font-weight-NavLink--active: createThemeVar("font-weight-#{$component}--active");
+$radius-indicator-NavLink: createThemeVar("radius-indicator-#{$component}");
+$thickness-indicator-NavLink: createThemeVar("thickness-indicator-#{$component}");
+$color-indicator-NavLink: createThemeVar("color-indicator-#{$component}");
+$color-indicator-NavLink--hover: createThemeVar("color-indicator-#{$component}--hover");
+$color-indicator-NavLink--active: createThemeVar("color-indicator-#{$component}--active");
+$color-indicator-NavLink--pressed: createThemeVar("color-indicator-#{$component}--pressed");
 
 $transition: color 0.1s, background-color 0.1s;
 
 .content {
   &.base {
-    // --- These padding properties are intentionally kept separated. Do not collapse them!
-    padding: $padding-vertical-NavLink $padding-horizontal-NavLink;
-    //t.useVar($padding-all-navLink, t.$space-2 t.$space-4);
+    @include t.paddingVars($themeVars, $component);
     border: none;
     outline: inherit;
     text-decoration: none;
@@ -95,19 +93,19 @@ $transition: color 0.1s, background-color 0.1s;
 
 
     &:focus-visible{
-      outline-width: createThemeVar('thickness-outline-NavLink--focus');
-      outline-color: createThemeVar('color-outline-NavLink--focus');
-      outline-style: createThemeVar('style-outline-NavLink--focus');
-      outline-offset: createThemeVar('offset-outline-NavLink--focus');
+      outline-width: createThemeVar('thickness-outline-#{$component}--focus');
+      outline-color: createThemeVar('color-outline-#{$component}--focus');
+      outline-style: createThemeVar('style-outline-#{$component}--focus');
+      outline-offset: createThemeVar('offset-outline-#{$component}--focus');
     }
 
     &[role='menuitem']{           //e.g. inside a navGroup, for hover it focuses the item, so it's always visible, that's why we have this selector here
       outline: none;
       &:not(:hover):focus-visible{
-        outline-width: createThemeVar('thickness-outline-NavLink--focus');
-        outline-color: createThemeVar('color-outline-NavLink--focus');
-        outline-style: createThemeVar('style-outline-NavLink--focus');
-        outline-offset: createThemeVar('offset-outline-NavLink--focus');
+        outline-width: createThemeVar('thickness-outline-#{$component}--focus');
+        outline-color: createThemeVar('color-outline-#{$component}--focus');
+        outline-style: createThemeVar('style-outline-#{$component}--focus');
+        outline-offset: createThemeVar('offset-outline-#{$component}--focus');
       }
     }
 

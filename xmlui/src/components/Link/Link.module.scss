@@ -20,7 +20,7 @@ $offset-decoration-Link: createThemeVar("offset-decoration-Link");
 $line-decoration-Link: createThemeVar("line-decoration-Link");
 $style-decoration-Link: createThemeVar("style-decoration-Link");
 $thickness-decoration-Link: createThemeVar("thickness-decoration-Link");
-$padding-icon-Link: createThemeVar("padding-icon-Link");
+$themeVars: t.composePaddingVars($themeVars, "icon-Link");
 $gap-icon-Link: createThemeVar("gap-icon-Link");
 
 .container {
@@ -68,7 +68,7 @@ $gap-icon-Link: createThemeVar("gap-icon-Link");
 }
 
 .iconWrapper {
-  padding: $padding-icon-Link;
+  @include t.paddingVars($themeVars, "icon-Link");
   padding-right: $gap-icon-Link;
   line-height: 0;
 }

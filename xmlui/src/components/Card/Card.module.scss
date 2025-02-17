@@ -7,9 +7,8 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$padding-Card: createThemeVar("padding-Card");
-$padding-horizontal-Card: createThemeVar("padding-horizontal-Card");
-$padding-vertical-Card: createThemeVar("padding-vertical-Card");
+$component: "Card";
+$themeVars: t.composePaddingVars($themeVars, $component);
 $shadow-Card: createThemeVar("shadow-Card");
 $color-bg-Card: createThemeVar("color-bg-Card");
 $radius-Card: createThemeVar("radius-Card");
@@ -19,7 +18,7 @@ $style-border-Card: createThemeVar("style-border-Card");
 $border-Card: createThemeVar("border-Card");
 
 .wrapper {
-  padding: $padding-Card;
+  @include t.paddingVars($themeVars, $component);
   box-shadow: $shadow-Card;
   background-color: $color-bg-Card;
   border: $border-Card;

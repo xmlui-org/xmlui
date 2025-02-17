@@ -351,6 +351,7 @@ $THEME-VAR-PREFIX: xmlui;
 
 // This mixin applies padding variables to a given subject
 @mixin paddingVars($themeVars, $subject) {
+  padding: getThemeVar($themeVars, "padding-#{$subject}");
   padding-left: getThemeVar($themeVars, "padding-left-#{$subject}");
   padding-right: getThemeVar($themeVars, "padding-right-#{$subject}");
   padding-top: getThemeVar($themeVars, "padding-top-#{$subject}");

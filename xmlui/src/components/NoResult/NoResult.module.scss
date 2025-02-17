@@ -7,17 +7,17 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$padding-vertical-NoResult: createThemeVar("padding-vertical-NoResult");
-$gap-icon-NoResult: createThemeVar("gap-icon-NoResult");
-$size-icon-NoResult: createThemeVar("size-icon-NoResult");
+$component: "NoResult";
+$themeVars: t.composePaddingVars($themeVars, $component);
+$gap-icon-NoResult: createThemeVar("gap-icon-#{$component}");
+$size-icon-NoResult: createThemeVar("size-icon-#{$component}");
 
 .wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: $padding-vertical-NoResult;
-  padding-bottom: $padding-vertical-NoResult;
+  @include t.paddingVars($themeVars, $component);
 }
 
 .icon{
