@@ -12,7 +12,7 @@ import {
 } from "../abstractions";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dClick, dGotFocus, dLostFocus } from "../../components/metadata-helpers";
+import { dClick, dGotFocus, dLostFocus, dOrientation } from "../../components/metadata-helpers";
 import { Icon } from "../Icon/IconNative";
 import { Button } from "./ButtonNative";
 
@@ -61,6 +61,7 @@ export const ButtonMd = createMetadata({
       null,
       true,
     ),
+    orientation: dOrientation(COMP),
     icon: d(
       `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
         `recognizes the icon by its name. If no label is specified and an icon is set, the ${COMP} ` +
@@ -190,6 +191,7 @@ export const buttonComponentRenderer = createComponentRenderer(
         size={extractValue(node.props.size)}
         icon={iconName && <Icon name={iconName} />}
         iconPosition={extractValue(node.props.iconPosition)}
+        orientation={extractValue(node.props.orientation)}
         contentPosition={extractValue(node.props.contentPosition)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
         onClick={lookupEventHandler("click")}

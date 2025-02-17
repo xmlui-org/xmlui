@@ -7,125 +7,133 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$component: "Button";
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, "#{$component}-xs");
+$themeVars: t.composePaddingVars($themeVars, "#{$component}-sm");
+$themeVars: t.composePaddingVars($themeVars, "#{$component}-md");
+$themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
+
+
 // --- CSS properties of solid buttons with the specified color scheme
 @mixin solid($colorScheme){
-  font-family: createThemeVar('font-family-Button-#{$colorScheme}-solid');
-  font-size: createThemeVar('font-size-Button-#{$colorScheme}-solid');
-  font-weight: createThemeVar('font-weight-Button-#{$colorScheme}-solid');
-  border-radius: createThemeVar('radius-Button-#{$colorScheme}-solid');
-  border-width: createThemeVar('thickness-border-Button-#{$colorScheme}-solid');
-  border-color: createThemeVar('color-border-Button-#{$colorScheme}-solid');
-  border-style: createThemeVar('style-border-Button-#{$colorScheme}-solid');
-  background: createThemeVar('color-bg-Button-#{$colorScheme}-solid');
-  color: createThemeVar('color-text-Button-#{$colorScheme}-solid');
-  box-shadow: createThemeVar('shadow-Button-#{$colorScheme}-solid');
+  font-family: createThemeVar('font-family-#{$component}-#{$colorScheme}-solid');
+  font-size: createThemeVar('font-size-#{$component}-#{$colorScheme}-solid');
+  font-weight: createThemeVar('font-weight-#{$component}-#{$colorScheme}-solid');
+  border-radius: createThemeVar('radius-#{$component}-#{$colorScheme}-solid');
+  border-width: createThemeVar('thickness-border-#{$component}-#{$colorScheme}-solid');
+  border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-solid');
+  border-style: createThemeVar('style-border-#{$component}-#{$colorScheme}-solid');
+  background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-solid');
+  color: createThemeVar('color-text-#{$component}-#{$colorScheme}-solid');
+  box-shadow: createThemeVar('shadow-#{$component}-#{$colorScheme}-solid');
 
 
   &:focus-visible {
-    outline-width: createThemeVar('thickness-outline-Button-#{$colorScheme}-solid--focus');
-    outline-color: createThemeVar('color-outline-Button-#{$colorScheme}-solid--focus');
-    outline-style: createThemeVar('style-outline-Button-#{$colorScheme}-solid--focus');
-    outline-offset: createThemeVar('offset-outline-Button-#{$colorScheme}-solid--focus');
+    outline-width: createThemeVar('thickness-outline-#{$component}-#{$colorScheme}-solid--focus');
+    outline-color: createThemeVar('color-outline-#{$component}-#{$colorScheme}-solid--focus');
+    outline-style: createThemeVar('style-outline-#{$component}-#{$colorScheme}-solid--focus');
+    outline-offset: createThemeVar('offset-outline-#{$component}-#{$colorScheme}-solid--focus');
   }
 
   &:not([disabled]) {
     &:hover {
-      border-color: createThemeVar('color-border-Button-#{$colorScheme}-solid--hover');
-      color: createThemeVar('color-text-Button-#{$colorScheme}-solid--hover');
-      background: createThemeVar('color-bg-Button-#{$colorScheme}-solid--hover');
+      border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-solid--hover');
+      color: createThemeVar('color-text-#{$component}-#{$colorScheme}-solid--hover');
+      background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-solid--hover');
     }
 
     &:active {
-      border-color: createThemeVar('color-border-Button-#{$colorScheme}-solid--active');
-      color: createThemeVar('color-text-Button-#{$colorScheme}-solid--active');
-      box-shadow: createThemeVar('shadow-Button-#{$colorScheme}-solid--active');
-      background: createThemeVar('color-bg-Button-#{$colorScheme}-solid--active');
+      border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-solid--active');
+      color: createThemeVar('color-text-#{$component}-#{$colorScheme}-solid--active');
+      box-shadow: createThemeVar('shadow-#{$component}-#{$colorScheme}-solid--active');
+      background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-solid--active');
     }
   }
 
   &:disabled {
     cursor: not-allowed;
-    background: createThemeVar('color-bg-Button--disabled');
-    color: createThemeVar('color-text-Button--disabled');
-    border-color: createThemeVar('color-border-Button--disabled');
+    background: createThemeVar('color-bg-#{$component}--disabled');
+    color: createThemeVar('color-text-#{$component}--disabled');
+    border-color: createThemeVar('color-border-#{$component}--disabled');
   }
 }
 
 // --- CSS properties of outlined buttons with the specified color scheme
 @mixin outlined($colorScheme){
-  font-family: createThemeVar('font-family-Button-#{$colorScheme}-outlined');
-  font-size: createThemeVar('font-size-Button-#{$colorScheme}-outlined');
-  font-weight: createThemeVar('font-weight-Button-#{$colorScheme}-outlined');
-  border-radius: createThemeVar('radius-Button-#{$colorScheme}-outlined');
-  border-width: createThemeVar('thickness-border-Button-#{$colorScheme}-outlined');
-  border-color: createThemeVar('color-border-Button-#{$colorScheme}-outlined');
-  border-style: createThemeVar('style-border-Button-#{$colorScheme}-outlined');
-  color: createThemeVar('color-text-Button-#{$colorScheme}-outlined');
-  box-shadow: createThemeVar('shadow-Button-#{$colorScheme}-outlined');
+  font-family: createThemeVar('font-family-#{$component}-#{$colorScheme}-outlined');
+  font-size: createThemeVar('font-size-#{$component}-#{$colorScheme}-outlined');
+  font-weight: createThemeVar('font-weight-#{$component}-#{$colorScheme}-outlined');
+  border-radius: createThemeVar('radius-#{$component}-#{$colorScheme}-outlined');
+  border-width: createThemeVar('thickness-border-#{$component}-#{$colorScheme}-outlined');
+  border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-outlined');
+  border-style: createThemeVar('style-border-#{$component}-#{$colorScheme}-outlined');
+  color: createThemeVar('color-text-#{$component}-#{$colorScheme}-outlined');
+  box-shadow: createThemeVar('shadow-#{$component}-#{$colorScheme}-outlined');
   background: transparent;
 
   &:focus-visible {
-    outline-width: createThemeVar('thickness-outline-Button-#{$colorScheme}-outlined--focus');
-    outline-color: createThemeVar('color-outline-Button-#{$colorScheme}-outlined--focus');
-    outline-style: createThemeVar('style-outline-Button-#{$colorScheme}-outlined--focus');
-    outline-offset: createThemeVar('offset-outline-Button-#{$colorScheme}-outlined--focus');
+    outline-width: createThemeVar('thickness-outline-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-color: createThemeVar('color-outline-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-style: createThemeVar('style-outline-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-offset: createThemeVar('offset-outline-#{$component}-#{$colorScheme}-outlined--focus');
   }
 
   &:not([disabled]) {
     &:hover {
-      border-color: createThemeVar('color-border-Button-#{$colorScheme}-outlined--hover');
-      background: createThemeVar('color-bg-Button-#{$colorScheme}-outlined--hover');
-      color: createThemeVar('color-text-Button-#{$colorScheme}-outlined--hover');
+      border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-outlined--hover');
+      background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-outlined--hover');
+      color: createThemeVar('color-text-#{$component}-#{$colorScheme}-outlined--hover');
     }
 
     &:active {
-      border-color: createThemeVar('color-border-Button-#{$colorScheme}-outlined--active');
-      background: createThemeVar('color-bg-Button-#{$colorScheme}-outlined--active');
-      color: createThemeVar('color-text-Button-#{$colorScheme}-outlined--active');
+      border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-outlined--active');
+      background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-outlined--active');
+      color: createThemeVar('color-text-#{$component}-#{$colorScheme}-outlined--active');
     }
   }
 
   &:disabled {
     cursor: not-allowed;
-    color: createThemeVar('color-text-Button--disabled');
-    border-color: createThemeVar('color-border-Button--disabled');
+    color: createThemeVar('color-text-#{$component}--disabled');
+    border-color: createThemeVar('color-border-#{$component}--disabled');
   }
 }
 
 // --- CSS properties of ghost buttons with the specified color scheme
 @mixin ghost($colorScheme){
-  font-family: createThemeVar('font-family-Button-#{$colorScheme}-ghost');
-  font-size: createThemeVar('font-size-Button-#{$colorScheme}-ghost');
-  font-weight: createThemeVar('font-weight-Button-#{$colorScheme}-ghost');
-  border-radius: createThemeVar('radius-Button-#{$colorScheme}-ghost');
-  border-width: createThemeVar('thickness-border-Button-#{$colorScheme}-ghost');
+  font-family: createThemeVar('font-family-#{$component}-#{$colorScheme}-ghost');
+  font-size: createThemeVar('font-size-#{$component}-#{$colorScheme}-ghost');
+  font-weight: createThemeVar('font-weight-#{$component}-#{$colorScheme}-ghost');
+  border-radius: createThemeVar('radius-#{$component}-#{$colorScheme}-ghost');
+  border-width: createThemeVar('thickness-border-#{$component}-#{$colorScheme}-ghost');
   border-color: transparent;
   border-style: solid;
   background: transparent;
-  color: createThemeVar('color-text-Button-#{$colorScheme}-ghost');
+  color: createThemeVar('color-text-#{$component}-#{$colorScheme}-ghost');
 
   &:focus-visible {
-    outline-width: createThemeVar('thickness-outline-Button-#{$colorScheme}-ghost--focus');
-    outline-color: createThemeVar('color-outline-Button-#{$colorScheme}-ghost--focus');
-    outline-style: createThemeVar('style-outline-Button-#{$colorScheme}-ghost--focus');
-    outline-offset: createThemeVar('offset-outline-Button-#{$colorScheme}-ghost--focus');
+    outline-width: createThemeVar('thickness-outline-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-color: createThemeVar('color-outline-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-style: createThemeVar('style-outline-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-offset: createThemeVar('offset-outline-#{$component}-#{$colorScheme}-ghost--focus');
   }
 
   &:not([disabled]) {
     &:hover {
-      background: createThemeVar('color-bg-Button-#{$colorScheme}-ghost--hover');
-      color: createThemeVar('color-text-Button-#{$colorScheme}-ghost--hover');
+      background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-ghost--hover');
+      color: createThemeVar('color-text-#{$component}-#{$colorScheme}-ghost--hover');
     }
 
     &:active {
-      background: createThemeVar('color-bg-Button-#{$colorScheme}-ghost--active');
-      color: createThemeVar('color-text-Button-#{$colorScheme}-ghost--active');
+      background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-ghost--active');
+      color: createThemeVar('color-text-#{$component}-#{$colorScheme}-ghost--active');
     }
   }
 
   &:disabled {
     cursor: not-allowed;
-    color: createThemeVar('color-text-Button--disabled');
+    color: createThemeVar('color-text-#{$component}--disabled');
   }
 }
 
@@ -161,19 +169,19 @@ $themeVars: ();
   &.buttonHorizontal {
     flex-direction: row;
     &.xs {
-      padding: createThemeVar("padding-vertical-Button-xs") createThemeVar("padding-horizontal-Button-xs");
+      @include t.paddingVars($themeVars, "#{$component}-xs");
     }
 
     &.sm {
-      padding: createThemeVar("padding-vertical-Button-sm") createThemeVar("padding-horizontal-Button-sm");
+      @include t.paddingVars($themeVars, "#{$component}-sm");
     }
 
     &.md {
-      padding: createThemeVar("padding-vertical-Button-md") createThemeVar("padding-horizontal-Button-md");
+      @include t.paddingVars($themeVars, "#{$component}-md");
     }
 
     &.lg {
-      padding: createThemeVar("padding-vertical-Button-lg") createThemeVar("padding-horizontal-Button-lg");
+      @include t.paddingVars($themeVars, "#{$component}-lg");
     }
   }
 
@@ -184,19 +192,19 @@ $themeVars: ();
     height: fit-content;
 
     &.xs {
-      padding: t.$space-0_5 t.$space-1;
+      @include t.paddingVars($themeVars, "#{$component}-xs");
     }
 
     &.sm {
-      padding: t.$space-2;
+      @include t.paddingVars($themeVars, "#{$component}-sm");
     }
 
     &.md {
-      padding: t.$space-4;
+      @include t.paddingVars($themeVars, "#{$component}-md");
     }
 
     &.lg {
-      padding: t.$space-5;
+      @include t.paddingVars($themeVars, "#{$component}-lg");
     }
   }
 

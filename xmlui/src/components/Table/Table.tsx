@@ -126,7 +126,6 @@ export const TableMd = createMetadata({
     [`padding-horizontal-cell-first-${COMP}`]: "$space-5",
     [`padding-horizontal-cell-last-${COMP}`]: "$space-5",
     [`padding-vertical-cell-${COMP}`]: "$space-2",
-    [`padding-cell-${COMP}`]: `$padding-vertical-cell-${COMP} $padding-horizontal-cell-${COMP}`,
     [`thickness-border-cell-${COMP}`]: "1px",
     [`style-border-cell-${COMP}`]: "solid",
     [`border-cell-${COMP}`]: `$thickness-border-cell-${COMP} $style-border-cell-${COMP} $color-border-cell-${COMP}`,

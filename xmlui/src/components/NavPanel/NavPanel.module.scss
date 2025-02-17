@@ -13,9 +13,8 @@ $color-bg-NavPanel: createThemeVar("color-bg-#{$component}");
 $shadow-NavPanel: createThemeVar("shadow-#{$component}");
 $height-NavPanel: createThemeVar("height-AppHeader");
 $max-content-width-NavPanel: createThemeVar("max-content-width-App");
-$padding-horizontal-NavPanel: createThemeVar("padding-horizontal-#{$component}");
-$padding-horizontal-logo-NavPanel: createThemeVar("padding-horizontal-logo-#{$component}");
-$padding-vertical-logo-NavPanel: createThemeVar("padding-vertical-logo-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
 $margin-bottom-logo-NavPanel: createThemeVar("margin-bottom-logo-#{$component}");
 $padding-vertical-AppHeader: createThemeVar("padding-vertical-AppHeader");
 $align-content-AppHeader: createThemeVar("align-content-AppHeader");
@@ -25,6 +24,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
   width: 100%;
   flex-shrink: 0;
   box-shadow: $shadow-NavPanel;
+  @include t.paddingVars($themeVars, $component);
   @include t.borderVars($themeVars, $component);
 
   overflow: auto;
@@ -44,7 +44,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
 
     &:not(.condensed){
       .wrapperInner{
-        padding-inline: $padding-horizontal-NavPanel;
+        padding-inline: createThemeVar("padding-horizontal-#{$component}");
         justify-content: $align-content-AppHeader;
       }
     }
@@ -73,9 +73,9 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
     justify-content: center;
     flex-shrink: 0;
     height: $height-NavPanel;
-    padding-top: calc(#{$padding-vertical-logo-NavPanel} + #{$padding-vertical-AppHeader});
-    padding-bottom: calc(#{$padding-vertical-logo-NavPanel} + #{$padding-vertical-AppHeader});
-    padding-inline: $padding-horizontal-logo-NavPanel;
+    padding-top: calc(#{createThemeVar("padding-vertical-logo-#{$component}")} + #{$padding-vertical-AppHeader});
+    padding-bottom: calc(#{createThemeVar("padding-vertical-logo-#{$component}")} + #{$padding-vertical-AppHeader});
+    padding-inline: createThemeVar("padding-horizontal-logo-#{$component}");
     margin-bottom: $margin-bottom-logo-NavPanel;
   }
 

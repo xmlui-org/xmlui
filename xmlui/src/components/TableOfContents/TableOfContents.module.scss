@@ -6,14 +6,14 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$padding-vertical-TableOfContentsItem: createThemeVar("padding-vertical-TableOfContentsItem");
-$padding-horizontal-TableOfContentsItem: createThemeVar("padding-horizontal-TableOfContentsItem");
-$padding-horizontal-TableOfContentsItem-level-1: createThemeVar("padding-horizontal-TableOfContentsItem-level-1");
-$padding-horizontal-TableOfContentsItem-level-2: createThemeVar("padding-horizontal-TableOfContentsItem-level-2");
-$padding-horizontal-TableOfContentsItem-level-3: createThemeVar("padding-horizontal-TableOfContentsItem-level-3");
-$padding-horizontal-TableOfContentsItem-level-4: createThemeVar("padding-horizontal-TableOfContentsItem-level-4");
-$padding-horizontal-TableOfContentsItem-level-5: createThemeVar("padding-horizontal-TableOfContentsItem-level-5");
-$padding-horizontal-TableOfContentsItem-level-6: createThemeVar("padding-horizontal-TableOfContentsItem-level-6");
+$component: "TableOfContents";
+$themeVars: t.composePaddingVars($themeVars, "#{$component}Item");
+$themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-1");
+$themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-2");
+$themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-3");
+$themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-4");
+$themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-5");
+$themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
 
 .nav {
   background-color: createThemeVar("color-bg-TableOfContents");
@@ -57,31 +57,30 @@ $padding-horizontal-TableOfContentsItem-level-6: createThemeVar("padding-horizon
         letter-spacing: createThemeVar("letter-spacing-TableOfContentsItem");
         overflow-wrap: break-word;
         display: block;
-
-        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem);
+        @include t.paddingVars($themeVars, "#{$component}Item");
 
         &.head_1 {
-          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem)  t.useVar($padding-horizontal-TableOfContentsItem-level-1, $padding-horizontal-TableOfContentsItem);
+          @include t.paddingVars($themeVars, "#{$component}Item-level-1");
         }
 
         &.head_2 {
-          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem)  t.useVar($padding-horizontal-TableOfContentsItem-level-2, $padding-horizontal-TableOfContentsItem);
+          @include t.paddingVars($themeVars, "#{$component}Item-level-2");
         }
 
         &.head_3 {
-          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem)  t.useVar($padding-horizontal-TableOfContentsItem-level-3, $padding-horizontal-TableOfContentsItem);
+          @include t.paddingVars($themeVars, "#{$component}Item-level-3");
         }
 
         &.head_4 {
-          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem)  t.useVar($padding-horizontal-TableOfContentsItem-level-4, $padding-horizontal-TableOfContentsItem);
+          @include t.paddingVars($themeVars, "#{$component}Item-level-4");
         }
 
         &.head_5 {
-          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem)  t.useVar($padding-horizontal-TableOfContentsItem-level-5, $padding-horizontal-TableOfContentsItem);
+          @include t.paddingVars($themeVars, "#{$component}Item-level-5");
         }
 
         &.head_6 {
-          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-6, $padding-horizontal-TableOfContentsItem);
+          @include t.paddingVars($themeVars, "#{$component}Item-level-6");
         }
       }
 

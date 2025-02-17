@@ -20,6 +20,10 @@ $THEME-VAR-PREFIX: xmlui;
   @return var(--#{$THEME-VAR-PREFIX}-#{$componentVariable});
 }
 
+@function createVarWithDefault($componentVariable, $defaultValue) {
+  @return var(--#{$THEME-VAR-PREFIX}-#{$componentVariable}, $defaultValue);
+}
+
 @function countSubstring($string, $delimiter: null) {
   @if (meta.type-of($string) != "string") {
     @return -1;
@@ -242,6 +246,16 @@ $THEME-VAR-PREFIX: xmlui;
   @return $themeVars;
 }
 
+@function appendThemeVarWithDefault($themeVars, $componentVariable, $defaultValue) {
+  $split: str-split($componentVariable, ":");
+  $varName: list.nth($split, -1);
+  $cssVar: createVarWithDefault($varName, $defaultValue);
+  $themeVars: map.set($themeVars, #{$componentVariable}, $cssVar);
+  @return $themeVars;
+}
+
+
+
 @function getThemeVar($themeVars, $componentVariable) {
   @return map.get($themeVars, $componentVariable);
 }
@@ -319,15 +333,29 @@ $THEME-VAR-PREFIX: xmlui;
 // =====================================================================================================================
 // Helper functions for theme variables
 
-@function appendPaddingVars($themeVars, $subject) {
-  $tmp: appendThemeVar($themeVars, "padding-horizontal-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "padding-vertical-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "padding-top-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "padding-bottom-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "padding-left-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "padding-right-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "padding-#{$subject}") !global;
+// This function composes padding variables for a given subject taking into 
+// account all possible padding directions
+@function composePaddingVars($themeVars, $subject) {
+  $tmp: appendThemeVar($themeVars, "padding-#{$subject}") !global;
+  $tmpAll: getThemeVar($tmp, "padding-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "padding-horizontal-#{$subject}", $tmpAll) !global;
+  $tmpHorizontal: getThemeVar($tmp, "padding-horizontal-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "padding-vertical-#{$subject}", $tmpAll) !global;
+  $tmpVertical: getThemeVar($tmp, "padding-vertical-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "padding-left-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "padding-right-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "padding-top-#{$subject}", $tmpVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "padding-bottom-#{$subject}", $tmpVertical) !global;
   @return $tmp;
+}
+
+// This mixin applies padding variables to a given subject
+@mixin paddingVars($themeVars, $subject) {
+  padding: getThemeVar($themeVars, "padding-#{$subject}");
+  padding-left: getThemeVar($themeVars, "padding-left-#{$subject}");
+  padding-right: getThemeVar($themeVars, "padding-right-#{$subject}");
+  padding-top: getThemeVar($themeVars, "padding-top-#{$subject}");
+  padding-bottom: getThemeVar($themeVars, "padding-bottom-#{$subject}");
 }
 
 @function appendBorderVars($themeVars, $subject) {
@@ -354,10 +382,6 @@ $THEME-VAR-PREFIX: xmlui;
   $tmp: appendThemeVar($tmp, "style-border-#{$subject}") !global;
   $tmp: appendThemeVar($tmp, "radius-#{$subject}") !global;
   @return $tmp;
-}
-
-@mixin paddingVars($themeVars, $subject) {
-  padding: getThemeVar($themeVars, "padding-#{$subject}");
 }
 
 @mixin borderVars($themeVars, $subject) {
