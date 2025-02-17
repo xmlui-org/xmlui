@@ -13,9 +13,9 @@ import { existsSync } from "fs";
 
 // Prefilter metadata by isHtmlTag
 const filterByProps = { isHtmlTag: true };
-const [components, lightweightComponents] = partitionMetadata(collectedComponentMetadata, filterByProps);
+const [components, htmlTagComponents] = partitionMetadata(collectedComponentMetadata, filterByProps);
 
-await generateLightweightComponents(lightweightComponents);
+await generateHtmlTagComponents(htmlTagComponents);
 
 await generateComponents(components);
 
@@ -92,7 +92,7 @@ async function generateComponents(metadata) {
   await metadataGenerator.generateArticleAndDownloadsLinks();
 }
 
-async function generateLightweightComponents(metadata) {
+async function generateHtmlTagComponents(metadata) {
   const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
   const metadataGenerator = new DocsGenerator(
     metadata,
@@ -103,7 +103,7 @@ async function generateLightweightComponents(metadata) {
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
-  await metadataGenerator.generateComponentsSummary("Lightweight Components", "lightweight-components.mdx");
+  await metadataGenerator.generateComponentsSummary("HtmlTag Components", "html-tag-components.mdx");
 }
 
 async function cleanFolder(folderToClean) {
@@ -187,7 +187,7 @@ async function dynamicallyLoadExtensionPackages() {
 }
 
 function partitionMetadata(metadata, filterByProps) {
-  const [components, lightweightComponents] = partitionObject(metadata, (compData, c) => {
+  const [components, htmlTagComponents] = partitionObject(metadata, (compData, c) => {
     if (!filterByProps || Object.keys(filterByProps).length === 0) {
       return true;
     }
@@ -201,7 +201,7 @@ function partitionMetadata(metadata, filterByProps) {
     }
   });
 
-  return [components, lightweightComponents];
+  return [components, htmlTagComponents];
 }
 
 /**
