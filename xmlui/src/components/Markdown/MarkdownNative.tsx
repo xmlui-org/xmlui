@@ -1,6 +1,7 @@
 import { type CSSProperties, memo, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { visit } from 'unist-util-visit';
 
 import styles from "./Markdown.module.scss";
 
@@ -9,14 +10,17 @@ import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Image } from "../Image/ImageNative";
 import { Toggle } from "../Toggle/Toggle";
+import { ValueExtractor } from "../../abstractions/RendererDefs";
 
 type MarkdownProps = {
+  extractValue: ValueExtractor;
   removeIndents?: boolean;
   children: ReactNode;
   style?: CSSProperties;
 };
 
 export const Markdown = memo(function Markdown({
+  extractValue,
   removeIndents = false,
   children,
   style,
@@ -30,7 +34,7 @@ export const Markdown = memo(function Markdown({
 
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }]]}
       components={{
         h1({ id, children }) {
           return (
@@ -229,3 +233,24 @@ const ListItem = ({ children, style }: ListItemProps) => {
     </li>
   );
 };
+
+/**
+ * Finds and evaluates given binding expressions in markdown text.
+ * The binding expressions are of the form `${...}$`.
+ * @param extractValue The function to resolve binding expressions
+ * @returns visitor function that processes the binding expressions
+ */
+function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
+  return (tree: any) => {
+    visit(tree, 'text', (node) => {
+      const regex = /\$(.+?)\$/g;
+      const parts: string[] = node.value.split(regex);
+      if (parts.length > 1) {
+        node.type = 'html';
+        node.value = parts.map((part, index) => 
+          index % 2 === 0 ? part : extractValue(part)
+        ).join('');
+      }
+    });
+  };
+}

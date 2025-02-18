@@ -195,7 +195,7 @@ export const H6Md = createMetadata({
 
 type HeadingComponentDef = ComponentDef<typeof HeadingMd>;
 
-type RenderHeadingPars = {
+type RenderHeadingProps = {
   node: HeadingComponentDef;
   extractValue: ValueExtractor;
   layoutCss: CSSProperties;
@@ -204,7 +204,7 @@ type RenderHeadingPars = {
   level: string;
 };
 
-function renderHeading({ node, extractValue, layoutCss, level, renderChild }: RenderHeadingPars) {
+function renderHeading({ node, extractValue, layoutCss, level, renderChild }: RenderHeadingProps) {
   const { maxLines, preserveLinebreaks, ellipses, ...restProps } = node.props;
   return (
     <Heading
