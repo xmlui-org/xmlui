@@ -60,9 +60,11 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
   &.error {
     @include variant("error");
   }
+
   &.warning {
     @include variant("warning");
   }
+
   &.valid {
     @include variant("success");
   }
@@ -76,6 +78,27 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
     .indicator, .datePickerInput {
       cursor: not-allowed;
     }
+  }
+}
+
+.inlinePickerMenu {
+  padding: 0;
+  overflow-y: auto;
+  width: fit-content !important;
+  height: fit-content;
+
+  @include variant("default");
+
+  &.error {
+    @include variant("error");
+  }
+
+  &.warning {
+    @include variant("warning");
+  }
+
+  &.valid {
+    @include variant("success");
   }
 }
 
@@ -97,6 +120,7 @@ $rdp-outline: 2px solid t.useVar($rdp-accent-color);
 $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
 
 .root {
+  width: fit-content;
   margin: 2rem;
 }
 

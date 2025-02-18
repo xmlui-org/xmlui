@@ -1,12 +1,5 @@
-import {
-  CSSProperties,
-  forwardRef,
-  useRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import type { CSSProperties } from "react";
+import { forwardRef, useRef, useCallback, useEffect, useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
 import { format, parse, isValid, parseISO } from "date-fns";
@@ -42,6 +35,7 @@ type Props = {
   fromDate?: string;
   toDate?: string;
   disabledDates?: string[];
+  inline?: boolean;
 };
 
 const enum WeekDays {
@@ -110,6 +104,7 @@ export const DatePicker = forwardRef(function DatePicker(
     disabledDates = [],
     style,
     registerComponentApi,
+    inline = false,
   }: Props,
   forwardedRef: React.Ref<HTMLButtonElement>,
 ) {
@@ -226,7 +221,27 @@ export const DatePicker = forwardRef(function DatePicker(
     [onDidChange, updateState, mode, dateFormat],
   );
 
-  return (
+  return inline ? (
+      <div>
+        <div className={styles.inlinePickerMenu}>
+          <DayPicker
+              fixedWeeks
+              fromDate={startDate}
+              toDate={endDate}
+              disabled={disabled}
+              weekStartsOn={_weekStartsOn}
+              showWeekNumber={showWeekNumber}
+              showOutsideDays
+              classNames={styles}
+              mode={mode === "single" ? "single" : "range"}
+              selected={selected}
+              onSelect={handleSelect}
+              initialFocus
+              numberOfMonths={mode === "range" ? 2 : 1}
+          />
+        </div>
+      </div>
+  ) : (
     <ReactDropdownMenu.Root open={open} onOpenChange={setOpen} modal={false}>
       <ReactDropdownMenu.Trigger asChild>
         <button
