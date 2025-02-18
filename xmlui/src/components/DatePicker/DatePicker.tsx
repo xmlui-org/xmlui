@@ -6,14 +6,14 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dAutoFocus,
   dDidChange,
-  dEnabled,
+  dEnabled, dEndIcon, dEndText,
   dFocus,
   dGotFocus,
   dInitialValue,
   dLostFocus,
   dPlaceholder,
   dReadonly,
-  dSetValueApi,
+  dSetValueApi, dStartIcon, dStartText,
   dValidationStatus,
 } from "../../components/metadata-helpers";
 import { DatePicker } from "./DatePickerNative";
@@ -38,6 +38,10 @@ export const DatePickerMd = createMetadata({
     toDate: d("The end date of the range of selectable dates"),
     disabledDates: d("An array of dates that are disabled"),
     inline: d("The datepicker is displayed inline"),
+    startText: dStartText(),
+    startIcon: dStartIcon(),
+    endText: dEndText(),
+    endIcon: dEndIcon(),
   },
   events: {
     didChange: dDidChange(COMP),
@@ -102,6 +106,10 @@ export const datePickerComponentRenderer = createComponentRenderer(
         toDate={extractValue(node.props.toDate)}
         disabledDates={extractValue(node.props.disabledDates)}
         inline={extractValue.asOptionalBoolean(node.props.inline)}
+        startText={extractValue.asOptionalString(node.props.startText)}
+        startIcon={extractValue.asOptionalString(node.props.startIcon)}
+        endText={extractValue.asOptionalString(node.props.endText)}
+        endIcon={extractValue.asOptionalString(node.props.endIcon)}
       />
     );
   },

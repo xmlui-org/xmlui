@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import React, { CSSProperties } from "react";
 import { forwardRef, useRef, useCallback, useEffect, useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
@@ -14,6 +14,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
+import { Adornment } from "../Input/InputAdornment";
 
 type Props = {
   id?: string;
@@ -36,6 +37,10 @@ type Props = {
   toDate?: string;
   disabledDates?: string[];
   inline?: boolean;
+  startText?: string;
+  startIcon?: string;
+  endText?: string;
+  endIcon?: string;
 };
 
 const enum WeekDays {
@@ -105,6 +110,10 @@ export const DatePicker = forwardRef(function DatePicker(
     style,
     registerComponentApi,
     inline = false,
+    startText,
+    startIcon,
+    endText,
+    endIcon,
   }: Props,
   forwardedRef: React.Ref<HTMLButtonElement>,
 ) {
@@ -222,25 +231,25 @@ export const DatePicker = forwardRef(function DatePicker(
   );
 
   return inline ? (
-      <div>
-        <div className={styles.inlinePickerMenu}>
-          <DayPicker
-              fixedWeeks
-              fromDate={startDate}
-              toDate={endDate}
-              disabled={disabled}
-              weekStartsOn={_weekStartsOn}
-              showWeekNumber={showWeekNumber}
-              showOutsideDays
-              classNames={styles}
-              mode={mode === "single" ? "single" : "range"}
-              selected={selected}
-              onSelect={handleSelect}
-              initialFocus
-              numberOfMonths={mode === "range" ? 2 : 1}
-          />
-        </div>
+    <div>
+      <div className={styles.inlinePickerMenu}>
+        <DayPicker
+          fixedWeeks
+          fromDate={startDate}
+          toDate={endDate}
+          disabled={disabled}
+          weekStartsOn={_weekStartsOn}
+          showWeekNumber={showWeekNumber}
+          showOutsideDays
+          classNames={styles}
+          mode={mode === "single" ? "single" : "range"}
+          selected={selected}
+          onSelect={handleSelect}
+          initialFocus
+          numberOfMonths={mode === "range" ? 2 : 1}
+        />
       </div>
+    </div>
   ) : (
     <ReactDropdownMenu.Root open={open} onOpenChange={setOpen} modal={false}>
       <ReactDropdownMenu.Trigger asChild>
@@ -258,21 +267,25 @@ export const DatePicker = forwardRef(function DatePicker(
           onFocus={handleOnButtonFocus}
           onBlur={handleOnButtonBlur}
         >
-          {mode === "single" && selected ? (
-            <>{format(selected, dateFormat)}</>
-          ) : mode === "range" && typeof selected === "object" && selected.from ? (
-            selected.to ? (
-              <>
-                {format(selected.from, dateFormat)} - {format(selected.to, dateFormat)}
-              </>
+          <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+          <div className={styles.datePickerValue}>
+            {mode === "single" && selected ? (
+              <>{format(selected, dateFormat)}</>
+            ) : mode === "range" && typeof selected === "object" && selected.from ? (
+              selected.to ? (
+                <>
+                  {format(selected.from, dateFormat)} - {format(selected.to, dateFormat)}
+                </>
+              ) : (
+                <>{format(selected.from, dateFormat)}</>
+              )
+            ) : placeholder ? (
+              <span className={styles.placeholder}>{placeholder}</span>
             ) : (
-              <>{format(selected.from, dateFormat)}</>
-            )
-          ) : placeholder ? (
-            <span className={styles.placeholder}>{placeholder}</span>
-          ) : (
-            <span>&nbsp;</span>
-          )}
+              <span>&nbsp;</span>
+            )}
+          </div>
+          <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
         </button>
       </ReactDropdownMenu.Trigger>
       <ReactDropdownMenu.Portal container={root}>
