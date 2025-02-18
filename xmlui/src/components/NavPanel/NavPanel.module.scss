@@ -8,7 +8,7 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$themeVars: t.appendBorderVars($themeVars, $component) !global;
+$themeVars: t.composeBorderVars($themeVars, $component);
 $color-bg-NavPanel: createThemeVar("color-bg-#{$component}");
 $shadow-NavPanel: createThemeVar("shadow-#{$component}");
 $height-NavPanel: createThemeVar("height-AppHeader");
@@ -18,6 +18,7 @@ $themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
 $margin-bottom-logo-NavPanel: createThemeVar("margin-bottom-logo-#{$component}");
 $padding-vertical-AppHeader: createThemeVar("padding-vertical-AppHeader");
 $align-content-AppHeader: createThemeVar("align-content-AppHeader");
+
 .wrapper {
   --footer-height: 0;     //temp solution, it's because of callbackDrive, settings stickyBox to the bottom (we'll have to introduce a smarter stickyBox)
   height: 100%;
@@ -37,10 +38,8 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
   }
 
   &.horizontal{
-    border-right: 0;
     box-shadow: none;
     height: $height-NavPanel;
-
 
     &:not(.condensed){
       .wrapperInner{

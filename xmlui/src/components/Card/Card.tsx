@@ -39,11 +39,7 @@ export const CardMd = createMetadata({
   defaultThemeVars: {
     [`padding-horizontal-${COMP}`]: "$space-4",
     [`padding-vertical-${COMP}`]: "$space-4",
-    [`padding-${COMP}`]: `$padding-vertical-${COMP} $padding-horizontal-${COMP}`,
-    [`color-border-${COMP}`]: "$color-border",
-    [`thickness-border-${COMP}`]: "1px",
-    [`style-border-${COMP}`]: "solid",
-    [`border-${COMP}`]: `$thickness-border-${COMP} $style-border-${COMP} $color-border-${COMP}`,
+    [`border-${COMP}`]: "1px solid $color-border",
     [`radius-${COMP}`]: "$radius",
     [`shadow-${COMP}`]: "none",
     light: {

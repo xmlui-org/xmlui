@@ -9,20 +9,16 @@ $themeVars: ();
 
 $component: "Card";
 $themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, $component);
 $shadow-Card: createThemeVar("shadow-Card");
 $color-bg-Card: createThemeVar("color-bg-Card");
 $radius-Card: createThemeVar("radius-Card");
-$color-border-Card: createThemeVar("color-border-Card");
-$thickness-border-Card: createThemeVar("thickness-border-Card");
-$style-border-Card: createThemeVar("style-border-Card");
-$border-Card: createThemeVar("border-Card");
 
 .wrapper {
+  @include t.borderVars($themeVars, $component);
   @include t.paddingVars($themeVars, $component);
   box-shadow: $shadow-Card;
   background-color: $color-bg-Card;
-  border: $border-Card;
-  border-radius: $radius-Card;
   display: flex;
   flex-direction: column;
   gap: var(--stack-gap-default);

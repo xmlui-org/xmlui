@@ -7,23 +7,28 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$color-text-Link: createThemeVar("color-text-Link");
-$color-text-Link--active: createThemeVar("color-text-Link--active");
-$color-text-Link--hover: createThemeVar("color-text-Link--hover");
-$color-text-Link--hover--active: createThemeVar("color-text-Link--hover--active");
-$font-family-Link: createThemeVar("font-family-Link");
-$font-size-Link: createThemeVar("font-size-Link");
-$font-weight-Link: createThemeVar("font-weight-Link");
-$font-weight-Link--active: createThemeVar("font-weight-Link--active");
-$color-decoration-Link: createThemeVar("color-decoration-Link");
-$offset-decoration-Link: createThemeVar("offset-decoration-Link");
-$line-decoration-Link: createThemeVar("line-decoration-Link");
-$style-decoration-Link: createThemeVar("style-decoration-Link");
-$thickness-decoration-Link: createThemeVar("thickness-decoration-Link");
-$themeVars: t.composePaddingVars($themeVars, "icon-Link");
-$gap-icon-Link: createThemeVar("gap-icon-Link");
+$component: "Link";
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, "icon-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, $component);
+$color-text-Link: createThemeVar("color-text-#{$component}");
+$color-text-Link--active: createThemeVar("color-text-#{$component}--active");
+$color-text-Link--hover: createThemeVar("color-text-#{$component}--hover");
+$color-text-Link--hover--active: createThemeVar("color-text-#{$component}--hover--active");
+$font-family-Link: createThemeVar("font-family-#{$component}");
+$font-size-Link: createThemeVar("font-size-#{$component}");
+$font-weight-Link: createThemeVar("font-weight-#{$component}");
+$font-weight-Link--active: createThemeVar("font-weight-#{$component}--active");
+$color-decoration-Link: createThemeVar("color-decoration-#{$component}");
+$offset-decoration-Link: createThemeVar("offset-decoration-#{$component}");
+$line-decoration-Link: createThemeVar("line-decoration-#{$component}");
+$style-decoration-Link: createThemeVar("style-decoration-#{$component}");
+$thickness-decoration-Link: createThemeVar("thickness-decoration-#{$component}");
+$gap-icon-Link: createThemeVar("gap-icon-#{$component}");
 
 .container {
+  @include t.borderVars($themeVars, $component);
+  @include t.paddingVars($themeVars, $component);
   flex-shrink: 0;
   color: $color-text-Link;
   font-family: $font-family-Link;
@@ -53,10 +58,10 @@ $gap-icon-Link: createThemeVar("gap-icon-Link");
     }
 
     &:focus-visible{
-      outline-width: createThemeVar('thickness-outline-Link--focus');
-      outline-color: createThemeVar('color-outline-Link--focus');
-      outline-style: createThemeVar('style-outline-Link--focus');
-      outline-offset: createThemeVar('offset-outline-Link--focus');
+      outline-width: createThemeVar('thickness-outline-#{$component}--focus');
+      outline-color: createThemeVar('color-outline-#{$component}--focus');
+      outline-style: createThemeVar('style-outline-#{$component}--focus');
+      outline-offset: createThemeVar('offset-outline-#{$component}--focus');
     }
 
     &.active {
@@ -68,7 +73,7 @@ $gap-icon-Link: createThemeVar("gap-icon-Link");
 }
 
 .iconWrapper {
-  @include t.paddingVars($themeVars, "icon-Link");
+  @include t.paddingVars($themeVars, "icon-#{$component}");
   padding-right: $gap-icon-Link;
   line-height: 0;
 }

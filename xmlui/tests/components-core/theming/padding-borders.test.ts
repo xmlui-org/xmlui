@@ -1,0 +1,545 @@
+import { describe, expect, it } from "vitest";
+import { generateBorderSegments } from "../../../src/components-core/theming/transformThemeVars";
+
+describe("generateBorderSegments", () => {
+  it("No border", () => {
+    const newTheme: Record<string, string> = {
+      "color-bg-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "color-bg-AppHeader": "xxx",
+    });
+  });
+
+  it("border-horizontal only", () => {
+    const newTheme: Record<string, string> = {
+      "border-horizontal-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-horizontal-AppHeader": "xxx",
+    });
+  });
+
+  it("border-vertical only", () => {
+    const newTheme: Record<string, string> = {
+      "border-vertical-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-vertical-AppHeader": "xxx",
+    });
+  });
+
+  it("border-top only", () => {
+    const newTheme: Record<string, string> = {
+      "border-top-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-top-AppHeader": "xxx",
+    });
+  });
+
+  it("border-right only", () => {
+    const newTheme: Record<string, string> = {
+      "border-right-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-right-AppHeader": "xxx",
+    });
+  });
+
+  it("border-bottom only", () => {
+    const newTheme: Record<string, string> = {
+      "border-bottom-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-bottom-AppHeader": "xxx",
+    });
+  });
+
+  it("border-left only", () => {
+    const newTheme: Record<string, string> = {
+      "border-left-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-left-AppHeader": "xxx",
+    });
+  });
+
+  it("thickness-border only", () => {
+    const newTheme: Record<string, string> = {
+      "thickness-border-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "thickness-border-AppHeader": "xxx",
+    });
+  });
+
+  it("style-border only", () => {
+    const newTheme: Record<string, string> = {
+      "style-border-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "style-border-AppHeader": "xxx",
+    });
+  });
+
+  it("color-border only", () => {
+    const newTheme: Record<string, string> = {
+      "color-border-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "color-border-AppHeader": "xxx",
+    });
+  });
+
+  it("border: thickness, style, color #1", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid red",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "red",
+    });
+  });
+
+  it("border: thickness, style, color #2", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid rgb(0,0,0)",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid rgb(0,0,0)",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "rgb(0,0,0)",
+    });
+  });
+
+  it("border: thickness, style, color #3", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid #000",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid #000",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "#000",
+    });
+  });
+
+  it("border: thickness, style, color #4", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid #000000",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid #000000",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "#000000",
+    });
+  });
+
+  it("border: thickness, style, color #5", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid hsl(0,0%,0%)",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid hsl(0,0%,0%)",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "hsl(0,0%,0%)",
+    });
+  });
+
+  it("border: thickness, style, color #6", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid hsl(0,0%,0%)",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid hsl(0,0%,0%)",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "hsl(0,0%,0%)",
+    });
+  });
+
+  it("border: thickness, style, color #7", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid hsl(0,0%,0%)",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid hsl(0,0%,0%)",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "hsl(0,0%,0%)",
+    });
+  });
+
+  it("border: thickness, style, color #8", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid hsla(0,0%,0%,0.5)",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid hsla(0,0%,0%,0.5)",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "hsla(0,0%,0%,0.5)",
+    });
+  });
+
+  it("border: thickness, style, color #9", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid rgba(0,0,0,0.5)",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid rgba(0,0,0,0.5)",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "rgba(0,0,0,0.5)",
+    });
+  });
+
+  it("border: thickness, color, style", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px red solid",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px red solid",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "red",
+    });
+  });
+
+  it("border: style, thickness, color", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "solid 1px red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "solid 1px red",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "red",
+    });
+  });
+
+  it("border: style, color, thickness", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "solid red 1px",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "solid red 1px",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "red",
+    });
+  });
+
+  it("border: color, thickness, style", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "red 1px solid",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "red 1px solid",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "red",
+    });
+  });
+
+  it("border: color, style, thickness", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "red solid 1px",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "red solid 1px",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+      "color-border-AppHeader": "red",
+    });
+  });
+
+  it("border: thickness, color", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px red",
+      "thickness-border-AppHeader": "1px",
+      "color-border-AppHeader": "red",
+    });
+  });
+
+  it("border: thickness, style", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid",
+      "thickness-border-AppHeader": "1px",
+      "style-border-AppHeader": "solid",
+    });
+  });
+
+  it("border: thickness, color", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px red",
+      "thickness-border-AppHeader": "1px",
+      "color-border-AppHeader": "red",
+    });
+  });
+
+  it("border: thickness, style, VAR", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px solid $some-color",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px solid $some-color",
+      "color-border-AppHeader": "$some-color",
+      "style-border-AppHeader": "solid",
+      "thickness-border-AppHeader": "1px",
+    });
+  });
+
+  it("border: style, thickness, VAR", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "solid 1px $some-color",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "solid 1px $some-color",
+      "color-border-AppHeader": "$some-color",
+      "style-border-AppHeader": "solid",
+      "thickness-border-AppHeader": "1px",
+    });
+  });
+
+  it("border: thickness, VAR, color", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px $some-style red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px $some-style red",
+      "color-border-AppHeader": "red",
+      "style-border-AppHeader": "$some-style",
+      "thickness-border-AppHeader": "1px",
+    });
+  });
+
+  it("border: color, VAR, thickness", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "red $some-style 1px",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "red $some-style 1px",
+      "color-border-AppHeader": "red",
+      "style-border-AppHeader": "$some-style",
+      "thickness-border-AppHeader": "1px",
+    });
+  });
+
+  it("border: VAR, style, color", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "$some-thickness solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "$some-thickness solid red",
+      "color-border-AppHeader": "red",
+      "style-border-AppHeader": "solid",
+      "thickness-border-AppHeader": "$some-thickness",
+    });
+  });
+
+  it("border: VAR, color, style", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "$some-thickness red solid",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "$some-thickness red solid",
+      "color-border-AppHeader": "red",
+      "style-border-AppHeader": "solid",
+      "thickness-border-AppHeader": "$some-thickness",
+    });
+  });
+
+  it("border: thickness, VAR1, VAR2", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "1px $some-style $some-color",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "1px $some-style $some-color",
+      "color-border-AppHeader": "$some-color",
+      "style-border-AppHeader": "$some-style",
+      "thickness-border-AppHeader": "1px",
+    });
+  });
+
+  it("border: VAR1, style, VAR2", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "$some-thickness solid $some-color",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "$some-thickness solid $some-color",
+      "color-border-AppHeader": "$some-color",
+      "style-border-AppHeader": "solid",
+      "thickness-border-AppHeader": "$some-thickness",
+    });
+  });
+
+  it("border: VAR1, VAR2, color", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "$some-thickness $some-style red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "$some-thickness $some-style red",
+      "color-border-AppHeader": "red",
+      "style-border-AppHeader": "$some-style",
+      "thickness-border-AppHeader": "$some-thickness",
+    });
+  });
+
+  it("border: VAR1, VAR2, VAR3", () => {
+    const newTheme: Record<string, string> = {
+      "border-AppHeader": "$some-thickness $some-style $some-color",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-AppHeader": "$some-thickness $some-style $some-color",
+      "color-border-AppHeader": "$some-color",
+      "style-border-AppHeader": "$some-style",
+      "thickness-border-AppHeader": "$some-thickness",
+    });
+  });
+
+  it("border-Card", () => {
+    const newTheme: Record<string, string> = {
+      "border-Card": "dotted rgb(255, 0, 0) 5px",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-Card": "dotted rgb(255, 0, 0) 5px",
+      "color-border-Card": "rgb(255, 0, 0)",
+      "style-border-Card": "dotted",
+      "thickness-border-Card": "5px",
+    });
+
+  });
+
+
+
+});

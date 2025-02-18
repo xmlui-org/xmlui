@@ -563,7 +563,9 @@ export class StyleParser {
     for (let i = 0; i < maxStyleTokens; i++) {
       const nextToken = this._lexer.peek();
       if (isThemeId(nextToken)) {
-        if (!themeId2) {
+        if (!themeId1) {
+          themeId1 = this.parseThemeId();
+        } else if (!themeId2) {
           themeId2 = this.parseThemeId();
         } else {
           themeId3 = this.parseThemeId();

@@ -10,7 +10,7 @@ $themeVars: ();
 // --- Theme vars for paddings
 $component: "Footer";
 $themeVars: t.composePaddingVars($themeVars, $component);
-$themeVars: t.appendBorderVars($themeVars, $component) !global;
+$themeVars: t.composeBorderVars($themeVars, $component) !global;
 
 // --- Other theme vars
 $color-bg-Footer: createThemeVar("color-bg-#{$component}");

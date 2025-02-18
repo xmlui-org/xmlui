@@ -1,16 +1,20 @@
 import Color from "color";
 
 import { HVar, parseHVar } from "../theming/hvar";
+import { styleKeywords } from "../../parsers/style-parser/StyleLexer";
+import { StyleTokenType } from "../../parsers/style-parser/tokens";
+import { StyleParser } from "../../parsers/style-parser/StyleParser";
 
-
-export function isThemeVarName(varName: any){
-  return typeof varName === 'string' && varName?.startsWith("$");
-
+export function isThemeVarName(varName: any) {
+  return typeof varName === "string" && varName?.startsWith("$");
 }
 
-export function resolveThemeVar(varName: string | undefined, theme: Record<string, string> = {}): string {
+export function resolveThemeVar(
+  varName: string | undefined,
+  theme: Record<string, string> = {},
+): string {
   let safeVarName = varName;
-  if(isThemeVarName(varName)){
+  if (isThemeVarName(varName)) {
     safeVarName = varName.substring(1);
   }
   const value = theme[safeVarName];
@@ -32,13 +36,13 @@ export function generateBaseTones(theme: Record<string, string> | undefined) {
     ...generateBaseTonesForColor("color-success", resolvedTheme),
     ...generateBaseTonesForColor("color-warn", resolvedTheme),
     ...generateBaseTonesForColor("color-danger", resolvedTheme),
-    ...generateBaseTonesForColor("color-surface", resolvedTheme, {distributeEven: true}),
+    ...generateBaseTonesForColor("color-surface", resolvedTheme, { distributeEven: true }),
   };
   return {
     ...colorTones,
-    ...generateRbgChannelsForTone("color-surface", {...resolvedTheme, ...colorTones}),
-    ...generateRbgChannelsForTone("color-primary", {...resolvedTheme, ...colorTones}),
-    ...generateRbgChannelsForTone("color-secondary", {...resolvedTheme, ...colorTones})
+    ...generateRbgChannelsForTone("color-surface", { ...resolvedTheme, ...colorTones }),
+    ...generateRbgChannelsForTone("color-primary", { ...resolvedTheme, ...colorTones }),
+    ...generateRbgChannelsForTone("color-secondary", { ...resolvedTheme, ...colorTones }),
   };
 }
 
@@ -60,21 +64,24 @@ export function generateBaseSpacings(theme: Record<string, string> | undefined) 
   let baseUnit = baseTrimmed.replace(baseNum + "", "") || "px";
 
   //  a) non-baseNum -> "0px"
-  if (Number.isNaN(baseNum)){
+  if (Number.isNaN(baseNum)) {
     return {};
   }
 
-  const scale = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 72, 80, 96];
+  const scale = [
+    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40,
+    44, 48, 52, 56, 60, 64, 72, 80, 96,
+  ];
   const ret: Record<string, string> = {};
 
-  scale.forEach((step)=>{
+  scale.forEach((step) => {
     ret[`space-${(step + "").replace(".", "_")}`] = `${step * baseNum}${baseUnit}`;
-  })
+  });
 
   return ret;
 }
 
-export function generateBaseFontSizes(theme: Record<string, string> | undefined){
+export function generateBaseFontSizes(theme: Record<string, string> | undefined) {
   if (!theme) {
     return {};
   }
@@ -93,7 +100,7 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
   let baseUnit = baseTrimmed.replace(baseNum + "", "") || "px";
 
   //  a) non-baseNum -> "0px"
-  if (Number.isNaN(baseNum)){
+  if (Number.isNaN(baseNum)) {
     return {};
   }
   const ret: Record<string, string> = {};
@@ -117,42 +124,51 @@ export function generateButtonTones(theme?: Record<string, string>) {
   let ret = {};
 
   variants.forEach((variant) => {
-    const solidTones = mapTones(findClosest(resolvedTheme, `color-Button-${variant}-solid`), (tones) => {
-      return {
-        [`color-bg-Button-${variant}-solid`]: tones.base,
-        [`color-bg-Button-${variant}-solid--hover`]: tones.tone1,
-        [`color-bg-Button-${variant}-solid--active`]: tones.tone2,
-        [`color-border-Button-${variant}-solid`]: tones.base,
-        [`color-border-Button-${variant}-solid--hover`]: tones.base,
-        [`color-border-Button-${variant}-solid--active`]: tones.base,
-        [`color-text-Button-${variant}-solid`]: tones.tone3,
-        [`color-text-Button-${variant}-solid--hover`]: tones.tone3,
-        [`color-text-Button-${variant}-solid--active`]: tones.tone3,
-      };
-    });
+    const solidTones = mapTones(
+      findClosest(resolvedTheme, `color-Button-${variant}-solid`),
+      (tones) => {
+        return {
+          [`color-bg-Button-${variant}-solid`]: tones.base,
+          [`color-bg-Button-${variant}-solid--hover`]: tones.tone1,
+          [`color-bg-Button-${variant}-solid--active`]: tones.tone2,
+          [`color-border-Button-${variant}-solid`]: tones.base,
+          [`color-border-Button-${variant}-solid--hover`]: tones.base,
+          [`color-border-Button-${variant}-solid--active`]: tones.base,
+          [`color-text-Button-${variant}-solid`]: tones.tone3,
+          [`color-text-Button-${variant}-solid--hover`]: tones.tone3,
+          [`color-text-Button-${variant}-solid--active`]: tones.tone3,
+        };
+      },
+    );
 
-    const outlinedTones = mapTones(findClosest(resolvedTheme, `color-Button-${variant}-outlined`), (tones) => {
-      return {
-        [`color-bg-Button-${variant}-outlined--hover`]: tones.alpha1,
-        [`color-bg-Button-${variant}-outlined--active`]: tones.alpha2,
-        [`color-border-Button-${variant}-outlined`]: tones.base,
-        [`color-border-Button-${variant}-outlined--hover`]: tones.tone1,
-        [`color-border-Button-${variant}-outlined--active`]: tones.tone2,
-        [`color-text-Button-${variant}-outlined`]: tones.base,
-        [`color-text-Button-${variant}-outlined--hover`]: tones.tone1,
-        [`color-text-Button-${variant}-outlined--active`]: tones.tone2,
-      };
-    });
+    const outlinedTones = mapTones(
+      findClosest(resolvedTheme, `color-Button-${variant}-outlined`),
+      (tones) => {
+        return {
+          [`color-bg-Button-${variant}-outlined--hover`]: tones.alpha1,
+          [`color-bg-Button-${variant}-outlined--active`]: tones.alpha2,
+          [`color-border-Button-${variant}-outlined`]: tones.base,
+          [`color-border-Button-${variant}-outlined--hover`]: tones.tone1,
+          [`color-border-Button-${variant}-outlined--active`]: tones.tone2,
+          [`color-text-Button-${variant}-outlined`]: tones.base,
+          [`color-text-Button-${variant}-outlined--hover`]: tones.tone1,
+          [`color-text-Button-${variant}-outlined--active`]: tones.tone2,
+        };
+      },
+    );
 
-    const ghostTones = mapTones(findClosest(resolvedTheme, `color-Button-${variant}-ghost`), (tones) => {
-      return {
-        [`color-bg-Button-${variant}-ghost--active`]: tones.alpha2,
-        [`color-bg-Button-${variant}-ghost--hover`]: tones.alpha1,
-        [`color-text-Button-${variant}-ghost`]: tones.base,
-        [`color-text-Button-${variant}-ghost--hover`]: tones.tone1,
-        [`color-text-Button-${variant}-ghost--active`]: tones.tone2,
-      };
-    });
+    const ghostTones = mapTones(
+      findClosest(resolvedTheme, `color-Button-${variant}-ghost`),
+      (tones) => {
+        return {
+          [`color-bg-Button-${variant}-ghost--active`]: tones.alpha2,
+          [`color-bg-Button-${variant}-ghost--hover`]: tones.alpha1,
+          [`color-text-Button-${variant}-ghost`]: tones.base,
+          [`color-text-Button-${variant}-ghost--hover`]: tones.tone1,
+          [`color-text-Button-${variant}-ghost--active`]: tones.tone2,
+        };
+      },
+    );
     ret = {
       ...ret,
       ...solidTones,
@@ -161,6 +177,259 @@ export function generateButtonTones(theme?: Record<string, string>) {
     };
   });
   return ret;
+}
+
+const paddingRegEx = /^padding-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+
+/**
+ * Segment the padding values into top, right, bottom, left to provide consistency
+ */
+export function generatePaddingSegments(theme?: Record<string, string>) {
+  if (!theme) {
+    return {};
+  }
+  const result = { ...theme };
+
+  // --- Iterate through theme variables and split padding values
+  Object.entries(theme).forEach(([key, value]) => {
+    const match = paddingRegEx.exec(key);
+    if (!match) return;
+    const remainder = match[1];
+
+    // --- Check for horizontal and vertical padding values
+    const horizontal = theme[`padding-horizontal-${remainder}`];
+    const vertical = theme[`padding-vertical-${remainder}`];
+
+    // --- We have a padding value to segment
+    const segments = value.trim().replace(/ +/g, " ").split(" ");
+    switch (segments.length) {
+      case 1:
+        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-right-${remainder}`] ??= horizontal ?? segments[0];
+        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-left-${remainder}`] ??= horizontal ?? segments[0];
+        break;
+      case 2:
+        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-right-${remainder}`] ??= horizontal ?? segments[1];
+        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-left-${remainder}`] ??= horizontal ?? segments[1];
+        break;
+      case 3:
+        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-right-${remainder}`] ??= horizontal ?? segments[1];
+        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[2];
+        result[`padding-left-${remainder}`] ??= horizontal ?? segments[1];
+        break;
+      case 4:
+        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-right-${remainder}`] ??= horizontal ?? segments[1];
+        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[2];
+        result[`padding-left-${remainder}`] ??= horizontal ?? segments[3];
+        break;
+      default:
+        return;
+    }
+  });
+
+  // --- Done
+  return result;
+}
+
+const borderRegEx =
+  /^border-(?!(?:horizontal|vertical|left|right|top|bottom|style|thickness|color)-)(.+)$/;
+
+/**
+ * Segment the border values to provide consistency
+ */
+export function generateBorderSegments(theme?: Record<string, string>) {
+  if (!theme) {
+    return {};
+  }
+  const result = { ...theme };
+
+  // --- Iterate through theme variables and split border values
+  Object.entries(theme).forEach(([key, value]) => {
+    const match = borderRegEx.exec(key);
+    if (!match) return;
+
+    // --- We have a border value to segment
+    const remainder = match[1];
+
+    const border = getBorderSegments(value);
+    if (border.thickness) {
+      result[`thickness-border-${remainder}`] ??= border.thickness;
+    }
+    if (border.style) {
+      result[`style-border-${remainder}`] ??= border.style;
+    }
+    if (border.color) {
+      result[`color-border-${remainder}`] ??= border.color;
+    }
+  });
+
+  // --- Done
+  return result;
+
+  function getBorderSegments(value: string) {
+    try {
+      const sParser = new StyleParser(value);
+      const parsed = sParser.parseBorder();
+
+      // --- Get the parsed result
+      const result = {
+        style: parsed.styleValue,
+        thickness:
+          parsed.widthValue !== undefined
+            ? `${parsed.widthValue}${parsed.widthUnit ?? "px"}`
+            : undefined,
+        color:
+          parsed.color === undefined
+            ? undefined
+            : typeof parsed.color === "string"
+              ? parsed.color
+              : parsed.color.toString(),
+      };
+
+      // --- All theme variables are present?
+      if (parsed.themeId1 && parsed.themeId2 && parsed.themeId3) {
+        return {
+          thickness: parsed.themeId1.id,
+          style: parsed.themeId2.id,
+          color: parsed.themeId3.id,
+        };
+      }
+
+      // --- Two theme variables are present?
+      if (parsed.themeId1 && parsed.themeId2) {
+        if (result.thickness) {
+          return {
+            thickness: result.thickness,
+            style: parsed.themeId1.id,
+            color: parsed.themeId2.id,
+          };
+        }
+        if (result.style) {
+          return {
+            thickness: parsed.themeId1.id,
+            style: result.style,
+            color: parsed.themeId2.id,
+          };
+        }
+        return {
+          thickness: parsed.themeId1.id,
+          style: parsed.themeId2.id,
+          color: result.color,
+        };
+      }
+
+      // --- One theme variable is present?
+      if (parsed.themeId1) {
+        if (result.thickness && result.style) {
+          return {
+            thickness: result.thickness,
+            style: result.style,
+            color: parsed.themeId1.id,
+          };
+        }
+        if (result.thickness && result.color) {
+          return {
+            thickness: result.thickness,
+            style: parsed.themeId1.id,
+            color: result.color,
+          };
+        }
+        if (result.style && result.color) {
+          return {
+            thickness: parsed.themeId1.id,
+            style: result.style,
+            color: result.color,
+          };
+        }
+      }
+      return {
+        thickness: result.thickness?.trim(),
+        style: result.style?.trim(),
+        color: result.color?.trim(),
+      };
+    } catch (e) {
+      return {
+        thickness: undefined,
+        style: undefined,
+        color: undefined,
+      };
+    }
+
+    // // --- Separate thickness, style, and color
+    // const segments = value.trim().replace(/ +/g, " ").split(" ");
+    // let thickness = "";
+    // let style = "";
+    // let color = "";
+    // if (segments.length === 1) {
+    //   const segmented = splitBorder(segments[0]);
+    //   thickness = segmented[0];
+    //   style = segmented[1];
+    //   color = segmented[2];
+    //   if (segmented[3]) {
+    //     thickness = segmented[3];
+    //   }
+    // } else if (segments.length === 2) {
+    //   const segmented1 = splitBorder(segments[0]);
+    //   const segmented2 = splitBorder(segments[1]);
+    //   thickness = segmented1[0] || segmented2[0];
+    //   style = segmented1[1] || segmented2[1];
+    //   color = segmented1[2] || segmented2[2];
+    //   if (segmented1[3]) {
+    //     thickness = segmented1[3];
+    //   }
+    //   if (segmented2[3]) {
+    //     style = segmented2[3];
+    //   }
+    // } else if (segments.length === 3) {
+    //   const segmented1 = splitBorder(segments[0]);
+    //   const segmented2 = splitBorder(segments[1]);
+    //   const segmented3 = splitBorder(segments[2]);
+    //   thickness = segmented1[0] || segmented2[0] || segmented3[0];
+    //   style = segmented1[1] || segmented2[1] || segmented3[1];
+    //   color = segmented1[2] || segmented2[2] || segmented3[2];
+    //   if (segmented1[3]) {
+    //     thickness = segmented1[3];
+    //   }
+    //   if (segmented2[3]) {
+    //     style = segmented2[3];
+    //   }
+    //   if (segmented3[3]) {
+    //     color = segmented3[3];
+    //   }
+    // }
+    // return { thickness, style, color };
+  }
+
+  function splitBorder(segment: string) {
+    let thickness = "";
+    let style = "";
+    let color = "";
+    let tVar = "";
+
+    if (segment.startsWith("$")) {
+      tVar = segment;
+    } else if (/^\d/.test(segment)) {
+      thickness = segment;
+    } else if (
+      segment.startsWith("#") ||
+      segment.startsWith("rgb") ||
+      segment.startsWith("hsl") ||
+      segment.startsWith("rgba") ||
+      segment.startsWith("hsla")
+    ) {
+      color = segment;
+    } else if (styleKeywords[segment] === StyleTokenType.ColorName) {
+      color = segment;
+    } else {
+      style = segment;
+    }
+    return [thickness, style, color, tVar];
+  }
 }
 
 function findClosest(theme: Record<string, string>, themeVarName: string) {
@@ -175,7 +444,11 @@ function findClosest(theme: Record<string, string>, themeVarName: string) {
   let closestKey: string | null = null;
   Object.keys(theme).forEach((themeVar) => {
     const parsedVar = parseHVar(themeVar);
-    if (!parsedVar || parsedVar.component !== hVar.component || parsedVar.attribute !== hVar.attribute) {
+    if (
+      !parsedVar ||
+      parsedVar.component !== hVar.component ||
+      parsedVar.attribute !== hVar.attribute
+    ) {
       return;
     }
     if (parsedVar.states.length) {
@@ -206,17 +479,21 @@ function resolveThemeVars(theme: Record<string, string>) {
 }
 
 function getRgbChannelsString(colorStr?: string) {
-  if(!colorStr){
+  if (!colorStr) {
     return undefined;
   }
-  const color = Color(colorStr)
+  const color = Color(colorStr);
   let rgb = color.rgb();
   return `${rgb.red()},${rgb.green()},${rgb.blue()}`;
 }
 
-function generateBaseTonesForColor(varName: string, theme: Record<string, string>, options = {distributeEven: false}) {
+function generateBaseTonesForColor(
+  varName: string,
+  theme: Record<string, string>,
+  options = { distributeEven: false },
+) {
   try {
-    const {distributeEven} = options;
+    const { distributeEven } = options;
     const color = theme[varName];
     if (!color || typeof color !== "string") {
       return {};
@@ -274,32 +551,32 @@ function generateBaseTonesForColor(varName: string, theme: Record<string, string
       [`${varName}-800`]: color800.toString(),
       [`${varName}-900`]: color900.toString(),
       [`${varName}-950`]: color950.toString(),
-    }
+    };
   } catch (e) {
     console.error("Error generating base tones for color:", varName);
     return {};
   }
 }
 
-function generateRbgChannelsForTone(varName: string, theme: Record<string, string>){
-    return {
-      [`${varName}-50-rgb`]: getRgbChannelsString(theme[`${varName}-50`]),
-      [`${varName}-100-rgb`]: getRgbChannelsString(theme[`${varName}-100`]),
-      [`${varName}-200-rgb`]: getRgbChannelsString(theme[`${varName}-200`]),
-      [`${varName}-300-rgb`]: getRgbChannelsString(theme[`${varName}-300`]),
-      [`${varName}-400-rgb`]: getRgbChannelsString(theme[`${varName}-400`]),
-      [`${varName}-500-rgb`]: getRgbChannelsString(theme[`${varName}-500`]),
-      [`${varName}-600-rgb`]: getRgbChannelsString(theme[`${varName}-600`]),
-      [`${varName}-700-rgb`]: getRgbChannelsString(theme[`${varName}-700`]),
-      [`${varName}-800-rgb`]: getRgbChannelsString(theme[`${varName}-800`]),
-      [`${varName}-900-rgb`]: getRgbChannelsString(theme[`${varName}-900`]),
-      [`${varName}-950-rgb`]: getRgbChannelsString(theme[`${varName}-950`]),
-    };
+function generateRbgChannelsForTone(varName: string, theme: Record<string, string>) {
+  return {
+    [`${varName}-50-rgb`]: getRgbChannelsString(theme[`${varName}-50`]),
+    [`${varName}-100-rgb`]: getRgbChannelsString(theme[`${varName}-100`]),
+    [`${varName}-200-rgb`]: getRgbChannelsString(theme[`${varName}-200`]),
+    [`${varName}-300-rgb`]: getRgbChannelsString(theme[`${varName}-300`]),
+    [`${varName}-400-rgb`]: getRgbChannelsString(theme[`${varName}-400`]),
+    [`${varName}-500-rgb`]: getRgbChannelsString(theme[`${varName}-500`]),
+    [`${varName}-600-rgb`]: getRgbChannelsString(theme[`${varName}-600`]),
+    [`${varName}-700-rgb`]: getRgbChannelsString(theme[`${varName}-700`]),
+    [`${varName}-800-rgb`]: getRgbChannelsString(theme[`${varName}-800`]),
+    [`${varName}-900-rgb`]: getRgbChannelsString(theme[`${varName}-900`]),
+    [`${varName}-950-rgb`]: getRgbChannelsString(theme[`${varName}-950`]),
+  };
 }
 
 function mapTones(
   baseColor: string | undefined | null,
-  mapper: (tones: ColorTones) => Record<string, string>
+  mapper: (tones: ColorTones) => Record<string, string>,
 ) {
   const tones = generateTones(baseColor);
   if (!tones) {
@@ -309,7 +586,8 @@ function mapTones(
 }
 
 function generateTones(baseColorStr: string | null | undefined): ColorTones | null {
-  if (!baseColorStr || typeof baseColorStr !== "string" || baseColorStr.startsWith("$")) return null; //TODO illesg here the startsWidth $ should be something else
+  if (!baseColorStr || typeof baseColorStr !== "string" || baseColorStr.startsWith("$"))
+    return null; //TODO illesg here the startsWidth $ should be something else
 
   const baseColor = Color(baseColorStr);
   let tone1;

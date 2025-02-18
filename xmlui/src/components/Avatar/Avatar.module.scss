@@ -7,21 +7,15 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$color-bg-Avatar: createThemeVar("color-bg-Avatar");
-$color-border-Avatar: createThemeVar("color-border-Avatar");
-$thickness-border-Avatar: createThemeVar("thickness-border-Avatar");
-$style-border-Avatar: createThemeVar("style-border-Avatar");
-$border-Avatar: createThemeVar("border-Avatar");
-$radius-Avatar: createThemeVar("radius-Avatar");
-$shadow-Avatar: createThemeVar("shadow-Avatar");
-$color-text-Avatar: createThemeVar("color-text-Avatar");
-$font-weight-Avatar: createThemeVar("font-weight-Avatar");
+$component: "Avatar";
+$themeVars: t.composeBorderVars($themeVars, $component);
+$color-bg-Avatar: createThemeVar("color-bg-#{$component}");
+$shadow-Avatar: createThemeVar("shadow-#{$component}");
+$color-text-Avatar: createThemeVar("color-text-#{$component}");
+$font-weight-Avatar: createThemeVar("font-weight-#{$component}");
 
 .container {
-  border-radius: $radius-Avatar;
-  border: $border-Avatar;
-  border-width: $thickness-border-Avatar;
-  border-style: $style-border-Avatar;
+  @include t.borderVars($themeVars, $component);
   aspect-ratio: 1 / 1;
   background-color: $color-bg-Avatar;
   color: $color-text-Avatar;
