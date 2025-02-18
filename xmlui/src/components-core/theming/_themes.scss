@@ -428,7 +428,7 @@ $THEME-VAR-PREFIX: xmlui;
   border-top-width: getThemeVar($themeVars, "thickness-border-top-#{$subject}");
   border-bottom-width: getThemeVar($themeVars, "thickness-border-bottom-#{$subject}");
   border-color: getThemeVar($themeVars, "color-border-#{$subject}");
-  border-left-color: getThemeVar($themeVars, "border-left-color-#{$subject}");
+  border-left-color: getThemeVar($themeVars, "color-border-left-#{$subject}");
   border-right-color: getThemeVar($themeVars, "color-border-right-#{$subject}");
   border-top-color: getThemeVar($themeVars, "color-border-top-#{$subject}");
   border-bottom-color: getThemeVar($themeVars, "color-border-bottom-#{$subject}");

@@ -236,8 +236,17 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
   return result;
 }
 
-const borderRegEx =
-  /^border-(?!(?:horizontal|vertical|left|right|top|bottom|style|thickness|color)-)(.+)$/;
+const borderRegEx = /^border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const thicknessBorderRegEx =
+  /^thickness-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const thicknessBorderHorizontalRegEx = /^thickness-border-(horizontal)-(.+)$/;
+const thicknessBorderVerticalRegEx = /^thickness-border-(vertical)-(.+)$/;
+const styleBorderRegEx = /^style-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const styleBorderHorizontalRegEx = /^style-border-(horizontal)-(.+)$/;
+const styleBorderVerticalRegEx = /^style-border-(vertical)-(.+)$/;
+const colorBorderRegEx = /^color-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const colorBorderHorizontalRegEx = /^color-border-(horizontal)-(.+)$/;
+const colorBorderVerticalRegEx = /^color-border-(vertical)-(.+)$/;
 
 /**
  * Segment the border values to provide consistency
@@ -250,21 +259,109 @@ export function generateBorderSegments(theme?: Record<string, string>) {
 
   // --- Iterate through theme variables and split border values
   Object.entries(theme).forEach(([key, value]) => {
-    const match = borderRegEx.exec(key);
-    if (!match) return;
+    // --- Check "border-" theme variables
+    let match = borderRegEx.exec(key);
+    if (match) {
+      // --- We have a border value to segment
+      const remainder = match[1];
 
-    // --- We have a border value to segment
-    const remainder = match[1];
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-${remainder}`] ??= border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-${remainder}`] ??= border.style;
+      }
+      if (border.color) {
+        result[`color-border-${remainder}`] ??= border.color;
+      }
+    }
 
-    const border = getBorderSegments(value);
-    if (border.thickness) {
-      result[`thickness-border-${remainder}`] ??= border.thickness;
+    // --- Check "thickness-border-" theme variables
+    match = thicknessBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a thickness-border value to flow down
+      const remainder = match[1];
+      result[`thickness-border-left-${remainder}`] ??= value;
+      result[`thickness-border-right-${remainder}`] ??= value;
+      result[`thickness-border-top-${remainder}`] ??= value;
+      result[`thickness-border-bottom-${remainder}`] ??= value;
     }
-    if (border.style) {
-      result[`style-border-${remainder}`] ??= border.style;
+
+    // --- Check "thickness-border-horizontal" theme variables
+    match = thicknessBorderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a thickness-border-horizontal value to flow down
+      const remainder = match[2];
+      result[`thickness-border-left-${remainder}`] ??= value;
+      result[`thickness-border-right-${remainder}`] ??= value;
     }
-    if (border.color) {
-      result[`color-border-${remainder}`] ??= border.color;
+
+    // --- Check "thickness-border-vertical" theme variables
+    match = thicknessBorderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a thickness-border-vertical value to flow down
+      const remainder = match[2];
+      result[`thickness-border-top-${remainder}`] ??= value;
+      result[`thickness-border-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check "style-border-" theme variables
+    match = styleBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a style-border value to flow down
+      const remainder = match[1];
+      result[`style-border-left-${remainder}`] ??= value;
+      result[`style-border-right-${remainder}`] ??= value;
+      result[`style-border-top-${remainder}`] ??= value;
+      result[`style-border-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check "style-border-horizontal" theme variables
+    match = styleBorderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a style-border-horizontal value to flow down
+      const remainder = match[1];
+      result[`style-border-left-${remainder}`] ??= value;
+      result[`style-border-right-${remainder}`] ??= value;
+    }
+
+    // --- Check "style-border-vertical" theme variables
+    match = styleBorderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a style-border-vertical value to flow down
+      const remainder = match[1];
+      result[`style-border-top-${remainder}`] ??= value;
+      result[`style-border-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check "color-border-" theme variables
+    match = colorBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a color-border value to flow down
+      const remainder = match[1];
+      result[`color-border-left-${remainder}`] ??= value;
+      result[`color-border-right-${remainder}`] ??= value;
+      result[`color-border-top-${remainder}`] ??= value;
+      result[`color-border-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check "color-border-horizontal" theme variables
+    match = colorBorderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a color-border-horizontal value to flow down
+      const remainder = match[1];
+      result[`color-border-left-${remainder}`] ??= value;
+      result[`color-border-right-${remainder}`] ??= value;
+    }
+
+    // --- Check "color-border-vertical" theme variables
+    match = colorBorderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a color-border-vertical value to flow down
+      const remainder = match[1];
+      result[`color-border-top-${remainder}`] ??= value;
+      result[`color-border-bottom-${remainder}`] ??= value;
     }
   });
 
@@ -359,76 +456,6 @@ export function generateBorderSegments(theme?: Record<string, string>) {
         color: undefined,
       };
     }
-
-    // // --- Separate thickness, style, and color
-    // const segments = value.trim().replace(/ +/g, " ").split(" ");
-    // let thickness = "";
-    // let style = "";
-    // let color = "";
-    // if (segments.length === 1) {
-    //   const segmented = splitBorder(segments[0]);
-    //   thickness = segmented[0];
-    //   style = segmented[1];
-    //   color = segmented[2];
-    //   if (segmented[3]) {
-    //     thickness = segmented[3];
-    //   }
-    // } else if (segments.length === 2) {
-    //   const segmented1 = splitBorder(segments[0]);
-    //   const segmented2 = splitBorder(segments[1]);
-    //   thickness = segmented1[0] || segmented2[0];
-    //   style = segmented1[1] || segmented2[1];
-    //   color = segmented1[2] || segmented2[2];
-    //   if (segmented1[3]) {
-    //     thickness = segmented1[3];
-    //   }
-    //   if (segmented2[3]) {
-    //     style = segmented2[3];
-    //   }
-    // } else if (segments.length === 3) {
-    //   const segmented1 = splitBorder(segments[0]);
-    //   const segmented2 = splitBorder(segments[1]);
-    //   const segmented3 = splitBorder(segments[2]);
-    //   thickness = segmented1[0] || segmented2[0] || segmented3[0];
-    //   style = segmented1[1] || segmented2[1] || segmented3[1];
-    //   color = segmented1[2] || segmented2[2] || segmented3[2];
-    //   if (segmented1[3]) {
-    //     thickness = segmented1[3];
-    //   }
-    //   if (segmented2[3]) {
-    //     style = segmented2[3];
-    //   }
-    //   if (segmented3[3]) {
-    //     color = segmented3[3];
-    //   }
-    // }
-    // return { thickness, style, color };
-  }
-
-  function splitBorder(segment: string) {
-    let thickness = "";
-    let style = "";
-    let color = "";
-    let tVar = "";
-
-    if (segment.startsWith("$")) {
-      tVar = segment;
-    } else if (/^\d/.test(segment)) {
-      thickness = segment;
-    } else if (
-      segment.startsWith("#") ||
-      segment.startsWith("rgb") ||
-      segment.startsWith("hsl") ||
-      segment.startsWith("rgba") ||
-      segment.startsWith("hsla")
-    ) {
-      color = segment;
-    } else if (styleKeywords[segment] === StyleTokenType.ColorName) {
-      color = segment;
-    } else {
-      style = segment;
-    }
-    return [thickness, style, color, tVar];
   }
 }
 

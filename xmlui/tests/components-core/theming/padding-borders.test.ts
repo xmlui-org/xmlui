@@ -95,6 +95,38 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "thickness-border-AppHeader": "xxx",
+      "thickness-border-bottom-AppHeader": "xxx",
+      "thickness-border-left-AppHeader": "xxx",
+      "thickness-border-right-AppHeader": "xxx",
+      "thickness-border-top-AppHeader": "xxx",
+    });
+  });
+
+  it("thickness-border-horizontal only", () => {
+    const newTheme: Record<string, string> = {
+      "thickness-border-horizontal-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "thickness-border-horizontal-AppHeader": "xxx",
+      "thickness-border-left-AppHeader": "xxx",
+      "thickness-border-right-AppHeader": "xxx",
+    });
+  });
+
+  it("thickness-border-vertical only", () => {
+    const newTheme: Record<string, string> = {
+      "thickness-border-vertical-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "thickness-border-vertical-AppHeader": "xxx",
+      "thickness-border-bottom-AppHeader": "xxx",
+      "thickness-border-top-AppHeader": "xxx",
     });
   });
 
@@ -107,6 +139,38 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "style-border-AppHeader": "xxx",
+      "style-border-bottom-AppHeader": "xxx",
+      "style-border-left-AppHeader": "xxx",
+      "style-border-right-AppHeader": "xxx",
+      "style-border-top-AppHeader": "xxx",
+    });
+  });
+
+  it("style-border-horizontal only", () => {
+    const newTheme: Record<string, string> = {
+      "style-border-horizontal-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "style-border-horizontal-AppHeader": "xxx",
+      "style-border-left-horizontal": "xxx",
+      "style-border-right-horizontal": "xxx",
+    });
+  });
+
+  it("style-border-vertical only", () => {
+    const newTheme: Record<string, string> = {
+      "style-border-vertical-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "style-border-vertical-AppHeader": "xxx",
+      "style-border-bottom-vertical": "xxx",
+      "style-border-top-vertical": "xxx",
     });
   });
 
@@ -119,6 +183,38 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "color-border-AppHeader": "xxx",
+      "color-border-bottom-AppHeader": "xxx",
+      "color-border-left-AppHeader": "xxx",
+      "color-border-right-AppHeader": "xxx",
+      "color-border-top-AppHeader": "xxx",
+    });
+  });
+
+  it("color-border-horizontal only", () => {
+    const newTheme: Record<string, string> = {
+      "color-border-horizontal-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "color-border-horizontal-AppHeader": "xxx",
+      "color-border-left-horizontal": "xxx",
+      "color-border-right-horizontal": "xxx",
+    });
+  });
+
+  it("color-border-vertical only", () => {
+    const newTheme: Record<string, string> = {
+      "color-border-vertical-AppHeader": "xxx",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "color-border-vertical-AppHeader": "xxx",
+      "color-border-bottom-vertical": "xxx",
+      "color-border-top-vertical": "xxx",
     });
   });
 
@@ -537,9 +633,5 @@ describe("generateBorderSegments", () => {
       "style-border-Card": "dotted",
       "thickness-border-Card": "5px",
     });
-
   });
-
-
-
 });
