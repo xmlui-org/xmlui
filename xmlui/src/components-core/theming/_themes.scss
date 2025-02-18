@@ -358,49 +358,85 @@ $THEME-VAR-PREFIX: xmlui;
   padding-bottom: getThemeVar($themeVars, "padding-bottom-#{$subject}");
 }
 
-@function appendBorderVars($themeVars, $subject) {
-  $tmp: appendThemeVar($themeVars, "color-border-horizontal-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "thickness-border-horizontal-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "style-border-horizontal-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "color-border-vertical-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "thickness-border-vertical-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "style-border-vertical-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "color-border-left-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "thickness-border-left-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "style-border-left-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "color-border-right-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "thickness-border-right-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "style-border-right-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "color-border-top-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "thickness-border-top-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "style-border-top-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "color-border-bottom-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "thickness-border-bottom-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "style-border-bottom-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "color-border-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "thickness-border-#{$subject}") !global;
+// This function composes padding variables for a given subject taking into 
+// account all possible padding directions
+@function composeBorderVars($themeVars, $subject) {
+  $tmp: appendThemeVar($themeVars, "border-#{$subject}") !global;
+  $tmpAll: getThemeVar($tmp, "border-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "border-horizontal-#{$subject}", $tmpAll) !global;
+  $tmpHorizontal: getThemeVar($tmp, "border-horizontal-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "border-vertical-#{$subject}", $tmpAll) !global;
+  $tmpVertical: getThemeVar($tmp, "border-vertical-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "border-left-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "border-right-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "border-top-#{$subject}", $tmpVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "border-bottom-#{$subject}", $tmpVertical) !global;
+  $tmpRadius: appendThemeVar($tmp, "radius-#{$subject}") !global;
+  $tmpRadiusAll: getThemeVar($tmpRadius, "radius-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault($tmp, "radius-start-start-#{$subject}", $tmpRadiusAll) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "radius-start-end-#{$subject}", $tmpRadiusAll) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "radius-end-start-#{$subject}", $tmpRadiusAll) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "radius-end-end-#{$subject}", $tmpRadiusAll) !global;
   $tmp: appendThemeVar($tmp, "style-border-#{$subject}") !global;
-  $tmp: appendThemeVar($tmp, "radius-#{$subject}") !global;
+  $tmpStyleAll: getThemeVar($tmp, "style-border-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-horizontal-#{$subject}", $tmpStyleAll) !global;
+  $tmpStyleHorizontal: getThemeVar($tmp, "style-border-horizontal-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-left-#{$subject}", $tmpStyleHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-right-#{$subject}", $tmpStyleHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-vertical-#{$subject}", $tmpStyleAll) !global;
+  $tmpStyleVertical: getThemeVar($tmp, "style-border-vertical-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-top-#{$subject}", $tmpStyleVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-bottom-#{$subject}", $tmpStyleVertical) !global;
+  $tmp: appendThemeVar($tmp, "thickness-border-#{$subject}") !global;
+  $tmpThicknessAll: getThemeVar($tmp, "thickness-border-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-horizontal-#{$subject}", $tmpThicknessAll) !global;
+  $tmpThicknessHorizontal: getThemeVar($tmp, "thickness-border-horizontal-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-left-#{$subject}", $tmpThicknessHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-right-#{$subject}", $tmpThicknessHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-vertical-#{$subject}", $tmpThicknessAll) !global;
+  $tmpThicknessVertical: getThemeVar($tmp, "thickness-border-vertical-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-top-#{$subject}", $tmpThicknessVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-bottom-#{$subject}", $tmpThicknessVertical) !global;
+  $tmp: appendThemeVar($tmp, "color-border-#{$subject}") !global;
+  $tmpColorAll: getThemeVar($tmp, "color-border-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-horizontal-#{$subject}", $tmpColorAll) !global;
+  $tmpColorHorizontal: getThemeVar($tmp, "color-border-horizontal-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-left-#{$subject}", $tmpColorHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-right-#{$subject}", $tmpColorHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-vertical-#{$subject}", $tmpColorAll) !global;
+  $tmpColorVertical: getThemeVar($tmp, "color-border-vertical-#{$subject}") !global;
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-top-#{$subject}", $tmpColorVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-bottom-#{$subject}", $tmpColorVertical) !global;
   @return $tmp;
 }
 
+// This mixin applies padding variables to a given subject
 @mixin borderVars($themeVars, $subject) {
-  border-radius: getThemeVar($themeVars, "radius-#{$subject}");
-  border-width: getThemeVar($themeVars, "thickness-border-#{$subject}");
+  border: getThemeVar($themeVars, "border-#{$subject}");
+  border-left: getThemeVar($themeVars, "border-left-#{$subject}");
+  border-right: getThemeVar($themeVars, "border-right-#{$subject}");
+  border-top: getThemeVar($themeVars, "border-top-#{$subject}");
+  border-bottom: getThemeVar($themeVars, "border-bottom-#{$subject}");
   border-style: getThemeVar($themeVars, "style-border-#{$subject}");
-  border-color: getThemeVar($themeVars, "color-border-#{$subject}");
-  border-top-width: getThemeVar($themeVars, "thickness-border-top-#{$subject}");
-  border-top-style: getThemeVar($themeVars, "style-border-top-#{$subject}");
-  border-top-color: getThemeVar($themeVars, "color-border-top-#{$subject}");
-  border-bottom-width: getThemeVar($themeVars, "thickness-border-bottom-#{$subject}");
-  border-bottom-style: getThemeVar($themeVars, "style-border-bottom-#{$subject}");
-  border-bottom-color: getThemeVar($themeVars, "color-border-bottom-#{$subject}");
-  border-left-width: getThemeVar($themeVars, "thickness-border-left-#{$subject}");
   border-left-style: getThemeVar($themeVars, "style-border-left-#{$subject}");
-  border-left-color: getThemeVar($themeVars, "color-border-left-#{$subject}");
-  border-right-width: getThemeVar($themeVars, "thickness-border-right-#{$subject}");
   border-right-style: getThemeVar($themeVars, "style-border-right-#{$subject}");
+  border-top-style: getThemeVar($themeVars, "style-border-top-#{$subject}");
+  border-bottom-style: getThemeVar($themeVars, "style-border-bottom-#{$subject}");
+  border-width: getThemeVar($themeVars, "thickness-border-#{$subject}");
+  border-left-width: getThemeVar($themeVars, "thickness-border-left-#{$subject}");
+  border-right-width: getThemeVar($themeVars, "thickness-border-right-#{$subject}");
+  border-top-width: getThemeVar($themeVars, "thickness-border-top-#{$subject}");
+  border-bottom-width: getThemeVar($themeVars, "thickness-border-bottom-#{$subject}");
+  border-color: getThemeVar($themeVars, "color-border-#{$subject}");
+  border-left-color: getThemeVar($themeVars, "color-border-left-#{$subject}");
   border-right-color: getThemeVar($themeVars, "color-border-right-#{$subject}");
+  border-top-color: getThemeVar($themeVars, "color-border-top-#{$subject}");
+  border-bottom-color: getThemeVar($themeVars, "color-border-bottom-#{$subject}");
+  border-radius: getThemeVar($themeVars, "radius-#{$subject}");
+  border-start-start-radius: getThemeVar($themeVars, "radius-start-start-#{$subject}");
+  border-start-end-radius: getThemeVar($themeVars, "radius-start-end-#{$subject}");
+  border-end-start-radius: getThemeVar($themeVars, "radius-end-start-#{$subject}");
+  border-end-end-radius: getThemeVar($themeVars, "radius-end-end-#{$subject}");
 }
 
 // =====================================================================================================================

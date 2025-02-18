@@ -8,14 +8,14 @@ $themeVars: ();
 }
 
 $component: "NavLink";
-$radius-NavLink: createThemeVar("radius-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, $component);
 $color-bg-NavLink: createThemeVar("color-bg-#{$component}");
 $color-bg-NavLink--hover: createThemeVar("color-bg-#{$component}--hover");
 $color-bg-NavLink--hover--active: createThemeVar("color-bg-#{$component}--hover--active");
 $color-bg-NavLink--active: createThemeVar("color-bg-#{$component}--active");
 $color-bg-NavLink--pressed: createThemeVar("color-bg-#{$component}--pressed");
 $color-bg-NavLink--pressed--active: createThemeVar("color-bg-#{$component}--pressed--active");
-$themeVars: t.composePaddingVars($themeVars, $component);
 $font-size-NavLink: createThemeVar("font-size-#{$component}");
 $color-text-NavLink: createThemeVar("color-text-#{$component}");
 $color-text-NavLink--hover: createThemeVar("color-text-#{$component}--hover");
@@ -39,8 +39,8 @@ $transition: color 0.1s, background-color 0.1s;
 
 .content {
   &.base {
+    @include t.borderVars($themeVars, $component);
     @include t.paddingVars($themeVars, $component);
-    border: none;
     outline: inherit;
     text-decoration: none;
     cursor: pointer;
@@ -52,7 +52,6 @@ $transition: color 0.1s, background-color 0.1s;
     font-family: $font-family-NavLink;
     position: relative;
     transition: $transition;
-    border-radius: $radius-NavLink;
     color: $color-text-NavLink;
     background-color: $color-bg-NavLink;
     flex-shrink: 0;
