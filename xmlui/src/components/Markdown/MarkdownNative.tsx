@@ -1,5 +1,6 @@
 import { type CSSProperties, memo, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import styles from "./Markdown.module.scss";
 
@@ -7,6 +8,7 @@ import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Image } from "../Image/ImageNative";
+import { Toggle } from "../Toggle/Toggle";
 
 type MarkdownProps = {
   removeIndents?: boolean;
@@ -14,16 +16,21 @@ type MarkdownProps = {
   style?: CSSProperties;
 };
 
-export const Markdown = memo(function Markdown({ removeIndents = false, children, style }: MarkdownProps) {
+export const Markdown = memo(function Markdown({
+  removeIndents = false,
+  children,
+  style,
+}: MarkdownProps) {
   if (typeof children !== "string") {
     return null;
   }
 
   children = removeIndents ? removeTextIndents(children) : children;
-  const textLayoutToUse = {textAlign: style?.textAlign};
+  const textLayoutToUse = { textAlign: style?.textAlign };
 
   return (
     <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
       components={{
         h1({ id, children }) {
           return (
@@ -68,7 +75,11 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
           );
         },
         p({ id, children }) {
-          return <Text uid={id} style={textLayoutToUse}>{children}</Text>;
+          return (
+            <Text uid={id} style={textLayoutToUse}>
+              {children}
+            </Text>
+          );
         },
         code({ id, children }) {
           return (
@@ -84,7 +95,6 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
             </Text>
           );
         },
-
         strong({ id, children }) {
           return (
             <Text uid={id} variant="strong">
@@ -95,6 +105,13 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
         em({ id, children }) {
           return (
             <Text uid={id} variant="em">
+              {children}
+            </Text>
+          );
+        },
+        del({ id, children }) {
+          return (
+            <Text uid={id} variant="deleted">
               {children}
             </Text>
           );
@@ -111,9 +128,6 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
         li({ children }) {
           return <ListItem style={textLayoutToUse}>{children}</ListItem>;
         },
-        // This needs a parser plugin for the ~ and ~~ signs that are available via react-markdown-gfm
-        // or we implement our own parser?
-        // del: variant="deleted"
         hr() {
           return <HorizontalRule />;
         },
@@ -122,7 +136,19 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
         },
         img({ src, alt }) {
           return <Image src={src} alt={alt} />;
-        }
+        },
+        // TODO: somehow get the label from the containing li element
+        input({ disabled, checked }) {
+          return (
+            <Toggle
+              variant="checkbox"
+              readOnly={disabled}
+              value={checked}
+              /* label={value}
+                  labelPosition={"right"} */
+            />
+          );
+        },
       }}
     >
       {children as any}
@@ -158,7 +184,11 @@ type BlockquoteProps = {
 };
 
 const Blockquote = ({ children, style }: BlockquoteProps) => {
-  return <blockquote className={styles.blockquote} style={style} >{children}</blockquote>;
+  return (
+    <blockquote className={styles.blockquote} style={style}>
+      {children}
+    </blockquote>
+  );
 };
 
 type UnorderedListProps = {
@@ -167,7 +197,11 @@ type UnorderedListProps = {
 };
 
 const UnorderedList = ({ children, style }: UnorderedListProps) => {
-  return <ul className={styles.unorderedList} style={style}>{children}</ul>;
+  return (
+    <ul className={styles.unorderedList} style={style}>
+      {children}
+    </ul>
+  );
 };
 
 type OrderedListProps = {
@@ -176,7 +210,11 @@ type OrderedListProps = {
 };
 
 const OrderedList = ({ children, style }: OrderedListProps) => {
-  return <ol className={styles.orderedList} style={style}>{children}</ol>;
+  return (
+    <ol className={styles.orderedList} style={style}>
+      {children}
+    </ol>
+  );
 };
 
 type ListItemProps = {
@@ -185,5 +223,9 @@ type ListItemProps = {
 };
 
 const ListItem = ({ children, style }: ListItemProps) => {
-  return <li className={styles.listItem} style={style}>{children}</li>;
+  return (
+    <li className={styles.listItem} style={style}>
+      {children}
+    </li>
+  );
 };
