@@ -23,6 +23,8 @@ import {
   dValueApi,
 } from "../../components/metadata-helpers";
 import { Toggle } from "../Toggle/Toggle";
+import { MemoizedItem } from "../container-helpers";
+import {divide} from "lodash-es";
 
 const COMP = "Checkbox";
 
@@ -44,9 +46,10 @@ export const CheckboxMd = createMetadata({
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
     description: d(
-      `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` + 
-      `of the ${COMP} besides its label.`,
+      `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
+        `of the ${COMP} besides its label.`,
     ),
+    inputTemplate: d(""),
   },
   events: {
     click: dClick(COMP),
@@ -92,9 +95,22 @@ export const checkboxComponentRenderer = createComponentRenderer(
     lookupEventHandler,
     state,
     registerComponentApi,
+    renderChild,
+    layoutContext,
   }) => {
+
     return (
       <Toggle
+        renderInput={() => (
+          <MemoizedItem
+            contextVars={{
+              $input: `<div>hello</div>`
+            }}
+            node={{type: "Text", props: {value: `{$input}`}}}
+            renderChild={renderChild}
+            layoutContext={layoutContext}
+          />
+        )}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         style={layoutCss}
         initialValue={extractValue.asOptionalBoolean(node.props.initialValue, false)}

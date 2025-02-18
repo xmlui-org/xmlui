@@ -14,6 +14,7 @@ import {
 } from "../metadata-helpers";
 import { parseSeverity } from "./Validations";
 import { CustomFormItem, FormItem } from "./FormItemNative";
+import { MemoizedItem } from "../container-helpers";
 
 const COMP = "FormItem";
 
@@ -85,6 +86,7 @@ export const FormItemMd = createMetadata({
     regexInvalidSeverity: d(
       `This property sets the severity level of regular expression validation.`,
     ),
+    inputTemplate: d(""),
   },
   events: {
     validate: d(`This event is used to define a custom validation function.`),
@@ -121,6 +123,7 @@ export const formItemComponentRenderer = createComponentRenderer(
     renderChild,
     extractValue,
     layoutCss,
+    layoutContext,
     lookupEventHandler,
     lookupAction,
     registerComponentApi,
@@ -153,6 +156,7 @@ export const formItemComponentRenderer = createComponentRenderer(
       customValidationsDebounce,
       validationMode,
       maxTextLength,
+      inputTemplate,
       ...rest
     } = node.props;
 
@@ -190,6 +194,7 @@ export const formItemComponentRenderer = createComponentRenderer(
     return (
       <FormItem
         style={layoutCss}
+        layoutContext={layoutContext}
         labelBreak={extractValue.asOptionalBoolean(labelBreak)}
         labelWidth={extractValue.asOptionalString(labelWidth)}
         bindTo={extractValue.asString(bindTo)}
@@ -204,6 +209,16 @@ export const formItemComponentRenderer = createComponentRenderer(
         validationMode={extractValue.asOptionalString(validationMode)}
         registerComponentApi={registerComponentApi}
         maxTextLength={extractValue(maxTextLength)}
+        renderInput={(contextVars: any) => {
+          return (
+              <MemoizedItem
+                node={extractValue(inputTemplate)}
+                contextVars={contextVars}
+                renderChild={renderChild}
+                layoutContext={layoutContext}
+              />
+          );
+        }}
         {...resolvedRestProps}
       >
         {isCustomFormItem ? (
@@ -214,7 +229,7 @@ export const formItemComponentRenderer = createComponentRenderer(
           />
         ) : (
           renderChild(node.children, {
-            type: formItemType
+            type: formItemType,
           })
         )}
       </FormItem>

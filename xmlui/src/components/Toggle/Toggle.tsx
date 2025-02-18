@@ -1,4 +1,11 @@
-import React, { type CSSProperties, type ForwardedRef, forwardRef, useCallback, useEffect } from "react";
+import React, {
+  type CSSProperties,
+  type ForwardedRef,
+  forwardRef,
+  ReactNode,
+  useCallback,
+  useEffect,
+} from "react";
 import classnames from "classnames";
 
 import styles from "./Toggle.module.scss";
@@ -9,6 +16,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import type { LabelPosition } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { divide } from "lodash-es";
 
 type ToggleProps = {
   id?: string;
@@ -31,6 +39,11 @@ type ToggleProps = {
   labelBreak?: boolean;
   required?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
+  renderInput?: () => ReactNode;
+};
+
+const defaultRenderer = (props: any) => {
+  return props.$input;
 };
 
 export const Toggle = forwardRef(function Toggle(
@@ -55,6 +68,7 @@ export const Toggle = forwardRef(function Toggle(
     labelBreak,
     required,
     registerComponentApi,
+    renderInput = defaultRenderer,
   }: ToggleProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -128,27 +142,29 @@ export const Toggle = forwardRef(function Toggle(
       // --- For some reason if it's an indeterminate checkbox, the label click still clears the indeterminate flag.
       // --- By setting pointerEvents we kind of 'disable' the label click, too
     >
-      <input
-        ref={innerRef}
-        type="checkbox"
-        role={variant}
-        checked={value}
-        disabled={!enabled}
-        required={required}
-        readOnly={readOnly}
-        aria-readonly={readOnly}
-        aria-checked={value}
-        onChange={onInputChange}
-        onFocus={handleOnFocus}
-        onBlur={handleOnBlur}
-        className={classnames(styles.resetAppearance, className, {
-          [styles.checkbox]: variant === "checkbox",
-          [styles.switch]: variant === "switch",
-          [styles.error]: validationStatus === "error",
-          [styles.warning]: validationStatus === "warning",
-          [styles.valid]: validationStatus === "valid",
-        })}
-      />
+      {renderInput()}
+
+{/*          <input
+            ref={innerRef}
+            type="checkbox"
+            role={variant}
+            checked={value}
+            disabled={!enabled}
+            required={required}
+            readOnly={readOnly}
+            aria-readonly={readOnly}
+            aria-checked={value}
+            onChange={onInputChange}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
+            className={classnames(styles.resetAppearance, className, {
+              [styles.checkbox]: variant === "checkbox",
+              [styles.switch]: variant === "switch",
+              [styles.error]: validationStatus === "error",
+              [styles.warning]: validationStatus === "warning",
+              [styles.valid]: validationStatus === "valid",
+            })}
+          />*/}
     </ItemWithLabel>
   );
 });
