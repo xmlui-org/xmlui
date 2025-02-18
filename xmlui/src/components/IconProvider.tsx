@@ -48,6 +48,7 @@ import { RxExit, RxLightningBolt, RxOpenInNewWindow } from "react-icons/rx";
 import { HiOutlinePaintBrush } from "react-icons/hi2";
 import { TfiReload } from "react-icons/tfi";
 import { HiOutlineCog, HiOutlineDuplicate } from "react-icons/hi";
+import { CiCalendarDate } from "react-icons/ci";
 
 import { IconRegistryContext } from "./IconRegistryContext";
 import type { IconBaseProps } from "./Icon/IconNative";
@@ -141,6 +142,7 @@ registerIconRenderer("arrowleft", (props: IconBaseProps) => <BsArrowLeftShort {.
 registerIconRenderer("arrowright", (props: IconBaseProps) => <BsArrowRightShort {...props} />);
 registerIconRenderer("pause", (props: IconBaseProps) => <BsPause {...props} />);
 registerIconRenderer("play", (props: IconBaseProps) => <BsPlay {...props} />);
+registerIconRenderer("date", (props: IconBaseProps) => <CiCalendarDate {...props} />);
 registerIconRenderer("hamburger", (props: IconBaseProps) => <AiOutlineMenu {...props} />);
 registerIconRenderer("send", (props: IconBaseProps) => <AiOutlineSend {...props} />);
 registerIconRenderer("users", (props: IconBaseProps) => <FiUsers {...props} />);
