@@ -1,4 +1,12 @@
-import React, { type CSSProperties, type ForwardedRef, forwardRef, useCallback, useEffect } from "react";
+import { ReactNode, useId } from "react";
+import { useMemo } from "react";
+import React, {
+  type CSSProperties,
+  type ForwardedRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+} from "react";
 import classnames from "classnames";
 
 import styles from "./Toggle.module.scss";
@@ -31,6 +39,7 @@ type ToggleProps = {
   labelBreak?: boolean;
   required?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
+  inputRenderer?: (contextVars: any, input?: ReactNode) => ReactNode;
 };
 
 export const Toggle = forwardRef(function Toggle(
@@ -55,9 +64,13 @@ export const Toggle = forwardRef(function Toggle(
     labelBreak,
     required,
     registerComponentApi,
+    inputRenderer,
   }: ToggleProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const generatedId = useId();
+  const inputId = id || generatedId;
+
   const innerRef = React.useRef<HTMLInputElement | null>(null);
   useEffect(() => {
     updateState({ value: initialValue }, { initial: true });
@@ -112,23 +125,10 @@ export const Toggle = forwardRef(function Toggle(
     });
   }, [focus, registerComponentApi, setValue]);
 
-  return (
-    <ItemWithLabel
-      ref={forwardedRef}
-      id={id}
-      label={label}
-      style={style}
-      labelPosition={labelPosition}
-      labelWidth={labelWidth}
-      labelBreak={labelBreak}
-      required={required}
-      enabled={enabled}
-      shrinkToLabel={true}
-      labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
-      // --- For some reason if it's an indeterminate checkbox, the label click still clears the indeterminate flag.
-      // --- By setting pointerEvents we kind of 'disable' the label click, too
-    >
+  const input = useMemo(
+    () => (
       <input
+        id={inputId}
         ref={innerRef}
         type="checkbox"
         role={variant}
@@ -149,6 +149,48 @@ export const Toggle = forwardRef(function Toggle(
           [styles.valid]: validationStatus === "valid",
         })}
       />
+    ),
+    [
+      className,
+      enabled,
+      handleOnBlur,
+      handleOnFocus,
+      onInputChange,
+      readOnly,
+      required,
+      validationStatus,
+      value,
+      variant,
+    ],
+  );
+
+  return (
+    <ItemWithLabel
+      ref={forwardedRef}
+      id={inputId}
+      label={label}
+      style={style}
+      labelPosition={labelPosition}
+      labelWidth={labelWidth}
+      labelBreak={labelBreak}
+      required={required}
+      enabled={enabled}
+      isInputTemplateUsed={!!inputRenderer}
+      shrinkToLabel={true}
+      labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
+      // --- For some reason if it's an indeterminate checkbox, the label click still clears the indeterminate flag.
+      // --- By setting pointerEvents we kind of 'disable' the label click, too
+    >
+      {inputRenderer ? (
+        <label className={styles.label}>
+          <div className={styles.inputContainer}>{input}</div>
+          {inputRenderer({
+            $checked: value,
+          })}
+        </label>
+      ) : (
+        input
+      )}
     </ItemWithLabel>
   );
 });

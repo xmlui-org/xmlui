@@ -14,6 +14,7 @@ import {
 } from "../metadata-helpers";
 import { parseSeverity } from "./Validations";
 import { CustomFormItem, FormItem } from "./FormItemNative";
+import { MemoizedItem } from "../container-helpers";
 
 const COMP = "FormItem";
 
@@ -85,6 +86,7 @@ export const FormItemMd = createMetadata({
     regexInvalidSeverity: d(
       `This property sets the severity level of regular expression validation.`,
     ),
+    inputTemplate: d("This property is used to define a custom input template."),
   },
   events: {
     validate: d(`This event is used to define a custom validation function.`),
@@ -121,6 +123,7 @@ export const formItemComponentRenderer = createComponentRenderer(
     renderChild,
     extractValue,
     layoutCss,
+    layoutContext,
     lookupEventHandler,
     lookupAction,
     registerComponentApi,
@@ -186,10 +189,12 @@ export const formItemComponentRenderer = createComponentRenderer(
     const resolvedRestProps = extractValue(nonLayoutCssProps);
     const formItemType = extractValue.asOptionalString(type);
     const isCustomFormItem = formItemType === undefined && !!node.children;
+    const inputTemplate = node.children || node.props?.inputTemplate;
 
     return (
       <FormItem
         style={layoutCss}
+        layoutContext={layoutContext}
         labelBreak={extractValue.asOptionalBoolean(labelBreak)}
         labelWidth={extractValue.asOptionalString(labelWidth)}
         bindTo={extractValue.asString(bindTo)}
@@ -204,6 +209,18 @@ export const formItemComponentRenderer = createComponentRenderer(
         validationMode={extractValue.asOptionalString(validationMode)}
         registerComponentApi={registerComponentApi}
         maxTextLength={extractValue(maxTextLength)}
+        inputRenderer={
+          inputTemplate
+            ? (contextVars) => (
+                <MemoizedItem
+                  contextVars={contextVars}
+                  node={inputTemplate}
+                  renderChild={renderChild}
+                  layoutContext={layoutContext}
+                />
+              )
+            : undefined
+        }
         {...resolvedRestProps}
       >
         {isCustomFormItem ? (
@@ -214,7 +231,7 @@ export const formItemComponentRenderer = createComponentRenderer(
           />
         ) : (
           renderChild(node.children, {
-            type: formItemType
+            type: formItemType,
           })
         )}
       </FormItem>

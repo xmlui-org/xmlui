@@ -18,7 +18,7 @@ import { NumberBox } from "../NumberBox/NumberBoxNative";
 import { Select } from "../Select/SelectNative";
 import { RadioGroup } from "../RadioGroup/RadioGroupNative";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
-import { HelperText } from "../FormItem/HelperText";
+
 import {
   fieldChanged,
   fieldFocused,
@@ -37,6 +37,7 @@ import { ItemWithLabel } from "./ItemWithLabel";
 import { useValidation, useValidationDisplay } from "./Validations";
 import { Slider } from "../Slider/SliderNative";
 import { ColorPicker } from "../ColorPicker/ColorPickerNative";
+import { HelperText } from "./HelperText";
 
 type FormControlType =
   | "text"
@@ -78,6 +79,7 @@ type Props = {
   initialValue?: any;
   registerComponentApi?: RegisterComponentApiFn;
   maxTextLength?: number;
+  inputRenderer?: any;
 };
 
 export const FormItem = memo(function FormItem({
@@ -96,6 +98,7 @@ export const FormItem = memo(function FormItem({
   validationMode,
   registerComponentApi,
   maxTextLength,
+  inputRenderer,
   ...rest
 }: Props) {
   const labelWidthValue = useFormContextPart((value) => labelWidth || value.itemLabelWidth);
@@ -235,6 +238,7 @@ export const FormItem = memo(function FormItem({
           enabled={isEnabled}
           validationStatus={validationStatus}
           variant={type}
+          inputRenderer={inputRenderer}
         />
       );
       break;

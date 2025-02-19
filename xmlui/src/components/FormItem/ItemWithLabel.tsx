@@ -22,6 +22,7 @@ type ItemWithLabelProps = {
   shrinkToLabel?: boolean;
   onFocus?: () => void;
   onBlur?: () => void;
+  isInputTemplateUsed?: boolean;
   validationResult?: ReactNode;
 };
 
@@ -44,6 +45,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     onBlur,
     labelStyle,
     validationResult,
+    isInputTemplateUsed = false,
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
@@ -100,7 +102,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             )}
           </label>
         )}
-        {Children.only(<Slot id={inputId}>{children}</Slot>)}
+        <Slot id={!isInputTemplateUsed ? inputId : undefined}>{children}</Slot>
       </div>
       {validationResult}
     </div>

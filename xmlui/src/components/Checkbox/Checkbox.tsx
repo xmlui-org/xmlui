@@ -23,6 +23,7 @@ import {
   dValueApi,
 } from "../../components/metadata-helpers";
 import { Toggle } from "../Toggle/Toggle";
+import { MemoizedItem } from "../container-helpers";
 
 const COMP = "Checkbox";
 
@@ -44,9 +45,10 @@ export const CheckboxMd = createMetadata({
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
     description: d(
-      `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` + 
-      `of the ${COMP} besides its label.`,
+      `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
+        `of the ${COMP} besides its label.`,
     ),
+    inputTemplate: d("This property is used to define a custom checkbox input template"),
   },
   events: {
     click: dClick(COMP),
@@ -92,9 +94,24 @@ export const checkboxComponentRenderer = createComponentRenderer(
     lookupEventHandler,
     state,
     registerComponentApi,
+    renderChild,
+    layoutContext,
   }) => {
+    const inputTemplate = node.children || node.props?.inputTemplate;
     return (
       <Toggle
+        inputRenderer={
+          inputTemplate
+            ? (contextVars) => (
+                <MemoizedItem
+                  contextVars={contextVars}
+                  node={inputTemplate}
+                  renderChild={renderChild}
+                  layoutContext={layoutContext}
+                />
+              )
+            : undefined
+        }
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         style={layoutCss}
         initialValue={extractValue.asOptionalBoolean(node.props.initialValue, false)}
