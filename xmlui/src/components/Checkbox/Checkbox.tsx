@@ -24,7 +24,7 @@ import {
 } from "../../components/metadata-helpers";
 import { Toggle } from "../Toggle/Toggle";
 import { MemoizedItem } from "../container-helpers";
-import {divide} from "lodash-es";
+import { divide } from "lodash-es";
 
 const COMP = "Checkbox";
 
@@ -98,19 +98,20 @@ export const checkboxComponentRenderer = createComponentRenderer(
     renderChild,
     layoutContext,
   }) => {
-
     return (
       <Toggle
-        renderInput={() => (
-          <MemoizedItem
-            contextVars={{
-              $input: `<div>hello</div>`
-            }}
-            node={{type: "Text", props: {value: `{$input}`}}}
-            renderChild={renderChild}
-            layoutContext={layoutContext}
-          />
-        )}
+        inputRenderer={
+          node.props?.inputTemplate
+            ? (contextVars) => (
+                <MemoizedItem
+                  contextVars={contextVars}
+                  node={node.props?.inputTemplate}
+                  renderChild={renderChild}
+                  layoutContext={layoutContext}
+                />
+              )
+            : undefined
+        }
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         style={layoutCss}
         initialValue={extractValue.asOptionalBoolean(node.props.initialValue, false)}
