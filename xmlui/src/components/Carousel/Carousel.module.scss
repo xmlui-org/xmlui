@@ -7,13 +7,13 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$componentName: "Carousel";
+$component: "Carousel";
 
 .carousel {
   position: relative;
   overflow: hidden;
-  width: createThemeVar("width-#{$componentName}");
-  height: createThemeVar("height-#{$componentName}");
+  width: createThemeVar("width-#{$component}");
+  height: createThemeVar("height-#{$component}");
   justify-content: center;
   align-items: center;
 }
@@ -61,26 +61,26 @@ $componentName: "Carousel";
   justify-content: center;
   align-items: center;
   display: inline-flex;
-  height: createThemeVar("height-control-#{$componentName}");
-  width: createThemeVar("width-control-#{$componentName}");
-  color: createThemeVar("color-text-control-#{$componentName}");
-  background-color: createThemeVar("color-bg-control-#{$componentName}");;
-  border-radius: createThemeVar("radius-control-#{$componentName}");
+  height: createThemeVar("height-control-#{$component}");
+  width: createThemeVar("width-control-#{$component}");
+  color: createThemeVar("color-text-control-#{$component}");
+  background-color: createThemeVar("color-bg-control-#{$component}");;
+  border-radius: createThemeVar("radius-control-#{$component}");
 }
 
 .controlButton:hover {
-  background-color: createThemeVar("color-bg-control-hover-#{$componentName}");
-  color: createThemeVar("color-text-control-hover-#{$componentName}");
+  background-color: createThemeVar("color-bg-control-hover-#{$component}");
+  color: createThemeVar("color-text-control-hover-#{$component}");
 }
 
 .controlButton:active {
-  background-color: createThemeVar("color-bg-control-active-#{$componentName}");
-  color: createThemeVar("color-text-control-active-#{$componentName}");
+  background-color: createThemeVar("color-bg-control-active-#{$component}");
+  color: createThemeVar("color-text-control-active-#{$component}");
 }
 
 .controlButton:disabled {
-  color: createThemeVar("color-text-control-disabled-#{$componentName}");
-  background-color: createThemeVar("color-bg-control-disabled-#{$componentName}");
+  color: createThemeVar("color-text-control-disabled-#{$component}");
+  background-color: createThemeVar("color-bg-control-disabled-#{$component}");
 }
 
 .indicators {
@@ -92,21 +92,21 @@ $componentName: "Carousel";
 
 .indicator {
   transition: all .3s;
-  width: createThemeVar("width-indicator-#{$componentName}");
-  height: createThemeVar("height-indicator-#{$componentName}");
+  width: createThemeVar("width-indicator-#{$component}");
+  height: createThemeVar("height-indicator-#{$component}");
   border-radius: 2px;
   margin: 0 1px;
-  color: createThemeVar("color-text-indicator-#{$componentName}");
-  background-color: createThemeVar("color-bg-indicator-#{$componentName}");
+  color: createThemeVar("color-text-indicator-#{$component}");
+  background-color: createThemeVar("color-bg-indicator-#{$component}");
 
   &:hover {
-    background-color: createThemeVar("color-bg-indicator-hover-#{$componentName}");
-    color: createThemeVar("color-text-indicator-hover-#{$componentName}");
+    background-color: createThemeVar("color-bg-indicator-hover-#{$component}");
+    color: createThemeVar("color-text-indicator-hover-#{$component}");
   }
 
   &.active {
-    background-color: createThemeVar("color-bg-indicator-active-#{$componentName}");
-    color: createThemeVar("color-text-indicator-active-#{$componentName}");
+    background-color: createThemeVar("color-bg-indicator-active-#{$component}");
+    color: createThemeVar("color-text-indicator-active-#{$component}");
   }
 }
 

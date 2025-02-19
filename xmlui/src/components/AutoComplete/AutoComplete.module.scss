@@ -7,29 +7,30 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$componentName: "AutoComplete";
-$themeVars: t.composePaddingVars($themeVars, "#{$componentName}-badge");
+$component: "AutoComplete";
+$themeVars: t.composePaddingVars($themeVars, "#{$component}-badge");
+$themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
-  border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
-  border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
-  border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
-  font-size: createThemeVar("Input:font-size-#{$componentName}-#{$variantName}");
-  background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
-  box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
-  color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
+  border-radius: createThemeVar("Input:radius-#{$component}-#{$variantName}");
+  border-color: createThemeVar("Input:color-border-#{$component}-#{$variantName}");
+  border-width: createThemeVar("Input:thickness-border-#{$component}-#{$variantName}");
+  border-style: createThemeVar("Input:style-border-#{$component}-#{$variantName}");
+  font-size: createThemeVar("Input:font-size-#{$component}-#{$variantName}");
+  background-color: createThemeVar("Input:color-bg-#{$component}-#{$variantName}");
+  box-shadow: createThemeVar("Input:shadow-#{$component}-#{$variantName}");
+  color: createThemeVar("Input:color-text-#{$component}-#{$variantName}");
 
   &:hover {
-    border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--hover");
-    color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
+    border-color: createThemeVar("Input:color-border-#{$component}-#{$variantName}--hover");
+    background-color: createThemeVar("Input:color-bg-#{$component}-#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:shadow-#{$component}-#{$variantName}--hover");
+    color: createThemeVar("Input:color-text-#{$component}-#{$variantName}--hover");
   }
 
   &::placeholder {
-    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
+    color: createThemeVar("Input:color-placeholder-#{$component}-#{$variantName}");
   }
 }
 
@@ -63,16 +64,16 @@ $themeVars: t.composePaddingVars($themeVars, "#{$componentName}-badge");
   &.disabled {
     cursor: not-allowed;
     opacity: 0.5;
-    background-color: createThemeVar("Input:color-bg-#{$componentName}--disabled");
-    color: createThemeVar("Input:color-text-#{$componentName}--disabled");
-    border-color: createThemeVar("Input:color-border-#{$componentName}--disabled");
+    background-color: createThemeVar("Input:color-bg-#{$component}--disabled");
+    color: createThemeVar("Input:color-text-#{$component}--disabled");
+    border-color: createThemeVar("Input:color-border-#{$component}--disabled");
   }
 
   &.focused {
-    outline-width: createThemeVar('Input:thickness-outline-#{$componentName}--focus');
-    outline-color: createThemeVar('Input:color-outline-#{$componentName}--focus');
-    outline-style: createThemeVar('Input:style-outline-#{$componentName}--focus');
-    outline-offset: createThemeVar('Input:offset-outline-#{$componentName}--focus');
+    outline-width: createThemeVar('Input:thickness-outline-#{$component}--focus');
+    outline-color: createThemeVar('Input:color-outline-#{$component}--focus');
+    outline-style: createThemeVar('Input:style-outline-#{$component}--focus');
+    outline-offset: createThemeVar('Input:offset-outline-#{$component}--focus');
   }
 }
 
@@ -89,7 +90,8 @@ $themeVars: t.composePaddingVars($themeVars, "#{$componentName}-badge");
   width: fit-content;
   height: fit-content;
   min-width: 0;
-  @include t.paddingVars($themeVars, "#{$componentName}-badge");
+  @include t.paddingVars($themeVars, "#{$component}-badge");
+  @include t.borderVars($themeVars, "#{$component}-badge");
   transition: color 0.2s, background-color 0.2s;
   user-select: none;
   cursor: pointer;
@@ -97,19 +99,18 @@ $themeVars: t.composePaddingVars($themeVars, "#{$componentName}-badge");
   gap: t.$space-1;
   justify-content: center;
   align-items: center;
-  border-radius: t.$radius;
-  font-size: createThemeVar("Input:font-size-#{$componentName}-badge");
-  background-color: createThemeVar("Input:color-bg-#{$componentName}-badge");
-  color: createThemeVar("Input:color-text-#{$componentName}-badge");
+  font-size: createThemeVar("Input:font-size-#{$component}-badge");
+  background-color: createThemeVar("Input:color-bg-#{$component}-badge");
+  color: createThemeVar("Input:color-text-#{$component}-badge");
 
   &:hover {
-    background-color: createThemeVar("Input:color-bg-#{$componentName}-badge--hover");
-    color: createThemeVar("Input:color-text-#{$componentName}-badge--hover");
+    background-color: createThemeVar("Input:color-bg-#{$component}-badge--hover");
+    color: createThemeVar("Input:color-text-#{$component}-badge--hover");
   }
 
   &:active {
-    background-color: createThemeVar("Input:color-bg-#{$componentName}-badge--active");
-    color: createThemeVar("Input:color-text-#{$componentName}-badge--active");
+    background-color: createThemeVar("Input:color-bg-#{$component}-badge--active");
+    color: createThemeVar("Input:color-text-#{$component}-badge--active");
   }
 }
 
@@ -124,7 +125,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$componentName}-badge");
   }
 
   &::placeholder {
-    color: createThemeVar("Input:color-placeholder-#{$componentName}");
+    color: createThemeVar("Input:color-placeholder-#{$component}");
   }
 }
 
@@ -151,9 +152,9 @@ $themeVars: t.composePaddingVars($themeVars, "#{$componentName}-badge");
   z-index: 10;
   width: 100%;
   outline: none;
-  background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
-  border-radius: createThemeVar("Input:radius-menu-#{$componentName}");
-  box-shadow: createThemeVar("Input:shadow-menu-#{$componentName}");
+  background-color: createThemeVar("Input:color-bg-menu-#{$component}");
+  border-radius: createThemeVar("Input:radius-menu-#{$component}");
+  box-shadow: createThemeVar("Input:shadow-menu-#{$component}");
   animation: fade-in 0.3s ease-in-out; /* animate-in */
 }
 
@@ -165,17 +166,17 @@ $themeVars: t.composePaddingVars($themeVars, "#{$componentName}-badge");
   justify-content: space-between;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  background-color: createThemeVar("color-bg-item-#{$componentName}");
+  background-color: createThemeVar("color-bg-item-#{$component}");
 
   &[data-selected=true] {
-    background-color: createThemeVar("color-bg-item-#{$componentName}--hover");
+    background-color: createThemeVar("color-bg-item-#{$component}--hover");
   }
 
   &[data-disabled=true] {
     pointer-events: none;
     opacity: 0.5;
     cursor: not-allowed;
-    color: createThemeVar("color-text-item-#{$componentName}--disabled");
+    color: createThemeVar("color-text-item-#{$component}--disabled");
     font-style: italic;
   }
 }

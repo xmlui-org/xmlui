@@ -45,6 +45,8 @@ This code passes an array of strings to `data`. A `List` component displays each
   height={240}
 />
 
+
+
 ### Using `data` with a valid URL
 
 When you pass a string value to `data`, XMLUI considers it a URL and fetches the data from it. When the fetch is complete, the UI is refreshed accordingly.
@@ -132,6 +134,28 @@ You can refer to the `DataSource` instance with its identifier, `rocketsData`.
 />
 
 This sample has the same effect as using a URL in the `data` property. However, when you need additional configuration to issue a fetch request (for example, changing the `GET` method or adding some custom headers), `DataSource` provides that flexibility over a single string URL.
+
+Note that a `DataSource` identifier can be shared among multiple components, intrinsic and/or user-defined.
+
+```ueml copy /rocketsData/
+<App>
+  <DataSource id="rocketsData" url="https://api.spacexdata.com/v4/rockets" />
+  <List data="{rocketsData}">
+    <Card title="{$item.rocket_name}" subtitle="{$item.success_rate_pct}%" />
+  </List>
+  <MyCustomRocketDisplay source="{rocketsData} />
+</App>
+```
+
+```ueml copy
+<Component name="MyCustomRocketDisplay">
+  <Items data="{$props.source}">
+    <Text>
+      {$item.name}, {$item.type}, {$item.first_flight}
+    </Text>
+  </Items>
+</Component>
+```
 
 ## Using `DataSource`
 

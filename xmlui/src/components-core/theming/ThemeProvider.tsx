@@ -1,12 +1,6 @@
 import type React from "react";
 
-import type {
-  ThemeScope,
-  AppThemes,
-  ThemeTone,
-  ThemeDefinition,
-  FontDef,
-} from "./abstractions";
+import type { ThemeScope, AppThemes, ThemeTone, ThemeDefinition, FontDef } from "./abstractions";
 import { ThemeToneKeys } from "./abstractions";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -14,21 +8,17 @@ import {
   generateBaseFontSizes,
   generateBaseSpacings,
   generateBaseTones,
+  generateBorderSegments,
   generateButtonTones,
+  generatePaddingSegments,
   resolveThemeVar,
 } from "./transformThemeVars";
 import { normalizePath } from "../utils/misc";
 import { matchThemeVar } from "../theming/hvar";
-import {
-  ThemeContext,
-  ThemesContext,
-} from "../theming/ThemeContext";
+import { ThemeContext, ThemesContext } from "../theming/ThemeContext";
 import themeVars, { getVarKey } from "../theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../constants";
-import {
-  collectThemeChainByExtends,
-  expandTheme,
-} from "../theming/extendThemeUtils";
+import { collectThemeChainByExtends, expandTheme } from "../theming/extendThemeUtils";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import {
   XmlUiCyanThemeDefinition,
@@ -47,18 +37,14 @@ export function useCompiledTheme(
   activeTone: ThemeTone,
   themes: ThemeDefinition[] = EMPTY_ARRAY,
   resources: Record<string, string> = EMPTY_OBJECT,
-  resourceMap: Record<string, string> = EMPTY_OBJECT
+  resourceMap: Record<string, string> = EMPTY_OBJECT,
 ) {
   const componentRegistry = useComponentRegistry();
   const { componentThemeVars, componentDefaultThemeVars } = componentRegistry;
 
   const themeDefChain = useMemo(() => {
     if (activeTheme) {
-      return collectThemeChainByExtends(
-        activeTheme,
-        themes,
-        componentDefaultThemeVars
-      );
+      return collectThemeChainByExtends(activeTheme, themes, componentDefaultThemeVars);
     }
     return undefined;
   }, [activeTheme, componentDefaultThemeVars, themes]);
@@ -101,20 +87,16 @@ export function useCompiledTheme(
       if (resourceMap[resourceUrl]) {
         return resourceMap[resourceUrl];
       }
-      if (
-        resourceUrl.startsWith("/") &&
-        resourceMap[resourceUrl.substring(1)]
-      ) {
+      if (resourceUrl.startsWith("/") && resourceMap[resourceUrl.substring(1)]) {
         return resourceMap[resourceUrl.substring(1)];
       }
       return normalizePath(resourceUrl);
     },
-    [allResources, resourceMap]
+    [allResources, resourceMap],
   );
 
   const fontLinks: Array<string> = useMemo(() => {
-    return (allFonts?.filter((theme) => typeof theme === "string") ||
-      []) as Array<string>;
+    return (allFonts?.filter((theme) => typeof theme === "string") || []) as Array<string>;
   }, [allFonts]);
 
   const themeDefChainVars = useMemo(() => {
@@ -144,14 +126,18 @@ export function useCompiledTheme(
         ...generateBaseSpacings(mergedThemeVars),
         ...generateBaseFontSizes(mergedThemeVars),
         ...generateBaseTones(mergedThemeVars),
+        ...generatePaddingSegments(mergedThemeVars),
+        ...generateBorderSegments(mergedThemeVars),
         ...generateButtonTones(mergedThemeVars),
       },
       {
         ...expandTheme({
           ...themeDefChain[themeDefChain.length - 1].themeVars,
-          ...themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<string, string>,
-          ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]
-            ?.themeVars,
+          ...(themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<
+            string,
+            string
+          >),
+          ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]?.themeVars,
         }),
       },
     ];
@@ -166,10 +152,7 @@ export function useCompiledTheme(
 
     const resolvedThemeVarsFromChains: Record<string, string> = {};
 
-    new Set([
-      ...Object.keys(themeVars.themeVars),
-      ...componentThemeVars,
-    ]).forEach((themeVar) => {
+    new Set([...Object.keys(themeVars.themeVars), ...componentThemeVars]).forEach((themeVar) => {
       const result = matchThemeVar(themeVar, themeDefChainVars);
       if (
         result &&
@@ -177,9 +160,7 @@ export function useCompiledTheme(
         result.matchedValue &&
         result.forValue !== result.matchedValue
       ) {
-        resolvedThemeVarsFromChains[
-          result.forValue
-        ] = `$${result.matchedValue}`;
+        resolvedThemeVarsFromChains[result.forValue] = `$${result.matchedValue}`;
       }
     });
 
@@ -191,14 +172,12 @@ export function useCompiledTheme(
 
   const themeCssVars = useMemo(() => {
     const ret: Record<string, string> = {};
-    Object.entries(allThemeVarsWithResolvedHierarchicalVars).forEach(
-      ([key, value]) => {
-        const themeKey = `--${themeVars.keyPrefix}-${key}`;
-        if (value) {
-          ret[themeKey] = value;
-        }
+    Object.entries(allThemeVarsWithResolvedHierarchicalVars).forEach(([key, value]) => {
+      const themeKey = `--${themeVars.keyPrefix}-${key}`;
+      if (value) {
+        ret[themeKey] = value;
       }
-    );
+    });
     return ret;
   }, [allThemeVarsWithResolvedHierarchicalVars]);
 
@@ -206,7 +185,7 @@ export function useCompiledTheme(
     (varName: string) => {
       return resolveThemeVar(varName, allThemeVarsWithResolvedHierarchicalVars);
     },
-    [allThemeVarsWithResolvedHierarchicalVars]
+    [allThemeVarsWithResolvedHierarchicalVars],
   );
 
   useEffect(() => {
@@ -304,28 +283,14 @@ function ThemeProvider({
       foundTheme = themes.find((theme) => theme.id === activeThemeId);
     }
     if (!foundTheme) {
-      throw new Error(
-        `Theme ${activeThemeId} not found, available themes: ${availableThemeIds}`
-      );
+      throw new Error(`Theme ${activeThemeId} not found, available themes: ${availableThemeIds}`);
     }
     return foundTheme;
   }, [activeThemeId, availableThemeIds, themes]);
 
-  const {
-    allThemeVarsWithResolvedHierarchicalVars,
-    themeCssVars,
-    getResourceUrl,
-    getThemeVar,
-  } = useCompiledTheme(
-    activeTheme,
-    activeThemeTone,
-    themes,
-    resources,
-    resourceMap
-  );
-  const [root, setRoot] = useState(
-    typeof document === "undefined" ? undefined : document.body
-  );
+  const { allThemeVarsWithResolvedHierarchicalVars, themeCssVars, getResourceUrl, getThemeVar } =
+    useCompiledTheme(activeTheme, activeThemeTone, themes, resources, resourceMap);
+  const [root, setRoot] = useState(typeof document === "undefined" ? undefined : document.body);
 
   const themeValue = useMemo(() => {
     const themeVal: AppThemes = {
@@ -340,7 +305,7 @@ function ThemeProvider({
       setActiveThemeTone,
       availableThemeIds,
       activeTheme,
-      toggleThemeTone: () => setActiveThemeTone(activeThemeTone === "light" ? "dark" : "light")
+      toggleThemeTone: () => setActiveThemeTone(activeThemeTone === "light" ? "dark" : "light"),
     };
     return themeVal;
   }, [
@@ -379,9 +344,7 @@ function ThemeProvider({
 
   return (
     <ThemesContext.Provider value={themeValue}>
-      <ThemeContext.Provider value={currentThemeContextValue}>
-        {children}
-      </ThemeContext.Provider>
+      <ThemeContext.Provider value={currentThemeContextValue}>{children}</ThemeContext.Provider>
     </ThemesContext.Provider>
   );
 }
@@ -396,10 +359,7 @@ function resolveThemeVarsWithCssVars(theme?: Record<string, string>) {
   });
   return ret;
 
-  function resolveThemeVarToCssVars(
-    varName: string,
-    theme: Record<string, string>
-  ) {
+  function resolveThemeVarToCssVars(varName: string, theme: Record<string, string>) {
     const value = theme[varName];
     if (typeof value === "string" && value.includes("$")) {
       return replaceThemeVar(value);

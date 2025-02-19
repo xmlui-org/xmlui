@@ -11,7 +11,7 @@ $themeVars: ();
 // --- Theme vars for paddings and borders
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
-$themeVars: t.appendBorderVars($themeVars, $component) !global;
+$themeVars: t.composeBorderVars($themeVars, $component);
 
 // --- Other
 $width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
@@ -21,8 +21,7 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   position: relative;
   height: createThemeVar("height-#{$component}");
   box-sizing: content-box;
-  background-color: createThemeVar("color-bg-AppHeader");
-
+  background-color: createThemeVar("color-bg-#{$component}");
   @include t.borderVars($themeVars, $component);
 }
 
@@ -34,8 +33,8 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   display: flex;
   flex-direction: row;
   align-items: center;
-  max-width: createThemeVar("max-content-width-AppHeader");
-  padding-inline: t.getThemeVar($themeVars, "padding-horizontal-AppHeader");
+  max-width: createThemeVar("max-content-width-#{$component}");
+  padding-inline: t.getThemeVar($themeVars, "padding-horizontal-#{$component}");
   @include t.paddingVars($themeVars, $component);
 
   &.full {
@@ -78,7 +77,6 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   width: $width-logo-AppHeader;
   height: 100%;
   align-items: center;
-
   @include t.paddingVars($themeVars, "logo-#{$component}");
 }
 

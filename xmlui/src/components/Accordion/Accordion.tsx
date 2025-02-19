@@ -67,9 +67,7 @@ export const AccordionMd = createMetadata({
     [`font-size-header-${COMP}`]: "$font-size-normal",
     [`font-weight-header-${COMP}`]: "$font-weight-normal",
     [`font-family-header-${COMP}`]: "$font-family",
-    [`radius-${COMP}`]: "$radius",
-    [`thickness-border-${COMP}`]: "0",
-    [`style-border-${COMP}`]: "solid",
+    [`border-${COMP}`]: "none",
     [`width-icon-${COMP}`]: "",
     [`height-icon-${COMP}`]: "",
     light: {
@@ -78,7 +76,6 @@ export const AccordionMd = createMetadata({
       [`color-header-${COMP}`]: "$color-surface-50",
       [`color-content-${COMP}`]: "$color-text-primary",
       [`color-bg-content-${COMP}`]: "transparent",
-      [`color-border-${COMP}`]: "transparent",
       [`color-icon-${COMP}`]: "$color-surface-50",
     },
     dark: {
@@ -87,7 +84,6 @@ export const AccordionMd = createMetadata({
       [`color-header-${COMP}`]: "$color-surface-50",
       [`color-content-${COMP}`]: "$color-text-primary",
       [`color-bg-content-${COMP}`]: "transparent",
-      [`color-border-${COMP}`]: "transparent",
       [`color-icon-${COMP}`]: "$color-surface-50",
     },
   },

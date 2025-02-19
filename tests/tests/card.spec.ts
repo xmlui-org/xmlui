@@ -56,7 +56,7 @@ test("border", async ({ page }) => {
 // in dev runs where they are run on multiple cores
 // =================================================
 
-test("thickness-border", async ({ page }) => {
+test("border-thickness", async ({ page }) => {
   const EXPECTED = "5px";
 
   await initThemedApp(page, CARD_CODE, {
@@ -78,7 +78,7 @@ test("color-bg", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("background-color", EXPECTED);
 });
 
-test("color-border", async ({ page }) => {
+test("border-color", async ({ page }) => {
   const EXPECTED = "rgb(255, 0, 0)";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
@@ -88,7 +88,7 @@ test("color-border", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("border-color", EXPECTED);
 });
 
-test("style-border", async ({ page }) => {
+test("border-style", async ({ page }) => {
   const EXPECTED = "dotted";
 
   await initThemedApp(page, CARD_CODE, {

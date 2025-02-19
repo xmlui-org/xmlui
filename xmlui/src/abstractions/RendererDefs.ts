@@ -60,9 +60,6 @@ export interface RendererContext<TMd extends ComponentMetadata = ComponentMetada
 
   // --- These are the CSS property values the underlying React component can merge into its "style" property
   layoutCss: CSSProperties;
-
-  // --- Other layout property values the component may transform and merge into its "style" property
-  layoutNonCss: NonCssLayoutProps;
 }
 
 /**
