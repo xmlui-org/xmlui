@@ -49,7 +49,7 @@ export const CheckboxMd = createMetadata({
       `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
         `of the ${COMP} besides its label.`,
     ),
-    inputTemplate: d(""),
+    inputTemplate: d("This property is used to define a custom checkbox input template"),
   },
   events: {
     click: dClick(COMP),
@@ -98,14 +98,15 @@ export const checkboxComponentRenderer = createComponentRenderer(
     renderChild,
     layoutContext,
   }) => {
+    const inputTemplate = node.children || node.props?.inputTemplate;
     return (
       <Toggle
         inputRenderer={
-          node.props?.inputTemplate
+          inputTemplate
             ? (contextVars) => (
                 <MemoizedItem
                   contextVars={contextVars}
-                  node={node.props?.inputTemplate}
+                  node={inputTemplate}
                   renderChild={renderChild}
                   layoutContext={layoutContext}
                 />

@@ -86,7 +86,7 @@ export const FormItemMd = createMetadata({
     regexInvalidSeverity: d(
       `This property sets the severity level of regular expression validation.`,
     ),
-    inputTemplate: d(""),
+    inputTemplate: d("This property is used to define a custom input template."),
   },
   events: {
     validate: d(`This event is used to define a custom validation function.`),
@@ -156,7 +156,6 @@ export const formItemComponentRenderer = createComponentRenderer(
       customValidationsDebounce,
       validationMode,
       maxTextLength,
-      inputTemplate,
       ...rest
     } = node.props;
 
@@ -190,6 +189,7 @@ export const formItemComponentRenderer = createComponentRenderer(
     const resolvedRestProps = extractValue(nonLayoutCssProps);
     const formItemType = extractValue.asOptionalString(type);
     const isCustomFormItem = formItemType === undefined && !!node.children;
+    const inputTemplate = node.children || node.props?.inputTemplate;
 
     return (
       <FormItem
@@ -210,8 +210,15 @@ export const formItemComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         maxTextLength={extractValue(maxTextLength)}
         inputRenderer={
-          node.props?.inputTemplate
-            ? (contextVars) => renderChild(node.props?.inputTemplate, contextVars)
+          inputTemplate
+            ? (contextVars) => (
+                <MemoizedItem
+                  contextVars={contextVars}
+                  node={inputTemplate}
+                  renderChild={renderChild}
+                  layoutContext={layoutContext}
+                />
+              )
             : undefined
         }
         {...resolvedRestProps}
