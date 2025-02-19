@@ -209,16 +209,11 @@ export const formItemComponentRenderer = createComponentRenderer(
         validationMode={extractValue.asOptionalString(validationMode)}
         registerComponentApi={registerComponentApi}
         maxTextLength={extractValue(maxTextLength)}
-        renderInput={(contextVars: any) => {
-          return (
-              <MemoizedItem
-                node={extractValue(inputTemplate)}
-                contextVars={contextVars}
-                renderChild={renderChild}
-                layoutContext={layoutContext}
-              />
-          );
-        }}
+        inputRenderer={
+          node.props?.inputTemplate
+            ? (contextVars) => renderChild(node.props?.inputTemplate, contextVars)
+            : undefined
+        }
         {...resolvedRestProps}
       >
         {isCustomFormItem ? (

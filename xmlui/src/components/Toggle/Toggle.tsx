@@ -182,8 +182,8 @@ export const Toggle = forwardRef(function Toggle(
       // --- By setting pointerEvents we kind of 'disable' the label click, too
     >
       {inputRenderer ? (
-        <label>
-          <div style={{ zIndex: -1, position: "relative", opacity: 0 }}>{input}</div>
+        <label className={styles.label}>
+          <div className={styles.inputContainer}>{input}</div>
           {inputRenderer({
             $checked: value,
           })}
