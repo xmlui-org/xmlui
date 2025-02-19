@@ -211,7 +211,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   );
 
   // --- Collect and compile the layout property values
-  const { cssProps, nonCssProps } = useMemo(() => {
+  const { cssProps } = useMemo(() => {
     const resolvedLayoutProps: Record<string, any> = {};
     layoutOptionKeys.forEach((key) => {
       if (safeNode.props && key in safeNode.props) {
@@ -235,7 +235,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- As compileLayout generates new cssProps and nonCssProps objects every time, we need to
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
-  const stableLayoutNonCss = useShallowCompareMemoize(nonCssProps);
 
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
@@ -255,7 +254,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       renderChild: memoedRenderChild,
       registerComponentApi: memoedRegisterComponentApi,
       layoutCss: stableLayoutCss,
-      layoutNonCss: stableLayoutNonCss,
       layoutContext: layoutContextRef?.current,
       uid,
     };

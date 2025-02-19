@@ -1,24 +1,20 @@
 import { CSSProperties } from "react";
-import { LayoutContext, NonCssLayoutProps } from "../../abstractions/RendererDefs";
+import { LayoutContext } from "../../abstractions/RendererDefs";
 import { EMPTY_OBJECT } from "../constants";
 import { isEmpty } from "lodash-es";
 
 export const THEME_VAR_PREFIX = "xmlui";
 const themeVarCapturesRegex = /(\$[a-zA-Z][a-zA-Z0-9-_]*)/g;
-const alignmentRegex = /^(start|end|center)$/;
-const orientationRegex = /^(horizontal|vertical)$/;
 const booleanRegex = /^(true|false)$/;
 const starSizeRegex = /^\d*\*$/;
 
 export type ResolvedLayout = {
   cssProps: CSSProperties;
-  nonCssProps: NonCssLayoutProps;
   issues: Set<string>;
 };
 
 const defaultCompResult: ResolvedLayout = {
   cssProps: {},
-  nonCssProps: {},
   issues: new Set(),
 };
 
@@ -28,14 +24,8 @@ export function resolveLayoutProps(
 ): ResolvedLayout {
   const result: ResolvedLayout = {
     cssProps: {},
-    nonCssProps: {},
     issues: new Set(),
   };
-
-  // --- Aligments & orientation
-  collectNonCss("horizontalAlignment");
-  collectNonCss("verticalAlignment");
-  collectNonCss("orientation");
 
   // --- Adjust flex
   if (!!getOrientation(layoutContext)) {
@@ -164,7 +154,7 @@ export function resolveLayoutProps(
   }
 
   // --- If we didn't set any props, return a referentially stable result
-  if (isEmpty(result.cssProps) && isEmpty(result.nonCssProps) && isEmpty(result.issues)) {
+  if (isEmpty(result.cssProps) && isEmpty(result.issues)) {
     return defaultCompResult;
   }
 
@@ -252,14 +242,6 @@ export function resolveLayoutProps(
     }
   }
 
-  function collectNonCss(prop: string): void {
-    const value = transformLayoutValue(prop);
-    if (value) {
-      // --- Evaluate
-      result.nonCssProps[prop] = value;
-    }
-  }
-
   function collectCss(prop: string, propCssName = ""): void {
     const value = transformLayoutValue(prop);
     if (value) {
@@ -318,11 +300,6 @@ export function toCssVar(c: string): string {
 
 // The properties constituting a component's layout
 export type LayoutProps = {
-  // --- Context-dependent/non-CSS props
-  horizontalAlignment?: string;
-  verticalAlignment?: string;
-  orientation?: string;
-
   // --- Dimensions
   width?: number | string;
   minWidth?: number | string;
@@ -410,11 +387,6 @@ export type LayoutProps = {
 
 // The properties constituting a component's layout
 const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
-  // --- Context-dependent/non-CSS props
-  horizontalAlignment: [alignmentRegex],
-  verticalAlignment: [alignmentRegex],
-  orientation: [orientationRegex],
-
   // --- Dimensions
   width: [],
   minWidth: [],

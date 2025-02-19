@@ -5,7 +5,6 @@ import styles from "./Splitter.module.scss";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import type {
-  NonCssLayoutProps,
   ValueExtractor,
   LookupEventHandlerFn,
 } from "../../abstractions/RendererDefs";
@@ -47,6 +46,11 @@ const baseSplitterMd = createMetadata({
       `Toggles whether the resizer is visible (\`false\`) or not (\`true\`) when not hovered ` +
         `or dragged. The default value is \`false\`, meaning the resizer is visible all the time.`,
     ),
+    orientation: d(
+      `Sets whether the \`Splitter\` divides the container horizontally and lays out the ` +
+        `section on top of each other (\`vertical\`), or vertically by placing the sections ` +
+        `next to each other (\`horizontal\`).`,
+    ),
   },
   events: {
     resize: d(`This event fires when the component is resized.`),
@@ -64,11 +68,6 @@ export const SplitterMd = {
   ...baseSplitterMd,
   props: {
     ...baseSplitterMd.props,
-    orientation: d(
-      `Sets whether the \`Splitter\` divides the container horizontally and lays out the ` +
-        `section on top of each other (\`vertical\`), or vertically by placing the sections ` +
-        `next to each other (\`horizontal\`).`,
-    ),
   },
 };
 
@@ -81,7 +80,6 @@ type HSplitterComponentDef = ComponentDef<typeof HSplitterMd>;
 
 type RenderSplitterPars = {
   node: SplitterComponentDef | VSplitterComponentDef | HSplitterComponentDef;
-  layoutNonCss: NonCssLayoutProps;
   extractValue: ValueExtractor;
   layoutCss: React.CSSProperties;
   renderChild: RenderChildFn;
@@ -94,11 +92,10 @@ const DEFAULT_ORIENTATION = "vertical";
 function renderSplitter({
   node,
   extractValue,
-  layoutNonCss,
   layoutCss,
   renderChild,
-  lookupEventHandler ,
-  orientation = (layoutNonCss.orientation as OrientationOptions) ?? DEFAULT_ORIENTATION,
+  lookupEventHandler,
+  orientation = extractValue(node.props.orientation) ?? DEFAULT_ORIENTATION,
 }: RenderSplitterPars) {
   if (!isComponentDefChildren(node.children)) {
     throw new NotAComponentDefError();
@@ -123,12 +120,11 @@ function renderSplitter({
 export const splitterComponentRenderer = createComponentRenderer(
   COMP,
   SplitterMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
     return renderSplitter({
       node,
       extractValue,
       layoutCss,
-      layoutNonCss,
       renderChild,
       lookupEventHandler: lookupEventHandler as any,
     });
@@ -138,12 +134,11 @@ export const splitterComponentRenderer = createComponentRenderer(
 export const vSplitterComponentRenderer = createComponentRenderer(
   "VSplitter",
   VSplitterMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
     return renderSplitter({
       node,
       extractValue,
       layoutCss,
-      layoutNonCss,
       renderChild,
       orientation: "vertical",
       lookupEventHandler: lookupEventHandler as any,
@@ -154,12 +149,11 @@ export const vSplitterComponentRenderer = createComponentRenderer(
 export const hSplitterComponentRenderer = createComponentRenderer(
   "HSplitter",
   HSplitterMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
     return renderSplitter({
       node,
       extractValue,
       layoutCss,
-      layoutNonCss,
       renderChild,
       orientation: "horizontal",
       lookupEventHandler: lookupEventHandler as any,

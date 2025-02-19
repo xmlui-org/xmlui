@@ -4,7 +4,7 @@ import styles from "./Heading.module.scss";
 
 import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
-import type { NonCssLayoutProps, ValueExtractor } from "../../abstractions/RendererDefs";
+import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Heading, type HeadingLevel } from "./HeadingNative";
@@ -199,7 +199,6 @@ type RenderHeadingPars = {
   node: HeadingComponentDef;
   extractValue: ValueExtractor;
   layoutCss: CSSProperties;
-  layoutNonCss: NonCssLayoutProps;
   renderChild: RenderChildFn;
   level: string;
 };
@@ -224,12 +223,11 @@ function renderHeading({ node, extractValue, layoutCss, level, renderChild }: Re
 export const headingComponentRenderer = createComponentRenderer(
   COMP,
   HeadingMd,
-  ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
+  ({ node, extractValue, layoutCss, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
       layoutCss,
-      layoutNonCss,
       level: node.props.level,
       renderChild,
     });
@@ -239,12 +237,11 @@ export const headingComponentRenderer = createComponentRenderer(
 export const h1ComponentRenderer = createComponentRenderer(
   H1,
   H1Md,
-  ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
+  ({ node, extractValue, layoutCss, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
       layoutCss,
-      layoutNonCss,
       level: "h1",
       renderChild,
     } as any);
@@ -254,12 +251,11 @@ export const h1ComponentRenderer = createComponentRenderer(
 export const h2ComponentRenderer = createComponentRenderer(
   H2,
   H2Md,
-  ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
+  ({ node, extractValue, layoutCss, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
       layoutCss,
-      layoutNonCss,
       level: "h2",
       renderChild,
     } as any);
@@ -269,12 +265,11 @@ export const h2ComponentRenderer = createComponentRenderer(
 export const h3ComponentRenderer = createComponentRenderer(
   H3,
   H3Md,
-  ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
+  ({ node, extractValue, layoutCss, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
       layoutCss,
-      layoutNonCss,
       level: "h3",
       renderChild,
     } as any);
@@ -284,12 +279,11 @@ export const h3ComponentRenderer = createComponentRenderer(
 export const h4ComponentRenderer = createComponentRenderer(
   H4,
   H4Md,
-  ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
+  ({ node, extractValue, layoutCss, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
       layoutCss,
-      layoutNonCss,
       level: "h4",
       renderChild,
     } as any);
@@ -299,12 +293,11 @@ export const h4ComponentRenderer = createComponentRenderer(
 export const h5ComponentRenderer = createComponentRenderer(
   H5,
   H5Md,
-  ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
+  ({ node, extractValue, layoutCss, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
       layoutCss,
-      layoutNonCss,
       level: "h5",
       renderChild,
     } as any);
@@ -314,12 +307,11 @@ export const h5ComponentRenderer = createComponentRenderer(
 export const h6ComponentRenderer = createComponentRenderer(
   H6,
   H6Md,
-  ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
+  ({ node, extractValue, layoutCss, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
       layoutCss,
-      layoutNonCss,
       level: "h6",
       renderChild,
     } as any);
