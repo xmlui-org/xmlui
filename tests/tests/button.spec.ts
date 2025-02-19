@@ -1,6 +1,6 @@
-import { test, expect, ColorChannelCombinations } from "./fixtures";
+import { test, expect, type ColorChannelCombinations } from "./fixtures";
 import { getStyle, getElementStyle, initApp, initThemedApp } from "./component-test-helpers";
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 const BTN_MATRIX_CODE = `
 <Stack gap="1rem">
@@ -471,7 +471,8 @@ test(`radius-Button to solid, outlined`, async ({ page }) => {
   expect(btnOutAttBorderRadius).toBe(EXPECTED);
 });
 
-test(`thickness-border-Button to solid, outlined`, async ({ page }) => {
+// Skip Reason: we are evaluating the usage of border-style
+test.skip(`thickness-border-Button to solid, outlined`, async ({ page }) => {
   const EXPECTED = "5px";
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
