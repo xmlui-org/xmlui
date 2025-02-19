@@ -6,73 +6,6 @@ import { Callout } from "nextra/components";
 
 This article describes common values that you can use in layout properties.
 
-## Alignment values [#alignment]
-
-Position a child component within its parent to the start according to the current content direction.
-
-|Value|Description|
-|---|---|
-|start|Position child component at the start|
-|center|Position child component in the center|
-|end|Position child component at the end|
-
-```ueml copy /horizontalAlignment/ /verticalAlignment/
-<App>
-  <VStack>
-    <HStack width="300px" backgroundColor="cyan"
-      horizontalAlignment="start">
-      <Text>This is a text aligned to the start</Text>
-    </HStack>
-    <HStack width="300px" backgroundColor="cyan"
-      horizontalAlignment="center">
-      <Text>This is a text aligned to the center</Text>
-    </HStack>
-    <HStack width="300px" backgroundColor="cyan"
-      horizontalAlignment="end">
-      <Text>This is a text aligned to the end</Text>
-    </HStack>
-    <VStack height="100px"
-      backgroundColor="cyan"
-      verticalAlignment="end"
-      horizontalAlignment="center">
-      <Text>
-        This text is aligned vertically to the bottom, horizontally to the center
-      </Text>
-    </VStack>
-  </VStack>
-</App>
-```
-
-<Playground
-    name="Alignment values"
-    app={`
-    <App>
-      <VStack>
-        <HStack width="300px" backgroundColor="cyan"
-          horizontalAlignment="start">
-          <Text>This is a text aligned to the start</Text>
-        </HStack>
-        <HStack width="300px" backgroundColor="cyan"
-          horizontalAlignment="center">
-          <Text>This is a text aligned to the center</Text>
-        </HStack>
-        <HStack width="300px" backgroundColor="cyan"
-          horizontalAlignment="end">
-          <Text>This is a text aligned to the end</Text>
-        </HStack>
-        <VStack height="100px"
-          backgroundColor="cyan"
-          verticalAlignment="end"
-          horizontalAlignment="center">
-          <Text>
-            This text is aligned vertically to the bottom, horizontally to the center
-          </Text>
-        </VStack>
-      </VStack>
-    </App>
-  `}
-/>
-
 ## Boolean Values [#boolean]
 
 You can represent the `true` and `false` values with multiple keywords:
@@ -357,34 +290,6 @@ This property selects a regular, condensed, or expanded face from a font. Its va
 This property sets an element's opacity. Opacity is the degree to which the content behind an element is hidden, and it is the opposite of transparency. 
 
 The property value is a number in the range of 0.0 to 1.0, inclusive, or a percentage in the range of 0% to 100%, inclusive, representing the opacity of the channel (that is, the value of its alpha channel). Any value outside the interval, though valid, is clamped to the nearest limit in the range.
-
-## Orientation [#orientation]
-
-Describes the orientation a particular component renders its content (child components).
-
-|Value|Description|
-|:---|:---|
-|vertical|Lays out its content (children) vertically (in a column)|
-|horizontal|Lays out its content (children) horizontally (in a row)|
-
-<Playground
-    name="Orientation"
-    app={`
-      <HStack gap="2rem" height="100%">
-        <VStack width="140px" gap="10px" backgroundColor="cyan">
-          <H4>vertical</H4>
-          <Stack height="40px" width="40px" backgroundColor="blue" />
-          <Stack height="40px" width="40px" backgroundColor="blue" />
-          <Stack height="40px" width="40px" backgroundColor="blue" />
-        </VStack>
-        <HStack width="240px" gap="10px" backgroundColor="cyan">
-          <H4>horizontal</H4>
-          <Stack height="40px" width="40px" backgroundColor="blue" />
-          <Stack height="40px" width="40px" backgroundColor="blue" />
-          <Stack height="40px" width="40px" backgroundColor="blue" />
-        </HStack>
-      </HStack>`}
-/>
 
 ## Overflow Values [#overflow]
 

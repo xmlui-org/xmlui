@@ -36,10 +36,10 @@ export const ContentSeparatorMd = createMetadata({
 export const contentSeparatorComponentRenderer = createComponentRenderer(
   COMP,
   ContentSeparatorMd,
-  ({ node, layoutCss, layoutNonCss, extractValue }) => {
+  ({ node, layoutCss, extractValue }) => {
     return (
       <ContentSeparator
-        orientation={layoutNonCss.orientation}
+        orientation={extractValue(node.props.orientation)}
         size={extractValue.asSize(node.props.size)}
         style={layoutCss}
       />
