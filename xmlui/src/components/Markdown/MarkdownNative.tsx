@@ -4,13 +4,14 @@ import remarkGfm from "remark-gfm";
 import { visit } from 'unist-util-visit';
 
 import styles from "./Markdown.module.scss";
+import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
 
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Image } from "../Image/ImageNative";
 import { Toggle } from "../Toggle/Toggle";
-import { ValueExtractor } from "../../abstractions/RendererDefs";
+import type { ValueExtractor } from "../../abstractions/RendererDefs";
 
 type MarkdownProps = {
   extractValue: ValueExtractor;
@@ -149,9 +150,30 @@ export const Markdown = memo(function Markdown({
               readOnly={disabled}
               value={checked}
               /* label={value}
-                  labelPosition={"right"} */
+                labelPosition={"right"} */
             />
           );
+        },
+        table({ children }) {
+          return <table className={htmlTagStyles.htmlTable}>{children}</table>;
+        },
+        tr({ children }) {
+          return <tr className={htmlTagStyles.htmlTr}>{children}</tr>;
+        },
+        td({ children }) {
+          return <td className={htmlTagStyles.htmlTd}>{children}</td>;
+        },
+        th({ children }) {
+          return <th className={htmlTagStyles.htmlTh}>{children}</th>;
+        },
+        thead({ children }) {
+          return <thead className={htmlTagStyles.htmlThead}>{children}</thead>;
+        },
+        tbody({ children }) {
+          return <tbody className={htmlTagStyles.htmlTbody}>{children}</tbody>;
+        },
+        tfoot({ children }) {
+          return <tfoot className={htmlTagStyles.htmlTfoot}>{children}</tfoot>;
         },
       }}
     >
@@ -243,12 +265,12 @@ const ListItem = ({ children, style }: ListItemProps) => {
 function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
   return (tree: any) => {
     visit(tree, 'text', (node) => {
-      const regex = /\$(.+?)\$/g;
+      const regex = /\$\{(.+?)\}\$/g;
       const parts: string[] = node.value.split(regex);
       if (parts.length > 1) {
         node.type = 'html';
         node.value = parts.map((part, index) => 
-          index % 2 === 0 ? part : extractValue(part)
+          index % 2 === 0 ? part : extractValue(`{${part}}`)
         ).join('');
       }
     });
