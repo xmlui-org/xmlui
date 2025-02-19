@@ -24,7 +24,6 @@ import {
 } from "../../components/metadata-helpers";
 import { Toggle } from "../Toggle/Toggle";
 import { MemoizedItem } from "../container-helpers";
-import { divide } from "lodash-es";
 
 const COMP = "Checkbox";
 
