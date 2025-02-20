@@ -5,24 +5,26 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import type { Option } from "../abstractions";
 import { dEnabled } from "../metadata-helpers";
 import { useOptionType } from "../Option/OptionTypeProvider";
+import { MemoizedItem } from "../container-helpers";
 
 const COMP = "Option";
 
 export const OptionMd = createMetadata({
   description:
-    `\`${COMP}\` is a non-visual component describing a selection option. Other components ` +
-    `(such as \`Select\`, \`Combobox\`, and others) may use nested \`Option\` instances ` +
-    `from which the user can select.`,
+      `\`${COMP}\` is a non-visual component describing a selection option. Other components ` +
+      `(such as \`Select\`, \`Combobox\`, and others) may use nested \`Option\` instances ` +
+      `from which the user can select.`,
   props: {
     label: d(
-      `This property defines the text to display for the option. If \`label\` is not defined, ` +
+        `This property defines the text to display for the option. If \`label\` is not defined, ` +
         `\`Option\` will use the \`value\` as the label.`,
     ),
     value: d(
-      `This property defines the value of the option. If \`value\` is not defined, ` +
+        `This property defines the value of the option. If \`value\` is not defined, ` +
         `\`Option\` will use the \`label\` as the value.`,
     ),
     enabled: dEnabled(),
+    optionTemplate: d("This property is used to define a custom option template"),
   },
 });
 
@@ -36,16 +38,29 @@ const OptionNative = memo((props: Option) => {
 OptionNative.displayName = "OptionNative";
 
 export const optionComponentRenderer = createComponentRenderer(
-  COMP,
-  OptionMd,
-  ({ node, extractValue, layoutCss, renderChild }) => {
-    return (
-      <OptionNative
-        value={extractValue(node.props.value)}
-        label={extractValue.asOptionalString(node.props.label) || renderChild(node.children)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        style={layoutCss}
-      />
-    );
-  },
+    COMP,
+    OptionMd,
+    ({ node, extractValue, layoutCss, renderChild, layoutContext }) => {
+      const optionTemplate = node.children || node.props.optionTemplate;
+      return (
+          <OptionNative
+              optionRenderer={
+                optionTemplate
+                    ? (contextVars) => (
+                        <MemoizedItem
+                            node={optionTemplate}
+                            renderChild={renderChild}
+                            contextVars={contextVars}
+                            layoutContext={layoutContext}
+                        />
+                    )
+                    : undefined
+              }
+              value={extractValue(node.props.value)}
+              label={extractValue.asOptionalString(node.props.label)}
+              enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+              style={layoutCss}
+          />
+      );
+    },
 );
