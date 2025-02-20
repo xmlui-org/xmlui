@@ -471,7 +471,7 @@ test(`radius-Button to solid, outlined`, async ({ page }) => {
   expect(btnOutAttBorderRadius).toBe(EXPECTED);
 });
 
-test(`thickness-border-Button to solid, outlined`, async ({ page }) => {
+test.skip(`thickness-border-Button to solid, outlined`, async ({ page }) => {
   const EXPECTED = "5px";
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {

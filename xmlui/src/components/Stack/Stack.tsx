@@ -71,8 +71,6 @@ export const HStackMd = {
   description: `This component represents a stack rendering its contents horizontally.`,
   props: {
     ...stackMd.props,
-    horizontalAlignment: HORIZONTAL_ALIGNMENT,
-    verticalAlignment: VERTICAL_ALIGNMENT,
   },
 };
 type HStackComponentDef = ComponentDef<typeof HStackMd>;
@@ -169,8 +167,8 @@ export const vStackComponentRenderer = createComponentRenderer(
   "VStack",
   VStackMd,
   ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
-    const horizontalAlignment = extractValue(node.props?.horizontalAlignment) || "start";
-    const verticalAlignment = extractValue(node.props?.verticalAlignment) || "start";
+    const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
+    const verticalAlignment = extractValue(node.props?.verticalAlignment);
     return renderStack({
       node,
       extractValue,
@@ -188,8 +186,8 @@ export const hStackComponentRenderer = createComponentRenderer(
   "HStack",
   HStackMd,
   ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
-    const horizontalAlignment = extractValue(node.props?.horizontalAlignment) || "start";
-    const verticalAlignment = extractValue(node.props?.verticalAlignment) || "start";
+    const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
+    const verticalAlignment = extractValue(node.props?.verticalAlignment);
     return renderStack({
       node,
       extractValue,

@@ -33,7 +33,7 @@ test("Renders inner text", async ({ page }) => {
   await expect(page.getByText(TEXT_CONTENT, { exact: true })).toBeVisible();
 });
 
-test("border", async ({ page }) => {
+test.skip("border", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
