@@ -17,7 +17,7 @@ import { matchThemeVar } from "../theming/hvar";
 import { ThemeContext, ThemesContext } from "../theming/ThemeContext";
 import themeVars, { getVarKey } from "../theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../constants";
-import { collectThemeChainByExtends, expandTheme } from "../theming/extendThemeUtils";
+import { collectThemeChainByExtends } from "../theming/extendThemeUtils";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import {
   XmlUiCyanThemeDefinition,
@@ -129,14 +129,12 @@ export function useCompiledTheme(
         ...generateButtonTones(mergedThemeVars),
       },
       {
-        ...expandTheme({
-          ...themeDefChain[themeDefChain.length - 1].themeVars,
-          ...(themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<
-            string,
-            string
-          >),
-          ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]?.themeVars,
-        }),
+        ...themeDefChain[themeDefChain.length - 1].themeVars,
+        ...(themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<
+          string,
+          string
+        >),
+        ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]?.themeVars,
       },
     ];
   }, [activeTone, themeDefChain]);

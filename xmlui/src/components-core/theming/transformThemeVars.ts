@@ -180,6 +180,8 @@ export function generateButtonTones(theme?: Record<string, string>) {
 }
 
 const paddingRegEx = /^padding-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const paddingHorizontalRegEx = /^padding-(horizontal)-(.+)$/;
+const paddingVerticalRegEx = /^padding-(vertical)-(.+)$/;
 
 /**
  * Segment the padding values into top, right, bottom, left to provide consistency
@@ -192,7 +194,26 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
 
   // --- Iterate through theme variables and split padding values
   Object.entries(theme).forEach(([key, value]) => {
-    const match = paddingRegEx.exec(key);
+    // --- Check the "padding-horizontal" theme variables
+    let match = paddingHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a padding-horizontal value to segment
+      const remainder = match[2];
+      result[`padding-left-${remainder}`] ??= value;
+      result[`padding-right-${remainder}`] ??= value;
+    }
+
+    // --- Check the "padding-vertical" theme variables
+    match = paddingVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a padding-vertical value to segment
+      const remainder = match[2];
+      result[`padding-top-${remainder}`] ??= value;
+      result[`padding-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check the "padding" theme variables
+    match = paddingRegEx.exec(key);
     if (!match) return;
     const remainder = match[1];
 
@@ -234,6 +255,352 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
 
   // --- Done
   return result;
+}
+
+const borderRegEx = /^border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const thicknessBorderRegEx =
+  /^thickness-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const thicknessBorderHorizontalRegEx = /^thickness-border-(horizontal)-(.+)$/;
+const thicknessBorderVerticalRegEx = /^thickness-border-(vertical)-(.+)$/;
+const styleBorderRegEx = /^style-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const styleBorderHorizontalRegEx = /^style-border-(horizontal)-(.+)$/;
+const styleBorderVerticalRegEx = /^style-border-(vertical)-(.+)$/;
+const borderLeftRegEx = /^border-(left)-(.+)$/;
+const borderRightRegEx = /^border-(right)-(.+)$/;
+const borderTopRegEx = /^border-(top)-(.+)$/;
+const borderBottomRegEx = /^border-(bottom)-(.+)$/;
+const borderHorizontalRegEx = /^border-(horizontal)-(.+)$/;
+const borderVerticalRegEx = /^border-(vertical)-(.+)$/;
+const colorBorderRegEx = /^color-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const colorBorderHorizontalRegEx = /^color-border-(horizontal)-(.+)$/;
+const colorBorderVerticalRegEx = /^color-border-(vertical)-(.+)$/;
+
+/**
+ * Segment the border values to provide consistency
+ */
+export function generateBorderSegments(theme?: Record<string, string>) {
+  if (!theme) {
+    return {};
+  }
+  const result = { ...theme };
+
+  // --- Iterate through theme variables and split border values
+  Object.entries(theme).forEach(([key, value]) => {
+    // --- Check "border-horizontal" theme variables
+    let match = borderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a border-horizontal value to segment
+      const remainder = match[2];
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-left-${remainder}`] = border.thickness;
+        result[`thickness-border-right-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-left-${remainder}`] = border.style;
+        result[`style-border-right-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-left-${remainder}`] = border.color;
+        result[`color-border-right-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-vertical" theme variables
+    match = borderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a border-vertical value to segment
+      const remainder = match[2];
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-top-${remainder}`] = border.thickness;
+        result[`thickness-border-bottom-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-top-${remainder}`] = border.style;
+        result[`style-border-bottom-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-top-${remainder}`] = border.color;
+        result[`color-border-bottom-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-left" theme variables
+    match = borderLeftRegEx.exec(key);
+    if (match) {
+      // --- We have a border-left value to segment
+      const remainder = match[2];
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-left-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-left-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-left-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-right" theme variables
+    match = borderRightRegEx.exec(key);
+    if (match) {
+      // --- We have a border-right value to segment
+      const remainder = match[2];
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-right-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-right-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-right-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-top" theme variables
+    match = borderTopRegEx.exec(key);
+    if (match) {
+      // --- We have a border-top value to segment
+      const remainder = match[2];
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-top-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-top-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-top-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-bottom" theme variables
+    match = borderBottomRegEx.exec(key);
+    if (match) {
+      // --- We have a border-bottom value to segment
+      const remainder = match[2];
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-bottom-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-bottom-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-bottom-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-" theme variables
+    match = borderRegEx.exec(key);
+    if (match) {
+      // --- We have a border value to segment
+      const remainder = match[1];
+
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-${remainder}`] ??= border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-${remainder}`] ??= border.style;
+      }
+      if (border.color) {
+        result[`color-border-${remainder}`] ??= border.color;
+      }
+    }
+
+    // --- Check "thickness-border-" theme variables
+    match = thicknessBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a thickness-border value to flow down
+      const remainder = match[1];
+      result[`thickness-border-left-${remainder}`] ??= value;
+      result[`thickness-border-right-${remainder}`] ??= value;
+      result[`thickness-border-top-${remainder}`] ??= value;
+      result[`thickness-border-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check "thickness-border-horizontal" theme variables
+    match = thicknessBorderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a thickness-border-horizontal value to flow down
+      const remainder = match[2];
+      result[`thickness-border-left-${remainder}`] ??= value;
+      result[`thickness-border-right-${remainder}`] ??= value;
+    }
+
+    // --- Check "thickness-border-vertical" theme variables
+    match = thicknessBorderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a thickness-border-vertical value to flow down
+      const remainder = match[2];
+      result[`thickness-border-top-${remainder}`] ??= value;
+      result[`thickness-border-bottom-${remainder}`] ??= value;
+    }
+
+    if (match) {
+      // --- We have a thickness-border value to flow down
+      const remainder = match[1];
+      result[`thickness-border-left-${remainder}`] ??= value;
+      result[`thickness-border-right-${remainder}`] ??= value;
+      result[`thickness-border-top-${remainder}`] ??= value;
+      result[`thickness-border-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check "style-border-" theme variables
+    match = styleBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a style-border value to flow down
+      const remainder = match[1];
+      result[`style-border-left-${remainder}`] ??= value;
+      result[`style-border-right-${remainder}`] ??= value;
+      result[`style-border-top-${remainder}`] ??= value;
+      result[`style-border-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check "style-border-horizontal" theme variables
+    match = styleBorderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a style-border-horizontal value to flow down
+      const remainder = match[1];
+      result[`style-border-left-${remainder}`] ??= value;
+      result[`style-border-right-${remainder}`] ??= value;
+    }
+
+    // --- Check "style-border-vertical" theme variables
+    match = styleBorderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a style-border-vertical value to flow down
+      const remainder = match[1];
+      result[`style-border-top-${remainder}`] ??= value;
+      result[`style-border-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check "color-border-" theme variables
+    match = colorBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a color-border value to flow down
+      const remainder = match[1];
+      result[`color-border-left-${remainder}`] ??= value;
+      result[`color-border-right-${remainder}`] ??= value;
+      result[`color-border-top-${remainder}`] ??= value;
+      result[`color-border-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check "color-border-horizontal" theme variables
+    match = colorBorderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a color-border-horizontal value to flow down
+      const remainder = match[1];
+      result[`color-border-left-${remainder}`] ??= value;
+      result[`color-border-right-${remainder}`] ??= value;
+    }
+
+    // --- Check "color-border-vertical" theme variables
+    match = colorBorderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a color-border-vertical value to flow down
+      const remainder = match[1];
+      result[`color-border-top-${remainder}`] ??= value;
+      result[`color-border-bottom-${remainder}`] ??= value;
+    }
+  });
+
+  // --- Done
+  return result;
+
+  function getBorderSegments(value: string) {
+    try {
+      const sParser = new StyleParser(value);
+      const parsed = sParser.parseBorder();
+
+      // --- Get the parsed result
+      const result = {
+        style: parsed.styleValue,
+        thickness:
+          parsed.widthValue !== undefined
+            ? `${parsed.widthValue}${parsed.widthUnit ?? "px"}`
+            : undefined,
+        color:
+          parsed.color === undefined
+            ? undefined
+            : typeof parsed.color === "string"
+              ? parsed.color
+              : parsed.color.toString(),
+      };
+
+      // --- All theme variables are present?
+      if (parsed.themeId1 && parsed.themeId2 && parsed.themeId3) {
+        return {
+          thickness: parsed.themeId1.id,
+          style: parsed.themeId2.id,
+          color: parsed.themeId3.id,
+        };
+      }
+
+      // --- Two theme variables are present?
+      if (parsed.themeId1 && parsed.themeId2) {
+        if (result.thickness) {
+          return {
+            thickness: result.thickness,
+            style: parsed.themeId1.id,
+            color: parsed.themeId2.id,
+          };
+        }
+        if (result.style) {
+          return {
+            thickness: parsed.themeId1.id,
+            style: result.style,
+            color: parsed.themeId2.id,
+          };
+        }
+        return {
+          thickness: parsed.themeId1.id,
+          style: parsed.themeId2.id,
+          color: result.color,
+        };
+      }
+
+      // --- One theme variable is present?
+      if (parsed.themeId1) {
+        if (result.thickness && result.style) {
+          return {
+            thickness: result.thickness,
+            style: result.style,
+            color: parsed.themeId1.id,
+          };
+        }
+        if (result.thickness && result.color) {
+          return {
+            thickness: result.thickness,
+            style: parsed.themeId1.id,
+            color: result.color,
+          };
+        }
+        if (result.style && result.color) {
+          return {
+            thickness: parsed.themeId1.id,
+            style: result.style,
+            color: result.color,
+          };
+        }
+      }
+      return {
+        thickness: result.thickness?.trim(),
+        style: result.style?.trim(),
+        color: result.color?.trim(),
+      };
+    } catch (e) {
+      return {
+        thickness: undefined,
+        style: undefined,
+        color: undefined,
+      };
+    }
+  }
 }
 
 function findClosest(theme: Record<string, string>, themeVarName: string) {
