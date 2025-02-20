@@ -130,6 +130,14 @@ export function useCompiledTheme(
         ...generateBorderSegments(mergedThemeVars),
         ...generateButtonTones(mergedThemeVars),
       },
+      {
+        ...themeDefChain[themeDefChain.length - 1].themeVars,
+        ...(themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<
+          string,
+          string
+        >),
+        ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]?.themeVars,
+      },
     ];
   }, [activeTone, themeDefChain]);
 

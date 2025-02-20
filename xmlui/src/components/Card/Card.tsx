@@ -37,8 +37,7 @@ export const CardMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`padding-horizontal-${COMP}`]: "$space-4",
-    [`padding-vertical-${COMP}`]: "$space-4",
+    [`padding-${COMP}`]: "$space-4",
     [`border-${COMP}`]: "1px solid $color-border",
     [`radius-${COMP}`]: "$radius",
     [`shadow-${COMP}`]: "none",

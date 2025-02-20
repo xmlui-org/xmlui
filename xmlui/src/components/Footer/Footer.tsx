@@ -17,7 +17,7 @@ export const FooterMd = createMetadata({
     [`font-size-${COMP}`]: "$font-size-small",
     [`color-text-${COMP}`]: "$color-text-secondary",
     [`max-content-width-${COMP}`]: "$max-content-width",
-    ...paddingSubject(COMP, { horizontal: "$space-4", vertical: "$space-2" }),
+    [`padding-${COMP}`]: "$space-4 $space-2",
     ...borderSubject(COMP, {
       top: {
         color: "$color-border",
