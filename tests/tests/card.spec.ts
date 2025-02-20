@@ -33,8 +33,7 @@ test("Renders inner text", async ({ page }) => {
   await expect(page.getByText(TEXT_CONTENT, { exact: true })).toBeVisible();
 });
 
-// Skip Reason we are evaluating the usage of border-style
-test.skip("border", async ({ page }) => {
+test("border", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -56,53 +55,6 @@ test.skip("border", async ({ page }) => {
 // but doing so makes them flaky 
 // in dev runs where they are run on multiple cores
 // =================================================
-
-// Skip Reason we are evaluating the usage of border-style
-test.skip("border-thickness", async ({ page }) => {
-  const EXPECTED = "5px";
-
-  await initThemedApp(page, CARD_CODE, {
-    themeVars: {
-      "thickness-border-Card": EXPECTED,
-    },
-  });
-
-  await expect(page.getByTestId("card")).toHaveCSS("border-width", EXPECTED);
-});
-
-test("color-bg", async ({ page }) => {
-  const EXPECTED = "rgb(255, 0, 0)";
-  await initThemedApp(page, CARD_CODE, {
-    themeVars: {
-      "color-bg-Card": EXPECTED,
-    },
-  });
-  await expect(page.getByTestId("card")).toHaveCSS("background-color", EXPECTED);
-});
-
-// Skip Reason we are evaluating the usage of border-style
-test.skip("border-color", async ({ page }) => {
-  const EXPECTED = "rgb(255, 0, 0)";
-  await initThemedApp(page, CARD_CODE, {
-    themeVars: {
-      "color-border-Card": EXPECTED,
-    },
-  });
-  await expect(page.getByTestId("card")).toHaveCSS("border-color", EXPECTED);
-});
-
-// Skip Reason: we are evaluating the usage of border-style
-test.skip("border-style", async ({ page }) => {
-  const EXPECTED = "dotted";
-
-  await initThemedApp(page, CARD_CODE, {
-    themeVars: {
-      "style-border-Card": EXPECTED,
-    },
-  });
-
-  await expect(page.getByTestId("card")).toHaveCSS("border-style", EXPECTED);
-});
 
 test("padding-horizontal", async ({ page }) => {
   const EXPECTED = "100px";

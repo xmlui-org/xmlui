@@ -471,8 +471,7 @@ test(`radius-Button to solid, outlined`, async ({ page }) => {
   expect(btnOutAttBorderRadius).toBe(EXPECTED);
 });
 
-// Skip Reason: we are evaluating the usage of border-style
-test.skip(`thickness-border-Button to solid, outlined`, async ({ page }) => {
+test(`thickness-border-Button to solid, outlined`, async ({ page }) => {
   const EXPECTED = "5px";
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
