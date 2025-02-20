@@ -3,6 +3,25 @@ import { expect, test } from "../../testing/fixtures";
 
 // --- Testing
 
+test.describe("smoke tests", { tag: "@smoke" }, () => {
+  test("Markdown renders", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown />`);
+    const driver = await createMarkdownDriver();
+
+    await expect(driver.component).toBeAttached();
+  });
+
+  test("handles binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\${1+1}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("2");
+  });
+
+  test("handles nested binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\${ \${ \${1+1}}}} }$ }]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("${ ${ 2}}} }$ }");
+  });
+});
+
 test.skip(
   "only renders if children are strings",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
