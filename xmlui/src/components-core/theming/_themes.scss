@@ -416,7 +416,7 @@ $THEME-VAR-PREFIX: xmlui;
   border-right: getThemeVar($themeVars, "border-right-#{$subject}");
   border-top: getThemeVar($themeVars, "border-top-#{$subject}");
   border-bottom: getThemeVar($themeVars, "border-bottom-#{$subject}");
-  /* border-left-style: getThemeVar($themeVars, "style-border-left-#{$subject}");
+  border-left-style: getThemeVar($themeVars, "style-border-left-#{$subject}");
   border-right-style: getThemeVar($themeVars, "style-border-right-#{$subject}");
   border-top-style: getThemeVar($themeVars, "style-border-top-#{$subject}");
   border-bottom-style: getThemeVar($themeVars, "style-border-bottom-#{$subject}");
@@ -427,7 +427,7 @@ $THEME-VAR-PREFIX: xmlui;
   border-left-color: getThemeVar($themeVars, "color-border-left-#{$subject}");
   border-right-color: getThemeVar($themeVars, "color-border-right-#{$subject}");
   border-top-color: getThemeVar($themeVars, "color-border-top-#{$subject}");
-  border-bottom-color: getThemeVar($themeVars, "color-border-bottom-#{$subject}"); */
+  border-bottom-color: getThemeVar($themeVars, "color-border-bottom-#{$subject}");
   border-radius: getThemeVar($themeVars, "radius-#{$subject}");
   border-start-start-radius: getThemeVar($themeVars, "radius-start-start-#{$subject}");
   border-start-end-radius: getThemeVar($themeVars, "radius-start-end-#{$subject}");
