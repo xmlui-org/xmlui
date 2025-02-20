@@ -265,7 +265,7 @@ const ListItem = ({ children, style }: ListItemProps) => {
 function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
   return (tree: any) => {
     visit(tree, 'text', (node) => {
-      const regex = /\$\{(.+?)\}\$/g;
+      const regex = /\$\{(?![^{]*\$\{)([^}]+)\}/g;
       const parts: string[] = node.value.split(regex);
       if (parts.length > 1) {
         node.type = 'html';
