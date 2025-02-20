@@ -781,7 +781,7 @@ export class ComponentRegistry {
           <CompoundComponent
             api={compoundComponentDef.api}
             scriptCollected={compoundComponentDef.scriptCollected}
-            compound={compoundComponentDef.component as ComponentDef}
+            compound={compoundComponentDef.component}
             {...rendererContext}
           />
         );

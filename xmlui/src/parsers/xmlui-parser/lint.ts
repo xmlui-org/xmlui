@@ -162,7 +162,7 @@ export function lint({
 }
  ): LintDiagnostic[] {
   if ("component" in component){
-      return lintHelp(component.component as ComponentDef, metadataByComponent, [])
+      return lintHelp(component.component, metadataByComponent, [])
   }
   return lintHelp(component, metadataByComponent, []);
 }

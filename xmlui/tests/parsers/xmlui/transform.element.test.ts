@@ -1051,7 +1051,7 @@ describe("Xmlui transform - child elements", () => {
       </Component>
     `;
       const cd = transformSource(source) as CompoundComponentDef;
-      const comp = cd.component as ComponentDef;
+      const comp = cd.component;
       expect(comp.children[0].debug).toMatchObject({
         source: {
           start: source.indexOf("<Stack>") + "<Stack>".length,
@@ -1103,7 +1103,7 @@ describe("Xmlui transform - child elements", () => {
         },
       });
 
-      const fragmentComp = cd.component as ComponentDef;
+      const fragmentComp = cd.component;
       expect(fragmentComp.debug).toMatchObject({
         source: {
           start: source.indexOf('<variable name="other"'),
@@ -1228,7 +1228,7 @@ describe("Xmlui transform - child elements", () => {
       const cd = transformSource(
         `<Component name="ABC" xmlns:Ns="Test-value"><Ns:DataGrid /></Component>`,
       ) as CompoundComponentDef;
-      expect((cd.component as ComponentDef).type).equal("Test-value.DataGrid");
+      expect((cd.component).type).equal("Test-value.DataGrid");
     });
 
     it("namespace resolves deeper within in compound component", () => {
@@ -1239,7 +1239,7 @@ describe("Xmlui transform - child elements", () => {
           </Stack>
         </Component>
         `) as CompoundComponentDef;
-      expect((cd.component as ComponentDef).children[0].type).equal("XMLUIExtensions.Pdf");
+      expect((cd.component).children[0].type).equal("XMLUIExtensions.Pdf");
     });
 
     it("accepts component name with '-' and '.'", () => {
