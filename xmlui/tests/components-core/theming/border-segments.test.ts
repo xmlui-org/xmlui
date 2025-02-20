@@ -124,9 +124,13 @@ describe("generateBorderSegments", () => {
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "thickness-border-vertical-AppHeader": "xxx",
       "thickness-border-bottom-AppHeader": "xxx",
+      "thickness-border-bottom-vertical": "xxx",
+      "thickness-border-left-vertical": "xxx",
+      "thickness-border-right-vertical": "xxx",
       "thickness-border-top-AppHeader": "xxx",
+      "thickness-border-top-vertical": "xxx",
+      "thickness-border-vertical-AppHeader": "xxx",
     });
   });
 
@@ -892,6 +896,214 @@ describe("generateBorderSegments", () => {
       "thickness-border-left-AppHeader": "1px",
       "thickness-border-right-AppHeader": "1px",
       "thickness-border-top-AppHeader": "2px",
+    });
+  });
+
+  it("border-horizontal: color override", () => {
+    const newTheme: Record<string, string> = {
+      "color-border-AppHeader": "blue",
+      "border-horizontal-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-horizontal-AppHeader": "1px solid red",
+      "color-border-AppHeader": "blue",
+      "color-border-bottom-AppHeader": "blue",
+      "color-border-left-AppHeader": "red",
+      "color-border-right-AppHeader": "red",
+      "color-border-top-AppHeader": "blue",
+      "style-border-left-AppHeader": "solid",
+      "style-border-right-AppHeader": "solid",
+      "thickness-border-left-AppHeader": "1px",
+      "thickness-border-right-AppHeader": "1px",
+    });
+  });
+
+  it("border-top: style override", () => {
+    const newTheme: Record<string, string> = {
+      "style-border-AppHeader": "dotted",
+      "border-top-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-top-AppHeader": "1px solid red",
+      "color-border-top-AppHeader": "red",
+      "style-border-AppHeader": "dotted",
+      "style-border-bottom-AppHeader": "dotted",
+      "style-border-left-AppHeader": "dotted",
+      "style-border-right-AppHeader": "dotted",
+      "style-border-top-AppHeader": "solid",
+      "thickness-border-top-AppHeader": "1px",
+    });
+  });
+
+  it("border-top: thickness override", () => {
+    const newTheme: Record<string, string> = {
+      "thickness-border-AppHeader": "2px",
+      "border-top-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-top-AppHeader": "1px solid red",
+      "color-border-top-AppHeader": "red",
+      "style-border-top-AppHeader": "solid",
+      "thickness-border-AppHeader": "2px",
+      "thickness-border-bottom-AppHeader": "2px",
+      "thickness-border-left-AppHeader": "2px",
+      "thickness-border-right-AppHeader": "2px",
+      "thickness-border-top-AppHeader": "1px",
+    });
+  });
+
+  it("border-top: color override", () => {
+    const newTheme: Record<string, string> = {
+      "color-border-AppHeader": "blue",
+      "border-top-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-top-AppHeader": "1px solid red",
+      "color-border-AppHeader": "blue",
+      "color-border-bottom-AppHeader": "blue",
+      "color-border-left-AppHeader": "blue",
+      "color-border-right-AppHeader": "blue",
+      "color-border-top-AppHeader": "red",
+      "style-border-top-AppHeader": "solid",
+      "thickness-border-top-AppHeader": "1px",
+    });
+  });
+
+  it("border-bottom: style override", () => {
+    const newTheme: Record<string, string> = {
+      "style-border-AppHeader": "dotted",
+      "border-bottom-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-bottom-AppHeader": "1px solid red",
+      "color-border-bottom-AppHeader": "red",
+      "style-border-AppHeader": "dotted",
+      "style-border-bottom-AppHeader": "solid",
+      "style-border-left-AppHeader": "dotted",
+      "style-border-right-AppHeader": "dotted",
+      "style-border-top-AppHeader": "dotted",
+      "thickness-border-bottom-AppHeader": "1px",
+    });
+  });
+
+  it("border-bottom: thickness override", () => {
+    const newTheme: Record<string, string> = {
+      "thickness-border-AppHeader": "2px",
+      "border-bottom-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-bottom-AppHeader": "1px solid red",
+      "color-border-bottom-AppHeader": "red",
+      "style-border-bottom-AppHeader": "solid",
+      "thickness-border-AppHeader": "2px",
+      "thickness-border-bottom-AppHeader": "1px",
+      "thickness-border-left-AppHeader": "2px",
+      "thickness-border-right-AppHeader": "2px",
+      "thickness-border-top-AppHeader": "2px",
+    });
+  });
+
+  it("border-bottom: color override", () => {
+    const newTheme: Record<string, string> = {
+      "color-border-AppHeader": "blue",
+      "border-bottom-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-bottom-AppHeader": "1px solid red",
+      "color-border-AppHeader": "blue",
+      "color-border-bottom-AppHeader": "red",
+      "color-border-left-AppHeader": "blue",
+      "color-border-right-AppHeader": "blue",
+      "color-border-top-AppHeader": "blue",
+      "style-border-bottom-AppHeader": "solid",
+      "thickness-border-bottom-AppHeader": "1px",
+    });
+  });
+
+  it("border-vertical: style override", () => {
+    const newTheme: Record<string, string> = {
+      "style-border-AppHeader": "dotted",
+      "border-vertical-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-vertical-AppHeader": "1px solid red",
+      "color-border-bottom-AppHeader": "red",
+      "color-border-top-AppHeader": "red",
+      "style-border-AppHeader": "dotted",
+      "style-border-bottom-AppHeader": "solid",
+      "style-border-left-AppHeader": "dotted",
+      "style-border-right-AppHeader": "dotted",
+      "style-border-top-AppHeader": "solid",
+      "thickness-border-bottom-AppHeader": "1px",
+      "thickness-border-top-AppHeader": "1px",
+    });
+  });
+
+  it("border-vertical: thickness override", () => {
+    const newTheme: Record<string, string> = {
+      "thickness-border-AppHeader": "2px",
+      "border-vertical-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-vertical-AppHeader": "1px solid red",
+      "color-border-bottom-AppHeader": "red",
+      "color-border-top-AppHeader": "red",
+      "style-border-bottom-AppHeader": "solid",
+      "style-border-top-AppHeader": "solid",
+      "thickness-border-AppHeader": "2px",
+      "thickness-border-bottom-AppHeader": "1px",
+      "thickness-border-left-AppHeader": "2px",
+      "thickness-border-right-AppHeader": "2px",
+      "thickness-border-top-AppHeader": "1px",
+    });
+  });
+
+  it("border-vertical: color override", () => {
+    const newTheme: Record<string, string> = {
+      "color-border-AppHeader": "blue",
+      "border-vertical-AppHeader": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "border-vertical-AppHeader": "1px solid red",
+      "color-border-AppHeader": "blue",
+      "color-border-bottom-AppHeader": "red",
+      "color-border-left-AppHeader": "blue",
+      "color-border-right-AppHeader": "blue",
+      "color-border-top-AppHeader": "red",
+      "style-border-bottom-AppHeader": "solid",
+      "style-border-top-AppHeader": "solid",
+      "thickness-border-bottom-AppHeader": "1px",
+      "thickness-border-top-AppHeader": "1px",
     });
   });
 });

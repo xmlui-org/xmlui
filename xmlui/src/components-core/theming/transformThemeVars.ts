@@ -180,6 +180,8 @@ export function generateButtonTones(theme?: Record<string, string>) {
 }
 
 const paddingRegEx = /^padding-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const paddingHorizontalRegEx = /^padding-(horizontal)-(.+)$/;
+const paddingVerticalRegEx = /^padding-(vertical)-(.+)$/;
 
 /**
  * Segment the padding values into top, right, bottom, left to provide consistency
@@ -192,7 +194,26 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
 
   // --- Iterate through theme variables and split padding values
   Object.entries(theme).forEach(([key, value]) => {
-    const match = paddingRegEx.exec(key);
+    // --- Check the "padding-horizontal" theme variables
+    let match = paddingHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a padding-horizontal value to segment
+      const remainder = match[2];
+      result[`padding-left-${remainder}`] ??= value;
+      result[`padding-right-${remainder}`] ??= value;
+    }
+
+    // --- Check the "padding-vertical" theme variables
+    match = paddingVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a padding-vertical value to segment
+      const remainder = match[2];
+      result[`padding-top-${remainder}`] ??= value;
+      result[`padding-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check the "padding" theme variables
+    match = paddingRegEx.exec(key);
     if (!match) return;
     const remainder = match[1];
 
