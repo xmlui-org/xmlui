@@ -123,9 +123,6 @@ const THEME_TESTS: ThemeTestDesc[] = [
   { themeVar: "font-weight-Avatar", themeVarAsCSS: "font-weight", expected: "700" },
   { themeVar: "radius-Avatar", themeVarAsCSS: "border-radius", expected: "15px" },
   { themeVar: "shadow-Avatar", themeVarAsCSS: "box-shadow", expected: RED + " 5px 10px 0px 0px" },
-  // Skip Reason we are evaluating the usage of border-style
-  /* { themeVar: "style-border-Avatar", themeVarAsCSS: "border-style", expected: "dotted" },
-  { themeVar: "thickness-border-Avatar", themeVarAsCSS: "border-width", expected: "5px"}, */
 ];
 
 THEME_TESTS.forEach((testCase) => {
