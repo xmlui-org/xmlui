@@ -91,6 +91,10 @@ $componentName: "TextBox";
     width: 100%;
     padding: 0;
     cursor: inherit;
+
+    &::-ms-reveal {
+      display: none;
+    }
   }
 }
 
