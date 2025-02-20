@@ -117,6 +117,6 @@ const b = 2;
     </Component>
     `) as CompoundComponentDef;
     expect(cd.name).toBe("MyComp");
-    expect((cd.component as ComponentDef).type).toBe("h1");
+    expect((cd.component).type).toBe("h1");
   });
 });

@@ -84,7 +84,7 @@ export function checkXmlUiMarkup(
       // --- Reset component ID scope
       componentIdsCollected.clear();
       // --- Visit the compount component's definition
-      visitComponent(component.component as ComponentDef, null, componentDefVisitor, continuation, metadataHandler);
+      visitComponent(component.component, null, componentDefVisitor, continuation, metadataHandler);
     }
   }
 
