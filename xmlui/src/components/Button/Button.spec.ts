@@ -65,7 +65,7 @@ const expect = fixtureExpect.extend({
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("component renders", async ({ initTestBed, createButtonDriver }) => {
-    await initTestBed(`<Button />`);
+    await initTestBed(`<Button abcdef="hi"/>`);
     const driver = await createButtonDriver();
 
     await expect(driver.component).toBeAttached();

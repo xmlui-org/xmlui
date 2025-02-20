@@ -12,7 +12,7 @@
     "xmlui": "*"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.0",
+    "@playwright/test": "1.50.1",
     "cross-env": "7.0.3",
     "serve": "14.2.0"
   },
