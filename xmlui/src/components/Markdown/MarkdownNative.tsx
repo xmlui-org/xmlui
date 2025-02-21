@@ -270,7 +270,7 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
   };
 
   function detectBindingExpression(node: any) {
-    const regex = /\$\{((?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*)\}/g;
+    const regex = /\$\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
     const parts: string[] = node.value.split(regex);
     if (parts.length > 1) {
       node.type = "html";
@@ -290,9 +290,9 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
 
   function mapByType(extracted: any) {
     if (extracted === null) {
-      return "null";
+      return null;
     } else if (extracted === undefined || typeof extracted === "undefined") {
-      return "undefined";
+      return undefined;
     } else if (typeof extracted === "object") {
       const result = parseArrowFunc(extracted);
       if (result) {
@@ -312,6 +312,7 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
     if (
       extracted.hasOwnProperty("type") &&
       extracted.type === "ArrowE" &&
+      extracted?._ARROW_EXPR_ &&
       extracted.hasOwnProperty("source")
     ) {
       return extracted.source;
