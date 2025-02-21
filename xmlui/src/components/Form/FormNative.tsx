@@ -379,6 +379,21 @@ const Form = forwardRef(function (
     onReset?.();
   });
 
+  const updateData = useEvent((change: any) => {
+    if (typeof change !== "object" || change === null || change === undefined) {
+      return;
+    }
+    Object.entries(change).forEach(([key, value]) => {
+      dispatch({
+        type: FormActionKind.FIELD_VALUE_CHANGED,
+        payload: {
+          uid: key,
+          value: value,
+        },
+      });
+    });
+  });
+
   const cancelButton =
     cancelLabel === "" ? null : (
       <Button
@@ -403,8 +418,9 @@ const Form = forwardRef(function (
   useEffect(() => {
     registerComponentApi?.({
       reset: doReset,
+      update: updateData,
     });
-  }, [doReset, registerComponentApi]);
+  }, [doReset, updateData, registerComponentApi]);
 
   return (
     <>
@@ -480,10 +496,25 @@ export function FormWithContextVar({
   const [formState, dispatch] = useReducer(formReducer, initialState);
 
   const nodeWithItem = useMemo(() => {
+    const updateData = (change: any) => {
+      if (typeof change !== "object" || change === null || change === undefined) {
+        return;
+      }
+      Object.entries(change).forEach(([key, value]) => {
+        dispatch({
+          type: FormActionKind.FIELD_VALUE_CHANGED,
+          payload: {
+            uid: key,
+            value: value,
+          },
+        });
+      });
+    };
+
     return {
       type: "Fragment",
       vars: {
-        $data: formState.subject,
+        $data: { ...formState.subject, update: updateData },
       },
       children: node.children,
     };
