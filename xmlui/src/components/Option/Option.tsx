@@ -57,7 +57,7 @@ export const optionComponentRenderer = createComponentRenderer(
                     : undefined
               }
               value={extractValue(node.props.value)}
-              label={extractValue.asOptionalString(node.props.label)}
+              label={extractValue.asOptionalString(node.props.label) || renderChild(node.children)}
               enabled={extractValue.asOptionalBoolean(node.props.enabled)}
               style={layoutCss}
           />
