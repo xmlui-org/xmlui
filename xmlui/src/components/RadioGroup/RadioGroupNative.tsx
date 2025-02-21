@@ -196,7 +196,7 @@ export const RadioGroupOption = ({
             {optionRenderer ? <label className={styles.optionLabel}>
                 <div className={styles.itemContainer}>{item}</div>
                 {optionRenderer({
-                    $value: value,
+                    $checked: value === validationContext.value,
                 })}
             </label> : item}
         </div>
