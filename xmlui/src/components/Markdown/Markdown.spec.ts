@@ -11,6 +11,16 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect(driver.component).toBeAttached();
   });
 
+  test("handles empty binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\${}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("");
+  });
+
+  test("handles only spaces binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\${   }]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("");
+  });
+
   test("handles binding expression", async ({ initTestBed, createMarkdownDriver }) => {
     await initTestBed(`<Markdown><![CDATA[\${1+1}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText("2");
