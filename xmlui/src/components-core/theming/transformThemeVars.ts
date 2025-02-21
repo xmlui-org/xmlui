@@ -1,8 +1,6 @@
 import Color from "color";
 
 import { HVar, parseHVar } from "../theming/hvar";
-import { styleKeywords } from "../../parsers/style-parser/StyleLexer";
-import { StyleTokenType } from "../../parsers/style-parser/tokens";
 import { StyleParser } from "../../parsers/style-parser/StyleParser";
 
 export function isThemeVarName(varName: any) {
@@ -283,6 +281,7 @@ export function generateBorderSegments(theme?: Record<string, string>) {
     return {};
   }
   const result = { ...theme };
+  let hasCard = false;
 
   // --- Iterate through theme variables and split border values
   Object.entries(theme).forEach(([key, value]) => {

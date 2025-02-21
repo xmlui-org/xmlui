@@ -8,6 +8,7 @@ import {
   generateBaseFontSizes,
   generateBaseSpacings,
   generateBaseTones,
+  generateBorderSegments,
   generateButtonTones,
   generatePaddingSegments,
   resolveThemeVar,
@@ -126,6 +127,7 @@ export function useCompiledTheme(
         ...generateBaseFontSizes(mergedThemeVars),
         ...generateBaseTones(mergedThemeVars),
         ...generatePaddingSegments(mergedThemeVars),
+        ...generateBorderSegments(mergedThemeVars),
         ...generateButtonTones(mergedThemeVars),
       },
       {
