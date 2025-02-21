@@ -12,6 +12,7 @@ export type Option = {
   style?: CSSProperties;
   keywords?: string[];
   renderer?: (item: any) => ReactNode;
+  optionRenderer?: (contextVars: any) => ReactNode;
 };
 
 export type Accordion = {
@@ -43,12 +44,12 @@ export const LinkTargetMd: PropertyValueDescription[] = [
   {
     value: "_top",
     description:
-      "The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self.",
+        "The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self.",
   },
   {
     value: "_unfencedTop",
     description:
-      "Allows embedded fenced frames to navigate the top-level frame, i.e. traversing beyond the root of the fenced frame."
+        "Allows embedded fenced frames to navigate the top-level frame, i.e. traversing beyond the root of the fenced frame."
   }
 ];
 
@@ -81,14 +82,14 @@ export type LinkAria = "aria-disabled" | "aria-label";
  * Represents the theme color a particular component can have.
  */
 export type ComponentThemeColor =
-  | "primary"
-  | "secondary"
-  | "success"
-  | "danger"
-  | "warning"
-  | "info"
-  | "light"
-  | "dark";
+    | "primary"
+    | "secondary"
+    | "success"
+    | "danger"
+    | "warning"
+    | "info"
+    | "light"
+    | "dark";
 
 // --- Available view sizes
 export const viewportSizeMd: PropertyValueDescription[] = [
@@ -137,12 +138,12 @@ export const buttonTypesMd: PropertyValueDescription[] = [
   {
     value: "submit",
     description:
-      "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component.",
+        "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component.",
   },
   {
     value: "reset",
     description:
-      "Resets all the controls to their initial values. Using it is ill advised for UX reasons.",
+        "Resets all the controls to their initial values. Using it is ill advised for UX reasons.",
   },
 ];
 export const defaultButtonType = "button";
@@ -160,7 +161,7 @@ export const buttonVariantMd: PropertyValueDescription[] = [
   {
     value: "ghost",
     description:
-      "A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked.",
+        "A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked.",
   },
 ];
 
@@ -202,12 +203,12 @@ export const iconPositionMd: PropertyValueDescription[] = [
   {
     value: "start",
     description:
-      "The icon will appear at the start (left side when the left-to-right direction is set)",
+        "The icon will appear at the start (left side when the left-to-right direction is set)",
   },
   {
     value: "end",
     description:
-      "The icon will appear at the end (right side when the left-to-right direction is set)",
+        "The icon will appear at the end (right side when the left-to-right direction is set)",
   },
 ];
 
@@ -243,12 +244,12 @@ export const placementMd: PropertyValueDescription[] = [
   {
     value: "start",
     description:
-      "The left side of the window (left-to-right) or the right side of the window (right-to-left)",
+        "The left side of the window (left-to-right) or the right side of the window (right-to-left)",
   },
   {
     value: "end",
     description:
-      "The right side of the window (left-to-right) or the left side of the window (right-to-left)",
+        "The right side of the window (left-to-right) or the left side of the window (right-to-left)",
   },
   { value: "top", description: "The top of the window" },
   { value: "bottom", description: "The bottom of the window" },
@@ -262,12 +263,12 @@ export const labelPositionMd: PropertyValueDescription[] = [
   {
     value: "start",
     description:
-      "The left side of the input (left-to-right) or the right side of the input (right-to-left)",
+        "The left side of the input (left-to-right) or the right side of the input (right-to-left)",
   },
   {
     value: "end",
     description:
-      "The right side of the input (left-to-right) or the left side of the input (right-to-left)",
+        "The right side of the input (left-to-right) or the left side of the input (right-to-left)",
   },
   { value: "top", description: "The top of the input" },
   { value: "bottom", description: "The bottom of the input" },
@@ -366,23 +367,23 @@ export const TextVariantElement: Record<TextVariant, TextVariantMapping> = {
 };
 
 type TextVariantMapping =
-  | "abbr"
-  | "cite"
-  | "code"
-  | "del"
-  | "ins"
-  | "kbd"
-  | "mark"
-  | "samp"
-  | "sub"
-  | "sup"
-  | "var"
-  | "pre"
-  | "strong"
-  | "em"
-  | "span"
-  | "p"
-  | "h6";
+    | "abbr"
+    | "cite"
+    | "code"
+    | "del"
+    | "ins"
+    | "kbd"
+    | "mark"
+    | "samp"
+    | "sub"
+    | "sup"
+    | "var"
+    | "pre"
+    | "strong"
+    | "em"
+    | "span"
+    | "p"
+    | "h6";
 
 export const variantOptionsMd: TextPropertyValueDescription[] = [
   { value: "abbr", description: "Represents an abbreviation or acronym" },
@@ -402,7 +403,7 @@ export const variantOptionsMd: TextPropertyValueDescription[] = [
   {
     value: "keyboard",
     description:
-      "Represents a span of text denoting textual user input from a keyboard or voice input",
+        "Represents a span of text denoting textual user input from a keyboard or voice input",
   },
   {
     value: "marked",

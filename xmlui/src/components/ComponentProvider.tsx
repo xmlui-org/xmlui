@@ -243,6 +243,7 @@ import {
   htmlWbrTagRenderer,
 } from "./HtmlTags/HtmlTags";
 import {colorPickerComponentRenderer} from "./ColorPicker/ColorPicker";
+import {radioItemComponentRenderer} from "./RadioGroup/RadioItem";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -311,8 +312,8 @@ export class ComponentRegistry {
    * about component registrations
    */
   constructor(
-    contributes: ContributesDefinition = {},
-    private readonly extensionManager?: StandaloneExtensionManager,
+      contributes: ContributesDefinition = {},
+      private readonly extensionManager?: StandaloneExtensionManager,
   ) {
     this.extensionManager = extensionManager;
 
@@ -452,6 +453,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_CarouselItem !== "false") {
       this.registerCoreComponent(carouselItemComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_RadioItem !== "false") {
+      this.registerCoreComponent(radioItemComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerCoreComponent(fileUploadDropZoneComponentRenderer);
@@ -714,9 +718,9 @@ export class ComponentRegistry {
    */
   hasComponent(componentName: string) {
     return (
-      this.pool.get(componentName) !== undefined ||
-      this.loaders.get(componentName) !== undefined ||
-      this.actionFns.get(componentName) !== undefined
+        this.pool.get(componentName) !== undefined ||
+        this.loaders.get(componentName) !== undefined ||
+        this.actionFns.get(componentName) !== undefined
     );
   }
 
@@ -730,7 +734,7 @@ export class ComponentRegistry {
   };
 
   private registerCoreComponent = (
-    component: ComponentRendererDef | CompoundComponentRendererInfo,
+      component: ComponentRendererDef | CompoundComponentRendererInfo,
   ) => {
     const coreNamespaces = ["#xmlui-core-ns", ""];
     if ("compoundComponentDef" in component) {
@@ -741,7 +745,7 @@ export class ComponentRegistry {
   };
 
   private registerAppComponent = (
-    component: ComponentRendererDef | CompoundComponentRendererInfo,
+      component: ComponentRendererDef | CompoundComponentRendererInfo,
   ) => {
     const appNamespaces = ["#app-ns", ""];
     if ("compoundComponentDef" in component) {
@@ -754,8 +758,8 @@ export class ComponentRegistry {
   // --- Registers a renderable component using its renderer function
   // --- and metadata
   private registerComponentRenderer = (
-    { type, renderer, metadata }: ComponentRendererDef,
-    ...namespaces: string[]
+      { type, renderer, metadata }: ComponentRendererDef,
+      ...namespaces: string[]
   ) => {
     const component = { renderer, descriptor: metadata };
     namespaces.forEach((ns) => {
@@ -771,19 +775,19 @@ export class ComponentRegistry {
 
   // --- Registers a compound component using its definition and metadata
   private registerCompoundComponentRenderer(
-    { compoundComponentDef, metadata }: CompoundComponentRendererInfo,
-    ...namespaces: string[]
+      { compoundComponentDef, metadata }: CompoundComponentRendererInfo,
+      ...namespaces: string[]
   ) {
     const component = {
       type: compoundComponentDef.name,
       renderer: (rendererContext: any) => {
         return (
-          <CompoundComponent
-            api={compoundComponentDef.api}
-            scriptCollected={compoundComponentDef.scriptCollected}
-            compound={compoundComponentDef.component}
-            {...rendererContext}
-          />
+            <CompoundComponent
+                api={compoundComponentDef.api}
+                scriptCollected={compoundComponentDef.scriptCollected}
+                compound={compoundComponentDef.component as ComponentDef}
+                {...rendererContext}
+            />
         );
       },
       isCompoundComponent: true,
@@ -831,12 +835,12 @@ type ComponentProviderProps = {
  * rendered before the component registry is initialized.
  */
 export function ComponentProvider({
-  children,
-  contributes,
-  extensionManager,
-}: ComponentProviderProps) {
+                                    children,
+                                    contributes,
+                                    extensionManager,
+                                  }: ComponentProviderProps) {
   const [componentRegistry, setComponentRegistry] = useState(
-    () => new ComponentRegistry(contributes, extensionManager),
+      () => new ComponentRegistry(contributes, extensionManager),
   );
   // --- Make sure the component registry is updated when the contributes or
   // --- component manager changes (e.g., due to HMR).
@@ -848,8 +852,8 @@ export function ComponentProvider({
   }, [extensionManager, contributes]);
 
   return (
-    <ComponentRegistryContext.Provider value={componentRegistry}>
-      {children}
-    </ComponentRegistryContext.Provider>
+      <ComponentRegistryContext.Provider value={componentRegistry}>
+        {children}
+      </ComponentRegistryContext.Provider>
   );
 }

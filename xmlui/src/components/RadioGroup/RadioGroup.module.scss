@@ -112,7 +112,21 @@ $color-text-RadioGroupOption-success: createThemeVar("Input:color-text-RadioGrou
   }
 }
 
+.itemContainer {
+  z-index: -1;
+  position: relative;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.optionLabel {
+  width: 100%;
+  cursor: pointer;
+}
+
 .label {
+  width: 100%;
   color: $color-text-RadioGroupOption-default;
   font-size: $font-size-RadioGroupOption;
   font-weight: $font-weight-RadioGroupOption;

@@ -40,21 +40,21 @@ import { ColorPicker } from "../ColorPicker/ColorPickerNative";
 import { HelperText } from "./HelperText";
 
 type FormControlType =
-  | "text"
-  | "password"
-  | "textarea"
-  | "checkbox"
-  | "number"
-  | "integer"
-  | "file"
-  | "select"
-  | "autocomplete"
-  | "datePicker"
-  | "radioGroup"
-  | "custom"
-  | "switch"
-  | "slider"
-  | "colorpicker";
+    | "text"
+    | "password"
+    | "textarea"
+    | "checkbox"
+    | "number"
+    | "integer"
+    | "file"
+    | "select"
+    | "autocomplete"
+    | "datePicker"
+    | "radioGroup"
+    | "custom"
+    | "switch"
+    | "slider"
+    | "colorpicker";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
   checkbox: "end",
@@ -83,36 +83,36 @@ type Props = {
 };
 
 export const FormItem = memo(function FormItem({
-  style,
-  bindTo,
-  type = "text",
-  label,
-  enabled = true,
-  labelPosition,
-  labelWidth,
-  labelBreak = true,
-  children,
-  validations,
-  onValidate,
-  customValidationsDebounce,
-  validationMode,
-  registerComponentApi,
-  maxTextLength,
-  inputRenderer,
-  ...rest
-}: Props) {
+                                                 style,
+                                                 bindTo,
+                                                 type = "text",
+                                                 label,
+                                                 enabled = true,
+                                                 labelPosition,
+                                                 labelWidth,
+                                                 labelBreak = true,
+                                                 children,
+                                                 validations,
+                                                 onValidate,
+                                                 customValidationsDebounce,
+                                                 validationMode,
+                                                 registerComponentApi,
+                                                 maxTextLength,
+                                                 inputRenderer,
+                                                 ...rest
+                                               }: Props) {
   const labelWidthValue = useFormContextPart((value) => labelWidth || value.itemLabelWidth);
   const labelBreakValue = useFormContextPart((value) =>
-    labelBreak !== undefined ? labelBreak : value.itemLabelBreak,
+      labelBreak !== undefined ? labelBreak : value.itemLabelBreak,
   );
   const labelPositionValue = useFormContextPart<any>(
-    (value) => labelPosition || value.itemLabelPosition || DEFAULT_LABEL_POSITIONS[type],
+      (value) => labelPosition || value.itemLabelPosition || DEFAULT_LABEL_POSITIONS[type],
   );
   const initialValueFromSubject = useFormContextPart<any>((value) =>
-    getByPath(value.originalSubject, bindTo),
+      getByPath(value.originalSubject, bindTo),
   );
   const initialValue =
-    initialValueFromSubject === undefined ? rest.initialValue : initialValueFromSubject;
+      initialValueFromSubject === undefined ? rest.initialValue : initialValueFromSubject;
   const value = useFormContextPart<any>((value) => getByPath(value.subject, bindTo));
   const validationResult = useFormContextPart((value) => value.validationResults[bindTo]);
   const dispatch = useFormContextPart((value) => value.dispatch);
@@ -127,13 +127,13 @@ export const FormItem = memo(function FormItem({
   useValidation(validations, onValidate, value, dispatch, bindTo, customValidationsDebounce);
 
   const onStateChange = useCallback(
-    ({ value }: any, options?: any) => {
-      //we already handled the initial value in the useEffect with fieldInitialized(...);
-      if (!options?.initial) {
-        dispatch(fieldChanged(bindTo, value));
-      }
-    },
-    [bindTo, dispatch],
+      ({ value }: any, options?: any) => {
+        //we already handled the initial value in the useEffect with fieldInitialized(...);
+        if (!options?.initial) {
+          dispatch(fieldChanged(bindTo, value));
+        }
+      },
+      [bindTo, dispatch],
   );
 
   useEffect(() => {
@@ -143,188 +143,188 @@ export const FormItem = memo(function FormItem({
   }, [bindTo, dispatch]);
 
   const { validationStatus, isHelperTextShown } = useValidationDisplay(
-    bindTo,
-    value,
-    validationResult,
-    validationMode,
+      bindTo,
+      value,
+      validationResult,
+      validationMode,
   );
 
   let formControl = null;
   switch (type) {
     case "select": {
       formControl = (
-        <Select
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-        >
-          {children}
-        </Select>
+          <Select
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+          >
+            {children}
+          </Select>
       );
       break;
     }
     case "autocomplete": {
       formControl = (
-        <AutoComplete
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-        >
-          {children}
-        </AutoComplete>
+          <AutoComplete
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+          >
+            {children}
+          </AutoComplete>
       );
       break;
     }
     case "datePicker": {
       formControl = (
-        <DatePicker
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          // registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-        />
+          <DatePicker
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              // registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+          />
       );
       break;
     }
     case "radioGroup": {
       formControl = (
-        <RadioGroup
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          // registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-        >
-          {children}
-        </RadioGroup>
+          <RadioGroup
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              // registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+          >
+            {children}
+          </RadioGroup>
       );
       break;
     }
     case "number":
     case "integer": {
       formControl = (
-        <NumberBox
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          integersOnly={type === "integer"}
-          validationStatus={validationStatus}
-          min={validations.minValue}
-          max={validations.maxValue}
-          maxLength={maxTextLength ?? validations?.maxLength}
-        ></NumberBox>
+          <NumberBox
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              integersOnly={type === "integer"}
+              validationStatus={validationStatus}
+              min={validations.minValue}
+              max={validations.maxValue}
+              maxLength={maxTextLength ?? validations?.maxLength}
+          ></NumberBox>
       );
       break;
     }
     case "switch":
     case "checkbox": {
       formControl = (
-        <Toggle
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          // registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-          variant={type}
-          inputRenderer={inputRenderer}
-        />
+          <Toggle
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              // registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+              variant={type}
+              inputRenderer={inputRenderer}
+          />
       );
       break;
     }
     case "file": {
       formControl = (
-        <FileInput
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-          multiple={asOptionalBoolean((rest as any).multiple, false)} //TODO come up with something for this
-        />
+          <FileInput
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+              multiple={asOptionalBoolean((rest as any).multiple, false)} //TODO come up with something for this
+          />
       );
       break;
     }
     case "text": {
       formControl = (
-        <TextBox
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-          maxLength={maxTextLength ?? validations?.maxLength}
-        />
+          <TextBox
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+              maxLength={maxTextLength ?? validations?.maxLength}
+          />
       );
       break;
     }
     case "password": {
       formControl = (
-        <TextBox
-          {...rest}
-          type={"password"}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-          maxLength={maxTextLength ?? validations?.maxLength}
-        />
+          <TextBox
+              {...rest}
+              type={"password"}
+              value={value}
+              updateState={onStateChange}
+              registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+              maxLength={maxTextLength ?? validations?.maxLength}
+          />
       );
       break;
     }
     case "textarea": {
       formControl = (
-        <TextArea
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-          maxLength={maxTextLength ?? validations?.maxLength}
-        />
+          <TextArea
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+              maxLength={maxTextLength ?? validations?.maxLength}
+          />
       );
       break;
     }
     case "slider": {
       formControl = (
-        <Slider
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-          min={validations.minValue}
-          max={validations.maxValue}
-        />
+          <Slider
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+              min={validations.minValue}
+              max={validations.maxValue}
+          />
       );
       break;
     }
     case "colorpicker": {
       formControl = (
-        <ColorPicker
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-        />
+          <ColorPicker
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+          />
       );
       break;
     }
@@ -349,53 +349,53 @@ export const FormItem = memo(function FormItem({
   const [animateContainerRef] = useAutoAnimate({ duration: 100 });
 
   return (
-    <ItemWithLabel
-      labelPosition={labelPositionValue}
-      label={label}
-      labelWidth={labelWidthValue}
-      labelBreak={labelBreakValue}
-      enabled={isEnabled}
-      required={validations.required}
-      validationInProgress={validationResult?.partial}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      style={style}
-      validationResult={
-        <div ref={animateContainerRef}>
-          {isHelperTextShown &&
-            validationResult?.validations.map((singleValidation, i) => (
-              <Fragment key={i}>
-                {singleValidation.isValid && !!singleValidation.validMessage && (
-                  <HelperText
-                    text={singleValidation.validMessage}
-                    status={"valid"}
-                    style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-                  />
-                )}
-                {!singleValidation.isValid && !!singleValidation.invalidMessage && (
-                  <HelperText
-                    text={singleValidation.invalidMessage}
-                    status={singleValidation.severity}
-                    style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-                  />
-                )}
-              </Fragment>
-            ))}
-        </div>
-      }
-    >
-      {formControl}
-    </ItemWithLabel>
+      <ItemWithLabel
+          labelPosition={labelPositionValue}
+          label={label}
+          labelWidth={labelWidthValue}
+          labelBreak={labelBreakValue}
+          enabled={isEnabled}
+          required={validations.required}
+          validationInProgress={validationResult?.partial}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          style={style}
+          validationResult={
+            <div ref={animateContainerRef}>
+              {isHelperTextShown &&
+                  validationResult?.validations.map((singleValidation, i) => (
+                      <Fragment key={i}>
+                        {singleValidation.isValid && !!singleValidation.validMessage && (
+                            <HelperText
+                                text={singleValidation.validMessage}
+                                status={"valid"}
+                                style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
+                            />
+                        )}
+                        {!singleValidation.isValid && !!singleValidation.invalidMessage && (
+                            <HelperText
+                                text={singleValidation.invalidMessage}
+                                status={singleValidation.severity}
+                                style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
+                            />
+                        )}
+                      </Fragment>
+                  ))}
+            </div>
+          }
+      >
+        {formControl}
+      </ItemWithLabel>
   );
 });
 
 type FormItemComponentDef = ComponentDef<typeof FormItemMd>;
 
 export function CustomFormItem({
-  renderChild,
-  node,
-  bindTo,
-}: {
+                                 renderChild,
+                                 node,
+                                 bindTo,
+                               }: {
   renderChild: RenderChildFn;
   node: FormItemComponentDef;
   bindTo: string;
