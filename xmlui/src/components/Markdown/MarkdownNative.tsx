@@ -270,6 +270,9 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
   };
 
   function detectBindingExpression(node: any) {
+    // Remove empty ${} expressions first
+    node.value = node.value.replace(/\$\{\s*\}/g, "");
+
     const regex = /\$\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
     const parts: string[] = node.value.split(regex);
     if (parts.length > 1) {

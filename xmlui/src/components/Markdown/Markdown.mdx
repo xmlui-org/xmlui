@@ -151,6 +151,7 @@ The `Markdown` component supports these syntax elements:
 - Heading
 - Bold
 - Italic
+- Strikethrough
 - Blockquote
 - Ordered List
 - Unordered List
@@ -159,14 +160,62 @@ The `Markdown` component supports these syntax elements:
 - Link
 - Image
 
+WIP elements:
+- Table
+- Tasklist
+- Footnote
+
 These are also found in the **Basic Syntax** table of [this markdown guide](https://www.markdownguide.org/cheat-sheet/).
-Note that further components may be added later, like elements from the [Github Flavored Markdown syntax](https://github.github.com/gfm/) (such as tables and deteleted styling) but are not supported as of yet.
+Note that further components may be added later,
+like elements from the [Github Flavored Markdown syntax](https://github.github.com/gfm/).
+
+## Binding Expressions
+
+Our `Markdown` component is capable of evaluating binding expressions just as other XMLUI components.
+Use the `${}` syntax to wrap expressions that need to be evaluated.
+
+Empty `${}` expressions are removed.
+Objects, functions and arrays will be stringified if you place them in `Markdown`.
+Function calls are executed and their return values inlined as strings into markdown.
+
+```ueml copy {5-9}
+<App>
+  <variable name="x" value="{() => { return 'testing' }}" />
+  <Markdown>
+    <![CDATA[
+  Empty elements are removed: ${}
+
+  Nested objects and functions are handled: ${ { a: 1, b: () => {} } }
+
+  Function calls are executed: ${x()}
+    ]]>
+  </Markdown>
+</App>
+```
+
+<Playground
+  name="Example: binding expressions syntax"
+  app={`
+  <App>
+    <variable name="x" value="{() => { return 'testing' }}" />
+    <Markdown>
+      <![CDATA[
+    Empty elements are removed: \${}
+
+    Nested objects and functions are handled: \${ { a: 1, b: () => {} } }
+
+    Function calls are executed: \${x()}
+      ]]>
+    </Markdown>
+  </App>
+  `}
+/>
 
 %-DESC-END
 
-
-The component itself cannot be styled.
 %-STYLE-START
+The component itself cannot be styled.
+
 However, the components that are used render the final text, have customizable style variables.
 
 The components used to render the final styled text are either used as regular XMLUI components.
@@ -175,6 +224,7 @@ See the links for styling details:
 [`Heading`](./Heading.mdx#styling)
 [`Link`](./Link.mdx#styling)
 [`Image`](./Image.mdx#styling)
+[`Checkbox`](./Checkbox.mdx#styling)
 
 Or they are components specifically created and used in the Markdown component.
 
