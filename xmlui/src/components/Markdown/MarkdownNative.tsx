@@ -1,7 +1,7 @@
 import { type CSSProperties, memo, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { visit } from 'unist-util-visit';
+import { visit } from "unist-util-visit";
 
 import styles from "./Markdown.module.scss";
 import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
@@ -264,15 +264,62 @@ const ListItem = ({ children, style }: ListItemProps) => {
  */
 function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
   return (tree: any) => {
-    visit(tree, 'text', (node) => {
-      const regex = /\$\{(?![^{]*\$\{)([^}]+)\}/g;
-      const parts: string[] = node.value.split(regex);
-      if (parts.length > 1) {
-        node.type = 'html';
-        node.value = parts.map((part, index) => 
-          index % 2 === 0 ? part : extractValue(`{${part}}`)
-        ).join('');
-      }
+    visit(tree, "text", (node) => {
+      return detectBindingExpression(node);
     });
   };
+
+  function detectBindingExpression(node: any) {
+    const regex = /\$\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
+    const parts: string[] = node.value.split(regex);
+    if (parts.length > 1) {
+      node.type = "html";
+      node.value = parts
+        .map((part, index) => {
+          const extracted = index % 2 === 0 ? part : extractValue(`{${part}}`);
+          const resultExpr = mapByType(extracted);
+          // The result expression might be an object, in that case we stringify it here,
+          // at the last step, so that there are no unnecessary apostrophes
+          return typeof resultExpr === "object" && resultExpr !== null
+            ? JSON.stringify(resultExpr)
+            : resultExpr;
+        })
+        .join("");
+    }
+  }
+
+  function mapByType(extracted: any) {
+    if (extracted === null) {
+      return null;
+    } else if (extracted === undefined || typeof extracted === "undefined") {
+      return undefined;
+    } else if (typeof extracted === "object") {
+      const arrowFuncResult = parseArrowFunc(extracted);
+      if (arrowFuncResult) {
+        return arrowFuncResult;
+      }
+      if (Array.isArray(extracted)) {
+        return extracted;
+      }
+      return Object.fromEntries(
+        Object.entries(extracted).map(([key, value]) => {
+          return [key, mapByType(value)];
+        }),
+      );
+    } else {
+      return extracted;
+    }
+  }
+
+  function parseArrowFunc(extracted: Record<string, any>): string {
+    if (
+      extracted.hasOwnProperty("type") &&
+      extracted.type === "ArrowE" &&
+      extracted?._ARROW_EXPR_ &&
+      extracted.hasOwnProperty("source")
+    ) {
+      return extracted.source;
+    }
+    return "";
+  }
 }
