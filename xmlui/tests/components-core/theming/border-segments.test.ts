@@ -224,16 +224,16 @@ describe("generateBorderSegments", () => {
 
   it("border: thickness, style, color #1", () => {
     const newTheme: Record<string, string> = {
-      "border-AppHeader": "1px solid red",
+      "border-AppHeader": "1px solid $color-border",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-AppHeader": "1px solid red",
-      "thickness-border-AppHeader": "1px",
+      "border-AppHeader": "1px solid $color-border",
+      "color-border-AppHeader": "$color-border",
       "style-border-AppHeader": "solid",
-      "color-border-AppHeader": "red",
+      "thickness-border-AppHeader": "1px",
     });
   });
 

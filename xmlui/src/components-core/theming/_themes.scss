@@ -371,6 +371,40 @@ $THEME-VAR-PREFIX: xmlui;
   $tmp: appendThemeVarWithDefault($tmp, "border-right-#{$subject}", $tmpHorizontal) !global;
   $tmp: appendThemeVarWithDefault($tmp, "border-top-#{$subject}", $tmpVertical) !global;
   $tmp: appendThemeVarWithDefault($tmp, "border-bottom-#{$subject}", $tmpVertical) !global;
+
+  $tmp: appendThemeVar($tmp, "thickness-border-#{$subject}") !global;
+  $tmpThickness: getThemeVar($tmp, "thickness-border-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-horizontal-#{$subject}", $tmpThickness) !global;
+  $tmpThicknessHorizontal: getThemeVar($tmp, "thickness-border-horizontal-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-left-#{$subject}", $tmpThicknessHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-right-#{$subject}", $tmpThicknessHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-vertical-#{$subject}", $tmpThickness) !global;
+  $tmpThicknessVertical: getThemeVar($tmp, "thickness-border-vertical-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-top-#{$subject}", $tmpThicknessVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "thickness-border-bottom-#{$subject}", $tmpThicknessVertical) !global;
+
+  $tmp: appendThemeVar($tmp, "style-border-#{$subject}") !global;
+  $tmpStyle: getThemeVar($tmp, "style-border-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-horizontal-#{$subject}", $tmpStyle) !global;
+  $tmpStyleHorizontal: getThemeVar($tmp, "style-border-horizontal-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-left-#{$subject}", $tmpStyleHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-right-#{$subject}", $tmpStyleHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-vertical-#{$subject}", $tmpStyle) !global;
+  $tmpStyleVertical: getThemeVar($tmp, "style-border-vertical-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-top-#{$subject}", $tmpStyleVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "style-border-bottom-#{$subject}", $tmpStyleVertical) !global;
+
+  $tmp: appendThemeVar($tmp, "color-border-#{$subject}") !global;
+  $tmpColor: getThemeVar($tmp, "color-border-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-horizontal-#{$subject}", $tmpColor) !global;
+  $tmpColorHorizontal: getThemeVar($tmp, "color-border-horizontal-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-left-#{$subject}", $tmpColorHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-right-#{$subject}", $tmpColorHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-vertical-#{$subject}", $tmpColor) !global;
+  $tmpColorVertical: getThemeVar($tmp, "color-border-vertical-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-top-#{$subject}", $tmpColorVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "color-border-bottom-#{$subject}", $tmpColorVertical) !global;
+  
   $tmpRadius: appendThemeVar($tmp, "radius-#{$subject}") !global;
   $tmpRadiusAll: getThemeVar($tmpRadius, "radius-#{$subject}") !global;
   $tmp: appendThemeVarWithDefault($tmp, "radius-start-start-#{$subject}", $tmpRadiusAll) !global;
