@@ -121,7 +121,7 @@ export interface CompoundComponentDef extends Scriptable {
   /**
    * Each compound component must have a single root component defining the component contents.
    */
-  component: ComponentLike;
+  component: ComponentDef;
 
   /**
    * Compound components may provide an API that other components can use to interact with them. This

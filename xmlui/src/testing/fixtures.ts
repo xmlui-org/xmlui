@@ -31,6 +31,8 @@ import {
   VStackDriver,
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
+import { LintSeverity } from "../parsers/xmlui-parser/lint";
+import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
 
 // -----------------------------------------------------------------
 // --- Utility
@@ -119,7 +121,7 @@ class Clipboard {
 
   /**
    * Performs a focus on the given driver element, then copies the contents to the clipboard
-   * @param driver 
+   * @param driver
    */
   async copyFrom(driver: ComponentDriver) {
     await driver.focus();
@@ -159,6 +161,7 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
             </Stack>
           </Fragment>
         `);
+        // `, 0, undefined, {lintSeverity: LintSeverity.Error, collectedMetadata: collectedComponentMetadata});
 
         if (errors.length > 0) {
           throw { errors };

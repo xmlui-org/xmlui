@@ -30,6 +30,32 @@ If the `label` is not specified `value` is shown.
   `}
 />
 
+You can use `Select` with dynamic options:
+
+```ueml copy
+<App>
+  <Select>
+    <Items data="{['one', 'two', 'three']}" >
+      <Option value="{$itemIndex}" label="{$item}" />
+    </Items> 
+  </Select>
+</App>  
+```
+
+<Playground
+  name="Example: using Select with dynamic options"
+  height={200}
+  app={`
+    <App>
+      <Select>
+        <Items data="{['one', 'two', 'three']}" >
+          <Option value="{$itemIndex}" label="{$item}" />
+        </Items> 
+      </Select>
+    </App>  
+  `}
+/>
+
 %-DESC-END
 
 %-PROP-START initialValue

@@ -94,6 +94,14 @@ Default value: `true`.
   `}
 />
 
+### `endIcon`
+
+This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
+
+### `endText`
+
+This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
+
 ### `fromDate`
 
 The start date of the range of selectable dates
@@ -133,6 +141,10 @@ This property sets the component's initial value.
     </App>  
   `}
 />
+
+### `inline`
+
+The datepicker is displayed inline
 
 ### `mode`
 
@@ -199,6 +211,14 @@ Whether to show the week number in the calendar
     </App>
   `}
 />
+
+### `startIcon`
+
+This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
+
+### `startText`
+
+This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ### `toDate`
 
@@ -482,6 +502,10 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-DatePicker--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -491,12 +515,12 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-bg](../styles-and-themes/common-units/#color)-DatePicker-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--active | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
-| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--active | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
-| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
-| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
-| [color-bg](../styles-and-themes/common-units/#color)-menu-DatePicker | $color-bg-primary | $color-bg-primary |
-| [color-bg](../styles-and-themes/common-units/#color)-menu-DatePicker | $color-bg-primary | $color-bg-primary |
+| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--active | $color-surface-200 | $color-surface-700 |
+| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--active | $color-surface-200 | $color-surface-700 |
+| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-surface-100 | $color-surface-600 |
+| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-surface-100 | $color-surface-600 |
+| [color-bg](../styles-and-themes/common-units/#color)-menu-DatePicker | $color-surface-50 | $color-surface-950 |
+| [color-bg](../styles-and-themes/common-units/#color)-menu-DatePicker | $color-surface-50 | $color-surface-950 |
 | [color-border](../styles-and-themes/common-units/#color)-DatePicker--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border](../styles-and-themes/common-units/#color)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border](../styles-and-themes/common-units/#color)-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -531,6 +555,10 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [offset-outline](../styles-and-themes/common-units/#size)-DatePicker-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [offset-outline](../styles-and-themes/common-units/#size)-DatePicker-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [offset-outline](../styles-and-themes/common-units/#size)-DatePicker-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

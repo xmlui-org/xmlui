@@ -23,6 +23,8 @@ describe("generatePaddingSegments", () => {
 
     expect(result).deep.equal({
       "padding-horizontal-AppHeader": "xxx",
+      "padding-left-AppHeader": "xxx",
+      "padding-right-AppHeader": "xxx",
     });
   });
 
@@ -34,6 +36,8 @@ describe("generatePaddingSegments", () => {
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
+      "padding-bottom-AppHeader": "xxx",
+      "padding-top-AppHeader": "xxx",
       "padding-vertical-AppHeader": "xxx",
     });
   });
@@ -47,7 +51,11 @@ describe("generatePaddingSegments", () => {
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
+      "padding-bottom-AppHeader": "yyy",
       "padding-horizontal-AppHeader": "xxx",
+      "padding-left-AppHeader": "xxx",
+      "padding-right-AppHeader": "xxx",
+      "padding-top-AppHeader": "yyy",
       "padding-vertical-AppHeader": "yyy",
     });
   });
