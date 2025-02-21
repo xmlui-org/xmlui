@@ -278,6 +278,7 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
         .map((part, index) => {
           const extracted = index % 2 === 0 ? part : extractValue(`{${part}}`);
           const resultExpr = mapByType(extracted);
+          console.log(resultExpr)
           // The result expression might be an object, in that case we stringify it here,
           // at the last step, so that there are no unnecessary apostrophes
           return typeof resultExpr === "object" && resultExpr !== null
@@ -294,9 +295,12 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
     } else if (extracted === undefined || typeof extracted === "undefined") {
       return undefined;
     } else if (typeof extracted === "object") {
-      const result = parseArrowFunc(extracted);
-      if (result) {
-        return result;
+      const arrowFuncResult = parseArrowFunc(extracted);
+      if (arrowFuncResult) {
+        return arrowFuncResult;
+      }
+      if (Array.isArray(extracted)) {
+        return extracted;
       }
       return Object.fromEntries(
         Object.entries(extracted).map(([key, value]) => {

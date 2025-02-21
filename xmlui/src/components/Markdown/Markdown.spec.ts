@@ -22,6 +22,12 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toHaveText(`{"a":1,"b":"c"}`);
   });
 
+  test("handles arrays in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
+    const expected = "[ 1, 2, 3 ]";
+    await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(`[1,2,3]`);
+  });
+
   test("handles functions in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
@@ -44,6 +50,24 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     const expected = "{ a: () => { const x = 1; console.log(x); return null; } }";
     await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(`{"a":"() => { const x = 1; console.log(x); return null; }"}`);
+  });
+
+  test("handles arrays nested in objects in binding expressions", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const expected = "{ a: [1, 2, 3] }";
+    await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(`{"a":[1,2,3]}`);
+  });
+
+  test("handles arrays nested in functions in binding expressions", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const expected = "() => { return [1, 2, 3]; }";
+    await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(`() => { return [1, 2, 3]; }`);
   });
 
   test("handles complex expressions", async ({ initTestBed, createMarkdownDriver }) => {
