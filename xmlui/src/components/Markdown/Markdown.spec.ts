@@ -37,6 +37,15 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toHaveText(`{"a":1,"b":{"c":1}}`);
   });
 
+  test("handles functions nested in objects in binding expressions", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const expected = "{ a: () => { const x = 1; console.log(x); return null; } }";
+    await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText(`{"a":"() => { const x = 1; console.log(x); return null; }"}`);
+  });
+
   test("handles complex expressions", async ({ initTestBed, createMarkdownDriver }) => {
     const expected =
       "Hello there ${ {a : () => {}, x: null, b: { c: 3, d: 'asdadsda', e: () => {return null;} } } } How are you ${true || undefined || []}";
