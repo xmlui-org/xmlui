@@ -278,7 +278,6 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
         .map((part, index) => {
           const extracted = index % 2 === 0 ? part : extractValue(`{${part}}`);
           const resultExpr = mapByType(extracted);
-          console.log(resultExpr)
           // The result expression might be an object, in that case we stringify it here,
           // at the last step, so that there are no unnecessary apostrophes
           return typeof resultExpr === "object" && resultExpr !== null
