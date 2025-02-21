@@ -68,6 +68,18 @@ $themeVars: ();
   margin: 0;
 }
 
+.label {
+  width: fit-content;
+}
+
+.inputContainer {
+  z-index: -1;
+  position: relative;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
 .checkbox {
   display: grid;
   place-content: center;
@@ -80,7 +92,6 @@ $themeVars: ();
   &:not([readonly]){
     cursor: pointer;
   }
-
 
   @include checkboxVariant("default");
   @include hoverAndDisabledState("Checkbox");

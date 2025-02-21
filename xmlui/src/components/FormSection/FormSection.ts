@@ -16,7 +16,7 @@ export const FormSectionMd = createMetadata({
 
 const componentSource = `
 <Component name="FormSection">
-  <VStack paddingBottom="{$props.paddingBottom ?? '1rem'}" gap="0">
+  <VStack paddingBottom="{$props.paddingBottom ?? '1rem'}" gap="0" width="100%">
     <Heading 
       when="{!!$props.heading}"
       marginBottom="$space-tight"
