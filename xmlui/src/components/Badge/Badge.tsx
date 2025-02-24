@@ -11,7 +11,11 @@ export const BadgeMd = createMetadata({
   status: "stable",
   description: `The \`${COMP}\` is a text label that accepts a color map to define its background color and, optionally, its label color.`,
   props: {
-    value: d("The text that the component displays"),
+    value: {
+      description: "The text that the component displays",
+      type: "string",
+      isRequired: true,
+    },
     variant: d(
       `Modifies the shape of the component. Comes in the regular \`badge\` variant or the \`pill\` variant ` +
         `with fully rounded corners.`,

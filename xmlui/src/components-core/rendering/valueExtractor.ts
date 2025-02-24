@@ -141,8 +141,10 @@ export function createValueExtractor(
   };
 
   // --- Extract an optional string value
-  extractor.asOptionalString = (expression?: any) => {
-    return extractor(expression)?.toString();
+  extractor.asOptionalString = <T extends string>(expression?: any, defValue?: string) => {
+    const value = extractor(expression)?.toString();
+    if (value === undefined || value === null) return defValue;
+    return value as T;
   };
 
   extractor.asDisplayText = (expression?: any) => {

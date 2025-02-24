@@ -16,7 +16,7 @@ The text box of the input field is read only.
 
 ## Properties
 
-### `acceptsFileType`
+### `acceptsFileType (optional)`
 
 A list of file types the input controls accepts provided as a string array.
 
@@ -35,13 +35,11 @@ A list of file types the input controls accepts provided as a string array.
   `}
 />
 
-### `autoFocus`
+### `autoFocus (optional, default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-Default value: `false`.
-
-### `buttonIcon`
+### `buttonIcon (optional)`
 
 The ID of the icon to display in the button
 
@@ -62,7 +60,7 @@ The ID of the icon to display in the button
   `}
 />
 
-### `buttonIconPosition`
+### `buttonIconPosition (optional)`
 
 This optional string determines the location of the button icon.
 
@@ -85,7 +83,7 @@ Available values: `start`, `end`
 
 Details on different icon positions can be found in the [`Button` icon positions section](./Button.mdx#iconposition).
 
-### `buttonLabel`
+### `buttonLabel (optional)`
 
 This property is an optional string to set a label for the button part.
 
@@ -109,7 +107,7 @@ By default the label reads `Browse`.
   `}
 />
 
-### `buttonSize`
+### `buttonSize (optional)`
 
 The size of the button (small, medium, large)
 
@@ -140,7 +138,7 @@ Available values:
 
 Details on different sizes can be found in the [`Button` sizes section](./Button.mdx#size).
 
-### `buttonThemeColor`
+### `buttonThemeColor (optional)`
 
 The button color scheme (primary, secondary, attention)
 
@@ -163,7 +161,7 @@ Available values: `attention`, `primary`, `secondary`
 
 Details on different theme colors can be found in the [`Button` theme colors section](./Button.mdx#themecolor).
 
-### `buttonVariant`
+### `buttonVariant (optional)`
 
 The button variant to use
 
@@ -187,11 +185,9 @@ Available values: `solid`, `outlined`, `ghost`
 
 Details on different button variants can be found in the [`Button` variants section](./Button.mdx#variant).
 
-### `directory`
+### `directory (optional, default: false)`
 
 This boolean property indicates whether the component allows selecting directories (`true`) or files only (`false`).
-
-Default value: `false`.
 
 ```ueml copy
 <App>
@@ -208,11 +204,9 @@ Default value: `false`.
   `}
 />
 
-### `enabled`
+### `enabled (optional, default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 ```ueml copy
 <App>
@@ -229,25 +223,21 @@ Default value: `true`.
   `}
 />
 
-### `initialValue`
+### `initialValue (optional)`
 
 This property sets the component's initial value.
 
-### `label`
+### `label (optional)`
 
 This property sets the label of the component.
 
-### `labelBreak`
+### `labelBreak (optional, default: false)`
 
 This boolean value indicates if the `FileInput` labels can be split into multiple lines if it would overflow the available label width.
 
-Default value: `false`.
-
-### `labelPosition`
+### `labelPosition (optional, default: top)`
 
 Places the label at the given position of the component.
-
-Default value: `"top"`.
 
 Available values:
 
@@ -259,15 +249,13 @@ Available values:
 | `bottom` | The bottom of the input |
 
 
-### `labelWidth`
+### `labelWidth (optional)`
 
 This property sets the width of the `FileInput`.
 
-### `multiple`
+### `multiple (optional, default: false)`
 
 This boolean property enables to add not just one (`false`), but multiple files to the field (`true`). This is done either by dragging onto the field or by selecting multiple files in the browser menu after clicking the input field button.
-
-Default value: `false`.
 
 ```ueml copy
 <App>
@@ -286,19 +274,19 @@ Default value: `false`.
   `}
 />
 
-### `placeholder`
+### `placeholder (optional)`
 
 A placeholder text that is visible in the input field when its empty.
 
-### `readOnly`
+### `readOnly (optional)`
 
 Set this property to `true` to disallow changing the component value.
 
-### `required`
+### `required (optional)`
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus`
+### `validationStatus (optional)`
 
 This property allows you to set the validation status of the input component.
 

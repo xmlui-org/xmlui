@@ -257,6 +257,11 @@ export type ComponentPropertyMetadata = {
    * documentation
    */
   isInternal?: boolean;
+
+  /**
+   * Indicates that a particular property is required for the component to essentially function.
+   */
+  isRequired?: boolean;
 };
 
 /**
@@ -375,8 +380,9 @@ export function d(
   valueType?: PropertyValueType,
   defaultValue?: any,
   isValid?: IsValidFunction<any>,
+  isRequired?: boolean,
 ): ComponentPropertyMetadata {
-  return { description, availableValues, valueType, defaultValue, isValid };
+  return { description, isRequired, availableValues, valueType, defaultValue, isValid };
 }
 
 export interface ParentRenderContext {

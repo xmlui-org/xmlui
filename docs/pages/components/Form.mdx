@@ -15,7 +15,7 @@ You can learn more about this component in the [Using Forms](/learning/using-com
 
 ## Properties
 
-### `buttonRowTemplate`
+### `buttonRowTemplate (optional)`
 
 This property allows defining a custom component to display the buttons at the bottom of the form.
 
@@ -74,27 +74,25 @@ This example mimics a one-second search and turns off the submit button during t
   `}
 />
 
-### `cancelLabel`
+### `cancelLabel (optional)`
 
 This property defines the label of the Cancel button, by default, "Cancel".
 
-### `data`
+### `data (optional)`
 
 This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form.
 
-### `enabled`
+### `enabled (optional)`
 
 Whether the form is enabled or not. The default value is `true`.
 
-### `itemLabelBreak`
+### `itemLabelBreak (optional)`
 
 This boolean value indicates if form item labels can be split into multiple lines if it would overflow the available label width. Individual `FormItem` instances can override this property.
 
-### `itemLabelPosition`
+### `itemLabelPosition (optional, default: top)`
 
 This property sets the position of the item labels within the form.Individual `FormItem` instances can override this property.
-
-Default value: `"top"`.
 
 Available values:
 
@@ -106,31 +104,31 @@ Available values:
 | `bottom` | The bottom of the input |
 
 
-### `itemLabelWidth`
+### `itemLabelWidth (optional)`
 
 This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property.
 
-### `keepModalOpenOnSubmit`
+### `keepModalOpenOnSubmit (optional)`
 
 This property prevents the modal from closing when the form is submitted.
 
-### `saveInProgressLabel`
+### `saveInProgressLabel (optional)`
 
 This property defines the label of the Save button to display during the form data submit (save) operation. By default, the value of `saveLabel`.
 
-### `saveLabel`
+### `saveLabel (optional)`
 
 This property defines the label of the Save button, by default, "Save".
 
-### `submitMethod`
+### `submitMethod (optional)`
 
 HTTP method to use when submitting the form data.
 
-### `submitUrl`
+### `submitUrl (optional)`
 
 URL to submit the form data.
 
-### `swapCancelAndSave`
+### `swapCancelAndSave (optional)`
 
 By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
 

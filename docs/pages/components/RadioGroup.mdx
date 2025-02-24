@@ -10,17 +10,13 @@ The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption
 
 ## Properties
 
-### `autoFocus`
+### `autoFocus (optional, default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-Default value: `false`.
-
-### `enabled`
+### `enabled (optional, default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 This property indicates whether the input accepts user actions (`true`) or not (`false`). The default value is `true`.
 
@@ -51,7 +47,7 @@ This property indicates whether the input accepts user actions (`true`) or not (
   `}
 />
 
-### `initialValue`
+### `initialValue (optional)`
 
 This property sets the component's initial value.
 
@@ -84,21 +80,17 @@ This property defines the initial value of the selected option within the group.
   `}
 />
 
-### `label`
+### `label (optional)`
 
 This property sets the label of the component.
 
-### `labelBreak`
+### `labelBreak (optional, default: false)`
 
 This boolean value indicates if the `RadioGroup` labels can be split into multiple lines if it would overflow the available label width.
 
-Default value: `false`.
-
-### `labelPosition`
+### `labelPosition (optional, default: top)`
 
 Places the label at the given position of the component.
-
-Default value: `"top"`.
 
 Available values:
 
@@ -110,23 +102,23 @@ Available values:
 | `bottom` | The bottom of the input |
 
 
-### `labelWidth`
+### `labelWidth (optional)`
 
 This property sets the width of the `RadioGroup`.
 
-### `orientation`
+### `orientation (optional)`
 
 (*** NOT IMPLEMENTED YET ***) This property sets the orientation of the options within the radio group.
 
-### `readOnly`
+### `readOnly (optional)`
 
 Set this property to `true` to disallow changing the component value.
 
-### `required`
+### `required (optional)`
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus`
+### `validationStatus (optional)`
 
 This property allows you to set the validation status of the input component.
 
