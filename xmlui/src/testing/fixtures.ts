@@ -15,6 +15,7 @@ import {
   HStackDriver,
   IconDriver,
   ItemsDriver,
+  LinkDriver,
   ListDriver,
   MarkdownDriver,
   NumberBoxDriver,
@@ -302,6 +303,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(VStackDriver, testId);
     });
   },
+  createLinkDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(LinkDriver, testId);
+    });
+  }
 });
 
 // --- Types
@@ -340,4 +346,5 @@ type TestDriverExtenderProps = {
   createStackDriver: ComponentDriverMethod<StackDriver>;
   createHStackDriver: ComponentDriverMethod<HStackDriver>;
   createVStackDriver: ComponentDriverMethod<VStackDriver>;
+  createLinkDriver: ComponentDriverMethod<LinkDriver>;
 };
