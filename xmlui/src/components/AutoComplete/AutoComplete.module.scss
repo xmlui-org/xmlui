@@ -8,6 +8,7 @@ $themeVars: ();
 }
 
 $component: "AutoComplete";
+$themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "#{$component}-badge");
 $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
 
