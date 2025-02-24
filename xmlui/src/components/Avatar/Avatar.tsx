@@ -22,17 +22,15 @@ export const AvatarMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`radius-${COMP}`]: "4px",
-    [`thickness-border-${COMP}`]: "0px",
-    [`style-border-${COMP}`]: "solid",
-    [`border-${COMP}`]: `$thickness-border-${COMP} $style-border-${COMP} $color-border-${COMP}`,
     [`shadow-${COMP}`]: "inset 0 0 0 1px rgba(4,32,69,0.1)",
     [`color-text-${COMP}`]: "$color-text-secondary",
     [`font-weight-${COMP}`]: "$font-weight-bold",
     light: {
+      [`border-${COMP}`]: "0px solid $color-surface-400A80",
       [`color-bg-${COMP}`]: "$color-surface-100",
-      [`color-border-${COMP}`]: "$color-surface-400A80",
     },
     dark: {
+      [`border-${COMP}`]: "0px solid $color-surface-700",
       [`color-bg-${COMP}`]: "$color-surface-800",
       [`color-border-${COMP}`]: "$color-surface-700",
     },

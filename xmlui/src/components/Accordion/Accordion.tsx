@@ -67,7 +67,7 @@ export const AccordionMd = createMetadata({
     [`font-size-header-${COMP}`]: "$font-size-normal",
     [`font-weight-header-${COMP}`]: "$font-weight-normal",
     [`font-family-header-${COMP}`]: "$font-family",
-    [`border-${COMP}`]: "none",
+    [`border-${COMP}`]: "0px solid $color-border",
     [`width-icon-${COMP}`]: "",
     [`height-icon-${COMP}`]: "",
     light: {

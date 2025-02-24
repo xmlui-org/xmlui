@@ -32,18 +32,7 @@ export const AppHeaderMd = createMetadata({
   defaultThemeVars: {
     "height-AppHeader": "$space-14",
     "max-content-width-AppHeader": "$max-content-width-App",
-    ...borderSubject("AppHeader", {
-      bottom: {
-        color: "$color-border",
-        thickness: "1px",
-        style: "solid",
-      },
-      all: {
-        color: "$color-border",
-        thickness: "0",
-        style: "solid",
-      },
-    }),
+    "border-bottom-AppHeader": "1px solid $color-border",
     ...paddingSubject("logo-AppHeader", { horizontal: "$space-0", vertical: "$space-4" }),
     ...paddingSubject("AppHeader", { horizontal: "$space-4", vertical: "$space-0" }),
     "radius-AppHeader": "0px",

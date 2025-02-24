@@ -114,7 +114,7 @@ export function useCompiledTheme(
     });
 
     //we put the generated theme vars before the last item in the chain
-    return [
+    const resultedTheme = [
       ...themeDefChain
         .map((themeDef) => ({
           ...themeDef.themeVars,
@@ -139,12 +139,15 @@ export function useCompiledTheme(
         ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]?.themeVars,
       },
     ];
+    return resultedTheme;
   }, [activeTone, themeDefChain]);
 
   const allThemeVarsWithResolvedHierarchicalVars = useMemo(() => {
     let mergedThemeVars: Record<string, string> = {};
 
     themeDefChainVars?.forEach((theme) => {
+      theme = generatePaddingSegments(theme);
+      theme = generateBorderSegments(theme);
       mergedThemeVars = { ...mergedThemeVars, ...theme };
     });
 
