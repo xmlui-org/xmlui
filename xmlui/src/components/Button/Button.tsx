@@ -210,15 +210,18 @@ export const buttonComponentRenderer = createComponentRenderer(
     const label = extractValue.asDisplayText(node.props.label);
     return (
       <Button
-        type={extractValue.asOptionalString(node.props.type)}
-        variant={extractValue.asOptionalString(node.props.variant)}
-        themeColor={extractValue.asOptionalString(node.props.themeColor)}
+        type={extractValue.asOptionalString(node.props.type, defaultButtonType)}
+        variant={extractValue.asOptionalString(node.props.variant, defaultButtonVariant)}
+        themeColor={extractValue.asOptionalString(node.props.themeColor, defaultButtonThemeColor)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        size={extractValue.asOptionalString(node.props.size)}
+        size={extractValue.asOptionalString(node.props.size, defaultButtonSize)}
         icon={iconName && <Icon name={iconName} />}
-        iconPosition={extractValue.asOptionalString(node.props.iconPosition)}
-        orientation={extractValue.asOptionalString(node.props.orientation)}
-        contentPosition={extractValue.asOptionalString(node.props.contentPosition)}
+        iconPosition={extractValue.asOptionalString(node.props.iconPosition, defaultIconPosition)}
+        orientation={extractValue.asOptionalString(node.props.orientation, defaultOrientation)}
+        contentPosition={extractValue.asOptionalString(
+          node.props.contentPosition,
+          defaultAlignement,
+        )}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         onClick={lookupEventHandler("click")}
         onFocus={lookupEventHandler("gotFocus")}
