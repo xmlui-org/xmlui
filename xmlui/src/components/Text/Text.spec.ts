@@ -10,6 +10,20 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect(driver.component).toBeEmpty();
   });
 
+  Array.from(new Set(Object.values(TextVariantElement)))
+    .filter((variant) => !["h6", "span"].includes(variant))
+    .forEach((htmlElement) => {
+      test(`HtmlTags '${htmlElement}' with Text is rendered`, async ({
+        initTestBed,
+        createTextDriver,
+      }) => {
+        await initTestBed(`<${htmlElement} />`);
+        const driver = await createTextDriver();
+
+        await expect(driver.component).toBeAttached();
+      });
+    });
+
   // --- value
 
   // correct types: string, undefined, null, number, boolean -> everything will be coerced to strings
@@ -171,16 +185,16 @@ please do not break it!"
 // --- variant
 
 Object.entries(TextVariantElement).forEach(([variant, htmlElement]) => {
-  test(
-    `variant=${variant} renders the HTML element: ${htmlElement}`,
-    async ({ initTestBed, createTextDriver }) => {
-      await initTestBed(`<Text variant=${variant} />`);
-      const driver = await createTextDriver();
+  test(`variant=${variant} renders the HTML element: ${htmlElement}`, async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
+    await initTestBed(`<Text variant=${variant} />`);
+    const driver = await createTextDriver();
 
-      const tagName = await driver.getComponentTagName();
-      expect(tagName).toEqual(htmlElement);
-    },
-  );
+    const tagName = await driver.getComponentTagName();
+    expect(tagName).toEqual(htmlElement);
+  });
 });
 
 // --- Other Tests
