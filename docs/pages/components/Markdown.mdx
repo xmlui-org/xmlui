@@ -221,7 +221,7 @@ Function calls are executed and their return values inlined as strings into mark
 
 ## Properties
 
-### `content`
+### `content (optional)`
 
 This property sets the markdown content to display.
 
@@ -258,11 +258,9 @@ Use this property when the text you provide is not static but a result of calcul
   `}
 />
 
-### `removeIndents`
+### `removeIndents (optional, default: false)`
 
 This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.
-
-Default value: `false`.
 
 ```ueml copy /removeIndents="true"/
 <App layout="horizontal-sticky" padding="1rem">

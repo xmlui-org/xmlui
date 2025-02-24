@@ -20,19 +20,15 @@ You can learn more details about using this component [here](../learning/using-c
 
 ## Properties
 
-### `defaultTheme`
+### `defaultTheme (optional, default: xmlui)`
 
 This property sets the app's default theme.
 
-Default value: `"xmlui"`.
-
-### `defaultTone`
+### `defaultTone (optional, default: light)`
 
 This property sets the app's default tone ("light" or "dark").
 
-Default value: `"light"`.
-
-### `layout`
+### `layout (optional)`
 
 This property sets the layout template of the app. This setting determines the position and size of the app parts (such as header, navigation bar, footer, etc.) and the app's scroll behavior.
 
@@ -123,7 +119,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 For a detailed list on the different kinds of layouts available see [this short guide](../learning/using-components/app-component.mdx).
 
-### `loggedInUser`
+### `loggedInUser (optional)`
 
 Stores information about the currently logged in user.
 
@@ -163,37 +159,33 @@ Currently, there is no restriction on what the user data must look like.
   `}
 />
 
-### `logo`
+### `logo (optional)`
 
 Optional logo path
 
-### `logo-dark`
+### `logo-dark (optional)`
 
 Optional logo path in dark tone
 
-### `logo-light`
+### `logo-light (optional)`
 
 Optional logo path in light tone
 
-### `logoTemplate`
+### `logoTemplate (optional)`
 
 Optional template of the app logo
 
-### `name`
+### `name (optional)`
 
 Optional application name (visible in the browser tab)
 
-### `noScrollbarGutters`
+### `noScrollbarGutters (optional, default: false)`
 
 This boolean property specifies whether the scrollbar gutters should be hidden.
 
-Default value: `false`.
-
-### `scrollWholePage`
+### `scrollWholePage (optional, default: true)`
 
 This boolean property specifies whether the whole page should scroll (`true`) or just the content area (`false`). The default value is `true`.
-
-Default value: `true`.
 
 This boolean property specifies whether the whole page should scroll (true) or just the content area (false).
 The default value is `true`.

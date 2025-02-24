@@ -8,21 +8,17 @@ The `Switch` component is a user interface element that allows users to toggle b
 
 ## Properties
 
-### `autoFocus`
+### `autoFocus (optional, default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-Default value: `false`.
-
-### `description`
+### `description (optional)`
 
 (*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description of the Switch besides its label.
 
-### `enabled`
+### `enabled (optional, default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 This boolean property indicates whether the checkbox responds to user events (i.e. clicks);
 it is `true` by default.
@@ -60,17 +56,15 @@ it is `true` by default.
   `}
 />
 
-### `indeterminate`
+### `indeterminate (optional)`
 
 The `true` value of this property signals that the component is in an _intedeterminate state_.
 
-### `initialValue`
+### `initialValue (optional, default: false)`
 
 This property sets the component's initial value.
 
-Default value: `false`.
-
-### `label`
+### `label (optional)`
 
 This property sets the label of the component.
 
@@ -93,17 +87,13 @@ This property sets the label of the component.
   `}
 />
 
-### `labelBreak`
+### `labelBreak (optional, default: false)`
 
 This boolean value indicates if the `Switch` labels can be split into multiple lines if it would overflow the available label width.
 
-Default value: `false`.
-
-### `labelPosition`
+### `labelPosition (optional, default: end)`
 
 Places the label at the given position of the component.
-
-Default value: `"end"`.
 
 Available values:
 
@@ -136,11 +126,11 @@ Available values:
   `}
 />
 
-### `labelWidth`
+### `labelWidth (optional)`
 
 This property sets the width of the `Switch`.
 
-### `readOnly`
+### `readOnly (optional)`
 
 Set this property to `true` to disallow changing the component value.
 
@@ -163,11 +153,11 @@ If true, the value of the component cannot be modified.
   `}
 />
 
-### `required`
+### `required (optional)`
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus`
+### `validationStatus (optional)`
 
 This property allows you to set the validation status of the input component.
 

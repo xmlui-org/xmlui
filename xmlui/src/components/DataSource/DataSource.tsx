@@ -1,5 +1,7 @@
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 
+// NOTE: Original component this is based on is the `Loader` component
+
 const COMP = "DataSource";
 
 export const DataSourceMd = createMetadata({
@@ -14,7 +16,10 @@ export const DataSourceMd = createMetadata({
         `setting this property to other supported methods, such as \`post\`, \`put\`, \`delete\`, ` +
         `and others.`,
     ),
-    url: d(`This property represents the URL to fetch the data.`),
+    url: {
+      description: `This property represents the URL to fetch the data.`,
+      isRequired: true,
+    },
     rawBody: d(
       `This property sets the request body to the value provided here without any conversion. ` +
         `Use the \`body\` property if you want the object sent in JSON. When you define \`body\` ` +

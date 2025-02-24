@@ -9,7 +9,10 @@ export const ColumnMd = createMetadata({
     `The \`${COMP}\` component can be used within a \`Table\` to define a particular table ` +
     `column's visual properties and data bindings.`,
   props: {
-    bindTo: d(`Indicates what part of the data to lay out in the column.`),
+    bindTo: {
+      description: `Indicates what part of the data to lay out in the column.`,
+      isRequired: true,
+    },
     header: d(`Adds a label for a particular column.`),
     width: d(
       `This property defines the width of the column. You can use a numeric value, a pixel ` +

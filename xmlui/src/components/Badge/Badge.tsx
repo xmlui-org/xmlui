@@ -11,7 +11,11 @@ export const BadgeMd = createMetadata({
   status: "stable",
   description: `The \`${COMP}\` is a text label that accepts a color map to define its background color and, optionally, its label color.`,
   props: {
-    value: d("The text that the component displays"),
+    value: {
+      description: "The text that the component displays",
+      type: "string",
+      isRequired: true,
+    },
     variant: d(
       `Modifies the shape of the component. Comes in the regular \`badge\` variant or the \`pill\` variant ` +
         `with fully rounded corners.`,
@@ -36,6 +40,7 @@ export const BadgeMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`padding-${COMP}`]: `$space-0_5 $space-2`,
+    [`border-${COMP}`]: `0px solid $color-border`,
     [`padding-${COMP}-pill`]: `$space-0_5 $space-2`,
     [`radius-${COMP}`]: "4px",
     [`font-size-${COMP}`]: "0.8em",

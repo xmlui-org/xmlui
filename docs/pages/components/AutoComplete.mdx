@@ -29,17 +29,15 @@ The component provides context values with which you can access some internal pr
 
 ## Properties
 
-### `autoFocus`
+### `autoFocus (optional, default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-Default value: `false`.
-
-### `dropdownHeight`
+### `dropdownHeight (optional)`
 
 This property sets the height of the dropdown list.
 
-### `emptyListTemplate`
+### `emptyListTemplate (optional)`
 
 This property defines the template to display when the list of options is empty.
 
@@ -57,25 +55,21 @@ This property defines the template to display when the list of options is empty.
   `}
 />
 
-### `enabled`
+### `enabled (optional, default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-Default value: `true`.
-
-### `initialValue`
+### `initialValue (optional)`
 
 This property sets the component's initial value.
 
-### `maxLength`
+### `maxLength (optional)`
 
 This property sets the maximum length of the input it accepts.
 
-### `multi`
+### `multi (optional, default: false)`
 
 The `true` value of the property indicates if the user can select multiple items.
-
-Default value: `false`.
 
 <Playground
   height={300}
@@ -93,7 +87,7 @@ Default value: `false`.
   `}
 />
 
-### `optionTemplate`
+### `optionTemplate (optional)`
 
 This property enables the customization of list items. To access the attributes of a list item use the `$item` context variable.
 
@@ -114,19 +108,19 @@ This property enables the customization of list items. To access the attributes 
   `}
 />
 
-### `placeholder`
+### `placeholder (optional)`
 
 A placeholder text that is visible in the input field when its empty.
 
-### `readOnly`
+### `readOnly (optional)`
 
 Set this property to `true` to disallow changing the component value.
 
-### `required`
+### `required (optional)`
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus`
+### `validationStatus (optional)`
 
 This property allows you to set the validation status of the input component.
 

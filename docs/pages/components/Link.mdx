@@ -39,11 +39,9 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 
 ## Properties
 
-### `active`
+### `active (optional, default: false)`
 
 Indicates whether this link is active or not. If so, it will have a distinct visual appearance.
-
-Default value: `false`.
 
 ```ueml copy /active="true"/ /active="false"/
 <App>
@@ -64,11 +62,9 @@ Default value: `false`.
   `}
 />
 
-### `enabled`
+### `enabled (optional, default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 ```ueml copy /enabled="true"/ /enabled="false"/
 <App>
@@ -89,7 +85,7 @@ Default value: `true`.
   `}
 />
 
-### `icon`
+### `icon (optional)`
 
 This property allows you to add an icon (specify the icon's name) to the link.
 
@@ -114,15 +110,13 @@ This property allows you to add an icon (specify the icon's name) to the link.
 If you want to specify paddings and gaps or put the icon to the right of the link text, use your custom link template (nest it into `Link`).
 </Callout>
 
-### `label`
+### `label (optional)`
 
 This property sets the label of the component.
 
-### `target`
+### `target (optional, default: _self)`
 
 This property specifies where to open the link represented by the `Link`. This property accepts the following values (in accordance with the HTML standard):
-
-Default value: `"_self"`.
 
 Available values:
 
@@ -156,7 +150,7 @@ The following sample opens its link in a new tab:
   `}
 />
 
-### `to`
+### `to (optional)`
 
 This property defines the URL of the link.
 

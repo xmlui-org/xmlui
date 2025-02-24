@@ -41,6 +41,7 @@ export const NavLinkMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    [`border-NavLink`]: '0px solid $color-border',
     "radius-NavLink": "$radius",
     "color-bg-NavLink": "transparent",
     "padding-horizontal-NavLink": "$space-4",

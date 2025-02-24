@@ -10,6 +10,7 @@ $themeVars: ();
 $component: "Badge";
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, "#{$component}-pill");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}-pill");
 $color-bg-Badge: createThemeVar("color-bg-#{$component}");
 $color-text-Badge: createThemeVar("color-text-#{$component}");
@@ -37,6 +38,7 @@ $font-weight-Badge-pill: createThemeVar("font-weight-#{$component}-pill");
 
 .pill {
   @include t.paddingVars($themeVars, "#{$component}-pill");
+  @include t.borderVars($themeVars, "#{$component}-pill");
   display: inline-block;
   width: fit-content;
   vertical-align: top;

@@ -1,5 +1,7 @@
 import { expect, test } from "../../testing/fixtures";
 
+const levels = ["h1", "h2", "h3", "h4", "h5", "h6"];
+
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("Heading is rendered", async ({ initTestBed, createHeadingDriver }) => {
     await initTestBed(`<Heading />`);
@@ -8,11 +10,13 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect(driver.component).toBeAttached();
   });
 
-  test("HtmlTag h1 is rendered", async ({ initTestBed, createHeadingDriver }) => {
-    await initTestBed(`<h1 />`);
-    const driver = await createHeadingDriver();
+  levels.forEach((htmlElement) => {
+    test(`HtmlTag '${htmlElement}' is rendered`, async ({ initTestBed, createHeadingDriver }) => {
+      await initTestBed(`<h1 />`);
+      const driver = await createHeadingDriver();
 
-    await expect(driver.component).toBeAttached();
+      await expect(driver.component).toBeAttached();
+    });
   });
 
   // --- value
@@ -87,35 +91,46 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       await createHeadingDriver("heading6"),
     ];
 
-    const headingSizes = await Promise.all(headings.map(async (heading) => {
-      const { width, height } = await heading.getComponentBounds();
-      return { width, height };
-    }));
+    const headingSizes = await Promise.all(
+      headings.map(async (heading) => {
+        const { width, height } = await heading.getComponentBounds();
+        return { width, height };
+      }),
+    );
 
     return headingSizes;
   }
   // NOTE: we don't explicitly test h6, since all other headings have tested for its size
-  ["h1", "h2", "h3", "h4", "h5"].forEach((level, idx) => {
-    test(`compare ${level} size to other levels`, async ({ initTestBed, createHeadingDriver }) => {
-      const headingSizes = await sizeComparisonSetup(initTestBed, createHeadingDriver);
-  
-      for (let i = idx + 1; i < headingSizes.length; i++) {
-        console.log(`${level} width: ${headingSizes[idx].width} and height: ${headingSizes[idx].height}`);
-        console.log(`compared to h${i + 1} width: ${headingSizes[i].width} and height: ${headingSizes[i].height}`);
-        
-        expect(headingSizes[idx].width).toBeGreaterThanOrEqual(headingSizes[i].width);
-        expect(headingSizes[idx].height).toBeGreaterThanOrEqual(headingSizes[i].height);
-      }
+  levels
+    .filter((l) => l !== "h6")
+    .forEach((level, idx) => {
+      test(`compare ${level} size to other levels`, async ({
+        initTestBed,
+        createHeadingDriver,
+      }) => {
+        const headingSizes = await sizeComparisonSetup(initTestBed, createHeadingDriver);
+
+        for (let i = idx + 1; i < headingSizes.length; i++) {
+          console.log(
+            `${level} width: ${headingSizes[idx].width} and height: ${headingSizes[idx].height}`,
+          );
+          console.log(
+            `compared to h${i + 1} width: ${headingSizes[i].width} and height: ${headingSizes[i].height}`,
+          );
+
+          expect(headingSizes[idx].width).toBeGreaterThanOrEqual(headingSizes[i].width);
+          expect(headingSizes[idx].height).toBeGreaterThanOrEqual(headingSizes[i].height);
+        }
+      });
     });
-  });
 
   [
-    {  label: "H1 is the same as Heading level='h1'", specializedComp: "H1", level: "h1" },
-    {  label: "H2 is the same as Heading level='h2'", specializedComp: "H2", level: "h2" },
-    {  label: "H3 is the same as Heading level='h3'", specializedComp: "H3", level: "h3" },
-    {  label: "H4 is the same as Heading level='h4'", specializedComp: "H4", level: "h4" },
-    {  label: "H5 is the same as Heading level='h5'", specializedComp: "H5", level: "h5" },
-    {  label: "H6 is the same as Heading level='h6'", specializedComp: "H6", level: "h6" },
+    { label: "H1 is the same as Heading level='h1'", specializedComp: "H1", level: "h1" },
+    { label: "H2 is the same as Heading level='h2'", specializedComp: "H2", level: "h2" },
+    { label: "H3 is the same as Heading level='h3'", specializedComp: "H3", level: "h3" },
+    { label: "H4 is the same as Heading level='h4'", specializedComp: "H4", level: "h4" },
+    { label: "H5 is the same as Heading level='h5'", specializedComp: "H5", level: "h5" },
+    { label: "H6 is the same as Heading level='h6'", specializedComp: "H6", level: "h6" },
   ].forEach(({ label, specializedComp, level }) => {
     const textContent = "Content";
     test(label, async ({ initTestBed, createHeadingDriver }) => {
@@ -136,7 +151,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       await expect(specialized.component).toHaveText(textContent);
     });
   });
-  
+
   // --- maxLines
 
   test('maxLines="2" cuts off long text', async ({ initTestBed, createHeadingDriver }) => {
@@ -235,7 +250,6 @@ please do not break it!"
   });
 });
 
-
 // --- Other Tests
 
 // --- formatting
@@ -272,7 +286,11 @@ test("break long text", async ({ initTestBed, createHeadingDriver }) => {
 
 // --- inside layout
 
-test("Heading is inline in HStack", async ({ initTestBed, createHeadingDriver, createIconDriver }) => {
+test("Heading is inline in HStack", async ({
+  initTestBed,
+  createHeadingDriver,
+  createIconDriver,
+}) => {
   await initTestBed(`
     <HStack>
       <Heading testId="heading0" >Show me a trash</Heading>
@@ -288,7 +306,11 @@ test("Heading is inline in HStack", async ({ initTestBed, createHeadingDriver, c
   expect(topIcon0).toEqual(topHeading1);
 });
 
-test("Heading is block in VStack", async ({ initTestBed, createHeadingDriver, createIconDriver }) => {
+test("Heading is block in VStack", async ({
+  initTestBed,
+  createHeadingDriver,
+  createIconDriver,
+}) => {
   await initTestBed(`
     <VStack>
       <Heading testId="heading0" >Show me a trash</Heading>
@@ -326,18 +348,26 @@ test("Heading overflows container dimensions", async ({
   expect(widthLayout).toEqual(widthLayoutExpected);
 });
 
-test("Heading accepts custom props not immediately used", async ({ initTestBed, createHeadingDriver }) => {
+test("Heading accepts custom props not immediately used", async ({
+  initTestBed,
+  createHeadingDriver,
+}) => {
   await initTestBed(`<Heading custom="test" boolean>Test Heading</Heading>`);
   const headingDriver = await createHeadingDriver();
-  
+
   await expect(headingDriver.component).toHaveAttribute("custom", "test");
   await expect(headingDriver.component).toHaveAttribute("boolean", "true");
 });
 
-test("HtmlTag h1 accepts custom props not immediately used", async ({ initTestBed, createHeadingDriver }) => {
-  await initTestBed(`<h1 custom="test" boolean>Test Heading</h1>`);
-  const headingDriver = await createHeadingDriver();
-  
-  await expect(headingDriver.component).toHaveAttribute("custom", "test");
-  await expect(headingDriver.component).toHaveAttribute("boolean", "true");
+levels.forEach((level) => {
+  test(`HtmlTag '${level}' accepts custom props not immediately used`, async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
+    await initTestBed(`<h1 custom="test" boolean>Test Heading</h1>`);
+    const headingDriver = await createHeadingDriver();
+
+    await expect(headingDriver.component).toHaveAttribute("custom", "test");
+    await expect(headingDriver.component).toHaveAttribute("boolean", "true");
+  });
 });

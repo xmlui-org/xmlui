@@ -12,7 +12,6 @@ import {
   type AlignmentOptions,
   type OrientationOptions,
   type ButtonAria,
-  defaultButtonType,
 } from "../abstractions";
 
 type Props = {
@@ -47,14 +46,14 @@ type Props = {
 export const Button = React.forwardRef(function Button(
   {
     id,
-    type = defaultButtonType,
+    type,
     icon,
-    iconPosition = "start",
-    contentPosition = "center",
-    orientation = "horizontal",
-    variant = "solid",
-    themeColor = "primary",
-    size = "sm",
+    iconPosition,
+    contentPosition,
+    orientation,
+    variant,
+    themeColor,
+    size,
     disabled,
     children,
     formId,
