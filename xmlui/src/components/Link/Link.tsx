@@ -34,6 +34,7 @@ export const LinkMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    [`border-${COMP}`]: '0px solid $color-border',
     [`color-text-${COMP}--hover--active`]: `$color-text-${COMP}--active`,
     [`color-text-decoration-${COMP}--hover`]: "$color-surface-400A80",
     [`color-text-decoration-${COMP}--active`]: "$color-surface200",
