@@ -14,11 +14,9 @@ To add new lines to the input field press `Shift` + `Enter`.
 
 ## Properties
 
-### `autoFocus`
+### `autoFocus (optional, default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
-
-Default value: `false`.
 
 ```ueml copy
 <App>
@@ -35,11 +33,9 @@ Default value: `false`.
   `}
 />
 
-### `autoSize`
+### `autoSize (optional, default: false)`
 
 If set to `true`, this boolean property enables the `TextArea` to resize automatically based on the number of lines inside it.
-
-Default value: `false`.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
@@ -60,11 +56,9 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
   `}
 />
 
-### `enabled`
+### `enabled (optional, default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 ```ueml copy
 <App>
@@ -81,7 +75,7 @@ Default value: `true`.
   `}
 />
 
-### `enterSubmits`
+### `enterSubmits (optional)`
 
 This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit. The default value is is `true`.
 
@@ -113,11 +107,11 @@ See [Using Forms](../learning/forms.mdx) for details.
   `}
 />
 
-### `escResets`
+### `escResets (optional)`
 
 This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.
 
-### `initialValue`
+### `initialValue (optional)`
 
 This property sets the component's initial value.
 
@@ -138,21 +132,17 @@ The initial value displayed in the input field.
   `}
 />
 
-### `label`
+### `label (optional)`
 
 This property sets the label of the component.
 
-### `labelBreak`
+### `labelBreak (optional, default: false)`
 
 This boolean value indicates if the `TextArea` labels can be split into multiple lines if it would overflow the available label width.
 
-Default value: `false`.
-
-### `labelPosition`
+### `labelPosition (optional, default: top)`
 
 Places the label at the given position of the component.
-
-Default value: `"top"`.
 
 Available values:
 
@@ -164,15 +154,15 @@ Available values:
 | `bottom` | The bottom of the input |
 
 
-### `labelWidth`
+### `labelWidth (optional)`
 
 This property sets the width of the `TextArea`.
 
-### `maxLength`
+### `maxLength (optional)`
 
 This property sets the maximum length of the input it accepts.
 
-### `maxRows`
+### `maxRows (optional)`
 
 This optional number property maximizes the number of lines the `TextArea` can grow to.
 
@@ -206,7 +196,7 @@ This optional number property maximizes the number of lines the `TextArea` can g
   `}
 />
 
-### `minRows`
+### `minRows (optional)`
 
 This optional number property indicates the minimum number of lines the `TextArea` has and specifies its size accordingly.
 
@@ -228,7 +218,7 @@ This optional number property indicates the minimum number of lines the `TextAre
   `}
 />
 
-### `placeholder`
+### `placeholder (optional)`
 
 A placeholder text that is visible in the input field when its empty.
 
@@ -247,7 +237,7 @@ A placeholder text that is visible in the input field when its empty.
   `}
 />
 
-### `readOnly`
+### `readOnly (optional)`
 
 Set this property to `true` to disallow changing the component value.
 
@@ -266,11 +256,11 @@ Set this property to `true` to disallow changing the component value.
   `}
 />
 
-### `required`
+### `required (optional)`
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `resize`
+### `resize (optional)`
 
 This optional property specifies in which dimensions can the `TextArea` be resized by the user.
 
@@ -308,7 +298,7 @@ Drag the small resize indicators at the bottom right on each of the controls in 
   `}
 />
 
-### `rows`
+### `rows (optional)`
 
 Specifies the number of lines or rows (and thus, its size) the component has.
 
@@ -329,7 +319,7 @@ Specifies the number of lines or rows (and thus, its size) the component has.
   `}
 />
 
-### `validationStatus`
+### `validationStatus (optional)`
 
 This property allows you to set the validation status of the input component.
 

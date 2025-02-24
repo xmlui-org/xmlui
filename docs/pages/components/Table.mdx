@@ -36,19 +36,15 @@ All samples use table columns with the following definition unless noted otherwi
 
 ## Properties
 
-### `alwaysShowSelectionHeader`
+### `alwaysShowSelectionHeader (optional, default: false)`
 
 This property indicates when the row selection header is displayed. When the value is `true,` the selection header is always visible. Otherwise, it is displayed only when hovered.
 
-Default value: `false`.
-
-### `autoFocus`
+### `autoFocus (optional, default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-Default value: `false`.
-
-### `data`
+### `data (optional)`
 
 The component receives data via this property. The `data` property is a list of items that the `Table` can display.
 
@@ -106,7 +102,7 @@ Here, the component displays rocket information coming from the official SpaceX 
   `}
 />
 
-### `enableMultiRowSelection`
+### `enableMultiRowSelection (optional)`
 
 This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.
 
@@ -143,7 +139,7 @@ By default, the value of this property is `true`.
   `}
 />
 
-### `headerHeight`
+### `headerHeight (optional)`
 
 This optional property is used to specify the height of the table header.
 
@@ -172,7 +168,7 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
   `}
 />
 
-### `hideHeader`
+### `hideHeader (optional)`
 
 Set the header visibility using this property. Set it to `true` to hide the header.
 
@@ -203,7 +199,7 @@ The default value is `false`.
   `}
 />
 
-### `iconNoSort`
+### `iconNoSort (optional)`
 
 Allows the customization of the icon displayed in the Table column header when when sorting is enabled and sorting is not done according to the column.
 
@@ -233,7 +229,7 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
   `}
 />
 
-### `iconSortAsc`
+### `iconSortAsc (optional)`
 
 Allows the customization of the icon displayed in the Table column header when sorting is enabled, sorting is done according to the column, and the column is sorted in ascending order.
 
@@ -263,7 +259,7 @@ sorting is done according to the column, and the column is sorted in ascending o
   `}
 />
 
-### `iconSortDesc`
+### `iconSortDesc (optional)`
 
 Allows the customization of the icon displayed in the Table column header when sorting is enabled, sorting is done according to the column, and the column is sorted in descending order.
 
@@ -295,7 +291,7 @@ Select a column header and set it to descending ordering.
   `}
 />
 
-### `isPaginated`
+### `isPaginated (optional)`
 
 This property adds pagination controls to the `Table`.
 
@@ -322,11 +318,11 @@ This property adds pagination controls to the `Table`.
   `}
 />
 
-### `items`
+### `items (optional)`
 
 You can use `items` as an alias for the `data` property. When you bind the table to a data source (e.g. an API endpoint), the `data` acts as the property that accepts a URL to fetch information from an API. When both `items` and `data` are used, `items` has priority.
 
-### `loading`
+### `loading (optional)`
 
 This boolean property indicates if the component is fetching (or processing) data. This property is useful when data is loaded conditionally or receiving it takes some time.
 
@@ -354,7 +350,7 @@ This property is useful when data is loaded conditionally or receiving it takes 
   `}
 />
 
-### `noDataTemplate`
+### `noDataTemplate (optional)`
 
 A property to customize what to display if the table does not contain any data.
 
@@ -385,7 +381,7 @@ A property to customize what to display if the table does not contain any data.
   `}
 />
 
-### `pageSizes`
+### `pageSizes (optional)`
 
 Describes how big a page should be for pagination.
 
@@ -416,7 +412,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
   `}
 />
 
-### `rowDisabledPredicate`
+### `rowDisabledPredicate (optional)`
 
 This property defines a predicate function with a return value that determines if the row should be disabled. The function retrieves the item to display and should return a Boolean-like value.
 
@@ -451,7 +447,7 @@ Disabled items are rendered with a different color.
   `}
 />
 
-### `rowsSelectable`
+### `rowsSelectable (optional)`
 
 Indicates whether the rows are selectable (`true`) or not (`false`).
 
@@ -480,7 +476,7 @@ The default value is `false`.
   `}
 />
 
-### `sortBy`
+### `sortBy (optional)`
 
 This property is used to determine which data attributes to sort by.
 
@@ -507,7 +503,7 @@ This property is used to determine which data attributes to sort by.
   `}
 />
 
-### `sortDirection`
+### `sortDirection (optional)`
 
 This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set.
 

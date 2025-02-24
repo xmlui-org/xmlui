@@ -12,7 +12,7 @@ Throught this documentation page the data used is the same that is found in the 
 
 ## Properties
 
-### `bindTo`
+### `bindTo (required)`
 
 Indicates what part of the data to lay out in the column.
 
@@ -35,11 +35,11 @@ Indicates what part of the data to lay out in the column.
   `}
 />
 
-### `canResize`
+### `canResize (optional)`
 
 This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.
 
-### `canSort`
+### `canSort (optional)`
 
 This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`).
 
@@ -68,7 +68,7 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
   `}
 />
 
-### `header`
+### `header (optional)`
 
 Adds a label for a particular column.
 
@@ -95,15 +95,15 @@ Adds a label for a particular column.
   `}
 />
 
-### `maxWidth`
+### `maxWidth (optional)`
 
 Indicates the maximum width a particular column can have.
 
-### `minWidth`
+### `minWidth (optional)`
 
 Indicates the minimum width a particular column can have.
 
-### `pinTo`
+### `pinTo (optional)`
 
 This property allows the column to be pinned to the `left` (left-to-right writing style) or `right` (left-to-right writing style) edge of the table. If the writing style is right-to-left, the locations are switched.
 
@@ -137,7 +137,7 @@ Scroll the table contents horizontally to see how the pinned columns are display
   `}
 />
 
-### `width`
+### `width (optional)`
 
 This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*`, `2*`, etc.). You will get an error if you use any other unit (or value).
 

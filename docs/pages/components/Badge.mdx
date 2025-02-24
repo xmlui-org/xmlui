@@ -8,7 +8,7 @@ The `Badge` is a text label that accepts a color map to define its background co
 
 ## Properties
 
-### `colorMap`
+### `colorMap (optional)`
 
 The `Badge` component supports the mapping of a list of colors using the `value` prop as the key. Provide the component with a list or key-value pairs in two ways:
 
@@ -58,11 +58,11 @@ The `Badge` component supports the mapping of a list of colors using the `value`
   `}
 />
 
-### `forceIndicator`
+### `forceIndicator (optional)`
 
 (**NOT IMPLEMENTED YET**) This property forces the display of the indicator, even if the `indicatorText` property is not defined or empty.
 
-### `indicatorPosition`
+### `indicatorPosition (optional)`
 
 (**NOT IMPLEMENTED YET**) The position of the indicator.
 
@@ -77,19 +77,19 @@ The value of this optional property sets the string to provide a color scheme fo
 | `bottom-start` | The indicator is displayed over the badge in the bottom-start corner |
 | `bottom-end`   | The indicator is displayed over the badge in the bottom-end corner   |
 
-### `indicatorText`
+### `indicatorText (optional)`
 
 (**NOT IMPLEMENTED YET**) This property defines the text to display in the indicator. If it is not defined or empty, no indicator is displayed unless the `forceIndicator` property is set.
 
-### `indicatorThemeColor`
+### `indicatorThemeColor (optional)`
 
 (**NOT IMPLEMENTED YET**) The theme color of the indicator.
 
-### `themeColor`
+### `themeColor (optional)`
 
 (**NOT IMPLEMENTED YET**) The theme color of the component.
 
-### `value`
+### `value (required)`
 
 The text that the component displays
 
@@ -107,7 +107,7 @@ The text that the component displays
     </App>  
   `} />
 
-### `variant`
+### `variant (optional)`
 
 Modifies the shape of the component. Comes in the regular `badge` variant or the `pill` variant with fully rounded corners.
 

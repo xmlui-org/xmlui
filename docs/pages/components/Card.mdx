@@ -77,19 +77,17 @@ Prestyled elements always appear above other children.
 
 ## Properties
 
-### `avatarUrl`
+### `avatarUrl (optional)`
 
 Show the avatar (`true`) or not (`false`). If not specified, the Card will show the first letters of the [`title`](#title).
 
-### `linkTo`
+### `linkTo (optional)`
 
 This property wraps the title in a `Link` component that is clickable to navigate.
 
-### `orientation`
+### `orientation (optional, default: vertical)`
 
 An optional property that governs the Card's orientation (whether the Card lays out its children in a row or a column). If the orientation is set to `horizontal`, the Card will display its children in a row, except for its [`title`](#title) and [`subtitle`](#subtitle).
-
-Default value: `"vertical"`.
 
 Available values:
 
@@ -124,7 +122,7 @@ Available values:
   `}
 />
 
-### `showAvatar`
+### `showAvatar (optional)`
 
 Indicates whether the Card should be displayed
 
@@ -150,7 +148,7 @@ Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is aut
   `}
 />
 
-### `subtitle`
+### `subtitle (optional)`
 
 This prop sets the prestyled subtitle.
 
@@ -171,7 +169,7 @@ This prop sets the prestyled subtitle.
   `}
 />
 
-### `title`
+### `title (optional)`
 
 This prop sets the prestyled title.
 

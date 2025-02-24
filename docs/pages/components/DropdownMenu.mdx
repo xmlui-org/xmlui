@@ -44,7 +44,7 @@ Try this dropdown menu:
 
 ## Properties
 
-### `alignment`
+### `alignment (optional)`
 
 This property allows you to determine the alignment of the displayed menu items.
 
@@ -90,11 +90,9 @@ Available values are:
   `}
 />
 
-### `enabled`
+### `enabled (optional, default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 ```ueml copy {4, 11}
 <App>
@@ -142,29 +140,29 @@ Default value: `true`.
   `}
 />
 
-### `label`
+### `label (optional)`
 
 This property sets the label of the component.
 
-### `triggerButtonIcon`
+### `triggerButtonIcon (optional)`
 
 This property defines the icon to display on the trigger button.
 
-### `triggerButtonIconPosition`
+### `triggerButtonIconPosition (optional)`
 
 This property defines the position of the icon on the trigger button.
 
 Available values: `start`, `end`
 
-### `triggerButtonThemeColor`
+### `triggerButtonThemeColor (optional)`
 
 This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
-### `triggerButtonVariant`
+### `triggerButtonVariant (optional)`
 
 This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
-### `triggerTemplate`
+### `triggerTemplate (optional)`
 
 This property allows you to define a custom trigger instead of the default one provided by `DropdownMenu`.
 

@@ -9,6 +9,9 @@ import {
   buttonTypesMd,
   iconPositionMd,
   defaultButtonType,
+  defaultButtonVariant,
+  defaultButtonThemeColor,
+  defaultButtonSize,
 } from "../abstractions";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -17,69 +20,92 @@ import { Icon } from "../Icon/IconNative";
 import { Button } from "./ButtonNative";
 
 const COMP = "Button";
+const defaultOrientation = "horizontal";
+const defaultAlignement = "center";
+const defaultIconPosition = "start";
 
 export const ButtonMd = createMetadata({
   description: `Button is an interactive element that triggers an action when clicked.`,
   status: "stable",
   props: {
-    autoFocus: d(
-      "Indicates if the button should receive focus when the page loads.",
-      null,
-      "boolean",
-      false,
-    ),
-    variant: d(
-      "The button variant determines the level of emphasis the button should possess.",
-      buttonVariantMd,
-      "string",
-      "solid",
-    ),
-    themeColor: d(
-      "Sets the button color scheme defined in the application theme.",
-      buttonThemeMd,
-      "string",
-      "primary",
-    ),
-    size: d("The size of the button.", sizeMd, "string", "sm"),
-    label: d(
-      `This property is an optional string to set a label for the ${COMP}. If no label is ` +
+    autoFocus: {
+      description: "Indicates if the button should receive focus when the page loads.",
+      isRequired: false,
+      type: "boolean",
+      defaultValue: false,
+    },
+    variant: {
+      description: "The button variant determines the level of emphasis the button should possess.",
+      isRequired: false,
+      type: "string",
+      availableValues: buttonVariantMd,
+      defaultValue: defaultButtonVariant,
+    },
+    themeColor: {
+      description: "Sets the button color scheme defined in the application theme.",
+      isRequired: false,
+      type: "string",
+      availableValues: buttonThemeMd,
+      defaultValue: defaultButtonThemeColor,
+    },
+    size: {
+      description: "Sets the size of the button.",
+      isRequired: false,
+      type: "string",
+      availableValues: sizeMd,
+      defaultValue: defaultButtonSize,
+    },
+    label: {
+      description:
+        `This property is an optional string to set a label for the ${COMP}. If no label is ` +
         `specified and an icon is set, the ${COMP} will modify its styling to look like a ` +
         `small icon button. When the ${COMP} has nested children, it will display them and ` +
         `ignore the value of the \`label\` prop.`,
-    ),
-    type: d(
-      `This optional string describes how the ${COMP} appears in an HTML context. You ` +
+      isRequired: false,
+      type: "string",
+    },
+    type: {
+      description:
+        `This optional string describes how the ${COMP} appears in an HTML context. You ` +
         `rarely need to set this property explicitly.`,
-      buttonTypesMd,
-      "string",
-      defaultButtonType,
-    ),
-    enabled: d(
-      `The value of this property indicates whether the button accepts actions (\`true\`) ` +
+      isRequired: false,
+      availableValues: buttonTypesMd,
+      valueType: "string",
+      defaultValue: defaultButtonType,
+    },
+    enabled: {
+      description:
+        `The value of this property indicates whether the button accepts actions (\`true\`) ` +
         `or does not react to them (\`false\`).`,
-      null,
-      null,
-      true,
-    ),
-    orientation: dOrientation(COMP),
-    icon: d(
-      `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
+      isRequired: false,
+      type: "boolean",
+      defaultValue: true,
+    },
+    orientation: dOrientation(defaultOrientation),
+    icon: {
+      description:
+        `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
         `recognizes the icon by its name. If no label is specified and an icon is set, the ${COMP} ` +
         `displays only that icon.`,
-    ),
-    iconPosition: d(
-      `This optional string determines the location of the icon in the ${COMP}.`,
-      iconPositionMd,
-      "string",
-      "start",
-    ),
-    contentPosition: d(
-      `This optional value determines how the label and icon (or nested children) should be placed` +
+      isRequired: false,
+      type: "string",
+    },
+    iconPosition: {
+      description: `This optional string determines the location of the icon in the ${COMP}.`,
+      isRequired: false,
+      availableValues: iconPositionMd,
+      type: "string",
+      defaultValue: defaultIconPosition,
+    },
+    contentPosition: {
+      description:
+        `This optional value determines how the label and icon (or nested children) should be placed` +
         `inside the ${COMP} component.`,
-      alignmentOptionMd,
-      "string",
-      "center",
-    ),
+      isRequired: false,
+      availableValues: alignmentOptionMd,
+      type: "string",
+      defaultValue: defaultAlignement,
+    },
   },
   events: {
     click: dClick(COMP),
@@ -184,25 +210,22 @@ export const buttonComponentRenderer = createComponentRenderer(
     const label = extractValue.asDisplayText(node.props.label);
     return (
       <Button
-        type={node.props.type}
-        variant={extractValue(node.props.variant)}
-        themeColor={extractValue(node.props.themeColor)}
+        type={extractValue.asOptionalString(node.props.type)}
+        variant={extractValue.asOptionalString(node.props.variant)}
+        themeColor={extractValue.asOptionalString(node.props.themeColor)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        size={extractValue(node.props.size)}
+        size={extractValue.asOptionalString(node.props.size)}
         icon={iconName && <Icon name={iconName} />}
-        iconPosition={extractValue(node.props.iconPosition)}
-        orientation={extractValue(node.props.orientation)}
-        contentPosition={extractValue(node.props.contentPosition)}
-        disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
+        iconPosition={extractValue.asOptionalString(node.props.iconPosition)}
+        orientation={extractValue.asOptionalString(node.props.orientation)}
+        contentPosition={extractValue.asOptionalString(node.props.contentPosition)}
+        disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         onClick={lookupEventHandler("click")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         style={layoutCss}
       >
-        {renderChild(node.children, {
-          type: "Stack",
-          orientation: "horizontal"
-        }) || label}
+        {renderChild(node.children, { type: "Stack", orientation: "horizontal" }) || label}
       </Button>
     );
   },

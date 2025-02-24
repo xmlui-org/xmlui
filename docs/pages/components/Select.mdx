@@ -70,13 +70,11 @@ You can use `Select` with dynamic options:
 
 ## Properties
 
-### `autoFocus`
+### `autoFocus (optional, default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-Default value: `false`.
-
-### `dropdownHeight`
+### `dropdownHeight (optional)`
 
 This property sets the height of the dropdown list.
 
@@ -116,7 +114,7 @@ This property sets the height of the dropdown list.
   `}
 />
 
-### `emptyListTemplate`
+### `emptyListTemplate (optional)`
 
 This optional property provides the ability to customize what is displayed when the list of options is empty.
 
@@ -160,11 +158,9 @@ Click on the second field to see the custom empty list indicator.
   `}
 />
 
-### `enabled`
+### `enabled (optional, default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 ```ueml copy
 <App>
@@ -181,7 +177,7 @@ Default value: `true`.
   `}
 />
 
-### `initialValue`
+### `initialValue (optional)`
 
 This property sets the component's initial value.
 
@@ -209,21 +205,17 @@ This property sets the component's initial value.
   `}
 />
 
-### `label`
+### `label (optional)`
 
 This property sets the label of the component.
 
-### `labelBreak`
+### `labelBreak (optional, default: false)`
 
 This boolean value indicates if the `Select` labels can be split into multiple lines if it would overflow the available label width.
 
-Default value: `false`.
-
-### `labelPosition`
+### `labelPosition (optional, default: top)`
 
 Places the label at the given position of the component.
-
-Default value: `"top"`.
 
 Available values:
 
@@ -235,19 +227,17 @@ Available values:
 | `bottom` | The bottom of the input |
 
 
-### `labelWidth`
+### `labelWidth (optional)`
 
 This property sets the width of the `Select`.
 
-### `maxLength`
+### `maxLength (optional)`
 
 This property sets the maximum length of the input it accepts.
 
-### `multiSelect`
+### `multiSelect (optional, default: false)`
 
 The `true` value of the property indicates if the user can select multiple items.
-
-Default value: `false`.
 
 ```ueml copy /multiSelect="true"/
 <App>
@@ -285,7 +275,7 @@ Default value: `false`.
   `}
 />
 
-### `optionLabelTemplate`
+### `optionLabelTemplate (optional)`
 
 This property allows replacing the default template to display an option in the dropdown list.
 
@@ -331,7 +321,7 @@ In the template definition, you can use the `$item` context property to access t
   `}
 />
 
-### `placeholder`
+### `placeholder (optional)`
 
 A placeholder text that is visible in the input field when its empty.
 
@@ -359,19 +349,19 @@ A placeholder text that is visible in the input field when its empty.
   `}
 />
 
-### `readOnly`
+### `readOnly (optional)`
 
 Set this property to `true` to disallow changing the component value.
 
-### `required`
+### `required (optional)`
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `searchable`
+### `searchable (optional)`
 
 This property enables the search functionality in the dropdown list.
 
-### `validationStatus`
+### `validationStatus (optional)`
 
 This property allows you to set the validation status of the input component.
 
@@ -405,7 +395,7 @@ Available values:
   `}
 />
 
-### `valueTemplate`
+### `valueTemplate (optional)`
 
 This property allows replacing the default template to display a selected value when multiple selections (`multiSelect` is `true`) are enabled.
 

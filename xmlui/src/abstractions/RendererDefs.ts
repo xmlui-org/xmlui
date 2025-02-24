@@ -88,14 +88,15 @@ export type ValueExtractor = {
   /**
    * Get an optional string value from an expression
    * @param expression Value expression
+   * @param defValue Default value, if the parameter value is undefined
    */
-  asOptionalString(expression?: any): string | undefined;
+  asOptionalString<T extends string>(expression?: any, defValue?: string): T | undefined;
 
   /**
    * Get an optional string value from an expression
    * @param expression Value expression
    */
-  asOptionalStringArray(expression?: any): string[];
+  asOptionalStringArray(expression?: any): (string | undefined)[];
 
   /**
    * Get a display string value from an expression
@@ -114,7 +115,7 @@ export type ValueExtractor = {
    * @param expression Value expression
    * @param defValue Default value, if the parameter value is undefined
    */
-  asOptionalNumber(expression?: any, defValue?: number): number;
+  asOptionalNumber(expression?: any, defValue?: number): number | undefined;
 
   /**
    * Get a boolean value (JavaScript semantics) from an expression
@@ -127,7 +128,7 @@ export type ValueExtractor = {
    * @param expression Value expression
    * @param defValue Default value, if the parameter value is undefined
    */
-  asOptionalBoolean(expression?: any, defValue?: boolean): boolean;
+  asOptionalBoolean(expression?: any, defValue?: boolean): boolean | undefined;
 
   /**
    * Get a CSS size value from an expression

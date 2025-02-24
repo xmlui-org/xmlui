@@ -10,17 +10,13 @@ Use the `Button` component to trigger various actions.
 
 ## Properties
 
-### `autoFocus`
+### `autoFocus (optional, default: false)`
 
 Indicates if the button should receive focus when the page loads.
 
-Default value: `false`.
-
-### `contentPosition`
+### `contentPosition (optional, default: center)`
 
 This optional value determines how the label and icon (or nested children) should be placedinside the Button component.
-
-Default value: `"center"`.
 
 Available values:
 
@@ -57,11 +53,9 @@ Available values:
   `}
 />
 
-### `enabled`
+### `enabled (optional, default: true)`
 
 The value of this property indicates whether the button accepts actions (`true`) or does not react to them (`false`).
-
-Default value: `true`.
 
 ```ueml copy
 <App>
@@ -88,7 +82,7 @@ Default value: `true`.
   height={100}
 />
 
-### `icon`
+### `icon (optional)`
 
 This string value denotes an icon name. The framework will render an icon if XMLUI recognizes the icon by its name. If no label is specified and an icon is set, the Button displays only that icon.
 
@@ -115,11 +109,9 @@ This string value denotes an icon name. The framework will render an icon if XML
   height={100}
 />
 
-### `iconPosition`
+### `iconPosition (optional, default: start)`
 
 This optional string determines the location of the icon in the Button.
-
-Default value: `"start"`.
 
 Available values:
 
@@ -168,7 +160,7 @@ Available values:
   height={220}
 />
 
-### `label`
+### `label (optional)`
 
 This property is an optional string to set a label for the Button. If no label is specified and an icon is set, the Button will modify its styling to look like a small icon button. When the Button has nested children, it will display them and ignore the value of the `label` prop.
 
@@ -199,25 +191,21 @@ This property is an optional string to set a label for the Button. If no label i
   height={200}
 />
 
-### `orientation`
+### `orientation (optional, default: horizontal)`
 
 This property sets the main axis along which the nested components are rendered.
-
-Default value: `"Button"`.
 
 Available values:
 
 | Value | Description |
 | --- | --- |
-| `horizontal` | The component will fill the available space horizontally |
+| `horizontal` | The component will fill the available space horizontally **(default)** |
 | `vertical` | The component will fill the available space vertically |
 
 
-### `size`
+### `size (optional, default: sm)`
 
-The size of the button.
-
-Default value: `"sm"`.
+Sets the size of the button.
 
 Available values:
 
@@ -271,11 +259,9 @@ Available values:
   `}
 />
 
-### `themeColor`
+### `themeColor (optional, default: primary)`
 
 Sets the button color scheme defined in the application theme.
-
-Default value: `"primary"`.
 
 Available values:
 
@@ -310,11 +296,9 @@ Available values:
   height={100}
 />
 
-### `type`
+### `type (optional, default: button)`
 
 This optional string describes how the Button appears in an HTML context. You rarely need to set this property explicitly.
-
-Default value: `"button"`.
 
 Available values:
 
@@ -325,11 +309,9 @@ Available values:
 | `reset` | Resets all the controls to their initial values. Using it is ill advised for UX reasons. |
 
 
-### `variant`
+### `variant (optional, default: solid)`
 
 The button variant determines the level of emphasis the button should possess.
-
-Default value: `"solid"`.
 
 Available values:
 
