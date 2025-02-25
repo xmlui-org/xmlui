@@ -472,23 +472,6 @@ function useStandalone(
       const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
 
-      const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
-
-      if (lintSeverity !== LintSeverity.Skip) {
-        const allComponentLints = lintApp({
-          appDef,
-          metadataByComponent: collectedComponentMetadata,
-        });
-
-        if (allComponentLints.length > 0) {
-          if (lintSeverity === LintSeverity.Warning) {
-            allComponentLints.forEach(printComponentLints);
-          } else if (lintSeverity === LintSeverity.Error) {
-            appDef.entryPoint = lintErrorsComponent(allComponentLints);
-          }
-        }
-      }
-
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
       // --- we must have the app definition available.
       if (
@@ -497,6 +480,10 @@ function useStandalone(
       ) {
         if (!appDef) {
           throw new Error("couldn't find the application metadata");
+        }
+        const lintErrorComponent = processAppLinting(appDef, collectedComponentMetadata);
+        if (lintErrorComponent) {
+          appDef.entryPoint = lintErrorComponent;
         }
         setStandaloneApp(appDef);
         return;
@@ -517,7 +504,8 @@ function useStandalone(
           themePromises.push(fetchWithoutCache(theme).then((value) => value.json()));
         });
         const themes = await Promise.all(themePromises);
-        setStandaloneApp({
+
+        const newAppDef = {
           ...appDef,
           name: config.name,
           appGlobals: config.appGlobals,
@@ -525,7 +513,13 @@ function useStandalone(
           resources: config.resources,
           resourceMap: config.resourceMap,
           themes,
-        });
+        };
+
+        const lintErrorComponent = processAppLinting(newAppDef, collectedComponentMetadata);
+        if (lintErrorComponent) {
+          newAppDef.entryPoint = lintErrorComponent;
+        }
+        setStandaloneApp(newAppDef);
         return;
       }
 
@@ -753,9 +747,19 @@ function useStandalone(
           extensionManager,
         );
       }
-
       // --- Let's check for errors to display
-      let errorComponent: ComponentDef | null =
+
+      const newAppDef = {
+        ...config,
+        themes,
+        sources,
+        components: componentsWithCodeBehinds as any,
+        entryPoint: entryPointWithCodeBehind,
+      };
+
+      const lintErrorComponent = processAppLinting(newAppDef, collectedComponentMetadata);
+
+      const errorComponent: ComponentDef | null =
         errorComponents.length > 0
           ? {
               type: "VStack",
@@ -763,14 +767,15 @@ function useStandalone(
               children: errorComponents,
             }
           : null;
-
-      setStandaloneApp({
-        ...config,
-        themes,
-        sources,
-        components: componentsWithCodeBehinds as any,
-        entryPoint: errorComponent ?? entryPointWithCodeBehind,
-      });
+      if (errorComponent) {
+        if (lintErrorComponent) {
+          errorComponent.children!.push(lintErrorComponent);
+        }
+        newAppDef.entryPoint = errorComponent;
+      } else if (lintErrorComponent) {
+        newAppDef.entryPoint = lintErrorComponent;
+      }
+      setStandaloneApp(newAppDef);
     })();
   }, [runtime, standaloneAppDef]);
   return standaloneApp;
@@ -873,3 +878,26 @@ export function startApp(
 }
 
 export default StandaloneApp;
+
+function processAppLinting(
+  appDef: StandaloneAppDescription,
+  metadataByComponent: any,
+): null | ComponentDef {
+  const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
+
+  if (lintSeverity !== LintSeverity.Skip) {
+    const allComponentLints = lintApp({
+      appDef,
+      metadataByComponent,
+    });
+
+    if (allComponentLints.length > 0) {
+      if (lintSeverity === LintSeverity.Warning) {
+        allComponentLints.forEach(printComponentLints);
+      } else if (lintSeverity === LintSeverity.Error) {
+        return lintErrorsComponent(allComponentLints);
+      }
+    }
+    return null;
+  }
+}
