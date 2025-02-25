@@ -262,6 +262,11 @@ export const dataLoaderRenderer = createLoaderRenderer(
     lookupAction,
     lookupSyncCallback,
   }) => {
+    // --- Check for reuqired properties
+    if (!loader.props?.url || !loader.props.url.trim()) {
+      throw new Error("You must specify a non-empty (not whitespace-only) 'url' property for DataSource");
+    }
+
     return (
       <DataLoader
         loader={loader}
