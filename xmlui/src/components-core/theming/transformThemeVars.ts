@@ -1,16 +1,19 @@
 import Color from "color";
 
 import { HVar, parseHVar } from "../theming/hvar";
+import { StyleParser } from "../../parsers/style-parser/StyleParser";
+import { cloneDeep } from "lodash-es";
 
-
-export function isThemeVarName(varName: any){
-  return typeof varName === 'string' && varName?.startsWith("$");
-
+export function isThemeVarName(varName: any) {
+  return typeof varName === "string" && varName?.startsWith("$");
 }
 
-export function resolveThemeVar(varName: string | undefined, theme: Record<string, string> = {}): string {
+export function resolveThemeVar(
+  varName: string | undefined,
+  theme: Record<string, string> = {},
+): string {
   let safeVarName = varName;
-  if(isThemeVarName(varName)){
+  if (isThemeVarName(varName)) {
     safeVarName = varName.substring(1);
   }
   const value = theme[safeVarName];
@@ -32,13 +35,13 @@ export function generateBaseTones(theme: Record<string, string> | undefined) {
     ...generateBaseTonesForColor("color-success", resolvedTheme),
     ...generateBaseTonesForColor("color-warn", resolvedTheme),
     ...generateBaseTonesForColor("color-danger", resolvedTheme),
-    ...generateBaseTonesForColor("color-surface", resolvedTheme, {distributeEven: true}),
+    ...generateBaseTonesForColor("color-surface", resolvedTheme, { distributeEven: true }),
   };
   return {
     ...colorTones,
-    ...generateRbgChannelsForTone("color-surface", {...resolvedTheme, ...colorTones}),
-    ...generateRbgChannelsForTone("color-primary", {...resolvedTheme, ...colorTones}),
-    ...generateRbgChannelsForTone("color-secondary", {...resolvedTheme, ...colorTones})
+    ...generateRbgChannelsForTone("color-surface", { ...resolvedTheme, ...colorTones }),
+    ...generateRbgChannelsForTone("color-primary", { ...resolvedTheme, ...colorTones }),
+    ...generateRbgChannelsForTone("color-secondary", { ...resolvedTheme, ...colorTones }),
   };
 }
 
@@ -60,21 +63,24 @@ export function generateBaseSpacings(theme: Record<string, string> | undefined) 
   let baseUnit = baseTrimmed.replace(baseNum + "", "") || "px";
 
   //  a) non-baseNum -> "0px"
-  if (Number.isNaN(baseNum)){
+  if (Number.isNaN(baseNum)) {
     return {};
   }
 
-  const scale = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 72, 80, 96];
+  const scale = [
+    0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 20, 24, 28, 32, 36, 40,
+    44, 48, 52, 56, 60, 64, 72, 80, 96,
+  ];
   const ret: Record<string, string> = {};
 
-  scale.forEach((step)=>{
+  scale.forEach((step) => {
     ret[`space-${(step + "").replace(".", "_")}`] = `${step * baseNum}${baseUnit}`;
-  })
+  });
 
   return ret;
 }
 
-export function generateBaseFontSizes(theme: Record<string, string> | undefined){
+export function generateBaseFontSizes(theme: Record<string, string> | undefined) {
   if (!theme) {
     return {};
   }
@@ -93,7 +99,7 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
   let baseUnit = baseTrimmed.replace(baseNum + "", "") || "px";
 
   //  a) non-baseNum -> "0px"
-  if (Number.isNaN(baseNum)){
+  if (Number.isNaN(baseNum)) {
     return {};
   }
   const ret: Record<string, string> = {};
@@ -117,42 +123,51 @@ export function generateButtonTones(theme?: Record<string, string>) {
   let ret = {};
 
   variants.forEach((variant) => {
-    const solidTones = mapTones(findClosest(resolvedTheme, `color-Button-${variant}-solid`), (tones) => {
-      return {
-        [`color-bg-Button-${variant}-solid`]: tones.base,
-        [`color-bg-Button-${variant}-solid--hover`]: tones.tone1,
-        [`color-bg-Button-${variant}-solid--active`]: tones.tone2,
-        [`color-border-Button-${variant}-solid`]: tones.base,
-        [`color-border-Button-${variant}-solid--hover`]: tones.base,
-        [`color-border-Button-${variant}-solid--active`]: tones.base,
-        [`color-text-Button-${variant}-solid`]: tones.tone3,
-        [`color-text-Button-${variant}-solid--hover`]: tones.tone3,
-        [`color-text-Button-${variant}-solid--active`]: tones.tone3,
-      };
-    });
+    const solidTones = mapTones(
+      findClosest(resolvedTheme, `color-Button-${variant}-solid`),
+      (tones) => {
+        return {
+          [`color-bg-Button-${variant}-solid`]: tones.base,
+          [`color-bg-Button-${variant}-solid--hover`]: tones.tone1,
+          [`color-bg-Button-${variant}-solid--active`]: tones.tone2,
+          [`color-border-Button-${variant}-solid`]: tones.base,
+          [`color-border-Button-${variant}-solid--hover`]: tones.base,
+          [`color-border-Button-${variant}-solid--active`]: tones.base,
+          [`color-text-Button-${variant}-solid`]: tones.tone3,
+          [`color-text-Button-${variant}-solid--hover`]: tones.tone3,
+          [`color-text-Button-${variant}-solid--active`]: tones.tone3,
+        };
+      },
+    );
 
-    const outlinedTones = mapTones(findClosest(resolvedTheme, `color-Button-${variant}-outlined`), (tones) => {
-      return {
-        [`color-bg-Button-${variant}-outlined--hover`]: tones.alpha1,
-        [`color-bg-Button-${variant}-outlined--active`]: tones.alpha2,
-        [`color-border-Button-${variant}-outlined`]: tones.base,
-        [`color-border-Button-${variant}-outlined--hover`]: tones.tone1,
-        [`color-border-Button-${variant}-outlined--active`]: tones.tone2,
-        [`color-text-Button-${variant}-outlined`]: tones.base,
-        [`color-text-Button-${variant}-outlined--hover`]: tones.tone1,
-        [`color-text-Button-${variant}-outlined--active`]: tones.tone2,
-      };
-    });
+    const outlinedTones = mapTones(
+      findClosest(resolvedTheme, `color-Button-${variant}-outlined`),
+      (tones) => {
+        return {
+          [`color-bg-Button-${variant}-outlined--hover`]: tones.alpha1,
+          [`color-bg-Button-${variant}-outlined--active`]: tones.alpha2,
+          [`color-border-Button-${variant}-outlined`]: tones.base,
+          [`color-border-Button-${variant}-outlined--hover`]: tones.tone1,
+          [`color-border-Button-${variant}-outlined--active`]: tones.tone2,
+          [`color-text-Button-${variant}-outlined`]: tones.base,
+          [`color-text-Button-${variant}-outlined--hover`]: tones.tone1,
+          [`color-text-Button-${variant}-outlined--active`]: tones.tone2,
+        };
+      },
+    );
 
-    const ghostTones = mapTones(findClosest(resolvedTheme, `color-Button-${variant}-ghost`), (tones) => {
-      return {
-        [`color-bg-Button-${variant}-ghost--active`]: tones.alpha2,
-        [`color-bg-Button-${variant}-ghost--hover`]: tones.alpha1,
-        [`color-text-Button-${variant}-ghost`]: tones.base,
-        [`color-text-Button-${variant}-ghost--hover`]: tones.tone1,
-        [`color-text-Button-${variant}-ghost--active`]: tones.tone2,
-      };
-    });
+    const ghostTones = mapTones(
+      findClosest(resolvedTheme, `color-Button-${variant}-ghost`),
+      (tones) => {
+        return {
+          [`color-bg-Button-${variant}-ghost--active`]: tones.alpha2,
+          [`color-bg-Button-${variant}-ghost--hover`]: tones.alpha1,
+          [`color-text-Button-${variant}-ghost`]: tones.base,
+          [`color-text-Button-${variant}-ghost--hover`]: tones.tone1,
+          [`color-text-Button-${variant}-ghost--active`]: tones.tone2,
+        };
+      },
+    );
     ret = {
       ...ret,
       ...solidTones,
@@ -161,6 +176,430 @@ export function generateButtonTones(theme?: Record<string, string>) {
     };
   });
   return ret;
+}
+
+const paddingRegEx = /^padding-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const paddingHorizontalRegEx = /^padding-(horizontal)-(.+)$/;
+const paddingVerticalRegEx = /^padding-(vertical)-(.+)$/;
+
+/**
+ * Segment the padding values into top, right, bottom, left to provide consistency
+ */
+export function generatePaddingSegments(theme?: Record<string, string>) {
+  if (!theme) {
+    return {};
+  }
+  const result = { ...theme };
+
+  // --- Iterate through theme variables and split padding values
+  Object.entries(theme).forEach(([key, value]) => {
+    // --- Check the "padding-horizontal" theme variables
+    let match = paddingHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a padding-horizontal value to segment
+      const remainder = match[2];
+      result[`padding-left-${remainder}`] ??= value;
+      result[`padding-right-${remainder}`] ??= value;
+    }
+
+    // --- Check the "padding-vertical" theme variables
+    match = paddingVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a padding-vertical value to segment
+      const remainder = match[2];
+      result[`padding-top-${remainder}`] ??= value;
+      result[`padding-bottom-${remainder}`] ??= value;
+    }
+
+    // --- Check the "padding" theme variables
+    match = paddingRegEx.exec(key);
+    if (!match) return;
+    const remainder = match[1];
+
+    // --- Check for horizontal and vertical padding values
+    const horizontal = theme[`padding-horizontal-${remainder}`];
+    const vertical = theme[`padding-vertical-${remainder}`];
+
+    // --- We have a padding value to segment
+    const segments = value.trim().replace(/ +/g, " ").split(" ");
+    switch (segments.length) {
+      case 1:
+        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-right-${remainder}`] ??= horizontal ?? segments[0];
+        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-left-${remainder}`] ??= horizontal ?? segments[0];
+        break;
+      case 2:
+        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-right-${remainder}`] ??= horizontal ?? segments[1];
+        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-left-${remainder}`] ??= horizontal ?? segments[1];
+        break;
+      case 3:
+        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-right-${remainder}`] ??= horizontal ?? segments[1];
+        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[2];
+        result[`padding-left-${remainder}`] ??= horizontal ?? segments[1];
+        break;
+      case 4:
+        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
+        result[`padding-right-${remainder}`] ??= horizontal ?? segments[1];
+        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[2];
+        result[`padding-left-${remainder}`] ??= horizontal ?? segments[3];
+        break;
+      default:
+        return;
+    }
+  });
+
+  // --- Done
+  return result;
+}
+
+const borderRegEx = /^border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const thicknessBorderRegEx =
+  /^thickness-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const thicknessBorderHorizontalRegEx = /^thickness-border-(horizontal)-(.+)$/;
+const thicknessBorderVerticalRegEx = /^thickness-border-(vertical)-(.+)$/;
+const styleBorderRegEx = /^style-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const styleBorderHorizontalRegEx = /^style-border-(horizontal)-(.+)$/;
+const styleBorderVerticalRegEx = /^style-border-(vertical)-(.+)$/;
+const borderLeftRegEx = /^border-(left)-(.+)$/;
+const borderRightRegEx = /^border-(right)-(.+)$/;
+const borderTopRegEx = /^border-(top)-(.+)$/;
+const borderBottomRegEx = /^border-(bottom)-(.+)$/;
+const borderHorizontalRegEx = /^border-(horizontal)-(.+)$/;
+const borderVerticalRegEx = /^border-(vertical)-(.+)$/;
+const colorBorderRegEx = /^color-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const colorBorderHorizontalRegEx = /^color-border-(horizontal)-(.+)$/;
+const colorBorderVerticalRegEx = /^color-border-(vertical)-(.+)$/;
+
+/**
+ * Segment the border values to provide consistency
+ */
+export function generateBorderSegments(theme?: Record<string, string>) {
+  if (!theme) {
+    return {};
+  }
+  const result = { ...theme };
+
+  // --- Iterate through theme variables and split border values
+  Object.entries(theme).forEach(([key, value]) => {
+    // --- Check "border-" theme variables
+    let match = borderRegEx.exec(key);
+    if (match) {
+      const remainder = match[1];
+
+      // --- Flow down the border value
+      result[`border-left-${remainder}`] = value;
+      result[`border-right-${remainder}`] = value;
+      result[`border-top-${remainder}`] = value;
+      result[`border-bottom-${remainder}`] = value;
+
+      // --- We have a border value to segment
+      const border = getBorderSegments(value);
+      result[`thickness-border-${remainder}`] = border.thickness;
+      result[`style-border-${remainder}`] ??= border.style;
+      result[`color-border-${remainder}`] ??= border.color;
+    }
+
+    // --- Check "border-horizontal" theme variables
+    match = borderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a border-horizontal value to segment
+      const remainder = match[2];
+
+      // --- Flow down the border value
+      result[`border-left-${remainder}`] = value;
+      result[`border-right-${remainder}`] = value;
+
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-left-${remainder}`] = border.thickness;
+        result[`thickness-border-right-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-left-${remainder}`] = border.style;
+        result[`style-border-right-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-left-${remainder}`] = border.color;
+        result[`color-border-right-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-vertical" theme variables
+    match = borderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a border-vertical value to segment
+      const remainder = match[2];
+      // --- Flow down the border value
+      result[`border-top-${remainder}`] = value;
+      result[`border-bottom-${remainder}`] = value;
+
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-top-${remainder}`] = border.thickness;
+        result[`thickness-border-bottom-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-top-${remainder}`] = border.style;
+        result[`style-border-bottom-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-top-${remainder}`] = border.color;
+        result[`color-border-bottom-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-left" theme variables
+    match = borderLeftRegEx.exec(key);
+    if (match) {
+      // --- We have a border-left value to segment
+      const remainder = match[2];
+      const border = getBorderSegments(value);
+      if (border.thickness && !theme[`thickness-border-left-${remainder}`]) {
+        result[`thickness-border-left-${remainder}`] = border.thickness;
+      }
+      if (border.style && !theme[`style-border-left-${remainder}`]) {
+        result[`style-border-left-${remainder}`] = border.style;
+      }
+      if (border.color && !theme[`color-border-left-${remainder}`]) {
+        result[`color-border-left-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-right" theme variables
+    match = borderRightRegEx.exec(key);
+    if (match) {
+      // --- We have a border-right value to segment
+      const remainder = match[2];
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-right-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-right-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-right-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-top" theme variables
+    match = borderTopRegEx.exec(key);
+    if (match) {
+      // --- We have a border-top value to segment
+      const remainder = match[2];
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-top-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-top-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-top-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "border-bottom" theme variables
+    match = borderBottomRegEx.exec(key);
+    if (match) {
+      // --- We have a border-bottom value to segment
+      const remainder = match[2];
+      const border = getBorderSegments(value);
+      if (border.thickness) {
+        result[`thickness-border-bottom-${remainder}`] = border.thickness;
+      }
+      if (border.style) {
+        result[`style-border-bottom-${remainder}`] = border.style;
+      }
+      if (border.color) {
+        result[`color-border-bottom-${remainder}`] = border.color;
+      }
+    }
+
+    // --- Check "thickness-border-" theme variables
+    match = thicknessBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a thickness-border value to flow down
+      const remainder = match[1];
+      result[`thickness-border-left-${remainder}`] = value;
+      result[`thickness-border-right-${remainder}`] = value;
+      result[`thickness-border-top-${remainder}`] = value;
+      result[`thickness-border-bottom-${remainder}`] = value;
+    }
+
+    // --- Check "thickness-border-horizontal" theme variables
+    match = thicknessBorderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a thickness-border-horizontal value to flow down
+      const remainder = match[2];
+      result[`thickness-border-left-${remainder}`] = value;
+      result[`thickness-border-right-${remainder}`] = value;
+    }
+
+    // --- Check "thickness-border-vertical" theme variables
+    match = thicknessBorderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a thickness-border-vertical value to flow down
+      const remainder = match[2];
+      result[`thickness-border-top-${remainder}`] = value;
+      result[`thickness-border-bottom-${remainder}`] = value;
+    }
+
+    // --- Check "style-border-" theme variables
+    match = styleBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a style-border value to flow down
+      const remainder = match[1];
+      result[`style-border-left-${remainder}`] = value;
+      result[`style-border-right-${remainder}`] = value;
+      result[`style-border-top-${remainder}`] = value;
+      result[`style-border-bottom-${remainder}`] = value;
+    }
+
+    // --- Check "style-border-horizontal" theme variables
+    match = styleBorderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a style-border-horizontal value to flow down
+      const remainder = match[2];
+      result[`style-border-left-${remainder}`] = value;
+      result[`style-border-right-${remainder}`] = value;
+    }
+
+    // --- Check "style-border-vertical" theme variables
+    match = styleBorderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a style-border-vertical value to flow down
+      const remainder = match[2];
+      result[`style-border-top-${remainder}`] = value;
+      result[`style-border-bottom-${remainder}`] = value;
+    }
+
+    // --- Check "color-border-" theme variables
+    match = colorBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a color-border value to flow down
+      const remainder = match[1];
+      result[`color-border-left-${remainder}`] = value;
+      result[`color-border-right-${remainder}`] = value;
+      result[`color-border-top-${remainder}`] = value;
+      result[`color-border-bottom-${remainder}`] = value;
+    }
+
+    // --- Check "color-border-horizontal" theme variables
+    match = colorBorderHorizontalRegEx.exec(key);
+    if (match) {
+      // --- We have a color-border-horizontal value to flow down
+      const remainder = match[2];
+      result[`color-border-left-${remainder}`] = value;
+      result[`color-border-right-${remainder}`] = value;
+    }
+
+    // --- Check "color-border-vertical" theme variables
+    match = colorBorderVerticalRegEx.exec(key);
+    if (match) {
+      // --- We have a color-border-vertical value to flow down
+      const remainder = match[2];
+      result[`color-border-top-${remainder}`] = value;
+      result[`color-border-bottom-${remainder}`] = value;
+    }
+  });
+
+  // --- Done
+  return result;
+
+  function getBorderSegments(value: string) {
+    try {
+      const sParser = new StyleParser(value);
+      const parsed = sParser.parseBorder();
+
+      // --- Get the parsed result
+      const result = {
+        style: parsed.styleValue,
+        thickness:
+          parsed.widthValue !== undefined
+            ? `${parsed.widthValue}${parsed.widthUnit ?? "px"}`
+            : undefined,
+        color:
+          parsed.color === undefined
+            ? undefined
+            : typeof parsed.color === "string"
+              ? parsed.color
+              : parsed.color.toString(),
+      };
+
+      // --- All theme variables are present?
+      if (parsed.themeId1 && parsed.themeId2 && parsed.themeId3) {
+        return {
+          thickness: parsed.themeId1.id,
+          style: parsed.themeId2.id,
+          color: parsed.themeId3.id,
+        };
+      }
+
+      // --- Two theme variables are present?
+      if (parsed.themeId1 && parsed.themeId2) {
+        if (result.thickness) {
+          return {
+            thickness: result.thickness,
+            style: parsed.themeId1.id,
+            color: parsed.themeId2.id,
+          };
+        }
+        if (result.style) {
+          return {
+            thickness: parsed.themeId1.id,
+            style: result.style,
+            color: parsed.themeId2.id,
+          };
+        }
+        return {
+          thickness: parsed.themeId1.id,
+          style: parsed.themeId2.id,
+          color: result.color,
+        };
+      }
+
+      // --- One theme variable is present?
+      if (parsed.themeId1) {
+        if (result.thickness && result.style) {
+          return {
+            thickness: result.thickness,
+            style: result.style,
+            color: parsed.themeId1.id,
+          };
+        }
+        if (result.thickness && result.color) {
+          return {
+            thickness: result.thickness,
+            style: parsed.themeId1.id,
+            color: result.color,
+          };
+        }
+        if (result.style && result.color) {
+          return {
+            thickness: parsed.themeId1.id,
+            style: result.style,
+            color: result.color,
+          };
+        }
+      }
+      return {
+        thickness: result.thickness?.trim(),
+        style: result.style?.trim(),
+        color: result.color?.trim(),
+      };
+    } catch (e) {
+      return {
+        thickness: undefined,
+        style: undefined,
+        color: undefined,
+      };
+    }
+  }
 }
 
 function findClosest(theme: Record<string, string>, themeVarName: string) {
@@ -175,7 +614,11 @@ function findClosest(theme: Record<string, string>, themeVarName: string) {
   let closestKey: string | null = null;
   Object.keys(theme).forEach((themeVar) => {
     const parsedVar = parseHVar(themeVar);
-    if (!parsedVar || parsedVar.component !== hVar.component || parsedVar.attribute !== hVar.attribute) {
+    if (
+      !parsedVar ||
+      parsedVar.component !== hVar.component ||
+      parsedVar.attribute !== hVar.attribute
+    ) {
       return;
     }
     if (parsedVar.states.length) {
@@ -206,17 +649,21 @@ function resolveThemeVars(theme: Record<string, string>) {
 }
 
 function getRgbChannelsString(colorStr?: string) {
-  if(!colorStr){
+  if (!colorStr) {
     return undefined;
   }
-  const color = Color(colorStr)
+  const color = Color(colorStr);
   let rgb = color.rgb();
   return `${rgb.red()},${rgb.green()},${rgb.blue()}`;
 }
 
-function generateBaseTonesForColor(varName: string, theme: Record<string, string>, options = {distributeEven: false}) {
+function generateBaseTonesForColor(
+  varName: string,
+  theme: Record<string, string>,
+  options = { distributeEven: false },
+) {
   try {
-    const {distributeEven} = options;
+    const { distributeEven } = options;
     const color = theme[varName];
     if (!color || typeof color !== "string") {
       return {};
@@ -274,32 +721,32 @@ function generateBaseTonesForColor(varName: string, theme: Record<string, string
       [`${varName}-800`]: color800.toString(),
       [`${varName}-900`]: color900.toString(),
       [`${varName}-950`]: color950.toString(),
-    }
+    };
   } catch (e) {
     console.error("Error generating base tones for color:", varName);
     return {};
   }
 }
 
-function generateRbgChannelsForTone(varName: string, theme: Record<string, string>){
-    return {
-      [`${varName}-50-rgb`]: getRgbChannelsString(theme[`${varName}-50`]),
-      [`${varName}-100-rgb`]: getRgbChannelsString(theme[`${varName}-100`]),
-      [`${varName}-200-rgb`]: getRgbChannelsString(theme[`${varName}-200`]),
-      [`${varName}-300-rgb`]: getRgbChannelsString(theme[`${varName}-300`]),
-      [`${varName}-400-rgb`]: getRgbChannelsString(theme[`${varName}-400`]),
-      [`${varName}-500-rgb`]: getRgbChannelsString(theme[`${varName}-500`]),
-      [`${varName}-600-rgb`]: getRgbChannelsString(theme[`${varName}-600`]),
-      [`${varName}-700-rgb`]: getRgbChannelsString(theme[`${varName}-700`]),
-      [`${varName}-800-rgb`]: getRgbChannelsString(theme[`${varName}-800`]),
-      [`${varName}-900-rgb`]: getRgbChannelsString(theme[`${varName}-900`]),
-      [`${varName}-950-rgb`]: getRgbChannelsString(theme[`${varName}-950`]),
-    };
+function generateRbgChannelsForTone(varName: string, theme: Record<string, string>) {
+  return {
+    [`${varName}-50-rgb`]: getRgbChannelsString(theme[`${varName}-50`]),
+    [`${varName}-100-rgb`]: getRgbChannelsString(theme[`${varName}-100`]),
+    [`${varName}-200-rgb`]: getRgbChannelsString(theme[`${varName}-200`]),
+    [`${varName}-300-rgb`]: getRgbChannelsString(theme[`${varName}-300`]),
+    [`${varName}-400-rgb`]: getRgbChannelsString(theme[`${varName}-400`]),
+    [`${varName}-500-rgb`]: getRgbChannelsString(theme[`${varName}-500`]),
+    [`${varName}-600-rgb`]: getRgbChannelsString(theme[`${varName}-600`]),
+    [`${varName}-700-rgb`]: getRgbChannelsString(theme[`${varName}-700`]),
+    [`${varName}-800-rgb`]: getRgbChannelsString(theme[`${varName}-800`]),
+    [`${varName}-900-rgb`]: getRgbChannelsString(theme[`${varName}-900`]),
+    [`${varName}-950-rgb`]: getRgbChannelsString(theme[`${varName}-950`]),
+  };
 }
 
 function mapTones(
   baseColor: string | undefined | null,
-  mapper: (tones: ColorTones) => Record<string, string>
+  mapper: (tones: ColorTones) => Record<string, string>,
 ) {
   const tones = generateTones(baseColor);
   if (!tones) {
@@ -309,7 +756,8 @@ function mapTones(
 }
 
 function generateTones(baseColorStr: string | null | undefined): ColorTones | null {
-  if (!baseColorStr || typeof baseColorStr !== "string" || baseColorStr.startsWith("$")) return null; //TODO illesg here the startsWidth $ should be something else
+  if (!baseColorStr || typeof baseColorStr !== "string" || baseColorStr.startsWith("$"))
+    return null; //TODO illesg here the startsWidth $ should be something else
 
   const baseColor = Color(baseColorStr);
   let tone1;

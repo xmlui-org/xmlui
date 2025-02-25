@@ -17,11 +17,9 @@ You can learn more about this component in the [Forms](../../create-apps/forms.m
 
 ## Properties
 
-### `autoFocus`
+### `autoFocus (default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
-
-Default value: `false`.
 
 ### `bindTo`
 
@@ -95,11 +93,9 @@ Note how changing the input in the demo below will result in a slight delay of i
   `}
 />
 
-### `enabled`
+### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 ```ueml copy {3-4}
 <App>
@@ -146,6 +142,10 @@ This property sets the component's initial value.
     </App>
   `}
 />
+
+### `inputTemplate`
+
+This property is used to define a custom input template.
 
 ### `label`
 

@@ -1,5 +1,5 @@
 import { ModuleResolver } from "../abstractions/scripting/modules";
-import { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
+import { ComponentDef, ComponentMetadata, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
 import { DiagnosticCategory, ErrCodes } from "../parsers/xmlui-parser/diagnostics";
@@ -26,7 +26,6 @@ export function xmlUiMarkupToComponent(
 } {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
-
   if (errors.length > 0) {
     const newlinePositions = [];
     for (let i = 0; i < source.length; ++i) {
@@ -39,7 +38,9 @@ export function xmlUiMarkupToComponent(
     return { component: null, errors: errorsWithLines, erroneousCompoundComponentName };
   }
   try {
-    return { component: nodeToComponentDef(node, getText, fileId, moduleResolver), errors: [] };
+    const component = nodeToComponentDef(node, getText, fileId, moduleResolver);
+    const transformResult = { component , errors: [] };
+    return transformResult
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
     const singleErr: ErrorWithLineColInfo = {
@@ -96,7 +97,17 @@ export function errReportComponent(
 ) {
   function makeComponent() {
     const errList = errors
-      .sort((a, b) => a.pos - b.pos)
+      .sort((a, b) => {
+        if (a.pos === undefined && b.pos === undefined){
+          return 0;
+        } else if (a.pos === undefined){
+          return 1;
+        } else if (b.pos === undefined){
+          return -1;
+        } else {
+        return a.pos - b.pos
+        }
+      })
       .map((e, idx) => {
         return {
           type: "VStack",

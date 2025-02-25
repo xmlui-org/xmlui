@@ -354,3 +354,7 @@ export class HStackDriver extends StackDriver {}
 // --- VStack
 
 export class VStackDriver extends StackDriver {}
+
+// --- Link
+
+export class LinkDriver extends ComponentDriver {}

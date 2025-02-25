@@ -2,10 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 
-import type {
-  StandaloneAppDescription,
-  StandaloneJsonConfig,
-} from "./abstractions/standalone";
+import type { StandaloneAppDescription, StandaloneJsonConfig } from "./abstractions/standalone";
 import type {
   ComponentDef,
   ComponentLike,
@@ -41,6 +38,14 @@ import { checkXmlUiMarkup } from "./markup-check";
 import StandaloneExtensionManager from "./StandaloneExtensionManager";
 import { builtInThemes } from "./theming/ThemeProvider";
 import type { Extension } from "../abstractions/ExtensionDefs";
+import {
+  getLintSeverity,
+  lintApp,
+  lintErrorsComponent,
+  LintSeverity,
+  printComponentLints,
+} from "../parsers/xmlui-parser/lint";
+import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -467,6 +472,23 @@ function useStandalone(
       const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
 
+      const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
+
+      if (lintSeverity !== LintSeverity.Skip) {
+        const allComponentLints = lintApp({
+          appDef,
+          metadataByComponent: collectedComponentMetadata,
+        });
+
+        if (allComponentLints.length > 0) {
+          if (lintSeverity === LintSeverity.Warning) {
+            allComponentLints.forEach(printComponentLints);
+          } else if (lintSeverity === LintSeverity.Error) {
+            appDef.entryPoint = lintErrorsComponent(allComponentLints);
+          }
+        }
+      }
+
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
       // --- we must have the app definition available.
       if (
@@ -733,7 +755,7 @@ function useStandalone(
       }
 
       // --- Let's check for errors to display
-      const errorComponent: ComponentDef | null =
+      let errorComponent: ComponentDef | null =
         errorComponents.length > 0
           ? {
               type: "VStack",
@@ -747,7 +769,7 @@ function useStandalone(
         themes,
         sources,
         components: componentsWithCodeBehinds as any,
-        entryPoint: errorComponent || entryPointWithCodeBehind,
+        entryPoint: errorComponent ?? entryPointWithCodeBehind,
       });
     })();
   }, [runtime, standaloneAppDef]);

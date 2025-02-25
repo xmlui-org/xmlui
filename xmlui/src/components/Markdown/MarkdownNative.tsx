@@ -1,29 +1,41 @@
 import { type CSSProperties, memo, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { visit } from "unist-util-visit";
 
 import styles from "./Markdown.module.scss";
+import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
 
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Image } from "../Image/ImageNative";
+import { Toggle } from "../Toggle/Toggle";
+import type { ValueExtractor } from "../../abstractions/RendererDefs";
 
 type MarkdownProps = {
+  extractValue: ValueExtractor;
   removeIndents?: boolean;
   children: ReactNode;
   style?: CSSProperties;
 };
 
-export const Markdown = memo(function Markdown({ removeIndents = false, children, style }: MarkdownProps) {
+export const Markdown = memo(function Markdown({
+  extractValue,
+  removeIndents = false,
+  children,
+  style,
+}: MarkdownProps) {
   if (typeof children !== "string") {
     return null;
   }
 
   children = removeIndents ? removeTextIndents(children) : children;
-  const textLayoutToUse = {textAlign: style?.textAlign};
+  const textLayoutToUse = { textAlign: style?.textAlign };
 
   return (
     <ReactMarkdown
+      remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }]]}
       components={{
         h1({ id, children }) {
           return (
@@ -68,7 +80,11 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
           );
         },
         p({ id, children }) {
-          return <Text uid={id} style={textLayoutToUse}>{children}</Text>;
+          return (
+            <Text uid={id} style={textLayoutToUse}>
+              {children}
+            </Text>
+          );
         },
         code({ id, children }) {
           return (
@@ -84,7 +100,6 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
             </Text>
           );
         },
-
         strong({ id, children }) {
           return (
             <Text uid={id} variant="strong">
@@ -95,6 +110,13 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
         em({ id, children }) {
           return (
             <Text uid={id} variant="em">
+              {children}
+            </Text>
+          );
+        },
+        del({ id, children }) {
+          return (
+            <Text uid={id} variant="deleted">
               {children}
             </Text>
           );
@@ -111,9 +133,6 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
         li({ children }) {
           return <ListItem style={textLayoutToUse}>{children}</ListItem>;
         },
-        // This needs a parser plugin for the ~ and ~~ signs that are available via react-markdown-gfm
-        // or we implement our own parser?
-        // del: variant="deleted"
         hr() {
           return <HorizontalRule />;
         },
@@ -122,7 +141,40 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
         },
         img({ src, alt }) {
           return <Image src={src} alt={alt} />;
-        }
+        },
+        // TODO: somehow get the label from the containing li element
+        input({ disabled, checked }) {
+          return (
+            <Toggle
+              variant="checkbox"
+              readOnly={disabled}
+              value={checked}
+              /* label={value}
+                labelPosition={"right"} */
+            />
+          );
+        },
+        table({ children }) {
+          return <table className={htmlTagStyles.htmlTable}>{children}</table>;
+        },
+        tr({ children }) {
+          return <tr className={htmlTagStyles.htmlTr}>{children}</tr>;
+        },
+        td({ children }) {
+          return <td className={htmlTagStyles.htmlTd}>{children}</td>;
+        },
+        th({ children }) {
+          return <th className={htmlTagStyles.htmlTh}>{children}</th>;
+        },
+        thead({ children }) {
+          return <thead className={htmlTagStyles.htmlThead}>{children}</thead>;
+        },
+        tbody({ children }) {
+          return <tbody className={htmlTagStyles.htmlTbody}>{children}</tbody>;
+        },
+        tfoot({ children }) {
+          return <tfoot className={htmlTagStyles.htmlTfoot}>{children}</tfoot>;
+        },
       }}
     >
       {children as any}
@@ -158,7 +210,11 @@ type BlockquoteProps = {
 };
 
 const Blockquote = ({ children, style }: BlockquoteProps) => {
-  return <blockquote className={styles.blockquote} style={style} >{children}</blockquote>;
+  return (
+    <blockquote className={styles.blockquote} style={style}>
+      {children}
+    </blockquote>
+  );
 };
 
 type UnorderedListProps = {
@@ -167,7 +223,11 @@ type UnorderedListProps = {
 };
 
 const UnorderedList = ({ children, style }: UnorderedListProps) => {
-  return <ul className={styles.unorderedList} style={style}>{children}</ul>;
+  return (
+    <ul className={styles.unorderedList} style={style}>
+      {children}
+    </ul>
+  );
 };
 
 type OrderedListProps = {
@@ -176,7 +236,11 @@ type OrderedListProps = {
 };
 
 const OrderedList = ({ children, style }: OrderedListProps) => {
-  return <ol className={styles.orderedList} style={style}>{children}</ol>;
+  return (
+    <ol className={styles.orderedList} style={style}>
+      {children}
+    </ol>
+  );
 };
 
 type ListItemProps = {
@@ -185,5 +249,80 @@ type ListItemProps = {
 };
 
 const ListItem = ({ children, style }: ListItemProps) => {
-  return <li className={styles.listItem} style={style}>{children}</li>;
+  return (
+    <li className={styles.listItem} style={style}>
+      {children}
+    </li>
+  );
 };
+
+/**
+ * Finds and evaluates given binding expressions in markdown text.
+ * The binding expressions are of the form `${...}$`.
+ * @param extractValue The function to resolve binding expressions
+ * @returns visitor function that processes the binding expressions
+ */
+function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
+  return (tree: any) => {
+    visit(tree, "text", (node) => {
+      return detectBindingExpression(node);
+    });
+  };
+
+  function detectBindingExpression(node: any) {
+    // Remove empty ${} expressions first
+    node.value = node.value.replace(/\$\{\s*\}/g, "");
+
+    const regex = /\$\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
+    const parts: string[] = node.value.split(regex);
+    if (parts.length > 1) {
+      node.type = "html";
+      node.value = parts
+        .map((part, index) => {
+          const extracted = index % 2 === 0 ? part : extractValue(`{${part}}`);
+          const resultExpr = mapByType(extracted);
+          // The result expression might be an object, in that case we stringify it here,
+          // at the last step, so that there are no unnecessary apostrophes
+          return typeof resultExpr === "object" && resultExpr !== null
+            ? JSON.stringify(resultExpr)
+            : resultExpr;
+        })
+        .join("");
+    }
+  }
+
+  function mapByType(extracted: any) {
+    if (extracted === null) {
+      return null;
+    } else if (extracted === undefined || typeof extracted === "undefined") {
+      return undefined;
+    } else if (typeof extracted === "object") {
+      const arrowFuncResult = parseArrowFunc(extracted);
+      if (arrowFuncResult) {
+        return arrowFuncResult;
+      }
+      if (Array.isArray(extracted)) {
+        return extracted;
+      }
+      return Object.fromEntries(
+        Object.entries(extracted).map(([key, value]) => {
+          return [key, mapByType(value)];
+        }),
+      );
+    } else {
+      return extracted;
+    }
+  }
+
+  function parseArrowFunc(extracted: Record<string, any>): string {
+    if (
+      extracted.hasOwnProperty("type") &&
+      extracted.type === "ArrowE" &&
+      extracted?._ARROW_EXPR_ &&
+      extracted.hasOwnProperty("source")
+    ) {
+      return extracted.source;
+    }
+    return "";
+  }
+}

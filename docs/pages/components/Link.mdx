@@ -39,11 +39,9 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 
 ## Properties
 
-### `active`
+### `active (default: false)`
 
 Indicates whether this link is active or not. If so, it will have a distinct visual appearance.
-
-Default value: `false`.
 
 ```ueml copy /active="true"/ /active="false"/
 <App>
@@ -64,11 +62,9 @@ Default value: `false`.
   `}
 />
 
-### `enabled`
+### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 ```ueml copy /enabled="true"/ /enabled="false"/
 <App>
@@ -118,11 +114,9 @@ If you want to specify paddings and gaps or put the icon to the right of the lin
 
 This property sets the label of the component.
 
-### `target`
+### `target (default: "_self")`
 
 This property specifies where to open the link represented by the `Link`. This property accepts the following values (in accordance with the HTML standard):
-
-Default value: `"_self"`.
 
 Available values:
 
@@ -221,6 +215,20 @@ The following sample theme sets a few visual properties of `Link`:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [border-bottom](../styles-and-themes/common-units/#border)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)-horizontal-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-left](../styles-and-themes/common-units/#border)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-right](../styles-and-themes/common-units/#border)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-top](../styles-and-themes/common-units/#border)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)-vertical-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border-bottom](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border-horizontal](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border-top](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border-vertical](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-decoration](../styles-and-themes/common-units/#color)-Link | $color-surface-400 | $color-surface-400 |
 | [color-outline](../styles-and-themes/common-units/#color)-Link--focus | $color-outline--focus | $color-outline--focus |
 | [color-text](../styles-and-themes/common-units/#color)-decoration-Link--active | $color-surface200 | $color-surface200 |
@@ -238,14 +246,39 @@ The following sample theme sets a few visual properties of `Link`:
 | [offset](../styles-and-themes/common-units/#size)-decoration-Link | $space-1 | $space-1 |
 | [offset-outline](../styles-and-themes/common-units/#size)-Link--focus | $offset-outline--focus | $offset-outline--focus |
 | [padding-bottom](../styles-and-themes/common-units/#size)-icon-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-bottom](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-horizontal](../styles-and-themes/common-units/#size)-icon-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-horizontal](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-icon-Link | $space-0_5 | $space-0_5 |
 | [padding-left](../styles-and-themes/common-units/#size)-icon-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-left](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-right](../styles-and-themes/common-units/#size)-icon-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-right](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-top](../styles-and-themes/common-units/#size)-icon-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-top](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-vertical](../styles-and-themes/common-units/#size)-icon-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-vertical](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-end-end-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-end-start-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-start-end-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-start-start-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-bottom](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-horizontal](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-left](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-right](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-top](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-vertical](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-decoration](../styles-and-themes/common-units/#text-decoration)-Link | dashed | dashed |
 | [style-outline](../styles-and-themes/common-units/#border)-Link--focus | $style-outline--focus | $style-outline--focus |
+| [thickness-border-bottom](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-horizontal](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-left](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-right](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-top](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-vertical](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-decoration](../styles-and-themes/common-units/#text-decoration)-Link | $space-0_5 | $space-0_5 |
 | [thickness-outline](../styles-and-themes/common-units/#size)-Link--focus | $thickness-outline--focus | $thickness-outline--focus |
 

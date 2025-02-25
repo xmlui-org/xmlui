@@ -5,7 +5,7 @@ import styles from "./Stack.module.scss";
 import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
-import type { NonCssLayoutProps, ValueExtractor } from "../../abstractions/RendererDefs";
+import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
@@ -31,6 +31,12 @@ const stackMd = createMetadata({
       `Optional boolean which wraps the content if set to true and the available space is not big ` +
         `enough. Works in all orientations.`,
     ),
+    orientation: d(
+      `An optional property that governs the Stack's orientation (whether the Stack lays out its ` +
+        `children in a row or a column).`,
+    ),
+    horizontalAlignment: HORIZONTAL_ALIGNMENT,
+    verticalAlignment: VERTICAL_ALIGNMENT,
     hoverContainer: d("Reserved for future use"),
     visibleOnHover: d("Reserved for future use"),
   },
@@ -45,12 +51,6 @@ export const StackMd = {
   ...stackMd,
   props: {
     ...stackMd.props,
-    orientation: d(
-      `An optional property that governs the Stack's orientation (whether the Stack lays out its ` +
-        `children in a row or a column).`,
-    ),
-    horizontalAlignment: HORIZONTAL_ALIGNMENT,
-    verticalAlignment: VERTICAL_ALIGNMENT,
   },
 };
 type StackComponentDef = ComponentDef<typeof StackMd>;
@@ -61,8 +61,6 @@ export const VStackMd = {
   description: `This component represents a stack rendering its contents vertically.`,
   props: {
     ...stackMd.props,
-    horizontalAlignment: HORIZONTAL_ALIGNMENT,
-    verticalAlignment: VERTICAL_ALIGNMENT,
   },
 };
 type VStackComponentDef = ComponentDef<typeof VStackMd>;
@@ -73,8 +71,6 @@ export const HStackMd = {
   description: `This component represents a stack rendering its contents horizontally.`,
   props: {
     ...stackMd.props,
-    horizontalAlignment: HORIZONTAL_ALIGNMENT,
-    verticalAlignment: VERTICAL_ALIGNMENT,
   },
 };
 type HStackComponentDef = ComponentDef<typeof HStackMd>;
@@ -104,28 +100,26 @@ type RenderStackPars = {
     | HStackComponentDef
     | CVStackComponentDef
     | CHStackComponentDef;
-  layoutNonCss: NonCssLayoutProps;
   extractValue: ValueExtractor;
   layoutCss: React.CSSProperties;
   lookupEventHandler: (
     eventName: keyof NonNullable<StackComponentDef["events"]>,
   ) => AsyncFunction | undefined;
   renderChild: RenderChildFn;
-  orientation?: string;
-  horizontalAlignment?: string;
-  verticalAlignment?: string;
+  orientation: string;
+  horizontalAlignment: string;
+  verticalAlignment: string;
 };
 
 function renderStack({
   node,
-  layoutNonCss,
   extractValue,
   layoutCss,
+  orientation,
+  horizontalAlignment,
+  verticalAlignment,
   lookupEventHandler,
   renderChild,
-  orientation = layoutNonCss.orientation || DEFAULT_ORIENTATION,
-  horizontalAlignment = layoutNonCss.horizontalAlignment,
-  verticalAlignment = layoutNonCss.verticalAlignment,
 }: RenderStackPars) {
   if (!isComponentDefChildren(node.children)) {
     throw new NotAComponentDefError();
@@ -152,12 +146,17 @@ function renderStack({
 export const stackComponentRenderer = createComponentRenderer(
   COMP,
   StackMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+    const orientation = extractValue(node.props?.orientation) || DEFAULT_ORIENTATION;
+    const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
+    const verticalAlignment = extractValue(node.props?.verticalAlignment);
     return renderStack({
       node,
-      layoutNonCss,
       extractValue,
       layoutCss,
+      orientation,
+      horizontalAlignment,
+      verticalAlignment,
       lookupEventHandler,
       renderChild,
     });
@@ -167,15 +166,18 @@ export const stackComponentRenderer = createComponentRenderer(
 export const vStackComponentRenderer = createComponentRenderer(
   "VStack",
   VStackMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+    const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
+    const verticalAlignment = extractValue(node.props?.verticalAlignment);
     return renderStack({
       node,
-      layoutNonCss,
       extractValue,
       layoutCss,
       lookupEventHandler,
       renderChild,
       orientation: "vertical",
+      horizontalAlignment,
+      verticalAlignment,
     });
   },
 );
@@ -183,15 +185,18 @@ export const vStackComponentRenderer = createComponentRenderer(
 export const hStackComponentRenderer = createComponentRenderer(
   "HStack",
   HStackMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+    const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
+    const verticalAlignment = extractValue(node.props?.verticalAlignment);
     return renderStack({
       node,
-      layoutNonCss,
       extractValue,
       layoutCss,
       lookupEventHandler,
       renderChild,
       orientation: "horizontal",
+      horizontalAlignment,
+      verticalAlignment,
     });
   },
 );
@@ -199,10 +204,9 @@ export const hStackComponentRenderer = createComponentRenderer(
 export const cvStackComponentRenderer = createComponentRenderer(
   "CVStack",
   CVStackMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
     return renderStack({
       node,
-      layoutNonCss,
       extractValue,
       layoutCss,
       lookupEventHandler,
@@ -217,10 +221,9 @@ export const cvStackComponentRenderer = createComponentRenderer(
 export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
     return renderStack({
       node,
-      layoutNonCss,
       extractValue,
       layoutCss,
       lookupEventHandler,

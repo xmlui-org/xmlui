@@ -14,11 +14,9 @@ To add new lines to the input field press `Shift` + `Enter`.
 
 ## Properties
 
-### `autoFocus`
+### `autoFocus (default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
-
-Default value: `false`.
 
 ```ueml copy
 <App>
@@ -35,11 +33,9 @@ Default value: `false`.
   `}
 />
 
-### `autoSize`
+### `autoSize (default: false)`
 
 If set to `true`, this boolean property enables the `TextArea` to resize automatically based on the number of lines inside it.
-
-Default value: `false`.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
@@ -60,11 +56,9 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
   `}
 />
 
-### `enabled`
+### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 ```ueml copy
 <App>
@@ -142,17 +136,13 @@ The initial value displayed in the input field.
 
 This property sets the label of the component.
 
-### `labelBreak`
+### `labelBreak (default: false)`
 
 This boolean value indicates if the `TextArea` labels can be split into multiple lines if it would overflow the available label width.
 
-Default value: `false`.
-
-### `labelPosition`
+### `labelPosition (default: "top")`
 
 Places the label at the given position of the component.
-
-Default value: `"top"`.
 
 Available values:
 

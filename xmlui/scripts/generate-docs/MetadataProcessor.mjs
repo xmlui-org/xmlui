@@ -51,11 +51,7 @@ const sectionNames = {
 };
 
 export class MetadataProcessor {
-  constructor(
-    metadata,
-    importsToInject,
-    { sourceFolder, outFolder, examplesFolder },
-  ) {
+  constructor(metadata, importsToInject, { sourceFolder, outFolder, examplesFolder }) {
     this.metadata = metadata;
     this.importsToInject = importsToInject;
     this.sourceFolder = sourceFolder;
@@ -71,14 +67,17 @@ export class MetadataProcessor {
     this.metadata.forEach((component) => {
       componentNames = this._processMdx(component, componentNames);
     });
-    
+
     // Write the _meta.json file
     if (writeMetaFile) {
       try {
         const metaFileContents = Object.fromEntries(
           componentNames.sort().map((name) => [name, name]),
         );
-        writeFileSync(join(this.outFolder, "_meta.json"), JSON.stringify(metaFileContents, null, 2));
+        writeFileSync(
+          join(this.outFolder, "_meta.json"),
+          JSON.stringify(metaFileContents, null, 2),
+        );
       } catch (e) {
         logger.error("Could not write _meta file: ", e?.message || "unknown error");
       }
@@ -264,7 +263,15 @@ function addPropsSection(data, component) {
     .sort()
     .forEach(([propName, prop]) => {
       if (prop.isInternal) return;
-      buffer += `### \`${propName}\`\n\n`;
+      // prop is component
+      const isRequired = prop.isRequired === true ? "(required)" : "";
+      const defaultValue =
+        prop.defaultValue !== undefined
+          ? `(default: ${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue})`
+          : "";
+      const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
+      buffer += `### \`${propName}${propModifier}\`\n\n`;
+
       buffer += combineDescriptionAndDescriptionRef(data, prop, PROPS);
       buffer += "\n\n";
     });
@@ -369,10 +376,10 @@ function combineDescriptionAndDescriptionRef(
   }
 
   if (sectionId === PROPS) {
-    const defaultValuesBuffer = addDefaultValue(component);
+    /* const defaultValuesBuffer = addDefaultValue(component);
     if (defaultValuesBuffer) {
       descriptionBuffer += "\n\n" + defaultValuesBuffer;
-    }
+    } */
 
     const availableValuesBuffer = addAvailableValues(component);
     if (availableValuesBuffer) {

@@ -16,19 +16,15 @@ You can paste characters copied to the clipboard into a `NumberBox` only if the 
 
 ## Properties
 
-### `autoFocus`
+### `autoFocus (default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-Default value: `false`.
-
 If this boolean prop is set to true, the `NumberBox` input will be focused when appearing on the UI.
 
-### `enabled`
+### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 Controls whether the input field is enabled (`true`) or disabled (`false`).
 
@@ -123,11 +119,9 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
   `}
 />
 
-### `hasSpinBox`
+### `hasSpinBox (default: true)`
 
 This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.
-
-Default value: `true`.
 
 ```ueml copy
 <App>
@@ -167,11 +161,9 @@ The initial value displayed in the input field.
   `}
 />
 
-### `integersOnly`
+### `integersOnly (default: false)`
 
 This boolean property signs whether the input field accepts integers only (`true`) or not (`false`).
-
-Default value: `false`.
 
 ```ueml copy
 <App>
@@ -194,17 +186,13 @@ Default value: `false`.
 
 This property sets the label of the component.
 
-### `labelBreak`
+### `labelBreak (default: false)`
 
 This boolean value indicates if the `NumberBox` labels can be split into multiple lines if it would overflow the available label width.
 
-Default value: `false`.
-
-### `labelPosition`
+### `labelPosition (default: "top")`
 
 Places the label at the given position of the component.
-
-Default value: `"top"`.
 
 Available values:
 
@@ -457,11 +445,9 @@ This prop is used to visually indicate status changes reacting to form field val
   `}
 />
 
-### `zeroOrPositive`
+### `zeroOrPositive (default: false)`
 
 This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
-
-Default value: `false`.
 
 This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
 By default, this property is set to `false`.

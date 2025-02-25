@@ -9,6 +9,7 @@ $themeVars: ();
 }
 
 $component: "OffCanvas";
+$themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
 $shadow-vertical-OffCanvas: createThemeVar("shadow-vertical-#{$component}");
 $shadow-horizontal-OffCanvas: createThemeVar("shadow-horizontal-#{$component}");
@@ -40,8 +41,9 @@ $margin-bottom-title-OffCanvas: createThemeVar("margin-bottom-title-#{$component
   z-index: 1000;
   transition: transform 0.3s ease;
   width: $width-OffCanvas;
-  @include t.paddingVars($themeVars, $component);
   height: 100vh;
+  @include t.borderVars($themeVars, $component);
+  @include t.paddingVars($themeVars, $component);
 }
 
 /* By default (right side) */

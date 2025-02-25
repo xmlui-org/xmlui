@@ -9,14 +9,14 @@ const COMP = "FormSection";
 export const FormSectionMd = createMetadata({
   status: "experimental",
   description:
-    `The \`${COMP}\` is a component that groups cohesive elements together within ` +
-    `a \`Form\`. This grouping is indicated visually: the child components of the \`${COMP}\` ` +
-    `are placed in a [\`FlowLayout\`](./FlowLayout.mdx) component.`,
+      `The \`${COMP}\` is a component that groups cohesive elements together within ` +
+      `a \`Form\`. This grouping is indicated visually: the child components of the \`${COMP}\` ` +
+      `are placed in a [\`FlowLayout\`](./FlowLayout.mdx) component.`,
 });
 
 const componentSource = `
 <Component name="FormSection">
-  <VStack paddingBottom="{$props.paddingBottom ?? '1rem'}" gap="0">
+  <VStack paddingBottom="{$props.paddingBottom ?? '1rem'}" gap="0" width="100%">
     <Heading 
       when="{!!$props.heading}"
       marginBottom="$space-tight"
@@ -29,6 +29,7 @@ const componentSource = `
       paddingBottom="$space-normal"
       value="{$props.info}" />
     <FlowLayout 
+      width="100%"
       paddingTop="{$props.paddingTop ?? '$space-normal'}"
       columnGap="{$props.columnGap ?? '3rem'}"
       rowGap="{$props.rowGap ?? '$space-normal'}" >

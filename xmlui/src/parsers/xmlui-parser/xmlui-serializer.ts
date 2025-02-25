@@ -359,7 +359,7 @@ export class XmlUiHelper {
     }
 
     const nested: XmlUiFragment = this.transformSimpleComponentDefinition(
-      def.component as ComponentDef,
+      def.component,
       options,
     );
     const componentNode: XmlUiElement = {

@@ -2065,6 +2065,10 @@ export const HtmlTableMd = createMetadata({
     rules: d("Specifies which rules to draw between cells"),
   },
   themeVars: parseScssVar(styles.themeVarsTable),
+  defaultThemeVars: {
+    "color-bg-HtmlTable": "$color-bg",
+    "border-HtmlTable": "1px solid $color-border",
+  }
 });
 
 export const htmlTableTagRenderer = createComponentRenderer(
@@ -2128,6 +2132,10 @@ export const HtmlTdMd = createMetadata({
     width: d("Specifies the width of the cell"),
   },
   themeVars: parseScssVar(styles.themeVarsTd),
+  defaultThemeVars: {
+    "padding-HtmlTd": "$space-2",
+    "border-bottom-HtmlTd": "1px solid $color-border",
+  }
 });
 
 export const htmlTdTagRenderer = createComponentRenderer(
@@ -2262,6 +2270,17 @@ export const HtmlThMd = createMetadata({
     ),
   },
   themeVars: parseScssVar(styles.themeVarsTh),
+  defaultThemeVars: {
+    "padding-HtmlTh": "$space-2",
+    "font-size-HtmlTh": "$font-size-tiny",
+    "font-weight-HtmlTh": "$font-weight-bold",
+    light: {
+      "color-bg-HtmlTh--hover": "$color-surface-200",
+    },
+    dark: {
+      "color-bg-HtmlTh--hover": "$color-surface-800",
+    },
+  }
 });
 
 export const htmlThTagRenderer = createComponentRenderer(
@@ -2292,6 +2311,16 @@ export const HtmlTheadMd = createMetadata({
   description: "This component renders an HTML `thead` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsThead),
+  defaultThemeVars: {
+    "transform-text-HtmlThead": "uppercase",
+    light: {
+      "color-bg-HtmlThead": "$color-surface-100",
+      "color-text-HtmlThead": "$color-surface-500",
+    },
+    dark: {
+      "color-bg-HtmlThead": "$color-surface-950",
+    }
+  }
 });
 
 export const htmlTheadTagRenderer = createComponentRenderer(
@@ -2334,6 +2363,16 @@ export const HtmlTrMd = createMetadata({
   description: "This component renders an HTML `tr` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsTr),
+  defaultThemeVars: {
+    "font-size-HtmlTr": "$font-size-small",
+    "color-bg-row-HtmlTr": "inherit",
+    light: {
+      "color-bg-HtmlTr--hover": "$color-primary-50",
+    },
+    dark: {
+      "color-bg-HtmlTr--hover": "$color-primary-900",
+    }
+  }
 });
 
 export const htmlTrTagRenderer = createComponentRenderer(

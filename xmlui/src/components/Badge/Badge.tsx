@@ -11,7 +11,11 @@ export const BadgeMd = createMetadata({
   status: "stable",
   description: `The \`${COMP}\` is a text label that accepts a color map to define its background color and, optionally, its label color.`,
   props: {
-    value: d("The text that the component displays"),
+    value: {
+      description: "The text that the component displays",
+      type: "string",
+      isRequired: true,
+    },
     variant: d(
       `Modifies the shape of the component. Comes in the regular \`badge\` variant or the \`pill\` variant ` +
         `with fully rounded corners.`,
@@ -35,15 +39,12 @@ export const BadgeMd = createMetadata({
   events: {},
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`padding-horizontal-${COMP}`]: "$space-2",
-    [`padding-vertical-${COMP}`]: "$space-0_5",
-    [`padding-${COMP}`]: `$padding-vertical-${COMP} $padding-horizontal-${COMP}`,
-    [`padding-${COMP}-pill`]: `$padding-vertical-${COMP}-pill $padding-horizontal-${COMP}-pill`,
+    [`padding-${COMP}`]: `$space-0_5 $space-2`,
+    [`border-${COMP}`]: `0px solid $color-border`,
+    [`padding-${COMP}-pill`]: `$space-0_5 $space-2`,
     [`radius-${COMP}`]: "4px",
     [`font-size-${COMP}`]: "0.8em",
     [`font-size-${COMP}-pill`]: "0.8em",
-    // [`font-weight-${COMP}`]: "$font-weight-bold",
-    // [`font-weight-${COMP}-pill`]: "$font-weight-normal",
     light: {
       [`color-bg-${COMP}`]: "rgba($color-secondary-500-rgb, .6)",
       [`color-text-${COMP}`]: "white",

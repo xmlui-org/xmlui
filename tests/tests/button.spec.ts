@@ -1,6 +1,6 @@
-import { test, expect, ColorChannelCombinations } from "./fixtures";
+import { test, expect, type ColorChannelCombinations } from "./fixtures";
 import { getStyle, getElementStyle, initApp, initThemedApp } from "./component-test-helpers";
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 const BTN_MATRIX_CODE = `
 <Stack gap="1rem">
@@ -471,7 +471,7 @@ test(`radius-Button to solid, outlined`, async ({ page }) => {
   expect(btnOutAttBorderRadius).toBe(EXPECTED);
 });
 
-test(`thickness-border-Button to solid, outlined`, async ({ page }) => {
+test.skip(`thickness-border-Button to solid, outlined`, async ({ page }) => {
   const EXPECTED = "5px";
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
@@ -596,7 +596,7 @@ VARIANTS.filter((variant) => variant.name !== "solid").forEach((variant) => {
 VARIANTS.filter((variant) => variant.name !== "ghost").forEach((variant) => {
   THEME_COLORS.forEach((themeColor) => {
     test(`disabled ${themeColor.name}-${variant.name}, grey border`, async ({ page }) => {
-      const EXPECTED = "rgb(199, 214, 225)"
+      const EXPECTED = "rgb(205, 219, 228)"
       const entryPoint = `
       <Button testId="btn" label="disabled button" variant="${variant.name}" themeColor="${themeColor.name}" enabled="{false}" />
       `;

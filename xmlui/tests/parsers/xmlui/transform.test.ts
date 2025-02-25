@@ -51,14 +51,14 @@ describe("Ueml transform", () => {
 
   it("Compound component needs a component child #1", () => {
     const cd = transformSource("<Component name='MyComp'><!-- comment--></Component>") as CompoundComponentDef;
-    expect((cd.component as ComponentDef).type).equal("TextNode");
-    expect(((cd.component as ComponentDef).props as any).value).equal("");
+    expect((cd.component).type).equal("TextNode");
+    expect(((cd.component).props as any).value).equal("");
   });
 
   it("Compound component needs a component child #2", () => {
     const cd = transformSource("<Component name='MyComp'></Component>") as CompoundComponentDef;
-    expect((cd.component as ComponentDef).type).equal("TextNode");
-    expect(((cd.component as ComponentDef).props as any).value).equal("");
+    expect((cd.component).type).equal("TextNode");
+    expect(((cd.component).props as any).value).equal("");
   });
 
   it("Compound component cannot nest another one", () => {

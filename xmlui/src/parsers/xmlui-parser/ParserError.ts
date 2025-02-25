@@ -72,7 +72,7 @@ type ErrorText = Record<ErrorCodes, string>;
 // The error messages of error codes
 export const errorMessages: ErrorText = {
   U001: "Unexpected token: {0}.",
-  U002: "A component definition can have exactly one UEML element.",
+  U002: "A component definition can have exactly one XMLUI element.",
   U003: "A '<' token expected.",
   U004: "A node identifier expected.",
   U005: "A '</' token expected.",
@@ -87,7 +87,7 @@ export const errorMessages: ErrorText = {
   U014: "An '{0}' ID expected in the closing tag's namespace but '{1}' received.",
   U015: "Unexpected token in text element: {0}.",
 
-  T001: "A component definition must have exactly one UEML element.",
+  T001: "A component definition must have exactly one XMLUI element.",
   T002: "A component definition's name must start with an uppercase letter.",
   T003: "A reusable component must have a non-empty name.",
   T004: "A reusable component's name must start with an uppercase letter.",

@@ -15,6 +15,7 @@ import {
   HStackDriver,
   IconDriver,
   ItemsDriver,
+  LinkDriver,
   ListDriver,
   MarkdownDriver,
   NumberBoxDriver,
@@ -31,6 +32,8 @@ import {
   VStackDriver,
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
+import { LintSeverity } from "../parsers/xmlui-parser/lint";
+import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
 
 // -----------------------------------------------------------------
 // --- Utility
@@ -119,7 +122,7 @@ class Clipboard {
 
   /**
    * Performs a focus on the given driver element, then copies the contents to the clipboard
-   * @param driver 
+   * @param driver
    */
   async copyFrom(driver: ComponentDriver) {
     await driver.focus();
@@ -159,6 +162,7 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
             </Stack>
           </Fragment>
         `);
+        // `, 0, undefined, {lintSeverity: LintSeverity.Error, collectedMetadata: collectedComponentMetadata});
 
         if (errors.length > 0) {
           throw { errors };
@@ -299,6 +303,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(VStackDriver, testId);
     });
   },
+  createLinkDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(LinkDriver, testId);
+    });
+  }
 });
 
 // --- Types
@@ -337,4 +346,5 @@ type TestDriverExtenderProps = {
   createStackDriver: ComponentDriverMethod<StackDriver>;
   createHStackDriver: ComponentDriverMethod<HStackDriver>;
   createVStackDriver: ComponentDriverMethod<VStackDriver>;
+  createLinkDriver: ComponentDriverMethod<LinkDriver>;
 };

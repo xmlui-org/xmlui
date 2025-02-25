@@ -35,11 +35,9 @@ A list of file types the input controls accepts provided as a string array.
   `}
 />
 
-### `autoFocus`
+### `autoFocus (default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
-
-Default value: `false`.
 
 ### `buttonIcon`
 
@@ -187,11 +185,9 @@ Available values: `solid`, `outlined`, `ghost`
 
 Details on different button variants can be found in the [`Button` variants section](./Button.mdx#variant).
 
-### `directory`
+### `directory (default: false)`
 
 This boolean property indicates whether the component allows selecting directories (`true`) or files only (`false`).
-
-Default value: `false`.
 
 ```ueml copy
 <App>
@@ -208,11 +204,9 @@ Default value: `false`.
   `}
 />
 
-### `enabled`
+### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 ```ueml copy
 <App>
@@ -237,17 +231,13 @@ This property sets the component's initial value.
 
 This property sets the label of the component.
 
-### `labelBreak`
+### `labelBreak (default: false)`
 
 This boolean value indicates if the `FileInput` labels can be split into multiple lines if it would overflow the available label width.
 
-Default value: `false`.
-
-### `labelPosition`
+### `labelPosition (default: "top")`
 
 Places the label at the given position of the component.
-
-Default value: `"top"`.
 
 Available values:
 
@@ -263,11 +253,9 @@ Available values:
 
 This property sets the width of the `FileInput`.
 
-### `multiple`
+### `multiple (default: false)`
 
 This boolean property enables to add not just one (`false`), but multiple files to the field (`true`). This is done either by dragging onto the field or by selecting multiple files in the browser menu after clicking the input field button.
-
-Default value: `false`.
 
 ```ueml copy
 <App>

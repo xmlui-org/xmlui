@@ -18,7 +18,7 @@ $componentName: "DatePicker";
   background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
-
+  padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
@@ -37,12 +37,15 @@ $componentName: "DatePicker";
   .placeholder {
     color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
   }
+
+  .adornment {
+    color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
+  }
 }
 
 $min-height: createThemeVar("Input:min-height-#{$componentName}");
 
 .datePicker {
-  padding: .5rem .5rem .5rem 1rem;
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -53,6 +56,7 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
   border-style: solid;
   transition: background-color ease-in .1s;
   overflow: hidden;
+  gap: t.$space-2;
   font-size: createThemeVar("Input:font-size-DatePicker");
 
   @include variant("default");
@@ -60,9 +64,11 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
   &.error {
     @include variant("error");
   }
+
   &.warning {
     @include variant("warning");
   }
+
   &.valid {
     @include variant("success");
   }
@@ -76,6 +82,32 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
     .indicator, .datePickerInput {
       cursor: not-allowed;
     }
+  }
+}
+
+.datePickerValue {
+  display: flex;
+  flex: 1;
+}
+
+.inlinePickerMenu {
+  padding: 0;
+  overflow-y: auto;
+  width: fit-content !important;
+  height: fit-content;
+
+  @include variant("default");
+
+  &.error {
+    @include variant("error");
+  }
+
+  &.warning {
+    @include variant("warning");
+  }
+
+  &.valid {
+    @include variant("success");
   }
 }
 
@@ -97,6 +129,7 @@ $rdp-outline: 2px solid t.useVar($rdp-accent-color);
 $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
 
 .root {
+  width: fit-content;
   margin: 2rem;
 }
 

@@ -250,11 +250,12 @@ export function dTriggerTemplate(comp: string): ComponentPropertyMetadata {
   };
 }
 
-export function dOrientation(defaultValue: string): ComponentPropertyMetadata {
+export function dOrientation(defaultValue: string, isRequired = false): ComponentPropertyMetadata {
   return {
     description: `This property sets the main axis along which the nested components are rendered.`,
     availableValues: orientationOptionMd,
     valueType: "string",
     defaultValue,
+    isRequired,
   };
 }

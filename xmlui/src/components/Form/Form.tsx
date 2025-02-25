@@ -67,7 +67,15 @@ export const FormMd = createMetadata({
   contextVars: {
     $data: d(
       `This property represents the value of the form data. You can access the fields of the form ` +
-        `using the IDs in the \`bindTo\` property of nested \`FormItem\` instances.`,
+        `using the IDs in the \`bindTo\` property of nested \`FormItem\` instances. \`$data\` also ` +
+        `provides an \`update\` method as a shortcut to the Form's exposed \`update\` method.`,
+    ),
+  },
+  apis: {
+    reset: d(`Call this event to reset the form to its initial state.`),
+    update: d(
+      "You can pass a data object to update the form data. The properties in the passed data " +
+        "object are updated to their values accordingly. Other form properties remain intact.",
     ),
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -111,7 +119,7 @@ export const formComponentRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, layoutCss, lookupEventHandler, registerComponentApi }) => {
     return (
       <FormWithContextVar
-        node={node}
+        node={node as any}
         renderChild={renderChild}
         extractValue={extractValue}
         lookupEventHandler={lookupEventHandler as any}

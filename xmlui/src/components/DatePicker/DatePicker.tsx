@@ -6,14 +6,14 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dAutoFocus,
   dDidChange,
-  dEnabled,
+  dEnabled, dEndIcon, dEndText,
   dFocus,
   dGotFocus,
   dInitialValue,
   dLostFocus,
   dPlaceholder,
   dReadonly,
-  dSetValueApi,
+  dSetValueApi, dStartIcon, dStartText,
   dValidationStatus,
 } from "../../components/metadata-helpers";
 import { DatePicker } from "./DatePickerNative";
@@ -37,6 +37,11 @@ export const DatePickerMd = createMetadata({
     fromDate: d("The start date of the range of selectable dates"),
     toDate: d("The end date of the range of selectable dates"),
     disabledDates: d("An array of dates that are disabled"),
+    inline: d("The datepicker is displayed inline"),
+    startText: dStartText(),
+    startIcon: dStartIcon(),
+    endText: dEndText(),
+    endIcon: dEndIcon(),
   },
   events: {
     didChange: dDidChange(COMP),
@@ -55,14 +60,15 @@ export const DatePickerMd = createMetadata({
     [`shadow-menu-${COMP}`]: "$shadow-md",
     [`radius-menu-${COMP}`]: "$radius",
     [`color-text-value-${COMP}`]: "$color-text-primary",
-    [`color-bg-menu-${COMP}`]: "$color-bg-primary",
-    [`color-bg-item-${COMP}--hover`]: "$color-bg-dropdown-item--active",
-    [`color-bg-item-${COMP}--active`]: "$color-bg-dropdown-item--active",
     light: {
-      [`color-bg-menu-${COMP}`]: "$color-bg-primary",
+      [`color-bg-menu-${COMP}`]: "$color-surface-50",
+      [`color-bg-item-${COMP}--hover`]: "$color-surface-100",
+      [`color-bg-item-${COMP}--active`]: "$color-surface-200",
     },
     dark: {
-      [`color-bg-menu-${COMP}`]: "$color-bg-primary",
+      [`color-bg-menu-${COMP}`]: "$color-surface-950",
+      [`color-bg-item-${COMP}--hover`]: "$color-surface-600",
+      [`color-bg-item-${COMP}--active`]: "$color-surface-700",
     },
   },
 });
@@ -99,6 +105,11 @@ export const datePickerComponentRenderer = createComponentRenderer(
         fromDate={extractValue(node.props.fromDate)}
         toDate={extractValue(node.props.toDate)}
         disabledDates={extractValue(node.props.disabledDates)}
+        inline={extractValue.asOptionalBoolean(node.props.inline)}
+        startText={extractValue.asOptionalString(node.props.startText)}
+        startIcon={extractValue.asOptionalString(node.props.startIcon)}
+        endText={extractValue.asOptionalString(node.props.endText)}
+        endIcon={extractValue.asOptionalString(node.props.endIcon)}
       />
     );
   },

@@ -121,7 +121,7 @@ export interface CompoundComponentDef extends Scriptable {
   /**
    * Each compound component must have a single root component defining the component contents.
    */
-  component: ComponentLike;
+  component: ComponentDef;
 
   /**
    * Compound components may provide an API that other components can use to interact with them. This
@@ -257,6 +257,11 @@ export type ComponentPropertyMetadata = {
    * documentation
    */
   isInternal?: boolean;
+
+  /**
+   * Indicates that a particular property is required for the component to essentially function.
+   */
+  isRequired?: boolean;
 };
 
 /**
@@ -375,8 +380,9 @@ export function d(
   valueType?: PropertyValueType,
   defaultValue?: any,
   isValid?: IsValidFunction<any>,
+  isRequired?: boolean,
 ): ComponentPropertyMetadata {
-  return { description, availableValues, valueType, defaultValue, isValid };
+  return { description, isRequired, availableValues, valueType, defaultValue, isValid };
 }
 
 export interface ParentRenderContext {

@@ -20,7 +20,7 @@ const COMPONENT_NAMESPACE_SCHEME = "component-ns";
 const APP_NS_KEY = "app-ns";
 const APP_NS_VALUE = "#app-ns";
 const CORE_NS_KEY = "core-ns";
-const CORE_NS_VALUE = "#xmlui-core-ns";
+export const CORE_NAMESPACE_VALUE = "#xmlui-core-ns";
 
 /** Nodes which got modified or added during transformation keep their own text,
  * since they are not present in the original source text */
@@ -1218,7 +1218,7 @@ function addToNamespaces(
       nsValue = APP_NS_VALUE;
       break;
     case CORE_NS_KEY:
-      nsValue = CORE_NS_VALUE;
+      nsValue = CORE_NAMESPACE_VALUE;
       break;
   }
 

@@ -1,5 +1,11 @@
 import { test, expect } from "./fixtures";
-import { getBoundingRect, getElementStyle, initApp, initThemedApp, pixelStrToNum } from "./component-test-helpers";
+import {
+  getBoundingRect,
+  getElementStyle,
+  initApp,
+  initThemedApp,
+  pixelStrToNum,
+} from "./component-test-helpers";
 import { Locator } from "@playwright/test";
 
 const RED = "rgb(255, 0, 0)";
@@ -184,38 +190,6 @@ test("pill: font-weight", async ({ page }) => {
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("font-weight", EXPECTED_FONT_WEIGHT);
-});
-
-test("pill: padding", async ({ page }) => {
-  const EXPECTED_PADDING = "12px";
-  await initThemedApp(page, BADGE_CODE_PILL, {
-    themeVars: {
-      "padding-Badge-pill": EXPECTED_PADDING,
-    },
-  });
-  await expect(page.getByTestId("badge")).toHaveCSS("padding", EXPECTED_PADDING);
-});
-
-test("pill: padding-horizontal", async ({ page }) => {
-  const EXPECTED_PADDING_HORIZONTAL = "6px";
-  await initThemedApp(page, BADGE_CODE_PILL, {
-    themeVars: {
-      "padding-horizontal-Badge-pill": EXPECTED_PADDING_HORIZONTAL,
-    },
-  });
-  await expect(page.getByTestId("badge")).toHaveCSS("padding-left", EXPECTED_PADDING_HORIZONTAL);
-  await expect(page.getByTestId("badge")).toHaveCSS("padding-right", EXPECTED_PADDING_HORIZONTAL);
-});
-
-test("pill: padding-vertical", async ({ page }) => {
-  const EXPECTED_PADDING_VERTICAL = "8px";
-  await initThemedApp(page, BADGE_CODE_PILL, {
-    themeVars: {
-      "padding-vertical-Badge-pill": EXPECTED_PADDING_VERTICAL,
-    },
-  });
-  await expect(page.getByTestId("badge")).toHaveCSS("padding-top", EXPECTED_PADDING_VERTICAL);
-  await expect(page.getByTestId("badge")).toHaveCSS("padding-bottom", EXPECTED_PADDING_VERTICAL);
 });
 
 async function isPillShaped(elem: Locator) {

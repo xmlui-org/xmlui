@@ -8,19 +8,20 @@ $themeVars: ();
 }
 
 $component: "Badge";
+$themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, "#{$component}-pill");
+$themeVars: t.composePaddingVars($themeVars, "#{$component}-pill");
 $color-bg-Badge: createThemeVar("color-bg-#{$component}");
-$radius-Badge: createThemeVar("radius-#{$component}");
 $color-text-Badge: createThemeVar("color-text-#{$component}");
 $font-size-Badge: createThemeVar("font-size-#{$component}");
 $font-size-Badge-pill: createThemeVar("font-size-#{$component}-pill");
 $font-weight-Badge: createThemeVar("font-weight-#{$component}");
 $font-weight-Badge-pill: createThemeVar("font-weight-#{$component}-pill");
 
-$themeVars: t.composePaddingVars($themeVars, $component);
-$themeVars: t.composePaddingVars($themeVars, "#{$component}-pill");
-
 .badge {
   @include t.paddingVars($themeVars, $component);
+  @include t.borderVars($themeVars, $component);
   display: inline-block;
   width: fit-content;
   vertical-align: top;
@@ -32,12 +33,12 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-pill");
 
   background-color: $color-bg-Badge;
   color: $color-text-Badge;
-  border-radius: $radius-Badge;
   font-size: $font-size-Badge;
 }
 
 .pill {
   @include t.paddingVars($themeVars, "#{$component}-pill");
+  @include t.borderVars($themeVars, "#{$component}-pill");
   display: inline-block;
   width: fit-content;
   vertical-align: top;

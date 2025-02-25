@@ -42,13 +42,37 @@ If the `label` is not specified `value` is shown.
   `}
 />
 
+You can use `Select` with dynamic options:
+
+```ueml copy
+<App>
+  <Select>
+    <Items data="{['one', 'two', 'three']}" >
+      <Option value="{$itemIndex}" label="{$item}" />
+    </Items> 
+  </Select>
+</App>  
+```
+
+<Playground
+  name="Example: using Select with dynamic options"
+  height={200}
+  app={`
+    <App>
+      <Select>
+        <Items data="{['one', 'two', 'three']}" >
+          <Option value="{$itemIndex}" label="{$item}" />
+        </Items> 
+      </Select>
+    </App>  
+  `}
+/>
+
 ## Properties
 
-### `autoFocus`
+### `autoFocus (default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
-
-Default value: `false`.
 
 ### `dropdownHeight`
 
@@ -134,11 +158,9 @@ Click on the second field to see the custom empty list indicator.
   `}
 />
 
-### `enabled`
+### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
 
 ```ueml copy
 <App>
@@ -187,17 +209,13 @@ This property sets the component's initial value.
 
 This property sets the label of the component.
 
-### `labelBreak`
+### `labelBreak (default: false)`
 
 This boolean value indicates if the `Select` labels can be split into multiple lines if it would overflow the available label width.
 
-Default value: `false`.
-
-### `labelPosition`
+### `labelPosition (default: "top")`
 
 Places the label at the given position of the component.
-
-Default value: `"top"`.
 
 Available values:
 
@@ -217,11 +235,9 @@ This property sets the width of the `Select`.
 
 This property sets the maximum length of the input it accepts.
 
-### `multiSelect`
+### `multiSelect (default: false)`
 
 The `true` value of the property indicates if the user can select multiple items.
-
-Default value: `false`.
 
 ```ueml copy /multiSelect="true"/
 <App>

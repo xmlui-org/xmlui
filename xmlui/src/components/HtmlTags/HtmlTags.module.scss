@@ -1,30 +1,4 @@
 @use "../../components-core/theming/themes" as t;
-// We are using this `meta` import here to call meta.get-function for calling specific
-// createThemeVar functions in mixins.
-// If we can use createThemeVar directly without creating derivatives, we can remove this import and function call.
-@use "sass:meta";
-
-@mixin borders($func, $element) {
-  $fn: meta.get-function($func);
-
-  border: meta.call($fn, "border-#{$element}");
-  border-radius: meta.call($fn, "border-radius-#{$element}");
-  border-color: meta.call($fn, "color-border-#{$element}");
-  border-width: meta.call($fn, "thickness-border-#{$element}");
-  border-style: meta.call($fn, "style-border-#{$element}");
-  border-top: meta.call($fn, "border-top-#{$element}");
-  border-right: meta.call($fn, "border-right-#{$element}");
-  border-bottom: meta.call($fn, "border-bottom-#{$element}");
-  border-left: meta.call($fn, "border-left-#{$element}");
-}
-
-@mixin paddings($func, $element) {
-  $fn: meta.get-function($func);
-
-  padding: meta.call($fn, "padding-#{$element}");
-  padding-block: meta.call($fn, "padding-vertical-#{$element}");
-  padding-inline: meta.call($fn, "padding-horizontal-#{$element}");
-}
 
 // --- table
 
@@ -35,19 +9,23 @@ $themeVarsTable: ();
 }
 
 $color-text-HtmlTable: createThemeVarTable("color-text-HtmlTable");
-$color-background-HtmlTable: createThemeVarTable("color-background-HtmlTable");
+$color-bg-HtmlTable: createThemeVarTable("color-bg-HtmlTable");
 $font-family-HtmlTable: createThemeVarTable("font-family-HtmlTable");
 $font-size-HtmlTable: createThemeVarTable("font-size-HtmlTable");
 $font-weight-HtmlTable: createThemeVarTable("font-weight-HtmlTable");
+$transform-text-HtmlTable: createThemeVarTable("transform-text-HtmlTable");
+$themeVarsTable: t.composeBorderVars($themeVarsTable, "HtmlTable");
+$themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
 
 .htmlTable {
-  background-color: $color-background-HtmlTable;
+  background-color: $color-bg-HtmlTable;
   color: $color-text-HtmlTable;
   font-family: $font-family-HtmlTable;
   font-size: $font-size-HtmlTable;
   font-weight: $font-weight-HtmlTable;
-  @include paddings("createThemeVarTable", "HtmlTable");
-  @include borders("createThemeVarTable", "HtmlTable");
+  text-transform: $transform-text-HtmlTable;
+  @include t.borderVars($themeVarsTable, "HtmlTable");
+  @include t.paddingVars($themeVarsTable, "HtmlTable");
 }
 
 // --- thead
@@ -58,18 +36,22 @@ $themeVarsThead: ();
   @return t.getThemeVar($themeVarsThead, $componentVariable);
 }
 
-$color-background-HtmlThead: createThemeVarThead("color-background-HtmlThead");
+$color-bg-HtmlThead: createThemeVarThead("color-bg-HtmlThead");
 $color-text-HtmlThead: createThemeVarThead("color-text-HtmlThead");
 $font-weight-HtmlThead: createThemeVarThead("font-weight-HtmlThead");
 $font-size-HtmlThead: createThemeVarThead("font-size-HtmlThead");
+$transform-text-HtmlThead: createThemeVarThead("transform-text-HtmlThead");
+$themeVarsThead: t.composeBorderVars($themeVarsThead, "HtmlThead");
+$themeVarsThead: t.composePaddingVars($themeVarsThead, "HtmlThead");
 
 .htmlThead {
-  background-color: $color-background-HtmlThead;
+  background-color: $color-bg-HtmlThead;
   color: $color-text-HtmlThead;
   font-weight: $font-weight-HtmlThead;
   font-size: $font-size-HtmlThead;
-  @include paddings("createThemeVarThead", "HtmlThead");
-  @include borders("createThemeVarThead", "HtmlThead");
+  text-transform: $transform-text-HtmlThead;
+  @include t.borderVars($themeVarsThead, "HtmlThead");
+  @include t.paddingVars($themeVarsThead, "HtmlThead");
 }
 
 // --- tbody
@@ -80,16 +62,18 @@ $themeVarsTbody: ();
   @return t.getThemeVar($themeVarsTbody, $componentVariable);
 }
 
-$color-background-HtmlTbody: createThemeVarTbody("color-background-HtmlTbody");
+$color-bg-HtmlTbody: createThemeVarTbody("color-bg-HtmlTbody");
 $color-text-HtmlTbody: createThemeVarTbody("color-text-HtmlTbody");
 $text-alignment-HtmlTbody: createThemeVarTbody("text-alignment-HtmlTbody");
 $vertical-alignment-HtmlTbody: createThemeVarTbody("vertical-alignment-HtmlTbody");
+$transform-text-HtmlTbody: createThemeVarTbody("transform-text-HtmlTbody");
 
 .htmlTbody {
-  background-color: $color-background-HtmlTbody;
+  background-color: $color-bg-HtmlTbody;
   color: $color-text-HtmlTbody;
   text-align: $text-alignment-HtmlTbody;
   vertical-align: $vertical-alignment-HtmlTbody;
+  text-transform: $transform-text-HtmlTbody;
 }
 
 // --- tfoot
@@ -100,11 +84,11 @@ $themeVarsTfoot: ();
   @return t.getThemeVar($themeVarsTfoot, $componentVariable);
 }
 
-$color-background-HtmlTfoot: createThemeVarTfoot("color-background-HtmlTfoot");
+$color-bg-HtmlTfoot: createThemeVarTfoot("color-bg-HtmlTfoot");
 $color-text-HtmlTfoot: createThemeVarTfoot("color-text-HtmlTfoot");
 
 .htmlTfoot {
-  background-color: $color-background-HtmlTfoot;
+  background-color: $color-bg-HtmlTfoot;
   color: $color-text-HtmlTfoot;
 }
 
@@ -116,14 +100,25 @@ $themeVarsTh: ();
   @return t.getThemeVar($themeVarsTh, $componentVariable);
 }
 
-$color-background-HtmlTh: createThemeVarTh("color-background-HtmlTh");
+$color-bg-HtmlTh: createThemeVarTh("color-bg-HtmlTh");
 $color-text-HtmlTh: createThemeVarTh("color-text-HtmlTh");
+$font-weight-HtmlTh: createThemeVarTh("font-weight-HtmlTh");
+$font-size-HtmlTh: createThemeVarTh("font-size-HtmlTh");
+$color-bg-HtmlTh--hover: createThemeVarTh("color-bg-HtmlTh--hover");
+$themeVarsTh: t.composeBorderVars($themeVarsTh, "HtmlTh");
+$themeVarsTh: t.composePaddingVars($themeVarsTh, "HtmlTh");
 
 .htmlTh {
-  background-color: $color-background-HtmlTh;
+  background-color: $color-bg-HtmlTh;
   color: $color-text-HtmlTh;
-  @include paddings("createThemeVarTh", "HtmlTh");
-  @include borders("createThemeVarTh", "HtmlTh");
+  font-weight: $font-weight-HtmlTh;
+  font-size: $font-size-HtmlTh;
+  @include t.borderVars($themeVarsTh, "HtmlTh");
+  @include t.paddingVars($themeVarsTh, "HtmlTh");
+
+  &:hover {
+    background-color: $color-bg-HtmlTh--hover;
+  }
 }
 
 // --- tr
@@ -134,28 +129,34 @@ $themeVarsTr: ();
   @return t.getThemeVar($themeVarsTr, $componentVariable);
 }
 
-$color-background-HtmlTr: createThemeVarTr("color-background-HtmlTr");
-$color-background-HtmlTr--hover: createThemeVarTr("color-background-HtmlTr--hover");
-$color-background-even-HtmlTr: createThemeVarTr("color-background-even-HtmlTr");
+$color-bg-HtmlTr: createThemeVarTr("color-bg-HtmlTr");
+$color-bg-HtmlTr--hover: createThemeVarTr("color-bg-HtmlTr--hover");
+$color-bg-even-HtmlTr: createThemeVarTr("color-bg-even-HtmlTr");
 $color-text-HtmlTr: createThemeVarTr("color-text-HtmlTr");
 $color-text-HtmlTr--hover: createThemeVarTr("color-text-HtmlTr--hover");
 $font-size-HtmlTr: createThemeVarTr("font-size-HtmlTr");
 $font-weight-HtmlTr: createThemeVarTr("font-weight-HtmlTr");
+$themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
 
 .htmlTr {
-  background-color: $color-background-HtmlTr;
+  background-color: $color-bg-HtmlTr;
   color: $color-text-HtmlTr;
   font-weight: $font-weight-HtmlTr;
   font-size: $font-size-HtmlTr;
-  @include borders("createThemeVarTr", "HtmlTr");
+  @include t.borderVars($themeVarsTr, "HtmlTr");
 
   &:nth-child(even) {
-    background-color: $color-background-even-HtmlTr;
+    background-color: $color-bg-even-HtmlTr;
   }
 
+  // Apply hover effect for rows with mixed th, td elements
   &:hover {
-    background-color: $color-background-HtmlTr--hover;
+    background-color: $color-bg-HtmlTr--hover;
     color: $color-text-HtmlTr--hover;
+  }
+  // Remove hover effect for rows with only th elements
+  &:hover:not(:has(:not(th))) {
+    background-color: initial;
   }
 }
 
@@ -167,20 +168,22 @@ $themeVarsTd: ();
   @return t.getThemeVar($themeVarsTd, $componentVariable);
 }
 
-$color-background-HtmlTd: createThemeVarTd("color-background-HtmlTd");
+$color-bg-HtmlTd: createThemeVarTd("color-bg-HtmlTd");
 $text-align-HtmlTd: createThemeVarTd("text-align-HtmlTd");
 $vertical-align-HtmlTd: createThemeVarTd("vertical-align-HtmlTd");
 $font-size-HtmlTd: createThemeVarTd("font-size-HtmlTd");
 $font-weight-HtmlTd: createThemeVarTd("font-weight-HtmlTd");
+$themeVarsTd: t.composeBorderVars($themeVarsTd, "HtmlTd");
+$themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
 
 .htmlTd {
-  background-color: $color-background-HtmlTd;
+  background-color: $color-bg-HtmlTd;
   text-align: $text-align-HtmlTd;
   vertical-align: $vertical-align-HtmlTd;
   font-size: $font-size-HtmlTd;
   font-weight: $font-weight-HtmlTd;
-  @include paddings("createThemeVarTd", "HtmlTd");
-  @include borders("createThemeVarTd", "HtmlTd");
+  @include t.borderVars($themeVarsTd, "HtmlTd");
+  @include t.paddingVars($themeVarsTd, "HtmlTd");
 }
 
 // --- We export the theme variables to add them to the component renderer

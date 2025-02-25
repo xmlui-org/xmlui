@@ -1,6 +1,6 @@
 import { test, expect } from "./fixtures";
 import {
-    ThemeTestDesc,
+  type ThemeTestDesc,
   getFullRectangle,
   initApp,
   initThemedApp,
@@ -123,8 +123,6 @@ const THEME_TESTS: ThemeTestDesc[] = [
   { themeVar: "font-weight-Avatar", themeVarAsCSS: "font-weight", expected: "700" },
   { themeVar: "radius-Avatar", themeVarAsCSS: "border-radius", expected: "15px" },
   { themeVar: "shadow-Avatar", themeVarAsCSS: "box-shadow", expected: RED + " 5px 10px 0px 0px" },
-  { themeVar: "style-border-Avatar", themeVarAsCSS: "border-style", expected: "dotted" },
-  { themeVar: "thickness-border-Avatar", themeVarAsCSS: "border-width", expected: "5px"},
 ];
 
 THEME_TESTS.forEach((testCase) => {
@@ -132,7 +130,7 @@ THEME_TESTS.forEach((testCase) => {
     const entryPoint = `<Avatar testId="avatar" name="Tim Alan" />`;
 
     const themeVars = {};
-    themeVars[testCase.themeVar] = testCase.expected
+    themeVars[testCase.themeVar] = testCase.expected;
 
     await initThemedApp(page, entryPoint, { themeVars });
 
