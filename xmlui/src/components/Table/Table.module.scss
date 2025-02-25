@@ -20,12 +20,9 @@ $color-bg-heading-Table--hover: createThemeVar("color-bg-heading-#{$component}--
 $color-bg-heading-Table--active: createThemeVar("color-bg-heading-#{$component}--active");
 $themeVars: t.composePaddingVars($themeVars, "heading-#{$component}");
 $themeVars: t.composePaddingVars($themeVars, "cell-#{$component}");
-$themeVars: t.composePaddingVars($themeVars, "cell-first-#{$component}");
-$themeVars: t.composePaddingVars($themeVars, "cell-last-#{$component}");
-$color-border-cell-Table: createThemeVar("color-border-cell-Table");
-$thickness-border-cell-Table: createThemeVar("thickness-border-cell-#{$component}");
-$style-border-cell-Table: createThemeVar("style-border-cell-#{$component}");
-$border-cell-Table: createThemeVar("border-cell-#{$component}");
+$padding-horizontal-cell-first-Table: createThemeVar("padding-horizontal-cell-first-#{$component}");
+$padding-horizontal-cell-last-Table: createThemeVar("padding-horizontal-cell-last-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, "cell-#{$component}");
 $color-bg-pagination-Table: createThemeVar("color-bg-pagination-#{$component}");
 $color-text-heading-Table: createThemeVar("color-text-heading-#{$component}");
 $font-weight-row-Table: createThemeVar("font-weight-row-#{$component}");
@@ -116,7 +113,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
   .row, .headerRow {
     display: flex;
     flex-direction: row;
-    border-bottom: $border-cell-Table;
+    border-bottom: createThemeVar("border-bottom-cell-Table");
     user-select: none;
     //background-color: inherit;
 
@@ -141,11 +138,11 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
 
     .columnCell:first-child {
       .headerContent {
-        @include t.paddingVars($themeVars, "cell-first-#{$component}");
+        padding-left: $padding-horizontal-cell-first-Table;
       }
 
       > button {
-        @include t.paddingVars($themeVars, "cell-first-#{$component}");
+        padding-left: $padding-horizontal-cell-first-Table;
 
         .headerContent {
           padding-left: 0;
@@ -155,11 +152,11 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
 
     .columnCell:last-child {
       .headerContent {
-        @include t.paddingVars($themeVars, "cell-last-#{$component}");
+        padding-right: $padding-horizontal-cell-last-Table;
       }
 
       > button {
-        @include t.paddingVars($themeVars, "cell-last-#{$component}");
+        padding-right: $padding-horizontal-cell-last-Table;
 
         .headerContent {
           padding-right: 0;
@@ -168,12 +165,12 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
     }
 
     .cell:first-child {
-      @include t.paddingVars($themeVars, "cell-first-#{$component}");
+      padding-left: $padding-horizontal-cell-first-Table;
       border-left: 0;
     }
 
     .cell:last-child {
-      @include t.paddingVars($themeVars, "cell-last-#{$component}");
+      padding-right: $padding-horizontal-cell-last-Table;
       border-right: 0;
     }
   }
@@ -322,7 +319,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
     content: '';
     width: 1px;
     height: 100%;
-    background: $color-border-cell-Table;
+    background:createThemeVar("color-border-cell-Table");
   }
 }
 

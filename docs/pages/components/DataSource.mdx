@@ -118,13 +118,13 @@ Here is a sample response from the HubSpot API.
 }
 ```
 
-The `resultSelector` used here builds an array of the `properties` objects.
+This `resultSelector` builds an array of the `properties` objects.
 
 
 ```ueml copy
 <DataSource 
   id="contacts" 
-  url="http://{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
   resultSelector="results.map(item => item.properties )"
   headers='{{"Authorization":"Bearer not-a-real-token"}}'
 ```
@@ -132,7 +132,7 @@ The `resultSelector` used here builds an array of the `properties` objects.
 This `List` uses the array.
 
 ```ueml copy 
-<List data="{contacts}"> 
+<List data="{contacts}" title="Hubspot Contacts"> 
   <Card gap="0" width="20em">
     <Text font-weight="bold">
       {$item.firstname} {$item.lastname}
@@ -150,13 +150,12 @@ This `List` uses the array.
 </List>
 ```
 
-The `resultSelector` used here filters the array of the `properties` objects to include only contacts with non-null `custom_notes`.
+This `resultSelector` filters the array of the `properties` objects to include only contacts with non-null `custom_notes`.
 
 ```ueml copy
 <DataSource 
   id="contacts" 
-  resultSelector=`results.filter(contact => contact.properties.custom_notes !== null)
-    .map(contact => contact.properties)`
+  resultSelector="results.filter(contact => contact.properties.custom_notes !== null).map(contact => contact.properties)"
   url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
   headers='{{"Authorization":"Bearer not-a-real-token"}}'
   /> 
@@ -172,7 +171,6 @@ This `Table` uses the filtered array.
   <Column bindTo="email" />
   <Column bindTo="custom_notes" />
 </Table>
-```
 
 ### `transformResult (optional)`
 
