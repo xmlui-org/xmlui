@@ -472,23 +472,6 @@ function useStandalone(
       const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
 
-      const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
-
-      if (lintSeverity !== LintSeverity.Skip) {
-        const allComponentLints = lintApp({
-          appDef,
-          metadataByComponent: collectedComponentMetadata,
-        });
-
-        if (allComponentLints.length > 0) {
-          if (lintSeverity === LintSeverity.Warning) {
-            allComponentLints.forEach(printComponentLints);
-          } else if (lintSeverity === LintSeverity.Error) {
-            appDef.entryPoint = lintErrorsComponent(allComponentLints);
-          }
-        }
-      }
-
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
       // --- we must have the app definition available.
       if (
@@ -497,6 +480,23 @@ function useStandalone(
       ) {
         if (!appDef) {
           throw new Error("couldn't find the application metadata");
+        }
+
+        const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
+
+        if (lintSeverity !== LintSeverity.Skip) {
+          const allComponentLints = lintApp({
+            appDef,
+            metadataByComponent: collectedComponentMetadata,
+          });
+
+          if (allComponentLints.length > 0) {
+            if (lintSeverity === LintSeverity.Warning) {
+              allComponentLints.forEach(printComponentLints);
+            } else if (lintSeverity === LintSeverity.Error) {
+              appDef.entryPoint = lintErrorsComponent(allComponentLints);
+            }
+          }
         }
         setStandaloneApp(appDef);
         return;
@@ -517,6 +517,24 @@ function useStandalone(
           themePromises.push(fetchWithoutCache(theme).then((value) => value.json()));
         });
         const themes = await Promise.all(themePromises);
+
+        const lintSeverity = getLintSeverity(config?.appGlobals?.lintSeverity);
+
+        if (lintSeverity !== LintSeverity.Skip) {
+          const allComponentLints = lintApp({
+            appDef,
+            metadataByComponent: collectedComponentMetadata,
+          });
+
+          if (allComponentLints.length > 0) {
+            if (lintSeverity === LintSeverity.Warning) {
+              allComponentLints.forEach(printComponentLints);
+            } else if (lintSeverity === LintSeverity.Error) {
+              appDef.entryPoint = lintErrorsComponent(allComponentLints);
+            }
+          }
+        }
+
         setStandaloneApp({
           ...appDef,
           name: config.name,
@@ -753,7 +771,6 @@ function useStandalone(
           extensionManager,
         );
       }
-
       // --- Let's check for errors to display
       let errorComponent: ComponentDef | null =
         errorComponents.length > 0
@@ -764,13 +781,31 @@ function useStandalone(
             }
           : null;
 
-      setStandaloneApp({
+      const newAppDef = {
         ...config,
         themes,
         sources,
         components: componentsWithCodeBehinds as any,
         entryPoint: errorComponent ?? entryPointWithCodeBehind,
-      });
+      };
+
+      const lintSeverity = getLintSeverity(newAppDef.appGlobals?.lintSeverity);
+      if (lintSeverity !== LintSeverity.Skip) {
+        const allComponentLints = lintApp({
+          appDef: newAppDef,
+          metadataByComponent: collectedComponentMetadata,
+        });
+
+        if (allComponentLints.length > 0) {
+          if (lintSeverity === LintSeverity.Warning) {
+            allComponentLints.forEach(printComponentLints);
+          } else if (lintSeverity === LintSeverity.Error) {
+            newAppDef.entryPoint = errorComponent ?? lintErrorsComponent(allComponentLints);
+          }
+        }
+      }
+
+      setStandaloneApp(newAppDef);
     })();
   }, [runtime, standaloneAppDef]);
   return standaloneApp;
