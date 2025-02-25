@@ -6,6 +6,7 @@ import classnames from "classnames";
 
 import styles from "./TableOfContents.module.scss";
 import { useTableOfContents } from "../../components-core/TableOfContentsContext";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   style?: CSSProperties;
@@ -21,6 +22,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
   const { headings, setObserveIntersection, activeAnchorId, setActiveAnchorId } =
     useTableOfContents();
   const ref = forwardedRef ? composeRefs(tocRef, forwardedRef) : tocRef;
+  const navigate = useNavigate();
 
   useEffect(() => {
     setObserveIntersection(true);
@@ -64,17 +66,22 @@ export const TableOfContents = forwardRef(function TableOfContents(
                   })}
                   to={`#${value.id}`}
                   onClick={(event) => {
-                    if (smoothScrolling) {
-                      event.preventDefault();
-                      scrollIntoView(value.anchor, {
-                        block: "start",
-                        inline: "start",
-                        behavior: "smooth",
-                        scrollMode: "always",
-                      });
-                    }
-
+                    event.preventDefault();
+                    value.anchor.scrollIntoView({
+                      block: "start",
+                      inline: "start",
+                      behavior: smoothScrolling ? "smooth" : "auto",
+                    });
                     setActiveAnchorId(value.id);
+                    requestAnimationFrame(()=>{
+                      navigate({
+                        hash: `#${value.id}`,
+                      }, {
+                        state: {
+                          preventHashScroll: true
+                        },
+                      });
+                    });
                   }}
                   id={value.id}
                 >

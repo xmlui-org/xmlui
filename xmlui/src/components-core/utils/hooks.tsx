@@ -274,12 +274,12 @@ export const useScrollEventHandler = (
     onScrollStart,
     onScrollEnd,
   }: {
-    onScrollStart: () => void;
-    onScrollEnd: () => void;
+    onScrollStart?: () => void;
+    onScrollEnd?: () => void;
   },
 ) => {
   const thisRef = useRef({scrolling: false});
-  useEffect(() => {
+  useLayoutEffect(() => {
     let timer;
     let listener = () => {
       if(!thisRef.current.scrolling){
@@ -298,3 +298,26 @@ export const useScrollEventHandler = (
     };
   }, [element, onScrollEnd, onScrollStart]);
 };
+
+function realBackgroundColor(elem: HTMLElement) {
+  let transparent = "rgba(0, 0, 0, 0)";
+  let transparentIE11 = "transparent";
+  if (!elem) return transparent;
+
+  let bg = getComputedStyle(elem).backgroundColor;
+  if (bg === transparent || bg === transparentIE11) {
+    return realBackgroundColor(elem.parentElement);
+  } else {
+    return bg;
+  }
+}
+
+
+export const useRealBackground = (element: HTMLElement)=>{
+  const { activeThemeTone, activeThemeId } = useTheme();
+  const [counter, setCounter] = useState(0);
+  useEffect(()=>{
+    return setCounter(prev => prev + 1);
+  }, [activeThemeTone, activeThemeId]);
+  return useMemo(()=> element ? realBackgroundColor(element) : 'transparent', [element, counter]);
+}

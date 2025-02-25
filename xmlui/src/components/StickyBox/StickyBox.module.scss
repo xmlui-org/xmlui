@@ -8,16 +8,12 @@ $themeVars: ();
 }
 
 .wrapper {
-  position: sticky;
   z-index: 1;
-  background-color: createThemeVar("color-bg-StickyBox");
+}
 
-  &.top {
-    top: var(--header-height, 0);
-  }
-
-  &.bottom {
-    bottom: var(--footer-height, 0);
+.sentinel ~ *:has([data-anchor="true"]){
+  [data-anchor="true"]{
+    scroll-margin-top: var(--xmlui-scroll-margin-top);
   }
 }
 

@@ -39,6 +39,12 @@ export const HeadingMd = createMetadata({
     maxLines: MAX_LINES_DESC,
     ellipses: ELLIPSES_DESC,
     preserveLinebreaks: PRESERVE_DESC,
+    omitFromToc: d(
+      "If true, this heading will be excluded from the table of contents.",
+      null,
+      "boolean",
+      false,
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -213,6 +219,7 @@ function renderHeading({ node, extractValue, layoutCss, level, renderChild }: Re
       preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
       ellipses={extractValue.asOptionalBoolean(ellipses, true)}
       style={layoutCss}
+      omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
       {...resolveAndCleanProps(restProps, extractValue, layoutCss)}
     >
       {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}

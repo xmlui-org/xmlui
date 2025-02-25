@@ -1,5 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
-import { useMemo } from "react";
+import { CSSProperties, ReactNode, useMemo } from "react";
 import { Navigate, Route, Routes, useParams } from "@remix-run/react";
 import classnames from "classnames";
 
@@ -16,7 +15,7 @@ export function RouteWrapper({
   renderChild,
   layoutContext,
   style,
-  uid
+  uid,
 }: {
   childRoute?: ComponentDef | Array<ComponentDef>;
   renderChild: RenderChildFn;
@@ -46,15 +45,15 @@ export function RouteWrapper({
     };
   }, [childRoute, uid]);
 
-  const wrapperStyle = useMemo(()=>{
-    const {padding, paddingLeft, paddingRight, paddingTop, paddingBottom, ...rest} = style;
+  const wrapperStyle = useMemo(() => {
+    const { padding, paddingLeft, paddingRight, paddingTop, paddingBottom, ...rest } = style;
     return {
       ...rest,
       "--page-padding-left-override": padding || paddingLeft,
       "--page-padding-right-override": padding || paddingRight,
       "--page-padding-top-override": padding || paddingTop,
-      "--page-padding-bottom-override": padding || paddingBottom
-    }
+      "--page-padding-bottom-override": padding || paddingBottom,
+    };
   }, [style]);
 
   return (

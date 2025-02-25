@@ -13,6 +13,7 @@ $shadow-pages-App: createThemeVar("shadow-pages-App");
 $max-content-width-App: createThemeVar("max-content-width-App");
 $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
 $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
+$scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
 .wrapper {
   --footer-height: 0px;
@@ -30,6 +31,7 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
 
     .contentWrapper {
       overflow: auto;
+      scroll-padding-block: $scrollPaddingBlockPage;
       position: relative;
       scrollbar-gutter: stable both-edges;
     }
@@ -56,6 +58,7 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
 
   &.horizontal {
     overflow: auto;
+    scroll-padding-block: $scrollPaddingBlockPage;
     .PagesWrapper {
       min-height: initial;
     }
@@ -80,7 +83,8 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
     min-height: 100%;
     height: 100%;
     overflow: auto;
-    scroll-padding-top: var(--header-height);
+    //scroll-padding-top: var(--header-height);
+    scroll-padding-block: $scrollPaddingBlockPage;
     //padding-bottom: var(--footer-height);
     .navPanelWrapper {
       width: $width-navPanel-App;
@@ -147,7 +151,8 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
     }
     .PagesWrapper {
       overflow: auto;
-      scroll-padding-top: var(--header-height);
+      //scroll-padding-top: var(--header-height);
+      scroll-padding-block: $scrollPaddingBlockPage;
       min-height: 0;
       height: 100%;
       scrollbar-gutter: stable both-edges;

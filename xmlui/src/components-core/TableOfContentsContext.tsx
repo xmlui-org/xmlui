@@ -7,8 +7,8 @@ import {
   useRef,
   useState,
 } from "react";
-import scrollIntoView from "scroll-into-view-if-needed";
 import { useScrollEventHandler, useScrollParent } from "./utils/hooks";
+import { useLocation } from "@remix-run/react";
 
 // --- Stores the information about a particular heading to be displayed in the TOC.
 type HeadingItem = {
@@ -53,8 +53,6 @@ interface ITableOfContentsContext {
  */
 export const TableOfContentsContext = createContext<ITableOfContentsContext | null>(null);
 
-
-
 /**
  * This provider component injects the specified children into the TOC context.
  */
@@ -66,15 +64,10 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
   const initialHeading = useRef<HTMLElement | null>(null);
   const thisRef = useRef({
     suspendPositionBasedSetActiveId: false,
-    scrolling: false,
   });
   const scrollParent = useScrollParent(Object.values(headings)?.[0]?.anchor);
   useScrollEventHandler(scrollParent, {
-    onScrollStart: useCallback(() => {
-      thisRef.current.scrolling = true;
-    }, []),
     onScrollEnd: useCallback(() => {
-      thisRef.current.scrolling = false;
       thisRef.current.suspendPositionBasedSetActiveId = false;
     }, []),
   });
@@ -98,7 +91,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
       Object.values(headings).forEach((elem) => observer?.current?.observe?.(elem.anchor!));
       return () => observer.current?.disconnect();
     }
-  }, [headings, observeIntersection, scrollParent]);
+  }, [headings, observeIntersection]);
 
   const registerHeading = useCallback((headingItem: HeadingItem) => {
     setHeadings((prevHeadings) => {
@@ -122,11 +115,6 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
       if (headings[id]) {
         thisRef.current.suspendPositionBasedSetActiveId = true;
         setActiveId(id);
-        setTimeout(() => {
-          if (!thisRef.current.scrolling) {
-            thisRef.current.suspendPositionBasedSetActiveId = false;
-          }
-        }, 50);
       }
     },
     [headings],
@@ -143,24 +131,24 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     });
   }, [headings]);
 
+  const location = useLocation();
   useEffect(() => {
-    const hash = window.location.hash;
+    const hash = location.hash;
     if (hash) {
-      if (initialHeading?.current) {
+      if (initialHeading.current) {
         return;
       } else {
         initialHeading.current = sortedHeadings.find((value) => `#${value.id}` === hash)?.anchor;
         if (initialHeading.current) {
-          scrollIntoView(initialHeading.current, {
+          initialHeading.current.scrollIntoView({
             block: "start",
             inline: "start",
             behavior: "instant",
-            scrollMode: "always",
           });
         }
       }
     }
-  }, [sortedHeadings]);
+  }, [location.hash, sortedHeadings]);
 
   const contextValue: ITableOfContentsContext = useMemo(() => {
     return {
