@@ -115,13 +115,11 @@ export const sizeMd: PropertyValueDescription[] = [
 const sizeValues = Object.keys(sizeMd);
 export const sizeNames = [...sizeValues];
 export type ComponentSize = (typeof sizeValues)[number];
-export const defaultButtonSize = "sm";
 
 // --- Available button themes
 const buttonThemeValues = ["attention", "primary", "secondary"] as const;
 export const buttonThemeNames = [...buttonThemeValues];
 export type ButtonThemeColor = (typeof buttonThemeValues)[number];
-export const defaultButtonThemeColor = "primary";
 export const buttonThemeMd: PropertyValueDescription[] = [
   { value: "attention", description: "Attention state theme color" },
   { value: "primary", description: "Primary theme color" },
@@ -148,13 +146,11 @@ export const buttonTypesMd: PropertyValueDescription[] = [
         "Resets all the controls to their initial values. Using it is ill advised for UX reasons.",
   },
 ];
-export const defaultButtonType = "button";
 
 // --- Available button variants
 const buttonVariantValues = ["solid", "outlined", "ghost"] as const;
 export const buttonVariantNames = [...buttonVariantValues];
 export type ButtonVariant = (typeof buttonVariantValues)[number];
-export const defaultButtonVariant = "solid";
 export const buttonVariantMd: PropertyValueDescription[] = [
   { value: "solid", description: "A button with a border and a filled background." },
   {
