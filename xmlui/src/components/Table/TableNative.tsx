@@ -68,7 +68,7 @@ declare module "@tanstack/table-core" {
     starSizedWidth?: string;
     accessorKey?: string;
     pinTo?: string;
-    cellRenderer?: (row: any) => ReactNode;
+    cellRenderer?: (row: any, rowIdx: number, colIdx: number, value?: any) => ReactNode;
   }
 }
 
@@ -724,7 +724,7 @@ export const Table = forwardRef(
                         }}
                       >
                         {cellRenderer
-                          ? cellRenderer(cell.row.original)
+                          ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
                           : (flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext(),

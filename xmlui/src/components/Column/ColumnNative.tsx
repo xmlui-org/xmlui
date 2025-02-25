@@ -16,8 +16,21 @@ export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) 
   const { registerColumn, unRegisterColumn } = useTableContext();
 
   const cellRenderer = useCallback(
-    (row: any) => {
-      return <MemoizedItem node={nodeChildren!} item={row} renderChild={renderChild} />;
+    (row: any, rowIndex: number, colIndex: number, value: any) => {
+      return (
+        <MemoizedItem
+          node={nodeChildren!}
+          item={row}
+          contextVars={{
+            $rowIndex: rowIndex,
+            $colIndex: colIndex,
+            $row: row,
+            $itemIndex: rowIndex,
+            $cell: value,
+          }}
+          renderChild={renderChild}
+        />
+      );
     },
     [nodeChildren, renderChild],
   );
@@ -27,10 +40,13 @@ export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) 
   }, [cellRenderer, nodeChildren]);
 
   useLayoutEffect(() => {
-    registerColumn({
-      ...columnMetadata,
-      cellRenderer: safeCellRenderer,
-    }, id);
+    registerColumn(
+      {
+        ...columnMetadata,
+        cellRenderer: safeCellRenderer,
+      },
+      id,
+    );
   }, [columnMetadata, id, registerColumn, safeCellRenderer]);
 
   useLayoutEffect(() => {

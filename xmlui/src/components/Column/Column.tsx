@@ -39,6 +39,26 @@ export const ColumnMd = createMetadata({
         `resets to the original size.`,
     ),
   },
+  contextVars: {
+    $item: {
+      description: "The data item being rendered.",
+    },
+    $row: {
+      description: "The data item being rendered (the same as \`$item\`).",
+    },
+    $itemIndex: {
+      description: "The index of the data item being rendered.",
+    },
+    $rowIndex: {
+      description: "The index of the data item being rendered (the same as \`$itemIndex\`).",
+    },
+    $colIndex: {
+      description: "The index of the column being rendered.",
+    },
+    $cell: {
+      description: "The value of the cell being rendered.",
+    },
+  }
 });
 
 export const columnComponentRenderer = createComponentRenderer(

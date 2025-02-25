@@ -12,7 +12,6 @@ type MemoizedItemProps = {
   context?: any;
   renderChild: RenderChildFn;
   layoutContext?: LayoutContext;
-  itemName?: string;
   contextVars?: Record<string, any>;
   itemKey?: string;
   contextKey?: string;
