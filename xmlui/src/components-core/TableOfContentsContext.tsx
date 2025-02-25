@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import scrollIntoView from "scroll-into-view-if-needed";
+import { useScrollEventHandler, useScrollParent } from "./utils/hooks";
 
 // --- Stores the information about a particular heading to be displayed in the TOC.
 type HeadingItem = {
@@ -52,26 +53,7 @@ interface ITableOfContentsContext {
  */
 export const TableOfContentsContext = createContext<ITableOfContentsContext | null>(null);
 
-function getScrollParent(element: HTMLElement) {
-  let style = getComputedStyle(element);
-  const excludeStaticParent = style.position === "absolute";
-  const overflowRegex = /(auto|scroll)/;
 
-  if (style.position === "fixed") {
-    return document.body;
-  }
-  for (let parent = element; ; parent = parent.parentElement) {
-    style = getComputedStyle(parent);
-    if (excludeStaticParent && style.position === "static") {
-      continue;
-    }
-    if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {
-      return parent;
-    }
-  }
-
-  return document.body;
-}
 
 /**
  * This provider component injects the specified children into the TOC context.
@@ -84,29 +66,21 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
   const initialHeading = useRef<HTMLElement | null>(null);
   const thisRef = useRef({
     suspendPositionBasedSetActiveId: false,
-    scrollParent: null,
     scrolling: false,
+  });
+  const scrollParent = useScrollParent(Object.values(headings)?.[0]?.anchor);
+  useScrollEventHandler(scrollParent, {
+    onScrollStart: useCallback(() => {
+      thisRef.current.scrolling = true;
+    }, []),
+    onScrollEnd: useCallback(() => {
+      thisRef.current.scrolling = false;
+      thisRef.current.suspendPositionBasedSetActiveId = false;
+    }, []),
   });
 
   useEffect(() => {
     if (observeIntersection) {
-      let headingValues = Object.values(headings);
-      if (!thisRef.current.scrollParent && headingValues.length) {
-        thisRef.current.scrollParent = getScrollParent(headingValues[0].anchor);
-        console.log("Scroll parent is: ", thisRef.current.scrollParent);
-
-        let timer;
-        thisRef.current.scrollParent.addEventListener("scroll", () => {
-          thisRef.current.scrolling = true;
-          clearTimeout(timer);
-          timer = setTimeout(() => {
-            thisRef.current.scrolling = false;
-            thisRef.current.suspendPositionBasedSetActiveId = false;
-            console.log("scroll end");
-          }, 50);
-        });
-      }
-
       const handleObserver = (entries: any) => {
         entries.forEach((entry: any) => {
           if (entry?.isIntersecting) {
@@ -124,7 +98,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
       Object.values(headings).forEach((elem) => observer?.current?.observe?.(elem.anchor!));
       return () => observer.current?.disconnect();
     }
-  }, [headings, observeIntersection]);
+  }, [headings, observeIntersection, scrollParent]);
 
   const registerHeading = useCallback((headingItem: HeadingItem) => {
     setHeadings((prevHeadings) => {
