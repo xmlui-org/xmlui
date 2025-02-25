@@ -21,6 +21,8 @@ npm run prepare-docs-data
 npm run generate-docs
 ```
 
+![process illustration](build-checklist.png)
+
 4. Check if end-to-end tests work (run from within the `tests` folder):
 
 ```
@@ -34,3 +36,4 @@ npm run build
 ```
 
 If these steps pass, you can merge your commit.
+
