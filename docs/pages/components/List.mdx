@@ -28,7 +28,7 @@ The data is provided as JSON.
 
 ## Properties
 
-### `availableGroups (optional)`
+### `availableGroups`
 
 This property is an array of group names that the `List` will display.
 
@@ -63,7 +63,7 @@ This property is an array of group names that the `List` will display.
   `}
 />
 
-### `borderCollapse (optional, default: true)`
+### `borderCollapse (default: true)`
 
 Collapse items borders
 
@@ -115,7 +115,7 @@ Note how the `List` on the right has different borders:
   `}
 />
 
-### `data (optional)`
+### `data`
 
 The component receives data via this property. The `data` property is a list of items that the `List` can display.
 
@@ -175,7 +175,7 @@ See the [itemTemplate section](#itemtemplate).
   `}
 />
 
-### `defaultGroups (optional)`
+### `defaultGroups`
 
 This property adds a list of default groups for the `List` and displays the group headers in the specified order. If the data contains group headers not in this list, those headers are also displayed (after the ones in this list); however, their order is not deterministic.
 
@@ -218,7 +218,7 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
   `}
 />
 
-### `emptyListTemplate (optional)`
+### `emptyListTemplate`
 
 This property defines the template to display when the list is empty.
 
@@ -250,7 +250,7 @@ This property defines the template to display when the list is empty.
   `}
 />
 
-### `groupBy (optional)`
+### `groupBy`
 
 This property sets which attribute of the data is used to group the list items. If the attribute does not appear in the data, it will be ignored.
 
@@ -291,7 +291,7 @@ or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
   `}
 />
 
-### `groupFooterTemplate (optional)`
+### `groupFooterTemplate`
 
 Enables the customization of how the the footer of each group is displayed. Combine with [`groupHeaderTemplate`](#groupHeaderTemplate) to customize sections. You can use the `$item` context variable to access an item group and map its individual attributes.
 
@@ -343,7 +343,7 @@ This example displays a separator line in the groups' footer:
   `}
 />
 
-### `groupHeaderTemplate (optional)`
+### `groupHeaderTemplate`
 
 Enables the customization of how the groups are displayed, similarly to the [`itemTemplate`](#itemtemplate). You can use the `$item` context variable to access an item group and map its individual attributes.
 
@@ -383,7 +383,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
   `}
 />
 
-### `groupsInitiallyExpanded (optional)`
+### `groupsInitiallyExpanded`
 
 This Boolean property defines whether the list groups are initially expanded.
 
@@ -435,7 +435,7 @@ Note how the groups in the right `List` are expanded by default:
   `}
 />
 
-### `hideEmptyGroups (optional, default: true)`
+### `hideEmptyGroups (default: true)`
 
 This boolean property indicates if empty groups should be hidden (no header and footer are displayed).
 
@@ -497,7 +497,7 @@ Note how the `meats` category is not displayed in the right `List`:
   `}
 />
 
-### `idKey (optional)`
+### `idKey`
 
 Denotes which attribute of an item acts as the ID or key of the item. Default is `"id"`.
 
@@ -517,7 +517,7 @@ Denotes which attribute of an item acts as the ID or key of the item. Default is
   `}
 />
 
-### `itemTemplate (optional)`
+### `itemTemplate`
 
 This property allows the customization of mapping data items to components. You can use the `$item` context variable to access an item and map its individual attributes.
 
@@ -565,11 +565,11 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
   `}
 />
 
-### `items (optional)`
+### `items`
 
 You can use `items` as an alias for the `data` property. When you bind the list to a data source (e.g. an API endpoint), the `data` acts as the property that accepts a URL to fetch information from an API.When both `items` and `data` are used, `items` has priority.
 
-### `limit (optional)`
+### `limit`
 
 This property limits the number of items displayed in the `List`.
 
@@ -589,7 +589,7 @@ This property limits the number of items displayed in the `List`.
   `}
 />
 
-### `loading (optional)`
+### `loading`
 
 This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property.
 
@@ -609,7 +609,7 @@ This property delays the rendering of children until it is set to `false`, or th
   `}
 />
 
-### `orderBy (optional)`
+### `orderBy`
 
 This property enables the ordering of list items by specifying an attribute in the data.
 
@@ -631,7 +631,7 @@ This property enables the ordering of list items by specifying an attribute in t
   `}
 />
 
-### `pageInfo (optional)`
+### `pageInfo`
 
 This property contains the current page information. Setting this property also enures the `List` uses pagination.
 
@@ -644,7 +644,7 @@ It contains the following boolean attributes:
 | `isFetchingPrevPage` | _TBD_                                |
 | `isFetchingNextPage` | _TBD_                                |
 
-### `scrollAnchor (optional, default: top)`
+### `scrollAnchor (default: top)`
 
 This property pins the scroll position to a specified location of the list. Available values are shown below.
 

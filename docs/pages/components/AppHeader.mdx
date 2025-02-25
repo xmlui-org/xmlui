@@ -14,7 +14,7 @@ You can learn more details about using this component [here](../learning/using-c
 
 ## Properties
 
-### `logoTemplate (optional)`
+### `logoTemplate`
 
 This property defines the template to use for the logo. With this property, you can construct your custom logo instead of using a single image.
 
@@ -76,7 +76,7 @@ With this property, you can construct your custom logo instead of using a single
   `}
 />
 
-### `profileMenuTemplate (optional)`
+### `profileMenuTemplate`
 
 This property makes the profile menu slot of the `AppHeader` component customizable.
 
@@ -116,15 +116,15 @@ It accepts component definitions.
   `}
 />
 
-### `showLogo (optional, default: true)`
+### `showLogo (default: true)`
 
 Show the logo in the header
 
-### `title (optional)`
+### `title`
 
 Title for the application logo
 
-### `titleTemplate (optional)`
+### `titleTemplate`
 
 This property defines the template to use for the title. With this property, you can construct your custom title instead of using a single image.
 
@@ -156,21 +156,21 @@ The `AppHeader` component allows these theme variables to customize the logo wit
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | align-content-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-bottom](../styles-and-themes/common-units/#border)-AppHeader | 1px solid $color-border | 1px solid $color-border |
-| [border](../styles-and-themes/common-units/#border)-horizontal-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-left](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-right](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-top](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)-vertical-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)-AppHeader | 0 solid $color-border  | 0 solid $color-border  |
+| [border-bottom](../styles-and-themes/common-units/#border)-AppHeader | $thickness-border-bottom-AppHeader $style-border-bottom-AppHeader $color-border-bottom-AppHeader | $thickness-border-bottom-AppHeader $style-border-bottom-AppHeader $color-border-bottom-AppHeader |
+| [border](../styles-and-themes/common-units/#border)-horizontal-AppHeader | $thickness-border-horizontal-AppHeader $style-border-horizontal-AppHeader $color-border-horizontal-AppHeader | $thickness-border-horizontal-AppHeader $style-border-horizontal-AppHeader $color-border-horizontal-AppHeader |
+| [border-left](../styles-and-themes/common-units/#border)-AppHeader | $thickness-border-left-AppHeader $style-border-left-AppHeader $color-border-left-AppHeader | $thickness-border-left-AppHeader $style-border-left-AppHeader $color-border-left-AppHeader |
+| [border-right](../styles-and-themes/common-units/#border)-AppHeader | $thickness-border-right-AppHeader $style-border-right-AppHeader $color-border-right-AppHeader | $thickness-border-right-AppHeader $style-border-right-AppHeader $color-border-right-AppHeader |
+| [border-top](../styles-and-themes/common-units/#border)-AppHeader | $thickness-border-top-AppHeader $style-border-top-AppHeader $color-border-top-AppHeader | $thickness-border-top-AppHeader $style-border-top-AppHeader $color-border-top-AppHeader |
+| [border](../styles-and-themes/common-units/#border)-vertical-AppHeader | $thickness-border-vertical-AppHeader $style-border-vertical-AppHeader $color-border-vertical-AppHeader | $thickness-border-vertical-AppHeader $style-border-vertical-AppHeader $color-border-vertical-AppHeader |
 | [color-bg](../styles-and-themes/common-units/#color)-AppHeader | white | $color-surface-900 |
-| [color-border](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border-bottom](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border-horizontal](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border-top](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border-vertical](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-AppHeader | $color-border | $color-border |
+| [color-border-bottom](../styles-and-themes/common-units/#color)-AppHeader | $color-border | $color-border |
+| [color-border-horizontal](../styles-and-themes/common-units/#color)-AppHeader | $color-border | $color-border |
+| [color-text](../styles-and-themes/common-units/#color)-AppHeader | $color-border | $color-border |
+| [color-text](../styles-and-themes/common-units/#color)-AppHeader | $color-border | $color-border |
+| [color-border-top](../styles-and-themes/common-units/#color)-AppHeader | $color-border | $color-border |
+| [color-border-vertical](../styles-and-themes/common-units/#color)-AppHeader | $color-border | $color-border |
 | [height](../styles-and-themes/common-units/#size)-AppHeader | $space-14 | $space-14 |
 | [max-content-width](../styles-and-themes/common-units/#size)-AppHeader | $max-content-width-App | $max-content-width-App |
 | [padding](../styles-and-themes/common-units/#size)-AppHeader | $padding-top-AppHeader $padding-right-AppHeader $padding-bottom-AppHeader $padding-left-AppHeader | $padding-top-AppHeader $padding-right-AppHeader $padding-bottom-AppHeader $padding-left-AppHeader |
@@ -192,19 +192,19 @@ The `AppHeader` component allows these theme variables to customize the logo wit
 | [radius](../styles-and-themes/common-units/#border-rounding)-end-start-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-start-end-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-start-start-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-bottom](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-horizontal](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-left](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-right](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-top](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-vertical](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-bottom](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-horizontal](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-left](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-right](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-top](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-vertical](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border](../styles-and-themes/common-units/#border-style)-AppHeader | solid | solid |
+| [style-border-bottom](../styles-and-themes/common-units/#border-style)-AppHeader | solid | solid |
+| [style-border-horizontal](../styles-and-themes/common-units/#border-style)-AppHeader | solid | solid |
+| [style-border-left](../styles-and-themes/common-units/#border-style)-AppHeader | solid | solid |
+| [style-border-right](../styles-and-themes/common-units/#border-style)-AppHeader | solid | solid |
+| [style-border-top](../styles-and-themes/common-units/#border-style)-AppHeader | solid | solid |
+| [style-border-vertical](../styles-and-themes/common-units/#border-style)-AppHeader | solid | solid |
+| [thickness-border](../styles-and-themes/common-units/#size)-AppHeader | 0 | 0 |
+| [thickness-border-bottom](../styles-and-themes/common-units/#size)-AppHeader | 1px | 1px |
+| [thickness-border-horizontal](../styles-and-themes/common-units/#size)-AppHeader | 0 | 0 |
+| [thickness-border-left](../styles-and-themes/common-units/#size)-AppHeader | 0 | 0 |
+| [thickness-border-right](../styles-and-themes/common-units/#size)-AppHeader | 0 | 0 |
+| [thickness-border-top](../styles-and-themes/common-units/#size)-AppHeader | 0 | 0 |
+| [thickness-border-vertical](../styles-and-themes/common-units/#size)-AppHeader | 0 | 0 |
 | [width](../styles-and-themes/common-units/#size)-logo-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 

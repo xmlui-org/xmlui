@@ -16,13 +16,13 @@ You can paste characters copied to the clipboard into a `NumberBox` only if the 
 
 ## Properties
 
-### `autoFocus (optional, default: false)`
+### `autoFocus (default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 If this boolean prop is set to true, the `NumberBox` input will be focused when appearing on the UI.
 
-### `enabled (optional, default: true)`
+### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -43,7 +43,7 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
   `}
 />
 
-### `endIcon (optional)`
+### `endIcon`
 
 This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
@@ -81,7 +81,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
   `}
 />
 
-### `endText (optional)`
+### `endText`
 
 This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
@@ -119,7 +119,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
   `}
 />
 
-### `hasSpinBox (optional, default: true)`
+### `hasSpinBox (default: true)`
 
 This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.
 
@@ -140,7 +140,7 @@ This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the 
   `}
 />
 
-### `initialValue (optional)`
+### `initialValue`
 
 This property sets the component's initial value.
 
@@ -161,7 +161,7 @@ The initial value displayed in the input field.
   `}
 />
 
-### `integersOnly (optional, default: false)`
+### `integersOnly (default: false)`
 
 This boolean property signs whether the input field accepts integers only (`true`) or not (`false`).
 
@@ -182,15 +182,15 @@ This boolean property signs whether the input field accepts integers only (`true
   `}
 />
 
-### `label (optional)`
+### `label`
 
 This property sets the label of the component.
 
-### `labelBreak (optional, default: false)`
+### `labelBreak (default: false)`
 
 This boolean value indicates if the `NumberBox` labels can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (optional, default: top)`
+### `labelPosition (default: top)`
 
 Places the label at the given position of the component.
 
@@ -204,15 +204,15 @@ Available values:
 | `bottom` | The bottom of the input |
 
 
-### `labelWidth (optional)`
+### `labelWidth`
 
 This property sets the width of the `NumberBox`.
 
-### `maxLength (optional)`
+### `maxLength`
 
 This property sets the maximum length of the input it accepts.
 
-### `maxValue (optional)`
+### `maxValue`
 
 The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.
 
@@ -237,7 +237,7 @@ Try to enter a bigger value into the input field below than the maximum allowed.
   `}
 />
 
-### `minValue (optional)`
+### `minValue`
 
 The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.
 
@@ -258,7 +258,7 @@ Try to enter a bigger value into the input field below than the minimum allowed.
   `}
 />
 
-### `placeholder (optional)`
+### `placeholder`
 
 A placeholder text that is visible in the input field when its empty.
 
@@ -279,7 +279,7 @@ A placeholder text that is visible in the input field when its empty.
   `}
 />
 
-### `readOnly (optional)`
+### `readOnly`
 
 Set this property to `true` to disallow changing the component value.
 
@@ -300,11 +300,11 @@ If true, the component's value cannot be modified with user interactions.
   `}
 />
 
-### `required (optional)`
+### `required`
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `startIcon (optional)`
+### `startIcon`
 
 This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
@@ -342,7 +342,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
   `}
 />
 
-### `startText (optional)`
+### `startText`
 
 This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
@@ -380,7 +380,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
   `}
 />
 
-### `step (optional)`
+### `step`
 
 This prop governs how big the step when clicking on the spinner of the field.
 
@@ -403,7 +403,7 @@ Note that only integers are allowed to be entered.
   `}
 />
 
-### `validationStatus (optional)`
+### `validationStatus`
 
 This property allows you to set the validation status of the input component.
 
@@ -445,7 +445,7 @@ This prop is used to visually indicate status changes reacting to form field val
   `}
 />
 
-### `zeroOrPositive (optional, default: false)`
+### `zeroOrPositive (default: false)`
 
 This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
 
