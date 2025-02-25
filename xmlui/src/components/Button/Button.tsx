@@ -1,6 +1,6 @@
 import styles from "./Button.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createMetadata } from "../../abstractions/ComponentDefs";
 import {
   buttonThemeMd,
   alignmentOptionMd,
@@ -8,21 +8,14 @@ import {
   buttonVariantMd,
   buttonTypesMd,
   iconPositionMd,
-  defaultButtonType,
-  defaultButtonVariant,
-  defaultButtonThemeColor,
-  defaultButtonSize,
 } from "../abstractions";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dClick, dGotFocus, dLostFocus, dOrientation } from "../../components/metadata-helpers";
 import { Icon } from "../Icon/IconNative";
-import { Button } from "./ButtonNative";
+import { Button, propDefaults } from "./ButtonNative";
 
 const COMP = "Button";
-const defaultOrientation = "horizontal";
-const defaultAlignement = "center";
-const defaultIconPosition = "start";
 
 export const ButtonMd = createMetadata({
   description: `Button is an interactive element that triggers an action when clicked.`,
@@ -39,21 +32,21 @@ export const ButtonMd = createMetadata({
       isRequired: false,
       type: "string",
       availableValues: buttonVariantMd,
-      defaultValue: defaultButtonVariant,
+      defaultValue: propDefaults.variant,
     },
     themeColor: {
       description: "Sets the button color scheme defined in the application theme.",
       isRequired: false,
       type: "string",
       availableValues: buttonThemeMd,
-      defaultValue: defaultButtonThemeColor,
+      defaultValue: propDefaults.themeColor,
     },
     size: {
       description: "Sets the size of the button.",
       isRequired: false,
       type: "string",
       availableValues: sizeMd,
-      defaultValue: defaultButtonSize,
+      defaultValue: propDefaults.size,
     },
     label: {
       description:
@@ -71,7 +64,7 @@ export const ButtonMd = createMetadata({
       isRequired: false,
       availableValues: buttonTypesMd,
       valueType: "string",
-      defaultValue: defaultButtonType,
+      defaultValue: propDefaults.type,
     },
     enabled: {
       description:
@@ -81,7 +74,7 @@ export const ButtonMd = createMetadata({
       type: "boolean",
       defaultValue: true,
     },
-    orientation: dOrientation(defaultOrientation),
+    orientation: dOrientation(propDefaults.orientation),
     icon: {
       description:
         `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
@@ -95,7 +88,7 @@ export const ButtonMd = createMetadata({
       isRequired: false,
       availableValues: iconPositionMd,
       type: "string",
-      defaultValue: defaultIconPosition,
+      defaultValue: propDefaults.iconPosition,
     },
     contentPosition: {
       description:
@@ -104,7 +97,7 @@ export const ButtonMd = createMetadata({
       isRequired: false,
       availableValues: alignmentOptionMd,
       type: "string",
-      defaultValue: defaultAlignement,
+      defaultValue: propDefaults.contentPosition,
     },
   },
   events: {
@@ -210,18 +203,15 @@ export const buttonComponentRenderer = createComponentRenderer(
     const label = extractValue.asDisplayText(node.props.label);
     return (
       <Button
-        type={extractValue.asOptionalString(node.props.type, defaultButtonType)}
-        variant={extractValue.asOptionalString(node.props.variant, defaultButtonVariant)}
-        themeColor={extractValue.asOptionalString(node.props.themeColor, defaultButtonThemeColor)}
+        type={extractValue.asOptionalString(node.props.type)}
+        variant={extractValue.asOptionalString(node.props.variant)}
+        themeColor={extractValue.asOptionalString(node.props.themeColor)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        size={extractValue.asOptionalString(node.props.size, defaultButtonSize)}
+        size={extractValue.asOptionalString(node.props.size)}
         icon={iconName && <Icon name={iconName} />}
-        iconPosition={extractValue.asOptionalString(node.props.iconPosition, defaultIconPosition)}
-        orientation={extractValue.asOptionalString(node.props.orientation, defaultOrientation)}
-        contentPosition={extractValue.asOptionalString(
-          node.props.contentPosition,
-          defaultAlignement,
-        )}
+        iconPosition={extractValue.asOptionalString(node.props.iconPosition)}
+        orientation={extractValue.asOptionalString(node.props.orientation)}
+        contentPosition={extractValue.asOptionalString(node.props.contentPosition)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         onClick={lookupEventHandler("click")}
         onFocus={lookupEventHandler("gotFocus")}

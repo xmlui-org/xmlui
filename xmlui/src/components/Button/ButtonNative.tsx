@@ -43,17 +43,30 @@ type Props = {
   | "className"
 >;
 
+export const propDefaults: Pick<
+  Props,
+  "type" | "iconPosition" | "contentPosition" | "orientation" | "variant" | "themeColor" | "size"
+> = {
+  type: "button",
+  iconPosition: "start",
+  contentPosition: "center",
+  orientation: "horizontal",
+  variant: "solid",
+  themeColor: "primary",
+  size: "sm",
+};
+
 export const Button = React.forwardRef(function Button(
   {
     id,
-    type,
+    type = propDefaults.type,
     icon,
-    iconPosition,
-    contentPosition,
-    orientation,
-    variant,
-    themeColor,
-    size,
+    iconPosition = propDefaults.iconPosition,
+    contentPosition = propDefaults.contentPosition,
+    orientation = propDefaults.orientation,
+    variant = propDefaults.variant,
+    themeColor = propDefaults.themeColor,
+    size = propDefaults.size,
     disabled,
     children,
     formId,
