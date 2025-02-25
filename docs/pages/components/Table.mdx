@@ -36,15 +36,15 @@ All samples use table columns with the following definition unless noted otherwi
 
 ## Properties
 
-### `alwaysShowSelectionHeader (optional, default: false)`
+### `alwaysShowSelectionHeader (default: false)`
 
 This property indicates when the row selection header is displayed. When the value is `true,` the selection header is always visible. Otherwise, it is displayed only when hovered.
 
-### `autoFocus (optional, default: false)`
+### `autoFocus (default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `data (optional)`
+### `data`
 
 The component receives data via this property. The `data` property is a list of items that the `Table` can display.
 
@@ -102,7 +102,7 @@ Here, the component displays rocket information coming from the official SpaceX 
   `}
 />
 
-### `enableMultiRowSelection (optional)`
+### `enableMultiRowSelection`
 
 This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.
 
@@ -139,7 +139,7 @@ By default, the value of this property is `true`.
   `}
 />
 
-### `headerHeight (optional)`
+### `headerHeight`
 
 This optional property is used to specify the height of the table header.
 
@@ -168,7 +168,7 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
   `}
 />
 
-### `hideHeader (optional)`
+### `hideHeader`
 
 Set the header visibility using this property. Set it to `true` to hide the header.
 
@@ -199,7 +199,7 @@ The default value is `false`.
   `}
 />
 
-### `iconNoSort (optional)`
+### `iconNoSort`
 
 Allows the customization of the icon displayed in the Table column header when when sorting is enabled and sorting is not done according to the column.
 
@@ -229,7 +229,7 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
   `}
 />
 
-### `iconSortAsc (optional)`
+### `iconSortAsc`
 
 Allows the customization of the icon displayed in the Table column header when sorting is enabled, sorting is done according to the column, and the column is sorted in ascending order.
 
@@ -259,7 +259,7 @@ sorting is done according to the column, and the column is sorted in ascending o
   `}
 />
 
-### `iconSortDesc (optional)`
+### `iconSortDesc`
 
 Allows the customization of the icon displayed in the Table column header when sorting is enabled, sorting is done according to the column, and the column is sorted in descending order.
 
@@ -291,7 +291,7 @@ Select a column header and set it to descending ordering.
   `}
 />
 
-### `isPaginated (optional)`
+### `isPaginated`
 
 This property adds pagination controls to the `Table`.
 
@@ -318,11 +318,11 @@ This property adds pagination controls to the `Table`.
   `}
 />
 
-### `items (optional)`
+### `items`
 
 You can use `items` as an alias for the `data` property. When you bind the table to a data source (e.g. an API endpoint), the `data` acts as the property that accepts a URL to fetch information from an API. When both `items` and `data` are used, `items` has priority.
 
-### `loading (optional)`
+### `loading`
 
 This boolean property indicates if the component is fetching (or processing) data. This property is useful when data is loaded conditionally or receiving it takes some time.
 
@@ -350,7 +350,7 @@ This property is useful when data is loaded conditionally or receiving it takes 
   `}
 />
 
-### `noDataTemplate (optional)`
+### `noDataTemplate`
 
 A property to customize what to display if the table does not contain any data.
 
@@ -381,7 +381,7 @@ A property to customize what to display if the table does not contain any data.
   `}
 />
 
-### `pageSizes (optional)`
+### `pageSizes`
 
 Describes how big a page should be for pagination.
 
@@ -412,7 +412,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
   `}
 />
 
-### `rowDisabledPredicate (optional)`
+### `rowDisabledPredicate`
 
 This property defines a predicate function with a return value that determines if the row should be disabled. The function retrieves the item to display and should return a Boolean-like value.
 
@@ -447,7 +447,7 @@ Disabled items are rendered with a different color.
   `}
 />
 
-### `rowsSelectable (optional)`
+### `rowsSelectable`
 
 Indicates whether the rows are selectable (`true`) or not (`false`).
 
@@ -476,7 +476,7 @@ The default value is `false`.
   `}
 />
 
-### `sortBy (optional)`
+### `sortBy`
 
 This property is used to determine which data attributes to sort by.
 
@@ -503,7 +503,7 @@ This property is used to determine which data attributes to sort by.
   `}
 />
 
-### `sortDirection (optional)`
+### `sortDirection`
 
 This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set.
 
@@ -809,13 +809,7 @@ Heading theme variables:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [border-bottom](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)-cell-Table | 1px solid $color-border | 1px solid $color-border |
-| [border](../styles-and-themes/common-units/#border)-horizontal-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-left](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-right](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-top](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)-vertical-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)-cell-Table | $thickness-border-cell-Table $style-border-cell-Table $color-border-cell-Table | $thickness-border-cell-Table $style-border-cell-Table $color-border-cell-Table |
 | [color-bg](../styles-and-themes/common-units/#color)-heading-Table | $color-surface-100 | $color-surface-950 |
 | [color-bg](../styles-and-themes/common-units/#color)-heading-Table--active | $color-surface-300 | $color-surface-700 |
 | [color-bg](../styles-and-themes/common-units/#color)-heading-Table--hover | $color-surface-200 | $color-surface-800 |
@@ -825,13 +819,7 @@ Heading theme variables:
 | [color-bg](../styles-and-themes/common-units/#color)-selected-Table | $color-primary-100 | $color-primary-800 |
 | [color-bg](../styles-and-themes/common-units/#color)-selected-Table--hover | $color-bg-row-Table--hover | $color-bg-row-Table--hover |
 | [color-bg](../styles-and-themes/common-units/#color)-Table | $color-bg | $color-bg |
-| [color-border-bottom](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border-horizontal](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border-top](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border-vertical](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-cell-Table | $color-border | $color-border |
 | [color-outline](../styles-and-themes/common-units/#color)-heading-Table--focus | $color-outline--focus | $color-outline--focus |
 | [color-text](../styles-and-themes/common-units/#color)-heading-Table | $color-surface-500 | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-pagination-Table | $color-secondary | $color-secondary |
@@ -841,41 +829,37 @@ Heading theme variables:
 | [font-weight](../styles-and-themes/common-units/#font-weight)-heading-Table | $font-weight-bold | $font-weight-bold |
 | [font-weight](../styles-and-themes/common-units/#font-weight)-row-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [offset-outline](../styles-and-themes/common-units/#size)-heading-Table--focus | $offset-outline--focus | $offset-outline--focus |
+| [padding-bottom](../styles-and-themes/common-units/#size)-cell-first-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-bottom](../styles-and-themes/common-units/#size)-cell-last-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-bottom](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-bottom](../styles-and-themes/common-units/#size)-heading-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-cell-first-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-cell-last-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [padding](../styles-and-themes/common-units/#size)-heading-Table | $space-2 | $space-2 |
+| [padding](../styles-and-themes/common-units/#size)-heading-Table | $padding-vertical-heading-Table $padding-horizontal-heading-Table | $padding-vertical-heading-Table $padding-horizontal-heading-Table |
 | [padding-horizontal](../styles-and-themes/common-units/#size)-cell-first-Table | $space-5 | $space-5 |
 | [padding-horizontal](../styles-and-themes/common-units/#size)-cell-last-Table | $space-5 | $space-5 |
 | [padding-horizontal](../styles-and-themes/common-units/#size)-cell-Table | $space-2 | $space-2 |
-| [padding-horizontal](../styles-and-themes/common-units/#size)-heading-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-horizontal](../styles-and-themes/common-units/#size)-heading-Table | $space-2 | $space-2 |
+| [padding-left](../styles-and-themes/common-units/#size)-cell-first-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-left](../styles-and-themes/common-units/#size)-cell-last-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-left](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-left](../styles-and-themes/common-units/#size)-heading-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-right](../styles-and-themes/common-units/#size)-cell-first-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-right](../styles-and-themes/common-units/#size)-cell-last-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-right](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-right](../styles-and-themes/common-units/#size)-heading-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-top](../styles-and-themes/common-units/#size)-cell-first-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-top](../styles-and-themes/common-units/#size)-cell-last-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-top](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-top](../styles-and-themes/common-units/#size)-heading-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-vertical](../styles-and-themes/common-units/#size)-cell-first-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-vertical](../styles-and-themes/common-units/#size)-cell-last-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-vertical](../styles-and-themes/common-units/#size)-cell-Table | $space-2 | $space-2 |
-| [padding-vertical](../styles-and-themes/common-units/#size)-heading-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-end-end-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-end-start-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-start-end-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-start-start-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-bottom](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-horizontal](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-left](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-right](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-top](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-vertical](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-vertical](../styles-and-themes/common-units/#size)-heading-Table | $space-2 | $space-2 |
+| [style-border](../styles-and-themes/common-units/#border-style)-cell-Table | solid | solid |
 | [style-outline](../styles-and-themes/common-units/#border)-heading-Table--focus | $style-outline--focus | $style-outline--focus |
-| [thickness-border-bottom](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-horizontal](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-left](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-right](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-top](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-vertical](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-cell-Table | 1px | 1px |
 | [thickness-outline](../styles-and-themes/common-units/#size)-heading-Table--focus | $thickness-outline--focus | $thickness-outline--focus |
 | [transform](../styles-and-themes/common-units/#text-transform)-text-heading-Table | uppercase | uppercase |
 

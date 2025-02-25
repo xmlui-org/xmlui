@@ -173,11 +173,11 @@ If you want to run the sample with explicit state buckets (for example, with the
 
 ## Properties
 
-### `bucket (optional)`
+### `bucket`
 
 This property is the identifier of the bucket to which the `AppState` instance is bound. Multiple `AppState` instances with the same bucket will share the same state object: any of them updating the state will cause the other instances to view the new, updated state.
 
-### `initialValue (optional)`
+### `initialValue`
 
 This property contains the initial state value. Though you can use multiple `AppState`component instances for the same bucket with their `initialValue` set, it may result in faulty app logic. When xmlui instantiates an `AppState` with an explicit initial value, that value is immediately set. Multiple initial values may result in undesired initialization.
 

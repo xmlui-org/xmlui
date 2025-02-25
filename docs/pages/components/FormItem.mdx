@@ -17,11 +17,11 @@ You can learn more about this component in the [Forms](../../create-apps/forms.m
 
 ## Properties
 
-### `autoFocus (optional, default: false)`
+### `autoFocus (default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `bindTo (optional)`
+### `bindTo`
 
 This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name.
 
@@ -52,7 +52,7 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
   `}
 />
 
-### `customValidationsDebounce (optional)`
+### `customValidationsDebounce`
 
 This optional number prop determines the time interval between two runs of a custom validation.
 
@@ -93,7 +93,7 @@ Note how changing the input in the demo below will result in a slight delay of i
   `}
 />
 
-### `enabled (optional, default: true)`
+### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -118,7 +118,7 @@ This boolean property value indicates whether the component responds to user eve
   `}
 />
 
-### `initialValue (optional)`
+### `initialValue`
 
 This property sets the component's initial value.
 
@@ -143,11 +143,11 @@ This property sets the component's initial value.
   `}
 />
 
-### `inputTemplate (optional)`
+### `inputTemplate`
 
 This property is used to define a custom input template.
 
-### `label (optional)`
+### `label`
 
 This property sets the label of the component.
 
@@ -170,11 +170,11 @@ This property sets the label of the component.
   `}
 />
 
-### `labelBreak (optional)`
+### `labelBreak`
 
 This boolean value indicates if the label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (optional)`
+### `labelPosition`
 
 Places the label at the given position of the component.
 
@@ -216,11 +216,11 @@ Different input components have different layout methods
   `}
 />
 
-### `labelWidth (optional)`
+### `labelWidth`
 
 This property sets the width of the item label.
 
-### `lengthInvalidMessage (optional)`
+### `lengthInvalidMessage`
 
 This optional string property is used to customize the message that is displayed on a failed length check: [minLength](#minlength) or [maxLength](#maxlength).
 
@@ -251,7 +251,7 @@ In the app, type a name longer than four characters in both fields, then leave t
   `}
 />
 
-### `lengthInvalidSeverity (optional)`
+### `lengthInvalidSeverity`
 
 This property sets the severity level of length validations.
 
@@ -285,7 +285,7 @@ In the app, type a name longer than four characters in both fields, then leave t
   `}
 />
 
-### `maxLength (optional)`
+### `maxLength`
 
 Checks whether the input has a maximum length of a specified value.
 
@@ -317,11 +317,11 @@ In the demo below, try to enter an input longer than 4 characters or submit the 
   `}
 />
 
-### `maxTextLength (optional)`
+### `maxTextLength`
 
 The maximum length of the text in the input field
 
-### `maxValue (optional)`
+### `maxValue`
 
 Checks whether the input has the maximum specified value.
 
@@ -353,7 +353,7 @@ In the demo below, enter an input greater than 99 or just submit the form as is.
   `}
 />
 
-### `minLength (optional)`
+### `minLength`
 
 Checks whether the input has a minimum length of a specified value.
 
@@ -382,7 +382,7 @@ In the demo below, enter an input shorter than 4 characters or just submit the f
   `}
 />
 
-### `minValue (optional)`
+### `minValue`
 
 Checks whether the input has the minimum specified value.
 
@@ -414,7 +414,7 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
   `}
 />
 
-### `pattern (optional)`
+### `pattern`
 
 Checks whether the input fits a predefined regular expression.
 
@@ -451,7 +451,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
   `}
 />
 
-### `patternInvalidMessage (optional)`
+### `patternInvalidMessage`
 
 This optional string property is used to customize the message that is displayed on a failed pattern test.
 
@@ -486,7 +486,7 @@ In the demo below, enter anything that does not look like an email and click out
   `}
 />
 
-### `patternInvalidSeverity (optional)`
+### `patternInvalidSeverity`
 
 This property sets the severity level of the pattern validation.
 
@@ -520,7 +520,7 @@ In the demo below, enter a string of characters that does not look like an email
   `}
 />
 
-### `rangeInvalidMessage (optional)`
+### `rangeInvalidMessage`
 
 This optional string property is used to customize the message that is displayed when a value is out of range.
 
@@ -562,7 +562,7 @@ Just submitting the form as is also produces the same error.
   `}
 />
 
-### `rangeInvalidSeverity (optional)`
+### `rangeInvalidSeverity`
 
 This property sets the severity level of the value range validation.
 
@@ -606,7 +606,7 @@ Just submitting the form as is also produces the same error.
   `}
 />
 
-### `regex (optional)`
+### `regex`
 
 Checks whether the input fits the provided regular expression.
 
@@ -635,7 +635,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
   `}
 />
 
-### `regexInvalidMessage (optional)`
+### `regexInvalidMessage`
 
 This optional string property is used to customize the message that is displayed on a failed regular expression test.
 
@@ -670,7 +670,7 @@ In the demo below, enter a password that is not a lowercase string and click out
   `}
 />
 
-### `regexInvalidSeverity (optional)`
+### `regexInvalidSeverity`
 
 This property sets the severity level of regular expression validation.
 
@@ -705,7 +705,7 @@ Just submitting the form as is also produces the same error.
   `}
 />
 
-### `required (optional)`
+### `required`
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -732,7 +732,7 @@ Set this property to `true` to indicate it must have a value before submitting t
   `}
 />
 
-### `requiredInvalidMessage (optional)`
+### `requiredInvalidMessage`
 
 This optional string property is used to customize the message that is displayed if the field is not filled in.
 
@@ -771,7 +771,7 @@ In the demo below, leave the field empty and click outside to see the regular an
   `}
 />
 
-### `type (optional)`
+### `type`
 
 This property is used to determine the specific input control the FormItem will wrap around. Note that the control names start with a lowercase letter and map to input components found in XMLUI.
 
@@ -797,7 +797,7 @@ For custom controls, there is no need to explicitly set the `type` to `custom`.
 Omitting the type and providing child components implicitly sets it to custom.
 </Callout>
 
-### `validationMode (optional)`
+### `validationMode`
 
 This property sets what kind of validation mode or strategy to employ for a particular input field.
 

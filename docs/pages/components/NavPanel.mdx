@@ -8,7 +8,7 @@ import { Callout } from "nextra/components";
 
 ## Properties
 
-### `logoTemplate (optional)`
+### `logoTemplate`
 
 This property defines the logo template to display in the navigation panel with the `vertical` and `vertical-sticky` layout.
 
@@ -86,13 +86,13 @@ The `NavPanel` component uses these theme variables to customize its appearance:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [border-bottom](../styles-and-themes/common-units/#border)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)-horizontal-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-left](../styles-and-themes/common-units/#border)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)-NavPanel | 0px solid $color-border | 0px solid $color-border |
-| [border-right](../styles-and-themes/common-units/#border)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-top](../styles-and-themes/common-units/#border)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)-vertical-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-bottom](../styles-and-themes/common-units/#border)-NavPanel | $thickness-border-bottom-NavPanel $style-border-bottom-NavPanel $color-border-bottom-NavPanel | $thickness-border-bottom-NavPanel $style-border-bottom-NavPanel $color-border-bottom-NavPanel |
+| [border](../styles-and-themes/common-units/#border)-horizontal-NavPanel | $thickness-border-horizontal-NavPanel $style-border-horizontal-NavPanel $color-border-horizontal-NavPanel | $thickness-border-horizontal-NavPanel $style-border-horizontal-NavPanel $color-border-horizontal-NavPanel |
+| [border-left](../styles-and-themes/common-units/#border)-NavPanel | $thickness-border-left-NavPanel $style-border-left-NavPanel $color-border-left-NavPanel | $thickness-border-left-NavPanel $style-border-left-NavPanel $color-border-left-NavPanel |
+| [border](../styles-and-themes/common-units/#border)-NavPanel | $thickness-border-NavPanel $style-border-NavPanel $color-border-NavPanel  | $thickness-border-NavPanel $style-border-NavPanel $color-border-NavPanel  |
+| [border-right](../styles-and-themes/common-units/#border)-NavPanel | $thickness-border-right-NavPanel $style-border-right-NavPanel $color-border-right-NavPanel | $thickness-border-right-NavPanel $style-border-right-NavPanel $color-border-right-NavPanel |
+| [border-top](../styles-and-themes/common-units/#border)-NavPanel | $thickness-border-top-NavPanel $style-border-top-NavPanel $color-border-top-NavPanel | $thickness-border-top-NavPanel $style-border-top-NavPanel $color-border-top-NavPanel |
+| [border](../styles-and-themes/common-units/#border)-vertical-NavPanel | $thickness-border-vertical-NavPanel $style-border-vertical-NavPanel $color-border-vertical-NavPanel | $thickness-border-vertical-NavPanel $style-border-vertical-NavPanel $color-border-vertical-NavPanel |
 | [color-bg](../styles-and-themes/common-units/#color)-NavPanel | transparent | transparent |
 | [color-border-bottom](../styles-and-themes/common-units/#color)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border-horizontal](../styles-and-themes/common-units/#color)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -118,6 +118,7 @@ The `NavPanel` component uses these theme variables to customize its appearance:
 | [padding-vertical](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-end-end-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-end-start-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-NavPanel | $radius | $radius |
 | [radius](../styles-and-themes/common-units/#border-rounding)-start-end-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-start-start-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [shadow](../styles-and-themes/common-units/#color)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
