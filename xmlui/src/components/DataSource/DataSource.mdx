@@ -23,8 +23,106 @@ This property customizes the message displayed in a toast when the API invocatio
   errorNotificationMessage="${error.statusCode}, {JSON.stringify($error.details)}" />
 ```
 
+%-PROP-END
+
 %-PROP-START resultSelector
 
-The selector can be a simple dot notation path (e.g., `value.results`) or a JavaScript expression that processes the data (e.g., `results.filter(item => item.type === 'active')`). The selector has access to standard JavaScript array methods and operates on the full response body.
+The selector can be a simple dot notation path (e.g., `value.results`) or a JavaScript expression that processes the data (e.g., `results.filter(item => item.type === 'active')`). The selector has access to standard JavaScript functions like `map` and `filter`, and operates on the full response body.
+
+Here is a sample response from the HubSpot API.
+
+```json
+{
+    "results": [
+        {
+            "id": "88903258744",
+            "properties": {
+                "company": "HubSpot",
+                "createdate": "2025-01-03T23:38:47.449Z",
+                "custom_notes": "Nice guy!",
+                "email": "bh@hubspot.com",
+                "firstname": "Brian",
+                "hs_object_id": "88903258744",
+                "lastmodifieddate": "2025-02-18T23:13:34.759Z",
+                "lastname": "Halligan (Sample Contact)"
+            },
+            "createdAt": "2025-01-03T23:38:47.449Z",
+            "updatedAt": "2025-02-18T23:13:34.759Z",
+            "archived": false
+        },
+        {
+            "id": "88918034480",
+            "properties": {
+                "company": "HubSpot",
+                "createdate": "2025-01-03T23:38:47.008Z",
+                "custom_notes": null,
+                "email": "emailmaria@hubspot.com",
+                "firstname": "Maria",
+                "hs_object_id": "88918034480",
+                "lastmodifieddate": "2025-01-03T23:38:59.001Z",
+                "lastname": "Johnson (Sample Contact)"
+            },
+            "createdAt": "2025-01-03T23:38:47.008Z",
+            "updatedAt": "2025-01-03T23:38:59.001Z",
+            "archived": false
+        }
+    ]
+}
+```
+
+This `resultSelector` builds an array of the `properties` objects.
+
+
+```ueml copy
+<DataSource 
+  id="contacts" 
+  url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  resultSelector="results.map(item => item.properties )"
+  headers='{{"Authorization":"Bearer not-a-real-token"}}'
+```
+
+This `List` uses the array.
+
+```ueml copy 
+<List data="{contacts}" title="Hubspot Contacts"> 
+  <Card gap="0" width="20em">
+    <Text font-weight="bold">
+      {$item.firstname} {$item.lastname}
+    </Text>
+    <Text>
+      {$item.company}
+    </Text>
+    <Text>
+      {$item.email}
+    </Text>
+    <Text>
+      {$item.custom_notes}
+    </Text>
+  </Card>
+</List>
+```
+
+This `resultSelector` filters the array of the `properties` objects to include only contacts with non-null `custom_notes`.
+
+```ueml copy
+<DataSource 
+  id="contacts" 
+  resultSelector="results.filter(contact => contact.properties.custom_notes !== null).map(contact => contact.properties)"
+  url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
+  headers='{{"Authorization":"Bearer not-a-real-token"}}'
+  /> 
+````
+
+This `Table` uses the filtered array.
+
+```ueml copy
+<Table title="HubSpot contacts" data="{contacts}">
+  <Column bindTo="firstname" />
+  <Column bindTo="lastname" />
+  <Column bindTo="company" />
+  <Column bindTo="email" />
+  <Column bindTo="custom_notes" />
+</Table>
+
 
 %-PROP-END
