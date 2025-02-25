@@ -502,6 +502,7 @@ describe("generateBorderSegments", () => {
       "border-right-Card": "1px red",
       "border-top-Card": "1px red",
       "color-border-Card": "red",
+      "style-border-Card": undefined,
       "thickness-border-Card": "1px",
     });
   });
@@ -519,6 +520,7 @@ describe("generateBorderSegments", () => {
       "border-left-Card": "1px solid",
       "border-right-Card": "1px solid",
       "border-top-Card": "1px solid",
+      "color-border-Card": undefined,
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
     });
@@ -538,6 +540,7 @@ describe("generateBorderSegments", () => {
       "border-right-Card": "1px red",
       "border-top-Card": "1px red",
       "color-border-Card": "red",
+      "style-border-Card": undefined,
       "thickness-border-Card": "1px",
     });
   });
