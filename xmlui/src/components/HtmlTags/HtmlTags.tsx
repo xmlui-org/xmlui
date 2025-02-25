@@ -2134,7 +2134,7 @@ export const HtmlTdMd = createMetadata({
   themeVars: parseScssVar(styles.themeVarsTd),
   defaultThemeVars: {
     "padding-HtmlTd": "$space-2",
-    "border-HtmlTd": "1px solid $color-border",
+    "border-bottom-HtmlTd": "1px solid $color-border",
   }
 });
 
