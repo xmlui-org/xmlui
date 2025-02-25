@@ -13,7 +13,7 @@ export type OurColumnMetadata = {
   canSort?: boolean;
   pinTo?: string;
   canResize?: boolean;
-  cellRenderer?: (row: any) => ReactNode;
+  cellRenderer?: (row: any, rowIndex: number, colIndex: number, value: any) => ReactNode;
 };
 
 export const TableContext = createContext({
