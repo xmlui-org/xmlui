@@ -1,5 +1,5 @@
-import { test, expect } from "./fixtures";
-import { initThemedApp } from "./component-test-helpers";
+import { test, expect } from "../../testing/fixtures";
+import { initThemedApp } from "../../../../tests/tests/component-test-helpers";
 
 const NAVLINK_CODE = `<NavLink testId="navlink" to="/">Hello</NavLink>`;
 

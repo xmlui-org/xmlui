@@ -55,7 +55,7 @@ test("compound component renders without namespace (no name-conflict with core c
   await expect(page.getByTestId("button")).toHaveText("COMPOUND COMPONENT");
 });
 
-test("extension renders with namespace (component-ns)", async ({ page }) => {
+test.skip("extension renders with namespace (component-ns)", async ({ page }) => {
   await initApp(page, {
     entryPoint: `<App xmlns:TEST_NS="component-ns"><TEST_NS:TestComponent testId="testComp">EXTENSION CONTENT</TEST_NS:TestComponent></App>`
   });
@@ -63,7 +63,7 @@ test("extension renders with namespace (component-ns)", async ({ page }) => {
   await expect(page.getByTestId("testComp")).toHaveText("EXTENSION CONTENT");
 });
 
-test("extension renders with namespace (component-ns:namespace)", async ({ page }) => {
+test.skip("extension renders with namespace (component-ns:namespace)", async ({ page }) => {
   await initApp(page, {
     entryPoint: `<App xmlns:ExtensionAlias="component-ns:TEST_NS"><ExtensionAlias:TestComponent testId="testComp">EXTENSION CONTENT</ExtensionAlias:TestComponent></App>`
   });

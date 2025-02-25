@@ -1,5 +1,10 @@
-import { test, expect } from "./fixtures";
-import { getBoundingRect, getElementStyle, initThemedApp, pixelStrToNum } from "./component-test-helpers";
+import { test, expect } from "../../testing/fixtures";
+import {
+  getBoundingRect,
+  getElementStyle,
+  initThemedApp,
+  pixelStrToNum,
+} from "../../../../tests/tests/component-test-helpers";
 import { Locator } from "@playwright/test";
 
 const BADGE_CODE_PILL = `<Badge variant="pill" testId="badge" value="test content"/>`;
@@ -78,7 +83,6 @@ async function isPillShaped(elem: Locator) {
 
   expect(radius).toBeGreaterThanOrEqual(minRadius);
 }
-
 
 test("border", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
