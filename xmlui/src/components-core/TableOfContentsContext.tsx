@@ -9,7 +9,7 @@ import {
 } from "react";
 import scrollIntoView from "scroll-into-view-if-needed";
 
-// --- Stores the information about a particular heading to be displeyed in the TOC.
+// --- Stores the information about a particular heading to be displayed in the TOC.
 type HeadingItem = {
   // --- The id of the heading.
   id: string;
@@ -52,6 +52,27 @@ interface ITableOfContentsContext {
  */
 export const TableOfContentsContext = createContext<ITableOfContentsContext | null>(null);
 
+function getScrollParent(element: HTMLElement) {
+  let style = getComputedStyle(element);
+  const excludeStaticParent = style.position === "absolute";
+  const overflowRegex = /(auto|scroll)/;
+
+  if (style.position === "fixed") {
+    return document.body;
+  }
+  for (let parent = element; ; parent = parent.parentElement) {
+    style = getComputedStyle(parent);
+    if (excludeStaticParent && style.position === "static") {
+      continue;
+    }
+    if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {
+      return parent;
+    }
+  }
+
+  return document.body;
+}
+
 /**
  * This provider component injects the specified children into the TOC context.
  */
@@ -61,13 +82,37 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
   const [activeId, setActiveId] = useState<string | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
   const initialHeading = useRef<HTMLElement | null>(null);
+  const thisRef = useRef({
+    suspendPositionBasedSetActiveId: false,
+    scrollParent: null,
+    scrolling: false,
+  });
 
   useEffect(() => {
     if (observeIntersection) {
+      let headingValues = Object.values(headings);
+      if (!thisRef.current.scrollParent && headingValues.length) {
+        thisRef.current.scrollParent = getScrollParent(headingValues[0].anchor);
+        console.log("Scroll parent is: ", thisRef.current.scrollParent);
+
+        let timer;
+        thisRef.current.scrollParent.addEventListener("scroll", () => {
+          thisRef.current.scrolling = true;
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            thisRef.current.scrolling = false;
+            thisRef.current.suspendPositionBasedSetActiveId = false;
+            console.log("scroll end");
+          }, 50);
+        });
+      }
+
       const handleObserver = (entries: any) => {
         entries.forEach((entry: any) => {
           if (entry?.isIntersecting) {
-            setActiveId(entry.target.id);
+            if (!thisRef.current.suspendPositionBasedSetActiveId) {
+              setActiveId(entry.target.id);
+            }
           }
         });
       };
@@ -101,7 +146,13 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
   const setActiveAnchorId = useCallback(
     (id: string) => {
       if (headings[id]) {
+        thisRef.current.suspendPositionBasedSetActiveId = true;
         setActiveId(id);
+        setTimeout(() => {
+          if (!thisRef.current.scrolling) {
+            thisRef.current.suspendPositionBasedSetActiveId = false;
+          }
+        }, 50);
       }
     },
     [headings],

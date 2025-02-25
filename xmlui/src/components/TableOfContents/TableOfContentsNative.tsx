@@ -63,13 +63,14 @@ export const TableOfContents = forwardRef(function TableOfContents(
                     [styles.head_6]: value.level === 6,
                   })}
                   to={`#${value.id}`}
-                  onClick={() => {
+                  onClick={(event) => {
                     if (smoothScrolling) {
+                      event.preventDefault();
                       scrollIntoView(value.anchor, {
                         block: "start",
                         inline: "start",
                         behavior: "smooth",
-                        scrollMode: "if-needed",
+                        scrollMode: "always",
                       });
                     }
 
