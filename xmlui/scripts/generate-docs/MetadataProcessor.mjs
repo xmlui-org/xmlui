@@ -265,7 +265,10 @@ function addPropsSection(data, component) {
       if (prop.isInternal) return;
       // prop is component
       const isRequired = prop.isRequired === true ? "(required)" : "";
-      const defaultValue = prop.defaultValue !== undefined ? `(default: ${prop.defaultValue})` : "";
+      const defaultValue =
+        prop.defaultValue !== undefined
+          ? `(default: ${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue})`
+          : "";
       const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
       buffer += `### \`${propName}${propModifier}\`\n\n`;
 
