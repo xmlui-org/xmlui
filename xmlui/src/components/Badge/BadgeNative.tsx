@@ -1,11 +1,10 @@
-import { CSSProperties, ForwardedRef, forwardRef } from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./Badge.module.scss";
 
-const badgeVariantValues = ["badge", "pill"] as const;
+export const badgeVariantValues = ["badge", "pill"] as const;
 export type BadgeVariant = (typeof badgeVariantValues)[number];
-export const badgeVariantNames: string[] = [...badgeVariantValues];
 export type BadgeColors = {
   label: string;
   background: string;
@@ -18,8 +17,12 @@ type Props = {
   style?: CSSProperties;
 };
 
+export const defaultProps: Pick<Props, "variant"> = {
+  variant: "badge",
+};
+
 export const Badge = forwardRef(function Badge(
-  { children, color, variant = "badge", style }: Props,
+  { children, color, variant = defaultProps.variant, style }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
@@ -35,7 +38,7 @@ export const Badge = forwardRef(function Badge(
             ? { backgroundColor: color }
             : { backgroundColor: color.background, color: color.label }
           : {}),
-        ...style
+        ...style,
       }}
     >
       {children}

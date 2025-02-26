@@ -11,8 +11,12 @@ type Props = {
   style?: CSSProperties;
 } & Pick<React.HTMLAttributes<HTMLDivElement>, "onClick">;
 
+export const defaultProps: Pick<Props, "size"> = {
+  size: "sm",
+};
+
 export const Avatar = forwardRef(function Avatar(
-  { size = "sm", url, name, style, onClick, ...rest }: Props,
+  { size = defaultProps.size, url, name, style, onClick, ...rest }: Props,
   ref: Ref<any>,
 ) {
   let abbrev = null;

@@ -1,6 +1,6 @@
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { ColorPicker } from "./ColorPickerNative";
+import { ColorPicker, defaultProps } from "./ColorPickerNative";
 import {
   dAutoFocus,
   dDidChange,
@@ -29,14 +29,14 @@ export const ColorPickerMd = createMetadata({
   props: {
     initialValue: dInitialValue(),
     label: dLabel(),
-    labelPosition: dLabelPosition("top"),
+    labelPosition: dLabelPosition(),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
     enabled: dEnabled(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
     readOnly: dReadonly(),
-    validationStatus: dValidationStatus(),
+    validationStatus: dValidationStatus(defaultProps.validationStatus),
   },
   events: {
     didChange: dDidChange(COMP),

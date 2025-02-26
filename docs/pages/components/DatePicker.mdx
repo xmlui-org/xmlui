@@ -14,9 +14,11 @@ A datepicker component enables the selection of a date or a range of dates in a 
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `dateFormat`
+### `dateFormat (default: "MM/dd/yyyy")`
 
 The format of the date displayed in the input field
+
+Available values: `MM/dd/yyyy` **(default)**, `MM-dd-yyyy`, `yyyy/MM/dd`, `yyyy-MM-dd`, `dd/MM/yyyy`, `dd-MM-yyyy`, `yyyyMMdd`, `MMddyyyy`
 
 Formats handle years (`y`), months (`m` or `M`), days of the month (`d`).
 Providing multiple placeholder letters changes the display of the date.
@@ -138,13 +140,15 @@ This property sets the component's initial value.
   `}
 />
 
-### `inline`
+### `inline (default: false)`
 
-The datepicker is displayed inline
+Whether to display the datepicker inline
 
-### `mode`
+### `mode (default: "single")`
 
 The mode of the datepicker (single or range)
+
+Available values: `single` **(default)**, `range`
 
 ```ueml copy {2-3}
 <App>
@@ -184,11 +188,11 @@ A placeholder text that is visible in the input field when its empty.
   `}
 />
 
-### `readOnly`
+### `readOnly (default: false)`
 
 Set this property to `true` to disallow changing the component value.
 
-### `showWeekNumber`
+### `showWeekNumber (default: false)`
 
 Whether to show the week number in the calendar
 
@@ -236,7 +240,7 @@ The end date of the range of selectable dates
   `}
 />
 
-### `validationStatus`
+### `validationStatus (default: "none")`
 
 This property allows you to set the validation status of the input component.
 
@@ -277,9 +281,22 @@ Available values:
   `}
 />
 
-### `weekStartsOn`
+### `weekStartsOn (default: 0)`
 
 The first day of the week. 0 is Sunday, 1 is Monday, etc.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `0` | Sunday **(default)** |
+| `1` | Monday |
+| `2` | Tuesday |
+| `3` | Wednesday |
+| `4` | Thursday |
+| `5` | Friday |
+| `6` | Saturday |
+
 
 | Day       | Number |
 | :-------- | :----- |

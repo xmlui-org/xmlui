@@ -58,37 +58,6 @@ The `Badge` component supports the mapping of a list of colors using the `value`
   `}
 />
 
-### `forceIndicator`
-
-(**NOT IMPLEMENTED YET**) This property forces the display of the indicator, even if the `indicatorText` property is not defined or empty.
-
-### `indicatorPosition`
-
-(**NOT IMPLEMENTED YET**) The position of the indicator.
-
-The value of this optional property sets the string to provide a color scheme for the Alert.
-
-| Value          | Description                                                          |
-| :------------- | :------------------------------------------------------------------- |
-| `start`        | The indicator is displayed within the badge before its text          |
-| `end`          | The indicator is displayed within the badge after its text           |
-| `top-start`    | The indicator is displayed over the badge in the top-start corner    |
-| `top-end`      | The indicator is displayed over the badge in the top-end corner      |
-| `bottom-start` | The indicator is displayed over the badge in the bottom-start corner |
-| `bottom-end`   | The indicator is displayed over the badge in the bottom-end corner   |
-
-### `indicatorText`
-
-(**NOT IMPLEMENTED YET**) This property defines the text to display in the indicator. If it is not defined or empty, no indicator is displayed unless the `forceIndicator` property is set.
-
-### `indicatorThemeColor`
-
-(**NOT IMPLEMENTED YET**) The theme color of the indicator.
-
-### `themeColor`
-
-(**NOT IMPLEMENTED YET**) The theme color of the component.
-
 ### `value (required)`
 
 The text that the component displays
@@ -107,9 +76,11 @@ The text that the component displays
     </App>  
   `} />
 
-### `variant`
+### `variant (default: "badge")`
 
 Modifies the shape of the component. Comes in the regular `badge` variant or the `pill` variant with fully rounded corners.
+
+Available values: `badge` **(default)**, `pill`
 
 ```ueml copy
 <App>

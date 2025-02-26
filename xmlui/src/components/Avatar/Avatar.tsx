@@ -4,7 +4,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { sizeMd } from "../../components/abstractions";
-import { Avatar } from "./AvatarNative";
+import { Avatar, defaultProps } from "./AvatarNative";
 
 const COMP = "Avatar";
 
@@ -12,9 +12,20 @@ export const AvatarMd = createMetadata({
   description:
     `The \`${COMP}\` component represents a user, group (or other entity's) avatar with a small image or initials.`,
   props: {
-    size: d(`This property defines the display size of the ${COMP}.`, sizeMd, "string", "sm"),
-    name: d(`This property sets the name value the ${COMP} uses to display initials.`),
-    url: d(`This property specifies the URL of the image to display in the ${COMP}.`),
+    size: {
+      description: `This property defines the display size of the ${COMP}.`,
+      availableValues: sizeMd,
+      valueType: "string",
+      defaultValue: defaultProps.size,
+    },
+    name: {
+      description: `This property sets the name value the ${COMP} uses to display initials.`,
+      valueType: "string",
+    },
+    url: {
+      description: `This property specifies the URL of the image to display in the ${COMP}.`,
+      valueType: "string",
+    },
   },
   events: {
     click: d("This event is triggered when the avatar is clicked."),

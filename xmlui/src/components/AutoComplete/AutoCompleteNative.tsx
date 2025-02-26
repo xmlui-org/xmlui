@@ -1,8 +1,8 @@
 import {
-  CSSProperties,
-  ForwardedRef,
+  type CSSProperties,
+  type ForwardedRef,
   forwardRef,
-  ReactNode,
+  type ReactNode,
   useId,
   useCallback,
   useEffect,

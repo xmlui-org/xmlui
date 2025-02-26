@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useMemo, useState, ForwardedRef } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useState, type ForwardedRef } from "react";
 import * as RAccordion from "@radix-ui/react-accordion";
 
 import styles from "./Accordion.module.scss";
@@ -19,17 +19,27 @@ type Props = {
   onDisplayDidChange?: (changedValue: string[]) => void;
 };
 
+export const propDefaults: Pick<
+  Props,
+  "hideIcon" | "collapsedIcon" | "triggerPosition" | "rotateExpanded"
+> = {
+  hideIcon: false,
+  collapsedIcon: "chevrondown",
+  triggerPosition: "end",
+  rotateExpanded: "180deg",
+};
+
 export const AccordionComponent = forwardRef(function AccordionComponent(
   {
     style,
     children,
-    hideIcon = false,
+    hideIcon = propDefaults.hideIcon,
     expandedIcon,
-    collapsedIcon = "chevrondown",
-    triggerPosition = "end",
+    collapsedIcon = propDefaults.collapsedIcon,
+    triggerPosition = propDefaults.triggerPosition,
     onDisplayDidChange = noop,
     registerComponentApi,
-    rotateExpanded = "180deg",
+    rotateExpanded = propDefaults.rotateExpanded,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -60,7 +70,7 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
         expandItem(id);
       }
     },
-    [setExpandedItems, expandedItems],
+    [collapseItem, expandItem, expandedItems],
   );
 
   const register = useCallback(

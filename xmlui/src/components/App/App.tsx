@@ -17,38 +17,55 @@ export const AppMd = createMetadata({
     `run-time configurable) structure templates, \`${COMP}\` allows you to display your ` +
     `preferred layout.`,
   props: {
-    layout: d(
-      `This property sets the layout template of the app. This setting determines the position ` +
+    layout: {
+      description: `This property sets the layout template of the app. This setting determines the position ` +
         `and size of the app parts (such as header, navigation bar, footer, etc.) and the app's ` +
         `scroll behavior.`,
-      appLayoutMd,
-    ),
-    loggedInUser: d(`Stores information about the currently logged in user.`),
+      availableValues: appLayoutMd,
+    },
+    loggedInUser: {
+      description: `Stores information about the currently logged in user.`,
+      valueType: "string",
+    },
     logoTemplate: dComponent("Optional template of the app logo"),
-    logo: d("Optional logo path"),
-    "logo-dark": d("Optional logo path in dark tone"),
-    "logo-light": d("Optional logo path in light tone"),
-    name: d("Optional application name (visible in the browser tab)"),
-    scrollWholePage: d(
-      `This boolean property specifies whether the whole page should scroll (\`true\`) or just ` +
+    logo: {
+      description: "Optional logo path",
+      valueType: "string",
+    },
+    "logo-dark": {
+      description: "Optional logo path in dark tone",
+      valueType: "string",
+    },
+    "logo-light": {
+      description: "Optional logo path in light tone",
+      valueType: "string",
+    },
+    name: {
+      description: "Optional application name (visible in the browser tab)",
+      valueType: "string",
+    },
+    scrollWholePage: {
+      description: `This boolean property specifies whether the whole page should scroll (\`true\`) or just ` +
         `the content area (\`false\`). The default value is \`true\`.`,
-      null,
-      "boolean",
-      true,
-    ),
-    noScrollbarGutters: d(
-      "This boolean property specifies whether the scrollbar gutters should be hidden.",
-      null,
-      "boolean",
-      false,
-    ),
-    defaultTone: d(
-      'This property sets the app\'s default tone ("light" or "dark").',
-      null,
-      "string",
-      "light",
-    ),
-    defaultTheme: d("This property sets the app's default theme.", null, "string", "xmlui"),
+      valueType: "boolean",
+      defaultValue: true,
+    },
+    noScrollbarGutters: {
+      description: "This boolean property specifies whether the scrollbar gutters should be hidden.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    defaultTone: {
+      description: 'This property sets the app\'s default tone ("light" or "dark").',
+      valueType: "string",
+      defaultValue: "light",
+      availableValues: ["light", "dark"],
+    },
+    defaultTheme: {
+      description: "This property sets the app's default theme.",
+      valueType: "string",
+      defaultValue: "xmlui",
+    },
   },
   events: {
     ready: d(`This event fires when the \`${COMP}\` component finishes rendering on the page.`),

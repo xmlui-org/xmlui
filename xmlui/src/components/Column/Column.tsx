@@ -11,33 +11,45 @@ export const ColumnMd = createMetadata({
   props: {
     bindTo: {
       description: `Indicates what part of the data to lay out in the column.`,
-      isRequired: true,
+      valueType: "string",
     },
-    header: d(`Adds a label for a particular column.`),
-    width: d(
-      `This property defines the width of the column. You can use a numeric value, a pixel ` +
+    header: {
+      description: `Adds a label for a particular column.`,
+      valueType: "string",
+    },
+    width: {
+      description: `This property defines the width of the column. You can use a numeric value, a pixel ` +
         `value (such as \`100px\`), or a star size value (such as \`*\`, \`2*\`, etc.). ` +
         `You will get an error if you use any other unit (or value).`,
-    ),
-    minWidth: d(`Indicates the minimum width a particular column can have.`),
-    maxWidth: d(`Indicates the maximum width a particular column can have.`),
-    canSort: d(
-      `This property sets whether the user can sort by a column by clicking on its header ` +
+      valueType: "any",
+    },
+    minWidth: {
+      description: `Indicates the minimum width a particular column can have. Same rules apply as with [width](#width).`,
+      valueType: "any",
+    },
+    maxWidth: {
+      description: `Indicates the maximum width a particular column can have. Same rules apply as with [width](#width).`,
+      valueType: "any",
+    },
+    canSort: {
+      description: `This property sets whether the user can sort by a column by clicking on its header ` +
         `(\`true\`) or not (\`false\`).`,
-    ),
-    pinTo: d(
-      `This property allows the column to be pinned to ` +
-       `the \`left\` (left-to-right writing style) or \`right\` (left-to-right writing style) edge ` +
+      valueType: "boolean",
+    },
+    pinTo: {
+      description: `This property allows the column to be pinned to ` +
+        `the \`left\` (left-to-right writing style) or \`right\` (left-to-right writing style) edge ` +
         `of the table. If the writing style is right-to-left, the locations are switched.`,
-      ["left", "right"],
-      "string",
-    ),
-    canResize: d(
-      `This property indicates whether the user can resize the column. If set to ` +
+      availableValues: ["left", "right"],
+      valueType: "string",
+    },
+    canResize: {
+      description: `This property indicates whether the user can resize the column. If set to ` +
         `\`true\`, the column can be resized by dragging the column border. If set to ` +
         `\`false\`, the column cannot be resized. Double-clicking the column border ` +
         `resets to the original size.`,
-    ),
+      valueType: "boolean",
+    },
   },
   contextVars: {
     $item: {

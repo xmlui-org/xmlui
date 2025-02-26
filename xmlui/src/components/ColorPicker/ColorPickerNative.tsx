@@ -8,7 +8,6 @@ import type { ValidationStatus } from "../abstractions";
 import { useEvent } from "../../components-core/utils/misc";
 import styles from "./ColorPicker.module.scss";
 import classnames from "classnames";
-import { read } from "fs";
 
 type Props = {
   value?: string;
@@ -31,6 +30,16 @@ type Props = {
   validationStatus?: ValidationStatus;
 };
 
+export const defaultProps: Pick<
+  Props,
+  "initialValue" | "value" | "enabled" | "validationStatus"
+> = {
+  initialValue: "",
+  value: "",
+  enabled: true,
+  validationStatus: "none",
+};
+
 export const ColorPicker = forwardRef(
   (
     {
@@ -40,8 +49,8 @@ export const ColorPicker = forwardRef(
       onFocus = noop,
       onBlur = noop,
       registerComponentApi,
-      enabled = true,
-      value = "",
+      enabled = defaultProps.enabled,
+      value = defaultProps.value,
       autoFocus,
       tabIndex = -1,
       label,
@@ -49,8 +58,8 @@ export const ColorPicker = forwardRef(
       labelWidth,
       labelBreak,
       required,
-      validationStatus = "none",
-      initialValue,
+      validationStatus = defaultProps.validationStatus,
+      initialValue = defaultProps.initialValue,
     }: Props,
     forwardedRef: ForwardedRef<HTMLDivElement>,
   ) => {
@@ -112,6 +121,7 @@ export const ColorPicker = forwardRef(
         style={style}
         ref={forwardedRef}
       >
+        {/* Produces a 7 character RGB color output in hex as a string type */}
         <input
           className={classnames(styles.colorInput, {
             [styles.disabled]: !enabled,

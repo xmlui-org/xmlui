@@ -1,4 +1,4 @@
-import { ForwardedRef, forwardRef } from "react";
+import { type ForwardedRef, forwardRef } from "react";
 
 type Props = {
   style?: React.CSSProperties;
