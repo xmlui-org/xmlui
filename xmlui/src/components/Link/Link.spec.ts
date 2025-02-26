@@ -1,5 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
-import { initThemedApp } from "../../../../tests/tests/component-test-helpers";
+import { initThemedApp } from "../../testing/themed-app-test-helpers";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("component renders", async ({ initTestBed, createLinkDriver }) => {
