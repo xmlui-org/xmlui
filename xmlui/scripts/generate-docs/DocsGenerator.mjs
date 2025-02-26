@@ -83,10 +83,17 @@ export class DocsGenerator {
     }
   }
 
+  /**
+   * Generates the component summary table and adds it to the provided file.
+   * The function looks for the summary section in the provided file and regenerates it if present,
+   * otherwise it appends one to the end of the file.
+   * @param {string} summarySectionName The section to look for and add the summary to
+   * @param {string?} summaryFileName The full path and name of the file to add the summary to
+   */
   async generateComponentsSummary(summarySectionName = "Components", summaryFileName) {
     logger.info("Creating Component Summary");
     try {
-      const outFile = join(FOLDERS.pages, summaryFileName || `${basename(this.folders.sourceFolder)}.mdx`);
+      const outFile = summaryFileName || join(FOLDERS.pages, `${basename(this.folders.sourceFolder)}.mdx`);
       
       if (!existsSync(outFile)) {
         await writeFile(outFile, "");
