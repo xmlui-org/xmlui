@@ -28,7 +28,7 @@ export const Bookmark = ({ uid, level = 1, children, title, omitFromToc = false 
   }, [uid, observeIntersection, registerHeading, level, title, omitFromToc]);
 
   return (
-    <span ref={elementRef} id={uid}>
+    <span ref={elementRef} id={uid} data-anchor={true}>
       {children}
     </span>
   );

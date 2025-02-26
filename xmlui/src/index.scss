@@ -1,254 +1,479 @@
 @use "./components-core/theming/themes.scss" as t;
 
-/************************/
-/*    Normalization     */
-/************************/
 
-/* Normal box-sizing model */
-*, *::before, *::after {
-  box-sizing: border-box;
+@scope(#_ui-engine-theme-root){
+  :scope{
+    line-height: 1.5;
+    font-feature-settings: normal;
+    font-variation-settings: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  hr {
+    color: inherit;
+    border-top-width: 1px;
+    height: 0
+  }
+
+  abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    // font-size: inherit;
+    font-weight: inherit
+  }
+
+  a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit
+  }
+
+  b, strong {
+    font-weight: bolder
+  }
+
+  code, kbd, samp, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    font-size: 1em
+  }
+
+  small {
+    font-size: 80%
+  }
+
+  sub, sup {
+    vertical-align: baseline;
+    font-size: 75%;
+    line-height: 0;
+    position: relative
+  }
+
+  sub {
+    bottom: -.25em
+  }
+
+  sup {
+    top: -.5em
+  }
+
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse
+  }
+
+  button, input, optgroup, select, textarea {
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0
+  }
+
+  button, select {
+    text-transform: none
+  }
+
+  button {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none
+  }
+
+  [type=button] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none
+  }
+
+  [type=reset] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none
+  }
+
+  [type=submit] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none
+  }
+
+  :-moz-focusring {
+    outline: auto
+  }
+
+  :-moz-ui-invalid {
+    box-shadow: none
+  }
+
+  *:focus-visible {
+    outline: t.$focus-outline;
+    outline-offset: t.$offset-outline--focus;
+  }
+
+  progress {
+    vertical-align: baseline
+  }
+
+  ::-webkit-inner-spin-button {
+    height: auto
+  }
+
+  ::-webkit-outer-spin-button {
+    height: auto
+  }
+
+  [type=search] {
+    -webkit-appearance: textfield;
+    outline-offset: -2px
+  }
+
+  ::-webkit-search-decoration {
+    -webkit-appearance: none
+  }
+
+  ::-webkit-file-upload-button {
+    -webkit-appearance: button;
+    font: inherit
+  }
+
+  summary {
+    display: list-item
+  }
+
+  blockquote, dl, dd, h1, h2, h3, h4, h5, h6, hr, figure, p, pre {
+    margin: 0
+  }
+
+  fieldset {
+    margin: 0;
+    padding: 0
+  }
+
+  legend {
+    padding: 0
+  }
+
+  // ol, ul, menu {
+  //   margin: 0;
+  //   padding: 0;
+  //   list-style: none
+  // }
+
+  dialog {
+    padding: 0
+  }
+
+  textarea {
+    resize: vertical
+  }
+
+  input::-ms-input-placeholder {
+    opacity: 1;
+    color: #9ca3af
+  }
+
+  input::placeholder {
+    opacity: 1;
+    color: #9ca3af
+  }
+
+  textarea::-ms-input-placeholder {
+    opacity: 1;
+    color: #9ca3af
+  }
+
+  textarea::placeholder {
+    opacity: 1;
+    color: #9ca3af
+  }
+
+  button, [role=button] {
+    cursor: pointer
+  }
+
+  :disabled {
+    cursor: default
+  }
+
+  img, svg, video, canvas, audio, iframe, embed, object {
+    vertical-align: middle;
+    display: block
+  }
+
+  img, video {
+    max-width: 100%;
+    height: auto
+  }
+
+  [hidden] {
+    display: none
+  }
 }
 
-/* Allow percentage-based heights in the application */
-html, body, #root {
-  height: 100%;
-}
 
-/* Remove default margin */
-* {
-  margin: 0;
-}
+@layer base {
+  /************************/
+  /*    Normalization     */
+  /************************/
 
-html {
-  -webkit-text-size-adjust: 100%;
-  tab-size: 4;
-  font-feature-settings: normal;
-  font-variation-settings: normal;
-  line-height: 1.5
-}
+  /* Normal box-sizing model */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 
-body {
-  line-height: inherit;
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  /* Remove default margin */
+  * {
+    margin: 0;
+  }
 
-/* Create a root stacking context */
-#root, #__next {
-  isolation: isolate;
-}
+  /* Allow percentage-based heights in the application */
+  html, body {
+    height: 100%;
+  }
 
-//tailwind css preflight
-*, :before, :after {
-  box-sizing: border-box;
-  border: 0 solid #e5e7eb
-}
+  #root{
+    min-height: 100%;
+    height: 100%;
+  }
 
-hr {
-  color: inherit;
-  border-top-width: 1px;
-  height: 0
-}
 
-abbr:where([title]) {
-  -webkit-text-decoration: underline dotted;
-  text-decoration: underline dotted
-}
+  html {
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+    line-height: 1.5
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  // font-size: inherit;
-  font-weight: inherit
-}
+  body {
+    line-height: inherit;
+    margin: 0;
 
-a {
-  color: inherit;
-  -webkit-text-decoration: inherit;
-  text-decoration: inherit
-}
+  }
 
-b, strong {
-  font-weight: bolder
-}
+  /* Create a root stacking context */
+  #root, #__next {
+    isolation: isolate;
+  }
 
-code, kbd, samp, pre {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  font-size: 1em
-}
+  //tailwind css preflight
+  *, :before, :after {
+    box-sizing: border-box;
+    border: 0 solid #e5e7eb
+  }
 
-small {
-  font-size: 80%
-}
+  hr {
+    color: inherit;
+    border-top-width: 1px;
+    height: 0
+  }
 
-sub, sup {
-  vertical-align: baseline;
-  font-size: 75%;
-  line-height: 0;
-  position: relative
-}
+  abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted
+  }
 
-sub {
-  bottom: -.25em
-}
+  h1, h2, h3, h4, h5, h6 {
+    // font-size: inherit;
+    font-weight: inherit
+  }
 
-sup {
-  top: -.5em
-}
+  a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit
+  }
 
-table {
-  text-indent: 0;
-  border-color: inherit;
-  border-collapse: collapse
-}
+  b, strong {
+    font-weight: bolder
+  }
 
-button, input, optgroup, select, textarea {
-  font-feature-settings: inherit;
-  font-variation-settings: inherit;
-  font-family: inherit;
-  font-size: 100%;
-  font-weight: inherit;
-  line-height: inherit;
-  color: inherit;
-  margin: 0;
-  padding: 0
-}
+  code, kbd, samp, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    font-size: 1em
+  }
 
-button, select {
-  text-transform: none
-}
+  small {
+    font-size: 80%
+  }
 
-button {
-  -webkit-appearance: button;
-  background-color: transparent;
-  background-image: none
-}
+  sub, sup {
+    vertical-align: baseline;
+    font-size: 75%;
+    line-height: 0;
+    position: relative
+  }
 
-[type=button] {
-  -webkit-appearance: button;
-  background-color: transparent;
-  background-image: none
-}
+  sub {
+    bottom: -.25em
+  }
 
-[type=reset] {
-  -webkit-appearance: button;
-  background-color: transparent;
-  background-image: none
-}
+  sup {
+    top: -.5em
+  }
 
-[type=submit] {
-  -webkit-appearance: button;
-  background-color: transparent;
-  background-image: none
-}
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse
+  }
 
-:-moz-focusring {
-  outline: auto
-}
+  button, input, optgroup, select, textarea {
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin: 0;
+    padding: 0
+  }
 
-:-moz-ui-invalid {
-  box-shadow: none
-}
+  button, select {
+    text-transform: none
+  }
 
-*:focus-visible {
-  outline: t.$focus-outline;
-  outline-offset: t.$offset-outline--focus;
-}
+  button {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none
+  }
 
-progress {
-  vertical-align: baseline
-}
+  [type=button] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none
+  }
 
-::-webkit-inner-spin-button {
-  height: auto
-}
+  [type=reset] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none
+  }
 
-::-webkit-outer-spin-button {
-  height: auto
-}
+  [type=submit] {
+    -webkit-appearance: button;
+    background-color: transparent;
+    background-image: none
+  }
 
-[type=search] {
-  -webkit-appearance: textfield;
-  outline-offset: -2px
-}
+  :-moz-focusring {
+    outline: auto
+  }
 
-::-webkit-search-decoration {
-  -webkit-appearance: none
-}
+  :-moz-ui-invalid {
+    box-shadow: none
+  }
 
-::-webkit-file-upload-button {
-  -webkit-appearance: button;
-  font: inherit
-}
+  *:focus-visible {
+    outline: t.$focus-outline;
+    outline-offset: t.$offset-outline--focus;
+  }
 
-summary {
-  display: list-item
-}
+  progress {
+    vertical-align: baseline
+  }
 
-blockquote, dl, dd, h1, h2, h3, h4, h5, h6, hr, figure, p, pre {
-  margin: 0
-}
+  ::-webkit-inner-spin-button {
+    height: auto
+  }
 
-fieldset {
-  margin: 0;
-  padding: 0
-}
+  ::-webkit-outer-spin-button {
+    height: auto
+  }
 
-legend {
-  padding: 0
-}
+  [type=search] {
+    -webkit-appearance: textfield;
+    outline-offset: -2px
+  }
 
-// ol, ul, menu {
-//   margin: 0;
-//   padding: 0;
-//   list-style: none
-// }
+  ::-webkit-search-decoration {
+    -webkit-appearance: none
+  }
 
-dialog {
-  padding: 0
-}
+  ::-webkit-file-upload-button {
+    -webkit-appearance: button;
+    font: inherit
+  }
 
-textarea {
-  resize: vertical
-}
+  summary {
+    display: list-item
+  }
 
-input::-ms-input-placeholder {
-  opacity: 1;
-  color: #9ca3af
-}
+  blockquote, dl, dd, h1, h2, h3, h4, h5, h6, hr, figure, p, pre {
+    margin: 0
+  }
 
-input::placeholder {
-  opacity: 1;
-  color: #9ca3af
-}
+  fieldset {
+    margin: 0;
+    padding: 0
+  }
 
-textarea::-ms-input-placeholder {
-  opacity: 1;
-  color: #9ca3af
-}
+  legend {
+    padding: 0
+  }
 
-textarea::placeholder {
-  opacity: 1;
-  color: #9ca3af
-}
+  // ol, ul, menu {
+  //   margin: 0;
+  //   padding: 0;
+  //   list-style: none
+  // }
 
-button, [role=button] {
-  cursor: pointer
-}
+  dialog {
+    padding: 0
+  }
 
-:disabled {
-  cursor: default
-}
+  textarea {
+    resize: vertical
+  }
 
-img, svg, video, canvas, audio, iframe, embed, object {
-  vertical-align: middle;
-  display: block
-}
+  input::-ms-input-placeholder {
+    opacity: 1;
+    color: #9ca3af
+  }
 
-img, video {
-  max-width: 100%;
-  height: auto
-}
+  input::placeholder {
+    opacity: 1;
+    color: #9ca3af
+  }
 
-[hidden] {
-  display: none
+  textarea::-ms-input-placeholder {
+    opacity: 1;
+    color: #9ca3af
+  }
+
+  textarea::placeholder {
+    opacity: 1;
+    color: #9ca3af
+  }
+
+  button, [role=button] {
+    cursor: pointer
+  }
+
+  :disabled {
+    cursor: default
+  }
+
+  img, svg, video, canvas, audio, iframe, embed, object {
+    vertical-align: middle;
+    display: block
+  }
+
+  img, video {
+    max-width: 100%;
+    height: auto
+  }
+
+  [hidden] {
+    display: none
+  }
 }

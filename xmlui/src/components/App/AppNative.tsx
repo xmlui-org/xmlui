@@ -163,9 +163,11 @@ export function App({
     return {
       "--header-height": !scrollWholePage ? 0 : headerHeight + "px",
       "--footer-height": !scrollWholePage ? 0 : footerHeight + "px",
-      "--scrollbar-width": scrollbarWidth + "px",
+      "--header-abs-height": headerHeight + "px",
+      "--footer-abs-height": footerHeight + "px",
+      "--scrollbar-width": noScrollbarGutters ? 0 : (scrollbarWidth + "px"),
     } as CSSProperties;
-  }, [footerHeight, headerHeight, scrollWholePage, scrollbarWidth]);
+  }, [footerHeight, headerHeight, noScrollbarGutters, scrollWholePage, scrollbarWidth]);
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const location = useLocation();
@@ -175,7 +177,11 @@ export function App({
   }, []);
 
   useLayoutEffect(() => {
-    scrollPageContainerRef.current?.scrollTo(0, 0);
+    scrollContainerRef.current?.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant", // Optional if you want to skip the scrolling animation
+    });
   }, [location.pathname]);
 
   const layoutContextValue = useMemo<IAppLayoutContext>(() => {

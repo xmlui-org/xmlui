@@ -7,9 +7,10 @@ import {
   useRef,
   useState,
 } from "react";
-import scrollIntoView from "scroll-into-view-if-needed";
+import { useScrollEventHandler, useScrollParent } from "./utils/hooks";
+import { useLocation } from "@remix-run/react";
 
-// --- Stores the information about a particular heading to be displeyed in the TOC.
+// --- Stores the information about a particular heading to be displayed in the TOC.
 type HeadingItem = {
   // --- The id of the heading.
   id: string;
@@ -61,13 +62,24 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
   const [activeId, setActiveId] = useState<string | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
   const initialHeading = useRef<HTMLElement | null>(null);
+  const thisRef = useRef({
+    suspendPositionBasedSetActiveId: false,
+  });
+  const scrollParent = useScrollParent(Object.values(headings)?.[0]?.anchor);
+  useScrollEventHandler(scrollParent, {
+    onScrollEnd: useCallback(() => {
+      thisRef.current.suspendPositionBasedSetActiveId = false;
+    }, []),
+  });
 
   useEffect(() => {
     if (observeIntersection) {
       const handleObserver = (entries: any) => {
         entries.forEach((entry: any) => {
           if (entry?.isIntersecting) {
-            setActiveId(entry.target.id);
+            if (!thisRef.current.suspendPositionBasedSetActiveId) {
+              setActiveId(entry.target.id);
+            }
           }
         });
       };
@@ -101,6 +113,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
   const setActiveAnchorId = useCallback(
     (id: string) => {
       if (headings[id]) {
+        thisRef.current.suspendPositionBasedSetActiveId = true;
         setActiveId(id);
       }
     },
@@ -118,24 +131,24 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     });
   }, [headings]);
 
+  const location = useLocation();
   useEffect(() => {
-    const hash = window.location.hash;
+    const hash = location.hash;
     if (hash) {
-      if (initialHeading?.current) {
+      if (initialHeading.current) {
         return;
       } else {
         initialHeading.current = sortedHeadings.find((value) => `#${value.id}` === hash)?.anchor;
         if (initialHeading.current) {
-          scrollIntoView(initialHeading.current, {
+          initialHeading.current.scrollIntoView({
             block: "start",
             inline: "start",
             behavior: "instant",
-            scrollMode: "always",
           });
         }
       }
     }
-  }, [sortedHeadings]);
+  }, [location.hash, sortedHeadings]);
 
   const contextValue: ITableOfContentsContext = useMemo(() => {
     return {

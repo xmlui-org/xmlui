@@ -21,17 +21,10 @@
     "generate-docs": "node scripts/generate-docs/get-docs.mjs"
   },
   "dependencies": {
-    "@azure/msal-browser": "2.30.0",
-    "@azure/msal-react": "1.4.9",
     "@eslint-community/regexpp": "4.10.0",
     "@formkit/auto-animate": "0.7.0",
-    "@headlessui/react": "1.7.16",
     "@modyfi/vite-plugin-yaml": "1.1.0",
     "@monaco-editor/react": "4.4.6",
-    "@nivo/bar": "0.87.0",
-    "@nivo/core": "0.87.0",
-    "@nivo/geo": "0.87.0",
-    "@nivo/pie": "0.87.0",
     "@popperjs/core": "2.11.6",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.2",
@@ -52,14 +45,12 @@
     "@types/color": "3.0.6",
     "@vitejs/plugin-react": "4.3.0",
     "adm-zip": "0.5.10",
-    "apexcharts": "3.44.0",
     "axios": "1.7.7",
     "cmdk": "^1.0.4",
     "color": "4.2.3",
     "date-fns": "2.30.0",
     "dexie": "3.2.4",
     "dotenv": "16.3.1",
-    "downshift": "8.2.3",
     "embla-carousel-autoplay": "^8.3.0",
     "embla-carousel-react": "^8.3.0",
     "emoji-picker-react": "4.4.10",
@@ -71,7 +62,6 @@
     "msw": "2.0.1",
     "oidc-client-ts": "2.1.0",
     "react": "18.2.0",
-    "react-apexcharts": "1.4.1",
     "react-currency-input-field": "3.6.9",
     "react-datepicker": "4.25.0",
     "react-day-picker": "8.10.1",
@@ -83,11 +73,11 @@
     "react-imask": "7.1.3",
     "react-markdown": "^9.0.1",
     "react-measure": "2.5.2",
-    "react-oidc-context": "2.2.0",
     "react-popper": "2.3.0",
     "react-resizable-panels": "2.0.19",
     "react-router-dom": "6.23.0",
     "react-select": "5.7.4",
+    "react-sticky-el": "^2.1.1",
     "react-textarea-autosize": "8.5.3",
     "react-virtualized-auto-sizer": "1.0.24",
     "react-window": "1.8.10",
@@ -170,6 +160,10 @@
         "./index.scss": {
           "import": "./src/index.scss",
           "require": "./src/index.scss"
+        },
+        "./vite-ueml-plugin": {
+          "import": "./dist/scripts/bin/vite-ueml-plugin.js",
+          "require": "./dist/scripts/bin/vite-ueml-plugin.js"
         }
       }
     }
@@ -186,6 +180,10 @@
     },
     "./themes.scss": {
       "import": "./src/components-core/theming/_themes.scss"
+    },
+    "./vite-ueml-plugin": {
+      "import": "./bin/vite-ueml-plugin.js",
+      "require": "./bin/vite-ueml-plugin.js"
     }
   },
   "browserslist": {

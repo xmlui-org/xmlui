@@ -44,7 +44,6 @@ import { NumberBoxMd } from "./NumberBox/NumberBox";
 import { OffCanvasMd } from "./OffCanvas/OffCanvas";
 import { PageMetaTitleMd } from "./PageMetaTitle/PageMetaTitle";
 import { PageMd, PagesMd } from "./Pages/Pages";
-import { PdfMd } from "./Pdf/LazyPdf";
 import { PositionedContainerMd } from "./PositionedContainer/PositionedContainer";
 import { ProgressBarMd } from "./ProgressBar/ProgressBar";
 import { QueueMd } from "./Queue/Queue";
@@ -359,7 +358,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Page: PageMd,
   PageHeader: PageHeaderMd,
   Pages: PagesMd,
-  Pdf: PdfMd,
   PositionedContainer: PositionedContainerMd,
   ProgressBar: ProgressBarMd,
   Queue: QueueMd,

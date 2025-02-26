@@ -21,7 +21,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
   width: createThemeVar("width-TableOfContents");
   align-self: flex-start;
   height: createThemeVar("height-TableOfContents");
-  max-height: calc(100vh - 70px);
+  max-height: calc(100vh - var(--header-abs-height) - var(--footer-abs-height));
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 99;

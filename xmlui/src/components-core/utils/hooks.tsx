@@ -234,3 +234,90 @@ export function useReferenceTrackedApi(componentState: ContainerState) {
  */
 export const useIsomorphicLayoutEffect =
   typeof document !== "undefined" ? useLayoutEffect : useEffect;
+
+
+// https://stackoverflow.com/a/49186677
+function getScrollParent(element: HTMLElement) {
+  let style = getComputedStyle(element);
+  const excludeStaticParent = style.position === "absolute";
+  const overflowRegex = /(auto|scroll)/;
+
+  if (style.position === "fixed") {
+    return document.body;
+  }
+  for (let parent = element; ; parent = parent.parentElement) {
+    style = getComputedStyle(parent);
+    if (excludeStaticParent && style.position === "static") {
+      continue;
+    }
+    if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {
+      return parent;
+    }
+  }
+
+  return document.body;
+}
+
+export const useScrollParent = (element?: HTMLElement): HTMLElement => {
+  const [scrollParent, setScrollParent] = useState<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    setScrollParent(element ? getScrollParent(element) : null);
+  }, [element]);
+  return scrollParent;
+};
+
+
+// because safari doesn't support scrollend event...
+export const useScrollEventHandler = (
+  element: HTMLElement | null | undefined,
+  {
+    onScrollStart,
+    onScrollEnd,
+  }: {
+    onScrollStart?: () => void;
+    onScrollEnd?: () => void;
+  },
+) => {
+  const thisRef = useRef({scrolling: false});
+  useLayoutEffect(() => {
+    let timer;
+    let listener = () => {
+      if(!thisRef.current.scrolling){
+        onScrollStart?.();
+      }
+      thisRef.current.scrolling = true;
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        thisRef.current.scrolling = false;
+        onScrollEnd?.();
+      }, 50);
+    };
+    element?.addEventListener("scroll", listener);
+    return () => {
+      element?.removeEventListener("scroll", listener);
+    };
+  }, [element, onScrollEnd, onScrollStart]);
+};
+
+function realBackgroundColor(elem: HTMLElement) {
+  let transparent = "rgba(0, 0, 0, 0)";
+  let transparentIE11 = "transparent";
+  if (!elem) return transparent;
+
+  let bg = getComputedStyle(elem).backgroundColor;
+  if (bg === transparent || bg === transparentIE11) {
+    return realBackgroundColor(elem.parentElement);
+  } else {
+    return bg;
+  }
+}
+
+
+export const useRealBackground = (element: HTMLElement)=>{
+  const { activeThemeTone, activeThemeId } = useTheme();
+  const [counter, setCounter] = useState(0);
+  useEffect(()=>{
+    return setCounter(prev => prev + 1);
+  }, [activeThemeTone, activeThemeId]);
+  return useMemo(()=> element ? realBackgroundColor(element) : 'transparent', [element, counter]);
+}

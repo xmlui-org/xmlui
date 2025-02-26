@@ -59,6 +59,7 @@ export const AppMd = createMetadata({
     [`max-content-width-${COMP}`]: "$max-content-width",
     [`shadow-header-${COMP}`]: "$shadow-spread",
     [`shadow-pages-${COMP}`]: "$shadow-spread",
+    [`scroll-padding-block-Pages`]: "$space-4",
     light: {
       // --- No light-specific theme vars
     },
