@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from "fs";
+import { existsSync, readdirSync, statSync, unlinkSync } from "fs";
 import { posix } from "path";
 import { logger } from "./logger.mjs";
 
@@ -146,4 +146,27 @@ export function toHeadingPath(rawStr) {
     .replaceAll(/[^A-Za-z0-9-]/g, "-")
     .replaceAll(/--+/g, "-")
     .replace(/^-|-$/, "");
+}
+
+/**
+ * 
+ * @param {string} rawStr 
+ * @returns {string} 
+ */
+export function fromKebabtoCamelCase(rawStr) {
+  return rawStr
+    .trim()
+    .split("-")
+    .map((n) => n[0].toUpperCase() + n.slice(1))
+    .join(" ");
+}
+
+/**
+ * Deletes a file if it exists
+ * @param {string} filePath the full path of the file to delete
+ */
+export function deleteFileIfExists(filePath) {
+  if (existsSync(filePath)) {
+    unlinkSync(filePath);
+  }
 }
