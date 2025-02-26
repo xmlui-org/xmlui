@@ -5,32 +5,44 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dClick } from "../metadata-helpers";
 import { orientationOptionMd } from "../abstractions";
-import { Card, DEFAULT_ORIENTATION } from "./CardNative";
+import { Card, defaultProps } from "./CardNative";
 
 const COMP = "Card";
 
 export const CardMd = createMetadata({
   description: `The \`${COMP}\` component is a container for cohesive elements, often rendered visually as a card.`,
   props: {
-    avatarUrl: d(
-      `Show the avatar (\`true\`) or not (\`false\`). If not specified, the ${COMP} will show the ` +
+    avatarUrl: {
+      description: `Show the avatar (\`true\`) or not (\`false\`). If not specified, the ${COMP} will show the ` +
         `first letters of the [\`title\`](#title).`,
-    ),
-    showAvatar: d(`Indicates whether the ${COMP} should be displayed`, null, "boolean"),
-    title: d(`This prop sets the prestyled title.`),
-    subtitle: d(`This prop sets the prestyled subtitle.`),
-    linkTo: d(
-      `This property wraps the title in a \`Link\` component that is clickable to navigate.`,
-    ),
-    orientation: d(
-      `An optional property that governs the ${COMP}'s orientation ` +
+      type: "string",
+    },
+    showAvatar: {
+      description: `Indicates whether the ${COMP} should be displayed`,
+      valueType: "boolean",
+      defaultValue: defaultProps.showAvatar,
+    },
+    title: {
+      description: `This prop sets the prestyled title.`,
+      valueType: "string",
+    },
+    subtitle: {
+      description: `This prop sets the prestyled subtitle.`,
+      valueType: "string",
+    },
+    linkTo: {
+      description: `This property wraps the title in a \`Link\` component that is clickable to navigate.`,
+      valueType: "string",
+    },
+    orientation: {
+      description: `An optional property that governs the ${COMP}'s orientation ` +
         `(whether the ${COMP} lays out its children in a row or a column). ` +
         `If the orientation is set to \`horizontal\`, the ${COMP} will display `+
         `its children in a row, except for its [\`title\`](#title) and [\`subtitle\`](#subtitle).`,
-      orientationOptionMd,
-      "string",
-      DEFAULT_ORIENTATION,
-    ),
+      availableValues: orientationOptionMd,
+      valueType: "string",
+      defaultValue: defaultProps.orientation,
+    },
   },
   events: {
     click: dClick(COMP),

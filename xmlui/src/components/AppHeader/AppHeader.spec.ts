@@ -1,5 +1,5 @@
 import { test, expect } from "../../testing/fixtures";
-import { initThemedApp } from "../../../../tests/tests/component-test-helpers";
+import { initThemedApp } from "../../testing/themed-app-test-helpers";
 
 const APPHEADER_CODE = `
   <AppHeader testId="appHeader">

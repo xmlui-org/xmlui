@@ -4,7 +4,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dComponent } from "../../components/metadata-helpers";
-import { Backdrop } from "./BackdropNative";
+import { Backdrop, defaultProps } from "./BackdropNative";
 
 const COMP = "Backdrop";
 
@@ -20,8 +20,16 @@ export const BackdropMd = createMetadata({
       "This property defines the component template for an optional overlay to display " +
         "over the component.",
     ),
-    backgroundColor: d("The background color of the backdrop.", null, "string", "black"),
-    opacity: d("The opacity of the backdrop.", null, "number", 0.1),
+    backgroundColor: {
+      description: "The background color of the backdrop.",
+      valueType: "string",
+      defaultValue: defaultProps.backgroundColor,
+    },
+    opacity: {
+      description: "The opacity of the backdrop.",
+      valueType: "number",
+      defaultValue: 0.1,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
 });

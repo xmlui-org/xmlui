@@ -58,37 +58,6 @@ The `Badge` component supports the mapping of a list of colors using the `value`
   `}
 />
 
-### `forceIndicator`
-
-(**NOT IMPLEMENTED YET**) This property forces the display of the indicator, even if the `indicatorText` property is not defined or empty.
-
-### `indicatorPosition`
-
-(**NOT IMPLEMENTED YET**) The position of the indicator.
-
-The value of this optional property sets the string to provide a color scheme for the Alert.
-
-| Value          | Description                                                          |
-| :------------- | :------------------------------------------------------------------- |
-| `start`        | The indicator is displayed within the badge before its text          |
-| `end`          | The indicator is displayed within the badge after its text           |
-| `top-start`    | The indicator is displayed over the badge in the top-start corner    |
-| `top-end`      | The indicator is displayed over the badge in the top-end corner      |
-| `bottom-start` | The indicator is displayed over the badge in the bottom-start corner |
-| `bottom-end`   | The indicator is displayed over the badge in the bottom-end corner   |
-
-### `indicatorText`
-
-(**NOT IMPLEMENTED YET**) This property defines the text to display in the indicator. If it is not defined or empty, no indicator is displayed unless the `forceIndicator` property is set.
-
-### `indicatorThemeColor`
-
-(**NOT IMPLEMENTED YET**) The theme color of the indicator.
-
-### `themeColor`
-
-(**NOT IMPLEMENTED YET**) The theme color of the component.
-
 ### `value (required)`
 
 The text that the component displays
@@ -107,9 +76,11 @@ The text that the component displays
     </App>  
   `} />
 
-### `variant`
+### `variant (default: "badge")`
 
 Modifies the shape of the component. Comes in the regular `badge` variant or the `pill` variant with fully rounded corners.
+
+Available values: `badge` **(default)**, `pill`
 
 ```ueml copy
 <App>
@@ -166,21 +137,35 @@ There are also variant specific styling options:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [border](../styles-and-themes/common-units/#border)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)-Badge | 0px solid $color-border | 0px solid $color-border |
+| [border](../styles-and-themes/common-units/#border)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border-bottom](../styles-and-themes/common-units/#border)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-bottom](../styles-and-themes/common-units/#border)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border](../styles-and-themes/common-units/#border)-horizontal-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)-horizontal-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border-left](../styles-and-themes/common-units/#border)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-left](../styles-and-themes/common-units/#border)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border-right](../styles-and-themes/common-units/#border)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-right](../styles-and-themes/common-units/#border)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border-top](../styles-and-themes/common-units/#border)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-top](../styles-and-themes/common-units/#border)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border](../styles-and-themes/common-units/#border)-vertical-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)-vertical-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-Badge | rgba($color-secondary-500-rgb, .6) | rgba($color-secondary-500-rgb, .6) |
 | [color-border](../styles-and-themes/common-units/#color)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border-bottom](../styles-and-themes/common-units/#color)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border-bottom](../styles-and-themes/common-units/#color)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border-horizontal](../styles-and-themes/common-units/#color)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border-horizontal](../styles-and-themes/common-units/#color)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border-top](../styles-and-themes/common-units/#color)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border-top](../styles-and-themes/common-units/#color)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border-vertical](../styles-and-themes/common-units/#color)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border-vertical](../styles-and-themes/common-units/#color)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Badge | white | $color-surface-50 |
 | [font-size](../styles-and-themes/common-units/#size)-Badge | 0.8em | 0.8em |
 | [font-size](../styles-and-themes/common-units/#size)-Badge-pill | 0.8em | 0.8em |
@@ -202,21 +187,39 @@ There are also variant specific styling options:
 | [padding-vertical](../styles-and-themes/common-units/#size)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-Badge | 4px | 4px |
 | [radius](../styles-and-themes/common-units/#border-rounding)-end-end-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-end-end-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-end-start-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-end-start-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-start-end-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-start-end-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-start-start-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-start-start-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border](../styles-and-themes/common-units/#border-style)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-bottom](../styles-and-themes/common-units/#border-style)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-bottom](../styles-and-themes/common-units/#border-style)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-horizontal](../styles-and-themes/common-units/#border-style)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-horizontal](../styles-and-themes/common-units/#border-style)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-left](../styles-and-themes/common-units/#border-style)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-left](../styles-and-themes/common-units/#border-style)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-right](../styles-and-themes/common-units/#border-style)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-right](../styles-and-themes/common-units/#border-style)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-top](../styles-and-themes/common-units/#border-style)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-top](../styles-and-themes/common-units/#border-style)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-vertical](../styles-and-themes/common-units/#border-style)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border-vertical](../styles-and-themes/common-units/#border-style)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border](../styles-and-themes/common-units/#size)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border-bottom](../styles-and-themes/common-units/#size)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-bottom](../styles-and-themes/common-units/#size)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border-horizontal](../styles-and-themes/common-units/#size)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-horizontal](../styles-and-themes/common-units/#size)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border-left](../styles-and-themes/common-units/#size)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-left](../styles-and-themes/common-units/#size)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border-right](../styles-and-themes/common-units/#size)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-right](../styles-and-themes/common-units/#size)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border-top](../styles-and-themes/common-units/#size)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-top](../styles-and-themes/common-units/#size)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border-vertical](../styles-and-themes/common-units/#size)-Badge | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border-vertical](../styles-and-themes/common-units/#size)-Badge-pill | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 

@@ -1,9 +1,9 @@
 import styles from "./AppHeader.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { borderSubject, paddingSubject } from "../../components-core/theming/themes/base-utils";
+import { paddingSubject } from "../../components-core/theming/themes/base-utils";
 import { dComponent } from "../../components/metadata-helpers";
 import { SlotItem } from "../../components/SlotItem";
 import { AppContextAwareAppHeader } from "./AppHeaderNative";
@@ -25,8 +25,15 @@ export const AppHeaderMd = createMetadata({
       `This property defines the template to use for the title. With this property, you can ` +
         `construct your custom title instead of using a single image.`,
     ),
-    title: d("Title for the application logo"),
-    showLogo: d("Show the logo in the header", null, "boolean", true),
+    title: {
+      description: "Title for the application logo",
+      valueType: "string",
+    },
+    showLogo: {
+      description: "Show the logo in the header",
+      valueType: "boolean",
+      defaultValue: true,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -54,7 +61,7 @@ export const appHeaderComponentRenderer = createComponentRenderer(
     const titleTemplate = node.props.titleTemplate || node.slots?.titleSlot;
     return (
       <AppContextAwareAppHeader
-        profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))}
+        profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))} // NOTE: if this a component template, why is the default true?
         title={extractValue(node.props.title)}
         showLogo={extractValue.asOptionalBoolean(node.props.showLogo, true)}
         titleContent={

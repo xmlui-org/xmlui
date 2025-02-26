@@ -4,7 +4,8 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dDidChange } from "../metadata-helpers";
-import { CarouselComponent } from "./CarouselNative";
+import { CarouselComponent, defaultProps } from "./CarouselNative";
+import { orientationOptionMd } from "../abstractions";
 
 const COMP = "Carousel";
 
@@ -14,43 +15,64 @@ export const CarouselMd = createMetadata({
     `This component displays a slideshow by cycling through elements (images, text, or ` +
     `custom slides) like a carousel.`,
   props: {
-    orientation: d(
-      "This property indicates the orientation of the carousel. The `horizontal` value indicates that the carousel moves horizontally, and the `vertical` value indicates that the carousel moves vertically.",
-      ["horizontal", "vertical"],
-      null,
-      "horizontal",
-    ),
-    indicators: d(
-      "This property indicates whether the carousel displays the indicators.",
-      null,
-      null,
-      "true",
-    ),
-    controls: d(
-      "This property indicates whether the carousel displays the controls.",
-      null,
-      null,
-      "true",
-    ),
-    autoplay: d(
-      "This property indicates whether the carousel automatically scrolls.",
-      null,
-      null,
-      "false",
-    ),
-    loop: d("This property indicates whether the carousel loops.", null, null, "false"),
-    startIndex: d(
-      "This property indicates the index of the first slide to display.",
-      null,
-      null,
-      "0",
-    ),
-    transitionDuration: d("This property specifies the duration of the transition between slides."),
-    autoplayInterval: d("This property specifies the interval between autoplay transitions."),
-    stopAutoplayOnInteraction: d("This property indicates whether autoplay stops on interaction."),
-    prevIcon: d("This property specifies the icon to display for the previous control."),
-    nextIcon: d("This property specifies the icon to display for the next control."),
-    keyboard: d("This property indicates whether the carousel responds to keyboard events."),
+    orientation: {
+      description: "This property indicates the orientation of the carousel. The `horizontal` value indicates that the carousel moves horizontally, and the `vertical` value indicates that the carousel moves vertically.",
+      availableValues: orientationOptionMd,
+      valueType: "string",
+      defaultValue: defaultProps.orientation,
+    },
+    indicators: {
+      description: "This property indicates whether the carousel displays the indicators.",
+      valueType: "boolean",
+      defaultValue: defaultProps.indicators,
+    },
+    controls: {
+      description: "This property indicates whether the carousel displays the controls.",
+      valueType: "boolean",
+      defaultValue: defaultProps.controls,
+    },
+    autoplay: {
+      description: "This property indicates whether the carousel automatically scrolls.",
+      valueType: "boolean",
+      defaultValue: defaultProps.autoplay,
+    },
+    loop: {
+      description: "This property indicates whether the carousel loops.",
+      valueType: "boolean",
+      defaultValue: defaultProps.loop,
+    },
+    startIndex: {
+      description: "This property indicates the index of the first slide to display.",
+      valueType: "number",
+      defaultValue: defaultProps.startIndex,
+    },
+    transitionDuration: {
+      description: "This property indicates the duration of the transition between slides.",
+      valueType: "number",
+      defaultValue: defaultProps.transitionDuration,
+    },
+    autoplayInterval: {
+      description: "This property specifies the interval between autoplay transitions.",
+      valueType: "number",
+      defaultValue: defaultProps.autoplayInterval,
+    },
+    stopAutoplayOnInteraction: {
+      description: "This property indicates whether autoplay stops on interaction.",
+      valueType: "boolean",
+      defaultValue: defaultProps.stopAutoplayOnInteraction,
+    },
+    prevIcon: {
+      description: "This property specifies the icon to display for the previous control.",
+      valueType: "string",
+    },
+    nextIcon: {
+      description: "This property specifies the icon to display for the next control.",
+      valueType: "string",
+    },
+    keyboard: {
+      description: "This property indicates whether the carousel responds to keyboard events.",
+      valueType: "boolean",
+    },
   },
   events: {
     displayDidChange: dDidChange(COMP),

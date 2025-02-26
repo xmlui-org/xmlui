@@ -32,25 +32,27 @@ export function dDidChange(comp: string): ComponentPropertyMetadata {
   };
 }
 
-export function dIndeterminate(): ComponentPropertyMetadata {
+export function dIndeterminate(defaultValue?: boolean): ComponentPropertyMetadata {
   return {
     description:
       `The \`true\` value of this property signals that the component is in an ` +
       `_intedeterminate state_.`,
+    defaultValue,
   };
 }
 
 export function dLabel(): ComponentPropertyMetadata {
   return {
     description: `This property sets the label of the component.`,
+    valueType: "string",
   };
 }
 
-export function dLabelPosition(def?: any): ComponentPropertyMetadata {
+export function dLabelPosition(def?: string): ComponentPropertyMetadata {
   return {
     description: `Places the label at the given position of the component.`,
     availableValues: labelPositionMd,
-    defaultValue: def,
+    defaultValue: def ?? "top",
   };
 }
 
@@ -79,24 +81,26 @@ export function dAutoFocus(): ComponentPropertyMetadata {
   };
 }
 
-export function dInitialValue(def?: any): ComponentPropertyMetadata {
+export function dInitialValue(value?: any): ComponentPropertyMetadata {
   return {
     description: `This property sets the component's initial value.`,
-    defaultValue: def,
+    defaultValue: value,
   };
 }
 
-export function dReadonly(): ComponentPropertyMetadata {
+export function dReadonly(readOnly?: boolean): ComponentPropertyMetadata {
   return {
     description: `Set this property to \`true\` to disallow changing the component value.`,
+    valueType: "boolean",
+    defaultValue: readOnly ?? false,
   };
 }
 
-export function dEnabled(): ComponentPropertyMetadata {
+export function dEnabled(isEnabled?: boolean): ComponentPropertyMetadata {
   return {
     description: `This boolean property value indicates whether the component responds to user events (\`true\`) or not (\`false\`).`,
     valueType: "boolean",
-    defaultValue: true,
+    defaultValue: isEnabled ?? true,
   };
 }
 
@@ -109,10 +113,11 @@ export function dMulti(): ComponentPropertyMetadata {
   };
 }
 
-export function dValidationStatus(): ComponentPropertyMetadata {
+export function dValidationStatus(value?: string): ComponentPropertyMetadata {
   return {
     description: `This property allows you to set the validation status of the input component.`,
     availableValues: validationStatusMd,
+    defaultValue: value ?? "none",
   };
 }
 
@@ -142,12 +147,14 @@ export function dComponent(description: string): ComponentPropertyMetadata {
 export function dPlaceholder(): ComponentPropertyMetadata {
   return {
     description: `A placeholder text that is visible in the input field when its empty.`,
+    valueType: "string",
   };
 }
 
 export function dMaxLength(): ComponentPropertyMetadata {
   return {
     description: `This property sets the maximum length of the input it accepts.`,
+    valueType: "number",
   };
 }
 
@@ -156,6 +163,7 @@ export function dRequired(): ComponentPropertyMetadata {
     description:
       `Set this property to \`true\` to indicate it must have a value ` +
       `before submitting the containing form.`,
+    valueType: "boolean",
   };
 }
 
@@ -164,6 +172,7 @@ export function dStartText(): ComponentPropertyMetadata {
     description:
       `This property sets a text to appear at the start (left side when the ` +
       `left-to-right direction is set) of the input.`,
+    valueType: "string",
   };
 }
 
@@ -172,6 +181,7 @@ export function dStartIcon(): ComponentPropertyMetadata {
     description:
       `This property sets an icon to appear at the start (left side when the ` +
       `left-to-right direction is set) of the input.`,
+    valueType: "string",
   };
 }
 
@@ -180,6 +190,7 @@ export function dEndText(): ComponentPropertyMetadata {
     description:
       `This property sets a text to appear on the end (right side when the ` +
       `left-to-right direction is set) of the input.`,
+    valueType: "string",
   };
 }
 
@@ -188,6 +199,7 @@ export function dEndIcon(): ComponentPropertyMetadata {
     description:
       `This property sets an icon to appear on the end (right side when the ` +
       `left-to-right direction is set) of the input.`,
+    valueType: "string",
   };
 }
 

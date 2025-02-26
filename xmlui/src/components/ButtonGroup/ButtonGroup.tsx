@@ -18,29 +18,29 @@ export const ButtonGroupMd = createMetadata({
     `(**NOT IMPLEMENTED YET**) The \`${COMP}\` component is a container that embeds buttons used ` +
     `together for a particular reason. It provides a view that emphasizes this coherency.`,
   props: {
-    themeColor: d(
-      `This optional property specifies the default theme color for the buttons in the group. ` +
+    themeColor: {
+      description: `This optional property specifies the default theme color for the buttons in the group. ` +
         `Individual buttons may override this setting with their \`themeColor\` property.`,
-      buttonThemeMd,
-      "string",
-      "primary",
-    ),
-    variant: d(
-      `This optional property specifies the default variant for the buttons in the group. ` +
+      availableValues: buttonThemeMd,
+      valueType: "string",
+      defaultValue: "primary",
+    },
+    variant: {
+      description: `This optional property specifies the default variant for the buttons in the group. ` +
         `Individual buttons may override this setting with their \`variant\` property.`,
-      buttonVariantMd,
-      "string",
-      "solid",
-    ),
+      availableValues: buttonVariantMd,
+      valueType: "string",
+      defaultValue: "solid",
+    },
     orientation: dOrientation("horizontal"),
-    buttonWidth: d(
-      `When this optional property is set, all buttons within the group will have the ` +
+    buttonWidth: {
+      description: `When this optional property is set, all buttons within the group will have the ` +
         `specified width. If it is empty, each button's width accommodates its content.`,
-    ),
-    gap: d(
-      `When this optional property is set, adjacent buttons will have the specified gap ` +
+    },
+    gap: {
+      description: `When this optional property is set, adjacent buttons will have the specified gap ` +
         `between them. If this property is not set, the buttons will be merged into one group.`,
-    ),
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

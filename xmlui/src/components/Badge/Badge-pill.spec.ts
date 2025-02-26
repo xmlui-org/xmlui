@@ -4,7 +4,7 @@ import {
   getElementStyle,
   initThemedApp,
   pixelStrToNum,
-} from "../../../../tests/tests/component-test-helpers";
+} from "../../testing/themed-app-test-helpers";
 import { Locator } from "@playwright/test";
 
 const BADGE_CODE_PILL = `<Badge variant="pill" testId="badge" value="test content"/>`;

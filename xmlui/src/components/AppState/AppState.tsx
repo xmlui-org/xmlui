@@ -9,18 +9,20 @@ export const AppStateMd = createMetadata({
     `${COMP} is a functional component (without a visible user interface) that helps ` +
     `store and manage the app's state.`,
   props: {
-    bucket: d(
-      `This property is the identifier of the bucket to which the \`${COMP}\` instance is bound. ` +
+    bucket: {
+      description: `This property is the identifier of the bucket to which the \`${COMP}\` instance is bound. ` +
         `Multiple \`${COMP}\` instances with the same bucket will share the same state object: any ` +
         `of them updating the state will cause the other instances to view the new, updated state.`,
-    ),
-    initialValue: d(
-      `This property contains the initial state value. Though you can use multiple \`${COMP}\`` +
+      valueType: "string",
+      defaultValue: "default",
+    },
+    initialValue: {
+      description: `This property contains the initial state value. Though you can use multiple \`${COMP}\`` +
         `component instances for the same bucket with their \`initialValue\` set, it may result ` +
         `in faulty app logic. When xmlui instantiates an \`${COMP}\` with an explicit initial ` +
         `value, that value is immediately set. Multiple initial values may result in ` +
         `undesired initialization.`,
-    ),
+    },
   },
   apis: {
     update: d(

@@ -222,13 +222,13 @@ export function AppContent({
       lastHash.current = location.hash.slice(1); // safe hash for further use after navigation
     }
 
-    if (lastHash.current) {
-      setTimeout(() => {
+    if (lastHash.current && !location.state?.preventHashScroll) {
+      requestAnimationFrame(() => {
         document
           .getElementById(lastHash.current)
           ?.scrollIntoView({ behavior: "instant", block: "start" });
         lastHash.current = "";
-      }, 100);
+      });
     }
   }, [location]);
 

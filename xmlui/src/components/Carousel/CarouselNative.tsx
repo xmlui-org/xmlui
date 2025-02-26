@@ -12,12 +12,13 @@ import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
 import { CarouselContext, useCarouselContextValue } from "./CarouselContext";
 import Icon from "../Icon/IconNative";
+import type { OrientationOptions } from "../abstractions";
 
 type CarouselApi = UseEmblaCarouselType[1];
 
 export type CarouselProps = {
   style?: CSSProperties;
-  orientation?: "horizontal" | "vertical";
+  orientation?: OrientationOptions;
   indicators?: boolean;
   controls?: boolean;
   children: React.ReactNode;
@@ -34,22 +35,45 @@ export type CarouselProps = {
   stopAutoplayOnInteraction?: boolean;
 };
 
+export const defaultProps: Pick<
+  CarouselProps,
+  | "orientation"
+  | "indicators"
+  | "autoplay"
+  | "controls"
+  | "loop"
+  | "startIndex"
+  | "transitionDuration"
+  | "autoplayInterval"
+  | "stopAutoplayOnInteraction"
+> = {
+  orientation: "horizontal",
+  indicators: true,
+  autoplay: false,
+  controls: true,
+  loop: false,
+  startIndex: 0,
+  transitionDuration: 25,
+  autoplayInterval: 5000,
+  stopAutoplayOnInteraction: true,
+};
+
 export const CarouselComponent = forwardRef(function CarouselComponent(
   {
-    orientation = "horizontal",
+    orientation = defaultProps.orientation,
     children,
     style,
-    indicators = true,
+    indicators = defaultProps.indicators,
     onDisplayDidChange = noop,
-    autoplay = false,
-    controls = true,
-    loop = false,
-    startIndex = 0,
+    autoplay = defaultProps.autoplay,
+    controls = defaultProps.controls,
+    loop = defaultProps.loop,
+    startIndex = defaultProps.startIndex,
     prevIcon,
     nextIcon,
-    transitionDuration = 25,
-    autoplayInterval = 5000,
-    stopAutoplayOnInteraction = true,
+    transitionDuration = defaultProps.transitionDuration,
+    autoplayInterval = defaultProps.autoplayInterval,
+    stopAutoplayOnInteraction = defaultProps.stopAutoplayOnInteraction,
     registerComponentApi,
   }: CarouselProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,

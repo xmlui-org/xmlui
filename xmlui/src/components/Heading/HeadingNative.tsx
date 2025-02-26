@@ -45,6 +45,7 @@ export const Heading = forwardRef(function Heading(
     preserveLinebreaks,
     ellipses = true,
     className,
+    omitFromToc,
     ...furtherProps
   }: HeadingProps,
   forwardedRef: ForwardedRef<HTMLHeadingElement>,
@@ -72,7 +73,7 @@ export const Heading = forwardRef(function Heading(
   }, [observeIntersection]);
 
   useEffect(() => {
-    if (observeIntersection && elementRef.current && anchorId) {
+    if (observeIntersection && elementRef.current && anchorId && !omitFromToc) {
       return registerHeading?.({
         id: anchorId,
         level: parseInt(level.replace("h", "")),
@@ -80,7 +81,7 @@ export const Heading = forwardRef(function Heading(
         anchor: anchorRef.current,
       });
     }
-  }, [anchorId, observeIntersection, registerHeading, level]);
+  }, [anchorId, observeIntersection, registerHeading, level, omitFromToc]);
 
   return (
     <Element
@@ -96,7 +97,7 @@ export const Heading = forwardRef(function Heading(
       {...furtherProps}
     >
       {anchorId && observeIntersection && (
-        <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0 }} />
+        <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0 }} data-anchor={true} />
       )}
       {children}
     </Element>

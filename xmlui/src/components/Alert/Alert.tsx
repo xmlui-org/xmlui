@@ -17,19 +17,32 @@ export const AlertMd = createMetadata({
     `notifications or feedback to users. It helps convey different statuses or levels of urgency, ` +
     `such as success, warning, error, and others.`,
   props: {
-    statusColor: d(
-      `The value of this optional property sets the string to provide a color scheme for the ${COMP}.`,
-      statusColorMd,
-      "string",
-      "primary",
-    ),
-    dismissable: d(
-      `This property's \`true\` value indicates if this alert is dismissable by the user. When the ` +
+    statusColor: {
+      description: `The value of this optional property sets the string to provide a color scheme for the ${COMP}.`,
+      availableValues: statusColorMd,
+      valueType: "string",
+      defaultValue: "primary",
+    },
+    dismissable: {
+      description:
+        `This property's \`true\` value indicates if this alert is dismissable by the user. When the ` +
         `user closes the ${COMP}, it gets hidden.`,
-    ),
-    autoDismissInMs: d("Timeout for the alert to be dismissed"),
-    showIcon: d("Indicates if the alert should display an icon"),
-    icon: d("Icon to be displayed in the alert"),
+      valueType: "boolean",
+      defaultValue: true,
+    },
+    autoDismissInMs: {
+      description: "Timeout for the alert to be dismissed",
+      valueType: "number",
+    },
+    showIcon: {
+      description: "Indicates if the alert should display an icon",
+      valueType: "boolean",
+      defaultValue: true,
+    },
+    icon: {
+      description: "Icon to be displayed in the alert",
+      valueType: "string",
+    },
   },
   events: {},
   apis: {

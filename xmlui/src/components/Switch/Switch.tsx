@@ -11,6 +11,7 @@ import {
   dGotFocus,
   dIndeterminate,
   dInitialValue,
+  dInternal,
   dLabel,
   dLabelBreak,
   dLabelPosition,
@@ -22,7 +23,7 @@ import {
   dValidationStatus,
   dValueApi,
 } from "../metadata-helpers";
-import { Toggle } from "../Toggle/Toggle";
+import { defaultProps, Toggle } from "../Toggle/Toggle";
 
 const COMP = "Switch";
 
@@ -32,18 +33,18 @@ export const SwitchMd = createMetadata({
     `on and off. It consists of a small rectangular or circular button that can be moved left or right to ` +
     `change its state.`,
   props: {
-    indeterminate: dIndeterminate(),
+    indeterminate: dIndeterminate(defaultProps.indeterminate),
     label: dLabel(),
     labelPosition: dLabelPosition("end"),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
     required: dRequired(),
-    initialValue: dInitialValue(false),
+    initialValue: dInitialValue(defaultProps.initialValue),
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
     enabled: dEnabled(),
-    validationStatus: dValidationStatus(),
-    description: d(
+    validationStatus: dValidationStatus(defaultProps.validationStatus),
+    description: dInternal(
       `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
         `of the ${COMP} besides its label.`,
     ),
@@ -86,7 +87,7 @@ export const SwitchMd = createMetadata({
 });
 
 export const switchComponentRenderer = createComponentRenderer(
-  "Switch",
+  COMP,
   SwitchMd,
   ({
     node,
@@ -101,7 +102,10 @@ export const switchComponentRenderer = createComponentRenderer(
       <Toggle
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         style={layoutCss}
-        initialValue={extractValue.asOptionalBoolean(node.props.initialValue) || false}
+        initialValue={extractValue.asOptionalBoolean(
+          node.props.initialValue,
+          defaultProps.initialValue,
+        )}
         value={state?.value}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         validationStatus={extractValue(node.props.validationStatus)}

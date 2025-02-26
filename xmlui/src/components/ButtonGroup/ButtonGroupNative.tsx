@@ -1,6 +1,6 @@
-import { ForwardedRef, forwardRef } from "react";
+import { type ForwardedRef, forwardRef } from "react";
 
-type Props = {};
+type Props = Record<string, any>;
 
 export const ButtonGroup = forwardRef(function ButtonGroup(
   {}: Props,

@@ -11,7 +11,11 @@ type Props = {
   throttleWaitInMs?: number;
 };
 
-export function ChangeListener({ listenTo, onChange, throttleWaitInMs = 0 }: Props) {
+export const defaultProps: Pick<Props, "throttleWaitInMs"> = {
+  throttleWaitInMs: 0,
+};
+
+export function ChangeListener({ listenTo, onChange, throttleWaitInMs = defaultProps.throttleWaitInMs }: Props) {
   const prevValue = usePrevious(listenTo);
 
   const throttledOnChange = useMemo(() => {

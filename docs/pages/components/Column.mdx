@@ -6,13 +6,21 @@ import data from  "../../component-samples/Column/list-component-data.js";
 
 The `Column` component can be used within a `Table` to define a particular table column's visual properties and data bindings.
 
+The component provides context values with which you can access some internal properties:
+
+- `$cell`: The value of the cell being rendered.
+- `$colIndex`: The index of the column being rendered.
+- `$item`: The data item being rendered.
+- `$itemIndex`: The index of the data item being rendered.
+- `$row`: The data item being rendered (the same as `$item`).
+- `$rowIndex`: The index of the data item being rendered (the same as `$itemIndex`).
 
 
 Throught this documentation page the data used is the same that is found in the [`Table` component documentation](./Table.mdx#properties).
 
 ## Properties
 
-### `bindTo (required)`
+### `bindTo`
 
 Indicates what part of the data to lay out in the column.
 
@@ -97,11 +105,11 @@ Adds a label for a particular column.
 
 ### `maxWidth`
 
-Indicates the maximum width a particular column can have.
+Indicates the maximum width a particular column can have. Same rules apply as with [width](#width).
 
 ### `minWidth`
 
-Indicates the minimum width a particular column can have.
+Indicates the minimum width a particular column can have. Same rules apply as with [width](#width).
 
 ### `pinTo`
 
