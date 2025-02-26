@@ -16,7 +16,7 @@ import {
   dSetValueApi, dStartIcon, dStartText,
   dValidationStatus,
 } from "../../components/metadata-helpers";
-import { DatePicker } from "./DatePickerNative";
+import { dateFormats, DatePicker, DatePickerModeValues, defaultProps, weekDaysMd } from "./DatePickerNative";
 
 const COMP = "DatePicker";
 
@@ -28,16 +28,48 @@ export const DatePickerMd = createMetadata({
     initialValue: dInitialValue(),
     autoFocus: dAutoFocus(),
     readOnly: dReadonly(),
-    enabled: dEnabled(),
-    validationStatus: dValidationStatus(),
-    mode: d("The mode of the datepicker (single or range)"),
-    dateFormat: d("The format of the date displayed in the input field"),
-    showWeekNumber: d("Whether to show the week number in the calendar"),
-    weekStartsOn: d("The first day of the week. 0 is Sunday, 1 is Monday, etc."),
-    fromDate: d("The start date of the range of selectable dates"),
-    toDate: d("The end date of the range of selectable dates"),
-    disabledDates: d("An array of dates that are disabled"),
-    inline: d("The datepicker is displayed inline"),
+    enabled: dEnabled(defaultProps.enabled),
+    validationStatus: dValidationStatus(defaultProps.validationStatus),
+    mode: {
+      description: "The mode of the datepicker (single or range)",
+      valueType: "string",
+      availableValues: DatePickerModeValues,
+      defaultValue: defaultProps.mode,
+    },
+    dateFormat: {
+      description: "The format of the date displayed in the input field",
+      valueType: "string",
+      defaultValue: defaultProps.dateFormat,
+      availableValues: dateFormats,
+    },
+    showWeekNumber: {
+      description: "Whether to show the week number in the calendar",
+      valueType: "boolean",
+      defaultValue: defaultProps.showWeekNumber,
+    },
+    weekStartsOn: {
+      description: "The first day of the week. 0 is Sunday, 1 is Monday, etc.",
+      valueType: "number",
+      defaultValue: defaultProps.weekStartsOn,
+      availableValues: weekDaysMd,
+    },
+    fromDate: {
+      description: "The start date of the range of selectable dates",
+      valueType: "string",
+    },
+    toDate: {
+      description: "The end date of the range of selectable dates",
+      valueType: "string",
+    },
+    disabledDates: {
+      description: "An array of dates that are disabled",
+      valueType: "any",
+    },
+    inline: {
+      description: "Whether to display the datepicker inline",
+      valueType: "boolean",
+      defaultValue: defaultProps.inline,
+    },
     startText: dStartText(),
     startIcon: dStartIcon(),
     endText: dEndText(),

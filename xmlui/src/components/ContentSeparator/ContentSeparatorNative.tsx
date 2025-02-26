@@ -9,8 +9,12 @@ type ContentSeparatorProps = {
   style?: CSSProperties;
 };
 
+export const defaultProps: Pick<ContentSeparatorProps, "orientation"> = {
+  orientation: "horizontal",
+}
+
 export const ContentSeparator = ({
-  orientation = "horizontal",
+  orientation = defaultProps.orientation,
   size,
   style,
 }: ContentSeparatorProps) => {

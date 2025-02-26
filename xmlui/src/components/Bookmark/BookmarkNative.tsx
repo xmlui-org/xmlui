@@ -10,7 +10,18 @@ type Props = {
   children: ReactNode;
 };
 
-export const Bookmark = ({ uid, level = 1, children, title, omitFromToc = false }: Props) => {
+export const defaultProps: Pick<Props, "level" | "omitFromToc"> = {
+  level: 1,
+  omitFromToc: false,
+};
+
+export const Bookmark = ({
+  uid,
+  level = defaultProps.level,
+  children,
+  title,
+  omitFromToc = defaultProps.omitFromToc,
+}: Props) => {
   const elementRef = useRef<HTMLAnchorElement>(null);
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const registerHeading = tableOfContentsContext?.registerHeading;

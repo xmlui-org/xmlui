@@ -1,9 +1,10 @@
 import styles from "./Badge.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Badge, type BadgeColors } from "./BadgeNative";
+import { Badge, badgeVariantValues, type BadgeColors } from "./BadgeNative";
+import { dInternal } from "../metadata-helpers";
 
 const COMP = "Badge";
 
@@ -16,25 +17,30 @@ export const BadgeMd = createMetadata({
       type: "string",
       isRequired: true,
     },
-    variant: d(
-      `Modifies the shape of the component. Comes in the regular \`badge\` variant or the \`pill\` variant ` +
+    variant: {
+      description:
+        `Modifies the shape of the component. Comes in the regular \`badge\` variant or the \`pill\` variant ` +
         `with fully rounded corners.`,
-    ),
-    colorMap: d(
-      `The \`${COMP}\` component supports the mapping of a list of colors using the \`value\` prop as the ` +
+      type: "string",
+      availableValues: badgeVariantValues,
+      defaultValue: "badge",
+    },
+    colorMap: {
+      description:
+        `The \`${COMP}\` component supports the mapping of a list of colors using the \`value\` prop as the ` +
         `key. Provide the component with a list or key-value pairs in two ways:`,
-    ),
-    themeColor: d(`(**NOT IMPLEMENTED YET**) The theme color of the component.`),
-    indicatorText: d(
+    },
+    themeColor: dInternal(`(**NOT IMPLEMENTED YET**) The theme color of the component.`),
+    indicatorText: dInternal(
       `(**NOT IMPLEMENTED YET**) This property defines the text to display in the indicator. If it is not ` +
         `defined or empty, no indicator is displayed unless the \`forceIndicator\` property is set.`,
     ),
-    forceIndicator: d(
+    forceIndicator: dInternal(
       `(**NOT IMPLEMENTED YET**) This property forces the display of the indicator, even if ` +
         `the \`indicatorText\` property is not defined or empty.`,
     ),
-    indicatorThemeColor: d(`(**NOT IMPLEMENTED YET**) The theme color of the indicator.`),
-    indicatorPosition: d(`(**NOT IMPLEMENTED YET**) The position of the indicator.`),
+    indicatorThemeColor: dInternal(`(**NOT IMPLEMENTED YET**) The theme color of the indicator.`),
+    indicatorPosition: dInternal(`(**NOT IMPLEMENTED YET**) The position of the indicator.`),
   },
   events: {},
   themeVars: parseScssVar(styles.themeVars),

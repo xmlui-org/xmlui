@@ -1,4 +1,4 @@
-import { CSSProperties, ForwardedRef, ReactNode, forwardRef } from "react";
+import { type CSSProperties, type ForwardedRef, type ReactNode, forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./Card.module.scss";
@@ -9,8 +9,6 @@ import type { HeadingProps } from "../Heading/HeadingNative";
 import { Heading } from "../Heading/HeadingNative";
 import { Stack } from "../Stack/StackNative";
 import { Text } from "../Text/TextNative";
-
-export const DEFAULT_ORIENTATION = "vertical";
 
 type Props = {
   style?: CSSProperties;
@@ -24,16 +22,21 @@ type Props = {
   onClick?: any;
 };
 
+export const defaultProps: Pick<Props, "orientation" | "showAvatar"> = {
+  orientation: "vertical",
+  showAvatar: false,
+};
+
 export const Card = forwardRef(function Card(
   {
     children,
-    orientation = DEFAULT_ORIENTATION,
+    orientation = defaultProps.orientation,
     style,
     title,
     subtitle,
     linkTo,
     avatarUrl,
-    showAvatar = !!avatarUrl || false,
+    showAvatar = !!avatarUrl || defaultProps.showAvatar,
     onClick,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,

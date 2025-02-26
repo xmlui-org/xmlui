@@ -11,7 +11,7 @@ import {
   dFocus,
 } from "../../components/metadata-helpers";
 import { triggerPositionNames } from "../../components/abstractions";
-import { AccordionComponent } from "./AccordionNative";
+import { AccordionComponent, propDefaults } from "./AccordionNative";
 
 const COMP = "Accordion";
 
@@ -25,29 +25,33 @@ export const AccordionMd = createMetadata({
     `the display of content sections. It helps organize information by expanding or collapsing it ` +
     `based on user interaction.`,
   props: {
-    triggerPosition: d(
-      `This property indicates the position where the trigger icon should be displayed. The \`start\` ` +
+    triggerPosition: {
+      description: `This property indicates the position where the trigger icon should be displayed. The \`start\` ` +
         `value signs the trigger is before the header text (template), and \`end\` indicates that it ` +
         `follows the header.`,
-      triggerPositionNames,
-      null,
-      "end",
-    ),
-    collapsedIcon: d(
-      `This property is the name of the icon that is displayed when the accordion is collapsed.`,
-    ),
-    expandedIcon: d(
-      `This property is the name of the icon that is displayed when the accordion is expanded.`,
-    ),
-    hideIcon: d(
-      `This property indicates that the trigger icon is not displayed (\`true\`).`,
-      null,
-      "boolean",
-      false,
-    ),
-    rotateExpanded: d(
-      `This optional property defines the rotation angle of the expanded icon (relative to the collapsed icon).`,
-    ),
+      defaultValue: propDefaults.triggerPosition,
+      valueType: "string",
+      availableValues: triggerPositionNames,
+    },
+    collapsedIcon: {
+      description: `This property is the name of the icon that is displayed when the accordion is collapsed.`,
+      valueType: "string",
+      defaultValue: propDefaults.collapsedIcon,
+    },
+    expandedIcon: {
+      description: `This property is the name of the icon that is displayed when the accordion is expanded.`,
+      valueType: "string",
+    },
+    hideIcon: {
+      description: `This property indicates that the trigger icon is not displayed (\`true\`).`,
+      defaultValue: propDefaults.hideIcon,
+      valueType: "boolean",
+    },
+    rotateExpanded: {
+      description: `This optional property defines the rotation angle of the expanded icon (relative to the collapsed icon).`,
+      valueType: "string",
+      defaultValue: propDefaults.rotateExpanded,
+    },
   },
   events: {
     displayDidChange: dDidChange(COMP),

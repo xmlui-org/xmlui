@@ -14,7 +14,7 @@ This property sets the request body. The object you pass here will be serialized
 
 ### `completedNotificationMessage`
 
-This property defines the message to display automatically when the data fetch operation has been completed.
+This property defines the message to display when the data fetch operation has been completed.
 
 This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:
 
@@ -27,7 +27,7 @@ This property customizes the success message displayed in a toast after the fini
 
 ### `errorNotificationMessage`
 
-This property defines the message to display automatically when the data fetch operation results in an error.
+This property defines the message to display when the data fetch operation results in an error.
 
 This property customizes the message displayed in a toast when the API invocation results in an error. The `$error.statusCode` context variable can refer to the response's status code, while `$error. details` to the response body. For example, you can use the following code snippet to display the status code and the details:
 
@@ -45,11 +45,13 @@ You can define request header values as key and value pairs, where the key is th
 
 ### `inProgressNotificationMessage`
 
-This property defines the message to display while the fetch operation progresses.
+This property defines the message to display when the data fetch operation is in progress.
 
-### `method`
+### `method (default: "get")`
 
-By default, data fetching uses the `get` operation method. You can change it by setting this property to other supported methods, such as `post`, `put`, `delete`, and others.
+The method by which the data fetching request is made.
+
+Available values: `get` **(default)**, `post`, `put`, `delete`
 
 ### `nextPageSelector`
 

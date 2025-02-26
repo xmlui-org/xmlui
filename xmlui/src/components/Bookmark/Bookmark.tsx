@@ -10,24 +10,27 @@ export const BookmarkMd = createMetadata({
     `component has an \`id\` that you can use in links to navigate (scroll to) the bookmark's location.`,
   opaque: true,
   props: {
-    id: d(
-      `The unique identifier of the bookmark. You can use this identifier in links to navigate ` +
+    uid: {
+      description: `The unique identifier of the bookmark. You can use this identifier in links to navigate ` +
         `to this component's location.`,
-    ),
-    level: d(
-      `The level of the bookmark. The level is used to determine the bookmark's ` +
+      valueType: "string",
+    },
+    level: {
+      description: `The level of the bookmark. The level is used to determine the bookmark's ` +
         `position in the table of contents.`,
-    ),
-    title: d(
-      "Defines the text to display the bookmark in the table of contents. If this property is " +
+      valueType: "number",
+      defaultValue: 1,
+    },
+    title: {
+      description: "Defines the text to display the bookmark in the table of contents. If this property is " +
         "empty, the text falls back to the value of `id`.",
-    ),
-    omitFromToc: d(
-      "If true, this bookmark will be excluded from the table of contents.",
-      null,
-      "boolean",
-      false,
-    ),
+      valueType: "string",
+    },
+    omitFromToc: {
+      description: "If true, this bookmark will be excluded from the table of contents.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
   },
 });
 
@@ -41,8 +44,8 @@ export const bookmarkComponentRenderer = createComponentRenderer(
       <Bookmark
         uid={extractValue(node.uid)}
         level={extractValue(node.props.level)}
-        title={extractValue(node.props?.title)}
-        omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
+        title={extractValue(node.props.title)}
+        omitFromToc={extractValue.asOptionalBoolean(node.props.omitFromToc)}
       >
         {renderChild(node.children, layoutContext)}
       </Bookmark>

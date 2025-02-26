@@ -1,4 +1,4 @@
-import React, { CSSProperties } from "react";
+import { type CSSProperties } from "react";
 import { forwardRef, useRef, useCallback, useEffect, useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
@@ -16,11 +16,14 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 
+export const DatePickerModeValues = ["single", "range"] as const;
+type DatePickerMode = typeof DatePickerModeValues[number];
+
 type Props = {
   id?: string;
   initialValue?: string | { from: string; to: string };
   value?: string | { from: string; to: string };
-  mode?: "single" | "range";
+  mode?: DatePickerMode;
   enabled?: boolean;
   placeholder?: string;
   updateState?: UpdateStateFn;
@@ -30,7 +33,7 @@ type Props = {
   onBlur?: () => void;
   validationStatus?: ValidationStatus;
   registerComponentApi?: RegisterComponentApiFn;
-  dateFormat?: string;
+  dateFormat?: DateFormat;
   showWeekNumber?: boolean;
   weekStartsOn?: WeekDays;
   fromDate?: string;
@@ -51,9 +54,39 @@ const enum WeekDays {
   Thursday = 4,
   Friday = 5,
   Saturday = 6,
-}
+};
+export const weekDaysMd = [
+  {
+    value: WeekDays.Sunday,
+    description: "Sunday",
+  },
+  {
+    value: WeekDays.Monday,
+    description: "Monday",
+  },
+  {
+    value: WeekDays.Tuesday,
+    description: "Tuesday",
+  },
+  {
+    value: WeekDays.Wednesday,
+    description: "Wednesday",
+  },
+  {
+    value: WeekDays.Thursday,
+    description: "Thursday",
+  },
+  {
+    value: WeekDays.Friday,
+    description: "Friday",
+  },
+  {
+    value: WeekDays.Saturday,
+    description: "Saturday",
+  },
+];
 
-const dateFormats = [
+export const dateFormats = [
   "MM/dd/yyyy",
   "MM-dd-yyyy",
   "yyyy/MM/dd",
@@ -62,30 +95,28 @@ const dateFormats = [
   "dd-MM-yyyy",
   "yyyyMMdd",
   "MMddyyyy",
-];
+] as const;
+type DateFormat = typeof dateFormats[number];
 
-const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
-
-const parseISODate = (dateString?: string) => {
-  if (dateString && isoRegex.test(dateString)) {
-    const parsedDate = parseISO(dateString);
-    if (isValid(parsedDate)) {
-      return parsedDate;
-    }
-  }
-  return undefined;
-};
-
-const parseDate = (dateString?: string) => {
-  if (dateString) {
-    for (const format of dateFormats) {
-      const parsedDate = parse(dateString, format, new Date());
-      if (isValid(parsedDate)) {
-        return parsedDate;
-      }
-    }
-  }
-  return undefined;
+export const defaultProps: Pick<
+  Props,
+  | "mode"
+  | "validationStatus"
+  | "enabled"
+  | "inline"
+  | "dateFormat"
+  | "showWeekNumber"
+  | "weekStartsOn"
+  | "disabledDates"
+> = {
+  mode: "single",
+  validationStatus: "none",
+  enabled: true,
+  inline: false,
+  dateFormat: "MM/dd/yyyy",
+  showWeekNumber: false,
+  weekStartsOn: WeekDays.Sunday,
+  disabledDates: [],
 };
 
 export const DatePicker = forwardRef(function DatePicker(
@@ -93,23 +124,23 @@ export const DatePicker = forwardRef(function DatePicker(
     id,
     initialValue,
     value,
-    mode = "single",
-    enabled = true,
+    mode = defaultProps.mode,
+    enabled = defaultProps.enabled,
     placeholder,
     updateState = noop,
-    validationStatus = "none",
+    validationStatus = defaultProps.validationStatus,
     onDidChange = noop,
     onFocus = noop,
     onBlur = noop,
-    dateFormat = "MM/dd/yyyy", // Default dateFormat
-    showWeekNumber = false,
-    weekStartsOn = WeekDays.Sunday,
+    dateFormat = defaultProps.dateFormat,
+    showWeekNumber = defaultProps.showWeekNumber,
+    weekStartsOn = defaultProps.weekStartsOn,
     fromDate,
     toDate,
-    disabledDates = [],
+    disabledDates = defaultProps.disabledDates,
     style,
     registerComponentApi,
-    inline = false,
+    inline = defaultProps.inline,
     startText,
     startIcon,
     endText,
@@ -316,3 +347,27 @@ export const DatePicker = forwardRef(function DatePicker(
     </ReactDropdownMenu.Root>
   );
 });
+
+const isoRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+
+const parseISODate = (dateString?: string) => {
+  if (dateString && isoRegex.test(dateString)) {
+    const parsedDate = parseISO(dateString);
+    if (isValid(parsedDate)) {
+      return parsedDate;
+    }
+  }
+  return undefined;
+};
+
+const parseDate = (dateString?: string) => {
+  if (dateString) {
+    for (const format of dateFormats) {
+      const parsedDate = parse(dateString, format, new Date());
+      if (isValid(parsedDate)) {
+        return parsedDate;
+      }
+    }
+  }
+  return undefined;
+};
