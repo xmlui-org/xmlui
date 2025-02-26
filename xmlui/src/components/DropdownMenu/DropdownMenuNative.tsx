@@ -8,7 +8,7 @@ import styles from "./DropdownMenu.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { noop } from "../../components-core/constants";
-import type { IconPosition, ButtonVariant, ButtonThemeColor } from "../abstractions";
+import type { IconPosition, ButtonVariant, ButtonThemeColor, AlignmentOptions } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { Icon } from "../Icon/IconNative";
 
@@ -18,13 +18,28 @@ type DropdownMenuProps = {
   label?: string;
   registerComponentApi?: RegisterComponentApiFn;
   style?: CSSProperties;
-  alignment?: "start" | "center" | "end";
+  alignment?: AlignmentOptions;
   onWillOpen?: () => Promise<boolean | undefined>;
   disabled?: boolean;
   triggerButtonVariant?: string;
   triggerButtonThemeColor?: string;
   triggerButtonIcon?: string;
   triggerButtonIconPosition?: IconPosition;
+};
+
+export const defaultDropdownMenuProps: Pick<
+  DropdownMenuProps,
+  | "alignment"
+  | "triggerButtonVariant"
+  | "triggerButtonThemeColor"
+  | "triggerButtonIcon"
+  | "triggerButtonIconPosition"
+> = {
+  alignment: "start",
+  triggerButtonVariant: "ghost",
+  triggerButtonThemeColor: "primary",
+  triggerButtonIcon: "chevrondown",
+  triggerButtonIconPosition: "end",
 };
 
 export const DropdownMenu = forwardRef(function DropdownMenu(
@@ -35,12 +50,12 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     registerComponentApi,
     style,
     onWillOpen,
-    alignment = "start",
+    alignment = defaultDropdownMenuProps.alignment,
     disabled = false,
-    triggerButtonVariant = "ghost",
-    triggerButtonThemeColor = "primary",
-    triggerButtonIcon = "chevrondown",
-    triggerButtonIconPosition = "end",
+    triggerButtonVariant = defaultDropdownMenuProps.triggerButtonVariant,
+    triggerButtonThemeColor = defaultDropdownMenuProps.triggerButtonThemeColor,
+    triggerButtonIcon = defaultDropdownMenuProps.triggerButtonIcon,
+    triggerButtonIconPosition = defaultDropdownMenuProps.triggerButtonIconPosition,
   }: DropdownMenuProps,
   ref,
 ) {
@@ -106,14 +121,19 @@ type MenuItemProps = {
   active?: boolean;
 };
 
+export const defaultMenuItemProps: Pick<MenuItemProps, "iconPosition" | "active"> = {
+  iconPosition: "start",
+  active: false,
+};
+
 export function MenuItem({
   children,
   onClick = noop,
   label,
   style,
   icon,
-  iconPosition = "start",
-  active = false,
+  iconPosition = defaultMenuItemProps.iconPosition,
+  active = defaultMenuItemProps.active,
 }: MenuItemProps) {
   const iconToStart = iconPosition === "start";
 

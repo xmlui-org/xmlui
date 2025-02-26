@@ -3,10 +3,17 @@ import styles from "./DropdownMenu.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { iconPositionMd, iconPositionNames } from "../abstractions";
+import { alignmentOptionMd, buttonThemeMd, buttonVariantMd, iconPositionMd } from "../abstractions";
 import { dClick, dEnabled, dLabel, dTriggerTemplate } from "../metadata-helpers";
 import { Icon } from "../Icon/IconNative";
-import { DropdownMenu, MenuItem, MenuSeparator, SubMenuItem } from "./DropdownMenuNative";
+import {
+  defaultDropdownMenuProps,
+  defaultMenuItemProps,
+  DropdownMenu,
+  MenuItem,
+  MenuSeparator,
+  SubMenuItem,
+} from "./DropdownMenuNative";
 
 const DDMCOMP = "DropdownMenu";
 
@@ -17,23 +24,40 @@ export const DropdownMenuMd = createMetadata({
   props: {
     label: dLabel(),
     triggerTemplate: dTriggerTemplate(DDMCOMP),
-    alignment: d(
-      `This property allows you to determine the alignment of the displayed menu items.`,
-    ),
+    alignment: {
+      description: `This property allows you to determine the alignment of the displayed menu items.`,
+      valueType: "string",
+      availableValues: alignmentOptionMd,
+      defaultValue: defaultDropdownMenuProps.alignment,
+    },
     enabled: dEnabled(),
-    triggerButtonVariant: d(
-      `This property defines the theme variant of the \`Button\` as the dropdown menu's trigger. ` +
+    triggerButtonVariant: {
+      description:
+        `This property defines the theme variant of the \`Button\` as the dropdown menu's trigger. ` +
         `It has no effect when a custom trigger is defined with \`triggerTemplate\`.`,
-    ),
-    triggerButtonThemeColor: d(
-      `This property defines the theme color of the \`Button\` as the dropdown menu's trigger. ` +
+      valueType: "string",
+      availableValues: buttonVariantMd,
+      defaultValue: defaultDropdownMenuProps.triggerButtonVariant,
+    },
+    triggerButtonThemeColor: {
+      description:
+        `This property defines the theme color of the \`Button\` as the dropdown menu's trigger. ` +
         `It has no effect when a custom trigger is defined with \`triggerTemplate\`.`,
-    ),
-    triggerButtonIcon: d(`This property defines the icon to display on the trigger button.`),
-    triggerButtonIconPosition: d(
-      `This property defines the position of the icon on the trigger button.`,
-      iconPositionNames,
-    ),
+      valueType: "string",
+      availableValues: buttonThemeMd,
+      defaultValue: defaultDropdownMenuProps.triggerButtonThemeColor,
+    },
+    triggerButtonIcon: {
+      description: `This property defines the icon to display on the trigger button.`,
+      defaultValue: defaultDropdownMenuProps.triggerButtonIcon,
+      valueType: "string",
+    },
+    triggerButtonIconPosition: {
+      description: `This property defines the position of the icon on the trigger button.`,
+      defaultValue: defaultDropdownMenuProps.triggerButtonIconPosition,
+      valueType: "string",
+      availableValues: iconPositionMd,
+    },
   },
   events: {
     willOpen: d(`This event fires when the \`${DDMCOMP}\` component is opened.`),
@@ -81,17 +105,28 @@ export const MenuItemMd = createMetadata({
   description: `This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action.`,
   docFolder: DDMCOMP,
   props: {
-    iconPosition: d(
-      `This property allows you to determine the position of the icon displayed in the menu item.`,
-      iconPositionMd.filter(p => (p as any).value === "start" || (p as any).value === "end"),
-    ),
-    icon: d(`This property names an optional icon to display with the menu item.`),
+    iconPosition: {
+      description: `This property allows you to determine the position of the icon displayed in the menu item.`,
+      valueType: "string",
+      availableValues: iconPositionMd,
+      defaultValue: defaultMenuItemProps.iconPosition,
+    },
+    icon: {
+      description: `This property names an optional icon to display with the menu item.`,
+      valueType: "string",
+    },
     label: dLabel(),
-    to: d(
-      `This property defines the URL of the menu item. If this property is defined (and the \`click\` ` +
+    to: {
+      description:
+        `This property defines the URL of the menu item. If this property is defined (and the \`click\` ` +
         `event does not have an event handler), clicking the menu item navigates to this link.`,
-    ),
-    active: d(`This property indicates if the specified menu item is active.`),
+      valueType: "string",
+    },
+    active: {
+      description: `This property indicates if the specified menu item is active.`,
+      valueType: "boolean",
+      defaultValue: defaultMenuItemProps.active,
+    },
   },
   events: {
     click: dClick(MICOMP),
