@@ -89,8 +89,9 @@ export class DocsGenerator {
    * otherwise it appends one to the end of the file.
    * @param {string} summarySectionName The section to look for and add the summary to
    * @param {string?} summaryFileName The full path and name of the file to add the summary to
+   * @param {boolean?} rowNums Whether to add row numbers to the summary table
    */
-  async generateComponentsSummary(summarySectionName = "Components", summaryFileName) {
+  async generateComponentsSummary(summarySectionName = "Components", summaryFileName, rowNums) {
     logger.info("Creating Component Summary");
     try {
       const outFile = summaryFileName || join(FOLDERS.pages, `${basename(this.folders.sourceFolder)}.mdx`);
@@ -105,6 +106,7 @@ export class DocsGenerator {
         this.folders.sourceFolder,
         this.folders.outFolder,
         summarySectionName,
+        rowNums,
       );
 
       await writeFile(outFile, summary);
@@ -144,6 +146,7 @@ async function createSummary(
   componentsSourceFolder,
   componentsOutFolder,
   sectionName = "Components",
+  rowNums = true,
 ) {
   const buffer = await readFile(filename, "utf8");
   const componentFolderName = basename(componentsSourceFolder);
@@ -168,7 +171,7 @@ async function createSummary(
   let table = "";
   table += `## ${sectionName}\n\n`;
   table += createTable({
-    rowNums: true,
+    rowNums,
     headers: [
       { value: "Component", style: "center" },
       "Description",

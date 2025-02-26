@@ -56,8 +56,9 @@ async function generateExtenionPackages(metadata) {
 
     // Create summary and index file for extension package
     await extensionGenerator.generateComponentsSummary(
-      `${fromKebabtoCamelCase(packageName)} Components`,
+      `Package Components`,
       join(extensionsFolder, `${packageName}.mdx`),
+      false,
     );
   }
 
@@ -237,4 +238,8 @@ function partitionObject(obj, discriminator) {
     },
     [{}, {}],
   );
+}
+
+function addPackageDescription() {
+
 }
