@@ -246,6 +246,9 @@ function getScrollParent(element: HTMLElement) {
     return document.body;
   }
   for (let parent = element; ; parent = parent.parentElement) {
+    if(!parent){
+      return null;
+    }
     style = getComputedStyle(parent);
     if (excludeStaticParent && style.position === "static") {
       continue;
