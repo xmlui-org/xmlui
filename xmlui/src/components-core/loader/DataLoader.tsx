@@ -102,7 +102,7 @@ function DataLoader({
       body,
       rawBody
     ).asKey();
-  }, [appContext?.appGlobals.apiUrl, queryParams, url]);
+  }, [appContext?.appGlobals.apiUrl, queryParams, url, body, rawBody]);
 
   const stateRef = useRef({ state, appContext });
   stateRef.current = { state, appContext };

@@ -393,6 +393,10 @@ function shallowEqual<T extends Comparable>(a: T, b: T): boolean {
   const aIsArr = Array.isArray(a);
   const bIsArr = Array.isArray(b);
 
+  if (typeof a === "string" || typeof b === "string") {
+    return a === b;
+  }
+
   if (aIsArr !== bIsArr) {
     return false;
   }
