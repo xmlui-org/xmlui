@@ -10,7 +10,7 @@ See the [`DropdownMenu` component](./DropdownMenu) for using this component in m
 
 ## Properties
 
-### `active`
+### `active (default: false)`
 
 This property indicates if the specified menu item is active.
 
@@ -42,7 +42,7 @@ This property indicates if the specified menu item is active.
 
 This property names an optional icon to display with the menu item.
 
-```ueml copy {2-4}
+```ueml copy /icon/
 <App>
   <DropdownMenu label="DropdownMenu">
     <MenuItem icon="drive">Item 1</MenuItem>
@@ -66,7 +66,7 @@ This property names an optional icon to display with the menu item.
   `}
 />
 
-### `iconPosition`
+### `iconPosition (default: "start")`
 
 This property allows you to determine the position of the icon displayed in the menu item.
 
@@ -74,19 +74,11 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
+| `start` | The icon will appear at the start (left side when the left-to-right direction is set) **(default)** |
 | `end` | The icon will appear at the end (right side when the left-to-right direction is set) |
 
 
-This property allows you to determine the position of the icon displayed in the menu item.
-
-Avaliable values are:
-
-- `start`: The icon starts the menu item (default).
-- `end`: The icon is displayed after the menu item.
-
-
-```ueml copy {2-4}
+```ueml copy /iconPosition/
 <App>
   <DropdownMenu label="DropdownMenu">
     <MenuItem icon="drive" iconPosition="start">Item 1</MenuItem>
@@ -128,7 +120,7 @@ This event is fired when the user clicks the menu item. With an event handler, y
 
 If both properties are defined, `click` takes precedence.
 
-```ueml copy {2-4}
+```ueml copy /onClick/
 <DropdownMenu label="DropdownMenu">
   <MenuItem onClick="window.alert('Item 1 clicked')">Item 1</MenuItem>
   <MenuItem onClick="window.alert('Item 2 clicked')">Item 2</MenuItem>

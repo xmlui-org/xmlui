@@ -44,9 +44,18 @@ Try this dropdown menu:
 
 ## Properties
 
-### `alignment`
+### `alignment (default: "start")`
 
 This property allows you to determine the alignment of the displayed menu items.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `center` | Place the content in the middle |
+| `start` | Justify the content to the left (to the right if in right-to-left) **(default)** |
+| `end` | Justify the content to the right (to the left if in right-to-left) |
+
 
 Available values are:
 - `start`: Menu items are aligned to the start of the trigger component (default).
@@ -144,23 +153,47 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the label of the component.
 
-### `triggerButtonIcon`
+### `triggerButtonIcon (default: "chevrondown")`
 
 This property defines the icon to display on the trigger button.
 
-### `triggerButtonIconPosition`
+### `triggerButtonIconPosition (default: "end")`
 
 This property defines the position of the icon on the trigger button.
 
-Available values: `start`, `end`
+Available values:
 
-### `triggerButtonThemeColor`
+| Value | Description |
+| --- | --- |
+| `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
+| `end` | The icon will appear at the end (right side when the left-to-right direction is set) **(default)** |
+
+
+### `triggerButtonThemeColor (default: "primary")`
 
 This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
-### `triggerButtonVariant`
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `attention` | Attention state theme color |
+| `primary` | Primary theme color **(default)** |
+| `secondary` | Secondary theme color |
+
+
+### `triggerButtonVariant (default: "ghost")`
 
 This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `solid` | A button with a border and a filled background. |
+| `outlined` | The button is displayed with a border and a transparent background. |
+| `ghost` | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. **(default)** |
+
 
 ### `triggerTemplate`
 
