@@ -3,7 +3,13 @@ import { lstatSync } from "fs";
 import { writeFileSync } from "fs";
 import { unlink, readdir, readFile, mkdir } from "fs/promises";
 import { logger, LOGGER_LEVELS } from "./logger.mjs";
-import { processError, ErrorWithSeverity, convertPath, deleteFileIfExists, fromKebabtoCamelCase } from "./utils.mjs";
+import {
+  processError,
+  ErrorWithSeverity,
+  convertPath,
+  deleteFileIfExists,
+  fromKebabtoCamelCase,
+} from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { FOLDERS } from "./folders.mjs";
@@ -54,11 +60,18 @@ async function generateExtenionPackages(metadata) {
 
     extensionGenerator.generateDocs();
 
-    // Create summary and index file for extension package
-    await extensionGenerator.generateComponentsSummary(
-      `${fromKebabtoCamelCase(packageName)} Components`,
-      join(extensionsFolder, `${packageName}.mdx`),
+    // In both of these cases, we are writing to the same file
+    const indexFile = join(extensionsFolder, `${packageName}.mdx`);
+    deleteFileIfExists(indexFile);
+
+    await extensionGenerator.generatePackageDescription(
+      metadata[packageName].description,
+      `${fromKebabtoCamelCase(packageName)} Package`,
+      indexFile,
     );
+
+    // Create summary and index file for extension package
+    await extensionGenerator.generateComponentsSummary(`Package Components`, indexFile, false);
   }
 
   // generate a _meta.json for the folder names
@@ -67,7 +80,7 @@ async function generateExtenionPackages(metadata) {
 
     const folderNames = Object.fromEntries(
       Object.keys(metadata).map((name) => {
-        return [ name, fromKebabtoCamelCase(name)];
+        return [name, fromKebabtoCamelCase(name)];
       }),
     );
 
@@ -167,6 +180,12 @@ async function loadConfig(configPath) {
 }
 
 // TODO: We assume a lot here, need to make all the folders and filenames transparent
+/**
+ * Dynamically loads extension package metadata from the `packages` folder.
+ * Loading of metadata is only possible if the package has a `dist` folder
+ * and is built using the `build:meta` script which produces a {file-name}-metadata.js file.
+ * @returns {Promise<Record<string, { sourceFolder: string, description: string, metadata: Record<string, any> }>>} imported metadata
+ */
 async function dynamicallyLoadExtensionPackages() {
   const extendedPackagesFolder = join(FOLDERS.projectRoot, "packages");
   const packageDirectories = (await readdir(extendedPackagesFolder)).filter((entry) => {
@@ -179,18 +198,24 @@ async function dynamicallyLoadExtensionPackages() {
   for (let dir of packageDirectories) {
     const extensionPackage = {
       sourceFolder: join(extendedPackagesFolder, dir),
+      description: "",
       metadata: {},
     };
     dir = join(extendedPackagesFolder, dir);
     try {
       const packageFolderDist = join(dir, "dist");
+      if (!existsSync(packageFolderDist)) {
+        logger.warning(`No dist folder found for ${dir}`);
+        continue;
+      }
       const distContents = await readdir(packageFolderDist);
       for (const file of distContents) {
         let filePath = join(packageFolderDist, file);
-        if (filePath.endsWith("-metadata.js")) {
+        if (filePath.endsWith("-metadata.js") && existsSync(filePath)) {
           filePath = convertPath(relative(FOLDERS.script, filePath));
           const { componentMetadata } = await import(filePath);
           extensionPackage.metadata = componentMetadata.metadata;
+          extensionPackage.description = componentMetadata.description ?? "";
         }
       }
       importedMetadata[basename(dir)] = extensionPackage;
@@ -238,3 +263,5 @@ function partitionObject(obj, discriminator) {
     [{}, {}],
   );
 }
+
+function addPackageDescription() {}
