@@ -46,7 +46,7 @@ Try this dropdown menu:
 
 ### `alignment (default: "start")`
 
-This property allows you to determine the alignment of the displayed menu items.
+This property allows you to determine the alignment of the dropdown panel with the displayed menu items.
 
 Available values:
 
@@ -64,12 +64,12 @@ Available values are:
 ```ueml copy {8}
 <App>
   <HStack>
-    <DropdownMenu label="Start-aligned menu">
+    <DropdownMenu label="Start-aligned menu (open it!)">
       <MenuItem>Item 1</MenuItem>
       <MenuItem>Item 2</MenuItem>
       <MenuItem>Item 3</MenuItem>
     </DropdownMenu>
-    <DropdownMenu label="End-aligned menu" alignment="end">
+    <DropdownMenu label="End-aligned menu (open it!)" alignment="end">
       <MenuItem>Item 1</MenuItem>
       <MenuItem>Item 2</MenuItem>
       <MenuItem>Item 3</MenuItem>
@@ -84,12 +84,12 @@ Available values are:
   app={`
     <App>
       <HStack>
-        <DropdownMenu label="Start-aligned menu">
+        <DropdownMenu label="Start-aligned menu (open it!)">
           <MenuItem>Item 1</MenuItem>
           <MenuItem>Item 2</MenuItem>
           <MenuItem>Item 3</MenuItem>
         </DropdownMenu>
-        <DropdownMenu label="End-aligned menu" alignment="end">
+        <DropdownMenu label="End-aligned menu (open it!)" alignment="end">
           <MenuItem>Item 1</MenuItem>
           <MenuItem>Item 2</MenuItem>
           <MenuItem>Item 3</MenuItem>
