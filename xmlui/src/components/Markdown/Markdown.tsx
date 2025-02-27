@@ -12,15 +12,15 @@ export const MarkdownMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   props: {
     content: d("This property sets the markdown content to display."),
-    removeIndents: d(
-      "This boolean property specifies whether leading indents should be " +
+    removeIndents: {
+      description:
+        "This boolean property specifies whether leading indents should be " +
         "removed from the markdown content. If set to `true`, the shortest " +
         "indent found at the start of the content lines is removed from the " +
         "beginning of every line.",
-      null,
-      "boolean",
-      false,
-    ),
+      valueType: "boolean",
+      defaultValue: false,
+    },
   },
   defaultThemeVars: {
     "color-border-HorizontalRule": "$color-border",

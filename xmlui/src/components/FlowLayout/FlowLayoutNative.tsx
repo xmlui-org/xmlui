@@ -148,6 +148,11 @@ type FlowLayoutProps = {
   children: ReactNode;
 };
 
+export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap"> = {
+  columnGap: "$gap-normal",
+  rowGap: "$gap-normal",
+};
+
 export const FlowLayout = forwardRef(function FlowLayout(
   { style, columnGap = 0, rowGap = 0, children }: FlowLayoutProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,

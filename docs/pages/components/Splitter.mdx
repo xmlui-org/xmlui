@@ -14,7 +14,7 @@ See also: [\`HSplitter\`](./HSplitter.mdx), [\`VSplitter\`](./VSplitter.mdx).
 
 ## Properties
 
-### `floating`
+### `floating (default: false)`
 
 Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged. The default value is `false`, meaning the resizer is visible all the time.
 
@@ -39,7 +39,7 @@ Toggles whether the resizer is visible (`false`) or not (`true`) when not hovere
 `}
 />
 
-### `initialPrimarySize`
+### `initialPrimarySize (default: "50%")`
 
 This optional number property sets the initial size of the primary section. The unit of the size value is in pixels or percentages.
 
@@ -64,7 +64,7 @@ This optional number property sets the initial size of the primary section. The 
   `}
 />
 
-### `maxPrimarySize`
+### `maxPrimarySize (default: "100%")`
 
 This property sets the maximum size the primary section can have. The unit of the size value is in pixels or percentages.
 
@@ -89,7 +89,7 @@ This property sets the maximum size the primary section can have. The unit of th
   `}
 />
 
-### `minPrimarySize`
+### `minPrimarySize (default: "0%")`
 
 This property sets the minimum size the primary section can have. The unit of the size value is in pixels or percentages.
 
@@ -114,9 +114,11 @@ This property sets the minimum size the primary section can have. The unit of th
   `}
 />
 
-### `orientation`
+### `orientation (default: "vertical")`
 
 Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`), or vertically by placing the sections next to each other (`horizontal`).
+
+Available values: `horizontal`, `vertical` **(default)**
 
 ```ueml copy /orientation="horizontal"/
 <App>
@@ -170,7 +172,7 @@ The divider can be customized using XMLUI components via this property.
   `}
 />
 
-### `swapped`
+### `swapped (default: false)`
 
 This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.
 

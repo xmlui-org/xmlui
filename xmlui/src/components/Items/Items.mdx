@@ -10,14 +10,14 @@ If you plan to work with many items (more than a few dozen), use the [`List`](./
 
 ### Inline Data
 
-You can set the list of data to be rendered via the `items` property, as the following sample shows.
+You can set the list of data to be rendered via the `data` property, as the following sample shows.
 The nested child component describes a template to display each data entry in `Items`.
 In the template, you can refer to a particular entry with the [`$item`](#&item) identifier:
 
 ```ueml copy {8}
 <App>
   <VStack>
-    <Items items="{[
+    <Items data="{[
       { idx: 1, value: 'One lion' },
       { idx: 2, value: 'Two monkeys' },
       { idx: 3, value: 'Three rabbits' },
@@ -33,7 +33,7 @@ In the template, you can refer to a particular entry with the [`$item`](#&item) 
   app={`
     <App>
       <VStack>
-        <Items items="{[
+        <Items data="{[
           { idx: 1, value: 'One lion' },
           { idx: 2, value: 'Two monkeys' },
           { idx: 3, value: 'Three rabbits' },
@@ -53,7 +53,7 @@ You can use also API bindings to display data:
 <App>
   <VStack>
     <Items>
-      <property name="items">
+      <property name="data">
         <DataSource url="https://api.spacexdata.com/v3/rockets"/>
       </property>
       <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
@@ -68,7 +68,7 @@ You can use also API bindings to display data:
     <App>
       <VStack>
         <Items>
-          <property name="items">
+          <property name="data">
             <DataSource url="https://api.spacexdata.com/v3/rockets"/>
           </property>
           <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
@@ -87,7 +87,7 @@ You can use also API bindings to display data:
   <VStack>
     <Items
       reverse="true"
-      items="{[
+      data="{[
         { idx: 1, value: 'One lion' },
         { idx: 2, value: 'Two monkeys' },
         { idx: 3, value: 'Three rabbits' },
@@ -105,7 +105,7 @@ You can use also API bindings to display data:
       <VStack>
         <Items
           reverse="true"
-          items="{[
+          data="{[
             { idx: 1, value: 'One lion' },
             { idx: 2, value: 'Two monkeys' },
             { idx: 3, value: 'Three rabbits' },

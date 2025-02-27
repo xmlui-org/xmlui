@@ -15,7 +15,11 @@ export const ImageMd = createMetadata({
   props: {
     src: d(`This property is used to indicate the source (path) of the image to display.`),
     alt: d(`This property specifies an alternate text for the image.`),
-    fit: d(`This property sets how the image content should be resized to fit its container.`),
+    fit: {
+      description: "This property sets how the image content should be resized to fit its container.",
+      type: "string",
+      defaultValue: "contain",
+    },
     lazyLoad: d(
       `Lazy loading instructs the browser to load the image only when it is imminently needed ` +
         `(e.g. user scrolls to it). The default value is eager (\`false\`).`,

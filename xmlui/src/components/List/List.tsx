@@ -4,7 +4,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
-import { dComponent } from "../metadata-helpers";
+import { dComponent, dInternal } from "../metadata-helpers";
 import { scrollAnchoringValues } from "../abstractions";
 import { ListNative, MemoizedSection } from "./ListNative";
 
@@ -21,7 +21,7 @@ export const ListMd = createMetadata({
       `The component receives data via this property. The \`data\` property is a list of items ` +
         `that the \`List\` can display.`,
     ),
-    items: d(
+    items: dInternal(
       `You can use \`items\` as an alias for the \`data\` property. ` +
         `When you bind the list to a data source (e.g. an API endpoint), ` +
         `the \`data\` acts as the property that accepts a URL to fetch information from an API.` +
@@ -32,12 +32,12 @@ export const ListMd = createMetadata({
         `component receives usable list items via the [\`data\`](#data) property.`,
     ),
     limit: d(`This property limits the number of items displayed in the \`${COMP}\`.`),
-    scrollAnchor: d(
-      `This property pins the scroll position to a specified location of the list. Available values are shown below.`,
-      scrollAnchoringValues,
-      "string",
-      "top",
-    ),
+    scrollAnchor: {
+      description: `This property pins the scroll position to a specified location of the list. Available values are shown below.`,
+      availableValues: scrollAnchoringValues,
+      type: "string",
+      defaultValue: "top",
+    },
     groupBy: d(
       `This property sets which attribute of the data is used to group the list items. ` +
         `If the attribute does not appear in the data, it will be ignored.`,
@@ -69,9 +69,11 @@ export const ListMd = createMetadata({
       `This property contains the current page information. Setting this property also enures the ` +
         `\`${COMP}\` uses pagination.`,
     ),
-    idKey: d(
-      `Denotes which attribute of an item acts as the ID or key of the item. Default is \`"id"\`.`,
-    ),
+    idKey: {
+      description: "Denotes which attribute of an item acts as the ID or key of the item",
+      type: "string",
+      defaultValue: "id",
+    },
     groupsInitiallyExpanded: d(
       `This Boolean property defines whether the list groups are initially expanded.`,
     ),
@@ -81,17 +83,17 @@ export const ListMd = createMetadata({
         `those headers are also displayed (after the ones in this list); however, their order ` +
         `is not deterministic.`,
     ),
-    hideEmptyGroups: d(
-      "This boolean property indicates if empty groups should be hidden (no header and footer are displayed).",
-      null,
-      "boolean",
-      true,
-    ),
-    borderCollapse: d(
-      "Collapse items borders",
-      null,
-      "boolean",
-      true)
+    hideEmptyGroups: {
+      description:
+        "This boolean property indicates if empty groups should be hidden (no header and footer are displayed).",
+      valueType: "boolean",
+      defaultValue: true,
+    },
+    borderCollapse: {
+      description: "Collapse items borders",
+      valueType: "boolean",
+      defaultValue: true,
+    },
   },
   contextVars: {
     $item: d(`This property represents the value of an item in the data list.`),

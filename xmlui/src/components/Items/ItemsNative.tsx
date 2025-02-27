@@ -4,15 +4,13 @@ import { isPlainObject } from "lodash-es";
 // =====================================================================================================================
 // React Items component implementation
 
-export function Items({
-  items,
-  renderItem,
-  reverse = false,
-}: {
-  reverse?: boolean;
+type Props = {
   items: any[];
   renderItem: (contextVars: any, key: number) => ReactNode;
-}) {
+  reverse?: boolean;
+};
+
+export function Items({ items, renderItem, reverse = false }: Props) {
   const itemsToRender = useMemo(() => {
     if (!items) {
       return [];

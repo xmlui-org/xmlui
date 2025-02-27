@@ -15,11 +15,15 @@ export const NoResultMd = createMetadata({
   props: {
     label: dLabel(),
     icon: d(`This property defines the icon to display with the component.`),
-    hideIcon: d(`This boolean property indicates if the icon should be hidden.`),
+    hideIcon: {
+      description: `This boolean property indicates if the icon should be hidden.`,
+      valueType: "boolean",
+      defaultValue: "false",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`border-${COMP}`]: '0px solid $color-border',
+    [`border-${COMP}`]: "0px solid $color-border",
     [`padding-vertical-${COMP}`]: "$space-2",
     [`gap-icon-${COMP}`]: "$space-2",
     [`size-icon-${COMP}`]: "$space-8",

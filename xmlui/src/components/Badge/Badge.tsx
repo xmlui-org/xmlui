@@ -19,8 +19,8 @@ export const BadgeMd = createMetadata({
     },
     variant: {
       description:
-        `Modifies the shape of the component. Comes in the regular \`badge\` variant or the \`pill\` variant ` +
-        `with fully rounded corners.`,
+        "Modifies the shape of the component. Comes in the regular \`badge\` variant or the \`pill\` variant " +
+        "with fully rounded corners.",
       type: "string",
       availableValues: badgeVariantValues,
       defaultValue: "badge",
