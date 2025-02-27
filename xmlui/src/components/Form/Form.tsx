@@ -5,7 +5,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dComponent, dInternal } from "../metadata-helpers";
 import { labelPositionMd } from "../abstractions";
-import { FormWithContextVar } from "./FormNative";
+import { FormWithContextVar, defaultProps } from "./FormNative";
 
 const COMP = "Form";
 
@@ -18,41 +18,67 @@ export const FormMd = createMetadata({
     buttonRowTemplate: dComponent(
       `This property allows defining a custom component to display the buttons at the bottom of the form.`,
     ),
-    itemLabelPosition: d(
-      `This property sets the position of the item labels within the form.` +
+    itemLabelPosition: {
+      description:
+        `This property sets the position of the item labels within the form.` +
         `Individual \`FormItem\` instances can override this property.`,
-      labelPositionMd,
-      "string",
-      "top",
-    ),
-    itemLabelWidth: d(
-      `This property sets the width of the item labels within the form. Individual ` +
+      availableValues: labelPositionMd,
+      type: "string",
+      defaultValue: defaultProps.itemLabelPosition,
+    },
+    itemLabelWidth: {
+      description:
+        `This property sets the width of the item labels within the form. Individual ` +
         `\`FormItem\` instances can override this property.`,
-    ),
-    itemLabelBreak: d(
-      `This boolean value indicates if form item labels can be split into multiple ` +
+      type: "string",
+    },
+    itemLabelBreak: {
+      description:
+        `This boolean value indicates if form item labels can be split into multiple ` +
         `lines if it would overflow the available label width. Individual \`FormItem\` ` +
         `instances can override this property.`,
-    ),
-    keepModalOpenOnSubmit: d(
-      "This property prevents the modal from closing when the form is submitted.",
-    ),
-    data: d(
-      `This property sets the initial value of the form's data structure. The form infrastructure ` +
+      type: "boolean",
+      defaultValue: defaultProps.itemLabelBreak,
+    },
+    keepModalOpenOnSubmit: {
+      description: "This property prevents the modal from closing when the form is submitted.",
+      type: "boolean",
+      defaultValue: defaultProps.keepModalOpenOnSubmit,
+    },
+    data: {
+      description:
+        `This property sets the initial value of the form's data structure. The form infrastructure ` +
         `uses this value to set the initial state of form items within the form.`,
-    ),
-    cancelLabel: d(`This property defines the label of the Cancel button, by default, "Cancel".`),
-    saveLabel: d(`This property defines the label of the Save button, by default, "Save".`),
-    saveInProgressLabel: d(
-      "This property defines the label of the Save button to display during the " +
-        "form data submit (save) operation. By default, the value of `saveLabel`.",
-    ),
-    swapCancelAndSave: d(
-      `By default, the Cancel button is to the left of the Save button. Set this property to ` +
+    },
+    cancelLabel: {
+      description: "This property defines the label of the Cancel button.",
+      type: "string",
+      defaultValue: defaultProps.cancelLabel,
+    },
+    saveLabel: {
+      description: `This property defines the label of the Save button.`,
+      type: "string",
+      defaultValue: defaultProps.saveLabel,
+    },
+    saveInProgressLabel: {
+      description:
+        "This property defines the label of the Save button to display during the " +
+        "form data submit (save) operation.",
+      type: "string",
+      defaultValue: defaultProps.saveInProgressLabel,
+    },
+    swapCancelAndSave: {
+      description:
+        `By default, the Cancel button is to the left of the Save button. Set this property to ` +
         `\`true\` to swap them or \`false\` to keep their original location.`,
-    ),
+      type: "boolean",
+    },
     submitUrl: d(`URL to submit the form data.`),
-    submitMethod: d(`HTTP method to use when submitting the form data.`),
+    submitMethod: {
+      description:
+        "This property sets the HTTP method to use when submitting the form data. If not " +
+        "defined, `put` is used when the form has initial data; otherwise, `post`.",
+    },
     enabled: d(`Whether the form is enabled or not. The default value is \`true\`.`),
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
   },

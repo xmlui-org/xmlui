@@ -1,4 +1,4 @@
-import {type CSSProperties, forwardRef} from "react";
+import { type CSSProperties, forwardRef } from "react";
 import type React from "react";
 import styles from "./Icon.module.scss";
 import { useCustomSvgIconRenderer, useIconRegistry } from "../IconRegistryContext";
@@ -17,10 +17,14 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const Icon = forwardRef(function Icon({ name, fallback, style, className, ...restProps }: IconBaseProps, ref) {
+export const Icon = forwardRef(function Icon(
+  { name, fallback, style, className, size = "md", ...restProps }: IconBaseProps,
+  ref,
+) {
   const iconRenderer = useFindIconRenderer(name, fallback);
 
-  const computedSize = typeof restProps?.size === "string" ? mapSizeToIconPack(restProps.size) : restProps?.size;
+  const computedSize =
+    typeof size === "string" ? mapSizeToIconPack(size) : size;
   const width = computedSize || restProps.width;
   const height = computedSize || restProps.height;
   const computedProps = {
@@ -95,7 +99,9 @@ function useFindIconRenderer(name?: string, fallback?: string) {
     const parts: string[] = name.split(separator);
     // Component specific icon
     if (parts.length > 1) {
-      const iconRenderer = iconRegistry.lookupIconRenderer(`${parts[0].toLowerCase()}${separator}${parts[1]}`);
+      const iconRenderer = iconRegistry.lookupIconRenderer(
+        `${parts[0].toLowerCase()}${separator}${parts[1]}`,
+      );
       if (iconRenderer) return iconRenderer;
     }
     // General icon

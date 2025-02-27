@@ -16,25 +16,25 @@ export const LinkMd = createMetadata({
   props: {
     to: d(`This property defines the URL of the link.`),
     enabled: dEnabled(),
-    active: d(
-      `Indicates whether this link is active or not. If so, it will have a distinct visual appearance.`,
-      null,
-      "boolean",
-      false
-    ),
-    target: d(
-      `This property specifies where to open the link represented by the \`${COMP}\`. This ` +
+    active: {
+      description: `Indicates whether this link is active or not. If so, it will have a distinct visual appearance.`,
+      type: "boolean",
+      defaultValue: false,
+    },
+    target: {
+      description:
+        `This property specifies where to open the link represented by the \`${COMP}\`. This ` +
         `property accepts the following values (in accordance with the HTML standard):`,
-      LinkTargetMd,
-      "string",
-      "_self",
-    ),
+      availableValues: LinkTargetMd,
+      type: "string",
+      defaultValue: "_self",
+    },
     label: dLabel(),
     icon: d(`This property allows you to add an icon (specify the icon's name) to the link.`),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`border-${COMP}`]: '0px solid $color-border',
+    [`border-${COMP}`]: "0px solid $color-border",
     [`color-text-${COMP}--hover--active`]: `$color-text-${COMP}--active`,
     [`color-text-decoration-${COMP}--hover`]: "$color-surface-400A80",
     [`color-text-decoration-${COMP}--active`]: "$color-surface200",

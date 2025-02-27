@@ -7,8 +7,10 @@ import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Heading, type HeadingLevel } from "./HeadingNative";
+import { Heading, type HeadingLevel, defaultProps } from "./HeadingNative";
 import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
+import { de } from "date-fns/locale";
+import { omit } from "lodash-es";
 
 const COMP = "Heading";
 
@@ -22,29 +24,36 @@ const MAX_LINES_DESC = d(
     `not enough space for all of the text, the component wraps the text up to as many ` +
     `lines as specified.`,
 );
-const ELLIPSES_DESC = d(
-  `This property indicates whether ellipses should be displayed (\`true\`) when the heading ` +
+const ELLIPSES_DESC = {
+  description:
+    `This property indicates whether ellipses should be displayed (\`true\`) when the heading ` +
     `text is cropped or not (\`false\`).`,
-);
+  type: "boolean",
+  defaultValue: defaultProps.ellipses,
+};
 const PRESERVE_DESC = d(
   `This property indicates whether linebreaks should be preserved when ` + `displaying text.`,
 );
 const LEVEL_DESC = (level: number) => `Represents a heading level ${level} text`;
+const OMIT_FROM_TOC_DESC = {
+  description: "If true, this heading will be excluded from the table of contents.",
+  type: "boolean",
+  defaultValue: defaultProps.omitFromToc,
+};
 
 export const HeadingMd = createMetadata({
   description: "Represents a heading text",
   props: {
     value: VALUE_DESC,
-    level: d(`This property sets the visual significance (level) of the heading.`),
+    level: {
+      description: "This property sets the visual significance (level) of the heading.",
+      availableValues: ["h1", "h2", "h3", "h4", "h5", "h6"],
+      defaultValue: defaultProps.level,
+    },
     maxLines: MAX_LINES_DESC,
     ellipses: ELLIPSES_DESC,
     preserveLinebreaks: PRESERVE_DESC,
-    omitFromToc: d(
-      "If true, this heading will be excluded from the table of contents.",
-      null,
-      "boolean",
-      false,
-    ),
+    omitFromToc: OMIT_FROM_TOC_DESC,
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -68,6 +77,7 @@ export const H1Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -91,6 +101,7 @@ export const H2Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -114,6 +125,7 @@ export const H3Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -137,6 +149,7 @@ export const H4Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -160,6 +173,7 @@ export const H5Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -183,6 +197,7 @@ export const H6Md = createMetadata({
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
+    omitFromToc: OMIT_FROM_TOC_DESC,
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

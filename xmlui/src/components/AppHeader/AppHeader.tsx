@@ -18,12 +18,12 @@ export const AppHeaderMd = createMetadata({
       `This property makes the profile menu slot of the \`${COMP}\` component customizable.`,
     ),
     logoTemplate: dComponent(
-      `This property defines the template to use for the logo. With this property, you can ` +
-        `construct your custom logo instead of using a single image.`,
+      "This property defines the template to use for the logo. With this property, you can " +
+        "construct your custom logo instead of using a single image.",
     ),
     titleTemplate: dComponent(
-      `This property defines the template to use for the title. With this property, you can ` +
-        `construct your custom title instead of using a single image.`,
+      "This property defines the template to use for the title. With this property, you can " +
+        "construct your custom title instead of using a single image.",
     ),
     title: {
       description: "Title for the application logo",

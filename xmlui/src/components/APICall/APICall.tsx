@@ -2,6 +2,7 @@ import { type ComponentDef, createMetadata, d } from "../../abstractions/Compone
 import { createComponentRenderer } from "../../components-core/renderers";
 import type { ApiOperationDef } from "../../components-core/RestApiProxy";
 import { dInternal } from "../../components/metadata-helpers";
+import { httpMethodNames } from "../abstractions";
 import { APICallNative } from "./APICallNative";
 
 const COMP = "APICall";
@@ -34,74 +35,77 @@ export const APICallMd = createMetadata({
   props: {
     method: {
       description:
-        `The method of data manipulation can be done via setting this property. The following ` +
-        `HTTP methods are available: \`post\`, \`put\`, and \`delete\`.`,
+        "The method of data manipulation can be done via setting this property.",
       valueType: "string",
+      availableValues: httpMethodNames,
+      defaultValue: "get",
     },
     url: {
-      description: `Use this property to set the URL to send data to.`,
+      description: "Use this property to set the URL to send data to.",
       isRequired: true,
       valueType: "string",
     },
     rawBody: {
       description:
-        `This property sets the request body to the value provided here without any conversion. ` +
-        `Use the * \`body\` property if you want the object sent in JSON. When you define ` +
-        `\`body\` and \`rawBody\`, the latest one prevails.`,
+        "This property sets the request body to the value provided here without any conversion. " +
+        "Use the * \`body\` property if you want the object sent in JSON. When you define " +
+        "\`body\` and \`rawBody\`, the latest one prevails.",
       valueType: "string",
     },
     body: {
       description:
-        `This property sets the request body. The object you pass here will be serialized to ` +
-        `JSON when sending the request. Use the \`rawBody\` property to send another request ` +
-        `body using its native format. When you define \`body\` and \`rawBody\`, the latest ` +
-        `one prevails.`,
+        "This property sets the request body. The object you pass here will be serialized to " +
+        "JSON when sending the request. Use the \`rawBody\` property to send another request " +
+        "body using its native format. When you define \`body\` and \`rawBody\`, the latest " +
+        "one prevails.",
       valueType: "string",
     },
     queryParams: {
       description:
-        `This property sets the query parameters for the request. The object you pass here will ` +
-        `be serialized to a query string and appended to the request URL. You can specify key ` +
-        `and value pairs where the key is the name of a particular query parameter and the value ` +
-        `is that parameter's value.`,
+        "This property sets the query parameters for the request. The object you pass here will " +
+        "be serialized to a query string and appended to the request URL. You can specify key " +
+        "and value pairs where the key is the name of a particular query parameter and the value " +
+        "is that parameter's value.",
     },
     headers: {
       description:
-        `You can define request header values as key and value pairs, where the key is the ID of ` +
-        `the particular header and the value is that header's value.`,
+        "You can define request header values as key and value pairs, where the key is the ID of " +
+        "the particular header and the value is that header's value.",
     },
     confirmTitle: {
       description:
-        `This optional string sets the title in the confirmation dialog that is displayed before ` +
+        "This optional string sets the title in the confirmation dialog that is displayed before " +
         `the \`${COMP}\` is executed.`,
-        valueType: "string",
+      valueType: "string",
     },
     confirmMessage: {
       description:
-        `This optional string sets the message in the confirmation dialog that is displayed before ` +
+        "This optional string sets the message in the confirmation dialog that is displayed before " +
         `the \`${COMP}\` is executed.`,
       valueType: "string",
     },
     confirmButtonLabel: {
       description:
-        `This optional string property enables the customization of the submit button in the ` +
+        "This optional string property enables the customization of the submit button in the " +
         `confirmation dialog that is displayed before the \`${COMP}\` is executed.`,
       valueType: "string",
     },
     inProgressNotificationMessage: {
       description:
-        `This property customizes the message that is displayed in a toast while the API operation ` +
-        `is in progress.`,
+        "This property customizes the message that is displayed in a toast while the API operation " +
+        "is in progress.",
       valueType: "string",
     },
     errorNotificationMessage: {
-      description: `This property defines the message to display automatically when the operation results ` +
-        `in an error.`,
+      description:
+        "This property defines the message to display automatically when the operation results " +
+        "in an error.",
       valueType: "string",
     },
     completedNotificationMessage: {
-      description: `This property defines the message to display automatically when the operation has ` +
-        `been completed.`,
+      description:
+        "This property defines the message to display automatically when the operation has " +
+        "been completed.",
       valueType: "string",
     },
     payloadType: dInternal(),
@@ -112,15 +116,15 @@ export const APICallMd = createMetadata({
   },
   events: {
     beforeRequest: d(
-      `This event fires before the request is sent. Returning an explicit boolean` +
-        `'false' value will prevent the request from being sent.`,
+      "This event fires before the request is sent. Returning an explicit boolean" +
+        "\`false\` value will prevent the request from being sent.",
     ),
-    success: d(`This event fires when a request results in a success.`),
+    success: d("This event fires when a request results in a success."),
     /**
      * This event fires when a request results in an error.
      * @descriptionRef
      */
-    error: d(`This event fires when a request results in an error.`),
+    error: d("This event fires when a request results in an error."),
     progress: dInternal(),
   },
   contextVars: {

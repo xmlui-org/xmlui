@@ -12,8 +12,16 @@ export const SpinnerMd = createMetadata({
     `The \`${COMP}\` component is an animated indicator that represents a particular action ` +
     `in progress without a deterministic progress value.`,
   props: {
-    delay: d(`The delay in milliseconds before the spinner is displayed.`),
-    fullScreen: d(`If set to \`true\`, the component will be rendered in a full screen container.`),
+    delay: {
+      description: `The delay in milliseconds before the spinner is displayed.`,
+      valueType: "number",
+      defaultValue: 400,
+    },
+    fullScreen: {
+      description: `If set to \`true\`, the component will be rendered in a full screen container.`,
+      valueType: "boolean",
+      defaultValue: false,
+    },
     themeColor: d(`(**NOT IMPLEMENTED YET**) The theme color of the component.`),
   },
   themeVars: parseScssVar(styles.themeVars),

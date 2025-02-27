@@ -12,14 +12,21 @@ export const FileUploadDropZoneMd = createMetadata({
     `The \`${COMP}\` component allows users to upload files to a web application by dragging ` +
     `and dropping files from their local file system onto a designated area within the UI.`,
   props: {
-    text: d(
-      `With this property, you can change the default text ("Drop files here") to display when files ` +
-        `are dragged over the drop zone.`,
-    ),
-    allowPaste: d(
-      `This property indicates if the drop zone accepts files pasted from the clipboard (\`true\`) or ` +
-        `only dragged files (\`false\`).`,
-    ),
+    text: {
+      description:
+        "With this property, you can change the default text to display when files " +
+        "are dragged over the drop zone.",
+      defaultValue: "Drop files here",
+      type: "string",
+    },
+    allowPaste: {
+      description:
+        "This property indicates if the drop zone accepts files pasted from the " +
+        "clipboard (\`true\`) or " +
+        "only dragged files (\`false\`).",
+      type: "boolean",
+      defaultValue: true,
+    },
     enabled: d(
       `If set to \`false\`, the drop zone will be disabled and users will not be able to upload files.`,
       null,

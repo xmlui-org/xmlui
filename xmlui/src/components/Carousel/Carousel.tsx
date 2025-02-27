@@ -16,7 +16,10 @@ export const CarouselMd = createMetadata({
     `custom slides) like a carousel.`,
   props: {
     orientation: {
-      description: "This property indicates the orientation of the carousel. The `horizontal` value indicates that the carousel moves horizontally, and the `vertical` value indicates that the carousel moves vertically.",
+      description:
+        "This property indicates the orientation of the carousel. The `horizontal` " +
+        "value indicates that the carousel moves horizontally, and the `vertical` " +
+        "value indicates that the carousel moves vertically.",
       availableValues: orientationOptionMd,
       valueType: "string",
       defaultValue: defaultProps.orientation,

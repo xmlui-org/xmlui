@@ -53,27 +53,30 @@ export const NumberBoxMd = createMetadata({
     startIcon: dStartIcon(),
     endText: dEndText(),
     endIcon: dEndIcon(),
-    hasSpinBox: d(
-      `This boolean prop shows (\`true\`) or hides (\`false\`) the spinner buttons for the input field.`,
-      null,
-      "boolean",
-      true,
-    ),
-    step: d(`This prop governs how big the step when clicking on the spinner of the field.`, null, "number"),
-    integersOnly: d(
-      `This boolean property signs whether the input field accepts integers only (\`true\`) ` +
+    hasSpinBox: {
+      description: `This boolean prop shows (\`true\`) or hides (\`false\`) the spinner buttons for the input field.`,
+      valueType: "boolean",
+      defaultValue: true,
+    },
+    step: {
+      description: `This prop governs how big the step when clicking on the spinner of the field.`,
+      valueType: "number",
+      defaultValue: 1,
+    },
+    integersOnly: {
+      description:
+        `This boolean property signs whether the input field accepts integers only (\`true\`) ` +
         `or not (\`false\`).`,
-      null,
-      "boolean",
-      false,
-    ),
-    zeroOrPositive: d(
-      `This boolean property determines whether the input value can only be 0 or positive numbers ` +
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    zeroOrPositive: {
+      description:
+        `This boolean property determines whether the input value can only be 0 or positive numbers ` +
         `(\`true\`) or also negative (\`false\`).`,
-      null,
-      "boolean",
-      false,
-    ),
+      valueType: "boolean",
+      defaultValue: false,
+    },
     minValue: d(
       `The minimum value the input field allows. Can be a float or an integer if ` +
         `[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer.`,

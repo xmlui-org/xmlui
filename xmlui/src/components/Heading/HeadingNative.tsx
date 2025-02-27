@@ -33,6 +33,12 @@ export type HeadingProps = {
   [furtherProps: string]: any;
 };
 
+export const defaultProps: Pick<HeadingProps, "level" | "ellipses" | "omitFromToc"> = {
+  level: "h1",
+  ellipses: true,
+  omitFromToc: false,
+};
+
 export const Heading = forwardRef(function Heading(
   {
     uid,
@@ -45,7 +51,7 @@ export const Heading = forwardRef(function Heading(
     preserveLinebreaks,
     ellipses = true,
     className,
-    omitFromToc,
+    omitFromToc = false,
     ...furtherProps
   }: HeadingProps,
   forwardedRef: ForwardedRef<HTMLHeadingElement>,

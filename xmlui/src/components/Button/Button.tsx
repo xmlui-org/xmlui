@@ -18,7 +18,7 @@ import { Button, propDefaults } from "./ButtonNative";
 const COMP = "Button";
 
 export const ButtonMd = createMetadata({
-  description: `Button is an interactive element that triggers an action when clicked.`,
+  description: "Button is an interactive element that triggers an action when clicked.",
   status: "stable",
   props: {
     autoFocus: {
@@ -54,14 +54,12 @@ export const ButtonMd = createMetadata({
         `specified and an icon is set, the ${COMP} will modify its styling to look like a ` +
         `small icon button. When the ${COMP} has nested children, it will display them and ` +
         `ignore the value of the \`label\` prop.`,
-      isRequired: false,
       type: "string",
     },
     type: {
       description:
         `This optional string describes how the ${COMP} appears in an HTML context. You ` +
         `rarely need to set this property explicitly.`,
-      isRequired: false,
       availableValues: buttonTypesMd,
       valueType: "string",
       defaultValue: propDefaults.type,
@@ -70,7 +68,6 @@ export const ButtonMd = createMetadata({
       description:
         `The value of this property indicates whether the button accepts actions (\`true\`) ` +
         `or does not react to them (\`false\`).`,
-      isRequired: false,
       type: "boolean",
       defaultValue: true,
     },
@@ -80,12 +77,10 @@ export const ButtonMd = createMetadata({
         `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
         `recognizes the icon by its name. If no label is specified and an icon is set, the ${COMP} ` +
         `displays only that icon.`,
-      isRequired: false,
       type: "string",
     },
     iconPosition: {
       description: `This optional string determines the location of the icon in the ${COMP}.`,
-      isRequired: false,
       availableValues: iconPositionMd,
       type: "string",
       defaultValue: propDefaults.iconPosition,
@@ -94,7 +89,6 @@ export const ButtonMd = createMetadata({
       description:
         `This optional value determines how the label and icon (or nested children) should be placed` +
         `inside the ${COMP} component.`,
-      isRequired: false,
       availableValues: alignmentOptionMd,
       type: "string",
       defaultValue: propDefaults.contentPosition,

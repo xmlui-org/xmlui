@@ -25,7 +25,8 @@ import styles from "./ColorPicker.module.scss";
 const COMP = "ColorPicker";
 
 export const ColorPickerMd = createMetadata({
-  description: ``,
+  description:
+    "This component allows the user to select a color with the browser's default color picker control.",
   props: {
     initialValue: dInitialValue(),
     label: dLabel(),

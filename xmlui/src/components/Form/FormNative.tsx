@@ -235,6 +235,23 @@ type Props = {
   keepModalOpenOnSubmit?: boolean;
 };
 
+export const defaultProps: Pick<
+  Props,
+  | "cancelLabel"
+  | "saveLabel"
+  | "saveInProgressLabel"
+  | "itemLabelPosition"
+  | "itemLabelBreak"
+  | "keepModalOpenOnSubmit"
+> = {
+  cancelLabel: "Cancel",
+  saveLabel: "Save",
+  saveInProgressLabel: "Saving...",
+  itemLabelPosition: "top",
+  itemLabelBreak: true,
+  keepModalOpenOnSubmit: false,
+};
+
 const Form = forwardRef(function (
   {
     formState,

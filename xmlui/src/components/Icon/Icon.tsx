@@ -14,10 +14,13 @@ export const IconMd = createMetadata({
       `This string property specifies the name of the icon to display. All icons have unique names ` +
         `and identifying the name is case-sensitive.`,
     ),
-    size: d(
-      `This property defines the size of the \`${COMP}\`. Note that setting the \`height\` and/or ` +
+    size: {
+      description:
+        `This property defines the size of the \`${COMP}\`. Note that setting the \`height\` and/or ` +
         `the \`width\` of the component will override this property.`,
-    ),
+      availableValues: ["xs", "sm", "md", "lg"],
+      defaultValue: "md",
+    },
     fallback: d(
       `This optional property provides a way to handle situations when the provided ` +
         `[icon name](#name) is not found in the registry.`,
