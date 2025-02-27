@@ -1,13 +1,21 @@
-import { Pie, PieChart as RPieChart, Sector, ResponsiveContainer, LabelList } from "recharts";
+import {
+  Pie,
+  PieChart as RPieChart,
+  Sector,
+  ResponsiveContainer,
+  LabelList,
+  Tooltip,
+} from "recharts";
 import type { PieSectorDataItem } from "recharts/types/polar/Pie";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../utils/Chart";
 import styles from "./PieChartNative.module.scss";
 import { useColors } from "xmlui";
 import type { CSSProperties, ReactNode } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import { useMemo } from "react";
 import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider from "../utils/ChartProvider";
+import * as React from "react";
 
 export type PieChartProps = {
   data: any[];
@@ -33,6 +41,7 @@ export function PieChart({
   children,
 }: PieChartProps) {
   const [labelList, setLabelList] = useState();
+  const [legend, setLegend] = useState();
 
   const colors = useColors(
     {
@@ -77,15 +86,21 @@ export function PieChart({
     });
   }, [colors, data]);
 
+  const chartRegistry = useMemo(
+    () => ({
+      setLabelList,
+      setLegend,
+    }),
+    [],
+  );
+
   return (
-    <ChartProvider
-      value={{ chartConfig, nameKey, dataKey, chartRegistry: { labelList, setLabelList } }}
-    >
-      {children}
-      <ResponsiveContainer style={style}>
-        <ChartContainer config={chartConfig} className={styles.chartContainer}>
+    <ChartProvider value={{ chartConfig, nameKey, dataKey, chartRegistry }}>
+      <div style={{ width: "100%", height: "100%" }}>
+        {children}
+        <ResponsiveContainer style={style}>
           <RPieChart>
-            <ChartTooltip cursor={true} content={<ChartTooltipContent hideLabel />} />
+            <Tooltip />
             <Pie
               data={chartData}
               dataKey={dataKey}
@@ -111,9 +126,10 @@ export function PieChart({
                     />
                   )}
             </Pie>
+            {legend && legend}
           </RPieChart>
-        </ChartContainer>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      </div>
     </ChartProvider>
   );
 }

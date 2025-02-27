@@ -27,13 +27,24 @@ export function useChart() {
 export function useLabelList() {
   const context = useContext(ChartContext);
   if (context === undefined) {
-    throw new Error("LabelList must be used within a PieChart");
+    throw new Error("LabelList must be used within a chart");
   }
 
   const { chartRegistry } = context;
   return {
-    labelList: chartRegistry?.labelList,
     setLabelList: chartRegistry?.setLabelList,
+  };
+}
+
+export function useLegend() {
+  const context = useContext(ChartContext);
+  if (context === undefined) {
+    throw new Error("Legend must be used within a chart");
+  }
+
+  const { chartRegistry } = context;
+  return {
+    setLegend: chartRegistry?.setLegend,
   };
 }
 

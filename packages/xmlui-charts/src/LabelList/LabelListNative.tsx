@@ -1,8 +1,8 @@
 import styles from "../PieChart/PieChartNative.module.scss";
 import type { LabelPosition } from "recharts/types/component/Label";
-import { useChart, useLabelList } from "./ChartProvider";
 import { useEffect, useMemo } from "react";
 import { LabelList as RLabelList } from "recharts";
+import { useChart, useLabelList } from "../utils/ChartProvider";
 
 type Props = {
   position: LabelPosition;

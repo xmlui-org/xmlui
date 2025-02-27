@@ -1,7 +1,13 @@
-import { CartesianGrid, Line, LineChart as RLineChart, XAxis, ResponsiveContainer } from "recharts";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../utils/Chart";
+import {
+  CartesianGrid,
+  Line,
+  LineChart as RLineChart,
+  XAxis,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 import { useColors } from "xmlui";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 export type LineChartProps = {
   data: any[];
@@ -58,31 +64,21 @@ export function LineChart({
 
   return (
     <ResponsiveContainer style={style}>
-      <ChartContainer config={config}>
-        <RLineChart accessibilityLayer data={data}>
-          <CartesianGrid vertical={false} />
-          <XAxis
-            interval="preserveStartEnd"
-            dataKey={nameKey}
-            tickLine={false}
-            hide={hideX}
-            axisLine={false}
-            tickFormatter={tickFormatter}
-          />
-          {!hideTooltip && (
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-          )}
-          {Object.keys(config).map((key, index) => (
-            <Line
-              key={index}
-              dataKey={key}
-              type="monotone"
-              stroke={config[key].color}
-              dot={false}
-            />
-          ))}
-        </RLineChart>
-      </ChartContainer>
+      <RLineChart accessibilityLayer data={data}>
+        <CartesianGrid vertical={false} />
+        <XAxis
+          interval="preserveStartEnd"
+          dataKey={nameKey}
+          tickLine={false}
+          hide={hideX}
+          axisLine={false}
+          tickFormatter={tickFormatter}
+        />
+        {!hideTooltip && <Tooltip />}
+        {Object.keys(config).map((key, index) => (
+          <Line key={index} dataKey={key} type="monotone" stroke={config[key].color} dot={false} />
+        ))}
+      </RLineChart>
     </ResponsiveContainer>
   );
 }
