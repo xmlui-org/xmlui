@@ -6,7 +6,6 @@ const COMP = "Animation";
 export const AnimationMd = createMetadata({
   status: "in progress",
   description: ``,
-  descriptionRef: "",
   props: {
     animation: d(`The animation object to be applied to the component`),
     animateWhenInView: d(

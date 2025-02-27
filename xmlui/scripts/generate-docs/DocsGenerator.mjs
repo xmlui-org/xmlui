@@ -84,18 +84,51 @@ export class DocsGenerator {
   }
 
   /**
+   * Generates the package description section in a specified file for a given Extension package.
+   * @param {string} packageDescription The data to add to the file
+   * @param {string} sectionName Name of the section to (re)generate
+   * @param {string} fileName The name and absolute path of the file to write to
+   */
+  async generatePackageDescription(packageDescription, sectionName, fileName) {
+    logger.info("Creating package description section in specified file");
+    try {
+      const outFile = fileName || join(FOLDERS.pages, `${basename(this.folders.sourceFolder)}.mdx`);
+
+      if (!existsSync(outFile)) {
+        await writeFile(outFile, "");
+      }
+      let buffer = await readFile(outFile, "utf8");
+
+      const sectionNameHeading = `## ${sectionName}`;
+      buffer = createSectionHeading(buffer, sectionNameHeading);
+      const { beforeSection, afterSection } = getSectionBeforeAndAfter(buffer, sectionName);
+      const section =
+        beforeSection + "\n" + sectionNameHeading + "\n\n" + packageDescription + afterSection;
+
+      await writeFile(outFile, section.trim());
+    } catch (error) {
+      processError(error);
+    }
+  }
+
+  /**
    * Generates the component summary table and adds it to the provided file.
    * The function looks for the summary section in the provided file and regenerates it if present,
    * otherwise it appends one to the end of the file.
    * @param {string} summarySectionName The section to look for and add the summary to
    * @param {string?} summaryFileName The full path and name of the file to add the summary to
-   * @param {boolean?} rowNums Whether to add row numbers to the summary table
+   * @param {boolean?} tableRowNums Whether to add row numbers to the summary table
    */
-  async generateComponentsSummary(summarySectionName = "Components", summaryFileName, rowNums) {
+  async generateComponentsSummary(
+    summarySectionName = "Components",
+    summaryFileName,
+    tableRowNums,
+  ) {
     logger.info("Creating Component Summary");
     try {
-      const outFile = summaryFileName || join(FOLDERS.pages, `${basename(this.folders.sourceFolder)}.mdx`);
-      
+      const outFile =
+        summaryFileName || join(FOLDERS.pages, `${basename(this.folders.sourceFolder)}.mdx`);
+
       if (!existsSync(outFile)) {
         await writeFile(outFile, "");
       }
@@ -106,7 +139,7 @@ export class DocsGenerator {
         this.folders.sourceFolder,
         this.folders.outFolder,
         summarySectionName,
-        rowNums,
+        tableRowNums,
       );
 
       await writeFile(outFile, summary);
@@ -148,21 +181,15 @@ async function createSummary(
   sectionName = "Components",
   rowNums = true,
 ) {
-  const buffer = await readFile(filename, "utf8");
+  let buffer = await readFile(filename, "utf8");
   const componentFolderName = basename(componentsSourceFolder);
 
-  // The summary file may contain other sections than the summary table.
-  // Thus, we only (re)generate the section that contains the summary table - and look for the next section
-  const lines = strBufferToLines(buffer);
-  const componentSectionStartIdx = lines.findIndex((line) => line.includes(`## ${sectionName}`));
-  const componentSectionEndIdx = lines
-    .slice(componentSectionStartIdx + 1)
-    .findIndex((line) => /^#+[\s\S]/.exec(line));
-
-  const beforeComponentsSection = lines.slice(0, componentSectionStartIdx).join("\n");
-  const afterComponentsSection = lines
-    .slice(componentSectionStartIdx + 1, componentSectionStartIdx + 1 + componentSectionEndIdx)
-    .join("\n");
+  buffer = createSectionHeading(buffer, `## ${sectionName}`);
+  // The summary file may contain further sections other than the summary table.
+  // Thus, we only (re)generate the section that contains the summary table.
+  // This is done by finding the heading for the start of the summary table section and either the end of file
+  // or the next section heading.
+  const { beforeSection, afterSection } = getSectionBeforeAndAfter(buffer, sectionName);
 
   const sortedMetadata = metadata.sort((a, b) => {
     return a.displayName.localeCompare(b.displayName);
@@ -193,7 +220,31 @@ async function createSummary(
       }),
   });
 
-  return beforeComponentsSection + "\n" + table + afterComponentsSection;
+  return beforeSection + "\n" + table + afterSection;
+}
+
+function createSectionHeading(buffer, sectionNameHeading) {
+  const lines = strBufferToLines(buffer);
+  const sectionStartIdx = lines.findIndex((line) => line.includes(sectionNameHeading));
+  if (sectionStartIdx === -1) {
+    buffer += `\n\n${sectionNameHeading}\n\n`;
+  }
+  return buffer.trim();
+}
+
+function getSectionBeforeAndAfter(buffer, sectionName) {
+  const lines = strBufferToLines(buffer);
+  const sectionStartIdx = lines.findIndex((line) => line.includes(`## ${sectionName}`));
+  const sectionEndIdx = lines
+    .slice(sectionStartIdx + 1)
+    .findIndex((line) => /^#+[\s\S]/.exec(line));
+
+  const beforeSection = lines.slice(0, sectionStartIdx).join("\n");
+  const afterSection = lines
+    .slice(sectionStartIdx + 1, sectionStartIdx + 1 + sectionEndIdx)
+    .join("\n");
+
+  return { beforeSection, afterSection };
 }
 
 function addDescriptionRef(component, entries = []) {
