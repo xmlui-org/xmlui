@@ -7,7 +7,9 @@ import {
   Tooltip,
 } from "recharts";
 import { useColors } from "xmlui";
+import type { ReactNode} from "react";
 import { useMemo } from "react";
+import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 
 export type LineChartProps = {
   data: any[];
@@ -17,6 +19,7 @@ export type LineChartProps = {
   hideX?: boolean;
   hideTooltip?: boolean;
   tickFormatter?: (value: any) => any;
+  children?: ReactNode;
 };
 
 export function LineChart({
@@ -27,6 +30,7 @@ export function LineChart({
   hideX = false,
   hideTooltip = false,
   tickFormatter,
+  children,
 }: LineChartProps) {
   const colors = useColors(
     {
@@ -62,23 +66,35 @@ export function LineChart({
     );
   }, [colors, dataKeys]);
 
+  const chartContextValue = useChartContextValue({ nameKey, dataKeys });
+
   return (
-    <ResponsiveContainer style={style}>
-      <RLineChart accessibilityLayer data={data}>
-        <CartesianGrid vertical={false} />
-        <XAxis
-          interval="preserveStartEnd"
-          dataKey={nameKey}
-          tickLine={false}
-          hide={hideX}
-          axisLine={false}
-          tickFormatter={tickFormatter}
-        />
-        {!hideTooltip && <Tooltip />}
-        {Object.keys(config).map((key, index) => (
-          <Line key={index} dataKey={key} type="monotone" stroke={config[key].color} dot={false} />
-        ))}
-      </RLineChart>
-    </ResponsiveContainer>
+    <ChartProvider value={chartContextValue}>
+      {children}
+      <ResponsiveContainer style={style}>
+        <RLineChart accessibilityLayer data={data}>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            interval="preserveStartEnd"
+            dataKey={nameKey}
+            tickLine={false}
+            hide={hideX}
+            axisLine={false}
+            tickFormatter={tickFormatter}
+          />
+          {!hideTooltip && <Tooltip />}
+          {Object.keys(config).map((key, index) => (
+            <Line
+              key={index}
+              dataKey={key}
+              type="monotone"
+              stroke={config[key].color}
+              dot={false}
+            />
+          ))}
+          {chartContextValue.legend && chartContextValue.legend}
+        </RLineChart>
+      </ResponsiveContainer>
+    </ChartProvider>
   );
 }

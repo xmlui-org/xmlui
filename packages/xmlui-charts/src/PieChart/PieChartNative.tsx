@@ -10,11 +10,9 @@ import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import styles from "./PieChartNative.module.scss";
 import { useColors } from "xmlui";
 import type { CSSProperties, ReactNode } from "react";
-import { useEffect } from "react";
-import { useState } from "react";
 import { useMemo } from "react";
 import type { LabelPosition } from "recharts/types/component/Label";
-import ChartProvider from "../utils/ChartProvider";
+import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import * as React from "react";
 
 export type PieChartProps = {
@@ -40,9 +38,6 @@ export function PieChart({
   innerRadius = 0,
   children,
 }: PieChartProps) {
-  const [labelList, setLabelList] = useState();
-  const [legend, setLegend] = useState();
-
   const colors = useColors(
     {
       name: "color-primary-500",
@@ -62,19 +57,6 @@ export function PieChart({
     },
   );
 
-  const chartConfig = useMemo(() => {
-    if (!data) return {};
-
-    return data.reduce((acc, item) => {
-      const key = item[nameKey];
-      acc[key] = {
-        label: key,
-        value: item[dataKey],
-      };
-      return acc;
-    }, {});
-  }, [data, dataKey, nameKey]);
-
   const chartData = useMemo(() => {
     const colorValues = Object.values(colors);
     if (!data) return [];
@@ -86,50 +68,39 @@ export function PieChart({
     });
   }, [colors, data]);
 
-  const chartRegistry = useMemo(
-    () => ({
-      setLabelList,
-      setLegend,
-    }),
-    [],
-  );
+  const chartContextValue = useChartContextValue({ dataKey, nameKey });
 
   return (
-    <ChartProvider value={{ chartConfig, nameKey, dataKey, chartRegistry }}>
-      <div style={{ width: "100%", height: "100%" }}>
-        {children}
-        <ResponsiveContainer style={style}>
-          <RPieChart>
-            <Tooltip />
-            <Pie
-              data={chartData}
-              dataKey={dataKey}
-              nameKey={nameKey}
-              innerRadius={innerRadius}
-              label={showLabel}
-              activeShape={({ outerRadius = 0, ...props }: PieSectorDataItem) => (
-                <Sector {...props} outerRadius={outerRadius + 10} />
-              )}
-            >
-              {labelList
-                ? labelList
-                : showLabelList && (
-                    <LabelList
-                      position={labelListPosition}
-                      dataKey={nameKey}
-                      className={styles.labelList}
-                      stroke="none"
-                      fontSize={12}
-                      formatter={(value: keyof typeof chartConfig) => {
-                        return chartConfig[value]?.label;
-                      }}
-                    />
-                  )}
-            </Pie>
-            {legend && legend}
-          </RPieChart>
-        </ResponsiveContainer>
-      </div>
+    <ChartProvider value={chartContextValue}>
+      {children}
+      <ResponsiveContainer style={style}>
+        <RPieChart>
+          <Tooltip />
+          <Pie
+            data={chartData}
+            dataKey={dataKey}
+            nameKey={nameKey}
+            innerRadius={innerRadius}
+            label={showLabel}
+            activeShape={({ outerRadius = 0, ...props }: PieSectorDataItem) => (
+              <Sector {...props} outerRadius={outerRadius + 10} />
+            )}
+          >
+            {chartContextValue.labelList
+              ? chartContextValue.labelList
+              : showLabelList && (
+                  <LabelList
+                    position={labelListPosition}
+                    dataKey={nameKey}
+                    className={styles.labelList}
+                    stroke="none"
+                    fontSize={12}
+                  />
+                )}
+          </Pie>
+          {chartContextValue.legend && chartContextValue.legend}
+        </RPieChart>
+      </ResponsiveContainer>
     </ChartProvider>
   );
 }

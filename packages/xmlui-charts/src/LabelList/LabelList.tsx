@@ -1,5 +1,5 @@
 import { createComponentRenderer, createMetadata, d, parseScssVar } from "xmlui";
-import styles from "../PieChart/PieChartNative.module.scss";
+import styles from "./LabelListNative.module.scss";
 import { LabelList } from "./LabelListNative";
 
 const COMP = "LabelList";
@@ -12,18 +12,19 @@ export const LabelListMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "color-text-labelList-PieChart": "$color-text-primary",
+    "color-text-LabelList": "$color-text-primary",
   },
 });
 
 export const labelListComponentRenderer = createComponentRenderer(
   COMP,
   LabelListMd,
-  ({ extractValue, node }: any) => {
+  ({ extractValue, node, layoutCss }: any) => {
     return (
       <LabelList
         key={extractValue(node.props?.dataKey)}
         position={extractValue.asOptionalString(node.props?.position)}
+        style={layoutCss}
       />
     );
   },
