@@ -9,6 +9,8 @@ import {
 } from "react";
 import { useScrollEventHandler, useScrollParent } from "./utils/hooks";
 import { useLocation } from "@remix-run/react";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "./constants";
+import { useNavigate } from "react-router-dom";
 
 // --- Stores the information about a particular heading to be displayed in the TOC.
 type HeadingItem = {
@@ -25,6 +27,8 @@ type HeadingItem = {
   anchor: HTMLAnchorElement | null;
 };
 
+type ActiveAnchorChangedCallback = (id: string) => void;
+
 // --- The context object that is used to store the hierarchy of headings.
 interface ITableOfContentsContext {
   // --- The list of headings in the TOC
@@ -34,16 +38,12 @@ interface ITableOfContentsContext {
   registerHeading: (headingItem: HeadingItem) => void;
 
   // --- This flag indicates whether the intersection observer is enabled.
-  observeIntersection: boolean;
-
-  // --- This method allows enabling or disabling the intersection
-  setObserveIntersection: (observe: boolean) => void;
-
-  // --- The id of the currently active anchor.
-  activeAnchorId: string | null;
+  hasTableOfContents: boolean;
 
   // --- This method allows setting the id of the active anchor.
-  setActiveAnchorId: (id: string) => void;
+  scrollToAnchor: (id: string, smoothScrolling: boolean) => void;
+
+  subscribeToActiveAnchorChange: (callback: ActiveAnchorChangedCallback) => () => void;
 }
 
 /**
@@ -57,9 +57,8 @@ export const TableOfContentsContext = createContext<ITableOfContentsContext | nu
  * This provider component injects the specified children into the TOC context.
  */
 export function TableOfContentsProvider({ children }: { children: React.ReactNode }) {
-  const [headings, setHeadings] = useState<Record<string, HeadingItem>>({});
-  const [observeIntersection, setObserveIntersection] = useState<boolean>(false);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [headings, setHeadings] = useState<Record<string, HeadingItem>>(EMPTY_OBJECT);
+  const [callbacks, setCallbacks] = useState<Array<ActiveAnchorChangedCallback>>(EMPTY_ARRAY);
   const observer = useRef<IntersectionObserver | null>(null);
   const initialHeading = useRef<HTMLElement | null>(null);
   const thisRef = useRef({
@@ -72,26 +71,39 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     }, []),
   });
 
+  const notify = useCallback(
+    (id) => {
+      callbacks.forEach((cb) => cb(id));
+    },
+    [callbacks],
+  );
+
   useEffect(() => {
-    if (observeIntersection) {
+    if (callbacks.length) {
       const handleObserver = (entries: any) => {
         entries.forEach((entry: any) => {
           if (entry?.isIntersecting) {
             if (!thisRef.current.suspendPositionBasedSetActiveId) {
-              setActiveId(entry.target.id);
+              notify(entry.target.id);
             }
           }
         });
       };
+
+      // stolen from nextra: https://github.com/shuding/nextra/blob/3729f67059f1fbdd3f98125bebabbe568c918694/packages/nextra-theme-docs/src/mdx-components/heading-anchor.client.tsx
+      // let headerHeight = getComputedStyle(scrollParent || document.body).getPropertyValue(
+      //   '--header-abs-height'
+      // );
       observer.current = new IntersectionObserver(handleObserver, {
-        rootMargin: "0px 0px -50%",
-        threshold: [0, 1],
+        rootMargin: `0% 0% -80%`,
+        // root: scrollParent,
+        // threshold: [0, 1],
       });
 
       Object.values(headings).forEach((elem) => observer?.current?.observe?.(elem.anchor!));
       return () => observer.current?.disconnect();
     }
-  }, [headings, observeIntersection]);
+  }, [callbacks.length, headings, notify, scrollParent]);
 
   const registerHeading = useCallback((headingItem: HeadingItem) => {
     setHeadings((prevHeadings) => {
@@ -110,14 +122,34 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     };
   }, []);
 
-  const setActiveAnchorId = useCallback(
-    (id: string) => {
-      if (headings[id]) {
+  const navigate = useNavigate();
+
+  const scrollToAnchor = useCallback(
+    (id: string, smoothScrolling: boolean) => {
+      const value = headings[id];
+      if (value) {
+        value.anchor.scrollIntoView({
+          block: "start",
+          inline: "start",
+          behavior: smoothScrolling ? "smooth" : "auto",
+        });
+        notify(id);
+        requestAnimationFrame(() => {
+          navigate(
+            {
+              hash: `#${value.id}`,
+            },
+            {
+              state: {
+                preventHashScroll: true,
+              },
+            },
+          );
+        });
         thisRef.current.suspendPositionBasedSetActiveId = true;
-        setActiveId(id);
       }
     },
-    [headings],
+    [headings, navigate, notify],
   );
 
   const sortedHeadings = useMemo(() => {
@@ -150,16 +182,32 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     }
   }, [location.hash, sortedHeadings]);
 
+  const subscribeToActiveAnchorChange = useCallback((cb: ActiveAnchorChangedCallback) => {
+    setCallbacks((prev) => {
+      return [...prev, cb];
+    });
+    return () => {
+      setCallbacks((prev) => {
+        return prev.filter((item) => item !== cb);
+      });
+    };
+  }, []);
+
   const contextValue: ITableOfContentsContext = useMemo(() => {
     return {
       registerHeading,
       headings: sortedHeadings,
-      observeIntersection,
-      setObserveIntersection,
-      activeAnchorId: activeId,
-      setActiveAnchorId,
+      scrollToAnchor,
+      subscribeToActiveAnchorChange,
+      hasTableOfContents: callbacks.length > 0,
     };
-  }, [registerHeading, sortedHeadings, observeIntersection, activeId, setActiveAnchorId]);
+  }, [
+    registerHeading,
+    sortedHeadings,
+    scrollToAnchor,
+    subscribeToActiveAnchorChange,
+    callbacks.length,
+  ]);
 
   return (
     <TableOfContentsContext.Provider value={contextValue}>

@@ -5,6 +5,7 @@ import {
   type ReactNode,
   useContext,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -57,7 +58,7 @@ export const Heading = forwardRef(function Heading(
 
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const registerHeading = tableOfContentsContext?.registerHeading;
-  const observeIntersection = tableOfContentsContext?.observeIntersection;
+  const observeIntersection = tableOfContentsContext?.hasTableOfContents;
 
   const ref = forwardedRef ? composeRefs(elementRef, forwardedRef) : elementRef;
 
@@ -72,7 +73,7 @@ export const Heading = forwardRef(function Heading(
     }
   }, [observeIntersection]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (observeIntersection && elementRef.current && anchorId && !omitFromToc) {
       return registerHeading?.({
         id: anchorId,

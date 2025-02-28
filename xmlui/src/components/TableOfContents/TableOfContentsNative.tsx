@@ -1,4 +1,12 @@
-import { CSSProperties, ForwardedRef, forwardRef, useEffect, useRef } from "react";
+import {
+  CSSProperties,
+  ForwardedRef,
+  forwardRef,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { NavLink as RrdNavLink } from "@remix-run/react";
 import scrollIntoView from "scroll-into-view-if-needed";
 import { composeRefs } from "@radix-ui/react-compose-refs";
@@ -6,7 +14,6 @@ import classnames from "classnames";
 
 import styles from "./TableOfContents.module.scss";
 import { useTableOfContents } from "../../components-core/TableOfContentsContext";
-import { useNavigate } from "react-router-dom";
 
 type Props = {
   style?: CSSProperties;
@@ -19,14 +26,19 @@ export const TableOfContents = forwardRef(function TableOfContents(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const tocRef = useRef<HTMLDivElement>(null);
-  const { headings, setObserveIntersection, activeAnchorId, setActiveAnchorId } =
-    useTableOfContents();
-  const ref = forwardedRef ? composeRefs(tocRef, forwardedRef) : tocRef;
-  const navigate = useNavigate();
+  const [activeAnchorId, setActiveId] = useState(null);
+  const { headings, scrollToAnchor, subscribeToActiveAnchorChange } = useTableOfContents();
 
-  useEffect(() => {
-    setObserveIntersection(true);
-  }, [setObserveIntersection]);
+  useLayoutEffect(() => {
+    return subscribeToActiveAnchorChange((id) => {
+      const foundHeading = headings.find((heading) => heading.id === id);
+      if (foundHeading.level <= maxHeadingLevel) {
+        setActiveId(id);
+      }
+    });
+  }, [headings, maxHeadingLevel, subscribeToActiveAnchorChange]);
+
+  const ref = forwardedRef ? composeRefs(tocRef, forwardedRef) : tocRef;
 
   useEffect(() => {
     if (activeAnchorId && tocRef?.current) {
@@ -66,22 +78,11 @@ export const TableOfContents = forwardRef(function TableOfContents(
                   })}
                   to={`#${value.id}`}
                   onClick={(event) => {
-                    event.preventDefault();
-                    value.anchor.scrollIntoView({
-                      block: "start",
-                      inline: "start",
-                      behavior: smoothScrolling ? "smooth" : "auto",
-                    });
-                    setActiveAnchorId(value.id);
-                    requestAnimationFrame(()=>{
-                      navigate({
-                        hash: `#${value.id}`,
-                      }, {
-                        state: {
-                          preventHashScroll: true
-                        },
-                      });
-                    });
+                    // cmd/ctrl + click - open in new tab, don't prevent that
+                    if (!event.ctrlKey && !event.metaKey && !event.metaKey) {
+                      event.preventDefault();
+                    }
+                    scrollToAnchor(value.id, smoothScrolling);
                   }}
                   id={value.id}
                 >
