@@ -3,7 +3,13 @@ import styles from "./FormItem.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import type { FormItemValidations } from "../Form/FormContext";
+import {
+  defaultValidationMode,
+  formControlTypesMd,
+  validationModeMd,
+  validationSeverityValues,
+  type FormItemValidations,
+} from "../Form/FormContext";
 import {
   dAutoFocus,
   dEnabled,
@@ -15,10 +21,13 @@ import {
 import { parseSeverity } from "./Validations";
 import { CustomFormItem, FormItem, defaultProps } from "./FormItemNative";
 import { MemoizedItem } from "../container-helpers";
-import { describe } from "yargs";
-import { de } from "date-fns/locale";
 
 const COMP = "FormItem";
+
+// NOTE: We need to filter the "none" value out so that it doesn't show up in the docs.
+const filteredValidationSeverityValues = validationSeverityValues.filter(
+  (value) => value !== "none",
+);
 
 export const FormItemMd = createMetadata({
   status: "experimental",
@@ -45,54 +54,114 @@ export const FormItemMd = createMetadata({
       defaultValue: defaultProps.labelBreak,
     },
     enabled: dEnabled(),
-    type: d(
-      `This property is used to determine the specific input control the FormItem will wrap ` +
+    type: {
+      description:
+        `This property is used to determine the specific input control the FormItem will wrap ` +
         `around. Note that the control names start with a lowercase letter and map to input ` +
         `components found in XMLUI.`,
-    ),
-    customValidationsDebounce: d(
-      `This optional number prop determines the time interval between two runs of a custom validation.`,
-    ),
-    validationMode: d(
-      `This property sets what kind of validation mode or strategy to employ for a particular ` +
+      availableValues: formControlTypesMd,
+      defaultValue: defaultProps.type,
+      valueType: "string",
+    },
+    customValidationsDebounce: {
+      description: `This optional number prop determines the time interval between two runs of a custom validation.`,
+      type: "number",
+      defaultValue: defaultProps.customValidationsDebounce,
+    },
+    validationMode: {
+      description:
+        `This property sets what kind of validation mode or strategy to employ for a particular ` +
         `input field.`,
-    ),
+      availableValues: validationModeMd,
+      defaultValue: defaultValidationMode,
+    },
     initialValue: dInitialValue(),
     required: dRequired(),
-    requiredInvalidMessage: d(
-      `This optional string property is used to customize the message that is displayed if the ` +
+    requiredInvalidMessage: {
+      description:
+        `This optional string property is used to customize the message that is displayed if the ` +
         `field is not filled in.`,
-    ),
-    minLength: d(`Checks whether the input has a minimum length of a specified value.`),
-    maxLength: d(`Checks whether the input has a maximum length of a specified value.`),
-    maxTextLength: d(`The maximum length of the text in the input field`),
-    lengthInvalidMessage: d(
-      `This optional string property is used to customize the message that is displayed on a failed ` +
+      valueType: "string",
+    },
+    minLength: {
+      description: `Checks whether the input has a minimum length of a specified value.`,
+      valueType: "number",
+    },
+    maxLength: {
+      description: `Checks whether the input has a maximum length of a specified value.`,
+      valueType: "number",
+    },
+    maxTextLength: {
+      description: `The maximum length of the text in the input field`,
+      valueType: "number",
+    },
+    lengthInvalidMessage: {
+      description:
+        `This optional string property is used to customize the message that is displayed on a failed ` +
         `length check: [minLength](#minlength) or [maxLength](#maxlength).`,
-    ),
-    lengthInvalidSeverity: d(`This property sets the severity level of length validations.`),
-    minValue: d(`Checks whether the input has the minimum specified value.`),
-    maxValue: d(`Checks whether the input has the maximum specified value.`),
-    rangeInvalidMessage: d(
-      `This optional string property is used to customize the message that is displayed when ` +
+      valueType: "string",
+    },
+    lengthInvalidSeverity: {
+      description: `This property sets the severity level of the length validation.`,
+      valueType: "string",
+      availableValues: filteredValidationSeverityValues,
+      defaultValue: "error",
+    },
+    minValue: {
+      description: `Checks whether the input has the minimum specified value.`,
+      valueType: "number",
+    },
+    maxValue: {
+      description: `Checks whether the input has the maximum specified value.`,
+      valueType: "number",
+    },
+    rangeInvalidMessage: {
+      description:
+        `This optional string property is used to customize the message that is displayed when ` +
         `a value is out of range.`,
-    ),
-    rangeInvalidSeverity: d(`This property sets the severity level of the value range validation.`),
-    pattern: d(`Checks whether the input fits a predefined regular expression.`),
-    patternInvalidMessage: d(
-      `This optional string property is used to customize the message that is displayed on a ` +
+      valueType: "string",
+    },
+    rangeInvalidSeverity: {
+      description: `This property sets the severity level of the value range validation.`,
+      valueType: "string",
+      availableValues: filteredValidationSeverityValues,
+      defaultValue: "error",
+    },
+    pattern: {
+      description: `Checks whether the input fits a predefined regular expression.`,
+      valueType: "string",
+    },
+    patternInvalidMessage: {
+      description:
+        `This optional string property is used to customize the message that is displayed on a ` +
         `failed pattern test.`,
-    ),
-    patternInvalidSeverity: d(`This property sets the severity level of the pattern validation.`),
-    regex: d(`Checks whether the input fits the provided regular expression.`),
-    regexInvalidMessage: d(
-      `This optional string property is used to customize the message that is displayed on a ` +
+      valueType: "string",
+    },
+    patternInvalidSeverity: {
+      description: `This property sets the severity level of the pattern validation.`,
+      valueType: "string",
+      availableValues: filteredValidationSeverityValues,
+      defaultValue: "error",
+    },
+    regex: {
+      description: `Checks whether the input fits the provided regular expression.`,
+      valueType: "string",
+    },
+    regexInvalidMessage: {
+      description:
+        `This optional string property is used to customize the message that is displayed on a ` +
         `failed regular expression test.`,
-    ),
-    regexInvalidSeverity: d(
-      `This property sets the severity level of regular expression validation.`,
-    ),
-    inputTemplate: d("This property is used to define a custom input template."),
+      valueType: "string",
+    },
+    regexInvalidSeverity: {
+      description: `This property sets the severity level of regular expression validation.`,
+      valueType: "string",
+      availableValues: filteredValidationSeverityValues,
+      defaultValue: "error",
+    },
+    inputTemplate: {
+      description: "This property is used to define a custom input template.",
+    },
   },
   events: {
     validate: d(`This event is used to define a custom validation function.`),

@@ -5,6 +5,7 @@ import { asyncThrottle } from "../../components-core/utils/misc";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import type { ContainerAction } from "../../components-core/abstractions/containers";
 import {
+  defaultValidationMode,
   useFormContextPart,
   type FormItemValidations,
   type SingleValidationResult,
@@ -307,7 +308,7 @@ export function useValidationDisplay (
   bindTo: string,
   value: any,
   validationResult: ValidationResult | undefined,
-  validationMode: ValidationMode = "errorLate"
+  validationMode: ValidationMode = defaultValidationMode,
 ): {
   isHelperTextShown: boolean;
   validationStatus: ValidationSeverity;
