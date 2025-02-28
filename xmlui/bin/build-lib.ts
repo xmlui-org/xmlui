@@ -6,8 +6,8 @@ import path from "path";
 import react from "@vitejs/plugin-react";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 
-export const buildLib = async ({ watchMode, mode }) => {
-  const env = loadEnv("production", process.cwd(), "");
+export const buildLib = async ({ watchMode, mode = "production" }) => {
+  const env = loadEnv(mode, process.cwd(), "");
 
   const umdFileName = `${env.npm_package_name}.js`;
   const esFileName = `${env.npm_package_name}.mjs`;
@@ -27,8 +27,10 @@ export const buildLib = async ({ watchMode, mode }) => {
       },
     },
     build: {
+      emptyOutDir: false,
+      outDir: "dist",
       watch: watchMode ? {} : undefined,
-      sourcemap: watchMode? "inline": false,
+      sourcemap: watchMode ? "inline": false,
       lib: mode === "metadata" ? {
         entry: [path.resolve("meta", "componentsMetadata.ts")],
         name: `${env.npm_package_name}-metadata`,
@@ -40,7 +42,8 @@ export const buildLib = async ({ watchMode, mode }) => {
         fileName: (format) => (format === "es" ? esFileName : umdFileName),
       },
       rollupOptions: {
-        external: ["react", "react-dom", "xmlui", "react/jsx-runtime"],
+        treeshake: mode === "metadata" ? "smallest" : undefined,
+        external: mode === "metadata" ? [] : ["react", "react-dom", "xmlui", "react/jsx-runtime"],
         output: {
           footer: (chunk) => {
             if (chunk.name === "index" && chunk.fileName === umdFileName) {
@@ -51,12 +54,12 @@ export const buildLib = async ({ watchMode, mode }) => {
           globals: {
             react: "React",
             "react-dom": "ReactDOM",
-            "react/jsx-runtime": "jsxRuntime"
+            "react/jsx-runtime": "react/jsx-runtime"
           },
         },
       },
     },
-    plugins: [react(), libInjectCss()],
+    plugins: mode === "metadata" ? [] : [react(), libInjectCss()],
   };
   
   await viteBuild(defineConfig(config));
