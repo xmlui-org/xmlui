@@ -14,10 +14,12 @@ export const ThemeMd = createMetadata({
   allowArbitraryProps: true,
   props: {
     themeId: d(`This property specifies which theme to use by setting the theme's id.`),
-    tone: d(
-      `This property allows the setting of the current theme's tone. Tone is either ` +
-        `\`light\` or \`dark\`.`,
-    ),
+    tone: {
+      description: "This property allows the setting of the current theme's tone.",
+      availableValues: ["light", "dark"],
+      valueType: "string",
+      defaultValue: "light",
+    },
     root: d(`This property indicates whether the component is at the root of the application.`),
   },
   opaque: true,

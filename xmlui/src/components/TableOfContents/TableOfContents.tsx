@@ -14,14 +14,21 @@ export const TableOfContentsMd = createMetadata({
     `and displays them in a tree representing their hierarchy. When you select an item ` +
     `in this tree, the component navigates the page to the selected position.`,
   props: {
-    smoothScrolling: d(
-      `This property indicates that smooth scrolling is used while scrolling the selected table ` +
+    smoothScrolling: {
+      description:
+        `This property indicates that smooth scrolling is used while scrolling the selected table ` +
         `of contents items into view.`,
-    ),
-    maxHeadingLevel: d(
-      "Defines the maximum heading level to include in the table of contents. Headings " +
-        "with a level greater than this value will be excluded.",
-    ),
+      valueType: "boolean",
+      defaultValue: "false",
+    },
+    maxHeadingLevel: {
+      description:
+        "Defines the maximum heading level (1 to 6) to include in the table of contents. " +
+        "For example, if it is 2, then `H1` and `H2` are displayed, but lower levels " +
+        "(`H3` to `H6`) are not.",
+      valueType: "number",
+      defaultValue: "6",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

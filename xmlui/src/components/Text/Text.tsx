@@ -17,23 +17,30 @@ export const TextMd = createMetadata({
       `The text to be displayed. This value can also be set via nesting the text into ` +
         `the \`${COMP}\` component.`,
     ),
-    variant: d(
-      `Optional string value that provides named presets for text variants with a ` +
-        `unique combination of font style, weight, size, color and other parameters.`,
-      variantOptionsMd,
-    ),
+    variant: {
+      description:
+        "An optional string value that provides named presets for text variants with a " +
+        "unique combination of font style, weight, size, color, and other parameters. " +
+        "If not defined, the text uses the current style of its context.",
+      availableValues: variantOptionsMd,
+    },
     maxLines: d(
-      `This property determines the maximum number of lines the component can wrap to. ` +
-        `If there is no space to display all the contents, the component displays up to ` +
-        `as many lines as specified in this property.`,
+      "This property determines the maximum number of lines the component can wrap to. " +
+        "If there is no space to display all the contents, the component displays up to as " +
+        "many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines.",
     ),
-    preserveLinebreaks: d(
-      `This property indicates if linebreaks should be preserved when displaying text.`,
-    ),
-    ellipses: d(
-      `This property indicates whether ellipses should be displayed when the text is ` +
-        `cropped (\`true\`) or not (\`false\`).`,
-    ),
+    preserveLinebreaks: {
+      description: `This property indicates if linebreaks should be preserved when displaying text.`,
+      valueType: "boolean",
+      defaultValue: "false",
+    },
+    ellipses: {
+      description:
+        "This property indicates whether ellipses should be displayed when the text is " +
+        "cropped (\`true\`) or not (\`false\`).",
+      valueType: "boolean",
+      defaultValue: false,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -119,7 +126,7 @@ export const textComponentRenderer = createComponentRenderer(
     // TEMP: Need to use the resolveAndCleanProps function here and handle VariantTypes correctly
     const { variant, maxLines, preserveLinebreaks, ellipses, value, ...variantSpecific } =
       node.props;
-    
+
     const variantSpecificProps: VariantProps = Object.fromEntries(
       Object.entries(variantSpecific)
         .filter(([key, _]) => VariantPropsKeys.includes(key as any))
