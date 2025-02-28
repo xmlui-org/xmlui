@@ -177,7 +177,7 @@ export function resolveAndCleanProps<T extends Record<string, any>>(
   },
 ): T {
   const { extractResourceUrl, resourceProps } = resourceExtraction ?? {};
-  const cleanedProps = cleanStyles(props, layoutCss);
+  const cleanedProps = removeStylesFromProps(props, layoutCss);
 
   const resultProps: Record<string, any> = {} as any;
   const result = Object.keys(cleanedProps).reduce((acc, propName) => {
@@ -198,7 +198,10 @@ export function resolveAndCleanProps<T extends Record<string, any>>(
  * @param layoutCss which style properties to remove
  * @returns only component-specific properties
  */
-function cleanStyles(nodeProps: Record<string, any>, layoutCss: CSSProperties = {}) {
+export function removeStylesFromProps(
+  nodeProps: Record<string, any>,
+  layoutCss: CSSProperties = {},
+) {
   if (nodeProps.hasOwnProperty("style")) {
     delete nodeProps["style"];
   }
@@ -209,6 +212,8 @@ function cleanStyles(nodeProps: Record<string, any>, layoutCss: CSSProperties = 
 
   function removeEntries(sourceObj: Record<string, any>, filterObj: Record<string, any>) {
     const filterKeys = Object.keys(filterObj);
-    return Object.fromEntries(Object.entries(sourceObj).filter(([key]) => !filterKeys.includes(key)));
+    return Object.fromEntries(
+      Object.entries(sourceObj).filter(([key]) => !filterKeys.includes(key)),
+    );
   }
 }

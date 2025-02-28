@@ -9,8 +9,6 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Heading, type HeadingLevel, defaultProps } from "./HeadingNative";
 import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
-import { de } from "date-fns/locale";
-import { omit } from "lodash-es";
 
 const COMP = "Heading";
 

@@ -87,7 +87,7 @@ const componentNames: CompletionItem[] = [
   { label: "Checkbox" },
   { label: "Slot" },
   { label: "CHStack" },
-  { label: "Combobox" },
+  { label: "AutoComplete" },
   { label: "ContentSeparator" },
   { label: "CVStack" },
   { label: "DataSource" },
