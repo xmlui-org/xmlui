@@ -50,7 +50,6 @@ export const SwitchMd = createMetadata({
     ),
   },
   events: {
-    click: dClick(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
