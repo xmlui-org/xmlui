@@ -497,9 +497,9 @@ Note how the `meats` category is not displayed in the right `List`:
   `}
 />
 
-### `idKey`
+### `idKey (default: "id")`
 
-Denotes which attribute of an item acts as the ID or key of the item. Default is `"id"`.
+Denotes which attribute of an item acts as the ID or key of the item
 
 ```ueml /idKey="key"/
 <App>
@@ -564,10 +564,6 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
     </App>
   `}
 />
-
-### `items`
-
-You can use `items` as an alias for the `data` property. When you bind the list to a data source (e.g. an API endpoint), the `data` acts as the property that accepts a URL to fetch information from an API.When both `items` and `data` are used, `items` has priority.
 
 ### `limit`
 

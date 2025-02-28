@@ -2,7 +2,7 @@ import type React from "react";
 
 import styles from "./Stack.module.scss";
 
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef, ComponentPropertyMetadata, createMetadata, d } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
@@ -10,39 +10,60 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dClick } from "../metadata-helpers";
+import { dClick, dInternal } from "../metadata-helpers";
 import { DEFAULT_ORIENTATION, Stack } from "./StackNative";
+import { alignmentOptionValues } from "../abstractions";
 
 const COMP = "Stack";
 
-const HORIZONTAL_ALIGNMENT = d(
-  `Manages the horizontal content alignment for each child element in the Stack.`,
-);
-const VERTICAL_ALIGNMENT = d(
-  `Manages the vertical content alignment for each child element in the Stack.`,
-);
+const HORIZONTAL_ALIGNMENT: ComponentPropertyMetadata = {
+  description: "Manages the horizontal content alignment for each child element in the Stack.",
+  availableValues: alignmentOptionValues,
+  valueType: "string",
+  defaultValue: "start",
+};
+const VERTICAL_ALIGNMENT: ComponentPropertyMetadata = {
+  description: "Manages the vertical content alignment for each child element in the Stack.",
+  availableValues: alignmentOptionValues,
+  valueType: "string",
+  defaultValue: "start",
+};
 
 const stackMd = createMetadata({
   description: `\`Stack\` is a layout container displaying children in a horizontal or vertical stack.`,
   props: {
-    gap: d(`Optional size value indicating the gap between child elements.`),
-    reverse: d(`Optional boolean property to reverse the order of child elements.`),
-    wrapContent: d(
-      `Optional boolean which wraps the content if set to true and the available space is not big ` +
-        `enough. Works in all orientations.`,
-    ),
-    orientation: d(
-      `An optional property that governs the Stack's orientation (whether the Stack lays out its ` +
-        `children in a row or a column).`,
-    ),
+    gap: {
+      description: "Optional size value indicating the gap between child elements.",
+      valueType: "string",
+      defaultValue: "$gap-normal",
+    },
+    reverse: {
+      description: "Optional boolean property to reverse the order of child elements.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    wrapContent: {
+      description:
+        "Optional boolean which wraps the content if set to true and the available " +
+        "space is not big enough. Works only with horizontal orientations.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    orientation: {
+      description: "An optional property that governs the Stack's orientation (whether " + 
+      "the Stack lays out its children in a row or a column).",
+      availableValues: ["horizontal", "vertical"],
+      valueType: "string",
+      defaultValue: DEFAULT_ORIENTATION,
+    },
     horizontalAlignment: HORIZONTAL_ALIGNMENT,
     verticalAlignment: VERTICAL_ALIGNMENT,
-    hoverContainer: d("Reserved for future use"),
-    visibleOnHover: d("Reserved for future use"),
+    hoverContainer: dInternal("Reserved for future use"),
+    visibleOnHover: dInternal("Reserved for future use"),
   },
   events: {
     click: dClick(COMP),
-    mounted: d("Reserved for future use"),
+    mounted: dInternal("Reserved for future use"),
   },
   themeVars: parseScssVar(styles.themeVars),
 });

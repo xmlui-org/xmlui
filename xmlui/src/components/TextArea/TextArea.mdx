@@ -6,25 +6,6 @@ To add new lines to the input field press `Shift` + `Enter`.
 
 %-DESC-END
 
-%-PROP-START autoFocus
-
-```ueml copy
-<App>
-  <TextArea autoFocus="true" />
-</App>
-```
-
-<Playground
-  name="Example: autoFocus"
-  app={`
-  <App>
-    <TextArea autoFocus="true" />
-  </App>
-  `}
-/>
-
-%-PROP-END
-
 %-PROP-START autoSize
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
@@ -44,6 +25,7 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
     <TextArea autoSize="true" />
   </App>
   `}
+  height={240}
 />
 
 %-PROP-END

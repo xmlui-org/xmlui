@@ -64,9 +64,11 @@ You can define request header values as key and value pairs, where the key is th
 
 This property customizes the message that is displayed in a toast while the API operation is in progress.
 
-### `method`
+### `method (default: "get")`
 
-The method of data manipulation can be done via setting this property. The following HTTP methods are available: `post`, `put`, and `delete`.
+The method of data manipulation can be done via setting this property.
+
+Available values: `get` **(default)**, `post`, `put`, `delete`, `patch`, `head`, `options`, `trace`, `connect`
 
 ### `queryParams`
 
@@ -84,7 +86,7 @@ Use this property to set the URL to send data to.
 
 ### `beforeRequest`
 
-This event fires before the request is sent. Returning an explicit boolean'false' value will prevent the request from being sent.
+This event fires before the request is sent. Returning an explicit boolean`false` value will prevent the request from being sent.
 
 ### `error`
 

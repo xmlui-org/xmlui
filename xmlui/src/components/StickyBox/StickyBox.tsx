@@ -13,10 +13,14 @@ export const StickyBoxMd = createMetadata({
     `The \`${COMP}\` is a component that "sticks" or remains fixed at the top or bottom ` +
     `position on the screen as the user scrolls.`,
   props: {
-    to: d(
-      `This property determines whether the StickyBox should be anchored to ` +
-        `the \`top\` or \`bottom\`.`,
-    ),
+    to: {
+      description:
+        "This property determines whether the StickyBox should be anchored to " +
+        "the \`top\` or \`bottom\`.",
+      availableValues: ["top", "bottom"],
+      valueType: "string",
+      defaultValue: "top",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

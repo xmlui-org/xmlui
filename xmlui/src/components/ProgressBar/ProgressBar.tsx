@@ -10,7 +10,11 @@ const COMP = "ProgressBar";
 export const ProgressBarMd = createMetadata({
   description: `A \`${COMP}\` component visually represents the progress of a task or process.`,
   props: {
-    value: d(`This property defines the progress value with a number between 0 and 1.`),
+    value: {
+      description: `This property defines the progress value with a number between 0 and 1.`,
+      valueType: "number",
+      defaultValue: 0,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

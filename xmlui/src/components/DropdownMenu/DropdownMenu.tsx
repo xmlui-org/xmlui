@@ -25,7 +25,9 @@ export const DropdownMenuMd = createMetadata({
     label: dLabel(),
     triggerTemplate: dTriggerTemplate(DDMCOMP),
     alignment: {
-      description: `This property allows you to determine the alignment of the displayed menu items.`,
+      description:
+        "This property allows you to determine the alignment of the dropdown panel with " +
+        "the displayed menu items.",
       valueType: "string",
       availableValues: alignmentOptionMd,
       defaultValue: defaultDropdownMenuProps.alignment,

@@ -43,7 +43,6 @@ export const RadioGroupMd = createMetadata({
     labelPosition: dLabelPosition("top"),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
-
   },
   events: {
     gotFocus: dGotFocus(COMP),

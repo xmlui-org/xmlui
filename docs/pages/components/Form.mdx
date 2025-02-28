@@ -74,9 +74,9 @@ This example mimics a one-second search and turns off the submit button during t
   `}
 />
 
-### `cancelLabel`
+### `cancelLabel (default: "Cancel")`
 
-This property defines the label of the Cancel button, by default, "Cancel".
+This property defines the label of the Cancel button.
 
 ### `data`
 
@@ -86,7 +86,7 @@ This property sets the initial value of the form's data structure. The form infr
 
 Whether the form is enabled or not. The default value is `true`.
 
-### `itemLabelBreak`
+### `itemLabelBreak (default: true)`
 
 This boolean value indicates if form item labels can be split into multiple lines if it would overflow the available label width. Individual `FormItem` instances can override this property.
 
@@ -108,21 +108,21 @@ Available values:
 
 This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property.
 
-### `keepModalOpenOnSubmit`
+### `keepModalOpenOnSubmit (default: false)`
 
 This property prevents the modal from closing when the form is submitted.
 
-### `saveInProgressLabel`
+### `saveInProgressLabel (default: "Saving...")`
 
-This property defines the label of the Save button to display during the form data submit (save) operation. By default, the value of `saveLabel`.
+This property defines the label of the Save button to display during the form data submit (save) operation.
 
-### `saveLabel`
+### `saveLabel (default: "Save")`
 
-This property defines the label of the Save button, by default, "Save".
+This property defines the label of the Save button.
 
 ### `submitMethod`
 
-HTTP method to use when submitting the form data.
+This property sets the HTTP method to use when submitting the form data. If not defined, `put` is used when the form has initial data; otherwise, `post`.
 
 ### `submitUrl`
 

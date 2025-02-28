@@ -13,7 +13,7 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
 
 ## Properties
 
-### `ellipses`
+### `ellipses (default: false)`
 
 This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
 
@@ -62,7 +62,7 @@ This property indicates whether ellipses should be displayed when the text is cr
 
 ### `maxLines`
 
-This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property.
+This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines.
 
 ```ueml copy
 <App>
@@ -89,7 +89,7 @@ This property determines the maximum number of lines the component can wrap to. 
   `}
 />
 
-### `preserveLinebreaks`
+### `preserveLinebreaks (default: "false")`
 
 This property indicates if linebreaks should be preserved when displaying text.
 
@@ -166,7 +166,7 @@ The text to be displayed. This value can also be set via nesting the text into t
 
 ### `variant`
 
-Optional string value that provides named presets for text variants with a unique combination of font style, weight, size, color and other parameters.
+An optional string value that provides named presets for text variants with a unique combination of font style, weight, size, color, and other parameters. If not defined, the text uses the current style of its context.
 
 Available values:
 
@@ -362,7 +362,7 @@ Available values:
   `}
 />
 
-#### HtmlTag Mappings
+**HtmlTag Mappings**
 
 The table below indicates which Text `variant` maps to which HtmlTag component.
 

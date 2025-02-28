@@ -1,4 +1,5 @@
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { httpMethodNames } from "../abstractions";
 
 // NOTE: Original component this is based on is the `Loader` component
 
@@ -14,7 +15,7 @@ export const DataSourceMd = createMetadata({
     method: {
       description: `The method by which the data fetching request is made.`,
       defaultValue: "get",
-      availableValues: ["get", "post", "put", "delete"],
+      availableValues: httpMethodNames,
     },
     url: {
       description: `This property represents the URL to fetch the data.`,

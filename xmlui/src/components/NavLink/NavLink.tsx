@@ -6,6 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dClick, dEnabled, dLabel } from "../metadata-helpers";
 import { Icon } from "../Icon/IconNative";
 import { NavLink } from "./NavLinkNative";
+import { LinkTargetMd } from "../abstractions";
 
 const COMP = "NavLink";
 
@@ -16,22 +17,36 @@ export const NavLinkMd = createMetadata({
   props: {
     to: d(`This property defines the URL of the link.`),
     enabled: dEnabled(),
-    active: d(
-      `This property indicates if the particular navigation is an active link. An active link ` +
+    active: {
+      description:
+        `This property indicates if the particular navigation is an active link. An active link ` +
         `has a particular visual appearance, provided its [\`displayActive\`](#displayactive) ` +
         `property is set to \`true\`.`,
-    ),
-    target: d(`This property specifies how to open the clicked link.`),
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    target: {
+      description: `This property specifies how to open the clicked link.`,
+      availableValues: LinkTargetMd,
+      type: "string",
+      defaultValue: "_self",
+    },
     label: dLabel(),
-    vertical: d(
-      `This property sets how the active status is displayed on the \`${COMP}\` component. If ` +
+    vertical: {
+      description:
+        `This property sets how the active status is displayed on the \`${COMP}\` component. If ` +
         `set to true, the indicator is displayed on the side which lends itself to a vertically ` +
         `aligned navigation menu.`,
-    ),
-    displayActive: d(
-      `This Boolean property indicates if the active state of a link should have a visual ` +
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    displayActive: {
+      description:
+        `This Boolean property indicates if the active state of a link should have a visual ` +
         `indication. Setting it to \`false\` removes the visual indication of an active link.`,
-    ),
+      valueType: "boolean",
+      defaultValue: true,
+    },
     icon: d(
       `This property allows you to add an icon (specify the icon's name) to the navigation link.`,
     ),
@@ -41,7 +56,7 @@ export const NavLinkMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`border-NavLink`]: '0px solid $color-border',
+    [`border-NavLink`]: "0px solid $color-border",
     "radius-NavLink": "$radius",
     "color-bg-NavLink": "transparent",
     "padding-horizontal-NavLink": "$space-4",

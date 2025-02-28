@@ -6,6 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject } from "../../components-core/theming/themes/base-utils";
 import { MemoizedItem } from "../container-helpers";
 import { ModalDialog, ModalDialogFrame } from "./ModalDialogNative";
+import { describe } from "yargs";
 
 const COMP = "ModalDialog";
 
@@ -14,18 +15,19 @@ export const ModalDialogMd = createMetadata({
     `The \`${COMP}\` component defines a modal dialog UI element that can be displayed over ` +
     `the existing UI - triggered by some action.`,
   props: {
-    fullScreen: d(
-      `Toggles whether the dialog encompasses the whole UI (\`true\`) or not and has a minimum ` +
+    fullScreen: {
+      description:
+        `Toggles whether the dialog encompasses the whole UI (\`true\`) or not and has a minimum ` +
         `width and height (\`false\`).`,
-    ),
+      valueType: "boolean",
+      defaultValue: false,
+    },
     title: d(`Provides a prestyled heading to display the intent of the dialog.`),
-    closeButtonVisible: d(
-      `Shows (\`true\`) or hides (\`false\`) the visibility of the close button on the dialog.`,
-    ),
-    isInitiallyOpen: d(
-      `This property sets whether the modal dialog appears open (\`true\`) or not (\`false\`) ` +
-        `when the page is it is defined on is rendered.`,
-    ),
+    closeButtonVisible: {
+      description: `Shows (\`true\`) or hides (\`false\`) the visibility of the close button on the dialog.`,
+      valueType: "boolean",
+      defaultValue: true,
+    },
   },
   events: {
     open: d(
@@ -44,8 +46,8 @@ export const ModalDialogMd = createMetadata({
     ),
     open: d(
       "This method imperatively opens the modal dialog. You can pass an arbitrary number " +
-      "of parameters to the method. In the \`ModalDialog\` instance, you can access those " +
-      "with the \`$paramq` and \`$params\` context values.",
+        "of parameters to the method. In the \`ModalDialog\` instance, you can access those " +
+        "with the \`$paramq` and \`$params\` context values.",
     ),
   },
   contextVars: {
@@ -78,13 +80,20 @@ export const ModalDialogMd = createMetadata({
 export const modalViewComponentRenderer = createComponentRenderer(
   COMP,
   ModalDialogMd,
-  ({ node, extractValue, layoutCss, renderChild, lookupEventHandler, registerComponentApi, layoutContext }) => {
-
+  ({
+    node,
+    extractValue,
+    layoutCss,
+    renderChild,
+    lookupEventHandler,
+    registerComponentApi,
+    layoutContext,
+  }) => {
     // gigantic hack: If the ModalDialog is not inside a ModalDialogFrame, wrap it in one
     //   we do this through the layout context, render it through another render loop with the extra $param context var
     //   (note the layoutContext and node on the MemoizedItem)
     // one solution would be to have a renderChild that can take a contextVars argument
-    if(!layoutContext?._insideModalFrame){
+    if (!layoutContext?._insideModalFrame) {
       return (
         <ModalDialogFrame
           isInitiallyOpen={node.when !== undefined}
@@ -112,7 +121,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
         title={extractValue(node.props?.title)}
         closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
       >
-        {renderChild(node.children, { type: "Stack"})}
+        {renderChild(node.children, { type: "Stack" })}
       </ModalDialog>
     );
   },

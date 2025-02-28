@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from "fs";
+import { existsSync, readdirSync, statSync, unlinkSync } from "fs";
 import { posix } from "path";
 import { logger } from "./logger.mjs";
 
@@ -10,6 +10,12 @@ export class ErrorWithSeverity extends Error {
   }
 }
 
+/**
+ * Logs error to console depending on the type of the error thrown.
+ * - ErrorWithSeverity type errors are logged with the severity specified.
+ * - Other errors are logged with severity ERROR.
+ * @param {ErrorWithSeverity | Error | string} error 
+ */
 export function processError(error) {
   if (error instanceof ErrorWithSeverity) {
     logger.log(error.severity, error.message);
@@ -146,4 +152,27 @@ export function toHeadingPath(rawStr) {
     .replaceAll(/[^A-Za-z0-9-]/g, "-")
     .replaceAll(/--+/g, "-")
     .replace(/^-|-$/, "");
+}
+
+/**
+ * 
+ * @param {string} rawStr 
+ * @returns {string} 
+ */
+export function fromKebabtoCamelCase(rawStr) {
+  return rawStr
+    .trim()
+    .split("-")
+    .map((n) => n[0].toUpperCase() + n.slice(1))
+    .join(" ");
+}
+
+/**
+ * Deletes a file if it exists
+ * @param {string} filePath the full path of the file to delete
+ */
+export function deleteFileIfExists(filePath) {
+  if (existsSync(filePath)) {
+    unlinkSync(filePath);
+  }
 }
