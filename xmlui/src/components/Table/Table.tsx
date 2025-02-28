@@ -8,7 +8,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
-import { dAutoFocus, dComponent } from "../metadata-helpers";
+import { dAutoFocus, dComponent, dInternal } from "../metadata-helpers";
 import type { OurColumnMetadata } from "../Column/TableContext";
 import { TableContext } from "../Column/TableContext";
 import {
@@ -24,7 +24,7 @@ export const TableMd = createMetadata({
     `\`${COMP}\` is a component that displays cells organized into rows and columns. The \`${COMP}\` ` +
     `component is virtualized so it only renders visible cells.`,
   props: {
-    items: d(
+    items: dInternal(
       `You can use \`items\` as an alias for the \`data\` property. ` +
         `When you bind the table to a data source (e.g. an API endpoint), ` +
         `the \`data\` acts as the property that accepts a URL to fetch information from an API. ` +
@@ -34,14 +34,22 @@ export const TableMd = createMetadata({
       `The component receives data via this property. The \`data\` property is a list of items ` +
         `that the \`Table\` can display.`,
     ),
-    isPaginated: d(`This property adds pagination controls to the \`${COMP}\`.`),
+    isPaginated: {
+      description: `This property adds pagination controls to the \`${COMP}\`.`,
+      valueType: "boolean",
+      defaultValue: false,
+    },
     loading: d(
       `This boolean property indicates if the component is fetching (or processing) data. This ` +
         `property is useful when data is loaded conditionally or receiving it takes some time.`,
     ),
     headerHeight: d(`This optional property is used to specify the height of the table header.`),
     rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`),
-    pageSizes: d(`Describes how big a page should be for pagination.`),
+    pageSizes: {
+      description:
+        "This property holds an array of page sizes (numbers) the user can select for " +
+        "pagination. If this property is not defined, the component allows only a page size of 10 items.",
+    },
     rowDisabledPredicate: d(
       `This property defines a predicate function with a return value that determines if the ` +
         `row should be disabled. The function retrieves the item to display and should return ` +
@@ -56,36 +64,40 @@ export const TableMd = createMetadata({
         `property only works if the [\`sortBy\`](#sortby) property is also set.`,
     ),
     autoFocus: dAutoFocus(),
-    hideHeader: d(
-      `Set the header visibility using this property. Set it to \`true\` to hide the header.`,
-    ),
+    hideHeader: {
+      description:
+        "Set the header visibility using this property. Set it to \`true\` to hide the header.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
     iconNoSort: d(
-      `Allows the customization of the icon displayed in the ${COMP} column header when ` +
-        `when sorting is enabled and sorting is not done according to the column.`,
+      `Allows setting the icon displayed in the ${COMP} column header when sorting is ` +
+        `enabled, but the column remains unsorted.`,
     ),
     iconSortAsc: d(
-      `Allows the customization of the icon displayed in the ${COMP} column header when sorting ` +
-        `is enabled, sorting is done according to the column, and the column is sorted in ` +
-        `ascending order.`,
+      `Allows setting the icon displayed in the ${COMP} column header when sorting is enabled, ` +
+        `and the column is sorted in ascending order.`,
     ),
     iconSortDesc: d(
-      `Allows the customization of the icon displayed in the ${COMP} column header when sorting ` +
-        `is enabled, sorting is done according to the column, and the column is sorted in ` +
-        `descending order.`,
+      `Allows setting the icon displayed in the ${COMP} column header when sorting is enabled, ` +
+        `and the column is sorted in descending order.`,
     ),
-    enableMultiRowSelection: d(
-      `This boolean property indicates whether you can select multiple rows in the table. ` +
+    enableMultiRowSelection: {
+      description:
+        `This boolean property indicates whether you can select multiple rows in the table. ` +
         `This property only has an effect when the rowsSelectable property is set. Setting it ` +
         `to \`false\` limits selection to a single row.`,
-    ),
-    alwaysShowSelectionHeader: d(
-      "This property indicates when the row selection header is displayed. When the value is " +
+      valueType: "boolean",
+      defaultValue: true,
+    },
+    alwaysShowSelectionHeader: {
+      description:
+        "This property indicates when the row selection header is displayed. When the value is " +
         "`true,` the selection header is always visible. Otherwise, it is displayed only " +
         "when hovered.",
-      null,
-      "boolean",
-      false,
-    ),
+      valueType: "boolean",
+      defaultValue: false,
+    },
   },
   events: {
     sortingDidChange: d(
@@ -227,54 +239,52 @@ const TableWithColumns = ({
   const selectionContext = useSelectionContext();
 
   const tableContent = (
-      <>
-        {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
+    <>
+      {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
             and once in a context where we refresh the columns (by forcing the first context to re-mount, via the 'tableKey').
             This way the order of the columns is preserved.
         */}
-        <TableContext.Provider value={tableContextValue} key={tableKey}>
-          {renderChild(node.children)}
-        </TableContext.Provider>
-        <TableContext.Provider value={columnRefresherContextValue}>
-          {renderChild(node.children)}
-        </TableContext.Provider>
-        <Table
-          data={data}
-          columns={columns}
-          pageSizes={extractValue(node.props.pageSizes)}
-          rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
-          registerComponentApi={registerComponentApi}
-          noDataRenderer={
-            node.props.noDataTemplate &&
-            (() => {
-              return renderChild(node.props.noDataTemplate);
-            })
-          }
-          hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
-          loading={extractValue.asOptionalBoolean(node.props.loading)}
-          isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
-          headerHeight={extractValue.asSize(node.props.headerHeight)}
-          rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
-          sortBy={extractValue(node.props?.sortBy)}
-          sortingDirection={extractValue(node.props?.sortDirection)}
-          iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
-          iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
-          iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
-          sortingDidChange={lookupEventHandler("sortingDidChange")}
-          onSelectionDidChange={lookupEventHandler("selectionDidChange")}
-          willSort={lookupEventHandler("willSort")}
-          style={layoutCss}
-          uid={node.uid}
-          autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-          hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
-          enableMultiRowSelection={extractValue.asOptionalBoolean(
-            node.props.enableMultiRowSelection,
-          )}
-          alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
-            node.props.alwaysShowSelectionHeader,
-          )}
-        />
-      </>
+      <TableContext.Provider value={tableContextValue} key={tableKey}>
+        {renderChild(node.children)}
+      </TableContext.Provider>
+      <TableContext.Provider value={columnRefresherContextValue}>
+        {renderChild(node.children)}
+      </TableContext.Provider>
+      <Table
+        data={data}
+        columns={columns}
+        pageSizes={extractValue(node.props.pageSizes)}
+        rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
+        registerComponentApi={registerComponentApi}
+        noDataRenderer={
+          node.props.noDataTemplate &&
+          (() => {
+            return renderChild(node.props.noDataTemplate);
+          })
+        }
+        hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
+        loading={extractValue.asOptionalBoolean(node.props.loading)}
+        isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
+        headerHeight={extractValue.asSize(node.props.headerHeight)}
+        rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
+        sortBy={extractValue(node.props?.sortBy)}
+        sortingDirection={extractValue(node.props?.sortDirection)}
+        iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
+        iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
+        iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
+        sortingDidChange={lookupEventHandler("sortingDidChange")}
+        onSelectionDidChange={lookupEventHandler("selectionDidChange")}
+        willSort={lookupEventHandler("willSort")}
+        style={layoutCss}
+        uid={node.uid}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+        hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
+        enableMultiRowSelection={extractValue.asOptionalBoolean(node.props.enableMultiRowSelection)}
+        alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
+          node.props.alwaysShowSelectionHeader,
+        )}
+      />
+    </>
   );
 
   if (selectionContext === null) {

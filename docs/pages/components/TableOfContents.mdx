@@ -10,11 +10,11 @@ The `TableOfContents` component collects headings and bookmarks within the curre
 
 ## Properties
 
-### `maxHeadingLevel`
+### `maxHeadingLevel (default: "6")`
 
-Defines the maximum heading level to include in the table of contents. Headings with a level greater than this value will be excluded.
+Defines the maximum heading level (1 to 6) to include in the table of contents. For example, if it is 2, then `H1` and `H2` are displayed, but lower levels (`H3` to `H6`) are not.
 
-### `smoothScrolling`
+### `smoothScrolling (default: "false")`
 
 This property indicates that smooth scrolling is used while scrolling the selected table of contents items into view.
 

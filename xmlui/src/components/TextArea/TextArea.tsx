@@ -27,7 +27,7 @@ import { type ResizeOptions, TextArea } from "./TextAreaNative";
 const COMP = "TextArea";
 
 export const resizeOptionsMd: PropertyValueDescription[] = [
-  { value: "undefined", description: "No resizing" },
+  { value: "(undefined)", description: "No resizing" },
   { value: "horizontal", description: "Can only resize horizontally" },
   { value: "vertical", description: "Can only resize vertically" },
   { value: "both", description: "Can resize in both dimensions" },
@@ -37,29 +37,38 @@ export const TextAreaMd = createMetadata({
   status: "experimental",
   description: `\`${COMP}\` is a component that provides a multiline text input area.`,
   props: {
-    enterSubmits: d(
-      `This optional boolean property indicates whether pressing the \`Enter\` key on the ` +
-        `keyboard prompts the parent \`Form\` component to submit. The default value is is \`true\`.`,
-    ),
-    escResets: d(
-      `This boolean property indicates whether the ${COMP} contents should be reset when pressing ` +
+    enterSubmits: {
+      description:
+        "This optional boolean property indicates whether pressing the \`Enter\` key on the " +
+        "keyboard prompts the parent \`Form\` component to submit.",
+      valueType: "boolean",
+      defaultValue: true,
+    },
+    escResets: {
+      description:
+        `This boolean property indicates whether the ${COMP} contents should be reset when pressing ` +
         `the ESC key.`,
-    ),
+      valueType: "boolean",
+      defaultValue: false,
+    },
     maxRows: d(
-      `This optional number property maximizes the number of lines the \`${COMP}\` can grow to.`,
+      `This optional property sets the maximum number of text rows the \`${COMP}\` can grow.`,
     ),
     minRows: d(
-      `This optional number property indicates the minimum number of lines the \`${COMP}\` ` +
-        `has and specifies its size accordingly.`,
+      `This optional property sets the minimum number of text rows the \`${COMP}\` can shrink.`,
     ),
-    rows: d(`Specifies the number of lines or rows (and thus, its size) the component has.`),
-    autoSize: d(
-      `If set to \`true\`, this boolean property enables the \`${COMP}\` to resize ` +
+    rows: {
+      description: `Specifies the number of rows the component initially has.`,
+      valueType: "number",
+      defaultValue: 2,
+    },
+    autoSize: {
+      description:
+        `If set to \`true\`, this boolean property enables the \`${COMP}\` to resize ` +
         `automatically based on the number of lines inside it.`,
-      null,
-      "boolean",
-      false,
-    ),
+      valueType: "boolean",
+      defaultValue: false,
+    },
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
     label: dLabel(),
@@ -72,11 +81,11 @@ export const TextAreaMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
-    resize: d(
+    resize: {description:
       `This optional property specifies in which dimensions can the \`TextArea\` ` +
-      `be resized by the user.`,
-       resizeOptionsMd,
-    ),
+        `be resized by the user.`,
+      availableValues: resizeOptionsMd,
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
