@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { useContext, useEffect, useRef } from "react";
+import type { ReactNode} from "react";
+import { useContext, useLayoutEffect, useRef } from "react";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 
 type Props = {
@@ -25,9 +25,9 @@ export const Bookmark = ({
   const elementRef = useRef<HTMLAnchorElement>(null);
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const registerHeading = tableOfContentsContext?.registerHeading;
-  const observeIntersection = tableOfContentsContext?.observeIntersection;
+  const observeIntersection = tableOfContentsContext?.hasTableOfContents;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (observeIntersection && elementRef.current && uid && !omitFromToc) {
       return registerHeading?.({
         id: uid,
