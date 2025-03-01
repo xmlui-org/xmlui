@@ -554,7 +554,7 @@ The engine raises an error if the app or component markup contains multiple root
 </MenuItem>
 ```
 
-**Connect FormSubmit to APICall** 
+**Connect Form submit to APICall**
 
 
 ```ueml copy /onClick/
@@ -571,6 +571,20 @@ The engine raises an error if the app or component markup contains multiple root
   </FlowLayout>
 </Form>
 ```
+
+**Connect Checkbox change to APICall**
+
+<Column header = "fave">
+  <Checkbox initialValue="{$item.fave}">
+    <event name="didChange">
+      <APICall
+        method="post"
+        url="{ window.xmluiHost + '/query' }"
+        body="{ window.favorite($item.id, $item.fave ? 0 : 1) }"
+        />
+    </event>
+  </Checkbox>
+</Column>
 
 ### Variable declarations
 
