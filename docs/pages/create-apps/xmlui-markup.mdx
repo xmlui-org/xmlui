@@ -518,27 +518,74 @@ The engine raises an error if the app or component markup contains multiple root
 ### Event Handlers
 
 <Callout type="info" emoji="💡">
-  You can use markup attributes to define event handlers for a particular event. Use an attribute with the `on` prefix
-  for a particular event.
+  You can use the `event` tag to define event handlers for these situations:
 </Callout>
 
-```ueml copy /onClick/
-<Button label="Click me!" onClick="console.log('Clicked!')"/>
-```
 
-There are a few components (for example, `APICall`) the framework can resolve as the value of an event handler (these components declare the particular activity to execute).
-
-<Callout type="info" emoji="💡">
-  In such a case, you can use the `
-  <event>` tag to set the event handler:
-</Callout>
+**Connect Button click to APICall**
 
 ```ueml copy /onClick/
-<Button label="Save">
+<Button label="Change Name">
   <event name="click">
-    <ApiAction url="/api/customer" method="post" body="{customerData}">
+    <APICall
+      url="/api/shopping-list-slow/{$item.id}"
+      method="put"
+      body="{{ name: itemName.value }}"
+      inProgressNotificationMessage="Name change pending..."
+      completedNotificationMessage="Name change successful!"
+    />
   </event>
 </Button>
+```
+
+**Connect MenuItem click to APICall**
+
+
+```ueml copy /onClick/
+<MenuItem label="Delete">
+  <event name="click">
+    <APICall
+      url="/api/contacts/{$item.id}"
+      method="delete"
+      confirmTitle="Delete Contact {$item.fullName}"
+      confirmMessage="Are you sure you want to delete this contact?"
+      confirmButtonLabel="Delete" />
+  </event>
+</MenuItem>
+```
+
+**Connect Form submit to APICall**
+
+
+```ueml copy /onClick/
+<Form data="{{ age: 43 }}">
+  <event name="submit">
+    <APICall
+      url="/api/contacts/age"
+      method="POST"
+      body="{$param}" />
+  </event>
+  <FlowLayout>
+    <H3>Customer Age</H3>
+    <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
+  </FlowLayout>
+</Form>
+```
+
+**Connect Checkbox change to APICall**
+
+```ueml copy /onClick/
+<Column header = "fave">
+  <Checkbox initialValue="{$item.fave}">
+    <event name="didChange">
+      <APICall
+        method="post"
+        url="{ window.xmluiHost + '/query' }"
+        body="{ window.favorite($item.id, $item.fave ? 0 : 1) }"
+        />
+    </event>
+  </Checkbox>
+</Column>
 ```
 
 ### Variable declarations
