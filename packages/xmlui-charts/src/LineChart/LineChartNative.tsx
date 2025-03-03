@@ -7,9 +7,10 @@ import {
   Tooltip,
 } from "recharts";
 import { useColors } from "xmlui";
-import type { ReactNode} from "react";
+import type { ReactNode } from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
+import { Legend } from "../Legend/LegendNative";
 
 export type LineChartProps = {
   data: any[];
@@ -20,6 +21,7 @@ export type LineChartProps = {
   hideTooltip?: boolean;
   tickFormatter?: (value: any) => any;
   children?: ReactNode;
+  showLegend?: boolean;
 };
 
 export function LineChart({
@@ -31,6 +33,7 @@ export function LineChart({
   hideTooltip = false,
   tickFormatter,
   children,
+  showLegend = false,
 }: LineChartProps) {
   const colors = useColors(
     {
@@ -92,7 +95,7 @@ export function LineChart({
               dot={false}
             />
           ))}
-          {chartContextValue.legend && chartContextValue.legend}
+          {chartContextValue.legend ? chartContextValue.legend : showLegend && <Legend />}
         </RLineChart>
       </ResponsiveContainer>
     </ChartProvider>

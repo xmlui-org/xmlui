@@ -31,6 +31,7 @@ export const pieChartComponentRenderer = createComponentRenderer(
         data={extractValue(node.props?.data)}
         style={layoutCss}
         showLabel={extractValue.asOptionalBoolean(node.props?.showLabel)}
+        showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
         dataKey={extractValue(node.props?.dataKey)}
         nameKey={extractValue(node.props?.nameKey)}
       >

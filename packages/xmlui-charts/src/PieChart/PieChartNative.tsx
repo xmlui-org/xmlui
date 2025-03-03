@@ -14,6 +14,7 @@ import { useMemo } from "react";
 import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import * as React from "react";
+import { Legend } from "../Legend/LegendNative";
 
 export type PieChartProps = {
   data: any[];
@@ -25,6 +26,7 @@ export type PieChartProps = {
   labelListPosition?: LabelPosition;
   innerRadius?: number;
   children?: ReactNode;
+  showLegend?: boolean;
 };
 
 export function PieChart({
@@ -37,6 +39,7 @@ export function PieChart({
   labelListPosition = "inside",
   innerRadius = 0,
   children,
+  showLegend = false,
 }: PieChartProps) {
   const colors = useColors(
     {
@@ -98,7 +101,7 @@ export function PieChart({
                   />
                 )}
           </Pie>
-          {chartContextValue.legend && chartContextValue.legend}
+          {chartContextValue.legend ? chartContextValue.legend : showLegend && <Legend />}
         </RPieChart>
       </ResponsiveContainer>
     </ChartProvider>

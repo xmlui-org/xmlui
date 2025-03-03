@@ -12,6 +12,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import { useColors } from "xmlui";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
+import { Legend } from "../Legend/LegendNative";
 
 export type BarChartProps = {
   data: any[];
@@ -26,6 +27,7 @@ export type BarChartProps = {
   hideY?: boolean;
   tickFormatter?: (value: any) => any;
   children?: ReactNode;
+  showLegend?: boolean;
 };
 
 export function BarChart({
@@ -41,6 +43,7 @@ export function BarChart({
   tickFormatter = (value) => value,
   style,
   children,
+  showLegend = false,
 }: BarChartProps) {
   const colors = useColors(
     {
@@ -132,7 +135,7 @@ export function BarChart({
               stackId={stacked ? "stacked" : undefined}
             />
           ))}
-          {chartContextValue.legend && chartContextValue.legend}
+          {chartContextValue.legend ? chartContextValue.legend : showLegend && <Legend />}
         </RBarChart>
       </ResponsiveContainer>
     </ChartProvider>
