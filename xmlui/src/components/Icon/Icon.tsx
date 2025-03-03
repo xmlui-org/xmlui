@@ -19,7 +19,6 @@ export const IconMd = createMetadata({
         `This property defines the size of the \`${COMP}\`. Note that setting the \`height\` and/or ` +
         `the \`width\` of the component will override this property.`,
       availableValues: ["xs", "sm", "md", "lg"],
-      defaultValue: "md",
     },
     fallback: d(
       `This optional property provides a way to handle situations when the provided ` +
