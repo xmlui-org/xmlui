@@ -11,7 +11,6 @@ The component provides context values with which you can access some internal pr
 - `$completedItems`: A list containing the queue items that have been completed (fully processed).
 - `$queuedItems`: A list containing the items waiting in the queue, icluding the completed items.
 
-
 ## Using Queue
 
 As its name suggests, the `Queue` component keeps a queue of items to process. You can add items to the queue with the `enqueueItem` (or `enqueueItems`) method. Once the queue has some items to process, the engine reads them one by one (in FIFO order) and processes an item with the `process` event handler.
