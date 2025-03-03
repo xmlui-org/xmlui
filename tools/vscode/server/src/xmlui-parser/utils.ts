@@ -1,8 +1,12 @@
+import type { Node } from "./syntax-node";
 import { GetText } from "./parser";
 import { SyntaxKind, getSyntaxKindStrRepr, isInnerNode } from "./syntax-kind";
-import { Node } from "./syntax-node";
 
-export function toDbgString(node: Node, getText: (node: Node) => string, indentationLvl: number = 0): string {
+export function toDbgString(
+  node: Node,
+  getText: (node: Node) => string,
+  indentationLvl: number = 0,
+): string {
   const prefix = `${"  ".repeat(indentationLvl)} ${getSyntaxKindStrRepr(node.kind)} @${node.start}..${node.end}`;
   if (!isInnerNode(node.kind)) {
     let tokenText = getText(node);
@@ -11,13 +15,18 @@ export function toDbgString(node: Node, getText: (node: Node) => string, indenta
     }
     return prefix + ` "${tokenText}"`;
   } else {
-    return prefix + "\n" + node.children?.map((c) => toDbgString(c, getText, indentationLvl + 1)).join("\n");
+    return (
+      prefix +
+      "\n" +
+      node.children?.map((c) => toDbgString(c, getText, indentationLvl + 1)).join("\n")
+    );
   }
 }
 
-export function tagNameNodesMatch(name1: Node, name2: Node, getText: GetText): boolean {
-  const children1 = name1.children ?? [];
-  const children2 = name2.children ?? [];
+/** Disregards error nodes amongst the children of the 2 compared name node. (Those reported an error earlyer anyways)*/
+export function tagNameNodesWithoutErrorsMatch(name1: Node, name2: Node, getText: GetText): boolean {
+  const children1 = name1.children?.filter((c) => c.kind !== SyntaxKind.ErrorNode) ?? [];
+  const children2 = name2.children?.filter((c) => c.kind !== SyntaxKind.ErrorNode) ?? [];
 
   if (children1.length !== children2.length) {
     return false;
@@ -31,7 +40,7 @@ export function tagNameNodesMatch(name1: Node, name2: Node, getText: GetText): b
 }
 
 /** If the position is in-between two tokens, the chain to the token just before the cursor is provided as well, but the shared parents are inside field chainAtPos */
-export type FindTokenSuccess = {
+type FindTokenSuccess = {
   chainAtPos: Node[];
 
   /** If the position is in-between two tokens, the chain to the token just before the position is provided.
@@ -64,7 +73,9 @@ export function findTokenAtPos(node: Node, position: number): FindTokenSuccess |
   while (node.children !== undefined && node.children.length > 0) {
     //todo: make it a binary search before finding a fork
     const nodeAtPosIdx = node.children.findIndex(
-      (n) => n.start <= position && (position < n.end || (n.kind === SyntaxKind.EndOfFileToken && n.start <= n.end)),
+      (n) =>
+        n.start <= position &&
+        (position < n.end || (n.kind === SyntaxKind.EndOfFileToken && n.start <= n.end)),
     );
 
     const nodeAtPos = node.children[nodeAtPosIdx];

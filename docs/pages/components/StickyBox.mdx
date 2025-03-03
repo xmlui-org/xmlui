@@ -6,13 +6,13 @@ import { Callout } from "nextra/components";
 
 The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls.
 
-
-
 ## Properties
 
-### `to`
+### `to (default: "top")`
 
 This property determines whether the StickyBox should be anchored to the `top` or `bottom`.
+
+Available values: `top` **(default)**, `bottom`
 
 ```ueml copy
 <App>
@@ -59,4 +59,3 @@ The component uses the following theme variables:
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [color-bg](../styles-and-themes/common-units/#color)-StickyBox | $color-bg | $color-bg |
-

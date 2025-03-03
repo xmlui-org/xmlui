@@ -1,23 +1,14 @@
 {
-  "name": "vscode-xmlui-languageservice-server",
-  "description": "The language server",
-  "version": "0.0.14",
-  "author": "Tamas Kapitany",
+  "name": "xmlui-language-server",
+  "description": "Language server for the xmlui language",
+  "version": "0.0.1",
+  "author": "Norbert Hajagos",
   "license": "MIT",
   "engines": {
     "node": "*"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/xmlui-com/xmlui.git"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.38.0",
-    "@typescript-eslint/parser": "^5.38.0",
-    "typescript": "^5.3.3",
-    "vitest": "^1.6.0"
-  },
   "dependencies": {
+    "xmlui": "*",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.11"
   },

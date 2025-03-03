@@ -54,7 +54,6 @@ export const CheckboxMd = createMetadata({
     },
   },
   events: {
-    click: dClick(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),

@@ -176,3 +176,24 @@ export function deleteFileIfExists(filePath) {
     unlinkSync(filePath);
   }
 }
+
+/**
+ * Removes duplicate new line characters adjecent to one another in a list of strings
+ * @param {string[]} buffer the list of strings
+ * @returns {string[]} the list of strings without duplicate new line characters
+ */
+export function removeAdjacentNewlines(buffer) {
+  const result = [];  
+  let prevWasNewline = false;
+
+  for (const item of buffer) {
+    // Check if the current item is only newline characters
+    const isNewline = /^\s*$/.test(item);
+
+    if (!isNewline || !prevWasNewline) {
+      result.push(item);
+    }
+    prevWasNewline = isNewline;
+  }
+  return result;
+}

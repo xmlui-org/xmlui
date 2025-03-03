@@ -1,4 +1,13 @@
-import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { ComponentDef } from "../abstractions/ComponentDefs";
 import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
@@ -71,9 +80,16 @@ export function InspectorProvider({
   return (
     <InspectorContext.Provider value={contextValue}>
       {children}
-      {process.env.VITE_USER_COMPONENTS_Inspect !== 'false' && inspectable &&
+      {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
+        inspectable &&
         Object.values(inspectable).map((item: any) => {
-          return <InspectButton key={item.inspectId + +"-" + item.key} inspectId={item.inspectId} node={item.node} />;
+          return (
+            <InspectButton
+              key={item.inspectId + +"-" + item.key}
+              inspectId={item.inspectId}
+              node={item.node}
+            />
+          );
         })}
     </InspectorContext.Provider>
   );
@@ -86,7 +102,7 @@ function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
     if (!compSrc) {
       return "";
     }
-    if(!sources){
+    if (!sources) {
       return "";
     }
     const { start, end, fileId } = compSrc;
@@ -103,7 +119,10 @@ function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
         dropEmptyLines = false;
         prunedLines.push(line);
         const startingWhiteSpaces = line.search(/\S|$/);
-        if (line.trim() !== "" && (trimBeginCount === undefined || startingWhiteSpaces < trimBeginCount)) {
+        if (
+          line.trim() !== "" &&
+          (trimBeginCount === undefined || startingWhiteSpaces < trimBeginCount)
+        ) {
           trimBeginCount = startingWhiteSpaces;
         }
       }
@@ -116,7 +135,9 @@ function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
       onClose={props.onClose}
       style={{ width: "auto", maxWidth: "100%", minWidth: 400 }}
     >
-      <XmluiCodeHighlighter value={value} />
+      <div style={{ overflow: "auto", height: "100%" }}>
+        <XmluiCodeHighlighter value={value} />
+      </div>
     </ModalDialog>
   );
 }
@@ -133,6 +154,13 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
         options: {
           offset: [0, -18],
         },
+      },
+      {
+        name: 'flip',
+        enabled: false,
+        // options: {
+        //   fallbackPlacements: ['top', 'right'],
+        // },
       },
     ],
   });
@@ -177,7 +205,8 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
 
   return (
     <>
-      {visible && !!root &&
+      {visible &&
+        !!root &&
         createPortal(
           <Button
             icon={<Icon name={"code"} />}

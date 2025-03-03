@@ -3,9 +3,10 @@ import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
-import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, PropertyValueDescription } from "../../abstractions/ComponentDefs";
 import { asOptionalBoolean } from "../../components-core/rendering/valueExtractor";
 import type {
+  FormControlType,
   FormItemValidations,
   ValidateEventHandler,
   ValidationMode,
@@ -39,23 +40,6 @@ import { Slider } from "../Slider/SliderNative";
 import { ColorPicker } from "../ColorPicker/ColorPickerNative";
 import { HelperText } from "./HelperText";
 
-type FormControlType =
-  | "text"
-  | "password"
-  | "textarea"
-  | "checkbox"
-  | "number"
-  | "integer"
-  | "file"
-  | "select"
-  | "autocomplete"
-  | "datePicker"
-  | "radioGroup"
-  | "custom"
-  | "switch"
-  | "slider"
-  | "colorpicker";
-
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
   checkbox: "end",
 };
@@ -82,25 +66,29 @@ type Props = {
   inputRenderer?: any;
 };
 
-export const defaultProps: Pick<Props, "type" | "labelBreak" | "enabled"> = {
+export const defaultProps: Pick<
+  Props,
+  "type" | "labelBreak" | "enabled" | "customValidationsDebounce"
+> = {
   type: "text",
   labelBreak: true,
   enabled: true,
+  customValidationsDebounce: 0,
 };
 
 export const FormItem = memo(function FormItem({
   style,
   bindTo,
-  type = "text",
+  type = defaultProps.type,
   label,
-  enabled = true,
+  enabled = defaultProps.enabled,
   labelPosition,
   labelWidth,
-  labelBreak = true,
+  labelBreak = defaultProps.labelBreak,
   children,
   validations,
   onValidate,
-  customValidationsDebounce,
+  customValidationsDebounce = defaultProps.customValidationsDebounce,
   validationMode,
   registerComponentApi,
   maxTextLength,

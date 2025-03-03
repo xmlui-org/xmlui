@@ -6,8 +6,6 @@ import { Callout } from "nextra/components";
 
 `TextArea` is a component that provides a multiline text input area.
 
-
-
 The `TextArea` is an input control component and is often used in forms. See the [Using Forms](../learning/forms.mdx) guide for details.
 
 To add new lines to the input field press `Shift` + `Enter`.
@@ -17,21 +15,6 @@ To add new lines to the input field press `Shift` + `Enter`.
 ### `autoFocus (default: false)`
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
-
-```ueml copy
-<App>
-  <TextArea autoFocus="true" />
-</App>
-```
-
-<Playground
-  name="Example: autoFocus"
-  app={`
-  <App>
-    <TextArea autoFocus="true" />
-  </App>
-  `}
-/>
 
 ### `autoSize (default: false)`
 
@@ -54,6 +37,7 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
     <TextArea autoSize="true" />
   </App>
   `}
+  height={240}
 />
 
 ### `enabled (default: true)`
@@ -75,9 +59,9 @@ This boolean property value indicates whether the component responds to user eve
   `}
 />
 
-### `enterSubmits`
+### `enterSubmits (default: true)`
 
-This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit. The default value is is `true`.
+This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.
 
 Press `Enter` after writing something in the `TextArea` in the demo below.
 See [Using Forms](../learning/forms.mdx) for details.
@@ -107,7 +91,7 @@ See [Using Forms](../learning/forms.mdx) for details.
   `}
 />
 
-### `escResets`
+### `escResets (default: false)`
 
 This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.
 
@@ -153,7 +137,6 @@ Available values:
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
 
-
 ### `labelWidth`
 
 This property sets the width of the `TextArea`.
@@ -164,7 +147,7 @@ This property sets the maximum length of the input it accepts.
 
 ### `maxRows`
 
-This optional number property maximizes the number of lines the `TextArea` can grow to.
+This optional property sets the maximum number of text rows the `TextArea` can grow.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
@@ -198,7 +181,7 @@ This optional number property maximizes the number of lines the `TextArea` can g
 
 ### `minRows`
 
-This optional number property indicates the minimum number of lines the `TextArea` has and specifies its size accordingly.
+This optional property sets the minimum number of text rows the `TextArea` can shrink.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
@@ -268,11 +251,10 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `undefined` | No resizing |
+| `(undefined)` | No resizing |
 | `horizontal` | Can only resize horizontally |
 | `vertical` | Can only resize vertically |
 | `both` | Can resize in both dimensions |
-
 
 If you allow resizing, the `TextArea` turns off automatic sizing.
 
@@ -298,9 +280,9 @@ Drag the small resize indicators at the bottom right on each of the controls in 
   `}
 />
 
-### `rows`
+### `rows (default: 2)`
 
-Specifies the number of lines or rows (and thus, its size) the component has.
+Specifies the number of rows the component initially has.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
@@ -330,7 +312,6 @@ Available values:
 | `valid` | Visual indicator for an input that is accepted |
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
-
 
 This prop is used to visually indicate status changes reacting to form field validation.
 

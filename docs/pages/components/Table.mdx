@@ -6,8 +6,6 @@ import data from  "../../component-samples/Table/list-component-data.js";
 
 `Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells.
 
-
-
 In the following sections the examples use data with the structure outlined below:
 
 | Id   | Name    | Quantity | Unit   | Category   |
@@ -102,7 +100,7 @@ Here, the component displays rocket information coming from the official SpaceX 
   `}
 />
 
-### `enableMultiRowSelection`
+### `enableMultiRowSelection (default: true)`
 
 This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.
 
@@ -168,7 +166,7 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
   `}
 />
 
-### `hideHeader`
+### `hideHeader (default: false)`
 
 Set the header visibility using this property. Set it to `true` to hide the header.
 
@@ -201,7 +199,7 @@ The default value is `false`.
 
 ### `iconNoSort`
 
-Allows the customization of the icon displayed in the Table column header when when sorting is enabled and sorting is not done according to the column.
+Allows setting the icon displayed in the Table column header when sorting is enabled, but the column remains unsorted.
 
 Allows the customization of the icon displayed in a Table column header when when sorting is enabled
 and sorting is not done according to the column. Use the "-" (dash) value to sign that you do not want to display an icon when a table column is not sorted.
@@ -231,7 +229,7 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
 
 ### `iconSortAsc`
 
-Allows the customization of the icon displayed in the Table column header when sorting is enabled, sorting is done according to the column, and the column is sorted in ascending order.
+Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order.
 
 Allows the customization of the icon displayed in a Table column header when sorting is enabled,
 sorting is done according to the column, and the column is sorted in ascending order.
@@ -261,7 +259,7 @@ sorting is done according to the column, and the column is sorted in ascending o
 
 ### `iconSortDesc`
 
-Allows the customization of the icon displayed in the Table column header when sorting is enabled, sorting is done according to the column, and the column is sorted in descending order.
+Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order.
 
 Allows the customization of the icon displayed in a Table column header when sorting is enabled,
 sorting is done according to the column, and the column is sorted in descending order.
@@ -291,7 +289,7 @@ Select a column header and set it to descending ordering.
   `}
 />
 
-### `isPaginated`
+### `isPaginated (default: false)`
 
 This property adds pagination controls to the `Table`.
 
@@ -317,10 +315,6 @@ This property adds pagination controls to the `Table`.
     </App>
   `}
 />
-
-### `items`
-
-You can use `items` as an alias for the `data` property. When you bind the table to a data source (e.g. an API endpoint), the `data` acts as the property that accepts a URL to fetch information from an API. When both `items` and `data` are used, `items` has priority.
 
 ### `loading`
 
@@ -383,7 +377,7 @@ A property to customize what to display if the table does not contain any data.
 
 ### `pageSizes`
 
-Describes how big a page should be for pagination.
+This property holds an array of page sizes (numbers) the user can select for pagination. If this property is not defined, the component allows only a page size of 10 items.
 
 Page sizes are only accepted in an array, even if the array contains one item.
 
@@ -878,4 +872,3 @@ Heading theme variables:
 | [thickness-border-vertical](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-outline](../styles-and-themes/common-units/#size)-heading-Table--focus | $thickness-outline--focus | $thickness-outline--focus |
 | [transform](../styles-and-themes/common-units/#text-transform)-text-heading-Table | uppercase | uppercase |
-

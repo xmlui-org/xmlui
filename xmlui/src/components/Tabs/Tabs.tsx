@@ -18,11 +18,15 @@ export const TabsMd = createMetadata({
       `This property indicates the index of the active tab. The indexing starts from 0, ` +
         `representing the starting (leftmost) tab.`,
     ),
-    orientation: d(
-      `This property indicates the orientation of the component. In horizontal orientation, ` +
+    orientation: {
+      description:
+        `This property indicates the orientation of the component. In horizontal orientation, ` +
         `the tab sections are laid out on the left side of the content panel, while in vertical ` +
         `orientation, the buttons are at the top.`,
-    ),
+      availableValues: ["horizontal", "vertical"],
+      defaultValue: "vertical",
+      valueType: "string",
+    },
     tabTemplate: dComponent(`This property declares the template for the clickable tab area.`),
   },
   apis: {
@@ -45,7 +49,6 @@ export const TabsMd = createMetadata({
       [`color-bg-trigger-${COMP}--hover`]: "$color-primary-800",
       [`color-bg-list-${COMP}`]: "$color-primary-800",
       [`color-text-trigge-r${COMP}`]: "$color-primary-100",
-
     },
   },
 });

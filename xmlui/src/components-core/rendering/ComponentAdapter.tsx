@@ -27,7 +27,6 @@ import { ContainerActionKind } from "../abstractions/containers";
 import { useInspector } from "../InspectorContext";
 import { SlotItem } from "../../components/SlotItem";
 import { layoutOptionKeys } from "../descriptorHelper";
-import { compileLayout } from "../../parsers/style-parser/style-compiler";
 import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
@@ -283,7 +282,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       ((appContext?.decorateComponentsWithTestId &&
         (safeNode.uid !== undefined || safeNode.testId !== undefined)) ||
         // --- The component has its "inspectId" property defined
-        (appContext?.debugEnabled && inspectId !== undefined)) &&
+        inspectId !== undefined) &&
       // // --- The app context indicates test mode
       // --- The component is visual
       descriptor?.nonVisual !== true &&

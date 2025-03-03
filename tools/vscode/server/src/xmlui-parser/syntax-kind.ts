@@ -1,3 +1,4 @@
+/** tokens and nodes combined. Order is significant since the functions below use the numeric values of this enum to check for a range of possible values*/
 export const enum SyntaxKind {
   Unknown = 0,
   EndOfFileToken = 1,
@@ -32,6 +33,7 @@ export const enum SyntaxKind {
   // Syntax node types
   ElementNode,
   AttributeNode,
+  AttributeKeyNode,
   ContentListNode,
   AttributeListNode,
   TagNameNode,
@@ -103,5 +105,12 @@ export function getSyntaxKindStrRepr(kind: SyntaxKind): string {
       return "TagNameNode";
     case SyntaxKind.ErrorNode:
       return "ErrorNode";
+    case SyntaxKind.AttributeKeyNode:
+      return "AttributeKeyNode";
   }
+  return assertUnreachable(kind);
+}
+
+function assertUnreachable(x: never): never {
+  throw new Error("Didn't expect to get here");
 }

@@ -270,11 +270,16 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     completeNode(SyntaxKind.AttributeKeyNode);
   }
 
+  type AttrName = {
+    ns?: string,
+    name: string
+  };
+
   /** emits errors when the attribute name is incorrect. Otherwise adds the attribute name to the list of valid names*/
-  function checkAttrName(attrNames, { nameIdent, nsIdent }: { nameIdent: Node; nsIdent: Node }) {
+  function checkAttrName(attrNames: AttrName[], { nameIdent, nsIdent }: { nameIdent: Node; nsIdent?: Node }) {
     const attrName = getText(nameIdent);
     const attrNs = nsIdent === undefined ? undefined : getText(nsIdent);
-    const attrKeyMatches = ({ ns, name }) => name === attrName && ns === attrNs;
+    const attrKeyMatches = ({ ns, name }: AttrName) => name === attrName && ns === attrNs;
     const isDuplicate = attrNames.findIndex(attrKeyMatches) !== -1;
     const nameStartsWithUppercase = "A" <= attrName[0] && attrName[0] <= "Z";
     const faultyName = isDuplicate || nameStartsWithUppercase;

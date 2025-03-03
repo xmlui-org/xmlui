@@ -2,14 +2,14 @@ import { COMPONENT_COMBOBOX, COMPONENT_TEXTBOX } from "../../meta/pages";
 
 # Customizing Input Fields
 
-Components with an input field, like <SmartLink href={COMPONENT_TEXTBOX}>TextBox</SmartLink> and <SmartLink href={COMPONENT_COMBOBOX}>Combobox</SmartLink>
+Components with an input field, like <SmartLink href={COMPONENT_TEXTBOX}>TextBox</SmartLink>
 can be customized with icons and adornment texts.
 
-Combobox example:
+AutoComplete example:
 
 ```ueml copy
 <App>
-  <Combobox
+  <AutoComplete
     initialValue="js"
     placeholder="Select a user"
     startIcon="user"
@@ -19,16 +19,16 @@ Combobox example:
     <Option label="Jane Arrington" value="ja" />
     <Option label="John Sniper" value="js" />
     <Option label="Emily Gold" value="eg" />
-  </Combobox>
+  </AutoComplete>
 </App>
 ```
 
 <Playground
-  name="Example: Combobox Input Field Customization"
+  name="Example: AutoComplete Input Field Customization"
   height={260}
   app={`
     <App>
-      <Combobox
+      <AutoComplete
         initialValue="js"
         placeholder="Select a user"
         startIcon="user"
@@ -38,7 +38,7 @@ Combobox example:
         <Option label="Jane Arrington" value="ja" />
         <Option label="John Sniper" value="js" />
         <Option label="Emily Gold" value="eg" />
-      </Combobox>
+      </AutoComplete>
     </App>
   `}
 />

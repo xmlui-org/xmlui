@@ -27,6 +27,7 @@ import type { ComponentRendererDef, RendererContext } from "./abstractions/Rende
 import { parseScssVar } from "./components-core/theming/themeVars";
 import type {RegisterComponentApiFn} from "./abstractions/RendererDefs";
 import type { ComponentMetadata } from "./abstractions/ComponentDefs";
+import { findTokenAtPos } from "./parsers/xmlui-parser/utils";
 
 export type {
   ThemeDefinition,

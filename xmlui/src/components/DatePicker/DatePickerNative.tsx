@@ -276,7 +276,7 @@ export const DatePicker = forwardRef(function DatePicker(
           mode={mode === "single" ? "single" : "range"}
           selected={selected}
           onSelect={handleSelect}
-          initialFocus
+          initialFocus={!inline}
           numberOfMonths={mode === "range" ? 2 : 1}
         />
       </div>
