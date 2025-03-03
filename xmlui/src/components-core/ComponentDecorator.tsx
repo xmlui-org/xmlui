@@ -1,5 +1,7 @@
-import React, { cloneElement, forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import type React from "react";
+import { cloneElement, forwardRef, useCallback, useLayoutEffect, useRef, useState } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useShallowCompareMemoize } from "./utils/hooks";
 
 // --- Describes the properties of the decorator component
 interface DecoratorProps {
@@ -16,62 +18,76 @@ interface DecoratorProps {
   children: React.ReactElement;
 }
 
+const HIDDEN_STYLE: React.CSSProperties = { position: "absolute", width: 0, display: "none" };
+
 /**
- * This component decorates the DOM element of a component with a set of 
- * attributes. We use this feature to assign helper attributes to the app's 
+ * This component decorates the DOM element of a component with a set of
+ * attributes. We use this feature to assign helper attributes to the app's
  * xmlui component nodes for testing, debugging, and other development-related
  * purposes.
  */
 const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
-  const [parentElement, setParentElement] = useState<HTMLElement | null>(null);
+  // the concept:
+  //   we want to add attributes to the component's DOM node even if that component doesn't handle refs
+  //   to find the actual dom node, we use either the ref passed to the component, or the ref of the previous or next sibling
+  //   with those sibling refs we can find the actual dom node (via nextElementSibling)
+  //   we are making sure that the next and previous elements are not the same, to avoid adding attributes to the wrong element
+  const prevSiblingRef = useRef(null);
+  const nextSiblingRef = useRef(null);
   const { onTargetMounted } = props;
 
-  // --- We wrap the component in a React.Fragment, if it has a parent element; 
-  // --- otherwise, we use a `div`
-  const Wrapper = parentElement ? React.Fragment : "div";
-
-  const ref = useRef<HTMLDivElement>(null);
-  const [itemNodeVisible, setItemNodeVisible] = useState(false);
+  const [handlesItemRef, sethandlesItemRef] = useState(false);
+  const [foundNode, setFoundNode] = useState(null);
   const itemRef = useRef<HTMLElement | null>(null);
-  const itemRefCallback = useCallback((node: any) => {
-    itemRef.current = node;
-    setItemNodeVisible(node !== null);
-  }, []);
-  const targetIndex = useRef(0);
+  const itemRefCallback = useCallback(
+    (node: any) => {
+      itemRef.current = node;
+      if (node !== null) {
+        onTargetMounted?.();
+      }
+      sethandlesItemRef(true);
+    },
+    [onTargetMounted],
+  );
 
-  // --- When the component mounts, we find the index of the component in its parent
-  useEffect(() => {
-    if (ref.current?.parentElement) {
-      targetIndex.current = Array.from(ref.current.parentElement.children).indexOf(ref.current);
-      setParentElement(ref.current.parentElement);
-      return;
-    }
-  }, []);
+  const shallowAttrs = useShallowCompareMemoize(props.attr);
+  const shouldRenderHelperSpan = !props.allowOnlyRefdChild && !handlesItemRef;
 
   // --- When the component mounts, we add the attributes to the component's DOM node
-  useEffect(() => {
-    let node = itemRef.current || parentElement?.children[targetIndex.current] || null;
-    if (props.allowOnlyRefdChild) {
+  useLayoutEffect(() => {
+    let node: any;
+    if (shouldRenderHelperSpan) {
+      if(foundNode){
+        node = foundNode;
+      } else {
+        node =
+          (prevSiblingRef.current.nextElementSibling === nextSiblingRef.current
+            ? null
+            : prevSiblingRef.current.nextElementSibling) || null;
+        setFoundNode(node);
+      }
+    } else {
       node = itemRef.current;
     }
-    Object.entries(props.attr).forEach(([key, value]) => {
-      if (value !== undefined) {
-        node?.setAttribute(key, value);
-      } else {
-        node?.removeAttribute(key);
-      }
-    });
-    if (itemNodeVisible) {
-      onTargetMounted?.();
+    if (node) {
+      Object.entries(shallowAttrs).forEach(([key, value]) => {
+        if (value !== undefined) {
+          node.setAttribute(key, value);
+        } else {
+          node.removeAttribute(key);
+        }
+      });
     }
-  }, [parentElement, targetIndex, props.attr, props.allowOnlyRefdChild, onTargetMounted, itemNodeVisible]);
+  }, [shouldRenderHelperSpan, shallowAttrs, foundNode]);
 
   return (
-    <Wrapper ref={parentElement ? undefined : ref}>
+    <>
+      {!foundNode && shouldRenderHelperSpan && <span style={HIDDEN_STYLE} ref={prevSiblingRef} />}
       {cloneElement(props.children, {
         ref: forwardedRef ? composeRefs(itemRefCallback, forwardedRef) : itemRefCallback,
       })}
-    </Wrapper>
+      {!foundNode && shouldRenderHelperSpan && <span style={HIDDEN_STYLE} ref={nextSiblingRef} />}
+    </>
   );
 });
 
