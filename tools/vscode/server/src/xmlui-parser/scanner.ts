@@ -1,18 +1,15 @@
 import { CharacterCodes } from "./CharacterCodes";
 import {
-  Diag_Hexadecimal_Digit_Expected,
   Diag_Invalid_Character,
-  Diag_Invalid_Extended_Unicode_Escape,
-  Diag_Unexpected_End_Of_Text,
   Diag_Unterminated_CData,
   Diag_Unterminated_Comment,
+  Diag_Unterminated_Script,
   Diag_Unterminated_String_Literal,
-  Diag_Unterminated_Unicode_Escape_Sequence,
-  DiagnosticMessage,
+  DiagnosticMessageFromScanner,
 } from "./diagnostics";
 import { SyntaxKind, isTrivia } from "./syntax-kind";
 
-type ScannerErrorCallback = (message: DiagnosticMessage, length: number, arg0?: any) => void;
+export type ScannerErrorCallback = (message: DiagnosticMessageFromScanner, length: number, arg0?: any) => void;
 
 export interface Scanner {
   getStartPos(): number;
@@ -39,7 +36,7 @@ export function createScanner(
   textInitial?: string,
   onError?: ScannerErrorCallback,
   start?: number,
-  length?: number,
+  length?: number
 ): Scanner {
   let text = textInitial ?? "";
 
@@ -213,6 +210,7 @@ export function createScanner(
             return (token = SyntaxKind.SingleQuoteEntity);
           }
           pos++;
+          error(Diag_Invalid_Character, 1)
           return (token = SyntaxKind.Unknown);
 
         // --- Collect equal token
@@ -249,9 +247,9 @@ export function createScanner(
               }
               pos += charSize(charCodeUnchecked(pos));
             }
-            error(Diag_Unterminated_Comment);
+            error(Diag_Unterminated_Comment,4);
             return (token = SyntaxKind.Unknown);
-          } else if (
+          }  else if (
             // --- <![CDATA[ section
             charCodeUnchecked(pos + 1) === CharacterCodes.exclamation &&
             charCodeUnchecked(pos + 2) === CharacterCodes.openBracket &&
@@ -274,7 +272,7 @@ export function createScanner(
               }
               pos += charSize(charCodeUnchecked(pos));
             }
-            error(Diag_Unterminated_CData);
+            error(Diag_Unterminated_CData, 9);
             return (token = SyntaxKind.CData);
           } else if (
             // --- <script>
@@ -285,26 +283,26 @@ export function createScanner(
             charCodeUnchecked(pos + 5) === CharacterCodes.p &&
             charCodeUnchecked(pos + 6) === CharacterCodes.t &&
             charCodeUnchecked(pos + 7) === CharacterCodes.greaterThan
-          ) {
+          ){
             pos += 8;
             while (pos < end) {
               if (
-                charCodeUnchecked(pos) === CharacterCodes.lessThan &&
-                charCodeUnchecked(pos + 1) === CharacterCodes.slash &&
-                charCodeUnchecked(pos + 2) === CharacterCodes.s &&
-                charCodeUnchecked(pos + 3) === CharacterCodes.c &&
-                charCodeUnchecked(pos + 4) === CharacterCodes.r &&
-                charCodeUnchecked(pos + 5) === CharacterCodes.i &&
-                charCodeUnchecked(pos + 6) === CharacterCodes.p &&
-                charCodeUnchecked(pos + 7) === CharacterCodes.t &&
-                charCodeUnchecked(pos + 8) === CharacterCodes.greaterThan
+            charCodeUnchecked(pos) === CharacterCodes.lessThan &&
+            charCodeUnchecked(pos + 1) === CharacterCodes.slash &&
+            charCodeUnchecked(pos + 2) === CharacterCodes.s &&
+            charCodeUnchecked(pos + 3) === CharacterCodes.c &&
+            charCodeUnchecked(pos + 4) === CharacterCodes.r &&
+            charCodeUnchecked(pos + 5) === CharacterCodes.i &&
+            charCodeUnchecked(pos + 6) === CharacterCodes.p &&
+            charCodeUnchecked(pos + 7) === CharacterCodes.t &&
+            charCodeUnchecked(pos + 8) === CharacterCodes.greaterThan
               ) {
                 pos += 9;
                 return (token = SyntaxKind.Script);
               }
               pos += charSize(charCodeUnchecked(pos));
             }
-            error(Diag_Unterminated_CData);
+            error(Diag_Unterminated_Script,9);
             return (token = SyntaxKind.Script);
           }
 
@@ -316,7 +314,8 @@ export function createScanner(
             pos += 2;
             return (token = SyntaxKind.NodeClose);
           }
-          error(Diag_Invalid_Character, pos, 1);
+          pos++;
+          error(Diag_Invalid_Character, 1);
           return (token = SyntaxKind.Unknown);
 
         // --- Collect node closing token
@@ -336,8 +335,8 @@ export function createScanner(
             continue;
           }
           const size = charSize(ch);
-          error(Diag_Invalid_Character, pos, size);
           pos += size;
+          error(Diag_Invalid_Character, size);
           return (token = SyntaxKind.Unknown);
       }
     }
@@ -424,7 +423,7 @@ export function createScanner(
     while (true) {
       if (pos >= end) {
         result += text.substring(start, pos);
-        error(Diag_Unterminated_String_Literal);
+        error(Diag_Unterminated_String_Literal, 1);
         break;
       }
       const ch = charCodeUnchecked(pos);
@@ -433,170 +432,14 @@ export function createScanner(
         pos++;
         break;
       }
-      if (ch === CharacterCodes.backslash) {
-        result += text.substring(start, pos);
-        result += scanEscapeSequence();
-        start = pos;
-        continue;
-      }
       pos++;
     }
     return result;
   }
 
-  function scanEscapeSequence(): string {
-    const start = pos;
-    pos++;
-    if (pos >= end) {
-      error(Diag_Unexpected_End_Of_Text);
-      return "";
-    }
-    const ch = charCodeUnchecked(pos);
-    pos++;
-    switch (ch) {
-      case CharacterCodes.b:
-        return "\b";
-      case CharacterCodes.t:
-        return "\t";
-      case CharacterCodes.n:
-        return "\n";
-      case CharacterCodes.v:
-        return "\v";
-      case CharacterCodes.f:
-        return "\f";
-      case CharacterCodes.r:
-        return "\r";
-      case CharacterCodes.S:
-        return "\xa0";
-      case CharacterCodes.singleQuote:
-        return "'";
-      case CharacterCodes.doubleQuote:
-        return '"';
-      case CharacterCodes.backtick:
-        return "`";
-      case CharacterCodes.u:
-        if (pos < end && charCodeUnchecked(pos) === CharacterCodes.openBrace) {
-          // '\u{DDDDDD}'
-          pos -= 2;
-          return scanExtendedUnicodeEscape(true);
-        }
-        // '\uDDDD'
-        for (; pos < start + 6; pos++) {
-          if (!(pos < end && isHexDigit(charCodeUnchecked(pos)))) {
-            error(Diag_Hexadecimal_Digit_Expected);
-            return text.substring(start, pos);
-          }
-        }
-        const escapedValue = parseInt(text.substring(start + 2, pos), 16);
-        return String.fromCharCode(escapedValue);
-
-      case CharacterCodes.x:
-        // '\xDD'
-        for (; pos < start + 4; pos++) {
-          if (!(pos < end && isHexDigit(charCodeUnchecked(pos)))) {
-            error(Diag_Hexadecimal_Digit_Expected);
-            return text.substring(start, pos);
-          }
-        }
-        return String.fromCharCode(parseInt(text.substring(start + 2, pos), 16));
-
-      // when encountering a LineContinuation (i.e. a backslash and a line terminator sequence),
-      // the line terminator is interpreted to be "the empty code unit sequence".
-      case CharacterCodes.carriageReturn:
-        if (pos < end && charCodeUnchecked(pos) === CharacterCodes.lineFeed) {
-          pos++;
-        }
-        return "";
-      case CharacterCodes.lineFeed:
-      case CharacterCodes.lineSeparator:
-      case CharacterCodes.paragraphSeparator:
-        return "";
-      default:
-        return String.fromCharCode(ch);
-    }
-  }
-
-  function scanExtendedUnicodeEscape(shouldEmitInvalidEscapeError: boolean): string {
-    const start = pos;
-    pos += 3;
-    const escapedStart = pos;
-    const escapedValueString = scanMinimumNumberOfHexDigits(1);
-    const escapedValue = escapedValueString ? parseInt(escapedValueString, 16) : -1;
-    let isInvalidExtendedEscape = false;
-
-    // Validate the value of the digit
-    if (escapedValue < 0) {
-      if (shouldEmitInvalidEscapeError) {
-        error(Diag_Hexadecimal_Digit_Expected);
-      }
-      isInvalidExtendedEscape = true;
-    } else if (escapedValue > 0x10ffff) {
-      if (shouldEmitInvalidEscapeError) {
-        error(Diag_Invalid_Extended_Unicode_Escape, escapedStart, pos - escapedStart);
-      }
-      isInvalidExtendedEscape = true;
-    }
-
-    if (pos >= end) {
-      if (shouldEmitInvalidEscapeError) {
-        error(Diag_Unexpected_End_Of_Text);
-      }
-      isInvalidExtendedEscape = true;
-    } else if (charCodeUnchecked(pos) === CharacterCodes.closeBrace) {
-      // Only swallow the following character up if it's a '}'.
-      pos++;
-    } else {
-      if (shouldEmitInvalidEscapeError) {
-        error(Diag_Unterminated_Unicode_Escape_Sequence);
-      }
-      isInvalidExtendedEscape = true;
-    }
-
-    if (isInvalidExtendedEscape) {
-      return text.substring(start, pos);
-    }
-
-    return utf16EncodeAsString(escapedValue);
-  }
-
-  /**
-   * Scans as many hexadecimal digits as are available in the text,
-   * returning "" if the given number of digits was unavailable.
-   */
-  function scanMinimumNumberOfHexDigits(count: number): string {
-    return scanHexDigits(/*minCount*/ count, /*scanAsManyAsPossible*/ true);
-  }
-
-  function scanHexDigits(minCount: number, scanAsManyAsPossible: boolean): string {
-    let valueChars: number[] = [];
-    let isPreviousTokenSeparator = false;
-    while (valueChars.length < minCount || scanAsManyAsPossible) {
-      let ch = charCodeUnchecked(pos);
-      if (ch >= CharacterCodes.A && ch <= CharacterCodes.F) {
-        ch += CharacterCodes.a - CharacterCodes.A; // standardize hex literals to lowercase
-      } else if (
-        !((ch >= CharacterCodes._0 && ch <= CharacterCodes._9) || (ch >= CharacterCodes.a && ch <= CharacterCodes.f))
-      ) {
-        break;
-      }
-      valueChars.push(ch);
-      pos++;
-      isPreviousTokenSeparator = false;
-    }
-    if (valueChars.length < minCount) {
-      valueChars = [];
-    }
-    return String.fromCharCode(...valueChars);
-  }
-
-  function error(message: DiagnosticMessage): void;
-  function error(message: DiagnosticMessage, errPos: number, length: number, arg0?: any): void;
-  function error(message: DiagnosticMessage, errPos: number = pos, length?: number, arg0?: any): void {
+  function error(message: DiagnosticMessageFromScanner, troublesomePrefixLength: number = 0): void {
     if (onError) {
-      const oldPos = pos;
-      pos = errPos;
-      onError(message, length || 0, arg0);
-      pos = oldPos;
+      onError(message, troublesomePrefixLength);
     }
   }
 }
@@ -623,42 +466,15 @@ function isDigit(ch: number): boolean {
   return ch >= CharacterCodes._0 && ch <= CharacterCodes._9;
 }
 
-function isHexDigit(ch: number): boolean {
-  return (
-    isDigit(ch) ||
-    (ch >= CharacterCodes.A && ch <= CharacterCodes.F) ||
-    (ch >= CharacterCodes.a && ch <= CharacterCodes.f)
-  );
-}
-
-function utf16EncodeAsStringFallback(codePoint: number) {
-  if (codePoint <= 65535) {
-    return String.fromCharCode(codePoint);
-  }
-
-  const codeUnit1 = Math.floor((codePoint - 65536) / 1024) + 0xd800;
-  const codeUnit2 = ((codePoint - 65536) % 1024) + 0xdc00;
-
-  return String.fromCharCode(codeUnit1, codeUnit2);
-}
-
-const utf16EncodeAsStringWorker: (codePoint: number) => string = (String as any).fromCodePoint
-  ? (codePoint) => (String as any).fromCodePoint(codePoint)
-  : utf16EncodeAsStringFallback;
-
-function utf16EncodeAsString(codePoint: number) {
-  return utf16EncodeAsStringWorker(codePoint);
-}
-
 export function isIdentifierStart(ch: number): boolean {
   return isASCIILetter(ch) || ch === CharacterCodes.$ || ch === CharacterCodes._;
 }
 
-export function isIdentifierPart(ch: number): boolean {
+function isIdentifierPart(ch: number): boolean {
   return isWordCharacter(ch) || ch === CharacterCodes.$ || ch === CharacterCodes.minus || ch === CharacterCodes.dot;
 }
 
-export function isWhiteSpaceSingleLine(ch: number): boolean {
+function isWhiteSpaceSingleLine(ch: number): boolean {
   // Note: nextLine is in the Zs space, and should be considered to be a whitespace.
   // It is explicitly not a line-break as it isn't in the exact set specified by EcmaScript.
   return (
@@ -677,7 +493,7 @@ export function isWhiteSpaceSingleLine(ch: number): boolean {
   );
 }
 
-export function isLineBreak(ch: number): boolean {
+function isLineBreak(ch: number): boolean {
   return (
     ch === CharacterCodes.lineFeed ||
     ch === CharacterCodes.carriageReturn ||

@@ -1,100 +1,56 @@
+import type { Node } from "./syntax-node";
+import type { ScannerErrorCallback } from "./scanner";
+import type { DiagnosticMessageFromScanner, GeneralDiagnosticMessage } from "./diagnostics";
+
 import { CharacterCodes } from "./CharacterCodes";
 import { createScanner } from "./scanner";
 import { SyntaxKind, getSyntaxKindStrRepr } from "./syntax-kind";
-import { Node } from "./syntax-node";
-import { tagNameNodesMatch } from "./utils";
+import { tagNameNodesWithoutErrorsMatch   } from "./utils";
+import {
+  Diag_Attr_Identifier_Expected,
+  Diag_Attr_Value_Expected,
+  Diag_CloseNodeStart_Token_Expected,
+  Diag_End_Or_Close_Token_Expected,
+  Diag_End_Token_Expected,
+  Diag_OpenNodeStart_Token_Expected,
+  Diag_Tag_Identifier_Expected,
+  DiagnosticCategory,
+  ErrCodes,
+} from "./diagnostics";
 
-export enum ErrCodes {
-  onlyOneElem = "U002",
-  expTagOpen = "U003",
-  expTagIdent = "U004",
-  expCloseStart = "U005",
-  expEndOrClose = "U006",
-  tagNameMismatch = "U007",
-  expEnd = "U008",
-  expAttrIdent = "U009",
-  expEq = "U010",
-  expAttrValue = "U011",
-  duplAttr = "U012",
-  uppercaseAttr = "U013",
-}
-
-type ErrResult = {
-  code: ErrCodes;
-  message: string;
-};
-
-const Err = {
+const MakeErr = {
   uppercaseAttr: function (attrName: string) {
     return {
+      category: DiagnosticCategory.Error,
       code: ErrCodes.uppercaseAttr,
       message: `Attribute name '${attrName}' cannot start with an uppercase letter.`,
     };
   },
   duplAttr: function (attrName: string) {
     return {
+      category: DiagnosticCategory.Error,
       code: ErrCodes.duplAttr,
       message: `Duplicated attribute: '${attrName}'.`,
     };
   },
-  expEnd: function () {
-    return {
-      code: ErrCodes.expEnd,
-      message: "A '>' token expected.",
-    };
-  },
-  expCloseStart: function () {
-    return {
-      code: ErrCodes.expCloseStart,
-      message: "A '</' token expected.",
-    };
-  },
-
-  expTagIdent: function () {
-    return {
-      code: ErrCodes.expTagIdent,
-      message: "A tag identifier expected.",
-    };
-  },
-  expAttrValue: function () {
-    return {
-      code: ErrCodes.expAttrValue,
-      message: "An attribute value expected",
-    };
-  },
-  expEq: function () {
-    return {
-      code: ErrCodes.expEq,
-      message: "An '=' token expected",
-    };
-  },
-  expTagOpen: function () {
-    return {
-      code: ErrCodes.expTagOpen,
-      message: "A '<' token expected.",
-    };
-  },
-  expEndOrClose: function () {
-    return {
-      code: ErrCodes.expEndOrClose,
-      message: `A '>' or '/>' token expected.`,
-    };
-  },
-  expAttrIdent: function () {
-    return {
-      code: ErrCodes.expAttrIdent,
-      message: `An attribute identifier expected.`,
-    };
-  },
   tagNameMismatch: function (openTagName: string, closeTagName: string) {
     return {
+      category: DiagnosticCategory.Error,
       code: ErrCodes.tagNameMismatch,
       message: `Opening and closing tag names should match. Opening tag has a name '${openTagName}', but the closing tag name is '${closeTagName}'.`,
+    };
+  },
+  invalidChar: function (char: string) {
+    return {
+      category: DiagnosticCategory.Error,
+      code: ErrCodes.invalidChar,
+      message: `Invalid character '${char}'.`,
     };
   },
 };
 
 export interface Error {
+  readonly category: DiagnosticCategory;
   readonly code: ErrCodes;
   readonly message: string;
   readonly pos: number;
@@ -115,10 +71,14 @@ const firstSetTagLike = [SyntaxKind.CData, SyntaxKind.Script, SyntaxKind.OpenNod
 //   SyntaxKind.Identifier,
 //   SyntaxKind.StringLiteral,
 // ])
-export function createXmlUiParser(source: string) {
+export function createXmlUiParser(source: string): {
+  parse: () => ParseResult;
+  getText: GetText;
+} {
   return {
     parse: () => parseXmlUiMarkup(source),
-    getText: (n: Node, ignoreTrivia: boolean = true) => source.substring(ignoreTrivia ? n.pos : n.start, n.end),
+    getText: (n: { pos?: number; start?: number; end: number }, ignoreTrivia: boolean = true) =>
+      source.substring(ignoreTrivia ? (n.pos ?? n.start ?? 0) : (n.start ?? n.pos ?? 0), n.end),
   };
 }
 
@@ -127,7 +87,16 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   const parents: (IncompleteNode | Node)[] = [];
   let peekedToken: Node | undefined;
   let node: Node | IncompleteNode = { children: [] };
-  const scanner = createScanner(false, text);
+  let errFromScanner: { message: DiagnosticMessageFromScanner; prefixLength: number } | undefined =
+    undefined;
+
+  const onScannerErr: ScannerErrorCallback = function (message, length) {
+    errFromScanner = {
+      message,
+      prefixLength: length,
+    };
+  };
+  const scanner = createScanner(false, text, onScannerErr);
 
   function getText(n: Node, ignoreTrivia: boolean = true) {
     return text.substring(ignoreTrivia ? n.pos : n.start, n.end);
@@ -135,7 +104,22 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
   function parseContent() {
     startNode();
-    parseSource();
+    loop: while (true) {
+      const token = peekInContent();
+      switch (token.kind) {
+        case SyntaxKind.TextNode:
+        case SyntaxKind.StringLiteral:
+          bump(token.kind);
+          break;
+        case SyntaxKind.CloseNodeStart:
+          break loop;
+        case SyntaxKind.EndOfFileToken:
+          break loop;
+        default:
+          parseTagLike();
+          break;
+      }
+    }
     if (node.children && node.children.length > 0) {
       completeNode(SyntaxKind.ContentListNode);
     } else {
@@ -143,16 +127,17 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  function parseSource() {
-    while (!eat(SyntaxKind.EndOfFileToken) && !at(SyntaxKind.CloseNodeStart)) {
-      if (peekInContent().kind === SyntaxKind.TextNode) {
-        bump(SyntaxKind.TextNode);
-        continue;
+  function parseSourceContent() {
+    while (true) {
+      const token = peekInContent();
+      switch (token.kind) {
+        case SyntaxKind.EndOfFileToken:
+          bumpAny();
+          return;
+        default:
+          parseTagLike();
+          break;
       }
-      if (eat(SyntaxKind.StringLiteral)) {
-        continue;
-      }
-      parseTagLike();
     }
   }
 
@@ -161,7 +146,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       if (at(SyntaxKind.OpenNodeStart)) {
         parseTag();
       } else {
-        errorAndBump(Err.expTagOpen());
+        errorAndBump(Diag_OpenNodeStart_Token_Expected);
       }
     }
   }
@@ -174,7 +159,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     if (at(SyntaxKind.Identifier)) {
       openTagName = parseTagName();
     } else {
-      error(Err.expTagIdent());
+      error(Diag_Tag_Identifier_Expected);
     }
 
     parseAttrList();
@@ -187,23 +172,24 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       if (eat(SyntaxKind.CloseNodeStart)) {
         if (at(SyntaxKind.Identifier)) {
           const closeTagName = parseTagName();
-          const namesMismatch = openTagName !== undefined && !tagNameNodesMatch(openTagName, closeTagName, getText);
+          const namesMismatch =
+            openTagName !== undefined && !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
           if (namesMismatch) {
-            error(Err.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
+            error(MakeErr.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
           }
         } else {
-          errRecover(Err.expTagIdent(), [SyntaxKind.NodeEnd]);
+          errRecover(Diag_Tag_Identifier_Expected, [SyntaxKind.NodeEnd]);
         }
         if (!eat(SyntaxKind.NodeEnd)) {
-          error(Err.expEnd());
+          error(Diag_End_Token_Expected);
         }
       } else {
-        error(Err.expCloseStart());
+        error(Diag_CloseNodeStart_Token_Expected);
       }
       completeNode(SyntaxKind.ElementNode);
       return;
     } else {
-      error(Err.expEndOrClose());
+      error(Diag_End_Or_Close_Token_Expected);
     }
   }
 
@@ -219,21 +205,19 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   }
 
   function parseAttrList() {
-    // no need to call errRecovery, since AttrList is optional
     startNode();
-    const attrNames: any[] = [];
+    const attrNames: { ns?: string; name: string }[] = [];
     while (!atAnyOf([SyntaxKind.EndOfFileToken, SyntaxKind.NodeEnd, SyntaxKind.NodeClose])) {
-      // parseAttr
-      if (!at(SyntaxKind.Identifier)) {
-        if (atAnyOf(firstSetTagLike)) {
-          error(Err.expAttrIdent());
-          parseTagLike();
-        } else {
-          errorAndBump(Err.expAttrIdent());
-        }
-      } else {
-        parseAttr(attrNames);
-      }
+      parseAttr(attrNames);
+      // todo: was this usefuel?
+      // if (at(SyntaxKind.Identifier)) {
+      //   parseAttr(attrNames);
+      // } else {
+      //   const atTagLike = errRecover(Diag_Attr_Identifier_Expected, firstSetTagLike);
+      //   if (atTagLike) {
+      //     parseTagLike();
+      //   }
+      // }
     }
 
     if (node.children!.length === 0) {
@@ -243,41 +227,72 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  function parseAttr(attrNames: string[]) {
-    //todo: make this recovery set actualy true (like implement handling cdata ,...)
-    const attrListFollow = [
-      // FOLLOW(AttrList) when a Tag is correct
-      SyntaxKind.NodeClose,
-      SyntaxKind.NodeEnd,
-      // FOLLOW(AttrList) when a Tag contains incorrect, but still parsed tokens for resilience
-      SyntaxKind.CData,
-      // todo
-      // SyntaxKind.ScriptLiteral,
-      SyntaxKind.OpenNodeStart,
-    ];
-    const attrFollow = attrListFollow.concat(SyntaxKind.Identifier);
-    const attrIdent = peek();
+  function parseAttr(attrNames: { ns?: string; name: string }[]) {
+    startNode();
+    if (at(SyntaxKind.Identifier)) {
+      parseAttrName(attrNames);
+    } else {
+      const attrNameFollow = [SyntaxKind.Equal];
+      const eqFollows = errRecover(Diag_Attr_Identifier_Expected, attrNameFollow);
+      if (!eqFollows) {
+        return;
+      }
+    }
+
+    if (eat(SyntaxKind.Equal)) {
+      if (!eat(SyntaxKind.StringLiteral) && !eat(SyntaxKind.Identifier)) {
+        const attrFollowWithoutIdent = [SyntaxKind.NodeEnd, SyntaxKind.NodeClose];
+        errRecover(Diag_Attr_Value_Expected, attrFollowWithoutIdent);
+      }
+    }
+
+    completeNode(SyntaxKind.AttributeNode);
+  }
+
+  function parseAttrName(attrNames: { ns?: string; name: string }[]) {
+    const nameIdent = peek();
+    let nsIdent = undefined;
 
     startNode();
     bump(SyntaxKind.Identifier);
-
-    if (eat(SyntaxKind.Equal)) {
-      if (eat(SyntaxKind.StringLiteral)) {
-        const attrName = getText(attrIdent);
-        if (attrNames.includes(attrName)) {
-          errorAt(Err.duplAttr(attrName), attrIdent.pos, attrIdent.end);
-        } else if (attrName[0] >= "A" && attrName[0] <= "Z") {
-          errorAt(Err.uppercaseAttr(attrName), attrIdent.pos, attrIdent.end);
-        } else {
-          attrNames.push(attrName);
-        }
+    if (eat(SyntaxKind.Colon)) {
+      if (at(SyntaxKind.Identifier)) {
+        nsIdent = bump(SyntaxKind.Identifier);
       } else {
-        errRecover(Err.expAttrValue(), attrFollow);
+        errRecover(Diag_Attr_Identifier_Expected, [
+          SyntaxKind.NodeClose,
+          SyntaxKind.NodeEnd,
+          SyntaxKind.Equal,
+        ]);
       }
-    } else {
-      errRecover(Err.expEq(), attrFollow);
     }
-    completeNode(SyntaxKind.AttributeNode);
+    checkAttrName(attrNames, { nsIdent, nameIdent });
+    completeNode(SyntaxKind.AttributeKeyNode);
+  }
+
+  type AttrName = {
+    ns?: string,
+    name: string
+  };
+
+  /** emits errors when the attribute name is incorrect. Otherwise adds the attribute name to the list of valid names*/
+  function checkAttrName(attrNames: AttrName[], { nameIdent, nsIdent }: { nameIdent: Node; nsIdent?: Node }) {
+    const attrName = getText(nameIdent);
+    const attrNs = nsIdent === undefined ? undefined : getText(nsIdent);
+    const attrKeyMatches = ({ ns, name }: AttrName) => name === attrName && ns === attrNs;
+    const isDuplicate = attrNames.findIndex(attrKeyMatches) !== -1;
+    const nameStartsWithUppercase = "A" <= attrName[0] && attrName[0] <= "Z";
+    const faultyName = isDuplicate || nameStartsWithUppercase;
+
+    if (isDuplicate) {
+      errorAt(MakeErr.duplAttr(attrName), nameIdent.pos, nameIdent.end);
+    }
+    if (nameStartsWithUppercase) {
+      errorAt(MakeErr.uppercaseAttr(attrName), nameIdent.pos, nameIdent.end);
+    }
+    if (!faultyName) {
+      attrNames.push({ name: attrName });
+    }
   }
 
   function at(kindToCheck: SyntaxKind): boolean {
@@ -297,22 +312,31 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   }
 
   /**
-   * @param recoveryTokens the [FollowSet](https://www.geeksforgeeks.org/follow-set-in-syntax-analysis/) of the parsed InnerNode*/
-  function errRecover(errCodeAndMsg: ErrResult, recoveryTokens: SyntaxKind[]) {
+   * report an error and skip the next token if it isn't in the recoveryTokens. EoF isn't skipped.
+   * @param recoveryTokens the [FollowSet](https://www.geeksforgeeks.org/follow-set-in-syntax-analysis/) of the parsed InnerNode. These tokens (or the EoF token) won't be skipped
+   * @returns true if the current token is in the recovery set or EoF
+   * */
+
+  function errRecover(
+    errCodeAndMsg: GeneralDiagnosticMessage,
+    recoveryTokens: SyntaxKind[],
+  ): boolean {
     if (atAnyOf(recoveryTokens) || at(SyntaxKind.EndOfFileToken)) {
       error(errCodeAndMsg);
-      return;
+      return true;
     }
 
     startNode();
     error(errCodeAndMsg);
     bumpAny();
     completeNode(SyntaxKind.ErrorNode);
+    return false;
   }
 
-  function error({ code, message }: ErrResult) {
+  function error({ code, message, category }: GeneralDiagnosticMessage) {
     const { pos, end } = peek();
     errors.push({
+      category,
       code,
       message,
       pos,
@@ -320,8 +344,13 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     });
   }
 
-  function errorAt({ code, message }: ErrResult, pos: number, end: number) {
+  function errorAt(
+    { code, message, category }: GeneralDiagnosticMessage,
+    pos: number,
+    end: number,
+  ) {
     errors.push({
+      category,
       code,
       message,
       pos,
@@ -329,17 +358,18 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     });
   }
 
-  function peek() {
+  function peek(inContent: boolean = false) {
     if (peekedToken !== undefined) {
       return peekedToken;
     }
-    peekedToken = collectToken();
+    peekedToken = collectToken(inContent);
     return peekedToken;
   }
 
   function peekInContent(): Node {
-    const token = peek();
+    const token = peek(true);
     if (
+      token.kind === SyntaxKind.EndOfFileToken ||
       token.kind === SyntaxKind.OpenNodeStart ||
       token.kind === SyntaxKind.Script ||
       token.kind === SyntaxKind.CData ||
@@ -373,7 +403,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     let parseAsStringLiteral = false;
     if (token.kind === SyntaxKind.StringLiteral) {
       const beforeLookahead = token.end;
-      const nextToken = collectToken();
+      const nextToken = collectToken(true);
       parseAsStringLiteral =
         nextToken.kind === SyntaxKind.CData ||
         nextToken.kind === SyntaxKind.CloseNodeStart ||
@@ -427,8 +457,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   function bump(kind: SyntaxKind) {
     const token = bumpAny();
     if (token.kind !== kind) {
-      throw new Error(`expected ${getSyntaxKindStrRepr(kind)}, bumped a ${getSyntaxKindStrRepr(token.kind)}`);
+      throw new Error(
+        `expected ${getSyntaxKindStrRepr(kind)}, bumped a ${getSyntaxKindStrRepr(token.kind)}`,
+      );
     }
+    return token;
   }
 
   function bumpAny(): Node {
@@ -438,12 +471,12 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       peekedToken = undefined;
       return bumpedToken;
     }
-    const token = collectToken();
+    const token = collectToken(false);
     node.children!.push(token);
     return token;
   }
 
-  /** start an new node. Any new tokens or nodes will be put into it's children list from that point */
+  /** start a new node. Any new tokens or nodes will be put into it's children list from that point. Each call to this should be paired with a [completeNode] */
   function startNode() {
     parents.push(node);
     node = {
@@ -462,15 +495,49 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     return completedNode;
   }
 
-  function collectToken(): Node {
-    let found: Node | null = null;
+  function collectToken(inContent: boolean): Node {
     let kind: SyntaxKind;
-    const triviaCollected: Node[] = [];
+    let triviaCollected: Node[] = [];
     let start: number | null = null;
     while (true) {
       kind = scanner.scan();
       if (start === null) {
         start = scanner.getTokenStart();
+      }
+      //handle error from scanner
+      if (errFromScanner !== undefined) {
+        let err: GeneralDiagnosticMessage;
+        if (errFromScanner.message.code === ErrCodes.invalidChar) {
+          err = MakeErr.invalidChar(scanner.getTokenText());
+        } else {
+          err = errFromScanner.message;
+        }
+
+        const pos = scanner.getTokenStart();
+        const token = {
+          kind,
+          start,
+          pos,
+          end: scanner.getTokenEnd(),
+          triviaBefore: triviaCollected.length > 0 ? triviaCollected : undefined,
+        };
+
+        triviaCollected = [];
+        if (inContent && err.code === ErrCodes.invalidChar) {
+          errFromScanner = undefined;
+          return token;
+        }
+
+        const badPrefixEnd = pos + errFromScanner.prefixLength;
+        token.end = badPrefixEnd;
+        scanner.resetTokenState(badPrefixEnd);
+        startNode();
+        node.children!.push(token);
+        errorAt(err, pos, badPrefixEnd);
+        completeNode(SyntaxKind.ErrorNode);
+
+        errFromScanner = undefined;
+        return collectToken(inContent);
       }
       switch (kind) {
         case SyntaxKind.CommentTrivia:
@@ -484,25 +551,20 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           });
           break;
 
-        // todo: handle error
-        // case SyntaxKind.Unknown:
-        //   found = createError(start, scanner.getTokenStart(), scanner.getTokenEnd());
-        //   break;
-
         default:
-          found = {
+          return {
             kind,
             start,
             pos: scanner.getTokenStart(),
             end: scanner.getTokenEnd(),
             triviaBefore: triviaCollected.length > 0 ? triviaCollected : undefined,
           };
-          return found;
       }
     }
   }
 
-  function errorAndBump(errCodeAndMsg: ErrResult) {
+  /** Bumps over the next token and marks it as an error node while adding an error to the error list*/
+  function errorAndBump(errCodeAndMsg: GeneralDiagnosticMessage) {
     errRecover(errCodeAndMsg, []);
   }
 
@@ -513,7 +575,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     parents.pop();
   }
 
-  parseSource();
+  parseSourceContent();
   const completedNode: Node = createNode(SyntaxKind.ContentListNode, node.children);
   return { node: completedNode, errors };
 }

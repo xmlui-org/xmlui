@@ -1,5 +1,7 @@
-# XMLUI Tools for Visual Studio Code
+-# XMLUI Tools for Visual Studio Code
 
-This extension adds tools for working with [XMLUI](https://github.com/xmlui-com/xmlui) files.
+This extension adds tools for working with [XMLUI](docs.xmlui.com) files.
 
-- Syntax highlighting for `.xmlui` and `.xmlui.xs` files
+- Syntax highlighting for `.xmlui` files and `.xmlui.xs` files
+- Hover for core components
+- Completion for core components
