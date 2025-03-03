@@ -12,7 +12,6 @@ The component provides context values with which you can access some internal pr
 - `$validationResult`: This variable represents the result of the latest validation of the `FormItem` instance.
 - `$value`: The context variable represents the current value of the `FormItem`. It can be used in expressions and code snippets within the `FormItem` instance.
 
-
 You can learn more about this component in the [Forms](../../create-apps/forms.mdx) article.
 
 ## Properties
@@ -184,7 +183,6 @@ Available values:
 | `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
-
 
 Different input components have different layout methods
 (i.e. `TextBox` labels are positioned at the top, `Checkbox` labels are on the right side).
@@ -789,7 +787,6 @@ Available values:
 | `colorpicker` | Renders ColorPicker |
 | `custom` | Custom control specified in children |
 
-
 <Callout type="info" emoji="📔">
 For custom controls, there is no need to explicitly set the `type` to `custom`.
 Omitting the type and providing child components implicitly sets it to custom.
@@ -806,7 +803,6 @@ Available values:
 | `errorLate` | Display the error when the field loses focus.If an error is already displayed, continue for every keystroke until input is accepted. **(default)** |
 | `onChanged` | Display error (if present) for every keystroke. |
 | `onLostFocus` | Show/hide error (if present) only if the field loses focus. |
-
 
 ## Events
 
@@ -881,4 +877,3 @@ This component displays other input components and binds them with the form's lo
 | [font-weight](../styles-and-themes/common-units/#font-weight)-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [transform](../styles-and-themes/common-units/#text-transform)-text-FormItemLabel | none | none |
 | [transform](../styles-and-themes/common-units/#text-transform)-text-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-

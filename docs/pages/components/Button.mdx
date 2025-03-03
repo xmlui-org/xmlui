@@ -4,8 +4,6 @@ import { Callout } from "nextra/components";
 
 Button is an interactive element that triggers an action when clicked.
 
-
-
 Use the `Button` component to trigger various actions.
 
 ## Properties
@@ -25,7 +23,6 @@ Available values:
 | `center` | Place the content in the middle **(default)** |
 | `start` | Justify the content to the left (to the right if in right-to-left) |
 | `end` | Justify the content to the right (to the left if in right-to-left) |
-
 
 ```ueml copy
 <App>
@@ -120,7 +117,6 @@ Available values:
 | `start` | The icon will appear at the start (left side when the left-to-right direction is set) **(default)** |
 | `end` | The icon will appear at the end (right side when the left-to-right direction is set) |
 
-
 ```ueml
 <App>
   <HStack>
@@ -202,7 +198,6 @@ Available values:
 | `horizontal` | The component will fill the available space horizontally **(default)** |
 | `vertical` | The component will fill the available space vertically |
 
-
 ### `size (default: "sm")`
 
 Sets the size of the button.
@@ -215,7 +210,6 @@ Available values:
 | `sm` | Small button **(default)** |
 | `md` | Medium button |
 | `lg` | Large button |
-
 
 ```ueml copy
 <App>
@@ -271,7 +265,6 @@ Available values:
 | `primary` | Primary theme color **(default)** |
 | `secondary` | Secondary theme color |
 
-
 ```ueml copy
 <App>
   <HStack>
@@ -308,7 +301,6 @@ Available values:
 | `submit` | The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component. |
 | `reset` | Resets all the controls to their initial values. Using it is ill advised for UX reasons. |
 
-
 ### `variant (default: "solid")`
 
 The button variant determines the level of emphasis the button should possess.
@@ -320,7 +312,6 @@ Available values:
 | `solid` | A button with a border and a filled background. **(default)** |
 | `outlined` | The button is displayed with a border and a transparent background. |
 | `ghost` | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. |
-
 
 ```ueml copy
 <App>
@@ -751,4 +742,3 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [thickness-outline](../styles-and-themes/common-units/#size)-Button-secondary-outlined--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-outline](../styles-and-themes/common-units/#size)-Button-secondary-solid--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [width](../styles-and-themes/common-units/#size)-Button | fit-content | fit-content |
-

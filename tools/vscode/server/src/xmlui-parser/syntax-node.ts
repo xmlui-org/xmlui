@@ -1,8 +1,8 @@
 import { SyntaxKind } from "./syntax-kind";
 
-export type NodeId = number;
+type NodeId = number;
 
-export interface ReadonlyTextRange {
+interface ReadonlyTextRange {
   readonly pos: number;
   readonly end: number;
 }

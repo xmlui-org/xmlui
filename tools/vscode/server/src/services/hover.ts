@@ -1,8 +1,10 @@
-import { ParseResult } from "../xmlui-parser/parser";
-import { findTokenAtPos } from "../xmlui-parser/utils";
-import { SyntaxKind, getSyntaxKindStrRepr } from "../xmlui-parser/syntax-kind";
+import type { GetText, ParseResult } from "../xmlui-parser/parser";
+import { findTokenAtPos } from "../xmlui-parser/utils"
+import { SyntaxKind } from "../xmlui-parser/syntax-kind";
+import metadataByComponent from "../metadata";
+import { Node } from "../xmlui-parser/syntax-node";
 
-type SimpleHover = {
+type SimpleHover = null | {
   value: string;
   range: {
     pos: number;
@@ -13,26 +15,122 @@ type SimpleHover = {
 /**
  * @returns The hover content string
  */
-export function handleHover({ node }: ParseResult, position: number): SimpleHover {
+export function handleHover({ parseResult: {node}, getText }: {parseResult: ParseResult, getText: GetText}, position: number): SimpleHover {
   const findRes = findTokenAtPos(node, position);
-  let value: string = "";
-  let pos: number = position;
-  let end: number = 0;
+  console.log("findres: ",findRes);
 
   if (findRes === undefined) {
-    return { value, range: { pos: position, end: end } };
+    return null;
   }
-  const { chainBeforePos, chainAtPos, sharedParents } = findRes;
+  const { chainAtPos } = findRes;
 
-  const atKind = chainAtPos[chainAtPos.length - 1].kind;
+  const atNode = chainAtPos.at(-1)!;
+  const parentNode =chainAtPos.at(-2);
+  console.log("hovering: ", atNode, parentNode);
+  switch (atNode.kind) {
+    case SyntaxKind.Identifier:
+      switch (parentNode?.kind){
+        case SyntaxKind.TagNameNode:{
 
-  if (chainBeforePos === undefined) {
-  } else {
-    const kindBefore = chainBeforePos[chainBeforePos.length - 1].kind;
+          const colonIdx = parentNode.children!.findIndex((n: Node) => n.kind === SyntaxKind.Colon);
+          const hasNs = colonIdx === -1 ? false : parentNode.children!.slice(0, colonIdx).findIndex((n:Node) => n.kind === SyntaxKind.Identifier) !== -1;
+          if(hasNs){
+            return null;
+          }
+          const tagName = getText(atNode);
+          const component = metadataByComponent[tagName];
+          if (!component){
+            return null;
+          }
+          const value = generateHoverDescription(tagName, component);
+          return {
+            value,
+            range: {
+              pos: atNode.pos,
+              end: atNode.end
+            }
+          };
+        break;
+        }
+      }
+      break;
+  }
+  return null;
+}
 
-    switch (kindBefore) {
-      case SyntaxKind.OpenNodeStart:
+function generateHoverDescription(componentName: string, metadata: any): string {
+    const sections: string[] = [];
+
+    // Add title and description
+    sections.push(`# ${componentName}`);
+
+    if (metadata.description) {
+        sections.push(metadata.description);
     }
-  }
-  return { value, range: { pos: pos, end: end } };
+
+    // Add status if not stable
+    if (metadata.status && metadata.status !== 'stable') {
+        sections.push(`**Status:** ${metadata.status}`);
+    }
+
+    // Add Properties section if there are props
+    if (metadata.props && Object.keys(metadata.props).length > 0) {
+        sections.push('\n## Properties');
+
+        Object.entries(metadata.props)
+            .filter(([_, prop]) => !prop.isInternal)
+            .forEach(([propName, prop]) => {
+                let propText = `### \`${propName}\`\n${prop.description}`;
+
+                if (prop.defaultValue !== undefined) {
+                    propText += `\n\nDefault: \`${prop.defaultValue}\``;
+                }
+
+                if (prop.availableValues) {
+                    const values = prop.availableValues.map(v =>
+                        typeof v === 'object' ?
+                            `- \`${v.value}\`: ${v.description}` :
+                            `- \`${v}\``
+                    ).join('\n');
+                    propText += `\n\nAllowed values:\n${values}`;
+                }
+
+                sections.push(propText);
+            });
+    }
+
+    // Add Events section if there are events
+    if (metadata.events && Object.keys(metadata.events).length > 0) {
+        sections.push('\n## Events');
+
+        Object.entries(metadata.events)
+            .filter(([_, event]) => !event.isInternal)
+            .forEach(([eventName, event]) => {
+                sections.push(`### \`${eventName}\`\n${event.description}`);
+            });
+    }
+
+    // Add APIs section if there are APIs
+    if (metadata.apis && Object.keys(metadata.apis).length > 0) {
+        sections.push('\n## APIs');
+
+        Object.entries(metadata.apis)
+            .filter(([_, api]) => !api.isInternal)
+            .forEach(([apiName, api]) => {
+                sections.push(`### \`${apiName}\`\n${api.description}`);
+            });
+    }
+
+    // Add Context Variables section if there are any
+    if (metadata.contextVars && Object.keys(metadata.contextVars).length > 0) {
+        sections.push('\n## Context Variables');
+
+        Object.entries(metadata.contextVars)
+            .filter(([_, contextVar]) => !contextVar.isInternal)
+            .forEach(([varName, contextVar]) => {
+                sections.push(`### \`${varName}\`\n${contextVar.description}`);
+            });
+    }
+
+    return sections.join('\n\n');
 }

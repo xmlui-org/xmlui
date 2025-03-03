@@ -6,8 +6,6 @@ import { Callout } from "nextra/components";
 
 AppState is a functional component (without a visible user interface) that helps store and manage the app's state.
 
-
-
 ## Using AppState
 
 Variables in xmlui are a straightforward tool for managing states. However, a variable's scope is the app's main file or the particular component file in which it is declared. To access the variable's value (the stored state), you must pass its value to components wanting to leverage it.
@@ -30,7 +28,6 @@ In the following example, the main file of the app declares a variable, `enhance
 ```
 
 Two components, `Component1` and `Component2`, use the value of `enhancedMode`. Because of the aforementioned scoping issue, the app must explicitly pass the variable's value to those components so that they can use it. These components utilize the value to render their UI:
-
 
 ```ueml copy filename="Component1.xmlui" /enhancedMode/
 <Component name="Component1">

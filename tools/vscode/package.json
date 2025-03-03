@@ -1,22 +1,37 @@
 {
   "name": "xmlui-lang",
   "description": "VSCode language support for XMLUI language",
-  "author": "Tamas Kapitany",
-  "publisher": "tamas-kapitany",
+  "author": "Norbert Hajagos",
+  "publisher": "norbidotdev",
   "license": "MIT",
-  "version": "0.5.1",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/xmlui-com/xmlui.git"
-  },
+  "version": "0.0.1",
   "categories": [],
   "keywords": [],
   "engines": {
-    "vscode": "^1.85.0",
-    "node": "^18.17.1",
-    "npm": "^9.6.7"
+    "vscode": "^1.75.0"
   },
+  "activationEvents": [
+    "onLanguage:xmlui"
+  ],
+  "main": "./client/out/extension",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": " configuration",
+      "properties": {
+        "XMLUILanguageService.trace.server": {
+          "scope": "window",
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server."
+        }
+      }
+    },
     "languages": [
       {
         "id": "xmlui",
@@ -51,18 +66,22 @@
     ]
   },
   "scripts": {
-    "reformat": "prettier --write .",
-    "create:package": "vsce package",
-    "publish": "vsce publish"
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -b",
+    "watch": "tsc -b -w",
+    "lint": "eslint",
+    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+    "test": "sh ./scripts/e2e.sh"
   },
   "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@stylistic/eslint-plugin": "^2.9.0",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.11.5",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
+    "@types/node": "^20",
     "@vscode/vsce": "^3.1.1",
-    "eslint": "^8.56.0",
-    "prettier": "^3.2.4",
-    "typescript": "^5.5.4"
+    "eslint": "^9.13.0",
+    "mocha": "^10.3.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.16.0"
   }
 }

@@ -4,8 +4,6 @@ import { Callout } from "nextra/components";
 
 This component represents a dropdown menu with a trigger. When the user clicks the trigger, the dropdown menu displays its items.
 
-
-
 You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
 
 ```ueml copy
@@ -55,7 +53,6 @@ Available values:
 | `center` | Place the content in the middle |
 | `start` | Justify the content to the left (to the right if in right-to-left) **(default)** |
 | `end` | Justify the content to the right (to the left if in right-to-left) |
-
 
 Available values are:
 - `start`: Menu items are aligned to the start of the trigger component (default).
@@ -168,7 +165,6 @@ Available values:
 | `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
 | `end` | The icon will appear at the end (right side when the left-to-right direction is set) **(default)** |
 
-
 ### `triggerButtonThemeColor (default: "primary")`
 
 This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
@@ -181,7 +177,6 @@ Available values:
 | `primary` | Primary theme color **(default)** |
 | `secondary` | Secondary theme color |
 
-
 ### `triggerButtonVariant (default: "ghost")`
 
 This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
@@ -193,7 +188,6 @@ Available values:
 | `solid` | A button with a border and a filled background. |
 | `outlined` | The button is displayed with a border and a transparent background. |
 | `ghost` | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. **(default)** |
-
 
 ### `triggerTemplate`
 
@@ -322,4 +316,3 @@ The `DropdownMenu` component uses these theme variables to customize its appeara
 | [shadow](../styles-and-themes/common-units/#color)-DropdownMenu | $shadow-xl | $shadow-xl |
 | [style-border](../styles-and-themes/common-units/#border-style)-DropdownMenu-content | solid | solid |
 | [thickness-border](../styles-and-themes/common-units/#size)-DropdownMenu-content | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-

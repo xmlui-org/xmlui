@@ -1,37 +1,91 @@
 import {
-  createConnection,
-  TextDocuments,
-  ProposedFeatures,
-  InitializeParams,
-  TextDocumentPositionParams,
-  TextDocumentSyncKind,
-  Connection,
-  MarkupKind,
-  HoverParams,
-} from "vscode-languageserver/node";
-import { TextDocument } from "vscode-languageserver-textdocument";
+	createConnection,
+	TextDocuments,
+	Diagnostic,
+	DiagnosticSeverity,
+	ProposedFeatures,
+	InitializeParams,
+	DidChangeConfigurationNotification,
+	CompletionItem,
+	CompletionItemKind,
+	TextDocumentPositionParams,
+	TextDocumentSyncKind,
+	InitializeResult,
+	DocumentDiagnosticReportKind,
+	type DocumentDiagnosticReport,
+    HoverParams,
+    MarkupKind
+} from 'vscode-languageserver/node';
 
-import { handleCompleteion } from "./services/completion";
-import { handleHover } from "./services/hover";
-import { createXmlUiParser, GetText, ParseResult } from "./xmlui-parser/parser";
+import {handleCompletion} from "./services/completion";
+import {handleHover} from "./services/hover";
 
-// Create a connection for the server. The connection uses Node's IPC as a transport.
+import {
+	TextDocument
+} from 'vscode-languageserver-textdocument';
+import { createXmlUiParser, GetText, ParseResult } from './xmlui-parser/parser';
+
+// Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
-const connection: Connection = createConnection(ProposedFeatures.all);
+const connection = createConnection(ProposedFeatures.all);
 
-const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
+// Create a simple text document manager.
+const documents = new TextDocuments(TextDocument);
 
-connection.onInitialize((_: InitializeParams) => {
-  return {
-    capabilities: {
-      textDocumentSync: TextDocumentSyncKind.Incremental,
-      completionProvider: {
-        resolveProvider: false,
-        triggerCharacters: ["<", "/"],
-      },
-      hoverProvider: true,
-    },
-  };
+let hasConfigurationCapability = false;
+let hasWorkspaceFolderCapability = false;
+let hasDiagnosticRelatedInformationCapability = false;
+
+connection.onInitialize((params: InitializeParams) => {
+  connection.console.log("initing!")
+  const capabilities = params.capabilities;
+
+	// Does the client support the `workspace/configuration` request?
+	// If not, we fall back using global settings.
+	hasConfigurationCapability = !!(
+		capabilities.workspace && !!capabilities.workspace.configuration
+	);
+	hasWorkspaceFolderCapability = !!(
+		capabilities.workspace && !!capabilities.workspace.workspaceFolders
+	);
+	hasDiagnosticRelatedInformationCapability = !!(
+		capabilities.textDocument &&
+		capabilities.textDocument.publishDiagnostics &&
+		capabilities.textDocument.publishDiagnostics.relatedInformation
+	);
+
+	const result: InitializeResult = {
+		capabilities: {
+			textDocumentSync: TextDocumentSyncKind.Incremental,
+			// Tell the client that this server supports code completion.
+			completionProvider: {
+				resolveProvider: false,
+				triggerCharacters: ["<", "/"],
+			},
+
+			hoverProvider: true,
+		}
+	};
+	if (hasWorkspaceFolderCapability) {
+		result.capabilities.workspace = {
+			workspaceFolders: {
+				supported: true
+			}
+		};
+	}
+	return result;
+});
+
+connection.onInitialized(() => {
+	if (hasConfigurationCapability) {
+		// Register for all configuration changes.
+		connection.client.register(DidChangeConfigurationNotification.type, undefined);
+	}
+	if (hasWorkspaceFolderCapability) {
+		connection.workspace.onDidChangeWorkspaceFolders(_event => {
+			connection.console.log('Workspace folder change event received.');
+		});
+	}
 });
 
 connection.onCompletion(async ({ position, textDocument }: TextDocumentPositionParams) => {
@@ -41,7 +95,7 @@ connection.onCompletion(async ({ position, textDocument }: TextDocumentPositionP
     return [];
   }
   const parseResult = getParseResult(document);
-  return handleCompleteion(parseResult.parseResult, document.offsetAt(position), parseResult.getText);
+  return handleCompletion(parseResult.parseResult, document.offsetAt(position), parseResult.getText);
 });
 
 connection.onHover(({ position, textDocument }: HoverParams) => {
@@ -52,10 +106,14 @@ connection.onHover(({ position, textDocument }: HoverParams) => {
   }
 
   const parseResult = getParseResult(document);
-  const { value, range } = handleHover(parseResult.parseResult, document.offsetAt(position));
+  const hoverRes = handleHover(parseResult, document.offsetAt(position));
+  if (hoverRes === null){
+    return null;
+  }
+  const { value, range } = hoverRes;
   return {
     contents: {
-      kind: MarkupKind.PlainText,
+      kind: MarkupKind.Markdown,
       value,
     },
     range: {
@@ -90,34 +148,25 @@ function getParseResult(document: TextDocument): {
   connection.console.log("recomputing parse result");
   return { parseResult, getText: parser.getText };
 }
-connection.onDidOpenTextDocument((/* params */) => {
-  // A text document got opened in VSCode.
-  // params.textDocument.uri uniquely identifies the document. For documents store on disk this is a file URI.
-  // params.textDocument.text the initial full content of the document.
-  // connection.console.log(`${params.textDocument.uri} opened.`);
-});
 
-connection.onDidChangeTextDocument((/* params */) => {
-  // The content of a text document did change in VSCode.
-  // params.textDocument.uri uniquely identifies the document.
-  // params.contentChanges describe the content changes to the document.
-  // connection.console.log(
-  //   `${params.textDocument.uri} changed: ${JSON.stringify(
-  //     params.contentChanges
-  //   )}`
-  // );
-});
-connection.onDidCloseTextDocument((/* params */) => {
-  // A text document got closed in VSCode.
-  // params.textDocument.uri uniquely identifies the document.
-  // connection.console.log(`${params.textDocument.uri} closed.`);
-});
+// This handler resolves additional information for the item selected in
+// the completion list.
+connection.onCompletionResolve(
+	(item: CompletionItem): CompletionItem => {
+		if (item.data === 1) {
+			item.detail = 'TypeScript details';
+			item.documentation = 'TypeScript documentation';
+		} else if (item.data === 2) {
+			item.detail = 'JavaScript details';
+			item.documentation = 'JavaScript documentation';
+		}
+		return item;
+	}
+);
 
 // Make the text document manager listen on the connection
 // for open, change and close text document events
 documents.listen(connection);
-documents.onDidChangeContent(function (e) {
-  e.document.uri;
-});
+
 // Listen on the connection
 connection.listen();

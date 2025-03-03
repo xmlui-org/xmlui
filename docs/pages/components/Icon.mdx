@@ -6,8 +6,6 @@ import { Callout } from "nextra/components";
 
 This component is the representation of an icon.
 
-
-
 It is a small visual element, which is used to graphically represent functions, features, or types of content within a user interface.
 
 ## Properties
@@ -67,11 +65,11 @@ Nothing is displayed if the icon name is not found in the registry.
   `}
 />
 
-### `size`
+### `size (default: "md")`
 
 This property defines the size of the `Icon`. Note that setting the `height` and/or the `width` of the component will override this property.
 
-Available values: `xs`, `sm`, `md`, `lg`
+Available values: `xs`, `sm`, `md` **(default)**, `lg`
 
 ```ueml copy /size/
 <App>
@@ -144,4 +142,3 @@ The `Icon` component uses these theme variables:
 | --- | --- | --- |
 | [size](../styles-and-themes/common-units/#size)-Icon | 1.25em | 1.25em |
 | [thickness](../styles-and-themes/common-units/#size)-stroke-Icon | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-
