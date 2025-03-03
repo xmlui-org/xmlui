@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { Legend } from "../Legend/LegendNative";
+import { TooltipContent } from "../Tooltip/TooltipContent";
 
 export type LineChartProps = {
   data: any[];
@@ -76,7 +77,6 @@ export function LineChart({
       {children}
       <ResponsiveContainer style={style}>
         <RLineChart accessibilityLayer data={data}>
-          <CartesianGrid vertical={false} />
           <XAxis
             interval="preserveStartEnd"
             dataKey={nameKey}
@@ -85,7 +85,7 @@ export function LineChart({
             axisLine={false}
             tickFormatter={tickFormatter}
           />
-          {!hideTooltip && <Tooltip />}
+          {!hideTooltip && <Tooltip content={<TooltipContent />} />}
           {Object.keys(config).map((key, index) => (
             <Line
               key={index}

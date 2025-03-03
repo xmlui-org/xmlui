@@ -5,14 +5,16 @@ import {
   XAxis,
   YAxis,
   ResponsiveContainer,
-  Tooltip,
+  Tooltip
 } from "recharts";
 
 import type { CSSProperties, ReactNode } from "react";
+import React from "react";
 import { useMemo } from "react";
 import { useColors } from "xmlui";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { Legend } from "../Legend/LegendNative";
+import { TooltipContent } from "../Tooltip/TooltipContent";
 
 export type BarChartProps = {
   data: any[];
@@ -125,7 +127,7 @@ export function BarChart({
               />
             </>
           )}
-          <Tooltip />
+          <Tooltip content={<TooltipContent />}/>
           {Object.keys(config).map((key, index) => (
             <Bar
               key={index}

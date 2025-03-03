@@ -3,8 +3,7 @@ import {
   PieChart as RPieChart,
   Sector,
   ResponsiveContainer,
-  LabelList,
-  Tooltip,
+  LabelList, Tooltip
 } from "recharts";
 import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import styles from "./PieChartNative.module.scss";
@@ -15,6 +14,7 @@ import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import * as React from "react";
 import { Legend } from "../Legend/LegendNative";
+import { TooltipContent } from "../Tooltip/TooltipContent";
 
 export type PieChartProps = {
   data: any[];
@@ -78,7 +78,7 @@ export function PieChart({
       {children}
       <ResponsiveContainer style={style}>
         <RPieChart>
-          <Tooltip />
+          <Tooltip content={<TooltipContent />}/>
           <Pie
             data={chartData}
             dataKey={dataKey}
