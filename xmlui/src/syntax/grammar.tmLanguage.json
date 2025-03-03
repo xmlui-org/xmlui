@@ -8,9 +8,8 @@
         { "include": "#comments" },
         { "include": "#helperTag" },
         { "include": "#componentTag" },
-        { "include": "#escapeCharacter" },
-        { "include": "#textWithBindingExpr" },
         { "include": "#entity" },
+        { "include": "#textWithBindingExpr" },
         {
           "begin": "(<!\\[)(CDATA)(\\[)",
           "beginCaptures": {
@@ -176,10 +175,10 @@
       "begin": "\\{",
       "end": "\\}",
       "beginCaptures": {
-        "0": { "name": "punctuation.definition.block.xmlui" }
+        "0": { "name": "entity.name.function.xmlui punctuation.definition.block.xmlui" }
       },
       "endCaptures": {
-        "0": { "name": "punctuation.definition.block.xmlui" }
+        "0": { "name": "entity.name.function.xmlui punctuation.definition.block.xmlui" }
       },
       "patterns": [{ "include": "source.js" }]
     },
@@ -224,11 +223,7 @@
       "patterns": [{ "include": "source.js" }]
     },
     "textWithBindingExpr": {
-      "patterns": [
-        { "include": "#escapeCharacter" },
-        { "include": "#entity" },
-        { "include": "#bindingExpr" }
-      ]
+      "patterns": [{ "include": "#entity" }, { "include": "#bindingExpr" }]
     },
     "propOrVarTag": {
       "begin": "(</?)([a-zA-Z_][\\w\\.\\-]*?:)?((?:variable)|(?:property)|(?:prop))",
@@ -325,14 +320,6 @@
             "1": { "name": "keyword.operator.namespace.xmlui" },
             "2": { "name": "entity.other.attribute-name.localname.xmlui" }
           }
-        }
-      ]
-    },
-    "escapeCharacter": {
-      "patterns": [
-        {
-          "match": "&(amp|gt|lt|apos|quot|nbsp);",
-          "name": "constant.character.escape.xmlui"
         }
       ]
     },
