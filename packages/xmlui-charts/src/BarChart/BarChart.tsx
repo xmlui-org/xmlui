@@ -43,7 +43,7 @@ export const BarChartMd = createMetadata({
 export const barChartComponentRenderer = createComponentRenderer(
   COMP,
   BarChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback }: any) => {
+  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
     return (
       <BarChart
         style={layoutCss}
@@ -57,7 +57,9 @@ export const barChartComponentRenderer = createComponentRenderer(
         hideY={extractValue.asOptionalBoolean(node.props?.hideY)}
         hideTickX={extractValue.asOptionalBoolean(node.props?.hideTickX)}
         hideTickY={extractValue.asOptionalBoolean(node.props?.hideTickY)}
-      />
+      >
+        {renderChild(node.children)}
+      </BarChart>
     );
   },
 );

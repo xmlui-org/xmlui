@@ -5,25 +5,27 @@ import {
   XAxis,
   YAxis,
   ResponsiveContainer,
-  Legend,
   Tooltip,
 } from "recharts";
 
+import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import { useColors } from "xmlui";
+import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 
 export type BarChartProps = {
   data: any[];
   layout?: "horizontal" | "vertical";
-  nameKey?: string;
+  nameKey: string;
   stacked?: boolean;
   dataKeys?: string[];
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   hideTickX?: boolean;
   hideTickY?: boolean;
   hideX?: boolean;
   hideY?: boolean;
   tickFormatter?: (value: any) => any;
+  children?: ReactNode;
 };
 
 export function BarChart({
@@ -38,6 +40,7 @@ export function BarChart({
   hideX = false,
   tickFormatter = (value) => value,
   style,
+  children,
 }: BarChartProps) {
   const colors = useColors(
     {
@@ -73,60 +76,65 @@ export function BarChart({
     );
   }, [colors, dataKeys]);
 
+  const chartContextValue = useChartContextValue({ dataKeys, nameKey });
+
   return (
-    <ResponsiveContainer style={style}>
-      <RBarChart
-        accessibilityLayer
-        data={data}
-        layout={layout}
-        margin={{ left: 10, top: 0, bottom: 0, right: 10 }}
-      >
-        <Legend />
-        <CartesianGrid vertical={true} strokeDasharray="3 3" />
-        {layout === "vertical" ? (
-          <>
-            <XAxis type="number" axisLine={false} hide={hideX} />
-            <YAxis
-              hide={hideY}
-              dataKey={nameKey}
-              type="category"
-              interval={"equidistantPreserveStart"}
-              tickLine={false}
-              tickFormatter={tickFormatter}
+    <ChartProvider value={chartContextValue}>
+      {children}
+      <ResponsiveContainer style={style}>
+        <RBarChart
+          accessibilityLayer
+          data={data}
+          layout={layout}
+          margin={{ left: 10, top: 0, bottom: 0, right: 10 }}
+        >
+          <CartesianGrid vertical={true} strokeDasharray="3 3" />
+          {layout === "vertical" ? (
+            <>
+              <XAxis type="number" axisLine={false} hide={hideX} />
+              <YAxis
+                hide={hideY}
+                dataKey={nameKey}
+                type="category"
+                interval={"equidistantPreserveStart"}
+                tickLine={false}
+                tickFormatter={tickFormatter}
+              />
+            </>
+          ) : (
+            <>
+              <XAxis
+                dataKey={nameKey}
+                type="category"
+                interval={"equidistantPreserveStart"}
+                tickLine={false}
+                tickFormatter={tickFormatter}
+                tick={!hideTickX}
+                height={hideX ? 0 : 30}
+                hide={hideX}
+              />
+              <YAxis
+                type="number"
+                axisLine={false}
+                tick={!hideTickY}
+                hide={hideY}
+                width={hideY ? 0 : 60}
+              />
+            </>
+          )}
+          <Tooltip />
+          {Object.keys(config).map((key, index) => (
+            <Bar
+              key={index}
+              dataKey={key}
+              fill={config[key].color}
+              radius={stacked ? 0 : 8}
+              stackId={stacked ? "stacked" : undefined}
             />
-          </>
-        ) : (
-          <>
-            <XAxis
-              dataKey={nameKey}
-              type="category"
-              interval={"equidistantPreserveStart"}
-              tickLine={false}
-              tickFormatter={tickFormatter}
-              tick={!hideTickX}
-              height={hideX ? 0 : 30}
-              hide={hideX}
-            />
-            <YAxis
-              type="number"
-              axisLine={false}
-              tick={!hideTickY}
-              hide={hideY}
-              width={hideY ? 0 : 60}
-            />
-          </>
-        )}
-        <Tooltip />
-        {Object.keys(config).map((key, index) => (
-          <Bar
-            key={index}
-            dataKey={key}
-            fill={config[key].color}
-            radius={stacked ? 0 : 8}
-            stackId={stacked ? "stacked" : undefined}
-          />
-        ))}
-      </RBarChart>
-    </ResponsiveContainer>
+          ))}
+          {chartContextValue.legend && chartContextValue.legend}
+        </RBarChart>
+      </ResponsiveContainer>
+    </ChartProvider>
   );
 }
