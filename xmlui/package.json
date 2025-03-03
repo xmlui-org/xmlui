@@ -153,6 +153,10 @@
           "import": "./dist/xmlui.mjs",
           "require": "./dist/xmlui.umd.js"
         },
+        "./parser": {
+          "import": "./dist/xmlui-parser.mjs",
+          "require": "./dist/xmlui-parser.mjs"
+        },
         "./*.css": {
           "import": "./dist/*.css",
           "require": "./dist/*.css"
@@ -173,6 +177,10 @@
     ".": {
       "import": "./src/index.ts",
       "require": "./src/index.ts"
+    },
+    "./parser": {
+      "import": "./src/parsers/xmlui-parser/index.ts",
+      "require": "./src/parsers/xmlui-parser/index.ts"
     },
     "./index.scss": {
       "import": "./src/index.scss",
