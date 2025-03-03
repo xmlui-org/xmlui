@@ -10,7 +10,7 @@ import {
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, LOGGER_LEVELS } from "./logger.mjs";
-import { createTable, processError, ErrorWithSeverity, strBufferToLines } from "./utils.mjs";
+import { createTable, processError, ErrorWithSeverity, strBufferToLines, removeAdjacentNewlines } from "./utils.mjs";
 
 // Note: string concatenation is the fastest using `+=` in Node.js
 
@@ -160,6 +160,8 @@ export class MetadataProcessor {
 
       result += addStylesSection(fileData, component);
       result += "\n";
+
+      result = removeAdjacentNewlines(strBufferToLines(result)).join("\n");
     }
 
     try {
