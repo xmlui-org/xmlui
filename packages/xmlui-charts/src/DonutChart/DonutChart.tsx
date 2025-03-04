@@ -13,6 +13,7 @@ export const DonutChartMd = createMetadata({
     showLabel: d("Whether to show labels"),
     innerRadius: d("The inner radius of the donut chart"),
     showLabelList: d("Whether to show labels in a list"),
+    showLegend: d("Whether to show the legend"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -23,7 +24,7 @@ export const DonutChartMd = createMetadata({
 export const donutChartComponentRenderer = createComponentRenderer(
   COMP,
   DonutChartMd,
-  ({ extractValue, node, layoutCss }: any) => {
+  ({ extractValue, node, layoutCss, renderChild }: any) => {
     return (
       <PieChart
         showLabelList={extractValue.asOptionalBoolean(node.props?.showLabelList)}
@@ -33,7 +34,10 @@ export const donutChartComponentRenderer = createComponentRenderer(
         showLabel={extractValue.asOptionalBoolean(node.props?.showLabel)}
         dataKey={extractValue(node.props?.dataKey)}
         nameKey={extractValue(node.props?.nameKey)}
-      />
+        showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
+      >
+        {renderChild(node.children)}
+      </PieChart>
     );
   },
 );

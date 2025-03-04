@@ -1,16 +1,18 @@
-import styles from "../PieChart/PieChartNative.module.scss";
+import styles from "./LabelListNative.module.scss";
 import type { LabelPosition } from "recharts/types/component/Label";
-import { useChart, useLabelList } from "./ChartProvider";
+import type { CSSProperties } from "react";
 import { useEffect, useMemo } from "react";
 import { LabelList as RLabelList } from "recharts";
+import { useChart, useLabelList } from "../utils/ChartProvider";
 
 type Props = {
   position: LabelPosition;
   key: string;
+  style?: CSSProperties;
 };
 
-export const LabelList = ({ position = "inside", key }: Props) => {
-  const { nameKey, chartConfig } = useChart();
+export const LabelList = ({ position = "inside", key, style }: Props) => {
+  const { nameKey } = useChart();
   const { setLabelList } = useLabelList();
 
   const content = useMemo(
@@ -21,13 +23,10 @@ export const LabelList = ({ position = "inside", key }: Props) => {
         className={styles.labelList}
         dataKey={key || nameKey}
         stroke="none"
-        fontSize={12}
-        formatter={(value: any) => {
-          return chartConfig[value]?.label;
-        }}
+        style={style}
       />
     ),
-    [chartConfig, key, nameKey, position],
+    [key, nameKey, position, style],
   );
 
   useEffect(() => {

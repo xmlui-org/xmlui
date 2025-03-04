@@ -5,24 +5,31 @@ import {
   XAxis,
   YAxis,
   ResponsiveContainer,
+  Tooltip,
+  Legend as RLegend,
 } from "recharts";
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../utils/Chart";
+import type { CSSProperties, ReactNode } from "react";
+import React from "react";
 import { useMemo } from "react";
 import { useColors } from "xmlui";
+import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
+import { TooltipContent } from "../Tooltip/TooltipContent";
 
 export type BarChartProps = {
   data: any[];
   layout?: "horizontal" | "vertical";
-  nameKey?: string;
+  nameKey: string;
   stacked?: boolean;
   dataKeys?: string[];
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   hideTickX?: boolean;
   hideTickY?: boolean;
   hideX?: boolean;
   hideY?: boolean;
   tickFormatter?: (value: any) => any;
+  children?: ReactNode;
+  showLegend?: boolean;
 };
 
 export function BarChart({
@@ -37,6 +44,8 @@ export function BarChart({
   hideX = false,
   tickFormatter = (value) => value,
   style,
+  children,
+  showLegend = false,
 }: BarChartProps) {
   const colors = useColors(
     {
@@ -72,9 +81,12 @@ export function BarChart({
     );
   }, [colors, dataKeys]);
 
+  const chartContextValue = useChartContextValue({ dataKeys, nameKey });
+
   return (
-    <ResponsiveContainer style={style}>
-      <ChartContainer config={config}>
+    <ChartProvider value={chartContextValue}>
+      {children}
+      <ResponsiveContainer style={style}>
         <RBarChart
           accessibilityLayer
           data={data}
@@ -115,7 +127,7 @@ export function BarChart({
               />
             </>
           )}
-          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+          <Tooltip content={<TooltipContent />} />
           {Object.keys(config).map((key, index) => (
             <Bar
               key={index}
@@ -125,8 +137,9 @@ export function BarChart({
               stackId={stacked ? "stacked" : undefined}
             />
           ))}
+          {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
         </RBarChart>
-      </ChartContainer>
-    </ResponsiveContainer>
+      </ResponsiveContainer>
+    </ChartProvider>
   );
 }

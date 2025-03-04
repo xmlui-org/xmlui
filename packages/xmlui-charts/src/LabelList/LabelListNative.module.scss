@@ -8,14 +8,11 @@ $themeVars: ();
 }
 
 
-$componentName: "PieChart";
+$componentName: "LabelList";
 
-.chartContainer {
-  margin-left: auto;
-  margin-right: auto;
-  aspect-ratio: 1 / 1;
+.labelList {
+  fill: createThemeVar("color-text-LabelList");
 }
-
 
 // --- We export the theme variables to add them to the component renderer
 :export{

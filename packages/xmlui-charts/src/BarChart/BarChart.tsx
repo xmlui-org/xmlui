@@ -37,13 +37,14 @@ export const BarChartMd = createMetadata({
     tickFormatter: d(
       "A function that formats the axis tick labels. It receives a tick value and returns a formatted string.",
     ),
+    showLegend: d("Determines whether the legend should be displayed."),
   },
 });
 
 export const barChartComponentRenderer = createComponentRenderer(
   COMP,
   BarChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback }: any) => {
+  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
     return (
       <BarChart
         style={layoutCss}
@@ -57,7 +58,10 @@ export const barChartComponentRenderer = createComponentRenderer(
         hideY={extractValue.asOptionalBoolean(node.props?.hideY)}
         hideTickX={extractValue.asOptionalBoolean(node.props?.hideTickX)}
         hideTickY={extractValue.asOptionalBoolean(node.props?.hideTickY)}
-      />
+        showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
+      >
+        {renderChild(node.children)}
+      </BarChart>
     );
   },
 );

@@ -1,20 +1,52 @@
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { createContext, useContext } from "react";
 
 type ChartContextType = {
   dataKey: string;
+  dataKeys: string[];
   nameKey: string;
-  chartConfig: any;
-  chartRegistry: any;
+  labelList: any;
+  setLabelList: any;
+  legend: any;
+  setLegend: any;
 };
 
 const ChartContext = createContext<ChartContextType | undefined>({
   dataKey: "",
   nameKey: "",
-  chartConfig: {},
-  chartRegistry: {},
+  dataKeys: [],
+  labelList: null,
+  setLabelList: () => {},
+  legend: null,
+  setLegend: () => {},
 });
+
+export function useChartContextValue({
+  dataKey = "",
+  dataKeys = [],
+  nameKey = "",
+}: {
+  dataKey?: string;
+  dataKeys?: string[];
+  nameKey: string;
+}) {
+  const [dKey] = useState(dataKey);
+  const [dKeys] = useState(dataKeys);
+  const [nKey] = useState(nameKey);
+  const [labelList, setLabelList] = useState(null);
+  const [legend, setLegend] = useState(null);
+
+  return {
+    dataKey: dKey,
+    nameKey: nKey,
+    dataKeys: dKeys,
+    labelList,
+    setLabelList,
+    legend,
+    setLegend,
+  };
+}
 
 export function useChart() {
   const context = useContext(ChartContext);
@@ -27,13 +59,24 @@ export function useChart() {
 export function useLabelList() {
   const context = useContext(ChartContext);
   if (context === undefined) {
-    throw new Error("LabelList must be used within a PieChart");
+    throw new Error("LabelList must be used within a chart");
   }
 
-  const { chartRegistry } = context;
+  const { setLabelList } = context;
   return {
-    labelList: chartRegistry?.labelList,
-    setLabelList: chartRegistry?.setLabelList,
+    setLabelList,
+  };
+}
+
+export function useLegend() {
+  const context = useContext(ChartContext);
+  if (context === undefined) {
+    throw new Error("Legend must be used within a chart");
+  }
+
+  const { setLegend } = context;
+  return {
+    setLegend,
   };
 }
 

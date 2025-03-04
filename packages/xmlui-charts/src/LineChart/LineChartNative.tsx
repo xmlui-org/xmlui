@@ -1,7 +1,17 @@
-import { CartesianGrid, Line, LineChart as RLineChart, XAxis, ResponsiveContainer } from "recharts";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../utils/Chart";
+import {
+  Line,
+  LineChart as RLineChart,
+  XAxis,
+  ResponsiveContainer,
+  Tooltip,
+  Legend as RLegend,
+} from "recharts";
 import { useColors } from "xmlui";
-import { useEffect, useMemo } from "react";
+import type { ReactNode } from "react";
+import type React from "react";
+import { useMemo } from "react";
+import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
+import { TooltipContent } from "../Tooltip/TooltipContent";
 
 export type LineChartProps = {
   data: any[];
@@ -11,6 +21,8 @@ export type LineChartProps = {
   hideX?: boolean;
   hideTooltip?: boolean;
   tickFormatter?: (value: any) => any;
+  children?: ReactNode;
+  showLegend?: boolean;
 };
 
 export function LineChart({
@@ -21,6 +33,8 @@ export function LineChart({
   hideX = false,
   hideTooltip = false,
   tickFormatter,
+  children,
+  showLegend = false,
 }: LineChartProps) {
   const colors = useColors(
     {
@@ -56,11 +70,13 @@ export function LineChart({
     );
   }, [colors, dataKeys]);
 
+  const chartContextValue = useChartContextValue({ nameKey, dataKeys });
+
   return (
-    <ResponsiveContainer style={style}>
-      <ChartContainer config={config}>
+    <ChartProvider value={chartContextValue}>
+      {children}
+      <ResponsiveContainer style={style}>
         <RLineChart accessibilityLayer data={data}>
-          <CartesianGrid vertical={false} />
           <XAxis
             interval="preserveStartEnd"
             dataKey={nameKey}
@@ -69,9 +85,7 @@ export function LineChart({
             axisLine={false}
             tickFormatter={tickFormatter}
           />
-          {!hideTooltip && (
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-          )}
+          {!hideTooltip && <Tooltip content={<TooltipContent />} />}
           {Object.keys(config).map((key, index) => (
             <Line
               key={index}
@@ -81,8 +95,9 @@ export function LineChart({
               dot={false}
             />
           ))}
+          {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
         </RLineChart>
-      </ChartContainer>
-    </ResponsiveContainer>
+      </ResponsiveContainer>
+    </ChartProvider>
   );
 }

@@ -1,0 +1,73 @@
+@use "xmlui/themes.scss" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+
+$componentName: "TooltipContent";
+
+.tooltipContainer {
+  display: grid;
+  min-width: 8rem;
+  align-items: start;
+  gap: 1.5px;
+  border-radius: 8px;
+  background: t.$color-bg-secondary;
+  padding: .4rem;
+  font-size: 0.75rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.gridGap {
+  display: grid;
+  gap: 1.5px;
+}
+
+.labelGrid {
+  display: grid;
+  gap: 1.5px;
+}
+
+.itemContainer {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.valueContainer {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.indicator {
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+}
+
+.line {
+  width: 4px;
+}
+
+.dashed {
+  width: 0;
+  border: 1.5px dashed;
+  background: transparent;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

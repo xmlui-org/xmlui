@@ -22,13 +22,14 @@ export const LineChartMd = createMetadata({
     tickFormatter: d(
       "A function that formats the axis tick labels. It receives a tick value and returns a formatted string.",
     ),
+    showLegend: d("Determines whether the legend should be displayed."),
   },
 });
 
 export const lineChartComponentRenderer = createComponentRenderer(
   COMP,
   LineChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback }: any) => {
+  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
     return (
       <LineChart
         tickFormatter={lookupSyncCallback(node.props?.tickFormatter)}
@@ -38,7 +39,10 @@ export const lineChartComponentRenderer = createComponentRenderer(
         nameKey={extractValue(node.props?.nameKey)}
         hideX={extractValue(node.props?.hideX)}
         hideTooltip={extractValue(node.props?.hideTooltip)}
-      />
+        showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
+      >
+        {renderChild(node.children)}
+      </LineChart>
     );
   },
 );
