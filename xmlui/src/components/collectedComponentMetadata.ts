@@ -59,7 +59,6 @@ import { StickyBoxMd } from "./StickyBox/StickyBox";
 import { SwitchMd } from "./Switch/Switch";
 import { TableMd } from "./Table/Table";
 import { ColumnMd } from "./Column/Column";
-import { TableHeaderMd } from "./TableHeader/TableHeader";
 import { TableOfContentsMd } from "./TableOfContents/TableOfContents";
 import { TabsMd } from "./Tabs/Tabs";
 import { TextMd } from "./Text/Text";
@@ -73,11 +72,6 @@ import { TreeMd } from "./Tree/TreeComponent";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
-import { IconInfoCardMd } from "./IconInfoCard/IconInfoCard";
-import { PageHeaderMd } from "./PageHeader/PageHeader";
-import { ToolbarMd } from "./Toolbar/Toolbar";
-import { ToolbarButtonMd } from "./ToolbarButton/ToolbarButton";
-import { TrendLabelMd } from "./TrendLabel/TrendLabel";
 import { ButtonGroupMd } from "./ButtonGroup/ButtonGroup";
 import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
@@ -337,7 +331,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   H6: H6Md,
   HoverCard: HoverCardMd,
   Icon: IconMd,
-  IconInfoCard: IconInfoCardMd,
   Image: ImageMd,
   Items: ItemsMd,
   Link: LinkMd,
@@ -355,7 +348,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Option: OptionMd,
   PageMetaTitle: PageMetaTitleMd,
   Page: PageMd,
-  PageHeader: PageHeaderMd,
   Pages: PagesMd,
   PositionedContainer: PositionedContainerMd,
   ProgressBar: ProgressBarMd,
@@ -379,7 +371,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   StickyBox: StickyBoxMd,
   Switch: SwitchMd,
   Table: TableMd,
-  TableHeader: TableHeaderMd,
   TableOfContents: TableOfContentsMd,
   TabItem: TabItemMd,
   Tabs: TabsMd,
@@ -387,9 +378,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   TextArea: TextAreaMd,
   TextBox: TextBoxMd,
   PasswordInput: PasswordMd,
-  Toolbar: ToolbarMd,
-  ToolbarButton: ToolbarButtonMd,
-  TrendLabel: TrendLabelMd,
   Theme: ThemeMd,
   ToneChangerButton: ToneChangerButtonMd,
   Tree: TreeMd,

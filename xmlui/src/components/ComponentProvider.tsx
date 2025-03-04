@@ -112,12 +112,6 @@ import { redirectRenderer } from "./Redirect/Redirect";
 import { tabsComponentRenderer } from "./Tabs/Tabs";
 import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
 import { appStateComponentRenderer } from "./AppState/AppState";
-import { pageHeaderRenderer } from "./PageHeader/PageHeader";
-import { trendLabelRenderer } from "./TrendLabel/TrendLabel";
-import { iconInfoCardRenderer } from "./IconInfoCard/IconInfoCard";
-import { tableHeaderRenderer } from "./TableHeader/TableHeader";
-import { toolbarRenderer } from "./Toolbar/Toolbar";
-import { toolbarButtonRenderer } from "./ToolbarButton/ToolbarButton";
 import { tableOfContentsRenderer } from "./TableOfContents/TableOfContents";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { alertComponentRenderer } from "./Alert/Alert";
@@ -517,14 +511,6 @@ export class ComponentRegistry {
     this.registerCoreComponent(themeComponentRenderer);
     this.registerCoreComponent(appStateComponentRenderer);
     this.registerCoreComponent(apiCallRenderer);
-
-    // --- Added after tabler-clone review
-    this.registerCoreComponent(pageHeaderRenderer);
-    this.registerCoreComponent(trendLabelRenderer);
-    this.registerCoreComponent(iconInfoCardRenderer);
-    this.registerCoreComponent(tableHeaderRenderer);
-    this.registerCoreComponent(toolbarRenderer);
-    this.registerCoreComponent(toolbarButtonRenderer);
 
     // --- New Bootstrap-inspired components
     this.registerCoreComponent(carouselComponentRenderer);
