@@ -1,7 +1,7 @@
 <App layout="condensed-sticky">
   <AppHeader>
     <SpaceFiller />
-    <ThemeChangerButton />
+    <ToneChangerButton />
   </AppHeader>
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>

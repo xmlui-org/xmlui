@@ -75,14 +75,13 @@ import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
 import { IconInfoCardMd } from "./IconInfoCard/IconInfoCard";
 import { PageHeaderMd } from "./PageHeader/PageHeader";
-import { ThemeChangerButtonMd } from "./ThemeChanger/ThemeChanger";
 import { ToolbarMd } from "./Toolbar/Toolbar";
 import { ToolbarButtonMd } from "./ToolbarButton/ToolbarButton";
 import { TrendLabelMd } from "./TrendLabel/TrendLabel";
 import { ButtonGroupMd } from "./ButtonGroup/ButtonGroup";
 import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
-import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
+import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
 import { OptionMd } from "./Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
 import { BackdropMd } from "./Backdrop/Backdrop";
@@ -392,7 +391,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ToolbarButton: ToolbarButtonMd,
   TrendLabel: TrendLabelMd,
   Theme: ThemeMd,
-  ThemeChangerButton: ThemeChangerButtonMd,
   ToneChangerButton: ToneChangerButtonMd,
   Tree: TreeMd,
 };
