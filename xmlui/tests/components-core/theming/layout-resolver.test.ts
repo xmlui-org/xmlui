@@ -10,7 +10,6 @@ describe("Layout resolver", () => {
   const THEME_ID3_VALUE = toCssVar(THEME_ID3);
   const THEME_ID4 = "$some-theme-id4";
   const THEME_ID4_VALUE = toCssVar(THEME_ID4);
-  const alignmentCases = ["start", "center", "end"];
 
   // --- Dimensions & Positions
   const sizeCases = ["0", "1px", "2.5rem", "50%", "4vmin"];

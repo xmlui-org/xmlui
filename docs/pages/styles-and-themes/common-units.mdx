@@ -301,6 +301,23 @@ A component may not fit into the viewport its parent provides. An overflow value
 |`hidden`| Overflow content is clipped at the element's padding box. There are no scroll bars, and the clipped content is not visible (i.e., clipped content is hidden), but the content still exists. |
 |`scroll`| Overflow content is clipped at the element's padding box, and overflow content can be scrolled into view using scroll bars. |
 
+## Outline Values [#outline]
+
+When you specify the outline of a component, you can use these three properties:
+- **Outline width**. The stroke <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> to draw the outline.
+- **Outline style**. The outline <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style pattern</SmartLink> to apply.
+- **Outline color**. The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of the outline.
+
+You must specify all of these properties to display an outline. You can specify the outline properties in any order; however, you can specify a property only once. All of these outline specifications are correct:
+
+```text
+1px solid blue
+dashed 4px #f0cccc
+#f0cccc 4 dashed
+```
+
+
+
 ## Shadow Values [#shadow]
 
 You can define shadow values with one or more shadow effects. If you use more than one effect, you must separate them with a comma. A shadow effect is composed of these parts:
@@ -419,7 +436,6 @@ This value sets the horizontal alignment of the inline-rendered content (e.g., t
         <Text textAlign="justify">This is a long, long,long, long, long, long, long, very long text with several words that do not fit into a single line (justify). Last line is not justified.</Text>
       </VStack>
   `}
-    height={180}
 />
 
 ## Text Decoration Values [#text-decoration]
