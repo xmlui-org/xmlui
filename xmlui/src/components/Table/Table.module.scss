@@ -91,6 +91,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
   font-size: $font-size-heading-Table;
   color: $color-text-heading-Table;
   font-weight: $font-weight-heading-Table;
+  user-select: text;
   @include t.paddingVars($themeVars, "heading-#{$component}");
 }
 
@@ -104,6 +105,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
   align-items: center;
   white-space: nowrap;
   text-overflow: ellipsis;
+  user-select: text;
 }
 
 .table {

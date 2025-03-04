@@ -78,7 +78,6 @@ import { fileInputRenderer } from "./FileInput/FileInput";
 import { spinnerComponentRenderer } from "./Spinner/Spinner";
 import { markdownComponentRenderer } from "./Markdown/Markdown";
 import { selectComponentRenderer } from "./Select/Select";
-import { themeChangerButtonComponentRenderer } from "./ThemeChanger/ThemeChanger";
 import { formSectionRenderer } from "./FormSection/FormSection";
 import { checkboxComponentRenderer } from "./Checkbox/Checkbox";
 import { switchComponentRenderer } from "./Switch/Switch";
@@ -113,12 +112,6 @@ import { redirectRenderer } from "./Redirect/Redirect";
 import { tabsComponentRenderer } from "./Tabs/Tabs";
 import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
 import { appStateComponentRenderer } from "./AppState/AppState";
-import { pageHeaderRenderer } from "./PageHeader/PageHeader";
-import { trendLabelRenderer } from "./TrendLabel/TrendLabel";
-import { iconInfoCardRenderer } from "./IconInfoCard/IconInfoCard";
-import { tableHeaderRenderer } from "./TableHeader/TableHeader";
-import { toolbarRenderer } from "./Toolbar/Toolbar";
-import { toolbarButtonRenderer } from "./ToolbarButton/ToolbarButton";
 import { tableOfContentsRenderer } from "./TableOfContents/TableOfContents";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { alertComponentRenderer } from "./Alert/Alert";
@@ -132,7 +125,7 @@ import { carouselComponentRenderer } from "./Carousel/Carousel";
 import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
 import { createPropHolderComponent } from "../components-core/renderers";
 import { breakoutComponentRenderer } from "./Breakout/Breakout";
-import { toneChangerButtonComponentRenderer } from "./ThemeChanger/ToneChangerButton";
+import { toneChangerButtonComponentRenderer } from "./ToneChangerButton/ToneChangerButton";
 import { apiCallRenderer } from "./APICall/APICall";
 import { optionComponentRenderer } from "./Option/Option";
 import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
@@ -504,7 +497,6 @@ export class ComponentRegistry {
       this.registerCoreComponent(selectComponentRenderer);
       this.registerCoreComponent(autoCompleteComponentRenderer);
       this.registerCoreComponent(dropdownMenuComponentRenderer);
-      this.registerCoreComponent(themeChangerButtonComponentRenderer);
       this.registerCoreComponent(toneChangerButtonComponentRenderer);
       this.registerCoreComponent(formSectionRenderer);
       this.registerCoreComponent(dropdownMenuComponentRenderer);
@@ -519,14 +511,6 @@ export class ComponentRegistry {
     this.registerCoreComponent(themeComponentRenderer);
     this.registerCoreComponent(appStateComponentRenderer);
     this.registerCoreComponent(apiCallRenderer);
-
-    // --- Added after tabler-clone review
-    this.registerCoreComponent(pageHeaderRenderer);
-    this.registerCoreComponent(trendLabelRenderer);
-    this.registerCoreComponent(iconInfoCardRenderer);
-    this.registerCoreComponent(tableHeaderRenderer);
-    this.registerCoreComponent(toolbarRenderer);
-    this.registerCoreComponent(toolbarButtonRenderer);
 
     // --- New Bootstrap-inspired components
     this.registerCoreComponent(carouselComponentRenderer);

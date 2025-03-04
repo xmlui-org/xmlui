@@ -95,6 +95,16 @@ export const ListMd = createMetadata({
       defaultValue: true,
     },
   },
+  apis: {
+    scrollToTop: d("This method scrolls the list to the top."),
+    scrollToBottom: d("This method scrolls the list to the bottom."),
+    scrollToIndex: d(
+      "This method scrolls the list to a specific index. The method accepts an index as a parameter.",
+    ),
+    scrollToId: d(
+      "This method scrolls the list to a specific item. The method accepts an item ID as a parameter.",
+    ),
+  },
   contextVars: {
     $item: d(`This property represents the value of an item in the data list.`),
   },

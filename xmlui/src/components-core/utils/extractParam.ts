@@ -23,7 +23,7 @@ export function extractParam(
   param: any,
   appContext: AppContextObject | undefined = undefined,
   strict: boolean = false, // --- In this case we only allow string binding expression
-  extractContext: { didResolve: boolean } = { didResolve: false }
+  extractContext: { didResolve: boolean } = { didResolve: false },
 ): any {
   if (typeof param === "string") {
     const paramSegments = parseParameterString(param);
@@ -85,7 +85,7 @@ export function extractParam(
   if (Array.isArray(param)) {
     const arrayExtractContext = { didResolve: false };
     let resolvedChildren = param.map((childParam) =>
-      extractParam(state, childParam, appContext, false, arrayExtractContext)
+      extractParam(state, childParam, appContext, false, arrayExtractContext),
     );
     if (arrayExtractContext.didResolve) {
       extractContext.didResolve = true;
@@ -150,7 +150,7 @@ export function withStableObjectReference(object: any) {
 export function shouldKeep(
   when: string | boolean | undefined,
   componentState: ContainerState,
-  appContext?: AppContextObject
+  appContext?: AppContextObject,
 ) {
   if (when === undefined) {
     return true;
@@ -172,8 +172,8 @@ export function resolveAndCleanProps<T extends Record<string, any>>(
   extractValue: ValueExtractor,
   layoutCss: CSSProperties = {},
   resourceExtraction?: {
-    extractResourceUrl: (url?: string) => string | undefined,
-    resourceProps?: string[]
+    extractResourceUrl: (url?: string) => string | undefined;
+    resourceProps?: string[];
   },
 ): T {
   const { extractResourceUrl, resourceProps } = resourceExtraction ?? {};
@@ -215,5 +215,125 @@ export function removeStylesFromProps(
     return Object.fromEntries(
       Object.entries(sourceObj).filter(([key]) => !filterKeys.includes(key)),
     );
+  }
+}
+
+type NodeProps = Record<string, any>;
+type ResourceUrlExtractor = (url?: string) => string | undefined;
+
+/**
+ * Extracts props that can either be regular properties or URL resources.
+ * It also removes layoutCss props from regular properties fed into it.
+ * @param extractValue Value extractor function
+ * @param extractResourceUrl URL resource extractor function that specifies which props are URL resources
+ * @param layoutCss Component styles
+ * @param props Component props
+ * @returns properties that are resolved and cleaned of CSS styles
+ */
+export class PropsTrasform<T extends NodeProps> {
+  private nodeProps: T;
+  private extractValue: ValueExtractor;
+  private extractResourceUrl: ResourceUrlExtractor;
+
+  private usedKeys: (keyof T)[] = [];
+
+  constructor(
+    extractValue: ValueExtractor,
+    extractResourceUrl: ResourceUrlExtractor,
+    layoutCss: CSSProperties,
+    props: T,
+  ) {
+    this.extractValue = extractValue;
+    this.extractResourceUrl = extractResourceUrl;
+    this.nodeProps = removeStylesFromProps(props, layoutCss) as T;
+  }
+
+  private mapValues(keys: (keyof T)[], fn: (value: any) => any) {
+    this.usedKeys = Array.from(new Set(this.usedKeys.concat(keys)));
+    return Object.fromEntries(keys.map((key) => [key, fn(this.nodeProps[key])]));
+  }
+
+  asValue<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue) as T;
+  }
+
+  asUrlResource<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractResourceUrl) as Record<K, string | undefined>;
+  }
+
+  asBoolean<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue.asBoolean) as Record<
+      string,
+      ReturnType<ValueExtractor["asBoolean"]>
+    >;
+  }
+
+  asOptionalBoolean<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue.asOptionalBoolean) as Record<
+      K,
+      ReturnType<ValueExtractor["asOptionalBoolean"]>
+    >;
+  }
+
+  asString<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue.asString) as Record<
+      string,
+      ReturnType<ValueExtractor["asString"]>
+    >;
+  }
+
+  asOptionalString<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue.asOptionalString) as Record<
+      string,
+      ReturnType<ValueExtractor["asOptionalString"]>
+    >;
+  }
+
+  asOptionalStringArray<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue.asOptionalString) as Record<
+      string,
+      ReturnType<ValueExtractor["asOptionalStringArray"]>
+    >;
+  }
+
+  asDisplayText<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue.asDisplayText) as Record<
+      string,
+      ReturnType<ValueExtractor["asDisplayText"]>
+    >;
+  }
+
+  asNumber<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue.asNumber) as Record<
+      string,
+      ReturnType<ValueExtractor["asNumber"]>
+    >;
+  }
+
+  asOptionalNumber<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue.asOptionalNumber) as Record<
+      K,
+      ReturnType<ValueExtractor["asOptionalNumber"]>
+    >;
+  }
+
+  asSize<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue.asSize) as Record<
+      K,
+      ReturnType<ValueExtractor["asSize"]>
+    >;
+  }
+
+  /**
+   * Resolves props which have not been used yet.
+   * If all keys have been referenced before this function is called, an empty object is returned.
+   *
+   * @returns props that have not been used yet
+   */
+  asRest(): T {
+    const filteredKeys = Object.keys(this.nodeProps).filter(
+      (propKey) => !this.usedKeys.includes(propKey as keyof T)
+    );
+    return this.mapValues(filteredKeys, this.extractValue) as T;
   }
 }
