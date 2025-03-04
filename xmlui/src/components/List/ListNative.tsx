@@ -249,18 +249,18 @@ const ListItemTypeContext = createContext<(index: number) => RowType>((index) =>
  * That's all encapsulated in this handy hook, to keep the logic out of the component.
  */
 const useShift = (listData: any[], idKey: any) => {
-  const previousListData = useRef<any[] | undefined>()
-  const shouldShift = useRef<boolean>()
+  const previousListData = useRef<any[] | undefined>();
+  const shouldShift = useRef<boolean>();
   if (listData !== previousListData.current) {
     if (listData?.[0]?.[idKey] !== previousListData.current?.[0]?.[idKey]) {
-      shouldShift.current = true
+      shouldShift.current = true;
     } else {
-      shouldShift.current = false
+      shouldShift.current = false;
     }
-    previousListData.current = listData
+    previousListData.current = listData;
   }
-  return shouldShift.current
-}
+  return shouldShift.current;
+};
 
 export const ListNative = forwardRef(function DynamicHeightList(
   {
@@ -325,7 +325,6 @@ export const ListNative = forwardRef(function DynamicHeightList(
   });
 
   const shift = useShift(rows, idKey);
-
 
   const initiallyScrolledToBottom = useRef(false);
   useEffect(() => {
@@ -431,9 +430,9 @@ export const ListNative = forwardRef(function DynamicHeightList(
     virtualizerRef.current?.scrollToIndex(index);
   });
 
-  const scrollToId = useEvent((id)=>{
-    const index = rows?.findIndex((row)=>row[idKey] === id);
-    if(index >= 0){
+  const scrollToId = useEvent((id) => {
+    const index = rows?.findIndex((row) => row[idKey] === id);
+    if (index >= 0) {
       scrollToIndex(index);
     }
   });
@@ -443,7 +442,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
       scrollToBottom,
       scrollToTop,
       scrollToIndex,
-      scrollToId
+      scrollToId,
     });
   }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop]);
   const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
@@ -486,18 +485,26 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 onScroll={onScroll}
                 startMargin={!hasOutsideScroll ? 0 : parentRef.current?.offsetTop || 0}
                 item={Item as CustomItemComponent}
+                count={rows.length ?? 0}
               >
-                {rows.map((row) => {
+                {(rowIndex) => {
+                  const row = rows[rowIndex];
                   const key = row[idKey];
                   switch (row._row_type) {
                     case RowType.SECTION:
-                      return <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>;
+                      return (
+                        <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>
+                      );
                     case RowType.SECTION_FOOTER:
-                      return <Fragment key={key}>{sectionFooterRenderer?.(row, key) || <div />}</Fragment>;
+                      return (
+                        <Fragment key={key}>
+                          {sectionFooterRenderer?.(row, key) || <div />}
+                        </Fragment>
+                      );
                     default:
                       return <Fragment key={key}>{itemRenderer(row, key) || <div />}</Fragment>;
                   }
-                })}
+                }}
               </Virtualizer>
             </div>
           )}
