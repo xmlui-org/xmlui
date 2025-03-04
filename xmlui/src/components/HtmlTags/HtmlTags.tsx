@@ -6,7 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { LocalLink } from "../Link/LinkNative";
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
-import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
+import { PropsTrasform } from "../../components-core/utils/extractParam";
 
 export const HtmlAMd = createMetadata({
   status: "experimental",
@@ -30,15 +30,12 @@ export const HtmlAMd = createMetadata({
 export const htmlATagRenderer = createComponentRenderer(
   "a",
   HtmlAMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { disabled } = p.asOptionalBoolean("disabled");
+    const { href, ...rest } = p.asRest();
     return (
-      <LocalLink
-        to={extractValue(node.props.href)}
-        disabled={!extractValue.asOptionalBoolean(node.props.disabled, true)}
-        style={layoutCss}
-        {...renderedProps}
-      >
+      <LocalLink to={href} disabled={disabled ?? false} style={layoutCss} {...rest}>
         {renderChild(node.children)}
       </LocalLink>
     );
@@ -54,10 +51,11 @@ export const HtmlAbbrMd = createMetadata({
 export const htmlAbbrTagRenderer = createComponentRenderer(
   "abbr",
   HtmlAbbrMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="abbr">
+      <Text style={layoutCss} {...props} variant="abbr">
         {renderChild(node.children)}
       </Text>
     );
@@ -73,10 +71,11 @@ export const HtmlAddressMd = createMetadata({
 export const htmlAddressTagRenderer = createComponentRenderer(
   "address",
   HtmlAddressMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <address style={layoutCss} {...renderedProps}>
+      <address style={layoutCss} {...props}>
         {renderChild(node.children)}
       </address>
     );
@@ -104,23 +103,11 @@ export const HtmlAreaMd = createMetadata({
 export const htmlAreaTagRenderer = createComponentRenderer(
   "area",
   HtmlAreaMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <area
-        style={layoutCss}
-        alt={extractValue(node.props.alt)}
-        coords={extractValue(node.props.coords)}
-        download={extractValue(node.props.download)}
-        href={extractValue(node.props.href)}
-        hrefLang={extractValue(node.props.hrefLang)}
-        referrerPolicy={extractValue(node.props.referrerPolicy)}
-        rel={extractValue(node.props.rel)}
-        shape={extractValue(node.props.shape)}
-        target={extractValue(node.props.target)}
-        media={extractValue(node.props.media)}
-        {...renderedProps}
-      >
+      <area style={layoutCss} {...props}>
         {renderChild(node.children)}
       </area>
     );
@@ -136,10 +123,11 @@ export const HtmlArticleMd = createMetadata({
 export const htmlArticleTagRenderer = createComponentRenderer(
   "article",
   HtmlArticleMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <article style={layoutCss} {...renderedProps}>
+      <article style={layoutCss} {...props}>
         {renderChild(node.children)}
       </article>
     );
@@ -155,10 +143,11 @@ export const HtmlAsideMd = createMetadata({
 export const htmlAsideTagRenderer = createComponentRenderer(
   "aside",
   HtmlAsideMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <aside style={layoutCss} {...renderedProps}>
+      <aside style={layoutCss} {...props}>
         {renderChild(node.children)}
       </aside>
     );
@@ -185,19 +174,23 @@ export const HtmlAudioMd = createMetadata({
 export const htmlAudioTagRenderer = createComponentRenderer(
   "audio",
   HtmlAudioMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { autoPlay, controls, loop, muted } = p.asOptionalBoolean(
+      "autoPlay",
+      "controls",
+      "loop",
+      "muted",
+    );
+    const props = p.asRest();
     return (
       <audio
         style={layoutCss}
-        autoPlay={extractValue.asOptionalBoolean(node.props.autoPlay, false)}
-        controls={extractValue.asOptionalBoolean(node.props.controls, false)}
-        crossOrigin={extractValue(node.props.crossOrigin)}
-        loop={extractValue.asOptionalBoolean(node.props.loop, false)}
-        muted={extractValue.asOptionalBoolean(node.props.muted, false)}
-        preload={extractValue(node.props.preload)}
-        src={extractValue(node.props.src)}
-        {...renderedProps}
+        autoPlay={autoPlay ?? false}
+        controls={controls ?? false}
+        loop={loop ?? false}
+        muted={muted ?? false}
+        {...props}
       >
         {renderChild(node.children)}
       </audio>
@@ -214,10 +207,11 @@ export const HtmlBMd = createMetadata({
 export const htmlBTagRenderer = createComponentRenderer(
   "b",
   HtmlBMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <b style={layoutCss} {...renderedProps}>
+      <b style={layoutCss} {...props}>
         {renderChild(node.children)}
       </b>
     );
@@ -233,10 +227,11 @@ export const HtmlBdiMd = createMetadata({
 export const htmlBdiTagRenderer = createComponentRenderer(
   "bdi",
   HtmlBdiMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <bdi style={layoutCss} {...renderedProps}>
+      <bdi style={layoutCss} {...props}>
         {renderChild(node.children)}
       </bdi>
     );
@@ -255,10 +250,11 @@ export const HtmlBdoMd = createMetadata({
 export const htmlBdoTagRenderer = createComponentRenderer(
   "bdo",
   HtmlBdoMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <bdo style={layoutCss} dir={extractValue(node.props.dir)} {...renderedProps}>
+      <bdo style={layoutCss} {...props}>
         {renderChild(node.children)}
       </bdo>
     );
@@ -277,10 +273,11 @@ export const HtmlBlockquoteMd = createMetadata({
 export const htmlBlockquoteTagRenderer = createComponentRenderer(
   "blockquote",
   HtmlBlockquoteMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <blockquote style={layoutCss} cite={extractValue(node.props.cite)} {...renderedProps}>
+      <blockquote style={layoutCss} {...props}>
         {renderChild(node.children)}
       </blockquote>
     );
@@ -296,10 +293,11 @@ export const HtmlBrMd = createMetadata({
 export const htmlBrTagRenderer = createComponentRenderer(
   "br",
   HtmlBrMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <br style={layoutCss} {...renderedProps}>
+      <br style={layoutCss} {...props}>
         {renderChild(node.children)}
       </br>
     );
@@ -332,23 +330,21 @@ export const HtmlButtonMd = createMetadata({
 export const htmlButtonTagRenderer = createComponentRenderer(
   "button",
   HtmlButtonMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { autoFocus, disabled, formNoValidate } = p.asOptionalBoolean(
+      "autoFocus",
+      "disabled",
+      "formNoValidate",
+    );
+    const props = p.asRest();
     return (
       <button
         style={layoutCss}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, false)}
-        disabled={extractValue.asOptionalBoolean(node.props.disabled, false)}
-        form={extractValue(node.props.form)}
-        formAction={extractValue(node.props.formAction)}
-        formEncType={extractValue(node.props.formEncType)}
-        formMethod={extractValue(node.props.formMethod)}
-        formNoValidate={extractValue.asOptionalBoolean(node.props.formNoValidate, false)}
-        formTarget={extractValue(node.props.formTarget)}
-        name={extractValue(node.props.name)}
-        type={extractValue(node.props.type)}
-        value={extractValue(node.props.value)}
-        {...renderedProps}
+        autoFocus={autoFocus ?? false}
+        disabled={disabled ?? false}
+        formNoValidate={formNoValidate ?? false}
+        {...props}
       >
         {renderChild(node.children)}
       </button>
@@ -369,15 +365,12 @@ export const HtmlCanvasMd = createMetadata({
 export const htmlCanvasTagRenderer = createComponentRenderer(
   "canvas",
   HtmlCanvasMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const sizeProps = p.asOptionalNumber("width", "height");
+    const props = p.asRest();
     return (
-      <canvas
-        style={layoutCss}
-        width={extractValue.asOptionalNumber(node.props.width)}
-        height={extractValue.asOptionalNumber(node.props.height)}
-        {...renderedProps}
-      >
+      <canvas style={layoutCss} {...sizeProps} {...props}>
         {renderChild(node.children)}
       </canvas>
     );
@@ -393,10 +386,11 @@ export const HtmlCaptionMd = createMetadata({
 export const htmlCaptionTagRenderer = createComponentRenderer(
   "caption",
   HtmlCaptionMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <caption style={layoutCss} {...renderedProps}>
+      <caption style={layoutCss} {...props}>
         {renderChild(node.children)}
       </caption>
     );
@@ -412,10 +406,11 @@ export const HtmlCiteMd = createMetadata({
 export const htmlCiteTagRenderer = createComponentRenderer(
   "cite",
   HtmlCiteMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="cite">
+      <Text style={layoutCss} {...props} variant="cite">
         {renderChild(node.children)}
       </Text>
     );
@@ -431,10 +426,11 @@ export const HtmlCodeMd = createMetadata({
 export const htmlCodeTagRenderer = createComponentRenderer(
   "code",
   HtmlCodeMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="code">
+      <Text style={layoutCss} {...props} variant="code">
         {renderChild(node.children)}
       </Text>
     );
@@ -453,14 +449,12 @@ export const HtmlColMd = createMetadata({
 export const htmlColTagRenderer = createComponentRenderer(
   "col",
   HtmlColMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { span } = p.asOptionalNumber("span");
+    const props = p.asRest();
     return (
-      <col
-        style={layoutCss}
-        span={extractValue.asOptionalNumber(node.props.span)}
-        {...renderedProps}
-      >
+      <col style={layoutCss} span={span} {...props}>
         {renderChild(node.children)}
       </col>
     );
@@ -479,14 +473,12 @@ export const HtmlColgroupMd = createMetadata({
 export const htmlColgroupTagRenderer = createComponentRenderer(
   "colgroup",
   HtmlColgroupMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { span } = p.asOptionalNumber("span");
+    const props = p.asRest();
     return (
-      <colgroup
-        style={layoutCss}
-        span={extractValue.asOptionalNumber(node.props.span)}
-        {...renderedProps}
-      >
+      <colgroup style={layoutCss} span={span} {...props}>
         {renderChild(node.children)}
       </colgroup>
     );
@@ -505,10 +497,11 @@ export const HtmlDataMd = createMetadata({
 export const htmlDataTagRenderer = createComponentRenderer(
   "data",
   HtmlDataMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <data style={layoutCss} value={extractValue(node.props.value)} {...renderedProps}>
+      <data style={layoutCss} {...props}>
         {renderChild(node.children)}
       </data>
     );
@@ -524,10 +517,11 @@ export const HtmlDatalistMd = createMetadata({
 export const htmlDatalistTagRenderer = createComponentRenderer(
   "datalist",
   HtmlDatalistMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <datalist style={layoutCss} {...renderedProps}>
+      <datalist style={layoutCss} {...props}>
         {renderChild(node.children)}
       </datalist>
     );
@@ -543,10 +537,11 @@ export const HtmlDdMd = createMetadata({
 export const htmlDdTagRenderer = createComponentRenderer(
   "dd",
   HtmlDdMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <dd style={layoutCss} {...renderedProps}>
+      <dd style={layoutCss} {...props}>
         {renderChild(node.children)}
       </dd>
     );
@@ -566,16 +561,11 @@ export const HtmlDelMd = createMetadata({
 export const htmlDelTagRenderer = createComponentRenderer(
   "del",
   HtmlDelMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text
-        style={layoutCss}
-        cite={extractValue(node.props.cite)}
-        dateTime={extractValue(node.props.dateTime)}
-        {...renderedProps}
-        variant="deleted"
-      >
+      <Text style={layoutCss} {...props} variant="deleted">
         {renderChild(node.children)}
       </Text>
     );
@@ -594,14 +584,12 @@ export const HtmlDetailsMd = createMetadata({
 export const htmlDetailsTagRenderer = createComponentRenderer(
   "details",
   HtmlDetailsMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { open } = p.asOptionalBoolean("open");
+    const props = p.asRest();
     return (
-      <details
-        style={layoutCss}
-        open={extractValue.asOptionalBoolean(node.props.open, false)}
-        {...renderedProps}
-      >
+      <details style={layoutCss} open={open ?? false} {...props}>
         {renderChild(node.children)}
       </details>
     );
@@ -617,10 +605,11 @@ export const HtmlDfnMd = createMetadata({
 export const htmlDfnTagRenderer = createComponentRenderer(
   "dfn",
   HtmlDfnMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <dfn style={layoutCss} {...renderedProps}>
+      <dfn style={layoutCss} {...props}>
         {renderChild(node.children)}
       </dfn>
     );
@@ -639,14 +628,12 @@ export const HtmlDialogMd = createMetadata({
 export const htmlDialogTagRenderer = createComponentRenderer(
   "dialog",
   HtmlDialogMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { open } = p.asOptionalBoolean("open");
+    const props = p.asRest();
     return (
-      <dialog
-        style={layoutCss}
-        open={extractValue.asOptionalBoolean(node.props.open, false)}
-        {...renderedProps}
-      >
+      <dialog style={layoutCss} open={open ?? false} {...props}>
         {renderChild(node.children)}
       </dialog>
     );
@@ -662,10 +649,11 @@ export const HtmlDivMd = createMetadata({
 export const htmlDivTagRenderer = createComponentRenderer(
   "div",
   HtmlDivMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <div style={layoutCss} {...renderedProps}>
+      <div style={layoutCss} {...props}>
         {renderChild(node.children)}
       </div>
     );
@@ -681,10 +669,11 @@ export const HtmlDlMd = createMetadata({
 export const htmlDlTagRenderer = createComponentRenderer(
   "dl",
   HtmlDlMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <dl style={layoutCss} {...renderedProps}>
+      <dl style={layoutCss} {...props}>
         {renderChild(node.children)}
       </dl>
     );
@@ -700,10 +689,11 @@ export const HtmlDtMd = createMetadata({
 export const htmlDtTagRenderer = createComponentRenderer(
   "dt",
   HtmlDtMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <dt style={layoutCss} {...renderedProps}>
+      <dt style={layoutCss} {...props}>
         {renderChild(node.children)}
       </dt>
     );
@@ -719,10 +709,11 @@ export const HtmlEMMd = createMetadata({
 export const htmlEMTagRenderer = createComponentRenderer(
   "em",
   HtmlEMMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="em">
+      <Text style={layoutCss} {...props} variant="em">
         {renderChild(node.children)}
       </Text>
     );
@@ -745,16 +736,11 @@ export const htmlEmbedTagRenderer = createComponentRenderer(
   "embed",
   HtmlEmbedMd,
   ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { src } = p.asUrlResource("src");
+    const props = p.asRest();
     return (
-      <embed
-        style={layoutCss}
-        src={extractResourceUrl(node.props.src)}
-        type={extractValue(node.props.type)}
-        width={extractValue(node.props.width)}
-        height={extractValue(node.props.height)}
-        {...renderedProps}
-      >
+      <embed style={layoutCss} src={src} {...props}>
         {renderChild(node.children)}
       </embed>
     );
@@ -775,16 +761,12 @@ export const HtmlFieldsetMd = createMetadata({
 export const htmlFieldsetTagRenderer = createComponentRenderer(
   "fieldset",
   HtmlFieldsetMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { disabled } = p.asOptionalBoolean("disabled");
+    const props = p.asRest();
     return (
-      <fieldset
-        style={layoutCss}
-        disabled={extractValue.asOptionalBoolean(node.props.disabled, false)}
-        form={extractValue(node.props.form)}
-        name={extractValue(node.props.name)}
-        {...renderedProps}
-      >
+      <fieldset style={layoutCss} disabled={disabled ?? false} {...props}>
         {renderChild(node.children)}
       </fieldset>
     );
@@ -800,10 +782,11 @@ export const HtmlFigcaptionMd = createMetadata({
 export const htmlFigcaptionTagRenderer = createComponentRenderer(
   "figcaption",
   HtmlFigcaptionMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <figcaption style={layoutCss} {...renderedProps}>
+      <figcaption style={layoutCss} {...props}>
         {renderChild(node.children)}
       </figcaption>
     );
@@ -819,10 +802,11 @@ export const HtmlFigureMd = createMetadata({
 export const htmlFigureTagRenderer = createComponentRenderer(
   "figure",
   HtmlFigureMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <figure style={layoutCss} {...renderedProps}>
+      <figure style={layoutCss} {...props}>
         {renderChild(node.children)}
       </figure>
     );
@@ -838,10 +822,11 @@ export const HtmlFooterMd = createMetadata({
 export const htmlFooterTagRenderer = createComponentRenderer(
   "footer",
   HtmlFooterMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <footer style={layoutCss} {...renderedProps}>
+      <footer style={layoutCss} {...props}>
         {renderChild(node.children)}
       </footer>
     );
@@ -869,21 +854,12 @@ export const HtmlFormMd = createMetadata({
 export const htmlFormTagRenderer = createComponentRenderer(
   "form",
   HtmlFormMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { noValidate } = p.asOptionalBoolean("noValidate");
+    const props = p.asRest();
     return (
-      <form
-        style={layoutCss}
-        acceptCharset={extractValue(node.props.acceptCharset)}
-        action={extractValue(node.props.action)}
-        autoComplete={extractValue(node.props.autoComplete)}
-        encType={extractValue(node.props.encType)}
-        method={extractValue(node.props.method)}
-        name={extractValue(node.props.name)}
-        noValidate={extractValue.asOptionalBoolean(node.props.noValidate, false)}
-        target={extractValue(node.props.target)}
-        {...renderedProps}
-      >
+      <form style={layoutCss} noValidate={noValidate ?? false} {...props}>
         {renderChild(node.children)}
       </form>
     );
@@ -899,10 +875,11 @@ export const HtmlH1Md = createMetadata({
 export const htmlH1TagRenderer = createComponentRenderer(
   "h1",
   HtmlH1Md,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...renderedProps} level="h1">
+      <Heading style={layoutCss} {...props} level="h1">
         {renderChild(node.children)}
       </Heading>
     );
@@ -918,10 +895,11 @@ export const HtmlH2Md = createMetadata({
 export const htmlH2TagRenderer = createComponentRenderer(
   "h2",
   HtmlH2Md,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...renderedProps} level="h2">
+      <Heading style={layoutCss} {...props} level="h2">
         {renderChild(node.children)}
       </Heading>
     );
@@ -937,10 +915,11 @@ export const HtmlH3Md = createMetadata({
 export const htmlH3TagRenderer = createComponentRenderer(
   "h3",
   HtmlH3Md,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...renderedProps} level="h3">
+      <Heading style={layoutCss} {...props} level="h3">
         {renderChild(node.children)}
       </Heading>
     );
@@ -956,10 +935,11 @@ export const HtmlH4Md = createMetadata({
 export const htmlH4TagRenderer = createComponentRenderer(
   "h4",
   HtmlH4Md,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...renderedProps} level="h4">
+      <Heading style={layoutCss} {...props} level="h4">
         {renderChild(node.children)}
       </Heading>
     );
@@ -975,10 +955,11 @@ export const HtmlH5Md = createMetadata({
 export const htmlH5TagRenderer = createComponentRenderer(
   "h5",
   HtmlH5Md,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...renderedProps} level="h5">
+      <Heading style={layoutCss} {...props} level="h5">
         {renderChild(node.children)}
       </Heading>
     );
@@ -994,10 +975,11 @@ export const HtmlH6Md = createMetadata({
 export const htmlH6TagRenderer = createComponentRenderer(
   "h6",
   HtmlH6Md,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...renderedProps} level="h6">
+      <Heading style={layoutCss} {...props} level="h6">
         {renderChild(node.children)}
       </Heading>
     );
@@ -1013,10 +995,11 @@ export const HtmlHeaderMd = createMetadata({
 export const htmlHeaderTagRenderer = createComponentRenderer(
   "header",
   HtmlHeaderMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <header style={layoutCss} {...renderedProps}>
+      <header style={layoutCss} {...props}>
         {renderChild(node.children)}
       </header>
     );
@@ -1032,10 +1015,11 @@ export const HtmlHrMd = createMetadata({
 export const htmlHrTagRenderer = createComponentRenderer(
   "hr",
   HtmlHrMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <hr style={layoutCss} {...renderedProps}>
+      <hr style={layoutCss} {...props}>
         {renderChild(node.children)}
       </hr>
     );
@@ -1051,10 +1035,11 @@ export const HtmlIMd = createMetadata({
 export const htmlITagRenderer = createComponentRenderer(
   "i",
   HtmlIMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <i style={layoutCss} {...renderedProps}>
+      <i style={layoutCss} {...props}>
         {renderChild(node.children)}
       </i>
     );
@@ -1083,22 +1068,12 @@ export const htmlIframeTagRenderer = createComponentRenderer(
   "iframe",
   HtmlIframeMd,
   ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { src } = p.asUrlResource("src");
+    const { allowFullScreen } = p.asOptionalBoolean("allowFullScreen");
+    const props = p.asRest();
     return (
-      <iframe
-        style={layoutCss}
-        src={extractResourceUrl(node.props.src)}
-        srcDoc={extractValue(node.props.srcDoc)}
-        name={extractValue(node.props.name)}
-        sandbox={extractValue(node.props.sandbox)}
-        allow={extractValue(node.props.allow)}
-        allowFullScreen={extractValue.asOptionalBoolean(node.props.allowFullScreen, false)}
-        width={extractValue(node.props.width)}
-        height={extractValue(node.props.height)}
-        loading={extractValue(node.props.loading)}
-        referrerPolicy={extractValue(node.props.referrerPolicy)}
-        {...renderedProps}
-      >
+      <iframe style={layoutCss} src={src} allowFullScreen={allowFullScreen ?? false} {...props}>
         {renderChild(node.children)}
       </iframe>
     );
@@ -1125,20 +1100,11 @@ export const htmlImgTagRenderer = createComponentRenderer(
   "img",
   HtmlImgMd,
   ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { src } = p.asUrlResource("src");
+    const props = p.asRest();
     return (
-      <img
-        style={layoutCss}
-        alt={extractValue(node.props.alt)}
-        height={extractValue(node.props.height)}
-        width={node.props.width}
-        src={extractResourceUrl(node.props.src)}
-        useMap={extractValue(node.props.useMap)}
-        loading={extractValue(node.props.loading)}
-        referrerPolicy={extractValue(node.props.referrerPolicy)}
-        sizes={extractValue(node.props.sizes)}
-        {...renderedProps}
-      >
+      <img style={layoutCss} src={src} {...props}>
         {renderChild(node.children)}
       </img>
     );
@@ -1177,31 +1143,29 @@ export const HtmlInputMd = createMetadata({
 export const htmlInputTagRenderer = createComponentRenderer(
   "input",
   HtmlInputMd,
-  ({ node, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { autoFocus, checked, disabled, readOnly, required, multiple } = p.asOptionalBoolean(
+      "autoFocus",
+      "checked",
+      "disabled",
+      "readOnly",
+      "required",
+      "multiple",
+    );
+    const numberProps = p.asOptionalNumber("maxLength", "minLength", "size");
+    const props = p.asRest();
     return (
       <input
         style={layoutCss}
-        type={extractValue(node.props.type)}
-        value={extractValue(node.props.value)}
-        placeholder={extractValue(node.props.placeholder)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, false)}
-        checked={extractValue.asOptionalBoolean(node.props.checked, false)}
-        disabled={extractValue.asOptionalBoolean(node.props.disabled, false)}
-        form={extractValue(node.props.form)}
-        name={extractValue(node.props.name)}
-        list={extractValue(node.props.list)}
-        max={extractValue(node.props.max)}
-        maxLength={extractValue.asOptionalNumber(node.props.maxLength)}
-        min={extractValue(node.props.min)}
-        minLength={extractValue.asOptionalNumber(node.props.minLength)}
-        multiple={extractValue.asOptionalBoolean(node.props.multiple, false)}
-        pattern={extractValue(node.props.pattern)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly, false)}
-        required={extractValue.asOptionalBoolean(node.props.required, false)}
-        size={extractValue.asOptionalNumber(node.props.size)}
-        step={extractValue(node.props.step)}
-        {...renderedProps}
+        autoFocus={autoFocus ?? false}
+        checked={checked ?? false}
+        disabled={disabled ?? false}
+        multiple={multiple ?? false}
+        readOnly={readOnly ?? false}
+        required={required ?? false}
+        {...numberProps}
+        {...props}
       />
     );
   },
@@ -1220,16 +1184,11 @@ export const HtmlInsMd = createMetadata({
 export const htmlInsTagRenderer = createComponentRenderer(
   "ins",
   HtmlInsMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text
-        style={layoutCss}
-        cite={extractValue(node.props.cite)}
-        dateTime={extractValue(node.props.dateTime)}
-        {...renderedProps}
-        variant="inserted"
-      >
+      <Text style={layoutCss} {...props} variant="inserted">
         {renderChild(node.children)}
       </Text>
     );
@@ -1245,10 +1204,11 @@ export const HtmlKbdMd = createMetadata({
 export const htmlKbdTagRenderer = createComponentRenderer(
   "kbd",
   HtmlKbdMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="keyboard">
+      <Text style={layoutCss} {...props} variant="keyboard">
         {renderChild(node.children)}
       </Text>
     );
@@ -1267,10 +1227,11 @@ export const HtmlLabelMd = createMetadata({
 export const htmlLabelTagRenderer = createComponentRenderer(
   "label",
   HtmlLabelMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <label style={layoutCss} htmlFor={extractValue(node.props.htmlFor)} {...renderedProps}>
+      <label style={layoutCss} {...props}>
         {renderChild(node.children)}
       </label>
     );
@@ -1286,10 +1247,11 @@ export const HtmlLegendMd = createMetadata({
 export const htmlLegendTagRenderer = createComponentRenderer(
   "legend",
   HtmlLegendMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <legend style={layoutCss} {...renderedProps}>
+      <legend style={layoutCss} {...props}>
         {renderChild(node.children)}
       </legend>
     );
@@ -1308,14 +1270,12 @@ export const HtmlLiMd = createMetadata({
 export const htmlLiTagRenderer = createComponentRenderer(
   "li",
   HtmlLiMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { value } = p.asOptionalNumber("value");
+    const props = p.asRest();
     return (
-      <li
-        style={layoutCss}
-        value={extractValue.asOptionalNumber(node.props.value)}
-        {...renderedProps}
-      >
+      <li style={layoutCss} value={value} {...props}>
         {renderChild(node.children)}
       </li>
     );
@@ -1331,10 +1291,11 @@ export const HtmlMainMd = createMetadata({
 export const htmlMainTagRenderer = createComponentRenderer(
   "main",
   HtmlMainMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <main style={layoutCss} {...renderedProps}>
+      <main style={layoutCss} {...props}>
         {renderChild(node.children)}
       </main>
     );
@@ -1353,10 +1314,11 @@ export const HtmlMapMd = createMetadata({
 export const htmlMapTagRenderer = createComponentRenderer(
   "map",
   HtmlMapMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <map style={layoutCss} name={extractValue(node.props.name)} {...renderedProps}>
+      <map style={layoutCss} {...props}>
         {renderChild(node.children)}
       </map>
     );
@@ -1372,10 +1334,11 @@ export const HtmlMarkMd = createMetadata({
 export const htmlMarkTagRenderer = createComponentRenderer(
   "mark",
   HtmlMarkMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="marked">
+      <Text style={layoutCss} {...props} variant="marked">
         {renderChild(node.children)}
       </Text>
     );
@@ -1394,10 +1357,11 @@ export const HtmlMenuMd = createMetadata({
 export const htmlMenuTagRenderer = createComponentRenderer(
   "menu",
   HtmlMenuMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <menu style={layoutCss} type={extractValue(node.props.type)} {...renderedProps}>
+      <menu style={layoutCss} {...props}>
         {renderChild(node.children)}
       </menu>
     );
@@ -1421,19 +1385,12 @@ export const HtmlMeterMd = createMetadata({
 export const htmlMeterTagRenderer = createComponentRenderer(
   "meter",
   HtmlMeterMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const numberProps = p.asOptionalNumber("value", "min", "max", "low", "high", "optimum");
+    const props = p.asRest();
     return (
-      <meter
-        style={layoutCss}
-        min={extractValue.asOptionalNumber(node.props.min)}
-        max={extractValue.asOptionalNumber(node.props.max)}
-        low={extractValue.asOptionalNumber(node.props.low)}
-        high={extractValue.asOptionalNumber(node.props.high)}
-        optimum={extractValue.asOptionalNumber(node.props.optimum)}
-        value={extractValue.asOptionalNumber(node.props.value)}
-        {...renderedProps}
-      >
+      <meter style={layoutCss} {...numberProps} {...props}>
         {renderChild(node.children)}
       </meter>
     );
@@ -1449,10 +1406,11 @@ export const HtmlNavMd = createMetadata({
 export const htmlNavTagRenderer = createComponentRenderer(
   "nav",
   HtmlNavMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <nav style={layoutCss} {...renderedProps}>
+      <nav style={layoutCss} {...props}>
         {renderChild(node.children)}
       </nav>
     );
@@ -1476,19 +1434,11 @@ export const HtmlObjectMd = createMetadata({
 export const htmlObjectTagRenderer = createComponentRenderer(
   "object",
   HtmlObjectMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <object
-        style={layoutCss}
-        data={extractValue(node.props.data)}
-        type={extractValue(node.props.type)}
-        name={extractValue(node.props.name)}
-        form={extractValue(node.props.form)}
-        width={extractValue(node.props.width)}
-        height={extractValue(node.props.height)}
-        {...renderedProps}
-      >
+      <object style={layoutCss} {...props}>
         {renderChild(node.children)}
       </object>
     );
@@ -1509,16 +1459,13 @@ export const HtmlOlMd = createMetadata({
 export const htmlOlTagRenderer = createComponentRenderer(
   "ol",
   HtmlOlMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { reversed } = p.asOptionalBoolean("reversed");
+    const { start } = p.asOptionalNumber("start");
+    const props = p.asRest();
     return (
-      <ol
-        style={layoutCss}
-        reversed={extractValue.asOptionalBoolean(node.props.reversed, false)}
-        start={extractValue.asOptionalNumber(node.props.start, 1)}
-        type={extractValue(node.props.type)}
-        {...renderedProps}
-      >
+      <ol style={layoutCss} reversed={reversed ?? false} start={start ?? 1} {...props}>
         {renderChild(node.children)}
       </ol>
     );
@@ -1538,15 +1485,12 @@ export const HtmlOptgroupMd = createMetadata({
 export const htmlOptgroupTagRenderer = createComponentRenderer(
   "optgroup",
   HtmlOptgroupMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { disabled } = p.asOptionalBoolean("disabled");
+    const props = p.asRest();
     return (
-      <optgroup
-        style={layoutCss}
-        label={extractValue(node.props.label)}
-        disabled={extractValue.asOptionalBoolean(node.props.disabled, false)}
-        {...renderedProps}
-      >
+      <optgroup style={layoutCss} disabled={disabled ?? false} {...props}>
         {renderChild(node.children)}
       </optgroup>
     );
@@ -1568,16 +1512,16 @@ export const HtmlOptionMd = createMetadata({
 export const htmlOptionTagRenderer = createComponentRenderer(
   "option",
   HtmlOptionMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { disabled, selected } = p.asOptionalBoolean("disabled", "selected");
+    const props = p.asRest();
     return (
       <option
         style={layoutCss}
-        disabled={extractValue.asOptionalBoolean(node.props.disabled, false)}
-        label={extractValue(node.props.label)}
-        selected={extractValue.asOptionalBoolean(node.props.selected, false)}
-        value={extractValue(node.props.value)}
-        {...renderedProps}
+        disabled={disabled ?? false}
+        selected={selected ?? false}
+        {...props}
       >
         {renderChild(node.children)}
       </option>
@@ -1599,16 +1543,11 @@ export const HtmlOutputMd = createMetadata({
 export const htmlOutputTagRenderer = createComponentRenderer(
   "output",
   HtmlOutputMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <output
-        style={layoutCss}
-        form={extractValue(node.props.form)}
-        htmlFor={extractValue(node.props.htmlFor)}
-        name={extractValue(node.props.name)}
-        {...renderedProps}
-      >
+      <output style={layoutCss} {...props}>
         {renderChild(node.children)}
       </output>
     );
@@ -1624,10 +1563,11 @@ export const HtmlPMd = createMetadata({
 export const htmlPTagRenderer = createComponentRenderer(
   "p",
   HtmlPMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="paragraph">
+      <Text style={layoutCss} {...props} variant="paragraph">
         {renderChild(node.children)}
       </Text>
     );
@@ -1647,15 +1587,11 @@ export const HtmlParamMd = createMetadata({
 export const htmlParamTagRenderer = createComponentRenderer(
   "param",
   HtmlParamMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <param
-        style={layoutCss}
-        name={extractValue(node.props.name)}
-        value={extractValue(node.props.value)}
-        {...renderedProps}
-      >
+      <param style={layoutCss} {...props}>
         {renderChild(node.children)}
       </param>
     );
@@ -1671,10 +1607,11 @@ export const HtmlPictureMd = createMetadata({
 export const htmlPictureTagRenderer = createComponentRenderer(
   "picture",
   HtmlPictureMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <picture style={layoutCss} {...renderedProps}>
+      <picture style={layoutCss} {...props}>
         {renderChild(node.children)}
       </picture>
     );
@@ -1690,10 +1627,11 @@ export const HtmlPreMd = createMetadata({
 export const htmlPreTagRenderer = createComponentRenderer(
   "pre",
   HtmlPreMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="codefence">
+      <Text style={layoutCss} {...props} variant="codefence">
         {renderChild(node.children)}
       </Text>
     );
@@ -1713,15 +1651,12 @@ export const HtmlProgressMd = createMetadata({
 export const htmlProgressTagRenderer = createComponentRenderer(
   "progress",
   HtmlProgressMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const numberProps = p.asOptionalNumber("max", "value");
+    const props = p.asRest();
     return (
-      <progress
-        style={layoutCss}
-        max={extractValue.asOptionalNumber(node.props.max)}
-        value={extractValue.asOptionalNumber(node.props.value)}
-        {...renderedProps}
-      >
+      <progress style={layoutCss} {...numberProps} {...props}>
         {renderChild(node.children)}
       </progress>
     );
@@ -1740,10 +1675,11 @@ export const HtmlQMd = createMetadata({
 export const htmlQTagRenderer = createComponentRenderer(
   "q",
   HtmlQMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <q style={layoutCss} cite={extractValue(node.props.cite)} {...renderedProps}>
+      <q style={layoutCss} {...props}>
         {renderChild(node.children)}
       </q>
     );
@@ -1759,10 +1695,11 @@ export const HtmlRpMd = createMetadata({
 export const htmlRpTagRenderer = createComponentRenderer(
   "rp",
   HtmlRpMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <rp style={layoutCss} {...renderedProps}>
+      <rp style={layoutCss} {...props}>
         {renderChild(node.children)}
       </rp>
     );
@@ -1778,10 +1715,11 @@ export const HtmlRtMd = createMetadata({
 export const htmlRtTagRenderer = createComponentRenderer(
   "rt",
   HtmlRtMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <rt style={layoutCss} {...renderedProps}>
+      <rt style={layoutCss} {...props}>
         {renderChild(node.children)}
       </rt>
     );
@@ -1797,10 +1735,11 @@ export const HtmlRubyMd = createMetadata({
 export const htmlRubyTagRenderer = createComponentRenderer(
   "ruby",
   HtmlRubyMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <ruby style={layoutCss} {...renderedProps}>
+      <ruby style={layoutCss} {...props}>
         {renderChild(node.children)}
       </ruby>
     );
@@ -1816,10 +1755,11 @@ export const HtmlSMd = createMetadata({
 export const htmlSTagRenderer = createComponentRenderer(
   "s",
   HtmlSMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <s style={layoutCss} {...renderedProps}>
+      <s style={layoutCss} {...props}>
         {renderChild(node.children)}
       </s>
     );
@@ -1835,10 +1775,11 @@ export const HtmlSampMd = createMetadata({
 export const htmlSampTagRenderer = createComponentRenderer(
   "samp",
   HtmlSampMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="sample">
+      <Text style={layoutCss} {...props} variant="sample">
         {renderChild(node.children)}
       </Text>
     );
@@ -1854,10 +1795,11 @@ export const HtmlSectionMd = createMetadata({
 export const htmlSectionTagRenderer = createComponentRenderer(
   "section",
   HtmlSectionMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <section style={layoutCss} {...renderedProps}>
+      <section style={layoutCss} {...props}>
         {renderChild(node.children)}
       </section>
     );
@@ -1882,19 +1824,25 @@ export const HtmlSelectMd = createMetadata({
 export const htmlSelectTagRenderer = createComponentRenderer(
   "select",
   HtmlSelectMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { autoFocus, disabled, multiple, required } = p.asOptionalBoolean(
+      "autoFocus",
+      "disabled",
+      "multiple",
+      "required",
+    );
+    const { size } = p.asOptionalNumber("size");
+    const props = p.asRest();
     return (
       <select
         style={layoutCss}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, false)}
-        disabled={extractValue.asOptionalBoolean(node.props.disabled, false)}
-        form={extractValue(node.props.form)}
-        multiple={extractValue.asOptionalBoolean(node.props.multiple, false)}
-        name={extractValue(node.props.name)}
-        required={extractValue.asOptionalBoolean(node.props.required, false)}
-        size={extractValue.asOptionalNumber(node.props.size)}
-        {...renderedProps}
+        autoFocus={autoFocus ?? false}
+        disabled={disabled ?? false}
+        multiple={multiple ?? false}
+        required={required ?? false}
+        size={size}
+        {...props}
       >
         {renderChild(node.children)}
       </select>
@@ -1911,10 +1859,11 @@ export const HtmlSmallMd = createMetadata({
 export const htmlSmallTagRenderer = createComponentRenderer(
   "small",
   HtmlSmallMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="small">
+      <Text style={layoutCss} {...props} variant="small">
         {renderChild(node.children)}
       </Text>
     );
@@ -1938,17 +1887,11 @@ export const htmlSourceTagRenderer = createComponentRenderer(
   "source",
   HtmlSourceMd,
   ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { src } = p.asUrlResource("src");
+    const props = p.asRest();
     return (
-      <source
-        style={layoutCss}
-        src={extractResourceUrl(node.props.src)}
-        type={extractValue(node.props.type)}
-        media={extractValue(node.props.media)}
-        srcSet={extractValue(node.props.srcSet)}
-        sizes={extractValue(node.props.sizes)}
-        {...renderedProps}
-      >
+      <source style={layoutCss} src={src} {...props}>
         {renderChild(node.children)}
       </source>
     );
@@ -1964,10 +1907,11 @@ export const HtmlSpanMd = createMetadata({
 export const htmlSpanTagRenderer = createComponentRenderer(
   "span",
   HtmlSpanMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <span style={layoutCss} {...renderedProps}>
+      <span style={layoutCss} {...props}>
         {renderChild(node.children)}
       </span>
     );
@@ -1983,10 +1927,11 @@ export const HtmlStrongMd = createMetadata({
 export const htmlStrongTagRenderer = createComponentRenderer(
   "strong",
   HtmlStrongMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="strong">
+      <Text style={layoutCss} {...props} variant="strong">
         {renderChild(node.children)}
       </Text>
     );
@@ -2002,10 +1947,11 @@ export const HtmlSubMd = createMetadata({
 export const htmlSubTagRenderer = createComponentRenderer(
   "sub",
   HtmlSubMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="sub">
+      <Text style={layoutCss} {...props} variant="sub">
         {renderChild(node.children)}
       </Text>
     );
@@ -2021,10 +1967,11 @@ export const HtmlSummaryMd = createMetadata({
 export const htmlSummaryTagRenderer = createComponentRenderer(
   "summary",
   HtmlSummaryMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <summary style={layoutCss} {...renderedProps}>
+      <summary style={layoutCss} {...props}>
         {renderChild(node.children)}
       </summary>
     );
@@ -2040,10 +1987,11 @@ export const HtmlSupMd = createMetadata({
 export const htmlSupTagRenderer = createComponentRenderer(
   "sup",
   HtmlSupMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="sup">
+      <Text style={layoutCss} {...props} variant="sup">
         {renderChild(node.children)}
       </Text>
     );
@@ -2068,28 +2016,17 @@ export const HtmlTableMd = createMetadata({
   defaultThemeVars: {
     "color-bg-HtmlTable": "$color-bg",
     "border-HtmlTable": "1px solid $color-border",
-  }
+  },
 });
 
 export const htmlTableTagRenderer = createComponentRenderer(
   "table",
   HtmlTableMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <table
-        style={layoutCss}
-        className={styles.htmlTable}
-        border={extractValue(node.props.border)}
-        cellPadding={extractValue(node.props.cellPadding)}
-        cellSpacing={extractValue(node.props.cellSpacing)}
-        summary={extractValue(node.props.summary)}
-        width={extractValue(node.props.width)}
-        align={extractValue(node.props.align)}
-        /* frame={extractValue(node.props.frame)} // this is deprecated */
-        /* rules={extractValue(node.props.rules)} // this is deprecated */
-        {...renderedProps}
-      >
+      <table style={layoutCss} className={styles.htmlTable} {...props}>
         {renderChild(node.children)}
       </table>
     );
@@ -2106,10 +2043,11 @@ export const HtmlTbodyMd = createMetadata({
 export const htmlTbodyTagRenderer = createComponentRenderer(
   "tbody",
   HtmlTbodyMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <tbody style={layoutCss} className={styles.htmlTbody} {...renderedProps}>
+      <tbody style={layoutCss} className={styles.htmlTbody} {...props}>
         {renderChild(node.children)}
       </tbody>
     );
@@ -2135,29 +2073,17 @@ export const HtmlTdMd = createMetadata({
   defaultThemeVars: {
     "padding-HtmlTd": "$space-2",
     "border-bottom-HtmlTd": "1px solid $color-border",
-  }
+  },
 });
 
 export const htmlTdTagRenderer = createComponentRenderer(
   "td",
   HtmlTdMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <td
-        style={layoutCss}
-        className={styles.htmlTd}
-        align={extractValue(node.props.align)}
-        colSpan={extractValue(node.props.colSpan)}
-        headers={extractValue(node.props.headers)}
-        rowSpan={extractValue(node.props.rowSpan)}
-        valign={extractValue(node.props.valign)}
-        scope={extractValue(node.props.scope)}
-        abbr={extractValue(node.props.abbr)}
-        height={extractValue(node.props.height)}
-        width={extractValue(node.props.width)}
-        {...renderedProps}
-      >
+      <td style={layoutCss} className={styles.htmlTd} {...props}>
         {renderChild(node.children)}
       </td>
     );
@@ -2173,10 +2099,11 @@ export const HtmlTemplateMd = createMetadata({
 export const htmlTemplateTagRenderer = createComponentRenderer(
   "template",
   HtmlTemplateMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <template style={layoutCss} {...renderedProps}>
+      <template style={layoutCss} {...props}>
         {renderChild(node.children)}
       </template>
     );
@@ -2208,26 +2135,25 @@ export const HtmlTextareaMd = createMetadata({
 export const htmlTextareaTagRenderer = createComponentRenderer(
   "textarea",
   HtmlTextareaMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { autoFocus, disabled, readOnly, required } = p.asOptionalBoolean(
+      "autoFocus",
+      "disabled",
+      "readOnly",
+      "required",
+    );
+    const numberProps = p.asOptionalNumber("cols", "rows", "maxLength", "minLength");
+    const props = p.asRest();
     return (
       <textarea
         style={layoutCss}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, false)}
-        cols={extractValue.asOptionalNumber(node.props.cols)}
-        /* dirName={extractValue(node.props.dirName)} // this will take effect when we handle i18n */
-        disabled={extractValue.asOptionalBoolean(node.props.disabled, false)}
-        form={extractValue(node.props.form)}
-        maxLength={extractValue.asOptionalNumber(node.props.maxLength)}
-        minLength={extractValue.asOptionalNumber(node.props.minLength)}
-        name={extractValue(node.props.name)}
-        placeholder={extractValue(node.props.placeholder)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly, false)}
-        required={extractValue.asOptionalBoolean(node.props.required, false)}
-        rows={extractValue.asOptionalNumber(node.props.rows)}
-        value={extractValue(node.props.value)}
-        wrap={extractValue(node.props.wrap)}
-        {...renderedProps}
+        autoFocus={autoFocus ?? false}
+        disabled={disabled ?? false}
+        readOnly={readOnly ?? false}
+        required={required ?? false}
+        {...numberProps}
+        {...props}
       >
         {renderChild(node.children)}
       </textarea>
@@ -2245,10 +2171,11 @@ export const HtmlTfootMd = createMetadata({
 export const htmlTfootTagRenderer = createComponentRenderer(
   "tfoot",
   HtmlTfootMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <tfoot style={layoutCss} className={styles.htmlTfoot} {...renderedProps}>
+      <tfoot style={layoutCss} className={styles.htmlTfoot} {...props}>
         {renderChild(node.children)}
       </tfoot>
     );
@@ -2280,26 +2207,17 @@ export const HtmlThMd = createMetadata({
     dark: {
       "color-bg-HtmlTh--hover": "$color-surface-800",
     },
-  }
+  },
 });
 
 export const htmlThTagRenderer = createComponentRenderer(
   "th",
   HtmlThMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <th
-        style={layoutCss}
-        className={styles.htmlTh}
-        abbr={extractValue(node.props.abbr)}
-        align={extractValue(node.props.align)}
-        colSpan={extractValue(node.props.colSpan)}
-        headers={extractValue(node.props.headers)}
-        rowSpan={extractValue(node.props.rowSpan)}
-        scope={extractValue(node.props.scope)}
-        {...renderedProps}
-      >
+      <th style={layoutCss} className={styles.htmlTh} {...props}>
         {renderChild(node.children)}
       </th>
     );
@@ -2319,17 +2237,18 @@ export const HtmlTheadMd = createMetadata({
     },
     dark: {
       "color-bg-HtmlThead": "$color-surface-950",
-    }
-  }
+    },
+  },
 });
 
 export const htmlTheadTagRenderer = createComponentRenderer(
   "thead",
   HtmlTheadMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <thead style={layoutCss} className={styles.htmlThead} {...renderedProps}>
+      <thead style={layoutCss} className={styles.htmlThead} {...props}>
         {renderChild(node.children)}
       </thead>
     );
@@ -2348,10 +2267,11 @@ export const HtmlTimeMd = createMetadata({
 export const htmlTimeTagRenderer = createComponentRenderer(
   "time",
   HtmlTimeMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <time style={layoutCss} {...renderedProps}>
+      <time style={layoutCss} {...props}>
         {renderChild(node.children)}
       </time>
     );
@@ -2371,17 +2291,18 @@ export const HtmlTrMd = createMetadata({
     },
     dark: {
       "color-bg-HtmlTr--hover": "$color-primary-900",
-    }
-  }
+    },
+  },
 });
 
 export const htmlTrTagRenderer = createComponentRenderer(
   "tr",
   HtmlTrMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <tr style={layoutCss} className={styles.htmlTr} {...renderedProps}>
+      <tr style={layoutCss} className={styles.htmlTr} {...props}>
         {renderChild(node.children)}
       </tr>
     );
@@ -2405,17 +2326,12 @@ export const htmlTrackTagRenderer = createComponentRenderer(
   "track",
   HtmlTrackMd,
   ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { src } = p.asUrlResource("src");
+    const { default: defaultProp } = p.asOptionalBoolean("default");
+    const props = p.asRest();
     return (
-      <track
-        style={layoutCss}
-        default={extractValue.asOptionalBoolean(node.props.default, false)}
-        kind={extractValue(node.props.kind)}
-        label={extractValue(node.props.label)}
-        src={extractResourceUrl(node.props.src)}
-        srcLang={extractValue(node.props.srcLang)}
-        {...renderedProps}
-      >
+      <track style={layoutCss} default={defaultProp ?? false} src={src} {...props}>
         {renderChild(node.children)}
       </track>
     );
@@ -2431,10 +2347,11 @@ export const HtmlUMd = createMetadata({
 export const htmlUTagRenderer = createComponentRenderer(
   "u",
   HtmlUMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <u style={layoutCss} {...renderedProps}>
+      <u style={layoutCss} {...props}>
         {renderChild(node.children)}
       </u>
     );
@@ -2450,10 +2367,11 @@ export const HtmlUlMd = createMetadata({
 export const htmlUlTagRenderer = createComponentRenderer(
   "ul",
   HtmlUlMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <ul style={layoutCss} {...renderedProps}>
+      <ul style={layoutCss} {...props}>
         {renderChild(node.children)}
       </ul>
     );
@@ -2469,10 +2387,11 @@ export const HtmlVarMd = createMetadata({
 export const htmlVarTagRenderer = createComponentRenderer(
   "var",
   HtmlCodeMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveAndCleanProps(node.props, extractValue, layoutCss);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <Text style={layoutCss} {...renderedProps} variant="var">
+      <Text style={layoutCss} {...props} variant="var">
         {renderChild(node.children)}
       </Text>
     );
@@ -2502,20 +2421,24 @@ export const htmlVideoTagRenderer = createComponentRenderer(
   "video",
   HtmlVideoMd,
   ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const { src } = p.asUrlResource("src");
+    const { autoPlay, controls, loop, muted } = p.asOptionalBoolean(
+      "autoPlay",
+      "controls",
+      "loop",
+      "muted",
+    );
+    const props = p.asRest();
     return (
       <video
         style={layoutCss}
-        autoPlay={extractValue.asOptionalBoolean(node.props.autoPlay, false)}
-        controls={extractValue.asOptionalBoolean(node.props.controls, false)}
-        height={extractValue(node.props.height)}
-        loop={extractValue.asOptionalBoolean(node.props.loop, false)}
-        muted={extractValue.asOptionalBoolean(node.props.muted, false)}
-        poster={extractValue(node.props.poster)}
-        preload={extractValue(node.props.preload)}
-        src={extractResourceUrl(node.props.src)}
-        width={extractValue(node.props.width)}
-        {...renderedProps}
+        src={src}
+        autoPlay={autoPlay ?? false}
+        controls={controls ?? false}
+        loop={loop ?? false}
+        muted={muted ?? false}
+        {...props}
       >
         {renderChild(node.children)}
       </video>
@@ -2532,30 +2455,13 @@ export const HtmlWbrMd = createMetadata({
 export const htmlWbrTagRenderer = createComponentRenderer(
   "wbr",
   HtmlWbrMd,
-  ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <wbr style={layoutCss} {...renderedProps}>
+      <wbr style={layoutCss} {...props}>
         {renderChild(node.children)}
       </wbr>
     );
   },
 );
-
-// --- Utils
-
-function resolveProps(
-  node: ComponentDef,
-  extractValue: ValueExtractor,
-  extractResourceUrl?: (url?: string) => string | undefined,
-  resourceProps?: string[],
-) {
-  return Object.keys(node.props).reduce((acc, propName) => {
-    if (resourceProps && resourceProps.includes(propName) && extractResourceUrl) {
-      acc[propName] = extractResourceUrl(node.props[propName]);
-    } else {
-      acc[propName] = extractValue(node.props[propName]);
-    }
-    return acc;
-  }, {});
-}
