@@ -9,6 +9,7 @@
     "preview": "xmlui preview",
     "build": "xmlui build-lib",
     "build-watch": "xmlui build-lib --watch",
+    "build:meta": "xmlui build-lib --mode=metadata",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {

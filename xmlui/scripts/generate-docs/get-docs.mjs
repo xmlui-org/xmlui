@@ -184,7 +184,10 @@ async function loadConfig(configPath) {
  * Dynamically loads extension package metadata from the `packages` folder.
  * Loading of metadata is only possible if the package has a `dist` folder
  * and is built using the `build:meta` script which produces a {file-name}-metadata.js file.
- * @returns {Promise<Record<string, { sourceFolder: string, description: string, metadata: Record<string, any> }>>} imported metadata
+ * @returns {Promise<Record<
+ *  string,
+ *  { sourceFolder: string, description: string, metadata: Record<string, any> }
+ * >>} imported metadata
  */
 async function dynamicallyLoadExtensionPackages() {
   const extendedPackagesFolder = join(FOLDERS.projectRoot, "packages");
