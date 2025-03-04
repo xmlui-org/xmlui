@@ -1,16 +1,16 @@
 import {
-  CartesianGrid,
   Line,
   LineChart as RLineChart,
   XAxis,
   ResponsiveContainer,
   Tooltip,
+  Legend as RLegend,
 } from "recharts";
 import { useColors } from "xmlui";
 import type { ReactNode } from "react";
+import type React from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
-import { Legend } from "../Legend/LegendNative";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 
 export type LineChartProps = {
@@ -95,7 +95,7 @@ export function LineChart({
               dot={false}
             />
           ))}
-          {chartContextValue.legend ? chartContextValue.legend : showLegend && <Legend />}
+          {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
         </RLineChart>
       </ResponsiveContainer>
     </ChartProvider>

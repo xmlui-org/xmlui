@@ -5,7 +5,8 @@ import {
   XAxis,
   YAxis,
   ResponsiveContainer,
-  Tooltip
+  Tooltip,
+  Legend as RLegend,
 } from "recharts";
 
 import type { CSSProperties, ReactNode } from "react";
@@ -13,7 +14,6 @@ import React from "react";
 import { useMemo } from "react";
 import { useColors } from "xmlui";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
-import { Legend } from "../Legend/LegendNative";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 
 export type BarChartProps = {
@@ -127,7 +127,7 @@ export function BarChart({
               />
             </>
           )}
-          <Tooltip content={<TooltipContent />}/>
+          <Tooltip content={<TooltipContent />} />
           {Object.keys(config).map((key, index) => (
             <Bar
               key={index}
@@ -137,7 +137,7 @@ export function BarChart({
               stackId={stacked ? "stacked" : undefined}
             />
           ))}
-          {chartContextValue.legend ? chartContextValue.legend : showLegend && <Legend />}
+          {chartContextValue.legend ? chartContextValue.legend : showLegend && <RLegend />}
         </RBarChart>
       </ResponsiveContainer>
     </ChartProvider>
