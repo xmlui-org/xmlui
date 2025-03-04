@@ -66,5 +66,16 @@ export const layoutOptionKeys = [
   "bottom",
   "left",
   "zoom",
-  "whiteSpace"
+  "whiteSpace",
+  "textDecoration",
+  "textDecorationLine",
+  "textDecorationColor",
+  "textDecorationStyle",
+  "textDecorationThickness",
+  "textUnderlineOffset",
+  "outline",
+  "outlineWidth",
+  "outlineColor",
+  "outlineStyle",
+  "outlineOffset",
 ];

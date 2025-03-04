@@ -121,6 +121,11 @@ export function resolveLayoutProps(
   collectCss("fontWeight");
   collectCss("italic");
   collectCss("textDecoration");
+  collectCss("textDecorationLine");
+  collectCss("textDecorationColor");
+  collectCss("textDecorationStyle");
+  collectCss("textDecorationThickness");
+  collectCss("textUnderlineOffset");
   collectCss("userSelect");
   collectCss("letterSpacing");
   collectCss("textTransform");
@@ -132,7 +137,7 @@ export function resolveLayoutProps(
   // --- Other
   collectCss("backgroundColor");
   collectCss("background");
-  collectCss("shadow", "boxShadow");  
+  collectCss("shadow", "boxShadow");
   collectCss("direction");
   collectCss("horizontalOverflow", "overflowX");
   collectCss("verticalOverflow", "overflowY");
@@ -141,6 +146,13 @@ export function resolveLayoutProps(
   collectCss("zoom");
   collectCss("cursor");
   collectCss("whiteSpace");
+
+  // --- Outline
+  collectCss("outline");
+  collectCss("outlineWidth");
+  collectCss("outlineColor");
+  collectCss("outlineStyle");
+  collectCss("outlineOffset");
 
   // --- Content rendering
   const wrapContent = transformLayoutValue("wrapContent");
@@ -367,6 +379,11 @@ export type LayoutProps = {
   fontWeight?: number | string;
   italic?: boolean | string;
   textDecoration?: string;
+  textDecorationLine?: string;
+  textDecorationColor?: string;
+  textDecorationStyle?: string;
+  textDecorationThickness?: string;
+  textUnderlineOffset?: string;
   userSelect?: string;
   letterSpacing?: string;
   textTransform?: string;
@@ -374,6 +391,13 @@ export type LayoutProps = {
   textAlign?: string;
   textWrap?: string;
   textAlignLast?: string;
+
+  // --- Outline
+  outline?: string;
+  outlineWidth?: string;
+  outlineColor?: string;
+  outlineStyle?: string;
+  outlineOffset?: string;
 
   // --- Content rendering
   wrapContent?: boolean | string;
@@ -470,4 +494,16 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   cursor: [],
   zoom: [],
   whiteSpace: [],
+  textDecorationLine: [],
+  textDecorationColor: [],
+  textDecorationStyle: [],
+  textDecorationThickness: [],
+  textUnderlineOffset: [],
+
+  // --- Outline
+  outline: [],
+  outlineWidth: [],
+  outlineColor: [],
+  outlineStyle: [],
+  outlineOffset: [],
 };
