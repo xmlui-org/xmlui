@@ -667,7 +667,77 @@ This component does not have any events.
 
 ## Exposed Methods
 
-This component does not expose any methods.
+### `scrollToBottom`
+
+This method scrolls the list to the bottom.
+
+The following example demonstrates `scrollToBottom` and all the other scroll methods:
+
+```ueml copy /scrollToBottom/ /scrollToTop/ /scrollToIndex/ /scrollToId/
+<App layout="condensed-sticky">
+  <AppHeader>
+    <HStack>
+      <Button onClick="myList.scrollToBottom()">Scroll to Bottom</Button>
+      <Button onClick="myList.scrollToTop()">Scroll to Top</Button>
+      <Button onClick="myList.scrollToIndex(25)">Scroll to #25</Button>
+      <Button onClick="myList.scrollToId('item-40')">Scroll to ID 'item-40'</Button>
+    </HStack>
+  </AppHeader>
+  <List 
+    id="myList" 
+    data="{Array.from({ length: 100 }).map((_, i) => ({id: 'item-' + i, value: 'Item #' + i}))}">
+    <property name="itemTemplate">
+      <Card>
+        <Text value="{$item.value}" />
+      </Card>
+    </property>
+  </List>
+</App>
+```
+
+<Playground
+  name="Example: data API Call"
+  height={400}
+  app={`
+  <App layout="condensed-sticky">
+    <AppHeader>
+      <HStack>
+        <Button onClick="myList.scrollToBottom()">Scroll to Bottom</Button>
+        <Button onClick="myList.scrollToTop()">Scroll to Top</Button>
+        <Button onClick="myList.scrollToIndex(25)">Scroll to #25</Button>
+        <Button onClick="myList.scrollToId('item-40')">Scroll to ID 'item-40'</Button>
+      </HStack>
+    </AppHeader>
+    <List 
+      id="myList" 
+      data="{Array.from({ length: 100 }).map((_, i) => ({id: 'item-' + i, value: 'Item #' + i}))}">
+      <property name="itemTemplate">
+        <Card>
+          <Text value="{$item.value}" />
+        </Card>
+      </property>
+    </List>
+  </App>
+  `}
+/>
+
+### `scrollToId`
+
+This method scrolls the list to a specific item. The method accepts an item ID as a parameter.
+
+See the [`scrollToBottom`](#scrolltobottom) example.
+
+### `scrollToIndex`
+
+This method scrolls the list to a specific index. The method accepts an index as a parameter.
+
+See the [`scrollToBottom`](#scrolltobottom) example.
+
+### `scrollToTop`
+
+This method scrolls the list to the top.
+
+See the [`scrollToBottom`](#scrolltobottom) example.
 
 ## Styling
 
