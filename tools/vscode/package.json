@@ -17,7 +17,7 @@
   "activationEvents": [
     "onLanguage:xmlui"
   ],
-  "main": "./client/out/extension",
+  "main": "./out/extension",
   "contributes": {
     "configuration": {
       "type": "object",
