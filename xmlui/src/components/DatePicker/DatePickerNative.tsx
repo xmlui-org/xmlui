@@ -17,7 +17,7 @@ import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 
 export const DatePickerModeValues = ["single", "range"] as const;
-type DatePickerMode = typeof DatePickerModeValues[number];
+type DatePickerMode = (typeof DatePickerModeValues)[number];
 
 type Props = {
   id?: string;
@@ -46,7 +46,7 @@ type Props = {
   endIcon?: string;
 };
 
-const enum WeekDays {
+export const enum WeekDays {
   Sunday = 0,
   Monday = 1,
   Tuesday = 2,
@@ -54,37 +54,7 @@ const enum WeekDays {
   Thursday = 4,
   Friday = 5,
   Saturday = 6,
-};
-export const weekDaysMd = [
-  {
-    value: WeekDays.Sunday,
-    description: "Sunday",
-  },
-  {
-    value: WeekDays.Monday,
-    description: "Monday",
-  },
-  {
-    value: WeekDays.Tuesday,
-    description: "Tuesday",
-  },
-  {
-    value: WeekDays.Wednesday,
-    description: "Wednesday",
-  },
-  {
-    value: WeekDays.Thursday,
-    description: "Thursday",
-  },
-  {
-    value: WeekDays.Friday,
-    description: "Friday",
-  },
-  {
-    value: WeekDays.Saturday,
-    description: "Saturday",
-  },
-];
+}
 
 export const dateFormats = [
   "MM/dd/yyyy",
@@ -96,7 +66,7 @@ export const dateFormats = [
   "yyyyMMdd",
   "MMddyyyy",
 ] as const;
-type DateFormat = typeof dateFormats[number];
+type DateFormat = (typeof dateFormats)[number];
 
 export const defaultProps: Pick<
   Props,
