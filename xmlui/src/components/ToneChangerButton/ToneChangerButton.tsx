@@ -7,7 +7,6 @@ import { Icon } from "../Icon/IconNative";
 const COMP = "ToneChangerButton";
 export const ToneChangerButtonMd = createMetadata({
   status: "experimental",
-  docFolder: "ThemeChanger",
   description: `The \`${COMP}\` component is a component that allows the user to change the tone of the app.`,
   props: {},
 });

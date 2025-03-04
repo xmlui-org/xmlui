@@ -92,7 +92,6 @@ export const COMPONENT_TEXT = "/components/Text";
 export const COMPONENT_TEXTAREA = "/components/TextArea";
 export const COMPONENT_TEXTBOX = "/components/TextBox";
 export const COMPONENT_THEME = "/components/Theme";
-export const COMPONENT_THEMECHANGERBUTTON = "/components/ThemeChangerButton";
 export const COMPONENT_TONECHANGERBUTTON = "/components/ToneChangerButton";
 export const COMPONENT_TOOLBAR = "/components/Toolbar";
 export const COMPONENT_TOOLBARBUTTON = "/components/ToolbarButton";
