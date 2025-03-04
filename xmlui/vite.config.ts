@@ -51,9 +51,10 @@ export default ({ mode }) => {
     }
     default: {
       lib = {
-        entry: [path.resolve("src", "index.ts")],
-        name: "xmlui",
-        fileName: "xmlui",
+        entry: {
+          xmlui: path.resolve("src", "index.ts"),
+          "xmlui-parser": path.resolve("src", "parsers", "xmlui-parser", "index.ts"),
+        },
         formats: ["es"],
       };
     }

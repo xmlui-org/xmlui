@@ -6,10 +6,8 @@ import type {
   XmlUiFragment,
   XmlUiNode,
 } from "./xmlui-tree";
+import { COMPOUND_COMP_ID } from "./transform";
 
-export const COMPOUND_COMP_ID = "Component";
-export const UCRegex = /^[A-Z]/;
-export const onPrefixRegex = /^on[A-Z]/;
 const attrBreakRegex = /[\r\n<>'"&]/;
 
 /**

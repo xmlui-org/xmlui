@@ -15,8 +15,8 @@ import {
   dReadonly,
   dSetValueApi, dStartIcon, dStartText,
   dValidationStatus,
-} from "../../components/metadata-helpers";
-import { dateFormats, DatePicker, DatePickerModeValues, defaultProps, weekDaysMd } from "./DatePickerNative";
+} from "../metadata-helpers";
+import { dateFormats, DatePicker, DatePickerModeValues, defaultProps, WeekDays } from "./DatePickerNative";
 
 const COMP = "DatePicker";
 
@@ -51,7 +51,36 @@ export const DatePickerMd = createMetadata({
       description: "The first day of the week. 0 is Sunday, 1 is Monday, etc.",
       valueType: "number",
       defaultValue: defaultProps.weekStartsOn,
-      availableValues: weekDaysMd,
+      availableValues: [
+        {
+          value: WeekDays.Sunday,
+          description: "Sunday",
+        },
+        {
+          value: WeekDays.Monday,
+          description: "Monday",
+        },
+        {
+          value: WeekDays.Tuesday,
+          description: "Tuesday",
+        },
+        {
+          value: WeekDays.Wednesday,
+          description: "Wednesday",
+        },
+        {
+          value: WeekDays.Thursday,
+          description: "Thursday",
+        },
+        {
+          value: WeekDays.Friday,
+          description: "Friday",
+        },
+        {
+          value: WeekDays.Saturday,
+          description: "Saturday",
+        },
+      ],
     },
     fromDate: {
       description: "The start date of the range of selectable dates",
