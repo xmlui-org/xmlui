@@ -1,27 +1,27 @@
 <App>
   <HStack padding="1.5rem" gap="1.5rem">
-      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow" >
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$shadow" >
         shadow
       </Stack>
 
-      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow-md">
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$shadow-md">
         shadow-md
       </Stack>
 
-      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow-xxl">
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$shadow-xxl">
         shadow-xxl
       </Stack>
   </HStack>
   <HStack padding="1.5rem" gap="1.5rem">
-      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow-spread">
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$shadow-spread">
         shadow-spread
       </Stack>
 
-      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow-spread-2">
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$shadow-spread-2">
         shadow-spread-2
       </Stack>
 
-      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow-spread-2-xl">
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$shadow-spread-2-xl">
         shadow-spread-2-xl
       </Stack>
   </HStack>

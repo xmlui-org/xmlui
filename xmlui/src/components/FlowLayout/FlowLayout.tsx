@@ -34,7 +34,6 @@ export const FlowLayoutMd = createMetadata({
         `the \`gap\` value.`,
       defaultValue: defaultProps.rowGap,
     },
-    shadow: d(`${COMP} does not support shadow, we're waiting for a decent solution.`),
   },
   themeVars: parseScssVar(styles.themeVars),
 });

@@ -34,7 +34,7 @@ export const layoutOptionKeys = [
   "paddingLeft",
   "backgroundColor",
   "background",
-  "shadow",
+  "boxShadow",
   "direction",
   "horizontalOverflow",
   "verticalOverflow",

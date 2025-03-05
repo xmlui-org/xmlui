@@ -72,9 +72,8 @@ const testDescriptors: TestDescriptor[] = [
     override2Value: "green",
   },
   {
-    category: "shadow",
-    props: ["shadow"],
-    cssProps: { shadow: "boxShadow" },
+    category: "boxShadow",
+    props: ["boxShadow"],
     baseValue: "1px 1px 1px 1px red",
     overrideValue: "2px 2px 2px 2px blue",
     override2Value: "3px 3px 3px 3px green",

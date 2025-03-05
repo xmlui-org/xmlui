@@ -148,7 +148,7 @@ export function resolveLayoutProps(
   // --- Other
   collectCss("backgroundColor");
   collectCss("background");
-  collectCss("shadow", "boxShadow");
+  collectCss("boxShadow");
   collectCss("direction");
   collectCss("horizontalOverflow", "overflowX");
   collectCss("verticalOverflow", "overflowY");
@@ -221,9 +221,6 @@ export function resolveLayoutProps(
     return defValue;
 
     function resolveSingleValue(sizeTag = ""): string {
-      if (prop === "shadow") {
-        let x = 1;
-      }
       const fullProp = sizeTag ? `${prop}-${sizeTag}` : prop;
       let singleInput = layoutProps[fullProp];
       if (singleInput == undefined) {
@@ -378,7 +375,7 @@ export type LayoutProps = {
   // --- Other
   backgroundColor?: string;
   background?: string;
-  shadow?: string;
+  boxShadow?: string;
   direction?: string;
   horizontalOverflow?: string;
   verticalOverflow?: string;
@@ -479,7 +476,7 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   // --- Other
   backgroundColor: [],
   background: [],
-  shadow: [],
+  boxShadow: [],
   direction: [],
   horizontalOverflow: [],
   verticalOverflow: [],
