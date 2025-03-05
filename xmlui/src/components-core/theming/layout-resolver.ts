@@ -99,10 +99,21 @@ export function resolveLayoutProps(
 
   // --- Borders
   collectCss("border");
-  collectCss("borderTop");
+  const horizontalBorder = transformLayoutValue("borderHorizontal");
+  if (horizontalBorder) {
+    result.cssProps.borderLeft = horizontalBorder;
+    result.cssProps.borderRight = horizontalBorder;
+  }
   collectCss("borderRight");
-  collectCss("borderBottom");
   collectCss("borderLeft");
+
+  const verticalBorder = transformLayoutValue("borderVertical");
+  if (verticalBorder) {
+    result.cssProps.borderTop = verticalBorder;
+    result.cssProps.borderBottom = verticalBorder;
+  }
+  collectCss("borderTop");
+  collectCss("borderBottom");
   collectCss("borderColor");
   collectCss("borderStyle");
   collectCss("borderThickness");
@@ -336,6 +347,8 @@ export type LayoutProps = {
   borderColor?: string;
   borderStyle?: string;
   borderThickness?: string;
+  borderHorizontal?: string;
+  borderVertical?: string;
 
   // --- Border radius
   radius?: number | string;
@@ -435,6 +448,8 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   borderColor: [],
   borderStyle: [],
   borderThickness: [],
+  borderHorizontal: [],
+  borderVertical: [],
 
   // --- Border radius
   radius: [],

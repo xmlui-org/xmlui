@@ -99,4 +99,112 @@ describe("Layout resolver 2", () => {
     expect(result.cssProps[PROP]).toBe(VALUE);
     expect(result.issues.has(PROP)).toBe(false);
   });
+
+  it("borderHorizontal: 1px solid red", () => {
+    const PROP = "borderHorizontal";
+    const VALUE = "1px solid red";
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps.borderLeft).toBe(VALUE);
+    expect(result.cssProps.borderRight).toBe(VALUE);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderLeft overwrites borderHorizontal", () => {
+    const PROP = "borderHorizontal";
+    const VALUE = "1px solid red";
+    const result = resolveLayoutProps({ [PROP]: VALUE, borderLeft: "2px solid blue" });
+    expect(result.cssProps.borderLeft).toBe("2px solid blue");
+    expect(result.cssProps.borderRight).toBe(VALUE);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderRight overwrites borderHorizontal", () => {
+    const PROP = "borderHorizontal";
+    const VALUE = "1px solid red";
+    const result = resolveLayoutProps({ [PROP]: VALUE, borderRight: "2px solid blue" });
+    expect(result.cssProps.borderLeft).toBe(VALUE);
+    expect(result.cssProps.borderRight).toBe("2px solid blue");
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderHorizontal (themeVar) 1", () => {
+    const PROP = "borderHorizontal";
+    const VALUE = THEME_ID;
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps.borderLeft).toBe(THEME_ID_VALUE);
+    expect(result.cssProps.borderRight).toBe(THEME_ID_VALUE);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderHorizontal (themeVar) 2", () => {
+    const PROP = "borderHorizontal";
+    const VALUE = `${THEME_ID} ${THEME_ID2}`;
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps.borderLeft).toBe(`${THEME_ID_VALUE} ${THEME_ID2_VALUE}`);
+    expect(result.cssProps.borderRight).toBe(`${THEME_ID_VALUE} ${THEME_ID2_VALUE}`);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderHorizontal (themeVar) 3", () => {
+    const PROP = "borderHorizontal";
+    const VALUE = `${THEME_ID} ${THEME_ID2} ${THEME_ID3}`;
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps.borderLeft).toBe(`${THEME_ID_VALUE} ${THEME_ID2_VALUE} ${THEME_ID3_VALUE}`);
+    expect(result.cssProps.borderRight).toBe(`${THEME_ID_VALUE} ${THEME_ID2_VALUE} ${THEME_ID3_VALUE}`);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderVertical: 1px solid red", () => {
+    const PROP = "borderVertical";
+    const VALUE = "1px solid red";
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps.borderTop).toBe(VALUE);
+    expect(result.cssProps.borderBottom).toBe(VALUE);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderVertical (themeVar) 1", () => {
+    const PROP = "borderVertical";
+    const VALUE = THEME_ID;
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps.borderTop).toBe(THEME_ID_VALUE);
+    expect(result.cssProps.borderBottom).toBe(THEME_ID_VALUE);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderVertical (themeVar) 2", () => {
+    const PROP = "borderVertical";
+    const VALUE = `${THEME_ID} ${THEME_ID2}`;
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps.borderTop).toBe(`${THEME_ID_VALUE} ${THEME_ID2_VALUE}`);
+    expect(result.cssProps.borderBottom).toBe(`${THEME_ID_VALUE} ${THEME_ID2_VALUE}`);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderVertical (themeVar) 3", () => {
+    const PROP = "borderVertical";
+    const VALUE = `${THEME_ID} ${THEME_ID2} ${THEME_ID3}`;
+    const result = resolveLayoutProps({ [PROP]: VALUE });
+    expect(result.cssProps.borderTop).toBe(`${THEME_ID_VALUE} ${THEME_ID2_VALUE} ${THEME_ID3_VALUE}`);
+    expect(result.cssProps.borderBottom).toBe(`${THEME_ID_VALUE} ${THEME_ID2_VALUE} ${THEME_ID3_VALUE}`);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderTop overwrites borderVertical", () => {
+    const PROP = "borderVertical";
+    const VALUE = "1px solid red";
+    const result = resolveLayoutProps({ [PROP]: VALUE, borderTop: "2px solid blue" });
+    expect(result.cssProps.borderTop).toBe("2px solid blue");
+    expect(result.cssProps.borderBottom).toBe(VALUE);
+    expect(result.issues.has(PROP)).toBe(false);
+  });
+
+  it("borderBottom overwrites borderVertical", () => {
+    const PROP = "borderVertical";
+    const VALUE = "1px solid red";
+    const result = resolveLayoutProps({ [PROP]: VALUE, borderBottom: "2px solid blue" });
+    expect(result.cssProps.borderTop).toBe(VALUE);
+    expect(result.cssProps.borderBottom).toBe("2px solid blue");
+    expect(result.issues.has(PROP)).toBe(false);
+  });
 });
