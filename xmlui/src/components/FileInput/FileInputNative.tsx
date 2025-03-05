@@ -3,6 +3,7 @@ import { type CSSProperties, useCallback, useEffect, useRef } from "react";
 import type { DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import classnames from "classnames";
 
 import styles from "./FileInput.module.scss";
 
@@ -10,12 +11,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
-import type {
-  ButtonThemeColor,
-  ButtonVariant,
-  ComponentSize,
-  IconPosition,
-} from "../abstractions";
+import type { ButtonThemeColor, ButtonVariant, ComponentSize, IconPosition } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { TextBox } from "../TextBox/TextBoxNative";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
@@ -57,13 +53,16 @@ type Props = {
   labelWidth?: string;
   labelBreak?: boolean;
   required?: boolean;
+  placeholder?: string;
+  buttonPosition?: "start" | "end";
 };
 
 export const FileInput = ({
   id,
   enabled = true,
   style,
-
+  placeholder,
+  buttonPosition = "end",
   buttonLabel = "Browse",
   buttonIcon,
   buttonIconPosition,
@@ -167,52 +166,58 @@ export const FileInput = ({
       onBlur={onBlur}
       style={style}
     >
-    <div className={styles.container}>
-      <button
-        {...getRootProps({
-          tabIndex: 0,
-          onFocus: handleOnFocus,
-          onBlur: handleOnBlur,
-          disabled: !enabled,
-          className: styles.textBoxWrapper,
-          onClick: open,
-          ref: buttonRef,
-          type: "button",
+      <div
+        className={classnames(styles.container, {
+          [styles.buttonStart]: buttonPosition === "start",
+          [styles.buttonEnd]: buttonPosition === "end",
         })}
       >
-        <VisuallyHidden.Root>
-          <input
-            {...getInputProps({
-              webkitdirectory: directory ? "true" : undefined,
-            } as DropzoneRootProps)}
-            accept={_acceptsFileType}
-          />
-        </VisuallyHidden.Root>
+        <button
+          {...getRootProps({
+            tabIndex: 0,
+            onFocus: handleOnFocus,
+            onBlur: handleOnBlur,
+            disabled: !enabled,
+            className: styles.textBoxWrapper,
+            onClick: open,
+            ref: buttonRef,
+            type: "button",
+          })}
+        >
+          <VisuallyHidden.Root>
+            <input
+              {...getInputProps({
+                webkitdirectory: directory ? "true" : undefined,
+              } as DropzoneRootProps)}
+              accept={_acceptsFileType}
+            />
+          </VisuallyHidden.Root>
 
-        <TextBox
-          enabled={enabled}
-          value={_value?.map((v) => v.name).join(", ") || ""}
-          validationStatus={validationStatus}
-          readOnly
-          tabIndex={-1}
-        />
-      </button>
-      <Button
-        id={id}
-        disabled={!enabled}
-        type="button"
-        onClick={open}
-        icon={buttonIcon}
-        iconPosition={buttonIconPosition}
-        variant={variant}
-        themeColor={buttonThemeColor}
-        size={buttonSize}
-        className={styles.button}
-        autoFocus={autoFocus}
-      >
-        {buttonLabel}
-      </Button>
-    </div>
+          <TextBox
+            placeholder={placeholder}
+            enabled={enabled}
+            value={_value?.map((v) => v.name).join(", ") || ""}
+            validationStatus={validationStatus}
+            readOnly
+            tabIndex={-1}
+          />
+        </button>
+        <Button
+          id={id}
+          disabled={!enabled}
+          type="button"
+          onClick={open}
+          icon={buttonIcon}
+          iconPosition={buttonIconPosition}
+          variant={variant}
+          themeColor={buttonThemeColor}
+          size={buttonSize}
+          className={styles.button}
+          autoFocus={autoFocus}
+        >
+          {buttonLabel}
+        </Button>
+      </div>
     </ItemWithLabel>
   );
 };

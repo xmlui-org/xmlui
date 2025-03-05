@@ -20,12 +20,7 @@ import {
   dRequired,
   dValidationStatus,
 } from "../../components/metadata-helpers";
-import {
-  buttonThemeNames,
-  buttonVariantNames,
-  iconPositionNames,
-  sizeMd,
-} from "../abstractions";
+import { buttonThemeNames, buttonVariantNames, iconPositionNames, sizeMd } from "../abstractions";
 import { Icon } from "../Icon/IconNative";
 import { FileInput, isFileArray } from "./FileInputNative";
 
@@ -72,6 +67,11 @@ export const FileInputMd = createMetadata({
       null,
       "boolean",
       false,
+    ),
+    buttonPosition: d(
+      `This property determines the position of the button relative to the input field. ` +
+        `The default is "end".`,
+      ["start", "end"],
     ),
     buttonSize: d("The size of the button (small, medium, large)", sizeMd),
     buttonThemeColor: d(
@@ -123,6 +123,8 @@ export const fileInputRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         multiple={extractValue.asOptionalBoolean(node.props.multiple)}
         directory={extractValue.asOptionalBoolean(node.props.directory)}
+        placeholder={extractValue.asOptionalString(node.props.placeholder)}
+        buttonPosition={extractValue.asOptionalString(node.props.buttonPosition)}
         initialValue={extractValue(node.props.initialValue)}
         acceptsFileType={extractValue(node.props.acceptsFileType)}
         label={extractValue.asOptionalString(node.props.label)}
