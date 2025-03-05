@@ -267,8 +267,6 @@ Weight values can be numbers between 1 and 1000. The hundreds (100, 200, 300, ..
 
 This property determines whether a font should be styled with a normal, italic, or oblique face from its font family.
 
-Weight values can be numbers between 1 and 1000. The hundreds (100, 200, 300, ..., 900) are conventionally used. You can use a few identifiers to specify the font weights:
-
 |Value|Description|
 |-|-|
 |`normal`| Selects a font that is classified as normal within a font-family. |
@@ -318,7 +316,7 @@ dashed 4px #f0cccc
 
 
 
-## Shadow Values [#shadow]
+## Shadow Values [#boxShadow]
 
 You can define shadow values with one or more shadow effects. If you use more than one effect, you must separate them with a comma. A shadow effect is composed of these parts:
 
@@ -343,38 +341,39 @@ When you prefix the shadow value with `inset`, it changes the shadow from an out
     name="Shadow Values"
     app={`
     <FlowLayout gap="24">
-      <Stack margin="16px" padding="16px" border="2px solid #202020"
-        shadow="12px 12px 5px orangered" >
+      <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+        boxShadow="12px 12px 5px orangered" >
         <Text>12px 12px 5px orangered</Text>
       </Stack>
-      <Stack margin="16px" padding="16px" border="2px solid #202020"
-        shadow="inset 12px 12px 5px #808080" >
+      <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+        boxShadow="inset 12px 12px 5px #808080" >
         <Text>inset 12px 12px 5px orangered</Text>
       </Stack>
-      <Stack margin="16px" padding="16px" border="2px solid #202020"
-        shadow="16px 8px green" >
+      <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+        boxShadow="16px 8px green" >
         <Text>16px 8px green</Text>
       </Stack>
-      <Stack margin="16px" padding="16px" border="2px solid #202020"
-        shadow="-8px -6px green" >
+      <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+        boxShadow="-8px -6px green" >
         <Text>"inset 12px 12px 5px orangered"</Text>
       </Stack>
-      <Stack margin="16px" padding="16px" border="2px solid #202020"
-        shadow="16px 8px 12px blue" >
+      <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+        boxShadow="16px 8px 12px blue" >
         <Text>16px 8px 12px blue</Text>
       </Stack>
-      <Stack margin="16px" padding="16px" border="2px solid #202020"
-        shadow="16px 8px 8px 4px blue" >
+      <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+        boxShadow="16px 8px 8px 4px blue" >
         <Text>16px 8px 8px 4px blue</Text>
       </Stack>
-      <Stack margin="16px" padding="16px" border="2px solid #202020"
-        shadow="12px 12px 5px orangered, inset 8px 6px green" >
+      <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+        boxShadow="12px 12px 5px orangered, inset 8px 6px green" >
         <Text>12px 12px 5px orangered, inset 8px 6px green</Text>
       </Stack>
-      <Stack margin="16px" padding="16px" border="2px solid #202020"
-        shadow="8px 4px 2px blue, -8px -6px green" >
+      <Stack margin="16px" padding="16px" width="80%" border="2px solid #202020"
+        boxShadow="8px 4px 2px blue, -8px -6px green" >
         <Text>12px 12px 5px blue, -8px -6px green</Text>
-      </Stack>    </FlowLayout>
+      </Stack>
+    </FlowLayout>
   `}
     height={360}
 />

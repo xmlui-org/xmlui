@@ -1289,40 +1289,40 @@ describe("Layout resolver", () => {
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("shadow: 1px 1px 1px red", () => {
-    const PROP = "shadow";
+  it("boxShadow: 1px 1px 1px red", () => {
+    const PROP = "boxShadow";
     const VALUE = "1px 1px 1px red";
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.boxShadow).toBe(VALUE);
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("shadow (themeVar) 1", () => {
-    const PROP = "shadow";
+  it("boxShadow (themeVar) 1", () => {
+    const PROP = "boxShadow";
     const VALUE = THEME_ID;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.boxShadow).toBe(THEME_ID_VALUE);
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("shadow (themeVar) 2", () => {
-    const PROP = "shadow";
+  it("boxShadow (themeVar) 2", () => {
+    const PROP = "boxShadow";
     const VALUE = `${THEME_ID} ${THEME_ID2}`;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.boxShadow).toBe(`${THEME_ID_VALUE} ${THEME_ID2_VALUE}`);
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("shadow (themeVar) 3", () => {
-    const PROP = "shadow";
+  it("boxShadow (themeVar) 3", () => {
+    const PROP = "boxShadow";
     const VALUE = `${THEME_ID} ${THEME_ID2} ${THEME_ID3}`;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.boxShadow).toBe(`${THEME_ID_VALUE} ${THEME_ID2_VALUE} ${THEME_ID3_VALUE}`);
     expect(result.issues.has(PROP)).toBe(false);
   }); 
 
-  it("shadow (themeVar) 4", () => {
-    const PROP = "shadow";
+  it("boxShadow (themeVar) 4", () => {
+    const PROP = "boxShadow";
     const VALUE = `${THEME_ID} ${THEME_ID2} ${THEME_ID3} ${THEME_ID4}`;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.boxShadow).toBe(

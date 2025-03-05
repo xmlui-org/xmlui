@@ -428,7 +428,7 @@ test("shadow is not clipped", async ({ page }, testInfo) => {
     entryPoint: `
     <CHStack height="300px">
       <FlowLayout testId="layout" width="500px" gap="10px">
-        <Stack height="50px" shadow="orangered 0px 0px 0px 100px"/>
+        <Stack height="50px" boxShadow="orangered 0px 0px 0px 100px"/>
       </FlowLayout>
     </CHStack>
     `

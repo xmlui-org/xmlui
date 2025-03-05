@@ -924,7 +924,10 @@ It functions as a container for a picture.
 ```ueml copy
 <App>
   <Image src="/resources/images/components/image/breakfast.jpg" width="240px" />
-  <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" width="240px" />
+  <Image 
+    src="cantFindIt.jpg" 
+    alt="This image depicts a wonderful scene not for human eyes" 
+    width="240px" />
 </App>
 ```
 
@@ -932,8 +935,14 @@ It functions as a container for a picture.
   name="Example: Using Image"
   app={`
     <App>
-      <Image src="/resources/images/components/image/breakfast.jpg" width="240px" />
-      <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" width="240px" shadow="$shadow-spread" />
+      <Image 
+        src="/resources/images/components/image/breakfast.jpg" 
+        width="240px" 
+        boxShadow="$shadow-spread" />
+      <Image src="cantFindIt.jpg" 
+        alt="This image depicts a wonderful scene not for human eyes" 
+        width="240px" 
+        boxShadow="$shadow-spread" />
     </App>
   `}
 />

@@ -591,7 +591,7 @@ The engine supports these layout properties to set component colors:
 |`color`| Sets the foreground <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_COLOR}>color</SmartLink> of a component's text and text decorations. |
 |`opacity`| This property sets the opacity of an element. Opacity is the degree to which the content behind an element is hidden. The value is a number in the range 0.0 to 1.0, inclusive, or a percentage from 0% to 100%. |
 
-> **Note**: Besides these colors, <SmartLink href="#border">borders</SmartLink> and <SmartLink href="#shadow">shadows</SmartLink> also can declare their display colors.
+> **Note**: Besides these colors, <SmartLink href="#border">borders</SmartLink> and <SmartLink href="#boxShadow">shadows</SmartLink> also can declare their display colors.
 
 ```ueml copy
 <App>
@@ -683,7 +683,7 @@ You can add <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SHADOW}>shadow effects
 ```ueml copy {2}
 <App>
   <VStack width="200px" padding="20px" border="2px solid #202020"
-    shadow="12px 12px 5px orangered" >
+    boxShadow="12px 12px 5px orangered" >
     <Text>This is a box with a shadow around it.</Text>
   </VStack>
 </App>
@@ -694,7 +694,7 @@ You can add <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SHADOW}>shadow effects
   app={`
     <App>
       <VStack width="200px" padding="20px" border="2px solid #202020"
-        shadow="12px 12px 5px orangered" >
+        boxShadow="12px 12px 5px orangered" >
         <Text>This is a box with a shadow around it.</Text>
       </VStack>
     </App>
