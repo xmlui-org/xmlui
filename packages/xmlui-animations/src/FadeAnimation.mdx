@@ -1,0 +1,80 @@
+%-PROP-START from
+
+```ueml copy /from="0.5"/
+<App>
+  <FadeInAnimation id="anim" from="0.5">
+  <Button onClick="anim.start()">Start</Button>
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: from"
+  app={`
+  <App>
+    <FadeInAnimation id="anim" from="0.5">
+    <Button onClick="anim.start()">Start</Button>
+      <Image
+        src="/resources/images/components/image/breakfast.jpg" width="500"/>
+    </FadeInAnimation>
+  </App>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START to
+
+```ueml copy /to="0.5"/
+<App>
+  <FadeInAnimation id="anim" to="0.5">
+  <Button onClick="anim.start()">Start</Button>
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: to"
+  app={`
+  <App>
+    <FadeInAnimation id="anim" to="0.5">
+    <Button onClick="anim.start()">Start</Button>
+      <Image
+        src="/resources/images/components/image/breakfast.jpg" width="500"/>
+    </FadeInAnimation>
+  </App>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START animateWhenInView
+
+```ueml copy /animateWhenInView/
+<App>
+  <FadeInAnimation id="anim" from="0" to="1" animateWhenInView>
+  <Button onClick="anim.start()">Start</Button>
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: animateWhenInView"
+  app={`
+  <App>
+    <FadeInAnimation id="anim" from="0" to="1" animateWhenInView>
+    <Button onClick="anim.start()">Start</Button>
+      <Image
+        src="/resources/images/components/image/breakfast.jpg" width="500"/>
+    </FadeInAnimation>
+  </App>
+  `}
+/>
+
+%-PROP-END
