@@ -791,16 +791,16 @@ describe("Layout resolver", () => {
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("borderThickness: 1px", () => {
-    const PROP = "borderThickness";
+  it("borderWidth: 1px", () => {
+    const PROP = "borderWidth";
     const VALUE = "1px";
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps[PROP]).toBe(VALUE);
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("borderThickness (themeVar) 1", () => {
-    const PROP = "borderThickness";
+  it("borderWidth (themeVar) 1", () => {
+    const PROP = "borderWidth";
     const VALUE = THEME_ID;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps[PROP]).toBe(THEME_ID_VALUE);

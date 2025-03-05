@@ -199,7 +199,7 @@ Create a new file in the `components` folder named `MyBox.xmlui`, and copy this 
   <Stack 
     padding="$padding-normal"
     borderColor="{$props.color}"
-    borderThickness="8">
+    borderWidth="8">
     {$props.label}
   </Stack>
 </Component>
@@ -255,7 +255,7 @@ Extend the `MyBox` component to display a toast when the box is clicked.
   <Stack 
     padding="$padding-normal"
     borderColor="{$props.color}"
-    borderThickness="8"
+    borderWidth="8"
     onClick="toast('You clicked ' + $props.label)">
     {$props.label}
   </Stack>
