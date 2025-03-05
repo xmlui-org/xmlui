@@ -8,9 +8,9 @@ import {
   useState,
 } from "react";
 import { useScrollEventHandler, useScrollParent } from "./utils/hooks";
-import { useLocation } from "@remix-run/react";
+import { useLocation, useNavigate } from "@remix-run/react";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "./constants";
-import { useNavigate } from "react-router-dom";
+
 
 // --- Stores the information about a particular heading to be displayed in the TOC.
 type HeadingItem = {

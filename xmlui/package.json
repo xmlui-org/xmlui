@@ -139,7 +139,7 @@
     "src/styles"
   ],
   "bin": {
-    "xmlui": "./bin/bootstrap.js"
+    "xmlui": "dist/scripts/bin/bootstrap.js"
   },
   "clean-package": {
     "replace": {
@@ -173,26 +173,27 @@
       }
     }
   },
-  "main": "./src/index.ts",
+  "main": "./dist/xmlui.umd.js",
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "require": "./src/index.ts"
+      "import": "./dist/xmlui.mjs",
+      "require": "./dist/xmlui.umd.js"
     },
     "./parser": {
-      "import": "./src/parsers/xmlui-parser/index.ts",
-      "require": "./src/parsers/xmlui-parser/index.ts"
+      "import": "./dist/xmlui-parser.mjs",
+      "require": "./dist/xmlui-parser.mjs"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
     },
     "./index.scss": {
       "import": "./src/index.scss",
       "require": "./src/index.scss"
     },
-    "./themes.scss": {
-      "import": "./src/components-core/theming/_themes.scss"
-    },
     "./vite-ueml-plugin": {
-      "import": "./bin/vite-ueml-plugin.js",
-      "require": "./bin/vite-ueml-plugin.js"
+      "import": "./dist/scripts/bin/vite-ueml-plugin.js",
+      "require": "./dist/scripts/bin/vite-ueml-plugin.js"
     }
   },
   "browserslist": {
@@ -212,5 +213,7 @@
   },
   "msw": {
     "workerDirectory": "src/testing/infrastructure"
-  }
+  },
+  "module": "./dist/xmlui.mjs",
+  "types": "./dist/xmlui.d.ts"
 }
