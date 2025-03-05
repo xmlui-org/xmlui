@@ -43,7 +43,7 @@ export const layoutOptionKeys = [
   "fontFamily",
   "fontSize",
   "fontWeight",
-  "italic",
+  "fontStyle",
   "textDecoration",
   "wrapContent",
   "canShrink",
