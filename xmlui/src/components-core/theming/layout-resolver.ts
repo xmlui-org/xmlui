@@ -116,7 +116,7 @@ export function resolveLayoutProps(
   collectCss("borderBottom");
   collectCss("borderColor");
   collectCss("borderStyle");
-  collectCss("borderThickness");
+  collectCss("borderWidth");
 
   // --- Radius
   collectCss("radius", "borderRadius");
@@ -343,7 +343,7 @@ export type LayoutProps = {
   borderLeft?: string;
   borderColor?: string;
   borderStyle?: string;
-  borderThickness?: string;
+  borderWidth?: string;
   borderHorizontal?: string;
   borderVertical?: string;
 
@@ -444,7 +444,7 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   borderLeft: [],
   borderColor: [],
   borderStyle: [],
-  borderThickness: [],
+  borderWidth: [],
   borderHorizontal: [],
   borderVertical: [],
 
