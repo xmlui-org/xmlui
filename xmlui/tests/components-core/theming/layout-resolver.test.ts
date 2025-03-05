@@ -1112,16 +1112,16 @@ describe("Layout resolver", () => {
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("italic: true", () => {
-    const PROP = "italic";
+  it("fontStyle: true", () => {
+    const PROP = "fontStyle";
     const VALUE = "true";
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps[PROP]).toBe(VALUE);
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("italic (themeVar)", () => {
-    const PROP = "italic";
+  it("fontStyle (themeVar)", () => {
+    const PROP = "fontStyle";
     const VALUE = THEME_ID;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps[PROP]).toBe(THEME_ID_VALUE);

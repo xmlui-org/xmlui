@@ -130,7 +130,7 @@ export function resolveLayoutProps(
   collectCss("fontFamily");
   collectCss("fontSize");
   collectCss("fontWeight");
-  collectCss("italic");
+  collectCss("fontStyle");
   collectCss("textDecoration");
   collectCss("textDecorationLine");
   collectCss("textDecorationColor");
@@ -390,7 +390,7 @@ export type LayoutProps = {
   fontFamily?: string;
   fontSize?: number | string;
   fontWeight?: number | string;
-  italic?: boolean | string;
+  fontStyle?: string;
   textDecoration?: string;
   textDecorationLine?: string;
   textDecorationColor?: string;
@@ -491,7 +491,7 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   fontFamily: [],
   fontSize: [],
   fontWeight: [],
-  italic: [booleanRegex],
+  fontStyle: [booleanRegex],
   textDecoration: [],
   userSelect: [],
   letterSpacing: [],

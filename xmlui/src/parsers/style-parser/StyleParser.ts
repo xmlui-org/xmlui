@@ -1,30 +1,13 @@
 import type { StyleErrorCodes } from "./errors";
 import type { StyleToken } from "./tokens";
 import type {
-  AlignmentNode,
   BaseNode,
-  BooleanNode,
   BorderNode,
   BorderStyleNode,
   ColorNode,
-  CursorNode,
-  DirectionNode,
-  FontFamilyNode,
-  FontWeightNode,
-  OrientationNode,
-  RadiusNode,
-  ScrollingNode,
-  ShadowNode,
-  ShadowSegment,
   SizeNode,
   StyleNode,
-  TextAlignNode,
-  TextDecorationNode,
-  TextTransformNode,
   ThemeIdDescriptor,
-  UserSelectNode,
-  ZIndexNode,
-  ZoomNode,
 } from "./source-tree";
 import { styleErrorMessages, StyleParserError } from "./errors";
 import { StyleInputStream } from "./StyleInputStream";
@@ -58,34 +41,6 @@ export class StyleParser {
   }
 
   /**
-   * The errors raised during the parse phase
-   */
-  get errors(): StyleParserErrorMessage[] {
-    return this._parseErrors;
-  }
-
-  /**
-   * Gets the current token
-   */
-  get current(): StyleToken {
-    return this._lexer.peek();
-  }
-
-  /**
-   * Checks if we're at the end of the expression
-   */
-  get isEof(): boolean {
-    return this._lexer.peek().type === StyleTokenType.Eof;
-  }
-
-  /**
-   * Gets the characters remaining after parsing
-   */
-  getTail(): string {
-    return this._lexer.getTail();
-  }
-
-  /**
    * Tests if the parse is complete
    */
   testCompleted(): boolean {
@@ -104,436 +59,6 @@ export class StyleParser {
    */
   parseSize(): SizeNode | null {
     return this.parseSizeLike("px");
-  }
-
-  /**
-   * Parses a line height value
-   */
-  parseLineHeight(): SizeNode | null {
-    return this.parseSizeLike("");
-  }
-
-  /**
-   * Parses size and allows "fit-content"
-   */
-  parseMargin(): SizeNode | null {
-    const startToken = this._lexer.peek();
-    if (startToken.type === StyleTokenType.Auto) {
-      this._lexer.get();
-      return this.createNode<SizeNode>(
-        "Size",
-        {
-          value: -1,
-          unit: "",
-          extSize: startToken.text,
-        },
-        startToken
-      );
-    }
-    return this.parseSize();
-  }
-
-  /**
-   * Parses an opacity value
-   */
-  parseOpacity(): SizeNode | null {
-    const startToken = this._lexer.peek();
-    const themeIdNode = this.tryThemeId<SizeNode>();
-    if (themeIdNode) return themeIdNode;
-
-    const value = this.getNumber();
-    if (value === null) return null;
-
-    // --- Get the unit
-    let unit = "";
-    const unitToken = this._lexer.peek(true);
-    if (unitToken.text === "%") {
-      unit = this._lexer.get(true).text;
-    } else if (unitToken.type === StyleTokenType.Ws) {
-      this._lexer.get(true);
-    } else if (unitToken.type !== StyleTokenType.Eof) {
-      this.reportError("S016", unitToken);
-      return null;
-    }
-
-    // --- Done.
-    return this.createNode<SizeNode>(
-      "Size",
-      {
-        value,
-        unit,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a Zoom value
-   */
-  parseZoom(): ZoomNode | null {
-    const startToken = this._lexer.peek();
-    const themeIdNode = this.tryThemeId<ZoomNode>();
-    if (themeIdNode) return themeIdNode;
-
-    if (startToken.text === "reset" || startToken.text === "normal") {
-      this._lexer.get();
-      return this.createNode<ZoomNode>(
-        "Zoom",
-        {
-          value: startToken.text,
-        },
-        startToken
-      );
-    }
-
-    const value = this.getNumber();
-    if (value === null) return null;
-
-    // --- Get the unit
-    let unit = "";
-    const unitToken = this._lexer.peek(true);
-    if (unitToken.text === "%") {
-      unit = this._lexer.get(true).text;
-    } else if (unitToken.type === StyleTokenType.Ws) {
-      this._lexer.get(true);
-    } else if (unitToken.type !== StyleTokenType.Eof) {
-      this.reportError("S016", unitToken);
-      return null;
-    }
-
-    // --- Done.
-    return this.createNode<ZoomNode>(
-      "Zoom",
-      {
-        value,
-        unit,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a boolean value
-   */
-  parseBoolean(): BooleanNode | null {
-    const startToken = this._lexer.peek();
-    const themeIdNode = this.tryThemeId<BooleanNode>();
-    if (themeIdNode) return themeIdNode;
-
-    if (startToken.type !== StyleTokenType.Boolean) {
-      this.reportError("S017", startToken);
-      return null;
-    }
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<BooleanNode>(
-      "Boolean",
-      {
-        value: startToken.text === "true" || startToken.text === "yes" || startToken.text === "on",
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses an alignment value
-   */
-  parseAlignment(): AlignmentNode | null {
-    const startToken = this._lexer.peek();
-    if (startToken.type !== StyleTokenType.Alignment) {
-      this.reportError("S003", startToken);
-      return null;
-    }
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<AlignmentNode>(
-      "Alignment",
-      {
-        value: startToken.text,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a text alignment value
-   */
-  parseTextAlign(): TextAlignNode | null {
-    const startToken = this._lexer.peek();
-    if (startToken.type !== StyleTokenType.Alignment && startToken.type !== StyleTokenType.TextAlignment) {
-      this.reportError("S003", startToken);
-      return null;
-    }
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<TextAlignNode>(
-      "TextAlign",
-      {
-        value: startToken.text,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a user select value
-   */
-  parseUserSelect(): UserSelectNode | null {
-    const startToken = this._lexer.peek();
-    if (
-      startToken.type !== StyleTokenType.None &&
-      startToken.type !== StyleTokenType.Auto &&
-      startToken.type !== StyleTokenType.UserSelect
-    ) {
-      this.reportError("S020", startToken);
-      return null;
-    }
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<UserSelectNode>(
-      "UserSelect",
-      {
-        value: startToken.text,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a text transform value
-   */
-  parseTextTransform(): TextTransformNode | null {
-    const startToken = this._lexer.peek();
-    if (startToken.type !== StyleTokenType.None && startToken.type !== StyleTokenType.TextTransform) {
-      this.reportError("S021", startToken);
-      return null;
-    }
-
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<TextTransformNode>(
-      "TextTransform",
-      {
-        value: startToken.text,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses an orientation value
-   */
-  parseOrientation(): OrientationNode | null {
-    const startToken = this._lexer.peek();
-    if (startToken.type !== StyleTokenType.Orientation) {
-      this.reportError("S018", startToken);
-      return null;
-    }
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<OrientationNode>(
-      "Orientation",
-      {
-        value: startToken.text,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a cursor value
-   */
-  parseCursor(): CursorNode | null {
-    const startToken = this._lexer.peek();
-    switch (startToken.type) {
-      case StyleTokenType.Auto:
-      case StyleTokenType.None:
-      case StyleTokenType.Default:
-      case StyleTokenType.Cursor:
-        this._lexer.get();
-        return this.createNode<CursorNode>(
-          "Cursor",
-          {
-            value: startToken.text,
-          },
-          startToken
-        );
-      case StyleTokenType.UserSelect:
-        if (startToken.text === "text") {
-          this._lexer.get();
-          return this.createNode<CursorNode>(
-            "Cursor",
-            {
-              value: "text",
-            },
-            startToken
-          );
-        }
-        this.reportError("S018", startToken);
-        return null;
-      default:
-        this.reportError("S018", startToken);
-        return null;
-    }
-  }
-
-  /**
-   * Parses a direction value
-   */
-  parseDirection(): DirectionNode | null {
-    const startToken = this._lexer.peek();
-    const themeIdNode = this.tryThemeId<DirectionNode>();
-    if (themeIdNode) return themeIdNode;
-
-    if (startToken.type !== StyleTokenType.Direction) {
-      this.reportError("S013", startToken);
-      return null;
-    }
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<DirectionNode>(
-      "Direction",
-      {
-        value: startToken.text,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a fontFamily value
-   */
-  parseFontFamily(): FontFamilyNode | null {
-    const startToken = this._lexer.peek();
-    const themeIdNode = this.tryThemeId<FontFamilyNode>();
-    if (themeIdNode) return themeIdNode;
-
-    let value = "";
-    let nextToken = startToken;
-    while (true) {
-      // --- Get font name token
-      if (nextToken.type === StyleTokenType.Eof) break;
-      if (
-        nextToken.type === StyleTokenType.FontFamily ||
-        nextToken.type === StyleTokenType.Identifier ||
-        nextToken.type === StyleTokenType.String
-      ) {
-        value += (value ? ", " : "") + nextToken.text;
-      } else {
-        this.reportError("S014", nextToken);
-        return null;
-      }
-
-      // --- Skip the parsed token
-      this._lexer.get();
-
-      // --- Check for separator comma
-      nextToken = this._lexer.peek();
-      if (nextToken.type === StyleTokenType.Comma) {
-        this._lexer.get();
-      } else {
-        break;
-      }
-      nextToken = this._lexer.peek();
-    }
-
-    // --- Done.
-    return this.createNode<FontFamilyNode>(
-      "FontFamily",
-      {
-        value,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a weight value
-   */
-  parseFontWeight(): FontWeightNode | null {
-    const startToken = this._lexer.peek();
-    const themeIdNode = this.tryThemeId<FontWeightNode>();
-    if (themeIdNode) return themeIdNode;
-
-    if (startToken.type !== StyleTokenType.FontWeight && startToken.type !== StyleTokenType.Number) {
-      this.reportError("S015", startToken);
-      return null;
-    }
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<FontWeightNode>(
-      "FontWeight",
-      {
-        value: startToken.text,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a zIndex value
-   */
-  parseZIndex(): ZIndexNode | null {
-    const startToken = this._lexer.peek();
-    const themeIdNode = this.tryThemeId<ZIndexNode>();
-    if (themeIdNode) return themeIdNode;
-
-    if (startToken.type !== StyleTokenType.Number) {
-      this.reportError("S001", startToken);
-      return null;
-    }
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<ZIndexNode>(
-      "ZIndex",
-      {
-        value: startToken.text,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a scrolling value
-   */
-  parseScrolling(): ScrollingNode | null {
-    const startToken = this._lexer.peek();
-    const themeIdNode = this.tryThemeId<ScrollingNode>();
-    if (themeIdNode) return themeIdNode;
-
-    if (startToken.type !== StyleTokenType.Scrolling) {
-      this.reportError("S012", startToken);
-      return null;
-    }
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<ScrollingNode>(
-      "Scrolling",
-      {
-        value: startToken.text,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a border style value with its unit
-   */
-  parseBorderStyle(): BorderStyleNode | null {
-    const startToken = this._lexer.peek();
-    if (startToken.type !== StyleTokenType.BorderStyle && startToken.type !== StyleTokenType.None) {
-      this.reportError("S004", startToken);
-      return null;
-    }
-    // --- Done.
-    this._lexer.get();
-    return this.createNode<BorderStyleNode>(
-      "BorderStyle",
-      {
-        value: startToken.text,
-      },
-      startToken
-    );
   }
 
   /**
@@ -622,14 +147,34 @@ export class StyleParser {
         color: colorFound?.value,
         styleValue: styleFound?.value,
       },
-      startToken
+      startToken,
+    );
+  }
+
+  /**
+   * Parses a border style value with its unit
+   */
+  private parseBorderStyle(): BorderStyleNode | null {
+    const startToken = this._lexer.peek();
+    if (startToken.type !== StyleTokenType.BorderStyle && startToken.type !== StyleTokenType.None) {
+      this.reportError("S004", startToken);
+      return null;
+    }
+    // --- Done.
+    this._lexer.get();
+    return this.createNode<BorderStyleNode>(
+      "BorderStyle",
+      {
+        value: startToken.text,
+      },
+      startToken,
     );
   }
 
   /**
    * Parses a color value
    */
-  parseColor(): ColorNode | null {
+  private parseColor(): ColorNode | null {
     const startToken = this._lexer.peek();
     const themeIdNode = this.tryThemeId<ColorNode>();
     if (themeIdNode) return themeIdNode;
@@ -643,7 +188,7 @@ export class StyleParser {
           {
             value: startToken.text.toLowerCase(),
           },
-          startToken
+          startToken,
         );
 
       case StyleTokenType.HexaColor:
@@ -653,7 +198,7 @@ export class StyleParser {
           {
             value: startToken.text,
           },
-          startToken
+          startToken,
         );
 
       case StyleTokenType.ColorFunc:
@@ -787,277 +332,6 @@ export class StyleParser {
     }
   }
 
-  /**
-   * Parses a text decoration value
-   */
-  parseTextDecoration(): TextDecorationNode | null {
-    const startToken = this._lexer.peek();
-    if (startToken.type === StyleTokenType.None) {
-      this._lexer.get();
-      return this.createNode<TextDecorationNode>(
-        "TextDecoration",
-        {
-          none: true,
-        },
-        startToken
-      );
-    }
-
-    const themeIdNode = this.tryThemeId<TextDecorationNode>();
-    let themeId1: ThemeIdDescriptor | undefined;
-
-    let maxStyleTokens = 3;
-    if (themeIdNode) {
-      if (this.testCompleted()) {
-        return themeIdNode;
-      }
-      maxStyleTokens = 2;
-      themeId1 = themeIdNode.themeId;
-    }
-
-    const acceptedStyles = ["solid", "double", "dotted", "dashed", "wavy"];
-    let lineFound: string | undefined;
-    let styleFound: string | undefined;
-    let colorFound: ColorNode | null = null;
-
-    let themeId2: ThemeIdDescriptor | undefined;
-    let themeId3: ThemeIdDescriptor | undefined;
-
-    for (let i = 0; i < maxStyleTokens; i++) {
-      const nextToken = this._lexer.peek();
-      if (isThemeId(nextToken)) {
-        if (!themeId2) {
-          themeId2 = this.parseThemeId();
-        } else {
-          themeId3 = this.parseThemeId();
-        }
-      } else {
-        if (acceptedStyles.indexOf(nextToken.text) >= 0) {
-          styleFound = nextToken.text;
-          this._lexer.get();
-        } else {
-          switch (nextToken.type) {
-            case StyleTokenType.DecorationLine:
-              if (lineFound) {
-                this.reportError("S016", nextToken);
-                return null;
-              }
-              this._lexer.get();
-              lineFound = nextToken.text;
-              break;
-
-            case StyleTokenType.ColorName:
-            case StyleTokenType.ColorFunc:
-            case StyleTokenType.HexaColor:
-              if (colorFound) {
-                this.reportError("S016", nextToken);
-                return null;
-              }
-              colorFound = this.parseColor();
-              break;
-
-            default:
-              this.reportError("S016", nextToken);
-              return null;
-          }
-        }
-      }
-      const spToken = this._lexer.peek(true);
-      if (spToken.type === StyleTokenType.Eof) break;
-      if (spToken.type === StyleTokenType.Ws) {
-        this._lexer.get(true);
-      }
-    }
-
-    return this.createNode<TextDecorationNode>(
-      "TextDecoration",
-      {
-        themeId1,
-        themeId2,
-        themeId3,
-        color: colorFound?.value,
-        style: styleFound,
-        line: lineFound,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a radius value
-   */
-  parseRadius(): RadiusNode | null {
-    const values: SizeNode[] = [];
-    const themeIds: ThemeIdDescriptor[] = [];
-    const startToken = this._lexer.peek();
-    let count = 0;
-    while (count < 2) {
-      // --- Resolve to theme id or size
-      const themeIdNode = this.tryThemeId<RadiusNode>();
-      if (themeIdNode) {
-        themeIds[count] = themeIdNode.themeId!;
-        if (this._lexer.peek().type === StyleTokenType.Eof) {
-          // --- No more token
-          count = 5;
-        } else {
-          // --- Skip trailing spaces
-          while (this._lexer.peek(true).type === StyleTokenType.Ws) {
-            this._lexer.get(true);
-          }
-        }
-      } else {
-        let size = this.parseSize();
-        if (!size) {
-          return null;
-        }
-        values[count] = size;
-
-        // --- Search for the end/whitespace
-        let wsCount = 0;
-        while (true) {
-          let nextToken = this._lexer.peek(true);
-          if (nextToken.type === StyleTokenType.Eof) {
-            // --- No more token
-            count = 5;
-            wsCount = 1;
-            break;
-          }
-          if (nextToken.type === StyleTokenType.Ws) {
-            // Skip the whitespace
-            this._lexer.get(true);
-            wsCount++;
-          } else {
-            break;
-          }
-        }
-
-        // --- We need a separator
-        if (!wsCount) {
-          this.reportError("S016");
-          return null;
-        }
-      }
-
-      // --- Next item
-      count++;
-    }
-
-    return this.createNode<RadiusNode>(
-      "Radius",
-      {
-        themeId1: themeIds[0],
-        themeId2: themeIds[1],
-        value1: values[0]?.value,
-        unit1: values[0]?.unit,
-        value2: values[1]?.value,
-        unit2: values[1]?.unit,
-      },
-      startToken
-    );
-  }
-
-  /**
-   * Parses a shadow value
-   */
-  parseShadow(): ShadowNode | null {
-    const startToken = this._lexer.peek();
-    const themeIdNode = this.tryThemeId<ShadowNode>();
-    if (themeIdNode) return themeIdNode;
-
-    const segments: ShadowSegment[] = [];
-    let nextToken: StyleToken | null = null;
-
-    // --- Parse a single segment
-    while (true) {
-      let inset: boolean | null = null;
-      let sizeX: SizeNode | null = null;
-      let sizeY: SizeNode | null = null;
-      let blurRadius: SizeNode | null = null;
-      let spreadRadius: SizeNode | null = null;
-      let color: ColorNode | null = null;
-
-      nextToken = this._lexer.peek();
-      if (nextToken.text === "inset") {
-        inset = true;
-        this._lexer.get();
-        nextToken = this._lexer.peek();
-      }
-
-      // --- Offset values
-      sizeX = this.parseSize();
-      if (!sizeX) {
-        return null;
-      }
-      nextToken = this._lexer.peek(true);
-      if (nextToken.type !== StyleTokenType.Ws) {
-        this.reportError("S016", nextToken);
-      }
-      this._lexer.get();
-      sizeY = this.parseSize();
-      if (!sizeY) {
-        return null;
-      }
-      nextToken = this._lexer.peek(true);
-      if (nextToken.type === StyleTokenType.Ws) {
-        this._lexer.get();
-        nextToken = this._lexer.peek();
-        if (nextToken.type === StyleTokenType.Number) {
-          // --- Blur radius
-          blurRadius = this.parseSize();
-          nextToken = this._lexer.peek(true);
-        }
-        if (nextToken.type === StyleTokenType.Ws) {
-          this._lexer.get();
-          nextToken = this._lexer.peek();
-          if (nextToken.type === StyleTokenType.Number) {
-            // --- Spread radius
-            spreadRadius = this.parseSize();
-            nextToken = this._lexer.peek(true);
-          }
-        }
-      }
-
-      // --- Check for color
-      if (nextToken.type === StyleTokenType.Ws) {
-        nextToken = this._lexer.get();
-      }
-      if (nextToken.type !== StyleTokenType.Eof && nextToken.type !== StyleTokenType.Comma) {
-        color = this.parseColor();
-      }
-
-      // --- Create segment
-      segments.push({
-        inset: inset ?? undefined,
-        offsetXValue: sizeX.value,
-        offsetXUnit: sizeX.unit,
-        offsetYValue: sizeY.value,
-        offsetYUnit: sizeY.unit,
-        blurRadiusValue: blurRadius?.value,
-        blurRadiusUnit: blurRadius?.unit,
-        spreadRadiusValue: spreadRadius?.value,
-        spreadRadiusUnit: spreadRadius?.unit,
-        color: color?.value,
-      });
-
-      // --- Check for next segment
-      const sp = this._lexer.peek(true);
-      if (sp.type === StyleTokenType.Comma) {
-        // --- There is a next shadow segment
-        this._lexer.get();
-      } else {
-        break;
-      }
-    }
-
-    return this.createNode<ShadowNode>(
-      "Shadow",
-      {
-        segments,
-      },
-      startToken
-    );
-  }
-
   private getNumber(): number | null {
     const token = this._lexer.get();
     if (token.type === StyleTokenType.Number) {
@@ -1067,7 +341,11 @@ export class StyleParser {
     return null;
   }
 
-  private expectToken(type: StyleTokenType, errorCode?: StyleErrorCodes, allowEof?: boolean): StyleToken | null {
+  private expectToken(
+    type: StyleTokenType,
+    errorCode?: StyleErrorCodes,
+    allowEof?: boolean,
+  ): StyleToken | null {
     const next = this._lexer.peek();
     if (next.type === type || (allowEof && next.type === StyleTokenType.Eof)) {
       // --- Skip the expected token
@@ -1086,7 +364,9 @@ export class StyleParser {
   private reportError(errorCode: StyleErrorCodes, token?: StyleToken, ...options: any[]): void {
     let errorText: string = styleErrorMessages[errorCode] ?? "Unknown error";
     if (options) {
-      options.forEach((o, idx) => (errorText = replace(errorText, `{${idx}}`, options[idx].toString())));
+      options.forEach(
+        (o, idx) => (errorText = replace(errorText, `{${idx}}`, options[idx].toString())),
+      );
     }
     if (!token) {
       token = this._lexer.peek(true);
@@ -1119,7 +399,7 @@ export class StyleParser {
     stump: any,
     startToken: StyleToken,
     endToken?: StyleToken,
-    source?: string
+    source?: string,
   ): T {
     if (!endToken) {
       endToken = this._lexer.peek(true);
@@ -1153,7 +433,7 @@ export class StyleParser {
         {
           themeId: this.parseThemeId(),
         },
-        token
+        token,
       );
     }
     return null;
@@ -1192,7 +472,7 @@ export class StyleParser {
           value: 1,
           unit: "*",
         },
-        startToken
+        startToken,
       );
     }
 
@@ -1222,7 +502,7 @@ export class StyleParser {
         value,
         unit: unit ? unit : value ? defUnit : "",
       },
-      startToken
+      startToken,
     );
   }
 }
