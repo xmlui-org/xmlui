@@ -7,7 +7,6 @@ import { version } from "../../../package.json";
 
 import { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
 import { useThemes } from "../theming/ThemeContext";
 import {
@@ -32,6 +31,7 @@ import { AppContext } from "../AppContext";
 import { renderChild } from "./renderChild";
 import { GlobalProps, queryClient } from "./AppRoot";
 import { ContainerWrapperDef } from "./ContainerWrapper";
+import { useLocation, useNavigate } from "@remix-run/react";
 
 // --- The properties of the AppContent component
 type AppContentProps = {

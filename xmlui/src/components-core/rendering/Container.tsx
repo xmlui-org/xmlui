@@ -12,7 +12,7 @@ import React, {
   Fragment,
   isValidElement,
 } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "@remix-run/react";
 import { cloneDeep, isArray } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import memoizeOne from "memoize-one";

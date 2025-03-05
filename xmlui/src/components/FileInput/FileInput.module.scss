@@ -7,18 +7,27 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-// --- The FileInput component uses a TextBox and a Button. We do not allow separately customize the 
+// --- The FileInput component uses a TextBox and a Button. We do not allow separately customize the
 // --- FileInput theme, only through the TextBox and Button themes.
 
 .container {
   gap: t.$space-2;
   width: 100%;
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: flex-start;
 }
 
-.textBoxWrapper{
+.buttonStart {
+  flex-direction: row-reverse;
+}
+
+.buttonEnd {
+  flex-direction: row;
+}
+
+.textBoxWrapper {
   width: 100%;
   border-radius: t.$radius;
   min-height: fit-content;
