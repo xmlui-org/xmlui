@@ -1,4 +1,4 @@
-import { COMMON_VISUAL_PROPERTY_UNITS, COMMON_VISUAL_PROPERTY_UNITS_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_BOOLEAN, COMMON_VISUAL_PROPERTY_UNITS_BORDER, COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING, COMMON_VISUAL_PROPERTY_UNITS_COLOR, COMMON_VISUAL_PROPERTY_UNITS_CURSOR, COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY, COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT, COMMON_VISUAL_PROPERTY_UNITS_ORIENTATION, COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW, COMMON_VISUAL_PROPERTY_UNITS_SHADOW, COMMON_VISUAL_PROPERTY_UNITS_SIZE, COMMON_VISUAL_PROPERTY_UNITS_TEXT_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION, COMMON_VISUAL_PROPERTY_UNITS_TEXT_TRANSFORM, COMMON_VISUAL_PROPERTY_UNITS_USER_SELECT, COMPONENT_HEADING, COMPONENT_TEXT } from "../../meta/pages";
+import { COMMON_VISUAL_PROPERTY_UNITS, COMMON_VISUAL_PROPERTY_UNITS_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_BOOLEAN, COMMON_VISUAL_PROPERTY_UNITS_BORDER, COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING, COMMON_VISUAL_PROPERTY_UNITS_COLOR, COMMON_VISUAL_PROPERTY_UNITS_CURSOR, COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY, COMMON_VISUAL_PROPERTY_UNITS_FONT_STYLE, COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT, COMMON_VISUAL_PROPERTY_UNITS_ORIENTATION, COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW, COMMON_VISUAL_PROPERTY_UNITS_SHADOW, COMMON_VISUAL_PROPERTY_UNITS_SIZE, COMMON_VISUAL_PROPERTY_UNITS_TEXT_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION, COMMON_VISUAL_PROPERTY_UNITS_TEXT_TRANSFORM, COMMON_VISUAL_PROPERTY_UNITS_USER_SELECT, COMPONENT_HEADING, COMPONENT_TEXT } from "../../meta/pages";
 import { Callout } from 'nextra/components';
 
 # Layout Properties
@@ -636,7 +636,7 @@ Several properties allow you to set the appearance of text elements displayed in
 |`fontFamily`|This property specifies a prioritized list of one or more <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY}>font family</SmartLink> names and/or generic family names for the selected component.|
 |`fontSize`|This property sets the size of the font. Changing the font <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> also updates the sizes of the font size-relative length units, such as em, ex, and so forth.|
 |`fontWeight`|Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT}>weight (or boldness)</SmartLink> of the font. The weights available depend on the `fontFamily` that is currently set.|
-|`fontStyle`| This property sets whether a font should be styled with a normal, italic, or oblique face from its font-family. |
+|`fontStyle`| This property sets whether a font should be <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_FONT_STYLE}>"slanted"</SmartLink> using the following values: normal, italic, or oblique. |
 |`letterSpacing`|This property sets the horizontal <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>spacing</SmartLink> behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together.|
 |`textDecoration`|This property sets the appearance of <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION}>decorative lines</SmartLink> on text.|
 |`textTransform`|This property specifies how to <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_TEXT_TRANSFORM}>capitalize</SmartLink> an element's text.|
@@ -653,7 +653,7 @@ Several properties allow you to set the appearance of text elements displayed in
   <Text fontWeight="bold">
     This is bold text!
   </Text>
-  <Text italic="true" textDecoration="green wavy underline">
+  <Text fontStyle="italic" textDecoration="green wavy underline">
     This is italic with decoration!
   </Text>
 </App>
@@ -669,7 +669,7 @@ Several properties allow you to set the appearance of text elements displayed in
       <Text fontWeight="bold">
         This is bold text!
       </Text>
-      <Text italic="true" textDecoration="green wavy underline">
+      <Text fontStyle="italic" textDecoration="green wavy underline">
         This is italic with decoration!
       </Text>
     </App>
