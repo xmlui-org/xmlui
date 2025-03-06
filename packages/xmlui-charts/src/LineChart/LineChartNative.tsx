@@ -25,6 +25,12 @@ export type LineChartProps = {
   showLegend?: boolean;
 };
 
+export const defaultProps: Pick<LineChartProps, "hideX" | "hideTooltip" | "showLegend"> = {
+  hideX: false,
+  hideTooltip: false,
+  showLegend: false,
+};
+
 export function LineChart({
   data,
   dataKeys = [],
