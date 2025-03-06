@@ -2,10 +2,8 @@ import { basename, join, extname, relative } from "path";
 import { lstatSync } from "fs";
 import { writeFileSync } from "fs";
 import { unlink, readdir, readFile, mkdir } from "fs/promises";
-import { logger, LOGGER_LEVELS } from "./logger.mjs";
+import { ErrorWithSeverity, logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import {
-  processError,
-  ErrorWithSeverity,
   convertPath,
   deleteFileIfExists,
   fromKebabtoCamelCase,

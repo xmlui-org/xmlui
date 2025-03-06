@@ -1,6 +1,5 @@
 import { readFile } from "fs/promises";
-import { ErrorWithSeverity } from "./utils.mjs";
-import { LOGGER_LEVELS } from "./logger.mjs";
+import { LOGGER_LEVELS, ErrorWithSeverity } from "./logger.mjs";
 
 export default async function loadConfig(configPath) {
   if (!configPath) {

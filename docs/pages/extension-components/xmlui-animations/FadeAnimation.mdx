@@ -2,11 +2,60 @@ import { Callout } from "nextra/components";
 
 # FadeAnimation [#component-fadeanimation]
 
-<Callout type="warning" emoji="📔">This component's implementation is **in progress**. This documentation shows the component's planned interface.</Callout>
+<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
 
-This component is inherited from <SmartLink href="/xmlui-animations/Animation">Animation</SmartLink>
+The `FadeAnimation` component represents an animation that fades the content with adjustable opacity values.
 
-See also: <SmartLink href="/xmlui-animations/FadeInAnimation">FadeInAnimation</SmartLink>, <SmartLink href="/xmlui-animations/FadeOutAnimation">FadeOutAnimation</SmartLink>, <SmartLink href="/xmlui-animations/ScaleAnimation">ScaleAnimation</SmartLink>, <SmartLink href="/xmlui-animations/SlideInAnimation">SlideInAnimation</SmartLink>
+## Properties
 
-There is no description for this component as of yet.
+### `animateWhenInView`
 
+Indicates whether the animation should start when the component is in view
+
+### `delay (default: 0)`
+
+The delay before the animation starts in milliseconds
+
+### `duration`
+
+The duration of the animation in milliseconds
+
+### `from (default: 0)`
+
+Sets the initial opacity of the content.If the `to` property is not set, the initial opacity set here will be used as the final opacity.
+
+### `loop (default: false)`
+
+Indicates whether the animation should loop
+
+### `reverse (default: false)`
+
+Indicates whether the animation should run in reverse
+
+### `to (default: 1)`
+
+Sets the final opacity of the content.If the `from` property is not set, the initial opacity set here will be used as the final opacity.
+
+## Events
+
+### `started`
+
+Event fired when the animation starts
+
+### `stopped`
+
+Event fired when the animation stops
+
+## Exposed Methods
+
+### `start`
+
+Starts the animation
+
+### `stop`
+
+Stops the animation
+
+## Styling
+
+This component does not have any styles.

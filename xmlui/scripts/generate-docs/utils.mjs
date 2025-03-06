@@ -1,30 +1,5 @@
 import { existsSync, readdirSync, statSync, unlinkSync } from "fs";
 import { posix } from "path";
-import { logger } from "./logger.mjs";
-
-export class ErrorWithSeverity extends Error {
-  constructor(message, severity = Logger.severity.error) {
-    super(message);
-    this.name = "ErrorWithSeverity";
-    this.severity = severity;
-  }
-}
-
-/**
- * Logs error to console depending on the type of the error thrown.
- * - ErrorWithSeverity type errors are logged with the severity specified.
- * - Other errors are logged with severity ERROR.
- * @param {ErrorWithSeverity | Error | string} error 
- */
-export function processError(error) {
-  if (error instanceof ErrorWithSeverity) {
-    logger.log(error.severity, error.message);
-  } else if (error instanceof Error) {
-    logger.error(error.message);
-  } else {
-    logger.error(error);
-  }
-}
 
 export function createTable({ headers = [], rows = [], rowNums = false }) {
   let table = "";

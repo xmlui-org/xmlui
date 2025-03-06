@@ -1,11 +1,50 @@
-import { createComponentRenderer, createMetadata, d } from "xmlui";
-import { Animation } from "./AnimationNative";
+import { createComponentRenderer, createMetadata } from "xmlui";
+import { Animation, defaultProps } from "./AnimationNative";
 
 const COMP = "FadeOutAnimation";
 
+const defaultAnimationValues = {
+  from: 1,
+  to: 0,
+};
+
 export const FadeOutAnimationMd = createMetadata({
-  specializedFrom: "Animation",
   description: `The \`${COMP}\` component represents an animation that fades out the content.`,
+  docFolder: "src",
+  status: "experimental",
+  props: {
+    animateWhenInView: {
+      description: `Indicates whether the animation should start when the component is in view`,
+      valueType: "boolean",
+    },
+    duration: {
+      description: `The duration of the animation in milliseconds`,
+      valueType: "number",
+    },
+    reverse: {
+      description: `Indicates whether the animation should run in reverse`,
+      defaultValue: defaultProps.reverse,
+      valueType: "boolean",
+    },
+    loop: {
+      description: `Indicates whether the animation should loop`,
+      defaultValue: defaultProps.loop,
+      valueType: "boolean",
+    },
+    delay: {
+      description: `The delay before the animation starts in milliseconds`,
+      defaultValue: defaultProps.delay,
+      valueType: "number",
+    },
+  },
+  events: {
+    started: { description: `Event fired when the animation starts` },
+    stopped: { description: `Event fired when the animation stops` },
+  },
+  apis: {
+    start: { description: `Starts the animation` },
+    stop: { description: `Stops the animation` },
+  },
 });
 
 export const fadeOutAnimationRenderer = createComponentRenderer(
@@ -16,8 +55,8 @@ export const fadeOutAnimationRenderer = createComponentRenderer(
       <Animation
         registerComponentApi={registerComponentApi}
         animation={{
-          from: { opacity: 1 },
-          to: { opacity: 0 },
+          from: { opacity: defaultAnimationValues.from },
+          to: { opacity: defaultAnimationValues.to },
         }}
         duration={extractValue.asOptionalNumber(node.props.duration)}
         onStop={lookupEventHandler("stopped")}
