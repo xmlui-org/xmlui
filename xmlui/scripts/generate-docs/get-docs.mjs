@@ -2,10 +2,8 @@ import { basename, join, extname, relative } from "path";
 import { lstatSync } from "fs";
 import { writeFileSync } from "fs";
 import { unlink, readdir, readFile, mkdir } from "fs/promises";
-import { logger, LOGGER_LEVELS } from "./logger.mjs";
+import { ErrorWithSeverity, logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import {
-  processError,
-  ErrorWithSeverity,
   convertPath,
   deleteFileIfExists,
   fromKebabtoCamelCase,
@@ -216,6 +214,7 @@ async function dynamicallyLoadExtensionPackages() {
         let filePath = join(packageFolderDist, file);
         if (filePath.endsWith("-metadata.js") && existsSync(filePath)) {
           filePath = convertPath(relative(FOLDERS.script, filePath));
+          console.log(filePath)
           const { componentMetadata } = await import(filePath);
           extensionPackage.metadata = componentMetadata.metadata;
           extensionPackage.description = componentMetadata.description ?? "";

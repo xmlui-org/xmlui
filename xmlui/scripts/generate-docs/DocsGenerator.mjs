@@ -1,9 +1,9 @@
 import { basename, join } from "path";
 import { existsSync } from "fs";
 import { unlink, readFile, writeFile } from "fs/promises";
-import { logger, LOGGER_LEVELS } from "./logger.mjs";
+import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import { MetadataProcessor } from "./MetadataProcessor.mjs";
-import { processError, createTable, strBufferToLines } from "./utils.mjs";
+import { createTable, strBufferToLines } from "./utils.mjs";
 import { buildPagesMap } from "./build-pages-map.mjs";
 import { buildDownloadsMap } from "./build-downloads-map.mjs";
 import { FOLDERS } from "./folders.mjs";

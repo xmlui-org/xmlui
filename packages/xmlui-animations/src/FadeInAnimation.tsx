@@ -1,5 +1,5 @@
 import { createComponentRenderer, createMetadata } from "xmlui";
-import { Animation, defaultProps, defaultPropsForSpecialized } from "./AnimationNative";
+import { Animation, defaultProps } from "./AnimationNative";
 
 const COMP = "FadeInAnimation";
 

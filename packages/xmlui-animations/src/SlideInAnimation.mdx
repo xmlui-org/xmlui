@@ -1,51 +1,24 @@
-%-PROP-START from
+%-PROP-START direction
 
-```ueml copy /from="0.5"/
+```ueml copy /direction="right"/
 <App>
   <Button onClick="anim.start()">Start</Button>
-  <FadeAnimation id="anim" from="0.5">
+  <SlideInAnimation id="anim" direction="right">
     <Image
       src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
+  </SlideInAnimation>
 </App>
 ```
 
 <Playground
-  name="Example: from"
+  name="Example: direction"
   app={`
   <App>
     <Button onClick="anim.start()">Start</Button>
-    <FadeAnimation id="anim" from="0.5">
+    <SlideInAnimation id="anim" direction="right">
       <Image
         src="/resources/images/components/image/breakfast.jpg" width="500"/>
-    </FadeAnimation>
-  </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START to
-
-```ueml copy /to="0.5"/
-<App>
-  <Button onClick="anim.start()">Start</Button>
-  <FadeAnimation id="anim" to="0.5">
-    <Image
-      src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
-</App>
-```
-
-<Playground
-  name="Example: to"
-  app={`
-  <App>
-    <Button onClick="anim.start()">Start</Button>
-    <FadeAnimation id="anim" to="0.5">
-      <Image
-        src="/resources/images/components/image/breakfast.jpg" width="500"/>
-    </FadeAnimation>
+    </SlideInAnimation>
   </App>
   `}
 />
@@ -57,10 +30,10 @@
 ```ueml copy /animateWhenInView/
 <App>
   <Button onClick="anim.start()">Start</Button>
-  <FadeAnimation id="anim" from="0" to="1" animateWhenInView>
+  <SlideInAnimation id="anim" from="0" to="1" animateWhenInView>
     <Image
       src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
+  </SlideInAnimation>
 </App>
 ```
 
@@ -69,10 +42,10 @@
   app={`
   <App>
     <Button onClick="anim.start()">Start</Button>
-    <FadeAnimation id="anim" from="0" to="1" animateWhenInView>
+    <SlideInAnimation id="anim" from="0" to="1" animateWhenInView>
       <Image
         src="/resources/images/components/image/breakfast.jpg" width="500"/>
-    </FadeAnimation>
+    </SlideInAnimation>
   </App>
   `}
 />
@@ -84,10 +57,10 @@
 ```ueml copy /duration/
 <App>
   <Button onClick="anim.start()">Start</Button>
-  <FadeAnimation id="anim" from="0" to="1" duration="3000">
+  <SlideInAnimation id="anim" from="0" to="1" duration="3000">
     <Image
       src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
+  </SlideInAnimation>
 </App>
 ```
 
@@ -96,10 +69,10 @@
   app={`
   <App>
     <Button onClick="anim.start()">Start</Button>
-    <FadeAnimation id="anim" from="0" to="1" duration="3000">
+    <SlideInAnimation id="anim" from="0" to="1" duration="3000">
       <Image
         src="/resources/images/components/image/breakfast.jpg" width="500"/>
-    </FadeAnimation>
+    </SlideInAnimation>
   </App>
   `}
 />
@@ -111,10 +84,10 @@
 ```ueml copy /reverse/
 <App>
   <Button onClick="anim.start()">Start</Button>
-  <FadeAnimation id="anim" from="0" to="1" reverse>
+  <SlideInAnimation id="anim" from="0" to="1" reverse>
     <Image
       src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
+  </SlideInAnimation>
 </App>
 ```
 
@@ -123,10 +96,10 @@
   app={`
   <App>
     <Button onClick="anim.start()">Start</Button>
-    <FadeAnimation id="anim" from="0" to="1" reverse>
+    <SlideInAnimation id="anim" from="0" to="1" reverse>
       <Image
         src="/resources/images/components/image/breakfast.jpg" width="500"/>
-    </FadeAnimation>
+    </SlideInAnimation>
   </App>
   `}
 />
@@ -138,10 +111,10 @@
 ```ueml copy /loop/
 <App>
   <Button onClick="anim.start()">Start</Button>
-  <FadeAnimation id="anim" from="0" to="1" loop>
+  <SlideInAnimation id="anim" from="0" to="1" loop>
     <Image
       src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
+  </SlideInAnimation>
 </App>
 ```
 
@@ -150,10 +123,10 @@
   app={`
   <App>
     <Button onClick="anim.start()">Start</Button>
-    <FadeAnimation id="anim" from="0" to="1" loop>
+    <SlideInAnimation id="anim" from="0" to="1" loop>
       <Image
         src="/resources/images/components/image/breakfast.jpg" width="500"/>
-    </FadeAnimation>
+    </SlideInAnimation>
   </App>
   `}
 />
@@ -165,10 +138,10 @@
 ```ueml copy /delay="1000"/
 <App>
   <Button onClick="anim.start()">Start</Button>
-  <FadeAnimation id="anim" from="0" to="1" delay="1000">
+  <SlideInAnimation id="anim" from="0" to="1" delay="1000">
     <Image
       src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
+  </SlideInAnimation>
 </App>
 ```
 
@@ -177,10 +150,10 @@
   app={`
   <App>
     <Button onClick="anim.start()">Start</Button>
-    <FadeAnimation id="anim" from="0" to="1" delay="1000">
+    <SlideInAnimation id="anim" from="0" to="1" delay="1000">
       <Image
         src="/resources/images/components/image/breakfast.jpg" width="500"/>
-    </FadeAnimation>
+    </SlideInAnimation>
   </App>
   `}
 />
@@ -192,10 +165,10 @@
 ```ueml copy /onStarted="toast('Animation start')"/
 <App>
   <Button onClick="anim.start()">Start</Button>
-  <FadeAnimation id="anim" from="0" to="1" onStarted="toast('Animation start')">
+  <SlideInAnimation id="anim" from="0" to="1" onStarted="toast('Animation start')">
     <Image
       src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
+  </SlideInAnimation>
 </App>
 ```
 
@@ -204,10 +177,10 @@
   app={`
     <App>
       <Button onClick="anim.start()">Start</Button>
-      <FadeAnimation id="anim" from="0" to="1" onStarted="toast('Animation start')">
+      <SlideInAnimation id="anim" from="0" to="1" onStarted="toast('Animation start')">
         <Image
           src="/resources/images/components/image/breakfast.jpg" width="500"/>
-      </FadeAnimation>
+      </SlideInAnimation>
     </App>
   `}
 />
@@ -219,10 +192,10 @@
 ```ueml copy /onStopped="toast('Animation start')"/
 <App>
   <Button onClick="anim.start()">Start</Button>
-  <FadeAnimation id="anim" from="0" to="1" onStopped="toast('Animation end')">
+  <SlideInAnimation id="anim" from="0" to="1" onStopped="toast('Animation end')">
     <Image
       src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
+  </SlideInAnimation>
 </App>
 ```
 
@@ -231,10 +204,10 @@
   app={`
     <App>
       <Button onClick="anim.start()">Start</Button>
-      <FadeAnimation id="anim" from="0" to="1" onStopped="toast('Animation end')">
+      <SlideInAnimation id="anim" from="0" to="1" onStopped="toast('Animation end')">
         <Image
           src="/resources/images/components/image/breakfast.jpg" width="500"/>
-      </FadeAnimation>
+      </SlideInAnimation>
     </App>
   `}
 />
@@ -246,10 +219,10 @@
 ```ueml copy /anim.start()/
 <App>
   <Button onClick="anim.start()">Start</Button>
-  <FadeAnimation id="anim" from="0" to="1">
+  <SlideInAnimation id="anim" from="0" to="1">
     <Image
       src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
+  </SlideInAnimation>
 </App>
 ```
 
@@ -258,10 +231,10 @@
   app={`
     <App>
       <Button onClick="anim.start()">Start</Button>
-      <FadeAnimation id="anim" from="0" to="1">
+      <SlideInAnimation id="anim" from="0" to="1">
         <Image
           src="/resources/images/components/image/breakfast.jpg" width="500"/>
-      </FadeAnimation>
+      </SlideInAnimation>
     </App>
   `}
 />
@@ -274,10 +247,10 @@
 <App>
   <Button onClick="anim.start()">Start</Button>
   <Button onClick="anim.stop()">Stop</Button>
-  <FadeAnimation id="anim" from="0" to="1" duration="10000">
+  <SlideInAnimation id="anim" from="0" to="1" duration="10000">
     <Image
       src="/resources/images/components/image/breakfast.jpg" width="500"/>
-  </FadeAnimation>
+  </SlideInAnimation>
 </App>
 ```
 
@@ -287,10 +260,10 @@
     <App>
       <Button onClick="anim.start()">Start</Button>
       <Button onClick="anim.stop()">Stop</Button>
-      <FadeAnimation id="anim" from="0" to="1" duration="10000">
+      <SlideInAnimation id="anim" from="0" to="1" duration="10000">
         <Image
           src="/resources/images/components/image/breakfast.jpg" width="500"/>
-      </FadeAnimation>
+      </SlideInAnimation>
     </App>
   `}
 />
