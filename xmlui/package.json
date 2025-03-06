@@ -197,6 +197,10 @@
     "./vite-ueml-plugin": {
       "import": "./bin/vite-ueml-plugin.js",
       "require": "./bin/vite-ueml-plugin.js"
+    },
+    "./xmlui-language-server": {
+      "import": "./bin/language-server.js",
+      "require": "./bin/language-server.js"
     }
   },
   "browserslist": {

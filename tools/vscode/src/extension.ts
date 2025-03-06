@@ -1,6 +1,5 @@
 import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
-// import {} from 'xmlui/bin/';
+import { ExtensionContext } from 'vscode';
 
 import {
 	LanguageClient,
@@ -12,11 +11,19 @@ import {
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
-	// The server is implemented in node
-	const serverModule = context.asAbsolutePath(
-		path.join('..', '..', '..', 'xmlui', 'xmlui', 'dist', 'scripts', 'bin', 'language-server.js')
-		 // 'server', 'out', 'server.js'
-	);
+  // The server is implemented in node
+  // const serverModule = context.asAbsolutePath(
+
+  const serverModule = path.normalize(
+    require.resolve('xmlui/xmlui-language-server')
+    // tried, but not working
+    // require.resolve('xmlui/dist/scripts/bin/language-server.js')
+    // require.resolve('xmlui/xmlui-language-server')
+    // require.resolve('xmlui/bin/xmlui-language-server')
+    // require.resolve('xmlui/bin/language-server.js')
+    // require.resolve('xmlui-language-server')
+  );
+  console.log({ serverModule });
 
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
