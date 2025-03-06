@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.7.31",
+  "version": "0.7.32",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -191,8 +191,8 @@
       "import": "./src/components-core/theming/_themes.scss"
     },
     "./vite-ueml-plugin": {
-      "import": "./bin/vite-ueml-plugin.ts",
-      "require": "./bin/vite-ueml-plugin.ts"
+      "import": "./bin/vite-ueml-plugin.js",
+      "require": "./bin/vite-ueml-plugin.js"
     }
   },
   "browserslist": {
