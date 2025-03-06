@@ -14,7 +14,6 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
-import * as React from "react";
 
 import { TooltipContent } from "../Tooltip/TooltipContent";
 
@@ -31,17 +30,28 @@ export type PieChartProps = {
   showLegend?: boolean;
 };
 
+export const defaultProps: Pick<
+  PieChartProps,
+  "showLabel" | "showLabelList" | "showLegend" | "labelListPosition" | "innerRadius"
+> = {
+  showLabel: true,
+  showLabelList: false,
+  showLegend: false,
+  labelListPosition: "inside",
+  innerRadius: 0,
+};
+
 export function PieChart({
   data,
   dataKey,
   nameKey,
   style,
-  showLabel = true,
-  showLabelList = false,
-  labelListPosition = "inside",
-  innerRadius = 0,
+  showLabel = defaultProps.showLabel,
+  showLabelList = defaultProps.showLabelList,
+  labelListPosition = defaultProps.labelListPosition,
+  innerRadius = defaultProps.innerRadius,
   children,
-  showLegend = false,
+  showLegend = defaultProps.showLegend,
 }: PieChartProps) {
   const colors = useColors(
     {

@@ -1,0 +1,49 @@
+import { Callout } from "nextra/components";
+
+# PieChart [#component-piechart]
+
+Represents a pie chart component.
+
+## Properties
+
+### `data`
+
+The data to be displayed in the chart. Needs to be an array of objects.
+
+### `dataKeys`
+
+This property specifies the keys in the data objects that should be used for rendering the bars.
+
+### `labelListPosition (default: "inside")`
+
+The position of the label list.
+
+Available values: `top`, `left`, `right`, `bottom`, `inside` **(default)**, `outside`, `insideLeft`, `insideRight`, `insideTop`, `insideBottom`, `insideTopLeft`, `insideBottomLeft`, `insideTopRight`, `insideBottomRight`, `insideStart`, `insideEnd`, `end`, `center`, `centerTop`, `centerBottom`, `middle`
+
+### `nameKey`
+
+Specifies the key in the data objects that will be used to label the different data series.
+
+### `showLabel (default: true)`
+
+Toggles whether to show labels (`true`) or not (`false`).
+
+### `showLabelList (default: false)`
+
+Whether to show labels in a list (`true`) or not (`false`).
+
+## Events
+
+This component does not have any events.
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [color-text](../styles-and-themes/common-units/#color)-labelList-PieChart | $color-text-primary | $color-text-primary |
