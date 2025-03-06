@@ -9,8 +9,9 @@ const defaultAnimationValues = {
 };
 
 export const FadeInAnimationMd = createMetadata({
-  specializedFrom: "Animation",
   description: `The \`${COMP}\` component represents an animation that fades in the content.`,
+  docFolder: "src",
+  status: "experimental",
   props: {
     animateWhenInView: {
       description: `Indicates whether the animation should start when the component is in view`,

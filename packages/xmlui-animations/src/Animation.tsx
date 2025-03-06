@@ -4,7 +4,7 @@ import { Animation, defaultProps } from "./AnimationNative";
 const COMP = "Animation";
 
 export const AnimationMd = createMetadata({
-  status: "in progress",
+  status: "experimental",
   description: ``,
   props: {
     animation: {

@@ -1,5 +1,5 @@
 import { createComponentRenderer, createMetadata } from "xmlui";
-import { Animation, defaultProps, defaultPropsForSpecialized } from "./AnimationNative";
+import { Animation, defaultProps } from "./AnimationNative";
 
 const COMP = "FadeAnimation";
 
@@ -9,9 +9,9 @@ const defaultAnimationValues = {
 };
 
 export const FadeAnimationMd = createMetadata({
-  status: "in progress",
-  specializedFrom: "Animation",
+  status: "experimental",
   description: `The \`${COMP}\` component represents an animation that fades the content with adjustable opacity values.`,
+  docFolder: "src",
   props: {
     from: {
       description:

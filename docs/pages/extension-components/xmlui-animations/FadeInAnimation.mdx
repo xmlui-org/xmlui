@@ -2,9 +2,261 @@ import { Callout } from "nextra/components";
 
 # FadeInAnimation [#component-fadeinanimation]
 
-This component is inherited from <SmartLink href="/xmlui-animations/Animation">Animation</SmartLink>
+<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
 
-See also: <SmartLink href="/xmlui-animations/FadeAnimation">FadeAnimation</SmartLink>, <SmartLink href="/xmlui-animations/FadeOutAnimation">FadeOutAnimation</SmartLink>, <SmartLink href="/xmlui-animations/ScaleAnimation">ScaleAnimation</SmartLink>, <SmartLink href="/xmlui-animations/SlideInAnimation">SlideInAnimation</SmartLink>
+The `FadeInAnimation` component represents an animation that fades in the content.
 
-There is no description for this component as of yet.
+## Properties
 
+### `animateWhenInView`
+
+Indicates whether the animation should start when the component is in view
+
+```ueml copy /animateWhenInView/
+<App>
+  <Button onClick="anim.start()">Start</Button>
+  <FadeInAnimation id="anim"  animateWhenInView>
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: animateWhenInView"
+  app={`
+  <App>
+    <Button onClick="anim.start()">Start</Button>
+    <FadeInAnimation id="anim"  animateWhenInView>
+      <Image
+        src="/resources/images/components/image/breakfast.jpg" width="500"/>
+    </FadeInAnimation>
+  </App>
+  `}
+/>
+
+### `delay (default: 0)`
+
+The delay before the animation starts in milliseconds
+
+```ueml copy /delay="1000"/
+<App>
+  <Button onClick="anim.start()">Start</Button>
+  <FadeInAnimation id="anim"  delay="1000">
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: delay"
+  app={`
+  <App>
+    <Button onClick="anim.start()">Start</Button>
+    <FadeInAnimation id="anim"  delay="1000">
+      <Image
+        src="/resources/images/components/image/breakfast.jpg" width="500"/>
+    </FadeInAnimation>
+  </App>
+  `}
+/>
+
+### `duration`
+
+The duration of the animation in milliseconds
+
+```ueml copy /duration/
+<App>
+  <Button onClick="anim.start()">Start</Button>
+  <FadeInAnimation id="anim"  duration="3000">
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: duration"
+  app={`
+  <App>
+    <Button onClick="anim.start()">Start</Button>
+    <FadeInAnimation id="anim"  duration="3000">
+      <Image
+        src="/resources/images/components/image/breakfast.jpg" width="500"/>
+    </FadeInAnimation>
+  </App>
+  `}
+/>
+
+### `loop (default: false)`
+
+Indicates whether the animation should loop
+
+```ueml copy /loop/
+<App>
+  <Button onClick="anim.start()">Start</Button>
+  <FadeInAnimation id="anim"  loop>
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: loop"
+  app={`
+  <App>
+    <Button onClick="anim.start()">Start</Button>
+    <FadeInAnimation id="anim"  loop>
+      <Image
+        src="/resources/images/components/image/breakfast.jpg" width="500"/>
+    </FadeInAnimation>
+  </App>
+  `}
+/>
+
+### `reverse (default: false)`
+
+Indicates whether the animation should run in reverse
+
+```ueml copy /reverse/
+<App>
+  <Button onClick="anim.start()">Start</Button>
+  <FadeInAnimation id="anim"  reverse>
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: reverse"
+  app={`
+  <App>
+    <Button onClick="anim.start()">Start</Button>
+    <FadeInAnimation id="anim"  reverse>
+      <Image
+        src="/resources/images/components/image/breakfast.jpg" width="500"/>
+    </FadeInAnimation>
+  </App>
+  `}
+/>
+
+## Events
+
+### `started`
+
+Event fired when the animation starts
+
+```ueml copy /onStarted="toast('Animation start')"/
+<App>
+  <Button onClick="anim.start()">Start</Button>
+  <FadeInAnimation id="anim"  onStarted="toast('Animation start')">
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: started"
+  app={`
+    <App>
+      <Button onClick="anim.start()">Start</Button>
+      <FadeInAnimation id="anim"  onStarted="toast('Animation start')">
+        <Image
+          src="/resources/images/components/image/breakfast.jpg" width="500"/>
+      </FadeInAnimation>
+    </App>
+  `}
+/>
+
+### `stopped`
+
+Event fired when the animation stops
+
+```ueml copy /onStopped="toast('Animation start')"/
+<App>
+  <Button onClick="anim.start()">Start</Button>
+  <FadeInAnimation id="anim"  onStopped="toast('Animation end')">
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: stopped"
+  app={`
+    <App>
+      <Button onClick="anim.start()">Start</Button>
+      <FadeInAnimation id="anim"  onStopped="toast('Animation end')">
+        <Image
+          src="/resources/images/components/image/breakfast.jpg" width="500"/>
+      </FadeInAnimation>
+    </App>
+  `}
+/>
+
+## Exposed Methods
+
+### `start`
+
+Starts the animation
+
+```ueml copy /anim.start()/
+<App>
+  <Button onClick="anim.start()">Start</Button>
+  <FadeInAnimation id="anim" >
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: start api"
+  app={`
+    <App>
+      <Button onClick="anim.start()">Start</Button>
+      <FadeInAnimation id="anim" >
+        <Image
+          src="/resources/images/components/image/breakfast.jpg" width="500"/>
+      </FadeInAnimation>
+    </App>
+  `}
+/>
+
+### `stop`
+
+Stops the animation
+
+```ueml copy /anim.stop()/
+<App>
+  <Button onClick="anim.start()">Start</Button>
+  <Button onClick="anim.stop()">Stop</Button>
+  <FadeInAnimation id="anim"  duration="10000">
+    <Image
+      src="/resources/images/components/image/breakfast.jpg" width="500"/>
+  </FadeInAnimation>
+</App>
+```
+
+<Playground
+  name="Example: stop api"
+  app={`
+    <App>
+      <Button onClick="anim.start()">Start</Button>
+      <Button onClick="anim.stop()">Stop</Button>
+      <FadeInAnimation id="anim"  duration="10000">
+        <Image
+          src="/resources/images/components/image/breakfast.jpg" width="500"/>
+      </FadeInAnimation>
+    </App>
+  `}
+/>
+
+## Styling
+
+This component does not have any styles.

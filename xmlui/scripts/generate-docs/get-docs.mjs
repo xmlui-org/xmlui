@@ -214,7 +214,6 @@ async function dynamicallyLoadExtensionPackages() {
         let filePath = join(packageFolderDist, file);
         if (filePath.endsWith("-metadata.js") && existsSync(filePath)) {
           filePath = convertPath(relative(FOLDERS.script, filePath));
-          console.log(filePath)
           const { componentMetadata } = await import(filePath);
           extensionPackage.metadata = componentMetadata.metadata;
           extensionPackage.description = componentMetadata.description ?? "";

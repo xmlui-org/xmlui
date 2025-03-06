@@ -9,9 +9,9 @@ const defaultAnimationValues = {
 };
 
 export const ScaleAnimationMd = createMetadata({
-  status: "in progress",
-  specializedFrom: "Animation",
+  status: "experimental",
   description: `The \`${COMP}\` component represents an animation that scales the content.`,
+  docFolder: "src",
   props: {
     from: {
       description: "The initial scale of the content.",

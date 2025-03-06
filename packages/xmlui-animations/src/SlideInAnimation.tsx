@@ -8,8 +8,9 @@ const defaultAnimationValues = {
 };
 
 export const SlideInAnimationMd = createMetadata({
-  specializedFrom: "Animation",
+  status: "experimental",
   description: `The \`${COMP}\` component represents an animation that slides in the content from the left.`,
+  docFolder: "src",
   props: {
       direction: {
         description: "The direction of the animation.",
