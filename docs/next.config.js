@@ -1,4 +1,4 @@
-const withTM = require("next-transpile-modules")(["react-icons"]);
+const withTM = require("next-transpile-modules")(["react-icons", "xmlui-charts", "xmlui", "recharts"]);
 const withSvgr = require("next-plugin-svgr");
 const shiki = require("shiki");
 const fs = require("fs");

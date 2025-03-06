@@ -28,6 +28,7 @@ import { parseScssVar } from "./components-core/theming/themeVars";
 import type {RegisterComponentApiFn} from "./abstractions/RendererDefs";
 import type { ComponentMetadata } from "./abstractions/ComponentDefs";
 import { findTokenAtPos } from "./parsers/xmlui-parser/utils";
+import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
 
 export type {
   ThemeDefinition,
@@ -46,6 +47,7 @@ export type {
 };
 export {
   StandaloneApp,
+  StandaloneExtensionManager,
   createComponentRenderer,
   createMetadata,
   d,

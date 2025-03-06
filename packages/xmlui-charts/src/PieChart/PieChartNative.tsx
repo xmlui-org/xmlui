@@ -28,6 +28,8 @@ export type PieChartProps = {
   innerRadius?: number;
   children?: ReactNode;
   showLegend?: boolean;
+  width?: CSSProperties["width"];
+  height?: CSSProperties["height"];
 };
 
 export const defaultProps: Pick<
@@ -52,6 +54,9 @@ export function PieChart({
   innerRadius = defaultProps.innerRadius,
   children,
   showLegend = defaultProps.showLegend,
+  width = "100%",
+  height = "100%",
+  showLegend = false,
 }: PieChartProps) {
   const colors = useColors(
     {
@@ -88,7 +93,7 @@ export function PieChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style}>
+      <ResponsiveContainer style={style} width={width} height={height}>
         <RPieChart>
           <Tooltip content={<TooltipContent />} />
           <Pie
