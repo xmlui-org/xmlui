@@ -1,5 +1,5 @@
 import type React from "react";
-import { cloneElement, forwardRef, useCallback, useLayoutEffect, useRef, useState } from "react";
+import { cloneElement, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { useShallowCompareMemoize } from "./utils/hooks";
 
@@ -54,10 +54,10 @@ const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
   const shouldRenderHelperSpan = !props.allowOnlyRefdChild && !handlesItemRef;
 
   // --- When the component mounts, we add the attributes to the component's DOM node
-  useLayoutEffect(() => {
+  useEffect(() => {
     let node: any;
     if (shouldRenderHelperSpan) {
-      if(foundNode){
+      if (foundNode) {
         node = foundNode;
       } else {
         node =
