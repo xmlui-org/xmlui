@@ -11,19 +11,7 @@ import {
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
-  // The server is implemented in node
-  // const serverModule = context.asAbsolutePath(
-
-  const serverModule = path.normalize(
-    require.resolve('xmlui/xmlui-language-server')
-    // tried, but not working
-    // require.resolve('xmlui/dist/scripts/bin/language-server.js')
-    // require.resolve('xmlui/xmlui-language-server')
-    // require.resolve('xmlui/bin/xmlui-language-server')
-    // require.resolve('xmlui/bin/language-server.js')
-    // require.resolve('xmlui-language-server')
-  );
-  console.log({ serverModule });
+  const serverModule = getPathToLangServer();
 
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
@@ -37,12 +25,7 @@ export function activate(context: ExtensionContext) {
 
 	// Options to control the language client
 	const clientOptions: LanguageClientOptions = {
-		// Register the server for plain text documents
-		documentSelector: [
-  		{ scheme: 'untitled', language: 'xmlui' },
-      { scheme: 'file', language: 'xmlui' },
-      { scheme: 'file', language: 'plaintext' },
-		]
+		documentSelector: [ { language: 'xmlui' } ]
 	};
 
 	// Create the language client and start the client.
@@ -62,4 +45,13 @@ export function deactivate(): Thenable<void> | undefined {
 		return undefined;
 	}
 	return client.stop();
+}
+
+function getPathToLangServer() {
+  const localLangServPath = null;
+  if (!localLangServPath){
+    const bundledLangServPath = path.normalize(require.resolve('xmlui/xmlui-language-server'));
+    return bundledLangServPath;
+  }
+  return localLangServPath;
 }
