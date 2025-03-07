@@ -5,15 +5,18 @@ import styles from "./Pdf.module.scss";
 const COMP = "Pdf";
 export const PdfMd = createMetadata({
   description: `The \`${COMP}\` component provides a read-only preview of a pdf document's contents.`,
+  status: "experimental",
   props: {
-    src: d(`This property defines the source URL of the pdf document stream to display.`),
+    src: {
+      description: `This property defines the source URL of the pdf document to display.`,
+      valueType: "string",
+    },
   },
-  status: "in progress",
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "shadow-page-Pdf": "$shadow-md",
     "gap-pages-Pdf": "$space-4",
-  }
+  },
 });
 const PdfComponent = createComponentRenderer(COMP, PdfMd, ({ node, extractValue }) => {
   return <LazyPdf src={extractValue(node.props.src)} />;
@@ -21,7 +24,5 @@ const PdfComponent = createComponentRenderer(COMP, PdfMd, ({ node, extractValue 
 
 export default {
   namespace: "XMLUIExtensions",
-  components: [
-    PdfComponent
-  ]
-}
+  components: [PdfComponent],
+};

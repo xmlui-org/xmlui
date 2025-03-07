@@ -4,6 +4,6 @@ export const componentMetadata = {
   name: "PDF",
   state: "in progress",
   metadata: {
-    pdf: PdfMd,
+    Pdf: PdfMd,
   },
 };
