@@ -76,7 +76,6 @@ export default ({ mode }) => {
     },
     build: {
       emptyOutDir: false,
-      minify: false,
       outDir: "dist",
       lib: lib,
       rollupOptions: {
