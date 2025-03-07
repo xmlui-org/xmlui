@@ -7,6 +7,7 @@ import { LegendMd } from "../src/Legend/Legend";
 
 export const componentMetadata = {
   name: "Charts",
+  state: "experimental",
   description:
     `The \`Charts\` package contains components that display data in a graphical way.` +
     `All chart components use the same set of properties to receive data.` +

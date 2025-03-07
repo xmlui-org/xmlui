@@ -17,7 +17,7 @@ for (let dir of packageDirectories) {
     const filePath = join(dirFullPath, "package.json");
     const { scripts } = JSON.parse(await readFile(filePath, "utf8"));
     if (!scripts) {
-      console.error(`No scriptssection found in package.json: ${filePath}`);
+      console.error(`No scripts section found in package.json: ${filePath}`);
       continue;
     }
 

@@ -188,6 +188,8 @@ async function loadConfig(configPath) {
  * >>} imported metadata
  */
 async function dynamicallyLoadExtensionPackages() {
+  const defaultPackageState = "experimental";
+
   const extendedPackagesFolder = join(FOLDERS.projectRoot, "packages");
   const packageDirectories = (await readdir(extendedPackagesFolder)).filter((entry) => {
     return (
@@ -201,6 +203,7 @@ async function dynamicallyLoadExtensionPackages() {
       sourceFolder: join(extendedPackagesFolder, dir),
       description: "",
       metadata: {},
+      state: defaultPackageState,
     };
     dir = join(extendedPackagesFolder, dir);
     try {
@@ -212,12 +215,18 @@ async function dynamicallyLoadExtensionPackages() {
       const distContents = await readdir(packageFolderDist);
       for (const file of distContents) {
         let filePath = join(packageFolderDist, file);
-        if (filePath.endsWith("-metadata.js") && existsSync(filePath)) {
+        if (filePath.endsWith(`${basename(dir)}-metadata.js`) && existsSync(filePath)) {
           filePath = convertPath(relative(FOLDERS.script, filePath));
           const { componentMetadata } = await import(filePath);
           extensionPackage.metadata = componentMetadata.metadata;
           extensionPackage.description = componentMetadata.description ?? "";
+          extensionPackage.state = componentMetadata.state ?? defaultPackageState;
         }
+      }
+      // Ignore internal packages
+      if (extensionPackage.state === "internal") {
+        logger.log("Skipping internal extension package:", dir);
+        continue;
       }
       importedMetadata[basename(dir)] = extensionPackage;
     } catch (error) {
