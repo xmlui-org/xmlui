@@ -2016,7 +2016,9 @@ export const HtmlTableMd = createMetadata({
   defaultThemeVars: {
     "color-bg-HtmlTable": "$color-bg",
     "border-HtmlTable": "1px solid $color-border",
-  },
+    "margin-bottom-HtmlTable": "1rem",
+    "margin-top-HtmlTable": "1rem",
+    },
 });
 
 export const htmlTableTagRenderer = createComponentRenderer(
