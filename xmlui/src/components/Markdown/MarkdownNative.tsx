@@ -211,8 +211,9 @@ type BlockquoteProps = {
   style?: CSSProperties;
 };
 
+
 const Blockquote = ({ children, style }: BlockquoteProps) => {
-  // Helper function to extract text from React nodes
+  // Helper function to extract text content from React nodes
   const extractTextContent = (node: React.ReactNode): string => {
     if (typeof node === 'string') {
       return node;
@@ -277,7 +278,7 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
     
     const processedChildren = React.Children.map(children, processNode);
     
-    // Render admonition blockquote
+    // Render admonition blockquote with the updated structure
     return (
       <blockquote className={styles.admonitionBlockquote} style={style}>
         <div className={styles.admonitionContainer}>

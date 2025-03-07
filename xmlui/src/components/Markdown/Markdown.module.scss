@@ -49,6 +49,8 @@ $margin-Blockquote: createThemeVar("margin-Blockquote");
 
 $color-bg-Admonition: createThemeVar("color-bg-Admonition");
 $color-text-Admonition: createThemeVar("color-text-Admonition");
+$size-icon-Admonition: createThemeVar("size-icon-Admonition");
+
 
 .admonitionBlockquote {
   position: relative;
@@ -56,13 +58,26 @@ $color-text-Admonition: createThemeVar("color-text-Admonition");
   background-color: $color-bg-Admonition;
   box-shadow: $shadow-Blockquote;
   padding: $padding-Blockquote;
-  margin-top: $margin-Blockquote;
-  margin-bottom: $margin-Blockquote;
+  margin: $margin-Blockquote;
   color: $color-text-Admonition;
-  background-color: $color-bg-Admonition;
-  // No ::before pseudo-element here
 }
 
+.admonitionContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.admonitionIcon {
+  font-size: $size-icon-Admonition;
+  padding-top: 0;
+  flex-shrink: 0;
+}
+
+.admonitionContent {
+  flex: 1;
+  min-width: 0;
+}
 
 // --- UnorderedList
 
