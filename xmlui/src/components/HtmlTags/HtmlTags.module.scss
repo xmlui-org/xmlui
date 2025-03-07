@@ -215,14 +215,19 @@ $themeVarsList: (
   @return t.getThemeVar($themeVarsList, $componentVariable);
 }
 
-$margin-top-HtmlList: createThemeVarList("margin-top-HtmlList");
-$margin-bottom-HtmlList: createThemeVarList("margin-bottom-HtmlList");
+$margin-top-HtmlOl: createThemeVarList("margin-top-HtmlOl");
+$margin-bottom-HtmlOl: createThemeVarList("margin-bottom-HtmlOl");
+$margin-top-HtmlUl: createThemeVarList("margin-top-HtmlUl");
+$margin-bottom-HtmlUl: createThemeVarList("margin-bottom-HtmlUl");
 
 // Apply to both ul and ol elements
-.htmlUl,
+.htmlUl {
+  margin-top: $margin-top-HtmlUl;
+  margin-bottom: $margin-bottom-HtmlUl;
+}
 .htmlOl {
-  margin-top: $margin-top-HtmlList;
-  margin-bottom: $margin-bottom-HtmlList;
+  margin-top: $margin-top-HtmlOl;
+  margin-bottom: $margin-bottom-HtmlOl;
 }
 
 li .htmlUl,

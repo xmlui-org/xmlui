@@ -1046,15 +1046,7 @@ export const htmlITagRenderer = createComponentRenderer(
   },
 );
 
-// Common metadata for both ul and ol
-export const HtmlListMd = createMetadata({
-  description: "Common styling for HTML list elements (ul and ol).",
-  themeVars: parseScssVar(styles.themeVarsList),
-  defaultThemeVars: {
-    "margin-top-HtmlList": "1rem",
-    "margin-bottom-HtmlList": "1rem",
-  },
-});
+
 
 export const HtmlIframeMd = createMetadata({
   status: "experimental",
@@ -1460,14 +1452,20 @@ export const HtmlOlMd = createMetadata({
   description: "This component renders an HTML `ol` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
+  defaultThemeVars: {
+    "margin-top-HtmlOl": "$space-4",
+    "margin-bottom-HtmlOl": "$space-4",
+  },
 });
 
 export const htmlOlTagRenderer = createComponentRenderer(
   "ol",
   HtmlOlMd, // Use HtmlOlMd instead of HtmlListMd
-  ({ node, renderChild, layoutCss }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <ol style={layoutCss} className={styles.htmlOl} >
+      <ol style={layoutCss} className={styles.htmlOl} {...props}>
         {renderChild(node.children)}
       </ol>
     );
@@ -2018,8 +2016,8 @@ export const HtmlTableMd = createMetadata({
   defaultThemeVars: {
     "color-bg-HtmlTable": "$color-bg",
     "border-HtmlTable": "1px solid $color-border",
-    "margin-bottom-HtmlTable": "1rem",
-    "margin-top-HtmlTable": "1rem",
+    "margin-bottom-HtmlTable": "$space-4",
+    "margin-top-HtmlTable": "$space-4",
     },
 });
 
@@ -2367,14 +2365,20 @@ export const HtmlUlMd = createMetadata({
   description: "This component renders an HTML `ul` tag.",
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
+  defaultThemeVars: {
+    "margin-top-HtmlUl": "$space-4",
+    "margin-bottom-HtmlUl": "$space-4",
+  },
 });
 
 export const htmlUlTagRenderer = createComponentRenderer(
   "ul",
   HtmlUlMd, // Use HtmlOlMd instead of HtmlListMd
-  ({ node, renderChild, layoutCss }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
+    const props = p.asRest();
     return (
-      <ul style={layoutCss} className={styles.htmlUl} >
+      <ul style={layoutCss} className={styles.htmlUl} {...props} >
         {renderChild(node.children)}
       </ul>
     );
