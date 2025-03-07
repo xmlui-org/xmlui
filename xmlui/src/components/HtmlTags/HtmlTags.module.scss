@@ -212,6 +212,19 @@ li .htmlUl, li .htmlOl {
   margin-bottom: 0;
 }
 
+.htmlUl li, .htmlOl li {
+  display: flex;
+  align-items: flex-start;
+  
+  /* Ensure there's a small gap between the checkbox and text */
+  > input[type="checkbox"] {
+    margin-right: 8px;
+    margin-top: 4px; /* Adjust to vertically align with text */
+    flex-shrink: 0;
+  }
+  
+}
+
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVarsTable: t.json-stringify($themeVarsTable);
