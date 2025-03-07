@@ -116,7 +116,7 @@ Example #2:
 </App>
 ```
 
-When the list's data is fetched from the specified URL, a particular list item displays the `title` and `detail	s` fields in the rendered data item.
+When the list's data is fetched from the specified URL, a particular list item displays the `title` and `details` fields in the rendered data item.
 
 ### State Management with Containers
 
