@@ -23,7 +23,7 @@ import {handleHover} from "./services/hover";
 import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
-import { createXmlUiParser, GetText, ParseResult } from './xmlui-parser/parser';
+import { createXmlUiParser, GetText, ParseResult } from '../parsers/xmlui-parser/parser';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
