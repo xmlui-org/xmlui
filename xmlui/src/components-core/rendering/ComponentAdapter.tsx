@@ -229,7 +229,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     //   ...layoutContextRef?.current,
     //   mediaSize: appContext.mediaSize,
     // });
-  }, [appContext.mediaSize, layoutContextRef, safeNode.props, themeVars, valueExtractor]);
+  }, [appContext.mediaSize, layoutContextRef, safeNode.props, valueExtractor]);
 
   // --- As compileLayout generates new cssProps and nonCssProps objects every time, we need to
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
@@ -339,7 +339,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     // --- https://www.radix-ui.com/primitives/docs/guides/composition
 
     return cloneElement(renderedNode, {
-      ref: ref ? composeRefs(ref, (renderedNode as any).ref) : undefined,
+      ref: ref ? composeRefs(ref, (renderedNode as any).ref) : (renderedNode as any).ref,
       ...mergeProps({ ...renderedNode.props, ...mouseEventHandlers }, rest),
     } as any);
   }
