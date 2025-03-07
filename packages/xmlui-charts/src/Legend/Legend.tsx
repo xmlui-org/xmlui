@@ -10,6 +10,7 @@ const COMP = "Legend";
 
 export const LegendMd = createMetadata({
   description: "Legend component to be displayed in a chart component.",
+  status: "experimental",
   props: {
     align: {
       description: "The alignment of the legend",

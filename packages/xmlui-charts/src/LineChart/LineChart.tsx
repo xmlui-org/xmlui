@@ -5,6 +5,7 @@ const COMP = "LineChart";
 
 export const LineChartMd = createMetadata({
   description: "Represents a line chart component.",
+  status: "experimental",
   props: {
     data: {
       description:

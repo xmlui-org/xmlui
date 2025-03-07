@@ -11,6 +11,7 @@ const defaultPropsDonut = {
 
 export const DonutChartMd = createMetadata({
   description: "Represents a derivative of the pie chart that is a donut chart.",
+  status: "experimental",
   props: {
     data: {
       description: "The data to be displayed in the chart. Needs to be an array of objects.",
