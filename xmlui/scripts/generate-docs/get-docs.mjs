@@ -36,6 +36,11 @@ async function generateExtenionPackages(metadata) {
 
   const extensionsFolder = join(FOLDERS.pages, "extension-components");
   for (const packageName in metadata) {
+    // Just to be sure we don't generate anything internal
+    if (metadata[packageName].state === "internal") {
+      continue;
+    }
+
     const packageFolder = join(extensionsFolder, packageName);
 
     if (!existsSync(packageFolder)) {
@@ -225,9 +230,10 @@ async function dynamicallyLoadExtensionPackages() {
       }
       // Ignore internal packages
       if (extensionPackage.state === "internal") {
-        logger.log("Skipping internal extension package:", dir);
+        logger.info("Skipping internal extension package:", dir);
         continue;
       }
+      console.log("Loaded extension package:", basename(dir));
       importedMetadata[basename(dir)] = extensionPackage;
     } catch (error) {
       processError(error);

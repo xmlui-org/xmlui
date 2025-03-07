@@ -28,7 +28,11 @@ for (let dir of packageDirectories) {
     }
 
     console.log(`--- Building Extension Package: ${dir}`);
-    execSync(metaBuildScript, { stdio: "inherit", cwd: dirFullPath });
+    execSync(metaBuildScript, {
+      stdio: "inherit",
+      cwd: dirFullPath,
+      env: { ...process.env, npm_package_name: dir, NODE_ENV: "metadata" },
+    });
   } catch (error) {
     console.error(error);
   }
