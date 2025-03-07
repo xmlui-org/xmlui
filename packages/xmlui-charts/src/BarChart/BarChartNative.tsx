@@ -10,7 +10,6 @@ import {
 } from "recharts";
 
 import type { CSSProperties, ReactNode } from "react";
-import React from "react";
 import { useMemo } from "react";
 import { useColors } from "xmlui";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
@@ -32,20 +31,41 @@ export type BarChartProps = {
   showLegend?: boolean;
 };
 
+export const defaultProps: Pick<
+  BarChartProps,
+  | "layout"
+  | "stacked"
+  | "hideTickX"
+  | "hideTickY"
+  | "hideX"
+  | "hideY"
+  | "tickFormatter"
+  | "showLegend"
+> = {
+  layout: "vertical",
+  stacked: false,
+  hideTickX: false,
+  hideTickY: false,
+  hideX: false,
+  hideY: false,
+  tickFormatter: (value) => value,
+  showLegend: false,
+};
+
 export function BarChart({
   data = [],
-  layout = "vertical",
+  layout = defaultProps.layout,
   nameKey,
-  stacked = false,
+  stacked = defaultProps.stacked,
   dataKeys = [],
-  hideTickX = false,
-  hideTickY = false,
-  hideY = false,
-  hideX = false,
-  tickFormatter = (value) => value,
+  hideTickX = defaultProps.hideTickX,
+  hideTickY = defaultProps.hideTickY,
+  hideY = defaultProps.hideY,
+  hideX = defaultProps.hideX,
+  tickFormatter = defaultProps.tickFormatter,
   style,
   children,
-  showLegend = false,
+  showLegend = defaultProps.showLegend,
 }: BarChartProps) {
   const colors = useColors(
     {

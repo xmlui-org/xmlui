@@ -9,8 +9,8 @@ import {
 } from "fs";
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
-import { logger, LOGGER_LEVELS } from "./logger.mjs";
-import { createTable, processError, ErrorWithSeverity, strBufferToLines, removeAdjacentNewlines } from "./utils.mjs";
+import { logger, LOGGER_LEVELS, processError, ErrorWithSeverity, } from "./logger.mjs";
+import { createTable, strBufferToLines, removeAdjacentNewlines } from "./utils.mjs";
 
 // Note: string concatenation is the fastest using `+=` in Node.js
 

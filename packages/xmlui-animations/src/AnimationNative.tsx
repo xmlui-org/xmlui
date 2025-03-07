@@ -24,6 +24,14 @@ const AnimatedComponent = animated(
   }),
 );
 
+export const defaultProps: Pick<AnimationProps, "delay" | "animateWhenInView" |"reverse" | "loop" | "once"> = {
+  delay: 0,
+  animateWhenInView: false,
+  reverse: false,
+  loop: false,
+  once: false
+};
+
 export const Animation = ({
   children,
   registerComponentApi,
@@ -31,11 +39,11 @@ export const Animation = ({
   duration,
   onStop,
   onStart,
-  delay = 0,
-  animateWhenInView = false,
-  reverse = false,
-  loop = false,
-  once = false,
+  delay = defaultProps.delay,
+  animateWhenInView = defaultProps.animateWhenInView,
+  reverse = defaultProps.reverse,
+  loop = defaultProps.loop,
+  once = defaultProps.once,
 }: AnimationProps) => {
   const [_animation] = useState(animation);
   const [toggle, setToggle] = useState(false);

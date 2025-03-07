@@ -1,28 +1,47 @@
 import { createComponentRenderer, createMetadata, d } from "xmlui";
-import { LineChart } from "./LineChartNative";
+import { defaultProps, LineChart } from "./LineChartNative";
 
 const COMP = "LineChart";
 
 export const LineChartMd = createMetadata({
-  description: "A line chart component",
+  description: "Represents a line chart component.",
   props: {
-    data: d(
-      "The data to be displayed in the line chart. It should be an array of objects, where each object represents a data point.",
-    ),
-    dataKeys: d(
-      "This property specifies the keys in the data objects that should be used for rendering the lines.",
-    ),
-    nameKey: d("The key in the data objects used for labeling different data series."),
-    hideX: d(
-      "Determines whether the X-axis should be hidden. If set to true, the axis will not be displayed.",
-    ),
-    hideTooltip: d(
-      "Determines whether the tooltip should be hidden. If set to true, no tooltip will be shown when hovering over data points.",
-    ),
-    tickFormatter: d(
-      "A function that formats the axis tick labels. It receives a tick value and returns a formatted string.",
-    ),
-    showLegend: d("Determines whether the legend should be displayed."),
+    data: {
+      description:
+        "The data to be displayed in the line chart." +
+        "It needs to be an array of objects, where each object represents a data point.",
+    },
+    dataKeys: {
+      description:
+        "This property specifies the keys in the data objects that should be used for rendering the lines.",
+      valueType: "string",
+    },
+    nameKey: {
+      description: "The key in the data objects used for labeling different data series.",
+      valueType: "string",
+    },
+    hideX: {
+      description:
+        "Determines whether the X-axis should be hidden. If set to (\`true\`), the axis will not be displayed.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideX,
+    },
+    hideTooltip: {
+      description:
+        "Determines whether the tooltip should be hidden." +
+        "If set to (\`true\`), no tooltip will be shown when hovering over data points.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideTooltip,
+    },
+    tickFormatter: {
+      description:
+        "A function that formats the axis tick labels. It receives a tick value and returns a formatted string.",
+    },
+    showLegend: {
+      description: "Determines whether the legend should be displayed.",
+      valueType: "boolean",
+      defaultValue: defaultProps.showLegend,
+    },
   },
 });
 

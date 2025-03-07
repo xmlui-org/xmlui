@@ -1,30 +1,59 @@
-import { createComponentRenderer, createMetadata, d } from "xmlui";
-import { Animation } from "./AnimationNative";
+import { createComponentRenderer, createMetadata } from "xmlui";
+import { Animation, defaultProps } from "./AnimationNative";
 
 const COMP = "ScaleAnimation";
 
+const defaultAnimationValues = {
+  from: 0,
+  to: 1,
+};
+
 export const ScaleAnimationMd = createMetadata({
-  status: "in progress",
-  specializedFrom: "Animation",
+  status: "experimental",
   description: `The \`${COMP}\` component represents an animation that scales the content.`,
+  docFolder: "src",
   props: {
-    from: d("The initial scale of the content."),
-    to: d("The final scale of the content."),
-    duration: d("The duration of the animation in milliseconds."),
-    animateWhenInView: d(
-      "Indicates whether the animation should start when the component is in view.",
-    ),
-    reverse: d("Indicates whether the animation should run in reverse."),
-    loop: d("Indicates whether the animation should loop."),
-    delay: d("The delay before the animation starts in milliseconds."),
+    from: {
+      description: "The initial scale of the content.",
+      valueType: "number",
+      defaultValue: defaultAnimationValues.from,
+    },
+    to: {
+      description: "The final scale of the content.",
+      valueType: "number",
+      defaultValue: defaultAnimationValues.to,
+    },
+    duration: {
+      description: "The duration of the animation in milliseconds.",
+      valueType: "number",
+    },
+    animateWhenInView: {
+      description: "Indicates whether the animation should start when the component is in view.",
+      valueType: "boolean",
+    },
+    reverse: {
+      description: `Indicates whether the animation should run in reverse`,
+      defaultValue: defaultProps.reverse,
+      valueType: "boolean",
+    },
+    loop: {
+      description: `Indicates whether the animation should loop`,
+      defaultValue: defaultProps.loop,
+      valueType: "boolean",
+    },
+    delay: {
+      description: `The delay before the animation starts in milliseconds`,
+      defaultValue: defaultProps.delay,
+      valueType: "number",
+    },
   },
   events: {
-    started: d("Event fired when the animation starts."),
-    stopped: d("Event fired when the animation stops."),
+    started: { description: `Event fired when the animation starts` },
+    stopped: { description: `Event fired when the animation stops` },
   },
   apis: {
-    start: d("Starts the animation."),
-    stop: d("Stops the animation."),
+    start: { description: `Starts the animation` },
+    stop: { description: `Stops the animation` },
   },
 });
 
@@ -36,8 +65,12 @@ export const scaleAnimationRenderer = createComponentRenderer(
       <Animation
         registerComponentApi={registerComponentApi}
         animation={{
-          from: { transform: `scale(${extractValue.asOptionalNumber(node.props?.from)})` },
-          to: { transform: `scale(${extractValue.asOptionalNumber(node.props?.to)})` },
+          from: {
+            transform: `scale(${extractValue.asOptionalNumber(node.props?.from, defaultAnimationValues.from)})`,
+          },
+          to: {
+            transform: `scale(${extractValue.asOptionalNumber(node.props?.to, defaultAnimationValues.to)})`,
+          },
         }}
         duration={extractValue.asOptionalNumber(node.props.duration)}
         onStop={lookupEventHandler("stopped")}

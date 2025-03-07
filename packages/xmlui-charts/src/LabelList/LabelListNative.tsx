@@ -11,7 +11,11 @@ type Props = {
   style?: CSSProperties;
 };
 
-export const LabelList = ({ position = "inside", key, style }: Props) => {
+export const defaultProps: Pick<Props, "position"> = {
+  position: "inside",
+};
+
+export const LabelList = ({ position = defaultProps.position, key, style }: Props) => {
   const { nameKey } = useChart();
   const { setLabelList } = useLabelList();
 

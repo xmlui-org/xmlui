@@ -5,7 +5,7 @@
  */
 class Logger {
   // TODO: make class a singleton
-  
+
   static severity = {
     info: "info",
     warning: "warning",
@@ -31,9 +31,7 @@ class Logger {
     levels = Array.from(new Set(levels));
     let validLevels = levels.filter((level) => this.isValidLevel(level));
     if (validLevels.length === 0) {
-      this._logError(
-        `No valid log levels provided. Using defaults: ${this.defaultLogLevel}.`
-      );
+      this._logError(`No valid log levels provided. Using defaults: ${this.defaultLogLevel}.`);
       validLevels = [this.defaultLogLevel];
     }
 
@@ -58,7 +56,7 @@ class Logger {
   log(severity = Logger.severity.info, ...args) {
     if (!this.isValidSeverity(severity)) {
       this.warning(
-        `Invalid log severity: ${severity}. Defaulting to message severity: ${this.defaultSeverity}.`
+        `Invalid log severity: ${severity}. Defaulting to message severity: ${this.defaultSeverity}.`,
       );
       severity = this.defaultSeverity;
     }
@@ -84,7 +82,11 @@ class Logger {
   }
 
   _logError(...args) {
-    console.error("[ERR]", ...args);
+    if (args[0] instanceof Error) {
+      console.error("[ERR]", args[0].message + "\n", args[0].stack.split("\n").slice(1).join("\n  "));
+    } else {
+      console.error("[ERR]", ...args);
+    }
   }
 
   _noop(...args) {}
@@ -98,3 +100,32 @@ export const LOGGER_LEVELS = {
 
 // --- Usable logger instance
 export const logger = new Logger(LOGGER_LEVELS.all);
+
+// --- Error classes
+
+export class ErrorWithSeverity extends Error {
+  constructor(message, severity = Logger.severity.error) {
+    super(message);
+    this.name = "ErrorWithSeverity";
+    this.severity = severity;
+  }
+}
+
+/**
+ * Logs error to console depending on the type of the error thrown.
+ * - ErrorWithSeverity type errors are logged with the severity specified.
+ * - Other errors are logged with severity ERROR.
+ * @param {ErrorWithSeverity | Error | string} error
+ */
+export function processError(error) {
+  if (error instanceof ErrorWithSeverity) {
+    // We log the stack trace only for errors with severity ERROR
+    error.severity === Logger.severity.error
+      ? logger.log(error.severity, error)
+      : logger.log(error.severity, error.message);
+  } else if (error instanceof Error) {
+    logger.error(error);
+  } else {
+    logger.error(error);
+  }
+}

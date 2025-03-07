@@ -1,19 +1,50 @@
 import { createComponentRenderer, createMetadata, d, parseScssVar } from "xmlui";
 import styles from "../PieChart/PieChartNative.module.scss";
-import { PieChart } from "../PieChart/PieChartNative";
+import { defaultProps, PieChart } from "../PieChart/PieChartNative";
 
 const COMP = "DonutChart";
 
+const defaultPropsDonut = {
+  ...defaultProps,
+  innerRadius: 60,
+};
+
 export const DonutChartMd = createMetadata({
-  description: "A donut chart component",
+  description: "Represents a derivative of the pie chart that is a donut chart.",
   props: {
-    data: d("The data to be displayed in the pie chart"),
-    dataKey: d("The key to use for the data"),
-    nameKey: d("The key to use for the name"),
-    showLabel: d("Whether to show labels"),
-    innerRadius: d("The inner radius of the donut chart"),
-    showLabelList: d("Whether to show labels in a list"),
-    showLegend: d("Whether to show the legend"),
+    data: {
+      description: "The data to be displayed in the chart. Needs to be an array of objects.",
+    },
+    dataKeys: {
+      description:
+        "This property specifies the keys in the data objects that should be used for rendering the bars.",
+      valueType: "string",
+    },
+    nameKey: {
+      description:
+        "Specifies the key in the data objects that will be used to label the different data series.",
+      valueType: "string",
+    },
+    showLabel: {
+      description: "Toggles whether to show labels (\`true\`) or not (\`false\`).",
+      valueType: "boolean",
+      defaultValue: defaultPropsDonut.showLabel,
+    },
+    innerRadius: {
+      description: "Sets the inner radius of the donut chart.",
+      valueType: "number",
+      defaultValue: defaultPropsDonut.innerRadius,
+    },
+    showLabelList: {
+      description: "Whether to show labels in a list (\`true\`) or not (\`false\`).",
+      valueType: "boolean",
+      defaultValue: defaultPropsDonut.showLabelList,
+    },
+    showLegend: {
+      description: "Whether to show a legend (\`true\`) or not (\`false\`).",
+      valueType: "boolean",
+      defaultValue: defaultPropsDonut.showLegend,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -27,14 +58,26 @@ export const donutChartComponentRenderer = createComponentRenderer(
   ({ extractValue, node, layoutCss, renderChild }: any) => {
     return (
       <PieChart
-        showLabelList={extractValue.asOptionalBoolean(node.props?.showLabelList)}
-        innerRadius={extractValue(node.props?.innerRadius || 60)}
+        showLabelList={extractValue.asOptionalBoolean(
+          node.props?.showLabelList,
+          defaultPropsDonut.showLabelList,
+        )}
+        innerRadius={extractValue.asOptionalNumber(
+          node.props?.innerRadius,
+          defaultPropsDonut.innerRadius,
+        )}
         data={extractValue(node.props?.data)}
         style={layoutCss}
-        showLabel={extractValue.asOptionalBoolean(node.props?.showLabel)}
+        showLabel={extractValue.asOptionalBoolean(
+          node.props?.showLabel,
+          defaultPropsDonut.showLabel,
+        )}
         dataKey={extractValue(node.props?.dataKey)}
         nameKey={extractValue(node.props?.nameKey)}
-        showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
+        showLegend={extractValue.asOptionalBoolean(
+          node.props?.showLegend,
+          defaultPropsDonut.showLegend,
+        )}
       >
         {renderChild(node.children)}
       </PieChart>

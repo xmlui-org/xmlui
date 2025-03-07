@@ -1,14 +1,23 @@
-import { createComponentRenderer, createMetadata, d, parseScssVar } from "xmlui";
+import { createComponentRenderer, createMetadata, parseScssVar } from "xmlui";
 import styles from "./LabelListNative.module.scss";
-import { LabelList } from "./LabelListNative";
+import { defaultProps, LabelList } from "./LabelListNative";
+import { LabelPositionValues } from "../utils/abstractions";
 
 const COMP = "LabelList";
 
 export const LabelListMd = createMetadata({
-  description: "A label list component",
+  description: "Label list component for a chart component.",
   props: {
-    key: d("The key to use for the data"),
-    position: d("The position of the label list"),
+    key: {
+      description: "The key that needs to be matched to the data series.",
+      valueType: "string",
+    },
+    position: {
+      description: "The position of the label list",
+      valueType: "string",
+      availableValues: LabelPositionValues,
+      defaultValue: defaultProps.position,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
