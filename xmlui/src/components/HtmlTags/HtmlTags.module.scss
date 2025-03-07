@@ -2,7 +2,9 @@
 
 // --- table
 
-$themeVarsTable: ();
+$themeVarsTable: (
+);
+
 @function createThemeVarTable($componentVariable) {
   $themeVarsTable: t.appendThemeVar($themeVarsTable, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTable, $componentVariable);
@@ -34,7 +36,9 @@ $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
 
 // --- thead
 
-$themeVarsThead: ();
+$themeVarsThead: (
+);
+
 @function createThemeVarThead($componentVariable) {
   $themeVarsThead: t.appendThemeVar($themeVarsThead, $componentVariable) !global;
   @return t.getThemeVar($themeVarsThead, $componentVariable);
@@ -60,7 +64,9 @@ $themeVarsThead: t.composePaddingVars($themeVarsThead, "HtmlThead");
 
 // --- tbody
 
-$themeVarsTbody: ();
+$themeVarsTbody: (
+);
+
 @function createThemeVarTbody($componentVariable) {
   $themeVarsTbody: t.appendThemeVar($themeVarsTbody, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTbody, $componentVariable);
@@ -82,7 +88,9 @@ $transform-text-HtmlTbody: createThemeVarTbody("transform-text-HtmlTbody");
 
 // --- tfoot
 
-$themeVarsTfoot: ();
+$themeVarsTfoot: (
+);
+
 @function createThemeVarTfoot($componentVariable) {
   $themeVarsTfoot: t.appendThemeVar($themeVarsTfoot, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTfoot, $componentVariable);
@@ -98,7 +106,9 @@ $color-text-HtmlTfoot: createThemeVarTfoot("color-text-HtmlTfoot");
 
 // --- th
 
-$themeVarsTh: ();
+$themeVarsTh: (
+);
+
 @function createThemeVarTh($componentVariable) {
   $themeVarsTh: t.appendThemeVar($themeVarsTh, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTh, $componentVariable);
@@ -127,7 +137,9 @@ $themeVarsTh: t.composePaddingVars($themeVarsTh, "HtmlTh");
 
 // --- tr
 
-$themeVarsTr: ();
+$themeVarsTr: (
+);
+
 @function createThemeVarTr($componentVariable) {
   $themeVarsTr: t.appendThemeVar($themeVarsTr, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTr, $componentVariable);
@@ -158,6 +170,7 @@ $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
     background-color: $color-bg-HtmlTr--hover;
     color: $color-text-HtmlTr--hover;
   }
+
   // Remove hover effect for rows with only th elements
   &:hover:not(:has(:not(th))) {
     background-color: initial;
@@ -166,7 +179,9 @@ $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
 
 // --- td
 
-$themeVarsTd: ();
+$themeVarsTd: (
+);
+
 @function createThemeVarTd($componentVariable) {
   $themeVarsTd: t.appendThemeVar($themeVarsTd, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTd, $componentVariable);
@@ -192,7 +207,9 @@ $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
 
 // --- List styling (for both ul and ol)
 
-$themeVarsList: ();
+$themeVarsList: (
+);
+
 @function createThemeVarList($componentVariable) {
   $themeVarsList: t.appendThemeVar($themeVarsList, $componentVariable) !global;
   @return t.getThemeVar($themeVarsList, $componentVariable);
@@ -202,27 +219,29 @@ $margin-top-HtmlList: createThemeVarList("margin-top-HtmlList");
 $margin-bottom-HtmlList: createThemeVarList("margin-bottom-HtmlList");
 
 // Apply to both ul and ol elements
-.htmlUl, .htmlOl {
+.htmlUl,
+.htmlOl {
   margin-top: $margin-top-HtmlList;
   margin-bottom: $margin-bottom-HtmlList;
 }
 
-li .htmlUl, li .htmlOl {
+li .htmlUl,
+li .htmlOl {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-.htmlUl li, .htmlOl li {
+// Only apply flex layout to list items that contain checkboxes
+.htmlUl li:has(> input[type="checkbox"]),
+.htmlOl li:has(> input[type="checkbox"]) {
   display: flex;
   align-items: flex-start;
-  
-  /* Ensure there's a small gap between the checkbox and text */
-  > input[type="checkbox"] {
+
+  >input[type="checkbox"] {
     margin-right: 8px;
-    margin-top: 4px; /* Adjust to vertically align with text */
+    margin-top: 4px;
     flex-shrink: 0;
   }
-  
 }
 
 // --- We export the theme variables to add them to the component renderer
