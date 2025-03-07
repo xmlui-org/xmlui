@@ -212,31 +212,33 @@ type BlockquoteProps = {
 };
 
 const Blockquote = ({ children, style }: BlockquoteProps) => {
-  // Convert all text content into a single string for analysis
-  let allText = '';
-  
-  const extractText = (node: React.ReactNode): void => {
+  // Helper function to extract text from React nodes
+  const extractTextContent = (node: React.ReactNode): string => {
     if (typeof node === 'string') {
-      allText += node;
-    } else if (React.isValidElement(node)) {
-      React.Children.forEach(node.props.children, extractText);
+      return node;
     }
+    
+    if (React.isValidElement(node) && node.props && node.props.children) {
+      if (Array.isArray(node.props.children)) {
+        return node.props.children.map(extractTextContent).join('');
+      }
+      return extractTextContent(node.props.children);
+    }
+    
+    return '';
   };
   
-  React.Children.forEach(children, extractText);
+  // Extract all text content
+  const allText = React.Children.toArray(children).map(extractTextContent).join('');
   
-  // Debug what's happening
-  console.log("Blockquote content:", JSON.stringify(allText));
-  
-  // Try to match admonition pattern
+  // Check for admonition pattern
   const match = allText.match(/\[!([A-Z]+)\]/);
-  console.log("Match result:", match);
+  const isAdmonition = !!match;
   
-  if (match && match[1]) {
+  if (isAdmonition && match && match[1]) {
     const type = match[1].toLowerCase();
-    console.log("Found admonition type:", type);
     
-    // Map type to emoji
+    // Map admonition type to emoji
     const emojiMap: Record<string, string> = {
       info: '💡',
       warning: '⚠️',
@@ -245,50 +247,58 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
       tip: '💬'
     };
     
-    // Process children to remove the admonition pattern
-    const processedChildren = React.Children.map(children, (child) => {
-      if (typeof child === 'string') {
-        return child.replace(/\[!([A-Z]+)\]\s*/, '');
+    // Process children to remove the admonition marker
+    const processNode = (node: React.ReactNode): React.ReactNode => {
+      if (typeof node === 'string') {
+        return node.replace(/\[!([A-Z]+)\]\s*/, '');
       }
       
-      if (React.isValidElement(child)) {
-        const newChildren = React.Children.map(child.props.children, (grandchild) => {
-          if (typeof grandchild === 'string') {
-            return grandchild.replace(/\[!([A-Z]+)\]\s*/, '');
+      if (React.isValidElement(node)) {
+        // Handle React elements with children
+        if (node.props && node.props.children) {
+          let newChildren;
+          
+          if (Array.isArray(node.props.children)) {
+            newChildren = node.props.children.map(processNode);
+          } else {
+            newChildren = processNode(node.props.children);
           }
-          return grandchild;
-        });
+          
+          return React.cloneElement(node, node.props, newChildren);
+        }
         
-        return React.cloneElement(child, {}, newChildren);
+        // Element without children, return as is
+        return node;
       }
       
-      return child;
-    });
+      // Other node types (null, undefined, etc.)
+      return node;
+    };
     
-    // Simple inline styles for testing
+    const processedChildren = React.Children.map(children, processNode);
+    
+    // Render admonition blockquote
     return (
-      <blockquote 
-        className={styles.blockquote} 
-        style={{
-          ...style,
-          display: 'flex',
-          alignItems: 'flex-start'
-        }}
-      >
-        <div style={{ marginRight: '12px' }}>{emojiMap[type] || '💡'}</div>
-        <div>{processedChildren}</div>
+      <blockquote className={styles.admonitionBlockquote} style={style}>
+        <div className={styles.admonitionContainer}>
+          <div className={`${styles.admonitionIcon} ${styles[type] || ''}`}>
+            {emojiMap[type] || '💡'}
+          </div>
+          <div className={styles.admonitionContent}>
+            {processedChildren}
+          </div>
+        </div>
       </blockquote>
     );
   }
   
-  // Regular blockquote
+  // Render regular blockquote
   return (
     <blockquote className={styles.blockquote} style={style}>
       {children}
     </blockquote>
   );
 };
-
 
 type UnorderedListProps = {
   children: React.ReactNode;
