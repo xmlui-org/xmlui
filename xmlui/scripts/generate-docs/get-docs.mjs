@@ -225,7 +225,7 @@ async function dynamicallyLoadExtensionPackages() {
       }
       // Ignore internal packages
       if (extensionPackage.state === "internal") {
-        logger.log("Skipping internal extension package:", dir);
+        logger.info("Skipping internal extension package:", dir);
         continue;
       }
       importedMetadata[basename(dir)] = extensionPackage;
