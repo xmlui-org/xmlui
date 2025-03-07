@@ -116,7 +116,7 @@ export function BarChart({
           <CartesianGrid vertical={true} strokeDasharray="3 3" />
           {layout === "vertical" ? (
             <>
-              <XAxis type="number" axisLine={false} hide={hideX} />
+              <XAxis type="number" axisLine={false} hide={hideX} tick={{ fill: "currentColor" }} />
               <YAxis
                 hide={hideY}
                 dataKey={nameKey}
@@ -124,6 +124,7 @@ export function BarChart({
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
                 tickFormatter={tickFormatter}
+                tick={{ fill: "currentColor" }}
               />
             </>
           ) : (
@@ -134,14 +135,14 @@ export function BarChart({
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
                 tickFormatter={tickFormatter}
-                tick={!hideTickX}
                 height={hideX ? 0 : 30}
                 hide={hideX}
+                tick={!hideTickX && { fill: "currentColor" }}
               />
               <YAxis
                 type="number"
                 axisLine={false}
-                tick={!hideTickY}
+                tick={!hideTickY && { fill: "currentColor" }}
                 hide={hideY}
                 width={hideY ? 0 : 60}
               />
