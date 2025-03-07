@@ -244,6 +244,18 @@ li .htmlOl {
   }
 }
 
+// --- Heading styling
+$themeVarsHeading: (
+);
+
+@function createThemeVarHeading($componentVariable) {
+  $themeVarsHeading: t.appendThemeVar($themeVarsHeading, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsHeading, $componentVariable);
+}
+
+$margin-top-HtmlHeading: createThemeVarHeading("margin-top-HtmlHeading");
+$margin-bottom-HtmlHeading: createThemeVarHeading("margin-bottom-HtmlHeading");
+
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVarsTable: t.json-stringify($themeVarsTable);
@@ -254,4 +266,6 @@ li .htmlOl {
   themeVarsTr: t.json-stringify($themeVarsTr);
   themeVarsTd: t.json-stringify($themeVarsTd);
   themeVarsList: t.json-stringify($themeVarsList);
+  themeVarsHeading: t.json-stringify($themeVarsHeading);
+  
 }

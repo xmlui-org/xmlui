@@ -34,28 +34,28 @@ export const Markdown = memo(function Markdown({
   // These styles should match the styles applied to headings outside Markdown
   const headingStyles = {
     h1: {
-      marginTop: 0,      
-      marginBottom: "1em"
+      marginTop: "0",
+      marginBottom: "1em",
     },
     h2: {
-      marginTop: 0,      
-      marginBottom: "1em"
+      marginBottom: "1em",
+      marginTop: "1em",
     },
     h3: {
-      marginTop: 0,      
-      marginBottom: "1em"
+      marginBottom: "1em",
+      marginTop: "1em",
     },
     h4: {
-      marginTop: 0,      
-      marginBottom: "1em"
+      marginBottom: "1em",
+      marginTop: "1em",
     },
     h5: {
-      marginTop: 0,      
-      marginBottom: "1em"
+      marginBottom: "1em",
+      marginTop: "1em",
     },
     h6: {
-      marginTop: 0,      
-      marginBottom: "1em"
+      marginBottom: "1em",
+      marginTop: "1em",
     }
   };
 
