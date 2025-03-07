@@ -190,6 +190,28 @@ $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
   @include t.paddingVars($themeVarsTd, "HtmlTd");
 }
 
+// --- List styling (for both ul and ol)
+
+$themeVarsList: ();
+@function createThemeVarList($componentVariable) {
+  $themeVarsList: t.appendThemeVar($themeVarsList, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsList, $componentVariable);
+}
+
+$margin-top-HtmlList: createThemeVarList("margin-top-HtmlList");
+$margin-bottom-HtmlList: createThemeVarList("margin-bottom-HtmlList");
+
+// Apply to both ul and ol elements
+.htmlUl, .htmlOl {
+  margin-top: $margin-top-HtmlList;
+  margin-bottom: $margin-bottom-HtmlList;
+}
+
+li .htmlUl, li .htmlOl {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVarsTable: t.json-stringify($themeVarsTable);
@@ -199,4 +221,5 @@ $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
   themeVarsTh: t.json-stringify($themeVarsTh);
   themeVarsTr: t.json-stringify($themeVarsTr);
   themeVarsTd: t.json-stringify($themeVarsTd);
+  themeVarsList: t.json-stringify($themeVarsList);
 }

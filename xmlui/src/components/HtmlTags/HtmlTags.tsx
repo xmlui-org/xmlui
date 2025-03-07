@@ -1046,6 +1046,16 @@ export const htmlITagRenderer = createComponentRenderer(
   },
 );
 
+// Common metadata for both ul and ol
+export const HtmlListMd = createMetadata({
+  description: "Common styling for HTML list elements (ul and ol).",
+  themeVars: parseScssVar(styles.themeVarsList),
+  defaultThemeVars: {
+    "margin-top-HtmlList": "1rem",
+    "margin-bottom-HtmlList": "1rem",
+  },
+});
+
 export const HtmlIframeMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `iframe` tag.",
@@ -1449,23 +1459,15 @@ export const HtmlOlMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `ol` tag.",
   isHtmlTag: true,
-  props: {
-    reversed: d("Specifies that the list order should be descending (9, 8, 7, ...)"),
-    start: d("Specifies the start value of the first list item"),
-    type: d("Specifies the kind of marker to use in the list (e.g., '1', 'A', 'a', 'I', 'i')"),
-  },
+  themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
 });
 
 export const htmlOlTagRenderer = createComponentRenderer(
   "ol",
-  HtmlOlMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
-    const { reversed } = p.asOptionalBoolean("reversed");
-    const { start } = p.asOptionalNumber("start");
-    const props = p.asRest();
+  HtmlOlMd, // Use HtmlOlMd instead of HtmlListMd
+  ({ node, renderChild, layoutCss }) => {
     return (
-      <ol style={layoutCss} reversed={reversed ?? false} start={start ?? 1} {...props}>
+      <ol style={layoutCss} className={styles.htmlOl} >
         {renderChild(node.children)}
       </ol>
     );
@@ -2364,16 +2366,15 @@ export const HtmlUlMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `ul` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
 });
 
 export const htmlUlTagRenderer = createComponentRenderer(
   "ul",
-  HtmlUlMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
-    const props = p.asRest();
+  HtmlUlMd, // Use HtmlOlMd instead of HtmlListMd
+  ({ node, renderChild, layoutCss }) => {
     return (
-      <ul style={layoutCss} {...props}>
+      <ul style={layoutCss} className={styles.htmlUl} >
         {renderChild(node.children)}
       </ul>
     );

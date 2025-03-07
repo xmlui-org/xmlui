@@ -126,13 +126,13 @@ export const Markdown = memo(function Markdown({
             return <Blockquote>{children}</Blockquote>;
           },
           ol({ children }) {
-            return <OrderedList>{children}</OrderedList>;
+            return <ol className={htmlTagStyles.htmlOl}>{children}</ol>;
           },
           ul({ children }) {
-            return <UnorderedList>{children}</UnorderedList>;
+            return <ul className={htmlTagStyles.htmlUl}>{children}</ul>;
           },
           li({ children }) {
-            return <ListItem>{children}</ListItem>;
+            return <li>{children}</li>; // No custom styling for li elements
           },
           hr() {
             return <HorizontalRule />;
