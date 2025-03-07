@@ -209,12 +209,10 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
         !!root &&
         createPortal(
           <Button
-            icon={<Icon name={"code"} />}
             variant={"ghost"}
-            size={"xs"}
             className={classnames(styles.wrapper, "_debug-inspect-button")}
             ref={(el) => setPopperElement(el)}
-            style={{ ...popperStyles.popper }}
+            style={{ ...popperStyles.popper, padding: 0 }}
             {...attributes.popper}
             onMouseEnter={() => {
               hoverRef.current = true;
@@ -230,7 +228,9 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
             onClick={() => {
               setShowCode(true);
             }}
-          />,
+          >
+            <Icon name={"inspect"} size={"md"}/>
+          </Button>,
           root,
         )}
       {showCode && <InspectModal onClose={() => setShowCode(false)} node={node} />}

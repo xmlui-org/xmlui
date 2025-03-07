@@ -105,6 +105,7 @@ import { SortAscendingIcon } from "./Icon/SortAscendingIcon";
 import { SortDescendingIcon } from "./Icon/SortDescendingIcon";
 import { NoSortIcon } from "./Icon/NoSortIcon";
 import { TrendingLevelIcon } from "./Icon/TrendingLevelIcon";
+import { InspectIcon } from "./Icon/Inspect";
 
 type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
 
@@ -185,6 +186,7 @@ registerIconRenderer("exit", (props: IconBaseProps) => <RxExit {...props} />);
 registerIconRenderer("adduser", (props: IconBaseProps) => <FiUserPlus {...props} />);
 registerIconRenderer("userminus", (props: IconBaseProps) => <FiUserMinus {...props} />);
 registerIconRenderer("plus", (props: IconBaseProps) => <PlusIcon {...props} />);
+registerIconRenderer("inspect", (props: IconBaseProps) => <InspectIcon {...props} />);
 registerIconRenderer("plus-circle", (props: IconBaseProps) => <AiOutlinePlusCircle {...props} />);
 registerIconRenderer("filledplus", (props: IconBaseProps) => <FillPlusCircleIcon {...props} />);
 registerIconRenderer("chevronright", (props: IconBaseProps) => <ChevronRightIcon {...props} />);
