@@ -34,44 +34,44 @@ export const Markdown = memo(function Markdown({
   // These styles should match the styles applied to headings outside Markdown
   const headingStyles = {
     h1: {
-      marginTop: "1.5em",
-      marginBottom: "0.5em"
+      marginTop: 0,      
+      marginBottom: "1em"
     },
     h2: {
-      marginTop: "1.3em",
-      marginBottom: "0.5em"
+      marginTop: 0,      
+      marginBottom: "1em"
     },
     h3: {
-      marginTop: "1.2em",
-      marginBottom: "0.5em"
+      marginTop: 0,      
+      marginBottom: "1em"
     },
     h4: {
-      marginTop: "1.1em",
-      marginBottom: "0.5em"
+      marginTop: 0,      
+      marginBottom: "1em"
     },
     h5: {
-      marginTop: "1em",
-      marginBottom: "0.5em"
+      marginTop: 0,      
+      marginBottom: "1em"
     },
     h6: {
-      marginTop: "1em",
-      marginBottom: "0.5em"
+      marginTop: 0,      
+      marginBottom: "1em"
     }
   };
 
   children = removeIndents ? removeTextIndents(children) : children;
 
   return (
-    <div style={style}>
+    <div style={{ ...style, marginTop: 0 }}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }]]}
         components={{
           h1({ id, children }) {
             return (
-              <Heading 
-                uid={id} 
-                level="h1" 
-                sx={{ 
+              <Heading
+                uid={id}
+                level="h1"
+                sx={{
                   lineHeight: "initial",
                   ...headingStyles.h1
                 }}
@@ -82,10 +82,10 @@ export const Markdown = memo(function Markdown({
           },
           h2({ id, children }) {
             return (
-              <Heading 
-                uid={id} 
-                level="h2" 
-                sx={{ 
+              <Heading
+                uid={id}
+                level="h2"
+                sx={{
                   lineHeight: "initial",
                   ...headingStyles.h2
                 }}
@@ -96,10 +96,10 @@ export const Markdown = memo(function Markdown({
           },
           h3({ id, children }) {
             return (
-              <Heading 
-                uid={id} 
-                level="h3" 
-                sx={{ 
+              <Heading
+                uid={id}
+                level="h3"
+                sx={{
                   lineHeight: "initial",
                   ...headingStyles.h3
                 }}
@@ -110,10 +110,10 @@ export const Markdown = memo(function Markdown({
           },
           h4({ id, children }) {
             return (
-              <Heading 
-                uid={id} 
-                level="h4" 
-                sx={{ 
+              <Heading
+                uid={id}
+                level="h4"
+                sx={{
                   lineHeight: "initial",
                   ...headingStyles.h4
                 }}
@@ -124,10 +124,10 @@ export const Markdown = memo(function Markdown({
           },
           h5({ id, children }) {
             return (
-              <Heading 
-                uid={id} 
-                level="h5" 
-                sx={{ 
+              <Heading
+                uid={id}
+                level="h5"
+                sx={{
                   lineHeight: "initial",
                   ...headingStyles.h5
                 }}
@@ -138,10 +138,10 @@ export const Markdown = memo(function Markdown({
           },
           h6({ id, children }) {
             return (
-              <Heading 
-                uid={id} 
-                level="h6" 
-                sx={{ 
+              <Heading
+                uid={id}
+                level="h6"
+                sx={{
                   lineHeight: "initial",
                   ...headingStyles.h6
                 }}
