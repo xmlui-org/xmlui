@@ -3,6 +3,7 @@ import { findTokenAtPos, toDbgString } from "../../parsers/xmlui-parser/utils"
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import metadataByComponent from "../metadata";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
+import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
 
 type SimpleHover = null | {
   value: string;
@@ -54,15 +55,12 @@ function hoverAttr(attrKeyNode: Node, parentStack: Node[], getText: GetText): Si
   if (tag?.kind !== SyntaxKind.ElementNode){
     return null;
   }
-  const tagNameNode = tag.children!.find(c => c.kind === SyntaxKind.TagNameNode);
+
+  const tagNameNode = findTagNameNodeInStack(parentStack);
   if (!tagNameNode){
     return null;
   }
-
-  const compName = compNameFromTagNameNode(tagNameNode, getText);
-  if (!compName){
-    return null;
-  }
+  const compName = compNameForTagNameNode(tagNameNode, getText)
 
   const component = metadataByComponent[compName];
   if (!component){
@@ -107,8 +105,7 @@ function hoverAttr(attrKeyNode: Node, parentStack: Node[], getText: GetText): Si
 }
 
 function hoverName(tagNameNode: Node, identNode: Node, getText: GetText): SimpleHover {
-  const compName = compNameFromTagNameNode(tagNameNode, getText)
-  console.log({ compName })
+  const compName = compNameForTagNameNode(tagNameNode, getText)
   if (!compName) {
     return null;
   }
@@ -117,7 +114,6 @@ function hoverName(tagNameNode: Node, identNode: Node, getText: GetText): Simple
     return null;
   }
   const value = generateCompNameDescription(compName, compMetadata);
-  console.log({value})
   return {
     value,
     range: {
@@ -127,15 +123,6 @@ function hoverName(tagNameNode: Node, identNode: Node, getText: GetText): Simple
   };
 }
 
-function compNameFromTagNameNode(tagNameNode: Node, getText: GetText): string | null{
-  const colonIdx = tagNameNode.children!.findIndex((n) => n.kind === SyntaxKind.Colon);
-  const hasNs = colonIdx === -1 ? false : tagNameNode.children!.slice(0, colonIdx).findIndex((n:Node) => n.kind === SyntaxKind.Identifier) !== -1;
-  if(hasNs){
-    return null;
-  }
-  const nameNode = tagNameNode.children!.findLast(c => c.kind === SyntaxKind.Identifier)
-  return getText(nameNode);
-}
 
 function generateCompNameDescription(componentName: string, metadata: any): string {
   const sections: string[] = [];

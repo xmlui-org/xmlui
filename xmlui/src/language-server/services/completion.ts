@@ -1,9 +1,10 @@
-import { CompletionItem } from "vscode-languageserver";
+import type { CompletionItem } from "vscode-languageserver";
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { findTokenAtPos } from "../../parsers/xmlui-parser/utils"
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import metadataByComponent from "../metadata";
+import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
 
 export function handleCompletion(
   { node }: ParseResult,
@@ -29,10 +30,12 @@ export function handleCompletion(
   const preceededByAttrKeyNode = chainBeforePos.findLast(n => n.kind === SyntaxKind.AttributeKeyNode);
   const preceededByNameNode = chainBeforePos.findLast(n => n.kind === SyntaxKind.TagNameNode);
   const preceededByAttrNode = chainBeforePos.findLast(n => n.kind === SyntaxKind.AttributeNode);
-  console.log()
+
   if(preceededByAttrKeyNode || preceededByAttrNode || preceededByNameNode){
     if(!(beforeNodeIsIdent && atEndOfPreceedingNode)){
-      return completionForNewProps();
+      const tagNameNode = findTagNameNodeInStack(chainAtPos);
+      const compName = compNameForTagNameNode(tagNameNode, getText)
+      return completionForNewProps(compName);
     }
   }
 
@@ -129,6 +132,11 @@ function matchingTagName(
 function handleCompletionInsideToken(chainAtPos: Node[], position: number, getText: (n: Node) => string): CompletionItem[] {
   return null;
 }
-function completionForNewProps(): CompletionItem[] | null {
-  return [{ label: "prop completion!" }];
+
+function completionForNewProps(compName: string): CompletionItem[] | null {
+  const metadata = metadataByComponent[compName];
+  if (!metadata || !metadata.props){
+    return null;
+  }
+  return Object.keys(metadata.props).map(propName => ({ label: propName }));
 }
