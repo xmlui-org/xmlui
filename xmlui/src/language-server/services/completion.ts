@@ -22,61 +22,25 @@ export function handleCompletion(
   }
 
   const nodeBefore = chainBeforePos.at(-1);
-  const atNode = chainAtPos.at(-1);
-
-  const atEndOfPreceedingNode = atNode.pos === nodeBefore.end;
-  const beforeNodeIsIdent = nodeBefore.kind === SyntaxKind.Identifier;
-
-  const preceededByAttrKeyNode = chainBeforePos.findLast(n => n.kind === SyntaxKind.AttributeKeyNode);
-  const preceededByNameNode = chainBeforePos.findLast(n => n.kind === SyntaxKind.TagNameNode);
-  const preceededByAttrNode = chainBeforePos.findLast(n => n.kind === SyntaxKind.AttributeNode);
-
-  if(preceededByAttrKeyNode || preceededByAttrNode || preceededByNameNode){
-    if(!(beforeNodeIsIdent && atEndOfPreceedingNode)){
-      const tagNameNode = findTagNameNodeInStack(chainAtPos);
-      const compName = compNameForTagNameNode(tagNameNode, getText)
-      return completionForNewProps(compName);
-    }
-  }
-
   switch (nodeBefore.kind) {
     case SyntaxKind.OpenNodeStart:
       return allComponentNames();
     case SyntaxKind.CloseNodeStart:
       return matchingTagName(findRes as FindTokenSuccessHasBefore, getText);
-    default:
-      return null;
-
-      //when would I offer completeion for props?
-      //
-      // ident preceeds which is inside an attrkeynode. ident's end === position.
-        // (first, try without filtering for props starting with ident, see if vscode handles it correctly, or the lang server needs to handle matching the correct prefix.)
-      // <A a|>
-      // <A ab|="hu">
-      //
-      // attrNode precedes
-      // position is not at the end of the preceeding token, unless it's a string (but the previous stage might already have eliminated this branch)
-      // <A abc="hi"|>
-      // <A isEnabled |>
-      // <A abc="hi" | b="hello" >
-      // NameNode preceeds
-      // position is not at the end of the preceeding token
-      // <A | >
-      //
-      // atposition ident with attrkey as parent
-      // <A isVi|sible >
-
-      // Simplified:
-      // 1. attrKeyNode precedes
-      // 1.1. before is an ident with end === position
-      // 1.2. before is NOT (an ident with end === position)
-      // 2. attrNode precedes
-      // 2.1. before is an ident with end === position
-      // 2.2. before is NOT (an ident with end === position)
-      // 3. NameNodepreceeds
-      // 3.2 before is NOT (an ident with end === position)
-      // 4 inside ident with attrkey as parent
   }
+
+  const completeForProp = chainBeforePos.some(n =>
+      n.kind === SyntaxKind.AttributeKeyNode ||
+      n.kind === SyntaxKind.TagNameNode ||
+      n.kind === SyntaxKind.AttributeNode
+  );
+
+  if(completeForProp){
+    const tagNameNode = findTagNameNodeInStack(chainAtPos);
+    const compName = compNameForTagNameNode(tagNameNode, getText)
+    return completionForNewProps(compName);
+  }
+  return null;
 }
 
 type FindTokenSuccessHasBefore = {
@@ -130,6 +94,20 @@ function matchingTagName(
 }
 
 function handleCompletionInsideToken(chainAtPos: Node[], position: number, getText: (n: Node) => string): CompletionItem[] {
+  const parent = chainAtPos.at(-2);
+  if (!parent){
+    return null;
+  }
+  switch (parent.kind){
+    case SyntaxKind.TagNameNode: {
+      return allComponentNames();
+    }
+    case SyntaxKind.AttributeKeyNode: {
+      const tagNameNode = findTagNameNodeInStack(chainAtPos);
+      const compName = compNameForTagNameNode(tagNameNode, getText)
+      return completionForNewProps(compName);
+    }
+  }
   return null;
 }
 
