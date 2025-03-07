@@ -1,8 +1,8 @@
 import type { CompletionItem } from "vscode-languageserver";
-import type { GetText, ParseResult } from "../xmlui-parser/parser";
-import { findTokenAtPos } from "../xmlui-parser/utils"
-import { SyntaxKind } from "../xmlui-parser/syntax-kind";
-import { Node } from "../xmlui-parser/syntax-node";
+import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
+import { findTokenAtPos } from "../../parsers/xmlui-parser/utils"
+import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
+import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import metadataByComponent from "../metadata";
 
 export function handleCompletion(
