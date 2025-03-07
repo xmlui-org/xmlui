@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { forwardRef, useMemo, useRef, useState } from "react";
 import produce from "immer";
 
 import styles from "./Table.module.scss";
@@ -16,6 +16,7 @@ import {
   useSelectionContext,
 } from "../SelectionStore/SelectionStoreNative";
 import { Table } from "./TableNative";
+import type { RendererContext } from "../../abstractions/RendererDefs";
 
 const COMP = "Table";
 
@@ -168,130 +169,147 @@ export const TableMd = createMetadata({
   },
 });
 
-const TableWithColumns = ({
-  extractValue,
-  node,
-  renderChild,
-  lookupEventHandler,
-  lookupSyncCallback,
-  layoutCss,
-  registerComponentApi,
-}) => {
-  const data = extractValue(node.props.items) || extractValue(node.props.data);
+const TableWithColumns = forwardRef(
+  (
+    {
+      extractValue,
+      node,
+      renderChild,
+      lookupEventHandler,
+      lookupSyncCallback,
+      layoutCss,
+      registerComponentApi,
+    }: Pick<
+      RendererContext,
+      | "extractValue"
+      | "node"
+      | "renderChild"
+      | "lookupEventHandler"
+      | "layoutCss"
+      | "registerComponentApi"
+      | "lookupSyncCallback"
+    >,
+    ref,
+  ) => {
+    const data = extractValue(node.props.items) || extractValue(node.props.data);
 
-  const [columnIds, setColumnIds] = useState(EMPTY_ARRAY);
-  const [columnsByIds, setColumnByIds] = useState(EMPTY_OBJECT);
-  const columnIdsRef = useRef([]);
-  const [tableKey, setTableKey] = useState(0);
-  const tableContextValue = useMemo(() => {
-    return {
-      registerColumn: (column: OurColumnMetadata, id: string) => {
-        setColumnIds(
-          produce((draft) => {
-            const existing = draft.findIndex((colId) => colId === id);
-            if (existing < 0) {
-              draft.push(id);
-            }
-          }),
-        );
-        setColumnByIds(
-          produce((draft) => {
-            draft[id] = column;
-          }),
-        );
-      },
-      unRegisterColumn: (id: string) => {
-        setColumnIds(
-          produce((draft) => {
-            return draft.filter((colId) => colId !== id);
-          }),
-        );
-        setColumnByIds(
-          produce((draft) => {
-            delete draft[id];
-          }),
-        );
-      },
-    };
-  }, []);
-  const columnRefresherContextValue = useMemo(() => {
-    return {
-      registerColumn: (column: OurColumnMetadata, id: string) => {
-        if (!columnIdsRef.current.find((colId) => colId === id)) {
-          setTableKey((prev) => prev + 1);
-          columnIdsRef.current.push(id);
-        }
-      },
-      unRegisterColumn: (id: string) => {
-        if (columnIdsRef.current.find((colId) => colId === id)) {
-          columnIdsRef.current = columnIdsRef.current.filter((colId) => colId !== id);
-          setTableKey((prev) => prev + 1);
-        }
-      },
-    };
-  }, []);
+    const [columnIds, setColumnIds] = useState(EMPTY_ARRAY);
+    const [columnsByIds, setColumnByIds] = useState(EMPTY_OBJECT);
+    const columnIdsRef = useRef([]);
+    const [tableKey, setTableKey] = useState(0);
+    const tableContextValue = useMemo(() => {
+      return {
+        registerColumn: (column: OurColumnMetadata, id: string) => {
+          setColumnIds(
+            produce((draft) => {
+              const existing = draft.findIndex((colId) => colId === id);
+              if (existing < 0) {
+                draft.push(id);
+              }
+            }),
+          );
+          setColumnByIds(
+            produce((draft) => {
+              draft[id] = column;
+            }),
+          );
+        },
+        unRegisterColumn: (id: string) => {
+          setColumnIds(
+            produce((draft) => {
+              return draft.filter((colId) => colId !== id);
+            }),
+          );
+          setColumnByIds(
+            produce((draft) => {
+              delete draft[id];
+            }),
+          );
+        },
+      };
+    }, []);
+    const columnRefresherContextValue = useMemo(() => {
+      return {
+        registerColumn: (column: OurColumnMetadata, id: string) => {
+          if (!columnIdsRef.current.find((colId) => colId === id)) {
+            setTableKey((prev) => prev + 1);
+            columnIdsRef.current.push(id);
+          }
+        },
+        unRegisterColumn: (id: string) => {
+          if (columnIdsRef.current.find((colId) => colId === id)) {
+            columnIdsRef.current = columnIdsRef.current.filter((colId) => colId !== id);
+            setTableKey((prev) => prev + 1);
+          }
+        },
+      };
+    }, []);
 
-  const columns = useMemo(
-    () => columnIds.map((colId) => columnsByIds[colId]),
-    [columnIds, columnsByIds],
-  );
+    const columns = useMemo(
+      () => columnIds.map((colId) => columnsByIds[colId]),
+      [columnIds, columnsByIds],
+    );
 
-  const selectionContext = useSelectionContext();
+    const selectionContext = useSelectionContext();
 
-  const tableContent = (
-    <>
-      {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
+    const tableContent = (
+      <>
+        {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
             and once in a context where we refresh the columns (by forcing the first context to re-mount, via the 'tableKey').
             This way the order of the columns is preserved.
         */}
-      <TableContext.Provider value={tableContextValue} key={tableKey}>
-        {renderChild(node.children)}
-      </TableContext.Provider>
-      <TableContext.Provider value={columnRefresherContextValue}>
-        {renderChild(node.children)}
-      </TableContext.Provider>
-      <Table
-        data={data}
-        columns={columns}
-        pageSizes={extractValue(node.props.pageSizes)}
-        rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
-        registerComponentApi={registerComponentApi}
-        noDataRenderer={
-          node.props.noDataTemplate &&
-          (() => {
-            return renderChild(node.props.noDataTemplate);
-          })
-        }
-        hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
-        loading={extractValue.asOptionalBoolean(node.props.loading)}
-        isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
-        headerHeight={extractValue.asSize(node.props.headerHeight)}
-        rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
-        sortBy={extractValue(node.props?.sortBy)}
-        sortingDirection={extractValue(node.props?.sortDirection)}
-        iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
-        iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
-        iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
-        sortingDidChange={lookupEventHandler("sortingDidChange")}
-        onSelectionDidChange={lookupEventHandler("selectionDidChange")}
-        willSort={lookupEventHandler("willSort")}
-        style={layoutCss}
-        uid={node.uid}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
-        enableMultiRowSelection={extractValue.asOptionalBoolean(node.props.enableMultiRowSelection)}
-        alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
-          node.props.alwaysShowSelectionHeader,
-        )}
-      />
-    </>
-  );
+        <TableContext.Provider value={tableContextValue} key={tableKey}>
+          {renderChild(node.children)}
+        </TableContext.Provider>
+        <TableContext.Provider value={columnRefresherContextValue}>
+          {renderChild(node.children)}
+        </TableContext.Provider>
+        <Table
+          ref={ref}
+          data={data}
+          columns={columns}
+          pageSizes={extractValue(node.props.pageSizes)}
+          rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
+          registerComponentApi={registerComponentApi}
+          noDataRenderer={
+            node.props.noDataTemplate &&
+            (() => {
+              return renderChild(node.props.noDataTemplate);
+            })
+          }
+          hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
+          loading={extractValue.asOptionalBoolean(node.props.loading)}
+          isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
+          headerHeight={extractValue.asSize(node.props.headerHeight)}
+          rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
+          sortBy={extractValue(node.props?.sortBy)}
+          sortingDirection={extractValue(node.props?.sortDirection)}
+          iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
+          iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
+          iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
+          sortingDidChange={lookupEventHandler("sortingDidChange")}
+          onSelectionDidChange={lookupEventHandler("selectionDidChange")}
+          willSort={lookupEventHandler("willSort")}
+          style={layoutCss}
+          uid={node.uid}
+          autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+          hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
+          enableMultiRowSelection={extractValue.asOptionalBoolean(
+            node.props.enableMultiRowSelection,
+          )}
+          alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
+            node.props.alwaysShowSelectionHeader,
+          )}
+        />
+      </>
+    );
 
-  if (selectionContext === null) {
-    return <StandaloneSelectionStore>{tableContent}</StandaloneSelectionStore>;
-  }
-  return tableContent;
-};
+    if (selectionContext === null) {
+      return <StandaloneSelectionStore>{tableContent}</StandaloneSelectionStore>;
+    }
+    return tableContent;
+  },
+);
 
 export const tableComponentRenderer = createComponentRenderer(
   COMP,

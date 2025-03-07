@@ -1,5 +1,12 @@
 import type React from "react";
-import { cloneElement, forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import {
+  cloneElement,
+  forwardRef,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { useShallowCompareMemoize } from "./utils/hooks";
 
@@ -36,38 +43,42 @@ const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
   const nextSiblingRef = useRef(null);
   const { onTargetMounted } = props;
 
-  const [handlesItemRef, sethandlesItemRef] = useState(false);
-  const [foundNode, setFoundNode] = useState(null);
+  const foundNode = useRef(null);
   const itemRef = useRef<HTMLElement | null>(null);
+  const [handlesItemRefs, setHandlesItemRefs] = useState(false);
   const itemRefCallback = useCallback(
     (node: any) => {
       itemRef.current = node;
       if (node !== null) {
         onTargetMounted?.();
       }
-      sethandlesItemRef(true);
+      setHandlesItemRefs(true);
     },
     [onTargetMounted],
   );
+  const [_, setForceRender] = useState(0);
 
   const shallowAttrs = useShallowCompareMemoize(props.attr);
-  const shouldRenderHelperSpan = !props.allowOnlyRefdChild && !handlesItemRef;
+  const shouldRenderHelperSpan = !props.allowOnlyRefdChild && !handlesItemRefs;
 
   // --- When the component mounts, we add the attributes to the component's DOM node
-  useEffect(() => {
-    let node: any;
-    if (shouldRenderHelperSpan) {
-      if (foundNode) {
-        node = foundNode;
-      } else {
-        node =
-          (prevSiblingRef.current.nextElementSibling === nextSiblingRef.current
-            ? null
-            : prevSiblingRef.current.nextElementSibling) || null;
-        setFoundNode(node);
-      }
-    } else {
+  useLayoutEffect(() => {
+    let node;
+    if (handlesItemRefs) {
       node = itemRef.current;
+    } else {
+      if (shouldRenderHelperSpan) {
+        if (foundNode.current) {
+          node = foundNode.current;
+        } else {
+          node =
+            (prevSiblingRef.current.nextElementSibling === nextSiblingRef.current
+              ? null
+              : prevSiblingRef.current.nextElementSibling) || null;
+          foundNode.current = node;
+          setForceRender((prev) => prev++);
+        }
+      }
     }
     if (node) {
       Object.entries(shallowAttrs).forEach(([key, value]) => {
@@ -78,15 +89,19 @@ const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
         }
       });
     }
-  }, [shouldRenderHelperSpan, shallowAttrs, foundNode]);
+  }, [shouldRenderHelperSpan, shallowAttrs, handlesItemRefs]);
 
   return (
     <>
-      {!foundNode && shouldRenderHelperSpan && <span style={HIDDEN_STYLE} ref={prevSiblingRef} />}
+      {!foundNode.current && shouldRenderHelperSpan && (
+        <span style={HIDDEN_STYLE} ref={prevSiblingRef} />
+      )}
       {cloneElement(props.children, {
         ref: forwardedRef ? composeRefs(itemRefCallback, forwardedRef) : itemRefCallback,
       })}
-      {!foundNode && shouldRenderHelperSpan && <span style={HIDDEN_STYLE} ref={nextSiblingRef} />}
+      {!foundNode.current && shouldRenderHelperSpan && (
+        <span style={HIDDEN_STYLE} ref={nextSiblingRef} />
+      )}
     </>
   );
 });

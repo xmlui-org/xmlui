@@ -13,6 +13,7 @@ import {
   type OrientationOptions,
   type ButtonAria,
 } from "../abstractions";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 type Props = {
   id?: string;
@@ -82,7 +83,7 @@ export const Button = React.forwardRef(function Button(
   ref: React.ForwardedRef<HTMLButtonElement>,
 ) {
   const innerRef = useRef<HTMLButtonElement>(null);
-  useImperativeHandle(ref, () => innerRef.current!);
+  const composedRef = ref ? composeRefs(ref, innerRef) : innerRef;
   useEffect(() => {
     if (autoFocus) {
       setTimeout(() => {
@@ -98,7 +99,7 @@ export const Button = React.forwardRef(function Button(
       {...rest}
       id={id}
       type={type}
-      ref={innerRef}
+      ref={composedRef}
       className={classnames(className, styles.button, {
         [styles.buttonHorizontal]: orientation === "horizontal",
         [styles.buttonVertical]: orientation === "vertical",

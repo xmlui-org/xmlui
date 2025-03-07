@@ -126,7 +126,7 @@ export const defaultMenuItemProps: Pick<MenuItemProps, "iconPosition" | "active"
   active: false,
 };
 
-export function MenuItem({
+export const MenuItem = forwardRef(function MenuItem({
   children,
   onClick = noop,
   label,
@@ -134,7 +134,7 @@ export function MenuItem({
   icon,
   iconPosition = defaultMenuItemProps.iconPosition,
   active = defaultMenuItemProps.active,
-}: MenuItemProps) {
+}: MenuItemProps, ref) {
   const iconToStart = iconPosition === "start";
 
   return (
@@ -147,13 +147,14 @@ export function MenuItem({
         event.stopPropagation();
         onClick(event);
       }}
+      ref={ref as any}
     >
       {iconToStart && icon}
       <div className={styles.wrapper}>{label ?? children}</div>
       {!iconToStart && icon}
     </ReactDropdownMenu.Item>
   );
-}
+})
 
 type SubMenuItemProps = {
   label?: string;

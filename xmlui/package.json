@@ -195,8 +195,8 @@
       "import": "./src/components-core/theming/_themes.scss"
     },
     "./vite-ueml-plugin": {
-      "import": "./bin/vite-ueml-plugin.js",
-      "require": "./bin/vite-ueml-plugin.js"
+      "import": "./bin/vite-ueml-plugin.ts",
+      "require": "./bin/vite-ueml-plugin.ts"
     },
     "./xmlui-language-server": {
       "import": "./bin/language-server.js",
