@@ -56,7 +56,6 @@ export function PieChart({
   showLegend = defaultProps.showLegend,
   width = "100%",
   height = "100%",
-  showLegend = false,
 }: PieChartProps) {
   const colors = useColors(
     {
