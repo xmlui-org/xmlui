@@ -870,6 +870,11 @@ export const HtmlH1Md = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `h1` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsHeading),
+  defaultThemeVars: {
+    "margin-top-HtmlHeading": "1rem",
+    "margin-bottom-HtmlHeading": ".5rem",
+  },
 });
 
 export const htmlH1TagRenderer = createComponentRenderer(
@@ -879,7 +884,12 @@ export const htmlH1TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...props} level="h1">
+      <Heading
+        style={layoutCss}
+        className={styles.htmlHeading}
+        {...props}
+        level="h1"
+      >
         {renderChild(node.children)}
       </Heading>
     );
@@ -890,6 +900,11 @@ export const HtmlH2Md = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `h2` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsHeading),
+  defaultThemeVars: {
+    "margin-top-HtmlHeading": "1rem",
+    "margin-bottom-HtmlHeading": ".5rem",
+  },
 });
 
 export const htmlH2TagRenderer = createComponentRenderer(
@@ -899,7 +914,12 @@ export const htmlH2TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...props} level="h2">
+      <Heading
+        style={layoutCss}
+        className={styles.htmlHeading}
+        {...props}
+        level="h2"
+      >
         {renderChild(node.children)}
       </Heading>
     );
@@ -910,6 +930,11 @@ export const HtmlH3Md = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `h3` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsHeading),
+  defaultThemeVars: {
+    "margin-top-HtmlHeading": "1rem",
+    "margin-bottom-HtmlHeading": ".5rem",
+  },
 });
 
 export const htmlH3TagRenderer = createComponentRenderer(
@@ -919,7 +944,12 @@ export const htmlH3TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...props} level="h3">
+      <Heading
+        style={layoutCss}
+        className={styles.htmlHeading}
+        {...props}
+        level="h3"
+      >
         {renderChild(node.children)}
       </Heading>
     );
@@ -930,6 +960,11 @@ export const HtmlH4Md = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `h4` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsHeading),
+  defaultThemeVars: {
+    "margin-top-HtmlHeading": "1rem",
+    "margin-bottom-HtmlHeading": ".5rem",
+  },
 });
 
 export const htmlH4TagRenderer = createComponentRenderer(
@@ -939,7 +974,12 @@ export const htmlH4TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...props} level="h4">
+      <Heading
+        style={layoutCss}
+        className={styles.htmlHeading}
+        {...props}
+        level="h4"
+      >
         {renderChild(node.children)}
       </Heading>
     );
@@ -950,6 +990,11 @@ export const HtmlH5Md = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `h5` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsHeading),
+  defaultThemeVars: {
+    "margin-top-HtmlHeading": "1rem",
+    "margin-bottom-HtmlHeading": ".5rem",
+  },
 });
 
 export const htmlH5TagRenderer = createComponentRenderer(
@@ -959,7 +1004,12 @@ export const htmlH5TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...props} level="h5">
+      <Heading
+        style={layoutCss}
+        className={styles.htmlHeading}
+        {...props}
+        level="h5"
+      >
         {renderChild(node.children)}
       </Heading>
     );
@@ -970,6 +1020,11 @@ export const HtmlH6Md = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `h6` tag.",
   isHtmlTag: true,
+  themeVars: parseScssVar(styles.themeVarsHeading),
+  defaultThemeVars: {
+    "margin-top-HtmlHeading": "1rem",
+    "margin-bottom-HtmlHeading": ".5rem",
+  },
 });
 
 export const htmlH6TagRenderer = createComponentRenderer(
@@ -979,7 +1034,12 @@ export const htmlH6TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading style={layoutCss} {...props} level="h6">
+      <Heading
+        style={layoutCss}
+        className={styles.htmlHeading}
+        {...props}
+        level="h6"
+      >
         {renderChild(node.children)}
       </Heading>
     );

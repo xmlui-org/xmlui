@@ -31,34 +31,6 @@ export const Markdown = memo(function Markdown({
     return null;
   }
 
-  // These styles should match the styles applied to headings outside Markdown
-  const headingStyles = {
-    h1: {
-      marginTop: "0",
-      marginBottom: "1em",
-    },
-    h2: {
-      marginBottom: "1em",
-      marginTop: "1em",
-    },
-    h3: {
-      marginBottom: "1em",
-      marginTop: "1em",
-    },
-    h4: {
-      marginBottom: "1em",
-      marginTop: "1em",
-    },
-    h5: {
-      marginBottom: "1em",
-      marginTop: "1em",
-    },
-    h6: {
-      marginBottom: "1em",
-      marginTop: "1em",
-    }
-  };
-
   children = removeIndents ? removeTextIndents(children) : children;
 
   return (
@@ -66,89 +38,23 @@ export const Markdown = memo(function Markdown({
       <ReactMarkdown
         remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }]]}
         components={{
-          h1({ id, children }) {
-            return (
-              <Heading
-                uid={id}
-                level="h1"
-                sx={{
-                  lineHeight: "initial",
-                  ...headingStyles.h1
-                }}
-              >
-                {children}
-              </Heading>
-            );
+          h1({ children }) {
+            return <h1 className={htmlTagStyles.htmlH1}>{children}</h1>;
           },
-          h2({ id, children }) {
-            return (
-              <Heading
-                uid={id}
-                level="h2"
-                sx={{
-                  lineHeight: "initial",
-                  ...headingStyles.h2
-                }}
-              >
-                {children}
-              </Heading>
-            );
+          h2({ children }) {
+            return <h2 className={htmlTagStyles.htmlH2}>{children}</h2>;
           },
-          h3({ id, children }) {
-            return (
-              <Heading
-                uid={id}
-                level="h3"
-                sx={{
-                  lineHeight: "initial",
-                  ...headingStyles.h3
-                }}
-              >
-                {children}
-              </Heading>
-            );
+          h3({ children }) {
+            return <h3 className={htmlTagStyles.htmlH3}>{children}</h3>;
           },
-          h4({ id, children }) {
-            return (
-              <Heading
-                uid={id}
-                level="h4"
-                sx={{
-                  lineHeight: "initial",
-                  ...headingStyles.h4
-                }}
-              >
-                {children}
-              </Heading>
-            );
+          h4({ children }) {
+            return <h4 className={htmlTagStyles.htmlH4}>{children}</h4>;
           },
-          h5({ id, children }) {
-            return (
-              <Heading
-                uid={id}
-                level="h5"
-                sx={{
-                  lineHeight: "initial",
-                  ...headingStyles.h5
-                }}
-              >
-                {children}
-              </Heading>
-            );
+          h5({ children }) {
+            return <h5 className={htmlTagStyles.htmlH5}>{children}</h5>;
           },
-          h6({ id, children }) {
-            return (
-              <Heading
-                uid={id}
-                level="h6"
-                sx={{
-                  lineHeight: "initial",
-                  ...headingStyles.h6
-                }}
-              >
-                {children}
-              </Heading>
-            );
+          h6({ children }) {
+            return <h6 className={htmlTagStyles.htmlH6}>{children}</h6>;
           },
           p({ id, children }) {
             return (

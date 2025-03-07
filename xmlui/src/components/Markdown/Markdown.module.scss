@@ -114,6 +114,16 @@ $color-marker-ListItem: createThemeVar("color-marker-ListItem");
   color: $color-marker-ListItem;
 }
 
+// -- Heading
+
+$margin-top-HtmlHeading: createThemeVar("margin-top-HtmlHeading");
+$margin-bottom-HtmlHeading: createThemeVar("margin-bottom-HtmlHeading");
+
+.htmlHeading {
+  margin-top: $margin-top-HtmlHeading;
+  margin-bottom: $margin-bottom-HtmlHeading;
+}
+
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVars: t.json-stringify($themeVars);

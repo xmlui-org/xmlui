@@ -249,6 +249,7 @@ li .htmlOl {
   }
 }
 
+
 // --- Heading styling
 $themeVarsHeading: (
 );
@@ -260,6 +261,12 @@ $themeVarsHeading: (
 
 $margin-top-HtmlHeading: createThemeVarHeading("margin-top-HtmlHeading");
 $margin-bottom-HtmlHeading: createThemeVarHeading("margin-bottom-HtmlHeading");
+
+.htmlH1, .htmlH2, .htmlH3, .htmlH4, .htmlH5, .htmlH6 {
+  margin-top: $margin-top-HtmlHeading;
+  margin-bottom: $margin-bottom-HtmlHeading;
+}
+
 
 // --- We export the theme variables to add them to the component renderer
 :export {
