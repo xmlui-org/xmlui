@@ -34,7 +34,7 @@ export const Markdown = memo(function Markdown({
   children = removeIndents ? removeTextIndents(children) : children;
 
   return (
-    <div className={styles.markdownContainer} style={{ ...style }}>
+    <div className={styles.markdownContent} style={{ ...style }}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }]]}
         components={{

@@ -8,18 +8,34 @@ $themeVars: ();
 }
 
 
-// --- container
+// --- Defaults for Markdown component
 
-.markdownContainer {
+.markdownContent {
+  // Common spacing for block elements
+  h1, h2, h3, h4, h5, h6, p, ul, ol, table, blockquote, hr {
+    margin-top: 1em;
+    margin-bottom: .5;
+  }
 
+  // First element should have no top margin
   > *:first-child {
     margin-top: 0;
   }
 
+  // Last element should have no bottom margin
   > *:last-child {
     margin-bottom: 0;
   }
+
+  // Specific margins for horizontal rule
+  hr {
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+    margin: 1.5em 0;
+  }
 }
+
 // --- HorizontalRule
 
 $color-border-HorizontalRule: createThemeVar("color-border-HorizontalRule");
