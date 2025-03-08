@@ -7,6 +7,19 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+
+// --- container
+
+.markdownContainer {
+
+  > *:first-child {
+    margin-top: 0;
+  }
+
+  > *:last-child {
+    margin-bottom: 0;
+  }
+}
 // --- HorizontalRule
 
 $color-border-HorizontalRule: createThemeVar("color-border-HorizontalRule");
