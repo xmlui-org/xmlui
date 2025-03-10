@@ -338,6 +338,7 @@ function addStylesSection(data, component) {
     hasStylesSection = true;
   }
   if (varsTable) {
+    buffer += addThemeVarDescriptions(component);
     buffer += "\n\n### Theme Variables\n\n" + varsTable;
     hasStylesSection = true;
   }
@@ -378,11 +379,6 @@ function combineDescriptionAndDescriptionRef(
   }
 
   if (sectionId === PROPS) {
-    /* const defaultValuesBuffer = addDefaultValue(component);
-    if (defaultValuesBuffer) {
-      descriptionBuffer += "\n\n" + defaultValuesBuffer;
-    } */
-
     const availableValuesBuffer = addAvailableValues(component);
     if (availableValuesBuffer) {
       descriptionBuffer += "\n\n" + availableValuesBuffer;
@@ -731,6 +727,28 @@ function listThemeVars(component) {
   }
 }
 
+/**
+ * Creates a buffer that contains the section with the theme variable descriptions
+ * @param {Record<string, any>} component Record containing component metadata
+ * @returns Buffer with a table of theme variable keys and their descriptions
+ */
+function addThemeVarDescriptions(component) {
+  if (!component.themeVarDescriptions) {
+    return "";
+  }
+  let buffer = "\n\n### Theme Variable Descriptions\n\n";
+
+  buffer += createTable({
+    headers: ["Theme Variable", "Description"],
+    rows: Object.entries(component.themeVarDescriptions).map(([themeVar, description]) => [
+      `\`**${themeVar}**\``,
+      description,
+    ]),
+  });
+
+  return buffer;
+}
+
 // Use this object/map to replace the occurrences of the keys and have them be replaced by links
 const themeKeywordLinks = {
   color: "[color](../styles-and-themes/common-units/#color)",
@@ -781,8 +799,8 @@ const themeKeywordLinks = {
   "padding-right": "[padding-right](../styles-and-themes/common-units/#size)",
   "padding-bottom": "[padding-bottom](../styles-and-themes/common-units/#size)",
   "padding-left": "[padding-left](../styles-and-themes/common-units/#size)",
-  "padding-horizontal": "[padding-horizontal](../styles-and-themes/common-units/#size)",
-  "padding-vertical": "[padding-vertical](../styles-and-themes/common-units/#size)",
+  "paddingHorizontal": "[paddingHorizontal](../styles-and-themes/common-units/#size)",
+  "paddingVertical": "[paddingVertical](../styles-and-themes/common-units/#size)",
   margin: "[margin](../styles-and-themes/common-units/#size)",
   "margin-top": "[margin-top](../styles-and-themes/common-units/#size)",
   "margin-bottom": "[margin-bottom](../styles-and-themes/common-units/#size)",

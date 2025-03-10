@@ -36,7 +36,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
   // --- Do not collapse these padding properties; they are intentionally expanded
   margin-top: createThemeVar("margin-top-TableOfContents");
   margin-bottom: createThemeVar("margin-bottom-TableOfContents");
-  padding: createThemeVar("padding-vertical-TableOfContents") createThemeVar("padding-horizontal-TableOfContents");
+  padding: createThemeVar("paddingVertical-TableOfContents") createThemeVar("paddingHorizontal-TableOfContents");
 
   .list {
     margin: 0;

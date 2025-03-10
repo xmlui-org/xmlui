@@ -70,8 +70,8 @@ export const OffCanvasMd = createMetadata({
   defaultThemeVars: {
     "width-OffCanvas": "600px",
     "padding-OffCanvas": "$padding-tight",
-    "padding-vertical-OffCanvas": "$padding-tight",
-    "padding-horizontal-OffCanvas": "$padding-normal",
+    "paddingVertical-OffCanvas": "$padding-tight",
+    "paddingHorizontal-OffCanvas": "$padding-normal",
     "color-bg-OffCanvas": "$color-bg",
     "boxShadow-horizontal-OffCanvas": "0 2px 10px rgba(0, 0, 0, 0.2)",
     "boxShadow-vertical-OffCanvas": "0 2px 10px rgba(0, 0, 0, 0.2)",

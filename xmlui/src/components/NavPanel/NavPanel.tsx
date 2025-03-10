@@ -21,9 +21,9 @@ export const NavPanelMd = createMetadata({
   defaultThemeVars: {
     [`color-bg-${COMP}`]: "transparent",
     [`border-${COMP}`]: '0px solid $color-border',
-    [`padding-horizontal-${COMP}`]: "$space-4",
-    [`padding-vertical-logo-${COMP}`]: "$space-4",
-    [`padding-horizontal-logo-${COMP}`]: "$space-4",
+    [`paddingHorizontal-${COMP}`]: "$space-4",
+    [`paddingVertical-logo-${COMP}`]: "$space-4",
+    [`paddingHorizontal-logo-${COMP}`]: "$space-4",
     [`margin-bottom-logo-${COMP}`]: "$space-4",
     light: {
       [`boxShadow-${COMP}-vertical`]: "4px 0 4px 0 rgb(0 0 0 / 10%)",

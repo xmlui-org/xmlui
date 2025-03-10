@@ -79,8 +79,8 @@ export const AutoCompleteMd = createMetadata({
     [`min-height-Input`]: "39px",
     [`color-bg-${COMP}-badge`]: "$color-primary-500",
     [`fontSize-${COMP}-badge`]: "$fontSize-small",
-    [`padding-horizontal-${COMP}-badge`]: "$space-1",
-    [`padding-vertical-${COMP}-badge`]: "$space-1",
+    [`paddingHorizontal-${COMP}-badge`]: "$space-1",
+    [`paddingVertical-${COMP}-badge`]: "$space-1",
     light: {
       [`color-bg-${COMP}-badge--hover`]: "$color-primary-400",
       [`color-bg-${COMP}-badge--active`]: "$color-primary-500",

@@ -65,8 +65,8 @@ export const AccordionMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`padding-horizontal-header-${COMP}`]: "$space-3",
-    [`padding-vertical-header-${COMP}`]: "$space-3",
+    [`paddingHorizontal-header-${COMP}`]: "$space-3",
+    [`paddingVertical-header-${COMP}`]: "$space-3",
     [`align-vertical-header-${COMP}`]: "center",
     [`fontSize-header-${COMP}`]: "$fontSize-normal",
     [`fontWeight-header-${COMP}`]: "$fontWeight-normal",

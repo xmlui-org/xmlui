@@ -16,7 +16,7 @@ $max-content-width-NavPanel: createThemeVar("max-content-width-App");
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
 $margin-bottom-logo-NavPanel: createThemeVar("margin-bottom-logo-#{$component}");
-$padding-vertical-AppHeader: createThemeVar("padding-vertical-AppHeader");
+$paddingVertical-AppHeader: createThemeVar("paddingVertical-AppHeader");
 $align-content-AppHeader: createThemeVar("align-content-AppHeader");
 
 .wrapper {
@@ -43,7 +43,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
 
     &:not(.condensed){
       .wrapperInner{
-        padding-inline: createThemeVar("padding-horizontal-#{$component}");
+        padding-inline: createThemeVar("paddingHorizontal-#{$component}");
         justify-content: $align-content-AppHeader;
       }
     }
@@ -72,9 +72,9 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
     justify-content: center;
     flex-shrink: 0;
     height: $height-NavPanel;
-    padding-top: calc(#{createThemeVar("padding-vertical-logo-#{$component}")} + #{$padding-vertical-AppHeader});
-    padding-bottom: calc(#{createThemeVar("padding-vertical-logo-#{$component}")} + #{$padding-vertical-AppHeader});
-    padding-inline: createThemeVar("padding-horizontal-logo-#{$component}");
+    padding-top: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
+    padding-bottom: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
+    padding-inline: createThemeVar("paddingHorizontal-logo-#{$component}");
     margin-bottom: $margin-bottom-logo-NavPanel;
   }
 

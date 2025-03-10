@@ -139,8 +139,8 @@ export const MenuItemMd = createMetadata({
     [`color-${MICOMP}`]: "$color-text-primary",
     [`fontFamily-${MICOMP}`]: "$fontFamily",
     [`fontSize-${MICOMP}`]: "$fontSize-small",
-    [`padding-vertical-${MICOMP}`]: "$space-2",
-    [`padding-horizontal-${MICOMP}`]: "$space-3",
+    [`paddingVertical-${MICOMP}`]: "$space-2",
+    [`paddingHorizontal-${MICOMP}`]: "$space-3",
     [`color-bg-${MICOMP}--hover`]: "$color-bg-dropdown-item--hover",
     [`color-${MICOMP}--hover`]: "inherit",
     [`gap-${MICOMP}`]: "$space-2",
@@ -218,7 +218,7 @@ export const MenuSeparatorMd = createMetadata({
     [`width-${MSEP}`]: "100%",
     [`height-${MSEP}`]: "1px",
     [`color-${MSEP}`]: "$color-border-dropdown-item",
-    [`margin-horizontal-${MSEP}`]: "12px",
+    [`marginHorizontal-${MSEP}`]: "12px",
   },
 });
 
