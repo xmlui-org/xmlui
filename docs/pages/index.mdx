@@ -8,13 +8,15 @@ import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui"
 ## No Build Required
 
 <Callout type="info" emoji="💡">
-XMLUI applications can be served directly as static files. Simply host them on a standard web server and load them in a browser—no bundling, compiling, or build pipeline needed.
+  XMLUI applications can be served directly as static files. Simply host them on a standard web server and load them in
+  a browser—no bundling, compiling, or build pipeline needed.
 </Callout>
 
 ## Declarative Markup
 
 <Callout type="info" emoji="💡">
-With an XML-based approach, your UI’s structure and appearance are clearly defined in markup, making it easy to understand, modify, and maintain without digging through complex scripts.
+  With an XML-based approach, your UI’s structure and appearance are clearly defined in markup, making it easy to
+  understand, modify, and maintain without digging through complex scripts.
 </Callout>
 
 ```ueml copy
@@ -54,7 +56,8 @@ You can **bind components to work together**.
 ## Minimal Scripting Needs
 
 <Callout type="info" emoji="💡">
-  While XMLUI supports a lightweight scripting layer, most of your app’s behavior can be handled through markup, themes, and properties. This reduces dependency on heavy JavaScript frameworks and lowers the learning curve.
+  While XMLUI supports a lightweight scripting layer, most of your app’s behavior can be handled through markup, themes,
+  and properties. This reduces dependency on heavy JavaScript frameworks and lowers the learning curve.
 </Callout>
 
 ```ueml copy
@@ -64,12 +67,13 @@ You can **bind components to work together**.
 ## Reactive Data Handling
 
 <Callout type="info" emoji="💡">
-  The UI automatically updates whenever underlying data changes. This built-in reactivity means you don’t have to manually trigger refreshes or write additional logic, streamlining the development process.
+  The UI automatically updates whenever underlying data changes. This built-in reactivity means you don’t have to
+  manually trigger refreshes or write additional logic, streamlining the development process.
 </Callout>
 
 ```ueml copy /countTimes3="{3 * count}"/ /countTimes3/
 <App
-  var.count="{0}" 
+  var.count="{0}"
   var.countTimes3="{3 * count}" >
   <Button label="Click to increment!" onClick="count++" />
   <Text>Click count = {count}</Text>
@@ -83,7 +87,7 @@ Each time the button is clicked, `count` is incremented, causing `countTimes3` t
   name="Example: Reactive variables"
   app={`
     <App
-      var.count="{0}" 
+      var.count="{0}"
       var.countTimes3="{3 * count}" >
       <Button
         label="Click to increment!"
@@ -101,7 +105,8 @@ Each time the button is clicked, `count` is incremented, causing `countTimes3` t
 ## Flexible Theming and Styling
 
 <Callout type="info" emoji="💡">
-  XMLUI themes and theme variables let you adjust colors, fonts, spacing, and more from a central location. Change a single theme variable, and the updated look cascades throughout the entire interface automatically.
+  XMLUI themes and theme variables let you adjust colors, fonts, spacing, and more from a central location. Change a
+  single theme variable, and the updated look cascades throughout the entire interface automatically.
 </Callout>
 
 ```ueml copy {5, 9}
@@ -146,15 +151,16 @@ The `color-primary` theme variable affects all components using the primary colo
 ## Reusable Components
 
 <Callout type="info" emoji="💡">
-  Define a component once and reuse it across different parts of your app or even share it as a third-party component. This modular approach saves development time, ensures consistency, and simplifies maintenance.
+  Define a component once and reuse it across different parts of your app or even share it as a third-party component.
+  This modular approach saves development time, ensures consistency, and simplifies maintenance.
 </Callout>
 
 Reusable components are in a separate markup file:
 
 ```ueml copy filename="components/MySquare.xmlui" /MySquare/
 <Component name="MySquare">
-  <Stack 
-    width="{$props.size}" 
+  <Stack
+    width="{$props.size}"
     height="{$props.size}"
     backgroundColor="{$props.color}"
     onClick="emitEvent('click')"/>
@@ -179,8 +185,8 @@ The app can immediately leverage the reusable component:
   components={[
     `
       <Component name="MySquare">
-        <Stack 
-          width="{$props.size}" 
+        <Stack
+          width="{$props.size}"
           height="{$props.size}"
           backgroundColor="{$props.color}"
           onClick="emitEvent('click')"/>
@@ -202,7 +208,8 @@ The app can immediately leverage the reusable component:
 ## Seamless Data Integration
 
 <Callout type="info" emoji="💡">
-  Connecting your UI to backend APIs is as simple as providing a URL. The framework fetches and presents the data without extra tooling, ensuring that dynamic content is readily available and easy to incorporate.
+  Connecting your UI to backend APIs is as simple as providing a URL. The framework fetches and presents the data
+  without extra tooling, ensuring that dynamic content is readily available and easy to incorporate.
 </Callout>
 
 ```ueml copy /data=/
