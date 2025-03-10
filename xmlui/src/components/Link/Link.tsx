@@ -33,6 +33,9 @@ export const LinkMd = createMetadata({
     icon: d(`This property allows you to add an icon (specify the icon's name) to the link.`),
   },
   themeVars: parseScssVar(styles.themeVars),
+  themeVarDescriptions: {
+    [`gap-icon-${COMP}`]: "This property defines the size of the gap between the icon and the label.",
+  },
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $color-border",
     [`color-text-${COMP}--hover--active`]: `$color-text-${COMP}--active`,
