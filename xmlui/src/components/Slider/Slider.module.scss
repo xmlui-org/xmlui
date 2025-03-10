@@ -14,16 +14,16 @@ $componentName: "Slider";
   border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
   border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
-  box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus-within {
     border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--focus");
-    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--focus");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
   }
 }
 
@@ -78,7 +78,7 @@ $componentName: "Slider";
   border-radius: 50%;
   border: createThemeVar("Input:thickness-border-thumb-#{$componentName}") createThemeVar("Input:style-border-thumb-#{$componentName}") createThemeVar("Input:color-border-thumb-#{$componentName}");
   background-color: createThemeVar("Input:color-bg-thumb-#{$componentName}");
-  box-shadow: createThemeVar("Input:shadow-thumb-#{$componentName}");
+  box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}");
   transition: background-color 0.2s;
   outline: none;
 

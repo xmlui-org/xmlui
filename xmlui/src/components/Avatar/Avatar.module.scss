@@ -10,7 +10,7 @@ $themeVars: ();
 $component: "Avatar";
 $themeVars: t.composeBorderVars($themeVars, $component);
 $color-bg-Avatar: createThemeVar("color-bg-#{$component}");
-$shadow-Avatar: createThemeVar("shadow-#{$component}");
+$boxShadow-Avatar: createThemeVar("boxShadow-#{$component}");
 $color-text-Avatar: createThemeVar("color-text-#{$component}");
 $font-weight-Avatar: createThemeVar("font-weight-#{$component}");
 
@@ -30,7 +30,7 @@ $font-weight-Avatar: createThemeVar("font-weight-#{$component}");
   white-space: nowrap;
   user-select: none;
   font-size: 12px;
-  box-shadow: $shadow-Avatar;
+  box-shadow: $boxShadow-Avatar;
 
   &.xs {
     width: t.$space-8;

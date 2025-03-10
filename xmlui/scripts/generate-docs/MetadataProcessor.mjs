@@ -797,7 +797,7 @@ const themeKeywordLinks = {
   "border-right": "[border-right](../styles-and-themes/common-units/#border)",
   "border-top": "[border-top](../styles-and-themes/common-units/#border)",
   "border-bottom": "[border-bottom](../styles-and-themes/common-units/#border)",
-  boxShadow: "[boxShadow](../styles-and-themes/common-units/#shadow)",
+  boxShadow: "[boxShadow](../styles-and-themes/common-units/#boxShadow)",
   gap: "[gap](../styles-and-themes/common-units/#size)",
   "align-vertical": "[align-vertical](../styles-and-themes/common-units/#alignment)",
   "font-family": "[font-family](../styles-and-themes/common-units/#font-family)",

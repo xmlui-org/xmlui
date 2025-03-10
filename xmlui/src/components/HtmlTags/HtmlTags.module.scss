@@ -74,14 +74,14 @@ $themeVarsTbody: (
 
 $color-bg-HtmlTbody: createThemeVarTbody("color-bg-HtmlTbody");
 $color-text-HtmlTbody: createThemeVarTbody("color-text-HtmlTbody");
-$text-alignment-HtmlTbody: createThemeVarTbody("text-alignment-HtmlTbody");
+$textAlign-HtmlTbody: createThemeVarTbody("textAlign-HtmlTbody");
 $vertical-alignment-HtmlTbody: createThemeVarTbody("vertical-alignment-HtmlTbody");
 $textTransform-HtmlTbody: createThemeVarTbody("textTransform-HtmlTbody");
 
 .htmlTbody {
   background-color: $color-bg-HtmlTbody;
   color: $color-text-HtmlTbody;
-  text-align: $text-alignment-HtmlTbody;
+  text-align: $textAlign-HtmlTbody;
   vertical-align: $vertical-alignment-HtmlTbody;
   text-transform: $textTransform-HtmlTbody;
 }

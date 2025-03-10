@@ -7,7 +7,7 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$shadow-page-Pdf: createThemeVar("shadow-page-Pdf");
+$boxShadow-page-Pdf: createThemeVar("boxShadow-page-Pdf");
 $gap-pages-Pdf: createThemeVar("gap-pages-Pdf");
 
 .document{
@@ -18,7 +18,7 @@ $gap-pages-Pdf: createThemeVar("gap-pages-Pdf");
 }
 
 .page{
-  box-shadow: $shadow-page-Pdf;
+  box-shadow: $boxShadow-page-Pdf;
 }
 
 // --- We export the theme variables to add them to the component renderer

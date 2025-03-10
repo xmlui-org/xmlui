@@ -10,14 +10,14 @@ $themeVars: ();
 $component: "Card";
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
-$shadow-Card: createThemeVar("shadow-Card");
+$boxShadow-Card: createThemeVar("boxShadow-Card");
 $color-bg-Card: createThemeVar("color-bg-Card");
 $radius-Card: createThemeVar("radius-Card");
 
 .wrapper {
   @include t.borderVars($themeVars, $component);
   @include t.paddingVars($themeVars, $component);
-  box-shadow: $shadow-Card;
+  box-shadow: $boxShadow-Card;
   background-color: $color-bg-Card;
   display: flex;
   flex-direction: column;

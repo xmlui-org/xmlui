@@ -251,11 +251,11 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     "size-Icon": "1.25em",
 
-    "shadow-Avatar": "inset 0 0 0 1px rgba(4, 32, 69, 0.1)",
+    "boxShadow-Avatar": "inset 0 0 0 1px rgba(4, 32, 69, 0.1)",
     "border-size-Avatar": "0px",
     "radius-Avatar": "4px",
 
-    "shadow-header-App": "none",
+    "boxShadow-header-App": "none",
     // "height-AppHeader": "3.5rem",
 
     "padding-horizontal-NavPanel-horizontal": "1rem",
@@ -265,7 +265,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "padding-TableHeading": ".5rem .75rem .5rem .75rem",
     "color-bg-TableRow--hover": "transparent",
 
-    "shadow-NavPanel-vertical": "none",
+    "boxShadow-NavPanel-vertical": "none",
     "width-NavPanel-vertical": "15rem",
   },
   tones: {

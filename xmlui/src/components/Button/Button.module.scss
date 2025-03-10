@@ -26,7 +26,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   border-style: createThemeVar('style-border-#{$component}-#{$colorScheme}-solid');
   background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-solid');
   color: createThemeVar('color-text-#{$component}-#{$colorScheme}-solid');
-  box-shadow: createThemeVar('shadow-#{$component}-#{$colorScheme}-solid');
+  box-shadow: createThemeVar('boxShadow-#{$component}-#{$colorScheme}-solid');
 
 
   &:focus-visible {
@@ -46,7 +46,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
     &:active {
       border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-solid--active');
       color: createThemeVar('color-text-#{$component}-#{$colorScheme}-solid--active');
-      box-shadow: createThemeVar('shadow-#{$component}-#{$colorScheme}-solid--active');
+      box-shadow: createThemeVar('boxShadow-#{$component}-#{$colorScheme}-solid--active');
       background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-solid--active');
     }
   }
@@ -69,7 +69,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-outlined');
   border-style: createThemeVar('style-border-#{$component}-#{$colorScheme}-outlined');
   color: createThemeVar('color-text-#{$component}-#{$colorScheme}-outlined');
-  box-shadow: createThemeVar('shadow-#{$component}-#{$colorScheme}-outlined');
+  box-shadow: createThemeVar('boxShadow-#{$component}-#{$colorScheme}-outlined');
   background: transparent;
 
   &:focus-visible {

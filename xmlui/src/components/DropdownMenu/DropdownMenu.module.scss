@@ -9,7 +9,7 @@ $themeVars: ();
 
 $color-bg-DropdownMenu: createThemeVar("color-bg-DropdownMenu");
 $radius-DropdownMenu: createThemeVar("radius-DropdownMenu");
-$shadow-DropdownMenu: createThemeVar("shadow-DropdownMenu");
+$boxShadow-DropdownMenu: createThemeVar("boxShadow-DropdownMenu");
 $color-border-DropdownMenu-content: createThemeVar(
   "color-border-DropdownMenu-content"
 );
@@ -44,7 +44,7 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
   background-color: $color-bg-DropdownMenu;
   border-radius: $radius-DropdownMenu;
   min-width: $min-width-DropdowMenu;
-  box-shadow: $shadow-DropdownMenu;
+  box-shadow: $boxShadow-DropdownMenu;
   overflow: hidden;
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
