@@ -80,7 +80,7 @@ export const SelectMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-bg-menu-${COMP}`]: "$color-bg-primary",
-    [`shadow-menu-${COMP}`]: "$shadow-md",
+    [`boxShadow-menu-${COMP}`]: "$shadow-md",
     [`radius-menu-${COMP}`]: "$radius",
     [`thickness-border-menu-${COMP}`]: "1px",
     [`color-border-menu-${COMP}`]: "$color-border",

@@ -493,11 +493,11 @@ test.skip(`thickness-border-Button to solid, outlined`, async ({ page }) => {
   expect(btnOutAttBorderWidth).toBe(EXPECTED);
 });
 
-test(`shadow-Button to solid, outlined`, async ({ page }) => {
+test(`boxShadow-Button to solid, outlined`, async ({ page }) => {
   const EXPECTED = "5px 10px";
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "shadow-Button": `${EXPECTED} red`,
+      "boxShadow-Button": `${EXPECTED} red`,
     },
   });
   const btnSolPriBorderWidth = await getStyle(page, "btnSolPri", "box-shadow");

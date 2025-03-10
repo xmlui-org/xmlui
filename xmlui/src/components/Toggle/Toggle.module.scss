@@ -14,10 +14,10 @@ $themeVars: ();
   background-color: createThemeVar("Input:color-bg-Checkbox-#{$variantName}");
 
   &:focus-visible{
-    outline-width: createThemeVar('Input:thickness-outline-Checkbox-#{$variantName}--focus');
-    outline-color: createThemeVar('Input:color-outline-Checkbox-#{$variantName}--focus');
-    outline-style: createThemeVar('Input:style-outline-Checkbox-#{$variantName}--focus');
-    outline-offset: createThemeVar('Input:offset-outline-Checkbox-#{$variantName}--focus');
+    outline-width: createThemeVar('Input:outlineWidth-Checkbox-#{$variantName}--focus');
+    outline-color: createThemeVar('Input:outlineColor-Checkbox-#{$variantName}--focus');
+    outline-style: createThemeVar('Input:outlineStyle-Checkbox-#{$variantName}--focus');
+    outline-offset: createThemeVar('Input:outlineOffset-Checkbox-#{$variantName}--focus');
   }
 }
 
@@ -184,10 +184,10 @@ $themeVars: ();
   @include checkedState("Switch");
 
   &:focus-visible{
-    outline-width: createThemeVar('Input:thickness-outline-Switch--focus');
-    outline-color: createThemeVar('Input:color-outline-Switch--focus');
-    outline-style: createThemeVar('Input:style-outline-Switch--focus');
-    outline-offset: createThemeVar('Input:offset-outline-Switch--focus');
+    outline-width: createThemeVar('Input:outlineWidth-Switch--focus');
+    outline-color: createThemeVar('Input:outlineColor-Switch--focus');
+    outline-style: createThemeVar('Input:outlineStyle-Switch--focus');
+    outline-offset: createThemeVar('Input:outlineOffset-Switch--focus');
   }
 
   &:checked::before {

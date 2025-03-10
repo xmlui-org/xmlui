@@ -16,22 +16,22 @@ $componentName: "DatePicker";
   border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
   background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
-  box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
   padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
     background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
     color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus {
-    outline-width: createThemeVar('Input:thickness-outline-#{$componentName}-#{$variantName}--focus');
-    outline-color: createThemeVar('Input:color-outline-#{$componentName}-#{$variantName}--focus');
-    outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
-    outline-offset: createThemeVar('Input:offset-outline-#{$componentName}-#{$variantName}--focus');
+    outline-width: createThemeVar('Input:outlineWidth-#{$componentName}-#{$variantName}--focus');
+    outline-color: createThemeVar('Input:outlineColor-#{$componentName}-#{$variantName}--focus');
+    outline-style: createThemeVar('Input:outlineStyle-#{$componentName}-#{$variantName}--focus');
+    outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}-#{$variantName}--focus');
   }
 
   .placeholder {
@@ -115,7 +115,7 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
   padding: 0;
   overflow-y: auto;
   height: fit-content;
-  box-shadow: createThemeVar("Input:shadow-menu-DatePicker");
+  box-shadow: createThemeVar("Input:boxShadow-menu-DatePicker");
   background-color: createThemeVar("Input:color-bg-menu-DatePicker");
   border-radius: createThemeVar("Input:radius-menu-DatePicker");
 }

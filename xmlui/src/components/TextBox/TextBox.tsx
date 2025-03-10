@@ -84,10 +84,10 @@ export const TextBoxMd = createMetadata({
     "color-placeholder-Input": "$color-text-subtitle",
     "color-adornment-Input": "$color-text-subtitle",
 
-    "color-outline-Input--focus": "$color-outline--focus",
-    "thickness-outline-Input--focus": "$thickness-outline--focus",
-    "style-outline-Input--focus": "$style-outline--focus",
-    "offset-outline-Input--focus": "$offset-outline--focus",
+    "outlineColor-Input--focus": "$outlineColor--focus",
+    "outlineWidth-Input--focus": "$outlineWidth--focus",
+    "outlineStyle-Input--focus": "$outlineStyle--focus",
+    "outlineOffset-Input--focus": "$outlineOffset--focus",
 
     light: {
       // --- No light-specific theme vars

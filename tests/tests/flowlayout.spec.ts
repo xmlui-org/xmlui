@@ -422,7 +422,7 @@ test("SpaceFiller breaks star sized items", async ({ page }) => {
   expect(blueWidth).toEqual(100);
 });
 
-test("shadow is not clipped", async ({ page }, testInfo) => {
+test("boxShadow is not clipped", async ({ page }, testInfo) => {
   testInfo.snapshotSuffix = "";
   await initApp(page, {
     entryPoint: `

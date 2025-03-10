@@ -92,19 +92,19 @@ $transition: color 0.1s, background-color 0.1s;
 
 
     &:focus-visible{
-      outline-width: createThemeVar('thickness-outline-#{$component}--focus');
-      outline-color: createThemeVar('color-outline-#{$component}--focus');
-      outline-style: createThemeVar('style-outline-#{$component}--focus');
-      outline-offset: createThemeVar('offset-outline-#{$component}--focus');
+      outline-width: createThemeVar('outlineWidth-#{$component}--focus');
+      outline-color: createThemeVar('outlineColor-#{$component}--focus');
+      outline-style: createThemeVar('outlineStyle-#{$component}--focus');
+      outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
     }
 
     &[role='menuitem']{           //e.g. inside a navGroup, for hover it focuses the item, so it's always visible, that's why we have this selector here
       outline: none;
       &:not(:hover):focus-visible{
-        outline-width: createThemeVar('thickness-outline-#{$component}--focus');
-        outline-color: createThemeVar('color-outline-#{$component}--focus');
-        outline-style: createThemeVar('style-outline-#{$component}--focus');
-        outline-offset: createThemeVar('offset-outline-#{$component}--focus');
+        outline-width: createThemeVar('outlineWidth-#{$component}--focus');
+        outline-color: createThemeVar('outlineColor-#{$component}--focus');
+        outline-style: createThemeVar('outlineStyle-#{$component}--focus');
+        outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
       }
     }
 

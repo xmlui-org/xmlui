@@ -26,14 +26,14 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   border-style: createThemeVar('style-border-#{$component}-#{$colorScheme}-solid');
   background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-solid');
   color: createThemeVar('color-text-#{$component}-#{$colorScheme}-solid');
-  box-shadow: createThemeVar('shadow-#{$component}-#{$colorScheme}-solid');
+  box-shadow: createThemeVar('boxShadow-#{$component}-#{$colorScheme}-solid');
 
 
   &:focus-visible {
-    outline-width: createThemeVar('thickness-outline-#{$component}-#{$colorScheme}-solid--focus');
-    outline-color: createThemeVar('color-outline-#{$component}-#{$colorScheme}-solid--focus');
-    outline-style: createThemeVar('style-outline-#{$component}-#{$colorScheme}-solid--focus');
-    outline-offset: createThemeVar('offset-outline-#{$component}-#{$colorScheme}-solid--focus');
+    outline-width: createThemeVar('outlineWidth-#{$component}-#{$colorScheme}-solid--focus');
+    outline-color: createThemeVar('outlineColor-#{$component}-#{$colorScheme}-solid--focus');
+    outline-style: createThemeVar('outlineStyle-#{$component}-#{$colorScheme}-solid--focus');
+    outline-offset: createThemeVar('outlineOffset-#{$component}-#{$colorScheme}-solid--focus');
   }
 
   &:not([disabled]) {
@@ -46,7 +46,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
     &:active {
       border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-solid--active');
       color: createThemeVar('color-text-#{$component}-#{$colorScheme}-solid--active');
-      box-shadow: createThemeVar('shadow-#{$component}-#{$colorScheme}-solid--active');
+      box-shadow: createThemeVar('boxShadow-#{$component}-#{$colorScheme}-solid--active');
       background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-solid--active');
     }
   }
@@ -69,14 +69,14 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-outlined');
   border-style: createThemeVar('style-border-#{$component}-#{$colorScheme}-outlined');
   color: createThemeVar('color-text-#{$component}-#{$colorScheme}-outlined');
-  box-shadow: createThemeVar('shadow-#{$component}-#{$colorScheme}-outlined');
+  box-shadow: createThemeVar('boxShadow-#{$component}-#{$colorScheme}-outlined');
   background: transparent;
 
   &:focus-visible {
-    outline-width: createThemeVar('thickness-outline-#{$component}-#{$colorScheme}-outlined--focus');
-    outline-color: createThemeVar('color-outline-#{$component}-#{$colorScheme}-outlined--focus');
-    outline-style: createThemeVar('style-outline-#{$component}-#{$colorScheme}-outlined--focus');
-    outline-offset: createThemeVar('offset-outline-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-width: createThemeVar('outlineWidth-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-color: createThemeVar('outlineColor-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-style: createThemeVar('outlineStyle-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-offset: createThemeVar('outlineOffset-#{$component}-#{$colorScheme}-outlined--focus');
   }
 
   &:not([disabled]) {
@@ -113,10 +113,10 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   color: createThemeVar('color-text-#{$component}-#{$colorScheme}-ghost');
 
   &:focus-visible {
-    outline-width: createThemeVar('thickness-outline-#{$component}-#{$colorScheme}-ghost--focus');
-    outline-color: createThemeVar('color-outline-#{$component}-#{$colorScheme}-ghost--focus');
-    outline-style: createThemeVar('style-outline-#{$component}-#{$colorScheme}-ghost--focus');
-    outline-offset: createThemeVar('offset-outline-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-width: createThemeVar('outlineWidth-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-color: createThemeVar('outlineColor-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-style: createThemeVar('outlineStyle-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-offset: createThemeVar('outlineOffset-#{$component}-#{$colorScheme}-ghost--focus');
   }
 
   &:not([disabled]) {

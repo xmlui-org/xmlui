@@ -71,7 +71,7 @@ export const DropdownMenuMd = createMetadata({
   defaultThemeVars: {
     [`color-bg-${DDMCOMP}`]: "$color-bg-primary",
     [`min-width-${DDMCOMP}`]: "160px",
-    [`shadow-${DDMCOMP}`]: "$shadow-xl",
+    [`boxShadow-${DDMCOMP}`]: "$shadow-xl",
     [`style-border-${DDMCOMP}-content`]: "solid",
     [`radius-${DDMCOMP}`]: "$radius",
   },

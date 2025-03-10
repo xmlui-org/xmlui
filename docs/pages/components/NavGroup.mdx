@@ -179,7 +179,7 @@ This component does not expose any methods.
 You can use these properties to change the styling of the `NavGroup` component:
 
 - `color-bg-dropdown-NavGroup`
-- `shadow-dropdown-NavGroup`
+- `boxShadow-dropdown-NavGroup`
 - `radius-dropdown-NavGroup`
 
 The following sample demonstrates using these theme variables and the `Theme` component:
@@ -188,7 +188,7 @@ The following sample demonstrates using these theme variables and the `Theme` co
 <App>
   <Theme
     color-bg-dropdown-NavGroup="cyan"
-    shadow-dropdown-NavGroup="$shadow-xxl"
+    boxShadow-dropdown-NavGroup="$shadow-xxl"
     radius-dropdown-NavGroup="4px">
     <HStack verticalAlignment="center">
       <NavGroup icon="email" label="Send To" >
@@ -212,7 +212,7 @@ The following sample demonstrates using these theme variables and the `Theme` co
     <App>
       <Theme
         color-bg-dropdown-NavGroup="cyan"
-        shadow-dropdown-NavGroup="$shadow-xxl"
+        boxShadow-dropdown-NavGroup="$shadow-xxl"
         radius-dropdown-NavGroup="4px">
         <HStack verticalAlignment="center">
           <NavGroup icon="email" label="Send To" >
@@ -234,6 +234,6 @@ The following sample demonstrates using these theme variables and the `Theme` co
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-dropdown-NavGroup | $shadow-spread | $shadow-spread |
 | [color-bg](../styles-and-themes/common-units/#color)-dropdown-NavGroup | $color-bg-primary | $color-bg-primary |
 | [radius](../styles-and-themes/common-units/#border-rounding)-dropdown-NavGroup | $radius | $radius |
-| shadow-dropdown-NavGroup | $shadow-spread | $shadow-spread |
