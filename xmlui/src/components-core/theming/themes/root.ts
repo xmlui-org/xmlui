@@ -258,8 +258,8 @@ export const RootThemeDefinition: ThemeDefinition = {
     "boxShadow-header-App": "none",
     // "height-AppHeader": "3.5rem",
 
-    "padding-horizontal-NavPanel-horizontal": "1rem",
-    "padding-vertical-HeaderLogo": "0.7rem",
+    "paddingHorizontal-NavPanel-horizontal": "1rem",
+    "paddingVertical-HeaderLogo": "0.7rem",
 
     "padding-TableCell": ".75rem",
     "padding-TableHeading": ".5rem .75rem .5rem .75rem",

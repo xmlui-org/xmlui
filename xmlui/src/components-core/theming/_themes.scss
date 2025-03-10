@@ -338,10 +338,10 @@ $THEME-VAR-PREFIX: xmlui;
 @function composePaddingVars($themeVars, $subject) {
   $tmp: appendThemeVar($themeVars, "padding-#{$subject}") !global;
   $tmpAll: getThemeVar($tmp, "padding-#{$subject}");
-  $tmp: appendThemeVarWithDefault($tmp, "padding-horizontal-#{$subject}", $tmpAll) !global;
-  $tmpHorizontal: getThemeVar($tmp, "padding-horizontal-#{$subject}");
-  $tmp: appendThemeVarWithDefault($tmp, "padding-vertical-#{$subject}", $tmpAll) !global;
-  $tmpVertical: getThemeVar($tmp, "padding-vertical-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "paddingHorizontal-#{$subject}", $tmpAll) !global;
+  $tmpHorizontal: getThemeVar($tmp, "paddingHorizontal-#{$subject}");
+  $tmp: appendThemeVarWithDefault($tmp, "paddingVertical-#{$subject}", $tmpAll) !global;
+  $tmpVertical: getThemeVar($tmp, "paddingVertical-#{$subject}");
   $tmp: appendThemeVarWithDefault($tmp, "padding-left-#{$subject}", $tmpHorizontal) !global;
   $tmp: appendThemeVarWithDefault($tmp, "padding-right-#{$subject}", $tmpHorizontal) !global;
   $tmp: appendThemeVarWithDefault($tmp, "padding-top-#{$subject}", $tmpVertical) !global;

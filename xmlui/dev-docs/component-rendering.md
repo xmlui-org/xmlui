@@ -79,7 +79,7 @@ export const NoResultMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`padding-vertical-${COMP}`]: "$space-2",
+    [`paddingVertical-${COMP}`]: "$space-2",
     [`gap-icon-${COMP}`]: "$space-2",
     [`size-icon-${COMP}`]: "$space-8",
     light: {

@@ -4652,7 +4652,7 @@ export default {
       "width-MenuSeparator": "100%",
       "height-MenuSeparator": "1px",
       "color-MenuSeparator": "$color-border-dropdown-item",
-      "margin-horizontal-MenuSeparator": "12px",
+      "marginHorizontal-MenuSeparator": "12px",
     },
     docFolder: "DropdownMenu",
   },

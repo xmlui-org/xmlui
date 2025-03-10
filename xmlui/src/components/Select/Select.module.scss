@@ -125,7 +125,7 @@ $componentName: "Select";
   width: fit-content;
   height: fit-content;
   min-width: 0;
-  padding: createThemeVar("padding-vertical-#{$componentName}-badge") createThemeVar("padding-horizontal-#{$componentName}-badge");
+  padding: createThemeVar("paddingVertical-#{$componentName}-badge") createThemeVar("paddingHorizontal-#{$componentName}-badge");
   transition: color 0.2s, background-color 0.2s;
   user-select: none;
   cursor: pointer;
