@@ -185,7 +185,7 @@ export const FormItemMd = createMetadata({
     "font-size-FormItemLabel": "$font-size-small",
     "font-weight-FormItemLabel": "$font-weight-medium",
     "font-style-FormItemLabel": "normal",
-    "transform-text-FormItemLabel": "none",
+    "textTransform-FormItemLabel": "none",
     "color-text-FormItemLabel-requiredMark": "$color-danger-400",
   },
 });

@@ -29,7 +29,7 @@ $component: "Text";
   @include t.paddingVars($themeVars, "#{$component}-#{$variant}");
   margin-top: createThemeVar("margin-top-#{$component}-#{$variant}");
   margin-bottom: createThemeVar("margin-bottom-#{$component}-#{$variant}");
-  text-transform: createThemeVar("transform-#{$component}-#{$variant}");
+  text-transform: createThemeVar("textTransform-#{$component}-#{$variant}");
   vertical-align: createThemeVar("align-vertical-#{$component}-#{$variant}");
   letter-spacing: createThemeVar("letter-spacing-#{$component}-#{$variant}");
 }

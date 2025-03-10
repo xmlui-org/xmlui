@@ -15,7 +15,7 @@ $color-bg-HtmlTable: createThemeVarTable("color-bg-HtmlTable");
 $font-family-HtmlTable: createThemeVarTable("font-family-HtmlTable");
 $font-size-HtmlTable: createThemeVarTable("font-size-HtmlTable");
 $font-weight-HtmlTable: createThemeVarTable("font-weight-HtmlTable");
-$transform-text-HtmlTable: createThemeVarTable("transform-text-HtmlTable");
+$textTransform-HtmlTable: createThemeVarTable("textTransform-HtmlTable");
 $margin-top-HtmlTable: createThemeVarTable("margin-top-HtmlTable");
 $margin-bottom-HtmlTable: createThemeVarTable("margin-bottom-HtmlTable");
 $themeVarsTable: t.composeBorderVars($themeVarsTable, "HtmlTable");
@@ -27,7 +27,7 @@ $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
   font-family: $font-family-HtmlTable;
   font-size: $font-size-HtmlTable;
   font-weight: $font-weight-HtmlTable;
-  text-transform: $transform-text-HtmlTable;
+  text-transform: $textTransform-HtmlTable;
   margin-top: $margin-top-HtmlTable;
   margin-bottom: $margin-bottom-HtmlTable;
   @include t.borderVars($themeVarsTable, "HtmlTable");
@@ -48,7 +48,7 @@ $color-bg-HtmlThead: createThemeVarThead("color-bg-HtmlThead");
 $color-text-HtmlThead: createThemeVarThead("color-text-HtmlThead");
 $font-weight-HtmlThead: createThemeVarThead("font-weight-HtmlThead");
 $font-size-HtmlThead: createThemeVarThead("font-size-HtmlThead");
-$transform-text-HtmlThead: createThemeVarThead("transform-text-HtmlThead");
+$textTransform-HtmlThead: createThemeVarThead("textTransform-HtmlThead");
 $themeVarsThead: t.composeBorderVars($themeVarsThead, "HtmlThead");
 $themeVarsThead: t.composePaddingVars($themeVarsThead, "HtmlThead");
 
@@ -57,7 +57,7 @@ $themeVarsThead: t.composePaddingVars($themeVarsThead, "HtmlThead");
   color: $color-text-HtmlThead;
   font-weight: $font-weight-HtmlThead;
   font-size: $font-size-HtmlThead;
-  text-transform: $transform-text-HtmlThead;
+  text-transform: $textTransform-HtmlThead;
   @include t.borderVars($themeVarsThead, "HtmlThead");
   @include t.paddingVars($themeVarsThead, "HtmlThead");
 }
@@ -76,14 +76,14 @@ $color-bg-HtmlTbody: createThemeVarTbody("color-bg-HtmlTbody");
 $color-text-HtmlTbody: createThemeVarTbody("color-text-HtmlTbody");
 $text-alignment-HtmlTbody: createThemeVarTbody("text-alignment-HtmlTbody");
 $vertical-alignment-HtmlTbody: createThemeVarTbody("vertical-alignment-HtmlTbody");
-$transform-text-HtmlTbody: createThemeVarTbody("transform-text-HtmlTbody");
+$textTransform-HtmlTbody: createThemeVarTbody("textTransform-HtmlTbody");
 
 .htmlTbody {
   background-color: $color-bg-HtmlTbody;
   color: $color-text-HtmlTbody;
   text-align: $text-alignment-HtmlTbody;
   vertical-align: $vertical-alignment-HtmlTbody;
-  text-transform: $transform-text-HtmlTbody;
+  text-transform: $textTransform-HtmlTbody;
 }
 
 // --- tfoot

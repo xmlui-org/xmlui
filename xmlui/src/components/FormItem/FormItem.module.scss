@@ -53,7 +53,7 @@ $themeVars: ();
     font-size: createThemeVar("font-size-FormItemLabel");
     font-weight: createThemeVar("font-weight-FormItemLabel");
     font-style: createThemeVar("font-style-FormItemLabel");
-    text-transform: createThemeVar("transform-text-FormItemLabel");
+    text-transform: createThemeVar("textTransform-FormItemLabel");
     user-select: none;
     cursor: pointer;
     word-break: normal;
@@ -74,7 +74,7 @@ $themeVars: ();
       font-size: createThemeVar("font-size-FormItemLabel-required");
       font-weight: createThemeVar("font-weight-FormItemLabel-required");
       font-style: createThemeVar("font-style-FormItemLabel-required");
-      text-transform: createThemeVar("transform-text-FormItemLabel-required");
+      text-transform: createThemeVar("textTransform-FormItemLabel-required");
     }
 
     .requiredMark {
