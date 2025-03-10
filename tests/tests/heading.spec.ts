@@ -168,17 +168,17 @@ test("child overrides value", async ({ page }) => {
 });
 
 const THEME_TESTS: ThemeTestDesc[] = [
-  { themeVar: "color-decoration-Heading", themeVarAsCSS: "text-decoration-color", expected: RED },
+  { themeVar: "textDecorationColor-Heading", themeVarAsCSS: "text-decoration-color", expected: RED },
   { themeVar: "color-text-Heading", themeVarAsCSS: "color", expected: RED },
   { themeVar: "font-family-H1", themeVarAsCSS: "font-family", expected: "sans-serif" },
   { themeVar: "font-weight-Heading", themeVarAsCSS: "font-weight", expected: "700" },
   { themeVar: "font-size-H1", themeVarAsCSS: "font-size", expected: "20px" },
   { themeVar: "letter-spacing-Heading", themeVarAsCSS: "letter-spacing", expected: "2px" },
-  { themeVar: "line-decoration-Heading", themeVarAsCSS: "text-decoration-line", expected: "underline" },
+  { themeVar: "textDecorationLine-Heading", themeVarAsCSS: "text-decoration-line", expected: "underline" },
   { themeVar: "margin-top-H1", themeVarAsCSS: "margin-top", expected: "30px" },
   { themeVar: "margin-bottom-H1", themeVarAsCSS: "margin-bottom", expected: "30px" },
   { themeVar: "textUnderlineOffset-Heading", themeVarAsCSS: "text-underline-offset", expected: "10px" },
-  { themeVar: "style-decoration-Heading", themeVarAsCSS: "text-decoration-style", expected: "dotted" },
+  { themeVar: "textDecorationStyle-Heading", themeVarAsCSS: "text-decoration-style", expected: "dotted" },
   { themeVar: "textDecorationThickness-Heading", themeVarAsCSS: "text-decoration-thickness", expected: "4px" },
 ];
 

@@ -16,9 +16,9 @@ $themeVars: ();
   line-height: createThemeVar('line-height-#{$level}'); // Intentionally omitting "Heading" inheritance
   margin-top: createThemeVar('margin-top-#{$level}'); // Intentionally omitting "Heading" inheritance
   margin-bottom: createThemeVar('margin-bottom-#{$level}'); // Intentionally omitting "Heading" inheritance
-  text-decoration-line: createThemeVar('Heading:line-decoration-#{$level}');
-  text-decoration-color: createThemeVar('Heading:color-decoration-#{$level}');
-  text-decoration-style: createThemeVar('Heading:style-decoration-#{$level}');
+  text-decoration-line: createThemeVar('Heading:textDecorationLine-#{$level}');
+  text-decoration-color: createThemeVar('Heading:textDecorationColor-#{$level}');
+  text-decoration-style: createThemeVar('Heading:textDecorationStyle-#{$level}');
   text-decoration-thickness: createThemeVar('Heading:textDecorationThickness-#{$level}');
   text-underline-offset: createThemeVar('Heading:textUnderlineOffset-#{$level}');
 }

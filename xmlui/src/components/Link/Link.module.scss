@@ -19,10 +19,10 @@ $font-family-Link: createThemeVar("font-family-#{$component}");
 $font-size-Link: createThemeVar("font-size-#{$component}");
 $font-weight-Link: createThemeVar("font-weight-#{$component}");
 $font-weight-Link--active: createThemeVar("font-weight-#{$component}--active");
-$color-decoration-Link: createThemeVar("color-decoration-#{$component}");
+$textDecorationColor-Link: createThemeVar("textDecorationColor-#{$component}");
 $textUnderlineOffset-Link: createThemeVar("textUnderlineOffset-#{$component}");
-$line-decoration-Link: createThemeVar("line-decoration-#{$component}");
-$style-decoration-Link: createThemeVar("style-decoration-#{$component}");
+$textDecorationLine-Link: createThemeVar("textDecorationLine-#{$component}");
+$textDecorationStyle-Link: createThemeVar("textDecorationStyle-#{$component}");
 $textDecorationThickness-Link: createThemeVar("textDecorationThickness-#{$component}");
 $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
 
@@ -82,9 +82,9 @@ $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
   text-underline-offset: $textUnderlineOffset-Link;
   &:not([disabled]) {
     &:hover {
-      text-decoration-line: $line-decoration-Link;
-      text-decoration-color: $color-decoration-Link;
-      text-decoration-style: $style-decoration-Link;
+      text-decoration-line: $textDecorationLine-Link;
+      text-decoration-color: $textDecorationColor-Link;
+      text-decoration-style: $textDecorationStyle-Link;
       text-decoration-thickness: $textDecorationThickness-Link;
 
       &:has(> button) {
@@ -92,9 +92,9 @@ $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
       }
     }
     &:active {
-      text-decoration-line: $line-decoration-Link;
-      text-decoration-color: $color-decoration-Link;
-      text-decoration-style: $style-decoration-Link;
+      text-decoration-line: $textDecorationLine-Link;
+      text-decoration-color: $textDecorationColor-Link;
+      text-decoration-style: $textDecorationStyle-Link;
       text-decoration-thickness: $textDecorationThickness-Link;
 
       &:has(> button) {
