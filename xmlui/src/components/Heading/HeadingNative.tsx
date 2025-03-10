@@ -16,6 +16,7 @@ import styles from "./Heading.module.scss";
 
 import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 const HeadingLevelKeys = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
 export type HeadingLevel = (typeof HeadingLevelKeys)[number];
@@ -79,7 +80,7 @@ export const Heading = forwardRef(function Heading(
     }
   }, [observeIntersection]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (observeIntersection && elementRef.current && anchorId && !omitFromToc) {
       return registerHeading?.({
         id: anchorId,

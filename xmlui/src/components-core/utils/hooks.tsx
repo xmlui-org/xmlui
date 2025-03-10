@@ -263,7 +263,7 @@ function getScrollParent(element: HTMLElement) {
 
 export const useScrollParent = (element?: HTMLElement): HTMLElement => {
   const [scrollParent, setScrollParent] = useState<HTMLElement | null>(null);
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     setScrollParent(element ? getScrollParent(element) : null);
   }, [element]);
   return scrollParent;
@@ -282,7 +282,7 @@ export const useScrollEventHandler = (
   },
 ) => {
   const thisRef = useRef({scrolling: false});
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     let timer;
     let listener = () => {
       if(!thisRef.current.scrolling){

@@ -1,7 +1,6 @@
 import {
   type CSSProperties,
   type ReactNode,
-  useLayoutEffect,
   useCallback,
   useEffect,
   useMemo,
@@ -20,7 +19,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { useAppContext } from "../../components-core/AppContext";
 import { ScrollContext } from "../../components-core/ScrollContext";
-import { useResizeObserver } from "../../components-core/utils/hooks";
+import { useIsomorphicLayoutEffect, useResizeObserver } from "../../components-core/utils/hooks";
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { Sheet, SheetContent } from "../../components/App/Sheet";
@@ -165,7 +164,7 @@ export function App({
       "--footer-height": !scrollWholePage ? 0 : footerHeight + "px",
       "--header-abs-height": headerHeight + "px",
       "--footer-abs-height": footerHeight + "px",
-      "--scrollbar-width": noScrollbarGutters ? 0 : (scrollbarWidth + "px"),
+      "--scrollbar-width": noScrollbarGutters ? 0 : scrollbarWidth + "px",
     } as CSSProperties;
   }, [footerHeight, headerHeight, noScrollbarGutters, scrollWholePage, scrollbarWidth]);
 
@@ -176,7 +175,7 @@ export function App({
     setDrawerVisible((prev) => !prev);
   }, []);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     scrollContainerRef.current?.scrollTo({
       top: 0,
       left: 0,

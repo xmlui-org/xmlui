@@ -78,6 +78,7 @@ export default ({ mode }) => {
       emptyOutDir: false,
       outDir: "dist",
       lib: lib,
+      // minify: false,
       rollupOptions: {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external:
