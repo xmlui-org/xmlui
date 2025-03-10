@@ -143,7 +143,7 @@ export const TableMd = createMetadata({
     [`offset-outline-heading-${COMP}--focus`]: "$offset-outline--focus",
     [`font-size-heading-${COMP}`]: "$font-size-tiny",
     [`font-weight-heading-${COMP}`]: "$font-weight-bold",
-    [`transform-text-heading-${COMP}`]: "uppercase",
+    [`textTransform-heading-${COMP}`]: "uppercase",
     [`font-size-row-${COMP}`]: "$font-size-small",
     [`color-bg-${COMP}`]: "$color-bg",
     [`color-bg-row-${COMP}`]: "inherit",

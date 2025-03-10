@@ -133,13 +133,13 @@ The following sample opens its link in a new tab:
 
 The `Link` component uses these theme variables to customize its appearance:
 
-- `color-decoration`
+- `textDecorationColor`
 - `color-text`
 - `font-weight`
-- `line-decoration`
-- `offset-decoration`
-- `style-decoration`
-- `thickness-decoration`
+- `textDecorationLine`
+- `textUnderlineOffset`
+- `textDecorationStyle`
+- `textDecorationThickness`
 
 The following sample theme sets a few visual properties of `Link`:
 
@@ -149,9 +149,9 @@ The following sample theme sets a few visual properties of `Link`:
   "name": "Custom Theme",
   "themeVars": {
     "color-text-Link--hover": "orangered",
-    "color-decoration-Link": "purple",
-    "thickness-decoration-Link": "4px",
-    "style-decoration-Link": "dotted"
+    "textDecorationColor-Link": "purple",
+    "textDecorationThickness-Link": "4px",
+    "textDecorationStyle-Link": "dotted"
   }
 }
 ```
@@ -165,9 +165,9 @@ The following sample theme sets a few visual properties of `Link`:
       name: "Custom Theme",
       themeVars: {
         "color-text-Link--hover": "orangered",
-        "color-decoration-Link": "purple",
-        "thickness-decoration-Link": "4px",
-        "style-decoration-Link": "dotted",
+        "textDecorationColor-Link": "purple",
+        "textDecorationThickness-Link": "4px",
+        "textDecorationStyle-Link": "dotted",
       },
     },
   ]}

@@ -29,7 +29,7 @@ $font-weight-row-Table: createThemeVar("font-weight-row-#{$component}");
 $font-size-row-Table: createThemeVar("font-size-row-#{$component}");
 $font-weight-heading-Table: createThemeVar("font-weight-heading-#{$component}");
 $font-size-heading-Table: createThemeVar("font-size-heading-#{$component}");
-$transform-text-heading-Table: createThemeVar("transform-text-heading-#{$component}");
+$textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component}");
 
 .wrapper {
   width: 100%;
@@ -87,7 +87,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
   flex-direction: row;
   gap: 0.5rem;
   align-items: center;
-  text-transform: $transform-text-heading-Table;
+  text-transform: $textTransform-heading-Table;
   font-size: $font-size-heading-Table;
   color: $color-text-heading-Table;
   font-weight: $font-weight-heading-Table;

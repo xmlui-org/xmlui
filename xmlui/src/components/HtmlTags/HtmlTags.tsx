@@ -2292,7 +2292,7 @@ export const HtmlTheadMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsThead),
   defaultThemeVars: {
-    "transform-text-HtmlThead": "uppercase",
+    "textTransform-HtmlThead": "uppercase",
     light: {
       "color-bg-HtmlThead": "$color-surface-100",
       "color-text-HtmlThead": "$color-surface-500",

@@ -3437,7 +3437,7 @@ export default {
       "font-size-FormItemLabel": "var(--xmlui-font-size-FormItemLabel)",
       "font-weight-FormItemLabel": "var(--xmlui-font-weight-FormItemLabel)",
       "font-style-FormItemLabel": "var(--xmlui-font-style-FormItemLabel)",
-      "transform-text-FormItemLabel": "var(--xmlui-transform-text-FormItemLabel)",
+      "textTransform-FormItemLabel": "var(--xmlui-textTransform-FormItemLabel)",
       "color-text-FormItemLabel-required": "var(--xmlui-color-text-FormItemLabel-required)",
       "font-size-FormItemLabel-required": "var(--xmlui-font-size-FormItemLabel-required)",
       "font-weight-FormItemLabel-required": "var(--xmlui-font-weight-FormItemLabel-required)",

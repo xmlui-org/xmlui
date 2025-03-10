@@ -52,7 +52,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
         font-size: createThemeVar("font-size-TableOfContentsItem");
         font-weight: createThemeVar("font-weight-TableOfContentsItem");
         font-family: createThemeVar("font-family-TableOfContentsItem");
-        text-transform: createThemeVar("transform-TableOfContentsItem");
+        text-transform: createThemeVar("textTransform-TableOfContentsItem");
         vertical-align: createThemeVar("align-vertical-TableOfContentsItem");
         letter-spacing: createThemeVar("letter-spacing-TableOfContentsItem");
         overflow-wrap: break-word;
