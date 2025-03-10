@@ -866,8 +866,8 @@ describe("Layout resolver", () => {
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("horizontalMargin (themeVar)", () => {
-    const PROP = "horizontalMargin";
+  it("marginHorizontal (themeVar)", () => {
+    const PROP = "marginHorizontal";
     const VALUE = THEME_ID;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.marginLeft).toBe(THEME_ID_VALUE);
@@ -875,8 +875,8 @@ describe("Layout resolver", () => {
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("verticalMargin (themeVar)", () => {
-    const PROP = "verticalMargin";
+  it("marginVertical (themeVar)", () => {
+    const PROP = "marginVertical";
     const VALUE = THEME_ID;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.marginTop).toBe(THEME_ID_VALUE);
@@ -921,8 +921,8 @@ describe("Layout resolver", () => {
   });
 
   sizeCases.forEach((c) => {
-    it(`horizontalMargin goes to left and right: ${c}`, () => {
-      const PROP = "horizontalMargin";
+    it(`marginHorizontal goes to left and right: ${c}`, () => {
+      const PROP = "marginHorizontal";
       const result = resolveLayoutProps({ [PROP]: c });
       expect(result.cssProps.marginLeft).toBe(c);
       expect(result.cssProps.marginRight).toBe(c);
@@ -931,8 +931,8 @@ describe("Layout resolver", () => {
       expect(result.issues.has(PROP)).toBe(false);
     });
 
-    it(`verticalMargin goes to top and bottom: ${c}`, () => {
-      const PROP = "verticalMargin";
+    it(`marginVertical goes to top and bottom: ${c}`, () => {
+      const PROP = "marginVertical";
       const result = resolveLayoutProps({ [PROP]: c });
       expect(result.cssProps.marginTop).toBe(c);
       expect(result.cssProps.marginBottom).toBe(c);
@@ -942,44 +942,44 @@ describe("Layout resolver", () => {
     });
   });
 
-  it(`marginLeft overrides horizontalMargin`, () => {
+  it(`marginLeft overrides marginHorizontal`, () => {
     const PROP = "marginLeft";
     const VALUE = "1px";
     const OVERRIDE = "2px";
-    const result = resolveLayoutProps({ horizontalMargin: OVERRIDE, [PROP]: VALUE });
+    const result = resolveLayoutProps({ marginHorizontal: OVERRIDE, [PROP]: VALUE });
     expect(result.cssProps.marginLeft).toBe(VALUE);
     expect(result.cssProps.marginRight).toBe(OVERRIDE);
-    expect(result.issues.has("horizontalMargin")).toBe(false);
+    expect(result.issues.has("marginHorizontal")).toBe(false);
   });
 
-  it(`marginRight overrides horizontalMargin`, () => {
+  it(`marginRight overrides marginHorizontal`, () => {
     const PROP = "marginRight";
     const VALUE = "1px";
     const OVERRIDE = "2px";
-    const result = resolveLayoutProps({ horizontalMargin: OVERRIDE, [PROP]: VALUE });
+    const result = resolveLayoutProps({ marginHorizontal: OVERRIDE, [PROP]: VALUE });
     expect(result.cssProps.marginLeft).toBe(OVERRIDE);
     expect(result.cssProps.marginRight).toBe(VALUE);
-    expect(result.issues.has("horizontalMargin")).toBe(false);
+    expect(result.issues.has("marginHorizontal")).toBe(false);
   });
 
-  it(`marginTop overrides verticalMargin`, () => {
+  it(`marginTop overrides marginVertical`, () => {
     const PROP = "marginTop";
     const VALUE = "1px";
     const OVERRIDE = "2px";
-    const result = resolveLayoutProps({ verticalMargin: OVERRIDE, [PROP]: VALUE });
+    const result = resolveLayoutProps({ marginVertical: OVERRIDE, [PROP]: VALUE });
     expect(result.cssProps.marginTop).toBe(VALUE);
     expect(result.cssProps.marginBottom).toBe(OVERRIDE);
-    expect(result.issues.has("verticalMargin")).toBe(false);
+    expect(result.issues.has("marginVertical")).toBe(false);
   });
 
-  it(`marginBottom overrides verticalMargin`, () => {
+  it(`marginBottom overrides marginVertical`, () => {
     const PROP = "marginBottom";
     const VALUE = "1px";
     const OVERRIDE = "2px";
-    const result = resolveLayoutProps({ verticalMargin: OVERRIDE, [PROP]: VALUE });
+    const result = resolveLayoutProps({ marginVertical: OVERRIDE, [PROP]: VALUE });
     expect(result.cssProps.marginTop).toBe(OVERRIDE);
     expect(result.cssProps.marginBottom).toBe(VALUE);
-    expect(result.issues.has("verticalMargin")).toBe(false);
+    expect(result.issues.has("marginVertical")).toBe(false);
   });
 
   // --- Radius

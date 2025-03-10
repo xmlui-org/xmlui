@@ -1,8 +1,0 @@
-<Text
-  backgroundColor="cyan"
-  width="320px"
-  horizontalMargin="48px"
-  verticalMargin="1rem"
-  padding="4rem">
-  "I'm a Text with explicit layout properties"
-</Text>

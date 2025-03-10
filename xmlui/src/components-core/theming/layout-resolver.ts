@@ -81,18 +81,18 @@ export function resolveLayoutProps(
 
   // --- Margins
   collectCss("margin");
-  const horizontalMargin = transformLayoutValue("horizontalMargin");
-  if (horizontalMargin) {
-    result.cssProps.marginLeft = horizontalMargin;
-    result.cssProps.marginRight = horizontalMargin;
+  const marginHorizontal = transformLayoutValue("marginHorizontal");
+  if (marginHorizontal) {
+    result.cssProps.marginLeft = marginHorizontal;
+    result.cssProps.marginRight = marginHorizontal;
   }
   collectCss("marginRight");
   collectCss("marginLeft");
 
-  const verticalMargin = transformLayoutValue("verticalMargin");
-  if (verticalMargin) {
-    result.cssProps.marginTop = verticalMargin;
-    result.cssProps.marginBottom = verticalMargin;
+  const marginVertical = transformLayoutValue("marginVertical");
+  if (marginVertical) {
+    result.cssProps.marginTop = marginVertical;
+    result.cssProps.marginBottom = marginVertical;
   }
   collectCss("marginTop");
   collectCss("marginBottom");
@@ -365,8 +365,8 @@ export type LayoutProps = {
 
   // --- Margin
   margin?: number | string;
-  horizontalMargin?: number | string;
-  verticalMargin?: number | string;
+  marginHorizontal?: number | string;
+  marginVertical?: number | string;
   marginTop?: number | string;
   marginRight?: number | string;
   marginBottom?: number | string;
@@ -466,8 +466,8 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
 
   // --- Margin
   margin: [],
-  horizontalMargin: [],
-  verticalMargin: [],
+  marginHorizontal: [],
+  marginVertical: [],
   marginTop: [],
   marginRight: [],
   marginBottom: [],
