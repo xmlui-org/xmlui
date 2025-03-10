@@ -36,18 +36,21 @@ export const AppHeaderMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  themeVarDescriptions: {
+    [`width-logo-${COMP}`]: "Sets the width of the displayed logo",
+  },
   defaultThemeVars: {
-    "height-AppHeader": "$space-14",
-    "max-content-width-AppHeader": "$max-content-width-App",
-    "border-bottom-AppHeader": "1px solid $color-border",
-    ...paddingSubject("logo-AppHeader", { horizontal: "$space-0", vertical: "$space-4" }),
-    ...paddingSubject("AppHeader", { horizontal: "$space-4", vertical: "$space-0" }),
-    "radius-AppHeader": "0px",
+    [`height-${COMP}`]: "$space-14",
+    [`max-content-width-${COMP}`]: "$max-content-width-App",
+    [`border-bottom-${COMP}`]: "1px solid $color-border",
+    ...paddingSubject(`logo-${COMP}`, { horizontal: "$space-0", vertical: "$space-4" }),
+    ...paddingSubject(COMP, { horizontal: "$space-4", vertical: "$space-0" }),
+    [`radius-${COMP}`]: "0px",
     light: {
-      "color-bg-AppHeader": "white",
+      [`color-bg-${COMP}`]: "white",
     },
     dark: {
-      "color-bg-AppHeader": "$color-surface-900",
+      [`color-bg-${COMP}`]: "$color-surface-900",
     },
   },
 });
