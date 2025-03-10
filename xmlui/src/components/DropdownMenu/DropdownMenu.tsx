@@ -213,8 +213,8 @@ export const MenuSeparatorMd = createMetadata({
   docFolder: DDMCOMP,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`margin-top-${MSEP}`]: "$space-1",
-    [`margin-bottom-${MSEP}`]: "$space-1",
+    [`marginTop-${MSEP}`]: "$space-1",
+    [`marginBottom-${MSEP}`]: "$space-1",
     [`width-${MSEP}`]: "100%",
     [`height-${MSEP}`]: "1px",
     [`color-${MSEP}`]: "$color-border-dropdown-item",

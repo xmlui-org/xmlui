@@ -15,7 +15,7 @@ $height-NavPanel: createThemeVar("height-AppHeader");
 $max-content-width-NavPanel: createThemeVar("max-content-width-App");
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
-$margin-bottom-logo-NavPanel: createThemeVar("margin-bottom-logo-#{$component}");
+$marginBottom-logo-NavPanel: createThemeVar("marginBottom-logo-#{$component}");
 $paddingVertical-AppHeader: createThemeVar("paddingVertical-AppHeader");
 $align-content-AppHeader: createThemeVar("align-content-AppHeader");
 
@@ -75,7 +75,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
     padding-top: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
     padding-bottom: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
     padding-inline: createThemeVar("paddingHorizontal-logo-#{$component}");
-    margin-bottom: $margin-bottom-logo-NavPanel;
+    margin-bottom: $marginBottom-logo-NavPanel;
   }
 
   &.inDrawer{     //to make room for the close button

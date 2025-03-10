@@ -33,8 +33,8 @@ $color-bg-MenuItem--active--hover: createThemeVar("color-bg-MenuItem--active--ho
 $color-MenuItem--hover: createThemeVar("color-MenuItem--hover");
 $color-MenuItem--active: createThemeVar("color-MenuItem--active");
 $color-MenuItem--active--hover: createThemeVar("color-MenuItem--active--hover");
-$margin-top-MenuSeparator: createThemeVar("margin-top-MenuSeparator");
-$margin-bottom-MenuSeparator: createThemeVar("margin-bottom-MenuSeparator");
+$marginTop-MenuSeparator: createThemeVar("marginTop-MenuSeparator");
+$marginBottom-MenuSeparator: createThemeVar("marginBottom-MenuSeparator");
 $width-MenuSeparator: createThemeVar("width-MenuSeparator");
 $height-MenuSeparator: createThemeVar("height-MenuSeparator");
 $color-MenuSeparator: createThemeVar("color-MenuSeparator");
@@ -93,8 +93,8 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
 }
 
 .DropdownMenuSeparator {
-  margin-top: $margin-top-MenuSeparator;
-  margin-bottom: $margin-bottom-MenuSeparator;
+  margin-top: $marginTop-MenuSeparator;
+  margin-bottom: $marginBottom-MenuSeparator;
   width: $width-MenuSeparator;
   height: $height-MenuSeparator;
   background-color: $color-MenuSeparator;

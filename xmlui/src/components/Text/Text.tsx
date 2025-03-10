@@ -88,8 +88,8 @@ export const TextMd = createMetadata({
     [`fontWeight-${COMP}-subheading`]: "$fontWeight-bold",
     [`letterSpacing-${COMP}-subheading`]: "0.04em",
     [`textTransform-${COMP}-subheading`]: "uppercase",
-    [`margin-top-${COMP}-tableheading`]: "$space-1",
-    [`margin-bottom-${COMP}-tableheading`]: "$space-4",
+    [`marginTop-${COMP}-tableheading`]: "$space-1",
+    [`marginBottom-${COMP}-tableheading`]: "$space-4",
     [`paddingHorizontal-${COMP}-tableheading`]: "$space-1",
     [`fontWeight-${COMP}-tableheading`]: "$fontWeight-bold",
     light: {

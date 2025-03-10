@@ -19,7 +19,7 @@ $fontFamily-ModalDialog: createThemeVar("Dialog:fontFamily-#{$component}");
 $color-text-ModalDialog: createThemeVar("Dialog:color-text-#{$component}");
 $min-width-ModalDialog: createThemeVar("Dialog:min-width-#{$component}");
 $max-width-ModalDialog: createThemeVar("Dialog:max-width-#{$component}");
-$margin-bottom-title-ModalDialog: createThemeVar("Dialog:margin-bottom-title-#{$component}");
+$marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$component}");
 
 
 
@@ -79,7 +79,7 @@ $margin-bottom-title-ModalDialog: createThemeVar("Dialog:margin-bottom-title-#{$
 
 .dialogTitle {
   flex: 1;
-  margin-bottom: $margin-bottom-title-ModalDialog;
+  margin-bottom: $marginBottom-title-ModalDialog;
   font-size: t.$fontSize-large;
 }
 

@@ -34,8 +34,8 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
   border-width: createThemeVar("thickness-border-TableOfContents");
   border-style: createThemeVar("style-border-TableOfContents");
   // --- Do not collapse these padding properties; they are intentionally expanded
-  margin-top: createThemeVar("margin-top-TableOfContents");
-  margin-bottom: createThemeVar("margin-bottom-TableOfContents");
+  margin-top: createThemeVar("marginTop-TableOfContents");
+  margin-bottom: createThemeVar("marginBottom-TableOfContents");
   padding: createThemeVar("paddingVertical-TableOfContents") createThemeVar("paddingHorizontal-TableOfContents");
 
   .list {
