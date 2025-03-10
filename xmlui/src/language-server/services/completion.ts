@@ -1,32 +1,46 @@
 import type { CompletionItem } from "vscode-languageserver";
-import type { GetText, ParseResult } from "../xmlui-parser/parser";
-import { findTokenAtPos } from "../xmlui-parser/utils"
-import { SyntaxKind } from "../xmlui-parser/syntax-kind";
-import { Node } from "../xmlui-parser/syntax-node";
+import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
+import { findTokenAtPos } from "../../parsers/xmlui-parser/utils"
+import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
+import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import metadataByComponent from "../metadata";
+import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
 
 export function handleCompletion(
   { node }: ParseResult,
   position: number,
   getText: (n: Node) => string,
-): CompletionItem[] {
+): CompletionItem[] | null {
   const findRes = findTokenAtPos(node, position);
-  if (findRes === undefined) {
-    return [];
+  if (!findRes) {
+    return null;
   }
+  const { chainAtPos, chainBeforePos, sharedParents } = findRes;
 
   if (findRes.chainBeforePos === undefined) {
-    return [];
+    return handleCompletionInsideToken(chainAtPos, position, getText);
   }
-  const kindBefore = findRes.chainBeforePos[findRes.chainBeforePos.length - 1].kind;
-  switch (kindBefore) {
+
+  const nodeBefore = chainBeforePos.at(-1);
+  switch (nodeBefore.kind) {
     case SyntaxKind.OpenNodeStart:
       return allComponentNames();
     case SyntaxKind.CloseNodeStart:
       return matchingTagName(findRes as FindTokenSuccessHasBefore, getText);
-    default:
-      return [];
   }
+
+  const completeForProp = chainBeforePos.some(n =>
+      n.kind === SyntaxKind.AttributeKeyNode ||
+      n.kind === SyntaxKind.TagNameNode ||
+      n.kind === SyntaxKind.AttributeNode
+  );
+
+  if(completeForProp){
+    const tagNameNode = findTagNameNodeInStack(chainAtPos);
+    const compName = compNameForTagNameNode(tagNameNode, getText)
+    return completionForNewProps(compName);
+  }
+  return null;
 }
 
 type FindTokenSuccessHasBefore = {
@@ -35,14 +49,14 @@ type FindTokenSuccessHasBefore = {
   sharedParents: number;
 };
 
-function allComponentNames(){
+function allComponentNames(): CompletionItem[] {
   return Object.keys(metadataByComponent).map(name => ({label: name}));
 }
 
 function matchingTagName(
   { chainAtPos, chainBeforePos, sharedParents }: FindTokenSuccessHasBefore,
   getText: GetText,
-): CompletionItem[] {
+): CompletionItem[]|null{
   let parentBefore;
   if (chainBeforePos.length > 1) {
     parentBefore = chainBeforePos[chainBeforePos.length - 2];
@@ -76,5 +90,31 @@ function matchingTagName(
     const value = nameSpace !== undefined ? nameSpace + ":" + name : name;
     return [{ label: value }];
   }
-  return [];
+  return null;
+}
+
+function handleCompletionInsideToken(chainAtPos: Node[], position: number, getText: (n: Node) => string): CompletionItem[] {
+  const parent = chainAtPos.at(-2);
+  if (!parent){
+    return null;
+  }
+  switch (parent.kind){
+    case SyntaxKind.TagNameNode: {
+      return allComponentNames();
+    }
+    case SyntaxKind.AttributeKeyNode: {
+      const tagNameNode = findTagNameNodeInStack(chainAtPos);
+      const compName = compNameForTagNameNode(tagNameNode, getText)
+      return completionForNewProps(compName);
+    }
+  }
+  return null;
+}
+
+function completionForNewProps(compName: string): CompletionItem[] | null {
+  const metadata = metadataByComponent[compName];
+  if (!metadata || !metadata.props){
+    return null;
+  }
+  return Object.keys(metadata.props).map(propName => ({ label: propName }));
 }

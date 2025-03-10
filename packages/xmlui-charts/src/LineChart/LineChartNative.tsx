@@ -89,6 +89,7 @@ export function LineChart({
             tickLine={false}
             hide={hideX}
             axisLine={false}
+            tick={{ fill: "currentColor" }}
             tickFormatter={tickFormatter}
           />
           {!hideTooltip && <Tooltip content={<TooltipContent />} />}

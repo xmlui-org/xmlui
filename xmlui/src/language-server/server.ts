@@ -23,7 +23,7 @@ import {handleHover} from "./services/hover";
 import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
-import { createXmlUiParser, GetText, ParseResult } from './xmlui-parser/parser';
+import { createXmlUiParser, GetText, ParseResult } from '../parsers/xmlui-parser/parser';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -131,7 +131,6 @@ function getParseResult(document: TextDocument): {
   const parseForDoc = parseResults.get(document.uri);
   if (parseForDoc !== undefined) {
     if (parseForDoc.version === document.version) {
-      connection.console.log("using cached parse result");
       return {
         parseResult: parseForDoc.parseResult,
         getText: parseForDoc.getText,
@@ -145,7 +144,6 @@ function getParseResult(document: TextDocument): {
     version: document.version,
     getText: parser.getText,
   });
-  connection.console.log("recomputing parse result");
   return { parseResult, getText: parser.getText };
 }
 

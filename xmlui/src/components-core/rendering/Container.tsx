@@ -484,7 +484,7 @@ export const Container = memo(
 
     // --- The container wraps the `renderChild` function to provide that to the child components
     const stableRenderChild: RenderChildFn = useCallback(
-      (childNode, lc, pRenderContext, uidInfoRef) => {
+      (childNode, lc, pRenderContext, uidInfoRef, ref) => {
         // TODO: Check if this is a valid use case
         if (typeof childNode === "string") {
           throw Error("should be resolved for now");
@@ -509,7 +509,7 @@ export const Container = memo(
           }
 
           // --- Invoke the jolly-joker `renderChild` function to render the child. Note that
-          // --- in ithe context, we pass the `stableRenderChild` function, so the child can
+          // --- in the context, we pass the `stableRenderChild` function, so the child can
           // --- render its children recursively.
           const renderedChild = renderChild({
             node: child,
@@ -577,7 +577,6 @@ export const Container = memo(
         statePartChanged,
         memoedVarsRef,
         cleanup,
-        ref,
       ],
     );
 
@@ -599,6 +598,37 @@ export const Container = memo(
     const debugContext = useDebugView();
     const stateViewProps = debugContext?.stateViewOptions;
     const showContainer = stateViewProps && debugContext.displayStateView;
+
+    const renderedChildren = stableRenderChild(
+      node.children,
+      layoutContextRef?.current,
+      parentRenderContext,
+      uidInfoRef,
+      ref,
+    );
+
+    const renderedLoaders = renderLoaders({
+      uidInfo,
+      uidInfoRef,
+      loaders: node.loaders,
+      componentState,
+      memoedVarsRef,
+      //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
+      dispatch: apiBoundContainer ? containerDispatch : dispatch,
+      registerComponentApi: apiBoundContainer
+        ? containerRegisterComponentApi
+        : registerComponentApi,
+      appContext,
+      lookupAction,
+      lookupSyncCallback,
+      cleanup,
+    });
+    const containerContent = (
+      <>
+        {renderedLoaders}
+        {renderedChildren}
+      </>
+    );
     return (
       <Fragment
         key={
@@ -613,56 +643,10 @@ export const Container = memo(
             showBoundary={stateViewProps?.showBoundary}
             blink={stateViewProps?.blink}
           >
-            {renderLoaders({
-              uidInfo,
-              uidInfoRef,
-              loaders: node.loaders,
-              componentState,
-              memoedVarsRef,
-              //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
-              dispatch: apiBoundContainer ? containerDispatch : dispatch,
-              registerComponentApi: apiBoundContainer
-                ? containerRegisterComponentApi
-                : registerComponentApi,
-              appContext,
-              lookupAction,
-              lookupSyncCallback,
-              cleanup,
-            })}
-            {stableRenderChild(
-              node.children,
-              layoutContextRef?.current,
-              parentRenderContext,
-              uidInfoRef,
-            )}
+            {containerContent}
           </StateViewer>
         )}
-        {!showContainer && (
-          <>
-            {renderLoaders({
-              uidInfo,
-              uidInfoRef,
-              loaders: node.loaders,
-              componentState,
-              memoedVarsRef,
-              //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
-              dispatch: apiBoundContainer ? containerDispatch : dispatch,
-              registerComponentApi: apiBoundContainer
-                ? containerRegisterComponentApi
-                : registerComponentApi,
-              appContext,
-              lookupAction,
-              lookupSyncCallback,
-              cleanup,
-            })}
-            {stableRenderChild(
-              node.children,
-              layoutContextRef?.current,
-              parentRenderContext,
-              uidInfoRef,
-            )}
-          </>
-        )}
+        {!showContainer && containerContent}
       </Fragment>
     );
   }),

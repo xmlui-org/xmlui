@@ -71,7 +71,7 @@ export const DropdownMenuMd = createMetadata({
   defaultThemeVars: {
     [`color-bg-${DDMCOMP}`]: "$color-bg-primary",
     [`min-width-${DDMCOMP}`]: "160px",
-    [`shadow-${DDMCOMP}`]: "$shadow-xl",
+    [`boxShadow-${DDMCOMP}`]: "$shadow-xl",
     [`style-border-${DDMCOMP}-content`]: "solid",
     [`radius-${DDMCOMP}`]: "$radius",
   },
@@ -137,8 +137,8 @@ export const MenuItemMd = createMetadata({
   defaultThemeVars: {
     [`color-bg-${MICOMP}`]: "$color-bg-dropdown-item",
     [`color-${MICOMP}`]: "$color-text-primary",
-    [`font-family-${MICOMP}`]: "$font-family",
-    [`font-size-${MICOMP}`]: "$font-size-small",
+    [`fontFamily-${MICOMP}`]: "$fontFamily",
+    [`fontSize-${MICOMP}`]: "$fontSize-small",
     [`padding-vertical-${MICOMP}`]: "$space-2",
     [`padding-horizontal-${MICOMP}`]: "$space-3",
     [`color-bg-${MICOMP}--hover`]: "$color-bg-dropdown-item--hover",

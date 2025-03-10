@@ -14,6 +14,7 @@ import classnames from "classnames";
 
 import styles from "./TableOfContents.module.scss";
 import { useTableOfContents } from "../../components-core/TableOfContentsContext";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 type Props = {
   style?: CSSProperties;
@@ -29,7 +30,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
   const [activeAnchorId, setActiveId] = useState(null);
   const { headings, scrollToAnchor, subscribeToActiveAnchorChange } = useTableOfContents();
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     return subscribeToActiveAnchorChange((id) => {
       const foundHeading = headings.find((heading) => heading.id === id);
       if (foundHeading.level <= maxHeadingLevel) {

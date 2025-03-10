@@ -25,11 +25,11 @@ $padding-horizontal-cell-last-Table: createThemeVar("padding-horizontal-cell-las
 $themeVars: t.composeBorderVars($themeVars, "cell-#{$component}");
 $color-bg-pagination-Table: createThemeVar("color-bg-pagination-#{$component}");
 $color-text-heading-Table: createThemeVar("color-text-heading-#{$component}");
-$font-weight-row-Table: createThemeVar("font-weight-row-#{$component}");
-$font-size-row-Table: createThemeVar("font-size-row-#{$component}");
-$font-weight-heading-Table: createThemeVar("font-weight-heading-#{$component}");
-$font-size-heading-Table: createThemeVar("font-size-heading-#{$component}");
-$transform-text-heading-Table: createThemeVar("transform-text-heading-#{$component}");
+$fontWeight-row-Table: createThemeVar("fontWeight-row-#{$component}");
+$fontSize-row-Table: createThemeVar("fontSize-row-#{$component}");
+$fontWeight-heading-Table: createThemeVar("fontWeight-heading-#{$component}");
+$fontSize-heading-Table: createThemeVar("fontSize-heading-#{$component}");
+$textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component}");
 
 .wrapper {
   width: 100%;
@@ -73,10 +73,10 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
     }
 
     &:focus-visible {
-      outline-width: createThemeVar('thickness-outline-heading-#{$component}--focus');
-      outline-color: createThemeVar('color-outline-heading-#{$component}--focus');
-      outline-style: createThemeVar('style-outline-heading-#{$component}--focus');
-      outline-offset: createThemeVar('offset-outline-heading-#{$component}--focus');
+      outline-width: createThemeVar('outlineWidth-heading-#{$component}--focus');
+      outline-color: createThemeVar('outlineColor-heading-#{$component}--focus');
+      outline-style: createThemeVar('outlineStyle-heading-#{$component}--focus');
+      outline-offset: createThemeVar('outlineOffset-heading-#{$component}--focus');
 
     }
   }
@@ -87,10 +87,10 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
   flex-direction: row;
   gap: 0.5rem;
   align-items: center;
-  text-transform: $transform-text-heading-Table;
-  font-size: $font-size-heading-Table;
+  text-transform: $textTransform-heading-Table;
+  font-size: $fontSize-heading-Table;
   color: $color-text-heading-Table;
-  font-weight: $font-weight-heading-Table;
+  font-weight: $fontWeight-heading-Table;
   user-select: text;
   @include t.paddingVars($themeVars, "heading-#{$component}");
 }
@@ -178,8 +178,8 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
   }
 
   .row {
-    font-size: $font-size-row-Table;
-    font-weight: $font-weight-row-Table;
+    font-size: $fontSize-row-Table;
+    font-weight: $fontWeight-row-Table;
     background-color: $color-bg-row-Table;
 
     &.selected {
@@ -266,7 +266,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-#{$compone
 
 .paginationLabel {
   color: $color-text-pagination-Table;
-  font-size: t.$font-size-small;
+  font-size: t.$fontSize-small;
 }
 
 .paginationSelect {

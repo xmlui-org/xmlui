@@ -16,7 +16,7 @@ $themeVars: t.composeBorderVars($themeVars, $component) !global;
 $color-bg-Footer: createThemeVar("color-bg-#{$component}");
 $color-text-Footer: createThemeVar("color-text-#{$component}");
 $height-Footer: createThemeVar("height-#{$component}");
-$font-size-Footer: createThemeVar("font-size-#{$component}");
+$fontSize-Footer: createThemeVar("fontSize-#{$component}");
 $align-vertical-Footer: createThemeVar("align-vertical-#{$component}");
 $max-content-width-Footer: createThemeVar("max-content-width-#{$component}");
 
@@ -33,7 +33,7 @@ $max-content-width-Footer: createThemeVar("max-content-width-#{$component}");
   height: 100%;
   flex-direction: row;
   @include t.paddingVars($themeVars, $component);
-  font-size: $font-size-Footer;
+  font-size: $fontSize-Footer;
   align-items: $align-vertical-Footer;
   max-width: $max-content-width-Footer;
   color: $color-text-Footer;

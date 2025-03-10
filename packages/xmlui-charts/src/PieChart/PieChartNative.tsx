@@ -113,6 +113,7 @@ export function PieChart({
                     dataKey={nameKey}
                     className={styles.labelList}
                     stroke="none"
+                    fill="currentColor"
                     fontSize={12}
                   />
                 )}

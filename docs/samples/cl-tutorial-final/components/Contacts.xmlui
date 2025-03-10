@@ -9,8 +9,8 @@
       groupBy="section">
       <property name="groupHeaderTemplate">
         <HStack 
-          horizontalPadding="$space-normal" 
-          verticalPadding="$space-tight"
+          paddingHorizontal="$space-normal" 
+          paddingVertical="$space-tight"
           verticalAlignment="center"
           onClick="$group.toggle">
           <Text 

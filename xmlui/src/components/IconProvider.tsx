@@ -23,6 +23,7 @@ import {
   FiUserPlus,
   FiUsers,
   FiX,
+  FiMoon
 } from "react-icons/fi";
 import { AiOutlineLike, AiOutlineMenu, AiOutlinePlusCircle, AiOutlineSend } from "react-icons/ai";
 import {
@@ -45,7 +46,7 @@ import { MdOutlineDriveFileRenameOutline, MdOutlinePalette } from "react-icons/m
 import { RiAttachment2, RiMessage2Line, RiStickyNoteLine } from "react-icons/ri";
 import { VscDebugStart, VscDebugStop, VscSplitHorizontal, VscSplitVertical } from "react-icons/vsc";
 import { RxExit, RxLightningBolt, RxOpenInNewWindow } from "react-icons/rx";
-import { HiMoon, HiOutlinePaintBrush, HiSun } from "react-icons/hi2";
+import { HiOutlinePaintBrush, HiSun } from "react-icons/hi2";
 import { TfiReload } from "react-icons/tfi";
 import { HiOutlineCog, HiOutlineDuplicate } from "react-icons/hi";
 import { CiCalendarDate } from "react-icons/ci";
@@ -104,6 +105,7 @@ import { SortAscendingIcon } from "./Icon/SortAscendingIcon";
 import { SortDescendingIcon } from "./Icon/SortDescendingIcon";
 import { NoSortIcon } from "./Icon/NoSortIcon";
 import { TrendingLevelIcon } from "./Icon/TrendingLevelIcon";
+import { InspectIcon } from "./Icon/Inspect";
 
 type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
 
@@ -184,6 +186,7 @@ registerIconRenderer("exit", (props: IconBaseProps) => <RxExit {...props} />);
 registerIconRenderer("adduser", (props: IconBaseProps) => <FiUserPlus {...props} />);
 registerIconRenderer("userminus", (props: IconBaseProps) => <FiUserMinus {...props} />);
 registerIconRenderer("plus", (props: IconBaseProps) => <PlusIcon {...props} />);
+registerIconRenderer("inspect", (props: IconBaseProps) => <InspectIcon {...props} />);
 registerIconRenderer("plus-circle", (props: IconBaseProps) => <AiOutlinePlusCircle {...props} />);
 registerIconRenderer("filledplus", (props: IconBaseProps) => <FillPlusCircleIcon {...props} />);
 registerIconRenderer("chevronright", (props: IconBaseProps) => <ChevronRightIcon {...props} />);
@@ -246,7 +249,7 @@ registerIconRenderer("duplicate", (props: IconBaseProps) => <HiOutlineDuplicate 
 registerIconRenderer("connect", (props: IconBaseProps) => <RxLightningBolt {...props} />);
 registerIconRenderer("cog", (props: IconBaseProps) => <HiOutlineCog {...props} />);
 registerIconRenderer("sun", (props: IconBaseProps) => <HiSun {...props} />);
-registerIconRenderer("moon", (props: IconBaseProps) => <HiMoon {...props} />);
+registerIconRenderer("moon", (props: IconBaseProps) => <FiMoon {...props} />);
 registerIconRenderer("share", (props: IconBaseProps) => <ShareIcon {...props} />);
 registerIconRenderer("new-window", (props: IconBaseProps) => <RxOpenInNewWindow {...props} />);
 registerIconRenderer("paint", (props: IconBaseProps) => <HiOutlinePaintBrush {...props} />);

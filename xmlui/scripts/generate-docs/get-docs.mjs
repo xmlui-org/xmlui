@@ -36,6 +36,11 @@ async function generateExtenionPackages(metadata) {
 
   const extensionsFolder = join(FOLDERS.pages, "extension-components");
   for (const packageName in metadata) {
+    // Just to be sure we don't generate anything internal
+    if (metadata[packageName].state === "internal") {
+      continue;
+    }
+
     const packageFolder = join(extensionsFolder, packageName);
 
     if (!existsSync(packageFolder)) {
@@ -188,6 +193,8 @@ async function loadConfig(configPath) {
  * >>} imported metadata
  */
 async function dynamicallyLoadExtensionPackages() {
+  const defaultPackageState = "experimental";
+
   const extendedPackagesFolder = join(FOLDERS.projectRoot, "packages");
   const packageDirectories = (await readdir(extendedPackagesFolder)).filter((entry) => {
     return (
@@ -201,6 +208,7 @@ async function dynamicallyLoadExtensionPackages() {
       sourceFolder: join(extendedPackagesFolder, dir),
       description: "",
       metadata: {},
+      state: defaultPackageState,
     };
     dir = join(extendedPackagesFolder, dir);
     try {
@@ -212,13 +220,20 @@ async function dynamicallyLoadExtensionPackages() {
       const distContents = await readdir(packageFolderDist);
       for (const file of distContents) {
         let filePath = join(packageFolderDist, file);
-        if (filePath.endsWith("-metadata.js") && existsSync(filePath)) {
+        if (filePath.endsWith(`${basename(dir)}-metadata.js`) && existsSync(filePath)) {
           filePath = convertPath(relative(FOLDERS.script, filePath));
           const { componentMetadata } = await import(filePath);
           extensionPackage.metadata = componentMetadata.metadata;
           extensionPackage.description = componentMetadata.description ?? "";
+          extensionPackage.state = componentMetadata.state ?? defaultPackageState;
         }
       }
+      // Ignore internal packages
+      if (extensionPackage.state === "internal") {
+        logger.info("Skipping internal extension package:", dir);
+        continue;
+      }
+      console.log("Loaded extension package:", basename(dir));
       importedMetadata[basename(dir)] = extensionPackage;
     } catch (error) {
       processError(error);

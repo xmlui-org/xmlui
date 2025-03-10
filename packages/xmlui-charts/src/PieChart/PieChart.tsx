@@ -7,6 +7,7 @@ const COMP = "PieChart";
 
 export const PieChartMd = createMetadata({
   description: "Represents a pie chart component.",
+  status: "experimental",
   props: {
     data: {
       description: "The data to be displayed in the chart. Needs to be an array of objects.",

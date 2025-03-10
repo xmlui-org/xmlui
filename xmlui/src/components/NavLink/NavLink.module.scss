@@ -16,7 +16,7 @@ $color-bg-NavLink--hover--active: createThemeVar("color-bg-#{$component}--hover-
 $color-bg-NavLink--active: createThemeVar("color-bg-#{$component}--active");
 $color-bg-NavLink--pressed: createThemeVar("color-bg-#{$component}--pressed");
 $color-bg-NavLink--pressed--active: createThemeVar("color-bg-#{$component}--pressed--active");
-$font-size-NavLink: createThemeVar("font-size-#{$component}");
+$fontSize-NavLink: createThemeVar("fontSize-#{$component}");
 $color-text-NavLink: createThemeVar("color-text-#{$component}");
 $color-text-NavLink--hover: createThemeVar("color-text-#{$component}--hover");
 $color-text-NavLink--active: createThemeVar("color-text-#{$component}--active");
@@ -24,10 +24,10 @@ $color-text-NavLink--hover--active: createThemeVar("color-text-#{$component}--ho
 $color-text-NavLink--pressed: createThemeVar("color-text-#{$component}--pressed");
 $color-text-NavLink--pressed--active: createThemeVar("color-text-#{$component}--pressed--active");
 $color-icon-NavLink: createThemeVar("color-icon-#{$component}");
-$font-family-NavLink: createThemeVar("font-family-#{$component}");
-$font-weight-NavLink: createThemeVar("font-weight-#{$component}");
-$font-weight-NavLink--pressed: createThemeVar("font-weight-#{$component}--pressed");
-$font-weight-NavLink--active: createThemeVar("font-weight-#{$component}--active");
+$fontFamily-NavLink: createThemeVar("fontFamily-#{$component}");
+$fontWeight-NavLink: createThemeVar("fontWeight-#{$component}");
+$fontWeight-NavLink--pressed: createThemeVar("fontWeight-#{$component}--pressed");
+$fontWeight-NavLink--active: createThemeVar("fontWeight-#{$component}--active");
 $radius-indicator-NavLink: createThemeVar("radius-indicator-#{$component}");
 $thickness-indicator-NavLink: createThemeVar("thickness-indicator-#{$component}");
 $color-indicator-NavLink: createThemeVar("color-indicator-#{$component}");
@@ -47,9 +47,9 @@ $transition: color 0.1s, background-color 0.1s;
     display: flex;
     align-items: center;
     gap: t.$space-2;
-    font-size: $font-size-NavLink;
-    font-weight: $font-weight-NavLink;
-    font-family: $font-family-NavLink;
+    font-size: $fontSize-NavLink;
+    font-weight: $fontWeight-NavLink;
+    font-family: $fontFamily-NavLink;
     position: relative;
     transition: $transition;
     color: $color-text-NavLink;
@@ -92,28 +92,28 @@ $transition: color 0.1s, background-color 0.1s;
 
 
     &:focus-visible{
-      outline-width: createThemeVar('thickness-outline-#{$component}--focus');
-      outline-color: createThemeVar('color-outline-#{$component}--focus');
-      outline-style: createThemeVar('style-outline-#{$component}--focus');
-      outline-offset: createThemeVar('offset-outline-#{$component}--focus');
+      outline-width: createThemeVar('outlineWidth-#{$component}--focus');
+      outline-color: createThemeVar('outlineColor-#{$component}--focus');
+      outline-style: createThemeVar('outlineStyle-#{$component}--focus');
+      outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
     }
 
     &[role='menuitem']{           //e.g. inside a navGroup, for hover it focuses the item, so it's always visible, that's why we have this selector here
       outline: none;
       &:not(:hover):focus-visible{
-        outline-width: createThemeVar('thickness-outline-#{$component}--focus');
-        outline-color: createThemeVar('color-outline-#{$component}--focus');
-        outline-style: createThemeVar('style-outline-#{$component}--focus');
-        outline-offset: createThemeVar('offset-outline-#{$component}--focus');
+        outline-width: createThemeVar('outlineWidth-#{$component}--focus');
+        outline-color: createThemeVar('outlineColor-#{$component}--focus');
+        outline-style: createThemeVar('outlineStyle-#{$component}--focus');
+        outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
       }
     }
 
     &:active.displayActive {
       color: $color-text-NavLink--pressed;
       background-color: $color-bg-NavLink--pressed;
-      font-weight: $font-weight-NavLink--pressed;
+      font-weight: $fontWeight-NavLink--pressed;
       * {
-        font-weight: $font-weight-NavLink--pressed;
+        font-weight: $fontWeight-NavLink--pressed;
         color: $color-text-NavLink--pressed;
       }
       &:after {
@@ -124,9 +124,9 @@ $transition: color 0.1s, background-color 0.1s;
     &.navItemActive {
       color: $color-text-NavLink--active;
       background-color: $color-bg-NavLink--active;
-      font-weight: $font-weight-NavLink--active;
+      font-weight: $fontWeight-NavLink--active;
       * {
-        font-weight: $font-weight-NavLink--active;
+        font-weight: $fontWeight-NavLink--active;
         color: $color-text-NavLink--active;
       }
       & > * {
@@ -147,9 +147,9 @@ $transition: color 0.1s, background-color 0.1s;
       &:active {
         color: $color-text-NavLink--pressed--active;
         background-color: $color-bg-NavLink--pressed--active;
-        font-weight: $font-weight-NavLink--pressed;
+        font-weight: $fontWeight-NavLink--pressed;
         * {
-          font-weight: $font-weight-NavLink--pressed;
+          font-weight: $fontWeight-NavLink--pressed;
           color: $color-text-NavLink--pressed--active;
         }
         &:after {

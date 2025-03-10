@@ -52,7 +52,7 @@ export const CardMd = createMetadata({
     [`padding-${COMP}`]: "$space-4",
     [`border-${COMP}`]: "1px solid $color-border",
     [`radius-${COMP}`]: "$radius",
-    [`shadow-${COMP}`]: "none",
+    [`boxShadow-${COMP}`]: "none",
     light: {
       [`color-bg-${COMP}`]: "white",
     },

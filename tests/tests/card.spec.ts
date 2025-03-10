@@ -1145,11 +1145,11 @@ test("radius", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("border-radius", EXPECTED);
 });
 
-test("shadow", async ({ page }) => {
+test("boxShadow", async ({ page }) => {
   const EXPECTED = RED + " 10px 5px 5px 0px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "shadow-Card": EXPECTED,
+      "boxShadow-Card": EXPECTED,
     },
   });
   await expect(page.getByTestId("card")).toHaveCSS("box-shadow", EXPECTED);

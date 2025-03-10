@@ -1,14 +1,16 @@
 import { Callout } from "nextra/components";
 
-# WindowsAppFrame [#component-windowsappframe]
+# Pdf [#component-pdf]
 
 <Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
 
-App Frame for Windows.
+The `Pdf` component provides a read-only preview of a pdf document's contents.
 
 ## Properties
 
-This component does not have any properties.
+### `src`
+
+This property defines the source URL of the pdf document to display.
 
 ## Events
 
@@ -24,4 +26,5 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [color-bg](../styles-and-themes/common-units/#color)-content-WindowsAppFrame | white | $color-bg |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-page-Pdf | $shadow-md | $shadow-md |
+| [gap](../styles-and-themes/common-units/#size)-pages-Pdf | $space-4 | $space-4 |

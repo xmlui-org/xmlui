@@ -9,17 +9,17 @@ $themeVars: ();
 $component: "Text";
 @mixin textVariant($variant) {
   $themeVars: t.composePaddingVars($themeVars, "#{$component}-#{$variant}");
-  font-family: createThemeVar("font-family-#{$component}-#{$variant}");
-  font-size: createThemeVar("font-size-#{$component}-#{$variant}");
-  font-weight: createThemeVar("font-weight-#{$component}-#{$variant}");
+  font-family: createThemeVar("fontFamily-#{$component}-#{$variant}");
+  font-size: createThemeVar("fontSize-#{$component}-#{$variant}");
+  font-weight: createThemeVar("fontWeight-#{$component}-#{$variant}");
   font-style: createThemeVar("font-style-#{$component}-#{$variant}");
   font-stretch: createThemeVar("font-stretch-#{$component}-#{$variant}");
-  text-decoration-line: createThemeVar('line-decoration-#{$component}-#{$variant}');
-  text-decoration-color: createThemeVar('color-decoration-#{$component}-#{$variant}');
-  text-decoration-style: createThemeVar('style-decoration-#{$component}-#{$variant}');
-  text-decoration-thickness: createThemeVar('thickness-decoration-#{$component}-#{$variant}');
-  text-underline-offset: createThemeVar('offset-decoration-#{$component}-#{$variant}');
-  line-height: createThemeVar("line-height-#{$component}-#{$variant}");
+  text-decoration-line: createThemeVar('textDecorationLine-#{$component}-#{$variant}');
+  text-decoration-color: createThemeVar('textDecorationColor-#{$component}-#{$variant}');
+  text-decoration-style: createThemeVar('textDecorationStyle-#{$component}-#{$variant}');
+  text-decoration-thickness: createThemeVar('textDecorationThickness-#{$component}-#{$variant}');
+  text-underline-offset: createThemeVar('textUnderlineOffset-#{$component}-#{$variant}');
+  line-height: createThemeVar("lineHeight-#{$component}-#{$variant}");
   color: createThemeVar("color-Text-#{$variant}");
   background-color: createThemeVar("color-bg-#{$component}-#{$variant}");
   border-radius: createThemeVar("border-radius-#{$component}-#{$variant}");
@@ -29,9 +29,9 @@ $component: "Text";
   @include t.paddingVars($themeVars, "#{$component}-#{$variant}");
   margin-top: createThemeVar("margin-top-#{$component}-#{$variant}");
   margin-bottom: createThemeVar("margin-bottom-#{$component}-#{$variant}");
-  text-transform: createThemeVar("transform-#{$component}-#{$variant}");
+  text-transform: createThemeVar("textTransform-#{$component}-#{$variant}");
   vertical-align: createThemeVar("align-vertical-#{$component}-#{$variant}");
-  letter-spacing: createThemeVar("letter-spacing-#{$component}-#{$variant}");
+  letter-spacing: createThemeVar("letterSpacing-#{$component}-#{$variant}");
 }
 
 .text {
@@ -208,7 +208,7 @@ $component: "Text";
   }
 
   &.strong{
-    font-weight: t.$font-weight-bold;
+    font-weight: t.$fontWeight-bold;
   }
 }
 

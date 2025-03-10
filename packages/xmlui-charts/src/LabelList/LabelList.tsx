@@ -7,6 +7,7 @@ const COMP = "LabelList";
 
 export const LabelListMd = createMetadata({
   description: "Label list component for a chart component.",
+  status: "experimental",
   props: {
     key: {
       description: "The key that needs to be matched to the data series.",

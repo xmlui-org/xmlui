@@ -17,7 +17,7 @@ for (let dir of packageDirectories) {
     const filePath = join(dirFullPath, "package.json");
     const { scripts } = JSON.parse(await readFile(filePath, "utf8"));
     if (!scripts) {
-      console.error(`No scriptssection found in package.json: ${filePath}`);
+      console.error(`No scripts section found in package.json: ${filePath}`);
       continue;
     }
 
@@ -28,7 +28,11 @@ for (let dir of packageDirectories) {
     }
 
     console.log(`--- Building Extension Package: ${dir}`);
-    execSync(metaBuildScript, { stdio: "inherit", cwd: dirFullPath });
+    execSync(metaBuildScript, {
+      stdio: "inherit",
+      cwd: dirFullPath,
+      env: { ...process.env, npm_package_name: dir, NODE_ENV: "metadata" },
+    });
   } catch (error) {
     console.error(error);
   }

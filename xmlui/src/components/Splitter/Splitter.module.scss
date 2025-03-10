@@ -8,7 +8,7 @@ $themeVars: ();
 }
 
 $component: "Splitter";
-$shadow-Splitter: createThemeVar("shadow-#{$component}");
+$boxShadow-Splitter: createThemeVar("boxShadow-#{$component}");
 $color-bg-Splitter: createThemeVar("color-bg-#{$component}");
 $radius-Splitter: createThemeVar("radius-#{$component}");
 $color-border-Splitter: createThemeVar("color-border-#{$component}");
@@ -27,7 +27,7 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$co
   display: flex;
   height: 100%;
   width: 100%;
-  box-shadow: $shadow-Splitter;
+  box-shadow: $boxShadow-Splitter;
   background-color: $color-bg-Splitter;
   border-radius: $radius-Splitter;
   border: $border-Splitter $style-border-Splitter $color-border-Splitter;

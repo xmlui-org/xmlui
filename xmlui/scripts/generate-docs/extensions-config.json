@@ -1,3 +1,4 @@
 {
-  "excludeComponentStatuses": ["deprecated"]
+  "excludeComponentStatuses": ["deprecated", "internal"],
+  "cleanFolder": true
 }

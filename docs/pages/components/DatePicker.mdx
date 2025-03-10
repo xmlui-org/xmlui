@@ -451,7 +451,7 @@ The `DatePicker` component provides these theme variables to customize its appea
 - `color-border-DatePicker-success`
 - `color-placeholder-DatePicker`
 - `color-bg-menu-DatePicker`
-- `shadow-menu-DatePicker`
+- `boxShadow-menu-DatePicker`
 - `radius-menu-DatePicker`
 - `color-bg-item-DatePicker--hover`
 - `color-bg-item-DatePicker--active`
@@ -511,6 +511,16 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-DatePicker | $shadow-md | $shadow-md |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-DatePicker | $shadow-md | $shadow-md |
 | [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -539,10 +549,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-border](../styles-and-themes/common-units/#color)-DatePicker-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border](../styles-and-themes/common-units/#color)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border](../styles-and-themes/common-units/#color)-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-DatePicker-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-DatePicker-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-DatePicker-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-DatePicker-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -558,12 +564,24 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-text](../styles-and-themes/common-units/#color)-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-value-DatePicker | $color-text-primary | $color-text-primary |
 | [color-text](../styles-and-themes/common-units/#color)-value-DatePicker | $color-text-primary | $color-text-primary |
-| [font-size](../styles-and-themes/common-units/#size)-DatePicker | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontSize](../styles-and-themes/common-units/#size)-DatePicker | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [min-height](../styles-and-themes/common-units/#size)-DatePicker | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-DatePicker-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-DatePicker-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-DatePicker-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-DatePicker-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-DatePicker-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-DatePicker-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-DatePicker-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-DatePicker-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-DatePicker-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-DatePicker-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-DatePicker-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-DatePicker-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-DatePicker-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-DatePicker-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-DatePicker-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-DatePicker-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-DatePicker-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-DatePicker-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-DatePicker-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-DatePicker-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -574,29 +592,11 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [radius](../styles-and-themes/common-units/#border-rounding)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [radius](../styles-and-themes/common-units/#border-rounding)-menu-DatePicker | $radius | $radius |
 | [radius](../styles-and-themes/common-units/#border-rounding)-menu-DatePicker | $radius | $radius |
-| shadow-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| shadow-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| shadow-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| shadow-DatePicker-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| shadow-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| shadow-DatePicker-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| shadow-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| shadow-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| shadow-menu-DatePicker | $shadow-md | $shadow-md |
-| shadow-menu-DatePicker | $shadow-md | $shadow-md |
 | [style-border](../styles-and-themes/common-units/#border-style)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-DatePicker-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-DatePicker-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-DatePicker-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-DatePicker-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border](../styles-and-themes/common-units/#size)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border](../styles-and-themes/common-units/#size)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border](../styles-and-themes/common-units/#size)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border](../styles-and-themes/common-units/#size)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-DatePicker-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-DatePicker-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-DatePicker-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-DatePicker-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

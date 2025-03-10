@@ -217,7 +217,7 @@ Move the mouse over the rectangles in the following example to check what the cu
   `}
 />
 
-## Font Family Values [#font-family]
+## Font Family Values [#fontFamily]
 
 Font family values are a prioritized list of one or more font family names and/or generic family names. Multiple names should be separated by commas. Font family names containing whitespace should be quoted.
 These are the generic family names:
@@ -250,7 +250,7 @@ Helvetica
 Bookville, "Times New Roman", serif
 ```
 
-## Font Weight Values [#font-weight]
+## Font Weight Values [#fontWeight]
 
 Font weight values set the font's weight (or boldness); the available values depend on the currently selected font family.
 
@@ -269,7 +269,7 @@ This property determines whether a font should be styled with a normal, italic, 
 
 |Value|Description|
 |-|-|
-|`normal`| Selects a font that is classified as normal within a font-family. |
+|`normal`| Selects a font that is classified as normal within a font family. |
 |`italic`| Selects a font that is classified as italic. If no italic version of the face is available, one classified as oblique is used instead. If neither is available, the style is artificially simulated. |
 |`oblique`| Selects a font that is classified as oblique. If no oblique version of the face is available, one classified as italic is used instead. If neither is available, the style is artificially simulated. |
 
@@ -412,7 +412,7 @@ UI Engine uses these units with the CSS semantics:
 | `%` | The percentage value is relative to the parent container's viewport size offered for the particular child element. |
 | `*` | Start sizing: The size weight used when calculating the dimension of the particular child element. The base of the calculation is the remaining space size in the parent's viewport. |
 
-## Text Alignment Values [#text-alignment]
+## Text Alignment Values [#textAlign]
 
 This value sets the horizontal alignment of the inline-rendered content (e.g., text) inside its block-rendered parent.
 
@@ -428,7 +428,7 @@ This value sets the horizontal alignment of the inline-rendered content (e.g., t
 <Playground
     name="Text Alignment Values"
     app={`
-      <VStack gap="8px" verticalMargin="8px" verticalPadding="8px" width="600px" margin="auto" backgroundColor="#eee">
+      <VStack gap="8px" marginVertical="8px" paddingVertical="8px" width="600px" margin="auto" backgroundColor="#eee">
         <Text textAlign="left">This is a long text with several words (left)</Text>
         <Text textAlign="right">This is a long text with several words (right)</Text>
         <Text textAlign="center">This is a long text with several words (center)</Text>
@@ -437,7 +437,7 @@ This value sets the horizontal alignment of the inline-rendered content (e.g., t
   `}
 />
 
-## Text Decoration Values [#text-decoration]
+## Text Decoration Values [#textDecoration]
 
 A text decoration value is composed of these segments:
 

@@ -14,16 +14,16 @@ $componentName: "ColorPicker";
   border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
   border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
-  box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus {
     border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--focus");
-    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--focus");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
   }
 }
 

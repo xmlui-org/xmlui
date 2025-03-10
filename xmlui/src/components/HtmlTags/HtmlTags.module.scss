@@ -2,7 +2,9 @@
 
 // --- table
 
-$themeVarsTable: ();
+$themeVarsTable: (
+);
+
 @function createThemeVarTable($componentVariable) {
   $themeVarsTable: t.appendThemeVar($themeVarsTable, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTable, $componentVariable);
@@ -10,27 +12,33 @@ $themeVarsTable: ();
 
 $color-text-HtmlTable: createThemeVarTable("color-text-HtmlTable");
 $color-bg-HtmlTable: createThemeVarTable("color-bg-HtmlTable");
-$font-family-HtmlTable: createThemeVarTable("font-family-HtmlTable");
-$font-size-HtmlTable: createThemeVarTable("font-size-HtmlTable");
-$font-weight-HtmlTable: createThemeVarTable("font-weight-HtmlTable");
-$transform-text-HtmlTable: createThemeVarTable("transform-text-HtmlTable");
+$fontFamily-HtmlTable: createThemeVarTable("fontFamily-HtmlTable");
+$fontSize-HtmlTable: createThemeVarTable("fontSize-HtmlTable");
+$fontWeight-HtmlTable: createThemeVarTable("fontWeight-HtmlTable");
+$textTransform-HtmlTable: createThemeVarTable("textTransform-HtmlTable");
+$margin-top-HtmlTable: createThemeVarTable("margin-top-HtmlTable");
+$margin-bottom-HtmlTable: createThemeVarTable("margin-bottom-HtmlTable");
 $themeVarsTable: t.composeBorderVars($themeVarsTable, "HtmlTable");
 $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
 
 .htmlTable {
   background-color: $color-bg-HtmlTable;
   color: $color-text-HtmlTable;
-  font-family: $font-family-HtmlTable;
-  font-size: $font-size-HtmlTable;
-  font-weight: $font-weight-HtmlTable;
-  text-transform: $transform-text-HtmlTable;
+  font-family: $fontFamily-HtmlTable;
+  font-size: $fontSize-HtmlTable;
+  font-weight: $fontWeight-HtmlTable;
+  text-transform: $textTransform-HtmlTable;
+  margin-top: $margin-top-HtmlTable;
+  margin-bottom: $margin-bottom-HtmlTable;
   @include t.borderVars($themeVarsTable, "HtmlTable");
   @include t.paddingVars($themeVarsTable, "HtmlTable");
 }
 
 // --- thead
 
-$themeVarsThead: ();
+$themeVarsThead: (
+);
+
 @function createThemeVarThead($componentVariable) {
   $themeVarsThead: t.appendThemeVar($themeVarsThead, $componentVariable) !global;
   @return t.getThemeVar($themeVarsThead, $componentVariable);
@@ -38,25 +46,27 @@ $themeVarsThead: ();
 
 $color-bg-HtmlThead: createThemeVarThead("color-bg-HtmlThead");
 $color-text-HtmlThead: createThemeVarThead("color-text-HtmlThead");
-$font-weight-HtmlThead: createThemeVarThead("font-weight-HtmlThead");
-$font-size-HtmlThead: createThemeVarThead("font-size-HtmlThead");
-$transform-text-HtmlThead: createThemeVarThead("transform-text-HtmlThead");
+$fontWeight-HtmlThead: createThemeVarThead("fontWeight-HtmlThead");
+$fontSize-HtmlThead: createThemeVarThead("fontSize-HtmlThead");
+$textTransform-HtmlThead: createThemeVarThead("textTransform-HtmlThead");
 $themeVarsThead: t.composeBorderVars($themeVarsThead, "HtmlThead");
 $themeVarsThead: t.composePaddingVars($themeVarsThead, "HtmlThead");
 
 .htmlThead {
   background-color: $color-bg-HtmlThead;
   color: $color-text-HtmlThead;
-  font-weight: $font-weight-HtmlThead;
-  font-size: $font-size-HtmlThead;
-  text-transform: $transform-text-HtmlThead;
+  font-weight: $fontWeight-HtmlThead;
+  font-size: $fontSize-HtmlThead;
+  text-transform: $textTransform-HtmlThead;
   @include t.borderVars($themeVarsThead, "HtmlThead");
   @include t.paddingVars($themeVarsThead, "HtmlThead");
 }
 
 // --- tbody
 
-$themeVarsTbody: ();
+$themeVarsTbody: (
+);
+
 @function createThemeVarTbody($componentVariable) {
   $themeVarsTbody: t.appendThemeVar($themeVarsTbody, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTbody, $componentVariable);
@@ -64,21 +74,23 @@ $themeVarsTbody: ();
 
 $color-bg-HtmlTbody: createThemeVarTbody("color-bg-HtmlTbody");
 $color-text-HtmlTbody: createThemeVarTbody("color-text-HtmlTbody");
-$text-alignment-HtmlTbody: createThemeVarTbody("text-alignment-HtmlTbody");
+$textAlign-HtmlTbody: createThemeVarTbody("textAlign-HtmlTbody");
 $vertical-alignment-HtmlTbody: createThemeVarTbody("vertical-alignment-HtmlTbody");
-$transform-text-HtmlTbody: createThemeVarTbody("transform-text-HtmlTbody");
+$textTransform-HtmlTbody: createThemeVarTbody("textTransform-HtmlTbody");
 
 .htmlTbody {
   background-color: $color-bg-HtmlTbody;
   color: $color-text-HtmlTbody;
-  text-align: $text-alignment-HtmlTbody;
+  text-align: $textAlign-HtmlTbody;
   vertical-align: $vertical-alignment-HtmlTbody;
-  text-transform: $transform-text-HtmlTbody;
+  text-transform: $textTransform-HtmlTbody;
 }
 
 // --- tfoot
 
-$themeVarsTfoot: ();
+$themeVarsTfoot: (
+);
+
 @function createThemeVarTfoot($componentVariable) {
   $themeVarsTfoot: t.appendThemeVar($themeVarsTfoot, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTfoot, $componentVariable);
@@ -94,7 +106,9 @@ $color-text-HtmlTfoot: createThemeVarTfoot("color-text-HtmlTfoot");
 
 // --- th
 
-$themeVarsTh: ();
+$themeVarsTh: (
+);
+
 @function createThemeVarTh($componentVariable) {
   $themeVarsTh: t.appendThemeVar($themeVarsTh, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTh, $componentVariable);
@@ -102,8 +116,8 @@ $themeVarsTh: ();
 
 $color-bg-HtmlTh: createThemeVarTh("color-bg-HtmlTh");
 $color-text-HtmlTh: createThemeVarTh("color-text-HtmlTh");
-$font-weight-HtmlTh: createThemeVarTh("font-weight-HtmlTh");
-$font-size-HtmlTh: createThemeVarTh("font-size-HtmlTh");
+$fontWeight-HtmlTh: createThemeVarTh("fontWeight-HtmlTh");
+$fontSize-HtmlTh: createThemeVarTh("fontSize-HtmlTh");
 $color-bg-HtmlTh--hover: createThemeVarTh("color-bg-HtmlTh--hover");
 $themeVarsTh: t.composeBorderVars($themeVarsTh, "HtmlTh");
 $themeVarsTh: t.composePaddingVars($themeVarsTh, "HtmlTh");
@@ -111,8 +125,8 @@ $themeVarsTh: t.composePaddingVars($themeVarsTh, "HtmlTh");
 .htmlTh {
   background-color: $color-bg-HtmlTh;
   color: $color-text-HtmlTh;
-  font-weight: $font-weight-HtmlTh;
-  font-size: $font-size-HtmlTh;
+  font-weight: $fontWeight-HtmlTh;
+  font-size: $fontSize-HtmlTh;
   @include t.borderVars($themeVarsTh, "HtmlTh");
   @include t.paddingVars($themeVarsTh, "HtmlTh");
 
@@ -123,7 +137,9 @@ $themeVarsTh: t.composePaddingVars($themeVarsTh, "HtmlTh");
 
 // --- tr
 
-$themeVarsTr: ();
+$themeVarsTr: (
+);
+
 @function createThemeVarTr($componentVariable) {
   $themeVarsTr: t.appendThemeVar($themeVarsTr, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTr, $componentVariable);
@@ -134,15 +150,15 @@ $color-bg-HtmlTr--hover: createThemeVarTr("color-bg-HtmlTr--hover");
 $color-bg-even-HtmlTr: createThemeVarTr("color-bg-even-HtmlTr");
 $color-text-HtmlTr: createThemeVarTr("color-text-HtmlTr");
 $color-text-HtmlTr--hover: createThemeVarTr("color-text-HtmlTr--hover");
-$font-size-HtmlTr: createThemeVarTr("font-size-HtmlTr");
-$font-weight-HtmlTr: createThemeVarTr("font-weight-HtmlTr");
+$fontSize-HtmlTr: createThemeVarTr("fontSize-HtmlTr");
+$fontWeight-HtmlTr: createThemeVarTr("fontWeight-HtmlTr");
 $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
 
 .htmlTr {
   background-color: $color-bg-HtmlTr;
   color: $color-text-HtmlTr;
-  font-weight: $font-weight-HtmlTr;
-  font-size: $font-size-HtmlTr;
+  font-weight: $fontWeight-HtmlTr;
+  font-size: $fontSize-HtmlTr;
   @include t.borderVars($themeVarsTr, "HtmlTr");
 
   &:nth-child(even) {
@@ -154,6 +170,7 @@ $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
     background-color: $color-bg-HtmlTr--hover;
     color: $color-text-HtmlTr--hover;
   }
+
   // Remove hover effect for rows with only th elements
   &:hover:not(:has(:not(th))) {
     background-color: initial;
@@ -162,7 +179,9 @@ $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
 
 // --- td
 
-$themeVarsTd: ();
+$themeVarsTd: (
+);
+
 @function createThemeVarTd($componentVariable) {
   $themeVarsTd: t.appendThemeVar($themeVarsTd, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTd, $componentVariable);
@@ -171,8 +190,8 @@ $themeVarsTd: ();
 $color-bg-HtmlTd: createThemeVarTd("color-bg-HtmlTd");
 $text-align-HtmlTd: createThemeVarTd("text-align-HtmlTd");
 $vertical-align-HtmlTd: createThemeVarTd("vertical-align-HtmlTd");
-$font-size-HtmlTd: createThemeVarTd("font-size-HtmlTd");
-$font-weight-HtmlTd: createThemeVarTd("font-weight-HtmlTd");
+$fontSize-HtmlTd: createThemeVarTd("fontSize-HtmlTd");
+$fontWeight-HtmlTd: createThemeVarTd("fontWeight-HtmlTd");
 $themeVarsTd: t.composeBorderVars($themeVarsTd, "HtmlTd");
 $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
 
@@ -180,11 +199,74 @@ $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
   background-color: $color-bg-HtmlTd;
   text-align: $text-align-HtmlTd;
   vertical-align: $vertical-align-HtmlTd;
-  font-size: $font-size-HtmlTd;
-  font-weight: $font-weight-HtmlTd;
+  font-size: $fontSize-HtmlTd;
+  font-weight: $fontWeight-HtmlTd;
   @include t.borderVars($themeVarsTd, "HtmlTd");
   @include t.paddingVars($themeVarsTd, "HtmlTd");
 }
+
+// --- List styling (for both ul and ol)
+
+$themeVarsList: (
+);
+
+@function createThemeVarList($componentVariable) {
+  $themeVarsList: t.appendThemeVar($themeVarsList, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsList, $componentVariable);
+}
+
+$margin-top-HtmlOl: createThemeVarList("margin-top-HtmlOl");
+$margin-bottom-HtmlOl: createThemeVarList("margin-bottom-HtmlOl");
+$margin-top-HtmlUl: createThemeVarList("margin-top-HtmlUl");
+$margin-bottom-HtmlUl: createThemeVarList("margin-bottom-HtmlUl");
+
+// Apply to both ul and ol elements
+.htmlUl {
+  margin-top: $margin-top-HtmlUl;
+  margin-bottom: $margin-bottom-HtmlUl;
+}
+.htmlOl {
+  margin-top: $margin-top-HtmlOl;
+  margin-bottom: $margin-bottom-HtmlOl;
+}
+
+li .htmlUl,
+li .htmlOl {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+// Only apply flex layout to list items that contain checkboxes
+.htmlUl li:has(> input[type="checkbox"]),
+.htmlOl li:has(> input[type="checkbox"]) {
+  display: flex;
+  align-items: flex-start;
+
+  >input[type="checkbox"] {
+    margin-right: 8px;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+}
+
+
+// --- Heading styling
+$themeVarsHeading: (
+);
+
+@function createThemeVarHeading($componentVariable) {
+  $themeVarsHeading: t.appendThemeVar($themeVarsHeading, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsHeading, $componentVariable);
+}
+
+$margin-top-HtmlHeading: createThemeVarHeading("margin-top-HtmlHeading");
+$margin-bottom-HtmlHeading: createThemeVarHeading("margin-bottom-HtmlHeading");
+
+.htmlH1, .htmlH2, .htmlH3, .htmlH4, .htmlH5, .htmlH6 {
+  margin-top: $margin-top-HtmlHeading;
+  margin-bottom: $margin-bottom-HtmlHeading;
+}
+
 
 // --- We export the theme variables to add them to the component renderer
 :export {
@@ -195,4 +277,7 @@ $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
   themeVarsTh: t.json-stringify($themeVarsTh);
   themeVarsTr: t.json-stringify($themeVarsTr);
   themeVarsTd: t.json-stringify($themeVarsTd);
+  themeVarsList: t.json-stringify($themeVarsList);
+  themeVarsHeading: t.json-stringify($themeVarsHeading);
+  
 }

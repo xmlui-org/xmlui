@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.7.32",
+  "version": "0.7.33",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -19,9 +19,12 @@
     "prepublishOnly": "clean-package && npm run build",
     "postpublish": "clean-package restore",
     "generate-docs": "node scripts/generate-docs/get-docs.mjs",
-    "prepare-docs-data": "npm run build:xmlui-metadata"
+    "prepare-docs-data": "npm run build:xmlui-metadata",
+    "generate-all-docs": "npm run build:xmlui-metadata && npm run build:ext-meta && npm run generate-docs"
   },
   "dependencies": {
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11",
     "@eslint-community/regexpp": "4.10.0",
     "@formkit/auto-animate": "0.7.0",
     "@modyfi/vite-plugin-yaml": "1.1.0",
@@ -139,12 +142,14 @@
     "src/styles"
   ],
   "bin": {
-    "xmlui": "./bin/bootstrap.js"
+    "xmlui": "./bin/bootstrap.js",
+    "xmlui-language-server": "./bin/language-server.js"
   },
   "clean-package": {
     "replace": {
       "bin": {
-        "xmlui": "dist/scripts/bin/bootstrap.js"
+        "xmlui": "dist/scripts/bin/bootstrap.js",
+        "xmlui-language-server": "dist/scripts/bin/language-server.js"
       },
       "main": "./dist/xmlui.umd.js",
       "module": "./dist/xmlui.mjs",
@@ -191,8 +196,12 @@
       "import": "./src/components-core/theming/_themes.scss"
     },
     "./vite-ueml-plugin": {
-      "import": "./bin/vite-ueml-plugin.js",
-      "require": "./bin/vite-ueml-plugin.js"
+      "import": "./bin/vite-ueml-plugin.ts",
+      "require": "./bin/vite-ueml-plugin.ts"
+    },
+    "./xmlui-language-server": {
+      "import": "./bin/language-server.js",
+      "require": "./bin/language-server.js"
     }
   },
   "browserslist": {

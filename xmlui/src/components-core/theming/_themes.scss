@@ -61,7 +61,7 @@ $THEME-VAR-PREFIX: xmlui;
     @if ($num > 1) {
       $offset: (-1 * $num) - 1;
     }
-    //@if(string.index(#{$fallbackValue}, 'font-size-small')) {
+    //@if(string.index(#{$fallbackValue}, 'fontSize-small')) {
     //  @debug 'original: ' + #{$componentVariable} + ", varcount: " + $num;
     //  @debug 'concatet:' + var(#{str-slice($componentVariable, 5, -2)}, #{$fallbackValue});
     //  @debug 'concat 2:' + var(#{str-slice($componentVariable, 5, $offset)}, #{$fallbackValue});
@@ -501,13 +501,13 @@ $color-text--disabled: createVar(color-text--disabled);
 $color-bg--disabled: createVar(color-bg--disabled);
 $color-border--disabled: createVar(color-border--disabled);
 $color-bg--selected: createVar(color-bg--selected);
-$font-family: useVar(createVar(font-family), createVar(font-family));
-$font-size-tiny: createVar(font-size-tiny);
-$font-size-smaller: createVar(font-size-smaller);
-$font-size-small: createVar(font-size-small);
-$font-size-normal: createVar(font-size-normal);
-$font-size-medium: createVar(font-size-medium);
-$font-size-large: createVar(font-size-large);
+$fontFamily: createVar(fontFamily);
+$fontSize-tiny: createVar(fontSize-tiny);
+$fontSize-smaller: createVar(fontSize-smaller);
+$fontSize-small: createVar(fontSize-small);
+$fontSize-normal: createVar(fontSize-normal);
+$fontSize-medium: createVar(fontSize-medium);
+$fontSize-large: createVar(fontSize-large);
 
 $color-bg-overlay: createVar(color-bg-overlay);
 $color-info: createVar(color-info);
@@ -522,11 +522,11 @@ $direction: createVar(direction);
 
 $font-feature-settings: createVar(font-feature-settings);
 
-$color-outline--focus: createVar(color-outline--focus);
-$thickness-outline--focus: createVar(thickness-outline--focus);
-$style-outline--focus: createVar(style-outline--focus);
-$offset-outline--focus: createVar(offset-outline--focus);
-$focus-outline: $thickness-outline--focus $style-outline--focus $color-outline--focus;
+$outlineColor--focus: createVar(outlineColor--focus);
+$outlineWidth--focus: createVar(outlineWidth--focus);
+$outlineStyle--focus: createVar(outlineStyle--focus);
+$outlineOffset--focus: createVar(outlineOffset--focus);
+$focus-outline: $outlineWidth--focus $outlineStyle--focus $outlineColor--focus;
 
 $media-max-width-phone: createVar(media-max-width-phone);
 $media-max-width-tablet: createVar(media-max-width-tablet);
@@ -559,8 +559,8 @@ $color-text-InputLabel-required: createVar(color-text-InputLabel-required);
 // ---------------------------------------------------------------------------------------------------------------------
 // formItem style variables
 $color-text-FormItemLabel: createVar(color-text-FormItemLabel);
-$font-size-FormItemLabel: createVar(font-size-FormItemLabel);
-$font-weight-FormItemLabel: createVar(font-weight-FormItemLabel);
+$fontSize-FormItemLabel: createVar(fontSize-FormItemLabel);
+$fontWeight-FormItemLabel: createVar(fontWeight-FormItemLabel);
 
 //----------------------------------------------------------------------------------------------------------------------
 // Tab style variables
@@ -572,13 +572,13 @@ $color-bg: createVar(color-bg);
 
 $color-text-secondary: createVar(color-text-secondary);
 
-$font-weight-light: createVar(font-weight-light);
-$font-weight-normal: createVar(font-weight-normal);
-$font-weight-medium: createVar(font-weight-medium);
-$font-weight-bold: createVar(font-weight-bold);
+$fontWeight-light: createVar(fontWeight-light);
+$fontWeight-normal: createVar(fontWeight-normal);
+$fontWeight-medium: createVar(fontWeight-medium);
+$fontWeight-bold: createVar(fontWeight-bold);
 
 $radius: createVar(radius);
 
 // body
-$font-size: createVar(font-size);
-$font-weight: createVar(font-weight);
+$fontSize: createVar(fontSize);
+$fontWeight: createVar(fontWeight);

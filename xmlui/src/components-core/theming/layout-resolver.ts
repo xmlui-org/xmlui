@@ -63,36 +63,36 @@ export function resolveLayoutProps(
   // --- Paddings and gap
   collectCss("gap");
   collectCss("padding");
-  const horizontalPadding = transformLayoutValue("horizontalPadding");
-  if (horizontalPadding) {
-    result.cssProps.paddingLeft = horizontalPadding;
-    result.cssProps.paddingRight = horizontalPadding;
+  const paddingHorizontal = transformLayoutValue("paddingHorizontal");
+  if (paddingHorizontal) {
+    result.cssProps.paddingLeft = paddingHorizontal;
+    result.cssProps.paddingRight = paddingHorizontal;
   }
   collectCss("paddingRight");
   collectCss("paddingLeft");
 
-  const verticalPadding = transformLayoutValue("verticalPadding");
-  if (verticalPadding) {
-    result.cssProps.paddingTop = verticalPadding;
-    result.cssProps.paddingBottom = verticalPadding;
+  const paddingVertical = transformLayoutValue("paddingVertical");
+  if (paddingVertical) {
+    result.cssProps.paddingTop = paddingVertical;
+    result.cssProps.paddingBottom = paddingVertical;
   }
   collectCss("paddingTop");
   collectCss("paddingBottom");
 
   // --- Margins
   collectCss("margin");
-  const horizontalMargin = transformLayoutValue("horizontalMargin");
-  if (horizontalMargin) {
-    result.cssProps.marginLeft = horizontalMargin;
-    result.cssProps.marginRight = horizontalMargin;
+  const marginHorizontal = transformLayoutValue("marginHorizontal");
+  if (marginHorizontal) {
+    result.cssProps.marginLeft = marginHorizontal;
+    result.cssProps.marginRight = marginHorizontal;
   }
   collectCss("marginRight");
   collectCss("marginLeft");
 
-  const verticalMargin = transformLayoutValue("verticalMargin");
-  if (verticalMargin) {
-    result.cssProps.marginTop = verticalMargin;
-    result.cssProps.marginBottom = verticalMargin;
+  const marginVertical = transformLayoutValue("marginVertical");
+  if (marginVertical) {
+    result.cssProps.marginTop = marginVertical;
+    result.cssProps.marginBottom = marginVertical;
   }
   collectCss("marginTop");
   collectCss("marginBottom");
@@ -150,8 +150,8 @@ export function resolveLayoutProps(
   collectCss("background");
   collectCss("boxShadow");
   collectCss("direction");
-  collectCss("horizontalOverflow", "overflowX");
-  collectCss("verticalOverflow", "overflowY");
+  collectCss("overflowX");
+  collectCss("overflowY");
   collectCss("zIndex");
   collectCss("opacity");
   collectCss("zoom");
@@ -356,8 +356,8 @@ export type LayoutProps = {
 
   // --- Padding
   padding?: number | string;
-  horizontalPadding?: number | string;
-  verticalPadding?: number | string;
+  paddingHorizontal?: number | string;
+  paddingVertical?: number | string;
   paddingTop?: number | string;
   paddingRight?: number | string;
   paddingBottom?: number | string;
@@ -365,8 +365,8 @@ export type LayoutProps = {
 
   // --- Margin
   margin?: number | string;
-  horizontalMargin?: number | string;
-  verticalMargin?: number | string;
+  marginHorizontal?: number | string;
+  marginVertical?: number | string;
   marginTop?: number | string;
   marginRight?: number | string;
   marginBottom?: number | string;
@@ -377,8 +377,8 @@ export type LayoutProps = {
   background?: string;
   boxShadow?: string;
   direction?: string;
-  horizontalOverflow?: string;
-  verticalOverflow?: string;
+  overflowX?: string;
+  overflowY?: string;
   zIndex?: number | string;
   opacity?: string | number;
 
@@ -457,8 +457,8 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
 
   // --- Padding
   padding: [],
-  horizontalPadding: [],
-  verticalPadding: [],
+  paddingHorizontal: [],
+  paddingVertical: [],
   paddingTop: [],
   paddingRight: [],
   paddingBottom: [],
@@ -466,8 +466,8 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
 
   // --- Margin
   margin: [],
-  horizontalMargin: [],
-  verticalMargin: [],
+  marginHorizontal: [],
+  marginVertical: [],
   marginTop: [],
   marginRight: [],
   marginBottom: [],
@@ -478,8 +478,8 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   background: [],
   boxShadow: [],
   direction: [],
-  horizontalOverflow: [],
-  verticalOverflow: [],
+  overflowX: [],
+  overflowY: [],
   zIndex: [],
   opacity: [],
 

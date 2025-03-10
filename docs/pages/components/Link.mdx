@@ -163,13 +163,13 @@ This component does not expose any methods.
 
 The `Link` component uses these theme variables to customize its appearance:
 
-- `color-decoration`
+- `textDecorationColor`
 - `color-text`
-- `font-weight`
-- `line-decoration`
-- `offset-decoration`
-- `style-decoration`
-- `thickness-decoration`
+- `fontWeight`
+- `textDecorationLine`
+- `textUnderlineOffset`
+- `textDecorationStyle`
+- `textDecorationThickness`
 
 The following sample theme sets a few visual properties of `Link`:
 
@@ -179,9 +179,9 @@ The following sample theme sets a few visual properties of `Link`:
   "name": "Custom Theme",
   "themeVars": {
     "color-text-Link--hover": "orangered",
-    "color-decoration-Link": "purple",
-    "thickness-decoration-Link": "4px",
-    "style-decoration-Link": "dotted"
+    "textDecorationColor-Link": "purple",
+    "textDecorationThickness-Link": "4px",
+    "textDecorationStyle-Link": "dotted"
   }
 }
 ```
@@ -195,9 +195,9 @@ The following sample theme sets a few visual properties of `Link`:
       name: "Custom Theme",
       themeVars: {
         "color-text-Link--hover": "orangered",
-        "color-decoration-Link": "purple",
-        "thickness-decoration-Link": "4px",
-        "style-decoration-Link": "dotted",
+        "textDecorationColor-Link": "purple",
+        "textDecorationThickness-Link": "4px",
+        "textDecorationStyle-Link": "dotted",
       },
     },
   ]}
@@ -226,22 +226,19 @@ The following sample theme sets a few visual properties of `Link`:
 | [color-text](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border-top](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border-vertical](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color)-Link | $color-surface-400 | $color-surface-400 |
-| [color-outline](../styles-and-themes/common-units/#color)-Link--focus | $color-outline--focus | $color-outline--focus |
-| [color-text](../styles-and-themes/common-units/#color)-decoration-Link--active | $color-surface200 | $color-surface200 |
-| [color-text](../styles-and-themes/common-units/#color)-decoration-Link--hover | $color-surface-400A80 | $color-surface-400A80 |
 | [color-text](../styles-and-themes/common-units/#color)-Link | $color-primary-500 | $color-primary-500 |
 | [color-text](../styles-and-themes/common-units/#color)-Link--active | $color-primary-500 | $color-primary-500 |
 | [color-text](../styles-and-themes/common-units/#color)-Link--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Link--hover--active | $color-text-Link--active | $color-text-Link--active |
-| [font-family](../styles-and-themes/common-units/#font-family)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [font-size](../styles-and-themes/common-units/#size)-Link | inherit | inherit |
-| [font-weight](../styles-and-themes/common-units/#font-weight)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [font-weight](../styles-and-themes/common-units/#font-weight)-Link--active | $font-weight-bold | $font-weight-bold |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontSize](../styles-and-themes/common-units/#size)-Link | inherit | inherit |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Link--active | $fontWeight-bold | $fontWeight-bold |
 | [gap](../styles-and-themes/common-units/#size)-icon-Link | $gap-tight | $gap-tight |
-| [line-decoration](../styles-and-themes/common-units/#text-decoration)-Link | underline | underline |
-| [offset](../styles-and-themes/common-units/#size)-decoration-Link | $space-1 | $space-1 |
-| [offset-outline](../styles-and-themes/common-units/#size)-Link--focus | $offset-outline--focus | $offset-outline--focus |
+| [outlineColor](../styles-and-themes/common-units/#color)-Link--focus | $outlineColor--focus | $outlineColor--focus |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Link--focus | $outlineOffset--focus | $outlineOffset--focus |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Link--focus | $outlineStyle--focus | $outlineStyle--focus |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Link--focus | $outlineWidth--focus | $outlineWidth--focus |
 | [padding-bottom](../styles-and-themes/common-units/#size)-icon-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-bottom](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-horizontal](../styles-and-themes/common-units/#size)-icon-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -267,8 +264,13 @@ The following sample theme sets a few visual properties of `Link`:
 | [style-border-right](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-top](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-vertical](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-decoration](../styles-and-themes/common-units/#text-decoration)-Link | dashed | dashed |
-| [style-outline](../styles-and-themes/common-units/#border)-Link--focus | $style-outline--focus | $style-outline--focus |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-Link | $color-surface-400 | $color-surface-400 |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-Link--active | $color-surface200 | $color-surface200 |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-Link--hover | $color-surface-400A80 | $color-surface-400A80 |
+| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-Link | underline | underline |
+| [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-Link | dashed | dashed |
+| [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-Link | $space-0_5 | $space-0_5 |
+| textUnderlineOffset-Link | $space-1 | $space-1 |
 | [thickness-border-bottom](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border-horizontal](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border-left](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -276,5 +278,3 @@ The following sample theme sets a few visual properties of `Link`:
 | [thickness-border-right](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border-top](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border-vertical](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-decoration](../styles-and-themes/common-units/#text-decoration)-Link | $space-0_5 | $space-0_5 |
-| [thickness-outline](../styles-and-themes/common-units/#size)-Link--focus | $thickness-outline--focus | $thickness-outline--focus |

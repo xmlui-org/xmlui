@@ -7,7 +7,7 @@ import { useChart, useLabelList } from "../utils/ChartProvider";
 
 type Props = {
   position: LabelPosition;
-  key: string;
+  nameKey?: string;
   style?: CSSProperties;
 };
 
@@ -15,7 +15,7 @@ export const defaultProps: Pick<Props, "position"> = {
   position: "inside",
 };
 
-export const LabelList = ({ position = defaultProps.position, key, style }: Props) => {
+export const LabelList = ({ position = defaultProps.position, nameKey: key, style }: Props) => {
   const { nameKey } = useChart();
   const { setLabelList } = useLabelList();
 

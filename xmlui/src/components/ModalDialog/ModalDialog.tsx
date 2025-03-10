@@ -68,7 +68,7 @@ export const ModalDialogMd = createMetadata({
     [`color-bg-overlay-${COMP}`]: "$color-bg-overlay",
     [`color-text-${COMP}`]: "$color-text-primary",
     [`radius-${COMP}`]: "$radius",
-    [`font-family-${COMP}`]: "$font-family",
+    [`fontFamily-${COMP}`]: "$fontFamily",
     [`max-width-${COMP}`]: "450px",
     [`margin-bottom-title-${COMP}`]: "0",
     dark: {

@@ -120,9 +120,9 @@ const THEME_TESTS: ThemeTestDesc[] = [
   { themeVar: "color-bg-Avatar", themeVarAsCSS: "background-color", expected: RED },
   { themeVar: "color-border-Avatar", themeVarAsCSS: "border-color", expected: RED },
   { themeVar: "color-text-Avatar", themeVarAsCSS: "color", expected: RED },
-  { themeVar: "font-weight-Avatar", themeVarAsCSS: "font-weight", expected: "700" },
+  { themeVar: "fontWeight-Avatar", themeVarAsCSS: "font-weight", expected: "700" },
   { themeVar: "radius-Avatar", themeVarAsCSS: "border-radius", expected: "15px" },
-  { themeVar: "shadow-Avatar", themeVarAsCSS: "box-shadow", expected: RED + " 5px 10px 0px 0px" },
+  { themeVar: "boxShadow-Avatar", themeVarAsCSS: "box-shadow", expected: RED + " 5px 10px 0px 0px" },
 ];
 
 THEME_TESTS.forEach((testCase) => {

@@ -87,10 +87,10 @@ const testDescriptors: TestDescriptor[] = [
   },
   {
     category: "overflow",
-    props: ["horizontalOverflow", "verticalOverflow"],
+    props: ["overflowX", "overflowY"],
     cssProps: {
-      horizontalOverflow: "overflowX",
-      verticalOverflow: "overflowY",
+      overflowX: "overflowX",
+      overflowY: "overflowY",
     },
     baseValue: "hidden",
     overrideValue: "visible",

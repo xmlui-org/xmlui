@@ -49,12 +49,12 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
 
       .link {
         color: createThemeVar("color-TableOfContentsItem");
-        font-size: createThemeVar("font-size-TableOfContentsItem");
-        font-weight: createThemeVar("font-weight-TableOfContentsItem");
-        font-family: createThemeVar("font-family-TableOfContentsItem");
-        text-transform: createThemeVar("transform-TableOfContentsItem");
+        font-size: createThemeVar("fontSize-TableOfContentsItem");
+        font-weight: createThemeVar("fontWeight-TableOfContentsItem");
+        font-family: createThemeVar("fontFamily-TableOfContentsItem");
+        text-transform: createThemeVar("textTransform-TableOfContentsItem");
         vertical-align: createThemeVar("align-vertical-TableOfContentsItem");
-        letter-spacing: createThemeVar("letter-spacing-TableOfContentsItem");
+        letter-spacing: createThemeVar("letterSpacing-TableOfContentsItem");
         overflow-wrap: break-word;
         display: block;
         @include t.paddingVars($themeVars, "#{$component}Item");
@@ -89,7 +89,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
 
         .link {
           color: createThemeVar("color-TableOfContentsItem--active");
-          font-weight: createThemeVar("font-weight-TableOfContentsItem--active");
+          font-weight: createThemeVar("fontWeight-TableOfContentsItem--active");
         }
       }
     }

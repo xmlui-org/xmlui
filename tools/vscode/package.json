@@ -7,13 +7,17 @@
   "version": "0.0.1",
   "categories": [],
   "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xmlui-com/xmlui"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },
   "activationEvents": [
     "onLanguage:xmlui"
   ],
-  "main": "./client/out/extension",
+  "main": "./out/extension",
   "contributes": {
     "configuration": {
       "type": "object",
@@ -66,19 +70,25 @@
     ]
   },
   "scripts": {
+    "create:package": "vsce package",
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -b",
     "watch": "tsc -b -w",
     "lint": "eslint",
-    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
     "test": "sh ./scripts/e2e.sh"
+  },
+  "dependencies": {
+    "xmlui": "*",
+    "vscode-languageclient": "^9.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@stylistic/eslint-plugin": "^2.9.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20",
-    "@vscode/vsce": "^3.1.1",
+    "@types/vscode": "^1.75.1",
+    "@vscode/test-electron": "^2.3.9",
+    "@vscode/vsce": "^3.2.2",
     "eslint": "^9.13.0",
     "mocha": "^10.3.0",
     "typescript": "^5.7.2",

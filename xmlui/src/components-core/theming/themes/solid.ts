@@ -10,7 +10,7 @@ export const SolidThemeDefinition: ThemeDefinition = {
     "max-content-width": "100%",
 
     radius: "0",
-    "font-size": "$font-size-normal",
+    "fontSize": "$fontSize-normal",
     "size-Icon": "1rem",
   }
 };

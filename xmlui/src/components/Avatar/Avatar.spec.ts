@@ -105,23 +105,6 @@ test("click works", async ({ initTestBed, createAvatarDriver }) => {
   await expect.poll(testStateDriver.testState).toEqual(true);
 });
 
-// theme vars are more intricate, global theme vars can interact
-// const THEME_TESTS: ThemeTestDesc[] = [
-//   { themeVar: "color-bg-Avatar", themeVarAsCSS: "background-color", expected: RED },
-//   { themeVar: "color-border-Avatar", themeVarAsCSS: "border-color", expected: RED },
-//   { themeVar: "color-text-Avatar", themeVarAsCSS: "color", expected: RED },
-//   { themeVar: "font-weight-Avatar", themeVarAsCSS: "font-weight", expected: "700" },
-//   { themeVar: "radius-Avatar", themeVarAsCSS: "border-radius", expected: "15px" },
-//   { themeVar: "shadow-Avatar", themeVarAsCSS: "box-shadow", expected: RED + " 5px 10px 0px 0px" },
-//   { themeVar: "style-border-Avatar", themeVarAsCSS: "border-style", expected: "dotted" },
-//   { themeVar: "thickness-border-Avatar", themeVarAsCSS: "border-width", expected: "5px"},
-// ];
-
-// THEME_TESTS.forEach((testCase) => {
-//   test(testCase.themeVar, async ({ }) => {
-//   });
-// });
-
 const AVATAR_CODE = '<Avatar testId="avatar" name="Tim"/>';
 
 test("border", async ({ page }) => {

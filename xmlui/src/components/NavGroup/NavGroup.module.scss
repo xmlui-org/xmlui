@@ -8,7 +8,7 @@ $themeVars: ();
 }
 
 $color-bg-dropdown-NavGroup: createThemeVar("color-bg-dropdown-NavGroup");
-$shadow-dropdown-NavGroup: createThemeVar("shadow-dropdown-NavGroup");
+$boxShadow-dropdown-NavGroup: createThemeVar("boxShadow-dropdown-NavGroup");
 $radius-dropdown-NavGroup: createThemeVar("radius-dropdown-NavGroup");
 
 .dropdownList {
@@ -22,7 +22,7 @@ $radius-dropdown-NavGroup: createThemeVar("radius-dropdown-NavGroup");
   list-style: none;
   height: fit-content;
   transition: height 0.2s ease;
-  box-shadow: $shadow-dropdown-NavGroup;
+  box-shadow: $boxShadow-dropdown-NavGroup;
   min-width: 11rem;
   border-radius: $radius-dropdown-NavGroup;
 
