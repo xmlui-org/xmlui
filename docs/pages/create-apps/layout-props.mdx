@@ -360,21 +360,21 @@ Individual components, such as <SmartLink href={COMPONENT_TEXT}>`Text`</SmartLin
 
 |Property|Description|
 |-|-|
-|`horizontalOverflow`| This property defines the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW}>overflow</SmartLink> strategy when a component horizontally overflows the UI its parent provides. |
-|`verticalOverflow`| This property defines the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW}>overflow</SmartLink> strategy when a component vertically overflows the UI its parent provides. |
+|`overflowX`| This property defines the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW}>overflow</SmartLink> strategy when a component horizontally overflows the UI its parent provides. |
+|`overflowY`| This property defines the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW}>overflow</SmartLink> strategy when a component vertically overflows the UI its parent provides. |
 
 ### Horizontal Overflow
 
 The following example demonstrates how the horizontal overflow property works:
 
-```ueml copy /horizontalOverflow/
+```ueml copy /overflowX/
 <App>
-  <VStack width="180px" height="40px" backgroundColor="cyan" horizontalOverflow="hidden">
+  <VStack width="180px" height="40px" backgroundColor="cyan" overflowX="hidden">
     <Text maxLines="1">
       This is a long text that probably won't fit entirely in a single line.
     </Text>
   </VStack>
-  <VStack width="180px" height="40px" backgroundColor="lightgreen" horizontalOverflow="scroll">
+  <VStack width="180px" height="40px" backgroundColor="lightgreen" overflowX="scroll">
     <Text color="purple" width="1000px">
       This is a long text that probably won't fit entirely in a single line.
     </Text>
@@ -388,18 +388,18 @@ The following example demonstrates how the horizontal overflow property works:
 ```
 
 Observe the second text's width, which is set to 1000px, to ensure it won't be trimmed and closed with ellipses.
-Due to the `horizontalOverflow="scroll"` setting, you can see a horizontal scrollbar at the bottom of the light green box. The last text has no `horizontalOverflow` value or `width` constraint, so the engine breaks it into multiple lines. As it has no `verticalOverflow` value, the engine lets it flow out of its container.
+Due to the `overflowX="scroll"` setting, you can see a horizontal scrollbar at the bottom of the light green box. The last text has no `overflowX` value or `width` constraint, so the engine breaks it into multiple lines. As it has no `overflowY` value, the engine lets it flow out of its container.
 
 <Playground
-  name="Example: horizontalOverflow"
+  name="Example: overflowX"
   app={`
   <App>
-    <VStack width="180px" height="40px" backgroundColor="cyan" horizontalOverflow="hidden">
+    <VStack width="180px" height="40px" backgroundColor="cyan" overflowX="hidden">
       <Text maxLines="1">
         This is a long text that probably won't fit entirely in a single line.
       </Text>
     </VStack>
-    <VStack width="180px" height="40px" backgroundColor="lightgreen" horizontalOverflow="scroll">
+    <VStack width="180px" height="40px" backgroundColor="lightgreen" overflowX="scroll">
       <Text color="purple" width="1000px">
         This is a long text that probably won't fit entirely in a single line.
       </Text>
@@ -418,14 +418,14 @@ Due to the `horizontalOverflow="scroll"` setting, you can see a horizontal scrol
 
 The following example demonstrates how the vertical overflow property works:
 
-```ueml copy /verticalOverflow/
+```ueml copy /overflowY/
 <App>
-  <VStack width="180px" height="40px" backgroundColor="cyan" verticalOverflow="hidden">
+  <VStack width="180px" height="40px" backgroundColor="cyan" overflowY="hidden">
     <Text maxLines="1">
       This is a long text that probably won't fit entirely in a single line.
     </Text>
   </VStack>
-  <VStack width="180px" height="40px" backgroundColor="lightgreen" verticalOverflow="scroll">
+  <VStack width="180px" height="40px" backgroundColor="lightgreen" overflowY="scroll">
     <Text color="purple">
       This is a long text that probably won't fit entirely in a single line.
     </Text>
@@ -437,18 +437,18 @@ The following example demonstrates how the vertical overflow property works:
   </VStack>
 </App>
 ```
-Each of the three text fragments is enclosed in a box with a fixed size (180 x 40 pixels). Observe the effect of different `verticalOverflow` values. The last box uses no `verticalOverflow`, which has the same effect as `verticalOverflow="visible"`.
+Each of the three text fragments is enclosed in a box with a fixed size (180 x 40 pixels). Observe the effect of different `overflowY` values. The last box uses no `overflowY`, which has the same effect as `overflowY="visible"`.
 
 <Playground
-  name="Example: verticalOverflow"
+  name="Example: overflowY"
   app={`
     <App>
-      <VStack width="180px" height="40px" backgroundColor="cyan" verticalOverflow="hidden">
+      <VStack width="180px" height="40px" backgroundColor="cyan" overflowY="hidden">
         <Text maxLines="1">
           This is a long text that probably won't fit entirely in a single line.
         </Text>
       </VStack>
-      <VStack width="180px" height="40px" backgroundColor="lightgreen" verticalOverflow="scroll">
+      <VStack width="180px" height="40px" backgroundColor="lightgreen" overflowY="scroll">
         <Text color="purple">
           This is a long text that probably won't fit entirely in a single line.
         </Text>

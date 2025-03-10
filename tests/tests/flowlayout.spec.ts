@@ -338,7 +338,7 @@ test("SpaceFiller adds line break", async ({ page }) => {
 test("scrollbar on overflow Y", async ({ page }) => {
   const itemHeight = 128;
   const entryPoint = `
-  <FlowLayout testId="layout" height="100px" columnGap="10px" verticalOverflow="auto">
+  <FlowLayout testId="layout" height="100px" columnGap="10px" overflowY="auto">
     <Stack backgroundColor="red" height="${itemHeight}px" border="solid 8px black"/>
     <Stack backgroundColor="blue" height="${itemHeight}px"/>
     <Stack backgroundColor="green" height="${itemHeight}px"/>
@@ -359,7 +359,7 @@ test("scrollbar on overflow Y", async ({ page }) => {
 test("scrollbar on overflow Y multi items", async ({ page }) => {
   const itemHeight = 128;
   const entryPoint = `
-  <FlowLayout testId="layout" height="100px" verticalOverflow="auto">
+  <FlowLayout testId="layout" height="100px" overflowY="auto">
     <Stack backgroundColor="red" height="${itemHeight}px" border="solid 8px black" width="50%"/>
     <Stack backgroundColor="blue" height="${itemHeight}px" border="solid 8px black" width="50%"/>
     <Stack backgroundColor="green" height="${itemHeight}px"/>
