@@ -23,8 +23,8 @@ $color-bg-checked-RadioGroupOption--disabled: createThemeVar("color-bg-checked-R
 $color-bg-checked-RadioGroupOption-error: createThemeVar("color-bg-checked-RadioGroupOption-error");
 $color-bg-checked-RadioGroupOption-warning: createThemeVar("color-bg-checked-RadioGroupOption-warning");
 $color-bg-checked-RadioGroupOption-success: createThemeVar("color-bg-checked-RadioGroupOption-success");
-$font-size-RadioGroupOption: createThemeVar("Input:font-size-RadioGroupOption");
-$font-weight-RadioGroupOption: createThemeVar("Input:font-weight-RadioGroupOption");
+$fontSize-RadioGroupOption: createThemeVar("Input:fontSize-RadioGroupOption");
+$fontWeight-RadioGroupOption: createThemeVar("Input:fontWeight-RadioGroupOption");
 $color-text-RadioGroupOption-default: createThemeVar("Input:color-text-RadioGroupOption-default");
 $color-text-RadioGroupOption-error: createThemeVar("Input:color-text-RadioGroupOption-error");
 $color-text-RadioGroupOption-warning: createThemeVar("Input:color-text-RadioGroupOption-warning");
@@ -128,8 +128,8 @@ $color-text-RadioGroupOption-success: createThemeVar("Input:color-text-RadioGrou
 .label {
   width: 100%;
   color: $color-text-RadioGroupOption-default;
-  font-size: $font-size-RadioGroupOption;
-  font-weight: $font-weight-RadioGroupOption;
+  font-size: $fontSize-RadioGroupOption;
+  font-weight: $fontWeight-RadioGroupOption;
   user-select: none;
   cursor: pointer;
 

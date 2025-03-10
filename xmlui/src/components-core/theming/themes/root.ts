@@ -142,11 +142,11 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-info-950": "hsl(183, 97%, 10%)",
 
     // --- Font weights
-    "font-weight-light": "300",
-    "font-weight-normal": "400",
-    "font-weight-medium": "500",
-    "font-weight-bold": "600",
-    "font-weight-extra-bold": "900",
+    "fontWeight-light": "300",
+    "fontWeight-normal": "400",
+    "fontWeight-medium": "500",
+    "fontWeight-bold": "600",
+    "fontWeight-extra-bold": "900",
 
     // --- Default text colors (component use these values as their defaults)
     "color-text-primary": "$color-surface-950",
@@ -168,19 +168,19 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-error": "$color-danger-600",
 
     // --- Default line height values (relative to the base unit, "space-base")
-    "line-height-none": "1",
-    "line-height-tight": "1.25",
-    "line-height-snug": "1.375",
-    "line-height-normal": "1.5",
-    "line-height-relaxed": "1.625",
-    "line-height-loose": "2",
+    "lineHeight-none": "1",
+    "lineHeight-tight": "1.25",
+    "lineHeight-snug": "1.375",
+    "lineHeight-normal": "1.5",
+    "lineHeight-relaxed": "1.625",
+    "lineHeight-loose": "2",
 
     // --- The sans-serif font set
-    "font-family-sans-serif":
+    "fontFamily-sans-serif":
       "'Inter', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
 
     // --- The monospace font set
-    "font-family-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
+    "fontFamily-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
     "font-feature-settings": "'cv03', 'cv04', 'cv11'",
 
     // --- Some media breakpoints (review them)
@@ -198,19 +198,19 @@ export const RootThemeDefinition: ThemeDefinition = {
     "outlineOffset--focus": "0",
 
     // --- The app's default font family
-    "font-family": "$font-family-sans-serif",
+    "fontFamily": "$fontFamily-sans-serif",
 
     // --- Various font sizes (relative to the current context)
-    "font-size-gigantic": "3rem",
-    "font-size-large": "1.5rem",
-    "font-size-medium": "1.25rem",
-    "font-size-normal": "1rem",
-    "font-size-small": "0.875rem",
-    "font-size-smaller": "0.75rem",
-    "font-size-tiny": "0.625rem",
+    "fontSize-gigantic": "3rem",
+    "fontSize-large": "1.5rem",
+    "fontSize-medium": "1.25rem",
+    "fontSize-normal": "1rem",
+    "fontSize-small": "0.875rem",
+    "fontSize-smaller": "0.75rem",
+    "fontSize-tiny": "0.625rem",
 
     // --- The default font size
-    "font-size": "$font-size-normal",
+    "fontSize": "$fontSize-normal",
 
     // --- Predefined gap sizes
     "gap-none": "$space-0",
@@ -231,7 +231,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "space-loose": "$space-8",
 
     // --- Font used for body
-    "font-weight": "$font-weight-normal",
+    "fontWeight": "$fontWeight-normal",
 
     // --- Various default values (review them)
     "color-border-dropdown-item": "$color-border",

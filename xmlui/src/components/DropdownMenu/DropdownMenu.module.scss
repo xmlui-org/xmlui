@@ -22,9 +22,9 @@ $style-border-DropdownMenu-content: createThemeVar(
 $min-width-DropdowMenu: createThemeVar("min-width-DropdownMenu");
 $color-bg-MenuItem: createThemeVar("color-bg-MenuItem");
 $color-MenuItem: createThemeVar("color-MenuItem");
-$font-family-MenuItem: createThemeVar("font-family-MenuItem");
+$fontFamily-MenuItem: createThemeVar("fontFamily-MenuItem");
 $gap-MenuItem: createThemeVar("gap-MenuItem");
-$font-size-MenuItem: createThemeVar("font-size-MenuItem");
+$fontSize-MenuItem: createThemeVar("fontSize-MenuItem");
 $padding-vertical-MenuItem: createThemeVar("padding-vertical-MenuItem");
 $padding-horizontal-MenuItem: createThemeVar("padding-horizontal-MenuItem");
 $color-bg-MenuItem--hover: createThemeVar("color-bg-MenuItem--hover");
@@ -57,12 +57,12 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
 .DropdownMenuSubTrigger {
   background-color: $color-bg-MenuItem;
   color: $color-MenuItem;
-  font-family: $font-family-MenuItem;
+  font-family: $fontFamily-MenuItem;
   display: flex;
   border: 0;
   width: 100%;
   gap: $gap-MenuItem;
-  font-size: $font-size-MenuItem;
+  font-size: $fontSize-MenuItem;
   padding: $padding-vertical-MenuItem 0;
   padding-inline: $padding-horizontal-MenuItem; //t.$space-3;
   cursor: pointer;

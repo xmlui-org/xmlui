@@ -621,12 +621,12 @@ THEME_COLORS.forEach((themeColor) => {
   });
 });
 
-test("font-size-Button-primary-solid", async ({ page }) => {
+test("fontSize-Button-primary-solid", async ({ page }) => {
   const EXPECTED = "20px";
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "font-size-Button": "10px",
-      "font-size-Button-primary-solid": EXPECTED,
+      "fontSize-Button": "10px",
+      "fontSize-Button-primary-solid": EXPECTED,
     },
   });
   const btnSolPriFontSize = await getStyle(page, "btnSolPri", "font-size");

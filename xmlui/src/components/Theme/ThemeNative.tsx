@@ -92,7 +92,7 @@ export function Theme({
       })
       .join(" ");
 
-    css += `font-family: var(${getVarKey("font-family")});`;
+    css += `font-family: var(${getVarKey("fontFamily")});`;
     const className = getClassName(css);
     const fromClass = `${className}-from`;
     const toClass = `${className}-to`;

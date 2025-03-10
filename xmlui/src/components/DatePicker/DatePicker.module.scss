@@ -57,7 +57,7 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
   transition: background-color ease-in .1s;
   overflow: hidden;
   gap: t.$space-2;
-  font-size: createThemeVar("Input:font-size-DatePicker");
+  font-size: createThemeVar("Input:fontSize-DatePicker");
 
   @include variant("default");
 

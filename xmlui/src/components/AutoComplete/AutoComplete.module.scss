@@ -18,7 +18,7 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   border-color: createThemeVar("Input:color-border-#{$component}-#{$variantName}");
   border-width: createThemeVar("Input:thickness-border-#{$component}-#{$variantName}");
   border-style: createThemeVar("Input:style-border-#{$component}-#{$variantName}");
-  font-size: createThemeVar("Input:font-size-#{$component}-#{$variantName}");
+  font-size: createThemeVar("Input:fontSize-#{$component}-#{$variantName}");
   background-color: createThemeVar("Input:color-bg-#{$component}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$component}-#{$variantName}");
   color: createThemeVar("Input:color-text-#{$component}-#{$variantName}");
@@ -100,7 +100,7 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   gap: t.$space-1;
   justify-content: center;
   align-items: center;
-  font-size: createThemeVar("Input:font-size-#{$component}-badge");
+  font-size: createThemeVar("Input:fontSize-#{$component}-badge");
   background-color: createThemeVar("Input:color-bg-#{$component}-badge");
   color: createThemeVar("Input:color-text-#{$component}-badge");
 

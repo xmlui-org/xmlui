@@ -112,7 +112,7 @@ When you define theme variables, you can separate tone-independent values from t
 ```json
 {
   "themeVars": {
-    "font-size-MyComponent": "2rem",
+    "fontSize-MyComponent": "2rem",
     "radius-MyComponent": "8px",
     "style-border-MyComponent": "solid",
     "light": {
@@ -257,10 +257,10 @@ Create a new theme named "my-brand" and save it into the `themes/my-brand.json` 
   "id": "my-brand",
   "name": "My Brand Theme",
   "themeVars": {
-    "font-family": "serif",
-    "font-size": "1.2rem",
-    "font-family-Heading": "sans-serif",
-    "font-weight-H1": "font-weight-medium",
+    "fontFamily": "serif",
+    "fontSize": "1.2rem",
+    "fontFamily-Heading": "sans-serif",
+    "fontWeight-H1": "fontWeight-medium",
     "radius": "8px",
     "light": {
       "color-primary": "purple",
@@ -310,10 +310,10 @@ Now, your new theme displays the app in a light tone like this:
             id: "my-brand",
             themeVars: {
                 "space-base": "0.35rem",
-                "font-family": "serif",
-                "font-size": "1.2rem",
-                "font-family-Heading": "sans-serif",
-                "font-weight-H1": "font-weight-medium",
+                "fontFamily": "serif",
+                "fontSize": "1.2rem",
+                "fontFamily-Heading": "sans-serif",
+                "fontWeight-H1": "fontWeight-medium",
                 radius: "8px",
                 "color-text": "black",
                 "color-primary": "purple",
@@ -344,10 +344,10 @@ It also handles the dark tone:
             id: "my-brand",
             themeVars: {
                 "space-base": "0.35rem",
-                "font-family": "serif",
-                "font-size": "1.2rem",
-                "font-family-Heading": "sans-serif",
-                "font-weight-H1": "font-weight-medium",
+                "fontFamily": "serif",
+                "fontSize": "1.2rem",
+                "fontFamily-Heading": "sans-serif",
+                "fontWeight-H1": "fontWeight-medium",
                 radius: "8px",
                 "color-text": "white",
                 "color-primary": "mediumpurple",
@@ -396,7 +396,7 @@ Here are a few examples:
 - `color-text`: text color (or forecolor)
 - `color-bg`: background color
 - `text-size`: the size of the text
-- `line-height`: the height of a text line
+- `lineHeight`: the height of a text line
 - `padding-horizontal`: The value declaring the horizontal padding space
 
 The `<propertyName>` segment should use lowercase letters and dashes.

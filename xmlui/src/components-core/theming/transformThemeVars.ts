@@ -85,7 +85,7 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
     return {};
   }
   const resolvedTheme = resolveThemeVars(theme);
-  const base = resolvedTheme["font-size"];
+  const base = resolvedTheme["fontSize"];
   if (!base || typeof base !== "string") {
     return {};
   }
@@ -103,12 +103,12 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
     return {};
   }
   const ret: Record<string, string> = {};
-  ret[`font-size-large`] = `${1.5 * baseNum}${baseUnit}`;
-  ret[`font-size-medium`] = `${1.25 * baseNum}${baseUnit}`;
-  ret[`font-size-normal`] = base;
-  ret[`font-size-small`] = `${0.875 * baseNum}${baseUnit}`;
-  ret[`font-size-smaller`] = `${0.75 * baseNum}${baseUnit}`;
-  ret[`font-size-tiny`] = `${0.625 * baseNum}${baseUnit}`;
+  ret[`fontSize-large`] = `${1.5 * baseNum}${baseUnit}`;
+  ret[`fontSize-medium`] = `${1.25 * baseNum}${baseUnit}`;
+  ret[`fontSize-normal`] = base;
+  ret[`fontSize-small`] = `${0.875 * baseNum}${baseUnit}`;
+  ret[`fontSize-smaller`] = `${0.75 * baseNum}${baseUnit}`;
+  ret[`fontSize-tiny`] = `${0.625 * baseNum}${baseUnit}`;
 
   return ret;
 }
