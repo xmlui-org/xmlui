@@ -442,8 +442,8 @@ describe("Layout resolver", () => {
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("horizontalPadding (themeVar)", () => {
-    const PROP = "horizontalPadding";
+  it("paddingHorizontal (themeVar)", () => {
+    const PROP = "paddingHorizontal";
     const VALUE = THEME_ID;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.paddingLeft).toBe(THEME_ID_VALUE);
@@ -451,8 +451,8 @@ describe("Layout resolver", () => {
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("verticalPadding (themeVar)", () => {
-    const PROP = "verticalPadding";
+  it("paddingVertical (themeVar)", () => {
+    const PROP = "paddingVertical";
     const VALUE = THEME_ID;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.paddingTop).toBe(THEME_ID_VALUE);
@@ -497,8 +497,8 @@ describe("Layout resolver", () => {
   });
 
   sizeCases.forEach((c) => {
-    it(`horizontalPadding goes to left and right: ${c}`, () => {
-      const PROP = "horizontalPadding";
+    it(`paddingHorizontal goes to left and right: ${c}`, () => {
+      const PROP = "paddingHorizontal";
       const result = resolveLayoutProps({ [PROP]: c });
       expect(result.cssProps.paddingLeft).toBe(c);
       expect(result.cssProps.paddingRight).toBe(c);
@@ -507,8 +507,8 @@ describe("Layout resolver", () => {
       expect(result.issues.has(PROP)).toBe(false);
     });
 
-    it(`verticalPadding goes to top and bottom: ${c}`, () => {
-      const PROP = "verticalPadding";
+    it(`paddingVertical goes to top and bottom: ${c}`, () => {
+      const PROP = "paddingVertical";
       const result = resolveLayoutProps({ [PROP]: c });
       expect(result.cssProps.paddingTop).toBe(c);
       expect(result.cssProps.paddingBottom).toBe(c);
@@ -558,44 +558,44 @@ describe("Layout resolver", () => {
     });
   });
 
-  it(`paddingLeft overrides horizontalPadding`, () => {
+  it(`paddingLeft overrides paddingHorizontal`, () => {
     const PROP = "paddingLeft";
     const VALUE = "1px";
     const OVERRIDE = "2px";
-    const result = resolveLayoutProps({ horizontalPadding: OVERRIDE, [PROP]: VALUE });
+    const result = resolveLayoutProps({ paddingHorizontal: OVERRIDE, [PROP]: VALUE });
     expect(result.cssProps.paddingLeft).toBe(VALUE);
     expect(result.cssProps.paddingRight).toBe(OVERRIDE);
-    expect(result.issues.has("horizontalPadding")).toBe(false);
+    expect(result.issues.has("paddingHorizontal")).toBe(false);
   });
 
-  it(`paddingRight overrides horizontalPadding`, () => {
+  it(`paddingRight overrides paddingHorizontal`, () => {
     const PROP = "paddingRight";
     const VALUE = "1px";
     const OVERRIDE = "2px";
-    const result = resolveLayoutProps({ horizontalPadding: OVERRIDE, [PROP]: VALUE });
+    const result = resolveLayoutProps({ paddingHorizontal: OVERRIDE, [PROP]: VALUE });
     expect(result.cssProps.paddingLeft).toBe(OVERRIDE);
     expect(result.cssProps.paddingRight).toBe(VALUE);
-    expect(result.issues.has("horizontalPadding")).toBe(false);
+    expect(result.issues.has("paddingHorizontal")).toBe(false);
   });
 
-  it(`paddingTop overrides verticalPadding`, () => {
+  it(`paddingTop overrides paddingVertical`, () => {
     const PROP = "paddingTop";
     const VALUE = "1px";
     const OVERRIDE = "2px";
-    const result = resolveLayoutProps({ verticalPadding: OVERRIDE, [PROP]: VALUE });
+    const result = resolveLayoutProps({ paddingVertical: OVERRIDE, [PROP]: VALUE });
     expect(result.cssProps.paddingTop).toBe(VALUE);
     expect(result.cssProps.paddingBottom).toBe(OVERRIDE);
-    expect(result.issues.has("verticalPadding")).toBe(false);
+    expect(result.issues.has("paddingVertical")).toBe(false);
   });
 
-  it(`paddingBottom overrides verticalPadding`, () => {
+  it(`paddingBottom overrides paddingVertical`, () => {
     const PROP = "paddingBottom";
     const VALUE = "1px";
     const OVERRIDE = "2px";
-    const result = resolveLayoutProps({ verticalPadding: OVERRIDE, [PROP]: VALUE });
+    const result = resolveLayoutProps({ paddingVertical: OVERRIDE, [PROP]: VALUE });
     expect(result.cssProps.paddingTop).toBe(OVERRIDE);
     expect(result.cssProps.paddingBottom).toBe(VALUE);
-    expect(result.issues.has("verticalPadding")).toBe(false);
+    expect(result.issues.has("paddingVertical")).toBe(false);
   });
 
   // --- Borders

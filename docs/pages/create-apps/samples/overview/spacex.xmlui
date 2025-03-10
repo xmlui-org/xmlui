@@ -3,7 +3,7 @@
     <DataSource url="https://api.spacexdata.com/v3/history"/>
   </property>
   <property name=itemTemplate>
-    <HStack verticalPadding=.2rem>
+    <HStack paddingVertical=.2rem>
       <Card title="{$item.title}" subtitle="{$item.details.substring(0, 100)}"/>
     </HStack>
   </property>

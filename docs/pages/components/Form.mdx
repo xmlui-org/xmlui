@@ -31,7 +31,7 @@ The following example demonstrates using it:
       <FormItem bindTo="search" width="280px" />
       <FormItem type="checkbox" label="Case sensitive?" bindTo="caseSensitive" />
       <property name="buttonRowTemplate">
-        <HStack gap="0.5rem" borderTop="1px solid #ddd" verticalPadding="1rem">
+        <HStack gap="0.5rem" borderTop="1px solid #ddd" paddingVertical="1rem">
           <Button label="Test Search Server" type="button"
             themeColor="secondary" variant="outlined"
             onClick="window.alert('Search server is ok.')"/>
@@ -59,7 +59,7 @@ This example mimics a one-second search and turns off the submit button during t
           <FormItem bindTo="search" width="280px" />
           <FormItem type="checkbox" label="Case sensitive?" bindTo="caseSensitive" />
           <property name="buttonRowTemplate">
-            <HStack gap="0.5rem" borderTop="1px solid #ddd" verticalPadding="1rem">
+            <HStack gap="0.5rem" borderTop="1px solid #ddd" paddingVertical="1rem">
               <Button label="Test Search Server" type="button"
                 themeColor="secondary" variant="outlined"
                 onClick="window.alert('Search server is ok.')"/>
