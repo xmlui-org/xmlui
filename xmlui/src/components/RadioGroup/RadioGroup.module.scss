@@ -59,10 +59,10 @@ $color-text-RadioGroupOption-success: createThemeVar("Input:color-text-RadioGrou
     border-color: $color-border-RadioGroupOption-default--hover;
   }
   &:focus-visible{
-    outline-width: createThemeVar('Input:thickness-outline-RadioGroupOption--focus');
-    outline-color: createThemeVar('Input:color-outline-RadioGroupOption--focus');
-    outline-style: createThemeVar('Input:style-outline-RadioGroupOption--focus');
-    outline-offset: createThemeVar('Input:offset-outline-RadioGroupOption--focus');
+    outline-width: createThemeVar('Input:outlineWidth-RadioGroupOption--focus');
+    outline-color: createThemeVar('Input:outlineColor-RadioGroupOption--focus');
+    outline-style: createThemeVar('Input:outlineStyle-RadioGroupOption--focus');
+    outline-offset: createThemeVar('Input:outlineOffset-RadioGroupOption--focus');
   }
   &:disabled {
     cursor: not-allowed;

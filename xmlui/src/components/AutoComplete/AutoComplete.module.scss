@@ -71,10 +71,10 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   }
 
   &.focused {
-    outline-width: createThemeVar('Input:thickness-outline-#{$component}--focus');
-    outline-color: createThemeVar('Input:color-outline-#{$component}--focus');
-    outline-style: createThemeVar('Input:style-outline-#{$component}--focus');
-    outline-offset: createThemeVar('Input:offset-outline-#{$component}--focus');
+    outline-width: createThemeVar('Input:outlineWidth-#{$component}--focus');
+    outline-color: createThemeVar('Input:outlineColor-#{$component}--focus');
+    outline-style: createThemeVar('Input:outlineStyle-#{$component}--focus');
+    outline-offset: createThemeVar('Input:outlineOffset-#{$component}--focus');
   }
 }
 

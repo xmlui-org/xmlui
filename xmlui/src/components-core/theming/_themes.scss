@@ -522,11 +522,11 @@ $direction: createVar(direction);
 
 $font-feature-settings: createVar(font-feature-settings);
 
-$color-outline--focus: createVar(color-outline--focus);
-$thickness-outline--focus: createVar(thickness-outline--focus);
-$style-outline--focus: createVar(style-outline--focus);
-$offset-outline--focus: createVar(offset-outline--focus);
-$focus-outline: $thickness-outline--focus $style-outline--focus $color-outline--focus;
+$outlineColor--focus: createVar(outlineColor--focus);
+$outlineWidth--focus: createVar(outlineWidth--focus);
+$outlineStyle--focus: createVar(outlineStyle--focus);
+$outlineOffset--focus: createVar(outlineOffset--focus);
+$focus-outline: $outlineWidth--focus $outlineStyle--focus $outlineColor--focus;
 
 $media-max-width-phone: createVar(media-max-width-phone);
 $media-max-width-tablet: createVar(media-max-width-tablet);

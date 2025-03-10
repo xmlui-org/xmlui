@@ -617,10 +617,10 @@ If the status segment is omitted, the style will be applied to all statuses.
 - `color-placeholder-Select-|status|`
 - `thickness-border-Select-|status|`
 
-- `thickness-outline-Select-|status|--focus`
-- `color-outline-Select-|status|--focus`
-- `style-outline-Select-|status|--focus`
-- `offset-outline-Select-|status|--focus`
+- `outlineWidth-Select-|status|--focus`
+- `outlineColor-Select-|status|--focus`
+- `outlineStyle-Select-|status|--focus`
+- `outlineOffset-Select-|status|--focus`
 
 ```json copy
 "radius-Select-default": "10px",
@@ -758,10 +758,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-border](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -789,12 +785,24 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [font-size](../styles-and-themes/common-units/#size)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [opacity](../styles-and-themes/common-units/#opacity)-Select--disabled | 0.5 | 0.5 |
 | [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | 0.5 | 0.5 |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding-horizontal](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
 | [padding-vertical](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
 | [radius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $radius | $radius |
@@ -807,17 +815,9 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [style-border](../styles-and-themes/common-units/#border-style)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
 | [thickness-border](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
 | [thickness-border](../styles-and-themes/common-units/#size)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border](../styles-and-themes/common-units/#size)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border](../styles-and-themes/common-units/#size)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [thickness-border](../styles-and-themes/common-units/#size)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

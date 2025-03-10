@@ -73,10 +73,10 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
     }
 
     &:focus-visible {
-      outline-width: createThemeVar('thickness-outline-heading-#{$component}--focus');
-      outline-color: createThemeVar('color-outline-heading-#{$component}--focus');
-      outline-style: createThemeVar('style-outline-heading-#{$component}--focus');
-      outline-offset: createThemeVar('offset-outline-heading-#{$component}--focus');
+      outline-width: createThemeVar('outlineWidth-heading-#{$component}--focus');
+      outline-color: createThemeVar('outlineColor-heading-#{$component}--focus');
+      outline-style: createThemeVar('outlineStyle-heading-#{$component}--focus');
+      outline-offset: createThemeVar('outlineOffset-heading-#{$component}--focus');
 
     }
   }

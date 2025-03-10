@@ -28,10 +28,10 @@ $componentName: "Select";
   }
 
   &:focus {
-    outline-width: createThemeVar('Input:thickness-outline-#{$componentName}-#{$variantName}--focus');
-    outline-color: createThemeVar('Input:color-outline-#{$componentName}-#{$variantName}--focus');
-    outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
-    outline-offset: createThemeVar('Input:offset-outline-#{$componentName}-#{$variantName}--focus');
+    outline-width: createThemeVar('Input:outlineWidth-#{$componentName}-#{$variantName}--focus');
+    outline-color: createThemeVar('Input:outlineColor-#{$componentName}-#{$variantName}--focus');
+    outline-style: createThemeVar('Input:outlineStyle-#{$componentName}-#{$variantName}--focus');
+    outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}-#{$variantName}--focus');
   }
 
   &::placeholder {

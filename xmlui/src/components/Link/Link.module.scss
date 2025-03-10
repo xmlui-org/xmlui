@@ -58,10 +58,10 @@ $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
     }
 
     &:focus-visible{
-      outline-width: createThemeVar('thickness-outline-#{$component}--focus');
-      outline-color: createThemeVar('color-outline-#{$component}--focus');
-      outline-style: createThemeVar('style-outline-#{$component}--focus');
-      outline-offset: createThemeVar('offset-outline-#{$component}--focus');
+      outline-width: createThemeVar('outlineWidth-#{$component}--focus');
+      outline-color: createThemeVar('outlineColor-#{$component}--focus');
+      outline-style: createThemeVar('outlineStyle-#{$component}--focus');
+      outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
     }
 
     &.active {

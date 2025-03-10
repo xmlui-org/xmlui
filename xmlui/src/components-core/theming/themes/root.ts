@@ -192,10 +192,10 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- The app's default radius value
     radius: "4px",
-    "color-outline--focus": "rgba($color-primary-500-rgb, .5)",
-    "thickness-outline--focus": "2px",
-    "style-outline--focus": "solid",
-    "offset-outline--focus": "0",
+    "outlineColor--focus": "rgba($color-primary-500-rgb, .5)",
+    "outlineWidth--focus": "2px",
+    "outlineStyle--focus": "solid",
+    "outlineOffset--focus": "0",
 
     // --- The app's default font family
     "font-family": "$font-family-sans-serif",

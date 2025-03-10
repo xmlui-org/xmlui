@@ -30,10 +30,10 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
 
 
   &:focus-visible {
-    outline-width: createThemeVar('thickness-outline-#{$component}-#{$colorScheme}-solid--focus');
-    outline-color: createThemeVar('color-outline-#{$component}-#{$colorScheme}-solid--focus');
-    outline-style: createThemeVar('style-outline-#{$component}-#{$colorScheme}-solid--focus');
-    outline-offset: createThemeVar('offset-outline-#{$component}-#{$colorScheme}-solid--focus');
+    outline-width: createThemeVar('outlineWidth-#{$component}-#{$colorScheme}-solid--focus');
+    outline-color: createThemeVar('outlineColor-#{$component}-#{$colorScheme}-solid--focus');
+    outline-style: createThemeVar('outlineStyle-#{$component}-#{$colorScheme}-solid--focus');
+    outline-offset: createThemeVar('outlineOffset-#{$component}-#{$colorScheme}-solid--focus');
   }
 
   &:not([disabled]) {
@@ -73,10 +73,10 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   background: transparent;
 
   &:focus-visible {
-    outline-width: createThemeVar('thickness-outline-#{$component}-#{$colorScheme}-outlined--focus');
-    outline-color: createThemeVar('color-outline-#{$component}-#{$colorScheme}-outlined--focus');
-    outline-style: createThemeVar('style-outline-#{$component}-#{$colorScheme}-outlined--focus');
-    outline-offset: createThemeVar('offset-outline-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-width: createThemeVar('outlineWidth-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-color: createThemeVar('outlineColor-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-style: createThemeVar('outlineStyle-#{$component}-#{$colorScheme}-outlined--focus');
+    outline-offset: createThemeVar('outlineOffset-#{$component}-#{$colorScheme}-outlined--focus');
   }
 
   &:not([disabled]) {
@@ -113,10 +113,10 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   color: createThemeVar('color-text-#{$component}-#{$colorScheme}-ghost');
 
   &:focus-visible {
-    outline-width: createThemeVar('thickness-outline-#{$component}-#{$colorScheme}-ghost--focus');
-    outline-color: createThemeVar('color-outline-#{$component}-#{$colorScheme}-ghost--focus');
-    outline-style: createThemeVar('style-outline-#{$component}-#{$colorScheme}-ghost--focus');
-    outline-offset: createThemeVar('offset-outline-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-width: createThemeVar('outlineWidth-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-color: createThemeVar('outlineColor-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-style: createThemeVar('outlineStyle-#{$component}-#{$colorScheme}-ghost--focus');
+    outline-offset: createThemeVar('outlineOffset-#{$component}-#{$colorScheme}-ghost--focus');
   }
 
   &:not([disabled]) {

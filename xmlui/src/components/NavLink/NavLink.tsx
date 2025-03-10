@@ -68,10 +68,10 @@ export const NavLinkMd = createMetadata({
     "font-weight-NavLink--pressed": "$font-weight-normal",
     "thickness-indicator-NavLink": "$space-0_5",
 
-    "color-outline-NavLink--focus": "$color-outline--focus",
-    "thickness-outline-NavLink--focus": "$thickness-outline--focus",
-    "style-outline-NavLink--focus": "$style-outline--focus",
-    "offset-outline-NavLink--focus": "-1px",
+    "outlineColor-NavLink--focus": "$outlineColor--focus",
+    "outlineWidth-NavLink--focus": "$outlineWidth--focus",
+    "outlineStyle-NavLink--focus": "$outlineStyle--focus",
+    "outlineOffset-NavLink--focus": "-1px",
     "radius-indicator-NavLink": "$radius",
 
     light: {

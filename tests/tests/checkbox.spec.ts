@@ -301,10 +301,10 @@ ERROR_LEVELS.forEach((errorLevel) => {
     const themeErrorLevel = errorLevel === "valid" ? "success" : errorLevel;
     // END TEMP
 
-    const outlineThickness = `thickness-outline-Checkbox-${themeErrorLevel}--focus`;
-    const outlineColor = `color-outline-Checkbox-${themeErrorLevel}--focus`;
-    const outlineStyle = `style-outline-Checkbox-${themeErrorLevel}--focus`;
-    const outlineOffset = `offset-outline-Checkbox-${themeErrorLevel}--focus`;
+    const outlineThickness = `outlineWidth-Checkbox-${themeErrorLevel}--focus`;
+    const outlineColor = `outlineColor-Checkbox-${themeErrorLevel}--focus`;
+    const outlineStyle = `outlineStyle-Checkbox-${themeErrorLevel}--focus`;
+    const outlineOffset = `outlineOffset-Checkbox-${themeErrorLevel}--focus`;
 
     await initThemedApp(
       page,
