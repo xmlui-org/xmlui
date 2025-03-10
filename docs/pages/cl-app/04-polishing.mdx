@@ -84,7 +84,7 @@ To display the section information, add the `groupBy` property to the `List` and
   <List data="{$props.data.map(extendWithSection)}"
     groupBy="section">
     <property name="groupHeaderTemplate">
-      <HStack horizontalPadding="$space-normal" verticalPadding="$space-tight">
+      <HStack paddingHorizontal="$space-normal" paddingVertical="$space-tight">
         <Text 
           variant="subtitle"
           value="{$group.key} ({loading(contacts, $group.items.length ?? 0)})" />
@@ -123,8 +123,8 @@ Update the `List` definition in `Contacts`:
     groupBy="section">
     <property name="groupHeaderTemplate">
       <HStack 
-        horizontalPadding="$space-normal" 
-        verticalPadding="$space-tight"
+        paddingHorizontal="$space-normal" 
+        paddingVertical="$space-tight"
         verticalAlignment="center"
         onClick="$group.toggle">
           <Text 
@@ -141,7 +141,7 @@ Update the `List` definition in `Contacts`:
 </Component>
 ```
 
-The `horizontalPadding` and `verticalPadding` properties of `HStack` (XMLUI calls them **layout properties**) define some spacing around the content within `HStack`. The `$space-normal` and `$space-tight` layout values refer to theme settings (they come from the app's current theme). Using these values ensures that your app accommodates the theme changes.
+The `paddingHorizontal` and `paddingVertical` properties of `HStack` (XMLUI calls them **layout properties**) define some spacing around the content within `HStack`. The `$space-normal` and `$space-tight` layout values refer to theme settings (they come from the app's current theme). Using these values ensures that your app accommodates the theme changes.
 
 Now, you can expand or collapse sections by clicking them. The following figure shows the Completed section in its collapsed state:
 

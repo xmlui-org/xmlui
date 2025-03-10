@@ -477,7 +477,7 @@ test("(vertical) star sizing comparison", async ({ page }) => {
 test("(horizontal) paddings + percentage", async ({ page }) => {
   const code = `
   <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray" gap="0"
-    horizontalPadding="50px" verticalPadding="50px">
+    paddingHorizontal="50px" paddingVertical="50px">
     <Text testId="item_0" backgroundColor="cyan" width="25%">W: 25%</Text>
     <Text testId="item_1" backgroundColor="yellow" width="50%">W: 50%</Text>
     <Text testId="item_2" backgroundColor="lightgreen" width="25%">W: 25%</Text>
@@ -500,7 +500,7 @@ test("(horizontal) paddings + percentage", async ({ page }) => {
 test("(vertical) paddings + percentage", async ({ page }) => {
   const code = `
   <Stack testId="stack" orientation="vertical" backgroundColor="lightgray" gap="0"
-    height="240px" horizontalPadding="50px" verticalPadding="50px">
+    height="240px" paddingHorizontal="50px" paddingVertical="50px">
     <Text testId="item_0" backgroundColor="cyan" height="25%">H: 25%</Text>
     <Text testId="item_1" backgroundColor="yellow" height="50%">H: 50%</Text>
     <Text testId="item_2" backgroundColor="lightgreen" height="25%">H: 25%</Text>

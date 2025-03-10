@@ -63,18 +63,18 @@ export function resolveLayoutProps(
   // --- Paddings and gap
   collectCss("gap");
   collectCss("padding");
-  const horizontalPadding = transformLayoutValue("horizontalPadding");
-  if (horizontalPadding) {
-    result.cssProps.paddingLeft = horizontalPadding;
-    result.cssProps.paddingRight = horizontalPadding;
+  const paddingHorizontal = transformLayoutValue("paddingHorizontal");
+  if (paddingHorizontal) {
+    result.cssProps.paddingLeft = paddingHorizontal;
+    result.cssProps.paddingRight = paddingHorizontal;
   }
   collectCss("paddingRight");
   collectCss("paddingLeft");
 
-  const verticalPadding = transformLayoutValue("verticalPadding");
-  if (verticalPadding) {
-    result.cssProps.paddingTop = verticalPadding;
-    result.cssProps.paddingBottom = verticalPadding;
+  const paddingVertical = transformLayoutValue("paddingVertical");
+  if (paddingVertical) {
+    result.cssProps.paddingTop = paddingVertical;
+    result.cssProps.paddingBottom = paddingVertical;
   }
   collectCss("paddingTop");
   collectCss("paddingBottom");
@@ -356,8 +356,8 @@ export type LayoutProps = {
 
   // --- Padding
   padding?: number | string;
-  horizontalPadding?: number | string;
-  verticalPadding?: number | string;
+  paddingHorizontal?: number | string;
+  paddingVertical?: number | string;
   paddingTop?: number | string;
   paddingRight?: number | string;
   paddingBottom?: number | string;
@@ -457,8 +457,8 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
 
   // --- Padding
   padding: [],
-  horizontalPadding: [],
-  verticalPadding: [],
+  paddingHorizontal: [],
+  paddingVertical: [],
   paddingTop: [],
   paddingRight: [],
   paddingBottom: [],
