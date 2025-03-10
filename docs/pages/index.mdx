@@ -27,17 +27,13 @@ import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui"
 
 <Playground
   name="Example: Hello, World!"
-  height={500}
   app={`
-    <App xmlns:XMLUIExtensions="component-ns">
-      <CVStack>
-        <XMLUIExtensions:PieChart data="{[{category: 'Direct', value: 34}, {category: 'Affilliate', value: 55}]}" dataKey="value" nameKey="category" showLegend="false" width="400" height="400">
-            <XMLUIExtensions:Legend />
-        </XMLUIExtensions:PieChart>
-      </CVStack>
+    <App>
+      Hello, World from XMLUI!
     </App>
   `}
 />
+
 You can **bind components to work together**.
 
 ```ueml copy /myTextBox/ /myTextBox.value/

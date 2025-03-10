@@ -2,7 +2,8 @@ import "../styles/global.scss";
 import localFont from "next/font/local";
 import { ApiWorkerContextProvider } from "../src/components/ApiWorkerContext";
 import charts from "xmlui-charts";
-import { createContext, useContext, useEffect } from "react";
+import animations from "xmlui-animations";
+import { createContext, useContext } from "react";
 import { StandaloneExtensionManager } from "xmlui";
 
 const myInter = localFont({
@@ -111,6 +112,7 @@ export function useExtensionContext() {
 export default function App({ Component, pageProps }) {
   const extensionManager = new StandaloneExtensionManager();
   extensionManager.registerExtension(charts);
+  extensionManager.registerExtension(animations);
 
   return (
     <ExtensionContext.Provider value={{ extensionManager }}>
