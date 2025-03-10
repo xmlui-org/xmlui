@@ -96,9 +96,9 @@ If both properties are defined, `click` takes precedence.
 
 ```ueml copy /onClick/
 <DropdownMenu label="DropdownMenu">
-  <MenuItem onClick="window.alert('Item 1 clicked')">Item 1</MenuItem>
-  <MenuItem onClick="window.alert('Item 2 clicked')">Item 2</MenuItem>
-  <MenuItem onClick="window.alert('Item 3 clicked')">Item 3</MenuItem>
+  <MenuItem onClick="toast('Item 1 clicked')">Item 1</MenuItem>
+  <MenuItem onClick="toast('Item 2 clicked')">Item 2</MenuItem>
+  <MenuItem onClick="toast('Item 3 clicked')">Item 3</MenuItem>
 </DropdownMenu>
 ```
 
@@ -108,9 +108,9 @@ If both properties are defined, `click` takes precedence.
   app={`
 <App>
   <DropdownMenu label="DropdownMenu">
-    <MenuItem onClick="window.alert('Item 1 clicked')">Item 1</MenuItem>
-    <MenuItem onClick="window.alert('Item 2 clicked')">Item 2</MenuItem>
-    <MenuItem onClick="window.alert('Item 3 clicked')">Item 3</MenuItem>
+    <MenuItem onClick="toast('Item 1 clicked')">Item 1</MenuItem>
+    <MenuItem onClick="toast('Item 2 clicked')">Item 2</MenuItem>
+    <MenuItem onClick="toast('Item 3 clicked')">Item 3</MenuItem>
   </DropdownMenu>
 </App>
   `}

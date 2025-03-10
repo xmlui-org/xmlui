@@ -34,7 +34,7 @@ The following example demonstrates using it:
         <HStack gap="0.5rem" borderTop="1px solid #ddd" paddingVertical="1rem">
           <Button label="Test Search Server" type="button"
             themeColor="secondary" variant="outlined"
-            onClick="window.alert('Search server is ok.')"/>
+            onClick="toast.success('Search server is ok.')"/>
           <SpaceFiller/>
           <Button type="submit" enabled="{!isSearching}" icon="search"
             label="{isSearching ? 'Searching...' : 'Search'}"/>
@@ -62,7 +62,7 @@ This example mimics a one-second search and turns off the submit button during t
             <HStack gap="0.5rem" borderTop="1px solid #ddd" paddingVertical="1rem">
               <Button label="Test Search Server" type="button"
                 themeColor="secondary" variant="outlined"
-                onClick="window.alert('Search server is ok.')"/>
+                onClick="toast.success('Search server is ok.')"/>
               <SpaceFiller/>
               <Button type="submit" enabled="{!isSearching}" icon="search"
                 label="{isSearching ? 'Searching...' : 'Search'}"/>
@@ -148,7 +148,7 @@ The form infrastructure fires this event when the form is submitted. The event a
 <App>
   <Form padding="0.5rem"
     data="{{ name: 'Joe', age: 43 }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FlowLayout columnGap="12px" paddingBottom="6px">
       <FormItem bindTo="name" label="Customer name" width="50%" />
       <FormItem bindTo="age" label="Age" type="integer" width="50%"
@@ -164,7 +164,7 @@ The form infrastructure fires this event when the form is submitted. The event a
     <App>
       <Form padding="0.5rem"
         data="{{ name: 'Joe', age: 43 }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FlowLayout columnGap="12px" paddingBottom="6px">
           <FormItem bindTo="name" label="Customer name" width="50%" />
           <FormItem bindTo="age" label="Age" type="integer" width="50%"
@@ -191,7 +191,7 @@ This method updates the form data with the change passed in its parameter. The p
 <App>
   <Form id="myForm" padding="0.5rem"
     data="{{ name: 'Joe', age: 43, $update: 123 }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FlowLayout columnGap="12px" paddingBottom="6px">
       <FormItem bindTo="name" label="Customer name" width="50%" />
       <FormItem bindTo="age" label="Age" type="integer" width="50%"
@@ -216,7 +216,7 @@ This method updates the form data with the change passed in its parameter. The p
     <App>
       <Form id="myForm" padding="0.5rem"
         data="{{ name: 'Joe', age: 43, $update: 123 }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FlowLayout columnGap="12px" paddingBottom="6px">
           <FormItem bindTo="name" label="Customer name" width="50%" />
           <FormItem bindTo="age" label="Age" type="integer" width="50%"
