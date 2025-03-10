@@ -23,7 +23,7 @@ $color-decoration-Link: createThemeVar("color-decoration-#{$component}");
 $textUnderlineOffset-Link: createThemeVar("textUnderlineOffset-#{$component}");
 $line-decoration-Link: createThemeVar("line-decoration-#{$component}");
 $style-decoration-Link: createThemeVar("style-decoration-#{$component}");
-$thickness-decoration-Link: createThemeVar("thickness-decoration-#{$component}");
+$textDecorationThickness-Link: createThemeVar("textDecorationThickness-#{$component}");
 $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
 
 .container {
@@ -85,7 +85,7 @@ $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
       text-decoration-line: $line-decoration-Link;
       text-decoration-color: $color-decoration-Link;
       text-decoration-style: $style-decoration-Link;
-      text-decoration-thickness: $thickness-decoration-Link;
+      text-decoration-thickness: $textDecorationThickness-Link;
 
       &:has(> button) {
         text-decoration-line: none;
@@ -95,7 +95,7 @@ $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
       text-decoration-line: $line-decoration-Link;
       text-decoration-color: $color-decoration-Link;
       text-decoration-style: $style-decoration-Link;
-      text-decoration-thickness: $thickness-decoration-Link;
+      text-decoration-thickness: $textDecorationThickness-Link;
 
       &:has(> button) {
         text-decoration-line: none;

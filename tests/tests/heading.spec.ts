@@ -179,7 +179,7 @@ const THEME_TESTS: ThemeTestDesc[] = [
   { themeVar: "margin-bottom-H1", themeVarAsCSS: "margin-bottom", expected: "30px" },
   { themeVar: "textUnderlineOffset-Heading", themeVarAsCSS: "text-underline-offset", expected: "10px" },
   { themeVar: "style-decoration-Heading", themeVarAsCSS: "text-decoration-style", expected: "dotted" },
-  { themeVar: "thickness-decoration-Heading", themeVarAsCSS: "text-decoration-thickness", expected: "4px" },
+  { themeVar: "textDecorationThickness-Heading", themeVarAsCSS: "text-decoration-thickness", expected: "4px" },
 ];
 
 THEME_TESTS.forEach((testCase) => {

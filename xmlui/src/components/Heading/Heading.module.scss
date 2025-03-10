@@ -19,7 +19,7 @@ $themeVars: ();
   text-decoration-line: createThemeVar('Heading:line-decoration-#{$level}');
   text-decoration-color: createThemeVar('Heading:color-decoration-#{$level}');
   text-decoration-style: createThemeVar('Heading:style-decoration-#{$level}');
-  text-decoration-thickness: createThemeVar('Heading:thickness-decoration-#{$level}');
+  text-decoration-thickness: createThemeVar('Heading:textDecorationThickness-#{$level}');
   text-underline-offset: createThemeVar('Heading:textUnderlineOffset-#{$level}');
 }
 

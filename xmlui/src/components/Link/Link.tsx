@@ -43,7 +43,7 @@ export const LinkMd = createMetadata({
     [`textUnderlineOffset-${COMP}`]: "$space-1",
     [`line-decoration-${COMP}`]: "underline",
     [`style-decoration-${COMP}`]: "dashed",
-    [`thickness-decoration-${COMP}`]: "$space-0_5",
+    [`textDecorationThickness-${COMP}`]: "$space-0_5",
     [`color-outline-${COMP}--focus`]: "$color-outline--focus",
     [`thickness-outline-${COMP}--focus`]: "$thickness-outline--focus",
     [`style-outline-${COMP}--focus`]: "$style-outline--focus",
