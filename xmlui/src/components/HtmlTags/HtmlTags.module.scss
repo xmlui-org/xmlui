@@ -2,7 +2,9 @@
 
 // --- table
 
-$themeVarsTable: ();
+$themeVarsTable: (
+);
+
 @function createThemeVarTable($componentVariable) {
   $themeVarsTable: t.appendThemeVar($themeVarsTable, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTable, $componentVariable);
@@ -14,6 +16,8 @@ $font-family-HtmlTable: createThemeVarTable("font-family-HtmlTable");
 $font-size-HtmlTable: createThemeVarTable("font-size-HtmlTable");
 $font-weight-HtmlTable: createThemeVarTable("font-weight-HtmlTable");
 $transform-text-HtmlTable: createThemeVarTable("transform-text-HtmlTable");
+$margin-top-HtmlTable: createThemeVarTable("margin-top-HtmlTable");
+$margin-bottom-HtmlTable: createThemeVarTable("margin-bottom-HtmlTable");
 $themeVarsTable: t.composeBorderVars($themeVarsTable, "HtmlTable");
 $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
 
@@ -24,13 +28,17 @@ $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
   font-size: $font-size-HtmlTable;
   font-weight: $font-weight-HtmlTable;
   text-transform: $transform-text-HtmlTable;
+  margin-top: $margin-top-HtmlTable;
+  margin-bottom: $margin-bottom-HtmlTable;
   @include t.borderVars($themeVarsTable, "HtmlTable");
   @include t.paddingVars($themeVarsTable, "HtmlTable");
 }
 
 // --- thead
 
-$themeVarsThead: ();
+$themeVarsThead: (
+);
+
 @function createThemeVarThead($componentVariable) {
   $themeVarsThead: t.appendThemeVar($themeVarsThead, $componentVariable) !global;
   @return t.getThemeVar($themeVarsThead, $componentVariable);
@@ -56,7 +64,9 @@ $themeVarsThead: t.composePaddingVars($themeVarsThead, "HtmlThead");
 
 // --- tbody
 
-$themeVarsTbody: ();
+$themeVarsTbody: (
+);
+
 @function createThemeVarTbody($componentVariable) {
   $themeVarsTbody: t.appendThemeVar($themeVarsTbody, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTbody, $componentVariable);
@@ -78,7 +88,9 @@ $transform-text-HtmlTbody: createThemeVarTbody("transform-text-HtmlTbody");
 
 // --- tfoot
 
-$themeVarsTfoot: ();
+$themeVarsTfoot: (
+);
+
 @function createThemeVarTfoot($componentVariable) {
   $themeVarsTfoot: t.appendThemeVar($themeVarsTfoot, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTfoot, $componentVariable);
@@ -94,7 +106,9 @@ $color-text-HtmlTfoot: createThemeVarTfoot("color-text-HtmlTfoot");
 
 // --- th
 
-$themeVarsTh: ();
+$themeVarsTh: (
+);
+
 @function createThemeVarTh($componentVariable) {
   $themeVarsTh: t.appendThemeVar($themeVarsTh, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTh, $componentVariable);
@@ -123,7 +137,9 @@ $themeVarsTh: t.composePaddingVars($themeVarsTh, "HtmlTh");
 
 // --- tr
 
-$themeVarsTr: ();
+$themeVarsTr: (
+);
+
 @function createThemeVarTr($componentVariable) {
   $themeVarsTr: t.appendThemeVar($themeVarsTr, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTr, $componentVariable);
@@ -154,6 +170,7 @@ $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
     background-color: $color-bg-HtmlTr--hover;
     color: $color-text-HtmlTr--hover;
   }
+
   // Remove hover effect for rows with only th elements
   &:hover:not(:has(:not(th))) {
     background-color: initial;
@@ -162,7 +179,9 @@ $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
 
 // --- td
 
-$themeVarsTd: ();
+$themeVarsTd: (
+);
+
 @function createThemeVarTd($componentVariable) {
   $themeVarsTd: t.appendThemeVar($themeVarsTd, $componentVariable) !global;
   @return t.getThemeVar($themeVarsTd, $componentVariable);
@@ -186,6 +205,69 @@ $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
   @include t.paddingVars($themeVarsTd, "HtmlTd");
 }
 
+// --- List styling (for both ul and ol)
+
+$themeVarsList: (
+);
+
+@function createThemeVarList($componentVariable) {
+  $themeVarsList: t.appendThemeVar($themeVarsList, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsList, $componentVariable);
+}
+
+$margin-top-HtmlOl: createThemeVarList("margin-top-HtmlOl");
+$margin-bottom-HtmlOl: createThemeVarList("margin-bottom-HtmlOl");
+$margin-top-HtmlUl: createThemeVarList("margin-top-HtmlUl");
+$margin-bottom-HtmlUl: createThemeVarList("margin-bottom-HtmlUl");
+
+// Apply to both ul and ol elements
+.htmlUl {
+  margin-top: $margin-top-HtmlUl;
+  margin-bottom: $margin-bottom-HtmlUl;
+}
+.htmlOl {
+  margin-top: $margin-top-HtmlOl;
+  margin-bottom: $margin-bottom-HtmlOl;
+}
+
+li .htmlUl,
+li .htmlOl {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+// Only apply flex layout to list items that contain checkboxes
+.htmlUl li:has(> input[type="checkbox"]),
+.htmlOl li:has(> input[type="checkbox"]) {
+  display: flex;
+  align-items: flex-start;
+
+  >input[type="checkbox"] {
+    margin-right: 8px;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+}
+
+
+// --- Heading styling
+$themeVarsHeading: (
+);
+
+@function createThemeVarHeading($componentVariable) {
+  $themeVarsHeading: t.appendThemeVar($themeVarsHeading, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsHeading, $componentVariable);
+}
+
+$margin-top-HtmlHeading: createThemeVarHeading("margin-top-HtmlHeading");
+$margin-bottom-HtmlHeading: createThemeVarHeading("margin-bottom-HtmlHeading");
+
+.htmlH1, .htmlH2, .htmlH3, .htmlH4, .htmlH5, .htmlH6 {
+  margin-top: $margin-top-HtmlHeading;
+  margin-bottom: $margin-bottom-HtmlHeading;
+}
+
+
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVarsTable: t.json-stringify($themeVarsTable);
@@ -195,4 +277,7 @@ $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
   themeVarsTh: t.json-stringify($themeVarsTh);
   themeVarsTr: t.json-stringify($themeVarsTr);
   themeVarsTd: t.json-stringify($themeVarsTd);
+  themeVarsList: t.json-stringify($themeVarsList);
+  themeVarsHeading: t.json-stringify($themeVarsHeading);
+  
 }

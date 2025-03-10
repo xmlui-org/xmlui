@@ -7,6 +7,35 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+
+// --- Defaults for Markdown component
+
+.markdownContent {
+  // Common spacing for block elements
+  h1, h2, h3, h4, h5, h6, p, ul, ol, table, blockquote, hr {
+    margin-top: 1em;
+    margin-bottom: .5;
+  }
+
+  // First element should have no top margin
+  > *:first-child {
+    margin-top: 0;
+  }
+
+  // Last element should have no bottom margin
+  > *:last-child {
+    margin-bottom: 0;
+  }
+
+  // Specific margins for horizontal rule
+  hr {
+    border: 0;
+    height: 1px;
+    background-color: #ddd;
+    margin: 1.5em 0;
+  }
+}
+
 // --- HorizontalRule
 
 $color-border-HorizontalRule: createThemeVar("color-border-HorizontalRule");
@@ -47,6 +76,38 @@ $margin-Blockquote: createThemeVar("margin-Blockquote");
   }
 }
 
+$color-bg-Admonition: createThemeVar("color-bg-Admonition");
+$color-text-Admonition: createThemeVar("color-text-Admonition");
+$size-icon-Admonition: createThemeVar("size-icon-Admonition");
+
+
+.admonitionBlockquote {
+  position: relative;
+  border-radius: $radius-Blockquote;
+  background-color: $color-bg-Admonition;
+  box-shadow: $shadow-Blockquote;
+  padding: $padding-Blockquote;
+  margin: $margin-Blockquote;
+  color: $color-text-Admonition;
+}
+
+.admonitionContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.admonitionIcon {
+  font-size: $size-icon-Admonition;
+  padding-top: 0;
+  flex-shrink: 0;
+}
+
+.admonitionContent {
+  flex: 1;
+  min-width: 0;
+}
+
 // --- UnorderedList
 
 $padding-left-UnorderedList: createThemeVar("padding-left-UnorderedList");
@@ -80,6 +141,16 @@ $color-marker-ListItem: createThemeVar("color-marker-ListItem");
 
 .listItem::marker {
   color: $color-marker-ListItem;
+}
+
+// -- Heading
+
+$margin-top-HtmlHeading: createThemeVar("margin-top-HtmlHeading");
+$margin-bottom-HtmlHeading: createThemeVar("margin-bottom-HtmlHeading");
+
+.htmlHeading {
+  margin-top: $margin-top-HtmlHeading;
+  margin-bottom: $margin-bottom-HtmlHeading;
 }
 
 // --- We export the theme variables to add them to the component renderer

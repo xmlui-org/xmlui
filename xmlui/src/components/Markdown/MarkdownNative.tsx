@@ -1,4 +1,5 @@
 import { type CSSProperties, memo, type ReactNode } from "react";
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { visit } from "unist-util-visit";
@@ -33,51 +34,27 @@ export const Markdown = memo(function Markdown({
   children = removeIndents ? removeTextIndents(children) : children;
 
   return (
-    <div style={style}>
+    <div className={styles.markdownContent} style={{ ...style }}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }]]}
         components={{
-          h1({ id, children }) {
-            return (
-              <Heading uid={id} level="h1" sx={{ lineHeight: "initial" }}>
-                {children}
-              </Heading>
-            );
+          h1({ children }) {
+            return <h1 className={htmlTagStyles.htmlH1}>{children}</h1>;
           },
-          h2({ id, children }) {
-            return (
-              <Heading uid={id} level="h2" sx={{ lineHeight: "initial" }}>
-                {children}
-              </Heading>
-            );
+          h2({ children }) {
+            return <h2 className={htmlTagStyles.htmlH2}>{children}</h2>;
           },
-          h3({ id, children }) {
-            return (
-              <Heading uid={id} level="h3" sx={{ lineHeight: "initial" }}>
-                {children}
-              </Heading>
-            );
+          h3({ children }) {
+            return <h3 className={htmlTagStyles.htmlH3}>{children}</h3>;
           },
-          h4({ id, children }) {
-            return (
-              <Heading uid={id} level="h4" sx={{ lineHeight: "initial" }}>
-                {children}
-              </Heading>
-            );
+          h4({ children }) {
+            return <h4 className={htmlTagStyles.htmlH4}>{children}</h4>;
           },
-          h5({ id, children }) {
-            return (
-              <Heading uid={id} level="h5" sx={{ lineHeight: "initial" }}>
-                {children}
-              </Heading>
-            );
+          h5({ children }) {
+            return <h5 className={htmlTagStyles.htmlH5}>{children}</h5>;
           },
-          h6({ id, children }) {
-            return (
-              <Heading uid={id} level="h6" sx={{ lineHeight: "initial" }}>
-                {children}
-              </Heading>
-            );
+          h6({ children }) {
+            return <h6 className={htmlTagStyles.htmlH6}>{children}</h6>;
           },
           p({ id, children }) {
             return (
@@ -125,13 +102,13 @@ export const Markdown = memo(function Markdown({
             return <Blockquote>{children}</Blockquote>;
           },
           ol({ children }) {
-            return <OrderedList>{children}</OrderedList>;
+            return <ol className={htmlTagStyles.htmlOl}>{children}</ol>;
           },
           ul({ children }) {
-            return <UnorderedList>{children}</UnorderedList>;
+            return <ul className={htmlTagStyles.htmlUl}>{children}</ul>;
           },
           li({ children }) {
-            return <ListItem>{children}</ListItem>;
+            return <li>{children}</li>; // No custom styling for li elements
           },
           hr() {
             return <HorizontalRule />;
@@ -149,8 +126,8 @@ export const Markdown = memo(function Markdown({
                 variant="checkbox"
                 readOnly={disabled}
                 value={checked}
-                /* label={value}
-                  labelPosition={"right"} */
+              /* label={value}
+                labelPosition={"right"} */
               />
             );
           },
@@ -210,7 +187,89 @@ type BlockquoteProps = {
   style?: CSSProperties;
 };
 
+
 const Blockquote = ({ children, style }: BlockquoteProps) => {
+  // Helper function to extract text content from React nodes
+  const extractTextContent = (node: React.ReactNode): string => {
+    if (typeof node === 'string') {
+      return node;
+    }
+
+    if (React.isValidElement(node) && node.props && node.props.children) {
+      if (Array.isArray(node.props.children)) {
+        return node.props.children.map(extractTextContent).join('');
+      }
+      return extractTextContent(node.props.children);
+    }
+
+    return '';
+  };
+
+  // Extract all text content
+  const allText = React.Children.toArray(children).map(extractTextContent).join('');
+
+  // Check for admonition pattern
+  const match = allText.match(/\[!([A-Z]+)\]/);
+  const isAdmonition = !!match;
+
+  if (isAdmonition && match && match[1]) {
+    const type = match[1].toLowerCase();
+
+    // Map admonition type to emoji
+    const emojiMap: Record<string, string> = {
+      info: '💡',
+      warning: '⚠️',
+      danger: '🚫',
+      note: '📝',
+      tip: '💬'
+    };
+
+    // Process children to remove the admonition marker
+    const processNode = (node: React.ReactNode): React.ReactNode => {
+      if (typeof node === 'string') {
+        return node.replace(/\[!([A-Z]+)\]\s*/, '');
+      }
+
+      if (React.isValidElement(node)) {
+        // Handle React elements with children
+        if (node.props && node.props.children) {
+          let newChildren;
+
+          if (Array.isArray(node.props.children)) {
+            newChildren = node.props.children.map(processNode);
+          } else {
+            newChildren = processNode(node.props.children);
+          }
+
+          return React.cloneElement(node, node.props, newChildren);
+        }
+
+        // Element without children, return as is
+        return node;
+      }
+
+      // Other node types (null, undefined, etc.)
+      return node;
+    };
+
+    const processedChildren = React.Children.map(children, processNode);
+
+    // Render admonition blockquote with the updated structure
+    return (
+      <blockquote className={styles.admonitionBlockquote} style={style}>
+        <div className={styles.admonitionContainer}>
+          <div className={`${styles.admonitionIcon} ${styles[type] || ''}`}>
+            {emojiMap[type] || '💡'}
+          </div>
+          <div className={styles.admonitionContent}>
+            {processedChildren}
+          </div>
+        </div>
+      </blockquote>
+    );
+  }
+
+  // Render regular blockquote
   return (
     <blockquote className={styles.blockquote} style={style}>
       {children}
