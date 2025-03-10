@@ -177,7 +177,7 @@ const THEME_TESTS: ThemeTestDesc[] = [
   { themeVar: "line-decoration-Heading", themeVarAsCSS: "text-decoration-line", expected: "underline" },
   { themeVar: "margin-top-H1", themeVarAsCSS: "margin-top", expected: "30px" },
   { themeVar: "margin-bottom-H1", themeVarAsCSS: "margin-bottom", expected: "30px" },
-  { themeVar: "offset-decoration-Heading", themeVarAsCSS: "text-underline-offset", expected: "10px" },
+  { themeVar: "textUnderlineOffset-Heading", themeVarAsCSS: "text-underline-offset", expected: "10px" },
   { themeVar: "style-decoration-Heading", themeVarAsCSS: "text-decoration-style", expected: "dotted" },
   { themeVar: "thickness-decoration-Heading", themeVarAsCSS: "text-decoration-thickness", expected: "4px" },
 ];

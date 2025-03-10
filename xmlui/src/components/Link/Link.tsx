@@ -40,7 +40,7 @@ export const LinkMd = createMetadata({
     [`color-text-decoration-${COMP}--active`]: "$color-surface200",
     [`font-weight-${COMP}--active`]: "$font-weight-bold",
     [`color-decoration-${COMP}`]: "$color-surface-400",
-    [`offset-decoration-${COMP}`]: "$space-1",
+    [`textUnderlineOffset-${COMP}`]: "$space-1",
     [`line-decoration-${COMP}`]: "underline",
     [`style-decoration-${COMP}`]: "dashed",
     [`thickness-decoration-${COMP}`]: "$space-0_5",
