@@ -711,7 +711,7 @@ export class ComponentRegistry {
   }
 
   private extensionRegistered = (extension: Extension) => {
-    extension.components.forEach((c) => {
+    extension.components?.forEach((c) => {
       if ("type" in c) {
         //we handle just the js components for now
         this.registerComponentRenderer(c, extension.namespace);

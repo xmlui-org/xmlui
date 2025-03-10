@@ -1,4 +1,4 @@
-const withTM = require("next-transpile-modules")(["react-icons", "xmlui-charts", "xmlui", "recharts"]);
+const withTM = require("next-transpile-modules")(["react-icons", "xmlui-charts", "xmlui", "recharts", "xmlui-animations"]);
 const withSvgr = require("next-plugin-svgr");
 const shiki = require("shiki");
 const fs = require("fs");
@@ -62,6 +62,7 @@ let nextConfig = {
   env: {
     VITE_MOCK_ENABLED: true,
   },
+  reactStrictMode: true,
   webpack: (config, options) => {
     config.module.rules.push({
       test: /\.xmlui$/i,

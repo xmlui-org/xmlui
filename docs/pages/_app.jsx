@@ -1,10 +1,10 @@
 import "../styles/global.scss";
 import localFont from "next/font/local";
 import { ApiWorkerContextProvider } from "../src/components/ApiWorkerContext";
-import charts from "xmlui-charts";
-import animations from "xmlui-animations";
 import { createContext, useContext } from "react";
 import { StandaloneExtensionManager } from "xmlui";
+import charts from "xmlui-charts";
+import animations from "xmlui-animations";
 
 const myInter = localFont({
   src: [
