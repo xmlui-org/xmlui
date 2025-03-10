@@ -29,24 +29,24 @@ test(`theme: padding`, async ({ page }) => {
   await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("padding", expectedPadding);
 });
 
-test("theme: padding-horizontal", async ({ page }) => {
+test("theme: paddingHorizontal", async ({ page }) => {
   const expectedPadding = "10px";
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
-      "padding-horizontal-Footer": expectedPadding,
+      "paddingHorizontal-Footer": expectedPadding,
     },
   });
   await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("padding-left", expectedPadding);
   await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("padding-right", expectedPadding);
 });
 
-test("theme: padding-vertical", async ({ page }) => {
+test("theme: paddingVertical", async ({ page }) => {
   const expectedPadding = "10px";
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
-      "padding-vertical-Footer": expectedPadding,
+      "paddingVertical-Footer": expectedPadding,
     },
   });
   await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("padding-top", expectedPadding);

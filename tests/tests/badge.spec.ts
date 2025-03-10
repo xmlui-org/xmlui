@@ -149,22 +149,22 @@ test("badge: padding", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("padding", EXPECTED_PADDING);
 });
 
-test("badge: padding-horizontal", async ({ page }) => {
+test("badge: paddingHorizontal", async ({ page }) => {
   const EXPECTED_PADDING_HORIZONTAL = "5px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
-      "padding-horizontal-Badge": EXPECTED_PADDING_HORIZONTAL,
+      "paddingHorizontal-Badge": EXPECTED_PADDING_HORIZONTAL,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("padding-left", EXPECTED_PADDING_HORIZONTAL);
   await expect(page.getByTestId("badge")).toHaveCSS("padding-right", EXPECTED_PADDING_HORIZONTAL);
 });
 
-test("badge: padding-vertical", async ({ page }) => {
+test("badge: paddingVertical", async ({ page }) => {
   const EXPECTED_PADDING_VERTICAL = "7px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
-      "padding-vertical-Badge": EXPECTED_PADDING_VERTICAL,
+      "paddingVertical-Badge": EXPECTED_PADDING_VERTICAL,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("padding-top", EXPECTED_PADDING_VERTICAL);

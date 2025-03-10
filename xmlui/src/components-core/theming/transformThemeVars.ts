@@ -179,8 +179,8 @@ export function generateButtonTones(theme?: Record<string, string>) {
 }
 
 const paddingRegEx = /^padding-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
-const paddingHorizontalRegEx = /^padding-(horizontal)-(.+)$/;
-const paddingVerticalRegEx = /^padding-(vertical)-(.+)$/;
+const paddingHorizontalRegEx = /^paddingHorizontal-(.+)$/;
+const paddingVerticalRegEx = /^paddingVertical-(.+)$/;
 
 /**
  * Segment the padding values into top, right, bottom, left to provide consistency
@@ -193,20 +193,20 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
 
   // --- Iterate through theme variables and split padding values
   Object.entries(theme).forEach(([key, value]) => {
-    // --- Check the "padding-horizontal" theme variables
+    // --- Check the "paddingHorizontal" theme variables
     let match = paddingHorizontalRegEx.exec(key);
     if (match) {
-      // --- We have a padding-horizontal value to segment
-      const remainder = match[2];
+      // --- We have a paddingHorizontal value to segment
+      const remainder = match[1];
       result[`padding-left-${remainder}`] ??= value;
       result[`padding-right-${remainder}`] ??= value;
     }
 
-    // --- Check the "padding-vertical" theme variables
+    // --- Check the "paddingVertical" theme variables
     match = paddingVerticalRegEx.exec(key);
     if (match) {
-      // --- We have a padding-vertical value to segment
-      const remainder = match[2];
+      // --- We have a paddingVertical value to segment
+      const remainder = match[1];
       result[`padding-top-${remainder}`] ??= value;
       result[`padding-bottom-${remainder}`] ??= value;
     }
@@ -217,8 +217,8 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
     const remainder = match[1];
 
     // --- Check for horizontal and vertical padding values
-    const horizontal = theme[`padding-horizontal-${remainder}`];
-    const vertical = theme[`padding-vertical-${remainder}`];
+    const horizontal = theme[`paddingHorizontal-${remainder}`];
+    const vertical = theme[`paddingVertical-${remainder}`];
 
     // --- We have a padding value to segment
     const segments = value.trim().replace(/ +/g, " ").split(" ");

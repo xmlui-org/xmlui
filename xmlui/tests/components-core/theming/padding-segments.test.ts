@@ -14,23 +14,23 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding-horizontal only", () => {
+  it("paddingHorizontal only", () => {
     const newTheme: Record<string, string> = {
-      "padding-horizontal-AppHeader": "xxx",
+      "paddingHorizontal-AppHeader": "xxx",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
-      "padding-horizontal-AppHeader": "xxx",
+      "paddingHorizontal-AppHeader": "xxx",
       "padding-left-AppHeader": "xxx",
       "padding-right-AppHeader": "xxx",
     });
   });
 
-  it("padding-vertical only", () => {
+  it("paddingVertical only", () => {
     const newTheme: Record<string, string> = {
-      "padding-vertical-AppHeader": "xxx",
+      "paddingVertical-AppHeader": "xxx",
     };
 
     const result = generatePaddingSegments(newTheme);
@@ -38,25 +38,25 @@ describe("generatePaddingSegments", () => {
     expect(result).deep.equal({
       "padding-bottom-AppHeader": "xxx",
       "padding-top-AppHeader": "xxx",
-      "padding-vertical-AppHeader": "xxx",
+      "paddingVertical-AppHeader": "xxx",
     });
   });
 
-  it("padding-horizontal and padding-vertical", () => {
+  it("paddingHorizontal and paddingVertical", () => {
     const newTheme: Record<string, string> = {
-      "padding-horizontal-AppHeader": "xxx",
-      "padding-vertical-AppHeader": "yyy",
+      "paddingHorizontal-AppHeader": "xxx",
+      "paddingVertical-AppHeader": "yyy",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-bottom-AppHeader": "yyy",
-      "padding-horizontal-AppHeader": "xxx",
+      "paddingHorizontal-AppHeader": "xxx",
       "padding-left-AppHeader": "xxx",
       "padding-right-AppHeader": "xxx",
       "padding-top-AppHeader": "yyy",
-      "padding-vertical-AppHeader": "yyy",
+      "paddingVertical-AppHeader": "yyy",
     });
   });
 
@@ -192,17 +192,17 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with one value and padding-horizontal override", () => {
+  it("padding with one value and paddingHorizontal override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px",
-      "padding-horizontal-AppHeader": "8px",
+      "paddingHorizontal-AppHeader": "8px",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px",
-      "padding-horizontal-AppHeader": "8px",
+      "paddingHorizontal-AppHeader": "8px",
       "padding-top-AppHeader": "4px",
       "padding-right-AppHeader": "8px",
       "padding-bottom-AppHeader": "4px",
@@ -210,10 +210,10 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with one value and padding-horizontal and padding-left override", () => {
+  it("padding with one value and paddingHorizontal and padding-left override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px",
-      "padding-horizontal-AppHeader": "8px",
+      "paddingHorizontal-AppHeader": "8px",
       "padding-left-AppHeader": "16px",
     };
 
@@ -221,7 +221,7 @@ describe("generatePaddingSegments", () => {
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px",
-      "padding-horizontal-AppHeader": "8px",
+      "paddingHorizontal-AppHeader": "8px",
       "padding-left-AppHeader": "16px",
       "padding-top-AppHeader": "4px",
       "padding-right-AppHeader": "8px",
@@ -229,10 +229,10 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with one value and padding-horizontal and padding-right override", () => {
+  it("padding with one value and paddingHorizontal and padding-right override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px",
-      "padding-horizontal-AppHeader": "8px",
+      "paddingHorizontal-AppHeader": "8px",
       "padding-right-AppHeader": "16px",
     };
 
@@ -240,7 +240,7 @@ describe("generatePaddingSegments", () => {
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px",
-      "padding-horizontal-AppHeader": "8px",
+      "paddingHorizontal-AppHeader": "8px",
       "padding-right-AppHeader": "16px",
       "padding-top-AppHeader": "4px",
       "padding-bottom-AppHeader": "4px",
@@ -248,17 +248,17 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with one value and padding-vertical override", () => {
+  it("padding with one value and paddingVertical override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px",
-      "padding-vertical-AppHeader": "8px",
+      "paddingVertical-AppHeader": "8px",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px",
-      "padding-vertical-AppHeader": "8px",
+      "paddingVertical-AppHeader": "8px",
       "padding-top-AppHeader": "8px",
       "padding-right-AppHeader": "4px",
       "padding-bottom-AppHeader": "8px",
@@ -266,10 +266,10 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with one value and padding-vertical and padding-top override", () => {
+  it("padding with one value and paddingVertical and padding-top override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px",
-      "padding-vertical-AppHeader": "8px",
+      "paddingVertical-AppHeader": "8px",
       "padding-top-AppHeader": "16px",
     };
 
@@ -277,7 +277,7 @@ describe("generatePaddingSegments", () => {
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px",
-      "padding-vertical-AppHeader": "8px",
+      "paddingVertical-AppHeader": "8px",
       "padding-top-AppHeader": "16px",
       "padding-right-AppHeader": "4px",
       "padding-bottom-AppHeader": "8px",
@@ -285,10 +285,10 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with one value and padding-vertical and padding-bottom override", () => {
+  it("padding with one value and paddingVertical and padding-bottom override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px",
-      "padding-vertical-AppHeader": "8px",
+      "paddingVertical-AppHeader": "8px",
       "padding-bottom-AppHeader": "16px",
     };
 
@@ -296,7 +296,7 @@ describe("generatePaddingSegments", () => {
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px",
-      "padding-vertical-AppHeader": "8px",
+      "paddingVertical-AppHeader": "8px",
       "padding-top-AppHeader": "8px",
       "padding-right-AppHeader": "4px",
       "padding-bottom-AppHeader": "16px",
@@ -354,17 +354,17 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with two values and padding-horizontal override", () => {
+  it("padding with two values and paddingHorizontal override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px 8px",
-      "padding-horizontal-AppHeader": "16px",
+      "paddingHorizontal-AppHeader": "16px",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px 8px",
-      "padding-horizontal-AppHeader": "16px",
+      "paddingHorizontal-AppHeader": "16px",
       "padding-top-AppHeader": "4px",
       "padding-right-AppHeader": "16px",
       "padding-bottom-AppHeader": "4px",
@@ -406,17 +406,17 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with two values and padding-vertical override", () => {
+  it("padding with two values and paddingVertical override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px 8px",
-      "padding-vertical-AppHeader": "16px",
+      "paddingVertical-AppHeader": "16px",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px 8px",
-      "padding-vertical-AppHeader": "16px",
+      "paddingVertical-AppHeader": "16px",
       "padding-top-AppHeader": "16px",
       "padding-right-AppHeader": "8px",
       "padding-bottom-AppHeader": "16px",
@@ -424,17 +424,17 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with two values and padding-horizontal override", () => {
+  it("padding with two values and paddingHorizontal override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px 8px",
-      "padding-horizontal-AppHeader": "16px",
+      "paddingHorizontal-AppHeader": "16px",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px 8px",
-      "padding-horizontal-AppHeader": "16px",
+      "paddingHorizontal-AppHeader": "16px",
       "padding-top-AppHeader": "4px",
       "padding-right-AppHeader": "16px",
       "padding-bottom-AppHeader": "4px",
@@ -442,17 +442,17 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with two values and padding-vertical override", () => {
+  it("padding with two values and paddingVertical override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px 8px",
-      "padding-vertical-AppHeader": "16px",
+      "paddingVertical-AppHeader": "16px",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px 8px",
-      "padding-vertical-AppHeader": "16px",
+      "paddingVertical-AppHeader": "16px",
       "padding-top-AppHeader": "16px",
       "padding-right-AppHeader": "8px",
       "padding-bottom-AppHeader": "16px",
@@ -544,17 +544,17 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with three values and padding-horizontal override", () => {
+  it("padding with three values and paddingHorizontal override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px 8px 16px",
-      "padding-horizontal-AppHeader": "32px",
+      "paddingHorizontal-AppHeader": "32px",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px 8px 16px",
-      "padding-horizontal-AppHeader": "32px",
+      "paddingHorizontal-AppHeader": "32px",
       "padding-top-AppHeader": "4px",
       "padding-right-AppHeader": "32px",
       "padding-bottom-AppHeader": "16px",
@@ -562,17 +562,17 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with three values and padding-vertical override", () => {
+  it("padding with three values and paddingVertical override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px 8px 16px",
-      "padding-vertical-AppHeader": "32px",
+      "paddingVertical-AppHeader": "32px",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px 8px 16px",
-      "padding-vertical-AppHeader": "32px",
+      "paddingVertical-AppHeader": "32px",
       "padding-top-AppHeader": "32px",
       "padding-right-AppHeader": "8px",
       "padding-bottom-AppHeader": "32px",
@@ -664,17 +664,17 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with four values and padding-horizontal override", () => {
+  it("padding with four values and paddingHorizontal override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px 8px 16px 32px",
-      "padding-horizontal-AppHeader": "64px",
+      "paddingHorizontal-AppHeader": "64px",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px 8px 16px 32px",
-      "padding-horizontal-AppHeader": "64px",
+      "paddingHorizontal-AppHeader": "64px",
       "padding-top-AppHeader": "4px",
       "padding-right-AppHeader": "64px",
       "padding-bottom-AppHeader": "16px",
@@ -682,17 +682,17 @@ describe("generatePaddingSegments", () => {
     });
   });
 
-  it("padding with four values and padding-vertical override", () => {
+  it("padding with four values and paddingVertical override", () => {
     const newTheme: Record<string, string> = {
       "padding-AppHeader": "4px 8px 16px 32px",
-      "padding-vertical-AppHeader": "64px",
+      "paddingVertical-AppHeader": "64px",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
       "padding-AppHeader": "4px 8px 16px 32px",
-      "padding-vertical-AppHeader": "64px",
+      "paddingVertical-AppHeader": "64px",
       "padding-top-AppHeader": "64px",
       "padding-right-AppHeader": "8px",
       "padding-bottom-AppHeader": "64px",

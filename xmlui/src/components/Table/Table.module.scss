@@ -20,8 +20,8 @@ $color-bg-heading-Table--hover: createThemeVar("color-bg-heading-#{$component}--
 $color-bg-heading-Table--active: createThemeVar("color-bg-heading-#{$component}--active");
 $themeVars: t.composePaddingVars($themeVars, "heading-#{$component}");
 $themeVars: t.composePaddingVars($themeVars, "cell-#{$component}");
-$padding-horizontal-cell-first-Table: createThemeVar("padding-horizontal-cell-first-#{$component}");
-$padding-horizontal-cell-last-Table: createThemeVar("padding-horizontal-cell-last-#{$component}");
+$paddingHorizontal-cell-first-Table: createThemeVar("paddingHorizontal-cell-first-#{$component}");
+$paddingHorizontal-cell-last-Table: createThemeVar("paddingHorizontal-cell-last-#{$component}");
 $themeVars: t.composeBorderVars($themeVars, "cell-#{$component}");
 $color-bg-pagination-Table: createThemeVar("color-bg-pagination-#{$component}");
 $color-text-heading-Table: createThemeVar("color-text-heading-#{$component}");
@@ -140,11 +140,11 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 
     .columnCell:first-child {
       .headerContent {
-        padding-left: $padding-horizontal-cell-first-Table;
+        padding-left: $paddingHorizontal-cell-first-Table;
       }
 
       > button {
-        padding-left: $padding-horizontal-cell-first-Table;
+        padding-left: $paddingHorizontal-cell-first-Table;
 
         .headerContent {
           padding-left: 0;
@@ -154,11 +154,11 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 
     .columnCell:last-child {
       .headerContent {
-        padding-right: $padding-horizontal-cell-last-Table;
+        padding-right: $paddingHorizontal-cell-last-Table;
       }
 
       > button {
-        padding-right: $padding-horizontal-cell-last-Table;
+        padding-right: $paddingHorizontal-cell-last-Table;
 
         .headerContent {
           padding-right: 0;
@@ -167,12 +167,12 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
     }
 
     .cell:first-child {
-      padding-left: $padding-horizontal-cell-first-Table;
+      padding-left: $paddingHorizontal-cell-first-Table;
       border-left: 0;
     }
 
     .cell:last-child {
-      padding-right: $padding-horizontal-cell-last-Table;
+      padding-right: $paddingHorizontal-cell-last-Table;
       border-right: 0;
     }
   }

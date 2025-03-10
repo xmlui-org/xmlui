@@ -10,12 +10,12 @@ type PaddingValue = {
 
 export function paddingSubject(name: string, valueSpec?: PaddingValue): Record<string, string> {
   return {
-    [`padding-left-${name}`]: valueSpec?.left ?? `$padding-horizontal-${name}`,
-    [`padding-right-${name}`]: valueSpec?.right ?? `$padding-horizontal-${name}`,
-    [`padding-top-${name}`]: valueSpec?.top ?? `$padding-vertical-${name}`,
-    [`padding-bottom-${name}`]: valueSpec?.bottom ?? `$padding-vertical-${name}`,
-    [`padding-horizontal-${name}`]: valueSpec?.horizontal ?? "",
-    [`padding-vertical-${name}`]: valueSpec?.vertical ?? "",
+    [`padding-left-${name}`]: valueSpec?.left ?? `$paddingHorizontal-${name}`,
+    [`padding-right-${name}`]: valueSpec?.right ?? `$paddingHorizontal-${name}`,
+    [`padding-top-${name}`]: valueSpec?.top ?? `$paddingVertical-${name}`,
+    [`padding-bottom-${name}`]: valueSpec?.bottom ?? `$paddingVertical-${name}`,
+    [`paddingHorizontal-${name}`]: valueSpec?.horizontal ?? "",
+    [`paddingVertical-${name}`]: valueSpec?.vertical ?? "",
     [`padding-${name}`]:
       valueSpec?.all ?? `$padding-top-${name} $padding-right-${name} $padding-bottom-${name} $padding-left-${name}`,
   };
