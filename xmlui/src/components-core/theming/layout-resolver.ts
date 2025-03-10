@@ -150,8 +150,8 @@ export function resolveLayoutProps(
   collectCss("background");
   collectCss("boxShadow");
   collectCss("direction");
-  collectCss("horizontalOverflow", "overflowX");
-  collectCss("verticalOverflow", "overflowY");
+  collectCss("overflowX");
+  collectCss("overflowY");
   collectCss("zIndex");
   collectCss("opacity");
   collectCss("zoom");
@@ -377,8 +377,8 @@ export type LayoutProps = {
   background?: string;
   boxShadow?: string;
   direction?: string;
-  horizontalOverflow?: string;
-  verticalOverflow?: string;
+  overflowX?: string;
+  overflowY?: string;
   zIndex?: number | string;
   opacity?: string | number;
 
@@ -478,8 +478,8 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   background: [],
   boxShadow: [],
   direction: [],
-  horizontalOverflow: [],
-  verticalOverflow: [],
+  overflowX: [],
+  overflowY: [],
   zIndex: [],
   opacity: [],
 

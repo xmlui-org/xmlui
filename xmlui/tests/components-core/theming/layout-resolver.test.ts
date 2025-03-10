@@ -1347,32 +1347,32 @@ describe("Layout resolver", () => {
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("horizontalOverflow: auto", () => {
-    const PROP = "horizontalOverflow";
+  it("overflowX: auto", () => {
+    const PROP = "overflowX";
     const VALUE = "auto";
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.overflowX).toBe(VALUE);
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("horizontalOverflow (themeVar)", () => {
-    const PROP = "horizontalOverflow";
+  it("overflowX (themeVar)", () => {
+    const PROP = "overflowX";
     const VALUE = THEME_ID;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.overflowX).toBe(THEME_ID_VALUE);
     expect(result.issues.has(PROP)).toBe(false);
   }); 
 
-  it("verticalOverflow: auto", () => {
-    const PROP = "verticalOverflow";
+  it("overflowY: auto", () => {
+    const PROP = "overflowY";
     const VALUE = "auto";
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.overflowY).toBe(VALUE);
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("verticalOverflow (themeVar)", () => {
-    const PROP = "verticalOverflow";
+  it("overflowY (themeVar)", () => {
+    const PROP = "overflowY";
     const VALUE = THEME_ID;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.overflowY).toBe(THEME_ID_VALUE);

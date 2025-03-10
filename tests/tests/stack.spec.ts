@@ -750,10 +750,10 @@ test("(horizontal) verticalAlignment center", async ({ page }) => {
   expect(itemDims2.bottom).toEqual(stackDims.height / 2 + itemDims2.height / 2);
 });
 
-test(`verticalOverflow="scroll"`, async ({ page }) => {
+test(`overflowY="scroll"`, async ({ page }) => {
   const code = `
   <VStack testId="stack" width="100px" height="60px" backgroundColor="cyan"
-    verticalOverflow="scroll">
+    overflowY="scroll">
     <Text testId="item0">
       As its container width and height are fixed, this long text does not
       fit into it; it will overflow.
@@ -769,10 +769,10 @@ test(`verticalOverflow="scroll"`, async ({ page }) => {
   expect(scrollHeight).toBeGreaterThan(clientHeight);
 });
 
-test(`horizontalOverflow="scroll"`, async ({ page }) => {
+test(`overflowX="scroll"`, async ({ page }) => {
   const code = `
   <HStack testId="stack" width="100px" height="60px" backgroundColor="cyan"
-    horizontalOverflow="scroll">
+    overflowX="scroll">
     <Text testId="item0">
       As its container width and height are fixed, this long text does not
       fit into it; it will overflow.
@@ -788,11 +788,11 @@ test(`horizontalOverflow="scroll"`, async ({ page }) => {
   expect(scrollWidth).toBeGreaterThan(clientWidth);
 });
 
-// When you set horizontalOverflow to scroll, it will automatically set verticalOverflow to scroll if the text exceeds the viewport vertically
-test(`horizontalOverflow sets verticalOverflow`, async ({ page }) => {
+// When you set overflowX to scroll, it will automatically set overflowY to scroll if the text exceeds the viewport vertically
+test(`overflowX sets overflowY`, async ({ page }) => {
   const code = `
   <VStack testId="stack" height="50px" width="300px" backgroundColor="cyan"
-    horizontalOverflow="scroll">
+    overflowX="scroll">
     <Text width="400px" backgroundColor="silver" opacity="0.8">
       This text sets its size explicitly bigger than its container. 
       As it does not fit into the container's viewport, it overflows.

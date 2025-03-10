@@ -562,19 +562,19 @@ By perceiving the overflow, you can decide how to handle it.
 
 ### Hiding the Overflown Text
 
-The `verticalOverflow` layout property of container component allows for defining their behavior in case of overflow.
+The `overflowY` layout property of container component allows for defining their behavior in case of overflow.
 By default, this value is set to `visible`, so the container displays the overflown text.
 
 <Callout type="info" emoji="💡">
-  Set the `verticalOverflow` property value to `hidden` to make the container crop the overflown part of a text.
+  Set the `overflowY` property value to `hidden` to make the container crop the overflown part of a text.
 </Callout>
 
-Observe in the sample below, not the text, but how the `verticalOverflow` property of the container is set:
+Observe in the sample below, not the text, but how the `overflowY` property of the container is set:
 
 ```ueml copy {3}
 <App>
   <VStack
-    verticalOverflow="hidden"
+    overflowY="hidden"
     width="200px" height="60px" backgroundColor="goldenrod">
     <Text>
       As its container width and height are fixed, this long text does not
@@ -590,7 +590,7 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
   app={`
     <App>
       <VStack
-        verticalOverflow="hidden"
+        overflowY="hidden"
         width="200px" height="60px" backgroundColor="goldenrod">
         <Text>
           As its container width and height are fixed, this long text does not
@@ -604,13 +604,13 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
 ### Scrolling the Text
 
 <Callout type="info" emoji="💡">
-  You can set `verticalOverflow` to `scroll` to make the container display a vertical scrollbar to reach the non-visible parts of the overflowing text.
+  You can set `overflowY` to `scroll` to make the container display a vertical scrollbar to reach the non-visible parts of the overflowing text.
 </Callout>
 
 ```ueml copy {2}
 <App>
   <VStack
-    verticalOverflow="scroll"
+    overflowY="scroll"
     width="200px" height="60px" backgroundColor="goldenrod">
     <Text>
       As its container width and height are fixed, this long text does not
@@ -626,7 +626,7 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
   app={`
     <App>
       <VStack
-        verticalOverflow="scroll"
+        overflowY="scroll"
         width="200px" height="60px" backgroundColor="goldenrod">
         <Text>
           As its container width and height are fixed, this long text does not
@@ -680,16 +680,16 @@ Behind the semi-transparent background of the text, you can see its container in
 
 ### Horizontal Scrolling
 
-Besides `verticalOverflow`, XMLUI containers provide another layout property, `horizontalOverflow`, which has the same values (`visible`, `hidden`, `scroll`).
+Besides `overflowY`, XMLUI containers provide another layout property, `overflowX`, which has the same values (`visible`, `hidden`, `scroll`).
 
 <Callout type="info" emoji="💡">
-  To enable and handle horizontal scrolling, use the `horizontalOverflow` property.
+  To enable and handle horizontal scrolling, use the `overflowX` property.
 </Callout>
 
 ```ueml copy
 <App>
   <VStack
-    horizontalOverflow="scroll"
+    overflowX="scroll"
     height="60px" width="300px" backgroundColor="goldenrod">
     <Text width="400px" backgroundColor="silver" opacity="0.7">
       This text sets its size explicitly bigger than its container.
@@ -702,7 +702,7 @@ Besides `verticalOverflow`, XMLUI containers provide another layout property, `h
 ```
 
 <Callout type="info" emoji="📔">
-  When you set `horizontalOverflow` to `scroll,` it will automatically set `verticalOverflow` to `scroll` if the text exceeds its container vertically.
+  When you set `overflowX` to `scroll,` it will automatically set `overflowY` to `scroll` if the text exceeds its container vertically.
 </Callout>
 
 <Playground
@@ -711,7 +711,7 @@ Besides `verticalOverflow`, XMLUI containers provide another layout property, `h
   app={`
     <App>
       <VStack
-        horizontalOverflow="scroll"
+        overflowX="scroll"
         height="60px" width="300px" backgroundColor="goldenrod">
         <Text width="400px" backgroundColor="silver" opacity="0.7">
           This text sets its size explicitly bigger than its container.
