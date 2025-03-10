@@ -38,7 +38,7 @@ export const LinkMd = createMetadata({
     [`color-text-${COMP}--hover--active`]: `$color-text-${COMP}--active`,
     [`textDecorationColor-${COMP}--hover`]: "$color-surface-400A80",
     [`textDecorationColor-${COMP}--active`]: "$color-surface200",
-    [`font-weight-${COMP}--active`]: "$font-weight-bold",
+    [`fontWeight-${COMP}--active`]: "$fontWeight-bold",
     [`textDecorationColor-${COMP}`]: "$color-surface-400",
     [`textUnderlineOffset-${COMP}`]: "$space-1",
     [`textDecorationLine-${COMP}`]: "underline",
@@ -48,7 +48,7 @@ export const LinkMd = createMetadata({
     [`outlineWidth-${COMP}--focus`]: "$outlineWidth--focus",
     [`outlineStyle-${COMP}--focus`]: "$outlineStyle--focus",
     [`outlineOffset-${COMP}--focus`]: "$outlineOffset--focus",
-    [`font-size-${COMP}`]: "inherit",
+    [`fontSize-${COMP}`]: "inherit",
     [`gap-icon-${COMP}`]: "$gap-tight",
     [`padding-icon-${COMP}`]: "$space-0_5",
 

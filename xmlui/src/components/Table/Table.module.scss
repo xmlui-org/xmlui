@@ -25,10 +25,10 @@ $padding-horizontal-cell-last-Table: createThemeVar("padding-horizontal-cell-las
 $themeVars: t.composeBorderVars($themeVars, "cell-#{$component}");
 $color-bg-pagination-Table: createThemeVar("color-bg-pagination-#{$component}");
 $color-text-heading-Table: createThemeVar("color-text-heading-#{$component}");
-$font-weight-row-Table: createThemeVar("font-weight-row-#{$component}");
-$font-size-row-Table: createThemeVar("font-size-row-#{$component}");
-$font-weight-heading-Table: createThemeVar("font-weight-heading-#{$component}");
-$font-size-heading-Table: createThemeVar("font-size-heading-#{$component}");
+$fontWeight-row-Table: createThemeVar("fontWeight-row-#{$component}");
+$fontSize-row-Table: createThemeVar("fontSize-row-#{$component}");
+$fontWeight-heading-Table: createThemeVar("fontWeight-heading-#{$component}");
+$fontSize-heading-Table: createThemeVar("fontSize-heading-#{$component}");
 $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component}");
 
 .wrapper {
@@ -88,9 +88,9 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   gap: 0.5rem;
   align-items: center;
   text-transform: $textTransform-heading-Table;
-  font-size: $font-size-heading-Table;
+  font-size: $fontSize-heading-Table;
   color: $color-text-heading-Table;
-  font-weight: $font-weight-heading-Table;
+  font-weight: $fontWeight-heading-Table;
   user-select: text;
   @include t.paddingVars($themeVars, "heading-#{$component}");
 }
@@ -178,8 +178,8 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   }
 
   .row {
-    font-size: $font-size-row-Table;
-    font-weight: $font-weight-row-Table;
+    font-size: $fontSize-row-Table;
+    font-weight: $fontWeight-row-Table;
     background-color: $color-bg-row-Table;
 
     &.selected {
@@ -266,7 +266,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 
 .paginationLabel {
   color: $color-text-pagination-Table;
-  font-size: t.$font-size-small;
+  font-size: t.$fontSize-small;
 }
 
 .paginationSelect {

@@ -2261,8 +2261,8 @@ export const HtmlThMd = createMetadata({
   themeVars: parseScssVar(styles.themeVarsTh),
   defaultThemeVars: {
     "padding-HtmlTh": "$space-2",
-    "font-size-HtmlTh": "$font-size-tiny",
-    "font-weight-HtmlTh": "$font-weight-bold",
+    "fontSize-HtmlTh": "$fontSize-tiny",
+    "fontWeight-HtmlTh": "$fontWeight-bold",
     light: {
       "color-bg-HtmlTh--hover": "$color-surface-200",
     },
@@ -2346,7 +2346,7 @@ export const HtmlTrMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsTr),
   defaultThemeVars: {
-    "font-size-HtmlTr": "$font-size-small",
+    "fontSize-HtmlTr": "$fontSize-small",
     "color-bg-row-HtmlTr": "inherit",
     light: {
       "color-bg-HtmlTr--hover": "$color-primary-50",

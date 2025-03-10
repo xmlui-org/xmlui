@@ -15,10 +15,10 @@ $color-text-Link: createThemeVar("color-text-#{$component}");
 $color-text-Link--active: createThemeVar("color-text-#{$component}--active");
 $color-text-Link--hover: createThemeVar("color-text-#{$component}--hover");
 $color-text-Link--hover--active: createThemeVar("color-text-#{$component}--hover--active");
-$font-family-Link: createThemeVar("font-family-#{$component}");
-$font-size-Link: createThemeVar("font-size-#{$component}");
-$font-weight-Link: createThemeVar("font-weight-#{$component}");
-$font-weight-Link--active: createThemeVar("font-weight-#{$component}--active");
+$fontFamily-Link: createThemeVar("fontFamily-#{$component}");
+$fontSize-Link: createThemeVar("fontSize-#{$component}");
+$fontWeight-Link: createThemeVar("fontWeight-#{$component}");
+$fontWeight-Link--active: createThemeVar("fontWeight-#{$component}--active");
 $textDecorationColor-Link: createThemeVar("textDecorationColor-#{$component}");
 $textUnderlineOffset-Link: createThemeVar("textUnderlineOffset-#{$component}");
 $textDecorationLine-Link: createThemeVar("textDecorationLine-#{$component}");
@@ -31,9 +31,9 @@ $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
   @include t.paddingVars($themeVars, $component);
   flex-shrink: 0;
   color: $color-text-Link;
-  font-family: $font-family-Link;
-  font-weight: $font-weight-Link;
-  font-size: $font-size-Link;
+  font-family: $fontFamily-Link;
+  font-weight: $fontWeight-Link;
+  font-size: $fontSize-Link;
   cursor: pointer;
   text-decoration: none;
   width: fit-content;
@@ -45,7 +45,7 @@ $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
 
   &.active {
     color: $color-text-Link--active;
-    font-weight: $font-weight-Link--active;
+    font-weight: $fontWeight-Link--active;
   }
 
   &.disabled{

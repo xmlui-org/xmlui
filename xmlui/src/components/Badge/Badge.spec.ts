@@ -42,22 +42,22 @@ test("badge: padding-vertical", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("padding-bottom", EXPECTED_PADDING_VERTICAL);
 });
 
-test("pill: font-size", async ({ page }) => {
+test("pill: fontSize", async ({ page }) => {
   const EXPECTED_FONT_SIZE = "18px";
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "font-size-Badge-pill": EXPECTED_FONT_SIZE,
+      "fontSize-Badge-pill": EXPECTED_FONT_SIZE,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("font-size", EXPECTED_FONT_SIZE);
 });
 
-test("pill: font-weight", async ({ page }) => {
+test("pill: fontWeight", async ({ page }) => {
   // bold font weight
   const EXPECTED_FONT_WEIGHT = "700";
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "font-weight-Badge-pill": EXPECTED_FONT_WEIGHT,
+      "fontWeight-Badge-pill": EXPECTED_FONT_WEIGHT,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("font-weight", EXPECTED_FONT_WEIGHT);

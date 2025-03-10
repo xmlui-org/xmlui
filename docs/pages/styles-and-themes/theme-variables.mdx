@@ -23,7 +23,7 @@ The `<propertyName>` segment names a property (and optionally a part of a compon
 - `color-bg`: Background color
 - `color-bg-indicator`: The background color of the "indicator" part of a specific component.
 - `text-size`: The size of the text
-- `line-height`: The height of a text line
+- `lineHeight`: The height of a text line
 - `padding-horizontal`: The value declaring the horizontal padding space
 
 The `<trait1>` and `<trait2>` segments describe one or two trait values regarding a particular property (`<propertyName>`).
@@ -312,9 +312,9 @@ These colors represent validation states:
 #### Font Family
 
 These theme variables set the default font styles:
-- `font-family`: The default font family used in the app
-- `font-family-sans-serif`: The default sans-serif font family used in the app
-- `font-family-monospace`: The default monospace font family used in the app
+- `fontFamily`: The default font family used in the app
+- `fontFamily-sans-serif`: The default sans-serif font family used in the app
+- `fontFamily-monospace`: The default monospace font family used in the app
 
 <Playground
   name="Font Family"
@@ -322,17 +322,17 @@ These theme variables set the default font styles:
   <App>
     <HStack>
       <Text width="200px" variant="strong">Default font family:</Text>
-      <Text fontFamily="$font-family-sans-serif">This is an example text</Text>
+      <Text fontFamily="$fontFamily-sans-serif">This is an example text</Text>
     </HStack>
 
     <HStack>
       <Text width="200px" variant="strong">Sans serif font family:</Text>
-      <Text fontFamily="$font-family-sans-serif">This is an example text</Text>
+      <Text fontFamily="$fontFamily-sans-serif">This is an example text</Text>
     </HStack>
 
     <HStack>
       <Text width="200px" variant="strong">Monospace font family:</Text>
-      <Text fontFamily="$font-family-monospace">This is an example text</Text>
+      <Text fontFamily="$fontFamily-monospace">This is an example text</Text>
     </HStack>
   </App>
   `}
@@ -347,33 +347,33 @@ These theme variables define a set of line heights:
   app={`
     <App>
       <HStack verticalAlignment="center">
-        <Text width="180px" variant="strong">line-height-none:</Text>
-        <Text lineHeight="$line-height-none" backgroundColor="$color-surface-300">This is an example text</Text>
+        <Text width="180px" variant="strong">lineHeight-none:</Text>
+        <Text lineHeight="$lineHeight-none" backgroundColor="$color-surface-300">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="180px" variant="strong">line-height-tight:</Text>
-        <Text lineHeight="$line-height-tight" backgroundColor="$color-surface-300">This is an example text</Text>
+        <Text width="180px" variant="strong">lineHeight-tight:</Text>
+        <Text lineHeight="$lineHeight-tight" backgroundColor="$color-surface-300">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="180px" variant="strong">line-height-snug:</Text>
-        <Text lineHeight="$line-height-snug" backgroundColor="$color-surface-300">This is an example text</Text>
+        <Text width="180px" variant="strong">lineHeight-snug:</Text>
+        <Text lineHeight="$lineHeight-snug" backgroundColor="$color-surface-300">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="180px" variant="strong">line-height-normal:</Text>
-        <Text lineHeight="$line-height-normal" backgroundColor="$color-surface-300">This is an example text</Text>
+        <Text width="180px" variant="strong">lineHeight-normal:</Text>
+        <Text lineHeight="$lineHeight-normal" backgroundColor="$color-surface-300">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="180px" variant="strong">line-height-relaxed:</Text>
-        <Text lineHeight="$line-height-relaxed" backgroundColor="$color-surface-300">This is an example text</Text>
+        <Text width="180px" variant="strong">lineHeight-relaxed:</Text>
+        <Text lineHeight="$lineHeight-relaxed" backgroundColor="$color-surface-300">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="180px" variant="strong">line-height-loose:</Text>
-        <Text lineHeight="$line-height-loose" backgroundColor="$color-surface-300">This is an example text</Text>
+        <Text width="180px" variant="strong">lineHeight-loose:</Text>
+        <Text lineHeight="$lineHeight-loose" backgroundColor="$color-surface-300">This is an example text</Text>
       </HStack>
     </App>
   `}
@@ -381,45 +381,45 @@ These theme variables define a set of line heights:
 
 #### Font Size
 
-The `font-size` theme variables allow you to set your themes' normal font size (`font-size-normal`). You can use this set of theme variables to define font sizes relative to `font-size`:
+The `fontSize` theme variables allow you to set your themes' normal font size (`fontSize-normal`). You can use this set of theme variables to define font sizes relative to `fontSize`:
 
 <Playground
   name="Font Size"
   app={`
     <App>
       <HStack verticalAlignment="center">
-        <Text width="160px" variant="strong">font-size-tiny:</Text>
-        <Text fontSize="$font-size-tiny">This is an example text</Text>
+        <Text width="160px" variant="strong">fontSize-tiny:</Text>
+        <Text fontSize="$fontSize-tiny">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="160px" variant="strong">font-size-smaller:</Text>
-        <Text fontSize="$font-size-smaller">This is an example text</Text>
+        <Text width="160px" variant="strong">fontSize-smaller:</Text>
+        <Text fontSize="$fontSize-smaller">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="160px" variant="strong">font-size-small:</Text>
-        <Text fontSize="$font-size-small">This is an example text</Text>
+        <Text width="160px" variant="strong">fontSize-small:</Text>
+        <Text fontSize="$fontSize-small">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="160px" variant="strong">font-size-normal:</Text>
-        <Text fontSize="$font-size-normal">This is an example text</Text>
+        <Text width="160px" variant="strong">fontSize-normal:</Text>
+        <Text fontSize="$fontSize-normal">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="160px" variant="strong">font-size-medium:</Text>
-        <Text fontSize="$font-size-medium">This is an example text</Text>
+        <Text width="160px" variant="strong">fontSize-medium:</Text>
+        <Text fontSize="$fontSize-medium">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="160px" variant="strong">font-size-large:</Text>
-        <Text fontSize="$font-size-large">This is an example text</Text>
+        <Text width="160px" variant="strong">fontSize-large:</Text>
+        <Text fontSize="$fontSize-large">This is an example text</Text>
       </HStack>
 
       <HStack verticalAlignment="center">
-        <Text width="160px" variant="strong">font-size-gigantic:</Text>
-        <Text fontSize="$font-size-gigantic">This is an example text</Text>
+        <Text width="160px" variant="strong">fontSize-gigantic:</Text>
+        <Text fontSize="$fontSize-gigantic">This is an example text</Text>
       </HStack>
     </App>
   `}
@@ -427,35 +427,35 @@ The `font-size` theme variables allow you to set your themes' normal font size (
 
 #### Font Weight
 
-The `font-weight` theme variables allow you to set your themes' normal font weight (`font-weight-normal`). You can use this set of theme variables to define font sizes relative to `font-weight`:
+The `fontWeight` theme variables allow you to set your themes' normal font weight (`fontWeight-normal`). You can use this set of theme variables to define font sizes relative to `fontWeight`:
 
 <Playground
   name="Font Weight"
   app={`
     <App>
       <HStack>
-        <Text width="200px" variant="strong">font-weight-light:</Text>
-        <Text fontWeight="$font-weight-light">This is an example text</Text>
+        <Text width="200px" variant="strong">fontWeight-light:</Text>
+        <Text fontWeight="$fontWeight-light">This is an example text</Text>
       </HStack>
 
       <HStack>
-        <Text width="200px" variant="strong">font-weight-normal:</Text>
-        <Text fontWeight="$font-weight-normal">This is an example text</Text>
+        <Text width="200px" variant="strong">fontWeight-normal:</Text>
+        <Text fontWeight="$fontWeight-normal">This is an example text</Text>
       </HStack>
 
       <HStack>
-        <Text width="200px" variant="strong">font-weight-medium:</Text>
-        <Text fontWeight="$font-weight-medium">This is an example text</Text>
+        <Text width="200px" variant="strong">fontWeight-medium:</Text>
+        <Text fontWeight="$fontWeight-medium">This is an example text</Text>
       </HStack>
 
       <HStack>
-        <Text width="200px" variant="strong">font-weight-bold:</Text>
-        <Text fontWeight="$font-weight-bold">This is an example text</Text>
+        <Text width="200px" variant="strong">fontWeight-bold:</Text>
+        <Text fontWeight="$fontWeight-bold">This is an example text</Text>
       </HStack>
 
       <HStack>
-        <Text width="200px" variant="strong">font-weight-extra-bold:</Text>
-        <Text fontWeight="$font-weight-extra-bold">This is an example text</Text>
+        <Text width="200px" variant="strong">fontWeight-extra-bold:</Text>
+        <Text fontWeight="$fontWeight-extra-bold">This is an example text</Text>
       </HStack>
     </App>
   `}

@@ -17,9 +17,9 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
 
 // --- CSS properties of solid buttons with the specified color scheme
 @mixin solid($colorScheme){
-  font-family: createThemeVar('font-family-#{$component}-#{$colorScheme}-solid');
-  font-size: createThemeVar('font-size-#{$component}-#{$colorScheme}-solid');
-  font-weight: createThemeVar('font-weight-#{$component}-#{$colorScheme}-solid');
+  font-family: createThemeVar('fontFamily-#{$component}-#{$colorScheme}-solid');
+  font-size: createThemeVar('fontSize-#{$component}-#{$colorScheme}-solid');
+  font-weight: createThemeVar('fontWeight-#{$component}-#{$colorScheme}-solid');
   border-radius: createThemeVar('radius-#{$component}-#{$colorScheme}-solid');
   border-width: createThemeVar('thickness-border-#{$component}-#{$colorScheme}-solid');
   border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-solid');
@@ -61,9 +61,9 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
 
 // --- CSS properties of outlined buttons with the specified color scheme
 @mixin outlined($colorScheme){
-  font-family: createThemeVar('font-family-#{$component}-#{$colorScheme}-outlined');
-  font-size: createThemeVar('font-size-#{$component}-#{$colorScheme}-outlined');
-  font-weight: createThemeVar('font-weight-#{$component}-#{$colorScheme}-outlined');
+  font-family: createThemeVar('fontFamily-#{$component}-#{$colorScheme}-outlined');
+  font-size: createThemeVar('fontSize-#{$component}-#{$colorScheme}-outlined');
+  font-weight: createThemeVar('fontWeight-#{$component}-#{$colorScheme}-outlined');
   border-radius: createThemeVar('radius-#{$component}-#{$colorScheme}-outlined');
   border-width: createThemeVar('thickness-border-#{$component}-#{$colorScheme}-outlined');
   border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-outlined');
@@ -102,9 +102,9 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
 
 // --- CSS properties of ghost buttons with the specified color scheme
 @mixin ghost($colorScheme){
-  font-family: createThemeVar('font-family-#{$component}-#{$colorScheme}-ghost');
-  font-size: createThemeVar('font-size-#{$component}-#{$colorScheme}-ghost');
-  font-weight: createThemeVar('font-weight-#{$component}-#{$colorScheme}-ghost');
+  font-family: createThemeVar('fontFamily-#{$component}-#{$colorScheme}-ghost');
+  font-size: createThemeVar('fontSize-#{$component}-#{$colorScheme}-ghost');
+  font-weight: createThemeVar('fontWeight-#{$component}-#{$colorScheme}-ghost');
   border-radius: createThemeVar('radius-#{$component}-#{$colorScheme}-ghost');
   border-width: createThemeVar('thickness-border-#{$component}-#{$colorScheme}-ghost');
   border-color: transparent;

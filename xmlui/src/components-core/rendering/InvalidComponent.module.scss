@@ -13,7 +13,7 @@
   span {
     background-color: themes.$color-danger-500;
     color: white;
-    font-weight: themes.$font-weight-normal;
+    font-weight: themes.$fontWeight-normal;
     border-radius: 4px;
     padding-left: 4px;
     padding-right: 8px;
@@ -26,7 +26,7 @@
 
 .errorItem {
   background-color: themes.$color-danger-500;
-  font-weight: themes.$font-weight-bold;
+  font-weight: themes.$fontWeight-bold;
   border-radius: 4px;
   padding-left: 8px;
   padding-right: 8px;

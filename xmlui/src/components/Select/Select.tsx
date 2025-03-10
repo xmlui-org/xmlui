@@ -89,7 +89,7 @@ export const SelectMd = createMetadata({
     [`color-bg-item-${COMP}--active`]: "$color-bg-dropdown-item--active",
     [`min-height-Input`]: "39px",
     [`color-bg-${COMP}-badge`]: "$color-primary-500",
-    [`font-size-${COMP}-badge`]: "$font-size-small",
+    [`fontSize-${COMP}-badge`]: "$fontSize-small",
     [`padding-horizontal-${COMP}-badge`]: "$space-1",
     [`padding-vertical-${COMP}-badge`]: "$space-1",
     [`opacity-text-item-${COMP}--disabled`]: "0.5",

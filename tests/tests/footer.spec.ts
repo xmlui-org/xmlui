@@ -65,12 +65,12 @@ test(`theme: bg-color`, async ({ page }) => {
   await expect(page.getByTestId(FOOTER_ID)).toHaveCSS("background-color", expectedBackgroundColor);
 });
 
-test(`theme: font-size`, async ({ page }) => {
+test(`theme: fontSize`, async ({ page }) => {
   const expectedFontSizePx = "20px";
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
-      "font-size-Footer": expectedFontSizePx,
+      "fontSize-Footer": expectedFontSizePx,
     },
   });
 

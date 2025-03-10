@@ -55,10 +55,10 @@ export const HeadingMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`font-family-${COMP}`]: "$font-family",
+    [`fontFamily-${COMP}`]: "$fontFamily",
     [`color-text-${COMP}`]: "inherit",
-    [`font-weight-${COMP}`]: "$font-weight-bold",
-    [`letter-spacing-${COMP} `]: "0",
+    [`fontWeight-${COMP}`]: "$fontWeight-bold",
+    [`letterSpacing-${COMP} `]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -79,8 +79,7 @@ export const H1Md = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    // letter-spacing
-    [`font-size-${H1}`]: "$font-size-large",
+    [`fontSize-${H1}`]: "$fontSize-large",
     [`margin-top-${H1}`]: "0",
     [`margin-bottom-${H1}`]: "0",
     light: {
@@ -103,8 +102,7 @@ export const H2Md = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    // letter-spacing
-    [`font-size-${H2}`]: "$font-size-medium",
+    [`fontSize-${H2}`]: "$fontSize-medium",
     [`margin-top-${H2}`]: "0",
     [`margin-bottom-${H2}`]: "0",
     light: {
@@ -127,8 +125,7 @@ export const H3Md = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    // letter-spacing
-    [`font-size-${H3}`]: "$font-size-normal",
+    [`fontSize-${H3}`]: "$fontSize-normal",
     [`margin-top-${H3}`]: "0",
     [`margin-bottom-${H3}`]: "0",
     light: {
@@ -151,8 +148,7 @@ export const H4Md = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    // letter-spacing
-    [`font-size-${H4}`]: "$font-size-small",
+    [`fontSize-${H4}`]: "$fontSize-small",
     [`margin-top-${H4}`]: "0",
     [`margin-bottom-${H4}`]: "0",
     light: {
@@ -175,8 +171,7 @@ export const H5Md = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    // letter-spacing
-    [`font-size-${H5}`]: "$font-size-smaller",
+    [`fontSize-${H5}`]: "$fontSize-smaller",
     [`margin-top-${H5}`]: "0",
     [`margin-bottom-${H5}`]: "0",
     light: {
@@ -199,8 +194,7 @@ export const H6Md = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    // letter-spacing
-    [`font-size-${H6}`]: "$font-size-tiny",
+    [`fontSize-${H6}`]: "$fontSize-tiny",
     [`margin-top-${H6}`]: "0",
     [`margin-bottom-${H6}`]: "0",
     light: {

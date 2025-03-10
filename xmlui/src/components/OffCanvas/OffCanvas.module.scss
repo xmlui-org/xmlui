@@ -123,7 +123,7 @@ $margin-bottom-title-OffCanvas: createThemeVar("margin-bottom-title-#{$component
 .offCanvasTitle {
   flex: 1;
   margin-bottom: $margin-bottom-title-OffCanvas;
-  font-size: t.$font-size-large;
+  font-size: t.$fontSize-large;
 }
 
 // --- We export the theme variables to add them to the component renderer
