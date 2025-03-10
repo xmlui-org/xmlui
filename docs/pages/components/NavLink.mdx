@@ -71,7 +71,7 @@ However, you can create a link that executes an explicit action responding to th
   </AppHeader>
   <NavPanel>
     <NavLink to="/" label="Home" />
-    <NavLink label="Danger!" onClick="window.alert('Be careful with this action!')" />
+    <NavLink label="Danger!" onClick="toast('Be careful with this action!')" />
   </NavPanel>
   <Pages>
     <Page url="/">Home</Page>
@@ -89,7 +89,7 @@ However, you can create a link that executes an explicit action responding to th
       </AppHeader>
       <NavPanel>
         <NavLink to="/" label="Home" />
-        <NavLink label="Danger!" onClick="window.alert('Be careful with this action!')" />
+        <NavLink label="Danger!" onClick="toast('Be careful with this action!')" />
       </NavPanel>
       <Pages>
         <Page url="/">Home</Page>
@@ -361,7 +361,7 @@ The following example shows a message and navigates to the "/status" link after 
     <NavPanel>
       <NavLink to="/" label="Home" />
       <NavLink label="Check my status" onClick="
-          window.alert('You will be redirected');
+          toast('You will be redirected');
           Actions.navigate('/status');
       " />
     </NavPanel>

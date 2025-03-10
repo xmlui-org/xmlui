@@ -93,7 +93,7 @@ This event is triggered when the avatar is clicked.
 ```ueml copy
 <App>
   <HStack verticalAlignment="center">
-    <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
+    <Avatar name="Molly Dough" size="md" onClick="toast('Avatar clicked')" />
     Click the avatar!
   </HStack>
 </App>
@@ -104,7 +104,7 @@ This event is triggered when the avatar is clicked.
   app={`
     <App>
       <HStack verticalAlignment="center">
-        <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
+        <Avatar name="Molly Dough" size="md" onClick="toast('Avatar clicked')" />
         Click the avatar!
       </HStack>
     </App>
