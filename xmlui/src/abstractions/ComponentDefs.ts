@@ -307,6 +307,9 @@ export type ComponentMetadata<
   // List of theme variables available for the component
   themeVars?: Array<string>;
 
+  // Optional description of theme variables available for the component
+  themeVarDescriptions?: Record<string, string>;
+
   // Theme variable default values for the "solid" theme
   defaultThemeVars?: DefaultThemeVars;
 
@@ -343,6 +346,7 @@ export function createMetadata<
   nonVisual,
   opaque,
   themeVars,
+  themeVarDescriptions,
   defaultThemeVars,
   toneSpecificThemeVars,
   allowArbitraryProps,
@@ -367,6 +371,7 @@ export function createMetadata<
     opaque,
     themeVars,
     defaultThemeVars,
+    themeVarDescriptions,
     toneSpecificThemeVars,
     allowArbitraryProps,
     docFolder,
