@@ -87,7 +87,7 @@ It accepts component definitions.
     <property name="profileMenuTemplate">
       <DropdownMenu>
         <property name="triggerTemplate">
-          <Avatar name="Joe" size="xs" radius="50%"/>
+          <Avatar name="Joe" size="xs" borderRadius="50%"/>
         </property>
       </DropdownMenu>
     </property>
@@ -105,7 +105,7 @@ It accepts component definitions.
       <property name="profileMenuTemplate">
         <DropdownMenu>
           <property name="triggerTemplate">
-            <Avatar name="Joe" size="xs" radius="50%"/>
+            <Avatar name="Joe" size="xs" borderRadius="50%"/>
           </property>
         </DropdownMenu>
       </property>
@@ -139,14 +139,14 @@ This component does not expose any methods.
 The `AppHeader` component uses these theme variables to customize its appearance:
 
 - `color-bg-AppHeader`: sets the background color of the header
-- `padding` (including all `padding` variants, such as `padding-left` and others)
+- `padding` (including all `padding` variants, such as `paddingLeft` and others)
 - `color-border` (including all `color-border` variants, such as `color-border-left` and others)
 - `style-border` (including all `style-border` variants, such as `style-border-left` and others)
 - `thickness-border` (including all `thickness-border` variants, such as `thickness-border-left` and others)
 
 The `AppHeader` component allows these theme variables to customize the logo within the header:
 
-- `padding-logo-AppHeader` (including all `padding` variants, such as `padding-left-logo-AppHeader` and others)
+- `padding-logo-AppHeader` (including all `padding` variants, such as `paddingLeft-logo-AppHeader` and others)
 - `width-logo-AppHeader`: sets the width of the displayed logo
 
 ### Theme Variable Descriptions
@@ -167,6 +167,7 @@ The `AppHeader` component allows these theme variables to customize the logo wit
 | [border-right](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border-top](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border](../styles-and-themes/common-units/#border)-vertical-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | 0px | 0px |
 | [color-bg](../styles-and-themes/common-units/#color)-AppHeader | white | $color-surface-900 |
 | [color-border](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border-bottom](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -177,25 +178,24 @@ The `AppHeader` component allows these theme variables to customize the logo wit
 | [color-border-vertical](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [height](../styles-and-themes/common-units/#size)-AppHeader | $space-14 | $space-14 |
 | [max-content-width](../styles-and-themes/common-units/#size)-AppHeader | $max-content-width-App | $max-content-width-App |
-| [padding](../styles-and-themes/common-units/#size)-AppHeader | $padding-top-AppHeader $padding-right-AppHeader $padding-bottom-AppHeader $padding-left-AppHeader | $padding-top-AppHeader $padding-right-AppHeader $padding-bottom-AppHeader $padding-left-AppHeader |
-| [padding-bottom](../styles-and-themes/common-units/#size)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
-| [padding-bottom](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
-| [padding-left](../styles-and-themes/common-units/#size)-AppHeader | $paddingHorizontal-AppHeader | $paddingHorizontal-AppHeader |
-| [padding-left](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingHorizontal-logo-AppHeader | $paddingHorizontal-logo-AppHeader |
-| [padding](../styles-and-themes/common-units/#size)-logo-AppHeader | $padding-top-logo-AppHeader $padding-right-logo-AppHeader $padding-bottom-logo-AppHeader $padding-left-logo-AppHeader | $padding-top-logo-AppHeader $padding-right-logo-AppHeader $padding-bottom-logo-AppHeader $padding-left-logo-AppHeader |
-| [padding-right](../styles-and-themes/common-units/#size)-AppHeader | $paddingHorizontal-AppHeader | $paddingHorizontal-AppHeader |
-| [padding-right](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingHorizontal-logo-AppHeader | $paddingHorizontal-logo-AppHeader |
-| [padding-top](../styles-and-themes/common-units/#size)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
-| [padding-top](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
+| [padding](../styles-and-themes/common-units/#size)-AppHeader | $paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader | $paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader |
+| [padding](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader | $paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader |
+| [paddingBottom](../styles-and-themes/common-units/#size)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
+| [paddingBottom](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-AppHeader | $space-4 | $space-4 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-logo-AppHeader | $space-0 | $space-0 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-AppHeader | $paddingHorizontal-AppHeader | $paddingHorizontal-AppHeader |
+| [paddingLeft](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingHorizontal-logo-AppHeader | $paddingHorizontal-logo-AppHeader |
+| [paddingRight](../styles-and-themes/common-units/#size)-AppHeader | $paddingHorizontal-AppHeader | $paddingHorizontal-AppHeader |
+| [paddingRight](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingHorizontal-logo-AppHeader | $paddingHorizontal-logo-AppHeader |
+| [paddingTop](../styles-and-themes/common-units/#size)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
+| [paddingTop](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
 | [paddingVertical](../styles-and-themes/common-units/#size)-AppHeader | $space-0 | $space-0 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-logo-AppHeader | $space-4 | $space-4 |
-| [radius](../styles-and-themes/common-units/#border-rounding)-AppHeader | 0px | 0px |
-| [radius](../styles-and-themes/common-units/#border-rounding)-end-end-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-end-start-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-start-end-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-start-start-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-end-end-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-end-start-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-start-end-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-start-start-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-bottom](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-horizontal](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

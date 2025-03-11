@@ -954,11 +954,11 @@ test("paddingHorizontal", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-left", async ({ page }) => {
+test("paddingLeft", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "padding-left-Accordion": EXPECTED,
+      "paddingLeft-Accordion": EXPECTED,
     },
   });
   await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-top", EXPECTED);
@@ -967,11 +967,11 @@ test("padding-left", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-right", async ({ page }) => {
+test("paddingRight", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "padding-right-Accordion": EXPECTED,
+      "paddingRight-Accordion": EXPECTED,
     },
   });
   await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-top", EXPECTED);
@@ -993,11 +993,11 @@ test("paddingVertical", async ({ page }) => {
   await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-top", async ({ page }) => {
+test("paddingTop", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "padding-top-Accordion": EXPECTED,
+      "paddingTop-Accordion": EXPECTED,
     },
   });
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);
@@ -1006,11 +1006,11 @@ test("padding-top", async ({ page }) => {
   await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-bottom", async ({ page }) => {
+test("paddingBottom", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "padding-bottom-Accordion": EXPECTED,
+      "paddingBottom-Accordion": EXPECTED,
     },
   });
   await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-top", EXPECTED);
@@ -1034,13 +1034,13 @@ test("padding, paddingHorizontal", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", UPDATED);
 });
 
-test("padding, padding-left", async ({ page }) => {
+test("padding, paddingLeft", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
       "padding-Accordion": EXPECTED,
-      "padding-left-Accordion": UPDATED,
+      "paddingLeft-Accordion": UPDATED,
     },
   });
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);
@@ -1049,13 +1049,13 @@ test("padding, padding-left", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", UPDATED);
 });
 
-test("padding, padding-right", async ({ page }) => {
+test("padding, paddingRight", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
       "padding-Accordion": EXPECTED,
-      "padding-right-Accordion": UPDATED,
+      "paddingRight-Accordion": UPDATED,
     },
   });
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);
@@ -1079,13 +1079,13 @@ test("padding, paddingVertical", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding, padding-top", async ({ page }) => {
+test("padding, paddingTop", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
       "padding-Accordion": EXPECTED,
-      "padding-top-Accordion": UPDATED,
+      "paddingTop-Accordion": UPDATED,
     },
   });
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", UPDATED);
@@ -1094,13 +1094,13 @@ test("padding, padding-top", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding, padding-bottom", async ({ page }) => {
+test("padding, paddingBottom", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
       "padding-Accordion": EXPECTED,
-      "padding-bottom-Accordion": UPDATED,
+      "paddingBottom-Accordion": UPDATED,
     },
   });
   await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);

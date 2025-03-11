@@ -184,14 +184,14 @@ export const RootThemeDefinition: ThemeDefinition = {
     "font-feature-settings": "'cv03', 'cv04', 'cv11'",
 
     // --- Some media breakpoints (review them)
-    "media-max-width-phone": "576px",
-    "media-max-width-landscape-phone": "768px",
-    "media-max-width-tablet": "992px",
-    "media-max-width-desktop": "1200px",
-    "media-max-width-large-desktop": "1400px",
+    "media-maxWidth-phone": "576px",
+    "media-maxWidth-landscape-phone": "768px",
+    "media-maxWidth-tablet": "992px",
+    "media-maxWidth-desktop": "1200px",
+    "media-maxWidth-large-desktop": "1400px",
 
     // --- The app's default radius value
-    radius: "4px",
+    borderRadius: "4px",
     "outlineColor--focus": "rgba($color-primary-500-rgb, .5)",
     "outlineWidth--focus": "2px",
     "outlineStyle--focus": "solid",
@@ -253,7 +253,7 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     "boxShadow-Avatar": "inset 0 0 0 1px rgba(4, 32, 69, 0.1)",
     "border-size-Avatar": "0px",
-    "radius-Avatar": "4px",
+    "borderRadius-Avatar": "4px",
 
     "boxShadow-header-App": "none",
     // "height-AppHeader": "3.5rem",

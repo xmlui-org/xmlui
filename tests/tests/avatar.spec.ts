@@ -121,7 +121,7 @@ const THEME_TESTS: ThemeTestDesc[] = [
   { themeVar: "color-border-Avatar", themeVarAsCSS: "border-color", expected: RED },
   { themeVar: "color-text-Avatar", themeVarAsCSS: "color", expected: RED },
   { themeVar: "fontWeight-Avatar", themeVarAsCSS: "font-weight", expected: "700" },
-  { themeVar: "radius-Avatar", themeVarAsCSS: "border-radius", expected: "15px" },
+  { themeVar: "borderRadius-Avatar", themeVarAsCSS: "border-radius", expected: "15px" },
   { themeVar: "boxShadow-Avatar", themeVarAsCSS: "box-shadow", expected: RED + " 5px 10px 0px 0px" },
 ];
 

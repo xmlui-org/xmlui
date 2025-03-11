@@ -80,8 +80,8 @@ export const H1Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H1}`]: "$fontSize-large",
-    [`margin-top-${H1}`]: "0",
-    [`margin-bottom-${H1}`]: "0",
+    [`marginTop-${H1}`]: "0",
+    [`marginBottom-${H1}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -103,8 +103,8 @@ export const H2Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H2}`]: "$fontSize-medium",
-    [`margin-top-${H2}`]: "0",
-    [`margin-bottom-${H2}`]: "0",
+    [`marginTop-${H2}`]: "0",
+    [`marginBottom-${H2}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -126,8 +126,8 @@ export const H3Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H3}`]: "$fontSize-normal",
-    [`margin-top-${H3}`]: "0",
-    [`margin-bottom-${H3}`]: "0",
+    [`marginTop-${H3}`]: "0",
+    [`marginBottom-${H3}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -149,8 +149,8 @@ export const H4Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H4}`]: "$fontSize-small",
-    [`margin-top-${H4}`]: "0",
-    [`margin-bottom-${H4}`]: "0",
+    [`marginTop-${H4}`]: "0",
+    [`marginBottom-${H4}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -172,8 +172,8 @@ export const H5Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H5}`]: "$fontSize-smaller",
-    [`margin-top-${H5}`]: "0",
-    [`margin-bottom-${H5}`]: "0",
+    [`marginTop-${H5}`]: "0",
+    [`marginBottom-${H5}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -195,8 +195,8 @@ export const H6Md = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`fontSize-${H6}`]: "$fontSize-tiny",
-    [`margin-top-${H6}`]: "0",
-    [`margin-bottom-${H6}`]: "0",
+    [`marginTop-${H6}`]: "0",
+    [`marginBottom-${H6}`]: "0",
     light: {
       // --- No light-specific theme vars
     },

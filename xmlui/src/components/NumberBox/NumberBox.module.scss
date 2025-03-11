@@ -11,7 +11,7 @@ $componentName: "NumberBox";
 
 // --- CSS properties of a particular NumberBox variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
   border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
   border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");

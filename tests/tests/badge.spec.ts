@@ -108,11 +108,11 @@ test("color-text", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("color", EXPECTED_TEXT_COLOR);
 });
 
-test("badge: radius", async ({ page }) => {
+test("badge: borderRadius", async ({ page }) => {
   const EXPECTED_RADIUS = "8px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
-      "radius-Badge": EXPECTED_RADIUS,
+      "borderRadius-Badge": EXPECTED_RADIUS,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("border-radius", EXPECTED_RADIUS);

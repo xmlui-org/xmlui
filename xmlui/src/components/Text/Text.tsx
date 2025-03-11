@@ -44,7 +44,7 @@ export const TextMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`border-radius-${COMP}`]: "$radius",
+    [`borderRadius-${COMP}`]: "$borderRadius",
     [`style-border-${COMP}`]: "solid",
     [`fontSize-${COMP}`]: "$fontSize-small",
     [`thickness-border-${COMP}`]: "$space-0",
@@ -88,8 +88,8 @@ export const TextMd = createMetadata({
     [`fontWeight-${COMP}-subheading`]: "$fontWeight-bold",
     [`letterSpacing-${COMP}-subheading`]: "0.04em",
     [`textTransform-${COMP}-subheading`]: "uppercase",
-    [`margin-top-${COMP}-tableheading`]: "$space-1",
-    [`margin-bottom-${COMP}-tableheading`]: "$space-4",
+    [`marginTop-${COMP}-tableheading`]: "$space-1",
+    [`marginBottom-${COMP}-tableheading`]: "$space-4",
     [`paddingHorizontal-${COMP}-tableheading`]: "$space-1",
     [`fontWeight-${COMP}-tableheading`]: "$fontWeight-bold",
     light: {

@@ -10,14 +10,14 @@ type PaddingValue = {
 
 export function paddingSubject(name: string, valueSpec?: PaddingValue): Record<string, string> {
   return {
-    [`padding-left-${name}`]: valueSpec?.left ?? `$paddingHorizontal-${name}`,
-    [`padding-right-${name}`]: valueSpec?.right ?? `$paddingHorizontal-${name}`,
-    [`padding-top-${name}`]: valueSpec?.top ?? `$paddingVertical-${name}`,
-    [`padding-bottom-${name}`]: valueSpec?.bottom ?? `$paddingVertical-${name}`,
+    [`paddingLeft-${name}`]: valueSpec?.left ?? `$paddingHorizontal-${name}`,
+    [`paddingRight-${name}`]: valueSpec?.right ?? `$paddingHorizontal-${name}`,
+    [`paddingTop-${name}`]: valueSpec?.top ?? `$paddingVertical-${name}`,
+    [`paddingBottom-${name}`]: valueSpec?.bottom ?? `$paddingVertical-${name}`,
     [`paddingHorizontal-${name}`]: valueSpec?.horizontal ?? "",
     [`paddingVertical-${name}`]: valueSpec?.vertical ?? "",
     [`padding-${name}`]:
-      valueSpec?.all ?? `$padding-top-${name} $padding-right-${name} $padding-bottom-${name} $padding-left-${name}`,
+      valueSpec?.all ?? `$paddingTop-${name} $paddingRight-${name} $paddingBottom-${name} $paddingLeft-${name}`,
   };
 }
 
@@ -40,7 +40,7 @@ type BorderValue = {
 
 export function borderSubject(name: string, valueSpec?: BorderValue): Record<string, string> {
   return {
-    [`radius-${name}`]: "$radius",
+    [`borderRadius-${name}`]: "$borderRadius",
     ...borderEdgeSubject("left", valueSpec?.left ?? valueSpec?.horizontal ?? valueSpec?.all),
     ...borderEdgeSubject("right", valueSpec?.right ?? valueSpec?.horizontal ?? valueSpec?.all),
     ...borderEdgeSubject("top", valueSpec?.top ?? valueSpec?.vertical ?? valueSpec?.all),

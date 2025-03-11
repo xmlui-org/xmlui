@@ -14,12 +14,12 @@ $themeVars: t.composePaddingVars($themeVars, "overlay-#{$component}");
 $padding-ModalDialog: createThemeVar("padding-#{$component}");
 $color-bg-ModalDialog: createThemeVar("Dialog:color-bg-#{$component}");
 $color-bg-overlay-ModalDialog: createThemeVar("Dialog:color-bg-overlay-#{$component}");
-$radius-ModalDialog: createThemeVar("Dialog:radius-#{$component}");
+$borderRadius-ModalDialog: createThemeVar("Dialog:borderRadius-#{$component}");
 $fontFamily-ModalDialog: createThemeVar("Dialog:fontFamily-#{$component}");
 $color-text-ModalDialog: createThemeVar("Dialog:color-text-#{$component}");
-$min-width-ModalDialog: createThemeVar("Dialog:min-width-#{$component}");
-$max-width-ModalDialog: createThemeVar("Dialog:max-width-#{$component}");
-$margin-bottom-title-ModalDialog: createThemeVar("Dialog:margin-bottom-title-#{$component}");
+$minWidth-ModalDialog: createThemeVar("Dialog:minWidth-#{$component}");
+$maxWidth-ModalDialog: createThemeVar("Dialog:maxWidth-#{$component}");
+$marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$component}");
 
 
 
@@ -56,15 +56,15 @@ $margin-bottom-title-ModalDialog: createThemeVar("Dialog:margin-bottom-title-#{$
 
 .content{
   background-color: $color-bg-ModalDialog;
-  border-radius: $radius-ModalDialog;
+  border-radius: $borderRadius-ModalDialog;
   font-family: $fontFamily-ModalDialog;
   color: $color-text-ModalDialog;
   @include t.paddingVars($themeVars, $component);
   box-shadow: t.$shadow-spread;
   transform: translate(0);
   width: 90vw;
-  max-width: $max-width-ModalDialog;
-  min-width: $min-width-ModalDialog;
+  max-width: $maxWidth-ModalDialog;
+  min-width: $minWidth-ModalDialog;
   isolation: isolate;
   position: relative;
   animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -79,7 +79,7 @@ $margin-bottom-title-ModalDialog: createThemeVar("Dialog:margin-bottom-title-#{$
 
 .dialogTitle {
   flex: 1;
-  margin-bottom: $margin-bottom-title-ModalDialog;
+  margin-bottom: $marginBottom-title-ModalDialog;
   font-size: t.$fontSize-large;
 }
 

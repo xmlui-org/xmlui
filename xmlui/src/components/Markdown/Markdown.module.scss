@@ -48,7 +48,7 @@ $style-border-HorizontalRule: createThemeVar("style-border-HorizontalRule");
 
 $color-bg-Blockquote: createThemeVar("color-bg-Blockquote");
 $accent-Blockquote: createThemeVar("accent-Blockquote");
-$radius-Blockquote: createThemeVar("radius-Blockquote");
+$borderRadius-Blockquote: createThemeVar("borderRadius-Blockquote");
 $boxShadow-Blockquote: createThemeVar("boxShadow-Blockquote");
 $padding-Blockquote: createThemeVar("padding-Blockquote");
 $margin-Blockquote: createThemeVar("margin-Blockquote");
@@ -57,7 +57,7 @@ $margin-Blockquote: createThemeVar("margin-Blockquote");
 
 .blockquote {
   position: relative;
-  border-radius: $radius-Blockquote;
+  border-radius: $borderRadius-Blockquote;
   background-color: $color-bg-Blockquote;
   box-shadow: $boxShadow-Blockquote;
   padding: $padding-Blockquote;
@@ -83,7 +83,7 @@ $size-icon-Admonition: createThemeVar("size-icon-Admonition");
 
 .admonitionBlockquote {
   position: relative;
-  border-radius: $radius-Blockquote;
+  border-radius: $borderRadius-Blockquote;
   background-color: $color-bg-Admonition;
   box-shadow: $boxShadow-Blockquote;
   padding: $padding-Blockquote;
@@ -110,33 +110,33 @@ $size-icon-Admonition: createThemeVar("size-icon-Admonition");
 
 // --- UnorderedList
 
-$padding-left-UnorderedList: createThemeVar("padding-left-UnorderedList");
+$paddingLeft-UnorderedList: createThemeVar("paddingLeft-UnorderedList");
 
 // the basic <ul> and <ol> styles are the same in tabler.io too 
 .unorderedList {
   list-style-type: revert; 
   list-style-position: outside; 
-  padding-left: $padding-left-UnorderedList;
+  padding-left: $paddingLeft-UnorderedList;
 }
 
 // --- OrderedList
 
-$padding-left-OrderedList: createThemeVar("padding-left-OrderedList");
+$paddingLeft-OrderedList: createThemeVar("paddingLeft-OrderedList");
 
 // the basic <ul> and <ol> styles are the same in tabler.io too 
 .orderedList {
   list-style-type: revert; 
   list-style-position: outside; 
-  padding-left: $padding-left-OrderedList;
+  padding-left: $paddingLeft-OrderedList;
 }
 
 // --- ListItem
 
-$padding-left-ListItem: createThemeVar("padding-left-ListItem");
+$paddingLeft-ListItem: createThemeVar("paddingLeft-ListItem");
 $color-marker-ListItem: createThemeVar("color-marker-ListItem");
 
 .listItem {
-  padding-left: $padding-left-ListItem;
+  padding-left: $paddingLeft-ListItem;
 }
 
 .listItem::marker {
@@ -145,12 +145,12 @@ $color-marker-ListItem: createThemeVar("color-marker-ListItem");
 
 // -- Heading
 
-$margin-top-HtmlHeading: createThemeVar("margin-top-HtmlHeading");
-$margin-bottom-HtmlHeading: createThemeVar("margin-bottom-HtmlHeading");
+$marginTop-HtmlHeading: createThemeVar("marginTop-HtmlHeading");
+$marginBottom-HtmlHeading: createThemeVar("marginBottom-HtmlHeading");
 
 .htmlHeading {
-  margin-top: $margin-top-HtmlHeading;
-  margin-bottom: $margin-bottom-HtmlHeading;
+  margin-top: $marginTop-HtmlHeading;
+  margin-bottom: $marginBottom-HtmlHeading;
 }
 
 // --- We export the theme variables to add them to the component renderer

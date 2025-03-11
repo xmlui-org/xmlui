@@ -112,7 +112,7 @@ export const CarouselMd = createMetadata({
     [`height-indicator-${COMP}`]: "6px",
     [`height-control-${COMP}`]: "36px",
     [`width-control-${COMP}`]: "36px",
-    [`radius-control-${COMP}`]: "50%",
+    [`borderRadius-control-${COMP}`]: "50%",
     [`height-${COMP}`]: "100%",
     [`width-${COMP}`]: "100%",
   },

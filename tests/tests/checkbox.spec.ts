@@ -355,7 +355,7 @@ test(`theme: disabled`, async ({ page }) => {
 
 // Border radius check
 ERROR_LEVELS.forEach((errorLevel) => {
-  test(`theme: border radius (${errorLevel})`, async ({ page }) => {  
+  test(`theme: border borderRadius (${errorLevel})`, async ({ page }) => {  
     const EXPECTED_BORDER_RADIUS = "4px" as const;
     
     const validationStatus = errorLevel === "default" ? "" : `validationStatus="${errorLevel}"`;
@@ -363,7 +363,7 @@ ERROR_LEVELS.forEach((errorLevel) => {
     const themeErrorLevel = errorLevel === "valid" ? "success" : errorLevel;
     // END TEMP
 
-    const radius = `radius-Checkbox-${themeErrorLevel}`;
+    const radius = `borderRadius-Checkbox-${themeErrorLevel}`;
 
     await initThemedApp(
       page,

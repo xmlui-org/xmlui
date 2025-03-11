@@ -34,7 +34,7 @@ The following example demonstrates using it:
         <HStack gap="0.5rem" borderTop="1px solid #ddd" paddingVertical="1rem">
           <Button label="Test Search Server" type="button"
             themeColor="secondary" variant="outlined"
-            onClick="toast.success('Search server is ok.')"/>
+            onClick="toast('Search server is ok.')"/>
           <SpaceFiller/>
           <Button type="submit" enabled="{!isSearching}" icon="search"
             label="{isSearching ? 'Searching...' : 'Search'}"/>
@@ -62,7 +62,7 @@ This example mimics a one-second search and turns off the submit button during t
             <HStack gap="0.5rem" borderTop="1px solid #ddd" paddingVertical="1rem">
               <Button label="Test Search Server" type="button"
                 themeColor="secondary" variant="outlined"
-                onClick="toast.success('Search server is ok.')"/>
+                onClick="toast('Search server is ok.')"/>
               <SpaceFiller/>
               <Button type="submit" enabled="{!isSearching}" icon="search"
                 label="{isSearching ? 'Searching...' : 'Search'}"/>

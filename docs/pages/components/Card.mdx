@@ -236,7 +236,7 @@ The `Card` component uses these theme variables to customize its appearance:
 - `padding-Card`
 - `paddingHorizontal-Card`
 - `paddingVertical-Card`
-- `radius-Card`
+- `borderRadius-Card`
 - `boxShadow-Card`
 - `style-border-Card`
 - `thickness-border-Card`
@@ -249,7 +249,7 @@ The following theme definition changes the visual appearance of the card:
   "name": "Custom Theme",
   "themeVars": {
     "color-bg-Card": "$color-surface-200",
-    "radius-Card": "4px",
+    "borderRadius-Card": "4px",
     "color-border-Card": "$color-surface-600",
     "thickness-border-Card": "2px",
     "paddingHorizontal-Card": "2rem",
@@ -266,7 +266,7 @@ The following theme definition changes the visual appearance of the card:
     name: "Custom Theme",
     themeVars: {
       "color-bg-Card": "$color-surface-200",
-      "radius-Card": "4px",
+      "borderRadius-Card": "4px",
       "color-border-Card": "$color-surface-600",
       "thickness-border-Card": "2px",
       "paddingHorizontal-Card": "2rem",
@@ -297,6 +297,7 @@ The following theme definition changes the visual appearance of the card:
 | [border-right](../styles-and-themes/common-units/#border)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border-top](../styles-and-themes/common-units/#border)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border](../styles-and-themes/common-units/#border)-vertical-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Card | $borderRadius | $borderRadius |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Card | none | none |
 | [color-bg](../styles-and-themes/common-units/#color)-Card | white | $color-surface-900 |
 | [color-border-bottom](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -306,18 +307,17 @@ The following theme definition changes the visual appearance of the card:
 | [color-text](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border-top](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border-vertical](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [padding-bottom](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-Card | $space-4 | $space-4 |
-| [padding-left](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [padding-right](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [padding-top](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingBottom](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingLeft](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingRight](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingTop](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-Card | $radius | $radius |
-| [radius](../styles-and-themes/common-units/#border-rounding)-end-end-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-end-start-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-start-end-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-start-start-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-end-end-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-end-start-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-start-end-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-start-start-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-bottom](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-horizontal](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

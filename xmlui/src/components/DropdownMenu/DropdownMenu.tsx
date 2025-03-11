@@ -70,10 +70,10 @@ export const DropdownMenuMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-bg-${DDMCOMP}`]: "$color-bg-primary",
-    [`min-width-${DDMCOMP}`]: "160px",
+    [`minWidth-${DDMCOMP}`]: "160px",
     [`boxShadow-${DDMCOMP}`]: "$shadow-xl",
     [`style-border-${DDMCOMP}-content`]: "solid",
-    [`radius-${DDMCOMP}`]: "$radius",
+    [`borderRadius-${DDMCOMP}`]: "$borderRadius",
   },
 });
 
@@ -213,8 +213,8 @@ export const MenuSeparatorMd = createMetadata({
   docFolder: DDMCOMP,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`margin-top-${MSEP}`]: "$space-1",
-    [`margin-bottom-${MSEP}`]: "$space-1",
+    [`marginTop-${MSEP}`]: "$space-1",
+    [`marginBottom-${MSEP}`]: "$space-1",
     [`width-${MSEP}`]: "100%",
     [`height-${MSEP}`]: "1px",
     [`color-${MSEP}`]: "$color-border-dropdown-item",

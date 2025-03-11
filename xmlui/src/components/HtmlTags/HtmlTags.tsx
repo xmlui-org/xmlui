@@ -872,8 +872,8 @@ export const HtmlH1Md = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
   defaultThemeVars: {
-    "margin-top-HtmlHeading": "1rem",
-    "margin-bottom-HtmlHeading": ".5rem",
+    "marginTop-HtmlHeading": "1rem",
+    "marginBottom-HtmlHeading": ".5rem",
   },
 });
 
@@ -902,8 +902,8 @@ export const HtmlH2Md = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
   defaultThemeVars: {
-    "margin-top-HtmlHeading": "1rem",
-    "margin-bottom-HtmlHeading": ".5rem",
+    "marginTop-HtmlHeading": "1rem",
+    "marginBottom-HtmlHeading": ".5rem",
   },
 });
 
@@ -932,8 +932,8 @@ export const HtmlH3Md = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
   defaultThemeVars: {
-    "margin-top-HtmlHeading": "1rem",
-    "margin-bottom-HtmlHeading": ".5rem",
+    "marginTop-HtmlHeading": "1rem",
+    "marginBottom-HtmlHeading": ".5rem",
   },
 });
 
@@ -962,8 +962,8 @@ export const HtmlH4Md = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
   defaultThemeVars: {
-    "margin-top-HtmlHeading": "1rem",
-    "margin-bottom-HtmlHeading": ".5rem",
+    "marginTop-HtmlHeading": "1rem",
+    "marginBottom-HtmlHeading": ".5rem",
   },
 });
 
@@ -992,8 +992,8 @@ export const HtmlH5Md = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
   defaultThemeVars: {
-    "margin-top-HtmlHeading": "1rem",
-    "margin-bottom-HtmlHeading": ".5rem",
+    "marginTop-HtmlHeading": "1rem",
+    "marginBottom-HtmlHeading": ".5rem",
   },
 });
 
@@ -1022,8 +1022,8 @@ export const HtmlH6Md = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsHeading),
   defaultThemeVars: {
-    "margin-top-HtmlHeading": "1rem",
-    "margin-bottom-HtmlHeading": ".5rem",
+    "marginTop-HtmlHeading": "1rem",
+    "marginBottom-HtmlHeading": ".5rem",
   },
 });
 
@@ -1513,8 +1513,8 @@ export const HtmlOlMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
   defaultThemeVars: {
-    "margin-top-HtmlOl": "$space-4",
-    "margin-bottom-HtmlOl": "$space-4",
+    "marginTop-HtmlOl": "$space-4",
+    "marginBottom-HtmlOl": "$space-4",
   },
 });
 
@@ -2076,8 +2076,8 @@ export const HtmlTableMd = createMetadata({
   defaultThemeVars: {
     "color-bg-HtmlTable": "$color-bg",
     "border-HtmlTable": "1px solid $color-border",
-    "margin-bottom-HtmlTable": "$space-4",
-    "margin-top-HtmlTable": "$space-4",
+    "marginBottom-HtmlTable": "$space-4",
+    "marginTop-HtmlTable": "$space-4",
     },
 });
 
@@ -2426,8 +2426,8 @@ export const HtmlUlMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
   defaultThemeVars: {
-    "margin-top-HtmlUl": "$space-4",
-    "margin-bottom-HtmlUl": "$space-4",
+    "marginTop-HtmlUl": "$space-4",
+    "marginBottom-HtmlUl": "$space-4",
   },
 });
 

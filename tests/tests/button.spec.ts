@@ -449,11 +449,11 @@ BORDER_STYLES.forEach((borderStyle) => {
   });
 });
 
-test(`radius-Button to solid, outlined`, async ({ page }) => {
+test(`borderRadius-Button to solid, outlined`, async ({ page }) => {
   const EXPECTED = "5px";
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "radius-Button": EXPECTED,
+      "borderRadius-Button": EXPECTED,
     },
   });
   const btnSolPriBorderRadius = await getStyle(page, "btnSolPri", "border-radius");

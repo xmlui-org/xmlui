@@ -10,7 +10,7 @@ $themeVars: ();
 $component: "Accordion";
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
-$radius: createThemeVar("radius-#{$component}");
+$borderRadius: createThemeVar("borderRadius-#{$component}");
 
 .root {
   overflow: hidden;
@@ -27,13 +27,13 @@ $radius: createThemeVar("radius-#{$component}");
 
   &:first-child {
     margin-top: 0;
-    border-top-left-radius: $radius;
-    border-top-right-radius: $radius;
+    border-top-left-radius: $borderRadius;
+    border-top-right-radius: $borderRadius;
   }
 
   &:last-child {
-    border-bottom-left-radius: $radius;
-    border-bottom-right-radius: $radius;
+    border-bottom-left-radius: $borderRadius;
+    border-bottom-right-radius: $borderRadius;
   }
 
   &:focus-within {

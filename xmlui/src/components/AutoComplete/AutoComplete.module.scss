@@ -14,7 +14,7 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:radius-#{$component}-#{$variantName}");
+  border-radius: createThemeVar("Input:borderRadius-#{$component}-#{$variantName}");
   border-color: createThemeVar("Input:color-border-#{$component}-#{$variantName}");
   border-width: createThemeVar("Input:thickness-border-#{$component}-#{$variantName}");
   border-style: createThemeVar("Input:style-border-#{$component}-#{$variantName}");
@@ -154,7 +154,7 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   width: 100%;
   outline: none;
   background-color: createThemeVar("Input:color-bg-menu-#{$component}");
-  border-radius: createThemeVar("Input:radius-menu-#{$component}");
+  border-radius: createThemeVar("Input:borderRadius-menu-#{$component}");
   box-shadow: createThemeVar("Input:boxShadow-menu-#{$component}");
   animation: fade-in 0.3s ease-in-out; /* animate-in */
 }

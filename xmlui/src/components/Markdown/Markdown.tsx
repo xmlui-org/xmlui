@@ -29,9 +29,9 @@ export const MarkdownMd = createMetadata({
     "accent-Blockquote": "$color-primary",
     "padding-Blockquote": "$space-2 $space-6",
     "margin-Blockquote": "$space-2",
-    "padding-left-UnorderedList": "$space-6",
-    "padding-left-OrderedList": "$space-6",
-    "padding-left-ListItem": "$space-1",
+    "paddingLeft-UnorderedList": "$space-6",
+    "paddingLeft-OrderedList": "$space-6",
+    "paddingLeft-ListItem": "$space-1",
     light: {
       // --- No light-specific theme vars
     },

@@ -980,11 +980,11 @@ test("paddingHorizontal", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-left", async ({ page }) => {
+test("paddingLeft", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "padding-left-Card": EXPECTED,
+      "paddingLeft-Card": EXPECTED,
     },
   });
   await expect(page.getByTestId("card")).not.toHaveCSS("padding-top", EXPECTED);
@@ -993,11 +993,11 @@ test("padding-left", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-right", async ({ page }) => {
+test("paddingRight", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "padding-right-Card": EXPECTED,
+      "paddingRight-Card": EXPECTED,
     },
   });
   await expect(page.getByTestId("card")).not.toHaveCSS("padding-top", EXPECTED);
@@ -1019,11 +1019,11 @@ test("paddingVertical", async ({ page }) => {
   await expect(page.getByTestId("card")).not.toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-top", async ({ page }) => {
+test("paddingTop", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "padding-top-Card": EXPECTED,
+      "paddingTop-Card": EXPECTED,
     },
   });
   await expect(page.getByTestId("card")).toHaveCSS("padding-top", EXPECTED);
@@ -1032,11 +1032,11 @@ test("padding-top", async ({ page }) => {
   await expect(page.getByTestId("card")).not.toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-bottom", async ({ page }) => {
+test("paddingBottom", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "padding-bottom-Card": EXPECTED,
+      "paddingBottom-Card": EXPECTED,
     },
   });
   await expect(page.getByTestId("card")).not.toHaveCSS("padding-top", EXPECTED);
@@ -1060,13 +1060,13 @@ test("padding, paddingHorizontal", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("padding-left", UPDATED);
 });
 
-test("padding, padding-left", async ({ page }) => {
+test("padding, paddingLeft", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
       "padding-Card": EXPECTED,
-      "padding-left-Card": UPDATED,
+      "paddingLeft-Card": UPDATED,
     },
   });
   await expect(page.getByTestId("card")).toHaveCSS("padding-top", EXPECTED);
@@ -1075,13 +1075,13 @@ test("padding, padding-left", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("padding-left", UPDATED);
 });
 
-test("padding, padding-right", async ({ page }) => {
+test("padding, paddingRight", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
       "padding-Card": EXPECTED,
-      "padding-right-Card": UPDATED,
+      "paddingRight-Card": UPDATED,
     },
   });
   await expect(page.getByTestId("card")).toHaveCSS("padding-top", EXPECTED);
@@ -1105,13 +1105,13 @@ test("padding, paddingVertical", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding, padding-top", async ({ page }) => {
+test("padding, paddingTop", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
       "padding-Card": EXPECTED,
-      "padding-top-Card": UPDATED,
+      "paddingTop-Card": UPDATED,
     },
   });
   await expect(page.getByTestId("card")).toHaveCSS("padding-top", UPDATED);
@@ -1120,13 +1120,13 @@ test("padding, padding-top", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding, padding-bottom", async ({ page }) => {
+test("padding, paddingBottom", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
       "padding-Card": EXPECTED,
-      "padding-bottom-Card": UPDATED,
+      "paddingBottom-Card": UPDATED,
     },
   });
   await expect(page.getByTestId("card")).toHaveCSS("padding-top", EXPECTED);
@@ -1135,11 +1135,11 @@ test("padding, padding-bottom", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("radius", async ({ page }) => {
+test("borderRadius", async ({ page }) => {
   const EXPECTED = "10px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "radius-Card": EXPECTED,
+      "borderRadius-Card": EXPECTED,
     },
   });
   await expect(page.getByTestId("card")).toHaveCSS("border-radius", EXPECTED);

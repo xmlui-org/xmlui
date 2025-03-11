@@ -113,7 +113,7 @@ When you define theme variables, you can separate tone-independent values from t
 {
   "themeVars": {
     "fontSize-MyComponent": "2rem",
-    "radius-MyComponent": "8px",
+    "borderRadius-MyComponent": "8px",
     "style-border-MyComponent": "solid",
     "light": {
       "color-bg-MyComponent": "white",
@@ -193,9 +193,9 @@ The next sample demonstrates that you can use the `tone` property of `Theme` to 
 
 In addition to theme IDs and tones, you can modify particular theme variables, as the following sample demonstrates:
 
-```ueml copy /color-text-primary="orangered"/ /radius-Card="40px"/ /color-text-primary="mediumpurple"/
+```ueml copy /color-text-primary="orangered"/ /borderRadius-Card="40px"/ /color-text-primary="mediumpurple"/
 <App>
-  <Theme color-text-primary="orangered" radius-Card="40px">
+  <Theme color-text-primary="orangered" borderRadius-Card="40px">
     <Card title="Card with custom text color and border radius" />
   </Theme>
   <Theme tone="dark" color-text-primary="mediumpurple">
@@ -209,7 +209,7 @@ In addition to theme IDs and tones, you can modify particular theme variables, a
     name="Theme component with modified theme variables"
     app={`
     <App>
-      <Theme color-text-primary="orangered" radius-Card="40px">
+      <Theme color-text-primary="orangered" borderRadius-Card="40px">
         <Card title="Card with custom text color and border radius" />
       </Theme>
       <Theme tone="dark" color-text-primary="mediumpurple">
@@ -261,7 +261,7 @@ Create a new theme named "my-brand" and save it into the `themes/my-brand.json` 
     "fontSize": "1.2rem",
     "fontFamily-Heading": "sans-serif",
     "fontWeight-H1": "fontWeight-medium",
-    "radius": "8px",
+    "borderRadius": "8px",
     "light": {
       "color-primary": "purple",
       "color-text": "black"
@@ -314,7 +314,7 @@ Now, your new theme displays the app in a light tone like this:
                 "fontSize": "1.2rem",
                 "fontFamily-Heading": "sans-serif",
                 "fontWeight-H1": "fontWeight-medium",
-                radius: "8px",
+                borderRadius: "8px",
                 "color-text": "black",
                 "color-primary": "purple",
             },
@@ -348,7 +348,7 @@ It also handles the dark tone:
                 "fontSize": "1.2rem",
                 "fontFamily-Heading": "sans-serif",
                 "fontWeight-H1": "fontWeight-medium",
-                radius: "8px",
+                borderRadius: "8px",
                 "color-text": "white",
                 "color-primary": "mediumpurple",
             },
@@ -688,8 +688,8 @@ The `<propertyName>` segment should use lowercase letters and dashes.
         "id": "rounded",
         "name": "Rounded theme",
         "themeVars": {
-          "radius-TextBox": "160px",
-          "radius-NumberBox": "160px"
+          "borderRadius-TextBox": "160px",
+          "borderRadius-NumberBox": "160px"
       }
     }
     ```
@@ -707,8 +707,8 @@ The `<propertyName>` segment should use lowercase letters and dashes.
                 name: "Rounded",
                 id: "rounded",
                 themeVars: {
-                    "radius-TextBox": "160px",
-                    "radius-NumberBox": "160px",
+                    "borderRadius-TextBox": "160px",
+                    "borderRadius-NumberBox": "160px",
                 },
             },
         ]}
@@ -719,7 +719,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     the border rounding of two components in the previous sample.
 
     What if you intend to change the rounding of ten input component types? Following the pattern above, you would endup
-    with a theme with ten different `radius-
+    with a theme with different `borderRadius-
 <component-name>` theme variables.
 
     XMLUI provides a faster way to do this. Define the theme like this:
@@ -729,7 +729,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
         "id": "rounded",
         "name": "Rounded theme",
         "themeVars": {
-          "radius-Input": "160px",
+          "borderRadius-Input": "160px",
           "color-bg-Input": "papayawhip"
         }
     }
@@ -748,14 +748,14 @@ The `<propertyName>` segment should use lowercase letters and dashes.
                 name: "Rounded",
                 id: "rounded",
                 themeVars: {
-                    "radius-Input": "160px",
+                    "borderRadius-Input": "160px",
                     "color-bg-Input": "papayawhip",
                 },
             },
         ]}
     />
 
-    The key to this behavior is the `Input` component name within the `radius-Input` and `color-bg-Input` variable
+    The key to this behavior is the `Input` component name within the `borderRadius-Input` and `color-bg-Input` variable
     names.
 
     There is no `Input` component. `Input` is just an abstract *theme class name* used from theming. The `TextBox`,
@@ -765,9 +765,9 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     For example, the border rounding-related theme variable chain is the following for the `TextBox`:
 
     ```text
-    radius
-    radius-Input
-    radius-TextBox
+    borderRadius
+    borderRadius-Input
+    borderRadius-TextBox
     ```
 
     <Callout type="info" emoji="📔">
