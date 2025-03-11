@@ -1,10 +1,6 @@
 import "../styles/global.scss";
 import localFont from "next/font/local";
 import { ApiWorkerContextProvider } from "../src/components/ApiWorkerContext";
-import { createContext, useContext } from "react";
-import { StandaloneExtensionManager } from "xmlui";
-import charts from "xmlui-charts";
-import animations from "xmlui-animations";
 
 const myInter = localFont({
   src: [
@@ -101,26 +97,13 @@ const myInter = localFont({
   ],
 });
 
-export const ExtensionContext = createContext({
-  extensionManager: null,
-});
-
-export function useExtensionContext() {
-  return useContext(ExtensionContext);
-}
-
 export default function App({ Component, pageProps }) {
-  const extensionManager = new StandaloneExtensionManager();
-  extensionManager.registerExtension(charts);
-  extensionManager.registerExtension(animations);
 
   return (
-    <ExtensionContext.Provider value={{ extensionManager }}>
       <ApiWorkerContextProvider>
         <main className={myInter.className}>
           <Component {...pageProps} />
         </main>
       </ApiWorkerContextProvider>
-    </ExtensionContext.Provider>
   );
 }
