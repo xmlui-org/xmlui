@@ -1,11 +1,12 @@
-import { CSSProperties, Fragment, ReactNode } from "react";
 import React, {
   createContext,
+  CSSProperties,
   forwardRef,
+  Fragment,
+  ReactNode,
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -25,7 +26,7 @@ import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
 import { Card } from "../Card/CardNative";
 import type { CustomItemComponentProps, VListHandle } from "virtua";
 import { Virtualizer } from "virtua";
-import { usePrevious } from "../../components-core/utils/hooks";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { ScrollContext } from "../../components-core/ScrollContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
@@ -291,6 +292,9 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const scrollRef = useContext(ScrollContext);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
+  const offsetsRef = useRef({
+    offsetTop: 0,
+  });
 
   const hasOutsideScroll =
     scrollRef &&
@@ -421,13 +425,19 @@ export const ListNative = forwardRef(function DynamicHeightList(
   });
 
   const scrollToTop = useEvent(() => {
+    const scrollPaddingTop =
+      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     if (rows.length) {
-      virtualizerRef.current?.scrollToIndex(0);
+      virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -scrollPaddingTop });
     }
   });
 
   const scrollToIndex = useEvent((index) => {
-    virtualizerRef.current?.scrollToIndex(index);
+    const scrollPaddingTop =
+      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
+    virtualizerRef.current?.scrollToIndex(index, {
+      offset: -scrollPaddingTop,
+    });
   });
 
   const scrollToId = useEvent((id) => {
@@ -437,7 +447,15 @@ export const ListNative = forwardRef(function DynamicHeightList(
     }
   });
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
+    if (parentRef.current && hasOutsideScroll && scrollRef.current) {
+      offsetsRef.current.offsetTop =
+        parentRef.current.getBoundingClientRect().top -
+        scrollRef.current.getBoundingClientRect().top;
+    }
+  }, [hasOutsideScroll]);
+
+  useIsomorphicLayoutEffect(() => {
     registerComponentApi?.({
       scrollToBottom,
       scrollToTop,
@@ -483,7 +501,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 scrollRef={scrollElementRef}
                 shift={shift}
                 onScroll={onScroll}
-                startMargin={!hasOutsideScroll ? 0 : parentRef.current?.offsetTop || 0}
+                startMargin={offsetsRef.current.offsetTop}
                 item={Item as CustomItemComponent}
                 count={rows.length ?? 0}
               >
