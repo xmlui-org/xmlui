@@ -1,6 +1,26 @@
 import { expect, test } from "../../testing/fixtures";
 import { TextVariantElement } from "../abstractions";
 
+// These are the html elements that are rendered using Text in their respective HtmlTag components
+const textVariantElements = [
+  "abbr",
+  "cite",
+  "code",
+  "del",
+  "em",
+  "ins",
+  "kbd",
+  "mark",
+  "p",
+  "pre",
+  "samp",
+  "small",
+  "strong",
+  "sub",
+  "sup",
+  "var",
+] as const;
+
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("component renders", async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`<Text />`);
@@ -285,4 +305,17 @@ test("Text overflows container dimensions", async ({
 
   expect(widthText).toEqual(widthTextExpected);
   expect(widthLayout).toEqual(widthLayoutExpected);
+});
+
+textVariantElements.forEach((htmlElement) => {
+  test(`HtmlTag '${htmlElement}' accepts custom props`, async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
+    await initTestBed(`<${htmlElement} custom="test" boolean>Test</${htmlElement}>`);
+    const driver = await createTextDriver();
+
+    await expect(driver.component).toHaveAttribute("custom", "test");
+    await expect(driver.component).toHaveAttribute("boolean", "true");
+  });
 });
