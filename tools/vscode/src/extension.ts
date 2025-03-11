@@ -11,7 +11,7 @@ import {
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
-  const serverModule = getPathToLangServer();
+  const serverModule = getPathToLangServer(context);
 
 	// If the extension is launched in debug mode then the debug server options are used
 	// Otherwise the run options are used
@@ -47,10 +47,11 @@ export function deactivate(): Thenable<void> | undefined {
 	return client.stop();
 }
 
-function getPathToLangServer() {
+function getPathToLangServer(context: ExtensionContext) {
   const localLangServPath = null;
   if (!localLangServPath){
-    const bundledLangServPath = path.normalize(require.resolve('xmlui/xmlui-language-server'));
+    const bundledLangServPath = context.asAbsolutePath(path.join('dist', 'server.js'));
+    console.log({ bundledLangServPath });
     return bundledLangServPath;
   }
   return localLangServPath;

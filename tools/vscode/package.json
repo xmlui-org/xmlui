@@ -1,5 +1,5 @@
 {
-  "name": "xmlui-lang",
+  "name": "xmlui-vscode",
   "description": "VSCode language support for XMLUI language",
   "author": "Norbert Hajagos",
   "publisher": "norbidotdev",
@@ -17,7 +17,10 @@
   "activationEvents": [
     "onLanguage:xmlui"
   ],
-  "main": "./out/extension",
+  "vsce": {
+    "dependencies": false
+  },
+  "main": "./dist/extension",
   "contributes": {
     "configuration": {
       "type": "object",
@@ -71,15 +74,18 @@
   },
   "scripts": {
     "create:package": "vsce package",
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -b",
-    "watch": "tsc -b -w",
-    "lint": "eslint",
-    "test": "sh ./scripts/e2e.sh"
+    "vscode:prepublish": "npm run bundle",
+    "bundle": "node esbuild.js --production",
+    "bundle:checking-turned-off-temporarily": "npm run check-types && npm run bundle",
+    "compile": "npm run check-types && node esbuild.js",
+    "check-types": "tsc --noEmit",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json"
   },
   "dependencies": {
-    "xmlui": "*",
-    "vscode-languageclient": "^9.0.1"
+    "vscode-languageclient": "^9.0.1",
+    "xmlui": "*"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -89,8 +95,10 @@
     "@types/vscode": "^1.75.1",
     "@vscode/test-electron": "^2.3.9",
     "@vscode/vsce": "^3.2.2",
+    "esbuild": "^0.25.1",
     "eslint": "^9.13.0",
     "mocha": "^10.3.0",
+    "npm-run-all": "^4.1.5",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.16.0"
   }
