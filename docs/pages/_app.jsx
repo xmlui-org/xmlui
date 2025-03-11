@@ -3,8 +3,6 @@ import localFont from "next/font/local";
 import { ApiWorkerContextProvider } from "../src/components/ApiWorkerContext";
 import { createContext, useContext } from "react";
 import { StandaloneExtensionManager } from "xmlui";
-import charts from "xmlui-charts";
-import animations from "xmlui-animations";
 
 const myInter = localFont({
   src: [
@@ -111,8 +109,6 @@ export function useExtensionContext() {
 
 export default function App({ Component, pageProps }) {
   const extensionManager = new StandaloneExtensionManager();
-  extensionManager.registerExtension(charts);
-  extensionManager.registerExtension(animations);
 
   return (
     <ExtensionContext.Provider value={{ extensionManager }}>
@@ -124,3 +120,4 @@ export default function App({ Component, pageProps }) {
     </ExtensionContext.Provider>
   );
 }
+
