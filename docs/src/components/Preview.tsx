@@ -21,7 +21,7 @@ export function Preview() {
   const contentRootRef = useRef<Root | null>(null);
   const { appDescription, options, playgroundId } = usePlayground();
   const apiUrl = `/${playgroundId.replaceAll(":", "")}`;
-  const extensionManager = new StandaloneExtensionManager();
+  const extensionManager = useMemo(() => new StandaloneExtensionManager(), []);
 
   extensionManager.registerExtension(charts);
   extensionManager.registerExtension(animations);
