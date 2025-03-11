@@ -120,3 +120,4 @@ export default function App({ Component, pageProps }) {
     </ExtensionContext.Provider>
   );
 }
+
