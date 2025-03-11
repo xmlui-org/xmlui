@@ -580,12 +580,12 @@ For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\
 
 The `Select` component uses these theme variables:
 
-- `min-height-Select`
+- `minHeight-Select`
 
 These variables have 4 variants depending on the [validationStatus](#validationstatus) denoted by `|status|`.
 If the status segment is omitted, the style will be applied to all statuses.
 
-- `radius-Select-|status|`
+- `borderRadius-Select-|status|`
 - `fontSize-Select-|status|`
 - `color-placeholder-Select-|status|`
 - `thickness-border-Select-|status|`
@@ -596,7 +596,7 @@ If the status segment is omitted, the style will be applied to all statuses.
 - `outlineOffset-Select-|status|--focus`
 
 ```json copy
-"radius-Select-default": "10px",
+"borderRadius-Select-default": "10px",
 "color-placeholder-Select-error": "crimson"
 ```
 
@@ -617,7 +617,7 @@ Theme variables to set the dropdown menu styles:
 
 - `color-bg-menu-Select`
 - `boxShadow-menu-Select`
-- `radius-menu-Select`
+- `borderRadius-menu-Select`
 - `color-text-indicator-Select`
 
 Theme variables to set the selection styles in a dropdown menu:
@@ -638,7 +638,7 @@ Theme variables to set the styles of an unselected item:
   "id": "custom",
   "name": "Custom Theme",
   "themeVars": {
-    "radius-Select": "30px",
+    "borderRadius-Select": "30px",
     "color-placeholder-Select": "red",
     "thickness-border-Select": "4px"
   }
@@ -654,7 +654,7 @@ Theme variables to set the styles of an unselected item:
             id: "custom",
             name: "Custom Theme",
             themeVars: {
-                "radius-Select": "30px",
+                "borderRadius-Select": "30px",
                 "color-placeholder-Select": "red",
                 "thickness-border-Select": "4px",
             },

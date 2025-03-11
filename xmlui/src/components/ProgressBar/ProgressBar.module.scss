@@ -9,14 +9,14 @@ $themeVars: ();
 
 $color-bg-ProgressBar: createThemeVar("color-bg-ProgressBar");
 $color-indicator-ProgressBar: createThemeVar("color-indicator-ProgressBar");
-$radius-ProgressBar: createThemeVar("radius-ProgressBar");
-$radius-indicator-ProgressBar: createThemeVar("radius-indicator-ProgressBar");
+$borderRadius-ProgressBar: createThemeVar("borderRadius-ProgressBar");
+$borderRadius-indicator-ProgressBar: createThemeVar("borderRadius-indicator-ProgressBar");
 $thickness-ProgressBar: createThemeVar("thickness-ProgressBar");
 
 .wrapper {
   width: 100%;
   background-color: $color-bg-ProgressBar;
-  border-radius: $radius-ProgressBar;
+  border-radius: $borderRadius-ProgressBar;
   overflow: hidden;
   position: relative;
   height: $thickness-ProgressBar;
@@ -25,7 +25,7 @@ $thickness-ProgressBar: createThemeVar("thickness-ProgressBar");
 .bar {
   position: absolute;
   background-color: $color-indicator-ProgressBar;
-  border-radius: $radius-indicator-ProgressBar;
+  border-radius: $borderRadius-indicator-ProgressBar;
   left: 0;
   top: 0;
   bottom: 0;

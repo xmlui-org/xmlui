@@ -342,20 +342,20 @@ $THEME-VAR-PREFIX: xmlui;
   $tmpHorizontal: getThemeVar($tmp, "paddingHorizontal-#{$subject}");
   $tmp: appendThemeVarWithDefault($tmp, "paddingVertical-#{$subject}", $tmpAll) !global;
   $tmpVertical: getThemeVar($tmp, "paddingVertical-#{$subject}");
-  $tmp: appendThemeVarWithDefault($tmp, "padding-left-#{$subject}", $tmpHorizontal) !global;
-  $tmp: appendThemeVarWithDefault($tmp, "padding-right-#{$subject}", $tmpHorizontal) !global;
-  $tmp: appendThemeVarWithDefault($tmp, "padding-top-#{$subject}", $tmpVertical) !global;
-  $tmp: appendThemeVarWithDefault($tmp, "padding-bottom-#{$subject}", $tmpVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "paddingLeft-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "paddingRight-#{$subject}", $tmpHorizontal) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "paddingTop-#{$subject}", $tmpVertical) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "paddingBottom-#{$subject}", $tmpVertical) !global;
   @return $tmp;
 }
 
 // This mixin applies padding variables to a given subject
 @mixin paddingVars($themeVars, $subject) {
   padding: getThemeVar($themeVars, "padding-#{$subject}");
-  padding-left: getThemeVar($themeVars, "padding-left-#{$subject}");
-  padding-right: getThemeVar($themeVars, "padding-right-#{$subject}");
-  padding-top: getThemeVar($themeVars, "padding-top-#{$subject}");
-  padding-bottom: getThemeVar($themeVars, "padding-bottom-#{$subject}");
+  padding-left: getThemeVar($themeVars, "paddingLeft-#{$subject}");
+  padding-right: getThemeVar($themeVars, "paddingRight-#{$subject}");
+  padding-top: getThemeVar($themeVars, "paddingTop-#{$subject}");
+  padding-bottom: getThemeVar($themeVars, "paddingBottom-#{$subject}");
 }
 
 // This function composes padding variables for a given subject taking into 
@@ -405,8 +405,8 @@ $THEME-VAR-PREFIX: xmlui;
   $tmp: appendThemeVarWithDefault($tmp, "color-border-top-#{$subject}", $tmpColorVertical) !global;
   $tmp: appendThemeVarWithDefault($tmp, "color-border-bottom-#{$subject}", $tmpColorVertical) !global;
   
-  $tmpRadius: appendThemeVar($tmp, "radius-#{$subject}") !global;
-  $tmpRadiusAll: getThemeVar($tmpRadius, "radius-#{$subject}") !global;
+  $tmpRadius: appendThemeVar($tmp, "borderRadius-#{$subject}") !global;
+  $tmpRadiusAll: getThemeVar($tmpRadius, "borderRadius-#{$subject}") !global;
   $tmp: appendThemeVarWithDefault($tmp, "radius-start-start-#{$subject}", $tmpRadiusAll) !global;
   $tmp: appendThemeVarWithDefault($tmp, "radius-start-end-#{$subject}", $tmpRadiusAll) !global;
   $tmp: appendThemeVarWithDefault($tmp, "radius-end-start-#{$subject}", $tmpRadiusAll) !global;
@@ -433,7 +433,7 @@ $THEME-VAR-PREFIX: xmlui;
   border-right-color: getThemeVar($themeVars, "color-border-right-#{$subject}");
   border-top-color: getThemeVar($themeVars, "color-border-top-#{$subject}");
   border-bottom-color: getThemeVar($themeVars, "color-border-bottom-#{$subject}");
-  border-radius: getThemeVar($themeVars, "radius-#{$subject}");
+  border-radius: getThemeVar($themeVars, "borderRadius-#{$subject}");
   border-start-start-radius: getThemeVar($themeVars, "radius-start-start-#{$subject}");
   border-start-end-radius: getThemeVar($themeVars, "radius-start-end-#{$subject}");
   border-end-start-radius: getThemeVar($themeVars, "radius-end-start-#{$subject}");
@@ -577,7 +577,7 @@ $fontWeight-normal: createVar(fontWeight-normal);
 $fontWeight-medium: createVar(fontWeight-medium);
 $fontWeight-bold: createVar(fontWeight-bold);
 
-$radius: createVar(radius);
+$borderRadius: createVar(radius);
 
 // body
 $fontSize: createVar(fontSize);

@@ -60,7 +60,7 @@ export const NavLinkMd = createMetadata({
   },
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $color-border",
-    [`radius-${COMP}`]: "$radius",
+    [`borderRadius-${COMP}`]: "$borderRadius",
     [`color-bg-${COMP}`]: "transparent",
     [`paddingHorizontal-${COMP}`]: "$space-4",
     [`paddingVertical-${COMP}`]: "$space-2",
@@ -75,7 +75,7 @@ export const NavLinkMd = createMetadata({
     [`outlineWidth-${COMP}--focus`]: "$outlineWidth--focus",
     [`outlineStyle-${COMP}--focus`]: "$outlineStyle--focus",
     [`outlineOffset-${COMP}--focus`]: "-1px",
-    [`radius-indicator-${COMP}`]: "$radius",
+    [`borderRadius-indicator-${COMP}`]: "$borderRadius",
 
     light: {
       [`color-icon-${COMP}`]: "$color-surface-500",

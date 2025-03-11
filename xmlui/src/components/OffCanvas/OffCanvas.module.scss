@@ -15,7 +15,7 @@ $boxShadow-vertical-OffCanvas: createThemeVar("boxShadow-vertical-#{$component}"
 $boxShadow-horizontal-OffCanvas: createThemeVar("boxShadow-horizontal-#{$component}");
 $color-bg-OffCanvas: createThemeVar("color-bg-#{$component}");
 $width-OffCanvas: createThemeVar("width-#{$component}");
-$margin-bottom-title-OffCanvas: createThemeVar("margin-bottom-title-#{$component}");
+$marginBottom-title-OffCanvas: createThemeVar("marginBottom-title-#{$component}");
 
 .overlay {
   position: fixed;
@@ -113,7 +113,7 @@ $margin-bottom-title-OffCanvas: createThemeVar("margin-bottom-title-#{$component
   display: flex;
   flex: 1;
   flex-direction: row;
-  margin-bottom: $margin-bottom-title-OffCanvas;
+  margin-bottom: $marginBottom-title-OffCanvas;
 }
 
 .offCanvasButtonSpace {
@@ -122,7 +122,7 @@ $margin-bottom-title-OffCanvas: createThemeVar("margin-bottom-title-#{$component
 
 .offCanvasTitle {
   flex: 1;
-  margin-bottom: $margin-bottom-title-OffCanvas;
+  margin-bottom: $marginBottom-title-OffCanvas;
   font-size: t.$fontSize-large;
 }
 

@@ -150,24 +150,24 @@ export function AppContent({
   // --- Whenever the application root DOM object or the active theme changes, we sync
   // --- with the theme variable values (because we can't use css var in media queries)
   useIsomorphicLayoutEffect(() => {
-    const mwPhone = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-phone"));
+    const mwPhone = getComputedStyle(root!).getPropertyValue(getVarKey("media-maxWidth-phone"));
     setMaxWidthPhone(mwPhone);
     setMaxWidthPhoneLower(createLowerDimensionValue(mwPhone));
     const mwLandscapePhone = getComputedStyle(root!).getPropertyValue(
-      getVarKey("media-max-width-landscape-phone"),
+      getVarKey("media-maxWidth-landscape-phone"),
     );
     setMaxWidthLandscapePhone(mwLandscapePhone);
     setMaxWidthLandscapePhoneLower(createLowerDimensionValue(mwLandscapePhone));
-    const mwTablet = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-tablet"));
+    const mwTablet = getComputedStyle(root!).getPropertyValue(getVarKey("media-maxWidth-tablet"));
     setMaxWidthTablet(mwTablet);
     setMaxWidthTabletLower(createLowerDimensionValue(mwTablet));
     const mwDesktop = getComputedStyle(root!).getPropertyValue(
-      getVarKey("media-max-width-desktop"),
+      getVarKey("media-maxWidth-desktop"),
     );
     setMaxWidthDesktop(mwDesktop);
     setMaxWidthDesktopLower(createLowerDimensionValue(mwDesktop));
     const mwLargeDesktop = getComputedStyle(root!).getPropertyValue(
-      getVarKey("media-max-width-large-desktop"),
+      getVarKey("media-maxWidth-large-desktop"),
     );
     setMaxWidthLargeDesktop(mwLargeDesktop);
     setMaxWidthLargeDesktopLower(createLowerDimensionValue(mwLargeDesktop));

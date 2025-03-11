@@ -54,17 +54,17 @@ test(`onClick event`, async ({ page }) => {
   await expect(page.getByText(EXPECTED_TEXT)).toBeVisible();
 });
 
-test(`custom themeVar radius`, async ({ page }) => {
+test(`custom themeVar borderRadius`, async ({ page }) => {
   const EXPECTED_RADIUS = "25px";
   const entryPoint = `
     <HStack width="100px" gap="1rem" verticalAlignment="center">   
-      <Image onClick="showTestText = true" testId="img" src="${SRC_IMG}" radius="$radius-MyImage"/>
+      <Image onClick="showTestText = true" testId="img" src="${SRC_IMG}" borderRadius="$borderRadius-MyImage"/>
     </HStack>
     `;
 
   await initThemedApp(page, entryPoint, {
     themeVars: {
-      "radius-MyImage": EXPECTED_RADIUS,
+      "borderRadius-MyImage": EXPECTED_RADIUS,
     },
   });
 

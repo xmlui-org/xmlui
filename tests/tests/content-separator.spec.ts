@@ -153,7 +153,7 @@ test(`theme: color-bg`, async ({ page }) => {
     page,
     `<Stack gap="0.5rem">
       <HStack>
-        <ContentSeparator testId="separator1" size="8px" radius="5px"/>
+        <ContentSeparator testId="separator1" size="8px" borderRadius="5px"/>
       </HStack>
       <HStack height="48px" horizontalAlignment="center">
         <ContentSeparator testId="separator2" orientation="vertical" size="8px"/>

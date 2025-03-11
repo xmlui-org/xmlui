@@ -51,10 +51,10 @@ const testDescriptors: TestDescriptor[] = [
     override2Value: "3px solid green",
   },
   {
-    category: "radius",
-    props: ["radius", "radiusTopLeft", "radiusTopRight", "radiusBottomRight", "radiusBottomLeft"],
+    category: "borderRadius",
+    props: ["borderRadius", "radiusTopLeft", "radiusTopRight", "radiusBottomRight", "radiusBottomLeft"],
     cssProps: {
-      radius: "borderRadius",
+      borderRadius: "borderRadius",
       radiusTopLeft: "borderTopLeftRadius",
       radiusTopRight: "borderTopRightRadius",
       radiusBottomRight: "borderBottomRightRadius",

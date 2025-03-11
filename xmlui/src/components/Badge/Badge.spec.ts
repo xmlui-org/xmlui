@@ -1053,11 +1053,11 @@ test("paddingHorizontal", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-left", async ({ page }) => {
+test("paddingLeft", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
-      "padding-left-Badge": EXPECTED,
+      "paddingLeft-Badge": EXPECTED,
     },
   });
   await expect(page.getByTestId("badge")).not.toHaveCSS("padding-top", EXPECTED);
@@ -1066,11 +1066,11 @@ test("padding-left", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-right", async ({ page }) => {
+test("paddingRight", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
-      "padding-right-Badge": EXPECTED,
+      "paddingRight-Badge": EXPECTED,
     },
   });
   await expect(page.getByTestId("badge")).not.toHaveCSS("padding-top", EXPECTED);
@@ -1092,11 +1092,11 @@ test("paddingVertical", async ({ page }) => {
   await expect(page.getByTestId("badge")).not.toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-top", async ({ page }) => {
+test("paddingTop", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
-      "padding-top-Badge": EXPECTED,
+      "paddingTop-Badge": EXPECTED,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("padding-top", EXPECTED);
@@ -1105,11 +1105,11 @@ test("padding-top", async ({ page }) => {
   await expect(page.getByTestId("badge")).not.toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding-bottom", async ({ page }) => {
+test("paddingBottom", async ({ page }) => {
   const EXPECTED = "100px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
-      "padding-bottom-Badge": EXPECTED,
+      "paddingBottom-Badge": EXPECTED,
     },
   });
   await expect(page.getByTestId("badge")).not.toHaveCSS("padding-top", EXPECTED);
@@ -1133,13 +1133,13 @@ test("padding, paddingHorizontal", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("padding-left", UPDATED);
 });
 
-test("padding, padding-left", async ({ page }) => {
+test("padding, paddingLeft", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
       "padding-Badge": EXPECTED,
-      "padding-left-Badge": UPDATED,
+      "paddingLeft-Badge": UPDATED,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("padding-top", EXPECTED);
@@ -1148,13 +1148,13 @@ test("padding, padding-left", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("padding-left", UPDATED);
 });
 
-test("padding, padding-right", async ({ page }) => {
+test("padding, paddingRight", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
       "padding-Badge": EXPECTED,
-      "padding-right-Badge": UPDATED,
+      "paddingRight-Badge": UPDATED,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("padding-top", EXPECTED);
@@ -1178,13 +1178,13 @@ test("padding, paddingVertical", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding, padding-top", async ({ page }) => {
+test("padding, paddingTop", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
       "padding-Badge": EXPECTED,
-      "padding-top-Badge": UPDATED,
+      "paddingTop-Badge": UPDATED,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("padding-top", UPDATED);
@@ -1193,13 +1193,13 @@ test("padding, padding-top", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding, padding-bottom", async ({ page }) => {
+test("padding, paddingBottom", async ({ page }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
       "padding-Badge": EXPECTED,
-      "padding-bottom-Badge": UPDATED,
+      "paddingBottom-Badge": UPDATED,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("padding-top", EXPECTED);

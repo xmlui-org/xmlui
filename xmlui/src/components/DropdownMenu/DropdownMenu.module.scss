@@ -8,7 +8,7 @@ $themeVars: ();
 }
 
 $color-bg-DropdownMenu: createThemeVar("color-bg-DropdownMenu");
-$radius-DropdownMenu: createThemeVar("radius-DropdownMenu");
+$borderRadius-DropdownMenu: createThemeVar("borderRadius-DropdownMenu");
 $boxShadow-DropdownMenu: createThemeVar("boxShadow-DropdownMenu");
 $color-border-DropdownMenu-content: createThemeVar(
   "color-border-DropdownMenu-content"
@@ -19,7 +19,7 @@ $thickness-border-DropdownMenu-content: createThemeVar(
 $style-border-DropdownMenu-content: createThemeVar(
   "style-border-DropdownMenu-content"
 );
-$min-width-DropdowMenu: createThemeVar("min-width-DropdownMenu");
+$minWidth-DropdowMenu: createThemeVar("minWidth-DropdownMenu");
 $color-bg-MenuItem: createThemeVar("color-bg-MenuItem");
 $color-MenuItem: createThemeVar("color-MenuItem");
 $fontFamily-MenuItem: createThemeVar("fontFamily-MenuItem");
@@ -33,8 +33,8 @@ $color-bg-MenuItem--active--hover: createThemeVar("color-bg-MenuItem--active--ho
 $color-MenuItem--hover: createThemeVar("color-MenuItem--hover");
 $color-MenuItem--active: createThemeVar("color-MenuItem--active");
 $color-MenuItem--active--hover: createThemeVar("color-MenuItem--active--hover");
-$margin-top-MenuSeparator: createThemeVar("margin-top-MenuSeparator");
-$margin-bottom-MenuSeparator: createThemeVar("margin-bottom-MenuSeparator");
+$marginTop-MenuSeparator: createThemeVar("marginTop-MenuSeparator");
+$marginBottom-MenuSeparator: createThemeVar("marginBottom-MenuSeparator");
 $width-MenuSeparator: createThemeVar("width-MenuSeparator");
 $height-MenuSeparator: createThemeVar("height-MenuSeparator");
 $color-MenuSeparator: createThemeVar("color-MenuSeparator");
@@ -42,8 +42,8 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
 .DropdownMenuContent,
 .DropdownMenuSubContent {
   background-color: $color-bg-DropdownMenu;
-  border-radius: $radius-DropdownMenu;
-  min-width: $min-width-DropdowMenu;
+  border-radius: $borderRadius-DropdownMenu;
+  min-width: $minWidth-DropdowMenu;
   box-shadow: $boxShadow-DropdownMenu;
   overflow: hidden;
   animation-duration: 400ms;
@@ -93,8 +93,8 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
 }
 
 .DropdownMenuSeparator {
-  margin-top: $margin-top-MenuSeparator;
-  margin-bottom: $margin-bottom-MenuSeparator;
+  margin-top: $marginTop-MenuSeparator;
+  margin-bottom: $marginBottom-MenuSeparator;
   width: $width-MenuSeparator;
   height: $height-MenuSeparator;
   background-color: $color-MenuSeparator;

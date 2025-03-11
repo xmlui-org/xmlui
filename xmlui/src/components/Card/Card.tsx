@@ -51,7 +51,7 @@ export const CardMd = createMetadata({
   defaultThemeVars: {
     [`padding-${COMP}`]: "$space-4",
     [`border-${COMP}`]: "1px solid $color-border",
-    [`radius-${COMP}`]: "$radius",
+    [`borderRadius-${COMP}`]: "$borderRadius",
     [`boxShadow-${COMP}`]: "none",
     light: {
       [`color-bg-${COMP}`]: "white",

@@ -18,8 +18,8 @@ export const ProgressBarMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`radius-${COMP}`]: "$radius",
-    [`radius-indicator-${COMP}`]: "0px",
+    [`borderRadius-${COMP}`]: "$borderRadius",
+    [`borderRadius-indicator-${COMP}`]: "0px",
     [`thickness-${COMP}`]: "$space-2",
     light: {
       [`color-bg-${COMP}`]: "$color-surface-200",

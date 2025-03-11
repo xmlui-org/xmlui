@@ -9,7 +9,7 @@ export const SolidThemeDefinition: ThemeDefinition = {
     "color-success": "#45a249",
     "max-content-width": "100%",
 
-    radius: "0",
+    borderRadius: "0",
     "fontSize": "$fontSize-normal",
     "size-Icon": "1rem",
   }

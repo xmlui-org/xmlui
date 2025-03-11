@@ -32,7 +32,7 @@ export const AvatarMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`radius-${COMP}`]: "4px",
+    [`borderRadius-${COMP}`]: "4px",
     [`boxShadow-${COMP}`]: "inset 0 0 0 1px rgba(4,32,69,0.1)",
     [`color-text-${COMP}`]: "$color-text-secondary",
     [`fontWeight-${COMP}`]: "$fontWeight-bold",

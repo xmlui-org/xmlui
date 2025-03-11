@@ -16,8 +16,8 @@ $fontFamily-HtmlTable: createThemeVarTable("fontFamily-HtmlTable");
 $fontSize-HtmlTable: createThemeVarTable("fontSize-HtmlTable");
 $fontWeight-HtmlTable: createThemeVarTable("fontWeight-HtmlTable");
 $textTransform-HtmlTable: createThemeVarTable("textTransform-HtmlTable");
-$margin-top-HtmlTable: createThemeVarTable("margin-top-HtmlTable");
-$margin-bottom-HtmlTable: createThemeVarTable("margin-bottom-HtmlTable");
+$marginTop-HtmlTable: createThemeVarTable("marginTop-HtmlTable");
+$marginBottom-HtmlTable: createThemeVarTable("marginBottom-HtmlTable");
 $themeVarsTable: t.composeBorderVars($themeVarsTable, "HtmlTable");
 $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
 
@@ -28,8 +28,8 @@ $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
   font-size: $fontSize-HtmlTable;
   font-weight: $fontWeight-HtmlTable;
   text-transform: $textTransform-HtmlTable;
-  margin-top: $margin-top-HtmlTable;
-  margin-bottom: $margin-bottom-HtmlTable;
+  margin-top: $marginTop-HtmlTable;
+  margin-bottom: $marginBottom-HtmlTable;
   @include t.borderVars($themeVarsTable, "HtmlTable");
   @include t.paddingVars($themeVarsTable, "HtmlTable");
 }
@@ -215,19 +215,19 @@ $themeVarsList: (
   @return t.getThemeVar($themeVarsList, $componentVariable);
 }
 
-$margin-top-HtmlOl: createThemeVarList("margin-top-HtmlOl");
-$margin-bottom-HtmlOl: createThemeVarList("margin-bottom-HtmlOl");
-$margin-top-HtmlUl: createThemeVarList("margin-top-HtmlUl");
-$margin-bottom-HtmlUl: createThemeVarList("margin-bottom-HtmlUl");
+$marginTop-HtmlOl: createThemeVarList("marginTop-HtmlOl");
+$marginBottom-HtmlOl: createThemeVarList("marginBottom-HtmlOl");
+$marginTop-HtmlUl: createThemeVarList("marginTop-HtmlUl");
+$marginBottom-HtmlUl: createThemeVarList("marginBottom-HtmlUl");
 
 // Apply to both ul and ol elements
 .htmlUl {
-  margin-top: $margin-top-HtmlUl;
-  margin-bottom: $margin-bottom-HtmlUl;
+  margin-top: $marginTop-HtmlUl;
+  margin-bottom: $marginBottom-HtmlUl;
 }
 .htmlOl {
-  margin-top: $margin-top-HtmlOl;
-  margin-bottom: $margin-bottom-HtmlOl;
+  margin-top: $marginTop-HtmlOl;
+  margin-bottom: $marginBottom-HtmlOl;
 }
 
 li .htmlUl,
@@ -259,12 +259,12 @@ $themeVarsHeading: (
   @return t.getThemeVar($themeVarsHeading, $componentVariable);
 }
 
-$margin-top-HtmlHeading: createThemeVarHeading("margin-top-HtmlHeading");
-$margin-bottom-HtmlHeading: createThemeVarHeading("margin-bottom-HtmlHeading");
+$marginTop-HtmlHeading: createThemeVarHeading("marginTop-HtmlHeading");
+$marginBottom-HtmlHeading: createThemeVarHeading("marginBottom-HtmlHeading");
 
 .htmlH1, .htmlH2, .htmlH3, .htmlH4, .htmlH5, .htmlH6 {
-  margin-top: $margin-top-HtmlHeading;
-  margin-bottom: $margin-bottom-HtmlHeading;
+  margin-top: $marginTop-HtmlHeading;
+  margin-bottom: $marginBottom-HtmlHeading;
 }
 
 

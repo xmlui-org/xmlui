@@ -198,8 +198,8 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
     if (match) {
       // --- We have a paddingHorizontal value to segment
       const remainder = match[1];
-      result[`padding-left-${remainder}`] ??= value;
-      result[`padding-right-${remainder}`] ??= value;
+      result[`paddingLeft-${remainder}`] ??= value;
+      result[`paddingRight-${remainder}`] ??= value;
     }
 
     // --- Check the "paddingVertical" theme variables
@@ -207,8 +207,8 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
     if (match) {
       // --- We have a paddingVertical value to segment
       const remainder = match[1];
-      result[`padding-top-${remainder}`] ??= value;
-      result[`padding-bottom-${remainder}`] ??= value;
+      result[`paddingTop-${remainder}`] ??= value;
+      result[`paddingBottom-${remainder}`] ??= value;
     }
 
     // --- Check the "padding" theme variables
@@ -224,28 +224,28 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
     const segments = value.trim().replace(/ +/g, " ").split(" ");
     switch (segments.length) {
       case 1:
-        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
-        result[`padding-right-${remainder}`] ??= horizontal ?? segments[0];
-        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[0];
-        result[`padding-left-${remainder}`] ??= horizontal ?? segments[0];
+        result[`paddingTop-${remainder}`] ??= vertical ?? segments[0];
+        result[`paddingRight-${remainder}`] ??= horizontal ?? segments[0];
+        result[`paddingBottom-${remainder}`] ??= vertical ?? segments[0];
+        result[`paddingLeft-${remainder}`] ??= horizontal ?? segments[0];
         break;
       case 2:
-        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
-        result[`padding-right-${remainder}`] ??= horizontal ?? segments[1];
-        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[0];
-        result[`padding-left-${remainder}`] ??= horizontal ?? segments[1];
+        result[`paddingTop-${remainder}`] ??= vertical ?? segments[0];
+        result[`paddingRight-${remainder}`] ??= horizontal ?? segments[1];
+        result[`paddingBottom-${remainder}`] ??= vertical ?? segments[0];
+        result[`paddingLeft-${remainder}`] ??= horizontal ?? segments[1];
         break;
       case 3:
-        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
-        result[`padding-right-${remainder}`] ??= horizontal ?? segments[1];
-        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[2];
-        result[`padding-left-${remainder}`] ??= horizontal ?? segments[1];
+        result[`paddingTop-${remainder}`] ??= vertical ?? segments[0];
+        result[`paddingRight-${remainder}`] ??= horizontal ?? segments[1];
+        result[`paddingBottom-${remainder}`] ??= vertical ?? segments[2];
+        result[`paddingLeft-${remainder}`] ??= horizontal ?? segments[1];
         break;
       case 4:
-        result[`padding-top-${remainder}`] ??= vertical ?? segments[0];
-        result[`padding-right-${remainder}`] ??= horizontal ?? segments[1];
-        result[`padding-bottom-${remainder}`] ??= vertical ?? segments[2];
-        result[`padding-left-${remainder}`] ??= horizontal ?? segments[3];
+        result[`paddingTop-${remainder}`] ??= vertical ?? segments[0];
+        result[`paddingRight-${remainder}`] ??= horizontal ?? segments[1];
+        result[`paddingBottom-${remainder}`] ??= vertical ?? segments[2];
+        result[`paddingLeft-${remainder}`] ??= horizontal ?? segments[3];
         break;
       default:
         return;
