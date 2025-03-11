@@ -78,14 +78,14 @@ test("border-right", async ({ page }) => {
   await expect(page.getByTestId("navpanel")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-horizontal", async ({ page }) => {
+test("borderHorizontal", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "border-horizontal-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderHorizontal-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -103,14 +103,14 @@ test("border-horizontal", async ({ page }) => {
   await expect(page.getByTestId("navpanel")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-horizontal and border-left", async ({ page }) => {
+test("borderHorizontal and border-left", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "border-horizontal-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderHorizontal-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       "border-left-NavPanel": "8px double rgb(0, 128, 0)",
     },
   });
@@ -129,14 +129,14 @@ test("border-horizontal and border-left", async ({ page }) => {
   await expect(page.getByTestId("navpanel")).toHaveCSS("border-left-style", "double");
 });
 
-test("border-horizontal and border-right", async ({ page }) => {
+test("borderHorizontal and border-right", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "border-horizontal-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderHorizontal-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       "border-right-NavPanel": "8px double rgb(0, 128, 0)",
     },
   });
@@ -180,14 +180,14 @@ test("border-top", async ({ page }) => {
   await expect(page.getByTestId("navpanel")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-bottom", async ({ page }) => {
+test("borderBottom", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "border-bottom-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderBottom-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -205,14 +205,14 @@ test("border-bottom", async ({ page }) => {
   await expect(page.getByTestId("navpanel")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-vertical", async ({ page }) => {
+test("borderVertical", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "border-vertical-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderVertical-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -230,14 +230,14 @@ test("border-vertical", async ({ page }) => {
   await expect(page.getByTestId("navpanel")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-vertical and border-top", async ({ page }) => {
+test("borderVertical and border-top", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "border-vertical-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderVertical-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       "border-top-NavPanel": "8px double rgb(0, 128, 0)",
     },
   });
@@ -256,15 +256,15 @@ test("border-vertical and border-top", async ({ page }) => {
   await expect(page.getByTestId("navpanel")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-vertical and border-bottom", async ({ page }) => {
+test("borderVertical and border-bottom", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "border-vertical-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-bottom-NavPanel": "8px double rgb(0, 128, 0)",
+      "borderVertical-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderBottom-NavPanel": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -342,7 +342,7 @@ test("border, border-color-horizontal", async ({ page }) => {
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "color-border-horizontal-NavPanel": UPDATED,
+      "borderHorizontalColor-NavPanel": UPDATED,
       "border-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -423,7 +423,7 @@ test("border, border-color-vertical", async ({ page }) => {
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "color-border-vertical-NavPanel": UPDATED,
+      "borderVerticalColor-NavPanel": UPDATED,
       "border-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -477,7 +477,7 @@ test("border, border-color-bottom", async ({ page }) => {
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "color-border-bottom-NavPanel": UPDATED,
+      "borderBottomColor-NavPanel": UPDATED,
       "border-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -556,7 +556,7 @@ test("border, border-style-horizontal", async ({ page }) => {
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "style-border-horizontal-NavPanel": UPDATED,
+      "borderHorizontalStyle-NavPanel": UPDATED,
       "border-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -637,7 +637,7 @@ test("border, border-style-vertical", async ({ page }) => {
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "style-border-vertical-NavPanel": UPDATED,
+      "borderVerticalStyle-NavPanel": UPDATED,
       "border-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -691,7 +691,7 @@ test("border, border-style-bottom", async ({ page }) => {
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "style-border-bottom-NavPanel": UPDATED,
+      "borderBottomStyle-NavPanel": UPDATED,
       "border-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -770,7 +770,7 @@ test("border, border-thickness-horizontal", async ({ page }) => {
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "thickness-border-horizontal-NavPanel": UPDATED,
+      "borderHorizontalWidth-NavPanel": UPDATED,
       "border-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -851,7 +851,7 @@ test("border, border-thickness-vertical", async ({ page }) => {
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "thickness-border-vertical-NavPanel": UPDATED,
+      "borderVerticalWidth-NavPanel": UPDATED,
       "border-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -905,7 +905,7 @@ test("border, border-thickness-bottom", async ({ page }) => {
 
   await initThemedApp(page, NAVPANEL_CODE, {
     themeVars: {
-      "thickness-border-bottom-NavPanel": UPDATED,
+      "borderBottomWidth-NavPanel": UPDATED,
       "border-NavPanel": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
