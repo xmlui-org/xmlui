@@ -1,8 +1,4 @@
-import type {
-  CSSProperties,
-  ForwardedRef,
-  ReactNode
-} from "react";
+import type { CSSProperties, ForwardedRef, ReactNode } from "react";
 import React, {
   forwardRef,
   useCallback,
@@ -11,7 +7,7 @@ import React, {
   useLayoutEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import {
@@ -26,17 +22,18 @@ import {
   ScrollUpButton,
   Trigger as SelectTrigger,
   Value as SelectValue,
-  Viewport as SelectViewport
+  Viewport as SelectViewport,
 } from "@radix-ui/react-select";
-import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import {
   Command as Cmd,
   CommandEmpty as CmdEmpty,
   CommandInput as CmdInput,
   CommandItem as CmdItem,
-  CommandList as CmdList
+  CommandList as CmdList,
 } from "cmdk";
 import classnames from "classnames";
+import { FocusScope } from "@radix-ui/react-focus-scope";
 
 import styles from "./Select.module.scss";
 
@@ -113,7 +110,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
     children: React.ReactNode;
     options: Set<Option>;
   },
-  forwardedRef
+  forwardedRef,
 ) {
   const { root } = useTheme();
   const {
@@ -130,7 +127,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
     id,
     triggerRef,
     onFocus,
-    options
+    options,
   } = props;
 
   const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
@@ -139,11 +136,11 @@ const SimpleSelect = forwardRef(function SimpleSelect(
   const onValChange = useCallback(
     (val: string) => {
       const valueWithMatchingType = Array.from(options.values()).find(
-        (o) => o.value + "" === val
+        (o) => o.value + "" === val,
       )?.value;
       onValueChange(valueWithMatchingType);
     },
-    [onValueChange, options]
+    [onValueChange, options],
   );
 
   return (
@@ -158,7 +155,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
           className={classnames(styles.selectTrigger, {
             [styles.error]: validationStatus === "error",
             [styles.warning]: validationStatus === "warning",
-            [styles.valid]: validationStatus === "valid"
+            [styles.valid]: validationStatus === "valid",
           })}
           ref={ref}
           autoFocus={autoFocus}
@@ -218,9 +215,9 @@ export const Select = forwardRef(function Select(
     labelPosition,
     labelWidth,
     labelBreak,
-    required = false
+    required = false,
   }: SelectProps,
-  ref: React.ForwardedRef<HTMLDivElement>
+  ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
@@ -267,7 +264,7 @@ export const Select = forwardRef(function Select(
       onDidChange(newSelectedValue);
       setOpen(false);
     },
-    [multiSelect, value, updateState, onDidChange]
+    [multiSelect, value, updateState, onDidChange],
   );
 
   // Clear selected value
@@ -289,7 +286,7 @@ export const Select = forwardRef(function Select(
   useEffect(() => {
     registerComponentApi?.({
       focus,
-      setValue
+      setValue,
     });
   }, [focus, registerComponentApi, setValue]);
 
@@ -302,7 +299,7 @@ export const Select = forwardRef(function Select(
           <span>List is empty</span>
         </div>
       ),
-    [emptyListTemplate]
+    [emptyListTemplate],
   );
 
   const onOptionAdd = useCallback((option: Option) => {
@@ -320,9 +317,9 @@ export const Select = forwardRef(function Select(
   const optionContextValue = useMemo(
     () => ({
       onOptionAdd,
-      onOptionRemove
+      onOptionRemove,
     }),
-    [onOptionAdd, onOptionRemove]
+    [onOptionAdd, onOptionRemove],
   );
 
   const selectContextValue = useMemo(
@@ -330,9 +327,9 @@ export const Select = forwardRef(function Select(
       multiSelect,
       value,
       optionLabelRenderer,
-      onChange: toggleOption
+      onChange: toggleOption,
     }),
-    [multiSelect, toggleOption, value, optionLabelRenderer]
+    [multiSelect, toggleOption, value, optionLabelRenderer],
   );
 
   return (
@@ -365,7 +362,7 @@ export const Select = forwardRef(function Select(
                     onClick={() => setOpen((prev) => !prev)}
                     className={classnames(styles.selectTrigger, styles[validationStatus], {
                       [styles.disabled]: !enabled,
-                      [styles.multi]: multiSelect
+                      [styles.multi]: multiSelect,
                     })}
                     autoFocus={autoFocus}
                   >
@@ -379,7 +376,7 @@ export const Select = forwardRef(function Select(
                                   Array.from(options).find((o) => o.value === v),
                                   () => {
                                     toggleOption(v);
-                                  }
+                                  },
                                 )
                               ) : (
                                 <span key={v} className={styles.badge}>
@@ -393,7 +390,7 @@ export const Select = forwardRef(function Select(
                                     }}
                                   />
                                 </span>
-                              )
+                              ),
                             )}
                           </div>
                         </div>
@@ -420,45 +417,50 @@ export const Select = forwardRef(function Select(
                   </button>
                 </PopoverTrigger>
                 {open && (
-                  <PopoverContent
-                    style={{ width, height: dropdownHeight }}
-                    className={styles.selectContent}
-                  >
-                    <Cmd
-                      className={styles.command}
-                      shouldFilter={searchable}
-                      filter={(value, search, keywords) => {
-                        const extendedValue = value + " " + keywords.join(" ");
-                        if (extendedValue.toLowerCase().includes(search.toLowerCase())) return 1;
-                        return 0;
-                      }}
-                    >
-                      {searchable ? (
-                        <div className={styles.commandInputContainer}>
-                          <Icon name="search" />
-                          <CmdInput
-                            className={classnames(styles.commandInput)}
-                            placeholder="Search..."
-                          />
-                        </div>
-                      ) : (
-                        // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
-                        <button autoFocus aria-hidden="true" className={styles.srOnly} />
-                      )}
-                      <CmdList className={styles.commandList}>
-                        {Array.from(options).map(({ value, label, enabled, keywords }) => (
-                          <ComboboxOption
-                            key={value}
-                            value={value}
-                            label={label}
-                            enabled={enabled}
-                            keywords={keywords}
-                          />
-                        ))}
-                        <CmdEmpty>{emptyListNode}</CmdEmpty>
-                      </CmdList>
-                    </Cmd>
-                  </PopoverContent>
+                  <SelectPortal container={root}>
+                    <FocusScope asChild loop trapped>
+                      <PopoverContent
+                        style={{ width, height: dropdownHeight }}
+                        className={styles.selectContent}
+                      >
+                        <Cmd
+                          className={styles.command}
+                          shouldFilter={searchable}
+                          filter={(value, search, keywords) => {
+                            const extendedValue = value + " " + keywords.join(" ");
+                            if (extendedValue.toLowerCase().includes(search.toLowerCase()))
+                              return 1;
+                            return 0;
+                          }}
+                        >
+                          {searchable ? (
+                            <div className={styles.commandInputContainer}>
+                              <Icon name="search" />
+                              <CmdInput
+                                className={classnames(styles.commandInput)}
+                                placeholder="Search..."
+                              />
+                            </div>
+                          ) : (
+                            // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
+                            <button autoFocus aria-hidden="true" className={styles.srOnly} />
+                          )}
+                          <CmdList className={styles.commandList}>
+                            {Array.from(options).map(({ value, label, enabled, keywords }) => (
+                              <ComboboxOption
+                                key={value}
+                                value={value}
+                                label={label}
+                                enabled={enabled}
+                                keywords={keywords}
+                              />
+                            ))}
+                            <CmdEmpty>{emptyListNode}</CmdEmpty>
+                          </CmdList>
+                        </Cmd>
+                      </PopoverContent>
+                    </FocusScope>
+                  </SelectPortal>
                 )}
               </Popover>
             </ItemWithLabel>
@@ -490,7 +492,7 @@ export const Select = forwardRef(function Select(
 
 export const ComboboxOption = forwardRef(function Combobox(
   option: Option,
-  forwardedRef: ForwardedRef<HTMLDivElement>
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const id = useId();
   const { label, value, enabled = true, keywords } = option;
@@ -525,7 +527,7 @@ export function HiddenOption(option: Option) {
     return {
       ...option,
       labelText: node?.textContent ?? "",
-      keywords: [node?.textContent ?? ""]
+      keywords: [node?.textContent ?? ""],
     };
   }, [option, node]);
 
@@ -564,7 +566,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
         </span>
       </SelectItem>
     );
-  }
+  },
 );
 
 SelectOption.displayName = "SelectOption";
