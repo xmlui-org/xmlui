@@ -951,3 +951,14 @@ test("border, border-thickness-bottom", async ({ page }) => {
   await expect(page.getByTestId("link")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(page.getByTestId("link")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
+/* 
+test("Link accepts custom props", async ({
+  initTestBed,
+  createLinkDriver,
+}) => {
+  await initTestBed(`<Link data-custom="test">Test</Link>`);
+  const driver = await createLinkDriver();
+
+  await expect(driver.component).toHaveAttribute("data-custom", "test");
+});
+ */
