@@ -1,5 +1,4 @@
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
-import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./HtmlTags.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -884,12 +883,7 @@ export const htmlH1TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading
-        style={layoutCss}
-        className={styles.htmlHeading}
-        {...props}
-        level="h1"
-      >
+      <Heading style={layoutCss} className={styles.htmlHeading} {...props} level="h1">
         {renderChild(node.children)}
       </Heading>
     );
@@ -914,12 +908,7 @@ export const htmlH2TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading
-        style={layoutCss}
-        className={styles.htmlHeading}
-        {...props}
-        level="h2"
-      >
+      <Heading style={layoutCss} className={styles.htmlHeading} {...props} level="h2">
         {renderChild(node.children)}
       </Heading>
     );
@@ -944,12 +933,7 @@ export const htmlH3TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading
-        style={layoutCss}
-        className={styles.htmlHeading}
-        {...props}
-        level="h3"
-      >
+      <Heading style={layoutCss} className={styles.htmlHeading} {...props} level="h3">
         {renderChild(node.children)}
       </Heading>
     );
@@ -974,12 +958,7 @@ export const htmlH4TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading
-        style={layoutCss}
-        className={styles.htmlHeading}
-        {...props}
-        level="h4"
-      >
+      <Heading style={layoutCss} className={styles.htmlHeading} {...props} level="h4">
         {renderChild(node.children)}
       </Heading>
     );
@@ -1004,12 +983,7 @@ export const htmlH5TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading
-        style={layoutCss}
-        className={styles.htmlHeading}
-        {...props}
-        level="h5"
-      >
+      <Heading style={layoutCss} className={styles.htmlHeading} {...props} level="h5">
         {renderChild(node.children)}
       </Heading>
     );
@@ -1034,12 +1008,7 @@ export const htmlH6TagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <Heading
-        style={layoutCss}
-        className={styles.htmlHeading}
-        {...props}
-        level="h6"
-      >
+      <Heading style={layoutCss} className={styles.htmlHeading} {...props} level="h6">
         {renderChild(node.children)}
       </Heading>
     );
@@ -1105,8 +1074,6 @@ export const htmlITagRenderer = createComponentRenderer(
     );
   },
 );
-
-
 
 export const HtmlIframeMd = createMetadata({
   status: "experimental",
@@ -2078,7 +2045,7 @@ export const HtmlTableMd = createMetadata({
     "border-HtmlTable": "1px solid $color-border",
     "marginBottom-HtmlTable": "$space-4",
     "marginTop-HtmlTable": "$space-4",
-    },
+  },
 });
 
 export const htmlTableTagRenderer = createComponentRenderer(
@@ -2438,7 +2405,7 @@ export const htmlUlTagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const props = p.asRest();
     return (
-      <ul style={layoutCss} className={styles.htmlUl} {...props} >
+      <ul style={layoutCss} className={styles.htmlUl} {...props}>
         {renderChild(node.children)}
       </ul>
     );

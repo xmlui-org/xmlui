@@ -348,7 +348,7 @@ test("Heading overflows container dimensions", async ({
   expect(widthLayout).toEqual(widthLayoutExpected);
 });
 
-test("Heading accepts custom props not immediately used", async ({
+test("Heading accepts custom props", async ({
   initTestBed,
   createHeadingDriver,
 }) => {
@@ -360,11 +360,11 @@ test("Heading accepts custom props not immediately used", async ({
 });
 
 levels.forEach((level) => {
-  test(`HtmlTag '${level}' accepts custom props not immediately used`, async ({
+  test(`HtmlTag '${level}' accepts custom props`, async ({
     initTestBed,
     createHeadingDriver,
   }) => {
-    await initTestBed(`<h1 custom="test" boolean>Test Heading</h1>`);
+    await initTestBed(`<${level.toLowerCase()} custom="test" boolean>Test Heading</${level.toLowerCase()}>`);
     const headingDriver = await createHeadingDriver();
 
     await expect(headingDriver.component).toHaveAttribute("custom", "test");
