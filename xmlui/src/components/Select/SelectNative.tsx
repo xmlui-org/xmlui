@@ -23,9 +23,8 @@ import {
   Trigger as SelectTrigger,
   Value as SelectValue,
   Viewport as SelectViewport,
-  Portal as PopoverPortal,
 } from "@radix-ui/react-select";
-import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import {
   Command as Cmd,
   CommandEmpty as CmdEmpty,
@@ -34,6 +33,7 @@ import {
   CommandList as CmdList,
 } from "cmdk";
 import classnames from "classnames";
+import { FocusScope } from "@radix-ui/react-focus-scope";
 
 import styles from "./Select.module.scss";
 
@@ -417,47 +417,50 @@ export const Select = forwardRef(function Select(
                   </button>
                 </PopoverTrigger>
                 {open && (
-                  <PopoverPortal container={root}>
-                    <PopoverContent
-                      style={{ width, height: dropdownHeight }}
-                      className={styles.selectContent}
-                    >
-                      <Cmd
-                        className={styles.command}
-                        shouldFilter={searchable}
-                        filter={(value, search, keywords) => {
-                          const extendedValue = value + " " + keywords.join(" ");
-                          if (extendedValue.toLowerCase().includes(search.toLowerCase())) return 1;
-                          return 0;
-                        }}
+                  <SelectPortal container={root}>
+                    <FocusScope asChild loop trapped>
+                      <PopoverContent
+                        style={{ width, height: dropdownHeight }}
+                        className={styles.selectContent}
                       >
-                        {searchable ? (
-                          <div className={styles.commandInputContainer}>
-                            <Icon name="search" />
-                            <CmdInput
-                              className={classnames(styles.commandInput)}
-                              placeholder="Search..."
-                            />
-                          </div>
-                        ) : (
-                          // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
-                          <button autoFocus aria-hidden="true" className={styles.srOnly} />
-                        )}
-                        <CmdList className={styles.commandList}>
-                          {Array.from(options).map(({ value, label, enabled, keywords }) => (
-                            <ComboboxOption
-                              key={value}
-                              value={value}
-                              label={label}
-                              enabled={enabled}
-                              keywords={keywords}
-                            />
-                          ))}
-                          <CmdEmpty>{emptyListNode}</CmdEmpty>
-                        </CmdList>
-                      </Cmd>
-                    </PopoverContent>
-                  </PopoverPortal>
+                        <Cmd
+                          className={styles.command}
+                          shouldFilter={searchable}
+                          filter={(value, search, keywords) => {
+                            const extendedValue = value + " " + keywords.join(" ");
+                            if (extendedValue.toLowerCase().includes(search.toLowerCase()))
+                              return 1;
+                            return 0;
+                          }}
+                        >
+                          {searchable ? (
+                            <div className={styles.commandInputContainer}>
+                              <Icon name="search" />
+                              <CmdInput
+                                className={classnames(styles.commandInput)}
+                                placeholder="Search..."
+                              />
+                            </div>
+                          ) : (
+                            // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
+                            <button autoFocus aria-hidden="true" className={styles.srOnly} />
+                          )}
+                          <CmdList className={styles.commandList}>
+                            {Array.from(options).map(({ value, label, enabled, keywords }) => (
+                              <ComboboxOption
+                                key={value}
+                                value={value}
+                                label={label}
+                                enabled={enabled}
+                                keywords={keywords}
+                              />
+                            ))}
+                            <CmdEmpty>{emptyListNode}</CmdEmpty>
+                          </CmdList>
+                        </Cmd>
+                      </PopoverContent>
+                    </FocusScope>
+                  </SelectPortal>
                 )}
               </Popover>
             </ItemWithLabel>
