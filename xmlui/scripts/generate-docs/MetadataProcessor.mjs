@@ -338,6 +338,7 @@ function addStylesSection(data, component) {
     hasStylesSection = true;
   }
   if (varsTable) {
+    buffer += addThemeVarDescriptions(component);
     buffer += "\n\n### Theme Variables\n\n" + varsTable;
     hasStylesSection = true;
   }
@@ -378,11 +379,6 @@ function combineDescriptionAndDescriptionRef(
   }
 
   if (sectionId === PROPS) {
-    /* const defaultValuesBuffer = addDefaultValue(component);
-    if (defaultValuesBuffer) {
-      descriptionBuffer += "\n\n" + defaultValuesBuffer;
-    } */
-
     const availableValuesBuffer = addAvailableValues(component);
     if (availableValuesBuffer) {
       descriptionBuffer += "\n\n" + availableValuesBuffer;
@@ -729,6 +725,28 @@ function listThemeVars(component) {
     const parts = themeVar.split(result);
     return parts[0] + themeKeywordLinks[result] + parts[1];
   }
+}
+
+/**
+ * Creates a buffer that contains the section with the theme variable descriptions
+ * @param {Record<string, any>} component Record containing component metadata
+ * @returns Buffer with a table of theme variable keys and their descriptions
+ */
+function addThemeVarDescriptions(component) {
+  if (!component.themeVarDescriptions) {
+    return "";
+  }
+  let buffer = "\n\n### Theme Variable Descriptions\n\n";
+
+  buffer += createTable({
+    headers: ["Theme Variable", "Description"],
+    rows: Object.entries(component.themeVarDescriptions).map(([themeVar, description]) => [
+      `\`**${themeVar}**\``,
+      description,
+    ]),
+  });
+
+  return buffer;
 }
 
 // Use this object/map to replace the occurrences of the keys and have them be replaced by links

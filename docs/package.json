@@ -35,7 +35,9 @@
     "react-icons": "5.0.1",
     "sharp": "0.32.6",
     "shiki": "0.14.3",
-    "xmlui": "*"
+    "xmlui": "*",
+    "xmlui-charts": "*",
+    "xmlui-animations": "*"
   },
   "devDependencies": {
     "@babel/preset-react": "7.22.15",

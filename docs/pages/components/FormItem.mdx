@@ -30,7 +30,7 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
 <App>
   <Form
     data="{{ firstname: 'James', lastname: 'Clewell' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem label="Firstname" bindTo="firstname" />
     <FormItem label="Lastname" />
   </Form>
@@ -43,7 +43,7 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
     <App>
       <Form
         data="{{ firstname: 'James', lastname: 'Clewell' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem label="Firstname" bindTo="firstname" />
         <FormItem label="Lastname" />
       </Form>
@@ -62,7 +62,7 @@ Note how changing the input in the demo below will result in a slight delay of i
   <Form
     var.validations="Validations: "
     data="{{ name: 'Joe' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem
       customValidationsDebounce="3000"
       onValidate="(value) => { validations += '| '; return value === value.toUpperCase(); }"
@@ -79,7 +79,7 @@ Note how changing the input in the demo below will result in a slight delay of i
       <Form
         var.validations="Validations: "
         data="{{ name: 'Joe' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem
           customValidationsDebounce="3000"
           onValidate="(value) => { validations += '| '; return value === value.toUpperCase(); }"
@@ -226,7 +226,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 <App>
   <Form
     data="{{ firstname: 'James', lastname: 'Clewell' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem maxLength="4" bindTo="firstname" />
     <FormItem lengthInvalidMessage="Name is too long!" maxLength="4" bindTo="lastname" />
   </Form>
@@ -239,7 +239,7 @@ In the app, type a name longer than four characters in both fields, then leave t
     <App>
       <Form
         data="{{ firstname: 'James', lastname: 'Clewell' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem maxLength="4" bindTo="firstname" />
         <FormItem lengthInvalidMessage="Name is too long!" maxLength="4" bindTo="lastname" />
       </Form>
@@ -259,7 +259,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 <App>
   <Form
     data="{{ firstname: 'James', lastname: 'Clewell' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem maxLength="4" bindTo="firstname" />
     <FormItem lengthInvalidSeverity="warning" maxLength="4" bindTo="lastname" />
   </Form>
@@ -272,7 +272,7 @@ In the app, type a name longer than four characters in both fields, then leave t
     <App>
       <Form
         data="{{ firstname: 'James', lastname: 'Clewell' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem maxLength="4" bindTo="firstname" />
         <FormItem lengthInvalidSeverity="warning" maxLength="4" bindTo="lastname" />
       </Form>
@@ -293,7 +293,7 @@ In the demo below, try to enter an input longer than 4 characters or submit the 
 <App>
   <Form
     data="{{ firstname: 'James' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem maxLength="4" bindTo="firstname" />
   </Form>
 </App>
@@ -305,7 +305,7 @@ In the demo below, try to enter an input longer than 4 characters or submit the 
     <App>
       <Form
         data="{{ firstname: 'James' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem maxLength="4" bindTo="firstname" />
       </Form>
     </App>
@@ -329,7 +329,7 @@ In the demo below, enter an input greater than 99 or just submit the form as is.
 <App>
   <Form
     data="{{ age: 100 }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem maxValue="99" bindTo="age" type="integer" />
   </Form>
 </App>
@@ -341,7 +341,7 @@ In the demo below, enter an input greater than 99 or just submit the form as is.
     <App>
       <Form
         data="{{ age: 100 }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem maxValue="99" bindTo="age" type="integer" />
       </Form>
     </App>
@@ -358,7 +358,7 @@ In the demo below, enter an input shorter than 4 characters or just submit the f
 <App>
   <Form
     data="{{ firstname: '' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem minLength="4" bindTo="firstname" />
   </Form>
 </App>
@@ -370,7 +370,7 @@ In the demo below, enter an input shorter than 4 characters or just submit the f
     <App>
       <Form
         data="{{ firstname: '' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem minLength="4" bindTo="firstname" />
       </Form>
     </App>
@@ -390,7 +390,7 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 <App>
   <Form
     data="{{ age: 0 }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem minValue="18" bindTo="age" type="integer" />
   </Form>
 </App>
@@ -402,7 +402,7 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
     <App>
       <Form
         data="{{ age: 0 }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem minValue="18" bindTo="age" type="integer" />
       </Form>
     </App>
@@ -427,7 +427,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 <App>
   <Form
     data="{{ userEmail: 'mailto' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem pattern="email" bindTo="userEmail" />
   </Form>
 </App>
@@ -439,7 +439,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
     <App>
       <Form
         data="{{ userEmail: 'mailto' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem pattern="email" bindTo="userEmail" />
       </Form>
     </App>
@@ -456,7 +456,7 @@ In the demo below, enter anything that does not look like an email and click out
 <App>
   <Form
     data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem pattern="email" bindTo="oldEmail" />
     <FormItem
       patternInvalidMessage="This does not look like an email"
@@ -471,7 +471,7 @@ In the demo below, enter anything that does not look like an email and click out
     <App>
       <Form
         data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem pattern="email" bindTo="oldEmail" />
         <FormItem
           patternInvalidMessage="This does not look like an email"
@@ -493,7 +493,7 @@ In the demo below, enter a string of characters that does not look like an email
 <App>
   <Form
     data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem pattern="email" bindTo="oldEmail" />
     <FormItem patternInvalidSeverity="warning" pattern="email" bindTo="newEmail" />
   </Form>
@@ -506,7 +506,7 @@ In the demo below, enter a string of characters that does not look like an email
     <App>
       <Form
         data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem pattern="email" bindTo="oldEmail" />
         <FormItem patternInvalidSeverity="warning" pattern="email" bindTo="newEmail" />
       </Form>
@@ -525,7 +525,7 @@ Just submitting the form as is also produces the same error.
 <App>
   <Form
     data="{{ age: 100, customAge: 100 }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
     <FormItem
       minValue="0"
@@ -543,7 +543,7 @@ Just submitting the form as is also produces the same error.
     <App>
       <Form
         data="{{ age: 100, customAge: 100 }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
         <FormItem
           minValue="0"
@@ -569,7 +569,7 @@ Just submitting the form as is also produces the same error.
 <App>
   <Form
     data="{{ age: 100, customAge: 100 }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
     <FormItem
       minValue="0" maxValue="99"
@@ -586,7 +586,7 @@ Just submitting the form as is also produces the same error.
     <App>
       <Form
         data="{{ age: 100, customAge: 100 }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
         <FormItem
           minValue="0"
@@ -609,7 +609,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 <App>
   <Form
     data="{{ password: 'PASSWORD123' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem regex="^[a-z]+$" bindTo="password" />
   </Form>
 </App>
@@ -621,7 +621,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
     <App>
       <Form
         data="{{ password: 'PASSWORD123' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem regex="^[a-z]+$" bindTo="password" />
       </Form>
     </App>
@@ -638,7 +638,7 @@ In the demo below, enter a password that is not a lowercase string and click out
 <App>
   <Form
     data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
     <FormItem
       regexInvalidMessage="Password must be all lowercase"
@@ -653,7 +653,7 @@ In the demo below, enter a password that is not a lowercase string and click out
     <App>
       <Form
         data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
         <FormItem
           regexInvalidMessage="Password must be all lowercase"
@@ -676,7 +676,7 @@ Just submitting the form as is also produces the same error.
 <App>
   <Form
     data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
     <FormItem regexInvalidSeverity="warning" regex="^[a-z]+$" bindTo="newPassword" />
   </Form>
@@ -689,7 +689,7 @@ Just submitting the form as is also produces the same error.
     <App>
       <Form
         data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
         <FormItem regexInvalidSeverity="warning" regex="^[a-z]+$" bindTo="newPassword" />
       </Form>
@@ -705,7 +705,7 @@ Set this property to `true` to indicate it must have a value before submitting t
 <App>
   <Form
     data="{{ name: undefined }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem required="true" label="Name" bindTo="name" />
   </Form>
 </App>
@@ -717,7 +717,7 @@ Set this property to `true` to indicate it must have a value before submitting t
     <App>
       <Form
         data="{{ name: undefined }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem required="true" label="Name" bindTo="name" />
       </Form>
     </App>
@@ -734,7 +734,7 @@ In the demo below, leave the field empty and click outside to see the regular an
 <App>
   <Form
     data="{{ firstname: undefined, lastname: undefined }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem required="true" label="First Name" bindTo="firstname" />
     <FormItem
       requiredInvalidMessage="Last Name is required!"
@@ -751,7 +751,7 @@ In the demo below, leave the field empty and click outside to see the regular an
     <App>
       <Form
         data="{{ firstname: undefined, lastname: undefined }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem required="true" label="First Name" bindTo="firstname" />
         <FormItem
           requiredInvalidMessage="Last Name is required!"
@@ -816,7 +816,7 @@ In the demo below, leave the field as is and submit the form or enter an input t
 <App>
   <Form
     data="{{ name: 'James' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem
       bindTo="name"
       onValidate="(value) => value === value.toUpperCase()" />
@@ -830,7 +830,7 @@ In the demo below, leave the field as is and submit the form or enter an input t
     <App>
       <Form
         data="{{ name: 'James' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
         <FormItem
           bindTo="name"
           onValidate="(value) => value === value.toUpperCase()" />

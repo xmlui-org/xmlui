@@ -1,6 +1,16 @@
 import { existsSync, readdirSync, statSync, unlinkSync } from "fs";
 import { posix } from "path";
 
+/**
+ * Creates a markdown table.
+ * The number of headers can be more or less than the number of rows.
+ * @param {Record<string, string[] | boolean>} data
+ * @param {string[]} data.headers A list of headers for the table 
+ * @param {string[][]} data.rows A list of rows of the table content,
+ *  each row is an array of strings
+ * @param {boolean} data.rowNums Toggle to generate row numbers or not
+ * @returns {string} Generated markdown table
+ */
 export function createTable({ headers = [], rows = [], rowNums = false }) {
   let table = "";
 

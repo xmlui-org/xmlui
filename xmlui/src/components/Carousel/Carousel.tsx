@@ -90,6 +90,9 @@ export const CarouselMd = createMetadata({
     scrollNext: d("This method scrolls the carousel to the next slide."),
   },
   themeVars: parseScssVar(styles.themeVars),
+  themeVarDescriptions: {
+    [`width-indicator-${COMP}`]: "Sets the width of the indicator.",
+  },
   defaultThemeVars: {
     [`color-bg-control-${COMP}`]: "$color-primary",
     [`color-text-control-${COMP}`]: "$color-text",

@@ -53,7 +53,7 @@ The following example sets this property to `false` and, thus, it turns off past
   <H3>You cannot paste files from the clipboard</H3>
   <FileUploadDropZone backgroundColor="cyan" height="100px"
     allowPaste="false"
-    onUpload="(files) => files.map(file => window.alert('file ' + file.path + ' uploaded'))" />
+    onUpload="(files) => files.map(file => toast('file ' + file.path + ' uploaded'))" />
 </App>
 ```
 
@@ -67,7 +67,7 @@ Try it! When you copy a file to a clipboard, you cannot paste it with the keyboa
       <H3>You cannot paste files from the clipboard</H3>
       <FileUploadDropZone backgroundColor="cyan" height="100px"
         allowPaste="false"
-        onUpload="(files) => files.map(file => window.alert('file ' + file.path + ' uploaded'))" />
+        onUpload="(files) => files.map(file => toast('file ' + file.path + ' uploaded'))" />
     </App>
   `}
 />

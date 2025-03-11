@@ -1,3 +1,13 @@
-<App xmlns:Extensions="component-ns:XMLUIExtensions" xmlns:My="app-ns">
-    Demo
+<App xmlns:XMLUIExtensions="component-ns" xmlns:My="app-ns">
+
+        <DataSource id="mentions" url="{ window.xmluiHost + '/query' }" body='{ $props.sql }' method="POST" />
+
+        <VStack>
+            <H1>{$props.title}</H1>
+
+            <Card width="400px" height="300px">
+                <XMLUIExtensions:PieChart data="{mentions.value}" dataKey="mentions" nameKey="name" showLabel="true" />
+            </Card>
+
+        </VStack>
 </App>

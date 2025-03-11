@@ -204,7 +204,7 @@ Replace the `Text` with the highlighted `Form` in `ContactForm`:
     <Form 
       id="contactForm" 
       data="{$param}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))" >
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem
         label="Full name" 
         placeholder="Specify the contact name" 

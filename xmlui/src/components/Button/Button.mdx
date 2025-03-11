@@ -276,7 +276,7 @@ Use the `Button` component to trigger various actions.
 
 ```ueml copy
 <App>
-  <Button label="Click me!" onClick="window.alert('Button clicked')" />
+  <Button label="Click me!" onClick="toast('Button clicked')" />
 </App>
 ```
 
@@ -284,10 +284,10 @@ Use the `Button` component to trigger various actions.
   name="Example: click"
   app={`
     <App>
-      <Button label="Click me!" onClick="window.alert('Button clicked')" />
+      <Button label="Click me!" onClick="toast('Button clicked')" />
     </App>
   `}
-  height={100}
+  height={160}
 />
 
 %-EVENT-END

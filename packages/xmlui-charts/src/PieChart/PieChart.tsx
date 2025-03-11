@@ -38,11 +38,13 @@ export const PieChartMd = createMetadata({
       defaultValue: defaultProps.labelListPosition,
       availableValues: LabelPositionValues,
     },
+    width: d("The width of the chart"),
+    height: d("The height of the chart"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "color-text-labelList-PieChart": "$color-text-primary",
-  }
+  },
 });
 
 export const pieChartComponentRenderer = createComponentRenderer(
@@ -59,6 +61,8 @@ export const pieChartComponentRenderer = createComponentRenderer(
         showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
         dataKey={extractValue(node.props?.dataKey)}
         nameKey={extractValue(node.props?.nameKey)}
+        width={extractValue.asOptionalNumber(node.props?.width)}
+        height={extractValue.asOptionalNumber(node.props?.height)}
       >
         {renderChild(node.children)}
       </PieChart>
