@@ -23,8 +23,8 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderHorizontal-Card": "xxx",
-      "border-left-Card": "xxx",
-      "border-right-Card": "xxx",
+      "borderLeft-Card": "xxx",
+      "borderRight-Card": "xxx",
     });
   });
 
@@ -37,32 +37,32 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderBottom-Card": "xxx",
-      "border-top-Card": "xxx",
+      "borderTop-Card": "xxx",
       "borderVertical-Card": "xxx",
     });
   });
 
-  it("border-top only", () => {
+  it("borderTop only", () => {
     const newTheme: Record<string, string> = {
-      "border-top-Card": "xxx",
+      "borderTop-Card": "xxx",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-top-Card": "xxx",
+      "borderTop-Card": "xxx",
     });
   });
 
-  it("border-right only", () => {
+  it("borderRight only", () => {
     const newTheme: Record<string, string> = {
-      "border-right-Card": "xxx",
+      "borderRight-Card": "xxx",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-right-Card": "xxx",
+      "borderRight-Card": "xxx",
     });
   });
 
@@ -78,15 +78,15 @@ describe("generateBorderSegments", () => {
     });
   });
 
-  it("border-left only", () => {
+  it("borderLeft only", () => {
     const newTheme: Record<string, string> = {
-      "border-left-Card": "xxx",
+      "borderLeft-Card": "xxx",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-left-Card": "xxx",
+      "borderLeft-Card": "xxx",
     });
   });
 
@@ -100,9 +100,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "thickness-border-Card": "xxx",
       "borderBottomWidth-Card": "xxx",
-      "thickness-border-left-Card": "xxx",
-      "thickness-border-right-Card": "xxx",
-      "thickness-border-top-Card": "xxx",
+      "borderLeftWidth-Card": "xxx",
+      "borderRightWidth-Card": "xxx",
+      "borderTopWidth-Card": "xxx",
     });
   });
 
@@ -115,8 +115,8 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderHorizontalWidth-Card": "xxx",
-      "thickness-border-left-Card": "xxx",
-      "thickness-border-right-Card": "xxx",
+      "borderLeftWidth-Card": "xxx",
+      "borderRightWidth-Card": "xxx",
     });
   });
 
@@ -129,7 +129,7 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderBottomWidth-Card": "xxx",
-      "thickness-border-top-Card": "xxx",
+      "borderTopWidth-Card": "xxx",
       "borderVerticalWidth-Card": "xxx",
     });
   });
@@ -144,9 +144,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "style-border-Card": "xxx",
       "borderBottomStyle-Card": "xxx",
-      "style-border-left-Card": "xxx",
-      "style-border-right-Card": "xxx",
-      "style-border-top-Card": "xxx",
+      "borderLeftStyle-Card": "xxx",
+      "borderRightStyle-Card": "xxx",
+      "borderTopStyle-Card": "xxx",
     });
   });
 
@@ -159,8 +159,8 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderHorizontalStyle-Card": "xxx",
-      "style-border-left-Card": "xxx",
-      "style-border-right-Card": "xxx",
+      "borderLeftStyle-Card": "xxx",
+      "borderRightStyle-Card": "xxx",
     });
   });
 
@@ -173,7 +173,7 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderBottomStyle-Card": "xxx",
-      "style-border-top-Card": "xxx",
+      "borderTopStyle-Card": "xxx",
       "borderVerticalStyle-Card": "xxx",
     });
   });
@@ -188,9 +188,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "color-border-Card": "xxx",
       "borderBottomColor-Card": "xxx",
-      "color-border-left-Card": "xxx",
-      "color-border-right-Card": "xxx",
-      "color-border-top-Card": "xxx",
+      "borderLeftColor-Card": "xxx",
+      "borderRightColor-Card": "xxx",
+      "borderTopColor-Card": "xxx",
     });
   });
 
@@ -203,8 +203,8 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderHorizontalColor-Card": "xxx",
-      "color-border-left-Card": "xxx",
-      "color-border-right-Card": "xxx",
+      "borderLeftColor-Card": "xxx",
+      "borderRightColor-Card": "xxx",
     });
   });
 
@@ -217,7 +217,7 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderBottomColor-Card": "xxx",
-      "color-border-top-Card": "xxx",
+      "borderTopColor-Card": "xxx",
       "borderVerticalColor-Card": "xxx",
     });
   });
@@ -232,9 +232,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid $color-border",
       "borderBottom-Card": "1px solid $color-border",
-      "border-left-Card": "1px solid $color-border",
-      "border-right-Card": "1px solid $color-border",
-      "border-top-Card": "1px solid $color-border",
+      "borderLeft-Card": "1px solid $color-border",
+      "borderRight-Card": "1px solid $color-border",
+      "borderTop-Card": "1px solid $color-border",
       "color-border-Card": "$color-border",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -251,9 +251,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid rgb(0,0,0)",
       "borderBottom-Card": "1px solid rgb(0,0,0)",
-      "border-left-Card": "1px solid rgb(0,0,0)",
-      "border-right-Card": "1px solid rgb(0,0,0)",
-      "border-top-Card": "1px solid rgb(0,0,0)",
+      "borderLeft-Card": "1px solid rgb(0,0,0)",
+      "borderRight-Card": "1px solid rgb(0,0,0)",
+      "borderTop-Card": "1px solid rgb(0,0,0)",
       "color-border-Card": "rgb(0,0,0)",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -270,9 +270,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid #000",
       "borderBottom-Card": "1px solid #000",
-      "border-left-Card": "1px solid #000",
-      "border-right-Card": "1px solid #000",
-      "border-top-Card": "1px solid #000",
+      "borderLeft-Card": "1px solid #000",
+      "borderRight-Card": "1px solid #000",
+      "borderTop-Card": "1px solid #000",
       "color-border-Card": "#000",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -289,9 +289,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid #000000",
       "borderBottom-Card": "1px solid #000000",
-      "border-left-Card": "1px solid #000000",
-      "border-right-Card": "1px solid #000000",
-      "border-top-Card": "1px solid #000000",
+      "borderLeft-Card": "1px solid #000000",
+      "borderRight-Card": "1px solid #000000",
+      "borderTop-Card": "1px solid #000000",
       "color-border-Card": "#000000",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -308,9 +308,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid hsl(0,0%,0%)",
       "borderBottom-Card": "1px solid hsl(0,0%,0%)",
-      "border-left-Card": "1px solid hsl(0,0%,0%)",
-      "border-right-Card": "1px solid hsl(0,0%,0%)",
-      "border-top-Card": "1px solid hsl(0,0%,0%)",
+      "borderLeft-Card": "1px solid hsl(0,0%,0%)",
+      "borderRight-Card": "1px solid hsl(0,0%,0%)",
+      "borderTop-Card": "1px solid hsl(0,0%,0%)",
       "color-border-Card": "hsl(0,0%,0%)",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -327,9 +327,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid hsl(0,0%,0%)",
       "borderBottom-Card": "1px solid hsl(0,0%,0%)",
-      "border-left-Card": "1px solid hsl(0,0%,0%)",
-      "border-right-Card": "1px solid hsl(0,0%,0%)",
-      "border-top-Card": "1px solid hsl(0,0%,0%)",
+      "borderLeft-Card": "1px solid hsl(0,0%,0%)",
+      "borderRight-Card": "1px solid hsl(0,0%,0%)",
+      "borderTop-Card": "1px solid hsl(0,0%,0%)",
       "color-border-Card": "hsl(0,0%,0%)",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -346,9 +346,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid hsl(0,0%,0%)",
       "borderBottom-Card": "1px solid hsl(0,0%,0%)",
-      "border-left-Card": "1px solid hsl(0,0%,0%)",
-      "border-right-Card": "1px solid hsl(0,0%,0%)",
-      "border-top-Card": "1px solid hsl(0,0%,0%)",
+      "borderLeft-Card": "1px solid hsl(0,0%,0%)",
+      "borderRight-Card": "1px solid hsl(0,0%,0%)",
+      "borderTop-Card": "1px solid hsl(0,0%,0%)",
       "color-border-Card": "hsl(0,0%,0%)",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -365,9 +365,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid hsla(0,0%,0%,0.5)",
       "borderBottom-Card": "1px solid hsla(0,0%,0%,0.5)",
-      "border-left-Card": "1px solid hsla(0,0%,0%,0.5)",
-      "border-right-Card": "1px solid hsla(0,0%,0%,0.5)",
-      "border-top-Card": "1px solid hsla(0,0%,0%,0.5)",
+      "borderLeft-Card": "1px solid hsla(0,0%,0%,0.5)",
+      "borderRight-Card": "1px solid hsla(0,0%,0%,0.5)",
+      "borderTop-Card": "1px solid hsla(0,0%,0%,0.5)",
       "color-border-Card": "hsla(0,0%,0%,0.5)",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -384,9 +384,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid rgba(0,0,0,0.5)",
       "borderBottom-Card": "1px solid rgba(0,0,0,0.5)",
-      "border-left-Card": "1px solid rgba(0,0,0,0.5)",
-      "border-right-Card": "1px solid rgba(0,0,0,0.5)",
-      "border-top-Card": "1px solid rgba(0,0,0,0.5)",
+      "borderLeft-Card": "1px solid rgba(0,0,0,0.5)",
+      "borderRight-Card": "1px solid rgba(0,0,0,0.5)",
+      "borderTop-Card": "1px solid rgba(0,0,0,0.5)",
       "color-border-Card": "rgba(0,0,0,0.5)",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -403,9 +403,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px red solid",
       "borderBottom-Card": "1px red solid",
-      "border-left-Card": "1px red solid",
-      "border-right-Card": "1px red solid",
-      "border-top-Card": "1px red solid",
+      "borderLeft-Card": "1px red solid",
+      "borderRight-Card": "1px red solid",
+      "borderTop-Card": "1px red solid",
       "color-border-Card": "red",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -422,9 +422,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "solid 1px red",
       "borderBottom-Card": "solid 1px red",
-      "border-left-Card": "solid 1px red",
-      "border-right-Card": "solid 1px red",
-      "border-top-Card": "solid 1px red",
+      "borderLeft-Card": "solid 1px red",
+      "borderRight-Card": "solid 1px red",
+      "borderTop-Card": "solid 1px red",
       "color-border-Card": "red",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -441,9 +441,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "solid red 1px",
       "borderBottom-Card": "solid red 1px",
-      "border-left-Card": "solid red 1px",
-      "border-right-Card": "solid red 1px",
-      "border-top-Card": "solid red 1px",
+      "borderLeft-Card": "solid red 1px",
+      "borderRight-Card": "solid red 1px",
+      "borderTop-Card": "solid red 1px",
       "color-border-Card": "red",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -460,9 +460,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "red 1px solid",
       "borderBottom-Card": "red 1px solid",
-      "border-left-Card": "red 1px solid",
-      "border-right-Card": "red 1px solid",
-      "border-top-Card": "red 1px solid",
+      "borderLeft-Card": "red 1px solid",
+      "borderRight-Card": "red 1px solid",
+      "borderTop-Card": "red 1px solid",
       "color-border-Card": "red",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -479,9 +479,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "red solid 1px",
       "borderBottom-Card": "red solid 1px",
-      "border-left-Card": "red solid 1px",
-      "border-right-Card": "red solid 1px",
-      "border-top-Card": "red solid 1px",
+      "borderLeft-Card": "red solid 1px",
+      "borderRight-Card": "red solid 1px",
+      "borderTop-Card": "red solid 1px",
       "color-border-Card": "red",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -498,9 +498,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px red",
       "borderBottom-Card": "1px red",
-      "border-left-Card": "1px red",
-      "border-right-Card": "1px red",
-      "border-top-Card": "1px red",
+      "borderLeft-Card": "1px red",
+      "borderRight-Card": "1px red",
+      "borderTop-Card": "1px red",
       "color-border-Card": "red",
       "style-border-Card": undefined,
       "thickness-border-Card": "1px",
@@ -517,9 +517,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid",
       "borderBottom-Card": "1px solid",
-      "border-left-Card": "1px solid",
-      "border-right-Card": "1px solid",
-      "border-top-Card": "1px solid",
+      "borderLeft-Card": "1px solid",
+      "borderRight-Card": "1px solid",
+      "borderTop-Card": "1px solid",
       "color-border-Card": undefined,
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -536,9 +536,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px red",
       "borderBottom-Card": "1px red",
-      "border-left-Card": "1px red",
-      "border-right-Card": "1px red",
-      "border-top-Card": "1px red",
+      "borderLeft-Card": "1px red",
+      "borderRight-Card": "1px red",
+      "borderTop-Card": "1px red",
       "color-border-Card": "red",
       "style-border-Card": undefined,
       "thickness-border-Card": "1px",
@@ -555,9 +555,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px solid $some-color",
       "borderBottom-Card": "1px solid $some-color",
-      "border-left-Card": "1px solid $some-color",
-      "border-right-Card": "1px solid $some-color",
-      "border-top-Card": "1px solid $some-color",
+      "borderLeft-Card": "1px solid $some-color",
+      "borderRight-Card": "1px solid $some-color",
+      "borderTop-Card": "1px solid $some-color",
       "color-border-Card": "$some-color",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -574,9 +574,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "solid 1px $some-color",
       "borderBottom-Card": "solid 1px $some-color",
-      "border-left-Card": "solid 1px $some-color",
-      "border-right-Card": "solid 1px $some-color",
-      "border-top-Card": "solid 1px $some-color",
+      "borderLeft-Card": "solid 1px $some-color",
+      "borderRight-Card": "solid 1px $some-color",
+      "borderTop-Card": "solid 1px $some-color",
       "color-border-Card": "$some-color",
       "style-border-Card": "solid",
       "thickness-border-Card": "1px",
@@ -593,9 +593,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px $some-style red",
       "borderBottom-Card": "1px $some-style red",
-      "border-left-Card": "1px $some-style red",
-      "border-right-Card": "1px $some-style red",
-      "border-top-Card": "1px $some-style red",
+      "borderLeft-Card": "1px $some-style red",
+      "borderRight-Card": "1px $some-style red",
+      "borderTop-Card": "1px $some-style red",
       "color-border-Card": "red",
       "style-border-Card": "$some-style",
       "thickness-border-Card": "1px",
@@ -612,9 +612,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "red $some-style 1px",
       "borderBottom-Card": "red $some-style 1px",
-      "border-left-Card": "red $some-style 1px",
-      "border-right-Card": "red $some-style 1px",
-      "border-top-Card": "red $some-style 1px",
+      "borderLeft-Card": "red $some-style 1px",
+      "borderRight-Card": "red $some-style 1px",
+      "borderTop-Card": "red $some-style 1px",
       "color-border-Card": "red",
       "style-border-Card": "$some-style",
       "thickness-border-Card": "1px",
@@ -631,9 +631,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "$some-thickness solid red",
       "borderBottom-Card": "$some-thickness solid red",
-      "border-left-Card": "$some-thickness solid red",
-      "border-right-Card": "$some-thickness solid red",
-      "border-top-Card": "$some-thickness solid red",
+      "borderLeft-Card": "$some-thickness solid red",
+      "borderRight-Card": "$some-thickness solid red",
+      "borderTop-Card": "$some-thickness solid red",
       "color-border-Card": "red",
       "style-border-Card": "solid",
       "thickness-border-Card": "$some-thickness",
@@ -650,9 +650,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "$some-thickness red solid",
       "borderBottom-Card": "$some-thickness red solid",
-      "border-left-Card": "$some-thickness red solid",
-      "border-right-Card": "$some-thickness red solid",
-      "border-top-Card": "$some-thickness red solid",
+      "borderLeft-Card": "$some-thickness red solid",
+      "borderRight-Card": "$some-thickness red solid",
+      "borderTop-Card": "$some-thickness red solid",
       "color-border-Card": "red",
       "style-border-Card": "solid",
       "thickness-border-Card": "$some-thickness",
@@ -669,9 +669,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "1px $some-style $some-color",
       "borderBottom-Card": "1px $some-style $some-color",
-      "border-left-Card": "1px $some-style $some-color",
-      "border-right-Card": "1px $some-style $some-color",
-      "border-top-Card": "1px $some-style $some-color",
+      "borderLeft-Card": "1px $some-style $some-color",
+      "borderRight-Card": "1px $some-style $some-color",
+      "borderTop-Card": "1px $some-style $some-color",
       "color-border-Card": "$some-color",
       "style-border-Card": "$some-style",
       "thickness-border-Card": "1px",
@@ -688,9 +688,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "$some-thickness solid $some-color",
       "borderBottom-Card": "$some-thickness solid $some-color",
-      "border-left-Card": "$some-thickness solid $some-color",
-      "border-right-Card": "$some-thickness solid $some-color",
-      "border-top-Card": "$some-thickness solid $some-color",
+      "borderLeft-Card": "$some-thickness solid $some-color",
+      "borderRight-Card": "$some-thickness solid $some-color",
+      "borderTop-Card": "$some-thickness solid $some-color",
       "color-border-Card": "$some-color",
       "style-border-Card": "solid",
       "thickness-border-Card": "$some-thickness",
@@ -707,9 +707,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "$some-thickness $some-style red",
       "borderBottom-Card": "$some-thickness $some-style red",
-      "border-left-Card": "$some-thickness $some-style red",
-      "border-right-Card": "$some-thickness $some-style red",
-      "border-top-Card": "$some-thickness $some-style red",
+      "borderLeft-Card": "$some-thickness $some-style red",
+      "borderRight-Card": "$some-thickness $some-style red",
+      "borderTop-Card": "$some-thickness $some-style red",
       "color-border-Card": "red",
       "style-border-Card": "$some-style",
       "thickness-border-Card": "$some-thickness",
@@ -726,9 +726,9 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "$some-thickness $some-style $some-color",
       "borderBottom-Card": "$some-thickness $some-style $some-color",
-      "border-left-Card": "$some-thickness $some-style $some-color",
-      "border-right-Card": "$some-thickness $some-style $some-color",
-      "border-top-Card": "$some-thickness $some-style $some-color",
+      "borderLeft-Card": "$some-thickness $some-style $some-color",
+      "borderRight-Card": "$some-thickness $some-style $some-color",
+      "borderTop-Card": "$some-thickness $some-style $some-color",
       "color-border-Card": "$some-color",
       "style-border-Card": "$some-style",
       "thickness-border-Card": "$some-thickness",
@@ -745,42 +745,42 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "border-Card": "dotted rgb(255, 0, 0) 5px",
       "borderBottom-Card": "dotted rgb(255, 0, 0) 5px",
-      "border-left-Card": "dotted rgb(255, 0, 0) 5px",
-      "border-right-Card": "dotted rgb(255, 0, 0) 5px",
-      "border-top-Card": "dotted rgb(255, 0, 0) 5px",
+      "borderLeft-Card": "dotted rgb(255, 0, 0) 5px",
+      "borderRight-Card": "dotted rgb(255, 0, 0) 5px",
+      "borderTop-Card": "dotted rgb(255, 0, 0) 5px",
       "color-border-Card": "rgb(255, 0, 0)",
       "style-border-Card": "dotted",
       "thickness-border-Card": "5px",
     });
   });
 
-  it("border-left: thickness, style, color", () => {
+  it("borderLeft: thickness, style, color", () => {
     const newTheme: Record<string, string> = {
-      "border-left-Card": "1px solid red",
+      "borderLeft-Card": "1px solid red",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-left-Card": "1px solid red",
-      "color-border-left-Card": "red",
-      "style-border-left-Card": "solid",
-      "thickness-border-left-Card": "1px",
+      "borderLeft-Card": "1px solid red",
+      "borderLeftColor-Card": "red",
+      "borderLeftStyle-Card": "solid",
+      "borderLeftWidth-Card": "1px",
     });
   });
 
-  it("border-right: thickness, style, color", () => {
+  it("borderRight: thickness, style, color", () => {
     const newTheme: Record<string, string> = {
-      "border-right-Card": "1px solid red",
+      "borderRight-Card": "1px solid red",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-right-Card": "1px solid red",
-      "color-border-right-Card": "red",
-      "style-border-right-Card": "solid",
-      "thickness-border-right-Card": "1px",
+      "borderRight-Card": "1px solid red",
+      "borderRightColor-Card": "red",
+      "borderRightStyle-Card": "solid",
+      "borderRightWidth-Card": "1px",
     });
   });
 
@@ -793,29 +793,29 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderHorizontal-Card": "1px solid red",
-      "border-left-Card": "1px solid red",
-      "border-right-Card": "1px solid red",
-      "color-border-left-Card": "red",
-      "color-border-right-Card": "red",
-      "style-border-left-Card": "solid",
-      "style-border-right-Card": "solid",
-      "thickness-border-left-Card": "1px",
-      "thickness-border-right-Card": "1px",
+      "borderLeft-Card": "1px solid red",
+      "borderRight-Card": "1px solid red",
+      "borderLeftColor-Card": "red",
+      "borderRightColor-Card": "red",
+      "borderLeftStyle-Card": "solid",
+      "borderRightStyle-Card": "solid",
+      "borderLeftWidth-Card": "1px",
+      "borderRightWidth-Card": "1px",
     });
   });
 
-  it("border-top: thickness, style, color", () => {
+  it("borderTop: thickness, style, color", () => {
     const newTheme: Record<string, string> = {
-      "border-top-Card": "1px solid red",
+      "borderTop-Card": "1px solid red",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-top-Card": "1px solid red",
-      "color-border-top-Card": "red",
-      "style-border-top-Card": "solid",
-      "thickness-border-top-Card": "1px",
+      "borderTop-Card": "1px solid red",
+      "borderTopColor-Card": "red",
+      "borderTopStyle-Card": "solid",
+      "borderTopWidth-Card": "1px",
     });
   });
 
@@ -843,134 +843,134 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderBottom-Card": "1px solid red",
-      "border-top-Card": "1px solid red",
+      "borderTop-Card": "1px solid red",
       "borderVertical-Card": "1px solid red",
       "borderBottomColor-Card": "red",
-      "color-border-top-Card": "red",
+      "borderTopColor-Card": "red",
       "borderBottomStyle-Card": "solid",
-      "style-border-top-Card": "solid",
+      "borderTopStyle-Card": "solid",
       "borderBottomWidth-Card": "1px",
-      "thickness-border-top-Card": "1px",
+      "borderTopWidth-Card": "1px",
     });
   });
 
-  it("border-left: style override", () => {
+  it("borderLeft: style override", () => {
     const newTheme: Record<string, string> = {
       "style-border-Card": "dotted",
-      "border-left-Card": "1px solid red",
+      "borderLeft-Card": "1px solid red",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-left-Card": "1px solid red",
-      "color-border-left-Card": "red",
-      "style-border-Card": "dotted",
-      "borderBottomStyle-Card": "dotted",
-      "style-border-left-Card": "solid",
-      "style-border-right-Card": "dotted",
-      "style-border-top-Card": "dotted",
-      "thickness-border-left-Card": "1px",
-    });
-  });
-
-  it("border-left: thickness override", () => {
-    const newTheme: Record<string, string> = {
-      "thickness-border-Card": "2px",
-      "border-left-Card": "1px solid red",
-    };
-
-    const result = generateBorderSegments(newTheme);
-
-    expect(result).deep.equal({
-      "border-left-Card": "1px solid red",
-      "color-border-left-Card": "red",
-      "style-border-left-Card": "solid",
-      "thickness-border-Card": "2px",
-      "borderBottomWidth-Card": "2px",
-      "thickness-border-left-Card": "1px",
-      "thickness-border-right-Card": "2px",
-      "thickness-border-top-Card": "2px",
-    });
-  });
-
-  it("border-left: color override", () => {
-    const newTheme: Record<string, string> = {
-      "color-border-Card": "blue",
-      "border-left-Card": "1px solid red",
-    };
-
-    const result = generateBorderSegments(newTheme);
-
-    expect(result).deep.equal({
-      "border-left-Card": "1px solid red",
-      "color-border-Card": "blue",
-      "borderBottomColor-Card": "blue",
-      "color-border-left-Card": "red",
-      "color-border-right-Card": "blue",
-      "color-border-top-Card": "blue",
-      "style-border-left-Card": "solid",
-      "thickness-border-left-Card": "1px",
-    });
-  });
-
-  it("border-right: style override", () => {
-    const newTheme: Record<string, string> = {
-      "style-border-Card": "dotted",
-      "border-right-Card": "1px solid red",
-    };
-
-    const result = generateBorderSegments(newTheme);
-
-    expect(result).deep.equal({
-      "border-right-Card": "1px solid red",
-      "color-border-right-Card": "red",
+      "borderLeft-Card": "1px solid red",
+      "borderLeftColor-Card": "red",
       "style-border-Card": "dotted",
       "borderBottomStyle-Card": "dotted",
-      "style-border-left-Card": "dotted",
-      "style-border-right-Card": "solid",
-      "style-border-top-Card": "dotted",
-      "thickness-border-right-Card": "1px",
+      "borderLeftStyle-Card": "solid",
+      "borderRightStyle-Card": "dotted",
+      "borderTopStyle-Card": "dotted",
+      "borderLeftWidth-Card": "1px",
     });
   });
 
-  it("border-right: thickness override", () => {
+  it("borderLeft: thickness override", () => {
     const newTheme: Record<string, string> = {
       "thickness-border-Card": "2px",
-      "border-right-Card": "1px solid red",
+      "borderLeft-Card": "1px solid red",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-right-Card": "1px solid red",
-      "color-border-right-Card": "red",
-      "style-border-right-Card": "solid",
+      "borderLeft-Card": "1px solid red",
+      "borderLeftColor-Card": "red",
+      "borderLeftStyle-Card": "solid",
       "thickness-border-Card": "2px",
       "borderBottomWidth-Card": "2px",
-      "thickness-border-left-Card": "2px",
-      "thickness-border-right-Card": "1px",
-      "thickness-border-top-Card": "2px",
+      "borderLeftWidth-Card": "1px",
+      "borderRightWidth-Card": "2px",
+      "borderTopWidth-Card": "2px",
     });
   });
 
-  it("border-right: color override", () => {
+  it("borderLeft: color override", () => {
     const newTheme: Record<string, string> = {
       "color-border-Card": "blue",
-      "border-right-Card": "1px solid red",
+      "borderLeft-Card": "1px solid red",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-right-Card": "1px solid red",
+      "borderLeft-Card": "1px solid red",
       "color-border-Card": "blue",
       "borderBottomColor-Card": "blue",
-      "color-border-left-Card": "blue",
-      "color-border-right-Card": "red",
-      "color-border-top-Card": "blue",
-      "style-border-right-Card": "solid",
-      "thickness-border-right-Card": "1px",
+      "borderLeftColor-Card": "red",
+      "borderRightColor-Card": "blue",
+      "borderTopColor-Card": "blue",
+      "borderLeftStyle-Card": "solid",
+      "borderLeftWidth-Card": "1px",
+    });
+  });
+
+  it("borderRight: style override", () => {
+    const newTheme: Record<string, string> = {
+      "style-border-Card": "dotted",
+      "borderRight-Card": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "borderRight-Card": "1px solid red",
+      "borderRightColor-Card": "red",
+      "style-border-Card": "dotted",
+      "borderBottomStyle-Card": "dotted",
+      "borderLeftStyle-Card": "dotted",
+      "borderRightStyle-Card": "solid",
+      "borderTopStyle-Card": "dotted",
+      "borderRightWidth-Card": "1px",
+    });
+  });
+
+  it("borderRight: thickness override", () => {
+    const newTheme: Record<string, string> = {
+      "thickness-border-Card": "2px",
+      "borderRight-Card": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "borderRight-Card": "1px solid red",
+      "borderRightColor-Card": "red",
+      "borderRightStyle-Card": "solid",
+      "thickness-border-Card": "2px",
+      "borderBottomWidth-Card": "2px",
+      "borderLeftWidth-Card": "2px",
+      "borderRightWidth-Card": "1px",
+      "borderTopWidth-Card": "2px",
+    });
+  });
+
+  it("borderRight: color override", () => {
+    const newTheme: Record<string, string> = {
+      "color-border-Card": "blue",
+      "borderRight-Card": "1px solid red",
+    };
+
+    const result = generateBorderSegments(newTheme);
+
+    expect(result).deep.equal({
+      "borderRight-Card": "1px solid red",
+      "color-border-Card": "blue",
+      "borderBottomColor-Card": "blue",
+      "borderLeftColor-Card": "blue",
+      "borderRightColor-Card": "red",
+      "borderTopColor-Card": "blue",
+      "borderRightStyle-Card": "solid",
+      "borderRightWidth-Card": "1px",
     });
   });
 
@@ -984,17 +984,17 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderHorizontal-Card": "1px solid red",
-      "border-left-Card": "1px solid red",
-      "border-right-Card": "1px solid red",
-      "color-border-left-Card": "red",
-      "color-border-right-Card": "red",
+      "borderLeft-Card": "1px solid red",
+      "borderRight-Card": "1px solid red",
+      "borderLeftColor-Card": "red",
+      "borderRightColor-Card": "red",
       "style-border-Card": "dotted",
       "borderBottomStyle-Card": "dotted",
-      "style-border-left-Card": "solid",
-      "style-border-right-Card": "solid",
-      "style-border-top-Card": "dotted",
-      "thickness-border-left-Card": "1px",
-      "thickness-border-right-Card": "1px",
+      "borderLeftStyle-Card": "solid",
+      "borderRightStyle-Card": "solid",
+      "borderTopStyle-Card": "dotted",
+      "borderLeftWidth-Card": "1px",
+      "borderRightWidth-Card": "1px",
     });
   });
 
@@ -1008,17 +1008,17 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderHorizontal-Card": "1px solid red",
-      "border-left-Card": "1px solid red",
-      "border-right-Card": "1px solid red",
-      "color-border-left-Card": "red",
-      "color-border-right-Card": "red",
-      "style-border-left-Card": "solid",
-      "style-border-right-Card": "solid",
+      "borderLeft-Card": "1px solid red",
+      "borderRight-Card": "1px solid red",
+      "borderLeftColor-Card": "red",
+      "borderRightColor-Card": "red",
+      "borderLeftStyle-Card": "solid",
+      "borderRightStyle-Card": "solid",
       "thickness-border-Card": "2px",
       "borderBottomWidth-Card": "2px",
-      "thickness-border-left-Card": "1px",
-      "thickness-border-right-Card": "1px",
-      "thickness-border-top-Card": "2px",
+      "borderLeftWidth-Card": "1px",
+      "borderRightWidth-Card": "1px",
+      "borderTopWidth-Card": "2px",
     });
   });
 
@@ -1032,77 +1032,77 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderHorizontal-Card": "1px solid red",
-      "border-left-Card": "1px solid red",
-      "border-right-Card": "1px solid red",
+      "borderLeft-Card": "1px solid red",
+      "borderRight-Card": "1px solid red",
       "color-border-Card": "blue",
       "borderBottomColor-Card": "blue",
-      "color-border-left-Card": "red",
-      "color-border-right-Card": "red",
-      "color-border-top-Card": "blue",
-      "style-border-left-Card": "solid",
-      "style-border-right-Card": "solid",
-      "thickness-border-left-Card": "1px",
-      "thickness-border-right-Card": "1px",
+      "borderLeftColor-Card": "red",
+      "borderRightColor-Card": "red",
+      "borderTopColor-Card": "blue",
+      "borderLeftStyle-Card": "solid",
+      "borderRightStyle-Card": "solid",
+      "borderLeftWidth-Card": "1px",
+      "borderRightWidth-Card": "1px",
     });
   });
 
-  it("border-top: style override", () => {
+  it("borderTop: style override", () => {
     const newTheme: Record<string, string> = {
       "style-border-Card": "dotted",
-      "border-top-Card": "1px solid red",
+      "borderTop-Card": "1px solid red",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-top-Card": "1px solid red",
-      "color-border-top-Card": "red",
+      "borderTop-Card": "1px solid red",
+      "borderTopColor-Card": "red",
       "style-border-Card": "dotted",
       "borderBottomStyle-Card": "dotted",
-      "style-border-left-Card": "dotted",
-      "style-border-right-Card": "dotted",
-      "style-border-top-Card": "solid",
-      "thickness-border-top-Card": "1px",
+      "borderLeftStyle-Card": "dotted",
+      "borderRightStyle-Card": "dotted",
+      "borderTopStyle-Card": "solid",
+      "borderTopWidth-Card": "1px",
     });
   });
 
-  it("border-top: thickness override", () => {
+  it("borderTop: thickness override", () => {
     const newTheme: Record<string, string> = {
       "thickness-border-Card": "2px",
-      "border-top-Card": "1px solid red",
+      "borderTop-Card": "1px solid red",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-top-Card": "1px solid red",
-      "color-border-top-Card": "red",
-      "style-border-top-Card": "solid",
+      "borderTop-Card": "1px solid red",
+      "borderTopColor-Card": "red",
+      "borderTopStyle-Card": "solid",
       "thickness-border-Card": "2px",
       "borderBottomWidth-Card": "2px",
-      "thickness-border-left-Card": "2px",
-      "thickness-border-right-Card": "2px",
-      "thickness-border-top-Card": "1px",
+      "borderLeftWidth-Card": "2px",
+      "borderRightWidth-Card": "2px",
+      "borderTopWidth-Card": "1px",
     });
   });
 
-  it("border-top: color override", () => {
+  it("borderTop: color override", () => {
     const newTheme: Record<string, string> = {
       "color-border-Card": "blue",
-      "border-top-Card": "1px solid red",
+      "borderTop-Card": "1px solid red",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-top-Card": "1px solid red",
+      "borderTop-Card": "1px solid red",
       "color-border-Card": "blue",
       "borderBottomColor-Card": "blue",
-      "color-border-left-Card": "blue",
-      "color-border-right-Card": "blue",
-      "color-border-top-Card": "red",
-      "style-border-top-Card": "solid",
-      "thickness-border-top-Card": "1px",
+      "borderLeftColor-Card": "blue",
+      "borderRightColor-Card": "blue",
+      "borderTopColor-Card": "red",
+      "borderTopStyle-Card": "solid",
+      "borderTopWidth-Card": "1px",
     });
   });
 
@@ -1119,9 +1119,9 @@ describe("generateBorderSegments", () => {
       "borderBottomColor-Card": "red",
       "style-border-Card": "dotted",
       "borderBottomStyle-Card": "solid",
-      "style-border-left-Card": "dotted",
-      "style-border-right-Card": "dotted",
-      "style-border-top-Card": "dotted",
+      "borderLeftStyle-Card": "dotted",
+      "borderRightStyle-Card": "dotted",
+      "borderTopStyle-Card": "dotted",
       "borderBottomWidth-Card": "1px",
     });
   });
@@ -1140,9 +1140,9 @@ describe("generateBorderSegments", () => {
       "borderBottomStyle-Card": "solid",
       "thickness-border-Card": "2px",
       "borderBottomWidth-Card": "1px",
-      "thickness-border-left-Card": "2px",
-      "thickness-border-right-Card": "2px",
-      "thickness-border-top-Card": "2px",
+      "borderLeftWidth-Card": "2px",
+      "borderRightWidth-Card": "2px",
+      "borderTopWidth-Card": "2px",
     });
   });
 
@@ -1158,9 +1158,9 @@ describe("generateBorderSegments", () => {
       "borderBottom-Card": "1px solid red",
       "color-border-Card": "blue",
       "borderBottomColor-Card": "red",
-      "color-border-left-Card": "blue",
-      "color-border-right-Card": "blue",
-      "color-border-top-Card": "blue",
+      "borderLeftColor-Card": "blue",
+      "borderRightColor-Card": "blue",
+      "borderTopColor-Card": "blue",
       "borderBottomStyle-Card": "solid",
       "borderBottomWidth-Card": "1px",
     });
@@ -1176,17 +1176,17 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderBottom-Card": "1px solid red",
-      "border-top-Card": "1px solid red",
+      "borderTop-Card": "1px solid red",
       "borderVertical-Card": "1px solid red",
       "borderBottomColor-Card": "red",
-      "color-border-top-Card": "red",
+      "borderTopColor-Card": "red",
       "style-border-Card": "dotted",
       "borderBottomStyle-Card": "solid",
-      "style-border-left-Card": "dotted",
-      "style-border-right-Card": "dotted",
-      "style-border-top-Card": "solid",
+      "borderLeftStyle-Card": "dotted",
+      "borderRightStyle-Card": "dotted",
+      "borderTopStyle-Card": "solid",
       "borderBottomWidth-Card": "1px",
-      "thickness-border-top-Card": "1px",
+      "borderTopWidth-Card": "1px",
     });
   });
 
@@ -1200,17 +1200,17 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderBottom-Card": "1px solid red",
-      "border-top-Card": "1px solid red",
+      "borderTop-Card": "1px solid red",
       "borderVertical-Card": "1px solid red",
       "borderBottomColor-Card": "red",
-      "color-border-top-Card": "red",
+      "borderTopColor-Card": "red",
       "borderBottomStyle-Card": "solid",
-      "style-border-top-Card": "solid",
+      "borderTopStyle-Card": "solid",
       "thickness-border-Card": "2px",
       "borderBottomWidth-Card": "1px",
-      "thickness-border-left-Card": "2px",
-      "thickness-border-right-Card": "2px",
-      "thickness-border-top-Card": "1px",
+      "borderLeftWidth-Card": "2px",
+      "borderRightWidth-Card": "2px",
+      "borderTopWidth-Card": "1px",
     });
   });
 
@@ -1224,17 +1224,17 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderBottom-Card": "1px solid red",
-      "border-top-Card": "1px solid red",
+      "borderTop-Card": "1px solid red",
       "borderVertical-Card": "1px solid red",
       "color-border-Card": "blue",
       "borderBottomColor-Card": "red",
-      "color-border-left-Card": "blue",
-      "color-border-right-Card": "blue",
-      "color-border-top-Card": "red",
+      "borderLeftColor-Card": "blue",
+      "borderRightColor-Card": "blue",
+      "borderTopColor-Card": "red",
       "borderBottomStyle-Card": "solid",
-      "style-border-top-Card": "solid",
+      "borderTopStyle-Card": "solid",
       "borderBottomWidth-Card": "1px",
-      "thickness-border-top-Card": "1px",
+      "borderTopWidth-Card": "1px",
     });
   });
 });

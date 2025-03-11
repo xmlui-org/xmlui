@@ -32,14 +32,14 @@ test("border", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-left", async ({ page }) => {
+test("borderLeft", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "border-left-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderLeft-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -57,14 +57,14 @@ test("border-left", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-right", async ({ page }) => {
+test("borderRight", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "border-right-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderRight-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -107,7 +107,7 @@ test("borderHorizontal", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("borderHorizontal and border-left", async ({ page }) => {
+test("borderHorizontal and borderLeft", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -115,7 +115,7 @@ test("borderHorizontal and border-left", async ({ page }) => {
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
       "borderHorizontal-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-left-Accordion": "8px double rgb(0, 128, 0)",
+      "borderLeft-Accordion": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -133,7 +133,7 @@ test("borderHorizontal and border-left", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", "double");
 });
 
-test("borderHorizontal and border-right", async ({ page }) => {
+test("borderHorizontal and borderRight", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -141,7 +141,7 @@ test("borderHorizontal and border-right", async ({ page }) => {
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
       "borderHorizontal-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-right-Accordion": "8px double rgb(0, 128, 0)",
+      "borderRight-Accordion": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -159,14 +159,14 @@ test("borderHorizontal and border-right", async ({ page }) => {
   await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-top", async ({ page }) => {
+test("borderTop", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "border-top-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderTop-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -234,7 +234,7 @@ test("borderVertical", async ({ page }) => {
   await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("borderVertical and border-top", async ({ page }) => {
+test("borderVertical and borderTop", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -242,7 +242,7 @@ test("borderVertical and border-top", async ({ page }) => {
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
       "borderVertical-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-top-Accordion": "8px double rgb(0, 128, 0)",
+      "borderTop-Accordion": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -373,7 +373,7 @@ test("border, border-color-left", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "color-border-left-Accordion": UPDATED,
+      "borderLeftColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -400,7 +400,7 @@ test("border, border-color-right", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "color-border-right-Accordion": UPDATED,
+      "borderRightColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -454,7 +454,7 @@ test("border, border-color-top", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "color-border-top-Accordion": UPDATED,
+      "borderTopColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -587,7 +587,7 @@ test("border, border-style-left", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "style-border-left-Accordion": UPDATED,
+      "borderLeftStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -614,7 +614,7 @@ test("border, border-style-right", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "style-border-right-Accordion": UPDATED,
+      "borderRightStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -668,7 +668,7 @@ test("border, border-style-top", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "style-border-top-Accordion": UPDATED,
+      "borderTopStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -801,7 +801,7 @@ test("border, border-thickness-left", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "thickness-border-left-Accordion": UPDATED,
+      "borderLeftWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -828,7 +828,7 @@ test("border, border-thickness-right", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "thickness-border-right-Accordion": UPDATED,
+      "borderRightWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -882,7 +882,7 @@ test("border, border-thickness-top", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "thickness-border-top-Accordion": UPDATED,
+      "borderTopWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
