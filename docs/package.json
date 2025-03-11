@@ -37,8 +37,8 @@
     "sharp": "0.32.6",
     "shiki": "0.14.3",
     "xmlui": "*",
-    "xmlui-animations": "^0.1.6",
-    "xmlui-charts": "^0.1.8"
+    "xmlui-animations": "*",
+    "xmlui-charts": "*"
   },
   "devDependencies": {
     "@babel/preset-react": "7.22.15",
