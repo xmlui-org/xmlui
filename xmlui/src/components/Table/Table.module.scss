@@ -115,7 +115,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   .row, .headerRow {
     display: flex;
     flex-direction: row;
-    border-bottom: createThemeVar("border-bottom-cell-Table");
+    border-bottom: createThemeVar("borderBottom-cell-Table");
     user-select: none;
     //background-color: inherit;
 

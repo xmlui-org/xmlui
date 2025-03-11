@@ -753,10 +753,10 @@ function addThemeVarDescriptions(component) {
 const themeKeywordLinks = {
   color: "[color](../styles-and-themes/common-units/#color)",
   "color-border": "[color-border](../styles-and-themes/common-units/#color)",
-  "color-border-bottom": "[color-border-bottom](../styles-and-themes/common-units/#color)",
+  "borderBottomColor": "[borderBottomColor](../styles-and-themes/common-units/#color)",
   "color-border-top": "[color-border-top](../styles-and-themes/common-units/#color)",
-  "color-border-horizontal": "[color-border-horizontal](../styles-and-themes/common-units/#color)",
-  "color-border-vertical": "[color-border-vertical](../styles-and-themes/common-units/#color)",
+  "borderHorizontalColor": "[borderHorizontalColor](../styles-and-themes/common-units/#color)",
+  "borderVerticalColor": "[borderVerticalColor](../styles-and-themes/common-units/#color)",
   "color-border-right": "[color-text](../styles-and-themes/common-units/#color)",
   "color-border-left": "[color-text](../styles-and-themes/common-units/#color)",
   "color-bg": "[color-bg](../styles-and-themes/common-units/#color)",
@@ -765,12 +765,12 @@ const themeKeywordLinks = {
   "fontWeight": "[fontWeight](../styles-and-themes/common-units/#fontWeight)",
   rounding: "[rounding](../styles-and-themes/common-units/#border-rounding)",
   "style-border": "[style-border](../styles-and-themes/common-units/#border-style)",
-  "style-border-bottom": "[style-border-bottom](../styles-and-themes/common-units/#border-style)",
+  "borderBottomStyle": "[borderBottomStyle](../styles-and-themes/common-units/#border-style)",
   "style-border-top": "[style-border-top](../styles-and-themes/common-units/#border-style)",
-  "style-border-horizontal":
-    "[style-border-horizontal](../styles-and-themes/common-units/#border-style)",
-  "style-border-vertical":
-    "[style-border-vertical](../styles-and-themes/common-units/#border-style)",
+  "borderHorizontalStyle":
+    "[borderHorizontalStyle](../styles-and-themes/common-units/#border-style)",
+  "borderVerticalStyle":
+    "[borderVerticalStyle](../styles-and-themes/common-units/#border-style)",
   "style-border-right": "[style-border-right](../styles-and-themes/common-units/#border-style)",
   "style-border-left": "[style-border-left](../styles-and-themes/common-units/#border-style)",
   size: "[size](../styles-and-themes/common-units/#size)",
@@ -784,12 +784,12 @@ const themeKeywordLinks = {
   distance: "[distance](../styles-and-themes/common-units/#size)",
   thickness: "[thickness](../styles-and-themes/common-units/#size)",
   "thickness-border": "[thickness-border](../styles-and-themes/common-units/#size)",
-  "thickness-border-bottom": "[thickness-border-bottom](../styles-and-themes/common-units/#size)",
+  "borderBottomWidth": "[borderBottomWidth](../styles-and-themes/common-units/#size)",
   "thickness-border-top": "[thickness-border-top](../styles-and-themes/common-units/#size)",
-  "thickness-border-horizontal":
-    "[thickness-border-horizontal](../styles-and-themes/common-units/#size)",
-  "thickness-border-vertical":
-    "[thickness-border-vertical](../styles-and-themes/common-units/#size)",
+  "borderHorizontalWidth":
+    "[borderHorizontalWidth](../styles-and-themes/common-units/#size)",
+  "borderVerticalWidth":
+    "[borderVerticalWidth](../styles-and-themes/common-units/#size)",
   "thickness-border-right": "[thickness-border-right](../styles-and-themes/common-units/#size)",
   "thickness-border-left": "[thickness-border-left](../styles-and-themes/common-units/#size)",
   "thickness‑decoration": "[thickness‑decoration](../styles-and-themes/common-units/#size)",
@@ -813,7 +813,7 @@ const themeKeywordLinks = {
   "border-left": "[border-left](../styles-and-themes/common-units/#border)",
   "border-right": "[border-right](../styles-and-themes/common-units/#border)",
   "border-top": "[border-top](../styles-and-themes/common-units/#border)",
-  "border-bottom": "[border-bottom](../styles-and-themes/common-units/#border)",
+  "borderBottom": "[borderBottom](../styles-and-themes/common-units/#border)",
   boxShadow: "[boxShadow](../styles-and-themes/common-units/#boxShadow)",
   gap: "[gap](../styles-and-themes/common-units/#size)",
   "align-vertical": "[align-vertical](../styles-and-themes/common-units/#alignment)",
