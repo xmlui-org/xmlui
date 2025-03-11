@@ -19,7 +19,7 @@ $thickness-border-DropdownMenu-content: createThemeVar(
 $style-border-DropdownMenu-content: createThemeVar(
   "style-border-DropdownMenu-content"
 );
-$min-width-DropdowMenu: createThemeVar("min-width-DropdownMenu");
+$minWidth-DropdowMenu: createThemeVar("minWidth-DropdownMenu");
 $color-bg-MenuItem: createThemeVar("color-bg-MenuItem");
 $color-MenuItem: createThemeVar("color-MenuItem");
 $fontFamily-MenuItem: createThemeVar("fontFamily-MenuItem");
@@ -43,7 +43,7 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
 .DropdownMenuSubContent {
   background-color: $color-bg-DropdownMenu;
   border-radius: $radius-DropdownMenu;
-  min-width: $min-width-DropdowMenu;
+  min-width: $minWidth-DropdowMenu;
   box-shadow: $boxShadow-DropdownMenu;
   overflow: hidden;
   animation-duration: 400ms;

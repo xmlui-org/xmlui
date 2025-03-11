@@ -43,7 +43,7 @@ $componentName: "DatePicker";
   }
 }
 
-$min-height: createThemeVar("Input:min-height-#{$componentName}");
+$minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 
 .datePicker {
   display: flex;
@@ -51,7 +51,7 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
   cursor: pointer;
   flex-direction: row;
   width: 100%;
-  min-height: $min-height;
+  min-height: $minHeight;
   border-width: 1px;
   border-style: solid;
   transition: background-color ease-in .1s;
