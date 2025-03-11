@@ -72,7 +72,7 @@ export const AutoCompleteMd = createMetadata({
   defaultThemeVars: {
     [`color-bg-menu-${COMP}`]: "$color-bg-primary",
     [`boxShadow-menu-${COMP}`]: "$shadow-md",
-    [`radius-menu-${COMP}`]: "$radius",
+    [`borderRadius-menu-${COMP}`]: "$borderRadius",
     [`color-bg-item-${COMP}`]: "$color-bg-dropdown-item",
     [`color-bg-item-${COMP}--hover`]: "$color-bg-dropdown-item--active",
     [`color-bg-item-${COMP}--active`]: "$color-bg-dropdown-item--active",

@@ -471,14 +471,14 @@ The `TextBox` component uses these theme variables:
 These variables have 4 variants depending on the [validationStatus](#validationstatus) denoted by `|status|`.
 If the status segment is omitted, the style will be applied to all validation statuses.
 
-- `radius-TextBox-|status|`
+- `borderRadius-TextBox-|status|`
 - `thickness-border-TextBox-|status|`
 - `style-border-TextBox-|status|`
 - `fontSize-TextBox-|status|`
 - `color-placeholder-TextBox-|status|`
 
 ```json copy
-"radius-TextBox-default": "10px",
+"borderRadius-TextBox-default": "10px",
 "color-placeholder-TextBox-error": "crimson"
 ```
 
@@ -511,7 +511,7 @@ These variables set the `disabled` state:
 ### Example
 
 ```json copy
-"radius-TextBox": "30px",
+"borderRadius-TextBox": "30px",
 "color-placeholder-TextBox-default": "blue"
 ```
 
@@ -523,7 +523,7 @@ These variables set the `disabled` state:
       id: "custom",
       name: "Custom Theme",
       themeVars: {
-        "radius-TextBox": "30px",
+        "borderRadius-TextBox": "30px",
         "color-placeholder-TextBox-default": "blue"
       },
     },
@@ -558,6 +558,10 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-TextBox-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-TextBox-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -641,10 +645,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [padding](../styles-and-themes/common-units/#size)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

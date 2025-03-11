@@ -20,7 +20,7 @@ export const layoutOptionKeys = [
   "borderWidth",
   "borderHorizontal",
   "borderVertical",
-  "radius",
+  "borderRadius",
   "radiusTopLeft",
   "radiusTopRight",
   "radiusBottomLeft",

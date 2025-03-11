@@ -119,7 +119,7 @@ export function resolveLayoutProps(
   collectCss("borderWidth");
 
   // --- Radius
-  collectCss("radius", "borderRadius");
+  collectCss("borderRadius");
   collectCss("radiusTopLeft", "borderTopLeftRadius");
   collectCss("radiusTopRight", "borderTopRightRadius");
   collectCss("radiusBottomLeft", "borderBottomLeftRadius");
@@ -348,7 +348,7 @@ export type LayoutProps = {
   borderVertical?: string;
 
   // --- Border radius
-  radius?: number | string;
+  borderRadius?: number | string;
   radiusTopLeft?: number | string;
   radiusTopRight?: number | string;
   radiusBottomLeft?: number | string;
@@ -449,7 +449,7 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   borderVertical: [],
 
   // --- Border radius
-  radius: [],
+  borderRadius: [],
   radiusTopLeft: [],
   radiusTopRight: [],
   radiusBottomLeft: [],

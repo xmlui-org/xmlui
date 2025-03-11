@@ -436,7 +436,7 @@ You can query the component's value. If no value is set, it will retrieve `undef
 
 The `DatePicker` component provides these theme variables to customize its appearance:
 
-- `radius-DatePicker`
+- `borderRadius-DatePicker`
 - `color-text-DatePicker`
 - `color-bg-DatePicker--disabled`
 - `thickness-border-DatePicker`
@@ -452,15 +452,15 @@ The `DatePicker` component provides these theme variables to customize its appea
 - `color-placeholder-DatePicker`
 - `color-bg-menu-DatePicker`
 - `boxShadow-menu-DatePicker`
-- `radius-menu-DatePicker`
+- `borderRadius-menu-DatePicker`
 - `color-bg-item-DatePicker--hover`
 - `color-bg-item-DatePicker--active`
 
 ```json
 {
-  "radius-DatePicker": "30px",
+  "borderRadius-DatePicker": "30px",
   "thickness-border-DatePicker": "4px",
-  "radius-menu-DatePicker": "30px",
+  "borderRadius-menu-DatePicker": "30px",
   "color-text-DatePicker": "black",
   "color-bg-menu-DatePicker": "#f5f5dc"
 }
@@ -475,9 +475,9 @@ The `DatePicker` component provides these theme variables to customize its appea
       id: "custom",
       name: "Custom Theme",
       themeVars: {
-        "radius-DatePicker": "30px",
+        "borderRadius-DatePicker": "30px",
         "thickness-border-DatePicker": "4px",
-        "radius-menu-DatePicker": "30px",
+        "borderRadius-menu-DatePicker": "30px",
         "color-text-DatePicker": "black",
         "color-bg-menu-DatePicker": "#f5f5dc"
       },
@@ -511,6 +511,12 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-DatePicker | $borderRadius | $borderRadius |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-DatePicker | $borderRadius | $borderRadius |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -586,12 +592,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-menu-DatePicker | $radius | $radius |
-| [radius](../styles-and-themes/common-units/#border-rounding)-menu-DatePicker | $radius | $radius |
 | [style-border](../styles-and-themes/common-units/#border-style)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border](../styles-and-themes/common-units/#border-style)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

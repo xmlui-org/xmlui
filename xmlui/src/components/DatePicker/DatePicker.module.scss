@@ -11,7 +11,7 @@ $componentName: "DatePicker";
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
   border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
   border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
@@ -117,7 +117,7 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
   height: fit-content;
   box-shadow: createThemeVar("Input:boxShadow-menu-DatePicker");
   background-color: createThemeVar("Input:color-bg-menu-DatePicker");
-  border-radius: createThemeVar("Input:radius-menu-DatePicker");
+  border-radius: createThemeVar("Input:borderRadius-menu-DatePicker");
 }
 
 $rdp-accent-color: createThemeVar("Input:color-bg-item-DatePicker--active");

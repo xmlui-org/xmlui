@@ -405,8 +405,8 @@ $THEME-VAR-PREFIX: xmlui;
   $tmp: appendThemeVarWithDefault($tmp, "color-border-top-#{$subject}", $tmpColorVertical) !global;
   $tmp: appendThemeVarWithDefault($tmp, "color-border-bottom-#{$subject}", $tmpColorVertical) !global;
   
-  $tmpRadius: appendThemeVar($tmp, "radius-#{$subject}") !global;
-  $tmpRadiusAll: getThemeVar($tmpRadius, "radius-#{$subject}") !global;
+  $tmpRadius: appendThemeVar($tmp, "borderRadius-#{$subject}") !global;
+  $tmpRadiusAll: getThemeVar($tmpRadius, "borderRadius-#{$subject}") !global;
   $tmp: appendThemeVarWithDefault($tmp, "radius-start-start-#{$subject}", $tmpRadiusAll) !global;
   $tmp: appendThemeVarWithDefault($tmp, "radius-start-end-#{$subject}", $tmpRadiusAll) !global;
   $tmp: appendThemeVarWithDefault($tmp, "radius-end-start-#{$subject}", $tmpRadiusAll) !global;
@@ -433,7 +433,7 @@ $THEME-VAR-PREFIX: xmlui;
   border-right-color: getThemeVar($themeVars, "color-border-right-#{$subject}");
   border-top-color: getThemeVar($themeVars, "color-border-top-#{$subject}");
   border-bottom-color: getThemeVar($themeVars, "color-border-bottom-#{$subject}");
-  border-radius: getThemeVar($themeVars, "radius-#{$subject}");
+  border-radius: getThemeVar($themeVars, "borderRadius-#{$subject}");
   border-start-start-radius: getThemeVar($themeVars, "radius-start-start-#{$subject}");
   border-start-end-radius: getThemeVar($themeVars, "radius-start-end-#{$subject}");
   border-end-start-radius: getThemeVar($themeVars, "radius-end-start-#{$subject}");
@@ -577,7 +577,7 @@ $fontWeight-normal: createVar(fontWeight-normal);
 $fontWeight-medium: createVar(fontWeight-medium);
 $fontWeight-bold: createVar(fontWeight-bold);
 
-$radius: createVar(radius);
+$borderRadius: createVar(radius);
 
 // body
 $fontSize: createVar(fontSize);

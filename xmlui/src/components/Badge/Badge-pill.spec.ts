@@ -73,17 +73,6 @@ test("pill: paddingVertical", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("padding-bottom", EXPECTED_PADDING_VERTICAL);
 });
 
-async function isPillShaped(elem: Locator) {
-  const { width, height } = await getBoundingRect(elem);
-  const smaller = Math.min(width, height);
-  const minRadius = smaller / 2;
-
-  const radiusPx = await getElementStyle(elem, "border-radius");
-  const radius = pixelStrToNum(radiusPx);
-
-  expect(radius).toBeGreaterThanOrEqual(minRadius);
-}
-
 test("border", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";

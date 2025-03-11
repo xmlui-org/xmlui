@@ -22,7 +22,7 @@ $component: "Text";
   line-height: createThemeVar("lineHeight-#{$component}-#{$variant}");
   color: createThemeVar("color-Text-#{$variant}");
   background-color: createThemeVar("color-bg-#{$component}-#{$variant}");
-  border-radius: createThemeVar("border-radius-#{$component}-#{$variant}");
+  border-radius: createThemeVar("borderRadius-#{$component}-#{$variant}");
   border-color: createThemeVar("color-border-#{$component}-#{$variant}");
   border-width: createThemeVar("thickness-border-#{$component}-#{$variant}");
   border-style: createThemeVar("style-border-#{$component}-#{$variant}");

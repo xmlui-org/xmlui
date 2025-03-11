@@ -65,7 +65,7 @@ $component: "Carousel";
   width: createThemeVar("width-control-#{$component}");
   color: createThemeVar("color-text-control-#{$component}");
   background-color: createThemeVar("color-bg-control-#{$component}");;
-  border-radius: createThemeVar("radius-control-#{$component}");
+  border-radius: createThemeVar("borderRadius-control-#{$component}");
 }
 
 .controlButton:hover {

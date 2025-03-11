@@ -1135,11 +1135,11 @@ test("padding, paddingBottom", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("radius", async ({ page }) => {
+test("borderRadius", async ({ page }) => {
   const EXPECTED = "10px";
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "radius-Card": EXPECTED,
+      "borderRadius-Card": EXPECTED,
     },
   });
   await expect(page.getByTestId("card")).toHaveCSS("border-radius", EXPECTED);

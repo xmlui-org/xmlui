@@ -8,7 +8,7 @@ $themeVars: ();
 }
 
 $color-bg-DropdownMenu: createThemeVar("color-bg-DropdownMenu");
-$radius-DropdownMenu: createThemeVar("radius-DropdownMenu");
+$borderRadius-DropdownMenu: createThemeVar("borderRadius-DropdownMenu");
 $boxShadow-DropdownMenu: createThemeVar("boxShadow-DropdownMenu");
 $color-border-DropdownMenu-content: createThemeVar(
   "color-border-DropdownMenu-content"
@@ -42,7 +42,7 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
 .DropdownMenuContent,
 .DropdownMenuSubContent {
   background-color: $color-bg-DropdownMenu;
-  border-radius: $radius-DropdownMenu;
+  border-radius: $borderRadius-DropdownMenu;
   min-width: $minWidth-DropdowMenu;
   box-shadow: $boxShadow-DropdownMenu;
   overflow: hidden;

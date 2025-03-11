@@ -11,7 +11,7 @@ $componentName: "Select";
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
   border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
   border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
@@ -133,7 +133,7 @@ $componentName: "Select";
   gap: t.$space-1;
   justify-content: center;
   align-items: center;
-  border-radius: t.$radius;
+  border-radius: t.$borderRadius;
   font-size: createThemeVar("Input:fontSize-#{$componentName}-badge");
   background-color: createThemeVar("Input:color-bg-#{$componentName}-badge");
   color: createThemeVar("Input:color-text-#{$componentName}-badge");
@@ -235,7 +235,7 @@ $componentName: "Select";
   z-index: 50;
   overflow: auto;
   background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
-  border-radius: createThemeVar("Input:radius-menu-#{$componentName}");
+  border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
   box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
   border: createThemeVar("Input:thickness-border-menu-#{$componentName}") solid createThemeVar("Input:color-border-menu-#{$componentName}");
 

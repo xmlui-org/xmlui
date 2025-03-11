@@ -81,7 +81,7 @@ export const SelectMd = createMetadata({
   defaultThemeVars: {
     [`color-bg-menu-${COMP}`]: "$color-bg-primary",
     [`boxShadow-menu-${COMP}`]: "$shadow-md",
-    [`radius-menu-${COMP}`]: "$radius",
+    [`borderRadius-menu-${COMP}`]: "$borderRadius",
     [`thickness-border-menu-${COMP}`]: "1px",
     [`color-border-menu-${COMP}`]: "$color-border",
     [`color-bg-item-${COMP}`]: "$color-bg-dropdown-item",

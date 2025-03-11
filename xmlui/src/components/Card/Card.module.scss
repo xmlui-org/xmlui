@@ -12,7 +12,7 @@ $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
 $boxShadow-Card: createThemeVar("boxShadow-Card");
 $color-bg-Card: createThemeVar("color-bg-Card");
-$radius-Card: createThemeVar("radius-Card");
+$borderRadius-Card: createThemeVar("borderRadius-Card");
 
 .wrapper {
   @include t.borderVars($themeVars, $component);

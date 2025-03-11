@@ -40,7 +40,7 @@ type BorderValue = {
 
 export function borderSubject(name: string, valueSpec?: BorderValue): Record<string, string> {
   return {
-    [`radius-${name}`]: "$radius",
+    [`borderRadius-${name}`]: "$borderRadius",
     ...borderEdgeSubject("left", valueSpec?.left ?? valueSpec?.horizontal ?? valueSpec?.all),
     ...borderEdgeSubject("right", valueSpec?.right ?? valueSpec?.horizontal ?? valueSpec?.all),
     ...borderEdgeSubject("top", valueSpec?.top ?? valueSpec?.vertical ?? valueSpec?.all),

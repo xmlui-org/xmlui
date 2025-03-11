@@ -983,16 +983,16 @@ describe("Layout resolver", () => {
   });
 
   // --- Radius
-  it("radius: 4px", () => {
-    const PROP = "radius";
+  it("borderRadius: 4px", () => {
+    const PROP = "borderRadius";
     const VALUE = "4px";
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.borderRadius).toBe(VALUE);
     expect(result.issues.has(PROP)).toBe(false);
   });
 
-  it("radius (themeVar)", () => {
-    const PROP = "radius";
+  it("borderRadius (themeVar)", () => {
+    const PROP = "borderRadius";
     const VALUE = THEME_ID;
     const result = resolveLayoutProps({ [PROP]: VALUE });
     expect(result.cssProps.borderRadius).toBe(THEME_ID_VALUE);

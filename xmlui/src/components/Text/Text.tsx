@@ -44,7 +44,7 @@ export const TextMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`border-radius-${COMP}`]: "$radius",
+    [`borderRadius-${COMP}`]: "$borderRadius",
     [`style-border-${COMP}`]: "solid",
     [`fontSize-${COMP}`]: "$fontSize-small",
     [`thickness-border-${COMP}`]: "$space-0",

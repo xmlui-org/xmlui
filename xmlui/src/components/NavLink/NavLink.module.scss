@@ -28,7 +28,7 @@ $fontFamily-NavLink: createThemeVar("fontFamily-#{$component}");
 $fontWeight-NavLink: createThemeVar("fontWeight-#{$component}");
 $fontWeight-NavLink--pressed: createThemeVar("fontWeight-#{$component}--pressed");
 $fontWeight-NavLink--active: createThemeVar("fontWeight-#{$component}--active");
-$radius-indicator-NavLink: createThemeVar("radius-indicator-#{$component}");
+$borderRadius-indicator-NavLink: createThemeVar("borderRadius-indicator-#{$component}");
 $thickness-indicator-NavLink: createThemeVar("thickness-indicator-#{$component}");
 $color-indicator-NavLink: createThemeVar("color-indicator-#{$component}");
 $color-indicator-NavLink--hover: createThemeVar("color-indicator-#{$component}--hover");
@@ -73,7 +73,7 @@ $transition: color 0.1s, background-color 0.1s;
         right: 0.1em;
         bottom: 0;
         height: $thickness-indicator-NavLink;
-        border-radius: $radius-indicator-NavLink;
+        border-radius: $borderRadius-indicator-NavLink;
         content: "";
       }
     }
@@ -171,7 +171,7 @@ $transition: color 0.1s, background-color 0.1s;
         right: auto;
         width: $thickness-indicator-NavLink;
         height: auto;
-        border-radius: $radius-indicator-NavLink;
+        border-radius: $borderRadius-indicator-NavLink;
       }
     }
 

@@ -389,8 +389,8 @@ The `Navlink` component uses these theme variables to customize its appearance:
 - `fontWeight`: (with these states: `--active`, `--pressed`)
 - `paddingHorizontal`
 - `paddingVertical`
-- `radius`
-- `radius-indicator`
+- `borderRadius`
+- `borderRadius-indicator`
 - `thickness-indicator`
 
 The theme variables ending with `indicator` set the indicator's visual properties that sign the link's active state.
@@ -466,6 +466,8 @@ The following sample theme sets a few visual properties of `NavLink`. It changes
 | [border-right](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border-top](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border](../styles-and-themes/common-units/#border)-vertical-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-indicator-NavLink | $borderRadius | $borderRadius |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | $borderRadius | $borderRadius |
 | [color-bg](../styles-and-themes/common-units/#color)-NavLink | transparent | transparent |
 | [color-bg](../styles-and-themes/common-units/#color)-NavLink--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-NavLink--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -506,12 +508,10 @@ The following sample theme sets a few visual properties of `NavLink`. It changes
 | [paddingRight](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [paddingTop](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [paddingVertical](../styles-and-themes/common-units/#size)-NavLink | $space-2 | $space-2 |
-| [radius](../styles-and-themes/common-units/#border-rounding)-end-end-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-end-start-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-indicator-NavLink | $radius | $radius |
-| [radius](../styles-and-themes/common-units/#border-rounding)-NavLink | $radius | $radius |
-| [radius](../styles-and-themes/common-units/#border-rounding)-start-end-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-start-start-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-end-end-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-end-start-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-start-end-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| radius-start-start-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-bottom](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-horizontal](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-border-left](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

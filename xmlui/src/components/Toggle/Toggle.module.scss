@@ -9,7 +9,7 @@ $themeVars: ();
 
 // --- CSS properties of a particular Checkbox variant
 @mixin checkboxVariant($variantName) {
-  border-radius: createThemeVar("Input:radius-Checkbox-#{$variantName}");
+  border-radius: createThemeVar("Input:borderRadius-Checkbox-#{$variantName}");
   border-color: createThemeVar("Input:color-border-Checkbox-#{$variantName}");
   background-color: createThemeVar("Input:color-bg-Checkbox-#{$variantName}");
 
