@@ -56,14 +56,14 @@ test("border", async ({ page }) => {
   await expect(page.getByTestId("link")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-left", async ({ page }) => {
+test("borderLeft", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "border-left-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderLeft-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -81,14 +81,14 @@ test("border-left", async ({ page }) => {
   await expect(page.getByTestId("link")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-right", async ({ page }) => {
+test("borderRight", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "border-right-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderRight-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -131,7 +131,7 @@ test("borderHorizontal", async ({ page }) => {
   await expect(page.getByTestId("link")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("borderHorizontal and border-left", async ({ page }) => {
+test("borderHorizontal and borderLeft", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -139,7 +139,7 @@ test("borderHorizontal and border-left", async ({ page }) => {
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
       "borderHorizontal-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-left-Link": "8px double rgb(0, 128, 0)",
+      "borderLeft-Link": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -157,7 +157,7 @@ test("borderHorizontal and border-left", async ({ page }) => {
   await expect(page.getByTestId("link")).toHaveCSS("border-left-style", "double");
 });
 
-test("borderHorizontal and border-right", async ({ page }) => {
+test("borderHorizontal and borderRight", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -165,7 +165,7 @@ test("borderHorizontal and border-right", async ({ page }) => {
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
       "borderHorizontal-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-right-Link": "8px double rgb(0, 128, 0)",
+      "borderRight-Link": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -183,14 +183,14 @@ test("borderHorizontal and border-right", async ({ page }) => {
   await expect(page.getByTestId("link")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-top", async ({ page }) => {
+test("borderTop", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "border-top-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderTop-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -258,7 +258,7 @@ test("borderVertical", async ({ page }) => {
   await expect(page.getByTestId("link")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("borderVertical and border-top", async ({ page }) => {
+test("borderVertical and borderTop", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -266,7 +266,7 @@ test("borderVertical and border-top", async ({ page }) => {
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
       "borderVertical-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-top-Link": "8px double rgb(0, 128, 0)",
+      "borderTop-Link": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -317,7 +317,7 @@ test("border-color", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "color-border-Link": EXPECTED_COLOR,
+      "borderColor-Link": EXPECTED_COLOR,
     },
   });
 
@@ -343,7 +343,7 @@ test("border, border-color", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "color-border-Link": UPDATED,
+      "borderColor-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -397,7 +397,7 @@ test("border, border-color-left", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "color-border-left-Link": UPDATED,
+      "borderLeftColor-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -424,7 +424,7 @@ test("border, border-color-right", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "color-border-right-Link": UPDATED,
+      "borderRightColor-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -478,7 +478,7 @@ test("border, border-color-top", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "color-border-top-Link": UPDATED,
+      "borderTopColor-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -531,7 +531,7 @@ test("border-style", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "style-border-Link": EXPECTED_STYLE,
+      "borderStyle-Link": EXPECTED_STYLE,
     },
   });
 
@@ -557,7 +557,7 @@ test("border, border-style", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "style-border-Link": UPDATED,
+      "borderStyle-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -611,7 +611,7 @@ test("border, border-style-left", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "style-border-left-Link": UPDATED,
+      "borderLeftStyle-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -638,7 +638,7 @@ test("border, border-style-right", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "style-border-right-Link": UPDATED,
+      "borderRightStyle-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -692,7 +692,7 @@ test("border, border-style-top", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "style-border-top-Link": UPDATED,
+      "borderTopStyle-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -745,7 +745,7 @@ test("border-thickness", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "thickness-border-Link": EXPECTED_WIDTH,
+      "borderWidth-Link": EXPECTED_WIDTH,
     },
   });
 
@@ -771,7 +771,7 @@ test("border, border-thickness", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "thickness-border-Link": UPDATED,
+      "borderWidth-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -825,7 +825,7 @@ test("border, border-thickness-left", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "thickness-border-left-Link": UPDATED,
+      "borderLeftWidth-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -852,7 +852,7 @@ test("border, border-thickness-right", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "thickness-border-right-Link": UPDATED,
+      "borderRightWidth-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -906,7 +906,7 @@ test("border, border-thickness-top", async ({ page }) => {
 
   await initThemedApp(page, LINK_CODE, {
     themeVars: {
-      "thickness-border-top-Link": UPDATED,
+      "borderTopWidth-Link": UPDATED,
       "border-Link": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });

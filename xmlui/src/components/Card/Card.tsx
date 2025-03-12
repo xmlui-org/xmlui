@@ -50,7 +50,7 @@ export const CardMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`padding-${COMP}`]: "$space-4",
-    [`border-${COMP}`]: "1px solid $color-border",
+    [`border-${COMP}`]: "1px solid $borderColor",
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`boxShadow-${COMP}`]: "none",
     light: {

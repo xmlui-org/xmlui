@@ -29,10 +29,10 @@ export const SpinnerMd = createMetadata({
     [`size-${COMP}`]: "$space-10",
     [`thickness-${COMP}`]: "$space-0_5",
     light: {
-      [`color-border-${COMP}`]: "$color-surface-400",
+      [`borderColor-${COMP}`]: "$color-surface-400",
     },
     dark: {
-      [`color-border-${COMP}`]: "$color-surface-600",
+      [`borderColor-${COMP}`]: "$color-surface-600",
     },
   },
 });

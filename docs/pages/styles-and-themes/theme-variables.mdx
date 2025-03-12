@@ -31,7 +31,7 @@ The `<trait1>` and `<trait2>` segments describe one or two trait values regardin
 For example, the `Button` component has two traits that define its appearance. The `themeColor` trait defines the set of colors to use with the button; its available values are `primary`, `secondary`, and `attention`. The `variant` trait specifies the general appearance of the button (whether it has a border at all, etc.) with the values of `solid`, `outlined`, or `ghost`. The `themeColor` is the first trait, and `variant` is the second. So, we can use (among the others) these theme variables with button colors:
 
 - `color-bg-Button-primary-solid`: Defines the background color of a button that is set up to use the `primary` theme color, displayed with the `solid` variant.
-- `color-border-Button-attention-ghost`: Specifies the border color of a ghost button displayed with the `attention` theme color.
+- `borderColor-Button-attention-ghost`: Specifies the border color of a ghost button displayed with the `attention` theme color.
 
 The `<state1>`, ..., `<stateN>` values define visual states that may modify the appearance of a particular UI element or component (regarding a specific trait). Here are a few examples:
 
@@ -42,7 +42,7 @@ The `<state1>`, ..., `<stateN>` values define visual states that may modify the 
 When defining a theme variable, you can define multiple state values (in any order). Let's see a few examples:
 
 - `color-bg-Button-primary-solid--hover`: The background color to use with a `solid` button with the `primary` theme color while the mouse hovers over it.
-- `color-border-Button-attention-ghost--focus`: Specifies the border color of a focused ghost button displayed with the `attention` theme color.
+- `borderColor-Button-attention-ghost--focus`: Specifies the border color of a focused ghost button displayed with the `attention` theme color.
 
 ## Theme Property Names [#property-names]
 
@@ -516,7 +516,7 @@ Besides the spacing theme variables, layout containers provide a few others that
 ### Dropwdowns
 
 XMLUI has several components with dropdowns. The following theme variables help style them:
-- `color-border-dropdown-item`: The border color of the items within the dropdown.
+- `borderColor-dropdown-item`: The border color of the items within the dropdown.
 - `color-bg-dropdown-item--hover`: The hovered color of the dropdown items' background.
 - `color-bg-dropdown-item--active`: The active (selected) color of the dropdown items' background.
 

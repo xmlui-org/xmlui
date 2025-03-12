@@ -98,14 +98,14 @@ test("border", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-left", async ({ page }) => {
+test("borderLeft", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "border-left-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderLeft-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -123,14 +123,14 @@ test("border-left", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-right", async ({ page }) => {
+test("borderRight", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "border-right-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderRight-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -173,7 +173,7 @@ test("borderHorizontal", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("borderHorizontal and border-left", async ({ page }) => {
+test("borderHorizontal and borderLeft", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -181,7 +181,7 @@ test("borderHorizontal and border-left", async ({ page }) => {
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
       "borderHorizontal-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-left-Badge-pill": "8px double rgb(0, 128, 0)",
+      "borderLeft-Badge-pill": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -199,7 +199,7 @@ test("borderHorizontal and border-left", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("border-left-style", "double");
 });
 
-test("borderHorizontal and border-right", async ({ page }) => {
+test("borderHorizontal and borderRight", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -207,7 +207,7 @@ test("borderHorizontal and border-right", async ({ page }) => {
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
       "borderHorizontal-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-right-Badge-pill": "8px double rgb(0, 128, 0)",
+      "borderRight-Badge-pill": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -225,14 +225,14 @@ test("borderHorizontal and border-right", async ({ page }) => {
   await expect(page.getByTestId("badge")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-top", async ({ page }) => {
+test("borderTop", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "border-top-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderTop-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -300,7 +300,7 @@ test("borderVertical", async ({ page }) => {
   await expect(page.getByTestId("badge")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("borderVertical and border-top", async ({ page }) => {
+test("borderVertical and borderTop", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -308,7 +308,7 @@ test("borderVertical and border-top", async ({ page }) => {
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
       "borderVertical-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-top-Badge-pill": "8px double rgb(0, 128, 0)",
+      "borderTop-Badge-pill": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -359,7 +359,7 @@ test("border-color", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "color-border-Badge-pill": EXPECTED_COLOR,
+      "borderColor-Badge-pill": EXPECTED_COLOR,
     },
   });
 
@@ -385,7 +385,7 @@ test("border, border-color", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "color-border-Badge-pill": UPDATED,
+      "borderColor-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -439,7 +439,7 @@ test("border, border-color-left", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "color-border-left-Badge-pill": UPDATED,
+      "borderLeftColor-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -466,7 +466,7 @@ test("border, border-color-right", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "color-border-right-Badge-pill": UPDATED,
+      "borderRightColor-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -520,7 +520,7 @@ test("border, border-color-top", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "color-border-top-Badge-pill": UPDATED,
+      "borderTopColor-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -573,7 +573,7 @@ test("border-style", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "style-border-Badge-pill": EXPECTED_STYLE,
+      "borderStyle-Badge-pill": EXPECTED_STYLE,
     },
   });
 
@@ -599,7 +599,7 @@ test("border, border-style", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "style-border-Badge-pill": UPDATED,
+      "borderStyle-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -653,7 +653,7 @@ test("border, border-style-left", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "style-border-left-Badge-pill": UPDATED,
+      "borderLeftStyle-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -680,7 +680,7 @@ test("border, border-style-right", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "style-border-right-Badge-pill": UPDATED,
+      "borderRightStyle-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -734,7 +734,7 @@ test("border, border-style-top", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "style-border-top-Badge-pill": UPDATED,
+      "borderTopStyle-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -787,7 +787,7 @@ test("border-thickness", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "thickness-border-Badge-pill": EXPECTED_WIDTH,
+      "borderWidth-Badge-pill": EXPECTED_WIDTH,
     },
   });
 
@@ -813,7 +813,7 @@ test("border, border-thickness", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "thickness-border-Badge-pill": UPDATED,
+      "borderWidth-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -867,7 +867,7 @@ test("border, border-thickness-left", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "thickness-border-left-Badge-pill": UPDATED,
+      "borderLeftWidth-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -894,7 +894,7 @@ test("border, border-thickness-right", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "thickness-border-right-Badge-pill": UPDATED,
+      "borderRightWidth-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -948,7 +948,7 @@ test("border, border-thickness-top", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "thickness-border-top-Badge-pill": UPDATED,
+      "borderTopWidth-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });

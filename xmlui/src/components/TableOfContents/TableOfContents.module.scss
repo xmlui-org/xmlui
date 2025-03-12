@@ -30,9 +30,9 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
   scrollbar-color: lab(48.438% 0 0 / .4) transparent;
   scrollbar-width: thin;
   border-radius: createThemeVar("borderRadius-TableOfContents");
-  border-color: createThemeVar("color-border-TableOfContents");
-  border-width: createThemeVar("thickness-border-TableOfContents");
-  border-style: createThemeVar("style-border-TableOfContents");
+  border-color: createThemeVar("borderColor-TableOfContents");
+  border-width: createThemeVar("borderWidth-TableOfContents");
+  border-style: createThemeVar("borderStyle-TableOfContents");
   // --- Do not collapse these padding properties; they are intentionally expanded
   margin-top: createThemeVar("marginTop-TableOfContents");
   margin-bottom: createThemeVar("marginBottom-TableOfContents");

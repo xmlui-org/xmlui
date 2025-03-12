@@ -332,7 +332,7 @@ See an example in the `setValue` API method.
 The `Checkbox` component uses these theme variables to customize its appearance:
 
 - `color-bg-Checkbox-default`
-- `color-border-Checkbox-default`
+- `borderColor-Checkbox-default`
 - `borderRadius-Checkbox-default`
 - `color-bg-Checkbox--disabled`
 - `color-bg-indicator-Checkbox`
@@ -340,14 +340,28 @@ The `Checkbox` component uses these theme variables to customize its appearance:
 - `color-bg-checked-Checkbox-warning`
 - `color-bg-checked-Checkbox-success`
 - `color-bg-checked-Checkbox-error`
-- `color-border-checked-Checkbox`
-- `color-border-checked-Checkbox-warning`
-- `color-border-checked-Checkbox-error`
+- `borderColor-checked-Checkbox`
+- `borderColor-checked-Checkbox-warning`
+- `borderColor-checked-Checkbox-error`
 
 ### Theme Variables
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [borderColor](../styles-and-themes/common-units/#color)-Checkbox--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Checkbox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Checkbox-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Checkbox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Checkbox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Checkbox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Checkbox | $color-primary-500 | $color-primary-400 |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Checkbox | $color-primary-500 | $color-primary-400 |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Checkbox-error | $borderColor-Checkbox-error | $borderColor-Checkbox-error |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Checkbox-error | $borderColor-Checkbox-error | $borderColor-Checkbox-error |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Checkbox-success | $borderColor-Checkbox-success | $borderColor-Checkbox-success |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Checkbox-success | $borderColor-Checkbox-success | $borderColor-Checkbox-success |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Checkbox-warning | $borderColor-Checkbox-warning | $borderColor-Checkbox-warning |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Checkbox-warning | $borderColor-Checkbox-warning | $borderColor-Checkbox-warning |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Checkbox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Checkbox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Checkbox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -360,27 +374,13 @@ The `Checkbox` component uses these theme variables to customize its appearance:
 | [color-bg](../styles-and-themes/common-units/#color)-Checkbox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox | $color-primary-500 | $color-primary-400 |
 | [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox | $color-primary-500 | $color-primary-400 |
-| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
-| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
-| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
-| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
-| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
-| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-error | $borderColor-Checkbox-error | $borderColor-Checkbox-error |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-error | $borderColor-Checkbox-error | $borderColor-Checkbox-error |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-success | $borderColor-Checkbox-success | $borderColor-Checkbox-success |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-success | $borderColor-Checkbox-success | $borderColor-Checkbox-success |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-warning | $borderColor-Checkbox-warning | $borderColor-Checkbox-warning |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-Checkbox-warning | $borderColor-Checkbox-warning | $borderColor-Checkbox-warning |
 | [color-bg](../styles-and-themes/common-units/#color)-indicator-Checkbox | $color-bg-primary | $color-bg-primary |
-| [color-border](../styles-and-themes/common-units/#color)-Checkbox--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Checkbox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Checkbox-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Checkbox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Checkbox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Checkbox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-checked-Checkbox | $color-primary-500 | $color-primary-400 |
-| [color-border](../styles-and-themes/common-units/#color)-checked-Checkbox | $color-primary-500 | $color-primary-400 |
-| [color-border](../styles-and-themes/common-units/#color)-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
-| [color-border](../styles-and-themes/common-units/#color)-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
-| [color-border](../styles-and-themes/common-units/#color)-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
-| [color-border](../styles-and-themes/common-units/#color)-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
-| [color-border](../styles-and-themes/common-units/#color)-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
-| [color-border](../styles-and-themes/common-units/#color)-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
 | [outlineColor](../styles-and-themes/common-units/#color)-Checkbox-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [outlineColor](../styles-and-themes/common-units/#color)-Checkbox-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [outlineColor](../styles-and-themes/common-units/#color)-Checkbox-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

@@ -10,14 +10,14 @@ $themeVars: ();
 $color-bg-DropdownMenu: createThemeVar("color-bg-DropdownMenu");
 $borderRadius-DropdownMenu: createThemeVar("borderRadius-DropdownMenu");
 $boxShadow-DropdownMenu: createThemeVar("boxShadow-DropdownMenu");
-$color-border-DropdownMenu-content: createThemeVar(
-  "color-border-DropdownMenu-content"
+$borderColor-DropdownMenu-content: createThemeVar(
+  "borderColor-DropdownMenu-content"
 );
-$thickness-border-DropdownMenu-content: createThemeVar(
-  "thickness-border-DropdownMenu-content"
+$borderWidth-DropdownMenu-content: createThemeVar(
+  "borderWidth-DropdownMenu-content"
 );
-$style-border-DropdownMenu-content: createThemeVar(
-  "style-border-DropdownMenu-content"
+$borderStyle-DropdownMenu-content: createThemeVar(
+  "borderStyle-DropdownMenu-content"
 );
 $minWidth-DropdowMenu: createThemeVar("minWidth-DropdownMenu");
 $color-bg-MenuItem: createThemeVar("color-bg-MenuItem");
@@ -49,8 +49,8 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
-  border: $thickness-border-DropdownMenu-content
-    $style-border-DropdownMenu-content $color-border-DropdownMenu-content;
+  border: $borderWidth-DropdownMenu-content
+    $borderStyle-DropdownMenu-content $borderColor-DropdownMenu-content;
 }
 
 .DropdownMenuItem,

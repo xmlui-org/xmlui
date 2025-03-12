@@ -23,7 +23,7 @@ export const NoResultMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`border-${COMP}`]: "0px solid $color-border",
+    [`border-${COMP}`]: "0px solid $borderColor",
     [`paddingVertical-${COMP}`]: "$space-2",
     [`gap-icon-${COMP}`]: "$space-2",
     [`size-icon-${COMP}`]: "$space-8",

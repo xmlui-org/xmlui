@@ -28,7 +28,7 @@ export const ContentSeparatorMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`color-bg-${COMP}`]: "$color-border",
+    [`color-bg-${COMP}`]: "$borderColor",
     [`size-${COMP}`]: "1px",
     light: {
       // --- No light-specific theme vars

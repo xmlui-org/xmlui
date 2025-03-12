@@ -591,15 +591,15 @@ The `NumberBox` component uses these theme variables to customize its appearance
 - `borderRadius-NumberBox`
 - `color-text-NumberBox`
 - `color-bg-NumberBox--disabled`
-- `thickness-border-NumberBox`
-- `style-border-NumberBox`
-- `color-border-NumberBox--disabled`
+- `borderWidth-NumberBox`
+- `borderStyle-NumberBox`
+- `borderColor-NumberBox--disabled`
 - `color-bg-NumberBox--disabled`
 - `color-text-NumberBox--disabled`
-- `color-border-NumberBox-default`
-- `color-border-NumberBox-error`
-- `color-border-NumberBox-warning`
-- `color-border-NumberBox-success`
+- `borderColor-NumberBox-default`
+- `borderColor-NumberBox-error`
+- `borderColor-NumberBox-warning`
+- `borderColor-NumberBox-success`
 - `color-placeholder-NumberBox`
 
 ```json
@@ -609,7 +609,7 @@ The `NumberBox` component uses these theme variables to customize its appearance
   "themeVars": {
     "borderRadius-NumberBox": "30px",
     "color-adornment-NumberBox": "red",
-    "thickness-border-NumberBox": "4px"
+    "borderWidth-NumberBox": "4px"
   }
 }
 ```
@@ -624,7 +624,7 @@ The `NumberBox` component uses these theme variables to customize its appearance
       themeVars: {
         "borderRadius-NumberBox": "30px",
         "color-adornment-NumberBox": "red",
-        "thickness-border-NumberBox": "4px",
+        "borderWidth-NumberBox": "4px",
       },
     },
   ]}
@@ -638,7 +638,7 @@ The `NumberBox` component uses these theme variables to customize its appearance
 To style all input controls not just this component, use `Input` instead of the `NumberBox` segment:
 
 ```
-color-border-Input: "#0033FF"
+borderColor-Input: "#0033FF"
 ```
 
 `Input` affects the following controls:
@@ -656,10 +656,31 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NumberBox-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-NumberBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-NumberBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-NumberBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-NumberBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-NumberBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-NumberBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-NumberBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-NumberBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-NumberBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-NumberBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-NumberBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-NumberBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NumberBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NumberBox-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NumberBox-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -689,19 +710,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-bg](../styles-and-themes/common-units/#color)-NumberBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-NumberBox-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-NumberBox-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-NumberBox-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-NumberBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-NumberBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-NumberBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -739,11 +747,3 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [outlineWidth](../styles-and-themes/common-units/#size)-NumberBox-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-NumberBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-NumberBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-NumberBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-NumberBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-NumberBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-NumberBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-NumberBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-NumberBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

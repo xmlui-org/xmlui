@@ -426,10 +426,10 @@ VARIANTS.forEach((variant) => {
 });
 
 BORDER_STYLES.forEach((borderStyle) => {
-  test(`style-border-Button: "${borderStyle}" to solid, outlined`, async ({ page }) => {
+  test(`borderStyle-Button: "${borderStyle}" to solid, outlined`, async ({ page }) => {
     await initThemedApp(page, BTN_MATRIX_CODE, {
       themeVars: {
-        "style-border-Button": borderStyle,
+        "borderStyle-Button": borderStyle,
       },
     });
 
@@ -471,11 +471,11 @@ test(`borderRadius-Button to solid, outlined`, async ({ page }) => {
   expect(btnOutAttBorderRadius).toBe(EXPECTED);
 });
 
-test.skip(`thickness-border-Button to solid, outlined`, async ({ page }) => {
+test.skip(`borderWidth-Button to solid, outlined`, async ({ page }) => {
   const EXPECTED = "5px";
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "thickness-border-Button": EXPECTED,
+      "borderWidth-Button": EXPECTED,
     },
   });
   const btnSolPriBorderWidth = await getStyle(page, "btnSolPri", "border-width");
@@ -515,11 +515,11 @@ test(`boxShadow-Button to solid, outlined`, async ({ page }) => {
   expect(btnOutAttBorderWidth).toContain(EXPECTED);
 });
 
-test("color-border to solid, outlined", async ({ page }) => {
+test("borderColor to solid, outlined", async ({ page }) => {
   const EXPECTED = COLORS.green;
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "color-border-Button": EXPECTED,
+      "borderColor-Button": EXPECTED,
     },
   });
 

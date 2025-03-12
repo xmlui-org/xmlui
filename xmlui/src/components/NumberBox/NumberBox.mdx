@@ -537,15 +537,15 @@ The `NumberBox` component uses these theme variables to customize its appearance
 - `borderRadius-NumberBox`
 - `color-text-NumberBox`
 - `color-bg-NumberBox--disabled`
-- `thickness-border-NumberBox`
-- `style-border-NumberBox`
-- `color-border-NumberBox--disabled`
+- `borderWidth-NumberBox`
+- `borderStyle-NumberBox`
+- `borderColor-NumberBox--disabled`
 - `color-bg-NumberBox--disabled`
 - `color-text-NumberBox--disabled`
-- `color-border-NumberBox-default`
-- `color-border-NumberBox-error`
-- `color-border-NumberBox-warning`
-- `color-border-NumberBox-success`
+- `borderColor-NumberBox-default`
+- `borderColor-NumberBox-error`
+- `borderColor-NumberBox-warning`
+- `borderColor-NumberBox-success`
 - `color-placeholder-NumberBox`
 
 ```json
@@ -555,7 +555,7 @@ The `NumberBox` component uses these theme variables to customize its appearance
   "themeVars": {
     "borderRadius-NumberBox": "30px",
     "color-adornment-NumberBox": "red",
-    "thickness-border-NumberBox": "4px"
+    "borderWidth-NumberBox": "4px"
   }
 }
 ```
@@ -570,7 +570,7 @@ The `NumberBox` component uses these theme variables to customize its appearance
       themeVars: {
         "borderRadius-NumberBox": "30px",
         "color-adornment-NumberBox": "red",
-        "thickness-border-NumberBox": "4px",
+        "borderWidth-NumberBox": "4px",
       },
     },
   ]}
@@ -584,7 +584,7 @@ The `NumberBox` component uses these theme variables to customize its appearance
 To style all input controls not just this component, use `Input` instead of the `NumberBox` segment:
 
 ```
-color-border-Input: "#0033FF"
+borderColor-Input: "#0033FF"
 ```
 
 `Input` affects the following controls:

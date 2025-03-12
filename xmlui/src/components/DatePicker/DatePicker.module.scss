@@ -12,16 +12,16 @@ $componentName: "DatePicker";
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
-  border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
-  border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
-  border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
   background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
   padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   &:hover {
-    border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
     background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
     color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
@@ -77,7 +77,7 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
     cursor: not-allowed;
     background-color: createThemeVar("Input:color-bg-DatePicker--disabled");
     color: createThemeVar("Input:color-text-DatePicker--disabled");
-    border-color: createThemeVar("Input:color-border-DatePicker--disabled");
+    border-color: createThemeVar("Input:borderColor-DatePicker--disabled");
 
     .indicator, .datePickerInput {
       cursor: not-allowed;

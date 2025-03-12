@@ -4,13 +4,13 @@ import { generatePaddingSegments } from "../../../src/components-core/theming/tr
 describe("generatePaddingSegments", () => {
   it("No padding", () => {
     const newTheme: Record<string, string> = {
-      "color-border-AppHeader": "xxx",
+      "borderColor-AppHeader": "xxx",
     };
 
     const result = generatePaddingSegments(newTheme);
 
     expect(result).deep.equal({
-      "color-border-AppHeader": "xxx",
+      "borderColor-AppHeader": "xxx",
     });
   });
 

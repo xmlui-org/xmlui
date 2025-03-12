@@ -75,9 +75,9 @@ export const SliderMd = createMetadata({
   defaultThemeVars: {
     [`color-bg-track-${COMP}`]: "$color-surface-200",
     [`color-bg-range-${COMP}`]: "$color-primary",
-    [`thickness-border-thumb-${COMP}`]: "2px",
-    [`style-border-thumb-${COMP}`]: "solid",
-    [`color-border-thumb-${COMP}`]: "$color-surface-50",
+    [`borderWidth-thumb-${COMP}`]: "2px",
+    [`borderStyle-thumb-${COMP}`]: "solid",
+    [`borderColor-thumb-${COMP}`]: "$color-surface-50",
     [`color-bg-thumb-${COMP}`]: "$color-primary",
     [`boxShadow-thumb-${COMP}`]: "$shadow-md",
 
