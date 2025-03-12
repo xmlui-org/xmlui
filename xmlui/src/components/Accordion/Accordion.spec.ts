@@ -293,7 +293,7 @@ test("border-color", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "color-border-Accordion": EXPECTED_COLOR,
+      "borderColor-Accordion": EXPECTED_COLOR,
     },
   });
 
@@ -319,7 +319,7 @@ test("border, border-color", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "color-border-Accordion": UPDATED,
+      "borderColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -507,7 +507,7 @@ test("border-style", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "style-border-Accordion": EXPECTED_STYLE,
+      "borderStyle-Accordion": EXPECTED_STYLE,
     },
   });
 
@@ -533,7 +533,7 @@ test("border, border-style", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "style-border-Accordion": UPDATED,
+      "borderStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -721,7 +721,7 @@ test("border-thickness", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "thickness-border-Accordion": EXPECTED_WIDTH,
+      "borderWidth-Accordion": EXPECTED_WIDTH,
     },
   });
 
@@ -747,7 +747,7 @@ test("border, border-thickness", async ({ page }) => {
 
   await initThemedApp(page, ACCORDION_CODE, {
     themeVars: {
-      "thickness-border-Accordion": UPDATED,
+      "borderWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });

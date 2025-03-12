@@ -130,9 +130,9 @@ export function generateButtonTones(theme?: Record<string, string>) {
           [`color-bg-Button-${variant}-solid`]: tones.base,
           [`color-bg-Button-${variant}-solid--hover`]: tones.tone1,
           [`color-bg-Button-${variant}-solid--active`]: tones.tone2,
-          [`color-border-Button-${variant}-solid`]: tones.base,
-          [`color-border-Button-${variant}-solid--hover`]: tones.base,
-          [`color-border-Button-${variant}-solid--active`]: tones.base,
+          [`borderColor-Button-${variant}-solid`]: tones.base,
+          [`borderColor-Button-${variant}-solid--hover`]: tones.base,
+          [`borderColor-Button-${variant}-solid--active`]: tones.base,
           [`color-text-Button-${variant}-solid`]: tones.tone3,
           [`color-text-Button-${variant}-solid--hover`]: tones.tone3,
           [`color-text-Button-${variant}-solid--active`]: tones.tone3,
@@ -146,9 +146,9 @@ export function generateButtonTones(theme?: Record<string, string>) {
         return {
           [`color-bg-Button-${variant}-outlined--hover`]: tones.alpha1,
           [`color-bg-Button-${variant}-outlined--active`]: tones.alpha2,
-          [`color-border-Button-${variant}-outlined`]: tones.base,
-          [`color-border-Button-${variant}-outlined--hover`]: tones.tone1,
-          [`color-border-Button-${variant}-outlined--active`]: tones.tone2,
+          [`borderColor-Button-${variant}-outlined`]: tones.base,
+          [`borderColor-Button-${variant}-outlined--hover`]: tones.tone1,
+          [`borderColor-Button-${variant}-outlined--active`]: tones.tone2,
           [`color-text-Button-${variant}-outlined`]: tones.base,
           [`color-text-Button-${variant}-outlined--hover`]: tones.tone1,
           [`color-text-Button-${variant}-outlined--active`]: tones.tone2,
@@ -256,12 +256,11 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
   return result;
 }
 
-const borderRegEx = /^border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
-const thicknessBorderRegEx =
-  /^thickness-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const borderRegEx = /^border-(.+)$/;
+const thicknessBorderRegEx = /^borderWidth-(.+)$/;
 const thicknessBorderHorizontalRegEx = /^borderHorizontalWidth-(.+)$/;
 const thicknessBorderVerticalRegEx = /^borderVerticalWidth-(.+)$/;
-const styleBorderRegEx = /^style-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const styleBorderRegEx = /^borderStyle-(.+)$/;
 const styleBorderHorizontalRegEx = /^borderHorizontalStyle-(.+)$/;
 const styleBorderVerticalRegEx = /^borderVerticalStyle-(.+)$/;
 const borderLeftRegEx = /^borderLeft-(.+)$/;
@@ -270,7 +269,7 @@ const borderTopRegEx = /^borderTop-(.+)$/;
 const borderBottomRegEx = /^borderBottom-(.+)$/;
 const borderHorizontalRegEx = /^borderHorizontal-(.+)$/;
 const borderVerticalRegEx = /^borderVertical-(.+)$/;
-const colorBorderRegEx = /^color-border-(?!(?:horizontal|vertical|left|right|top|bottom)-)(.+)$/;
+const colorBorderRegEx = /^borderColor-(.+)$/;
 const colorBorderHorizontalRegEx = /^borderHorizontalColor-(.+)$/;
 const colorBorderVerticalRegEx = /^borderVerticalColor-(.+)$/;
 
@@ -298,9 +297,42 @@ export function generateBorderSegments(theme?: Record<string, string>) {
 
       // --- We have a border value to segment
       const border = getBorderSegments(value);
-      result[`thickness-border-${remainder}`] = border.thickness;
-      result[`style-border-${remainder}`] ??= border.style;
-      result[`color-border-${remainder}`] ??= border.color;
+      result[`borderWidth-${remainder}`] = border.thickness;
+      result[`borderStyle-${remainder}`] ??= border.style;
+      result[`borderColor-${remainder}`] ??= border.color;
+    }
+
+    // --- Check "borderWidth-" theme variables
+    match = thicknessBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a borderWidth value to flow down
+      const remainder = match[1];
+      result[`borderLeftWidth-${remainder}`] = value;
+      result[`borderRightWidth-${remainder}`] = value;
+      result[`borderTopWidth-${remainder}`] = value;
+      result[`borderBottomWidth-${remainder}`] = value;
+    }
+
+    // --- Check "borderStyle-" theme variables
+    match = styleBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a borderStyle value to flow down
+      const remainder = match[1];
+      result[`borderLeftStyle-${remainder}`] = value;
+      result[`borderRightStyle-${remainder}`] = value;
+      result[`borderTopStyle-${remainder}`] = value;
+      result[`borderBottomStyle-${remainder}`] = value;
+    }
+
+    // --- Check "borderColor-" theme variables
+    match = colorBorderRegEx.exec(key);
+    if (match) {
+      // --- We have a borderColor value to flow down
+      const remainder = match[1];
+      result[`borderLeftColor-${remainder}`] = value;
+      result[`borderRightColor-${remainder}`] = value;
+      result[`borderTopColor-${remainder}`] = value;
+      result[`borderBottomColor-${remainder}`] = value;
     }
 
     // --- Check "borderHorizontal" theme variables
@@ -420,17 +452,6 @@ export function generateBorderSegments(theme?: Record<string, string>) {
       }
     }
 
-    // --- Check "thickness-border-" theme variables
-    match = thicknessBorderRegEx.exec(key);
-    if (match) {
-      // --- We have a thickness-border value to flow down
-      const remainder = match[1];
-      result[`borderLeftWidth-${remainder}`] = value;
-      result[`borderRightWidth-${remainder}`] = value;
-      result[`borderTopWidth-${remainder}`] = value;
-      result[`borderBottomWidth-${remainder}`] = value;
-    }
-
     // --- Check "borderHorizontalWidth" theme variables
     match = thicknessBorderHorizontalRegEx.exec(key);
     if (match) {
@@ -449,17 +470,6 @@ export function generateBorderSegments(theme?: Record<string, string>) {
       result[`borderBottomWidth-${remainder}`] = value;
     }
 
-    // --- Check "style-border-" theme variables
-    match = styleBorderRegEx.exec(key);
-    if (match) {
-      // --- We have a style-border value to flow down
-      const remainder = match[1];
-      result[`borderLeftStyle-${remainder}`] = value;
-      result[`borderRightStyle-${remainder}`] = value;
-      result[`borderTopStyle-${remainder}`] = value;
-      result[`borderBottomStyle-${remainder}`] = value;
-    }
-
     // --- Check "borderHorizontalStyle" theme variables
     match = styleBorderHorizontalRegEx.exec(key);
     if (match) {
@@ -476,17 +486,6 @@ export function generateBorderSegments(theme?: Record<string, string>) {
       const remainder = match[1];
       result[`borderTopStyle-${remainder}`] = value;
       result[`borderBottomStyle-${remainder}`] = value;
-    }
-
-    // --- Check "color-border-" theme variables
-    match = colorBorderRegEx.exec(key);
-    if (match) {
-      // --- We have a color-border value to flow down
-      const remainder = match[1];
-      result[`borderLeftColor-${remainder}`] = value;
-      result[`borderRightColor-${remainder}`] = value;
-      result[`borderTopColor-${remainder}`] = value;
-      result[`borderBottomColor-${remainder}`] = value;
     }
 
     // --- Check "borderHorizontalColor" theme variables

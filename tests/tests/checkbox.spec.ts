@@ -235,9 +235,9 @@ ERROR_LEVELS.forEach((errorLevel) => {
     const background = errorLevel === "default" ? `color-bg-Checkbox` : `color-bg-Checkbox-${themeErrorLevel}`;
     const checkedBackground =
       errorLevel === "default" ? `color-bg-checked-Checkbox` : `color-bg-checked-Checkbox-${themeErrorLevel}`;
-    const border = `color-border-Checkbox-${themeErrorLevel}`;
+    const border = `borderColor-Checkbox-${themeErrorLevel}`;
     const checkedBorder =
-      errorLevel === "default" ? `color-border-checked-Checkbox` : `color-border-checked-Checkbox-${themeErrorLevel}`;
+      errorLevel === "default" ? `borderColor-checked-Checkbox` : `borderColor-checked-Checkbox-${themeErrorLevel}`;
 
     await initThemedApp(
       page,
@@ -342,7 +342,7 @@ test(`theme: disabled`, async ({ page }) => {
     {
       themeVars: {
         "color-bg-Checkbox--disabled": EXPECTED_COLORS,
-        "color-border-Checkbox--disabled": EXPECTED_COLORS,
+        "borderColor-Checkbox--disabled": EXPECTED_COLORS,
       },
     }
   );

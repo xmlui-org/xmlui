@@ -43,7 +43,7 @@ export const AvatarMd = createMetadata({
     dark: {
       [`border-${COMP}`]: "0px solid $color-surface-700",
       [`color-bg-${COMP}`]: "$color-surface-800",
-      [`color-border-${COMP}`]: "$color-surface-700",
+      [`borderColor-${COMP}`]: "$color-surface-700",
     },
   },
 });

@@ -35,10 +35,10 @@ export const TabsMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-bg-${COMP}`]: "$color-bg-primary",
-    [`style-border-${COMP}`]: "solid",
-    [`color-border-${COMP}`]: "$color-border",
-    [`color-border-active-${COMP}`]: "$color-primary",
-    [`thickness-border-${COMP}`]: "2px",
+    [`borderStyle-${COMP}`]: "solid",
+    [`borderColor-${COMP}`]: "$borderColor",
+    [`borderColor-active-${COMP}`]: "$color-primary",
+    [`borderWidth-${COMP}`]: "2px",
     [`color-bg-trigger-${COMP}`]: "$color-bg-primary",
     light: {
       [`color-bg-trigger-${COMP}--hover`]: "$color-primary-50",

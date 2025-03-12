@@ -752,7 +752,7 @@ function addThemeVarDescriptions(component) {
 // Use this object/map to replace the occurrences of the keys and have them be replaced by links
 const themeKeywordLinks = {
   color: "[color](../styles-and-themes/common-units/#color)",
-  "color-border": "[color-border](../styles-and-themes/common-units/#color)",
+  "borderColor": "[borderColor](../styles-and-themes/common-units/#color)",
   "borderBottomColor": "[borderBottomColor](../styles-and-themes/common-units/#color)",
   "borderTopColor": "[borderTopColor](../styles-and-themes/common-units/#color)",
   "borderHorizontalColor": "[borderHorizontalColor](../styles-and-themes/common-units/#color)",
@@ -764,7 +764,7 @@ const themeKeywordLinks = {
   "color-text": "[color-text](../styles-and-themes/common-units/#color)",
   "fontWeight": "[fontWeight](../styles-and-themes/common-units/#fontWeight)",
   rounding: "[rounding](../styles-and-themes/common-units/#border-rounding)",
-  "style-border": "[style-border](../styles-and-themes/common-units/#border-style)",
+  "borderStyle": "[borderStyle](../styles-and-themes/common-units/#border-style)",
   "borderBottomStyle": "[borderBottomStyle](../styles-and-themes/common-units/#border-style)",
   "borderTopStyle": "[borderTopStyle](../styles-and-themes/common-units/#border-style)",
   "borderHorizontalStyle":
@@ -783,7 +783,7 @@ const themeKeywordLinks = {
   "maxWidth": "[maxWidth](../styles-and-themes/common-units/#size)",
   distance: "[distance](../styles-and-themes/common-units/#size)",
   thickness: "[thickness](../styles-and-themes/common-units/#size)",
-  "thickness-border": "[thickness-border](../styles-and-themes/common-units/#size)",
+  "borderWidth": "[borderWidth](../styles-and-themes/common-units/#size)",
   "borderBottomWidth": "[borderBottomWidth](../styles-and-themes/common-units/#size)",
   "borderTopWidth": "[borderTopWidth](../styles-and-themes/common-units/#size)",
   "borderHorizontalWidth":

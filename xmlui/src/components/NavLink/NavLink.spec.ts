@@ -289,7 +289,7 @@ test("border-color", async ({ page }) => {
 
   await initThemedApp(page, NAVLINK_CODE, {
     themeVars: {
-      "color-border-NavLink": EXPECTED_COLOR,
+      "borderColor-NavLink": EXPECTED_COLOR,
     },
   });
 
@@ -315,7 +315,7 @@ test("border, border-color", async ({ page }) => {
 
   await initThemedApp(page, NAVLINK_CODE, {
     themeVars: {
-      "color-border-NavLink": UPDATED,
+      "borderColor-NavLink": UPDATED,
       "border-NavLink": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -503,7 +503,7 @@ test("border-style", async ({ page }) => {
 
   await initThemedApp(page, NAVLINK_CODE, {
     themeVars: {
-      "style-border-NavLink": EXPECTED_STYLE,
+      "borderStyle-NavLink": EXPECTED_STYLE,
     },
   });
 
@@ -529,7 +529,7 @@ test("border, border-style", async ({ page }) => {
 
   await initThemedApp(page, NAVLINK_CODE, {
     themeVars: {
-      "style-border-NavLink": UPDATED,
+      "borderStyle-NavLink": UPDATED,
       "border-NavLink": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -717,7 +717,7 @@ test("border-thickness", async ({ page }) => {
 
   await initThemedApp(page, NAVLINK_CODE, {
     themeVars: {
-      "thickness-border-NavLink": EXPECTED_WIDTH,
+      "borderWidth-NavLink": EXPECTED_WIDTH,
     },
   });
 
@@ -743,7 +743,7 @@ test("border, border-thickness", async ({ page }) => {
 
   await initThemedApp(page, NAVLINK_CODE, {
     themeVars: {
-      "thickness-border-NavLink": UPDATED,
+      "borderWidth-NavLink": UPDATED,
       "border-NavLink": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });

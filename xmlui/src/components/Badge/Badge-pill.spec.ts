@@ -359,7 +359,7 @@ test("border-color", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "color-border-Badge-pill": EXPECTED_COLOR,
+      "borderColor-Badge-pill": EXPECTED_COLOR,
     },
   });
 
@@ -385,7 +385,7 @@ test("border, border-color", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "color-border-Badge-pill": UPDATED,
+      "borderColor-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -573,7 +573,7 @@ test("border-style", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "style-border-Badge-pill": EXPECTED_STYLE,
+      "borderStyle-Badge-pill": EXPECTED_STYLE,
     },
   });
 
@@ -599,7 +599,7 @@ test("border, border-style", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "style-border-Badge-pill": UPDATED,
+      "borderStyle-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -787,7 +787,7 @@ test("border-thickness", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "thickness-border-Badge-pill": EXPECTED_WIDTH,
+      "borderWidth-Badge-pill": EXPECTED_WIDTH,
     },
   });
 
@@ -813,7 +813,7 @@ test("border, border-thickness", async ({ page }) => {
 
   await initThemedApp(page, BADGE_CODE_PILL, {
     themeVars: {
-      "thickness-border-Badge-pill": UPDATED,
+      "borderWidth-Badge-pill": UPDATED,
       "border-Badge-pill": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });

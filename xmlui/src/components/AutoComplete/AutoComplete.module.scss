@@ -15,16 +15,16 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$component}-#{$variantName}");
-  border-color: createThemeVar("Input:color-border-#{$component}-#{$variantName}");
-  border-width: createThemeVar("Input:thickness-border-#{$component}-#{$variantName}");
-  border-style: createThemeVar("Input:style-border-#{$component}-#{$variantName}");
+  border-color: createThemeVar("Input:borderColor-#{$component}-#{$variantName}");
+  border-width: createThemeVar("Input:borderWidth-#{$component}-#{$variantName}");
+  border-style: createThemeVar("Input:borderStyle-#{$component}-#{$variantName}");
   font-size: createThemeVar("Input:fontSize-#{$component}-#{$variantName}");
   background-color: createThemeVar("Input:color-bg-#{$component}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$component}-#{$variantName}");
   color: createThemeVar("Input:color-text-#{$component}-#{$variantName}");
 
   &:hover {
-    border-color: createThemeVar("Input:color-border-#{$component}-#{$variantName}--hover");
+    border-color: createThemeVar("Input:borderColor-#{$component}-#{$variantName}--hover");
     background-color: createThemeVar("Input:color-bg-#{$component}-#{$variantName}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$component}-#{$variantName}--hover");
     color: createThemeVar("Input:color-text-#{$component}-#{$variantName}--hover");
@@ -67,7 +67,7 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
     opacity: 0.5;
     background-color: createThemeVar("Input:color-bg-#{$component}--disabled");
     color: createThemeVar("Input:color-text-#{$component}--disabled");
-    border-color: createThemeVar("Input:color-border-#{$component}--disabled");
+    border-color: createThemeVar("Input:borderColor-#{$component}--disabled");
   }
 
   &.focused {

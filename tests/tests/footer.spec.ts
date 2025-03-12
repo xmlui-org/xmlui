@@ -375,7 +375,7 @@ test("border-color", async ({ page }) => {
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
-      "color-border-Footer": EXPECTED_COLOR,
+      "borderColor-Footer": EXPECTED_COLOR,
     },
   });
 
@@ -401,7 +401,7 @@ test("border, border-color", async ({ page }) => {
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
-      "color-border-Footer": UPDATED,
+      "borderColor-Footer": UPDATED,
       "border-Footer": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -589,7 +589,7 @@ test("border-style", async ({ page }) => {
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
-      "style-border-Footer": EXPECTED_STYLE,
+      "borderStyle-Footer": EXPECTED_STYLE,
     },
   });
 
@@ -615,7 +615,7 @@ test("border, border-style", async ({ page }) => {
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
-      "style-border-Footer": UPDATED,
+      "borderStyle-Footer": UPDATED,
       "border-Footer": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -803,7 +803,7 @@ test("border-thickness", async ({ page }) => {
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
-      "thickness-border-Footer": EXPECTED_WIDTH,
+      "borderWidth-Footer": EXPECTED_WIDTH,
     },
   });
 
@@ -829,7 +829,7 @@ test("border, border-thickness", async ({ page }) => {
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
-      "thickness-border-Footer": UPDATED,
+      "borderWidth-Footer": UPDATED,
       "border-Footer": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });

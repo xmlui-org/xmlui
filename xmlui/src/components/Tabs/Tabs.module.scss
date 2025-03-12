@@ -9,9 +9,9 @@ $themeVars: ();
 }
 
 $color-bg-Tabs: createThemeVar("color-bg-Tabs");
-$color-border-Tabs: createThemeVar("color-border-Tabs");
-$thickness-border-Tabs: createThemeVar("thickness-border-Tabs");
-$color-border-active-Tabs: createThemeVar("color-border-active-Tabs");
+$borderColor-Tabs: createThemeVar("borderColor-Tabs");
+$borderWidth-Tabs: createThemeVar("borderWidth-Tabs");
+$borderColor-active-Tabs: createThemeVar("borderColor-active-Tabs");
 $color-bg-trigger-Tabs: createThemeVar("color-bg-trigger-Tabs");
 $color-text-trigger-Tabs: createThemeVar("color-text-trigger-Tabs");
 $color-bg-trigger-Tabs--hover: createThemeVar("color-bg-trigger-Tabs--hover");
@@ -36,15 +36,15 @@ $color-bg-list-Tabs: createThemeVar("color-bg-list-Tabs");
   flex: 1 1 auto;
 
   &[data-orientation='horizontal'] {
-    border-right-width: $thickness-border-Tabs;
+    border-right-width: $borderWidth-Tabs;
     border-right-style: solid;
-    border-right-color: $color-border-Tabs;
+    border-right-color: $borderColor-Tabs;
   }
 
   &[data-orientation='vertical'] {
-    border-bottom-width: $thickness-border-Tabs;
+    border-bottom-width: $borderWidth-Tabs;
     border-bottom-style: solid;
-    border-bottom-color: $color-border-Tabs;
+    border-bottom-color: $borderColor-Tabs;
   }
 }
 
@@ -68,26 +68,26 @@ $color-bg-list-Tabs: createThemeVar("color-bg-list-Tabs");
   }
 
   &[data-orientation='horizontal'] {
-    border-right-width: $thickness-border-Tabs;
+    border-right-width: $borderWidth-Tabs;
     border-right-style: solid;
-    border-right-color: $color-border-Tabs;
+    border-right-color: $borderColor-Tabs;
 
     &[data-state='active'] {
-      border-right-width: $thickness-border-Tabs;
+      border-right-width: $borderWidth-Tabs;
       border-right-style: solid;
-      border-right-color: $color-border-active-Tabs;
+      border-right-color: $borderColor-active-Tabs;
     }
   }
 
   &[data-orientation='vertical'] {
-    border-bottom-width: $thickness-border-Tabs;
+    border-bottom-width: $borderWidth-Tabs;
     border-bottom-style: solid;
-    border-bottom-color: $color-border-Tabs;
+    border-bottom-color: $borderColor-Tabs;
 
     &[data-state='active'] {
-      border-bottom-width: $thickness-border-Tabs;
+      border-bottom-width: $borderWidth-Tabs;
       border-bottom-style: solid;
-      border-bottom-color: $color-border-active-Tabs;
+      border-bottom-color: $borderColor-active-Tabs;
     }
   }
 

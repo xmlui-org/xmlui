@@ -38,12 +38,12 @@ $themeVars: ();
 
 // --- HorizontalRule
 
-$color-border-HorizontalRule: createThemeVar("color-border-HorizontalRule");
-$thickness-border-HorizontalRule: createThemeVar("thickness-border-HorizontalRule");
-$style-border-HorizontalRule: createThemeVar("style-border-HorizontalRule");
+$borderColor-HorizontalRule: createThemeVar("borderColor-HorizontalRule");
+$borderWidth-HorizontalRule: createThemeVar("borderWidth-HorizontalRule");
+$borderStyle-HorizontalRule: createThemeVar("borderStyle-HorizontalRule");
 
 .horizontalRule {
-  border: $thickness-border-HorizontalRule $style-border-HorizontalRule $color-border-HorizontalRule;
+  border: $borderWidth-HorizontalRule $borderStyle-HorizontalRule $borderColor-HorizontalRule;
 }
 
 $color-bg-Blockquote: createThemeVar("color-bg-Blockquote");

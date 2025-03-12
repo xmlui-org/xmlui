@@ -10,7 +10,7 @@ $themeVars: ();
 // --- CSS properties of a particular Checkbox variant
 @mixin checkboxVariant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-Checkbox-#{$variantName}");
-  border-color: createThemeVar("Input:color-border-Checkbox-#{$variantName}");
+  border-color: createThemeVar("Input:borderColor-Checkbox-#{$variantName}");
   background-color: createThemeVar("Input:color-bg-Checkbox-#{$variantName}");
 
   &:focus-visible{
@@ -23,39 +23,39 @@ $themeVars: ();
 
 @mixin hoverAndDisabledState($componentName) {
   &:hover {
-    border-color: createThemeVar("Input:color-border-#{$componentName}-default--hover");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}-default--hover");
   }
 
   &:disabled {
     cursor: not-allowed;
     background-color: createThemeVar("Input:color-bg-#{$componentName}--disabled");
-    border-color: createThemeVar("Input:color-border-#{$componentName}--disabled");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
   }
 }
 
 @mixin checkedState($componentName) {
   &:checked {
-    border-color: createThemeVar("Input:color-border-checked-#{$componentName}");
+    border-color: createThemeVar("Input:borderColor-checked-#{$componentName}");
     background-color: createThemeVar("Input:color-bg-checked-#{$componentName}");
   }
 
   &:checked:disabled {
     background-color: createThemeVar("Input:color-bg-#{$componentName}--disabled");
-    border-color: createThemeVar("Input:color-border-#{$componentName}--disabled");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
   }
 
   &:checked.error {
-    border-color: createThemeVar("Input:color-border-checked-#{$componentName}-error");
+    border-color: createThemeVar("Input:borderColor-checked-#{$componentName}-error");
     background-color: createThemeVar("Input:color-bg-checked-#{$componentName}-error");
   }
 
   &:checked.warning {
-    border-color: createThemeVar("Input:color-border-checked-#{$componentName}-warning");
+    border-color: createThemeVar("Input:borderColor-checked-#{$componentName}-warning");
     background-color: createThemeVar("Input:color-bg-checked-#{$componentName}-warning");
   }
 
   &:checked.valid {
-    border-color: createThemeVar("Input:color-border-checked-#{$componentName}-success");
+    border-color: createThemeVar("Input:borderColor-checked-#{$componentName}-success");
     background-color: createThemeVar("Input:color-bg-checked-#{$componentName}-success");
   }
 }
@@ -127,7 +127,7 @@ $themeVars: ();
 
   &:indeterminate {
     background-color: createThemeVar("Input:color-bg-checked-Checkbox");
-    border-color: createThemeVar("Input:color-border-checked-Checkbox");
+    border-color: createThemeVar("Input:borderColor-checked-Checkbox");
 
     &[readonly]{
       pointer-events: none;
@@ -135,7 +135,7 @@ $themeVars: ();
   }
   &:indeterminate:disabled {
     background-color: createThemeVar("Input:color-bg-Checkbox--disabled");
-    border-color: createThemeVar("Input:color-border-Checkbox--disabled");
+    border-color: createThemeVar("Input:borderColor-Checkbox--disabled");
   }
   &:indeterminate::before {
     clip-path: circle(30.0% at 50% 50%);
@@ -145,7 +145,7 @@ $themeVars: ();
 }
 
 .switch {
-  border: 2px solid createThemeVar("Input:color-border-Switch");
+  border: 2px solid createThemeVar("Input:borderColor-Switch");
   width: 32px;
   height: 20px;
   border-radius: 1rem;
@@ -158,15 +158,15 @@ $themeVars: ();
   @include hoverAndDisabledState("Switch");
 
   &.error {
-    border-color: createThemeVar("Input:color-border-Switch-error");
+    border-color: createThemeVar("Input:borderColor-Switch-error");
   }
 
   &.warning {
-    border-color: createThemeVar("Input:color-border-Switch-warning");
+    border-color: createThemeVar("Input:borderColor-Switch-warning");
   }
 
   &.valid {
-    border-color: createThemeVar("Input:color-border-Switch-success");
+    border-color: createThemeVar("Input:borderColor-Switch-success");
   }
 
   &::before {

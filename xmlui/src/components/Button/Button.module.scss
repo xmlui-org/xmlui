@@ -21,9 +21,9 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   font-size: createThemeVar('fontSize-#{$component}-#{$colorScheme}-solid');
   font-weight: createThemeVar('fontWeight-#{$component}-#{$colorScheme}-solid');
   border-radius: createThemeVar('borderRadius-#{$component}-#{$colorScheme}-solid');
-  border-width: createThemeVar('thickness-border-#{$component}-#{$colorScheme}-solid');
-  border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-solid');
-  border-style: createThemeVar('style-border-#{$component}-#{$colorScheme}-solid');
+  border-width: createThemeVar('borderWidth-#{$component}-#{$colorScheme}-solid');
+  border-color: createThemeVar('borderColor-#{$component}-#{$colorScheme}-solid');
+  border-style: createThemeVar('borderStyle-#{$component}-#{$colorScheme}-solid');
   background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-solid');
   color: createThemeVar('color-text-#{$component}-#{$colorScheme}-solid');
   box-shadow: createThemeVar('boxShadow-#{$component}-#{$colorScheme}-solid');
@@ -38,13 +38,13 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
 
   &:not([disabled]) {
     &:hover {
-      border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-solid--hover');
+      border-color: createThemeVar('borderColor-#{$component}-#{$colorScheme}-solid--hover');
       color: createThemeVar('color-text-#{$component}-#{$colorScheme}-solid--hover');
       background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-solid--hover');
     }
 
     &:active {
-      border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-solid--active');
+      border-color: createThemeVar('borderColor-#{$component}-#{$colorScheme}-solid--active');
       color: createThemeVar('color-text-#{$component}-#{$colorScheme}-solid--active');
       box-shadow: createThemeVar('boxShadow-#{$component}-#{$colorScheme}-solid--active');
       background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-solid--active');
@@ -55,7 +55,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
     cursor: not-allowed;
     background: createThemeVar('color-bg-#{$component}--disabled');
     color: createThemeVar('color-text-#{$component}--disabled');
-    border-color: createThemeVar('color-border-#{$component}--disabled');
+    border-color: createThemeVar('borderColor-#{$component}--disabled');
   }
 }
 
@@ -65,9 +65,9 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   font-size: createThemeVar('fontSize-#{$component}-#{$colorScheme}-outlined');
   font-weight: createThemeVar('fontWeight-#{$component}-#{$colorScheme}-outlined');
   border-radius: createThemeVar('borderRadius-#{$component}-#{$colorScheme}-outlined');
-  border-width: createThemeVar('thickness-border-#{$component}-#{$colorScheme}-outlined');
-  border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-outlined');
-  border-style: createThemeVar('style-border-#{$component}-#{$colorScheme}-outlined');
+  border-width: createThemeVar('borderWidth-#{$component}-#{$colorScheme}-outlined');
+  border-color: createThemeVar('borderColor-#{$component}-#{$colorScheme}-outlined');
+  border-style: createThemeVar('borderStyle-#{$component}-#{$colorScheme}-outlined');
   color: createThemeVar('color-text-#{$component}-#{$colorScheme}-outlined');
   box-shadow: createThemeVar('boxShadow-#{$component}-#{$colorScheme}-outlined');
   background: transparent;
@@ -81,13 +81,13 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
 
   &:not([disabled]) {
     &:hover {
-      border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-outlined--hover');
+      border-color: createThemeVar('borderColor-#{$component}-#{$colorScheme}-outlined--hover');
       background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-outlined--hover');
       color: createThemeVar('color-text-#{$component}-#{$colorScheme}-outlined--hover');
     }
 
     &:active {
-      border-color: createThemeVar('color-border-#{$component}-#{$colorScheme}-outlined--active');
+      border-color: createThemeVar('borderColor-#{$component}-#{$colorScheme}-outlined--active');
       background: createThemeVar('color-bg-#{$component}-#{$colorScheme}-outlined--active');
       color: createThemeVar('color-text-#{$component}-#{$colorScheme}-outlined--active');
     }
@@ -96,7 +96,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   &:disabled {
     cursor: not-allowed;
     color: createThemeVar('color-text-#{$component}--disabled');
-    border-color: createThemeVar('color-border-#{$component}--disabled');
+    border-color: createThemeVar('borderColor-#{$component}--disabled');
   }
 }
 
@@ -106,7 +106,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   font-size: createThemeVar('fontSize-#{$component}-#{$colorScheme}-ghost');
   font-weight: createThemeVar('fontWeight-#{$component}-#{$colorScheme}-ghost');
   border-radius: createThemeVar('borderRadius-#{$component}-#{$colorScheme}-ghost');
-  border-width: createThemeVar('thickness-border-#{$component}-#{$colorScheme}-ghost');
+  border-width: createThemeVar('borderWidth-#{$component}-#{$colorScheme}-ghost');
   border-color: transparent;
   border-style: solid;
   background: transparent;

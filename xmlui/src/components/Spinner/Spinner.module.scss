@@ -9,7 +9,7 @@ $themeVars: ();
 
 $size-Spinner: createThemeVar("size-Spinner");
 $thickness-Spinner: createThemeVar("thickness-Spinner");
-$color-border-Spinner: createThemeVar("color-border-Spinner");
+$borderColor-Spinner: createThemeVar("borderColor-Spinner");
 
 .lds-ring {
   display: inline-block;
@@ -29,7 +29,7 @@ $color-border-Spinner: createThemeVar("color-border-Spinner");
   border-style: solid;
   border-radius: 50%;
   animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: $color-border-Spinner transparent transparent transparent;
+  border-color: $borderColor-Spinner transparent transparent transparent;
 }
 
 .lds-ring div:nth-child(1) {

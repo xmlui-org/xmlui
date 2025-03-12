@@ -57,7 +57,7 @@ export default {
     themeVars: {
       "radius-Accordion": "var(--xmlui-radius-Accordion)",
       "color-border-Accordion": "var(--xmlui-color-border-Accordion)",
-      "thickness-border-Accordion": "var(--xmlui-thickness-border-Accordion)",
+      "borderWidth-Accordion": "var(--xmlui-borderWidth-Accordion)",
       "style-border-Accordion": "var(--xmlui-style-border-Accordion)",
       "align-vertical-header-Accordion": "var(--xmlui-align-vertical-header-Accordion)",
       "font-size-header-Accordion": "var(--xmlui-font-size-header-Accordion)",

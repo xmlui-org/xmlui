@@ -11,9 +11,9 @@ $component: "Splitter";
 $boxShadow-Splitter: createThemeVar("boxShadow-#{$component}");
 $color-bg-Splitter: createThemeVar("color-bg-#{$component}");
 $borderRadius-Splitter: createThemeVar("borderRadius-#{$component}");
-$color-border-Splitter: createThemeVar("color-border-#{$component}");
-$thickness-border-Splitter: createThemeVar("thickness-border-#{$component}");
-$style-border-Splitter: createThemeVar("style-border-#{$component}");
+$borderColor-Splitter: createThemeVar("borderColor-#{$component}");
+$borderWidth-Splitter: createThemeVar("borderWidth-#{$component}");
+$borderStyle-Splitter: createThemeVar("borderStyle-#{$component}");
 $border-Splitter: createThemeVar("border-#{$component}");
 $color-bg-resizer-Splitter: createThemeVar("color-bg-resizer-#{$component}");
 $thickness-resizer-Splitter: createThemeVar("thickness-resizer-#{$component}");
@@ -30,7 +30,7 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$co
   box-shadow: $boxShadow-Splitter;
   background-color: $color-bg-Splitter;
   border-radius: $borderRadius-Splitter;
-  border: $border-Splitter $style-border-Splitter $color-border-Splitter;
+  border: $border-Splitter $borderStyle-Splitter $borderColor-Splitter;
   user-select: none;
 
   &.vertical {

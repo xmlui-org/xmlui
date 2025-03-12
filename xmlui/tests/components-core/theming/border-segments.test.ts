@@ -90,15 +90,15 @@ describe("generateBorderSegments", () => {
     });
   });
 
-  it("thickness-border only", () => {
+  it("borderWidth only", () => {
     const newTheme: Record<string, string> = {
-      "thickness-border-Card": "xxx",
+      "borderWidth-Card": "xxx",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "thickness-border-Card": "xxx",
+      "borderWidth-Card": "xxx",
       "borderBottomWidth-Card": "xxx",
       "borderLeftWidth-Card": "xxx",
       "borderRightWidth-Card": "xxx",
@@ -134,15 +134,15 @@ describe("generateBorderSegments", () => {
     });
   });
 
-  it("style-border only", () => {
+  it("borderStyle only", () => {
     const newTheme: Record<string, string> = {
-      "style-border-Card": "xxx",
+      "borderStyle-Card": "xxx",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "style-border-Card": "xxx",
+      "borderStyle-Card": "xxx",
       "borderBottomStyle-Card": "xxx",
       "borderLeftStyle-Card": "xxx",
       "borderRightStyle-Card": "xxx",
@@ -178,15 +178,15 @@ describe("generateBorderSegments", () => {
     });
   });
 
-  it("color-border only", () => {
+  it("borderColor only", () => {
     const newTheme: Record<string, string> = {
-      "color-border-Card": "xxx",
+      "borderColor-Card": "xxx",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "color-border-Card": "xxx",
+      "borderColor-Card": "xxx",
       "borderBottomColor-Card": "xxx",
       "borderLeftColor-Card": "xxx",
       "borderRightColor-Card": "xxx",
@@ -224,20 +224,20 @@ describe("generateBorderSegments", () => {
 
   it("border: thickness, style, color #1", () => {
     const newTheme: Record<string, string> = {
-      "border-Card": "1px solid $color-border",
+      "border-Card": "1px solid $borderColor",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "border-Card": "1px solid $color-border",
-      "borderBottom-Card": "1px solid $color-border",
-      "borderLeft-Card": "1px solid $color-border",
-      "borderRight-Card": "1px solid $color-border",
-      "borderTop-Card": "1px solid $color-border",
-      "color-border-Card": "$color-border",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "border-Card": "1px solid $borderColor",
+      "borderBottom-Card": "1px solid $borderColor",
+      "borderLeft-Card": "1px solid $borderColor",
+      "borderRight-Card": "1px solid $borderColor",
+      "borderTop-Card": "1px solid $borderColor",
+      "borderColor-Card": "$borderColor",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -254,9 +254,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid rgb(0,0,0)",
       "borderRight-Card": "1px solid rgb(0,0,0)",
       "borderTop-Card": "1px solid rgb(0,0,0)",
-      "color-border-Card": "rgb(0,0,0)",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "rgb(0,0,0)",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -273,9 +273,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid #000",
       "borderRight-Card": "1px solid #000",
       "borderTop-Card": "1px solid #000",
-      "color-border-Card": "#000",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "#000",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -292,9 +292,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid #000000",
       "borderRight-Card": "1px solid #000000",
       "borderTop-Card": "1px solid #000000",
-      "color-border-Card": "#000000",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "#000000",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -311,9 +311,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid hsl(0,0%,0%)",
       "borderRight-Card": "1px solid hsl(0,0%,0%)",
       "borderTop-Card": "1px solid hsl(0,0%,0%)",
-      "color-border-Card": "hsl(0,0%,0%)",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "hsl(0,0%,0%)",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -330,9 +330,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid hsl(0,0%,0%)",
       "borderRight-Card": "1px solid hsl(0,0%,0%)",
       "borderTop-Card": "1px solid hsl(0,0%,0%)",
-      "color-border-Card": "hsl(0,0%,0%)",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "hsl(0,0%,0%)",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -349,9 +349,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid hsl(0,0%,0%)",
       "borderRight-Card": "1px solid hsl(0,0%,0%)",
       "borderTop-Card": "1px solid hsl(0,0%,0%)",
-      "color-border-Card": "hsl(0,0%,0%)",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "hsl(0,0%,0%)",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -368,9 +368,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid hsla(0,0%,0%,0.5)",
       "borderRight-Card": "1px solid hsla(0,0%,0%,0.5)",
       "borderTop-Card": "1px solid hsla(0,0%,0%,0.5)",
-      "color-border-Card": "hsla(0,0%,0%,0.5)",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "hsla(0,0%,0%,0.5)",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -387,9 +387,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid rgba(0,0,0,0.5)",
       "borderRight-Card": "1px solid rgba(0,0,0,0.5)",
       "borderTop-Card": "1px solid rgba(0,0,0,0.5)",
-      "color-border-Card": "rgba(0,0,0,0.5)",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "rgba(0,0,0,0.5)",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -406,9 +406,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px red solid",
       "borderRight-Card": "1px red solid",
       "borderTop-Card": "1px red solid",
-      "color-border-Card": "red",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "red",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -425,9 +425,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "solid 1px red",
       "borderRight-Card": "solid 1px red",
       "borderTop-Card": "solid 1px red",
-      "color-border-Card": "red",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "red",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -444,9 +444,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "solid red 1px",
       "borderRight-Card": "solid red 1px",
       "borderTop-Card": "solid red 1px",
-      "color-border-Card": "red",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "red",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -463,9 +463,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "red 1px solid",
       "borderRight-Card": "red 1px solid",
       "borderTop-Card": "red 1px solid",
-      "color-border-Card": "red",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "red",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -482,9 +482,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "red solid 1px",
       "borderRight-Card": "red solid 1px",
       "borderTop-Card": "red solid 1px",
-      "color-border-Card": "red",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "red",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -501,9 +501,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px red",
       "borderRight-Card": "1px red",
       "borderTop-Card": "1px red",
-      "color-border-Card": "red",
-      "style-border-Card": undefined,
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "red",
+      "borderStyle-Card": undefined,
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -520,9 +520,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid",
       "borderRight-Card": "1px solid",
       "borderTop-Card": "1px solid",
-      "color-border-Card": undefined,
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": undefined,
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -539,9 +539,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px red",
       "borderRight-Card": "1px red",
       "borderTop-Card": "1px red",
-      "color-border-Card": "red",
-      "style-border-Card": undefined,
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "red",
+      "borderStyle-Card": undefined,
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -558,9 +558,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid $some-color",
       "borderRight-Card": "1px solid $some-color",
       "borderTop-Card": "1px solid $some-color",
-      "color-border-Card": "$some-color",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "$some-color",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -577,9 +577,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "solid 1px $some-color",
       "borderRight-Card": "solid 1px $some-color",
       "borderTop-Card": "solid 1px $some-color",
-      "color-border-Card": "$some-color",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "$some-color",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -596,9 +596,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px $some-style red",
       "borderRight-Card": "1px $some-style red",
       "borderTop-Card": "1px $some-style red",
-      "color-border-Card": "red",
-      "style-border-Card": "$some-style",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "red",
+      "borderStyle-Card": "$some-style",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -615,9 +615,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "red $some-style 1px",
       "borderRight-Card": "red $some-style 1px",
       "borderTop-Card": "red $some-style 1px",
-      "color-border-Card": "red",
-      "style-border-Card": "$some-style",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "red",
+      "borderStyle-Card": "$some-style",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -634,9 +634,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "$some-thickness solid red",
       "borderRight-Card": "$some-thickness solid red",
       "borderTop-Card": "$some-thickness solid red",
-      "color-border-Card": "red",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "$some-thickness",
+      "borderColor-Card": "red",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "$some-thickness",
     });
   });
 
@@ -653,9 +653,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "$some-thickness red solid",
       "borderRight-Card": "$some-thickness red solid",
       "borderTop-Card": "$some-thickness red solid",
-      "color-border-Card": "red",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "$some-thickness",
+      "borderColor-Card": "red",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "$some-thickness",
     });
   });
 
@@ -672,9 +672,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px $some-style $some-color",
       "borderRight-Card": "1px $some-style $some-color",
       "borderTop-Card": "1px $some-style $some-color",
-      "color-border-Card": "$some-color",
-      "style-border-Card": "$some-style",
-      "thickness-border-Card": "1px",
+      "borderColor-Card": "$some-color",
+      "borderStyle-Card": "$some-style",
+      "borderWidth-Card": "1px",
     });
   });
 
@@ -691,9 +691,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "$some-thickness solid $some-color",
       "borderRight-Card": "$some-thickness solid $some-color",
       "borderTop-Card": "$some-thickness solid $some-color",
-      "color-border-Card": "$some-color",
-      "style-border-Card": "solid",
-      "thickness-border-Card": "$some-thickness",
+      "borderColor-Card": "$some-color",
+      "borderStyle-Card": "solid",
+      "borderWidth-Card": "$some-thickness",
     });
   });
 
@@ -710,9 +710,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "$some-thickness $some-style red",
       "borderRight-Card": "$some-thickness $some-style red",
       "borderTop-Card": "$some-thickness $some-style red",
-      "color-border-Card": "red",
-      "style-border-Card": "$some-style",
-      "thickness-border-Card": "$some-thickness",
+      "borderColor-Card": "red",
+      "borderStyle-Card": "$some-style",
+      "borderWidth-Card": "$some-thickness",
     });
   });
 
@@ -729,9 +729,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "$some-thickness $some-style $some-color",
       "borderRight-Card": "$some-thickness $some-style $some-color",
       "borderTop-Card": "$some-thickness $some-style $some-color",
-      "color-border-Card": "$some-color",
-      "style-border-Card": "$some-style",
-      "thickness-border-Card": "$some-thickness",
+      "borderColor-Card": "$some-color",
+      "borderStyle-Card": "$some-style",
+      "borderWidth-Card": "$some-thickness",
     });
   });
 
@@ -748,9 +748,9 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "dotted rgb(255, 0, 0) 5px",
       "borderRight-Card": "dotted rgb(255, 0, 0) 5px",
       "borderTop-Card": "dotted rgb(255, 0, 0) 5px",
-      "color-border-Card": "rgb(255, 0, 0)",
-      "style-border-Card": "dotted",
-      "thickness-border-Card": "5px",
+      "borderColor-Card": "rgb(255, 0, 0)",
+      "borderStyle-Card": "dotted",
+      "borderWidth-Card": "5px",
     });
   });
 
@@ -856,7 +856,7 @@ describe("generateBorderSegments", () => {
 
   it("borderLeft: style override", () => {
     const newTheme: Record<string, string> = {
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderLeft-Card": "1px solid red",
     };
 
@@ -865,7 +865,7 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "borderLeft-Card": "1px solid red",
       "borderLeftColor-Card": "red",
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderBottomStyle-Card": "dotted",
       "borderLeftStyle-Card": "solid",
       "borderRightStyle-Card": "dotted",
@@ -876,7 +876,7 @@ describe("generateBorderSegments", () => {
 
   it("borderLeft: thickness override", () => {
     const newTheme: Record<string, string> = {
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderLeft-Card": "1px solid red",
     };
 
@@ -886,7 +886,7 @@ describe("generateBorderSegments", () => {
       "borderLeft-Card": "1px solid red",
       "borderLeftColor-Card": "red",
       "borderLeftStyle-Card": "solid",
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderBottomWidth-Card": "2px",
       "borderLeftWidth-Card": "1px",
       "borderRightWidth-Card": "2px",
@@ -896,7 +896,7 @@ describe("generateBorderSegments", () => {
 
   it("borderLeft: color override", () => {
     const newTheme: Record<string, string> = {
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderLeft-Card": "1px solid red",
     };
 
@@ -904,7 +904,7 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderLeft-Card": "1px solid red",
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderBottomColor-Card": "blue",
       "borderLeftColor-Card": "red",
       "borderRightColor-Card": "blue",
@@ -916,7 +916,7 @@ describe("generateBorderSegments", () => {
 
   it("borderRight: style override", () => {
     const newTheme: Record<string, string> = {
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderRight-Card": "1px solid red",
     };
 
@@ -925,7 +925,7 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "borderRight-Card": "1px solid red",
       "borderRightColor-Card": "red",
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderBottomStyle-Card": "dotted",
       "borderLeftStyle-Card": "dotted",
       "borderRightStyle-Card": "solid",
@@ -936,7 +936,7 @@ describe("generateBorderSegments", () => {
 
   it("borderRight: thickness override", () => {
     const newTheme: Record<string, string> = {
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderRight-Card": "1px solid red",
     };
 
@@ -946,7 +946,7 @@ describe("generateBorderSegments", () => {
       "borderRight-Card": "1px solid red",
       "borderRightColor-Card": "red",
       "borderRightStyle-Card": "solid",
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderBottomWidth-Card": "2px",
       "borderLeftWidth-Card": "2px",
       "borderRightWidth-Card": "1px",
@@ -956,7 +956,7 @@ describe("generateBorderSegments", () => {
 
   it("borderRight: color override", () => {
     const newTheme: Record<string, string> = {
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderRight-Card": "1px solid red",
     };
 
@@ -964,7 +964,7 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderRight-Card": "1px solid red",
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderBottomColor-Card": "blue",
       "borderLeftColor-Card": "blue",
       "borderRightColor-Card": "red",
@@ -976,7 +976,7 @@ describe("generateBorderSegments", () => {
 
   it("borderHorizontal: style override", () => {
     const newTheme: Record<string, string> = {
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderHorizontal-Card": "1px solid red",
     };
 
@@ -988,7 +988,7 @@ describe("generateBorderSegments", () => {
       "borderRight-Card": "1px solid red",
       "borderLeftColor-Card": "red",
       "borderRightColor-Card": "red",
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderBottomStyle-Card": "dotted",
       "borderLeftStyle-Card": "solid",
       "borderRightStyle-Card": "solid",
@@ -1000,7 +1000,7 @@ describe("generateBorderSegments", () => {
 
   it("borderHorizontal: thickness override", () => {
     const newTheme: Record<string, string> = {
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderHorizontal-Card": "1px solid red",
     };
 
@@ -1014,7 +1014,7 @@ describe("generateBorderSegments", () => {
       "borderRightColor-Card": "red",
       "borderLeftStyle-Card": "solid",
       "borderRightStyle-Card": "solid",
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderBottomWidth-Card": "2px",
       "borderLeftWidth-Card": "1px",
       "borderRightWidth-Card": "1px",
@@ -1024,7 +1024,7 @@ describe("generateBorderSegments", () => {
 
   it("borderHorizontal: color override", () => {
     const newTheme: Record<string, string> = {
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderHorizontal-Card": "1px solid red",
     };
 
@@ -1034,7 +1034,7 @@ describe("generateBorderSegments", () => {
       "borderHorizontal-Card": "1px solid red",
       "borderLeft-Card": "1px solid red",
       "borderRight-Card": "1px solid red",
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderBottomColor-Card": "blue",
       "borderLeftColor-Card": "red",
       "borderRightColor-Card": "red",
@@ -1048,7 +1048,7 @@ describe("generateBorderSegments", () => {
 
   it("borderTop: style override", () => {
     const newTheme: Record<string, string> = {
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderTop-Card": "1px solid red",
     };
 
@@ -1057,7 +1057,7 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "borderTop-Card": "1px solid red",
       "borderTopColor-Card": "red",
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderBottomStyle-Card": "dotted",
       "borderLeftStyle-Card": "dotted",
       "borderRightStyle-Card": "dotted",
@@ -1068,7 +1068,7 @@ describe("generateBorderSegments", () => {
 
   it("borderTop: thickness override", () => {
     const newTheme: Record<string, string> = {
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderTop-Card": "1px solid red",
     };
 
@@ -1078,7 +1078,7 @@ describe("generateBorderSegments", () => {
       "borderTop-Card": "1px solid red",
       "borderTopColor-Card": "red",
       "borderTopStyle-Card": "solid",
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderBottomWidth-Card": "2px",
       "borderLeftWidth-Card": "2px",
       "borderRightWidth-Card": "2px",
@@ -1088,7 +1088,7 @@ describe("generateBorderSegments", () => {
 
   it("borderTop: color override", () => {
     const newTheme: Record<string, string> = {
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderTop-Card": "1px solid red",
     };
 
@@ -1096,7 +1096,7 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderTop-Card": "1px solid red",
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderBottomColor-Card": "blue",
       "borderLeftColor-Card": "blue",
       "borderRightColor-Card": "blue",
@@ -1108,7 +1108,7 @@ describe("generateBorderSegments", () => {
 
   it("borderBottom: style override", () => {
     const newTheme: Record<string, string> = {
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderBottom-Card": "1px solid red",
     };
 
@@ -1117,7 +1117,7 @@ describe("generateBorderSegments", () => {
     expect(result).deep.equal({
       "borderBottom-Card": "1px solid red",
       "borderBottomColor-Card": "red",
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderBottomStyle-Card": "solid",
       "borderLeftStyle-Card": "dotted",
       "borderRightStyle-Card": "dotted",
@@ -1128,7 +1128,7 @@ describe("generateBorderSegments", () => {
 
   it("borderBottom: thickness override", () => {
     const newTheme: Record<string, string> = {
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderBottom-Card": "1px solid red",
     };
 
@@ -1138,7 +1138,7 @@ describe("generateBorderSegments", () => {
       "borderBottom-Card": "1px solid red",
       "borderBottomColor-Card": "red",
       "borderBottomStyle-Card": "solid",
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderBottomWidth-Card": "1px",
       "borderLeftWidth-Card": "2px",
       "borderRightWidth-Card": "2px",
@@ -1148,7 +1148,7 @@ describe("generateBorderSegments", () => {
 
   it("borderBottom: color override", () => {
     const newTheme: Record<string, string> = {
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderBottom-Card": "1px solid red",
     };
 
@@ -1156,7 +1156,7 @@ describe("generateBorderSegments", () => {
 
     expect(result).deep.equal({
       "borderBottom-Card": "1px solid red",
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderBottomColor-Card": "red",
       "borderLeftColor-Card": "blue",
       "borderRightColor-Card": "blue",
@@ -1168,7 +1168,7 @@ describe("generateBorderSegments", () => {
 
   it("borderVertical: style override", () => {
     const newTheme: Record<string, string> = {
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderVertical-Card": "1px solid red",
     };
 
@@ -1180,7 +1180,7 @@ describe("generateBorderSegments", () => {
       "borderVertical-Card": "1px solid red",
       "borderBottomColor-Card": "red",
       "borderTopColor-Card": "red",
-      "style-border-Card": "dotted",
+      "borderStyle-Card": "dotted",
       "borderBottomStyle-Card": "solid",
       "borderLeftStyle-Card": "dotted",
       "borderRightStyle-Card": "dotted",
@@ -1192,7 +1192,7 @@ describe("generateBorderSegments", () => {
 
   it("borderVertical: thickness override", () => {
     const newTheme: Record<string, string> = {
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderVertical-Card": "1px solid red",
     };
 
@@ -1206,7 +1206,7 @@ describe("generateBorderSegments", () => {
       "borderTopColor-Card": "red",
       "borderBottomStyle-Card": "solid",
       "borderTopStyle-Card": "solid",
-      "thickness-border-Card": "2px",
+      "borderWidth-Card": "2px",
       "borderBottomWidth-Card": "1px",
       "borderLeftWidth-Card": "2px",
       "borderRightWidth-Card": "2px",
@@ -1216,7 +1216,7 @@ describe("generateBorderSegments", () => {
 
   it("borderVertical: color override", () => {
     const newTheme: Record<string, string> = {
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderVertical-Card": "1px solid red",
     };
 
@@ -1226,7 +1226,7 @@ describe("generateBorderSegments", () => {
       "borderBottom-Card": "1px solid red",
       "borderTop-Card": "1px solid red",
       "borderVertical-Card": "1px solid red",
-      "color-border-Card": "blue",
+      "borderColor-Card": "blue",
       "borderBottomColor-Card": "red",
       "borderLeftColor-Card": "blue",
       "borderRightColor-Card": "blue",

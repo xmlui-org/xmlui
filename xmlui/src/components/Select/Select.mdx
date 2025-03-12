@@ -588,7 +588,7 @@ If the status segment is omitted, the style will be applied to all statuses.
 - `borderRadius-Select-|status|`
 - `fontSize-Select-|status|`
 - `color-placeholder-Select-|status|`
-- `thickness-border-Select-|status|`
+- `borderWidth-Select-|status|`
 
 - `outlineWidth-Select-|status|--focus`
 - `outlineColor-Select-|status|--focus`
@@ -603,7 +603,7 @@ If the status segment is omitted, the style will be applied to all statuses.
 In addition to the validation statuses,
 the variables below are associated with styles for `hover` and `disabled` interaction states denoted by `|interact|` in their signature:
 
-- `color-border-Select-|status|--|interact|`
+- `borderColor-Select-|status|--|interact|`
 - `color-bg-Select-|status|--|interact|`
 - `boxShadow-Select-|status|--|interact|`
 - `color-text-Select-|status|--|interact|`
@@ -640,7 +640,7 @@ Theme variables to set the styles of an unselected item:
   "themeVars": {
     "borderRadius-Select": "30px",
     "color-placeholder-Select": "red",
-    "thickness-border-Select": "4px"
+    "borderWidth-Select": "4px"
   }
 }
 ```
@@ -656,7 +656,7 @@ Theme variables to set the styles of an unselected item:
             themeVars: {
                 "borderRadius-Select": "30px",
                 "color-placeholder-Select": "red",
-                "thickness-border-Select": "4px",
+                "borderWidth-Select": "4px",
             },
         },
     ]}
@@ -670,7 +670,7 @@ Theme variables to set the styles of an unselected item:
 To style all input controls not just this component, use `Input` instead of the `Select` segment:
 
 ```
-color-border-Input: "#0033FF"
+borderColor-Input: "#0033FF"
 ```
 
 `Input` affects the following controls:

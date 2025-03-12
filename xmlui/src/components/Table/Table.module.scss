@@ -321,7 +321,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
     content: '';
     width: 1px;
     height: 100%;
-    background:createThemeVar("color-border-cell-Table");
+    background:createThemeVar("borderColor-cell-Table");
   }
 }
 

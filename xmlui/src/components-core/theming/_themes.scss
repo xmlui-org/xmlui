@@ -372,8 +372,8 @@ $THEME-VAR-PREFIX: xmlui;
   $tmp: appendThemeVarWithDefault($tmp, "borderTop-#{$subject}", $tmpVertical) !global;
   $tmp: appendThemeVarWithDefault($tmp, "borderBottom-#{$subject}", $tmpVertical) !global;
 
-  $tmp: appendThemeVar($tmp, "thickness-border-#{$subject}") !global;
-  $tmpThickness: getThemeVar($tmp, "thickness-border-#{$subject}");
+  $tmp: appendThemeVar($tmp, "borderWidth-#{$subject}") !global;
+  $tmpThickness: getThemeVar($tmp, "borderWidth-#{$subject}");
   $tmp: appendThemeVarWithDefault($tmp, "borderHorizontalWidth-#{$subject}", $tmpThickness) !global;
   $tmpThicknessHorizontal: getThemeVar($tmp, "borderHorizontalWidth-#{$subject}");
   $tmp: appendThemeVarWithDefault($tmp, "borderLeftWidth-#{$subject}", $tmpThicknessHorizontal) !global;
@@ -383,8 +383,8 @@ $THEME-VAR-PREFIX: xmlui;
   $tmp: appendThemeVarWithDefault($tmp, "borderTopWidth-#{$subject}", $tmpThicknessVertical) !global;
   $tmp: appendThemeVarWithDefault($tmp, "borderBottomWidth-#{$subject}", $tmpThicknessVertical) !global;
 
-  $tmp: appendThemeVar($tmp, "style-border-#{$subject}") !global;
-  $tmpStyle: getThemeVar($tmp, "style-border-#{$subject}");
+  $tmp: appendThemeVar($tmp, "borderStyle-#{$subject}") !global;
+  $tmpStyle: getThemeVar($tmp, "borderStyle-#{$subject}");
   $tmp: appendThemeVarWithDefault($tmp, "borderHorizontalStyle-#{$subject}", $tmpStyle) !global;
   $tmpStyleHorizontal: getThemeVar($tmp, "borderHorizontalStyle-#{$subject}");
   $tmp: appendThemeVarWithDefault($tmp, "borderLeftStyle-#{$subject}", $tmpStyleHorizontal) !global;
@@ -394,8 +394,8 @@ $THEME-VAR-PREFIX: xmlui;
   $tmp: appendThemeVarWithDefault($tmp, "borderTopStyle-#{$subject}", $tmpStyleVertical) !global;
   $tmp: appendThemeVarWithDefault($tmp, "borderBottomStyle-#{$subject}", $tmpStyleVertical) !global;
 
-  $tmp: appendThemeVar($tmp, "color-border-#{$subject}") !global;
-  $tmpColor: getThemeVar($tmp, "color-border-#{$subject}");
+  $tmp: appendThemeVar($tmp, "borderColor-#{$subject}") !global;
+  $tmpColor: getThemeVar($tmp, "borderColor-#{$subject}");
   $tmp: appendThemeVarWithDefault($tmp, "borderHorizontalColor-#{$subject}", $tmpColor) !global;
   $tmpColorHorizontal: getThemeVar($tmp, "borderHorizontalColor-#{$subject}");
   $tmp: appendThemeVarWithDefault($tmp, "borderLeftColor-#{$subject}", $tmpColorHorizontal) !global;
@@ -411,7 +411,7 @@ $THEME-VAR-PREFIX: xmlui;
   $tmp: appendThemeVarWithDefault($tmp, "radius-start-end-#{$subject}", $tmpRadiusAll) !global;
   $tmp: appendThemeVarWithDefault($tmp, "radius-end-start-#{$subject}", $tmpRadiusAll) !global;
   $tmp: appendThemeVarWithDefault($tmp, "radius-end-end-#{$subject}", $tmpRadiusAll) !global;
-  $tmp: appendThemeVar($tmp, "style-border-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "borderStyle-#{$subject}") !global;
   @return $tmp;
 }
 
@@ -499,7 +499,7 @@ $color-bg-secondary: createVar(color-bg-secondary);
 $color-bg-Input-default: createVar(color-bg-Input-default);
 $color-text--disabled: createVar(color-text--disabled);
 $color-bg--disabled: createVar(color-bg--disabled);
-$color-border--disabled: createVar(color-border--disabled);
+$borderColor--disabled: createVar(borderColor--disabled);
 $color-bg--selected: createVar(color-bg--selected);
 $fontFamily: createVar(fontFamily);
 $fontSize-tiny: createVar(fontSize-tiny);
@@ -515,7 +515,7 @@ $color-valid: createVar(color-valid);
 $color-warning: createVar(color-warning);
 $color-error: createVar(color-error);
 
-$color-border: createVar(color-border);
+$borderColor: createVar(borderColor);
 
 $max-content-width: createVar(max-content-width);
 $direction: createVar(direction);
@@ -536,7 +536,7 @@ $media-max-width-tablet: createVar(media-max-width-tablet);
 
 $color-bg-dropdown-item: createVar(color-bg-dropdown-item);
 $color-bg-dropdown-item--active: createVar(color-bg-dropdown-item--active);
-$color-border-dropdown-item: createVar(color-border-dropdown-item);
+$borderColor-dropdown-item: createVar(borderColor-dropdown-item);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Tree style variables
@@ -545,11 +545,11 @@ $color-bg-tree-row--selected--before: createVar(color-bg-tree-row--selected--bef
 // ---------------------------------------------------------------------------------------------------------------------
 // Input border style variables
 
-$color-border-Input-default: createVar(color-border-Input-default);
-$color-border-Input-default--hover: createVar(color-border-Input-default--hover);
-$color-border-Input-default--success: createVar(color-border-Input-default--success);
-$color-border-Input-default--warning: createVar(color-border-Input-default--warning);
-$color-border-Input-default--error: createVar(color-border-Input-default--error);
+$borderColor-Input-default: createVar(borderColor-Input-default);
+$borderColor-Input-default--hover: createVar(borderColor-Input-default--hover);
+$borderColor-Input-default--success: createVar(borderColor-Input-default--success);
+$borderColor-Input-default--warning: createVar(borderColor-Input-default--warning);
+$borderColor-Input-default--error: createVar(borderColor-Input-default--error);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // InputLabel style variables
