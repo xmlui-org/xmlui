@@ -2,15 +2,15 @@
 
 .inputLabel {
   cursor: pointer;
-  color: t.$color-text-subtitle;
+  color: t.$textColor-subtitle;
   padding-bottom: t.$space-1;
 
   &.disabled {
     cursor: not-allowed;
-    color: t.$color-text--disabled;
+    color: t.$textColor--disabled;
   }
 }
 
 .required {
-  color: t.$color-text-InputLabel-required;
+  color: t.$color-InputLabel-required;
 }

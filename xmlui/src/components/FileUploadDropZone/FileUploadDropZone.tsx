@@ -44,10 +44,10 @@ export const FileUploadDropZoneMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "color-bg-FileUploadDropZone": "$color-bg",
-    "color-bg-dropping-FileUploadDropZone": "$color-bg--selected",
+    "backgroundColor-FileUploadDropZone": "$backgroundColor",
+    "backgroundColor-dropping-FileUploadDropZone": "$backgroundColor--selected",
     "opacity-dropping-FileUploadDropZone": "0.5",
-    "color-text-FileUploadDropZone": "$color-text",
+    "color-FileUploadDropZone": "$textColor",
     light: {
       // --- No light-specific theme vars
     },

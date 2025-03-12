@@ -7,15 +7,15 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$color-bg-FileUploadDropZone: createThemeVar("color-bg-FileUploadDropZone");
-$color-text-FileUploadDropZone: createThemeVar("color-text-FileUploadDropZone");
-$color-bg-dropping-FileUploadDropZone: createThemeVar("color-bg-dropping-FileUploadDropZone");
+$backgroundColor-FileUploadDropZone: createThemeVar("backgroundColor-FileUploadDropZone");
+$color-FileUploadDropZone: createThemeVar("color-FileUploadDropZone");
+$backgroundColor-dropping-FileUploadDropZone: createThemeVar("backgroundColor-dropping-FileUploadDropZone");
 $opacity-dropping-FileUploadDropZone: createThemeVar("opacity-dropping-FileUploadDropZone");
 
 .wrapper {
   position: relative;
-  background-color: $color-bg-FileUploadDropZone;
-  color: $color-text-FileUploadDropZone;
+  background-color: $backgroundColor-FileUploadDropZone;
+  color: $color-FileUploadDropZone;
   display: flex;
   flex-direction: column;
 }
@@ -35,7 +35,7 @@ $opacity-dropping-FileUploadDropZone: createThemeVar("opacity-dropping-FileUploa
     content: "";
     position: absolute;
     inset: 0;
-    background-color: $color-bg-dropping-FileUploadDropZone;
+    background-color: $backgroundColor-dropping-FileUploadDropZone;
     opacity: $opacity-dropping-FileUploadDropZone; //0.5;
   }
 }

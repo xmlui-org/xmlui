@@ -73,9 +73,9 @@ export const AppMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`width-navPanel-${COMP}`]: "$space-64",
-    [`max-content-width-${COMP}`]: "$max-content-width",
-    [`boxShadow-header-${COMP}`]: "$shadow-spread",
-    [`boxShadow-pages-${COMP}`]: "$shadow-spread",
+    [`maxWidth-content-${COMP}`]: "$maxWidth-content",
+    [`boxShadow-header-${COMP}`]: "$boxShadow-spread",
+    [`boxShadow-pages-${COMP}`]: "$boxShadow-spread",
     [`scroll-padding-block-Pages`]: "$space-4",
     light: {
       // --- No light-specific theme vars

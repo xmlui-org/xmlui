@@ -15,16 +15,16 @@ $componentName: "DatePicker";
   border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}");
   border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
-  background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
-  color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
+  color: createThemeVar("Input:color-#{$componentName}-#{$variantName}");
   padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
-    color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
+    color: createThemeVar("Input:color-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus {
@@ -75,8 +75,8 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 
   &.disabled {
     cursor: not-allowed;
-    background-color: createThemeVar("Input:color-bg-DatePicker--disabled");
-    color: createThemeVar("Input:color-text-DatePicker--disabled");
+    background-color: createThemeVar("Input:backgroundColor-DatePicker--disabled");
+    color: createThemeVar("Input:color-DatePicker--disabled");
     border-color: createThemeVar("Input:borderColor-DatePicker--disabled");
 
     .indicator, .datePickerInput {
@@ -116,13 +116,13 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
   overflow-y: auto;
   height: fit-content;
   box-shadow: createThemeVar("Input:boxShadow-menu-DatePicker");
-  background-color: createThemeVar("Input:color-bg-menu-DatePicker");
+  background-color: createThemeVar("Input:backgroundColor-menu-DatePicker");
   border-radius: createThemeVar("Input:borderRadius-menu-DatePicker");
 }
 
-$rdp-accent-color: createThemeVar("Input:color-bg-item-DatePicker--active");
-$rdp-bg-color-hover: createThemeVar("Input:color-bg-item-DatePicker--hover");
-$rdp-selected-color: createThemeVar("Input:color-text-value-DatePicker");
+$rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active");
+$rdp-bg-color-hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
+$rdp-selected-color: createThemeVar("Input:color-value-DatePicker");
 $rdp-cell-size: 40px;
 $rdp-caption-font-size: 18px;
 $rdp-outline: 2px solid t.useVar($rdp-accent-color);

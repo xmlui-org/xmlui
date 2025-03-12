@@ -418,7 +418,7 @@ $THEME-VAR-PREFIX: xmlui;
 // This mixin applies padding variables to a given subject
 @mixin borderVars($themeVars, $subject) {
   border-left: getThemeVar($themeVars, "borderLeft-#{$subject}");
-  borderRight: getThemeVar($themeVars, "borderRight-#{$subject}");
+  border-right: getThemeVar($themeVars, "borderRight-#{$subject}");
   border-top: getThemeVar($themeVars, "borderTop-#{$subject}");
   border-bottom: getThemeVar($themeVars, "borderBottom-#{$subject}");
   border-left-style: getThemeVar($themeVars, "borderLeftStyle-#{$subject}");
@@ -442,13 +442,13 @@ $THEME-VAR-PREFIX: xmlui;
 
 // =====================================================================================================================
 // CSS variables for miscellaneous shadows
-$shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-xxl: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+$boxShadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$boxShadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$boxShadow-xxl: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 
-$shadow-spread: 0px 0px 30px rgba(0, 0, 0, 0.1);
-$shadow-spread-2: -6px -4px 40px 10px rgba(0, 0, 0, 0.1);
-$shadow-spread-2-xl: -6px -4px 40px 18px rgba(0, 0, 0, 0.1);
+$boxShadow-spread: 0px 0px 30px rgba(0, 0, 0, 0.1);
+$boxShadow-spread-2: -6px -4px 40px 10px rgba(0, 0, 0, 0.1);
+$boxShadow-spread-2-xl: -6px -4px 40px 18px rgba(0, 0, 0, 0.1);
 
 // CSS variables describing spacing between UI elements
 $space-0: createVar(space-0);
@@ -489,18 +489,18 @@ $space-96: createVar(space-96);
 // ---------------------------------------------------------------------------------------------------------------------
 // Generic style variables
 
-$color-text-primary: createVar(color-text-primary);
-$color-bg-primary: createVar(color-bg-primary);
-$color-text-attention: createVar(color-text-attention);
-$color-bg-attention: createVar(color-bg-attention);
-$color-text-subtitle: createVar(color-text-subtitle);
-$color-bg-primary: createVar(color-bg-primary);
-$color-bg-secondary: createVar(color-bg-secondary);
-$color-bg-Input-default: createVar(color-bg-Input-default);
-$color-text--disabled: createVar(color-text--disabled);
-$color-bg--disabled: createVar(color-bg--disabled);
+$textColor-primary: createVar(textColor-primary);
+$backgroundColor-primary: createVar(backgroundColor-primary);
+$textColor-attention: createVar(textColor-attention);
+$backgroundColor-attention: createVar(backgroundColor-attention);
+$textColor-subtitle: createVar(textColor-subtitle);
+$backgroundColor-primary: createVar(backgroundColor-primary);
+$backgroundColor-secondary: createVar(backgroundColor-secondary);
+$backgroundColor-Input-default: createVar(backgroundColor-Input-default);
+$textColor--disabled: createVar(textColor--disabled);
+$backgroundColor--disabled: createVar(backgroundColor--disabled);
 $borderColor--disabled: createVar(borderColor--disabled);
-$color-bg--selected: createVar(color-bg--selected);
+$backgroundColor--selected: createVar(backgroundColor--selected);
 $fontFamily: createVar(fontFamily);
 $fontSize-tiny: createVar(fontSize-tiny);
 $fontSize-smaller: createVar(fontSize-smaller);
@@ -509,7 +509,7 @@ $fontSize-normal: createVar(fontSize-normal);
 $fontSize-medium: createVar(fontSize-medium);
 $fontSize-large: createVar(fontSize-large);
 
-$color-bg-overlay: createVar(color-bg-overlay);
+$backgroundColor-overlay: createVar(backgroundColor-overlay);
 $color-info: createVar(color-info);
 $color-valid: createVar(color-valid);
 $color-warning: createVar(color-warning);
@@ -517,7 +517,7 @@ $color-error: createVar(color-error);
 
 $borderColor: createVar(borderColor);
 
-$max-content-width: createVar(max-content-width);
+$maxWidth-content: createVar(maxWidth-content);
 $direction: createVar(direction);
 
 $font-feature-settings: createVar(font-feature-settings);
@@ -534,13 +534,13 @@ $media-max-width-tablet: createVar(media-max-width-tablet);
 // ---------------------------------------------------------------------------------------------------------------------
 // Dropdown style variables
 
-$color-bg-dropdown-item: createVar(color-bg-dropdown-item);
-$color-bg-dropdown-item--active: createVar(color-bg-dropdown-item--active);
+$backgroundColor-dropdown-item: createVar(backgroundColor-dropdown-item);
+$backgroundColor-dropdown-item--active: createVar(backgroundColor-dropdown-item--active);
 $borderColor-dropdown-item: createVar(borderColor-dropdown-item);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Tree style variables
-$color-bg-tree-row--selected--before: createVar(color-bg-tree-row--selected--before);
+$backgroundColor-tree-row--selected--before: createVar(backgroundColor-tree-row--selected--before);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Input border style variables
@@ -554,11 +554,11 @@ $borderColor-Input-default--error: createVar(borderColor-Input-default--error);
 // ---------------------------------------------------------------------------------------------------------------------
 // InputLabel style variables
 
-$color-text-InputLabel-required: createVar(color-text-InputLabel-required);
+$color-InputLabel-required: createVar(color-InputLabel-required);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // formItem style variables
-$color-text-FormItemLabel: createVar(color-text-FormItemLabel);
+$color-FormItemLabel: createVar(color-FormItemLabel);
 $fontSize-FormItemLabel: createVar(fontSize-FormItemLabel);
 $fontWeight-FormItemLabel: createVar(fontWeight-FormItemLabel);
 
@@ -568,9 +568,9 @@ $fontWeight-FormItemLabel: createVar(fontWeight-FormItemLabel);
 $color-primary-500: createVar(color-primary-500);
 $color-danger-500: createVar(color-danger-500);
 
-$color-bg: createVar(color-bg);
+$backgroundColor: createVar(backgroundColor);
 
-$color-text-secondary: createVar(color-text-secondary);
+$textColor-secondary: createVar(textColor-secondary);
 
 $fontWeight-light: createVar(fontWeight-light);
 $fontWeight-normal: createVar(fontWeight-normal);

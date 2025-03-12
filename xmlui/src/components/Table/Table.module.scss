@@ -8,23 +8,23 @@ $themeVars: ();
 }
 
 $component: "Table";
-$color-text-pagination-Table: createThemeVar("color-text-pagination-#{$component}");
-$color-bg-Table: createThemeVar("color-bg-#{$component}");
-$color-text-Table: createThemeVar("color-text-#{$component}");
-$color-bg-row-Table: createThemeVar("color-bg-row-#{$component}");
-$color-bg-row-Table--hover: createThemeVar("color-bg-row-#{$component}--hover");
-$color-bg-selected-Table: createThemeVar("color-bg-selected-#{$component}");
-$color-bg-selected-Table--hover: createThemeVar("color-bg-selected-#{$component}--hover");
-$color-bg-heading-Table: createThemeVar("color-bg-heading-#{$component}");
-$color-bg-heading-Table--hover: createThemeVar("color-bg-heading-#{$component}--hover");
-$color-bg-heading-Table--active: createThemeVar("color-bg-heading-#{$component}--active");
+$color-pagination-Table: createThemeVar("color-pagination-#{$component}");
+$backgroundColor-Table: createThemeVar("backgroundColor-#{$component}");
+$color-Table: createThemeVar("color-#{$component}");
+$backgroundColor-row-Table: createThemeVar("backgroundColor-row-#{$component}");
+$backgroundColor-row-Table--hover: createThemeVar("backgroundColor-row-#{$component}--hover");
+$backgroundColor-selected-Table: createThemeVar("backgroundColor-selected-#{$component}");
+$backgroundColor-selected-Table--hover: createThemeVar("backgroundColor-selected-#{$component}--hover");
+$backgroundColor-heading-Table: createThemeVar("backgroundColor-heading-#{$component}");
+$backgroundColor-heading-Table--hover: createThemeVar("backgroundColor-heading-#{$component}--hover");
+$backgroundColor-heading-Table--active: createThemeVar("backgroundColor-heading-#{$component}--active");
 $themeVars: t.composePaddingVars($themeVars, "heading-#{$component}");
 $themeVars: t.composePaddingVars($themeVars, "cell-#{$component}");
 $paddingHorizontal-cell-first-Table: createThemeVar("paddingHorizontal-cell-first-#{$component}");
 $paddingHorizontal-cell-last-Table: createThemeVar("paddingHorizontal-cell-last-#{$component}");
 $themeVars: t.composeBorderVars($themeVars, "cell-#{$component}");
-$color-bg-pagination-Table: createThemeVar("color-bg-pagination-#{$component}");
-$color-text-heading-Table: createThemeVar("color-text-heading-#{$component}");
+$backgroundColor-pagination-Table: createThemeVar("backgroundColor-pagination-#{$component}");
+$color-heading-Table: createThemeVar("color-heading-#{$component}");
 $fontWeight-row-Table: createThemeVar("fontWeight-row-#{$component}");
 $fontSize-row-Table: createThemeVar("fontSize-row-#{$component}");
 $fontWeight-heading-Table: createThemeVar("fontWeight-heading-#{$component}");
@@ -46,13 +46,13 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 .headerWrapper, .tableBody {
   display: inline-block;
   min-width: 100%;
-  background-color: $color-bg-Table;
+  background-color: $backgroundColor-Table;
 }
 
 .clickableHeader {
   width: 100%;
   height: 100%;
-  color: $color-text-heading-Table;
+  color: $color-heading-Table;
   background-color: transparent;
   border: none;
   transition: color 0.2s, background-color 0.2s;
@@ -65,11 +65,11 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 
   &:not([disabled]) {
     &:hover {
-      background-color: $color-bg-heading-Table--hover;
+      background-color: $backgroundColor-heading-Table--hover;
     }
 
     &:active {
-      background-color: $color-bg-heading-Table--active;
+      background-color: $backgroundColor-heading-Table--active;
     }
 
     &:focus-visible {
@@ -89,7 +89,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   align-items: center;
   text-transform: $textTransform-heading-Table;
   font-size: $fontSize-heading-Table;
-  color: $color-text-heading-Table;
+  color: $color-heading-Table;
   font-weight: $fontWeight-heading-Table;
   user-select: text;
   @include t.paddingVars($themeVars, "heading-#{$component}");
@@ -97,7 +97,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 
 .headerRow {
   height: 100%;
-  background-color: $color-bg-heading-Table;
+  background-color: $backgroundColor-heading-Table;
 }
 
 .columnCell, .cell{
@@ -110,7 +110,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 
 .table {
   display: block;
-  color: $color-text-Table;
+  color: $color-Table;
 
   .row, .headerRow {
     display: flex;
@@ -180,38 +180,38 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   .row {
     font-size: $fontSize-row-Table;
     font-weight: $fontWeight-row-Table;
-    background-color: $color-bg-row-Table;
+    background-color: $backgroundColor-row-Table;
 
     &.selected {
-      background-color: $color-bg-selected-Table;
+      background-color: $backgroundColor-selected-Table;
 
       .cell {
-        background-color: $color-bg-selected-Table;
+        background-color: $backgroundColor-selected-Table;
 
       }
     }
 
     &:hover {
-      background-color: $color-bg-row-Table--hover;
+      background-color: $backgroundColor-row-Table--hover;
 
       .cell {
-        background-color: $color-bg-row-Table--hover;
+        background-color: $backgroundColor-row-Table--hover;
       }
     }
 
     &.selected.focused {
-      background-color: $color-bg-selected-Table;
+      background-color: $backgroundColor-selected-Table;
 
       .cell {
-        background-color: $color-bg-selected-Table;
+        background-color: $backgroundColor-selected-Table;
       }
     }
 
     &.selected:hover {
-      background-color: $color-bg-selected-Table--hover;
+      background-color: $backgroundColor-selected-Table--hover;
 
       .cell {
-        background-color: $color-bg-selected-Table--hover;
+        background-color: $backgroundColor-selected-Table--hover;
       }
     }
 
@@ -235,7 +235,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 }
 
 .columnCell {
-  background-color: $color-bg-heading-Table;
+  background-color: $backgroundColor-heading-Table;
   text-align: start;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -261,11 +261,11 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   gap: t.$space-8;
   width: 100%;
   margin: 0 auto;
-  background-color: $color-bg-pagination-Table;
+  background-color: $backgroundColor-pagination-Table;
 }
 
 .paginationLabel {
-  color: $color-text-pagination-Table;
+  color: $color-pagination-Table;
   font-size: t.$fontSize-small;
 }
 
@@ -328,7 +328,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 .resizer.isResizing {
   opacity: 1;
   &:before{
-    box-shadow: t.$shadow;
+    box-shadow: t.$boxShadow;
   }
 }
 

@@ -9,13 +9,13 @@ $themeVars: ();
 
 $component: "Splitter";
 $boxShadow-Splitter: createThemeVar("boxShadow-#{$component}");
-$color-bg-Splitter: createThemeVar("color-bg-#{$component}");
+$backgroundColor-Splitter: createThemeVar("backgroundColor-#{$component}");
 $borderRadius-Splitter: createThemeVar("borderRadius-#{$component}");
 $borderColor-Splitter: createThemeVar("borderColor-#{$component}");
 $borderWidth-Splitter: createThemeVar("borderWidth-#{$component}");
 $borderStyle-Splitter: createThemeVar("borderStyle-#{$component}");
 $border-Splitter: createThemeVar("border-#{$component}");
-$color-bg-resizer-Splitter: createThemeVar("color-bg-resizer-#{$component}");
+$backgroundColor-resizer-Splitter: createThemeVar("backgroundColor-resizer-#{$component}");
 $thickness-resizer-Splitter: createThemeVar("thickness-resizer-#{$component}");
 $cursor-resizer-horizontal-Splitter: createThemeVar("cursor-resizer-horizontal-#{$component}");
 $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$component}");
@@ -28,7 +28,7 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$co
   height: 100%;
   width: 100%;
   box-shadow: $boxShadow-Splitter;
-  background-color: $color-bg-Splitter;
+  background-color: $backgroundColor-Splitter;
   border-radius: $borderRadius-Splitter;
   border: $border-Splitter $borderStyle-Splitter $borderColor-Splitter;
   user-select: none;
@@ -65,7 +65,7 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$co
 .resizer {
   order: 2;
   overflow: hidden;
-  background-color: t.useVar($color-bg-resizer-Splitter, transparent);
+  background-color: t.useVar($backgroundColor-resizer-Splitter, transparent);
 
   &.vertical {
     cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);
@@ -86,7 +86,7 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$co
   opacity: 0;
   overflow: hidden;
   transition: opacity 0.2s;
-  background-color: t.useVar($color-bg-resizer-Splitter, transparent);
+  background-color: t.useVar($backgroundColor-resizer-Splitter, transparent);
 
   &.vertical {
     cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);

@@ -16,13 +16,13 @@ export const XmlUiThemeDefinition: ThemeDefinition = {
   themeVars: {
     "boxShadow-header-App": "none",
     "font-size": "15px",
-    "boxShadow-Input": "$shadow-sm",
+    "boxShadow-Input": "$boxShadow-sm",
   },
   tones: {
     light: {
       themeVars: {
-        "color-bg-ModalDialog": "white",
-        "color-bg-checked-RadioGroupOption": "$color-primary-400",
+        "backgroundColor-ModalDialog": "white",
+        "backgroundColor-checked-RadioGroupOption": "$color-primary-400",
       }
     },
     dark: {

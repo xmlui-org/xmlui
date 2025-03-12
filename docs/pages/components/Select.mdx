@@ -631,32 +631,32 @@ In addition to the validation statuses,
 the variables below are associated with styles for `hover` and `disabled` interaction states denoted by `|interact|` in their signature:
 
 - `borderColor-Select-|status|--|interact|`
-- `color-bg-Select-|status|--|interact|`
+- `backgroundColor-Select-|status|--|interact|`
 - `boxShadow-Select-|status|--|interact|`
-- `color-text-Select-|status|--|interact|`
+- `color-Select-|status|--|interact|`
 
 ```json copy
-"color-bg-Select-default--disabled": "gray",
-"color-text-Select-error--active": "lightcoral"
+"backgroundColor-Select-default--disabled": "gray",
+"color-Select-error--active": "lightcoral"
 ```
 
 Theme variables to set the dropdown menu styles:
 
-- `color-bg-menu-Select`
+- `backgroundColor-menu-Select`
 - `boxShadow-menu-Select`
 - `borderRadius-menu-Select`
-- `color-text-indicator-Select`
+- `color-indicator-Select`
 
 Theme variables to set the selection styles in a dropdown menu:
 
-- `color-text-value-Select`
-- `color-bg-value-Select`
+- `color-value-Select`
+- `backgroundColor-value-Select`
 
 Theme variables to set the styles of an unselected item:
 
-- `color-bg-item-Select--hover`
-- `color-bg-item-Select--active`
-- `color-text-item-Select--disabled`
+- `backgroundColor-item-Select--hover`
+- `backgroundColor-item-Select--active`
+- `color-item-Select--disabled`
 
 ### Example
 
@@ -717,6 +717,26 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-Select | $backgroundColor-dropdown-item | $backgroundColor-dropdown-item |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-Select--active | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-Select--hover | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
+| [backgroundColor](../styles-and-themes/common-units/#color)-menu-Select | $backgroundColor-primary | $backgroundColor-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-menu-Select | $backgroundColor-primary | $backgroundColor-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-600 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-600 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
 | [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -744,8 +764,8 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [borderWidth](../styles-and-themes/common-units/#size)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-Select | $shadow-md | $shadow-md |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-Select | $shadow-md | $shadow-md |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-Select | $boxShadow-md | $boxShadow-md |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-Select | $boxShadow-md | $boxShadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -754,46 +774,26 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-item-Select | $color-bg-dropdown-item | $color-bg-dropdown-item |
-| [color-bg](../styles-and-themes/common-units/#color)-item-Select--active | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
-| [color-bg](../styles-and-themes/common-units/#color)-item-Select--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
-| [color-bg](../styles-and-themes/common-units/#color)-menu-Select | $color-bg-primary | $color-bg-primary |
-| [color-bg](../styles-and-themes/common-units/#color)-menu-Select | $color-bg-primary | $color-bg-primary |
-| [color-bg](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-600 |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-600 |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-indicator-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-200 | $color-surface-800 |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-indicator-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-200 | $color-surface-800 |
-| [color-text](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Select-badge | $color-surface-50 | $color-surface-50 |
-| [color-text](../styles-and-themes/common-units/#color)-Select-badge | $color-surface-50 | $color-surface-50 |
-| [color-text](../styles-and-themes/common-units/#color)-Select-badge--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Select-badge--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Select-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select-badge | $color-surface-50 | $color-surface-50 |
+| [color](../styles-and-themes/common-units/#color)-Select-badge | $color-surface-50 | $color-surface-50 |
+| [color](../styles-and-themes/common-units/#color)-Select-badge--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select-badge--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontSize](../styles-and-themes/common-units/#size)-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |

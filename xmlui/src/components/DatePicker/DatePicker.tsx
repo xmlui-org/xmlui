@@ -118,18 +118,18 @@ export const DatePickerMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`boxShadow-menu-${COMP}`]: "$shadow-md",
+    [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
-    [`color-text-value-${COMP}`]: "$color-text-primary",
+    [`color-value-${COMP}`]: "$textColor-primary",
     light: {
-      [`color-bg-menu-${COMP}`]: "$color-surface-50",
-      [`color-bg-item-${COMP}--hover`]: "$color-surface-100",
-      [`color-bg-item-${COMP}--active`]: "$color-surface-200",
+      [`backgroundColor-menu-${COMP}`]: "$color-surface-50",
+      [`backgroundColor-item-${COMP}--hover`]: "$color-surface-100",
+      [`backgroundColor-item-${COMP}--active`]: "$color-surface-200",
     },
     dark: {
-      [`color-bg-menu-${COMP}`]: "$color-surface-950",
-      [`color-bg-item-${COMP}--hover`]: "$color-surface-600",
-      [`color-bg-item-${COMP}--active`]: "$color-surface-700",
+      [`backgroundColor-menu-${COMP}`]: "$color-surface-950",
+      [`backgroundColor-item-${COMP}--hover`]: "$color-surface-600",
+      [`backgroundColor-item-${COMP}--active`]: "$color-surface-700",
     },
   },
 });

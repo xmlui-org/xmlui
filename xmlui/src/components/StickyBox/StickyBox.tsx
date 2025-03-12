@@ -24,7 +24,7 @@ export const StickyBoxMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`color-bg-${COMP}`]: "$color-bg",
+    [`backgroundColor-${COMP}`]: "$backgroundColor",
   },
 });
 

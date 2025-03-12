@@ -5,46 +5,46 @@ describe("Parse HVar", () => {
 
   const cases = [
     {
-      src: 'color-bg-Button-primary-solid--active--hover',
-      attribute: "color-bg",
+      src: 'backgroundColor-Button-primary-solid--active--hover',
+      attribute: "backgroundColor",
       component: "Button",
       traits: ["primary", "solid"],
       states: ["active", "hover"],
     },
     {
-      src: 'color-bg-Button--active--hover',
-      attribute: "color-bg",
+      src: 'backgroundColor-Button--active--hover',
+      attribute: "backgroundColor",
       component: "Button",
       states: ["active", "hover"],
     },
     {
-      src: "color-bg-Button-primary-solid",
-      attribute: "color-bg",
+      src: "backgroundColor-Button-primary-solid",
+      attribute: "backgroundColor",
       component: "Button",
       traits: ["primary", "solid"],
     },
     {
-      src: "color-bg-Button-primary--active",
-      attribute: "color-bg",
+      src: "backgroundColor-Button-primary--active",
+      attribute: "backgroundColor",
       component: "Button",
       traits: ["primary"],
       states: ["active"],
     },
     {
-      src: "color-bg-Button",
-      attribute: "color-bg",
+      src: "backgroundColor-Button",
+      attribute: "backgroundColor",
       component: "Button",
     },
     {
-      src: "Input:color-bg-TextBox",
+      src: "Input:backgroundColor-TextBox",
       classes: ['Input'],
-      attribute: "color-bg",
+      attribute: "backgroundColor",
       component: "TextBox",
     },
     {
-      src: "Control:Input:color-bg-TextBox",
+      src: "Control:Input:backgroundColor-TextBox",
       classes: ['Control', 'Input'],
-      attribute: "color-bg",
+      attribute: "backgroundColor",
       component: "TextBox",
     }
   ];

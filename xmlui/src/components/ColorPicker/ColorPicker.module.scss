@@ -28,7 +28,7 @@ $componentName: "ColorPicker";
 }
 
 .colorInput {
-  background-color: createThemeVar("Input:color-bg-#{$componentName}");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}");
   outline: none;
   appearance: none;
   -webkit-appearance: none;

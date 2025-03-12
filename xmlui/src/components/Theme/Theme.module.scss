@@ -9,10 +9,10 @@
   position: relative;
   height: inherit;
   font-family: t.$fontFamily;
-  background-color: t.$color-bg;
+  background-color: t.$backgroundColor;
   font-size: t.$fontSize;
   font-weight: t.$fontWeight;
-  color: t.$color-text-primary;
+  color: t.$textColor-primary;
   overflow: auto;
   direction: t.$direction;
   font-feature-settings: t.$font-feature-settings;

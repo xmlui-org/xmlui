@@ -4,13 +4,13 @@ import { generateBorderSegments } from "../../../src/components-core/theming/tra
 describe("generateBorderSegments", () => {
   it("No border", () => {
     const newTheme: Record<string, string> = {
-      "color-bg-Card": "xxx",
+      "backgroundColor-Card": "xxx",
     };
 
     const result = generateBorderSegments(newTheme);
 
     expect(result).deep.equal({
-      "color-bg-Card": "xxx",
+      "backgroundColor-Card": "xxx",
     });
   });
 

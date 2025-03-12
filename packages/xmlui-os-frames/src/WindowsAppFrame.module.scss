@@ -7,7 +7,7 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$color-bg-content-WindowsAppFrame: createThemeVar("color-bg-content-WindowsAppFrame");
+$backgroundColor-content-WindowsAppFrame: createThemeVar("backgroundColor-content-WindowsAppFrame");
 
 .toolbar {
   display: flex;
@@ -109,7 +109,7 @@ $color-bg-content-WindowsAppFrame: createThemeVar("color-bg-content-WindowsAppFr
   .restWindow {
     min-height: 0;
     flex-grow: 1;
-    background-color: $color-bg-content-WindowsAppFrame;
+    background-color: $backgroundColor-content-WindowsAppFrame;
     overflow: auto;
   }
 

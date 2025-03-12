@@ -13,7 +13,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
 $boxShadow-vertical-OffCanvas: createThemeVar("boxShadow-vertical-#{$component}");
 $boxShadow-horizontal-OffCanvas: createThemeVar("boxShadow-horizontal-#{$component}");
-$color-bg-OffCanvas: createThemeVar("color-bg-#{$component}");
+$backgroundColor-OffCanvas: createThemeVar("backgroundColor-#{$component}");
 $width-OffCanvas: createThemeVar("width-#{$component}");
 $marginBottom-title-OffCanvas: createThemeVar("marginBottom-title-#{$component}");
 
@@ -37,7 +37,7 @@ $marginBottom-title-OffCanvas: createThemeVar("marginBottom-title-#{$component}"
 
 .offCanvas {
   position: fixed;
-  background-color: $color-bg-OffCanvas;
+  background-color: $backgroundColor-OffCanvas;
   z-index: 1000;
   transition: transform 0.3s ease;
   width: $width-OffCanvas;

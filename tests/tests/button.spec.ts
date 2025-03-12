@@ -48,13 +48,13 @@ const PAGE_WIDTH = 640;
 const PAGE_HEIGHT = 480;
 test.use({ viewport: { width: PAGE_WIDTH, height: PAGE_HEIGHT } });
 
-// --- color-bg-Button applied to all button combinations. For outlined and ghost, applied after hover
-test("color-bg-Button to all", async ({
+// --- backgroundColor-Button applied to all button combinations. For outlined and ghost, applied after hover
+test("backgroundColor-Button to all", async ({
   page,
 }) => {
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "color-bg-Button": COLORS.red,
+      "backgroundColor-Button": COLORS.red,
     },
   });
   const btnSolPriBg = await getBgColor(page, "btnSolPri");
@@ -94,12 +94,12 @@ test("color-bg-Button to all", async ({
   expect(btnGhoAttBgPostHover).toBeShadeOf("red");
 });
 
-// --- color-bg-Button-solid applied to all solid buttons. Outlined and ghost default to color-bg-Button after hover
-test("color-bg-Button-solid and hover", async ({ page }) => {
+// --- backgroundColor-Button-solid applied to all solid buttons. Outlined and ghost default to backgroundColor-Button after hover
+test("backgroundColor-Button-solid and hover", async ({ page }) => {
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "color-bg-Button": COLORS.red,
-      "color-bg-Button-solid": COLORS.green,
+      "backgroundColor-Button": COLORS.red,
+      "backgroundColor-Button-solid": COLORS.green,
     },
   });
   const btnSolPriBg = await getBgColor(page, "btnSolPri");
@@ -139,13 +139,13 @@ test("color-bg-Button-solid and hover", async ({ page }) => {
   expect(btnGhoAttBgPostHover).toBeShadeOf("red");
 });
 
-// --- color-bg-Button-outlined applied to all outlined buttons after hover. Solid defaults to color-bg-Button.
-// --- Ghost defaults to color-bg-Button after hover
-test("color-bg-Button-outlined and hover", async ({ page }) => {
+// --- backgroundColor-Button-outlined applied to all outlined buttons after hover. Solid defaults to backgroundColor-Button.
+// --- Ghost defaults to backgroundColor-Button after hover
+test("backgroundColor-Button-outlined and hover", async ({ page }) => {
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "color-bg-Button": COLORS.red,
-      "color-bg-Button-outlined": COLORS.green,
+      "backgroundColor-Button": COLORS.red,
+      "backgroundColor-Button-outlined": COLORS.green,
     },
   });
   const btnSolPriBg = await getBgColor(page, "btnSolPri");
@@ -185,13 +185,13 @@ test("color-bg-Button-outlined and hover", async ({ page }) => {
   expect(btnGhoAttBgPostHover).toBeShadeOf("red");
 });
 
-// --- color-bg-Button-ghost applied to all ghost buttons after hover. Solid defaults to color-bg-Button.
-// --- Outlined defaults to color-bg-Button after hover
-test("color-bg-Button-ghost and hover", async ({ page }) => {
+// --- backgroundColor-Button-ghost applied to all ghost buttons after hover. Solid defaults to backgroundColor-Button.
+// --- Outlined defaults to backgroundColor-Button after hover
+test("backgroundColor-Button-ghost and hover", async ({ page }) => {
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "color-bg-Button": COLORS.red,
-      "color-bg-Button-ghost": COLORS.green,
+      "backgroundColor-Button": COLORS.red,
+      "backgroundColor-Button-ghost": COLORS.green,
     },
   });
   const btnSolPriBg = await getBgColor(page, "btnSolPri");
@@ -231,13 +231,13 @@ test("color-bg-Button-ghost and hover", async ({ page }) => {
   expect(btnGhoAttBgPostHover).toBeShadeOf("green");
 });
 
-// --- color-bg-Button-primary applied to primary buttons. Immediately for solid variant,
+// --- backgroundColor-Button-primary applied to primary buttons. Immediately for solid variant,
 // --- after hover for outlined, ghost
-test("color-bg-Button-primary and hover", async ({ page }) => {
+test("backgroundColor-Button-primary and hover", async ({ page }) => {
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "color-bg-Button": COLORS.red,
-      "color-bg-Button-primary": COLORS.green,
+      "backgroundColor-Button": COLORS.red,
+      "backgroundColor-Button-primary": COLORS.green,
     },
   });
   const btnSolPriBg = await getBgColor(page, "btnSolPri");
@@ -277,13 +277,13 @@ test("color-bg-Button-primary and hover", async ({ page }) => {
   expect(btnGhoAttBgPostHover).toBeShadeOf("red");
 });
 
-// --- color-bg-Button-secondary applied to secondary buttons. Immediately for solid variant,
+// --- backgroundColor-Button-secondary applied to secondary buttons. Immediately for solid variant,
 // --- after hover for outlined, ghost
-test("color-bg-Button-secondary and hover", async ({ page }) => {
+test("backgroundColor-Button-secondary and hover", async ({ page }) => {
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "color-bg-Button": COLORS.red,
-      "color-bg-Button-secondary": COLORS.green,
+      "backgroundColor-Button": COLORS.red,
+      "backgroundColor-Button-secondary": COLORS.green,
     },
   });
   const btnSolPriBg = await getBgColor(page, "btnSolPri");
@@ -323,13 +323,13 @@ test("color-bg-Button-secondary and hover", async ({ page }) => {
   expect(btnGhoAttBgPostHover).toBeShadeOf("red");
 });
 
-// --- color-bg-Button-attention applied to attention buttons. Immediately for solid variant,
+// --- backgroundColor-Button-attention applied to attention buttons. Immediately for solid variant,
 // --- after hover for outlined, ghost
-test("color-bg-Button-attention and hover", async ({ page }) => {
+test("backgroundColor-Button-attention and hover", async ({ page }) => {
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "color-bg-Button": COLORS.red,
-      "color-bg-Button-attention": COLORS.green,
+      "backgroundColor-Button": COLORS.red,
+      "backgroundColor-Button-attention": COLORS.green,
     },
   });
   const btnSolPriBg = await getBgColor(page, "btnSolPri");
@@ -369,14 +369,14 @@ test("color-bg-Button-attention and hover", async ({ page }) => {
   expect(btnGhoAttBgPostHover).toBeShadeOf("green");
 });
 
-// color-bg solid applied to different themeVariables
+// backgroundColor solid applied to different themeVariables
 THEME_COLORS.forEach((themeColor) => {
-  test(`color-bg-Button-${themeColor.name}-solid`, async ({ page }) => {
+  test(`backgroundColor-Button-${themeColor.name}-solid`, async ({ page }) => {
     const EXPECTED = COLORS.green;
     const themeVars = {
-      "color-bg-Button": COLORS.red,
+      "backgroundColor-Button": COLORS.red,
     };
-    themeVars[`color-bg-Button-${themeColor.name}-solid`] = EXPECTED;
+    themeVars[`backgroundColor-Button-${themeColor.name}-solid`] = EXPECTED;
     await initThemedApp(page, BTN_MATRIX_CODE, { themeVars });
 
     const testId = "btnSol" + themeColor.testIdFragment2;
@@ -385,15 +385,15 @@ THEME_COLORS.forEach((themeColor) => {
   });
 });
 
-// color-bg applied to every button combination where the background color
+// backgroundColor applied to every button combination where the background color
 // is only shown when hovered over
 VARIANTS.filter((variant) => variant.name !== "solid").forEach((variant) => {
   THEME_COLORS.forEach((themeColor) => {
-    test(`color-bg-Button-${themeColor.name}-${variant.name} on hover`, async ({ page }) => {
+    test(`backgroundColor-Button-${themeColor.name}-${variant.name} on hover`, async ({ page }) => {
       const themeVars = {
-        "color-bg-Button": COLORS.red,
+        "backgroundColor-Button": COLORS.red,
       };
-      themeVars[`color-bg-Button-${themeColor.name}-${variant.name}`] = COLORS.green;
+      themeVars[`backgroundColor-Button-${themeColor.name}-${variant.name}`] = COLORS.green;
       await initThemedApp(page, BTN_MATRIX_CODE, { themeVars });
 
       const testId = "btn" + variant.testIdFragment1 + themeColor.testIdFragment2;
@@ -406,15 +406,15 @@ VARIANTS.filter((variant) => variant.name !== "solid").forEach((variant) => {
   });
 });
 
-// color-text theme variable applied to every button combination
+// color theme variable applied to every button combination
 VARIANTS.forEach((variant) => {
   THEME_COLORS.forEach((themeColor) => {
-    test(`color-text-Button-${themeColor.name}-${variant.name}`, async ({ page }) => {
+    test(`color-Button-${themeColor.name}-${variant.name}`, async ({ page }) => {
       const EXPECTED = COLORS.green;
       const themeVars = {
-        "color-text-Button": COLORS.red,
+        "color-Button": COLORS.red,
       };
-      themeVars[`color-text-Button-${themeColor.name}-${variant.name}`] = EXPECTED;
+      themeVars[`color-Button-${themeColor.name}-${variant.name}`] = EXPECTED;
       await initThemedApp(page, BTN_MATRIX_CODE, { themeVars });
 
       const testId = "btn" + variant.testIdFragment1 + themeColor.testIdFragment2;
@@ -633,14 +633,14 @@ test("fontSize-Button-primary-solid", async ({ page }) => {
   expect(btnSolPriFontSize).toBe(EXPECTED);
 });
 
-// --- color-bg-Button-primary-solid--hover applied when hovered, falls back to color-bg-Button-primary-solid when not hovered
-test("color-bg-Button-primary-solid--hover", async ({
+// --- backgroundColor-Button-primary-solid--hover applied when hovered, falls back to backgroundColor-Button-primary-solid when not hovered
+test("backgroundColor-Button-primary-solid--hover", async ({
   page,
 }) => {
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "color-bg-Button-primary-solid": COLORS.grey,
-      "color-bg-Button-primary-solid--hover": COLORS.green,
+      "backgroundColor-Button-primary-solid": COLORS.grey,
+      "backgroundColor-Button-primary-solid--hover": COLORS.green,
     },
   });
   const btnBgColorPreHover = await getBgColor(page, "btnSolPri");
@@ -650,14 +650,14 @@ test("color-bg-Button-primary-solid--hover", async ({
   expect(btnBgColorPostHover).toBeShadeOf("green");
 });
 
-// --- color-bg-Button-primary-solid--active applied while pressed, falls back to color-bg-Button-primary-solid when not pressed
-test("color-bg-Button-primary-solid--active", async ({
+// --- backgroundColor-Button-primary-solid--active applied while pressed, falls back to backgroundColor-Button-primary-solid when not pressed
+test("backgroundColor-Button-primary-solid--active", async ({
   page,
 }) => {
   await initThemedApp(page, BTN_MATRIX_CODE, {
     themeVars: {
-      "color-bg-Button-primary-solid": COLORS.grey,
-      "color-bg-Button-primary-solid--active": COLORS.green,
+      "backgroundColor-Button-primary-solid": COLORS.grey,
+      "backgroundColor-Button-primary-solid--active": COLORS.green,
     },
   });
   const btnBgColorPreActive = await getBgColor(page, "btnSolPri");

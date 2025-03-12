@@ -116,12 +116,12 @@ When you define theme variables, you can separate tone-independent values from t
     "borderRadius-MyComponent": "8px",
     "borderStyle-MyComponent": "solid",
     "light": {
-      "color-bg-MyComponent": "white",
-      "color-text-MyComponent": "black"
+      "backgroundColor-MyComponent": "white",
+      "color-MyComponent": "black"
     },
     "dark": {
-      "color-bg-MyComponent": "black",
-      "color-text-MyComponent": "white"
+      "backgroundColor-MyComponent": "black",
+      "color-MyComponent": "white"
     }
   }
 }
@@ -193,12 +193,12 @@ The next sample demonstrates that you can use the `tone` property of `Theme` to 
 
 In addition to theme IDs and tones, you can modify particular theme variables, as the following sample demonstrates:
 
-```ueml copy /color-text-primary="orangered"/ /borderRadius-Card="40px"/ /color-text-primary="mediumpurple"/
+```ueml copy /color-primary="orangered"/ /borderRadius-Card="40px"/ /color-primary="mediumpurple"/
 <App>
-  <Theme color-text-primary="orangered" borderRadius-Card="40px">
+  <Theme color-primary="orangered" borderRadius-Card="40px">
     <Card title="Card with custom text color and border radius" />
   </Theme>
-  <Theme tone="dark" color-text-primary="mediumpurple">
+  <Theme tone="dark" color-primary="mediumpurple">
     <Card title="Card with dark tone and custom text color" />
   </Theme>
 </App>
@@ -209,10 +209,10 @@ In addition to theme IDs and tones, you can modify particular theme variables, a
     name="Theme component with modified theme variables"
     app={`
     <App>
-      <Theme color-text-primary="orangered" borderRadius-Card="40px">
+      <Theme color-primary="orangered" borderRadius-Card="40px">
         <Card title="Card with custom text color and border radius" />
       </Theme>
-      <Theme tone="dark" color-text-primary="mediumpurple">
+      <Theme tone="dark" color-primary="mediumpurple">
         <Card title="Card with dark tone and custom text color" />
       </Theme>
     </App>
@@ -264,11 +264,11 @@ Create a new theme named "my-brand" and save it into the `themes/my-brand.json` 
     "borderRadius": "8px",
     "light": {
       "color-primary": "purple",
-      "color-text": "black"
+      "color": "black"
     },
     "dark": {
       "color-primary": "mediumpurple",
-      "color-text": "white"
+      "color": "white"
     }
   }
 }
@@ -315,7 +315,7 @@ Now, your new theme displays the app in a light tone like this:
                 "fontFamily-Heading": "sans-serif",
                 "fontWeight-H1": "fontWeight-medium",
                 borderRadius: "8px",
-                "color-text": "black",
+                "color": "black",
                 "color-primary": "purple",
             },
         }
@@ -349,7 +349,7 @@ It also handles the dark tone:
                 "fontFamily-Heading": "sans-serif",
                 "fontWeight-H1": "fontWeight-medium",
                 borderRadius: "8px",
-                "color-text": "white",
+                "color": "white",
                 "color-primary": "mediumpurple",
             },
         }
@@ -393,8 +393,8 @@ In this convention, the `<ComponentId>` part is optional.
 
 Here are a few examples:
 
-- `color-text`: text color (or forecolor)
-- `color-bg`: background color
+- `color`: text color (or forecolor)
+- `backgroundColor`: background color
 - `text-size`: the size of the text
 - `lineHeight`: the height of a text line
 - `paddingHorizontal`: The value declaring the horizontal padding space
@@ -415,7 +415,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     `solid`, `outlined`, or `ghost`. The `themeColor` is the first trait, and `variant` is the second. So, wecan use
     (among others) these theme variables to modify button colors:
 
-    - `color-bg-Button-primary-solid`: Defines the background color of a button that is set up to use the `primary`theme
+    - `backgroundColor-Button-primary-solid`: Defines the background color of a button that is set up to use the `primary`theme
     color, displayed with the `solid` variant.
     - `borderColor-Button-attention-ghost`: Specifies the border color of a ghost button displayed with the `attention`
     theme color.
@@ -436,7 +436,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     When defining a theme variable, you can define multiple state values (in any order). Let's see a few examples:
 
-    - `color-bg-Button-primary-solid--hover`: The background color to use with a `solid` button and with the `primary`
+    - `backgroundColor-Button-primary-solid--hover`: The background color to use with a `solid` button and with the `primary`
     theme color while the mouse hovers over it.
     - `borderColor-Button-attention-ghost--focus`: Specifies the border color of a focused ghost button displayed with
     the `attention` theme color.
@@ -467,11 +467,11 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     ```text
     color-primary
     color-Button
-    color-bg-Button
-    color-bg-Button-solid
-    color-bg-Button-primary
-    color-bg-Button-primary-solid
-    color-bg-Button-primary-solid--hover
+    backgroundColor-Button
+    backgroundColor-Button-solid
+    backgroundColor-Button-primary
+    backgroundColor-Button-primary-solid
+    backgroundColor-Button-primary-solid--hover
     ```
 
     Theme variable chaining has two significant behaviors:
@@ -610,7 +610,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     ```json
     {
-        "color-bg-Button--hover": "orangered"
+        "backgroundColor-Button--hover": "orangered"
     }
     ```
 
@@ -618,7 +618,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     <Playground
         fixedTheme={true}
-        name="Changing 'color-bg-Button--hover'"
+        name="Changing 'backgroundColor-Button--hover'"
         horizontal={true}
         app={gallery}
         defaultTheme="sample"
@@ -628,7 +628,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
                 id: "sample",
                 tone: "light",
                 themeVars: {
-                    "color-bg-Button--hover": "orangered",
+                    "backgroundColor-Button--hover": "orangered",
                 },
             },
         ]}
@@ -639,7 +639,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     ```json
     {
-        "color-bg-Button-primary-solid--hover": "orangered"
+        "backgroundColor-Button-primary-solid--hover": "orangered"
     }
     ```
 
@@ -648,7 +648,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     <Playground
         fixedTheme={true}
-        name="Changing 'color-bg-Button-primary-solid--hover'"
+        name="Changing 'backgroundColor-Button-primary-solid--hover'"
         horizontal={true}
         app={gallery}
         defaultTheme="sample"
@@ -658,7 +658,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
                 id: "sample",
                 tone: "light",
                 themeVars: {
-                    "color-bg-Button-primary-solid--hover": "orangered",
+                    "backgroundColor-Button-primary-solid--hover": "orangered",
                 },
             },
         ]}
@@ -730,7 +730,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
         "name": "Rounded theme",
         "themeVars": {
           "borderRadius-Input": "160px",
-          "color-bg-Input": "papayawhip"
+          "backgroundColor-Input": "papayawhip"
         }
     }
     ```
@@ -749,13 +749,13 @@ The `<propertyName>` segment should use lowercase letters and dashes.
                 id: "rounded",
                 themeVars: {
                     "borderRadius-Input": "160px",
-                    "color-bg-Input": "papayawhip",
+                    "backgroundColor-Input": "papayawhip",
                 },
             },
         ]}
     />
 
-    The key to this behavior is the `Input` component name within the `borderRadius-Input` and `color-bg-Input` variable
+    The key to this behavior is the `Input` component name within the `borderRadius-Input` and `backgroundColor-Input` variable
     names.
 
     There is no `Input` component. `Input` is just an abstract *theme class name* used from theming. The `TextBox`,

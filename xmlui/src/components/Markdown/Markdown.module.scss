@@ -46,7 +46,7 @@ $borderStyle-HorizontalRule: createThemeVar("borderStyle-HorizontalRule");
   border: $borderWidth-HorizontalRule $borderStyle-HorizontalRule $borderColor-HorizontalRule;
 }
 
-$color-bg-Blockquote: createThemeVar("color-bg-Blockquote");
+$backgroundColor-Blockquote: createThemeVar("backgroundColor-Blockquote");
 $accent-Blockquote: createThemeVar("accent-Blockquote");
 $borderRadius-Blockquote: createThemeVar("borderRadius-Blockquote");
 $boxShadow-Blockquote: createThemeVar("boxShadow-Blockquote");
@@ -58,7 +58,7 @@ $margin-Blockquote: createThemeVar("margin-Blockquote");
 .blockquote {
   position: relative;
   border-radius: $borderRadius-Blockquote;
-  background-color: $color-bg-Blockquote;
+  background-color: $backgroundColor-Blockquote;
   box-shadow: $boxShadow-Blockquote;
   padding: $padding-Blockquote;
   margin-top: $margin-Blockquote;
@@ -76,19 +76,19 @@ $margin-Blockquote: createThemeVar("margin-Blockquote");
   }
 }
 
-$color-bg-Admonition: createThemeVar("color-bg-Admonition");
-$color-text-Admonition: createThemeVar("color-text-Admonition");
+$backgroundColor-Admonition: createThemeVar("backgroundColor-Admonition");
+$color-Admonition: createThemeVar("color-Admonition");
 $size-icon-Admonition: createThemeVar("size-icon-Admonition");
 
 
 .admonitionBlockquote {
   position: relative;
   border-radius: $borderRadius-Blockquote;
-  background-color: $color-bg-Admonition;
+  background-color: $backgroundColor-Admonition;
   box-shadow: $boxShadow-Blockquote;
   padding: $padding-Blockquote;
   margin: $margin-Blockquote;
-  color: $color-text-Admonition;
+  color: $color-Admonition;
 }
 
 .admonitionContainer {
