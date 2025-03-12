@@ -26,14 +26,13 @@ export function start(){
 
   // Create a simple text document manager.
   const documents = new TextDocuments(TextDocument);
-  let componentMetadata = null;
 
   let hasConfigurationCapability = false;
   let hasWorkspaceFolderCapability = false;
   let hasDiagnosticRelatedInformationCapability = false;
 
   connection.onInitialize((params: InitializeParams) => {
-    console.log("initializing!")
+    connection.console.log("initing!")
     const capabilities = params.capabilities;
 
 	// Does the client support the `workspace/configuration` request?
