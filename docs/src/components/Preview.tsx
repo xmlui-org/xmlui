@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useMemo } from "react";
 import { usePlayground } from "../hooks/usePlayground";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
-import type { CompoundComponentDef } from "xmlui";
+import { CompoundComponentDef, StandaloneExtensionManager } from "xmlui";
 import { AppRoot } from "../../../xmlui/src/components-core/rendering/AppRoot";
 import type { ThemeTone } from "../../../xmlui/src/components-core/theming/abstractions";
 import styles from "./Preview.module.scss";
@@ -13,14 +13,20 @@ import {
 import { ApiInterceptorProvider } from "../../../xmlui/src/components-core/interception/ApiInterceptorProvider";
 import { useApiWorkerContext } from "../components/ApiWorkerContext";
 import { ErrorBoundary } from "../../../xmlui/src/components-core/rendering/ErrorBoundary";
-import { useExtensionContext } from "../../pages/_app";
+import charts from "xmlui-charts";
+import animations from "xmlui-animations";
+import pdf from "xmlui-pdf";
 
 export function Preview() {
   const rootRef = useRef<HTMLDivElement>(null);
   const contentRootRef = useRef<Root | null>(null);
   const { appDescription, options, playgroundId } = usePlayground();
   const apiUrl = `/${playgroundId.replaceAll(":", "")}`;
-  const { extensionManager } = useExtensionContext();
+  const extensionManager = useMemo(() => new StandaloneExtensionManager(), []);
+
+  extensionManager.registerExtension(charts);
+  extensionManager.registerExtension(animations);
+  extensionManager.registerExtension(pdf);
 
   const mock = useMemo(
     () =>
