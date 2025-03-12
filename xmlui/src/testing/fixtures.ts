@@ -1,5 +1,5 @@
 import { expect as baseExpect, test as baseTest } from "@playwright/test";
-import type { Page } from "playwright-core";
+import type { Locator, Page } from "playwright-core";
 
 import type { ComponentDef } from "../abstractions/ComponentDefs";
 import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
@@ -9,6 +9,7 @@ import {
   type ComponentDriverParams,
   AvatarDriver,
   ButtonDriver,
+  CardDriver,
   FormDriver,
   FormItemDriver,
   HeadingDriver,
@@ -189,8 +190,14 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
     { page, baseComponentTestId, testStateViewTestId },
     use,
   ) => {
-    await use(async (driverClass: T, testId?: string) => {
-      const locator = await getOnlyFirstLocator(page, testId ?? baseComponentTestId);
+    await use(async (driverClass: T, testIdOrLocator?: string | Locator) => {
+      let locator: Locator = undefined;
+      if (testIdOrLocator === undefined || typeof testIdOrLocator === "string") {
+        locator = await getOnlyFirstLocator(page, testIdOrLocator ?? baseComponentTestId);
+      } else if (typeof testIdOrLocator === "object") {
+        locator = testIdOrLocator;
+      }
+
       return new driverClass({
         locator,
         page,
@@ -199,120 +206,125 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   },
 
   createButtonDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(ButtonDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ButtonDriver, testIdOrLocator);
     });
   },
   createAvatarDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(AvatarDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(AvatarDriver, testIdOrLocator);
     });
   },
   createFormDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(FormDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(FormDriver, testIdOrLocator);
     });
   },
   createFormItemDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(FormItemDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(FormItemDriver, testIdOrLocator);
     });
   },
   createSplitterDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(SplitterDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(SplitterDriver, testIdOrLocator);
     });
   },
   createMarkdownDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(MarkdownDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(MarkdownDriver, testIdOrLocator);
     });
   },
   createItemsDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(ItemsDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ItemsDriver, testIdOrLocator);
     });
   },
   createSliderDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(SliderDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(SliderDriver, testIdOrLocator);
     });
   },
   createRangeDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(RangeDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(RangeDriver, testIdOrLocator);
     });
   },
   createSelectDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(SelectDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(SelectDriver, testIdOrLocator);
     });
   },
   createRadioGroupDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(RadioGroupDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(RadioGroupDriver, testIdOrLocator);
     });
   },
   createNumberBoxDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(NumberBoxDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(NumberBoxDriver, testIdOrLocator);
     });
   },
   createTextBoxDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(TextBoxDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(TextBoxDriver, testIdOrLocator);
     });
   },
   createTextAreaDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(TextAreaDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(TextAreaDriver, testIdOrLocator);
     });
   },
   createListDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(ListDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ListDriver, testIdOrLocator);
     });
   },
   createTextDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(TextDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(TextDriver, testIdOrLocator);
     });
   },
   createHeadingDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(HeadingDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(HeadingDriver, testIdOrLocator);
     });
   },
   createIconDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(IconDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(IconDriver, testIdOrLocator);
     });
   },
   createStackDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(StackDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(StackDriver, testIdOrLocator);
     });
   },
   createHStackDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(HStackDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(HStackDriver, testIdOrLocator);
     });
   },
   createVStackDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(VStackDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(VStackDriver, testIdOrLocator);
     });
   },
   createLinkDriver: async ({ createDriver }, use) => {
-    await use(async (testId?: string) => {
-      return createDriver(LinkDriver, testId);
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(LinkDriver, testIdOrLocator);
+    });
+  },
+  createCardDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(CardDriver, testIdOrLocator);
     });
   }
 });
 
 // --- Types
 
-type ComponentDriverMethod<T extends ComponentDriver> = (testId?: string) => Promise<T>;
+type ComponentDriverMethod<T extends ComponentDriver> = (testIdOrLocator?: string | Locator) => Promise<T>;
 
 type TestDriverExtenderProps = {
   testStateViewTestId: string;
@@ -323,7 +335,7 @@ type TestDriverExtenderProps = {
   ) => Promise<{ testStateDriver: TestStateDriver, clipboard: Clipboard }>;
   createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
     driverClass: T,
-    testId?: string,
+    testIdOrLocator?: string | Locator,
   ) => Promise<InstanceType<T>>;
   createButtonDriver: ComponentDriverMethod<ButtonDriver>;
   createAvatarDriver: ComponentDriverMethod<AvatarDriver>;
@@ -347,4 +359,5 @@ type TestDriverExtenderProps = {
   createHStackDriver: ComponentDriverMethod<HStackDriver>;
   createVStackDriver: ComponentDriverMethod<VStackDriver>;
   createLinkDriver: ComponentDriverMethod<LinkDriver>;
+  createCardDriver: ComponentDriverMethod<CardDriver>;
 };
