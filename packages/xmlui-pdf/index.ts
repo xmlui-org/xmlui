@@ -9,3 +9,5 @@ if (import.meta.hot) {
     startApp(newModule?.runtime, pdf);
   });
 }
+
+export default pdf;

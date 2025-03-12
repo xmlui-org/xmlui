@@ -15,6 +15,7 @@ import { useApiWorkerContext } from "../components/ApiWorkerContext";
 import { ErrorBoundary } from "../../../xmlui/src/components-core/rendering/ErrorBoundary";
 import charts from "xmlui-charts";
 import animations from "xmlui-animations";
+import pdf from "xmlui-pdf";
 
 export function Preview() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -25,6 +26,7 @@ export function Preview() {
 
   extensionManager.registerExtension(charts);
   extensionManager.registerExtension(animations);
+  extensionManager.registerExtension(pdf);
 
   const mock = useMemo(
     () =>

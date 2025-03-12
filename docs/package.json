@@ -38,7 +38,8 @@
     "shiki": "0.14.3",
     "xmlui": "*",
     "xmlui-animations": "*",
-    "xmlui-charts": "*"
+    "xmlui-charts": "*",
+    "xmlui-pdf": "*"
   },
   "devDependencies": {
     "@babel/preset-react": "7.22.15",
