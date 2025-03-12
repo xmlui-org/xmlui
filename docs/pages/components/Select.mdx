@@ -615,7 +615,7 @@ If the status segment is omitted, the style will be applied to all statuses.
 - `borderRadius-Select-|status|`
 - `fontSize-Select-|status|`
 - `color-placeholder-Select-|status|`
-- `thickness-border-Select-|status|`
+- `borderWidth-Select-|status|`
 
 - `outlineWidth-Select-|status|--focus`
 - `outlineColor-Select-|status|--focus`
@@ -630,7 +630,7 @@ If the status segment is omitted, the style will be applied to all statuses.
 In addition to the validation statuses,
 the variables below are associated with styles for `hover` and `disabled` interaction states denoted by `|interact|` in their signature:
 
-- `color-border-Select-|status|--|interact|`
+- `borderColor-Select-|status|--|interact|`
 - `color-bg-Select-|status|--|interact|`
 - `boxShadow-Select-|status|--|interact|`
 - `color-text-Select-|status|--|interact|`
@@ -667,7 +667,7 @@ Theme variables to set the styles of an unselected item:
   "themeVars": {
     "borderRadius-Select": "30px",
     "color-placeholder-Select": "red",
-    "thickness-border-Select": "4px"
+    "borderWidth-Select": "4px"
   }
 }
 ```
@@ -683,7 +683,7 @@ Theme variables to set the styles of an unselected item:
             themeVars: {
                 "borderRadius-Select": "30px",
                 "color-placeholder-Select": "red",
-                "thickness-border-Select": "4px",
+                "borderWidth-Select": "4px",
             },
         },
     ]}
@@ -697,7 +697,7 @@ Theme variables to set the styles of an unselected item:
 To style all input controls not just this component, use `Input` instead of the `Select` segment:
 
 ```
-color-border-Input: "#0033FF"
+borderColor-Input: "#0033FF"
 ```
 
 `Input` affects the following controls:
@@ -717,12 +717,33 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
+| [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
+| [borderWidth](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-Select | $shadow-md | $shadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-Select | $shadow-md | $shadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -753,17 +774,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-bg](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-menu-Select | $color-border | $color-border |
-| [color-border](../styles-and-themes/common-units/#color)-menu-Select | $color-border | $color-border |
-| [color-border](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Select-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -811,13 +821,3 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [outlineWidth](../styles-and-themes/common-units/#size)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
-| [style-border](../styles-and-themes/common-units/#border-style)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
-| [thickness-border](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
-| [thickness-border](../styles-and-themes/common-units/#size)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

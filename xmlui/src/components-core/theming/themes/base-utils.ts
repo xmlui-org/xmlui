@@ -47,23 +47,23 @@ export function borderSubject(name: string, valueSpec?: BorderValue): Record<str
     ...borderEdgeSubject("bottom", valueSpec?.bottom ?? valueSpec?.vertical ?? valueSpec?.all),
     ...borderEdgeSubject("horizontal", valueSpec?.horizontal ?? valueSpec?.all),
     ...borderEdgeSubject("vertical", valueSpec?.vertical ?? valueSpec?.all),
-    [`color-border-${name}`]: valueSpec?.all?.color ?? "",
-    [`thickness-border-${name}`]: valueSpec?.all?.thickness ?? "",
-    [`style-border-${name}`]: valueSpec?.all?.style ?? "",
+    [`borderColor-${name}`]: valueSpec?.all?.color ?? "",
+    [`borderWidth-${name}`]: valueSpec?.all?.thickness ?? "",
+    [`borderStyle-${name}`]: valueSpec?.all?.style ?? "",
     [`border-${name}`]:
-      `${valueSpec?.all?.thickness ?? `$thickness-border-${name}`} ` +
-      `${valueSpec?.all?.style ?? `$style-border-${name}`} ` +
-      `${valueSpec?.all?.color ?? `$color-border-${name}`} `,
+      `${valueSpec?.all?.thickness ?? `$borderWidth-${name}`} ` +
+      `${valueSpec?.all?.style ?? `$borderStyle-${name}`} ` +
+      `${valueSpec?.all?.color ?? `$borderColor-${name}`} `,
   };
 
   function borderEdgeSubject(edge: string, edgeSpec?: BorderEdgeValue): Record<string, string> {
     return {
-      [`color-border-${edge}-${name}`]: edgeSpec?.color ?? "",
-      [`thickness-border-${edge}-${name}`]: edgeSpec?.thickness ?? "",
-      [`style-border-${edge}-${name}`]: edgeSpec?.style ?? "",
+      [`borderColor-${edge}-${name}`]: edgeSpec?.color ?? "",
+      [`borderWidth-${edge}-${name}`]: edgeSpec?.thickness ?? "",
+      [`borderStyle-${edge}-${name}`]: edgeSpec?.style ?? "",
       [`border-${edge}-${name}`]:
         edgeSpec?.all ??
-        `$thickness-border-${edge}-${name} $style-border-${edge}-${name} $color-border-${edge}-${name}`,
+        `$borderWidth-${edge}-${name} $borderStyle-${edge}-${name} $borderColor-${edge}-${name}`,
     };
   }
 }

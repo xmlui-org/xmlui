@@ -232,14 +232,14 @@ The `Card` component uses these theme variables to customize its appearance:
 
 - `border-Card`
 - `color-bg-Card`
-- `color-border-Card`
+- `borderColor-Card`
 - `padding-Card`
 - `paddingHorizontal-Card`
 - `paddingVertical-Card`
 - `borderRadius-Card`
 - `boxShadow-Card`
-- `style-border-Card`
-- `thickness-border-Card`
+- `borderStyle-Card`
+- `borderWidth-Card`
 
 The following theme definition changes the visual appearance of the card:
 
@@ -250,8 +250,8 @@ The following theme definition changes the visual appearance of the card:
   "themeVars": {
     "color-bg-Card": "$color-surface-200",
     "borderRadius-Card": "4px",
-    "color-border-Card": "$color-surface-600",
-    "thickness-border-Card": "2px",
+    "borderColor-Card": "$color-surface-600",
+    "borderWidth-Card": "2px",
     "paddingHorizontal-Card": "2rem",
     "color": "black"
   }
@@ -267,8 +267,8 @@ The following theme definition changes the visual appearance of the card:
     themeVars: {
       "color-bg-Card": "$color-surface-200",
       "borderRadius-Card": "4px",
-      "color-border-Card": "$color-surface-600",
-      "thickness-border-Card": "2px",
+      "borderColor-Card": "$color-surface-600",
+      "borderWidth-Card": "2px",
       "paddingHorizontal-Card": "2rem",
       "color": "black"
     }
@@ -290,29 +290,37 @@ The following theme definition changes the visual appearance of the card:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [border](../styles-and-themes/common-units/#border)-Card | 1px solid $color-border | 1px solid $color-border |
-| [border-left](../styles-and-themes/common-units/#border)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-right](../styles-and-themes/common-units/#border)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-top](../styles-and-themes/common-units/#border)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)-Card | 1px solid $borderColor | 1px solid $borderColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border](../styles-and-themes/common-units/#border)Horizontal-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalWidth](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeft](../styles-and-themes/common-units/#border)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeftStyle](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeftWidth](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Card | $borderRadius | $borderRadius |
+| [borderRight](../styles-and-themes/common-units/#border)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRightStyle](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRightWidth](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTop](../styles-and-themes/common-units/#border)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopColor](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopStyle](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopWidth](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border](../styles-and-themes/common-units/#border)Vertical-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderVerticalColor](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Card | none | none |
 | [color-bg](../styles-and-themes/common-units/#color)-Card | white | $color-surface-900 |
-| [color-border](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border-top](../styles-and-themes/common-units/#color)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-Card | $space-4 | $space-4 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -324,11 +332,3 @@ The following theme definition changes the visual appearance of the card:
 | radius-end-start-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | radius-start-end-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | radius-start-start-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-left](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-right](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-top](../styles-and-themes/common-units/#border-style)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-left](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-right](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-top](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

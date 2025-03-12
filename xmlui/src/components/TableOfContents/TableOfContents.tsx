@@ -66,13 +66,13 @@ export const TableOfContentsMd = createMetadata({
     [`letterSpacing-${COMP}Item`]: "0",
     light: {
       [`color-${COMP}Item`]: "$color-text-primary",
-      [`border-color-${COMP}Item`]: "$color-border",
+      [`border-color-${COMP}Item`]: "$borderColor",
       [`border-color-${COMP}Item--active`]: "$color-primary-500",
       [`color-${COMP}Item--active`]: "$color-primary-500",
     },
     dark: {
       [`color-${COMP}Item`]: "$color-text-primary",
-      [`border-color-${COMP}Item`]: "$color-border",
+      [`border-color-${COMP}Item`]: "$borderColor",
       [`border-color-${COMP}Item--active`]: "$color-primary-500",
       [`color-${COMP}Item--active`]: "$color-text-secondary",
     },

@@ -23,9 +23,9 @@ export const MarkdownMd = createMetadata({
     },
   },
   defaultThemeVars: {
-    "color-border-HorizontalRule": "$color-border",
-    "thickness-border-HorizontalRule": "1px",
-    "style-border-HorizontalRule": "solid",
+    "borderColor-HorizontalRule": "$borderColor",
+    "borderWidth-HorizontalRule": "1px",
+    "borderStyle-HorizontalRule": "solid",
     "accent-Blockquote": "$color-primary",
     "padding-Blockquote": "$space-2 $space-6",
     "margin-Blockquote": "$space-2",

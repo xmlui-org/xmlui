@@ -9,15 +9,15 @@ $themeVars: ();
 
 $gap-RadioGroupOption: createThemeVar("gap-RadioGroupOption");
 $color-bg-RadioGroupOption-default: createThemeVar("Input:color-bg-RadioGroupOption-default");
-$thickness-border-RadioGroupOption: createThemeVar("thickness-border-RadioGroupOption");
-$color-border-RadioGroupOption-default: createThemeVar("Input:color-border-RadioGroupOption-default");
-$color-border-RadioGroupOption-default--hover: createThemeVar("Input:color-border-RadioGroupOption-default--hover");
-$color-border-RadioGroupOption-default--active: createThemeVar("Input:color-border-RadioGroupOption-default--active");
-$color-border-RadioGroupOption--disabled: createThemeVar("Input:color-border-RadioGroupOption--disabled");
+$borderWidth-RadioGroupOption: createThemeVar("borderWidth-RadioGroupOption");
+$borderColor-RadioGroupOption-default: createThemeVar("Input:borderColor-RadioGroupOption-default");
+$borderColor-RadioGroupOption-default--hover: createThemeVar("Input:borderColor-RadioGroupOption-default--hover");
+$borderColor-RadioGroupOption-default--active: createThemeVar("Input:borderColor-RadioGroupOption-default--active");
+$borderColor-RadioGroupOption--disabled: createThemeVar("Input:borderColor-RadioGroupOption--disabled");
 $color-text-RadioGroupOption--disabled: createThemeVar("Input:color-text-RadioGroupOption--disabled");
-$color-border-RadioGroupOption-error: createThemeVar("Input:color-border-RadioGroupOption-error");
-$color-border-RadioGroupOption-warning: createThemeVar("Input:color-border-RadioGroupOption-warning");
-$color-border-RadioGroupOption-success: createThemeVar("Input:color-border-RadioGroupOption-success");
+$borderColor-RadioGroupOption-error: createThemeVar("Input:borderColor-RadioGroupOption-error");
+$borderColor-RadioGroupOption-warning: createThemeVar("Input:borderColor-RadioGroupOption-warning");
+$borderColor-RadioGroupOption-success: createThemeVar("Input:borderColor-RadioGroupOption-success");
 $color-bg-checked-RadioGroupOption-default: createThemeVar("color-bg-checked-RadioGroupOption-default");
 $color-bg-checked-RadioGroupOption--disabled: createThemeVar("color-bg-checked-RadioGroupOption--disabled");
 $color-bg-checked-RadioGroupOption-error: createThemeVar("color-bg-checked-RadioGroupOption-error");
@@ -49,14 +49,14 @@ $color-text-RadioGroupOption-success: createThemeVar("Input:color-text-RadioGrou
   height: 18px;
   border-radius: 100%;
   background-color: $color-bg-RadioGroupOption-default;
-  border-width: $thickness-border-RadioGroupOption;
+  border-width: $borderWidth-RadioGroupOption;
   border-style: solid;
-  border-color: $color-border-RadioGroupOption-default;
+  border-color: $borderColor-RadioGroupOption-default;
   padding: 0;
   cursor: pointer;
 
   &:hover {
-    border-color: $color-border-RadioGroupOption-default--hover;
+    border-color: $borderColor-RadioGroupOption-default--hover;
   }
   &:focus-visible{
     outline-width: createThemeVar('Input:outlineWidth-RadioGroupOption--focus');
@@ -66,20 +66,20 @@ $color-text-RadioGroupOption-success: createThemeVar("Input:color-text-RadioGrou
   }
   &:disabled {
     cursor: not-allowed;
-    border-color: $color-border-RadioGroupOption--disabled;
+    border-color: $borderColor-RadioGroupOption--disabled;
   }
   &:disabled+label {
     cursor: not-allowed;
     color: $color-text-RadioGroupOption--disabled;
   }
   &.error {
-    border-color: $color-border-RadioGroupOption-error;
+    border-color: $borderColor-RadioGroupOption-error;
   }
   &.warning {
-    border-color: $color-border-RadioGroupOption-warning;
+    border-color: $borderColor-RadioGroupOption-warning;
   }
   &.valid {
-    border-color: $color-border-RadioGroupOption-success;
+    border-color: $borderColor-RadioGroupOption-success;
   }
 }
 

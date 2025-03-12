@@ -37,7 +37,7 @@ export const LinkMd = createMetadata({
     [`gap-icon-${COMP}`]: "This property defines the size of the gap between the icon and the label.",
   },
   defaultThemeVars: {
-    [`border-${COMP}`]: "0px solid $color-border",
+    [`border-${COMP}`]: "0px solid $borderColor",
     [`color-text-${COMP}--hover--active`]: `$color-text-${COMP}--active`,
     [`textDecorationColor-${COMP}--hover`]: "$color-surface-400A80",
     [`textDecorationColor-${COMP}--active`]: "$color-surface200",

@@ -472,8 +472,8 @@ These variables have 4 variants depending on the [validationStatus](#validations
 If the status segment is omitted, the style will be applied to all validation statuses.
 
 - `borderRadius-TextBox-|status|`
-- `thickness-border-TextBox-|status|`
-- `style-border-TextBox-|status|`
+- `borderWidth-TextBox-|status|`
+- `borderStyle-TextBox-|status|`
 - `fontSize-TextBox-|status|`
 - `color-placeholder-TextBox-|status|`
 
@@ -485,7 +485,7 @@ If the status segment is omitted, the style will be applied to all validation st
 In addition to the validation statuses,
 the variables below are associated with styles for `hover` and `focus` interaction states denoted by `|interact|` in their signature:
 
-- `color-border-TextBox-|status|--|interact|`
+- `borderColor-TextBox-|status|--|interact|`
 - `color-bg-TextBox-|status|--|interact|`
 - `boxShadow-TextBox-|status|--|interact|`
 - `color-text-TextBox-|status|--|interact|`
@@ -506,7 +506,7 @@ These variables set the `disabled` state:
 
 - `color-bg-TextBox--disabled`
 - `color-text-TextBox--disabled`
-- `color-border-TextBox--disabled`
+- `borderColor-TextBox--disabled`
 
 ### Example
 
@@ -538,7 +538,7 @@ These variables set the `disabled` state:
 To style all input controls not just this component, replace the `TextBox` segment with `Input`:
 
 ```
-color-border-Input: "#0033FF"
+borderColor-Input: "#0033FF"
 ```
 
 `Input` affects the following controls:
@@ -558,10 +558,31 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-TextBox-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-TextBox-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-TextBox-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -591,19 +612,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-bg](../styles-and-themes/common-units/#color)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-TextBox-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-TextBox-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-TextBox-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -645,11 +653,3 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [padding](../styles-and-themes/common-units/#size)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-TextBox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-TextBox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-TextBox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-TextBox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

@@ -46,7 +46,7 @@ export const BadgeMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`padding-${COMP}`]: `$space-0_5 $space-2`,
-    [`border-${COMP}`]: `0px solid $color-border`,
+    [`border-${COMP}`]: `0px solid $borderColor`,
     [`padding-${COMP}-pill`]: `$space-0_5 $space-2`,
     [`borderRadius-${COMP}`]: "4px",
     [`fontSize-${COMP}`]: "0.8em",

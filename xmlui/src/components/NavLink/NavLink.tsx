@@ -59,7 +59,7 @@ export const NavLinkMd = createMetadata({
     [`color-indicator-${COMP}`]: "Provides the following states: `--hover`, `--active`, `--pressed`",
   },
   defaultThemeVars: {
-    [`border-${COMP}`]: "0px solid $color-border",
+    [`border-${COMP}`]: "0px solid $borderColor",
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`color-bg-${COMP}`]: "transparent",
     [`paddingHorizontal-${COMP}`]: "$space-4",

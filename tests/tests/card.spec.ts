@@ -58,14 +58,14 @@ test("border", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-left", async ({ page }) => {
+test("borderLeft", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "border-left-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderLeft-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -83,14 +83,14 @@ test("border-left", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-right", async ({ page }) => {
+test("borderRight", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "border-right-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderRight-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -133,7 +133,7 @@ test("borderHorizontal", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("borderHorizontal and border-left", async ({ page }) => {
+test("borderHorizontal and borderLeft", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -141,7 +141,7 @@ test("borderHorizontal and border-left", async ({ page }) => {
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
       "borderHorizontal-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-left-Card": "8px double rgb(0, 128, 0)",
+      "borderLeft-Card": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -159,7 +159,7 @@ test("borderHorizontal and border-left", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("border-left-style", "double");
 });
 
-test("borderHorizontal and border-right", async ({ page }) => {
+test("borderHorizontal and borderRight", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -167,7 +167,7 @@ test("borderHorizontal and border-right", async ({ page }) => {
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
       "borderHorizontal-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-right-Card": "8px double rgb(0, 128, 0)",
+      "borderRight-Card": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -185,14 +185,14 @@ test("borderHorizontal and border-right", async ({ page }) => {
   await expect(page.getByTestId("card")).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-top", async ({ page }) => {
+test("borderTop", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "border-top-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderTop-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
 
@@ -260,7 +260,7 @@ test("borderVertical", async ({ page }) => {
   await expect(page.getByTestId("card")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("borderVertical and border-top", async ({ page }) => {
+test("borderVertical and borderTop", async ({ page }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
@@ -268,7 +268,7 @@ test("borderVertical and border-top", async ({ page }) => {
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
       "borderVertical-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "border-top-Card": "8px double rgb(0, 128, 0)",
+      "borderTop-Card": "8px double rgb(0, 128, 0)",
     },
   });
 
@@ -319,7 +319,7 @@ test("border-color", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "color-border-Card": EXPECTED_COLOR,
+      "borderColor-Card": EXPECTED_COLOR,
     },
   });
 
@@ -345,7 +345,7 @@ test("border, border-color", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "color-border-Card": UPDATED,
+      "borderColor-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -399,7 +399,7 @@ test("border, border-color-left", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "color-border-left-Card": UPDATED,
+      "borderLeftColor-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -426,7 +426,7 @@ test("border, border-color-right", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "color-border-right-Card": UPDATED,
+      "borderRightColor-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -480,7 +480,7 @@ test("border, border-color-top", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "color-border-top-Card": UPDATED,
+      "borderTopColor-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -533,7 +533,7 @@ test("border-style", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "style-border-Card": EXPECTED_STYLE,
+      "borderStyle-Card": EXPECTED_STYLE,
     },
   });
 
@@ -559,7 +559,7 @@ test("border, border-style", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "style-border-Card": UPDATED,
+      "borderStyle-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -613,7 +613,7 @@ test("border, border-style-left", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "style-border-left-Card": UPDATED,
+      "borderLeftStyle-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -640,7 +640,7 @@ test("border, border-style-right", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "style-border-right-Card": UPDATED,
+      "borderRightStyle-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -694,7 +694,7 @@ test("border, border-style-top", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "style-border-top-Card": UPDATED,
+      "borderTopStyle-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -747,7 +747,7 @@ test("border-thickness", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "thickness-border-Card": EXPECTED_WIDTH,
+      "borderWidth-Card": EXPECTED_WIDTH,
     },
   });
 
@@ -773,7 +773,7 @@ test("border, border-thickness", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "thickness-border-Card": UPDATED,
+      "borderWidth-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -827,7 +827,7 @@ test("border, border-thickness-left", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "thickness-border-left-Card": UPDATED,
+      "borderLeftWidth-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -854,7 +854,7 @@ test("border, border-thickness-right", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "thickness-border-right-Card": UPDATED,
+      "borderRightWidth-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
@@ -908,7 +908,7 @@ test("border, border-thickness-top", async ({ page }) => {
 
   await initThemedApp(page, CARD_CODE, {
     themeVars: {
-      "thickness-border-top-Card": UPDATED,
+      "borderTopWidth-Card": UPDATED,
       "border-Card": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });

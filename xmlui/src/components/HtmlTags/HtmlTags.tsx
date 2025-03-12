@@ -2042,7 +2042,7 @@ export const HtmlTableMd = createMetadata({
   themeVars: parseScssVar(styles.themeVarsTable),
   defaultThemeVars: {
     "color-bg-HtmlTable": "$color-bg",
-    "border-HtmlTable": "1px solid $color-border",
+    "border-HtmlTable": "1px solid $borderColor",
     "marginBottom-HtmlTable": "$space-4",
     "marginTop-HtmlTable": "$space-4",
   },
@@ -2101,7 +2101,7 @@ export const HtmlTdMd = createMetadata({
   themeVars: parseScssVar(styles.themeVarsTd),
   defaultThemeVars: {
     "padding-HtmlTd": "$space-2",
-    "borderBottom-HtmlTd": "1px solid $color-border",
+    "borderBottom-HtmlTd": "1px solid $borderColor",
   },
 });
 

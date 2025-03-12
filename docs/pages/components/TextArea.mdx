@@ -487,8 +487,8 @@ These variables have 4 variants depending on the [validationStatus](#validations
 If the status segment is omitted, the style will be applied to all validation statuses.
 
 - `borderRadius-TextArea-|status|`
-- `thickness-border-TextArea-|status|`
-- `style-border-TextArea-|status|`
+- `borderWidth-TextArea-|status|`
+- `borderStyle-TextArea-|status|`
 - `fontSize-TextArea-|status|`
 - `color-placeholder-TextArea-|status|`
 
@@ -500,7 +500,7 @@ If the status segment is omitted, the style will be applied to all validation st
 In addition to the validation statuses,
 the variables below are associated with styles for `hover` and `focus` interaction states denoted by `|interact|` in their signature:
 
-- `color-border-TextArea-|status|--|interact|`
+- `borderColor-TextArea-|status|--|interact|`
 - `color-bg-TextArea-|status|--|interact|`
 - `boxShadow-TextArea-|status|--|interact|`
 - `color-text-TextArea-|status|--|interact|`
@@ -521,7 +521,7 @@ These variables set the `disabled` state:
 
 - `color-bg-TextArea--disabled`
 - `color-text-TextArea--disabled`
-- `color-border-TextArea--disabled`
+- `borderColor-TextArea--disabled`
 
 ### Example
 
@@ -553,7 +553,7 @@ These variables set the `disabled` state:
 To style all input controls not just this component, replace the `TextArea` segment with `Input`:
 
 ```
-color-border-Input: "#0033FF"
+borderColor-Input: "#0033FF"
 ```
 
 `Input` affects the following controls:

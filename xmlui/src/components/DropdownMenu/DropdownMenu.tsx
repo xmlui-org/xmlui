@@ -72,7 +72,7 @@ export const DropdownMenuMd = createMetadata({
     [`color-bg-${DDMCOMP}`]: "$color-bg-primary",
     [`minWidth-${DDMCOMP}`]: "160px",
     [`boxShadow-${DDMCOMP}`]: "$shadow-xl",
-    [`style-border-${DDMCOMP}-content`]: "solid",
+    [`borderStyle-${DDMCOMP}-content`]: "solid",
     [`borderRadius-${DDMCOMP}`]: "$borderRadius",
   },
 });
@@ -217,7 +217,7 @@ export const MenuSeparatorMd = createMetadata({
     [`marginBottom-${MSEP}`]: "$space-1",
     [`width-${MSEP}`]: "100%",
     [`height-${MSEP}`]: "1px",
-    [`color-${MSEP}`]: "$color-border-dropdown-item",
+    [`color-${MSEP}`]: "$borderColor-dropdown-item",
     [`marginHorizontal-${MSEP}`]: "12px",
   },
 });

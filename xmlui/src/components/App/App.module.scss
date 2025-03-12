@@ -49,6 +49,9 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       position: static;
     }
     &.sticky {
+      .contentWrapper{
+        scroll-padding-top: var(--header-height);
+      }
       .footerWrapper {
         position: sticky;
         bottom: 0;
@@ -129,6 +132,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
 
     &.verticalFullHeader {
+      scroll-padding-top: var(--header-height);
       .content {
         margin-inline: calc(-1 * var(--scrollbar-width));
       }

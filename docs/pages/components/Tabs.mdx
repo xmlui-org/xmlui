@@ -193,9 +193,9 @@ This method selects the next tab.
 The `Tabs` component uses these theme variables to customize its appearance:
 
 - `color-bg-Tabs`
-- `color-border-Tabs`
-- `thickness-border-Tabs`
-- `color-border-active-Tabs`
+- `borderColor-Tabs`
+- `borderWidth-Tabs`
+- `borderColor-active-Tabs`
 - `color-bg-trigger-Tabs`
 - `color-bg-trigger-Tabs--hover`
 
@@ -205,8 +205,8 @@ The `Tabs` component uses these theme variables to customize its appearance:
   "name": "Custom Theme",
   "themeVars": {
     "color-bg-Tabs": "green",
-    "thickness-border-Tabs": "6px",
-    "color-border-Tabs": "gold"
+    "borderWidth-Tabs": "6px",
+    "borderColor-Tabs": "gold"
   }
 }
 ```
@@ -221,8 +221,8 @@ The `Tabs` component uses these theme variables to customize its appearance:
       name: "Custom Theme",
       themeVars: {
         "color-bg-Tabs": "green",
-        "thickness-border-Tabs": "6px",
-        "color-border-Tabs": "gold"
+        "borderWidth-Tabs": "6px",
+        "borderColor-Tabs": "gold"
       },
     },
   ]}
@@ -247,13 +247,13 @@ The `Tabs` component uses these theme variables to customize its appearance:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [borderColor](../styles-and-themes/common-units/#color)-active-Tabs | $color-primary | $color-primary |
+| [borderColor](../styles-and-themes/common-units/#color)-Tabs | $borderColor | $borderColor |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Tabs | solid | solid |
+| [borderWidth](../styles-and-themes/common-units/#size)-Tabs | 2px | 2px |
 | [color-bg](../styles-and-themes/common-units/#color)-list-Tabs | $color-primary-50 | $color-primary-800 |
 | [color-bg](../styles-and-themes/common-units/#color)-Tabs | $color-bg-primary | $color-bg-primary |
 | [color-bg](../styles-and-themes/common-units/#color)-trigger-Tabs | $color-bg-primary | $color-bg-primary |
 | [color-bg](../styles-and-themes/common-units/#color)-trigger-Tabs--hover | $color-primary-50 | $color-primary-800 |
-| [color-border](../styles-and-themes/common-units/#color)-active-Tabs | $color-primary | $color-primary |
-| [color-border](../styles-and-themes/common-units/#color)-Tabs | $color-border | $color-border |
 | [color-text](../styles-and-themes/common-units/#color)-trigge-rTabs | $color-primary-100 | $color-primary-100 |
 | [color-text](../styles-and-themes/common-units/#color)-trigger-Tabs | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-Tabs | solid | solid |
-| [thickness-border](../styles-and-themes/common-units/#size)-Tabs | 2px | 2px |

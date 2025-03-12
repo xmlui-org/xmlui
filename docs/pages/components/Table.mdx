@@ -715,7 +715,7 @@ The `Table` component uses the following theme variables.
 Overall Table theme variables:
 
 - `color-bg-Table`
-- `style-border-cell-Table`
+- `borderStyle-cell-Table`
 - `color-bg-pagination-Table`
 - `color-text-Table`
 - `color-text-pagination-Table`
@@ -735,8 +735,8 @@ Selected row theme variables:
 Cell theme variables:
 
 - `border-cell-Table`
-- `color-border-cell-Table`
-- `thickness-border-cell-Table`
+- `borderColor-cell-Table`
+- `borderWidth-cell-Table`
 - `padding-cell-Table`
 - `paddingHorizontal-cell-Table`
 - `paddingVertical-cell-Table`
@@ -803,22 +803,34 @@ Heading theme variables:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [border](../styles-and-themes/common-units/#border)-cell-Table | 1px solid $color-border | 1px solid $color-border |
-| [border-left](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-right](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border-top](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)-cell-Table | 1px solid $borderColor | 1px solid $borderColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border](../styles-and-themes/common-units/#border)Horizontal-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeft](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeftStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeftWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRight](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRightStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRightWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTop](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopColor](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border](../styles-and-themes/common-units/#border)Vertical-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderVerticalColor](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-heading-Table | $color-surface-100 | $color-surface-950 |
 | [color-bg](../styles-and-themes/common-units/#color)-heading-Table--active | $color-surface-300 | $color-surface-700 |
 | [color-bg](../styles-and-themes/common-units/#color)-heading-Table--hover | $color-surface-200 | $color-surface-800 |
@@ -828,10 +840,6 @@ Heading theme variables:
 | [color-bg](../styles-and-themes/common-units/#color)-selected-Table | $color-primary-100 | $color-primary-800 |
 | [color-bg](../styles-and-themes/common-units/#color)-selected-Table--hover | $color-bg-row-Table--hover | $color-bg-row-Table--hover |
 | [color-bg](../styles-and-themes/common-units/#color)-Table | $color-bg | $color-bg |
-| [color-border](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border-top](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-heading-Table | $color-surface-500 | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-pagination-Table | $color-secondary | $color-secondary |
 | [color-text](../styles-and-themes/common-units/#color)-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -863,12 +871,4 @@ Heading theme variables:
 | radius-end-start-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | radius-start-end-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | radius-start-start-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-left](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-right](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border-top](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | textTransform-heading-Table | uppercase | uppercase |
-| [thickness-border](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-left](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-right](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border-top](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
