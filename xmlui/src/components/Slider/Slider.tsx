@@ -79,7 +79,7 @@ export const SliderMd = createMetadata({
     [`borderStyle-thumb-${COMP}`]: "solid",
     [`borderColor-thumb-${COMP}`]: "$color-surface-50",
     [`backgroundColor-thumb-${COMP}`]: "$color-primary",
-    [`boxShadow-thumb-${COMP}`]: "$shadow-md",
+    [`boxShadow-thumb-${COMP}`]: "$boxShadow-md",
 
     light: {
       [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-300",

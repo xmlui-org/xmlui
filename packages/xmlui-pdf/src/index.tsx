@@ -14,7 +14,7 @@ export const PdfMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "boxShadow-page-Pdf": "$shadow-md",
+    "boxShadow-page-Pdf": "$boxShadow-md",
     "gap-pages-Pdf": "$space-4",
   },
 });

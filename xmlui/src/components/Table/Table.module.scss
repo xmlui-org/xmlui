@@ -328,7 +328,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 .resizer.isResizing {
   opacity: 1;
   &:before{
-    box-shadow: t.$shadow;
+    box-shadow: t.$boxShadow;
   }
 }
 

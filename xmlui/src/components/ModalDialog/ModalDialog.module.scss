@@ -60,7 +60,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
   font-family: $fontFamily-ModalDialog;
   color: $color-ModalDialog;
   @include t.paddingVars($themeVars, $component);
-  box-shadow: t.$shadow-spread;
+  box-shadow: t.$boxShadow-spread;
   transform: translate(0);
   width: 90vw;
   max-width: $maxWidth-ModalDialog;

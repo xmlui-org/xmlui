@@ -237,36 +237,17 @@ export const RootThemeDefinition: ThemeDefinition = {
     "borderColor-dropdown-item": "$borderColor",
 
     // --- Various predefined shadow values
-    shadow: "0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06)",
-    "shadow-md": "0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06)",
-    "shadow-xl":
+    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06)",
+    "boxShadow-md": "0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06)",
+    "boxShadow-xl":
       "0 16px 24px 2px rgba(0, 0, 0, 0.07), 0 6px 30px 5px rgba(0, 0, 0, 0.06), 0 8px 10px -5px rgba(0, 0, 0, 0.1)",
-    "shadow-xxl": "0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19)",
-    "shadow-spread": "0px 0px 30px rgba(0, 0, 0, 0.1)",
-    "shadow-spread-2": "-6px -4px 40px 10px rgba(0, 0, 0, 0.1)",
-    "shadow-spread-2-xl": "-6px -4px 40px 18px rgba(0, 0, 0, 0.1)",
+    "boxShadow-xxl": "0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19)",
+    "boxShadow-spread": "0px 0px 30px rgba(0, 0, 0, 0.1)",
+    "boxShadow-spread-2": "-6px -4px 40px 10px rgba(0, 0, 0, 0.1)",
+    "boxShadow-spread-2-xl": "-6px -4px 40px 18px rgba(0, 0, 0, 0.1)",
 
     // --- The default maximum content width
     "maxWidth-content": "1320px",
-
-    "size-Icon": "1.25em",
-
-    "boxShadow-Avatar": "inset 0 0 0 1px rgba(4, 32, 69, 0.1)",
-    "border-size-Avatar": "0px",
-    "borderRadius-Avatar": "4px",
-
-    "boxShadow-header-App": "none",
-    // "height-AppHeader": "3.5rem",
-
-    "paddingHorizontal-NavPanel-horizontal": "1rem",
-    "paddingVertical-HeaderLogo": "0.7rem",
-
-    "padding-TableCell": ".75rem",
-    "padding-TableHeading": ".5rem .75rem .5rem .75rem",
-    "backgroundColor-TableRow--hover": "transparent",
-
-    "boxShadow-NavPanel-vertical": "none",
-    "width-NavPanel-vertical": "15rem",
   },
   tones: {
     light: {
