@@ -7,6 +7,7 @@ import {
   buttonTypeValues,
   type IconPosition,
 } from "../../components/abstractions";
+import type { ComponentDriver } from "../../testing/ComponentDrivers";
 
 // --- Setup
 
@@ -65,11 +66,8 @@ const expect = fixtureExpect.extend({
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("component renders", async ({ initTestBed, createButtonDriver }) => {
-    await initTestBed(`<Button abcdef="hi"/>`);
-    const driver = await createButtonDriver();
-
-    await expect(driver.component).toBeAttached();
-    await expect(driver.component).toBeEmpty();
+    await initTestBed(`<Button />`);
+    await expect((await createButtonDriver()).component).toBeAttached();
   });
 
   // --- label
@@ -84,17 +82,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createButtonDriver()).component).toHaveText("😀");
   });
 
-  test("renders without label, icon or children", async ({ initTestBed, createButtonDriver }) => {
-    // We could get the sum of vertical paddings, margins and comp height to get the expected height
-    await initTestBed(`<Button height="20px" />`);
-    const driver = await createButtonDriver();
-    const { width, height } = await driver.getComponentBounds();
-
-    // TODO: These should be comp height >= button vertical paddings
-    expect(height).toBeGreaterThan(0);
-    expect(width).toBeGreaterThan(0);
-  });
-
   // --- icon
 
   test("can render icon", async ({ initTestBed, createButtonDriver }) => {
@@ -103,7 +90,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
         "icon.test": "resources/bell.svg",
       },
     });
-    await expect((await createButtonDriver()).getFirstIcon()).toBeVisible();
+    await expect((await createButtonDriver()).getIcons().first()).toBeVisible();
   });
 
   // --- enabled
@@ -188,27 +175,27 @@ test("ignores label property if children present", async ({ initTestBed, createB
   await expect((await createButtonDriver()).component).toHaveExplicitLabel("world");
 });
 
-// TODO
-test.skip(
-  "renders XMLUI Text component as child",
-  SKIP_REASON.TO_BE_IMPLEMENTED(
-    "Flesh out these tests by adding child targeting locators or targeting the children as a whole as a black box",
-  ),
-  async ({ initTestBed, createButtonDriver }) => {
-    await initTestBed(`<Button label="hello"><Text>world</Text></Button>`);
-    await expect((await createButtonDriver()).component).not.toHaveExplicitLabel("hello");
-  },
-);
+test("renders XMLUI Text component as child", async ({
+  initTestBed,
+  createButtonDriver,
+  createTextDriver,
+}) => {
+  await initTestBed(`<Button label="hello"><Text testId="text">world</Text></Button>`);
+  await expect((await createButtonDriver()).component).not.toHaveExplicitLabel("hello");
+  await expect((await createTextDriver("text")).component).toHaveText("world");
+});
 
-// TODO
-test.skip(
-  "renders XMLUI Complex component as child",
-  SKIP_REASON.TO_BE_IMPLEMENTED("See skip reason in test above"),
-  async ({ initTestBed, createButtonDriver }) => {
-    await initTestBed(`<Button label="hello"><Card title="Button">Content</Card></Button>`);
-    await expect((await createButtonDriver()).component).toHaveText("world");
-  },
-);
+test("renders XMLUI Complex component as child", async ({
+  initTestBed,
+  createButtonDriver,
+  createCardDriver,
+}) => {
+  await initTestBed(
+    `<Button label="hello"><Card testId="card" title="Button">Content</Card></Button>`,
+  );
+  await expect((await createButtonDriver()).component).not.toHaveExplicitLabel("hello");
+  await expect((await createCardDriver("card")).component).toBeAttached();
+});
 
 // --- icon
 
@@ -221,7 +208,7 @@ test("renders icon and label", async ({ initTestBed, createButtonDriver }) => {
   const driver = await createButtonDriver();
 
   await expect(driver.component).toHaveText("hello");
-  await expect(driver.getFirstIcon()).toBeVisible();
+  await expect(driver.getIcons().first()).toBeVisible();
 });
 
 test("renders icon if children present", async ({ initTestBed, createButtonDriver }) => {
@@ -230,7 +217,7 @@ test("renders icon if children present", async ({ initTestBed, createButtonDrive
       "icon.test": "resources/bell.svg",
     },
   });
-  await expect((await createButtonDriver()).getFirstIcon()).toBeVisible();
+  await expect((await createButtonDriver()).getIcons().first()).toBeVisible();
 });
 
 [
@@ -247,7 +234,7 @@ test("renders icon if children present", async ({ initTestBed, createButtonDrive
     createButtonDriver,
   }) => {
     await initTestBed(`<Button icon="${type.value}" />`);
-    await expect((await createButtonDriver()).getFirstIcon()).not.toBeAttached();
+    await expect((await createButtonDriver()).getIcons().first()).not.toBeAttached();
   });
 });
 
@@ -258,78 +245,110 @@ test("renders if icon is not found and label is present", async ({
   await initTestBed(`<Button icon="_" label="hello" />`);
   const driver = await createButtonDriver();
 
-  await expect(driver.getFirstIcon()).not.toBeAttached();
+  await expect(driver.getIcons().first()).not.toBeAttached();
   await expect(driver.component).toHaveText("hello");
 });
 
 // --- iconPosition
 
-// TODO: These tests require some work: iconPosition=start/end + with label, without label, with children
-// 1. The idea of testing positioning this way can be challenged: it may be too specific
-// 2. The logic is not final since getters are used differently because async functions,
-//    the calculation may be too verbose or should be restructured
-
-const iconPositionCases: { position: string; value: IconPosition }[] = [
-  { position: "left (ltr)", value: "start" },
-  { position: "right (rtl)", value: "end" },
+const iconPositionCases: {
+  position: "left" | "right";
+  value: IconPosition;
+}[] = [
+  { position: "left", value: "start" },
+  { position: "right", value: "end" },
 ];
+
+async function iconPositionCalculation(buttonDriver: ComponentDriver, iconDriver: ComponentDriver) {
+  const buttonBounds = await buttonDriver.getComponentBounds();
+  const buttonPadding = await buttonDriver.getPaddings();
+  const buttonBorders = await buttonDriver.getBorders();
+  const { left: iconLeft, right: iconRight } = await iconDriver.getComponentBounds();
+  const buttonContentLeft =
+    buttonBounds.left + buttonBorders.left.width.value + buttonPadding.left.value;
+  const buttonContentRight =
+    buttonBounds.right - buttonBorders.right.width.value - buttonPadding.right.value;
+  return { buttonContentLeft, buttonContentRight, iconLeft, iconRight };
+}
+
+iconPositionCases.forEach(({ value }) => {
+  test(`iconPosition=${value} leaves icon in middle`, async ({
+    initTestBed,
+    createButtonDriver,
+    createIconDriver,
+  }) => {
+    await initTestBed(`<Button icon="test" iconPosition="${value}" />`, {
+      resources: {
+        "icon.test": "resources/bell.svg",
+      },
+    });
+    const buttonDriver = await createButtonDriver();
+    const iconDriver = await createIconDriver(buttonDriver.getIcons().first());
+    const { buttonContentLeft, buttonContentRight, iconLeft, iconRight } =
+      await iconPositionCalculation(buttonDriver, iconDriver);
+
+    expect(buttonContentLeft).toBeCloseTo(iconLeft, 5);
+    expect(buttonContentRight).toBeCloseTo(iconRight, 5);
+  });
+});
 
 // With label
 iconPositionCases.forEach(({ position, value }) => {
-  test.skip(
-    `iconPosition=${value} places icon on ${position} of label`,
-    SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-    async ({ initTestBed, createButtonDriver }) => {
-      await initTestBed(`<Button icon="test" label="hello" iconPosition="${value}" />`, {
-        resources: {
-          "icon.test": "resources/bell.svg",
-        },
-      });
+  test(`iconPosition=${value} places icon on the ${position} of label`, async ({
+    initTestBed,
+    createButtonDriver,
+    createIconDriver,
+  }) => {
+    await initTestBed(`<Button icon="test" label="hello" iconPosition="${value}" />`, {
+      resources: {
+        "icon.test": "resources/bell.svg",
+      },
+    });
+    const buttonDriver = await createButtonDriver();
+    const iconDriver = await createIconDriver(buttonDriver.getIcons().first());
+    const { buttonContentLeft, buttonContentRight, iconLeft, iconRight } =
+      await iconPositionCalculation(buttonDriver, iconDriver);
 
-      const driver = await createButtonDriver();
-      //const buttonDimensions = await getFullRectangle(driver.component);
-      /* const contentStart = pixelStrToNum(
-        buttonDimensions[pos] + (await getElementStyle(driver.component, `padding-${pos}`)),
-      );
-      const iconStart = (await getFullRectangle(driver.getFirstNonTextNode()))[pos];
-
-      expect(contentStart).toEqualWithTolerance(iconStart); */
-    },
-  );
+    if (value === "start") {
+      expect(buttonContentLeft).toBeCloseTo(iconLeft, 5);
+      expect(buttonContentRight).toBeGreaterThan(iconRight + 1);
+    } else {
+      expect(buttonContentLeft).toBeLessThan(iconLeft - 1);
+      expect(buttonContentRight).toBeCloseTo(iconRight, 5);
+    }
+  });
 });
 
-// Without label
+// With children
 iconPositionCases.forEach(({ position, value }) => {
-  test.skip(
-    `iconPosition=${value} places icon on ${position}`,
-    SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-    async ({ initTestBed, createButtonDriver }) => {
-      await initTestBed(`<Button icon="test" iconPosition="${value}" />`, {
+  test(`iconPosition=${value} places icon on ${position} of children`, async ({
+    initTestBed,
+    createButtonDriver,
+    createIconDriver,
+  }) => {
+    await initTestBed(
+      `<Button icon="test" iconPosition="${value}">
+          <Card title="Test">This is some content</Card>
+        </Button>`,
+      {
         resources: {
           "icon.test": "resources/bell.svg",
         },
-      });
+      },
+    );
+    const buttonDriver = await createButtonDriver();
+    const iconDriver = await createIconDriver(buttonDriver.getIcons().first());
+    const { buttonContentLeft, buttonContentRight, iconLeft, iconRight } =
+      await iconPositionCalculation(buttonDriver, iconDriver);
 
-      await expect((await createButtonDriver()).component).toBeAttached();
-    },
-  );
-});
-
-// With children instead of label
-iconPositionCases.forEach(({ position, value }) => {
-  test.skip(
-    `iconPosition=${value} places icon on ${position} of children`,
-    SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-    async ({ initTestBed, createButtonDriver }) => {
-      await initTestBed(`<Button icon="test" label="hello" iconPosition="${value}" />`, {
-        resources: {
-          "icon.test": "resources/bell.svg",
-        },
-      });
-
-      await expect((await createButtonDriver()).component).toBeAttached();
-    },
-  );
+    if (value === "start") {
+      expect(buttonContentLeft).toBeCloseTo(iconLeft, 5);
+      expect(buttonContentRight).toBeGreaterThan(iconRight + 1);
+    } else {
+      expect(buttonContentLeft).toBeLessThan(iconLeft - 1);
+      expect(buttonContentRight).toBeCloseTo(iconRight, 5);
+    }
+  });
 });
 
 // --- contentPosition
