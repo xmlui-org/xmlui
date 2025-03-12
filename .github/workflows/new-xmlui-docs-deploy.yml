@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - docs/**
-    branches: [ captaaint/docs-with-extensions ]
+    branches: [ main ]
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
