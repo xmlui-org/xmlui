@@ -117,11 +117,11 @@ When you define theme variables, you can separate tone-independent values from t
     "borderStyle-MyComponent": "solid",
     "light": {
       "backgroundColor-MyComponent": "white",
-      "textColor-MyComponent": "black"
+      "color-MyComponent": "black"
     },
     "dark": {
       "backgroundColor-MyComponent": "black",
-      "textColor-MyComponent": "white"
+      "color-MyComponent": "white"
     }
   }
 }
@@ -193,12 +193,12 @@ The next sample demonstrates that you can use the `tone` property of `Theme` to 
 
 In addition to theme IDs and tones, you can modify particular theme variables, as the following sample demonstrates:
 
-```ueml copy /textColor-primary="orangered"/ /borderRadius-Card="40px"/ /textColor-primary="mediumpurple"/
+```ueml copy /color-primary="orangered"/ /borderRadius-Card="40px"/ /color-primary="mediumpurple"/
 <App>
-  <Theme textColor-primary="orangered" borderRadius-Card="40px">
+  <Theme color-primary="orangered" borderRadius-Card="40px">
     <Card title="Card with custom text color and border radius" />
   </Theme>
-  <Theme tone="dark" textColor-primary="mediumpurple">
+  <Theme tone="dark" color-primary="mediumpurple">
     <Card title="Card with dark tone and custom text color" />
   </Theme>
 </App>
@@ -209,10 +209,10 @@ In addition to theme IDs and tones, you can modify particular theme variables, a
     name="Theme component with modified theme variables"
     app={`
     <App>
-      <Theme textColor-primary="orangered" borderRadius-Card="40px">
+      <Theme color-primary="orangered" borderRadius-Card="40px">
         <Card title="Card with custom text color and border radius" />
       </Theme>
-      <Theme tone="dark" textColor-primary="mediumpurple">
+      <Theme tone="dark" color-primary="mediumpurple">
         <Card title="Card with dark tone and custom text color" />
       </Theme>
     </App>
@@ -264,11 +264,11 @@ Create a new theme named "my-brand" and save it into the `themes/my-brand.json` 
     "borderRadius": "8px",
     "light": {
       "color-primary": "purple",
-      "textColor": "black"
+      "color": "black"
     },
     "dark": {
       "color-primary": "mediumpurple",
-      "textColor": "white"
+      "color": "white"
     }
   }
 }
@@ -315,7 +315,7 @@ Now, your new theme displays the app in a light tone like this:
                 "fontFamily-Heading": "sans-serif",
                 "fontWeight-H1": "fontWeight-medium",
                 borderRadius: "8px",
-                "textColor": "black",
+                "color": "black",
                 "color-primary": "purple",
             },
         }
@@ -349,7 +349,7 @@ It also handles the dark tone:
                 "fontFamily-Heading": "sans-serif",
                 "fontWeight-H1": "fontWeight-medium",
                 borderRadius: "8px",
-                "textColor": "white",
+                "color": "white",
                 "color-primary": "mediumpurple",
             },
         }
@@ -393,7 +393,7 @@ In this convention, the `<ComponentId>` part is optional.
 
 Here are a few examples:
 
-- `textColor`: text color (or forecolor)
+- `color`: text color (or forecolor)
 - `backgroundColor`: background color
 - `text-size`: the size of the text
 - `lineHeight`: the height of a text line

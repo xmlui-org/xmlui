@@ -150,14 +150,14 @@ export const TableMd = createMetadata({
     [`backgroundColor-selected-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
     [`backgroundColor-pagination-${COMP}`]: `$backgroundColor-${COMP}`,
     [`outlineColor-heading-${COMP}--focus`]: "$outlineColor--focus",
-    [`textColor-pagination-${COMP}`]: "$color-secondary",
+    [`color-pagination-${COMP}`]: "$color-secondary",
     light: {
       [`backgroundColor-row-${COMP}--hover`]: "$color-primary-50",
       [`backgroundColor-selected-${COMP}`]: "$color-primary-100",
       [`backgroundColor-heading-${COMP}--hover`]: "$color-surface-200",
       [`backgroundColor-heading-${COMP}--active`]: "$color-surface-300",
       [`backgroundColor-heading-${COMP}`]: "$color-surface-100",
-      [`textColor-heading-${COMP}`]: "$color-surface-500",
+      [`color-heading-${COMP}`]: "$color-surface-500",
     },
     dark: {
       [`backgroundColor-row-${COMP}--hover`]: "$color-primary-900",

@@ -67,7 +67,7 @@ export const NavLinkMd = createMetadata({
     [`fontSize-${COMP}`]: "$fontSize-small",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
     [`fontFamily-${COMP}`]: "$fontFamily",
-    [`textColor-${COMP}`]: "$textColor-primary",
+    [`color-${COMP}`]: "$textColor-primary",
     [`fontWeight-${COMP}--pressed`]: "$fontWeight-normal",
     [`thickness-indicator-${COMP}`]: "$space-0_5",
 

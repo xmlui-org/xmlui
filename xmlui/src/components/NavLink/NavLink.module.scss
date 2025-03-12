@@ -17,12 +17,12 @@ $backgroundColor-NavLink--active: createThemeVar("backgroundColor-#{$component}-
 $backgroundColor-NavLink--pressed: createThemeVar("backgroundColor-#{$component}--pressed");
 $backgroundColor-NavLink--pressed--active: createThemeVar("backgroundColor-#{$component}--pressed--active");
 $fontSize-NavLink: createThemeVar("fontSize-#{$component}");
-$textColor-NavLink: createThemeVar("textColor-#{$component}");
-$textColor-NavLink--hover: createThemeVar("textColor-#{$component}--hover");
-$textColor-NavLink--active: createThemeVar("textColor-#{$component}--active");
-$textColor-NavLink--hover--active: createThemeVar("textColor-#{$component}--hover--active");
-$textColor-NavLink--pressed: createThemeVar("textColor-#{$component}--pressed");
-$textColor-NavLink--pressed--active: createThemeVar("textColor-#{$component}--pressed--active");
+$color-NavLink: createThemeVar("color-#{$component}");
+$color-NavLink--hover: createThemeVar("color-#{$component}--hover");
+$color-NavLink--active: createThemeVar("color-#{$component}--active");
+$color-NavLink--hover--active: createThemeVar("color-#{$component}--hover--active");
+$color-NavLink--pressed: createThemeVar("color-#{$component}--pressed");
+$color-NavLink--pressed--active: createThemeVar("color-#{$component}--pressed--active");
 $color-icon-NavLink: createThemeVar("color-icon-#{$component}");
 $fontFamily-NavLink: createThemeVar("fontFamily-#{$component}");
 $fontWeight-NavLink: createThemeVar("fontWeight-#{$component}");
@@ -52,7 +52,7 @@ $transition: color 0.1s, background-color 0.1s;
     font-family: $fontFamily-NavLink;
     position: relative;
     transition: $transition;
-    color: $textColor-NavLink;
+    color: $color-NavLink;
     background-color: $backgroundColor-NavLink;
     flex-shrink: 0;
     white-space: nowrap;
@@ -62,7 +62,7 @@ $transition: color 0.1s, background-color 0.1s;
     }
 
     * {
-      color: $textColor-NavLink;
+      color: $color-NavLink;
     }
 
     &.includeHoverIndicator {
@@ -80,10 +80,10 @@ $transition: color 0.1s, background-color 0.1s;
 
     &:hover.displayActive,
     &:focus-visible {
-      color: $textColor-NavLink--hover;
+      color: $color-NavLink--hover;
       background-color: $backgroundColor-NavLink--hover;
       * {
-        color: $textColor-NavLink--hover;
+        color: $color-NavLink--hover;
       }
       &:after {
         background-color: $color-indicator-NavLink--hover;
@@ -109,12 +109,12 @@ $transition: color 0.1s, background-color 0.1s;
     }
 
     &:active.displayActive {
-      color: $textColor-NavLink--pressed;
+      color: $color-NavLink--pressed;
       background-color: $backgroundColor-NavLink--pressed;
       font-weight: $fontWeight-NavLink--pressed;
       * {
         font-weight: $fontWeight-NavLink--pressed;
-        color: $textColor-NavLink--pressed;
+        color: $color-NavLink--pressed;
       }
       &:after {
         background-color: $color-indicator-NavLink--pressed;
@@ -122,21 +122,21 @@ $transition: color 0.1s, background-color 0.1s;
     }
 
     &.navItemActive {
-      color: $textColor-NavLink--active;
+      color: $color-NavLink--active;
       background-color: $backgroundColor-NavLink--active;
       font-weight: $fontWeight-NavLink--active;
       * {
         font-weight: $fontWeight-NavLink--active;
-        color: $textColor-NavLink--active;
+        color: $color-NavLink--active;
       }
       & > * {
         z-index: 1;
       }
       &:hover {
-        color: $textColor-NavLink--hover--active;
+        color: $color-NavLink--hover--active;
         background-color: $backgroundColor-NavLink--hover--active;
         * {
-          color: $textColor-NavLink--hover--active;
+          color: $color-NavLink--hover--active;
         }
       }
       &:after {
@@ -145,12 +145,12 @@ $transition: color 0.1s, background-color 0.1s;
       }
 
       &:active {
-        color: $textColor-NavLink--pressed--active;
+        color: $color-NavLink--pressed--active;
         background-color: $backgroundColor-NavLink--pressed--active;
         font-weight: $fontWeight-NavLink--pressed;
         * {
           font-weight: $fontWeight-NavLink--pressed;
-          color: $textColor-NavLink--pressed--active;
+          color: $color-NavLink--pressed--active;
         }
         &:after {
           background-color: $color-indicator-NavLink--pressed;

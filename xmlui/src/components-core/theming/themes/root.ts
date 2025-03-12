@@ -311,7 +311,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "borderColor-Input-default--error": $colorDanger600,
 
         // --- InputLabel is a React component, so we define its default theme variables here
-        "textColor-InputLabel-required": $colorDanger600,
+        "color-InputLabel-required": $colorDanger600,
       },
     },
     dark: {
@@ -354,7 +354,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "borderColor-Input-default--error": $colorDanger500,
 
         // --- InputLabel is a React component, so we define its default theme variables here
-        "textColor-InputLabel-required": $colorDanger400,
+        "color-InputLabel-required": $colorDanger400,
       },
     },
   },

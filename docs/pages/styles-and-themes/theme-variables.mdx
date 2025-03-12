@@ -19,7 +19,7 @@ In this convention, the `<ComponentId>` part is optional.
 
 The `<propertyName>` segment names a property (and optionally a part of a component) the particular theme variable affects. This segment should use lowercase letters and dashes. The property name can be a single word or multiple words separated with a dash (`-`). Here are a few examples:
 
-- `textColor`: Text color
+- `color`: Text color
 - `backgroundColor`: Background color
 - `backgroundColor-indicator`: The background color of the "indicator" part of a specific component.
 - `text-size`: The size of the text
@@ -298,10 +298,10 @@ These colors represent validation states:
   app={`
     <App>
       <FlowLayout>
-        <Swatch color="$color-info" width="25%" textColor="$color-surface-50" />
-        <Swatch color="$color-valid" width="25%" textColor="$color-surface-50" />
-        <Swatch color="$color-warning" width="25%" textColor="$color-surface-50" />
-        <Swatch color="$color-error" width="25%" textColor="$color-surface-50" />
+        <Swatch color="$color-info" width="25%" color="$color-surface-50" />
+        <Swatch color="$color-valid" width="25%" color="$color-surface-50" />
+        <Swatch color="$color-warning" width="25%" color="$color-surface-50" />
+        <Swatch color="$color-error" width="25%" color="$color-surface-50" />
       </FlowLayout>
     </App>
   `}

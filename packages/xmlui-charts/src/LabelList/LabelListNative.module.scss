@@ -11,7 +11,7 @@ $themeVars: ();
 $componentName: "LabelList";
 
 .labelList {
-  fill: createThemeVar("textColor-LabelList");
+  fill: createThemeVar("color-LabelList");
 }
 
 // --- We export the theme variables to add them to the component renderer

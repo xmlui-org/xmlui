@@ -406,15 +406,15 @@ VARIANTS.filter((variant) => variant.name !== "solid").forEach((variant) => {
   });
 });
 
-// textColor theme variable applied to every button combination
+// color theme variable applied to every button combination
 VARIANTS.forEach((variant) => {
   THEME_COLORS.forEach((themeColor) => {
-    test(`textColor-Button-${themeColor.name}-${variant.name}`, async ({ page }) => {
+    test(`color-Button-${themeColor.name}-${variant.name}`, async ({ page }) => {
       const EXPECTED = COLORS.green;
       const themeVars = {
-        "textColor-Button": COLORS.red,
+        "color-Button": COLORS.red,
       };
-      themeVars[`textColor-Button-${themeColor.name}-${variant.name}`] = EXPECTED;
+      themeVars[`color-Button-${themeColor.name}-${variant.name}`] = EXPECTED;
       await initThemedApp(page, BTN_MATRIX_CODE, { themeVars });
 
       const testId = "btn" + variant.testIdFragment1 + themeColor.testIdFragment2;

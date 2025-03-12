@@ -13,7 +13,7 @@ $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, "#{$component}-pill");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}-pill");
 $backgroundColor-Badge: createThemeVar("backgroundColor-#{$component}");
-$textColor-Badge: createThemeVar("textColor-#{$component}");
+$color-Badge: createThemeVar("color-#{$component}");
 $fontSize-Badge: createThemeVar("fontSize-#{$component}");
 $fontSize-Badge-pill: createThemeVar("fontSize-#{$component}-pill");
 $fontWeight-Badge: createThemeVar("fontWeight-#{$component}");
@@ -32,7 +32,7 @@ $fontWeight-Badge-pill: createThemeVar("fontWeight-#{$component}-pill");
   font-weight: $fontWeight-Badge;
 
   background-color: $backgroundColor-Badge;
-  color: $textColor-Badge;
+  color: $color-Badge;
   font-size: $fontSize-Badge;
 }
 
@@ -48,7 +48,7 @@ $fontWeight-Badge-pill: createThemeVar("fontWeight-#{$component}-pill");
   font-weight: $fontWeight-Badge-pill;
 
   background-color: $backgroundColor-Badge;
-  color: $textColor-Badge;
+  color: $color-Badge;
   border-radius: 9999px;
   font-size: $fontSize-Badge-pill;
 }

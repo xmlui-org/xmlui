@@ -8,9 +8,9 @@ $themeVars: ();
 }
 
 $component: "Table";
-$textColor-pagination-Table: createThemeVar("textColor-pagination-#{$component}");
+$color-pagination-Table: createThemeVar("color-pagination-#{$component}");
 $backgroundColor-Table: createThemeVar("backgroundColor-#{$component}");
-$textColor-Table: createThemeVar("textColor-#{$component}");
+$color-Table: createThemeVar("color-#{$component}");
 $backgroundColor-row-Table: createThemeVar("backgroundColor-row-#{$component}");
 $backgroundColor-row-Table--hover: createThemeVar("backgroundColor-row-#{$component}--hover");
 $backgroundColor-selected-Table: createThemeVar("backgroundColor-selected-#{$component}");
@@ -24,7 +24,7 @@ $paddingHorizontal-cell-first-Table: createThemeVar("paddingHorizontal-cell-firs
 $paddingHorizontal-cell-last-Table: createThemeVar("paddingHorizontal-cell-last-#{$component}");
 $themeVars: t.composeBorderVars($themeVars, "cell-#{$component}");
 $backgroundColor-pagination-Table: createThemeVar("backgroundColor-pagination-#{$component}");
-$textColor-heading-Table: createThemeVar("textColor-heading-#{$component}");
+$color-heading-Table: createThemeVar("color-heading-#{$component}");
 $fontWeight-row-Table: createThemeVar("fontWeight-row-#{$component}");
 $fontSize-row-Table: createThemeVar("fontSize-row-#{$component}");
 $fontWeight-heading-Table: createThemeVar("fontWeight-heading-#{$component}");
@@ -52,7 +52,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 .clickableHeader {
   width: 100%;
   height: 100%;
-  color: $textColor-heading-Table;
+  color: $color-heading-Table;
   background-color: transparent;
   border: none;
   transition: color 0.2s, background-color 0.2s;
@@ -89,7 +89,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   align-items: center;
   text-transform: $textTransform-heading-Table;
   font-size: $fontSize-heading-Table;
-  color: $textColor-heading-Table;
+  color: $color-heading-Table;
   font-weight: $fontWeight-heading-Table;
   user-select: text;
   @include t.paddingVars($themeVars, "heading-#{$component}");
@@ -110,7 +110,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 
 .table {
   display: block;
-  color: $textColor-Table;
+  color: $color-Table;
 
   .row, .headerRow {
     display: flex;
@@ -265,7 +265,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 }
 
 .paginationLabel {
-  color: $textColor-pagination-Table;
+  color: $color-pagination-Table;
   font-size: t.$fontSize-small;
 }
 

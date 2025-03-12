@@ -47,7 +47,7 @@ export const FileUploadDropZoneMd = createMetadata({
     "backgroundColor-FileUploadDropZone": "$backgroundColor",
     "backgroundColor-dropping-FileUploadDropZone": "$backgroundColor--selected",
     "opacity-dropping-FileUploadDropZone": "0.5",
-    "textColor-FileUploadDropZone": "$textColor",
+    "color-FileUploadDropZone": "$textColor",
     light: {
       // --- No light-specific theme vars
     },
