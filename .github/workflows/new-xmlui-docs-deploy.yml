@@ -10,34 +10,16 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      # checkout the repo
-      - name: 'Checkout Github Action'
-        uses: actions/checkout@v3
-
-      - name: cache node modules
-        uses: actions/cache@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+          node-version: 18
+          cache: "npm"
+          registry-url: https://registry.npmjs.org/
 
-      - name: Setup Node 18.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
-
-      - name: npm install
-        run: npm i
-
-      - name: npm install @napi-rs
-        run: npm i @napi-rs/simple-git-linux-x64-gnu
-        working-directory: docs
-
-      - name: npm install docs
-        run: npm i
-        working-directory: docs
+      - run: npm ci --prefer-offline
 
       - name: build docs package
-        shell: bash
         run: npm run release-ci
         working-directory: docs
 
