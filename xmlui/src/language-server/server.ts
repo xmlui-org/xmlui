@@ -1,44 +1,39 @@
-import {
-	createConnection,
-	TextDocuments,
-	Diagnostic,
-	DiagnosticSeverity,
-	ProposedFeatures,
+import type {
 	InitializeParams,
-	DidChangeConfigurationNotification,
 	CompletionItem,
-	CompletionItemKind,
 	TextDocumentPositionParams,
-	TextDocumentSyncKind,
 	InitializeResult,
-	DocumentDiagnosticReportKind,
-	type DocumentDiagnosticReport,
-    HoverParams,
-    MarkupKind
+  HoverParams,
 } from 'vscode-languageserver/node';
+import {
+  createConnection,
+  MarkupKind,
+  TextDocumentSyncKind,
+  DidChangeConfigurationNotification,
+  TextDocuments,
+  ProposedFeatures,
+} from 'vscode-languageserver/node';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 
 import {handleCompletion} from "./services/completion";
 import {handleHover} from "./services/hover";
+import { createXmlUiParser, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
 
-import {
-	TextDocument
-} from 'vscode-languageserver-textdocument';
-import { createXmlUiParser, GetText, ParseResult } from '../parsers/xmlui-parser/parser';
+export function start(){
+  // Create a connection for the server, using Node's IPC as a transport.
+  // Also include all preview / proposed LSP features.
+  const connection = createConnection(ProposedFeatures.all);
 
-// Create a connection for the server, using Node's IPC as a transport.
-// Also include all preview / proposed LSP features.
-const connection = createConnection(ProposedFeatures.all);
+  // Create a simple text document manager.
+  const documents = new TextDocuments(TextDocument);
 
-// Create a simple text document manager.
-const documents = new TextDocuments(TextDocument);
+  let hasConfigurationCapability = false;
+  let hasWorkspaceFolderCapability = false;
+  let hasDiagnosticRelatedInformationCapability = false;
 
-let hasConfigurationCapability = false;
-let hasWorkspaceFolderCapability = false;
-let hasDiagnosticRelatedInformationCapability = false;
-
-connection.onInitialize((params: InitializeParams) => {
-  connection.console.log("initing!")
-  const capabilities = params.capabilities;
+  connection.onInitialize((params: InitializeParams) => {
+    connection.console.log("initing!")
+    const capabilities = params.capabilities;
 
 	// Does the client support the `workspace/configuration` request?
 	// If not, we fall back using global settings.
@@ -74,9 +69,9 @@ connection.onInitialize((params: InitializeParams) => {
 		};
 	}
 	return result;
-});
+  });
 
-connection.onInitialized(() => {
+  connection.onInitialized(() => {
 	if (hasConfigurationCapability) {
 		// Register for all configuration changes.
 		connection.client.register(DidChangeConfigurationNotification.type, undefined);
@@ -86,70 +81,70 @@ connection.onInitialized(() => {
 			connection.console.log('Workspace folder change event received.');
 		});
 	}
-});
-
-connection.onCompletion(async ({ position, textDocument }: TextDocumentPositionParams) => {
-  connection.console.log(`Received request completion`);
-  const document = documents.get(textDocument.uri);
-  if (!document) {
-    return [];
-  }
-  const parseResult = getParseResult(document);
-  return handleCompletion(parseResult.parseResult, document.offsetAt(position), parseResult.getText);
-});
-
-connection.onHover(({ position, textDocument }: HoverParams) => {
-  connection.console.log(`Received request hover`);
-  const document = documents.get(textDocument.uri);
-  if (!document) {
-    return null;
-  }
-
-  const parseResult = getParseResult(document);
-  const hoverRes = handleHover(parseResult, document.offsetAt(position));
-  if (hoverRes === null){
-    return null;
-  }
-  const { value, range } = hoverRes;
-  return {
-    contents: {
-      kind: MarkupKind.Markdown,
-      value,
-    },
-    range: {
-      start: document.positionAt(range.pos),
-      end: document.positionAt(range.end),
-    },
-  };
-});
-
-const parseResults = new Map();
-function getParseResult(document: TextDocument): {
-  parseResult: ParseResult;
-  getText: GetText;
-} {
-  const parseForDoc = parseResults.get(document.uri);
-  if (parseForDoc !== undefined) {
-    if (parseForDoc.version === document.version) {
-      return {
-        parseResult: parseForDoc.parseResult,
-        getText: parseForDoc.getText,
-      };
-    }
-  }
-  const parser = createXmlUiParser(document.getText());
-  const parseResult = parser.parse();
-  parseResults.set(document.uri, {
-    parseResult,
-    version: document.version,
-    getText: parser.getText,
   });
-  return { parseResult, getText: parser.getText };
-}
 
-// This handler resolves additional information for the item selected in
-// the completion list.
-connection.onCompletionResolve(
+  connection.onCompletion(async ({ position, textDocument }: TextDocumentPositionParams) => {
+    connection.console.log(`Received request completion`);
+    const document = documents.get(textDocument.uri);
+    if (!document) {
+      return [];
+    }
+    const parseResult = getParseResult(document);
+    return handleCompletion(parseResult.parseResult, document.offsetAt(position), parseResult.getText);
+  });
+
+  connection.onHover(({ position, textDocument }: HoverParams) => {
+    connection.console.log(`Received request hover`);
+    const document = documents.get(textDocument.uri);
+    if (!document) {
+      return null;
+    }
+
+    const parseResult = getParseResult(document);
+    const hoverRes = handleHover(parseResult, document.offsetAt(position));
+    if (hoverRes === null){
+      return null;
+    }
+    const { value, range } = hoverRes;
+    return {
+      contents: {
+        kind: MarkupKind.Markdown,
+        value,
+      },
+      range: {
+        start: document.positionAt(range.pos),
+        end: document.positionAt(range.end),
+      },
+    };
+  });
+
+  const parseResults = new Map();
+  function getParseResult(document: TextDocument): {
+    parseResult: ParseResult;
+    getText: GetText;
+  } {
+    const parseForDoc = parseResults.get(document.uri);
+    if (parseForDoc !== undefined) {
+      if (parseForDoc.version === document.version) {
+        return {
+          parseResult: parseForDoc.parseResult,
+          getText: parseForDoc.getText,
+        };
+      }
+    }
+    const parser = createXmlUiParser(document.getText());
+    const parseResult = parser.parse();
+    parseResults.set(document.uri, {
+      parseResult,
+      version: document.version,
+      getText: parser.getText,
+    });
+    return { parseResult, getText: parser.getText };
+  }
+
+  // This handler resolves additional information for the item selected in
+  // the completion list.
+  connection.onCompletionResolve(
 	(item: CompletionItem): CompletionItem => {
 		if (item.data === 1) {
 			item.detail = 'TypeScript details';
@@ -160,11 +155,12 @@ connection.onCompletionResolve(
 		}
 		return item;
 	}
-);
+  );
 
-// Make the text document manager listen on the connection
-// for open, change and close text document events
-documents.listen(connection);
+  // Make the text document manager listen on the connection
+  // for open, change and close text document events
+  documents.listen(connection);
 
-// Listen on the connection
-connection.listen();
+  // Listen on the connection
+  connection.listen();
+}

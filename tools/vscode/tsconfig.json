@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "target": "es2020",
-    "lib": ["es2020"],
-    "outDir": "out",
+    "lib": ["ESNext"],
+    "outDir": "dist",
     "rootDir": "src",
     "skipLibCheck": true,
     "sourceMap": true

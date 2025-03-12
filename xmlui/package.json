@@ -142,14 +142,12 @@
     "src/styles"
   ],
   "bin": {
-    "xmlui": "./bin/bootstrap.js",
-    "xmlui-language-server": "./bin/language-server.js"
+    "xmlui": "./bin/bootstrap.js"
   },
   "clean-package": {
     "replace": {
       "bin": {
-        "xmlui": "dist/scripts/bin/bootstrap.js",
-        "xmlui-language-server": "dist/scripts/bin/language-server.js"
+        "xmlui": "dist/scripts/bin/bootstrap.js"
       },
       "main": "./dist/xmlui.umd.js",
       "module": "./dist/xmlui.mjs",
@@ -158,6 +156,10 @@
         ".": {
           "import": "./dist/xmlui.mjs",
           "require": "./dist/xmlui.umd.js"
+        },
+        "./language-server": {
+          "import": "./dist/language-server.mjs",
+          "require": "./dist/language-server.mjs"
         },
         "./parser": {
           "import": "./dist/xmlui-parser.mjs",
@@ -199,9 +201,9 @@
       "import": "./bin/vite-ueml-plugin.ts",
       "require": "./bin/vite-ueml-plugin.ts"
     },
-    "./xmlui-language-server": {
-      "import": "./bin/language-server.js",
-      "require": "./bin/language-server.js"
+    "./language-server": {
+      "import": "./src/language-server/server.ts",
+      "require": "./src/language-server/server.ts"
     }
   },
   "browserslist": {
