@@ -1,7 +1,7 @@
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { findTokenAtPos, toDbgString } from "../../parsers/xmlui-parser/utils"
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
-import metadataByComponent from "../metadata";
+import { collectedComponentMetadata } from "../../../dist/xmlui-metadata.mjs";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
 
@@ -62,7 +62,7 @@ function hoverAttr(attrKeyNode: Node, parentStack: Node[], getText: GetText): Si
   }
   const compName = compNameForTagNameNode(tagNameNode, getText)
 
-  const component = metadataByComponent[compName];
+  const component = collectedComponentMetadata[compName];
   if (!component){
     return null;
   }
@@ -109,7 +109,7 @@ function hoverName(tagNameNode: Node, identNode: Node, getText: GetText): Simple
   if (!compName) {
     return null;
   }
-  const compMetadata = metadataByComponent[compName];
+  const compMetadata = collectedComponentMetadata[compName];
   if (!compMetadata) {
     return null;
   }
