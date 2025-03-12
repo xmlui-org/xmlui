@@ -29,12 +29,6 @@ jobs:
           node-version: 18
           cache: "npm"
           registry-url: https://registry.npmjs.org/
-      - run: npm run build
-        working-directory: packages/xmlui-charts
-      - run: npm run build
-        working-directory: packages/xmlui-animations
-      - run: npm run build
-        working-directory: packages/xmlui-pdf
       - run: npm ci --prefer-offline
       - run: npm publish
         working-directory: xmlui

@@ -19,6 +19,15 @@ jobs:
 
       - run: npm ci --prefer-offline
 
+      - run: npm run build
+        working-directory: packages/xmlui-charts
+
+      - run: npm run build
+        working-directory: packages/xmlui-animations
+
+      - run: npm run build
+        working-directory: packages/xmlui-pdf
+
       - name: build docs package
         run: npm run release-ci
         working-directory: docs
