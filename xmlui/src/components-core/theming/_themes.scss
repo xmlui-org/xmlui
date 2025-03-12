@@ -489,15 +489,15 @@ $space-96: createVar(space-96);
 // ---------------------------------------------------------------------------------------------------------------------
 // Generic style variables
 
-$color-text-primary: createVar(color-text-primary);
+$textColor-primary: createVar(textColor-primary);
 $backgroundColor-primary: createVar(backgroundColor-primary);
-$color-text-attention: createVar(color-text-attention);
+$textColor-attention: createVar(textColor-attention);
 $backgroundColor-attention: createVar(backgroundColor-attention);
-$color-text-subtitle: createVar(color-text-subtitle);
+$textColor-subtitle: createVar(textColor-subtitle);
 $backgroundColor-primary: createVar(backgroundColor-primary);
 $backgroundColor-secondary: createVar(backgroundColor-secondary);
 $backgroundColor-Input-default: createVar(backgroundColor-Input-default);
-$color-text--disabled: createVar(color-text--disabled);
+$textColor--disabled: createVar(textColor--disabled);
 $backgroundColor--disabled: createVar(backgroundColor--disabled);
 $borderColor--disabled: createVar(borderColor--disabled);
 $backgroundColor--selected: createVar(backgroundColor--selected);
@@ -554,11 +554,11 @@ $borderColor-Input-default--error: createVar(borderColor-Input-default--error);
 // ---------------------------------------------------------------------------------------------------------------------
 // InputLabel style variables
 
-$color-text-InputLabel-required: createVar(color-text-InputLabel-required);
+$textColor-InputLabel-required: createVar(textColor-InputLabel-required);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // formItem style variables
-$color-text-FormItemLabel: createVar(color-text-FormItemLabel);
+$textColor-FormItemLabel: createVar(textColor-FormItemLabel);
 $fontSize-FormItemLabel: createVar(fontSize-FormItemLabel);
 $fontWeight-FormItemLabel: createVar(fontWeight-FormItemLabel);
 
@@ -570,7 +570,7 @@ $color-danger-500: createVar(color-danger-500);
 
 $backgroundColor: createVar(backgroundColor);
 
-$color-text-secondary: createVar(color-text-secondary);
+$textColor-secondary: createVar(textColor-secondary);
 
 $fontWeight-light: createVar(fontWeight-light);
 $fontWeight-normal: createVar(fontWeight-normal);

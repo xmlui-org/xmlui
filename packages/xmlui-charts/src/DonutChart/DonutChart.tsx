@@ -49,7 +49,7 @@ export const DonutChartMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "color-text-labelList-PieChart": "$color-text-primary",
+    "textColor-labelList-PieChart": "$textColor-primary",
   },
 });
 

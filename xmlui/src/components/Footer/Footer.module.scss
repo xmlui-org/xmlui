@@ -14,7 +14,7 @@ $themeVars: t.composeBorderVars($themeVars, $component) !global;
 
 // --- Other theme vars
 $backgroundColor-Footer: createThemeVar("backgroundColor-#{$component}");
-$color-text-Footer: createThemeVar("color-text-#{$component}");
+$textColor-Footer: createThemeVar("textColor-#{$component}");
 $height-Footer: createThemeVar("height-#{$component}");
 $fontSize-Footer: createThemeVar("fontSize-#{$component}");
 $align-vertical-Footer: createThemeVar("align-vertical-#{$component}");
@@ -36,7 +36,7 @@ $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
   font-size: $fontSize-Footer;
   align-items: $align-vertical-Footer;
   max-width: $maxWidth-content-Footer;
-  color: $color-text-Footer;
+  color: $textColor-Footer;
   margin: 0 auto;
 
   &.full{

@@ -136,7 +136,7 @@ export const MenuItemMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${MICOMP}`]: "$backgroundColor-dropdown-item",
-    [`color-${MICOMP}`]: "$color-text-primary",
+    [`color-${MICOMP}`]: "$textColor-primary",
     [`fontFamily-${MICOMP}`]: "$fontFamily",
     [`fontSize-${MICOMP}`]: "$fontSize-small",
     [`paddingVertical-${MICOMP}`]: "$space-2",

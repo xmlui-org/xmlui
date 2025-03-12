@@ -181,12 +181,12 @@ export const FormItemMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "color-text-FormItemLabel": "$color-text-primary",
+    "textColor-FormItemLabel": "$textColor-primary",
     "fontSize-FormItemLabel": "$fontSize-small",
     "fontWeight-FormItemLabel": "$fontWeight-medium",
     "font-style-FormItemLabel": "normal",
     "textTransform-FormItemLabel": "none",
-    "color-text-FormItemLabel-requiredMark": "$color-danger-400",
+    "textColor-FormItemLabel-requiredMark": "$color-danger-400",
   },
 });
 

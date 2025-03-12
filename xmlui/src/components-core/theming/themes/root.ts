@@ -149,10 +149,10 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontWeight-extra-bold": "900",
 
     // --- Default text colors (component use these values as their defaults)
-    "color-text-primary": "$color-surface-950",
-    "color-text-attention": "$color-danger-600",
-    "color-text-subtitle": "$color-surface-500",
-    "color-text--disabled": "$color-surface-400",
+    "textColor-primary": "$color-surface-950",
+    "textColor-attention": "$color-danger-600",
+    "textColor-subtitle": "$color-surface-500",
+    "textColor--disabled": "$color-surface-400",
 
     // --- Default background colors (component use these values as their defaults)
     "backgroundColor-primary": "$color-surface-50",
@@ -295,11 +295,11 @@ export const RootThemeDefinition: ThemeDefinition = {
         "borderColor-dropdown-item": $colorSurface200,
 
         // --- Text colors
-        "color-text-primary": $colorSurface950,
-        "color-text-secondary": $colorSurface600,
-        "color-text-attention": $colorDanger600,
-        "color-text-subtitle": $colorSurface500,
-        "color-text--disabled": $colorSurface400,
+        "textColor-primary": $colorSurface950,
+        "textColor-secondary": $colorSurface600,
+        "textColor-attention": $colorDanger600,
+        "textColor-subtitle": $colorSurface500,
+        "textColor--disabled": $colorSurface400,
 
         // --- Input is an abstract component, so we define its default theme variables here
         "backgroundColor-Input-default": "white",
@@ -311,7 +311,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "borderColor-Input-default--error": $colorDanger600,
 
         // --- InputLabel is a React component, so we define its default theme variables here
-        "color-text-InputLabel-required": $colorDanger600,
+        "textColor-InputLabel-required": $colorDanger600,
       },
     },
     dark: {
@@ -339,11 +339,11 @@ export const RootThemeDefinition: ThemeDefinition = {
         "borderColor-dropdown-item": $colorSurface300,
 
         // --- Text colors
-        "color-text-primary": $colorSurface100,
-        "color-text-secondary": $colorSurface400,
-        "color-text-attention": $colorDanger400,
-        "color-text-subtitle": $colorSurface500,
-        "color-text--disabled": $colorSurface500,
+        "textColor-primary": $colorSurface100,
+        "textColor-secondary": $colorSurface400,
+        "textColor-attention": $colorDanger400,
+        "textColor-subtitle": $colorSurface500,
+        "textColor--disabled": $colorSurface500,
 
         // --- Input is an abstract component, so we define its default theme variables here
         "borderColor-Input-default": $colorSurface800,
@@ -354,7 +354,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "borderColor-Input-default--error": $colorDanger500,
 
         // --- InputLabel is a React component, so we define its default theme variables here
-        "color-text-InputLabel-required": $colorDanger400,
+        "textColor-InputLabel-required": $colorDanger400,
       },
     },
   },

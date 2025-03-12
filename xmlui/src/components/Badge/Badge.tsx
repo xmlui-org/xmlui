@@ -53,11 +53,11 @@ export const BadgeMd = createMetadata({
     [`fontSize-${COMP}-pill`]: "0.8em",
     light: {
       [`backgroundColor-${COMP}`]: "rgba($color-secondary-500-rgb, .6)",
-      [`color-text-${COMP}`]: "white",
+      [`textColor-${COMP}`]: "white",
     },
     dark: {
       [`backgroundColor-${COMP}`]: "rgba($color-secondary-500-rgb, .6)",
-      [`color-text-${COMP}`]: "$color-surface-50",
+      [`textColor-${COMP}`]: "$color-surface-50",
     },
   },
 });

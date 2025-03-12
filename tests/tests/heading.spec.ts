@@ -169,7 +169,7 @@ test("child overrides value", async ({ page }) => {
 
 const THEME_TESTS: ThemeTestDesc[] = [
   { themeVar: "textDecorationColor-Heading", themeVarAsCSS: "text-decoration-color", expected: RED },
-  { themeVar: "color-text-Heading", themeVarAsCSS: "color", expected: RED },
+  { themeVar: "textColor-Heading", themeVarAsCSS: "color", expected: RED },
   { themeVar: "fontFamily-H1", themeVarAsCSS: "font-family", expected: "sans-serif" },
   { themeVar: "fontWeight-Heading", themeVarAsCSS: "font-weight", expected: "700" },
   { themeVar: "fontSize-H1", themeVarAsCSS: "font-size", expected: "20px" },

@@ -63,23 +63,23 @@ $component: "Carousel";
   display: inline-flex;
   height: createThemeVar("height-control-#{$component}");
   width: createThemeVar("width-control-#{$component}");
-  color: createThemeVar("color-text-control-#{$component}");
+  color: createThemeVar("textColor-control-#{$component}");
   background-color: createThemeVar("backgroundColor-control-#{$component}");;
   border-radius: createThemeVar("borderRadius-control-#{$component}");
 }
 
 .controlButton:hover {
   background-color: createThemeVar("backgroundColor-control-hover-#{$component}");
-  color: createThemeVar("color-text-control-hover-#{$component}");
+  color: createThemeVar("textColor-control-hover-#{$component}");
 }
 
 .controlButton:active {
   background-color: createThemeVar("backgroundColor-control-active-#{$component}");
-  color: createThemeVar("color-text-control-active-#{$component}");
+  color: createThemeVar("textColor-control-active-#{$component}");
 }
 
 .controlButton:disabled {
-  color: createThemeVar("color-text-control-disabled-#{$component}");
+  color: createThemeVar("textColor-control-disabled-#{$component}");
   background-color: createThemeVar("backgroundColor-control-disabled-#{$component}");
 }
 
@@ -96,17 +96,17 @@ $component: "Carousel";
   height: createThemeVar("height-indicator-#{$component}");
   border-radius: 2px;
   margin: 0 1px;
-  color: createThemeVar("color-text-indicator-#{$component}");
+  color: createThemeVar("textColor-indicator-#{$component}");
   background-color: createThemeVar("backgroundColor-indicator-#{$component}");
 
   &:hover {
     background-color: createThemeVar("backgroundColor-indicator-hover-#{$component}");
-    color: createThemeVar("color-text-indicator-hover-#{$component}");
+    color: createThemeVar("textColor-indicator-hover-#{$component}");
   }
 
   &.active {
     background-color: createThemeVar("backgroundColor-indicator-active-#{$component}");
-    color: createThemeVar("color-text-indicator-active-#{$component}");
+    color: createThemeVar("textColor-indicator-active-#{$component}");
   }
 }
 

@@ -17,14 +17,14 @@ $componentName: "DatePicker";
   border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
-  color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
+  color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
   padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
     background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
-    color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
+    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus {
@@ -76,7 +76,7 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
   &.disabled {
     cursor: not-allowed;
     background-color: createThemeVar("Input:backgroundColor-DatePicker--disabled");
-    color: createThemeVar("Input:color-text-DatePicker--disabled");
+    color: createThemeVar("Input:textColor-DatePicker--disabled");
     border-color: createThemeVar("Input:borderColor-DatePicker--disabled");
 
     .indicator, .datePickerInput {
@@ -122,7 +122,7 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 
 $rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active");
 $rdp-bg-color-hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
-$rdp-selected-color: createThemeVar("Input:color-text-value-DatePicker");
+$rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
 $rdp-cell-size: 40px;
 $rdp-caption-font-size: 18px;
 $rdp-outline: 2px solid t.useVar($rdp-accent-color);

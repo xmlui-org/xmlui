@@ -14,7 +14,7 @@ $borderColor-RadioGroupOption-default: createThemeVar("Input:borderColor-RadioGr
 $borderColor-RadioGroupOption-default--hover: createThemeVar("Input:borderColor-RadioGroupOption-default--hover");
 $borderColor-RadioGroupOption-default--active: createThemeVar("Input:borderColor-RadioGroupOption-default--active");
 $borderColor-RadioGroupOption--disabled: createThemeVar("Input:borderColor-RadioGroupOption--disabled");
-$color-text-RadioGroupOption--disabled: createThemeVar("Input:color-text-RadioGroupOption--disabled");
+$textColor-RadioGroupOption--disabled: createThemeVar("Input:textColor-RadioGroupOption--disabled");
 $borderColor-RadioGroupOption-error: createThemeVar("Input:borderColor-RadioGroupOption-error");
 $borderColor-RadioGroupOption-warning: createThemeVar("Input:borderColor-RadioGroupOption-warning");
 $borderColor-RadioGroupOption-success: createThemeVar("Input:borderColor-RadioGroupOption-success");
@@ -25,10 +25,10 @@ $backgroundColor-checked-RadioGroupOption-warning: createThemeVar("backgroundCol
 $backgroundColor-checked-RadioGroupOption-success: createThemeVar("backgroundColor-checked-RadioGroupOption-success");
 $fontSize-RadioGroupOption: createThemeVar("Input:fontSize-RadioGroupOption");
 $fontWeight-RadioGroupOption: createThemeVar("Input:fontWeight-RadioGroupOption");
-$color-text-RadioGroupOption-default: createThemeVar("Input:color-text-RadioGroupOption-default");
-$color-text-RadioGroupOption-error: createThemeVar("Input:color-text-RadioGroupOption-error");
-$color-text-RadioGroupOption-warning: createThemeVar("Input:color-text-RadioGroupOption-warning");
-$color-text-RadioGroupOption-success: createThemeVar("Input:color-text-RadioGroupOption-success");
+$textColor-RadioGroupOption-default: createThemeVar("Input:textColor-RadioGroupOption-default");
+$textColor-RadioGroupOption-error: createThemeVar("Input:textColor-RadioGroupOption-error");
+$textColor-RadioGroupOption-warning: createThemeVar("Input:textColor-RadioGroupOption-warning");
+$textColor-RadioGroupOption-success: createThemeVar("Input:textColor-RadioGroupOption-success");
 
 .radioGroupContainer {
   width: 100%;
@@ -70,7 +70,7 @@ $color-text-RadioGroupOption-success: createThemeVar("Input:color-text-RadioGrou
   }
   &:disabled+label {
     cursor: not-allowed;
-    color: $color-text-RadioGroupOption--disabled;
+    color: $textColor-RadioGroupOption--disabled;
   }
   &.error {
     border-color: $borderColor-RadioGroupOption-error;
@@ -127,20 +127,20 @@ $color-text-RadioGroupOption-success: createThemeVar("Input:color-text-RadioGrou
 
 .label {
   width: 100%;
-  color: $color-text-RadioGroupOption-default;
+  color: $textColor-RadioGroupOption-default;
   font-size: $fontSize-RadioGroupOption;
   font-weight: $fontWeight-RadioGroupOption;
   user-select: none;
   cursor: pointer;
 
   &.error {
-    color: $color-text-RadioGroupOption-error;
+    color: $textColor-RadioGroupOption-error;
   }
   &.warning {
-    color: $color-text-RadioGroupOption-warning;
+    color: $textColor-RadioGroupOption-warning;
   }
   &.valid {
-    color: $color-text-RadioGroupOption-success;
+    color: $textColor-RadioGroupOption-success;
   }
 }
 

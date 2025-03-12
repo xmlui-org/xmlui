@@ -164,7 +164,7 @@ This component does not expose any methods.
 The `Link` component uses these theme variables to customize its appearance:
 
 - `textDecorationColor`
-- `color-text`
+- `textColor`
 - `fontWeight`
 - `textDecorationLine`
 - `textUnderlineOffset`
@@ -178,7 +178,7 @@ The following sample theme sets a few visual properties of `Link`:
   "id": "custom",
   "name": "Custom Theme",
   "themeVars": {
-    "color-text-Link--hover": "orangered",
+    "textColor-Link--hover": "orangered",
     "textDecorationColor-Link": "purple",
     "textDecorationThickness-Link": "4px",
     "textDecorationStyle-Link": "dotted"
@@ -194,7 +194,7 @@ The following sample theme sets a few visual properties of `Link`:
       id: "custom",
       name: "Custom Theme",
       themeVars: {
-        "color-text-Link--hover": "orangered",
+        "textColor-Link--hover": "orangered",
         "textDecorationColor-Link": "purple",
         "textDecorationThickness-Link": "4px",
         "textDecorationStyle-Link": "dotted",
@@ -229,11 +229,11 @@ The following sample theme sets a few visual properties of `Link`:
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalWidth](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderLeft](../styles-and-themes/common-units/#border)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderLeftStyle](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderLeftWidth](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRight](../styles-and-themes/common-units/#border)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -246,10 +246,6 @@ The following sample theme sets a few visual properties of `Link`:
 | [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Link | $color-primary-500 | $color-primary-500 |
-| [color-text](../styles-and-themes/common-units/#color)-Link--active | $color-primary-500 | $color-primary-500 |
-| [color-text](../styles-and-themes/common-units/#color)-Link--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-Link--hover--active | $color-text-Link--active | $color-text-Link--active |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontSize](../styles-and-themes/common-units/#size)-Link | inherit | inherit |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -277,6 +273,10 @@ The following sample theme sets a few visual properties of `Link`:
 | radius-end-start-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | radius-start-end-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | radius-start-start-Link | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Link | $color-primary-500 | $color-primary-500 |
+| [textColor](../styles-and-themes/common-units/#color)-Link--active | $color-primary-500 | $color-primary-500 |
+| [textColor](../styles-and-themes/common-units/#color)-Link--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Link--hover--active | $textColor-Link--active | $textColor-Link--active |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Link | $color-surface-400 | $color-surface-400 |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Link--active | $color-surface200 | $color-surface200 |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Link--hover | $color-surface-400A80 | $color-surface-400A80 |

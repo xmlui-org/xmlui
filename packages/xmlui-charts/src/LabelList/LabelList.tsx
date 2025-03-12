@@ -22,7 +22,7 @@ export const LabelListMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "color-text-LabelList": "$color-text-primary",
+    "textColor-LabelList": "$textColor-primary",
   },
 });
 

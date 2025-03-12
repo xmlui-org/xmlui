@@ -97,14 +97,14 @@ export const SelectMd = createMetadata({
     light: {
       [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
       [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
-      [`color-text-item-${COMP}--disabled`]: "$color-surface-200",
-      [`color-text-${COMP}-badge`]: "$color-surface-50",
+      [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
+      [`textColor-${COMP}-badge`]: "$color-surface-50",
     },
     dark: {
       [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-600",
       [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
-      [`color-text-${COMP}-badge`]: "$color-surface-50",
-      [`color-text-item-${COMP}--disabled`]: "$color-surface-800",
+      [`textColor-${COMP}-badge`]: "$color-surface-50",
+      [`textColor-item-${COMP}--disabled`]: "$color-surface-800",
     },
   },
 });

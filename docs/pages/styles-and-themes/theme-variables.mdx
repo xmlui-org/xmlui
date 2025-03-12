@@ -19,7 +19,7 @@ In this convention, the `<ComponentId>` part is optional.
 
 The `<propertyName>` segment names a property (and optionally a part of a component) the particular theme variable affects. This segment should use lowercase letters and dashes. The property name can be a single word or multiple words separated with a dash (`-`). Here are a few examples:
 
-- `color-text`: Text color
+- `textColor`: Text color
 - `backgroundColor`: Background color
 - `backgroundColor-indicator`: The background color of the "indicator" part of a specific component.
 - `text-size`: The size of the text
@@ -213,11 +213,11 @@ XMLUI declares these default color shade sets:
 
 #### Default Text Colors
 
-- `color-text-primary`: The text color used by components that build on the primary color
-- `color-text-secondary`: The text color used by components that build on the secondary color
-- `color-text-attention`: Accented text color
-- `color-text-subtitle`: Text color of text with the "subtitle" variant
-- `color-text--disabled`: Text color representing the disabled state of a component
+- `textColor-primary`: The text color used by components that build on the primary color
+- `textColor-secondary`: The text color used by components that build on the secondary color
+- `textColor-attention`: Accented text color
+- `textColor-subtitle`: Text color of text with the "subtitle" variant
+- `textColor--disabled`: Text color representing the disabled state of a component
 
 <Playground
   name="Default Text Colors"
@@ -225,28 +225,28 @@ XMLUI declares these default color shade sets:
   app={`
   <App>
     <HStack>
-      <Text width="180px" variant="strong">color-text-primary:</Text>
-      <Text color="$color-text-primary">This is an example text</Text>
+      <Text width="180px" variant="strong">textColor-primary:</Text>
+      <Text color="$textColor-primary">This is an example text</Text>
     </HStack>
 
     <HStack>
-      <Text width="180px" variant="strong">color-text-secondary:</Text>
-      <Text color="$color-text-secondary">This is an example text</Text>
+      <Text width="180px" variant="strong">textColor-secondary:</Text>
+      <Text color="$textColor-secondary">This is an example text</Text>
     </HStack>
 
     <HStack>
-      <Text width="180px" variant="strong">color-text-attention:</Text>
-      <Text color="$color-text-attention">This is an example text</Text>
+      <Text width="180px" variant="strong">textColor-attention:</Text>
+      <Text color="$textColor-attention">This is an example text</Text>
     </HStack>
 
     <HStack>
-      <Text width="180px" variant="strong">color-text-subtitle:</Text>
-      <Text color="$color-text-subtitle">This is an example text</Text>
+      <Text width="180px" variant="strong">textColor-subtitle:</Text>
+      <Text color="$textColor-subtitle">This is an example text</Text>
     </HStack>
 
     <HStack>
-      <Text width="180px" variant="strong">color-text--disabled:</Text>
-      <Text color="$color-text--disabled">This is an example text</Text>
+      <Text width="180px" variant="strong">textColor--disabled:</Text>
+      <Text color="$textColor--disabled">This is an example text</Text>
     </HStack>
   </App>
   `}

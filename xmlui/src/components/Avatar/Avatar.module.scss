@@ -11,14 +11,14 @@ $component: "Avatar";
 $themeVars: t.composeBorderVars($themeVars, $component);
 $backgroundColor-Avatar: createThemeVar("backgroundColor-#{$component}");
 $boxShadow-Avatar: createThemeVar("boxShadow-#{$component}");
-$color-text-Avatar: createThemeVar("color-text-#{$component}");
+$textColor-Avatar: createThemeVar("textColor-#{$component}");
 $fontWeight-Avatar: createThemeVar("fontWeight-#{$component}");
 
 .container {
   @include t.borderVars($themeVars, $component);
   aspect-ratio: 1 / 1;
   background-color: $backgroundColor-Avatar;
-  color: $color-text-Avatar;
+  color: $textColor-Avatar;
   flex-shrink: 0;
   background-repeat: no-repeat;
   background-position: 50%;
