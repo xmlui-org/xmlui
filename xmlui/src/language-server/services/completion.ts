@@ -3,7 +3,7 @@ import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { findTokenAtPos } from "../../parsers/xmlui-parser/utils"
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
-import { collectedComponentMetadata } from "../../../dist/xmlui-metadata.mjs";
+import metadataByComponent from "../metadata";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
 
 export function handleCompletion(
@@ -50,7 +50,7 @@ type FindTokenSuccessHasBefore = {
 };
 
 function allComponentNames(): CompletionItem[] {
-  return Object.keys(collectedComponentMetadata).map(name => ({label: name}));
+  return Object.keys(metadataByComponent).map(name => ({label: name}));
 }
 
 function matchingTagName(
@@ -112,7 +112,7 @@ function handleCompletionInsideToken(chainAtPos: Node[], position: number, getTe
 }
 
 function completionForNewProps(compName: string): CompletionItem[] | null {
-  const metadata = collectedComponentMetadata[compName];
+  const metadata = metadataByComponent[compName];
   if (!metadata || !metadata.props){
     return null;
   }
