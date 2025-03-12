@@ -184,11 +184,11 @@ export const RootThemeDefinition: ThemeDefinition = {
     "font-feature-settings": "'cv03', 'cv04', 'cv11'",
 
     // --- Some media breakpoints (review them)
-    "media-maxWidth-phone": "576px",
-    "media-maxWidth-landscape-phone": "768px",
-    "media-maxWidth-tablet": "992px",
-    "media-maxWidth-desktop": "1200px",
-    "media-maxWidth-large-desktop": "1400px",
+    "maxWidth-phone": "576px",
+    "maxWidth-landscape-phone": "768px",
+    "maxWidth-tablet": "992px",
+    "maxWidth-desktop": "1200px",
+    "maxWidth-large-desktop": "1400px",
 
     // --- The app's default radius value
     borderRadius: "4px",
@@ -247,7 +247,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "shadow-spread-2-xl": "-6px -4px 40px 18px rgba(0, 0, 0, 0.1)",
 
     // --- The default maximum content width
-    "max-content-width": "1320px",
+    "maxWidth-content": "1320px",
 
     "size-Icon": "1.25em",
 

@@ -418,7 +418,7 @@ $THEME-VAR-PREFIX: xmlui;
 // This mixin applies padding variables to a given subject
 @mixin borderVars($themeVars, $subject) {
   border-left: getThemeVar($themeVars, "borderLeft-#{$subject}");
-  borderRight: getThemeVar($themeVars, "borderRight-#{$subject}");
+  border-right: getThemeVar($themeVars, "borderRight-#{$subject}");
   border-top: getThemeVar($themeVars, "borderTop-#{$subject}");
   border-bottom: getThemeVar($themeVars, "borderBottom-#{$subject}");
   border-left-style: getThemeVar($themeVars, "borderLeftStyle-#{$subject}");
@@ -517,7 +517,7 @@ $color-error: createVar(color-error);
 
 $borderColor: createVar(borderColor);
 
-$max-content-width: createVar(max-content-width);
+$maxWidth-content: createVar(maxWidth-content);
 $direction: createVar(direction);
 
 $font-feature-settings: createVar(font-feature-settings);

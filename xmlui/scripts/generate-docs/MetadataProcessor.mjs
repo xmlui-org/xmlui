@@ -825,7 +825,7 @@ const themeKeywordLinks = {
   "textDecorationThickness":
     "[textDecorationThickness](../styles-and-themes/common-units/#textDecoration)",
   transform: "[transform](../styles-and-themes/common-units/#textTransform)",
-  "max-content-width": "[max-content-width](../styles-and-themes/common-units/#size)",
+  "maxWidth-content": "[maxWidth-content](../styles-and-themes/common-units/#size)",
   "outlineStyle": "[outlineStyle](../styles-and-themes/common-units/#border)",
   "outlineWidth": "[outlineWidth](../styles-and-themes/common-units/#size)",
   "outlineColor": "[outlineColor](../styles-and-themes/common-units/#color)",

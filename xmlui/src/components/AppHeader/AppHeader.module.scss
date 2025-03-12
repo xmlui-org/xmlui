@@ -33,7 +33,7 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   display: flex;
   flex-direction: row;
   align-items: center;
-  max-width: createThemeVar("max-content-width-#{$component}");
+  max-width: createThemeVar("maxWidth-content-#{$component}");
   padding-inline: t.getThemeVar($themeVars, "paddingHorizontal-#{$component}");
   @include t.paddingVars($themeVars, $component);
 

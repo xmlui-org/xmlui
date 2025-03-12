@@ -3,7 +3,6 @@ import styles from "./NavPanel.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { borderSubject } from "../../components-core/theming/themes/base-utils";
 import { dComponent } from "../metadata-helpers";
 import { NavPanel } from "./NavPanelNative";
 
