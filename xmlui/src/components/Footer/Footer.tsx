@@ -12,7 +12,7 @@ export const FooterMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$backgroundColor-AppHeader",
-    [`align-vertical-${COMP}`]: "center",
+    [`verticalAlign-${COMP}`]: "center",
     [`fontSize-${COMP}`]: "$fontSize-small",
     [`color-${COMP}`]: "$textColor-secondary",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",

@@ -62,7 +62,7 @@ export const TableOfContentsMd = createMetadata({
     [`border-color-${COMP}`]: "transparent",
     [`border-style-${COMP}`]: "solid",
     [`textTransform-${COMP}Item`]: "none",
-    [`align-vertical-${COMP}Item`]: "baseline",
+    [`verticalAlign-${COMP}Item`]: "baseline",
     [`letterSpacing-${COMP}Item`]: "0",
     light: {
       [`color-${COMP}Item`]: "$textColor-primary",
