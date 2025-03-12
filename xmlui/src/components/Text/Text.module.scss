@@ -30,7 +30,7 @@ $component: "Text";
   margin-top: createThemeVar("marginTop-#{$component}-#{$variant}");
   margin-bottom: createThemeVar("marginBottom-#{$component}-#{$variant}");
   text-transform: createThemeVar("textTransform-#{$component}-#{$variant}");
-  vertical-align: createThemeVar("align-vertical-#{$component}-#{$variant}");
+  vertical-align: createThemeVar("verticalAlign-#{$component}-#{$variant}");
   letter-spacing: createThemeVar("letterSpacing-#{$component}-#{$variant}");
 }
 
