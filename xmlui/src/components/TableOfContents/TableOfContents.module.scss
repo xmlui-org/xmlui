@@ -16,7 +16,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-5");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
 
 .nav {
-  background-color: createThemeVar("color-bg-TableOfContents");
+  background-color: createThemeVar("backgroundColor-TableOfContents");
   min-width: 240px;
   width: createThemeVar("width-TableOfContents");
   align-self: flex-start;

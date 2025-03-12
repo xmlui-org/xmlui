@@ -232,9 +232,9 @@ ERROR_LEVELS.forEach((errorLevel) => {
     const themeErrorLevel = errorLevel === "valid" ? "success" : errorLevel;
     // END TEMP
 
-    const background = errorLevel === "default" ? `color-bg-Checkbox` : `color-bg-Checkbox-${themeErrorLevel}`;
+    const background = errorLevel === "default" ? `backgroundColor-Checkbox` : `backgroundColor-Checkbox-${themeErrorLevel}`;
     const checkedBackground =
-      errorLevel === "default" ? `color-bg-checked-Checkbox` : `color-bg-checked-Checkbox-${themeErrorLevel}`;
+      errorLevel === "default" ? `backgroundColor-checked-Checkbox` : `backgroundColor-checked-Checkbox-${themeErrorLevel}`;
     const border = `borderColor-Checkbox-${themeErrorLevel}`;
     const checkedBorder =
       errorLevel === "default" ? `borderColor-checked-Checkbox` : `borderColor-checked-Checkbox-${themeErrorLevel}`;
@@ -276,10 +276,10 @@ test(`theme: checkbox overrides input`, async ({ page }) => {
     </Stack>`,
     {
       themeVars: {
-        "color-bg-Input": TO_OVERRIDE_COLORS,
-        "color-bg-checked-Input": TO_OVERRIDE_COLORS,
-        "color-bg-Checkbox": EXPECTED_BACKGROUND,
-        "color-bg-checked-Checkbox": EXPECTED_CHECKED_BACKGROUND,
+        "backgroundColor-Input": TO_OVERRIDE_COLORS,
+        "backgroundColor-checked-Input": TO_OVERRIDE_COLORS,
+        "backgroundColor-Checkbox": EXPECTED_BACKGROUND,
+        "backgroundColor-checked-Checkbox": EXPECTED_CHECKED_BACKGROUND,
       },
     }
   );
@@ -341,7 +341,7 @@ test(`theme: disabled`, async ({ page }) => {
     </Stack>`,
     {
       themeVars: {
-        "color-bg-Checkbox--disabled": EXPECTED_COLORS,
+        "backgroundColor-Checkbox--disabled": EXPECTED_COLORS,
         "borderColor-Checkbox--disabled": EXPECTED_COLORS,
       },
     }

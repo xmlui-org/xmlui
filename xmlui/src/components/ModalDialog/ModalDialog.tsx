@@ -64,15 +64,15 @@ export const ModalDialogMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     ...paddingSubject(COMP, { all: "$space-7" }),
-    [`color-bg-${COMP}`]: "$color-bg-primary",
-    [`color-bg-overlay-${COMP}`]: "$color-bg-overlay",
-    [`color-text-${COMP}`]: "$color-text-primary",
+    [`backgroundColor-${COMP}`]: "$backgroundColor-primary",
+    [`backgroundColor-overlay-${COMP}`]: "$backgroundColor-overlay",
+    [`color-${COMP}`]: "$textColor-primary",
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`maxWidth-${COMP}`]: "450px",
     [`marginBottom-title-${COMP}`]: "0",
     dark: {
-      [`color-bg-${COMP}`]: "$color-bg-primary",
+      [`backgroundColor-${COMP}`]: "$backgroundColor-primary",
     },
   },
 });

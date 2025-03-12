@@ -41,16 +41,16 @@ export const AppHeaderMd = createMetadata({
   },
   defaultThemeVars: {
     [`height-${COMP}`]: "$space-14",
-    [`max-content-width-${COMP}`]: "$max-content-width-App",
+    [`maxWidth-content-${COMP}`]: "$maxWidth-content-App",
     [`borderBottom-${COMP}`]: "1px solid $borderColor",
     ...paddingSubject(`logo-${COMP}`, { horizontal: "$space-0", vertical: "$space-4" }),
     ...paddingSubject(COMP, { horizontal: "$space-4", vertical: "$space-0" }),
     [`borderRadius-${COMP}`]: "0px",
     light: {
-      [`color-bg-${COMP}`]: "white",
+      [`backgroundColor-${COMP}`]: "white",
     },
     dark: {
-      [`color-bg-${COMP}`]: "$color-surface-900",
+      [`backgroundColor-${COMP}`]: "$color-surface-900",
     },
   },
 });

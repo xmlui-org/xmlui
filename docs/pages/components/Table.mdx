@@ -714,23 +714,23 @@ The `Table` component uses the following theme variables.
 
 Overall Table theme variables:
 
-- `color-bg-Table`
+- `backgroundColor-Table`
 - `borderStyle-cell-Table`
-- `color-bg-pagination-Table`
-- `color-text-Table`
-- `color-text-pagination-Table`
+- `backgroundColor-pagination-Table`
+- `color-Table`
+- `color-pagination-Table`
 
 Row theme variables:
 
-- `color-bg-row-Table`
-- `color-bg-row-Table--hover`
+- `backgroundColor-row-Table`
+- `backgroundColor-row-Table--hover`
 - `fontSize-row-Table`
 - `fontWeight-row-Table`
 
 Selected row theme variables:
 
-- `color-bg-selected-Table`
-- `color-bg-selected-Table--hover`
+- `backgroundColor-selected-Table`
+- `backgroundColor-selected-Table--hover`
 
 Cell theme variables:
 
@@ -745,10 +745,10 @@ Cell theme variables:
 
 Heading theme variables:
 
-- `color-bg-heading-Table`
-- `color-bg-heading-Table--hover`
-- `color-bg-heading-Table--active`
-- `color-text-heading-Table`
+- `backgroundColor-heading-Table`
+- `backgroundColor-heading-Table--hover`
+- `backgroundColor-heading-Table--active`
+- `color-heading-Table`
 - `fontSize-heading-Table`
 - `fontWeight-heading-Table`
 - `padding-heading-Table`
@@ -763,11 +763,11 @@ Heading theme variables:
   "id": "custom",
   "name": "Custom Theme",
   "themeVars": {
-    "color-bg-heading-Table": "#c4c4c4",
-    "color-bg-Table": "#ededed",
+    "backgroundColor-heading-Table": "#c4c4c4",
+    "backgroundColor-Table": "#ededed",
     "paddingVertical-heading-Table": "1rem",
-    "color-text-Table": "black",
-    "color-text-heading-Table": "black"
+    "color-Table": "black",
+    "color-heading-Table": "black"
   }
 }
 ```
@@ -780,11 +780,11 @@ Heading theme variables:
       id: "custom",
       name: "Custom Theme",
       themeVars: {
-        "color-bg-heading-Table": "#c4c4c4",
-        "color-bg-Table": "#ededed",
+        "backgroundColor-heading-Table": "#c4c4c4",
+        "backgroundColor-Table": "#ededed",
         "paddingVertical-heading-Table": "1rem",
-        "color-text-Table": "black",
-        "color-text-heading-Table": "black"
+        "color-Table": "black",
+        "color-heading-Table": "black"
       },
     },
   ]}
@@ -803,6 +803,15 @@ Heading theme variables:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-heading-Table | $color-surface-100 | $color-surface-950 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-heading-Table--active | $color-surface-300 | $color-surface-700 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-heading-Table--hover | $color-surface-200 | $color-surface-800 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-pagination-Table | $backgroundColor-Table | $backgroundColor-Table |
+| [backgroundColor](../styles-and-themes/common-units/#color)-row-Table | inherit | inherit |
+| [backgroundColor](../styles-and-themes/common-units/#color)-row-Table--hover | $color-primary-50 | $color-primary-900 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-selected-Table | $color-primary-100 | $color-primary-800 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-selected-Table--hover | $backgroundColor-row-Table--hover | $backgroundColor-row-Table--hover |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Table | $backgroundColor | $backgroundColor |
 | [border](../styles-and-themes/common-units/#border)-cell-Table | 1px solid $borderColor | 1px solid $borderColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -814,11 +823,11 @@ Heading theme variables:
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderLeft](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderLeftStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderLeftWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRight](../styles-and-themes/common-units/#border)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -831,18 +840,9 @@ Heading theme variables:
 | [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-cell-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-heading-Table | $color-surface-100 | $color-surface-950 |
-| [color-bg](../styles-and-themes/common-units/#color)-heading-Table--active | $color-surface-300 | $color-surface-700 |
-| [color-bg](../styles-and-themes/common-units/#color)-heading-Table--hover | $color-surface-200 | $color-surface-800 |
-| [color-bg](../styles-and-themes/common-units/#color)-pagination-Table | $color-bg-Table | $color-bg-Table |
-| [color-bg](../styles-and-themes/common-units/#color)-row-Table | inherit | inherit |
-| [color-bg](../styles-and-themes/common-units/#color)-row-Table--hover | $color-primary-50 | $color-primary-900 |
-| [color-bg](../styles-and-themes/common-units/#color)-selected-Table | $color-primary-100 | $color-primary-800 |
-| [color-bg](../styles-and-themes/common-units/#color)-selected-Table--hover | $color-bg-row-Table--hover | $color-bg-row-Table--hover |
-| [color-bg](../styles-and-themes/common-units/#color)-Table | $color-bg | $color-bg |
-| [color-text](../styles-and-themes/common-units/#color)-heading-Table | $color-surface-500 | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-pagination-Table | $color-secondary | $color-secondary |
-| [color-text](../styles-and-themes/common-units/#color)-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-heading-Table | $color-surface-500 | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-pagination-Table | $color-secondary | $color-secondary |
+| [color](../styles-and-themes/common-units/#color)-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontSize](../styles-and-themes/common-units/#size)-heading-Table | $fontSize-tiny | $fontSize-tiny |
 | [fontSize](../styles-and-themes/common-units/#size)-row-Table | $fontSize-small | $fontSize-small |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-heading-Table | $fontWeight-bold | $fontWeight-bold |

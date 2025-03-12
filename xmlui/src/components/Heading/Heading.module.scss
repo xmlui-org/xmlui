@@ -8,7 +8,7 @@ $themeVars: ();
 }
 
 @mixin heading($level) {
-  color: createThemeVar('Heading:color-text-#{$level}');
+  color: createThemeVar('Heading:color-#{$level}');
   letter-spacing: createThemeVar('Heading:letterSpacing-#{$level}');
   font-family: createThemeVar('Heading:fontFamily-#{$level}');
   font-weight: createThemeVar('Heading:fontWeight-#{$level}');

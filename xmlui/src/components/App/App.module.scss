@@ -10,8 +10,8 @@ $themeVars: ();
 $width-navPanel-App: createThemeVar("width-navPanel-App");
 $boxShadow-header-App: createThemeVar("boxShadow-header-App");
 $boxShadow-pages-App: createThemeVar("boxShadow-pages-App");
-$max-content-width-App: createThemeVar("max-content-width-App");
-$color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
+$maxWidth-content-App: createThemeVar("maxWidth-content-App");
+$backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
@@ -180,7 +180,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   overflow-x: clip;
   top: 0;
   box-shadow: $boxShadow-header-App;
-  background-color: $color-bg-AppHeader;
+  background-color: $backgroundColor-AppHeader;
   &.sticky {
     position: sticky;
   }
@@ -229,7 +229,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   --page-padding-top: #{t.$space-5};
   --page-padding-bottom: #{t.$space-5};
   --page-gap: #{t.$space-5};
-  max-width: $max-content-width-App;
+  max-width: $maxWidth-content-App;
   width: 100%;
   margin: 0 auto;
   //flex: 1;

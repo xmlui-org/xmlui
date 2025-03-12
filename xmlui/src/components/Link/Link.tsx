@@ -38,7 +38,7 @@ export const LinkMd = createMetadata({
   },
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $borderColor",
-    [`color-text-${COMP}--hover--active`]: `$color-text-${COMP}--active`,
+    [`color-${COMP}--hover--active`]: `$color-${COMP}--active`,
     [`textDecorationColor-${COMP}--hover`]: "$color-surface-400A80",
     [`textDecorationColor-${COMP}--active`]: "$color-surface200",
     [`fontWeight-${COMP}--active`]: "$fontWeight-bold",
@@ -56,12 +56,12 @@ export const LinkMd = createMetadata({
     [`padding-icon-${COMP}`]: "$space-0_5",
 
     light: {
-      [`color-text-${COMP}`]: "$color-primary-500",
-      [`color-text-${COMP}--active`]: "$color-primary-500",
+      [`color-${COMP}`]: "$color-primary-500",
+      [`color-${COMP}--active`]: "$color-primary-500",
     },
     dark: {
-      [`color-text-${COMP}`]: "$color-primary-500",
-      [`color-text-${COMP}--active`]: "$color-primary-500",
+      [`color-${COMP}`]: "$color-primary-500",
+      [`color-${COMP}--active`]: "$color-primary-500",
     },
   },
 });

@@ -19,9 +19,9 @@ In this convention, the `<ComponentId>` part is optional.
 
 The `<propertyName>` segment names a property (and optionally a part of a component) the particular theme variable affects. This segment should use lowercase letters and dashes. The property name can be a single word or multiple words separated with a dash (`-`). Here are a few examples:
 
-- `color-text`: Text color
-- `color-bg`: Background color
-- `color-bg-indicator`: The background color of the "indicator" part of a specific component.
+- `color`: Text color
+- `backgroundColor`: Background color
+- `backgroundColor-indicator`: The background color of the "indicator" part of a specific component.
 - `text-size`: The size of the text
 - `lineHeight`: The height of a text line
 - `paddingHorizontal`: The value declaring the horizontal padding space
@@ -30,7 +30,7 @@ The `<trait1>` and `<trait2>` segments describe one or two trait values regardin
 
 For example, the `Button` component has two traits that define its appearance. The `themeColor` trait defines the set of colors to use with the button; its available values are `primary`, `secondary`, and `attention`. The `variant` trait specifies the general appearance of the button (whether it has a border at all, etc.) with the values of `solid`, `outlined`, or `ghost`. The `themeColor` is the first trait, and `variant` is the second. So, we can use (among the others) these theme variables with button colors:
 
-- `color-bg-Button-primary-solid`: Defines the background color of a button that is set up to use the `primary` theme color, displayed with the `solid` variant.
+- `backgroundColor-Button-primary-solid`: Defines the background color of a button that is set up to use the `primary` theme color, displayed with the `solid` variant.
 - `borderColor-Button-attention-ghost`: Specifies the border color of a ghost button displayed with the `attention` theme color.
 
 The `<state1>`, ..., `<stateN>` values define visual states that may modify the appearance of a particular UI element or component (regarding a specific trait). Here are a few examples:
@@ -41,7 +41,7 @@ The `<state1>`, ..., `<stateN>` values define visual states that may modify the 
 
 When defining a theme variable, you can define multiple state values (in any order). Let's see a few examples:
 
-- `color-bg-Button-primary-solid--hover`: The background color to use with a `solid` button with the `primary` theme color while the mouse hovers over it.
+- `backgroundColor-Button-primary-solid--hover`: The background color to use with a `solid` button with the `primary` theme color while the mouse hovers over it.
 - `borderColor-Button-attention-ghost--focus`: Specifies the border color of a focused ghost button displayed with the `attention` theme color.
 
 ## Theme Property Names [#property-names]
@@ -213,11 +213,11 @@ XMLUI declares these default color shade sets:
 
 #### Default Text Colors
 
-- `color-text-primary`: The text color used by components that build on the primary color
-- `color-text-secondary`: The text color used by components that build on the secondary color
-- `color-text-attention`: Accented text color
-- `color-text-subtitle`: Text color of text with the "subtitle" variant
-- `color-text--disabled`: Text color representing the disabled state of a component
+- `textColor-primary`: The text color used by components that build on the primary color
+- `textColor-secondary`: The text color used by components that build on the secondary color
+- `textColor-attention`: Accented text color
+- `textColor-subtitle`: Text color of text with the "subtitle" variant
+- `textColor--disabled`: Text color representing the disabled state of a component
 
 <Playground
   name="Default Text Colors"
@@ -225,28 +225,28 @@ XMLUI declares these default color shade sets:
   app={`
   <App>
     <HStack>
-      <Text width="180px" variant="strong">color-text-primary:</Text>
-      <Text color="$color-text-primary">This is an example text</Text>
+      <Text width="180px" variant="strong">textColor-primary:</Text>
+      <Text color="$textColor-primary">This is an example text</Text>
     </HStack>
 
     <HStack>
-      <Text width="180px" variant="strong">color-text-secondary:</Text>
-      <Text color="$color-text-secondary">This is an example text</Text>
+      <Text width="180px" variant="strong">textColor-secondary:</Text>
+      <Text color="$textColor-secondary">This is an example text</Text>
     </HStack>
 
     <HStack>
-      <Text width="180px" variant="strong">color-text-attention:</Text>
-      <Text color="$color-text-attention">This is an example text</Text>
+      <Text width="180px" variant="strong">textColor-attention:</Text>
+      <Text color="$textColor-attention">This is an example text</Text>
     </HStack>
 
     <HStack>
-      <Text width="180px" variant="strong">color-text-subtitle:</Text>
-      <Text color="$color-text-subtitle">This is an example text</Text>
+      <Text width="180px" variant="strong">textColor-subtitle:</Text>
+      <Text color="$textColor-subtitle">This is an example text</Text>
     </HStack>
 
     <HStack>
-      <Text width="180px" variant="strong">color-text--disabled:</Text>
-      <Text color="$color-text--disabled">This is an example text</Text>
+      <Text width="180px" variant="strong">textColor--disabled:</Text>
+      <Text color="$textColor--disabled">This is an example text</Text>
     </HStack>
   </App>
   `}
@@ -254,15 +254,15 @@ XMLUI declares these default color shade sets:
 
 #### Default Background Colors
 
-- `color-bg`: The default background color for all components
-- `color-bg-primary`: The background color used by components that build on the secondary color
-- `color-bg-secondary`: The background color used by components that build on the secondary color
-- `color-bg-attention`: The background color used by components that build on the attention color
-- `color-bg--disabled`: The background color representing the disabled state of a component
-- `color-bg--selected`: The background color representing the selected state of a component
-- `color-bg-overlay`: The background color of overlaid components
-- `color-bg-dropdown-item--hover`: The background color of hovered items in dropdown containers
-- `color-bg-dropdown-item--active`: The background color of active items in dropdown containers
+- `backgroundColor`: The default background color for all components
+- `backgroundColor-primary`: The background color used by components that build on the secondary color
+- `backgroundColor-secondary`: The background color used by components that build on the secondary color
+- `backgroundColor-attention`: The background color used by components that build on the attention color
+- `backgroundColor--disabled`: The background color representing the disabled state of a component
+- `backgroundColor--selected`: The background color representing the selected state of a component
+- `backgroundColor-overlay`: The background color of overlaid components
+- `backgroundColor-dropdown-item--hover`: The background color of hovered items in dropdown containers
+- `backgroundColor-dropdown-item--active`: The background color of active items in dropdown containers
 
 <Playground
   name="Default Background Colors"
@@ -270,15 +270,15 @@ XMLUI declares these default color shade sets:
   app={`
     <App>
       <FlowLayout>
-          <Swatch color="$color-bg" width="25%" />
-          <Swatch color="$color-bg-primary" width="25%" />
-          <Swatch color="$color-bg-secondary" width="25%" />
-          <Swatch color="$color-bg-attention" width="25%" />
-          <Swatch color="$color-bg--disabled" width="25%" />
-          <Swatch color="$color-bg--selected" width="25%" />
-          <Swatch color="$color-bg-overlay" width="25%" />
-          <Swatch color="$color-bg-dropdown-item--hover" width="50%" />
-          <Swatch color="$color-bg-dropdown-item--active" width="50%" />
+          <Swatch color="$backgroundColor" width="25%" />
+          <Swatch color="$backgroundColor-primary" width="25%" />
+          <Swatch color="$backgroundColor-secondary" width="25%" />
+          <Swatch color="$backgroundColor-attention" width="25%" />
+          <Swatch color="$backgroundColor--disabled" width="25%" />
+          <Swatch color="$backgroundColor--selected" width="25%" />
+          <Swatch color="$backgroundColor-overlay" width="25%" />
+          <Swatch color="$backgroundColor-dropdown-item--hover" width="50%" />
+          <Swatch color="$backgroundColor-dropdown-item--active" width="50%" />
       </FlowLayout>
     </App>
   `}
@@ -298,10 +298,10 @@ These colors represent validation states:
   app={`
     <App>
       <FlowLayout>
-        <Swatch color="$color-info" width="25%" textColor="$color-surface-50" />
-        <Swatch color="$color-valid" width="25%" textColor="$color-surface-50" />
-        <Swatch color="$color-warning" width="25%" textColor="$color-surface-50" />
-        <Swatch color="$color-error" width="25%" textColor="$color-surface-50" />
+        <Swatch color="$color-info" width="25%" color="$color-surface-50" />
+        <Swatch color="$color-valid" width="25%" color="$color-surface-50" />
+        <Swatch color="$color-warning" width="25%" color="$color-surface-50" />
+        <Swatch color="$color-error" width="25%" color="$color-surface-50" />
       </FlowLayout>
     </App>
   `}
@@ -506,19 +506,19 @@ Besides the spacing theme variables, layout containers provide a few others that
 
 ### Screen Size
 
-- `max-content-width`: The theme variable defines the maximum width of the content. A large screen with broad content makes reading text hard because of the long lines. This variable allows for maximizing the content's width and adding margins around it.
-- `media-maxWidth-phone`: The maximum width of the screen (in pixels) considered as a mobile device (phone) screen.
-- `media-maxWidth-landscape-phone`: The maximum width of the screen (in pixels) considered a landscape phone screen.
-- `media-maxWidth-tablet`: The maximum width of the screen (in pixels) considered a tablet screen. Smaller screens represent a phone, broader a desktop.
-- `media-maxWidth-desktop`: The maximum width of the screen (in pixels) considered a desktop screen.
-- `media-maxWidth-large-desktop`: The maximum width of the screen (in pixels) considered a large desktop screen.
+- `maxWidth-content`: The theme variable defines the maximum width of the content. A large screen with broad content makes reading text hard because of the long lines. This variable allows for maximizing the content's width and adding margins around it.
+- `maxWidth-phone`: The maximum width of the screen (in pixels) considered as a mobile device (phone) screen.
+- `maxWidth-landscape-phone`: The maximum width of the screen (in pixels) considered a landscape phone screen.
+- `maxWidth-tablet`: The maximum width of the screen (in pixels) considered a tablet screen. Smaller screens represent a phone, broader a desktop.
+- `maxWidth-desktop`: The maximum width of the screen (in pixels) considered a desktop screen.
+- `maxWidth-large-desktop`: The maximum width of the screen (in pixels) considered a large desktop screen.
 
 ### Dropwdowns
 
 XMLUI has several components with dropdowns. The following theme variables help style them:
 - `borderColor-dropdown-item`: The border color of the items within the dropdown.
-- `color-bg-dropdown-item--hover`: The hovered color of the dropdown items' background.
-- `color-bg-dropdown-item--active`: The active (selected) color of the dropdown items' background.
+- `backgroundColor-dropdown-item--hover`: The hovered color of the dropdown items' background.
+- `backgroundColor-dropdown-item--active`: The active (selected) color of the dropdown items' background.
 
 ### Outline
 

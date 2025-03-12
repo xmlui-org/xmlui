@@ -381,9 +381,9 @@ This component does not expose any methods.
 
 The `Navlink` component uses these theme variables to customize its appearance:
 
-- `color-bg`: (with these states: `--hover`, `--hover--active`, `--active`, `--pressed`, `--pressed-active`)
+- `backgroundColor`: (with these states: `--hover`, `--hover--active`, `--active`, `--pressed`, `--pressed-active`)
 - `color-indicator`: (with these states: `--hover`, `--active`, `--pressed`)
-- `color-text`: (with these states: `--hover`, `--hover--active`, `--active`, `--pressed`, `--pressed-active`)
+- `color`: (with these states: `--hover`, `--hover--active`, `--active`, `--pressed`, `--pressed-active`)
 - `color-icon`
 - `fontSize`
 - `fontWeight`: (with these states: `--active`, `--pressed`)
@@ -402,10 +402,10 @@ The following sample theme sets a few visual properties of `NavLink`. It changes
   "id": "custom",
   "name": "Custom Theme",
   "themeVars": {
-    "color-bg-NavLink--hover": "deepskyblue",
-    "color-bg-NavLink--pressed": "steelblue",
-    "color-bg-NavLink--active": "lightblue",
-    "color-bg-NavLink--hover--active": "deepskyblue",
+    "backgroundColor-NavLink--hover": "deepskyblue",
+    "backgroundColor-NavLink--pressed": "steelblue",
+    "backgroundColor-NavLink--active": "lightblue",
+    "backgroundColor-NavLink--hover--active": "deepskyblue",
     "color-indicator-NavLink--active": "purple",
     "thickness-indicator-NavLink": "4px",
     "fontWeight-NavLink": "900"
@@ -422,10 +422,10 @@ The following sample theme sets a few visual properties of `NavLink`. It changes
       id: "custom",
       name: "Custom Theme",
       themeVars: {
-        "color-bg-NavLink--hover": "deepskyblue",
-        "color-bg-NavLink--pressed": "steelblue",
-        "color-bg-NavLink--active": "lightblue",
-        "color-bg-NavLink--hover--active": "deepskyblue",
+        "backgroundColor-NavLink--hover": "deepskyblue",
+        "backgroundColor-NavLink--pressed": "steelblue",
+        "backgroundColor-NavLink--active": "lightblue",
+        "backgroundColor-NavLink--hover--active": "deepskyblue",
         "color-indicator-NavLink--active": "purple",
         "thickness-indicator-NavLink": "4px",
         "fontWeight-NavLink": "900",
@@ -459,6 +459,12 @@ The following sample theme sets a few visual properties of `NavLink`. It changes
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink | transparent | transparent |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--hover--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--pressed | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--pressed--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [border](../styles-and-themes/common-units/#border)-NavLink | 0px solid $borderColor | 0px solid $borderColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -470,13 +476,13 @@ The following sample theme sets a few visual properties of `NavLink`. It changes
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderLeft](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderLeftStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderLeftWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-indicator-NavLink | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | $borderRadius | $borderRadius |
 | [borderRight](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -489,23 +495,17 @@ The following sample theme sets a few visual properties of `NavLink`. It changes
 | [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-NavLink | transparent | transparent |
-| [color-bg](../styles-and-themes/common-units/#color)-NavLink--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-NavLink--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-NavLink--hover--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-NavLink--pressed | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-NavLink--pressed--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-icon-NavLink | $color-surface-500 | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink--active | $color-primary-500 | $color-primary-500 |
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink--hover | $color-primary-600 | $color-primary-400 |
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink--pressed | $color-primary-500 | $color-primary-500 |
-| [color-text](../styles-and-themes/common-units/#color)-NavLink | $color-text-primary | $color-text-primary |
-| [color-text](../styles-and-themes/common-units/#color)-NavLink--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-NavLink--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-NavLink--hover--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-NavLink--pressed | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-NavLink--pressed--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-NavLink | $textColor-primary | $textColor-primary |
+| [color](../styles-and-themes/common-units/#color)-NavLink--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-NavLink--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-NavLink--hover--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-NavLink--pressed | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-NavLink--pressed--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-NavLink | $fontFamily | $fontFamily |
 | [fontSize](../styles-and-themes/common-units/#size)-NavLink | $fontSize-small | $fontSize-small |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink | $fontWeight-normal | $fontWeight-normal |

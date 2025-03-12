@@ -58,7 +58,7 @@ test(`theme: bg-color`, async ({ page }) => {
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
-      "color-bg-Footer": expectedBackgroundColor,
+      "backgroundColor-Footer": expectedBackgroundColor,
     },
   });
 

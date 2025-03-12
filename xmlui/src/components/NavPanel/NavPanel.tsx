@@ -3,7 +3,6 @@ import styles from "./NavPanel.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { borderSubject } from "../../components-core/theming/themes/base-utils";
 import { dComponent } from "../metadata-helpers";
 import { NavPanel } from "./NavPanelNative";
 
@@ -19,7 +18,7 @@ export const NavPanelMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`color-bg-${COMP}`]: "transparent",
+    [`backgroundColor-${COMP}`]: "transparent",
     [`border-${COMP}`]: '0px solid $borderColor',
     [`paddingHorizontal-${COMP}`]: "$space-4",
     [`paddingVertical-logo-${COMP}`]: "$space-4",

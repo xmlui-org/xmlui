@@ -9,10 +9,10 @@ $themeVars: ();
 }
 
 $themeVars: t.composeBorderVars($themeVars, $component);
-$color-bg-NavPanel: createThemeVar("color-bg-#{$component}");
+$backgroundColor-NavPanel: createThemeVar("backgroundColor-#{$component}");
 $shadow-NavPanel: createThemeVar("shadow-#{$component}");
 $height-NavPanel: createThemeVar("height-AppHeader");
-$max-content-width-NavPanel: createThemeVar("max-content-width-App");
+$maxWidth-content-NavPanel: createThemeVar("maxWidth-content-App");
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
 $marginBottom-logo-NavPanel: createThemeVar("marginBottom-logo-#{$component}");
@@ -34,7 +34,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
   flex-direction: column;
 
   &:not(.condensed){
-    background-color: $color-bg-NavPanel;
+    background-color: $backgroundColor-NavPanel;
   }
 
   &.horizontal{
@@ -50,7 +50,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
     .wrapperInner{
       height: 100%;
       flex-direction: row;
-      max-width: $max-content-width-NavPanel;
+      max-width: $maxWidth-content-NavPanel;
       //align-items: center;
       width: 100%;
       margin: 0 auto;

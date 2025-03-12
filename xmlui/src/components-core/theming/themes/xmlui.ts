@@ -21,8 +21,8 @@ export const XmlUiThemeDefinition: ThemeDefinition = {
   tones: {
     light: {
       themeVars: {
-        "color-bg-ModalDialog": "white",
-        "color-bg-checked-RadioGroupOption": "$color-primary-400",
+        "backgroundColor-ModalDialog": "white",
+        "backgroundColor-checked-RadioGroupOption": "$color-primary-400",
       }
     },
     dark: {

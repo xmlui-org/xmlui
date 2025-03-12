@@ -21,7 +21,7 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   position: relative;
   height: createThemeVar("height-#{$component}");
   box-sizing: content-box;
-  background-color: createThemeVar("color-bg-#{$component}");
+  background-color: createThemeVar("backgroundColor-#{$component}");
   @include t.borderVars($themeVars, $component);
 }
 
@@ -33,7 +33,7 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   display: flex;
   flex-direction: row;
   align-items: center;
-  max-width: createThemeVar("max-content-width-#{$component}");
+  max-width: createThemeVar("maxWidth-content-#{$component}");
   padding-inline: t.getThemeVar($themeVars, "paddingHorizontal-#{$component}");
   @include t.paddingVars($themeVars, $component);
 
@@ -109,11 +109,11 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   margin-right: t.$space-4;
   width: 40px;
   padding: t.$space-2;
-  color: t.$color-text-subtitle;
+  color: t.$textColor-subtitle;
   cursor: pointer;
 
   &:hover {
-    color: t.$color-text-secondary;
+    color: t.$textColor-secondary;
   }
 
   svg {

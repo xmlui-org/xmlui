@@ -149,17 +149,17 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontWeight-extra-bold": "900",
 
     // --- Default text colors (component use these values as their defaults)
-    "color-text-primary": "$color-surface-950",
-    "color-text-attention": "$color-danger-600",
-    "color-text-subtitle": "$color-surface-500",
-    "color-text--disabled": "$color-surface-400",
+    "textColor-primary": "$color-surface-950",
+    "textColor-attention": "$color-danger-600",
+    "textColor-subtitle": "$color-surface-500",
+    "textColor--disabled": "$color-surface-400",
 
     // --- Default background colors (component use these values as their defaults)
-    "color-bg-primary": "$color-surface-50",
-    "color-bg-secondary": "$color-surface-50",
-    "color-bg-attention": "$color-attention",
-    "color-bg--disabled": "$color-surface-50",
-    "color-bg--selected": "$color-primary-50",
+    "backgroundColor-primary": "$color-surface-50",
+    "backgroundColor-secondary": "$color-surface-50",
+    "backgroundColor-attention": "$color-attention",
+    "backgroundColor--disabled": "$color-surface-50",
+    "backgroundColor--selected": "$color-primary-50",
 
     // --- Various default colors
     "color-info": "$color-info-500",
@@ -184,11 +184,11 @@ export const RootThemeDefinition: ThemeDefinition = {
     "font-feature-settings": "'cv03', 'cv04', 'cv11'",
 
     // --- Some media breakpoints (review them)
-    "media-maxWidth-phone": "576px",
-    "media-maxWidth-landscape-phone": "768px",
-    "media-maxWidth-tablet": "992px",
-    "media-maxWidth-desktop": "1200px",
-    "media-maxWidth-large-desktop": "1400px",
+    "maxWidth-phone": "576px",
+    "maxWidth-landscape-phone": "768px",
+    "maxWidth-tablet": "992px",
+    "maxWidth-desktop": "1200px",
+    "maxWidth-large-desktop": "1400px",
 
     // --- The app's default radius value
     borderRadius: "4px",
@@ -247,7 +247,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "shadow-spread-2-xl": "-6px -4px 40px 18px rgba(0, 0, 0, 0.1)",
 
     // --- The default maximum content width
-    "max-content-width": "1320px",
+    "maxWidth-content": "1320px",
 
     "size-Icon": "1.25em",
 
@@ -263,7 +263,7 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     "padding-TableCell": ".75rem",
     "padding-TableHeading": ".5rem .75rem .5rem .75rem",
-    "color-bg-TableRow--hover": "transparent",
+    "backgroundColor-TableRow--hover": "transparent",
 
     "boxShadow-NavPanel-vertical": "none",
     "width-NavPanel-vertical": "15rem",
@@ -272,16 +272,16 @@ export const RootThemeDefinition: ThemeDefinition = {
     light: {
       themeVars: {
         // --- Background colors
-        "color-bg": $colorSurface50,
-        "color-bg-primary": $colorSurface50,
-        "color-bg-secondary": $colorSurface50,
-        "color-bg--disabled": $colorSurface50,
-        "color-bg--selected": $colorPrimary50,
-        "color-bg-overlay": "rgba(0, 0, 0, 0.2)",
-        "color-bg-dropdown-item--hover": $colorSurface100,
-        "color-bg-dropdown-item--active": $colorSurface100,
-        "color-bg-dropdown-item--active-hover": $colorSurface50,
-        "color-bg-tree-row--selected--before": $colorPrimary50,
+        "backgroundColor": $colorSurface50,
+        "backgroundColor-primary": $colorSurface50,
+        "backgroundColor-secondary": $colorSurface50,
+        "backgroundColor--disabled": $colorSurface50,
+        "backgroundColor--selected": $colorPrimary50,
+        "backgroundColor-overlay": "rgba(0, 0, 0, 0.2)",
+        "backgroundColor-dropdown-item--hover": $colorSurface100,
+        "backgroundColor-dropdown-item--active": $colorSurface100,
+        "backgroundColor-dropdown-item--active-hover": $colorSurface50,
+        "backgroundColor-tree-row--selected--before": $colorPrimary50,
 
         // --- Various default colors
         "color-info": "$color-info-800",
@@ -295,14 +295,14 @@ export const RootThemeDefinition: ThemeDefinition = {
         "borderColor-dropdown-item": $colorSurface200,
 
         // --- Text colors
-        "color-text-primary": $colorSurface950,
-        "color-text-secondary": $colorSurface600,
-        "color-text-attention": $colorDanger600,
-        "color-text-subtitle": $colorSurface500,
-        "color-text--disabled": $colorSurface400,
+        "textColor-primary": $colorSurface950,
+        "textColor-secondary": $colorSurface600,
+        "textColor-attention": $colorDanger600,
+        "textColor-subtitle": $colorSurface500,
+        "textColor--disabled": $colorSurface400,
 
         // --- Input is an abstract component, so we define its default theme variables here
-        "color-bg-Input-default": "white",
+        "backgroundColor-Input-default": "white",
         "borderColor-Input-default": $colorSurface200,
         "borderColor-Input-default--hover": $colorSurface600,
         "borderColor-Input-default--focus": $colorSurface600,
@@ -311,21 +311,21 @@ export const RootThemeDefinition: ThemeDefinition = {
         "borderColor-Input-default--error": $colorDanger600,
 
         // --- InputLabel is a React component, so we define its default theme variables here
-        "color-text-InputLabel-required": $colorDanger600,
+        "color-InputLabel-required": $colorDanger600,
       },
     },
     dark: {
       themeVars: {
         // --- Background colors
-        "color-bg": $colorSurface950,
-        "color-bg-primary": $colorSurface900,
-        "color-bg-secondary": $colorSurface800,
-        "color-bg--disabled": $colorSurface800,
-        "color-bg--selected": $colorSurface700,
-        "color-bg-overlay": "rgba(0, 0, 0, 0.4)",
-        "color-bg-dropdown-item--hover": $colorSurface500A60,
-        "color-bg-dropdown-item--active": $colorSurface500A80,
-        "color-bg-tree-row--selected--before": $colorPrimary950,
+        "backgroundColor": $colorSurface950,
+        "backgroundColor-primary": $colorSurface900,
+        "backgroundColor-secondary": $colorSurface800,
+        "backgroundColor--disabled": $colorSurface800,
+        "backgroundColor--selected": $colorSurface700,
+        "backgroundColor-overlay": "rgba(0, 0, 0, 0.4)",
+        "backgroundColor-dropdown-item--hover": $colorSurface500A60,
+        "backgroundColor-dropdown-item--active": $colorSurface500A80,
+        "backgroundColor-tree-row--selected--before": $colorPrimary950,
 
         // --- Various default colors
         "color-info": $colorInfo600,
@@ -339,11 +339,11 @@ export const RootThemeDefinition: ThemeDefinition = {
         "borderColor-dropdown-item": $colorSurface300,
 
         // --- Text colors
-        "color-text-primary": $colorSurface100,
-        "color-text-secondary": $colorSurface400,
-        "color-text-attention": $colorDanger400,
-        "color-text-subtitle": $colorSurface500,
-        "color-text--disabled": $colorSurface500,
+        "textColor-primary": $colorSurface100,
+        "textColor-secondary": $colorSurface400,
+        "textColor-attention": $colorDanger400,
+        "textColor-subtitle": $colorSurface500,
+        "textColor--disabled": $colorSurface500,
 
         // --- Input is an abstract component, so we define its default theme variables here
         "borderColor-Input-default": $colorSurface800,
@@ -354,7 +354,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "borderColor-Input-default--error": $colorDanger500,
 
         // --- InputLabel is a React component, so we define its default theme variables here
-        "color-text-InputLabel-required": $colorDanger400,
+        "color-InputLabel-required": $colorDanger400,
       },
     },
   },

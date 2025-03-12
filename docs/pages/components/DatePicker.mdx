@@ -437,32 +437,32 @@ You can query the component's value. If no value is set, it will retrieve `undef
 The `DatePicker` component provides these theme variables to customize its appearance:
 
 - `borderRadius-DatePicker`
-- `color-text-DatePicker`
-- `color-bg-DatePicker--disabled`
+- `color-DatePicker`
+- `backgroundColor-DatePicker--disabled`
 - `borderWidth-DatePicker`
 - `borderStyle-DatePicker`
 - `borderColor-DatePicker--disabled`
-- `color-bg-DatePicker--disabled`
-- `color-text-DatePicker--disabled`
-- `color-text-value-DatePicker`
+- `backgroundColor-DatePicker--disabled`
+- `color-DatePicker--disabled`
+- `color-value-DatePicker`
 - `borderColor-DatePicker-default`
 - `borderColor-DatePicker-error`
 - `borderColor-DatePicker-warning`
 - `borderColor-DatePicker-success`
 - `color-placeholder-DatePicker`
-- `color-bg-menu-DatePicker`
+- `backgroundColor-menu-DatePicker`
 - `boxShadow-menu-DatePicker`
 - `borderRadius-menu-DatePicker`
-- `color-bg-item-DatePicker--hover`
-- `color-bg-item-DatePicker--active`
+- `backgroundColor-item-DatePicker--hover`
+- `backgroundColor-item-DatePicker--active`
 
 ```json
 {
   "borderRadius-DatePicker": "30px",
   "borderWidth-DatePicker": "4px",
   "borderRadius-menu-DatePicker": "30px",
-  "color-text-DatePicker": "black",
-  "color-bg-menu-DatePicker": "#f5f5dc"
+  "color-DatePicker": "black",
+  "backgroundColor-menu-DatePicker": "#f5f5dc"
 }
 ```
 
@@ -478,8 +478,8 @@ The `DatePicker` component provides these theme variables to customize its appea
         "borderRadius-DatePicker": "30px",
         "borderWidth-DatePicker": "4px",
         "borderRadius-menu-DatePicker": "30px",
-        "color-text-DatePicker": "black",
-        "color-bg-menu-DatePicker": "#f5f5dc"
+        "color-DatePicker": "black",
+        "backgroundColor-menu-DatePicker": "#f5f5dc"
       },
     },
   ]}
@@ -493,7 +493,7 @@ The `DatePicker` component provides these theme variables to customize its appea
 To style all input controls not just this component, use `Input` instead of the `DatePicker` segment:
 
 ```
-color-text-Input: "#0033FF"
+color-Input: "#0033FF"
 ```
 
 `Input` affects the following controls:
@@ -511,6 +511,21 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DatePicker--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DatePicker-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DatePicker-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-DatePicker--active | $color-surface-200 | $color-surface-700 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-DatePicker--active | $color-surface-200 | $color-surface-700 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-surface-100 | $color-surface-600 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-surface-100 | $color-surface-600 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-menu-DatePicker | $color-surface-50 | $color-surface-950 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-menu-DatePicker | $color-surface-50 | $color-surface-950 |
 | [borderColor](../styles-and-themes/common-units/#color)-DatePicker--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -548,36 +563,21 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-DatePicker--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-DatePicker-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-DatePicker-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--active | $color-surface-200 | $color-surface-700 |
-| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--active | $color-surface-200 | $color-surface-700 |
-| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-surface-100 | $color-surface-600 |
-| [color-bg](../styles-and-themes/common-units/#color)-item-DatePicker--hover | $color-surface-100 | $color-surface-600 |
-| [color-bg](../styles-and-themes/common-units/#color)-menu-DatePicker | $color-surface-50 | $color-surface-950 |
-| [color-bg](../styles-and-themes/common-units/#color)-menu-DatePicker | $color-surface-50 | $color-surface-950 |
+| [color](../styles-and-themes/common-units/#color)-DatePicker--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-DatePicker-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-DatePicker-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-DatePicker--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-DatePicker-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-DatePicker-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-value-DatePicker | $color-text-primary | $color-text-primary |
-| [color-text](../styles-and-themes/common-units/#color)-value-DatePicker | $color-text-primary | $color-text-primary |
+| [color](../styles-and-themes/common-units/#color)-value-DatePicker | $textColor-primary | $textColor-primary |
+| [color](../styles-and-themes/common-units/#color)-value-DatePicker | $textColor-primary | $textColor-primary |
 | [fontSize](../styles-and-themes/common-units/#size)-DatePicker | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [minHeight](../styles-and-themes/common-units/#size)-DatePicker | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [outlineColor](../styles-and-themes/common-units/#color)-DatePicker-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

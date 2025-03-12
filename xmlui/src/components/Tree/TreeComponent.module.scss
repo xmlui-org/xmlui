@@ -11,13 +11,13 @@
   flex: 1;
   min-width: 0;
   height: 100%;
-  color: t.$color-text-primary;
+  color: t.$textColor-primary;
   position: relative;
 
   &.selected {
     &:before{
       content: '';
-      background-color: t.$color-bg-tree-row--selected--before;
+      background-color: t.$backgroundColor-tree-row--selected--before;
       position: absolute;
       left: 0;
       right: 0;

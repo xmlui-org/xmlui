@@ -34,15 +34,15 @@ export const AvatarMd = createMetadata({
   defaultThemeVars: {
     [`borderRadius-${COMP}`]: "4px",
     [`boxShadow-${COMP}`]: "inset 0 0 0 1px rgba(4,32,69,0.1)",
-    [`color-text-${COMP}`]: "$color-text-secondary",
+    [`color-${COMP}`]: "$textColor-secondary",
     [`fontWeight-${COMP}`]: "$fontWeight-bold",
     light: {
       [`border-${COMP}`]: "0px solid $color-surface-400A80",
-      [`color-bg-${COMP}`]: "$color-surface-100",
+      [`backgroundColor-${COMP}`]: "$color-surface-100",
     },
     dark: {
       [`border-${COMP}`]: "0px solid $color-surface-700",
-      [`color-bg-${COMP}`]: "$color-surface-800",
+      [`backgroundColor-${COMP}`]: "$color-surface-800",
       [`borderColor-${COMP}`]: "$color-surface-700",
     },
   },

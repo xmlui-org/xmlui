@@ -19,15 +19,15 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   border-width: createThemeVar("Input:borderWidth-#{$component}-#{$variantName}");
   border-style: createThemeVar("Input:borderStyle-#{$component}-#{$variantName}");
   font-size: createThemeVar("Input:fontSize-#{$component}-#{$variantName}");
-  background-color: createThemeVar("Input:color-bg-#{$component}-#{$variantName}");
+  background-color: createThemeVar("Input:backgroundColor-#{$component}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$component}-#{$variantName}");
-  color: createThemeVar("Input:color-text-#{$component}-#{$variantName}");
+  color: createThemeVar("Input:color-#{$component}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$component}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:color-bg-#{$component}-#{$variantName}--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$component}-#{$variantName}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$component}-#{$variantName}--hover");
-    color: createThemeVar("Input:color-text-#{$component}-#{$variantName}--hover");
+    color: createThemeVar("Input:color-#{$component}-#{$variantName}--hover");
   }
 
   &::placeholder {
@@ -65,8 +65,8 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   &.disabled {
     cursor: not-allowed;
     opacity: 0.5;
-    background-color: createThemeVar("Input:color-bg-#{$component}--disabled");
-    color: createThemeVar("Input:color-text-#{$component}--disabled");
+    background-color: createThemeVar("Input:backgroundColor-#{$component}--disabled");
+    color: createThemeVar("Input:color-#{$component}--disabled");
     border-color: createThemeVar("Input:borderColor-#{$component}--disabled");
   }
 
@@ -101,17 +101,17 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   justify-content: center;
   align-items: center;
   font-size: createThemeVar("Input:fontSize-#{$component}-badge");
-  background-color: createThemeVar("Input:color-bg-#{$component}-badge");
-  color: createThemeVar("Input:color-text-#{$component}-badge");
+  background-color: createThemeVar("Input:backgroundColor-#{$component}-badge");
+  color: createThemeVar("Input:color-#{$component}-badge");
 
   &:hover {
-    background-color: createThemeVar("Input:color-bg-#{$component}-badge--hover");
-    color: createThemeVar("Input:color-text-#{$component}-badge--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$component}-badge--hover");
+    color: createThemeVar("Input:color-#{$component}-badge--hover");
   }
 
   &:active {
-    background-color: createThemeVar("Input:color-bg-#{$component}-badge--active");
-    color: createThemeVar("Input:color-text-#{$component}-badge--active");
+    background-color: createThemeVar("Input:backgroundColor-#{$component}-badge--active");
+    color: createThemeVar("Input:color-#{$component}-badge--active");
   }
 }
 
@@ -153,7 +153,7 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   z-index: 10;
   width: 100%;
   outline: none;
-  background-color: createThemeVar("Input:color-bg-menu-#{$component}");
+  background-color: createThemeVar("Input:backgroundColor-menu-#{$component}");
   border-radius: createThemeVar("Input:borderRadius-menu-#{$component}");
   box-shadow: createThemeVar("Input:boxShadow-menu-#{$component}");
   animation: fade-in 0.3s ease-in-out; /* animate-in */
@@ -167,17 +167,17 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   justify-content: space-between;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  background-color: createThemeVar("color-bg-item-#{$component}");
+  background-color: createThemeVar("backgroundColor-item-#{$component}");
 
   &[data-selected=true] {
-    background-color: createThemeVar("color-bg-item-#{$component}--hover");
+    background-color: createThemeVar("backgroundColor-item-#{$component}--hover");
   }
 
   &[data-disabled=true] {
     pointer-events: none;
     opacity: 0.5;
     cursor: not-allowed;
-    color: createThemeVar("color-text-item-#{$component}--disabled");
+    color: createThemeVar("color-item-#{$component}--disabled");
     font-style: italic;
   }
 }

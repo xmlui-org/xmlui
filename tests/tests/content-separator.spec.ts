@@ -146,7 +146,7 @@ test.fixme(`vertical in FlowLayout`, async ({ page }) => {
 
 const COLOR_RED = "rgb(255, 0, 0)" as const;
 
-test(`theme: color-bg`, async ({ page }) => {
+test(`theme: backgroundColor`, async ({ page }) => {
   const expectedColor = COLOR_RED;
 
   await initThemedApp(
@@ -161,7 +161,7 @@ test(`theme: color-bg`, async ({ page }) => {
     </Stack>`,
     {
       themeVars: {
-        "color-bg-ContentSeparator": expectedColor,
+        "backgroundColor-ContentSeparator": expectedColor,
       }
     }
   );

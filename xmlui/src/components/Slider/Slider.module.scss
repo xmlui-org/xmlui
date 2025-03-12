@@ -43,7 +43,7 @@ $componentName: "Slider";
   width: 100%;
   flex-grow: 1;
   overflow: hidden;
-  background-color: createThemeVar("Input:color-bg-track-#{$componentName}");
+  background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}");
 
   @include variant("default");
 
@@ -58,16 +58,16 @@ $componentName: "Slider";
   }
 
   &[data-disabled] {
-    background-color: createThemeVar("Input:color-bg-track-#{$componentName}--disabled");
+    background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}--disabled");
   }
 }
 
 .sliderRange {
   position: absolute;
   height: 100%;
-  background-color: createThemeVar("Input:color-bg-range-#{$componentName}");
+  background-color: createThemeVar("Input:backgroundColor-range-#{$componentName}");
   &[data-disabled] {
-    background-color: createThemeVar("Input:color-bg-range-#{$componentName}--disabled");
+    background-color: createThemeVar("Input:backgroundColor-range-#{$componentName}--disabled");
   }
 }
 
@@ -77,7 +77,7 @@ $componentName: "Slider";
   height: 20px;
   border-radius: 50%;
   border: createThemeVar("Input:borderWidth-thumb-#{$componentName}") createThemeVar("Input:borderStyle-thumb-#{$componentName}") createThemeVar("Input:borderColor-thumb-#{$componentName}");
-  background-color: createThemeVar("Input:color-bg-thumb-#{$componentName}");
+  background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}");
   box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}");
   transition: background-color 0.2s;
   outline: none;

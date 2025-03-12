@@ -73,21 +73,21 @@ export const SliderMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`color-bg-track-${COMP}`]: "$color-surface-200",
-    [`color-bg-range-${COMP}`]: "$color-primary",
+    [`backgroundColor-track-${COMP}`]: "$color-surface-200",
+    [`backgroundColor-range-${COMP}`]: "$color-primary",
     [`borderWidth-thumb-${COMP}`]: "2px",
     [`borderStyle-thumb-${COMP}`]: "solid",
     [`borderColor-thumb-${COMP}`]: "$color-surface-50",
-    [`color-bg-thumb-${COMP}`]: "$color-primary",
+    [`backgroundColor-thumb-${COMP}`]: "$color-primary",
     [`boxShadow-thumb-${COMP}`]: "$shadow-md",
 
     light: {
-      [`color-bg-track-${COMP}--disabled`]: "$color-surface-300",
-      [`color-bg-range-${COMP}--disabled`]: "$color-surface-400",
+      [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-300",
+      [`backgroundColor-range-${COMP}--disabled`]: "$color-surface-400",
     },
     dark: {
-      [`color-bg-track-${COMP}--disabled`]: "$color-surface-600",
-      [`color-bg-range-${COMP}--disabled`]: "$color-surface-800",
+      [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-600",
+      [`backgroundColor-range-${COMP}--disabled`]: "$color-surface-800",
     },
   },
 });

@@ -22,13 +22,13 @@ and sets several theme variables to style the `ProgressBar` component:
 <App>
   <Theme
     tone="dark"
-    color-bg-ProgressBar="cyan"
+    backgroundColor-ProgressBar="cyan"
     color-indicator-ProgressBar="purple"
     thickness-ProgressBar="12px"
     borderRadius-indicator-ProgressBar="12px"
     borderRadius-Progressbar="4px"
   >
-    <VStack backgroundColor="$color-bg-primary">
+    <VStack backgroundColor="$backgroundColor-primary">
       <ProgressBar value="0"/>
       <ProgressBar value="0.2"/>
       <ProgressBar value="0.6"/>
@@ -44,13 +44,13 @@ and sets several theme variables to style the `ProgressBar` component:
   <App>
     <Theme
       tone="dark"
-      color-bg-ProgressBar="cyan"
+      backgroundColor-ProgressBar="cyan"
       color-indicator-ProgressBar="purple"
       thickness-ProgressBar="12px"
       borderRadius-indicator-ProgressBar="12px"
       borderRadius-Progressbar="4px"
     >
-      <VStack backgroundColor="$color-bg-primary">
+      <VStack backgroundColor="$backgroundColor-primary">
         <ProgressBar value="0"/>
         <ProgressBar value="0.2"/>
         <ProgressBar value="0.6"/>
@@ -82,21 +82,21 @@ This property specifies which theme to use by setting the theme's id.
 ```ueml copy {2, 9, 16}
 <App>
   <Theme themeId="xmlui">
-    <VStack backgroundColor="$color-bg-primary">
+    <VStack backgroundColor="$backgroundColor-primary">
       <H3>Use 'xmlui' theme:</H3>
       <ProgressBar value="0"/>
       <ProgressBar value="0.6"/>
     </VStack>
   </Theme>
   <Theme themeId="xmlui-green">
-    <VStack backgroundColor="$color-bg-primary">
+    <VStack backgroundColor="$backgroundColor-primary">
       <H3>Use 'xmlui-green' theme:</H3>
       <ProgressBar value="0"/>
       <ProgressBar value="0.6"/>
     </VStack>
   </Theme>
   <Theme themeId="solid">
-    <VStack backgroundColor="$color-bg-primary">
+    <VStack backgroundColor="$backgroundColor-primary">
       <H3>Use the 'solid' theme:</H3>
       <ProgressBar value="0"/>
       <ProgressBar value="0.6"/>
@@ -110,21 +110,21 @@ This property specifies which theme to use by setting the theme's id.
   app={`
   <App>
     <Theme themeId="xmlui">
-      <VStack backgroundColor="$color-bg-primary">
+      <VStack backgroundColor="$backgroundColor-primary">
         <H3>Use 'xmlui' theme:</H3>
         <ProgressBar value="0"/>
         <ProgressBar value="0.6"/>
       </VStack>
     </Theme>
     <Theme themeId="xmlui-green">
-      <VStack backgroundColor="$color-bg-primary">
+      <VStack backgroundColor="$backgroundColor-primary">
         <H3>Use 'xmlui-green' theme:</H3>
         <ProgressBar value="0"/>
         <ProgressBar value="0.6"/>
       </VStack>
     </Theme>
     <Theme themeId="solid">
-      <VStack backgroundColor="$color-bg-primary">
+      <VStack backgroundColor="$backgroundColor-primary">
         <H3>Use the 'solid' theme:</H3>
         <ProgressBar value="0"/>
         <ProgressBar value="0.6"/>
@@ -143,14 +143,14 @@ Available values: `light` **(default)**, `dark`
 ```ueml copy {2,9}
 <App>
   <Theme tone="light">
-    <VStack backgroundColor="$color-bg-primary" >
+    <VStack backgroundColor="$backgroundColor-primary" >
       <H3>Use the light tone of the base theme:</H3>
       <ProgressBar value="0"/>
       <ProgressBar value="0.6"/>
     </VStack>
   </Theme>
   <Theme tone="dark">
-    <VStack backgroundColor="$color-bg-primary">
+    <VStack backgroundColor="$backgroundColor-primary">
       <H3>Use the dark tone of the base theme:</H3>
       <ProgressBar value="0"/>
       <ProgressBar value="0.6"/>
@@ -164,14 +164,14 @@ Available values: `light` **(default)**, `dark`
   app={`
   <App>
     <Theme tone="light">
-      <VStack backgroundColor="$color-bg-primary" >
+      <VStack backgroundColor="$backgroundColor-primary" >
         <H3>Use the light tone of the base theme:</H3>
         <ProgressBar value="0"/>
         <ProgressBar value="0.6"/>
       </VStack>
     </Theme>
     <Theme tone="dark">
-      <VStack backgroundColor="$color-bg-primary">
+      <VStack backgroundColor="$backgroundColor-primary">
         <H3>Use the dark tone of the base theme:</H3>
         <ProgressBar value="0"/>
         <ProgressBar value="0.6"/>

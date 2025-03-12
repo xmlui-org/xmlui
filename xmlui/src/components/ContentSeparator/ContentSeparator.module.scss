@@ -7,11 +7,11 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$color-bg-ContentSeparator: createThemeVar("color-bg-ContentSeparator");
+$backgroundColor-ContentSeparator: createThemeVar("backgroundColor-ContentSeparator");
 $size-ContentSeparator: createThemeVar("size-ContentSeparator");
 
 .separator {
-  background-color: $color-bg-ContentSeparator;
+  background-color: $backgroundColor-ContentSeparator;
 
   &.horizontal {
     height: $size-ContentSeparator;
