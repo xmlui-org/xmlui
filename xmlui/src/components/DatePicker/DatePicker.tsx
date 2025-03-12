@@ -118,7 +118,7 @@ export const DatePickerMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`boxShadow-menu-${COMP}`]: "$shadow-md",
+    [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
     [`color-value-${COMP}`]: "$textColor-primary",
     light: {

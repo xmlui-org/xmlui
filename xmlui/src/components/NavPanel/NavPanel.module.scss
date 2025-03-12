@@ -10,7 +10,7 @@ $themeVars: ();
 
 $themeVars: t.composeBorderVars($themeVars, $component);
 $backgroundColor-NavPanel: createThemeVar("backgroundColor-#{$component}");
-$shadow-NavPanel: createThemeVar("shadow-#{$component}");
+$boxShadow-NavPanel: createThemeVar("boxShadow-#{$component}");
 $height-NavPanel: createThemeVar("height-AppHeader");
 $maxWidth-content-NavPanel: createThemeVar("maxWidth-content-App");
 $themeVars: t.composePaddingVars($themeVars, $component);
@@ -24,7 +24,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
   height: 100%;
   width: 100%;
   flex-shrink: 0;
-  box-shadow: $shadow-NavPanel;
+  box-shadow: $boxShadow-NavPanel;
   @include t.paddingVars($themeVars, $component);
   @include t.borderVars($themeVars, $component);
 

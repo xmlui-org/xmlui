@@ -442,13 +442,13 @@ $THEME-VAR-PREFIX: xmlui;
 
 // =====================================================================================================================
 // CSS variables for miscellaneous shadows
-$shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-$shadow-xxl: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+$boxShadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$boxShadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$boxShadow-xxl: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 
-$shadow-spread: 0px 0px 30px rgba(0, 0, 0, 0.1);
-$shadow-spread-2: -6px -4px 40px 10px rgba(0, 0, 0, 0.1);
-$shadow-spread-2-xl: -6px -4px 40px 18px rgba(0, 0, 0, 0.1);
+$boxShadow-spread: 0px 0px 30px rgba(0, 0, 0, 0.1);
+$boxShadow-spread-2: -6px -4px 40px 10px rgba(0, 0, 0, 0.1);
+$boxShadow-spread-2-xl: -6px -4px 40px 18px rgba(0, 0, 0, 0.1);
 
 // CSS variables describing spacing between UI elements
 $space-0: createVar(space-0);
