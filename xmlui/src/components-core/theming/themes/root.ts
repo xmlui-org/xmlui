@@ -155,11 +155,11 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-text--disabled": "$color-surface-400",
 
     // --- Default background colors (component use these values as their defaults)
-    "color-bg-primary": "$color-surface-50",
-    "color-bg-secondary": "$color-surface-50",
-    "color-bg-attention": "$color-attention",
-    "color-bg--disabled": "$color-surface-50",
-    "color-bg--selected": "$color-primary-50",
+    "backgroundColor-primary": "$color-surface-50",
+    "backgroundColor-secondary": "$color-surface-50",
+    "backgroundColor-attention": "$color-attention",
+    "backgroundColor--disabled": "$color-surface-50",
+    "backgroundColor--selected": "$color-primary-50",
 
     // --- Various default colors
     "color-info": "$color-info-500",
@@ -263,7 +263,7 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     "padding-TableCell": ".75rem",
     "padding-TableHeading": ".5rem .75rem .5rem .75rem",
-    "color-bg-TableRow--hover": "transparent",
+    "backgroundColor-TableRow--hover": "transparent",
 
     "boxShadow-NavPanel-vertical": "none",
     "width-NavPanel-vertical": "15rem",
@@ -272,16 +272,16 @@ export const RootThemeDefinition: ThemeDefinition = {
     light: {
       themeVars: {
         // --- Background colors
-        "color-bg": $colorSurface50,
-        "color-bg-primary": $colorSurface50,
-        "color-bg-secondary": $colorSurface50,
-        "color-bg--disabled": $colorSurface50,
-        "color-bg--selected": $colorPrimary50,
-        "color-bg-overlay": "rgba(0, 0, 0, 0.2)",
-        "color-bg-dropdown-item--hover": $colorSurface100,
-        "color-bg-dropdown-item--active": $colorSurface100,
-        "color-bg-dropdown-item--active-hover": $colorSurface50,
-        "color-bg-tree-row--selected--before": $colorPrimary50,
+        "backgroundColor": $colorSurface50,
+        "backgroundColor-primary": $colorSurface50,
+        "backgroundColor-secondary": $colorSurface50,
+        "backgroundColor--disabled": $colorSurface50,
+        "backgroundColor--selected": $colorPrimary50,
+        "backgroundColor-overlay": "rgba(0, 0, 0, 0.2)",
+        "backgroundColor-dropdown-item--hover": $colorSurface100,
+        "backgroundColor-dropdown-item--active": $colorSurface100,
+        "backgroundColor-dropdown-item--active-hover": $colorSurface50,
+        "backgroundColor-tree-row--selected--before": $colorPrimary50,
 
         // --- Various default colors
         "color-info": "$color-info-800",
@@ -302,7 +302,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-text--disabled": $colorSurface400,
 
         // --- Input is an abstract component, so we define its default theme variables here
-        "color-bg-Input-default": "white",
+        "backgroundColor-Input-default": "white",
         "borderColor-Input-default": $colorSurface200,
         "borderColor-Input-default--hover": $colorSurface600,
         "borderColor-Input-default--focus": $colorSurface600,
@@ -317,15 +317,15 @@ export const RootThemeDefinition: ThemeDefinition = {
     dark: {
       themeVars: {
         // --- Background colors
-        "color-bg": $colorSurface950,
-        "color-bg-primary": $colorSurface900,
-        "color-bg-secondary": $colorSurface800,
-        "color-bg--disabled": $colorSurface800,
-        "color-bg--selected": $colorSurface700,
-        "color-bg-overlay": "rgba(0, 0, 0, 0.4)",
-        "color-bg-dropdown-item--hover": $colorSurface500A60,
-        "color-bg-dropdown-item--active": $colorSurface500A80,
-        "color-bg-tree-row--selected--before": $colorPrimary950,
+        "backgroundColor": $colorSurface950,
+        "backgroundColor-primary": $colorSurface900,
+        "backgroundColor-secondary": $colorSurface800,
+        "backgroundColor--disabled": $colorSurface800,
+        "backgroundColor--selected": $colorSurface700,
+        "backgroundColor-overlay": "rgba(0, 0, 0, 0.4)",
+        "backgroundColor-dropdown-item--hover": $colorSurface500A60,
+        "backgroundColor-dropdown-item--active": $colorSurface500A80,
+        "backgroundColor-tree-row--selected--before": $colorPrimary950,
 
         // --- Various default colors
         "color-info": $colorInfo600,

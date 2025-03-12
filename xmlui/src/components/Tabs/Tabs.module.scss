@@ -8,20 +8,20 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$color-bg-Tabs: createThemeVar("color-bg-Tabs");
+$backgroundColor-Tabs: createThemeVar("backgroundColor-Tabs");
 $borderColor-Tabs: createThemeVar("borderColor-Tabs");
 $borderWidth-Tabs: createThemeVar("borderWidth-Tabs");
 $borderColor-active-Tabs: createThemeVar("borderColor-active-Tabs");
-$color-bg-trigger-Tabs: createThemeVar("color-bg-trigger-Tabs");
+$backgroundColor-trigger-Tabs: createThemeVar("backgroundColor-trigger-Tabs");
 $color-text-trigger-Tabs: createThemeVar("color-text-trigger-Tabs");
-$color-bg-trigger-Tabs--hover: createThemeVar("color-bg-trigger-Tabs--hover");
-$color-bg-list-Tabs: createThemeVar("color-bg-list-Tabs");
+$backgroundColor-trigger-Tabs--hover: createThemeVar("backgroundColor-trigger-Tabs--hover");
+$backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
 
 .tabs {
   display: flex;
   flex: 1 1 auto;
   width: 100%;
-  background-color: $color-bg-Tabs;
+  background-color: $backgroundColor-Tabs;
   overflow: hidden;
   &[data-orientation='horizontal'] {
     flex-direction: row;
@@ -53,7 +53,7 @@ $color-bg-list-Tabs: createThemeVar("color-bg-list-Tabs");
   //flex: 1 1 auto;
   font-family: inherit;
   color: $color-text-trigger-Tabs;
-  background-color: $color-bg-trigger-Tabs;
+  background-color: $backgroundColor-trigger-Tabs;
   padding: t.$space-4;
   display: flex;
   align-items: center;
@@ -64,7 +64,7 @@ $color-bg-list-Tabs: createThemeVar("color-bg-list-Tabs");
   border-color: transparent;
 
   &:hover {
-    background-color: $color-bg-trigger-Tabs--hover;
+    background-color: $backgroundColor-trigger-Tabs--hover;
   }
 
   &[data-orientation='horizontal'] {
@@ -97,7 +97,7 @@ $color-bg-list-Tabs: createThemeVar("color-bg-list-Tabs");
 }
 
 .tabsList {
-  background-color: $color-bg-list-Tabs;
+  background-color: $backgroundColor-list-Tabs;
   position: relative;
   z-index: 99;
   overflow: hidden;

@@ -490,17 +490,17 @@ $space-96: createVar(space-96);
 // Generic style variables
 
 $color-text-primary: createVar(color-text-primary);
-$color-bg-primary: createVar(color-bg-primary);
+$backgroundColor-primary: createVar(backgroundColor-primary);
 $color-text-attention: createVar(color-text-attention);
-$color-bg-attention: createVar(color-bg-attention);
+$backgroundColor-attention: createVar(backgroundColor-attention);
 $color-text-subtitle: createVar(color-text-subtitle);
-$color-bg-primary: createVar(color-bg-primary);
-$color-bg-secondary: createVar(color-bg-secondary);
-$color-bg-Input-default: createVar(color-bg-Input-default);
+$backgroundColor-primary: createVar(backgroundColor-primary);
+$backgroundColor-secondary: createVar(backgroundColor-secondary);
+$backgroundColor-Input-default: createVar(backgroundColor-Input-default);
 $color-text--disabled: createVar(color-text--disabled);
-$color-bg--disabled: createVar(color-bg--disabled);
+$backgroundColor--disabled: createVar(backgroundColor--disabled);
 $borderColor--disabled: createVar(borderColor--disabled);
-$color-bg--selected: createVar(color-bg--selected);
+$backgroundColor--selected: createVar(backgroundColor--selected);
 $fontFamily: createVar(fontFamily);
 $fontSize-tiny: createVar(fontSize-tiny);
 $fontSize-smaller: createVar(fontSize-smaller);
@@ -509,7 +509,7 @@ $fontSize-normal: createVar(fontSize-normal);
 $fontSize-medium: createVar(fontSize-medium);
 $fontSize-large: createVar(fontSize-large);
 
-$color-bg-overlay: createVar(color-bg-overlay);
+$backgroundColor-overlay: createVar(backgroundColor-overlay);
 $color-info: createVar(color-info);
 $color-valid: createVar(color-valid);
 $color-warning: createVar(color-warning);
@@ -534,13 +534,13 @@ $media-max-width-tablet: createVar(media-max-width-tablet);
 // ---------------------------------------------------------------------------------------------------------------------
 // Dropdown style variables
 
-$color-bg-dropdown-item: createVar(color-bg-dropdown-item);
-$color-bg-dropdown-item--active: createVar(color-bg-dropdown-item--active);
+$backgroundColor-dropdown-item: createVar(backgroundColor-dropdown-item);
+$backgroundColor-dropdown-item--active: createVar(backgroundColor-dropdown-item--active);
 $borderColor-dropdown-item: createVar(borderColor-dropdown-item);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Tree style variables
-$color-bg-tree-row--selected--before: createVar(color-bg-tree-row--selected--before);
+$backgroundColor-tree-row--selected--before: createVar(backgroundColor-tree-row--selected--before);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // Input border style variables
@@ -568,7 +568,7 @@ $fontWeight-FormItemLabel: createVar(fontWeight-FormItemLabel);
 $color-primary-500: createVar(color-primary-500);
 $color-danger-500: createVar(color-danger-500);
 
-$color-bg: createVar(color-bg);
+$backgroundColor: createVar(backgroundColor);
 
 $color-text-secondary: createVar(color-text-secondary);
 

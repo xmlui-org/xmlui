@@ -7,7 +7,7 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$color-bg-ProgressBar: createThemeVar("color-bg-ProgressBar");
+$backgroundColor-ProgressBar: createThemeVar("backgroundColor-ProgressBar");
 $color-indicator-ProgressBar: createThemeVar("color-indicator-ProgressBar");
 $borderRadius-ProgressBar: createThemeVar("borderRadius-ProgressBar");
 $borderRadius-indicator-ProgressBar: createThemeVar("borderRadius-indicator-ProgressBar");
@@ -15,7 +15,7 @@ $thickness-ProgressBar: createThemeVar("thickness-ProgressBar");
 
 .wrapper {
   width: 100%;
-  background-color: $color-bg-ProgressBar;
+  background-color: $backgroundColor-ProgressBar;
   border-radius: $borderRadius-ProgressBar;
   overflow: hidden;
   position: relative;

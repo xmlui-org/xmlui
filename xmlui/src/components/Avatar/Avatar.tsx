@@ -38,11 +38,11 @@ export const AvatarMd = createMetadata({
     [`fontWeight-${COMP}`]: "$fontWeight-bold",
     light: {
       [`border-${COMP}`]: "0px solid $color-surface-400A80",
-      [`color-bg-${COMP}`]: "$color-surface-100",
+      [`backgroundColor-${COMP}`]: "$color-surface-100",
     },
     dark: {
       [`border-${COMP}`]: "0px solid $color-surface-700",
-      [`color-bg-${COMP}`]: "$color-surface-800",
+      [`backgroundColor-${COMP}`]: "$color-surface-800",
       [`borderColor-${COMP}`]: "$color-surface-700",
     },
   },

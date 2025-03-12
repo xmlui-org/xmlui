@@ -88,11 +88,11 @@ test("colorMap background and label", async ({ page }) => {
   await expect(page.getByTestId("badgeReg")).toHaveCSS("color", EXPECTED_TEXT_COLOR_REG);
 });
 
-test("color-bg", async ({ page }) => {
+test("backgroundColor", async ({ page }) => {
   const EXPECTED_BG_COLOR = RED;
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
-      "color-bg-Badge": EXPECTED_BG_COLOR,
+      "backgroundColor-Badge": EXPECTED_BG_COLOR,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("background-color", EXPECTED_BG_COLOR);

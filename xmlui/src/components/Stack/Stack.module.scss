@@ -7,7 +7,7 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$color-bg-Stack--hover: createThemeVar("color-bg-Stack--hover");
+$backgroundColor-Stack--hover: createThemeVar("backgroundColor-Stack--hover");
 $border-Stack--hover: createThemeVar("border-Stack--hover");
 
 .base {
@@ -20,7 +20,7 @@ $border-Stack--hover: createThemeVar("border-Stack--hover");
   gap: var(--stack-gap-default);
 
   &:hover {
-    background-color: $color-bg-Stack--hover;
+    background-color: $backgroundColor-Stack--hover;
     border: $border-Stack--hover;
   }
 

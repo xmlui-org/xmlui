@@ -12,9 +12,9 @@ export const windowsAppFrameMd = createMetadata({
   status: "experimental",
   themeVars: windowsStyles.themeVars,
   defaultThemeVars: {
-    "color-bg-content-WindowsAppFrame": "$color-bg",
+    "backgroundColor-content-WindowsAppFrame": "$backgroundColor",
     light: {
-      "color-bg-content-WindowsAppFrame": "white"
+      "backgroundColor-content-WindowsAppFrame": "white"
     }
   }
 });

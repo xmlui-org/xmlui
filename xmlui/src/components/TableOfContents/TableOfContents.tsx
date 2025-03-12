@@ -44,7 +44,7 @@ export const TableOfContentsMd = createMetadata({
     [`border-width-${COMP}Item--active`]: "$space-0_5",
     [`border-style-${COMP}Item--active`]: "solid",
     [`fontWeight-${COMP}Item--active`]: "$fontWeight-bold",
-    [`color-bg-${COMP}`]: "transparent",
+    [`backgroundColor-${COMP}`]: "transparent",
     [`paddingHorizontal-${COMP}`]: "$space-8",
     [`paddingVertical-${COMP}`]: "$space-4",
     [`paddingHorizontal-${COMP}Item`]: "$space-2",

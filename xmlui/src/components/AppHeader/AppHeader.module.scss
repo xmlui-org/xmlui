@@ -21,7 +21,7 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   position: relative;
   height: createThemeVar("height-#{$component}");
   box-sizing: content-box;
-  background-color: createThemeVar("color-bg-#{$component}");
+  background-color: createThemeVar("backgroundColor-#{$component}");
   @include t.borderVars($themeVars, $component);
 }
 

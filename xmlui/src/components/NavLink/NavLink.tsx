@@ -61,7 +61,7 @@ export const NavLinkMd = createMetadata({
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $borderColor",
     [`borderRadius-${COMP}`]: "$borderRadius",
-    [`color-bg-${COMP}`]: "transparent",
+    [`backgroundColor-${COMP}`]: "transparent",
     [`paddingHorizontal-${COMP}`]: "$space-4",
     [`paddingVertical-${COMP}`]: "$space-2",
     [`fontSize-${COMP}`]: "$fontSize-small",

@@ -18,20 +18,20 @@ $componentName: "TextBox";
   font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
   padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
-  background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
     color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus-within {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--focus");
-    background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--focus");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--focus");
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
     color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--focus");
   }
@@ -77,7 +77,7 @@ $componentName: "TextBox";
 
   &:has(.input:is(:disabled)) {
     cursor: not-allowed;
-    background-color: createThemeVar("Input:color-bg-TextBox--disabled");
+    background-color: createThemeVar("Input:backgroundColor-TextBox--disabled");
     color: createThemeVar("Input:color-text-TextBox--disabled");
     border-color: createThemeVar("Input:borderColor-TextBox--disabled");
   }

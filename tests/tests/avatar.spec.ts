@@ -117,7 +117,7 @@ test("click", async ({ page }) => {
 });
 
 const THEME_TESTS: ThemeTestDesc[] = [
-  { themeVar: "color-bg-Avatar", themeVarAsCSS: "background-color", expected: RED },
+  { themeVar: "backgroundColor-Avatar", themeVarAsCSS: "background-color", expected: RED },
   { themeVar: "borderColor-Avatar", themeVarAsCSS: "border-color", expected: RED },
   { themeVar: "color-text-Avatar", themeVarAsCSS: "color", expected: RED },
   { themeVar: "fontWeight-Avatar", themeVarAsCSS: "font-weight", expected: "700" },

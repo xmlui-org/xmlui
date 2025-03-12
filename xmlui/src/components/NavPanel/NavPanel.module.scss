@@ -9,7 +9,7 @@ $themeVars: ();
 }
 
 $themeVars: t.composeBorderVars($themeVars, $component);
-$color-bg-NavPanel: createThemeVar("color-bg-#{$component}");
+$backgroundColor-NavPanel: createThemeVar("backgroundColor-#{$component}");
 $shadow-NavPanel: createThemeVar("shadow-#{$component}");
 $height-NavPanel: createThemeVar("height-AppHeader");
 $max-content-width-NavPanel: createThemeVar("max-content-width-App");
@@ -34,7 +34,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
   flex-direction: column;
 
   &:not(.condensed){
-    background-color: $color-bg-NavPanel;
+    background-color: $backgroundColor-NavPanel;
   }
 
   &.horizontal{

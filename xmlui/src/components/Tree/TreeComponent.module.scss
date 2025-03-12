@@ -17,7 +17,7 @@
   &.selected {
     &:before{
       content: '';
-      background-color: t.$color-bg-tree-row--selected--before;
+      background-color: t.$backgroundColor-tree-row--selected--before;
       position: absolute;
       left: 0;
       right: 0;

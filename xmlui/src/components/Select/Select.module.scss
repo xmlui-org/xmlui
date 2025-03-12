@@ -16,13 +16,13 @@ $componentName: "Select";
   border-width: createThemeVar("Input:borderWidth-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
   font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
-  background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
     color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
   }
@@ -95,7 +95,7 @@ $componentName: "Select";
 .selectTrigger:disabled {
   cursor: not-allowed;
   opacity: createThemeVar("opacity-#{$componentName}--disabled");
-  background-color: createThemeVar("Input:color-bg-#{$componentName}--disabled");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
   color: createThemeVar("Input:color-text-#{$componentName}--disabled");
   border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
 }
@@ -135,16 +135,16 @@ $componentName: "Select";
   align-items: center;
   border-radius: t.$borderRadius;
   font-size: createThemeVar("Input:fontSize-#{$componentName}-badge");
-  background-color: createThemeVar("Input:color-bg-#{$componentName}-badge");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge");
   color: createThemeVar("Input:color-text-#{$componentName}-badge");
 
   &:hover {
-    background-color: createThemeVar("Input:color-bg-#{$componentName}-badge--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge--hover");
     color: createThemeVar("Input:color-text-#{$componentName}-badge--hover");
   }
 
   &:active {
-    background-color: createThemeVar("Input:color-bg-#{$componentName}-badge--active");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge--active");
     color: createThemeVar("Input:color-text-#{$componentName}-badge--active");
   }
 }
@@ -195,7 +195,7 @@ $componentName: "Select";
   width: 100%;
   overflow: auto;
   border-radius: 6px;
-  background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
+  background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
 }
 
 .commandInputContainer {
@@ -234,7 +234,7 @@ $componentName: "Select";
   position: relative;
   z-index: 50;
   overflow: auto;
-  background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
+  background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
   border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
   box-shadow: createThemeVar("Input:boxShadow-menu-#{$componentName}");
   border: createThemeVar("Input:borderWidth-menu-#{$componentName}") solid createThemeVar("Input:borderColor-menu-#{$componentName}");
@@ -288,10 +288,10 @@ $componentName: "Select";
   justify-content: space-between;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  background-color: createThemeVar("color-bg-item-#{$componentName}");
+  background-color: createThemeVar("backgroundColor-item-#{$componentName}");
 
   &[data-selected=true] {
-    background-color: createThemeVar("color-bg-item-#{$componentName}--hover");
+    background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
   }
 
   &[data-disabled=true] {
@@ -317,11 +317,11 @@ $componentName: "Select";
   font-size: createThemeVar("fontSize-#{$componentName}");
 
   &[data-highlighted] {
-    background-color: createThemeVar("color-bg-item-#{$componentName}--hover");
+    background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
   }
 
   &[data-state=checked] {
-    background-color: createThemeVar("color-bg-item-#{$componentName}--active");
+    background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
   }
 }
 

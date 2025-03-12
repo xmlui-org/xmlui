@@ -759,7 +759,7 @@ const themeKeywordLinks = {
   "borderVerticalColor": "[borderVerticalColor](../styles-and-themes/common-units/#color)",
   "borderRightColor": "[color-text](../styles-and-themes/common-units/#color)",
   "borderLeftColor": "[color-text](../styles-and-themes/common-units/#color)",
-  "color-bg": "[color-bg](../styles-and-themes/common-units/#color)",
+  "backgroundColor": "[backgroundColor](../styles-and-themes/common-units/#color)",
   "textDecorationColor": "[textDecorationColor](../styles-and-themes/common-units/#color)",
   "color-text": "[color-text](../styles-and-themes/common-units/#color)",
   "fontWeight": "[fontWeight](../styles-and-themes/common-units/#fontWeight)",

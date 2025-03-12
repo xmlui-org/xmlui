@@ -12,7 +12,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, "#{$component}-pill");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}-pill");
-$color-bg-Badge: createThemeVar("color-bg-#{$component}");
+$backgroundColor-Badge: createThemeVar("backgroundColor-#{$component}");
 $color-text-Badge: createThemeVar("color-text-#{$component}");
 $fontSize-Badge: createThemeVar("fontSize-#{$component}");
 $fontSize-Badge-pill: createThemeVar("fontSize-#{$component}-pill");
@@ -31,7 +31,7 @@ $fontWeight-Badge-pill: createThemeVar("fontWeight-#{$component}-pill");
   text-transform: uppercase;
   font-weight: $fontWeight-Badge;
 
-  background-color: $color-bg-Badge;
+  background-color: $backgroundColor-Badge;
   color: $color-text-Badge;
   font-size: $fontSize-Badge;
 }
@@ -47,7 +47,7 @@ $fontWeight-Badge-pill: createThemeVar("fontWeight-#{$component}-pill");
   text-overflow: ellipsis;
   font-weight: $fontWeight-Badge-pill;
 
-  background-color: $color-bg-Badge;
+  background-color: $backgroundColor-Badge;
   color: $color-text-Badge;
   border-radius: 9999px;
   font-size: $fontSize-Badge-pill;

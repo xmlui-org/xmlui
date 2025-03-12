@@ -332,7 +332,7 @@ Use the `Button` component to trigger various actions.
 
 The `Button` component uses these theme variables to customize its appearance:
 
-- `color-bg`
+- `backgroundColor`
 - `borderColor`
 - `color-text`
 - `fontSize`
@@ -349,15 +349,15 @@ Outlined and ghost buttons have no background color unless active or hovered. As
 When you set a value for background-related variables, the `Button` component recalculates its background color tones toward the theme variable chain. Thus, using these variables may render different background colors than you expect with outlined and ghost buttons, as by default, they use background when they are active or hovered:
 
 ```text
-color-bg-Button-solid
-color-bg-Button-outlined
-color-bg-Button-ghost
-color-bg-Button-primary-outlined
-color-bg-Button-primary-ghost
-color-bg-Button-secondary-outlined
-color-bg-Button-secondary-ghost
-color-bg-Button-attention-outlined
-color-bg-Button-attention-ghost
+backgroundColor-Button-solid
+backgroundColor-Button-outlined
+backgroundColor-Button-ghost
+backgroundColor-Button-primary-outlined
+backgroundColor-Button-primary-ghost
+backgroundColor-Button-secondary-outlined
+backgroundColor-Button-secondary-ghost
+backgroundColor-Button-attention-outlined
+backgroundColor-Button-attention-ghost
 ```
 
 The `themeColor` and `variant` properties of `Button` are used within theme variables as traits; first the `themeColor`, and then the `variant` value. So, when setting theme variables, you can use these traits with `Button`:

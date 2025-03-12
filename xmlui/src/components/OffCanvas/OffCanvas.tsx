@@ -72,7 +72,7 @@ export const OffCanvasMd = createMetadata({
     "padding-OffCanvas": "$padding-tight",
     "paddingVertical-OffCanvas": "$padding-tight",
     "paddingHorizontal-OffCanvas": "$padding-normal",
-    "color-bg-OffCanvas": "$color-bg",
+    "backgroundColor-OffCanvas": "$backgroundColor",
     "boxShadow-horizontal-OffCanvas": "0 2px 10px rgba(0, 0, 0, 0.2)",
     "boxShadow-vertical-OffCanvas": "0 2px 10px rgba(0, 0, 0, 0.2)",
     light: {},

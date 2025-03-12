@@ -9,7 +9,7 @@ $themeVars: ();
 
 @mixin validationDisplayVariant($variantName) {
   &.#{$variantName} {
-    background-color: createThemeVar("color-bg-ValidationDisplay-#{$variantName}");
+    background-color: createThemeVar("backgroundColor-ValidationDisplay-#{$variantName}");
   
     &::before {
       background-color: createThemeVar("color-accent-ValidationDisplay-#{$variantName}");

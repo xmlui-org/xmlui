@@ -396,7 +396,7 @@ The `Text` component uses these theme variables:
 - `align-vertical`
 - `borderRadius`
 - `color`
-- `color-bg`
+- `backgroundColor`
 - `borderColor`
 - `textDecorationColor`
 - `fontFamily`
@@ -421,7 +421,7 @@ For example, you can set a light green background for the `abbr` variant and add
 with the following theme variables:
 
 ```json copy
-"color-bg-Text-abbr": "lightgreen",
+"backgroundColor-Text-abbr": "lightgreen",
 "paddingHorizontal-Text-abbr": "8px"
 ```
 
@@ -453,7 +453,7 @@ with the following theme variables:
       id: "custom",
       name: "Custom Theme",
       themeVars: {
-        "color-bg-Text-abbr": "lightgreen",
+        "backgroundColor-Text-abbr": "lightgreen",
         "paddingHorizontal-Text-abbr": "8px",
       },
     },
@@ -486,6 +486,28 @@ with the following theme variables:
 | [align-vertical](../styles-and-themes/common-units/#alignment)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [align-vertical](../styles-and-themes/common-units/#alignment)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [align-vertical](../styles-and-themes/common-units/#alignment)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-code | $color-surface-100 | $color-surface-800 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-codefence | $color-primary-100 | $color-primary-800 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-200 | $color-surface-800 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-marked | yellow | orange |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -577,28 +599,6 @@ with the following theme variables:
 | [borderWidth](../styles-and-themes/common-units/#size)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-code | $color-surface-100 | $color-surface-800 |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-codefence | $color-primary-100 | $color-primary-800 |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-200 | $color-surface-800 |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-marked | yellow | orange |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-Text | $color-text-primary | $color-text-primary |
 | [color](../styles-and-themes/common-units/#color)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

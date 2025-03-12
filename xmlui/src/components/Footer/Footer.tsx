@@ -11,7 +11,7 @@ export const FooterMd = createMetadata({
   description: `The \`${COMP}\` is a component that acts as a placeholder within \`App\`.`,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`color-bg-${COMP}`]: "$color-bg-AppHeader",
+    [`backgroundColor-${COMP}`]: "$backgroundColor-AppHeader",
     [`align-vertical-${COMP}`]: "center",
     [`fontSize-${COMP}`]: "$fontSize-small",
     [`color-text-${COMP}`]: "$color-text-secondary",

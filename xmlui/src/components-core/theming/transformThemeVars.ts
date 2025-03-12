@@ -127,9 +127,9 @@ export function generateButtonTones(theme?: Record<string, string>) {
       findClosest(resolvedTheme, `color-Button-${variant}-solid`),
       (tones) => {
         return {
-          [`color-bg-Button-${variant}-solid`]: tones.base,
-          [`color-bg-Button-${variant}-solid--hover`]: tones.tone1,
-          [`color-bg-Button-${variant}-solid--active`]: tones.tone2,
+          [`backgroundColor-Button-${variant}-solid`]: tones.base,
+          [`backgroundColor-Button-${variant}-solid--hover`]: tones.tone1,
+          [`backgroundColor-Button-${variant}-solid--active`]: tones.tone2,
           [`borderColor-Button-${variant}-solid`]: tones.base,
           [`borderColor-Button-${variant}-solid--hover`]: tones.base,
           [`borderColor-Button-${variant}-solid--active`]: tones.base,
@@ -144,8 +144,8 @@ export function generateButtonTones(theme?: Record<string, string>) {
       findClosest(resolvedTheme, `color-Button-${variant}-outlined`),
       (tones) => {
         return {
-          [`color-bg-Button-${variant}-outlined--hover`]: tones.alpha1,
-          [`color-bg-Button-${variant}-outlined--active`]: tones.alpha2,
+          [`backgroundColor-Button-${variant}-outlined--hover`]: tones.alpha1,
+          [`backgroundColor-Button-${variant}-outlined--active`]: tones.alpha2,
           [`borderColor-Button-${variant}-outlined`]: tones.base,
           [`borderColor-Button-${variant}-outlined--hover`]: tones.tone1,
           [`borderColor-Button-${variant}-outlined--active`]: tones.tone2,
@@ -160,8 +160,8 @@ export function generateButtonTones(theme?: Record<string, string>) {
       findClosest(resolvedTheme, `color-Button-${variant}-ghost`),
       (tones) => {
         return {
-          [`color-bg-Button-${variant}-ghost--active`]: tones.alpha2,
-          [`color-bg-Button-${variant}-ghost--hover`]: tones.alpha1,
+          [`backgroundColor-Button-${variant}-ghost--active`]: tones.alpha2,
+          [`backgroundColor-Button-${variant}-ghost--hover`]: tones.alpha1,
           [`color-text-Button-${variant}-ghost`]: tones.base,
           [`color-text-Button-${variant}-ghost--hover`]: tones.tone1,
           [`color-text-Button-${variant}-ghost--active`]: tones.tone2,

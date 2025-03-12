@@ -405,7 +405,7 @@ This component does not expose any methods.
 
 The `Button` component uses these theme variables to customize its appearance:
 
-- `color-bg`
+- `backgroundColor`
 - `borderColor`
 - `color-text`
 - `fontSize`
@@ -422,15 +422,15 @@ Outlined and ghost buttons have no background color unless active or hovered. As
 When you set a value for background-related variables, the `Button` component recalculates its background color tones toward the theme variable chain. Thus, using these variables may render different background colors than you expect with outlined and ghost buttons, as by default, they use background when they are active or hovered:
 
 ```text
-color-bg-Button-solid
-color-bg-Button-outlined
-color-bg-Button-ghost
-color-bg-Button-primary-outlined
-color-bg-Button-primary-ghost
-color-bg-Button-secondary-outlined
-color-bg-Button-secondary-ghost
-color-bg-Button-attention-outlined
-color-bg-Button-attention-ghost
+backgroundColor-Button-solid
+backgroundColor-Button-outlined
+backgroundColor-Button-ghost
+backgroundColor-Button-primary-outlined
+backgroundColor-Button-primary-ghost
+backgroundColor-Button-secondary-outlined
+backgroundColor-Button-secondary-ghost
+backgroundColor-Button-attention-outlined
+backgroundColor-Button-attention-ghost
 ```
 
 The `themeColor` and `variant` properties of `Button` are used within theme variables as traits; first the `themeColor`, and then the `variant` value. So, when setting theme variables, you can use these traits with `Button`:
@@ -517,6 +517,37 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button--disabled | $backgroundColor--disabled | $backgroundColor--disabled |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention | $backgroundColor-attention | $backgroundColor-attention |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention--active | $color-danger-500 | $color-danger-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention--hover | $color-danger-400 | $color-danger-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention-ghost--active | $color-danger-100 | $color-danger-950 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention-ghost--hover | $color-danger-50 | $color-danger-900 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention-outlined--active | $color-danger-100 | $color-danger-950 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention-outlined--hover | $color-danger-50 | $color-danger-900 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention-solid | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention-solid--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-attention-solid--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-primary | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-primary--active | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-primary--hover | $color-primary-400 | $color-primary-600 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-primary-ghost--active | $color-primary-100 | $color-primary-950 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-primary-ghost--hover | $color-primary-50 | $color-primary-900 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-primary-outlined--active | $color-primary-100 | $color-primary-950 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-primary-outlined--hover | $color-primary-50 | $color-primary-900 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-primary-solid | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-primary-solid--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-primary-solid--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary | $color-secondary-500 | $color-secondary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary--active | $color-secondary-500 | $color-secondary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary--hover | $color-secondary-400 | $color-secondary-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary-ghost--active | $color-secondary-100 | $color-secondary-950 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary-ghost--hover | $color-secondary-100 | $color-secondary-900 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary-outlined--active | $color-secondary-100 | $color-secondary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary-outlined--hover | $color-secondary-50 | $color-secondary-600 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary-solid | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary-solid--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Button-secondary-solid--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-Button--disabled | $borderColor--disabled | $borderColor--disabled |
 | [borderColor](../styles-and-themes/common-units/#color)-Button-attention | $color-attention | $color-attention |
 | [borderColor](../styles-and-themes/common-units/#color)-Button-attention-outlined | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -575,37 +606,6 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button-secondary-outlined | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button-secondary-solid | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Button-secondary-solid--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Button--disabled | $color-bg--disabled | $color-bg--disabled |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-attention | $color-bg-attention | $color-bg-attention |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-attention--active | $color-danger-500 | $color-danger-500 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-attention--hover | $color-danger-400 | $color-danger-400 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-attention-ghost--active | $color-danger-100 | $color-danger-950 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-attention-ghost--hover | $color-danger-50 | $color-danger-900 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-attention-outlined--active | $color-danger-100 | $color-danger-950 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-attention-outlined--hover | $color-danger-50 | $color-danger-900 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-attention-solid | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-attention-solid--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-attention-solid--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-primary | $color-primary-500 | $color-primary-500 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-primary--active | $color-primary-500 | $color-primary-500 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-primary--hover | $color-primary-400 | $color-primary-600 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-primary-ghost--active | $color-primary-100 | $color-primary-950 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-primary-ghost--hover | $color-primary-50 | $color-primary-900 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-primary-outlined--active | $color-primary-100 | $color-primary-950 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-primary-outlined--hover | $color-primary-50 | $color-primary-900 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-primary-solid | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-primary-solid--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-primary-solid--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-secondary | $color-secondary-500 | $color-secondary-500 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-secondary--active | $color-secondary-500 | $color-secondary-500 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-secondary--hover | $color-secondary-400 | $color-secondary-400 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-secondary-ghost--active | $color-secondary-100 | $color-secondary-950 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-secondary-ghost--hover | $color-secondary-100 | $color-secondary-900 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-secondary-outlined--active | $color-secondary-100 | $color-secondary-500 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-secondary-outlined--hover | $color-secondary-50 | $color-secondary-600 |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-secondary-solid | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-secondary-solid--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-Button-secondary-solid--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Button | $color-surface-950 | $color-surface-50 |
 | [color-text](../styles-and-themes/common-units/#color)-Button--disabled | $color-text--disabled | $color-text--disabled |
 | [color-text](../styles-and-themes/common-units/#color)-Button-attention-ghost | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

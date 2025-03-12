@@ -11,7 +11,7 @@ $width-navPanel-App: createThemeVar("width-navPanel-App");
 $boxShadow-header-App: createThemeVar("boxShadow-header-App");
 $boxShadow-pages-App: createThemeVar("boxShadow-pages-App");
 $max-content-width-App: createThemeVar("max-content-width-App");
-$color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
+$backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
@@ -180,7 +180,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   overflow-x: clip;
   top: 0;
   box-shadow: $boxShadow-header-App;
-  background-color: $color-bg-AppHeader;
+  background-color: $backgroundColor-AppHeader;
   &.sticky {
     position: sticky;
   }

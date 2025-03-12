@@ -2041,7 +2041,7 @@ export const HtmlTableMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVarsTable),
   defaultThemeVars: {
-    "color-bg-HtmlTable": "$color-bg",
+    "backgroundColor-HtmlTable": "$backgroundColor",
     "border-HtmlTable": "1px solid $borderColor",
     "marginBottom-HtmlTable": "$space-4",
     "marginTop-HtmlTable": "$space-4",
@@ -2231,10 +2231,10 @@ export const HtmlThMd = createMetadata({
     "fontSize-HtmlTh": "$fontSize-tiny",
     "fontWeight-HtmlTh": "$fontWeight-bold",
     light: {
-      "color-bg-HtmlTh--hover": "$color-surface-200",
+      "backgroundColor-HtmlTh--hover": "$color-surface-200",
     },
     dark: {
-      "color-bg-HtmlTh--hover": "$color-surface-800",
+      "backgroundColor-HtmlTh--hover": "$color-surface-800",
     },
   },
 });
@@ -2261,11 +2261,11 @@ export const HtmlTheadMd = createMetadata({
   defaultThemeVars: {
     "textTransform-HtmlThead": "uppercase",
     light: {
-      "color-bg-HtmlThead": "$color-surface-100",
+      "backgroundColor-HtmlThead": "$color-surface-100",
       "color-text-HtmlThead": "$color-surface-500",
     },
     dark: {
-      "color-bg-HtmlThead": "$color-surface-950",
+      "backgroundColor-HtmlThead": "$color-surface-950",
     },
   },
 });
@@ -2314,12 +2314,12 @@ export const HtmlTrMd = createMetadata({
   themeVars: parseScssVar(styles.themeVarsTr),
   defaultThemeVars: {
     "fontSize-HtmlTr": "$fontSize-small",
-    "color-bg-row-HtmlTr": "inherit",
+    "backgroundColor-row-HtmlTr": "inherit",
     light: {
-      "color-bg-HtmlTr--hover": "$color-primary-50",
+      "backgroundColor-HtmlTr--hover": "$color-primary-50",
     },
     dark: {
-      "color-bg-HtmlTr--hover": "$color-primary-900",
+      "backgroundColor-HtmlTr--hover": "$color-primary-900",
     },
   },
 });

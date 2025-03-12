@@ -10,12 +10,12 @@ $themeVars: ();
 $component: "NavLink";
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
-$color-bg-NavLink: createThemeVar("color-bg-#{$component}");
-$color-bg-NavLink--hover: createThemeVar("color-bg-#{$component}--hover");
-$color-bg-NavLink--hover--active: createThemeVar("color-bg-#{$component}--hover--active");
-$color-bg-NavLink--active: createThemeVar("color-bg-#{$component}--active");
-$color-bg-NavLink--pressed: createThemeVar("color-bg-#{$component}--pressed");
-$color-bg-NavLink--pressed--active: createThemeVar("color-bg-#{$component}--pressed--active");
+$backgroundColor-NavLink: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-NavLink--hover: createThemeVar("backgroundColor-#{$component}--hover");
+$backgroundColor-NavLink--hover--active: createThemeVar("backgroundColor-#{$component}--hover--active");
+$backgroundColor-NavLink--active: createThemeVar("backgroundColor-#{$component}--active");
+$backgroundColor-NavLink--pressed: createThemeVar("backgroundColor-#{$component}--pressed");
+$backgroundColor-NavLink--pressed--active: createThemeVar("backgroundColor-#{$component}--pressed--active");
 $fontSize-NavLink: createThemeVar("fontSize-#{$component}");
 $color-text-NavLink: createThemeVar("color-text-#{$component}");
 $color-text-NavLink--hover: createThemeVar("color-text-#{$component}--hover");
@@ -53,7 +53,7 @@ $transition: color 0.1s, background-color 0.1s;
     position: relative;
     transition: $transition;
     color: $color-text-NavLink;
-    background-color: $color-bg-NavLink;
+    background-color: $backgroundColor-NavLink;
     flex-shrink: 0;
     white-space: nowrap;
 
@@ -81,7 +81,7 @@ $transition: color 0.1s, background-color 0.1s;
     &:hover.displayActive,
     &:focus-visible {
       color: $color-text-NavLink--hover;
-      background-color: $color-bg-NavLink--hover;
+      background-color: $backgroundColor-NavLink--hover;
       * {
         color: $color-text-NavLink--hover;
       }
@@ -110,7 +110,7 @@ $transition: color 0.1s, background-color 0.1s;
 
     &:active.displayActive {
       color: $color-text-NavLink--pressed;
-      background-color: $color-bg-NavLink--pressed;
+      background-color: $backgroundColor-NavLink--pressed;
       font-weight: $fontWeight-NavLink--pressed;
       * {
         font-weight: $fontWeight-NavLink--pressed;
@@ -123,7 +123,7 @@ $transition: color 0.1s, background-color 0.1s;
 
     &.navItemActive {
       color: $color-text-NavLink--active;
-      background-color: $color-bg-NavLink--active;
+      background-color: $backgroundColor-NavLink--active;
       font-weight: $fontWeight-NavLink--active;
       * {
         font-weight: $fontWeight-NavLink--active;
@@ -134,7 +134,7 @@ $transition: color 0.1s, background-color 0.1s;
       }
       &:hover {
         color: $color-text-NavLink--hover--active;
-        background-color: $color-bg-NavLink--hover--active;
+        background-color: $backgroundColor-NavLink--hover--active;
         * {
           color: $color-text-NavLink--hover--active;
         }
@@ -146,7 +146,7 @@ $transition: color 0.1s, background-color 0.1s;
 
       &:active {
         color: $color-text-NavLink--pressed--active;
-        background-color: $color-bg-NavLink--pressed--active;
+        background-color: $backgroundColor-NavLink--pressed--active;
         font-weight: $fontWeight-NavLink--pressed;
         * {
           font-weight: $fontWeight-NavLink--pressed;

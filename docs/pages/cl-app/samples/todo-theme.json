@@ -11,9 +11,9 @@
     "padding-all-navLink": "0 0.5rem",
     "fontSize-navLink": "14px",
     "color-text-navLink--active": "#777",
-    "color-bg-navLink-indicator--hover": "rgba(175, 47, 47, 0.1)",
-    "color-bg-navLink-indicator--pressed": "rgba(175, 47, 47, 0.2)",
-    "color-bg-navLink-indicator--active": "rgba(175, 47, 47, 0.2)",
+    "backgroundColor-navLink-indicator--hover": "rgba(175, 47, 47, 0.1)",
+    "backgroundColor-navLink-indicator--pressed": "rgba(175, 47, 47, 0.2)",
+    "backgroundColor-navLink-indicator--active": "rgba(175, 47, 47, 0.2)",
 
     "container-padding": "0.5rem",
     "heading-fontSize": "100px",
