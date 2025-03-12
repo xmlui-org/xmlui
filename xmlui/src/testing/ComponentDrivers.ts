@@ -358,3 +358,7 @@ export class VStackDriver extends StackDriver {}
 // --- Link
 
 export class LinkDriver extends ComponentDriver {}
+
+// --- Card
+
+export class CardDriver extends ComponentDriver {}
