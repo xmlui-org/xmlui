@@ -17,7 +17,7 @@ $backgroundColor-Footer: createThemeVar("backgroundColor-#{$component}");
 $color-Footer: createThemeVar("color-#{$component}");
 $height-Footer: createThemeVar("height-#{$component}");
 $fontSize-Footer: createThemeVar("fontSize-#{$component}");
-$align-vertical-Footer: createThemeVar("align-vertical-#{$component}");
+$verticalAlign-Footer: createThemeVar("verticalAlign-#{$component}");
 $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
 
 .outerWrapper{
@@ -34,7 +34,7 @@ $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
   flex-direction: row;
   @include t.paddingVars($themeVars, $component);
   font-size: $fontSize-Footer;
-  align-items: $align-vertical-Footer;
+  align-items: $verticalAlign-Footer;
   max-width: $maxWidth-content-Footer;
   color: $color-Footer;
   margin: 0 auto;
