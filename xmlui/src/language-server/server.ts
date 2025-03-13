@@ -15,7 +15,7 @@ import {
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
-import {handleCompletion} from "./services/completion";
+import {handleCompletion, handleCompletionResolve} from "./services/completion";
 import {handleHover} from "./services/hover";
 import { createXmlUiParser, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
 
@@ -54,7 +54,7 @@ export function start(){
 			textDocumentSync: TextDocumentSyncKind.Incremental,
 			// Tell the client that this server supports code completion.
 			completionProvider: {
-				resolveProvider: false,
+				resolveProvider: true,
 				triggerCharacters: ["<", "/"],
 			},
 
@@ -92,6 +92,8 @@ export function start(){
     const parseResult = getParseResult(document);
     return handleCompletion(parseResult.parseResult, document.offsetAt(position), parseResult.getText);
   });
+
+  connection.onCompletionResolve(handleCompletionResolve);
 
   connection.onHover(({ position, textDocument }: HoverParams) => {
     connection.console.log(`Received request hover`);
@@ -141,21 +143,6 @@ export function start(){
     });
     return { parseResult, getText: parser.getText };
   }
-
-  // This handler resolves additional information for the item selected in
-  // the completion list.
-  connection.onCompletionResolve(
-	(item: CompletionItem): CompletionItem => {
-		if (item.data === 1) {
-			item.detail = 'TypeScript details';
-			item.documentation = 'TypeScript documentation';
-		} else if (item.data === 2) {
-			item.detail = 'JavaScript details';
-			item.documentation = 'JavaScript documentation';
-		}
-		return item;
-	}
-  );
 
   // Make the text document manager listen on the connection
   // for open, change and close text document events
