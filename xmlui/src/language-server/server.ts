@@ -15,6 +15,7 @@ import {
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
+import { collectedComponentMetadata } from "./xmlui-metadata.mjs";
 import {handleCompletion, handleCompletionResolve} from "./services/completion";
 import {handleHover} from "./services/hover";
 import { createXmlUiParser, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
@@ -103,7 +104,11 @@ export function start(){
     }
 
     const parseResult = getParseResult(document);
-    const hoverRes = handleHover(parseResult, document.offsetAt(position));
+    const ctx = {
+      parseResult,
+      collectedComponentMetadata
+    }
+    const hoverRes = handleHover(ctx, document.offsetAt(position));
     if (hoverRes === null){
       return null;
     }
