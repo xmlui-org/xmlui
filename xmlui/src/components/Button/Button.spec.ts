@@ -112,10 +112,20 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   // import from abstractions: buttonThemeMd
   ["solid", "outlined", "ghost"].forEach((variant) => {
     ["primary", "secondary", "attention"].forEach((themeColor) => {
-      test.skip(
+      test(
         `themeColor "${themeColor}" is applied for variant "${variant}"`,
-        SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-        async ({ initTestBed, createButtonDriver }) => {},
+        async ({ initTestBed, createButtonDriver }) => {
+          const EXPECTED_COLOR = "rgb(255, 0, 0)";
+          const EXPECTED_WIDTH = "5px";
+          const EXPECTED_STYLE = "dotted";
+
+          await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
+            testThemeVars: {
+              [`backgroundColor-Button-${themeColor}-${variant}`]: "EXPECTED_COLOR",
+            }
+          });
+          await expect((await createButtonDriver()).component).toHaveCSS("background-color", EXPECTED_COLOR);
+        },
       );
       ["disabled", "hover", "active", "focused"].forEach((state) => {
         test.skip(
@@ -259,6 +269,7 @@ const iconPositionCases: {
   { position: "right", value: "end" },
 ];
 
+// This is a helper function to calculate the icon position
 async function iconPositionCalculation(buttonDriver: ComponentDriver, iconDriver: ComponentDriver) {
   const buttonBounds = await buttonDriver.getComponentBounds();
   const buttonPadding = await buttonDriver.getPaddings();
@@ -309,6 +320,8 @@ iconPositionCases.forEach(({ position, value }) => {
     const { buttonContentLeft, buttonContentRight, iconLeft, iconRight } =
       await iconPositionCalculation(buttonDriver, iconDriver);
 
+    // Depending on orientation, the icon's leftmost and rightmost points fall shorter
+    // compared to the button's leftmost and rightmost points because of the label 
     if (value === "start") {
       expect(buttonContentLeft).toBeCloseTo(iconLeft, 5);
       expect(buttonContentRight).toBeGreaterThan(iconRight + 1);
@@ -341,6 +354,8 @@ iconPositionCases.forEach(({ position, value }) => {
     const { buttonContentLeft, buttonContentRight, iconLeft, iconRight } =
       await iconPositionCalculation(buttonDriver, iconDriver);
 
+    // Depending on orientation, the icon's leftmost and rightmost points fall shorter
+    // compared to the button's leftmost and rightmost points because of the children
     if (value === "start") {
       expect(buttonContentLeft).toBeCloseTo(iconLeft, 5);
       expect(buttonContentRight).toBeGreaterThan(iconRight + 1);
