@@ -54,7 +54,7 @@ function hoverAttr({
   parentStack,
   getText,
 }: {
-  collectedComponentMetadata: any
+  collectedComponentMetadata: ComponentMetadataCollection,
   attrKeyNode: Node,
   parentStack: Node[],
   getText: GetText
@@ -125,7 +125,7 @@ function hoverName({
   identNode,
   getText
 }: {
-  collectedComponentMetadata: any,
+  collectedComponentMetadata: ComponentMetadataCollection,
   tagNameNode: Node;
   identNode: Node;
   getText: GetText;

@@ -1,6 +1,7 @@
+import type { ComponentMetadata, ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
 
 
-export function generateCompNameDescription(componentName: string, metadata: any): string {
+export function generateCompNameDescription(componentName: string, metadata: ComponentMetadata): string {
   const sections: string[] = [];
 
   // Add title and description
@@ -62,7 +63,7 @@ export function generateCompNameDescription(componentName: string, metadata: any
   return sections.join('\n\n');
 }
 
-export function generatePropDescription(propName: string, prop: any){
+export function generatePropDescription(propName: string, prop: ComponentPropertyMetadata){
   let propText = `### \`${propName}\`\n${(prop as any).description}`;
 
   if ((prop as any).defaultValue !== undefined) {
