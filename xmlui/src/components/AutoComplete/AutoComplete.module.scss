@@ -128,6 +128,9 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   &::placeholder {
     color: createThemeVar("Input:color-placeholder-#{$component}");
   }
+  &:focus-within {
+    outline: none;
+  }
 }
 
 .actions {
