@@ -15,7 +15,9 @@ import {
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
-import {handleCompletion, handleCompletionResolve} from "./services/completion";
+import { collectedComponentMetadata } from "./xmlui-metadata.mjs";
+import type {XmluiCompletionItem} from "./services/completion";
+import { handleCompletion, handleCompletionResolve} from "./services/completion";
 import {handleHover} from "./services/hover";
 import { createXmlUiParser, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
 
@@ -90,10 +92,12 @@ export function start(){
       return [];
     }
     const parseResult = getParseResult(document);
-    return handleCompletion(parseResult.parseResult, document.offsetAt(position), parseResult.getText);
+    return handleCompletion({ parseResult: parseResult.parseResult, getText: parseResult.getText, metaByComp: collectedComponentMetadata }, document.offsetAt(position));
   });
 
-  connection.onCompletionResolve(handleCompletionResolve);
+  connection.onCompletionResolve((completionItem: XmluiCompletionItem) => {
+    return handleCompletionResolve({collectedComponentMetadata, item: completionItem})
+  });
 
   connection.onHover(({ position, textDocument }: HoverParams) => {
     connection.console.log(`Received request hover`);
@@ -103,7 +107,11 @@ export function start(){
     }
 
     const parseResult = getParseResult(document);
-    const hoverRes = handleHover(parseResult, document.offsetAt(position));
+    const ctx = {
+      parseResult,
+      collectedComponentMetadata
+    }
+    const hoverRes = handleHover(ctx, document.offsetAt(position));
     if (hoverRes === null){
       return null;
     }

@@ -8,7 +8,7 @@
     "build:bin": "tsc -p tsconfig.bin.json",
     "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
-    "build:xmlui-metadata": "vite build --mode metadata && node scripts/cp-metadata-to-langserver.js",
+    "build:xmlui-metadata": "vite build --mode metadata",
     "build:ext-meta": "node scripts/build-extension-packages/build-extension-packages.mjs",
     "build": "rimraf dist && tsc && npm run build:bin && npm run build:xmlui-metadata && npm run build:xmlui && npm run build:xmlui-standalone",
     "test": "npm run test:unit",

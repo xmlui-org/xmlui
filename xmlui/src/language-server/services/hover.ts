@@ -1,10 +1,10 @@
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { findTokenAtPos, toDbgString } from "../../parsers/xmlui-parser/utils"
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
-import { collectedComponentMetadata } from "../xmlui-metadata.mjs";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
 import * as docGen from "./docs-generation"
+import type { ComponentMetadataCollection } from "../../components/collectedComponentMetadata";
 
 type SimpleHover = null | {
   value: string;
@@ -14,10 +14,14 @@ type SimpleHover = null | {
   };
 };
 
+type HoverContex = {
+  parseResult: {parseResult: ParseResult, getText: GetText},
+  collectedComponentMetadata: ComponentMetadataCollection
+}
 /**
  * @returns The hover content string
  */
-export function handleHover({ parseResult: {node}, getText }: {parseResult: ParseResult, getText: GetText}, position: number): SimpleHover {
+export function handleHover({ parseResult: { parseResult: { node }, getText }, collectedComponentMetadata}: HoverContex, position: number): SimpleHover {
   const findRes = findTokenAtPos(node, position);
   console.log("findres: ",findRes);
 
@@ -33,10 +37,10 @@ export function handleHover({ parseResult: {node}, getText }: {parseResult: Pars
     case SyntaxKind.Identifier:
       switch (parentNode?.kind){
         case SyntaxKind.TagNameNode:{
-          return hoverName(parentNode, atNode, getText);
+          return hoverName({ collectedComponentMetadata, tagNameNode: parentNode, identNode: atNode, getText });
         }
         case SyntaxKind.AttributeKeyNode:{
-          return hoverAttr(parentNode, chainAtPos.slice(0, -2), getText);
+          return hoverAttr({ collectedComponentMetadata, attrKeyNode: parentNode, parentStack: chainAtPos.slice(0, -2), getText });
         }
       }
       break;
@@ -44,7 +48,17 @@ export function handleHover({ parseResult: {node}, getText }: {parseResult: Pars
   return null;
 }
 
-function hoverAttr(attrKeyNode: Node, parentStack: Node[], getText: GetText): SimpleHover {
+function hoverAttr({
+  collectedComponentMetadata,
+  attrKeyNode,
+  parentStack,
+  getText,
+}: {
+  collectedComponentMetadata: ComponentMetadataCollection,
+  attrKeyNode: Node,
+  parentStack: Node[],
+  getText: GetText
+}): SimpleHover {
   if (parentStack.at(-1).kind !== SyntaxKind.AttributeNode){
     return null;
   }
@@ -105,7 +119,17 @@ function hoverAttr(attrKeyNode: Node, parentStack: Node[], getText: GetText): Si
   }
 }
 
-function hoverName(tagNameNode: Node, identNode: Node, getText: GetText): SimpleHover {
+function hoverName({
+  collectedComponentMetadata,
+  tagNameNode,
+  identNode,
+  getText
+}: {
+  collectedComponentMetadata: ComponentMetadataCollection,
+  tagNameNode: Node;
+  identNode: Node;
+  getText: GetText;
+}): SimpleHover {
   const compName = compNameForTagNameNode(tagNameNode, getText)
   if (!compName) {
     return null;
