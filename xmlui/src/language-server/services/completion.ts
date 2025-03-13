@@ -1,16 +1,47 @@
-import type { CompletionItem } from "vscode-languageserver";
+import { CompletionItemKind, type CompletionItem, MarkupContent, MarkupKind } from "vscode-languageserver";
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { findTokenAtPos } from "../../parsers/xmlui-parser/utils"
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { collectedComponentMetadata } from "../xmlui-metadata.mjs";
+import * as docGen from "./docs-generation"
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
+
+type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<Type, keyof NewType> & NewType;
+
+type XmluiCompletionData = {
+  metadataAccessInfo: {
+    componentName: string
+  } | {
+    componentName: string
+    prop: string
+  }
+}
+
+type XmluiCompletionItem = Override<CompletionItem, { data?: XmluiCompletionData }>;
+
+export function handleCompletionResolve(item: XmluiCompletionItem): CompletionItem {
+  const metadataAccessInfo = item?.data?.metadataAccessInfo;
+  if (metadataAccessInfo) {
+    collectedComponentMetadata.Alert.props
+    const { componentName } = metadataAccessInfo;
+    const componentMeta = collectedComponentMetadata[componentName];
+    if ("prop" in metadataAccessInfo) {
+      const propName = metadataAccessInfo.prop;
+      const propMeta = componentMeta.props[propName]
+      item.documentation = markupContent(docGen.generatePropDescription(propName, propMeta));
+    } else {
+      item.documentation = markupContent(docGen.generateCompNameDescription(componentName, componentMeta));
+    }
+  }
+  return item;
+}
 
 export function handleCompletion(
   { node }: ParseResult,
   position: number,
   getText: (n: Node) => string,
-): CompletionItem[] | null {
+): XmluiCompletionItem[] | null {
   const findRes = findTokenAtPos(node, position);
   if (!findRes) {
     return null;
@@ -50,14 +81,14 @@ type FindTokenSuccessHasBefore = {
 };
 
 function allComponentNames(): CompletionItem[] {
-  return Object.keys(collectedComponentMetadata).map(name => ({label: name}));
+  return Object.keys(collectedComponentMetadata).map(componentCompletionItem);
 }
 
 function matchingTagName(
   { chainAtPos, chainBeforePos, sharedParents }: FindTokenSuccessHasBefore,
   getText: GetText,
 ): CompletionItem[]|null{
-  let parentBefore;
+  let parentBefore: Node;
   if (chainBeforePos.length > 1) {
     parentBefore = chainBeforePos[chainBeforePos.length - 2];
   } else if (sharedParents! > 0) {
@@ -88,10 +119,11 @@ function matchingTagName(
     }
     name = getText(nameIdent);
     const value = nameSpace !== undefined ? nameSpace + ":" + name : name;
-    return [{ label: value }];
+    return [componentCompletionItem(value)];
   }
   return null;
 }
+
 
 function handleCompletionInsideToken(chainAtPos: Node[], position: number, getText: (n: Node) => string): CompletionItem[] {
   const parent = chainAtPos.at(-2);
@@ -116,5 +148,40 @@ function completionForNewProps(compName: string): CompletionItem[] | null {
   if (!metadata || !metadata.props){
     return null;
   }
-  return Object.keys(metadata.props).map(propName => ({ label: propName }));
+  return Object.keys(metadata.props).map((propName) => propCompletionItem(compName, propName));
+}
+
+function componentCompletionItem(name:string): XmluiCompletionItem{
+  return {
+    label: name,
+    kind: CompletionItemKind.Constructor,
+    labelDetails: {
+      description: "Core component"
+    },
+    data: {
+      metadataAccessInfo: {
+        componentName: name
+      }
+    }
+  }
+}
+
+function propCompletionItem(componentName:string, name:string): XmluiCompletionItem{
+  return {
+    label: name,
+    kind: CompletionItemKind.Property,
+    data: {
+      metadataAccessInfo:{
+        prop: name,
+        componentName: componentName,
+      }
+    }
+  }
+}
+
+function markupContent(content: string): MarkupContent{
+  return {
+    kind: MarkupKind.Markdown,
+    value: content
+  }
 }
