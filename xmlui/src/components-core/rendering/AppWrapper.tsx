@@ -16,6 +16,8 @@ import { GlobalProps, queryClient } from "./AppRoot";
 import { AppContent } from "./AppContent";
 import { ContainerWrapperDef } from "./ContainerWrapper";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { DevTools } from "../DevTools";
 
 export type AppWrapperProps = {
   // --- The root node of the application definition; the internal

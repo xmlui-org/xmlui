@@ -1,5 +1,6 @@
 import {
   createContext,
+  MouseEvent,
   useCallback,
   useContext,
   useEffect,
@@ -18,6 +19,8 @@ import { XmluiCodeHighlighter } from "./XmluiCodeHighlighter";
 import { Button } from "../components/Button/ButtonNative";
 import Icon from "../components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
+import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
+import { DevTools } from "./DevTools";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {
@@ -156,7 +159,7 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
         },
       },
       {
-        name: 'flip',
+        name: "flip",
         enabled: false,
         // options: {
         //   fallbackPlacements: ['top', 'right'],
@@ -229,11 +232,11 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
               setShowCode(true);
             }}
           >
-            <Icon name={"inspect"} size={"md"}/>
+            <Icon name={"inspect"} size={"md"} />
           </Button>,
           root,
         )}
-      {showCode && <InspectModal onClose={() => setShowCode(false)} node={node} />}
+      <DevTools isOpen={showCode} setIsOpen={setShowCode} />
     </>
   );
 }
