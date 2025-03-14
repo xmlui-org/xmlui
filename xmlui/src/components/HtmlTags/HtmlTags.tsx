@@ -2262,7 +2262,7 @@ export const HtmlTheadMd = createMetadata({
     "textTransform-HtmlThead": "uppercase",
     light: {
       "backgroundColor-HtmlThead": "$color-surface-100",
-      "color-HtmlThead": "$color-surface-500",
+      "textColor-HtmlThead": "$color-surface-500",
     },
     dark: {
       "backgroundColor-HtmlThead": "$color-surface-950",

@@ -437,14 +437,14 @@ You can query the component's value. If no value is set, it will retrieve `undef
 The `DatePicker` component provides these theme variables to customize its appearance:
 
 - `borderRadius-DatePicker`
-- `color-DatePicker`
+- `textColor-DatePicker`
 - `backgroundColor-DatePicker--disabled`
 - `borderWidth-DatePicker`
 - `borderStyle-DatePicker`
 - `borderColor-DatePicker--disabled`
 - `backgroundColor-DatePicker--disabled`
-- `color-DatePicker--disabled`
-- `color-value-DatePicker`
+- `textColor-DatePicker--disabled`
+- `textColor-value-DatePicker`
 - `borderColor-DatePicker-default`
 - `borderColor-DatePicker-error`
 - `borderColor-DatePicker-warning`
@@ -461,7 +461,7 @@ The `DatePicker` component provides these theme variables to customize its appea
   "borderRadius-DatePicker": "30px",
   "borderWidth-DatePicker": "4px",
   "borderRadius-menu-DatePicker": "30px",
-  "color-DatePicker": "black",
+  "textColor-DatePicker": "black",
   "backgroundColor-menu-DatePicker": "#f5f5dc"
 }
 ```
@@ -478,7 +478,7 @@ The `DatePicker` component provides these theme variables to customize its appea
         "borderRadius-DatePicker": "30px",
         "borderWidth-DatePicker": "4px",
         "borderRadius-menu-DatePicker": "30px",
-        "color-DatePicker": "black",
+        "textColor-DatePicker": "black",
         "backgroundColor-menu-DatePicker": "#f5f5dc"
       },
     },
@@ -493,7 +493,7 @@ The `DatePicker` component provides these theme variables to customize its appea
 To style all input controls not just this component, use `Input` instead of the `DatePicker` segment:
 
 ```
-color-Input: "#0033FF"
+textColor-Input: "#0033FF"
 ```
 
 `Input` affects the following controls:
@@ -559,25 +559,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-DatePicker | $boxShadow-md | $boxShadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-DatePicker | $boxShadow-md | $boxShadow-md |
-| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-adornment-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-DatePicker--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-DatePicker-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-DatePicker-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-placeholder-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-value-DatePicker | $textColor-primary | $textColor-primary |
-| [color](../styles-and-themes/common-units/#color)-value-DatePicker | $textColor-primary | $textColor-primary |
 | [fontSize](../styles-and-themes/common-units/#size)-DatePicker | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [minHeight](../styles-and-themes/common-units/#size)-DatePicker | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [outlineColor](../styles-and-themes/common-units/#color)-DatePicker-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -600,3 +581,22 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-adornment-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-adornment-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-adornment-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-adornment-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-DatePicker--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-DatePicker-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-DatePicker-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-DatePicker-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-DatePicker-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-placeholder-DatePicker-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-placeholder-DatePicker-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-placeholder-DatePicker-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-placeholder-DatePicker-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| textColor-value-DatePicker | $textColor-primary | $textColor-primary |
+| textColor-value-DatePicker | $textColor-primary | $textColor-primary |

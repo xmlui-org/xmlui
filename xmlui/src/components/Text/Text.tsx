@@ -52,7 +52,7 @@ export const TextMd = createMetadata({
     [`textTransform-${COMP}-abbr`]: "uppercase",
     [`fontSize-${COMP}-secondary`]: "$fontSize-small",
     [`font-style-${COMP}-cite`]: "italic",
-    [`color-${COMP}`]: "$textColor-primary",
+    [`textColor-${COMP}`]: "$textColor-primary",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
     [`fontFamily-${COMP}-code`]: "$fontFamily-monospace",

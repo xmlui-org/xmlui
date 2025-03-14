@@ -10,7 +10,7 @@ $themeVarsTable: (
   @return t.getThemeVar($themeVarsTable, $componentVariable);
 }
 
-$color-HtmlTable: createThemeVarTable("color-HtmlTable");
+$textColor-HtmlTable: createThemeVarTable("textColor-HtmlTable");
 $backgroundColor-HtmlTable: createThemeVarTable("backgroundColor-HtmlTable");
 $fontFamily-HtmlTable: createThemeVarTable("fontFamily-HtmlTable");
 $fontSize-HtmlTable: createThemeVarTable("fontSize-HtmlTable");
@@ -23,7 +23,7 @@ $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
 
 .htmlTable {
   background-color: $backgroundColor-HtmlTable;
-  color: $color-HtmlTable;
+  color: $textColor-HtmlTable;
   font-family: $fontFamily-HtmlTable;
   font-size: $fontSize-HtmlTable;
   font-weight: $fontWeight-HtmlTable;
@@ -45,7 +45,7 @@ $themeVarsThead: (
 }
 
 $backgroundColor-HtmlThead: createThemeVarThead("backgroundColor-HtmlThead");
-$color-HtmlThead: createThemeVarThead("color-HtmlThead");
+$textColor-HtmlThead: createThemeVarThead("textColor-HtmlThead");
 $fontWeight-HtmlThead: createThemeVarThead("fontWeight-HtmlThead");
 $fontSize-HtmlThead: createThemeVarThead("fontSize-HtmlThead");
 $textTransform-HtmlThead: createThemeVarThead("textTransform-HtmlThead");
@@ -54,7 +54,7 @@ $themeVarsThead: t.composePaddingVars($themeVarsThead, "HtmlThead");
 
 .htmlThead {
   background-color: $backgroundColor-HtmlThead;
-  color: $color-HtmlThead;
+  color: $textColor-HtmlThead;
   font-weight: $fontWeight-HtmlThead;
   font-size: $fontSize-HtmlThead;
   text-transform: $textTransform-HtmlThead;
@@ -73,14 +73,14 @@ $themeVarsTbody: (
 }
 
 $backgroundColor-HtmlTbody: createThemeVarTbody("backgroundColor-HtmlTbody");
-$color-HtmlTbody: createThemeVarTbody("color-HtmlTbody");
+$textColor-HtmlTbody: createThemeVarTbody("textColor-HtmlTbody");
 $textAlign-HtmlTbody: createThemeVarTbody("textAlign-HtmlTbody");
 $verticalAlign-HtmlTbody: createThemeVarTbody("verticalAlign-HtmlTbody");
 $textTransform-HtmlTbody: createThemeVarTbody("textTransform-HtmlTbody");
 
 .htmlTbody {
   background-color: $backgroundColor-HtmlTbody;
-  color: $color-HtmlTbody;
+  color: $textColor-HtmlTbody;
   text-align: $textAlign-HtmlTbody;
   vertical-align: $verticalAlign-HtmlTbody;
   text-transform: $textTransform-HtmlTbody;
@@ -97,11 +97,11 @@ $themeVarsTfoot: (
 }
 
 $backgroundColor-HtmlTfoot: createThemeVarTfoot("backgroundColor-HtmlTfoot");
-$color-HtmlTfoot: createThemeVarTfoot("color-HtmlTfoot");
+$textColor-HtmlTfoot: createThemeVarTfoot("textColor-HtmlTfoot");
 
 .htmlTfoot {
   background-color: $backgroundColor-HtmlTfoot;
-  color: $color-HtmlTfoot;
+  color: $textColor-HtmlTfoot;
 }
 
 // --- th
@@ -115,7 +115,7 @@ $themeVarsTh: (
 }
 
 $backgroundColor-HtmlTh: createThemeVarTh("backgroundColor-HtmlTh");
-$color-HtmlTh: createThemeVarTh("color-HtmlTh");
+$textColor-HtmlTh: createThemeVarTh("textColor-HtmlTh");
 $fontWeight-HtmlTh: createThemeVarTh("fontWeight-HtmlTh");
 $fontSize-HtmlTh: createThemeVarTh("fontSize-HtmlTh");
 $backgroundColor-HtmlTh--hover: createThemeVarTh("backgroundColor-HtmlTh--hover");
@@ -124,7 +124,7 @@ $themeVarsTh: t.composePaddingVars($themeVarsTh, "HtmlTh");
 
 .htmlTh {
   background-color: $backgroundColor-HtmlTh;
-  color: $color-HtmlTh;
+  color: $textColor-HtmlTh;
   font-weight: $fontWeight-HtmlTh;
   font-size: $fontSize-HtmlTh;
   @include t.borderVars($themeVarsTh, "HtmlTh");
@@ -148,15 +148,15 @@ $themeVarsTr: (
 $backgroundColor-HtmlTr: createThemeVarTr("backgroundColor-HtmlTr");
 $backgroundColor-HtmlTr--hover: createThemeVarTr("backgroundColor-HtmlTr--hover");
 $backgroundColor-even-HtmlTr: createThemeVarTr("backgroundColor-even-HtmlTr");
-$color-HtmlTr: createThemeVarTr("color-HtmlTr");
-$color-HtmlTr--hover: createThemeVarTr("color-HtmlTr--hover");
+$textColor-HtmlTr: createThemeVarTr("textColor-HtmlTr");
+$textColor-HtmlTr--hover: createThemeVarTr("textColor-HtmlTr--hover");
 $fontSize-HtmlTr: createThemeVarTr("fontSize-HtmlTr");
 $fontWeight-HtmlTr: createThemeVarTr("fontWeight-HtmlTr");
 $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
 
 .htmlTr {
   background-color: $backgroundColor-HtmlTr;
-  color: $color-HtmlTr;
+  color: $textColor-HtmlTr;
   font-weight: $fontWeight-HtmlTr;
   font-size: $fontSize-HtmlTr;
   @include t.borderVars($themeVarsTr, "HtmlTr");
@@ -168,7 +168,7 @@ $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
   // Apply hover effect for rows with mixed th, td elements
   &:hover {
     background-color: $backgroundColor-HtmlTr--hover;
-    color: $color-HtmlTr--hover;
+    color: $textColor-HtmlTr--hover;
   }
 
   // Remove hover effect for rows with only th elements

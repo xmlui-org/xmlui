@@ -70,14 +70,14 @@ export const TextBoxMd = createMetadata({
   defaultThemeVars: {
     // TODO: When FormItem is themed, move these defaults there
     "borderRadius-Input": "$borderRadius",
-    "color-Input": "$textColor-primary",
+    "textColor-Input": "$textColor-primary",
     "backgroundColor-Input--disabled": "$backgroundColor--disabled",
     "borderWidth-Input": "1px",
     "minHeight-Input": "39px",
     "padding-Input": "$space-2",
     "borderStyle-Input": "solid",
     "borderColor-Input--disabled": "$borderColor--disabled",
-    "color-Input--disabled": "$textColor--disabled",
+    "textColor-Input--disabled": "$textColor--disabled",
     "borderColor-Input-error": "$borderColor-Input-default--error",
     "borderColor-Input-warning": "$borderColor-Input-default--warning",
     "borderColor-Input-success": "$borderColor-Input-default--success",

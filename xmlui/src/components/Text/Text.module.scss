@@ -20,7 +20,7 @@ $component: "Text";
   text-decoration-thickness: createThemeVar('textDecorationThickness-#{$component}-#{$variant}');
   text-underline-offset: createThemeVar('textUnderlineOffset-#{$component}-#{$variant}');
   line-height: createThemeVar("lineHeight-#{$component}-#{$variant}");
-  color: createThemeVar("color-Text-#{$variant}");
+  color: createThemeVar("textColor-Text-#{$variant}");
   background-color: createThemeVar("backgroundColor-#{$component}-#{$variant}");
   border-radius: createThemeVar("borderRadius-#{$component}-#{$variant}");
   border-color: createThemeVar("borderColor-#{$component}-#{$variant}");

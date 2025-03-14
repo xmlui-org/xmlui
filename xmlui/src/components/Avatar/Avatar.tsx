@@ -34,7 +34,7 @@ export const AvatarMd = createMetadata({
   defaultThemeVars: {
     [`borderRadius-${COMP}`]: "4px",
     [`boxShadow-${COMP}`]: "inset 0 0 0 1px rgba(4,32,69,0.1)",
-    [`color-${COMP}`]: "$textColor-secondary",
+    [`textColor-${COMP}`]: "$textColor-secondary",
     [`fontWeight-${COMP}`]: "$fontWeight-bold",
     light: {
       [`border-${COMP}`]: "0px solid $color-surface-400A80",

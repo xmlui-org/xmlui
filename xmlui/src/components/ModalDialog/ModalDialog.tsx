@@ -66,7 +66,7 @@ export const ModalDialogMd = createMetadata({
     ...paddingSubject(COMP, { all: "$space-7" }),
     [`backgroundColor-${COMP}`]: "$backgroundColor-primary",
     [`backgroundColor-overlay-${COMP}`]: "$backgroundColor-overlay",
-    [`color-${COMP}`]: "$textColor-primary",
+    [`textColor-${COMP}`]: "$textColor-primary",
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`maxWidth-${COMP}`]: "450px",
