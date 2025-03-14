@@ -5,7 +5,7 @@ import { Rnd } from "react-rnd";
 import { XmluiCodeHighlighter } from "./XmluiCodeHighlighter";
 import { useTheme } from "./theming/ThemeContext";
 import { createPortal } from "react-dom";
-import { InspectorContext } from "./InspectorContext";
+import { InspectorContext, useDevTools } from "./InspectorContext";
 import { Button } from "../components/Button/ButtonNative";
 import styles from "./DevTools.module.scss";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
@@ -15,13 +15,15 @@ import { HiOutlineDotsVertical } from "react-icons/all";
 
 type Props = {
   setIsOpen: (isOpen: boolean) => void;
+  setIsDocked: (isDocked: boolean) => void;
+  isDocked: boolean;
   node: any;
 };
 
-export const DevTools = ({ setIsOpen, node }: Props) => {
-  const [isDocked, setIsDocked] = useState(true);
+export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
   const [side, setSide] = useState<"bottom" | "left" | "right">("bottom");
   const { root } = useTheme();
+  const { setDevToolsSize, setDevToolsSide } = useDevTools();
 
   const { sources } = useContext(InspectorContext)!;
   const value = useMemo(() => {
@@ -88,7 +90,7 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
   useEffect(() => {
     setSize(getInitialSize());
     setPosition(getInitialPosition());
-  }, [getInitialPosition, getInitialSize, side]);
+  }, [getInitialPosition, getInitialSize]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -99,6 +101,15 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [getInitialPosition, getInitialSize, side]);
+
+  useEffect(() => {
+    setDevToolsSide(side);
+    if (side === "bottom") {
+      setDevToolsSize(size.height);
+    } else {
+      setDevToolsSize(size.width);
+    }
+  }, [setDevToolsSide, setDevToolsSize, side, size]);
 
   return createPortal(
     <Rnd

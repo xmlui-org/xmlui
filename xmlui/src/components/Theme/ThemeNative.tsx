@@ -10,11 +10,16 @@ import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
 import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
-import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../components-core/theming/abstractions";
+import type {
+  ThemeDefinition,
+  ThemeScope,
+  ThemeTone,
+} from "../../components-core/theming/abstractions";
 import { getVarKey } from "../../components-core/theming/themeVars";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { NotificationToast } from "./NotificationToast";
+import { useDevTools } from "../../components-core/InspectorContext";
 
 function getClassName(css: string) {
   return `theme-${calculateHash(css)}`;
@@ -81,8 +86,13 @@ export function Theme({
     return foundTheme;
   }, [activeTheme, generatedId, id, themeTone, themeVars, themes]);
 
-  const { themeCssVars, getResourceUrl, fontLinks, allThemeVarsWithResolvedHierarchicalVars, getThemeVar } =
-    useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
+  const {
+    themeCssVars,
+    getResourceUrl,
+    fontLinks,
+    allThemeVarsWithResolvedHierarchicalVars,
+    getThemeVar,
+  } = useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
   const { css, className, rangeClassName, fromClass, toClass } = useMemo(() => {
     const vars = { ...themeCssVars, "color-scheme": themeTone };
     // const vars = themeCssVars;
@@ -152,18 +162,29 @@ export function Theme({
     getThemeVar,
   ]);
 
+  const { devToolsSize, devToolsSide, devToolsEnabled, dockedDevtools } = useDevTools();
+
+  const inspectStyle = useMemo(() => {
+    return devToolsEnabled && dockedDevtools
+      ? {
+          paddingBottom: devToolsSide === "bottom" ? devToolsSize : 0,
+          paddingLeft: devToolsSide === "left" ? devToolsSize : 0,
+          paddingRight: devToolsSide === "right" ? devToolsSize : 0,
+        }
+      : {};
+  }, [devToolsEnabled, devToolsSide, devToolsSize, dockedDevtools]);
+
   if (isRoot) {
     const faviconUrl = getResourceUrl("resource:favicon") || "/resources/favicon.ico";
     return (
       <>
         <Helmet>
           {!!faviconUrl && <link rel="icon" type="image/svg+xml" href={faviconUrl} />}
-          {fontLinks?.map((fontLink) => (
-            <link href={fontLink} rel={"stylesheet"} key={fontLink} />
-          ))}
+          {fontLinks?.map((fontLink) => <link href={fontLink} rel={"stylesheet"} key={fontLink} />)}
         </Helmet>
         <style>{`.${className} {${css}}`}</style>
         <div
+          style={inspectStyle}
           id={"_ui-engine-theme-root"}
           className={classnames(styles.baseRootComponent, className)}
           ref={(el) => {
@@ -197,7 +218,7 @@ export function Theme({
               }
             }}
           ></div>,
-          root
+          root,
         )}
     </ThemeContext.Provider>
   );

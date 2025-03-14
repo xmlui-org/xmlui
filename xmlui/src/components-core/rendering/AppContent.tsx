@@ -161,9 +161,7 @@ export function AppContent({
     const mwTablet = getComputedStyle(root!).getPropertyValue(getVarKey("maxWidth-tablet"));
     setMaxWidthTablet(mwTablet);
     setMaxWidthTabletLower(createLowerDimensionValue(mwTablet));
-    const mwDesktop = getComputedStyle(root!).getPropertyValue(
-      getVarKey("maxWidth-desktop"),
-    );
+    const mwDesktop = getComputedStyle(root!).getPropertyValue(getVarKey("maxWidth-desktop"));
     setMaxWidthDesktop(mwDesktop);
     setMaxWidthDesktopLower(createLowerDimensionValue(mwDesktop));
     const mwLargeDesktop = getComputedStyle(root!).getPropertyValue(

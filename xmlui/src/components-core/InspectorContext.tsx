@@ -26,6 +26,12 @@ interface IInspectorContext {
   attach: (node: ComponentDef, uid: symbol, inspectId: string) => void;
   detach: (uid: symbol, inspectId: string) => void;
   refresh: (inspectId: string) => void;
+  devToolsSize?: number;
+  setDevToolsSize: (size: number) => void;
+  devToolsSide?: "bottom" | "left" | "right";
+  setDevToolsSide: (side: "bottom" | "left" | "right") => void;
+  devToolsEnabled?: boolean;
+  dockedDevtools?: boolean;
 }
 
 // --- The context object that is used to store the inspector information.
@@ -41,6 +47,9 @@ export function InspectorProvider({
   const [inspectable, setInspectable] = useState<Record<string, any>>({});
   const [inspectedNode, setInspectedNode] = useState<ComponentDef | null>(null);
   const [showCode, setShowCode] = useState(false);
+  const [devToolsSize, setDevToolsSize] = useState(0);
+  const [devToolsSide, setDevToolsSide] = useState<"bottom" | "left" | "right">("bottom");
+  const [dockedDevTools, setDockedDevTools] = useState(true);
 
   const contextValue: IInspectorContext = useMemo(() => {
     return {
@@ -76,20 +85,27 @@ export function InspectorProvider({
           return ret;
         });
       },
+      devToolsSize,
+      setDevToolsSize,
+      devToolsSide,
+      setDevToolsSide,
+      devToolsEnabled: showCode,
+      dockedDevtools: dockedDevTools,
     };
-  }, [sources]);
+  }, [devToolsSide, devToolsSize, dockedDevTools, showCode, sources]);
 
   return (
     <InspectorContext.Provider value={contextValue}>
       {children}
-      {
-        showCode && inspectedNode &&
+      {showCode && inspectedNode && (
         <DevTools
           setIsOpen={setShowCode}
           node={inspectedNode}
           key={inspectedNode?.uid}
+          setIsDocked={setDockedDevTools}
+          isDocked={dockedDevTools}
         />
-      }
+      )}
       {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
         inspectable &&
         Object.values(inspectable).map((item: any) => {
@@ -210,6 +226,18 @@ function InspectButton({
         )}
     </>
   );
+}
+
+export function useDevTools() {
+  const context = useContext(InspectorContext);
+  return {
+    devToolsSize: context?.devToolsSize,
+    setDevToolsSize: context?.setDevToolsSize,
+    devToolsSide: context?.devToolsSide,
+    setDevToolsSide: context?.setDevToolsSide,
+    devToolsEnabled: context?.devToolsEnabled,
+    dockedDevtools: context?.dockedDevtools,
+  };
 }
 
 export function useInspector(node: ComponentDef, uid: symbol) {
