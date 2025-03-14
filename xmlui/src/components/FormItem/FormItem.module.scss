@@ -52,7 +52,7 @@ $themeVars: ();
     font-family: createThemeVar("fontFamily-FormItemLabel");
     font-size: createThemeVar("fontSize-FormItemLabel");
     font-weight: createThemeVar("fontWeight-FormItemLabel");
-    font-style: createThemeVar("font-style-FormItemLabel");
+    font-style: createThemeVar("fontStyle-FormItemLabel");
     text-transform: createThemeVar("textTransform-FormItemLabel");
     user-select: none;
     cursor: pointer;
@@ -73,7 +73,7 @@ $themeVars: ();
       color: createThemeVar("textColor-FormItemLabel-required");
       font-size: createThemeVar("fontSize-FormItemLabel-required");
       font-weight: createThemeVar("fontWeight-FormItemLabel-required");
-      font-style: createThemeVar("font-style-FormItemLabel-required");
+      font-style: createThemeVar("fontStyle-FormItemLabel-required");
       text-transform: createThemeVar("textTransform-FormItemLabel-required");
     }
 
