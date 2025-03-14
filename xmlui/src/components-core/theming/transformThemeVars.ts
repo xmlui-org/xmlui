@@ -2,7 +2,6 @@ import Color from "color";
 
 import { HVar, parseHVar } from "../theming/hvar";
 import { StyleParser } from "../../parsers/style-parser/StyleParser";
-import { cloneDeep } from "lodash-es";
 
 export function isThemeVarName(varName: any) {
   return typeof varName === "string" && varName?.startsWith("$");
@@ -133,9 +132,9 @@ export function generateButtonTones(theme?: Record<string, string>) {
           [`borderColor-Button-${variant}-solid`]: tones.base,
           [`borderColor-Button-${variant}-solid--hover`]: tones.base,
           [`borderColor-Button-${variant}-solid--active`]: tones.base,
-          [`color-Button-${variant}-solid`]: tones.tone3,
-          [`color-Button-${variant}-solid--hover`]: tones.tone3,
-          [`color-Button-${variant}-solid--active`]: tones.tone3,
+          [`textColor-Button-${variant}-solid`]: tones.tone3,
+          [`textColor-Button-${variant}-solid--hover`]: tones.tone3,
+          [`textColor-Button-${variant}-solid--active`]: tones.tone3,
         };
       },
     );
@@ -149,9 +148,9 @@ export function generateButtonTones(theme?: Record<string, string>) {
           [`borderColor-Button-${variant}-outlined`]: tones.base,
           [`borderColor-Button-${variant}-outlined--hover`]: tones.tone1,
           [`borderColor-Button-${variant}-outlined--active`]: tones.tone2,
-          [`color-Button-${variant}-outlined`]: tones.base,
-          [`color-Button-${variant}-outlined--hover`]: tones.tone1,
-          [`color-Button-${variant}-outlined--active`]: tones.tone2,
+          [`textColor-Button-${variant}-outlined`]: tones.base,
+          [`textColor-Button-${variant}-outlined--hover`]: tones.tone1,
+          [`textColor-Button-${variant}-outlined--active`]: tones.tone2,
         };
       },
     );
@@ -162,9 +161,9 @@ export function generateButtonTones(theme?: Record<string, string>) {
         return {
           [`backgroundColor-Button-${variant}-ghost--active`]: tones.alpha2,
           [`backgroundColor-Button-${variant}-ghost--hover`]: tones.alpha1,
-          [`color-Button-${variant}-ghost`]: tones.base,
-          [`color-Button-${variant}-ghost--hover`]: tones.tone1,
-          [`color-Button-${variant}-ghost--active`]: tones.tone2,
+          [`textColor-Button-${variant}-ghost`]: tones.base,
+          [`textColor-Button-${variant}-ghost--hover`]: tones.tone1,
+          [`textColor-Button-${variant}-ghost--active`]: tones.tone2,
         };
       },
     );

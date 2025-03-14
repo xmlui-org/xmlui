@@ -102,7 +102,7 @@ test("textColor", async ({ page }) => {
   const EXPECTED_TEXT_COLOR = BLUE;
   await initThemedApp(page, BADGE_CODE, {
     themeVars: {
-      "color-Badge": EXPECTED_TEXT_COLOR,
+      "textColor-Badge": EXPECTED_TEXT_COLOR,
     },
   });
   await expect(page.getByTestId("badge")).toHaveCSS("color", EXPECTED_TEXT_COLOR);

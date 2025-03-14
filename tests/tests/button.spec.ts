@@ -412,9 +412,9 @@ VARIANTS.forEach((variant) => {
     test(`color-Button-${themeColor.name}-${variant.name}`, async ({ page }) => {
       const EXPECTED = COLORS.green;
       const themeVars = {
-        "color-Button": COLORS.red,
+        "textColor-Button": COLORS.red,
       };
-      themeVars[`color-Button-${themeColor.name}-${variant.name}`] = EXPECTED;
+      themeVars[`textColor-Button-${themeColor.name}-${variant.name}`] = EXPECTED;
       await initThemedApp(page, BTN_MATRIX_CODE, { themeVars });
 
       const testId = "btn" + variant.testIdFragment1 + themeColor.testIdFragment2;

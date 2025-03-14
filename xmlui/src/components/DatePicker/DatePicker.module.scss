@@ -17,14 +17,14 @@ $componentName: "DatePicker";
   border-style: createThemeVar("Input:borderStyle-#{$componentName}-#{$variantName}");
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
-  color: createThemeVar("Input:color-#{$componentName}-#{$variantName}");
+  color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
   padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
     background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
-    color: createThemeVar("Input:color-#{$componentName}-#{$variantName}--hover");
+    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus {
@@ -35,11 +35,11 @@ $componentName: "DatePicker";
   }
 
   .placeholder {
-    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
+    color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
   }
 
   .adornment {
-    color: createThemeVar("Input:color-adornment-#{$componentName}-#{$variantName}");
+    color: createThemeVar("Input:textColor-adornment-#{$componentName}-#{$variantName}");
   }
 }
 
@@ -76,7 +76,7 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
   &.disabled {
     cursor: not-allowed;
     background-color: createThemeVar("Input:backgroundColor-DatePicker--disabled");
-    color: createThemeVar("Input:color-DatePicker--disabled");
+    color: createThemeVar("Input:textColor-DatePicker--disabled");
     border-color: createThemeVar("Input:borderColor-DatePicker--disabled");
 
     .indicator, .datePickerInput {
@@ -121,8 +121,8 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 }
 
 $rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active");
-$rdp-bg-color-hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
-$rdp-selected-color: createThemeVar("Input:color-value-DatePicker");
+$rdp-bg-textColor-hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
+$rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
 $rdp-cell-size: 40px;
 $rdp-caption-font-size: 18px;
 $rdp-outline: 2px solid t.useVar($rdp-accent-color);
@@ -187,12 +187,12 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
 
 .button:focus-visible:not([disabled]) {
   color: inherit;
-  background-color: t.useVar($rdp-bg-color-hover);
+  background-color: t.useVar($rdp-bg-textColor-hover);
   border: $rdp-outline;
 }
 
 .button:hover:not([disabled]):not(.day_selected) {
-  background-color: t.useVar($rdp-bg-color-hover);
+  background-color: t.useVar($rdp-bg-textColor-hover);
 }
 
 .months {
@@ -321,7 +321,7 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
 }
 
 .dropdown:focus-visible:not([disabled]) + .caption_label {
-  background-color: t.useVar($rdp-bg-color-hover);
+  background-color: t.useVar($rdp-bg-textColor-hover);
   border: $rdp-outline;
   border-radius: 6px;
 }

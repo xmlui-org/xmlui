@@ -18,13 +18,13 @@ $componentName: "Select";
   font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}");
-  color: createThemeVar("Input:color-#{$componentName}-#{$variantName}");
+  color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
     background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
-    color: createThemeVar("Input:color-#{$componentName}-#{$variantName}--hover");
+    color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus {
@@ -35,17 +35,17 @@ $componentName: "Select";
   }
 
   &::placeholder {
-    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
+    color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
   }
 }
 
 @mixin valueVariant($variantName) {
   & > span {
     font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
-    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
+    color: createThemeVar("Input:textColor-placeholder-#{$componentName}-#{$variantName}");
 
     & > div {
-      color: createThemeVar("Input:color-#{$componentName}-#{$variantName}");
+      color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}");
       font-size: createThemeVar("Input:fontSize-#{$componentName}-#{$variantName}");
     }
   }
@@ -96,7 +96,7 @@ $componentName: "Select";
   cursor: not-allowed;
   opacity: createThemeVar("opacity-#{$componentName}--disabled");
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
-  color: createThemeVar("Input:color-#{$componentName}--disabled");
+  color: createThemeVar("Input:textColor-#{$componentName}--disabled");
   border-color: createThemeVar("Input:borderColor-#{$componentName}--disabled");
 }
 
@@ -136,16 +136,16 @@ $componentName: "Select";
   border-radius: t.$borderRadius;
   font-size: createThemeVar("Input:fontSize-#{$componentName}-badge");
   background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge");
-  color: createThemeVar("Input:color-#{$componentName}-badge");
+  color: createThemeVar("Input:textColor-#{$componentName}-badge");
 
   &:hover {
     background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge--hover");
-    color: createThemeVar("Input:color-#{$componentName}-badge--hover");
+    color: createThemeVar("Input:textColor-#{$componentName}-badge--hover");
   }
 
   &:active {
     background-color: createThemeVar("Input:backgroundColor-#{$componentName}-badge--active");
-    color: createThemeVar("Input:color-#{$componentName}-badge--active");
+    color: createThemeVar("Input:textColor-#{$componentName}-badge--active");
   }
 }
 
@@ -157,7 +157,7 @@ $componentName: "Select";
 
 .placeholder {
   display: block;
-  color: createThemeVar("Input:color-placeholder-#{$componentName}");
+  color: createThemeVar("Input:textColor-placeholder-#{$componentName}");
 }
 
 .emptyList {
@@ -340,7 +340,7 @@ $componentName: "Select";
   width: 0.875rem;
   align-items: center;
   justify-content: center;
-  color: createThemeVar("color-indicator-#{$componentName}");
+  color: createThemeVar("textColor-indicator-#{$componentName}");
 }
 
 .selectViewport {

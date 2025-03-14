@@ -43,7 +43,7 @@ export const PieChartMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "color-labelList-PieChart": "$textColor-primary",
+    "textColor-labelList-PieChart": "$textColor-primary",
   },
 });
 

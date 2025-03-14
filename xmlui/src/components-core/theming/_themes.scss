@@ -554,11 +554,11 @@ $borderColor-Input-default--error: createVar(borderColor-Input-default--error);
 // ---------------------------------------------------------------------------------------------------------------------
 // InputLabel style variables
 
-$color-InputLabel-required: createVar(color-InputLabel-required);
+$textColor-InputLabel-required: createVar(textColor-InputLabel-required);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // formItem style variables
-$color-FormItemLabel: createVar(color-FormItemLabel);
+$textColor-FormItemLabel: createVar(textColor-FormItemLabel);
 $fontSize-FormItemLabel: createVar(fontSize-FormItemLabel);
 $fontWeight-FormItemLabel: createVar(fontWeight-FormItemLabel);
 

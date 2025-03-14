@@ -117,11 +117,11 @@ When you define theme variables, you can separate tone-independent values from t
     "borderStyle-MyComponent": "solid",
     "light": {
       "backgroundColor-MyComponent": "white",
-      "color-MyComponent": "black"
+      "textColor-MyComponent": "black"
     },
     "dark": {
       "backgroundColor-MyComponent": "black",
-      "color-MyComponent": "white"
+      "textColor-MyComponent": "white"
     }
   }
 }
@@ -466,7 +466,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     ```text
     color-primary
-    color-Button
+    textColor-Button
     backgroundColor-Button
     backgroundColor-Button-solid
     backgroundColor-Button-primary
@@ -484,7 +484,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     <Callout type="info" emoji="📔">
         Components may add logic to generate undefined lower-level theme variable values from upper-level values. For
-        example, the `Button` component automaticaly creates fallback colors when the `color-Button` theme variable is
+        example, the `Button` component automaticaly creates fallback colors when the `textColor-Button` theme variable is
         set.
     </Callout>
 
@@ -535,7 +535,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     Changing `color-primary` updated the primary color of all components, including the `Badge`. Suppose you want to
     keep the `Badge` component intact, because you intend to change only button colors. In that case, you should use the
-    more specific `color-Button` theme variable, which (as it is a component-bound theme variable), affects only the
+    more specific `textColor-Button` theme variable, which (as it is a component-bound theme variable), affects only the
     `Button` component:
 
     ```json
@@ -549,13 +549,13 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     colors.
 
     <Callout type="info" emoji="📔">
-        The `Button` component responds to the changes of the `color-Button` and updates the background, text, and
+        The `Button` component responds to the changes of the `textColor-Button` and updates the background, text, and
         border colors accordingly. It also updates the colors to use with the hover and active states.
     </Callout>
 
     <Playground
         fixedTheme={true}
-        name="Changing 'color-Button'"
+        name="Changing 'textColor-Button'"
         horizontal={true}
         app={gallery}
         defaultTheme="sample"
@@ -565,7 +565,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
                 id: "sample",
                 tone: "light",
                 themeVars: {
-                    "color-Button": "orangered",
+                    "textColor-Button": "orangered",
                 },
             },
         ]}
@@ -573,13 +573,13 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     ### More Specific Variable Changes
 
-    The single change of `color-Button` redefined all button colors, which goes against the intention of having several
+    The single change of `textColor-Button` redefined all button colors, which goes against the intention of having several
     theme colors. If you intend to change only the solid button using the primary color, the best theme variable to
-    modify is `color-Button-primary-solid`:
+    modify is `textColor-Button-primary-solid`:
 
     ```json
     {
-        "color-Button-primary-solid": "orangered"
+        "textColor-Button-primary-solid": "orangered"
     }
     ```
 
@@ -589,7 +589,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     <Playground
         fixedTheme={true}
-        name="Changing 'color-Button-primary-solid'"
+        name="Changing 'textColor-Button-primary-solid'"
         horizontal={true}
         app={gallery}
         defaultTheme="sample"
@@ -599,7 +599,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
                 id: "sample",
                 tone: "light",
                 themeVars: {
-                    "color-Button-primary-solid": "orangered",
+                    "textColor-Button-primary-solid": "orangered",
                 },
             },
         ]}
