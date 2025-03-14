@@ -8,14 +8,14 @@ $themeVars: ();
 }
 
 $backgroundColor-FileUploadDropZone: createThemeVar("backgroundColor-FileUploadDropZone");
-$color-FileUploadDropZone: createThemeVar("color-FileUploadDropZone");
+$textColor-FileUploadDropZone: createThemeVar("textColor-FileUploadDropZone");
 $backgroundColor-dropping-FileUploadDropZone: createThemeVar("backgroundColor-dropping-FileUploadDropZone");
 $opacity-dropping-FileUploadDropZone: createThemeVar("opacity-dropping-FileUploadDropZone");
 
 .wrapper {
   position: relative;
   background-color: $backgroundColor-FileUploadDropZone;
-  color: $color-FileUploadDropZone;
+  color: $textColor-FileUploadDropZone;
   display: flex;
   flex-direction: column;
 }

@@ -16,7 +16,7 @@ $themeVars: ();
     }
   
     .heading {
-      color: createThemeVar("color-ValidationDisplay-#{$variantName}");
+      color: createThemeVar("textColor-ValidationDisplay-#{$variantName}");
       font-weight: bold;
     }
   }

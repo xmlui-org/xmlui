@@ -48,7 +48,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
       border-left: createThemeVar("border-width-TableOfContentsItem") createThemeVar("border-style-TableOfContentsItem") createThemeVar("border-color-TableOfContentsItem");
 
       .link {
-        color: createThemeVar("color-TableOfContentsItem");
+        color: createThemeVar("textColor-TableOfContentsItem");
         font-size: createThemeVar("fontSize-TableOfContentsItem");
         font-weight: createThemeVar("fontWeight-TableOfContentsItem");
         font-family: createThemeVar("fontFamily-TableOfContentsItem");
@@ -85,7 +85,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
       }
 
       &.active {
-        border-left: 2px solid createThemeVar("border-color-TableOfContentsItem--active");
+        border-left: 2px solid createThemeVar("borderColor-TableOfContentsItem--active");
 
         .link {
           color: createThemeVar("color-TableOfContentsItem--active");

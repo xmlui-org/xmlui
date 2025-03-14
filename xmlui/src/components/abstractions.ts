@@ -117,7 +117,7 @@ export const sizeNames = [...sizeValues];
 export type ComponentSize = (typeof sizeValues)[number];
 
 // --- Available button themes
-const buttonThemeValues = ["attention", "primary", "secondary"] as const;
+export const buttonThemeValues = ["attention", "primary", "secondary"] as const;
 export const buttonThemeNames = [...buttonThemeValues];
 export type ButtonThemeColor = (typeof buttonThemeValues)[number];
 export const buttonThemeMd: PropertyValueDescription[] = [
@@ -148,7 +148,7 @@ export const buttonTypesMd: PropertyValueDescription[] = [
 ];
 
 // --- Available button variants
-const buttonVariantValues = ["solid", "outlined", "ghost"] as const;
+export const buttonVariantValues = ["solid", "outlined", "ghost"] as const;
 export const buttonVariantNames = [...buttonVariantValues];
 export type ButtonVariant = (typeof buttonVariantValues)[number];
 export const buttonVariantMd: PropertyValueDescription[] = [

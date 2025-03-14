@@ -48,11 +48,11 @@ $themeVars: ();
   
   .inputLabel {
     display: flex;
-    color: createThemeVar("color-FormItemLabel");
+    color: createThemeVar("textColor-FormItemLabel");
     font-family: createThemeVar("fontFamily-FormItemLabel");
     font-size: createThemeVar("fontSize-FormItemLabel");
     font-weight: createThemeVar("fontWeight-FormItemLabel");
-    font-style: createThemeVar("font-style-FormItemLabel");
+    font-style: createThemeVar("fontStyle-FormItemLabel");
     text-transform: createThemeVar("textTransform-FormItemLabel");
     user-select: none;
     cursor: pointer;
@@ -70,16 +70,16 @@ $themeVars: ();
     }
 
     &.required {
-      color: createThemeVar("color-FormItemLabel-required");
+      color: createThemeVar("textColor-FormItemLabel-required");
       font-size: createThemeVar("fontSize-FormItemLabel-required");
       font-weight: createThemeVar("fontWeight-FormItemLabel-required");
-      font-style: createThemeVar("font-style-FormItemLabel-required");
+      font-style: createThemeVar("fontStyle-FormItemLabel-required");
       text-transform: createThemeVar("textTransform-FormItemLabel-required");
     }
 
     .requiredMark {
       margin-left: 0.2em;
-      color: createThemeVar("color-FormItemLabel-requiredMark")
+      color: createThemeVar("textColor-FormItemLabel-requiredMark")
     }
   }
 }

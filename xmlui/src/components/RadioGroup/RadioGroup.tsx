@@ -59,9 +59,9 @@ export const RadioGroupMd = createMetadata({
     [`backgroundColor-checked-${RGOption}-success`]: `$borderColor-${RGOption}-success`,
     [`fontSize-${RGOption}`]: "$fontSize-small",
     [`fontWeight-${RGOption}`]: "$fontWeight-bold",
-    [`color-${RGOption}-error`]: `$borderColor-${RGOption}-error`,
-    [`color-${RGOption}-warning`]: `$borderColor-${RGOption}-warning`,
-    [`color-${RGOption}-success`]: `$borderColor-${RGOption}-success`,
+    [`textColor-${RGOption}-error`]: `$borderColor-${RGOption}-error`,
+    [`textColor-${RGOption}-warning`]: `$borderColor-${RGOption}-warning`,
+    [`textColor-${RGOption}-success`]: `$borderColor-${RGOption}-success`,
     light: {
       [`backgroundColor-checked-${RGOption}-default`]: "$color-primary-500",
       [`borderColor-${RGOption}-default`]: "$color-surface-500",

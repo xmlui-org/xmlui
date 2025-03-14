@@ -120,7 +120,7 @@ export const DatePickerMd = createMetadata({
   defaultThemeVars: {
     [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
-    [`color-value-${COMP}`]: "$textColor-primary",
+    [`textColor-value-${COMP}`]: "$textColor-primary",
     light: {
       [`backgroundColor-menu-${COMP}`]: "$color-surface-50",
       [`backgroundColor-item-${COMP}--hover`]: "$color-surface-100",

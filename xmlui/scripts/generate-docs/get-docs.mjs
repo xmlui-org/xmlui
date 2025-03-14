@@ -6,7 +6,7 @@ import { ErrorWithSeverity, logger, LOGGER_LEVELS, processError } from "./logger
 import {
   convertPath,
   deleteFileIfExists,
-  fromKebabtoCamelCase,
+  fromKebabtoReadable,
 } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
@@ -69,7 +69,7 @@ async function generateExtenionPackages(metadata) {
 
     await extensionGenerator.generatePackageDescription(
       metadata[packageName].description,
-      `${fromKebabtoCamelCase(packageName)} Package`,
+      `${fromKebabtoReadable(packageName)} Package`,
       indexFile,
     );
 
@@ -83,7 +83,7 @@ async function generateExtenionPackages(metadata) {
 
     const folderNames = Object.fromEntries(
       Object.keys(metadata).map((name) => {
-        return [name, fromKebabtoCamelCase(name)];
+        return [name, fromKebabtoReadable(name)];
       }),
     );
 

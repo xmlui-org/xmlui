@@ -57,7 +57,7 @@ $borderRadius: createThemeVar("borderRadius-#{$component}");
   box-sizing: border-box;
   font-size: createThemeVar("fontSize-header-#{$component}");
   font-weight: createThemeVar("fontWeight-header-#{$component}");
-  font-style: createThemeVar("font-style-header-#{$component}");
+  font-style: createThemeVar("fontStyle-header-#{$component}");
   padding: createThemeVar("paddingVertical-header-#{$component}") createThemeVar("paddingHorizontal-header-#{$component}");
   background-color: createThemeVar("backgroundColor-header-#{$component}");
   color: createThemeVar("color-header-#{$component}");

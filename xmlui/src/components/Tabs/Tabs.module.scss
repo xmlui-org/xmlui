@@ -13,7 +13,7 @@ $borderColor-Tabs: createThemeVar("borderColor-Tabs");
 $borderWidth-Tabs: createThemeVar("borderWidth-Tabs");
 $borderColor-active-Tabs: createThemeVar("borderColor-active-Tabs");
 $backgroundColor-trigger-Tabs: createThemeVar("backgroundColor-trigger-Tabs");
-$color-trigger-Tabs: createThemeVar("color-trigger-Tabs");
+$textColor-trigger-Tabs: createThemeVar("textColor-trigger-Tabs");
 $backgroundColor-trigger-Tabs--hover: createThemeVar("backgroundColor-trigger-Tabs--hover");
 $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
 
@@ -52,7 +52,7 @@ $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
 .tabTrigger {
   //flex: 1 1 auto;
   font-family: inherit;
-  color: $color-trigger-Tabs;
+  color: $textColor-trigger-Tabs;
   background-color: $backgroundColor-trigger-Tabs;
   padding: t.$space-4;
   display: flex;

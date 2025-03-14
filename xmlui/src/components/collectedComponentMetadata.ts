@@ -183,7 +183,8 @@ import {
 import { SliderMd } from "./Slider/Slider";
 import { ColorPickerMd } from "./ColorPicker/ColorPicker";
 
-export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
+export type ComponentMetadataCollection = Record<string, ComponentMetadata>;
+export const collectedComponentMetadata: ComponentMetadataCollection = {
   // --- HTML tags
   a: HtmlAMd,
   address: HtmlAddressMd,

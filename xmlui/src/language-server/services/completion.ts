@@ -1,16 +1,57 @@
-import type { CompletionItem } from "vscode-languageserver";
+import type { MarkupContent, CompletionItem} from "vscode-languageserver";
+import { CompletionItemKind, MarkupKind } from "vscode-languageserver";
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { findTokenAtPos } from "../../parsers/xmlui-parser/utils"
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
-import { collectedComponentMetadata } from "../xmlui-metadata.mjs";
+import * as docGen from "./docs-generation"
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
+import type { ComponentMetadataCollection } from "../../components/collectedComponentMetadata";
+
+type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<Type, keyof NewType> & NewType;
+
+type XmluiCompletionData = {
+  metadataAccessInfo: {
+    componentName: string
+  } | {
+    componentName: string
+    prop: string
+  }
+}
+
+export type XmluiCompletionItem = Override<CompletionItem, { data?: XmluiCompletionData }>;
+
+type CompletionResolveContext = {
+  item: XmluiCompletionItem,
+  collectedComponentMetadata: ComponentMetadataCollection
+}
+export function handleCompletionResolve({ item, collectedComponentMetadata}: CompletionResolveContext): CompletionItem {
+  const metadataAccessInfo = item?.data?.metadataAccessInfo;
+  if (metadataAccessInfo) {
+    collectedComponentMetadata.Alert.props
+    const { componentName } = metadataAccessInfo;
+    const componentMeta = collectedComponentMetadata[componentName];
+    if ("prop" in metadataAccessInfo) {
+      const propName = metadataAccessInfo.prop;
+      const propMeta = componentMeta.props[propName]
+      item.documentation = markupContent(docGen.generatePropDescription(propName, propMeta));
+    } else {
+      item.documentation = markupContent(docGen.generateCompNameDescription(componentName, componentMeta));
+    }
+  }
+  return item;
+}
+
+type CompletionContext = {
+  parseResult: ParseResult,
+  getText: GetText,
+  metaByComp: ComponentMetadataCollection
+}
 
 export function handleCompletion(
-  { node }: ParseResult,
+  { parseResult: { node }, getText, metaByComp }: CompletionContext,
   position: number,
-  getText: (n: Node) => string,
-): CompletionItem[] | null {
+): XmluiCompletionItem[] | null {
   const findRes = findTokenAtPos(node, position);
   if (!findRes) {
     return null;
@@ -18,15 +59,15 @@ export function handleCompletion(
   const { chainAtPos, chainBeforePos, sharedParents } = findRes;
 
   if (findRes.chainBeforePos === undefined) {
-    return handleCompletionInsideToken(chainAtPos, position, getText);
+    return handleCompletionInsideToken(chainAtPos, position, metaByComp, getText);
   }
 
   const nodeBefore = chainBeforePos.at(-1);
   switch (nodeBefore.kind) {
     case SyntaxKind.OpenNodeStart:
-      return allComponentNames();
+      return allComponentNames(metaByComp);
     case SyntaxKind.CloseNodeStart:
-      return matchingTagName(findRes as FindTokenSuccessHasBefore, getText);
+      return matchingTagName(findRes as FindTokenSuccessHasBefore, metaByComp, getText);
   }
 
   const completeForProp = chainBeforePos.some(n =>
@@ -38,7 +79,7 @@ export function handleCompletion(
   if(completeForProp){
     const tagNameNode = findTagNameNodeInStack(chainAtPos);
     const compName = compNameForTagNameNode(tagNameNode, getText)
-    return completionForNewProps(compName);
+    return completionForNewProps(compName, metaByComp);
   }
   return null;
 }
@@ -49,27 +90,28 @@ type FindTokenSuccessHasBefore = {
   sharedParents: number;
 };
 
-function allComponentNames(): CompletionItem[] {
-  return Object.keys(collectedComponentMetadata).map(name => ({label: name}));
+function allComponentNames(md: ComponentMetadataCollection): CompletionItem[] {
+  return Object.keys(md).map(componentCompletionItem);
 }
 
 function matchingTagName(
   { chainAtPos, chainBeforePos, sharedParents }: FindTokenSuccessHasBefore,
+  metaByComp: ComponentMetadataCollection,
   getText: GetText,
 ): CompletionItem[]|null{
-  let parentBefore;
+  let parentBefore: Node;
   if (chainBeforePos.length > 1) {
     parentBefore = chainBeforePos[chainBeforePos.length - 2];
   } else if (sharedParents! > 0) {
     parentBefore = chainAtPos[sharedParents! - 1];
   } else {
-    return allComponentNames();
+    return allComponentNames(metaByComp);
   }
 
   if (parentBefore.kind === SyntaxKind.ElementNode) {
     const nameNode = parentBefore.children!.find((c) => c.kind === SyntaxKind.TagNameNode);
     if (nameNode === undefined) {
-      return allComponentNames();
+      return allComponentNames(metaByComp);
     }
     const colonIdx = nameNode.children!.findIndex((c) => c.kind === SyntaxKind.Colon);
     let nameSpace: string | undefined = undefined;
@@ -84,37 +126,73 @@ function matchingTagName(
     }
     const nameIdent = nameIdentSearchSpace.find((c) => c.kind === SyntaxKind.Identifier);
     if (nameIdent === undefined) {
-      return allComponentNames();
+      return allComponentNames(metaByComp);
     }
     name = getText(nameIdent);
     const value = nameSpace !== undefined ? nameSpace + ":" + name : name;
-    return [{ label: value }];
+    return [componentCompletionItem(value)];
   }
   return null;
 }
 
-function handleCompletionInsideToken(chainAtPos: Node[], position: number, getText: (n: Node) => string): CompletionItem[] {
+
+function handleCompletionInsideToken(chainAtPos: Node[], position: number, metaByComp: ComponentMetadataCollection, getText: (n: Node) => string): CompletionItem[] {
   const parent = chainAtPos.at(-2);
   if (!parent){
     return null;
   }
   switch (parent.kind){
     case SyntaxKind.TagNameNode: {
-      return allComponentNames();
+      return allComponentNames(metaByComp);
     }
     case SyntaxKind.AttributeKeyNode: {
       const tagNameNode = findTagNameNodeInStack(chainAtPos);
       const compName = compNameForTagNameNode(tagNameNode, getText)
-      return completionForNewProps(compName);
+      return completionForNewProps(compName, metaByComp);
     }
   }
   return null;
 }
 
-function completionForNewProps(compName: string): CompletionItem[] | null {
-  const metadata = collectedComponentMetadata[compName];
+function completionForNewProps(compName: string, metaByComp: ComponentMetadataCollection): CompletionItem[] | null {
+  const metadata = metaByComp[compName];
   if (!metadata || !metadata.props){
     return null;
   }
-  return Object.keys(metadata.props).map(propName => ({ label: propName }));
+  return Object.keys(metadata.props).map((propName) => propCompletionItem(compName, propName));
+}
+
+function componentCompletionItem(name:string): XmluiCompletionItem{
+  return {
+    label: name,
+    kind: CompletionItemKind.Constructor,
+    labelDetails: {
+      description: "Core component"
+    },
+    data: {
+      metadataAccessInfo: {
+        componentName: name
+      }
+    }
+  }
+}
+
+function propCompletionItem(componentName:string, name:string): XmluiCompletionItem{
+  return {
+    label: name,
+    kind: CompletionItemKind.Property,
+    data: {
+      metadataAccessInfo:{
+        prop: name,
+        componentName: componentName,
+      }
+    }
+  }
+}
+
+function markupContent(content: string): MarkupContent{
+  return {
+    kind: MarkupKind.Markdown,
+    value: content
+  }
 }
