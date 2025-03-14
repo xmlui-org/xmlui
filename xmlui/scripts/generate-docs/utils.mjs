@@ -140,11 +140,11 @@ export function toHeadingPath(rawStr) {
 }
 
 /**
- * 
- * @param {string} rawStr 
- * @returns {string} 
+ * Converts string from kebab case to space separated string with uppercase starting character
+ * @param {string} rawStr input in kebab case (e.g. "hello-there-friend")
+ * @returns {string} camel cased string (e.g. "Hello There Friend")
  */
-export function fromKebabtoCamelCase(rawStr) {
+export function fromKebabtoReadable(rawStr) {
   return rawStr
     .trim()
     .split("-")

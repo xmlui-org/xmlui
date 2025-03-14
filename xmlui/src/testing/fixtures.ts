@@ -137,8 +137,27 @@ class Clipboard {
   }
 }
 
+function mapThemeRelatedVars(description: TestBedDescription): TestBedDescription {
+  const { themes, defaultTheme, testThemeVars, ...rest } = description ?? {};
+
+  if (themes) {
+    return { themes, defaultTheme: defaultTheme ?? "xmlui", ...rest };
+  } 
+
+  const testTheme = {
+    id: "test",
+    name: "Test",
+    extends: "xmlui",
+    themeVars: testThemeVars,
+  };
+
+  return {  themes: [testTheme], defaultTheme: "test", ...rest };
+}
+
 // -----------------------------------------------------------------
 // --- TestBed and Driver Fixtures
+
+type TestBedDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & { testThemeVars?: Record<string, string> };
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
   // NOTE: the base Playwright test can be extended with fixture methods
@@ -150,7 +169,7 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
     await use(
       async (
         source: string,
-        description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
+        description?: TestBedDescription,
       ) => {
         // --- Initialize XMLUI App
         const { errors, component } = xmlUiMarkupToComponent(`
@@ -176,8 +195,9 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
             sourceBaseComponent.testId = baseComponentTestId;
           }
         }
-
-        await initComponent(page, { ...description, entryPoint });
+        
+        const themedDescription = mapThemeRelatedVars(description);
+        await initComponent(page, { ...themedDescription, entryPoint });
         return {
           testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
           clipboard: new Clipboard(page),
@@ -331,7 +351,7 @@ type TestDriverExtenderProps = {
   baseComponentTestId: string;
   initTestBed: (
     source: string,
-    description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
+    description?: TestBedDescription,
   ) => Promise<{ testStateDriver: TestStateDriver, clipboard: Clipboard }>;
   createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
     driverClass: T,

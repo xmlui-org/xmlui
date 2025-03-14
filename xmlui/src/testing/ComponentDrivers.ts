@@ -1,4 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
+import { mapObject, parseAsCssBorder, parseAsNumericCss } from "./component-test-helpers";
 
 export type ComponentDriverParams = {
   locator: Locator;
@@ -31,7 +32,11 @@ export class ComponentDriver {
       (element, styles) =>
         Object.fromEntries(
           styles.map((styleName) => [
-            styleName,
+            styleName
+              .trim()
+              .split("-")
+              .map((n, idx) => (idx === 0 ? n : n[0].toUpperCase() + n.slice(1)))
+              .join(""),
             window.getComputedStyle(element).getPropertyValue(styleName),
           ]),
         ),
@@ -39,33 +44,61 @@ export class ComponentDriver {
     );
   }
 
+  async getPaddings() {
+    const paddings = mapObject(
+      await this.getStyles(["padding-left", "padding-right", "padding-top", "padding-bottom"]),
+      parseAsNumericCss,
+    );
+    return {
+      left: paddings.paddingLeft,
+      right: paddings.paddingRight,
+      top: paddings.paddingTop,
+      bottom: paddings.paddingBottom,
+    };
+  }
+
+  async getBorders() {
+    const borders = mapObject(
+      await this.getStyles(["border-left", "border-right", "border-top", "border-bottom"]),
+      parseAsCssBorder,
+    );
+    return {
+      left: borders.borderLeft,
+      right: borders.borderRight,
+      top: borders.borderTop,
+      bottom: borders.borderBottom,
+    };
+  }
+
+  async getMargins() {
+    return this.getStyles(["margin-left", "margin-right", "margin-top", "margin-bottom"]);
+  }
+
   /**
-   * Retrieves the bounding rectangle of the component including margins and padding
+   * Retrieves the bounding rectangle of the component including **margins** and **padding**
    * added to the dimensions.
    */
   async getComponentBounds() {
     const boundingRect = await this.component.evaluate((element) =>
       element.getBoundingClientRect(),
     );
-    const margins = await this.getStyles([
-      "margin-left",
-      "margin-right",
-      "margin-top",
-      "margin-bottom",
-    ]);
-    const marginLeft = parseFloat(margins["margin-left"]);
-    const marginRight = parseFloat(margins["margin-right"]);
-    const marginTop = parseFloat(margins["margin-top"]);
-    const marginBottom = parseFloat(margins["margin-bottom"]);
+    const m = mapObject(await this.getMargins(), parseFloat);
 
-    const width = boundingRect.width + marginLeft + marginRight;
-    const height = boundingRect.height + marginTop + marginBottom;
-    const left = boundingRect.left - marginLeft;
-    const right = boundingRect.right + marginRight;
-    const top = boundingRect.top - marginTop;
-    const bottom = boundingRect.bottom + marginBottom;
+    const width = boundingRect.width + m.marginLeft + m.marginRight;
+    const height = boundingRect.height + m.marginTop + m.marginBottom;
+    const left = boundingRect.left - m.marginLeft;
+    const right = boundingRect.right + m.marginRight;
+    const top = boundingRect.top - m.marginTop;
+    const bottom = boundingRect.bottom + m.marginBottom;
 
-    return { width, height, left, right, top, bottom };
+    return {
+      width,
+      height,
+      left,
+      right,
+      top,
+      bottom,
+    };
   }
 
   // NOTE: methods must be created using the arrow function notation.
@@ -108,44 +141,34 @@ export class TestStateDriver {
 // --- Button
 
 export class ButtonDriver extends ComponentDriver {
-  // Ensure we either get rtl or ltr strings - Pending approval
+  // Ensure we either get rtl or ltr strings
   /* async getWritingDirection() {
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir
     const attribute = await this.locator.getAttribute("dir");
     if (attribute && attribute !== "auto") return attribute as "rtl" | "ltr";
-    const style = await this.locator.evaluate((element) => window.getComputedStyle(element).direction);
+    const style = await this.locator.evaluate(
+      (element) => window.getComputedStyle(element).direction,
+    );
     // Default is ltr: https://developer.mozilla.org/en-US/docs/Web/CSS/direction#values
     return style === "rtl" ? "rtl" : "ltr";
   } */
 
-  // NOTE: It may be prudent to target the text nodes and wrap them in a Locator-like, very basic class
-  // to better handle them and provide supporting methods such as dimensions (via getClientRects?)
-  // Source: https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects
-  async getTextNodes() {
+  // Unused as of yet
+  /* async getTextNodes() {
     return await this.locator.evaluate((element) =>
       [...element.childNodes]
         .filter((e) => e.nodeType === Node.TEXT_NODE && e.textContent.trim())
         .map((e) => e.textContent.trim()),
     );
   }
-
-  // NOTE: Accounts for the icon being passed as a child as well
-  getIcons() {
-    return this.locator.locator("> svg").or(this.locator.locator("> img"));
-  }
-
-  // NOTE: Added because we can set an icon via the icon prop as well as child
-  getFirstIcon() {
-    return this.locator.locator("> svg").or(this.locator.locator("> img")).first();
-  }
-
-  // NOTE: Added because we can set an icon via the icon prop as well as child
-  getLastIcon() {
-    return this.locator.locator("> svg").or(this.locator.locator("> img")).last();
-  }
-
+ */
   getFirstNonTextNode() {
     return this.locator.locator("> *").first();
+  }
+
+  // NOTE: Accounts for icons being passed as children as well
+  getIcons() {
+    return this.locator.locator("> svg").or(this.locator.locator("> img"));
   }
 }
 
