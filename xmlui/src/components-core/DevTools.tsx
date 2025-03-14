@@ -1,4 +1,3 @@
-import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import React, { useCallback, useContext, useEffect, useMemo } from "react";
 import { useState } from "react";
 import { Rnd } from "react-rnd";
@@ -221,11 +220,6 @@ export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
         </Content>
         <Content value={"console"} className={styles.content}>
           Debug console
-          {/*<ReactQueryDevtoolsPanel
-                    style={{ height: "100%", width: "100%", maxWidth: "100vw" }}
-                    setIsOpen={setIsOpen}
-                    onDragStart={(e) => e.stopPropagation()}
-                  />*/}
         </Content>
       </Root>
     </Rnd>,
