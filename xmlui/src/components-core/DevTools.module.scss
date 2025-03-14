@@ -1,0 +1,61 @@
+@use "./theming/themes" as themes;
+
+.wrapper {
+  z-index: 9999;
+  overflow: auto;
+  box-shadow: 0 2px 6px 0 rgba(58, 57, 68, 0.4);
+
+  & > :nth-child(2) {
+    display: none;
+  }
+}
+
+.actions {
+  display: inline-flex;
+  justify-content: flex-end;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  background-color: themes.$backgroundColor;
+}
+
+.sideButtons {
+  display: flex;
+}
+
+.sideButton {
+  padding: 2px
+}
+
+.menuItem {
+  width: 240px;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px;
+  align-items: center;
+  background-color: themes.$backgroundColor-secondary;
+  box-shadow: themes.$boxShadow-md;
+}
+
+.list {
+  padding: .2rem;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: space-between;
+  color: themes.$textColor-primary;
+  background-color: themes.$backgroundColor-secondary;
+  border-bottom: 1px solid themes.$borderColor;
+
+}
+
+.menu {
+  position: relative;
+  z-index: 9999;
+}
+
+.content {
+  flex: 1;
+  overflow: auto;
+}

@@ -19,7 +19,6 @@ import { XmluiCodeHighlighter } from "./XmluiCodeHighlighter";
 import { Button } from "../components/Button/ButtonNative";
 import Icon from "../components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
-import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { DevTools } from "./DevTools";
 
 // --- The context object that is used to store the inspector information.
@@ -32,7 +31,7 @@ interface IInspectorContext {
 }
 
 // --- The context object that is used to store the inspector information.
-const InspectorContext = createContext<IInspectorContext | null>(null);
+export const InspectorContext = createContext<IInspectorContext | null>(null);
 
 export function InspectorProvider({
   children,
@@ -236,7 +235,7 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
           </Button>,
           root,
         )}
-      <DevTools isOpen={showCode} setIsOpen={setShowCode} />
+      <DevTools isOpen={showCode} setIsOpen={setShowCode} node={node} />
     </>
   );
 }
