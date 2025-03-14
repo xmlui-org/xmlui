@@ -338,8 +338,8 @@ function addStylesSection(data, component) {
     hasStylesSection = true;
   }
   if (varsTable) {
-    buffer += addThemeVarDescriptions(component);
     buffer += "\n\n### Theme Variables\n\n" + varsTable;
+    buffer += addThemeVarDescriptions(component);
     hasStylesSection = true;
   }
   if (!hasStylesSection) {
@@ -736,17 +736,17 @@ function addThemeVarDescriptions(component) {
   if (!component.themeVarDescriptions) {
     return "";
   }
-  let buffer = "\n\n### Theme Variable Descriptions\n\n";
+  let buffer = "\n\n### Variable Explanations\n\n";
 
   buffer += createTable({
     headers: ["Theme Variable", "Description"],
     rows: Object.entries(component.themeVarDescriptions).map(([themeVar, description]) => [
-      `\`**${themeVar}**\``,
+      `**\`${themeVar}\`**`,
       description,
     ]),
   });
 
-  return buffer;
+  return buffer + "\n\n";
 }
 
 // Use this object/map to replace the occurrences of the keys and have them be replaced by links
