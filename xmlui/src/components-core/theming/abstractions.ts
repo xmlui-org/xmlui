@@ -150,8 +150,8 @@ export type FontDef =
       fontFamily: string;
 
       /**
-       * A font-style value. Accepts two values to specify a range that is supported by a font-face,
-       * for example `font-style: oblique 20deg 50deg`
+       * A fontStyle value. Accepts two values to specify a range that is supported by a font-face,
+       * for example `fontStyle: oblique 20deg 50deg`
        */
       fontStyle?: string;
 

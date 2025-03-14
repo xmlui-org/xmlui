@@ -407,10 +407,10 @@ $THEME-VAR-PREFIX: xmlui;
   
   $tmpRadius: appendThemeVar($tmp, "borderRadius-#{$subject}") !global;
   $tmpRadiusAll: getThemeVar($tmpRadius, "borderRadius-#{$subject}") !global;
-  $tmp: appendThemeVarWithDefault($tmp, "radius-start-start-#{$subject}", $tmpRadiusAll) !global;
-  $tmp: appendThemeVarWithDefault($tmp, "radius-start-end-#{$subject}", $tmpRadiusAll) !global;
-  $tmp: appendThemeVarWithDefault($tmp, "radius-end-start-#{$subject}", $tmpRadiusAll) !global;
-  $tmp: appendThemeVarWithDefault($tmp, "radius-end-end-#{$subject}", $tmpRadiusAll) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderRadius-start-start-#{$subject}", $tmpRadiusAll) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderRadius-start-end-#{$subject}", $tmpRadiusAll) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderRadius-end-start-#{$subject}", $tmpRadiusAll) !global;
+  $tmp: appendThemeVarWithDefault($tmp, "borderRadius-end-end-#{$subject}", $tmpRadiusAll) !global;
   $tmp: appendThemeVar($tmp, "borderStyle-#{$subject}") !global;
   @return $tmp;
 }
@@ -434,10 +434,10 @@ $THEME-VAR-PREFIX: xmlui;
   border-top-color: getThemeVar($themeVars, "borderTopColor-#{$subject}");
   border-bottom-color: getThemeVar($themeVars, "borderBottomColor-#{$subject}");
   border-radius: getThemeVar($themeVars, "borderRadius-#{$subject}");
-  border-start-start-radius: getThemeVar($themeVars, "radius-start-start-#{$subject}");
-  border-start-end-radius: getThemeVar($themeVars, "radius-start-end-#{$subject}");
-  border-end-start-radius: getThemeVar($themeVars, "radius-end-start-#{$subject}");
-  border-end-end-radius: getThemeVar($themeVars, "radius-end-end-#{$subject}");
+  border-start-start-radius: getThemeVar($themeVars, "borderRadius-start-start-#{$subject}");
+  border-start-end-radius: getThemeVar($themeVars, "borderRadius-start-end-#{$subject}");
+  border-end-start-radius: getThemeVar($themeVars, "borderRadius-end-start-#{$subject}");
+  border-end-end-radius: getThemeVar($themeVars, "borderRadius-end-end-#{$subject}");
 }
 
 // =====================================================================================================================

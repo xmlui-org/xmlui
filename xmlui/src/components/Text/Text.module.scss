@@ -13,7 +13,7 @@ $component: "Text";
   font-size: createThemeVar("fontSize-#{$component}-#{$variant}");
   font-weight: createThemeVar("fontWeight-#{$component}-#{$variant}");
   font-style: createThemeVar("font-style-#{$component}-#{$variant}");
-  font-stretch: createThemeVar("font-stretch-#{$component}-#{$variant}");
+  font-stretch: createThemeVar("fontStretch-#{$component}-#{$variant}");
   text-decoration-line: createThemeVar('textDecorationLine-#{$component}-#{$variant}');
   text-decoration-color: createThemeVar('textDecorationColor-#{$component}-#{$variant}');
   text-decoration-style: createThemeVar('textDecorationStyle-#{$component}-#{$variant}');
