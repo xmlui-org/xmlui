@@ -147,7 +147,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       }) => {
         await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
           testThemeVars: {
-            [`color-Button-${themeColor}-${variant}`]: EXPECTED_CONTENT_COLOR,
+            [`textColor-Button-${themeColor}-${variant}`]: EXPECTED_CONTENT_COLOR,
           },
         });
         await expect((await createButtonDriver()).component).toHaveCSS(
@@ -163,7 +163,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   const EXPECTED_BORDER_WIDTH = "5px";
   const EXPECTED_BORDER_STYLE = "dotted";
   const EXPECTED_BORDER_RADIUS = "10px";
-  buttonVariantValues.forEach((variant) => {
+  buttonVariantValues.filter(v => v !== "ghost").forEach((variant) => {
     buttonThemeValues.forEach((themeColor) => {
       test(`border: "${themeColor}" "${variant}" variant`, async ({
         initTestBed,
@@ -183,6 +183,23 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
         await expect(driver.component).toHaveCSS("border-radius", EXPECTED_BORDER_RADIUS);
         await expect(driver.component).toHaveCSS("border-style", EXPECTED_BORDER_STYLE);
       });
+    });
+  });
+
+  buttonThemeValues.forEach((themeColor) => {
+    test(`border: "${themeColor}" "ghost" variant`, async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
+      await initTestBed(`<Button variant="ghost" themeColor="${themeColor}" />`, {
+        testThemeVars: {
+          [`borderWidth-Button-${themeColor}-ghost`]: EXPECTED_BORDER_WIDTH,
+          [`borderRadius-Button-${themeColor}-ghost`]: EXPECTED_BORDER_RADIUS,
+        },
+      });
+      const driver = await createButtonDriver();
+      await expect(driver.component).toHaveCSS("border-width", EXPECTED_BORDER_WIDTH);
+      await expect(driver.component).toHaveCSS("border-radius", EXPECTED_BORDER_RADIUS);
     });
   });
 
