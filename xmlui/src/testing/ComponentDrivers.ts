@@ -153,14 +153,15 @@ export class ButtonDriver extends ComponentDriver {
     return style === "rtl" ? "rtl" : "ltr";
   } */
 
-  async getTextNodes() {
+  // Unused as of yet
+  /* async getTextNodes() {
     return await this.locator.evaluate((element) =>
       [...element.childNodes]
         .filter((e) => e.nodeType === Node.TEXT_NODE && e.textContent.trim())
         .map((e) => e.textContent.trim()),
     );
   }
-
+ */
   getFirstNonTextNode() {
     return this.locator.locator("> *").first();
   }

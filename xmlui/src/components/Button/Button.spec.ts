@@ -5,6 +5,9 @@ import { expect as fixtureExpect, test } from "../../testing/fixtures";
 import {
   alignmentOptionValues,
   buttonTypeValues,
+  buttonThemeValues,
+  buttonVariantValues,
+  type ButtonVariant,
   type IconPosition,
 } from "../../components/abstractions";
 import type { ComponentDriver } from "../../testing/ComponentDrivers";
@@ -105,38 +108,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createButtonDriver()).component).toBeDisabled();
   });
 
-  // --- variant & themeColor
-
-  // TODO: add theme variable tests - a Solid Button has specific background, border, font colors, size, etc.
-  // import from abstractions: buttonVariantMd
-  // import from abstractions: buttonThemeMd
-  ["solid", "outlined", "ghost"].forEach((variant) => {
-    ["primary", "secondary", "attention"].forEach((themeColor) => {
-      test(
-        `themeColor "${themeColor}" is applied for variant "${variant}"`,
-        async ({ initTestBed, createButtonDriver }) => {
-          const EXPECTED_COLOR = "rgb(255, 0, 0)";
-          const EXPECTED_WIDTH = "5px";
-          const EXPECTED_STYLE = "dotted";
-
-          await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
-            testThemeVars: {
-              [`backgroundColor-Button-${themeColor}-${variant}`]: "EXPECTED_COLOR",
-            }
-          });
-          await expect((await createButtonDriver()).component).toHaveCSS("background-color", EXPECTED_COLOR);
-        },
-      );
-      ["disabled", "hover", "active", "focused"].forEach((state) => {
-        test.skip(
-          `${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`,
-          SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-          async ({ initTestBed, createButtonDriver }) => {},
-        );
-      });
-    });
-  });
-
   // --- click
 
   test("click event fires", async ({ initTestBed, createButtonDriver }) => {
@@ -144,32 +115,144 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await (await createButtonDriver()).click();
     await expect.poll(testStateDriver.testState).toEqual(true);
   });
+
+  // --- variant & themeColor
+
+  // background color
+  const EXPECTED_BACKGROUND_COLOR = "rgb(255, 0, 0)";
+  buttonThemeValues.forEach((themeColor) => {
+    test(`"solid" background color: "${themeColor}"`, async ({
+      initTestBed,
+      createButtonDriver,
+    }) => {
+      await initTestBed(`<Button variant="solid" themeColor="${themeColor}" />`, {
+        testThemeVars: {
+          [`backgroundColor-Button-${themeColor}-solid`]: EXPECTED_BACKGROUND_COLOR,
+        },
+      });
+      await expect((await createButtonDriver()).component).toHaveCSS(
+        "background-color",
+        EXPECTED_BACKGROUND_COLOR,
+      );
+    });
+  });
+
+  // content/label color
+  const EXPECTED_CONTENT_COLOR = "rgb(255, 255, 255)";
+  buttonVariantValues.forEach((variant) => {
+    buttonThemeValues.forEach((themeColor) => {
+      test(`"${variant}" content color: "${themeColor}"`, async ({
+        initTestBed,
+        createButtonDriver,
+      }) => {
+        await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
+          testThemeVars: {
+            [`color-Button-${themeColor}-${variant}`]: EXPECTED_CONTENT_COLOR,
+          },
+        });
+        await expect((await createButtonDriver()).component).toHaveCSS(
+          "color",
+          EXPECTED_CONTENT_COLOR,
+        );
+      });
+    });
+  });
+
+  // border
+  const EXPECTED_BORDER_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_BORDER_WIDTH = "5px";
+  const EXPECTED_BORDER_STYLE = "dotted";
+  const EXPECTED_BORDER_RADIUS = "10px";
+  buttonVariantValues.forEach((variant) => {
+    buttonThemeValues.forEach((themeColor) => {
+      test(`border: "${themeColor}" "${variant}" variant`, async ({
+        initTestBed,
+        createButtonDriver,
+      }) => {
+        await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
+          testThemeVars: {
+            [`borderColor-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_COLOR,
+            [`borderWidth-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_WIDTH,
+            [`borderRadius-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_RADIUS,
+            [`borderStyle-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_STYLE,
+          },
+        });
+        const driver = await createButtonDriver();
+        await expect(driver.component).toHaveCSS("border-color", EXPECTED_BORDER_COLOR);
+        await expect(driver.component).toHaveCSS("border-width", EXPECTED_BORDER_WIDTH);
+        await expect(driver.component).toHaveCSS("border-radius", EXPECTED_BORDER_RADIUS);
+        await expect(driver.component).toHaveCSS("border-style", EXPECTED_BORDER_STYLE);
+      });
+    });
+  });
+
+  /* 
+  ["disabled", "hover", "active", "focused"].forEach((state) => {
+    test.skip(
+      `${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`,
+      SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
+      async ({ initTestBed, createButtonDriver }) => {},
+    );
+  });
+  */
+
+  // fonts
+  const EXPECTED_FONT_FAMILY = "Arial, sans-serif";
+  const EXPECTED_FONT_SIZE = "20px";
+  const EXPECTED_FONT_WEIGHT = "200";
+  buttonVariantValues.forEach((variant) => {
+    buttonThemeValues.forEach((themeColor) => {
+      test(`font: "${themeColor}" "${variant}" variant`, async ({
+        initTestBed,
+        createButtonDriver,
+      }) => {
+        await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
+          testThemeVars: {
+            [`fontFamily-Button-${themeColor}-${variant}`]: EXPECTED_FONT_FAMILY,
+            [`fontSize-Button-${themeColor}-${variant}`]: EXPECTED_FONT_SIZE,
+            [`fontWeight-Button-${themeColor}-${variant}`]: EXPECTED_FONT_WEIGHT,
+          },
+        });
+        const driver = await createButtonDriver();
+        await expect(driver.component).toHaveCSS("font-family", EXPECTED_FONT_FAMILY);
+        await expect(driver.component).toHaveCSS("font-size", EXPECTED_FONT_SIZE);
+        await expect(driver.component).toHaveCSS("font-weight", EXPECTED_FONT_WEIGHT);
+      });
+    });
+  });
 });
 
 // --- E2E
 
 // --- label
 
-// TODO
+// Label inputs resolved with converting them to a string
 [
-  { label: "null", value: null },
-  { label: "undefined", value: undefined },
-  { label: "empty object", value: {} },
-  { label: "object", value: { a: 1, b: "hi" } },
-  { label: "empty array", value: [] },
-  { label: "array", value: [] },
-  { label: "function", value: () => {} },
+  { label: "null", input: null, toExpect: "null" },
+  { label: "undefined", input: undefined, toExpect: "undefined" },
+  { label: "empty object", input: {}, toExpect: "[object Object]" },
+  { label: "object", input: { a: 1, b: "hi" }, toExpect: "[object Object]" },
+  { label: "empty array", input: [], toExpect: undefined },
+  { label: "array", input: [1, 2, 3], toExpect: "1,2,3" },
+  { label: "arrow function returning string", input: "{() => ''}", toExpect: "[object Object]" },
+  {
+    label: "function returning string",
+    input: "{function () { return ''; }}",
+    toExpect: "[object Object]",
+  },
+  {
+    label: "IIFE returning string",
+    input: "{(function () { return 'hello'; })()}",
+    toExpect: "hello",
+  },
 ].forEach((type) => {
-  test.skip(
-    `does not render if label is ${type.label}`,
-    SKIP_REASON.UNSURE(
-      "Need to talk this through, ex. the function throws an error, the rest just don't render",
-    ),
-    async ({ initTestBed, createButtonDriver }) => {
-      await initTestBed(`<Button label="${type.value}" />`);
-      await expect((await createButtonDriver()).component).not.toBeAttached();
-    },
-  );
+  test(`if label is ${type.label} renders label as "${type.toExpect}"`, async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`<Button label="${type.input}" />`);
+    await expect((await createButtonDriver()).component).toHaveExplicitLabel(type.toExpect);
+  });
 });
 
 test("text node as children are same as setting label", async ({
@@ -321,7 +404,7 @@ iconPositionCases.forEach(({ position, value }) => {
       await iconPositionCalculation(buttonDriver, iconDriver);
 
     // Depending on orientation, the icon's leftmost and rightmost points fall shorter
-    // compared to the button's leftmost and rightmost points because of the label 
+    // compared to the button's leftmost and rightmost points because of the label
     if (value === "start") {
       expect(buttonContentLeft).toBeCloseTo(iconLeft, 5);
       expect(buttonContentRight).toBeGreaterThan(iconRight + 1);
