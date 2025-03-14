@@ -9,7 +9,7 @@ import { InspectorContext, useDevTools } from "./InspectorContext";
 import { Button } from "../components/Button/ButtonNative";
 import styles from "./DevTools.module.scss";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
-import { BiDockBottom, BiDockLeft, BiDockRight } from "react-icons/bi";
+import { BiDockBottom, BiDockLeft, BiDockRight, BiWindows } from "react-icons/bi";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { HiOutlineDotsVertical } from "react-icons/all";
 
@@ -84,13 +84,8 @@ export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
     }
   }, [side]);
 
-  const [size, setSize] = useState(getInitialSize);
-  const [position, setPosition] = useState(getInitialPosition);
-
-  useEffect(() => {
-    setSize(getInitialSize());
-    setPosition(getInitialPosition());
-  }, [getInitialPosition, getInitialSize]);
+  const [size, setSize] = useState(getInitialSize());
+  const [position, setPosition] = useState(getInitialPosition());
 
   useEffect(() => {
     const handleResize = () => {
@@ -101,6 +96,11 @@ export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [getInitialPosition, getInitialSize, side]);
+
+  useEffect(() => {
+    setPosition(getInitialPosition());
+    setSize(getInitialSize());
+  }, [getInitialPosition, getInitialSize]);
 
   useEffect(() => {
     setDevToolsSide(side);
@@ -118,9 +118,14 @@ export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
       position={position}
       disableDragging={isDocked}
       enableResizing={{
-        top: side === "bottom",
-        right: side === "left",
-        left: side === "right",
+        top: side === "bottom" || !isDocked,
+        right: side === "left" || !isDocked,
+        left: side === "right" || !isDocked,
+        bottom: !isDocked,
+        topRight: !isDocked,
+        bottomRight: !isDocked,
+        bottomLeft: !isDocked,
+        topLeft: !isDocked,
       }}
       minWidth={300}
       minHeight={200}
@@ -166,21 +171,37 @@ export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
                     <div className={styles.sideButtons}>
                       <Button
                         style={{ padding: 8 }}
-                        onClick={() => setSide("left")}
+                        onClick={() => setIsDocked(false)}
+                        variant={"ghost"}
+                      >
+                        <BiWindows color={"currentColor"} />
+                      </Button>
+                      <Button
+                        style={{ padding: 8 }}
+                        onClick={() => {
+                          setSide("left");
+                          setIsDocked(true);
+                        }}
                         variant={"ghost"}
                       >
                         <BiDockLeft color={"currentColor"} />
                       </Button>
                       <Button
                         style={{ padding: 8 }}
-                        onClick={() => setSide("bottom")}
+                        onClick={() => {
+                          setSide("bottom");
+                          setIsDocked(true);
+                        }}
                         variant={"ghost"}
                       >
                         <BiDockBottom color={"currentColor"} />
                       </Button>
                       <Button
                         style={{ padding: 8 }}
-                        onClick={() => setSide("right")}
+                        onClick={() => {
+                          setSide("right");
+                          setIsDocked(true);
+                        }}
                         variant={"ghost"}
                       >
                         <BiDockRight color={"currentColor"} />
