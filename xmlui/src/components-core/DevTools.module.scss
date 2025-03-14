@@ -4,10 +4,13 @@
   z-index: 9999;
   overflow: auto;
   box-shadow: 0 2px 6px 0 rgba(58, 57, 68, 0.4);
-
-  & > :nth-child(2) {
-    display: none;
-  }
+  position: relative;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  /*  & > :nth-child(2) {
+      display: none;
+    }*/
 }
 
 .actions {
@@ -57,5 +60,6 @@
 
 .content {
   flex: 1;
+  padding: 1rem;
   overflow: auto;
 }

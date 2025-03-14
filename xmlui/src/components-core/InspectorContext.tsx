@@ -13,9 +13,7 @@ import type { ComponentDef } from "../abstractions/ComponentDefs";
 import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
 import { useTheme } from "./theming/ThemeContext";
-import { ModalDialog } from "../components/ModalDialog/ModalDialogNative";
 import classnames from "classnames";
-import { XmluiCodeHighlighter } from "./XmluiCodeHighlighter";
 import { Button } from "../components/Button/ButtonNative";
 import Icon from "../components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
@@ -41,6 +39,8 @@ export function InspectorProvider({
   sources?: Record<string, string>;
 }) {
   const [inspectable, setInspectable] = useState<Record<string, any>>({});
+  const [inspectedNode, setInspectedNode] = useState<ComponentDef | null>(null);
+  const [showCode, setShowCode] = useState(false);
 
   const contextValue: IInspectorContext = useMemo(() => {
     return {
@@ -82,14 +82,24 @@ export function InspectorProvider({
   return (
     <InspectorContext.Provider value={contextValue}>
       {children}
+      {
+        showCode && inspectedNode &&
+        <DevTools
+          setIsOpen={setShowCode}
+          node={inspectedNode}
+          key={inspectedNode?.uid}
+        />
+      }
       {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
         inspectable &&
         Object.values(inspectable).map((item: any) => {
           return (
             <InspectButton
+              setShowCode={setShowCode}
               key={item.inspectId + +"-" + item.key}
               inspectId={item.inspectId}
               node={item.node}
+              setInspectedNode={setInspectedNode}
             />
           );
         })}
@@ -97,54 +107,17 @@ export function InspectorProvider({
   );
 }
 
-function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
-  const { sources } = useContext(InspectorContext)!;
-  const value = useMemo(() => {
-    const compSrc = props.node.debug?.source;
-    if (!compSrc) {
-      return "";
-    }
-    if (!sources) {
-      return "";
-    }
-    const { start, end, fileId } = compSrc;
-    const slicedSrc = sources[fileId].slice(start, end);
-
-    let dropEmptyLines = true;
-    const prunedLines: Array<string> = [];
-    let trimBeginCount: number | undefined = undefined;
-    slicedSrc.split("\n").forEach((line) => {
-      if (line.trim() === "" && dropEmptyLines) {
-        //drop empty lines from the beginning
-        return;
-      } else {
-        dropEmptyLines = false;
-        prunedLines.push(line);
-        const startingWhiteSpaces = line.search(/\S|$/);
-        if (
-          line.trim() !== "" &&
-          (trimBeginCount === undefined || startingWhiteSpaces < trimBeginCount)
-        ) {
-          trimBeginCount = startingWhiteSpaces;
-        }
-      }
-    });
-    return prunedLines.map((line) => line.slice(trimBeginCount)).join("\n");
-  }, [props.node.debug?.source, sources]);
-  return (
-    <ModalDialog
-      isInitiallyOpen={true}
-      onClose={props.onClose}
-      style={{ width: "auto", maxWidth: "100%", minWidth: 400 }}
-    >
-      <div style={{ overflow: "auto", height: "100%" }}>
-        <XmluiCodeHighlighter value={value} />
-      </div>
-    </ModalDialog>
-  );
-}
-
-function InspectButton({ inspectId, node }: { inspectId: string; node: ComponentDef }) {
+function InspectButton({
+  inspectId,
+  node,
+  setInspectedNode,
+  setShowCode,
+}: {
+  inspectId: string;
+  node: ComponentDef;
+  setInspectedNode: (node: ComponentDef | null) => void;
+  setShowCode: (show: boolean) => void;
+}) {
   const { root } = useTheme();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLButtonElement | null>(null);
@@ -167,7 +140,6 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
     ],
   });
   const [visible, setVisible] = useState(false);
-  const [showCode, setShowCode] = useState(false);
   const timeoutRef = useRef<number | null>(null);
   const hoverRef = useRef<boolean>(false);
 
@@ -229,13 +201,13 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
             }}
             onClick={() => {
               setShowCode(true);
+              setInspectedNode(node);
             }}
           >
             <Icon name={"inspect"} size={"md"} />
           </Button>,
           root,
         )}
-      <DevTools isOpen={showCode} setIsOpen={setShowCode} node={node} />
     </>
   );
 }
