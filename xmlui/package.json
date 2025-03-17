@@ -23,8 +23,6 @@
     "generate-all-docs": "npm run build:xmlui-metadata && npm run build:ext-meta && npm run generate-docs"
   },
   "dependencies": {
-    "vscode-languageserver": "^9.0.1",
-    "vscode-languageserver-textdocument": "^1.0.11",
     "@eslint-community/regexpp": "4.10.0",
     "@formkit/auto-animate": "0.7.0",
     "@modyfi/vite-plugin-yaml": "1.1.0",
@@ -46,10 +44,12 @@
     "@tanstack/react-query-devtools": "4.32.6",
     "@tanstack/react-table": "8.17.3",
     "@tanstack/react-virtual": "3.10.8",
+    "@types/chroma-js": "^3.1.1",
     "@types/color": "3.0.6",
     "@vitejs/plugin-react": "4.3.0",
     "adm-zip": "0.5.10",
     "axios": "1.7.7",
+    "chroma-js": "^3.1.2",
     "cmdk": "^1.0.4",
     "color": "4.2.3",
     "date-fns": "2.30.0",
@@ -96,6 +96,8 @@
     "virtua": "0.40.0",
     "vite-plugin-lib-inject-css": "1.3.0",
     "vite-plugin-svgr": "4.2.0",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11",
     "yargs": "17.7.2"
   },
   "devDependencies": {
