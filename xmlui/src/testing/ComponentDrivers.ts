@@ -385,3 +385,7 @@ export class LinkDriver extends ComponentDriver {}
 // --- Card
 
 export class CardDriver extends ComponentDriver {}
+
+// --- Accordion
+
+export class AccordionDriver extends ComponentDriver {}
