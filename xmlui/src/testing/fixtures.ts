@@ -8,6 +8,8 @@ import {
   type ComponentDriver,
   type ComponentDriverParams,
   AccordionDriver,
+  AppFooterDriver,
+  AppHeaderDriver,
   AvatarDriver,
   ButtonDriver,
   CardDriver,
@@ -294,6 +296,16 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(AccordionDriver, testIdOrLocator);
     });
   },
+  createAppHeaderDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(AppHeaderDriver, testIdOrLocator);
+    });
+  },
+  createAppFooterDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(AppFooterDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
@@ -337,4 +349,6 @@ type TestDriverExtenderProps = {
   createLinkDriver: ComponentDriverMethod<LinkDriver>;
   createCardDriver: ComponentDriverMethod<CardDriver>;
   createAccordionDriver: ComponentDriverMethod<AccordionDriver>;
+  createAppHeaderDriver: ComponentDriverMethod<AppHeaderDriver>;
+  createAppFooterDriver: ComponentDriverMethod<AppFooterDriver>;
 };

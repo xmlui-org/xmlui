@@ -1,1075 +1,787 @@
 import { test, expect } from "../../testing/fixtures";
-import { initThemedApp } from "../../testing/themed-app-test-helpers";
 
-const ACCORDION_CODE = `
-  <Accordion testId="accordion">
+const CODE = `
+  <Accordion>
     <AccordionItem>Hello</AccordionItem>
   </Accordion>
 `;
 
 test("border", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
-
-  await initTestBed(ACCORDION_CODE, {
+  await initTestBed(CODE, {
     testThemeVars: {
       "border-Accordion": EXPECTED_BORDER_DEFAULT,
     },
   });
-  const driver = await createAccordionDriver("accordion");
+  const driver = await createAccordionDriver();
   await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT);
 });
 
 test("borderLeft", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
-  await initTestBed(ACCORDION_CODE, {
+  await initTestBed(CODE, {
     testThemeVars: {
       "borderLeft-Accordion": EXPECTED_BORDER_DEFAULT,
     },
   });
-  const driver = await createAccordionDriver("accordion");
+  const driver = await createAccordionDriver();
   await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "left");
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["right", "top", "bottom"]);
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
+    "right",
+    "top",
+    "bottom",
+  ]);
 });
 
-test("borderRight", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
-      "borderRight-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderRight", async ({ initTestBed, createAccordionDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderRight-Accordion": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "right");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
+    "left",
+    "top",
+    "bottom",
+  ]);
 });
 
-test("borderHorizontal", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
-      "borderHorizontal-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderHorizontal", async ({ initTestBed, createAccordionDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderHorizontal-Accordion": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, ["right", "left"]);
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
 });
 
 test("borderHorizontal and borderLeft", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
   const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
 
-  await initTestBed(ACCORDION_CODE, {
+  await initTestBed(CODE, {
     testThemeVars: {
       "borderHorizontal-Accordion": EXPECTED_BORDER_DEFAULT,
       "borderLeft-Accordion": EXPECTED_BORDER_UPDATE,
     },
   });
-  const driver = await createAccordionDriver("accordion");
-
+  const driver = await createAccordionDriver();
   await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "left");
   await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "right");
   await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
 });
 
-test("borderHorizontal and borderRight", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
-      "borderHorizontal-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "borderRight-Accordion": "8px double rgb(0, 128, 0)",
+test("borderHorizontal and borderRight", async ({ initTestBed, createAccordionDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderHorizontal-Accordion": EXPECTED_BORDER_DEFAULT,
+      "borderRight-Accordion": EXPECTED_BORDER_UPDATE,
     },
   });
-
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", "rgb(0, 128, 0)");
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", "8px");
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", "double");
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "right");
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "left");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
 });
 
-test("borderTop", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
-      "borderTop-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderTop", async ({ initTestBed, createAccordionDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderTop-Accordion": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "top");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
+    "left",
+    "right",
+    "bottom",
+  ]);
 });
 
-test("borderBottom", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
-      "borderBottom-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderBottom", async ({ initTestBed, createAccordionDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderBottom-Accordion": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "bottom");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
+    "left",
+    "right",
+    "top",
+  ]);
 });
 
-test("borderVertical", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
-      "borderVertical-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderVertical", async ({ initTestBed, createAccordionDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderVertical-Accordion": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["left", "right"]);
 });
 
-test("borderVertical and borderTop", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
-      "borderVertical-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "borderTop-Accordion": "8px double rgb(0, 128, 0)",
+test("borderVertical and borderTop", async ({ initTestBed, createAccordionDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderVertical-Accordion": EXPECTED_BORDER_DEFAULT,
+      "borderTop-Accordion": EXPECTED_BORDER_UPDATE,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", "8px");
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", "double");
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "bottom");
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "top");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["left", "right"]);
 });
 
-test("borderVertical and border-bottom", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
-      "borderVertical-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "borderBottom-Accordion": "8px double rgb(0, 128, 0)",
+test("borderVertical and border-bottom", async ({ initTestBed, createAccordionDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderVertical-Accordion": EXPECTED_BORDER_DEFAULT,
+      "borderBottom-Accordion": EXPECTED_BORDER_UPDATE,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", "rgb(0, 128, 0)");
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", "8px");
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", "double");
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "top");
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "bottom");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["left", "right"]);
 });
 
-test("border-color", async ({ page }) => {
+test("border-color", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderColor-Accordion": EXPECTED_COLOR,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).not.toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).not.toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color", async ({ page }) => {
+test("border, border-color", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-horizontal", async ({ page }) => {
+test("border, border-color-horizontal", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderHorizontalColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, ["right", "left"]);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-left", async ({ page }) => {
+test("border, border-color-left", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderLeftColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, "left");
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-right", async ({ page }) => {
+test("border, border-color-right", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderRightColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, "right");
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-vertical", async ({ page }) => {
+test("border, border-color-vertical", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderVerticalColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, ["top", "bottom"]);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-top", async ({ page }) => {
+test("border, border-color-top", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderTopColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, "top");
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-bottom", async ({ page }) => {
+test("border, border-color-bottom", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderBottomColor-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, "bottom");
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border-style", async ({ page }) => {
+test("border-style", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderStyle-Accordion": EXPECTED_STYLE,
     },
   });
-
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).not.toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).not.toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style", async ({ page }) => {
+test("border, border-style", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", UPDATED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-horizontal", async ({ page }) => {
+test("border, border-style-horizontal", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderHorizontalStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", UPDATED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR, ["left", "right"]);
+  await expect(driver.component).toHaveBorderStyle(UPDATED);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-left", async ({ page }) => {
+test("border, border-style-left", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderLeftStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", UPDATED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, "left");
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-right", async ({ page }) => {
+test("border, border-style-right", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderRightStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, "right");
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-vertical", async ({ page }) => {
+test("border, border-style-vertical", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderVerticalStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, ["top", "bottom"]);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-top", async ({ page }) => {
+test("border, border-style-top", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderTopStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, "top");
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-bottom", async ({ page }) => {
+test("border, border-style-bottom", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderBottomStyle-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, "bottom");
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border-thickness", async ({ page }) => {
+test("border-thickness", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "8px";
   const EXPECTED_STYLE = "dotted";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderWidth-Accordion": EXPECTED_WIDTH,
     },
   });
-
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).not.toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).not.toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-thickness", async ({ page }) => {
+test("border, border-thickness", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED);
 });
 
-test("border, border-thickness-horizontal", async ({ page }) => {
+test("border, border-thickness-horizontal", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderHorizontalWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, ["left", "right"]);
 });
 
-test("border, border-thickness-left", async ({ page }) => {
+test("border, border-thickness-left", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderLeftWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, "left");
 });
 
-test("border, border-thickness-right", async ({ page }) => {
+test("border, border-thickness-right", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderRightWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, "right");
 });
 
-test("border, border-thickness-vertical", async ({ page }) => {
+test("border, border-thickness-vertical", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderVerticalWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, ["top", "bottom"]);
 });
 
-test("border, border-thickness-top", async ({ page }) => {
+test("border, border-thickness-top", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderTopWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, "top");
 });
 
-test("border, border-thickness-bottom", async ({ page }) => {
+test("border, border-thickness-bottom", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderBottomWidth-Accordion": UPDATED,
       "border-Accordion": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-width", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("accordion")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, "bottom");
 });
 
-test("padding", async ({ page }) => {
+test("padding", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "padding-Accordion": EXPECTED,
     },
   });
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("paddingHorizontal", async ({ page }) => {
+test("paddingHorizontal", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "paddingHorizontal-Accordion": EXPECTED,
     },
   });
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).not.toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("paddingLeft", async ({ page }) => {
+test("paddingLeft", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "paddingLeft-Accordion": EXPECTED,
     },
   });
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).not.toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("paddingRight", async ({ page }) => {
+test("paddingRight", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "paddingRight-Accordion": EXPECTED,
     },
   });
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).not.toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-left", EXPECTED);
 });
 
-test("paddingVertical", async ({ page }) => {
+test("paddingVertical", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "paddingVertical-Accordion": EXPECTED,
     },
   });
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-left", EXPECTED);
 });
 
-test("paddingTop", async ({ page }) => {
+test("paddingTop", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "paddingTop-Accordion": EXPECTED,
     },
   });
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-left", EXPECTED);
 });
 
-test("paddingBottom", async ({ page }) => {
+test("paddingBottom", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "paddingBottom-Accordion": EXPECTED,
     },
   });
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).not.toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).not.toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).not.toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding, paddingHorizontal", async ({ page }) => {
+test("padding, paddingHorizontal", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "padding-Accordion": EXPECTED,
       "paddingHorizontal-Accordion": UPDATED,
     },
   });
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-right", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", UPDATED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-right", UPDATED);
+  await expect(driver.component).toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-left", UPDATED);
 });
 
-test("padding, paddingLeft", async ({ page }) => {
+test("padding, paddingLeft", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "padding-Accordion": EXPECTED,
       "paddingLeft-Accordion": UPDATED,
     },
   });
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", UPDATED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-left", UPDATED);
 });
 
-test("padding, paddingRight", async ({ page }) => {
+test("padding, paddingRight", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "padding-Accordion": EXPECTED,
       "paddingRight-Accordion": UPDATED,
     },
   });
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-right", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-right", UPDATED);
+  await expect(driver.component).toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding, paddingVertical", async ({ page }) => {
+test("padding, paddingVertical", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "padding-Accordion": EXPECTED,
       "paddingVertical-Accordion": UPDATED,
     },
   });
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-bottom", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveCSS("padding-top", UPDATED);
+  await expect(driver.component).toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-bottom", UPDATED);
+  await expect(driver.component).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding, paddingTop", async ({ page }) => {
+test("padding, paddingTop", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "padding-Accordion": EXPECTED,
       "paddingTop-Accordion": UPDATED,
     },
   });
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-bottom", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveCSS("padding-top", UPDATED);
+  await expect(driver.component).toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-bottom", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-left", EXPECTED);
 });
 
-test("padding, paddingBottom", async ({ page }) => {
+test("padding, paddingBottom", async ({ initTestBed, createAccordionDriver }) => {
   const EXPECTED = "100px";
   const UPDATED = "48px";
-  await initThemedApp(page, ACCORDION_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "padding-Accordion": EXPECTED,
       "paddingBottom-Accordion": UPDATED,
     },
   });
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-top", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-right", EXPECTED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-bottom", UPDATED);
-  await expect(page.getByTestId("accordion")).toHaveCSS("padding-left", EXPECTED);
+  const driver = await createAccordionDriver();
+  await expect(driver.component).toHaveCSS("padding-top", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-right", EXPECTED);
+  await expect(driver.component).toHaveCSS("padding-bottom", UPDATED);
+  await expect(driver.component).toHaveCSS("padding-left", EXPECTED);
 });

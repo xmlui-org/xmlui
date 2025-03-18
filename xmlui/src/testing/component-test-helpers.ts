@@ -270,6 +270,16 @@ export function numericCSSToString(cssValue: NumericCSS) {
   return `${cssValue.value}${cssValue.unit}`;
 }
 
+export type CSSColor = chroma.Color;
+
+export function isCSSColor(str: any): str is CSSColor {
+  return chroma.valid(str);
+}
+
+export function parseAsCSSColor(str: string): CSSColor {
+  return chroma(str);
+}
+
 const CSSUnitValues = [
   "px",
   "em",
@@ -311,7 +321,7 @@ const CSSBorderStyleValues = [
   "inset",
   "outset",
 ] as const;
-type CSSBorderStyle = (typeof CSSBorderStyleValues)[number];
+export type CSSBorderStyle = (typeof CSSBorderStyleValues)[number];
 
 export function isCSSBorderStyle(str: string): str is CSSBorderStyle {
   return CSSBorderStyleValues.includes(str as any);
