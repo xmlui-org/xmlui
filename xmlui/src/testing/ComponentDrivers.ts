@@ -389,3 +389,11 @@ export class CardDriver extends ComponentDriver {}
 // --- Accordion
 
 export class AccordionDriver extends ComponentDriver {}
+
+// --- AppHeader
+
+export class AppHeaderDriver extends ComponentDriver {}
+
+// --- AppFooter
+
+export class AppFooterDriver extends ComponentDriver {}
