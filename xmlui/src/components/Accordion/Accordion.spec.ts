@@ -355,8 +355,8 @@ test("border, border-style-horizontal", async ({ initTestBed, createAccordionDri
     },
   });
   const driver = await createAccordionDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR, ["left", "right"]);
-  await expect(driver.component).toHaveBorderStyle(UPDATED);
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, ["left", "right"]);
   await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 

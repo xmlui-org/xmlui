@@ -105,925 +105,590 @@ test("click works", async ({ initTestBed, createAvatarDriver }) => {
   await expect.poll(testStateDriver.testState).toEqual(true);
 });
 
-const AVATAR_CODE = '<Avatar testId="avatar" name="Tim"/>';
+const CODE = '<Avatar name="Tim"/>';
 
-test("border", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("border", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "border-Avatar": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT);
 });
 
-test("borderLeft", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "borderLeft-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderLeft", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderLeft-Avatar": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "left");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
+    "right",
+    "top",
+    "bottom",
+  ]);
 });
 
-test("borderRight", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "borderRight-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderRight", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderRight-Avatar": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "right");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
+    "left",
+    "top",
+    "bottom",
+  ]);
 });
 
-test("borderHorizontal", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "borderHorizontal-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderHorizontal", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderHorizontal-Avatar": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, ["right", "left"]);
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
 });
 
-test("borderHorizontal and borderLeft", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
+test("borderHorizontal and borderLeft", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "borderHorizontal-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "borderLeft-Avatar": "8px double rgb(0, 128, 0)",
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderHorizontal-Avatar": EXPECTED_BORDER_DEFAULT,
+      "borderLeft-Avatar": EXPECTED_BORDER_UPDATE,
     },
   });
-
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", "rgb(0, 128, 0)");
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", "8px");
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", "double");
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "left");
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "right");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
 });
 
-test("borderHorizontal and borderRight", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "borderHorizontal-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "borderRight-Avatar": "8px double rgb(0, 128, 0)",
+test("borderHorizontal and borderRight", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderHorizontal-Avatar": EXPECTED_BORDER_DEFAULT,
+      "borderRight-Avatar": EXPECTED_BORDER_UPDATE,
     },
   });
-
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", "rgb(0, 128, 0)");
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", "8px");
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", "double");
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "right");
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "left");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
 });
 
-test("borderTop", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "borderTop-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderTop", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderTop-Avatar": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "top");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
+    "left",
+    "right",
+    "bottom",
+  ]);
 });
 
-test("borderBottom", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "borderBottom-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderBottom", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderBottom-Avatar": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "bottom");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
+    "left",
+    "right",
+    "top",
+  ]);
 });
 
-test("borderVertical", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "borderVertical-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+test("borderVertical", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderVertical-Avatar": EXPECTED_BORDER_DEFAULT,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["left", "right"]);
 });
 
-test("borderVertical and borderTop", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "borderVertical-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "borderTop-Avatar": "8px double rgb(0, 128, 0)",
+test("borderVertical and borderTop", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderVertical-Avatar": EXPECTED_BORDER_DEFAULT,
+      "borderTop-Avatar": EXPECTED_BORDER_UPDATE,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", "8px");
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", "double");
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "bottom");
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "top");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["left", "right"]);
 });
 
-test("borderVertical and border-bottom", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
-      "borderVertical-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-      "borderBottom-Avatar": "8px double rgb(0, 128, 0)",
+test("borderVertical and border-bottom", async ({ initTestBed, createAvatarDriver }) => {
+  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
+  await initTestBed(CODE, {
+    testThemeVars: {
+      "borderVertical-Avatar": EXPECTED_BORDER_DEFAULT,
+      "borderBottom-Avatar": EXPECTED_BORDER_UPDATE,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", "rgb(0, 128, 0)");
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", "8px");
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", "double");
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "top");
+  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "bottom");
+  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["left", "right"]);
 });
 
-test("border-color", async ({ page }) => {
+test("border-color", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderColor-Avatar": EXPECTED_COLOR,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).not.toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).not.toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color", async ({ page }) => {
+test("border, border-color", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderColor-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-horizontal", async ({ page }) => {
+test("border, border-color-horizontal", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderHorizontalColor-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, ["right", "left"]);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-left", async ({ page }) => {
+test("border, border-color-left", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderLeftColor-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, "left");
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-right", async ({ page }) => {
+test("border, border-color-right", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderRightColor-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, "right");
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-vertical", async ({ page }) => {
+test("border, border-color-vertical", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderVerticalColor-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, ["top", "bottom"]);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-top", async ({ page }) => {
+test("border, border-color-top", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderTopColor-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, "top");
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-color-bottom", async ({ page }) => {
+test("border, border-color-bottom", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "rgb(0, 128, 0)";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderBottomColor-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(UPDATED, "bottom");
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border-style", async ({ page }) => {
+test("border-style", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderStyle-Avatar": EXPECTED_STYLE,
     },
   });
-
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).not.toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).not.toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style", async ({ page }) => {
+test("border, border-style", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderStyle-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", UPDATED);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-horizontal", async ({ page }) => {
+test("border, border-style-horizontal", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderHorizontalStyle-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", UPDATED);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, ["left", "right"]);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-left", async ({ page }) => {
+test("border, border-style-left", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderLeftStyle-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", UPDATED);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, "left");
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-right", async ({ page }) => {
+test("border, border-style-right", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderRightStyle-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, "right");
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-vertical", async ({ page }) => {
+test("border, border-style-vertical", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderVerticalStyle-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, ["top", "bottom"]);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-top", async ({ page }) => {
+test("border, border-style-top", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderTopStyle-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, "top");
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-style-bottom", async ({ page }) => {
+test("border, border-style-bottom", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "double";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderBottomStyle-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(UPDATED, "bottom");
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border-thickness", async ({ page }) => {
+test("border-thickness", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "8px";
   const EXPECTED_STYLE = "dotted";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderWidth-Avatar": EXPECTED_WIDTH,
     },
   });
-
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).not.toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).not.toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
 });
 
-test("border, border-thickness", async ({ page }) => {
+test("border, border-thickness", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderWidth-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED);
 });
 
-test("border, border-thickness-horizontal", async ({ page }) => {
+test("border, border-thickness-horizontal", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderHorizontalWidth-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, ["left", "right"]);
 });
 
-test("border, border-thickness-left", async ({ page }) => {
+test("border, border-thickness-left", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderLeftWidth-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, "left");
 });
 
-test("border, border-thickness-right", async ({ page }) => {
+test("border, border-thickness-right", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderRightWidth-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, "right");
 });
 
-test("border, border-thickness-vertical", async ({ page }) => {
+test("border, border-thickness-vertical", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderVerticalWidth-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, ["top", "bottom"]);
 });
 
-test("border, border-thickness-top", async ({ page }) => {
+test("border, border-thickness-top", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderTopWidth-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, "top");
 });
 
-test("border, border-thickness-bottom", async ({ page }) => {
+test("border, border-thickness-bottom", async ({ initTestBed, createAvatarDriver }) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
   const UPDATED = "12px";
 
-  await initThemedApp(page, AVATAR_CODE, {
-    themeVars: {
+  await initTestBed(CODE, {
+    testThemeVars: {
       "borderBottomWidth-Avatar": UPDATED,
       "border-Avatar": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-width", UPDATED);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("avatar")).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  const driver = await createAvatarDriver();
+  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
+  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
+  await expect(driver.component).toHaveBorderWidth(UPDATED, "bottom");
 });

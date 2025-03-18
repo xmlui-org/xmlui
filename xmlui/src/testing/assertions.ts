@@ -341,7 +341,7 @@ export const expect = baseExpect.extend({
    *
    * ---
    * **Usage**
-   *
+  *
    * ```js
    * await initTestBed(`<Button label="hello" />`, {
    *    testThemeVars: { "borderLeft-Button": "1px solid black" },
