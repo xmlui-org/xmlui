@@ -162,17 +162,17 @@ export function Theme({
     getThemeVar,
   ]);
 
-  const { devToolsSize, devToolsSide, devToolsEnabled, dockedDevtools } = useDevTools();
+  const { devToolsSize, devToolsSide, devToolsEnabled } = useDevTools();
 
   const inspectStyle = useMemo(() => {
-    return devToolsEnabled && dockedDevtools
+    return devToolsEnabled
       ? {
           paddingBottom: devToolsSide === "bottom" ? devToolsSize : 0,
           paddingLeft: devToolsSide === "left" ? devToolsSize : 0,
           paddingRight: devToolsSide === "right" ? devToolsSize : 0,
         }
       : {};
-  }, [devToolsEnabled, devToolsSide, devToolsSize, dockedDevtools]);
+  }, [devToolsEnabled, devToolsSide, devToolsSize]);
 
   if (isRoot) {
     const faviconUrl = getResourceUrl("resource:favicon") || "/resources/favicon.ico";

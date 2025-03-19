@@ -1,6 +1,5 @@
 import {
   createContext,
-  MouseEvent,
   useCallback,
   useContext,
   useEffect,
@@ -31,7 +30,6 @@ interface IInspectorContext {
   devToolsSide?: "bottom" | "left" | "right";
   setDevToolsSide: (side: "bottom" | "left" | "right") => void;
   devToolsEnabled?: boolean;
-  dockedDevtools?: boolean;
 }
 
 // --- The context object that is used to store the inspector information.
@@ -49,7 +47,6 @@ export function InspectorProvider({
   const [showCode, setShowCode] = useState(false);
   const [devToolsSize, setDevToolsSize] = useState(0);
   const [devToolsSide, setDevToolsSide] = useState<"bottom" | "left" | "right">("bottom");
-  const [dockedDevTools, setDockedDevTools] = useState(true);
 
   const contextValue: IInspectorContext = useMemo(() => {
     return {
@@ -90,21 +87,14 @@ export function InspectorProvider({
       devToolsSide,
       setDevToolsSide,
       devToolsEnabled: showCode,
-      dockedDevtools: dockedDevTools,
     };
-  }, [devToolsSide, devToolsSize, dockedDevTools, showCode, sources]);
+  }, [devToolsSide, devToolsSize, showCode, sources]);
 
   return (
     <InspectorContext.Provider value={contextValue}>
       {children}
       {showCode && inspectedNode && (
-        <DevTools
-          setIsOpen={setShowCode}
-          node={inspectedNode}
-          key={inspectedNode?.uid}
-          setIsDocked={setDockedDevTools}
-          isDocked={dockedDevTools}
-        />
+        <DevTools setIsOpen={setShowCode} node={inspectedNode} key={inspectedNode?.uid} />
       )}
       {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
         inspectable &&
@@ -236,7 +226,6 @@ export function useDevTools() {
     devToolsSide: context?.devToolsSide,
     setDevToolsSide: context?.setDevToolsSide,
     devToolsEnabled: context?.devToolsEnabled,
-    dockedDevtools: context?.dockedDevtools,
   };
 }
 

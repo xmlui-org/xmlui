@@ -4,20 +4,11 @@ import styles from "./XmluiCodeHighlighter.module.scss";
 import { useTheme } from "./theming/ThemeContext";
 import classnames from "classnames";
 import { createComponentRenderer } from "./renderers";
-import { Button } from "../components/Button/ButtonNative";
-import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 
 let highlighter: HighlighterCore | null = null;
 
 export function XmluiCodeHighlighter({ value }: { value: string }) {
   const { activeThemeTone } = useTheme();
-  const [isHovered, setIsHovered] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const copyToClipboard = () => {
-    setCopied(true);
-    navigator.clipboard.writeText(value);
-  };
 
   const [initialized, setInitialized] = useState(false);
   useEffect(() => {
@@ -63,13 +54,9 @@ export function XmluiCodeHighlighter({ value }: { value: string }) {
   }, [initialized, value]);
 
   return (
-    <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className={styles.wrapper}
-    >
+    <div className={styles.wrapper}>
       <div
-        className={classnames(styles.wrapper, {
+        className={classnames(styles.innerWrapper, {
           [styles.dark]: activeThemeTone === "dark",
           [styles.light]: activeThemeTone === "light",
         })}
@@ -77,13 +64,6 @@ export function XmluiCodeHighlighter({ value }: { value: string }) {
           __html: html,
         }}
       />
-      {isHovered && (
-        <div className={styles.copyButton}>
-          <Button onClick={copyToClipboard} variant={"ghost"} style={{ padding: 8 }} size={"sm"}>
-            {copied ? <HiOutlineClipboardDocumentCheck size={16}/> : <HiOutlineClipboardDocument size={16}/>}
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

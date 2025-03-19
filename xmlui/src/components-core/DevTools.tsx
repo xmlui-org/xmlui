@@ -8,21 +8,26 @@ import { InspectorContext, useDevTools } from "./InspectorContext";
 import { Button } from "../components/Button/ButtonNative";
 import styles from "./DevTools.module.scss";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
-import { BiDockBottom, BiDockLeft, BiDockRight, BiWindows } from "react-icons/bi";
+import { BiDockBottom, BiDockLeft, BiDockRight } from "react-icons/bi";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { HiOutlineDotsVertical } from "react-icons/all";
+import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 
 type Props = {
   setIsOpen: (isOpen: boolean) => void;
-  setIsDocked: (isDocked: boolean) => void;
-  isDocked: boolean;
   node: any;
 };
 
-export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
+export const DevTools = ({ setIsOpen, node }: Props) => {
   const [side, setSide] = useState<"bottom" | "left" | "right">("bottom");
   const { root } = useTheme();
   const { setDevToolsSize, setDevToolsSide } = useDevTools();
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = () => {
+    setCopied(true);
+    navigator.clipboard.writeText(value);
+  };
 
   const { sources } = useContext(InspectorContext)!;
   const value = useMemo(() => {
@@ -115,16 +120,11 @@ export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
       className={styles.wrapper}
       size={size}
       position={position}
-      disableDragging={isDocked}
+      disableDragging={true}
       enableResizing={{
-        top: side === "bottom" || !isDocked,
-        right: side === "left" || !isDocked,
-        left: side === "right" || !isDocked,
-        bottom: !isDocked,
-        topRight: !isDocked,
-        bottomRight: !isDocked,
-        bottomLeft: !isDocked,
-        topLeft: !isDocked,
+        top: side === "bottom",
+        right: side === "left",
+        left: side === "right",
       }}
       minWidth={300}
       minHeight={200}
@@ -170,16 +170,8 @@ export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
                     <div className={styles.sideButtons}>
                       <Button
                         style={{ padding: 8 }}
-                        onClick={() => setIsDocked(false)}
-                        variant={"ghost"}
-                      >
-                        <BiWindows color={"currentColor"} />
-                      </Button>
-                      <Button
-                        style={{ padding: 8 }}
                         onClick={() => {
                           setSide("left");
-                          setIsDocked(true);
                         }}
                         variant={"ghost"}
                       >
@@ -189,7 +181,6 @@ export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
                         style={{ padding: 8 }}
                         onClick={() => {
                           setSide("bottom");
-                          setIsDocked(true);
                         }}
                         variant={"ghost"}
                       >
@@ -199,7 +190,6 @@ export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
                         style={{ padding: 8 }}
                         onClick={() => {
                           setSide("right");
-                          setIsDocked(true);
                         }}
                         variant={"ghost"}
                       >
@@ -217,6 +207,15 @@ export const DevTools = ({ setIsOpen, setIsDocked, isDocked, node }: Props) => {
         </List>
         <Content value={"code"} className={styles.content}>
           <XmluiCodeHighlighter value={value} />
+          <div className={styles.copyButton}>
+            <Button onClick={copyToClipboard} variant={"solid"} themeColor={"secondary"} style={{ padding: 8 }} size={"sm"}>
+              {copied ? (
+                <HiOutlineClipboardDocumentCheck size={16} />
+              ) : (
+                <HiOutlineClipboardDocument size={16} />
+              )}
+            </Button>
+          </div>
         </Content>
         <Content value={"console"} className={styles.content}>
           Debug console

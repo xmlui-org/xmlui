@@ -9,9 +9,6 @@
   right: 0;
   left: 0;
   border: 1px solid themes.$borderColor;
-  /*  & > :nth-child(2) {
-      display: none;
-    }*/
 }
 
 .actions {
@@ -61,6 +58,26 @@
 
 .content {
   flex: 1;
-  padding: 1rem;
   overflow: auto;
+  position: relative;
+
+  .copyButton {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    border: none;
+    padding: 4px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    gap: 5px;
+    transition: opacity 0.2s;
+  }
+
+  &:hover {
+    .copyButton {
+      display: flex;
+    }
+  }
 }
