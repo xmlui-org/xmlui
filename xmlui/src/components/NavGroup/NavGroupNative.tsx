@@ -43,6 +43,7 @@ type Props = {
   to?: string;
   node: NavGroupComponentDef;
   renderChild: RenderChildFn;
+  initiallyExpanded: boolean;
 };
 
 const NavGroupContext = createContext({
@@ -50,7 +51,7 @@ const NavGroupContext = createContext({
 });
 
 export const NavGroup = forwardRef(function NavGroup(
-  { node, style, label, icon, renderChild, to }: Props,
+  { node, style, label, icon, renderChild, to, initiallyExpanded }: Props,
   ref,
 ) {
   const { level } = useContext(NavGroupContext);
@@ -82,6 +83,7 @@ export const NavGroup = forwardRef(function NavGroup(
           node={node}
           renderChild={renderChild}
           ref={ref}
+          initiallyExpanded={initiallyExpanded}
         />
       ) : (
         <DropDownNavGroup
@@ -105,6 +107,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     renderChild,
     node,
     to,
+    initiallyExpanded = false,
   }: {
     style?: CSSProperties;
     label: string;
@@ -112,11 +115,12 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     node: NavGroupComponentDef;
     renderChild: RenderChildFn;
     to?: string;
+    initiallyExpanded?: boolean;
   },
   ref,
 ) {
   const { level } = useContext(NavGroupContext);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(initiallyExpanded);
 
   const toggleStyle = {
     ...style,

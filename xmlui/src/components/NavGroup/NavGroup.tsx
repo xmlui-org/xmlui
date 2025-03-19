@@ -18,6 +18,7 @@ export const NavGroupMd = createMetadata({
     label: dLabel(),
     icon: d(`This property defines an optional icon to display along with the \`${COMP}\` label.`),
     to: d(`This property defines an optional navigation link.`),
+    initiallyExpanded: d('This property defines whether the group is initially expanded or collapsed.'),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -37,6 +38,7 @@ export const navGroupComponentRenderer = createComponentRenderer(
         to={extractValue.asOptionalString(node.props.to)}
         icon={<Icon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />}
         node={node}
+        initiallyExpanded={extractValue.asBoolean(node.props.initiallyExpanded)}
         renderChild={renderChild}
       />
     );
