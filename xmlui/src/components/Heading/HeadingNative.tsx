@@ -65,12 +65,11 @@ export const Heading = forwardRef(function Heading(
 
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const registerHeading = tableOfContentsContext?.registerHeading;
-  const observeIntersection = tableOfContentsContext?.hasTableOfContents;
 
   const ref = forwardedRef ? composeRefs(elementRef, forwardedRef) : elementRef;
 
   useEffect(() => {
-    if (observeIntersection && elementRef.current) {
+    if (elementRef.current) {
       const newAnchorId = elementRef.current.textContent
         ?.trim()
         ?.replace(/[^\w\s-]/g, "")
@@ -78,10 +77,11 @@ export const Heading = forwardRef(function Heading(
         ?.toLowerCase();
       setAnchorId(newAnchorId || null);
     }
-  }, [observeIntersection]);
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
-    if (observeIntersection && elementRef.current && anchorId && !omitFromToc) {
+    if (elementRef.current && anchorId && !omitFromToc) {
+      console.log("HERE", {anchorId, registerHeading, level, omitFromToc});
       return registerHeading?.({
         id: anchorId,
         level: parseInt(level.replace("h", "")),
@@ -89,7 +89,8 @@ export const Heading = forwardRef(function Heading(
         anchor: anchorRef.current,
       });
     }
-  }, [anchorId, observeIntersection, registerHeading, level, omitFromToc]);
+  }, [anchorId, registerHeading, level, omitFromToc]);
+
 
   return (
     <Element
@@ -104,7 +105,7 @@ export const Heading = forwardRef(function Heading(
       })}
       {...furtherProps}
     >
-      {anchorId && observeIntersection && (
+      {anchorId && (
         <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0 }} data-anchor={true} />
       )}
       {children}

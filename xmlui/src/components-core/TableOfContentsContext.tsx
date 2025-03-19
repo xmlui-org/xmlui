@@ -8,8 +8,9 @@ import {
   useState,
 } from "react";
 import { useScrollEventHandler, useScrollParent } from "./utils/hooks";
-import { useLocation, useNavigate } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "./constants";
+import { useAppContext } from "./AppContext";
 
 
 // --- Stores the information about a particular heading to be displayed in the TOC.
@@ -44,6 +45,7 @@ interface ITableOfContentsContext {
   scrollToAnchor: (id: string, smoothScrolling: boolean) => void;
 
   subscribeToActiveAnchorChange: (callback: ActiveAnchorChangedCallback) => () => void;
+  activeAnchorId: string;
 }
 
 /**
@@ -60,7 +62,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
   const [headings, setHeadings] = useState<Record<string, HeadingItem>>(EMPTY_OBJECT);
   const [callbacks, setCallbacks] = useState<Array<ActiveAnchorChangedCallback>>(EMPTY_ARRAY);
   const observer = useRef<IntersectionObserver | null>(null);
-  const initialHeading = useRef<HTMLElement | null>(null);
+  const {forceRefreshAnchorScroll} = useAppContext();
   const thisRef = useRef({
     suspendPositionBasedSetActiveId: false,
   });
@@ -70,10 +72,12 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
       thisRef.current.suspendPositionBasedSetActiveId = false;
     }, []),
   });
+  const [activeAnchorId, setActiveAnchorId] = useState(null);
 
   const notify = useCallback(
     (id) => {
       callbacks.forEach((cb) => cb(id));
+      setActiveAnchorId(id);
     },
     [callbacks],
   );
@@ -128,6 +132,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     (id: string, smoothScrolling: boolean) => {
       const value = headings[id];
       if (value) {
+        thisRef.current.suspendPositionBasedSetActiveId = true;
         value.anchor.scrollIntoView({
           block: "start",
           inline: "start",
@@ -145,8 +150,13 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
               },
             },
           );
+          //we clear the preventHashScroll route state:  https://stackoverflow.com/questions/72121228/how-to-update-location-state-in-react-router-v6
+          requestAnimationFrame(()=>{
+            navigate({
+              hash: `#${value.id}`,
+            }, { replace: true });
+          })
         });
-        thisRef.current.suspendPositionBasedSetActiveId = true;
       }
     },
     [headings, navigate, notify],
@@ -163,24 +173,14 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     });
   }, [headings]);
 
-  const location = useLocation();
-  useEffect(() => {
-    const hash = location.hash;
-    if (hash) {
-      if (initialHeading.current) {
-        return;
-      } else {
-        initialHeading.current = sortedHeadings.find((value) => `#${value.id}` === hash)?.anchor;
-        if (initialHeading.current) {
-          initialHeading.current.scrollIntoView({
-            block: "start",
-            inline: "start",
-            behavior: "instant",
-          });
-        }
-      }
+
+  //the content could take time to load, this way we try to force the scroll to anchor mechanism to kick in
+  const hasHeadings = sortedHeadings.length > 0;
+  useEffect(()=>{
+    if(hasHeadings){
+      forceRefreshAnchorScroll();
     }
-  }, [location.hash, sortedHeadings]);
+  }, [forceRefreshAnchorScroll, hasHeadings]);
 
   const subscribeToActiveAnchorChange = useCallback((cb: ActiveAnchorChangedCallback) => {
     setCallbacks((prev) => {
@@ -200,6 +200,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
       scrollToAnchor,
       subscribeToActiveAnchorChange,
       hasTableOfContents: callbacks.length > 0,
+      activeAnchorId
     };
   }, [
     registerHeading,
@@ -207,6 +208,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     scrollToAnchor,
     subscribeToActiveAnchorChange,
     callbacks.length,
+    activeAnchorId,
   ]);
 
   return (
