@@ -1,11 +1,12 @@
 import { CharacterCodes } from "./CharacterCodes";
+import type {
+  DiagnosticMessageFromScanner} from "./diagnostics";
 import {
   Diag_Invalid_Character,
   Diag_Unterminated_CData,
   Diag_Unterminated_Comment,
   Diag_Unterminated_Script,
-  Diag_Unterminated_String_Literal,
-  DiagnosticMessageFromScanner,
+  Diag_Unterminated_String_Literal
 } from "./diagnostics";
 import { SyntaxKind, isTrivia } from "./syntax-kind";
 
