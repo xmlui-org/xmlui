@@ -70,7 +70,6 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-primary-800": "hsl(212,71.9%,18.1%)",
     "color-primary-900": "hsl(212,71.9%,9.1%)",
     "color-primary-950": "hsl(212,71.9%,4.5%)",
-    "color-primary": "$color-primary-500",
 
     // --- Secondary color shades (steel-bluish)
     "color-secondary-50": "hsl(211.7,21.2%,96.9%)",

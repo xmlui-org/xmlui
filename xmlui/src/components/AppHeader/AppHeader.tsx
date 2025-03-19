@@ -37,7 +37,10 @@ export const AppHeaderMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
-    [`width-logo-${COMP}`]: "Sets the width of the displayed logo",
+    [`padding‑logo‑${COMP}`]:
+      "This theme variable sets the padding of the logo in the app header (including all " +
+      "`padding` variants, such as `paddingLeft-logo-AppHeader` and others).",
+    [`width‑logo‑${COMP}`]: "Sets the width of the displayed logo",
   },
   defaultThemeVars: {
     [`height-${COMP}`]: "$space-14",

@@ -18,7 +18,8 @@ export const AppMd = createMetadata({
     `preferred layout.`,
   props: {
     layout: {
-      description: `This property sets the layout template of the app. This setting determines the position ` +
+      description:
+        `This property sets the layout template of the app. This setting determines the position ` +
         `and size of the app parts (such as header, navigation bar, footer, etc.) and the app's ` +
         `scroll behavior.`,
       availableValues: appLayoutMd,
@@ -45,13 +46,15 @@ export const AppMd = createMetadata({
       valueType: "string",
     },
     scrollWholePage: {
-      description: `This boolean property specifies whether the whole page should scroll (\`true\`) or just ` +
+      description:
+        `This boolean property specifies whether the whole page should scroll (\`true\`) or just ` +
         `the content area (\`false\`). The default value is \`true\`.`,
       valueType: "boolean",
       defaultValue: true,
     },
     noScrollbarGutters: {
-      description: "This boolean property specifies whether the scrollbar gutters should be hidden.",
+      description:
+        "This boolean property specifies whether the scrollbar gutters should be hidden.",
       valueType: "boolean",
       defaultValue: false,
     },
@@ -71,11 +74,23 @@ export const AppMd = createMetadata({
     ready: d(`This event fires when the \`${COMP}\` component finishes rendering on the page.`),
   },
   themeVars: parseScssVar(styles.themeVars),
+  themeVarDescriptions: {
+    "maxWidth‑content‑App":
+      "This theme variable defines the maximum width of the main content. If the main " + 
+      "content is broader, the engine adds margins to keep the expected maximum size.",
+    "boxShadow‑header‑App": "This theme variable sets the shadow of the app's header section.",
+    "boxShadow‑navPanel‑App":
+      "This theme variable sets the shadow of the app's navigation panel section " +
+      "(visible only in vertical layouts).",
+    "width‑navPanel‑App":
+      "This theme variable sets the width of the navigation panel when the app is displayed " +
+      "with one of the vertical layouts.",
+  },
   defaultThemeVars: {
     [`width-navPanel-${COMP}`]: "$space-64",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",
     [`boxShadow-header-${COMP}`]: "$boxShadow-spread",
-    [`boxShadow-pages-${COMP}`]: "$boxShadow-spread",
+    [`boxShadow-navPanel-${COMP}`]: "$boxShadow-spread",
     [`scroll-padding-block-Pages`]: "$space-4",
     light: {
       // --- No light-specific theme vars
