@@ -596,7 +596,7 @@ VARIANTS.filter((variant) => variant.name !== "solid").forEach((variant) => {
 VARIANTS.filter((variant) => variant.name !== "ghost").forEach((variant) => {
   THEME_COLORS.forEach((themeColor) => {
     test(`disabled ${themeColor.name}-${variant.name}, grey border`, async ({ page }) => {
-      const EXPECTED = "rgb(205, 219, 228)"
+      const EXPECTED = "rgb(199, 214, 225)"
       const entryPoint = `
       <Button testId="btn" label="disabled button" variant="${variant.name}" themeColor="${themeColor.name}" enabled="{false}" />
       `;

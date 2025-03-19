@@ -188,7 +188,6 @@ export const THEME_VARIABLES = "/styles-and-themes/theme-variables";
 export const THEME_VARIABLES_PROPERTY_NAMES = "/styles-and-themes/theme-variables#property-names";
 export const THEME_VARIABLES_APP_BOUND_TRAITS = "/styles-and-themes/theme-variables#app-bound-traits";
 export const THEME_VARIABLES_SPACING_IN_LAYOUT_CONTAINERS = "/styles-and-themes/theme-variables#spacing-in-layout-containers";
-export const THEME_VARIABLES_VISUAL_STATES = "/styles-and-themes/theme-variables#visual-states";
 export const THEMES_DEFINITIONS = "/styles-and-themes/themes";
 export const THEMES_REFERENCE = "/styles-and-themes";
 export const THEME_DEVELOPMENT = "/theme-devs";

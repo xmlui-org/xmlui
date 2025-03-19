@@ -125,9 +125,9 @@ export function useCompiledTheme(
       {
         ...generateBaseSpacings(mergedThemeVars),
         ...generateBaseFontSizes(mergedThemeVars),
-        ...generateBaseTones(mergedThemeVars),
         ...generatePaddingSegments(mergedThemeVars),
         ...generateBorderSegments(mergedThemeVars),
+        ...generateBaseTones(mergedThemeVars),
         ...generateButtonTones(mergedThemeVars),
       },
       {
