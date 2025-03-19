@@ -382,6 +382,14 @@ export class VStackDriver extends StackDriver {}
 
 export class LinkDriver extends ComponentDriver {}
 
+// --- NavLink
+
+export class NavLinkDriver extends ComponentDriver {}
+
+// --- NavPanel
+
+export class NavPanelDriver extends ComponentDriver {}
+
 // --- Card
 
 export class CardDriver extends ComponentDriver {}
@@ -397,3 +405,11 @@ export class AppHeaderDriver extends ComponentDriver {}
 // --- AppFooter
 
 export class AppFooterDriver extends ComponentDriver {}
+
+// --- Badge
+
+export class BadgeDriver extends ComponentDriver {}
+
+// --- NoResult
+
+export class NoResultDriver extends ComponentDriver {}
