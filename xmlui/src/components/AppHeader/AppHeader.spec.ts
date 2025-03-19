@@ -1,4 +1,3 @@
-import { ComponentDriver } from "../../testing/ComponentDrivers";
 import { test, expect } from "../../testing/fixtures";
 
 const CODE = `
@@ -8,163 +7,293 @@ const CODE = `
 `;
 
 test("border", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+
   await initTestBed(CODE, {
     testThemeVars: {
-      "border-AppHeader": EXPECTED_BORDER_DEFAULT,
+      "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("borderLeft", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+
   await initTestBed(CODE, {
     testThemeVars: {
-      "borderLeft-AppHeader": EXPECTED_BORDER_DEFAULT,
+      "borderLeft-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "left");
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
-    "right",
-    "top",
-    "bottom",
-  ]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("borderRight", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+
   await initTestBed(CODE, {
     testThemeVars: {
-      "borderRight-AppHeader": EXPECTED_BORDER_DEFAULT,
+      "borderRight-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "right");
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
-    "left",
-    "top",
-    "bottom",
-  ]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("borderHorizontal", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+
   await initTestBed(CODE, {
     testThemeVars: {
-      "borderHorizontal-AppHeader": EXPECTED_BORDER_DEFAULT,
+      "borderHorizontal-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, ["right", "left"]);
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("borderHorizontal and borderLeft", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
-  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
 
   await initTestBed(CODE, {
     testThemeVars: {
-      "borderHorizontal-AppHeader": EXPECTED_BORDER_DEFAULT,
-      "borderLeft-AppHeader": EXPECTED_BORDER_UPDATE,
+      "borderHorizontal-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderLeft-AppHeader": "8px double rgb(0, 128, 0)",
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "left");
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "right");
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-left-width", "8px");
+  await expect(component).toHaveCSS("border-left-style", "double");
 });
 
 test("borderHorizontal and borderRight", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
-  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+
   await initTestBed(CODE, {
     testThemeVars: {
-      "borderHorizontal-AppHeader": EXPECTED_BORDER_DEFAULT,
-      "borderRight-AppHeader": EXPECTED_BORDER_UPDATE,
+      "borderHorizontal-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderRight-AppHeader": "8px double rgb(0, 128, 0)",
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "right");
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "left");
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-right-width", "8px");
+  await expect(component).toHaveCSS("border-right-style", "double");
+  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("borderTop", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+
   await initTestBed(CODE, {
     testThemeVars: {
-      "borderTop-AppHeader": EXPECTED_BORDER_DEFAULT,
+      "borderTop-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "top");
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
-    "left",
-    "right",
-    "bottom",
-  ]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("borderBottom", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+
   await initTestBed(CODE, {
     testThemeVars: {
-      "borderBottom-AppHeader": EXPECTED_BORDER_DEFAULT,
+      "borderBottom-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "bottom");
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, [
-    "left",
-    "right",
-    "top",
-  ]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("borderVertical", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+
   await initTestBed(CODE, {
     testThemeVars: {
-      "borderVertical-AppHeader": EXPECTED_BORDER_DEFAULT,
+      "borderVertical-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, ["top", "bottom"]);
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["left", "right"]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("borderVertical and borderTop", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
-  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+
   await initTestBed(CODE, {
     testThemeVars: {
-      "borderVertical-AppHeader": EXPECTED_BORDER_DEFAULT,
-      "borderTop-AppHeader": EXPECTED_BORDER_UPDATE,
+      "borderVertical-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderTop-AppHeader": "8px double rgb(0, 128, 0)",
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "bottom");
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "top");
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["left", "right"]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-top-width", "8px");
+  await expect(component).toHaveCSS("border-top-style", "double");
+  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("borderVertical and border-bottom", async ({ initTestBed, createAppHeaderDriver }) => {
-  const EXPECTED_BORDER_DEFAULT = "5px dotted rgb(255, 0, 0)";
-  const EXPECTED_BORDER_UPDATE = "8px double rgb(0, 128, 0)";
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
+  const EXPECTED_WIDTH = "5px";
+  const EXPECTED_STYLE = "dotted";
+
   await initTestBed(CODE, {
     testThemeVars: {
-      "borderVertical-AppHeader": EXPECTED_BORDER_DEFAULT,
-      "borderBottom-AppHeader": EXPECTED_BORDER_UPDATE,
+      "borderVertical-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+      "borderBottom-AppHeader": "8px double rgb(0, 128, 0)",
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_DEFAULT, "top");
-  await expect(driver.component).toHaveBorder(EXPECTED_BORDER_UPDATE, "bottom");
-  await expect(driver.component).not.toHaveBorder(EXPECTED_BORDER_DEFAULT, ["left", "right"]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-bottom-width", "8px");
+  await expect(component).toHaveCSS("border-bottom-style", "double");
+  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border-color", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -177,10 +306,20 @@ test("border-color", async ({ initTestBed, createAppHeaderDriver }) => {
       "borderColor-AppHeader": EXPECTED_COLOR,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).not.toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).not.toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-color", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -195,10 +334,20 @@ test("border, border-color", async ({ initTestBed, createAppHeaderDriver }) => {
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(UPDATED);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", UPDATED);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", UPDATED);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", UPDATED);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-color-horizontal", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -213,10 +362,20 @@ test("border, border-color-horizontal", async ({ initTestBed, createAppHeaderDri
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(UPDATED, ["right", "left"]);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", UPDATED);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", UPDATED);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-color-left", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -231,10 +390,20 @@ test("border, border-color-left", async ({ initTestBed, createAppHeaderDriver })
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(UPDATED, "left");
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", UPDATED);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-color-right", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -249,10 +418,20 @@ test("border, border-color-right", async ({ initTestBed, createAppHeaderDriver }
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(UPDATED, "right");
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", UPDATED);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-color-vertical", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -267,10 +446,20 @@ test("border, border-color-vertical", async ({ initTestBed, createAppHeaderDrive
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(UPDATED, ["top", "bottom"]);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", UPDATED);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-color-top", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -285,10 +474,20 @@ test("border, border-color-top", async ({ initTestBed, createAppHeaderDriver }) 
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(UPDATED, "top");
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", UPDATED);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-color-bottom", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -303,10 +502,20 @@ test("border, border-color-bottom", async ({ initTestBed, createAppHeaderDriver 
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(UPDATED, "bottom");
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border-style", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -319,10 +528,20 @@ test("border-style", async ({ initTestBed, createAppHeaderDriver }) => {
       "borderStyle-AppHeader": EXPECTED_STYLE,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).not.toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).not.toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-style", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -337,10 +556,20 @@ test("border, border-style", async ({ initTestBed, createAppHeaderDriver }) => {
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(UPDATED);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", UPDATED);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", UPDATED);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", UPDATED);
 });
 
 test("border, border-style-horizontal", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -355,10 +584,20 @@ test("border, border-style-horizontal", async ({ initTestBed, createAppHeaderDri
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(UPDATED, ["left", "right"]);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", UPDATED);
 });
 
 test("border, border-style-left", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -373,10 +612,20 @@ test("border, border-style-left", async ({ initTestBed, createAppHeaderDriver })
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(UPDATED, "left");
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", UPDATED);
 });
 
 test("border, border-style-right", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -391,10 +640,20 @@ test("border, border-style-right", async ({ initTestBed, createAppHeaderDriver }
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(UPDATED, "right");
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-style-vertical", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -409,10 +668,20 @@ test("border, border-style-vertical", async ({ initTestBed, createAppHeaderDrive
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(UPDATED, ["top", "bottom"]);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", UPDATED);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", UPDATED);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-style-top", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -427,10 +696,20 @@ test("border, border-style-top", async ({ initTestBed, createAppHeaderDriver }) 
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(UPDATED, "top");
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", UPDATED);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-style-bottom", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -445,10 +724,20 @@ test("border, border-style-bottom", async ({ initTestBed, createAppHeaderDriver 
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(UPDATED, "bottom");
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", UPDATED);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border-thickness", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -461,10 +750,20 @@ test("border-thickness", async ({ initTestBed, createAppHeaderDriver }) => {
       "borderWidth-AppHeader": EXPECTED_WIDTH,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).not.toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).not.toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(EXPECTED_WIDTH, "bottom");
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-thickness", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -479,10 +778,20 @@ test("border, border-thickness", async ({ initTestBed, createAppHeaderDriver }) 
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(UPDATED);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", UPDATED);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", UPDATED);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", UPDATED);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-thickness-horizontal", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -497,10 +806,20 @@ test("border, border-thickness-horizontal", async ({ initTestBed, createAppHeade
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(UPDATED, ["left", "right"]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", UPDATED);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", UPDATED);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-thickness-left", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -515,10 +834,20 @@ test("border, border-thickness-left", async ({ initTestBed, createAppHeaderDrive
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(UPDATED, "left");
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", UPDATED);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-thickness-right", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -533,10 +862,20 @@ test("border, border-thickness-right", async ({ initTestBed, createAppHeaderDriv
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(UPDATED, "right");
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", UPDATED);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-thickness-vertical", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -551,10 +890,20 @@ test("border, border-thickness-vertical", async ({ initTestBed, createAppHeaderD
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(UPDATED, ["top", "bottom"]);
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", UPDATED);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-thickness-top", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -569,10 +918,20 @@ test("border, border-thickness-top", async ({ initTestBed, createAppHeaderDriver
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(UPDATED, "top");
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", UPDATED);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
 test("border, border-thickness-bottom", async ({ initTestBed, createAppHeaderDriver }) => {
@@ -587,8 +946,18 @@ test("border, border-thickness-bottom", async ({ initTestBed, createAppHeaderDri
       "border-AppHeader": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const driver = await createAppHeaderDriver();
-  await expect(driver.component).toHaveBorderColor(EXPECTED_COLOR);
-  await expect(driver.component).toHaveBorderStyle(EXPECTED_STYLE);
-  await expect(driver.component).toHaveBorderWidth(UPDATED, "bottom");
+  const component = (await createAppHeaderDriver()).component;
+
+  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", UPDATED);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });

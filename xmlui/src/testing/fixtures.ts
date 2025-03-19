@@ -11,6 +11,7 @@ import {
   AppFooterDriver,
   AppHeaderDriver,
   AvatarDriver,
+  BadgeDriver,
   ButtonDriver,
   CardDriver,
   FormDriver,
@@ -22,6 +23,9 @@ import {
   LinkDriver,
   ListDriver,
   MarkdownDriver,
+  NavLinkDriver,
+  NavPanelDriver,
+  NoResultDriver,
   NumberBoxDriver,
   RadioGroupDriver,
   RangeDriver,
@@ -286,6 +290,16 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(LinkDriver, testIdOrLocator);
     });
   },
+  createNavLinkDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(NavLinkDriver, testIdOrLocator);
+    });
+  },
+  createNavPanelDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(NavPanelDriver, testIdOrLocator);
+    });
+  },
   createCardDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(CardDriver, testIdOrLocator);
@@ -304,6 +318,16 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   createAppFooterDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(AppFooterDriver, testIdOrLocator);
+    });
+  },
+  createBadgeDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(BadgeDriver, testIdOrLocator);
+    });
+  },
+  createNoResultDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(NoResultDriver, testIdOrLocator);
     });
   },
 });
@@ -347,8 +371,12 @@ type TestDriverExtenderProps = {
   createHStackDriver: ComponentDriverMethod<HStackDriver>;
   createVStackDriver: ComponentDriverMethod<VStackDriver>;
   createLinkDriver: ComponentDriverMethod<LinkDriver>;
+  createNavLinkDriver: ComponentDriverMethod<NavLinkDriver>;
+  createNavPanelDriver: ComponentDriverMethod<NavPanelDriver>;
   createCardDriver: ComponentDriverMethod<CardDriver>;
   createAccordionDriver: ComponentDriverMethod<AccordionDriver>;
   createAppHeaderDriver: ComponentDriverMethod<AppHeaderDriver>;
   createAppFooterDriver: ComponentDriverMethod<AppFooterDriver>;
+  createBadgeDriver: ComponentDriverMethod<BadgeDriver>;
+  createNoResultDriver: ComponentDriverMethod<NoResultDriver>;
 };

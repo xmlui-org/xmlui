@@ -60,6 +60,10 @@ export const expect = baseExpect.extend({
     };
   },
 
+  // ---
+  // --- NOTE: Assertations below this line are experimental and are reserved for future test cases (ex. comparison tests)
+  // ---
+
   /**
    * Asserts whether a component has the correct CSS `border-color` styling.
    *
