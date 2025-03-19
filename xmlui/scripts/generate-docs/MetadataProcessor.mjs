@@ -338,8 +338,8 @@ function addStylesSection(data, component) {
     hasStylesSection = true;
   }
   if (varsTable) {
-    buffer += addThemeVarDescriptions(component);
     buffer += "\n\n### Theme Variables\n\n" + varsTable;
+    buffer += addThemeVarDescriptions(component);
     hasStylesSection = true;
   }
   if (!hasStylesSection) {
@@ -736,12 +736,12 @@ function addThemeVarDescriptions(component) {
   if (!component.themeVarDescriptions) {
     return "";
   }
-  let buffer = "\n\n### Theme Variable Descriptions\n\n";
+  let buffer = "\n\nThis component uses a few unique theme variables. The following table summarizes them:\n\n";
 
   buffer += createTable({
     headers: ["Theme Variable", "Description"],
     rows: Object.entries(component.themeVarDescriptions).map(([themeVar, description]) => [
-      `\`**${themeVar}**\``,
+      `**\`${themeVar}\`**`,
       description,
     ]),
   });

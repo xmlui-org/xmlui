@@ -1,3 +1,5 @@
+import { Callout } from 'nextra/components'
+
 import spacingSizes from "./samples/spacing-sizes.xmlui";
 import shadowSizes from "./samples/shadow-sizes.xmlui";
 import swatch from "./samples/swatch.xmlui";
@@ -6,95 +8,168 @@ import { COMMON_VISUAL_PROPERTY_UNITS, COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUND
 
 # Theme Variables
 
-Theme variables follow a naming convention that allows decode what components and visual traits they affect:
+The appearance of an xmlui app can be quickly customized with themes. The basic unit of a theme is a *theme variable*, which sets a particular visual trait of the app or a specific component, such as the background color, text weight, vertical padding, and others.
 
+Theme variables follow a naming convention: They compose identifier-like segments separated by a simple or double dash. Here are a few examples:
+
+```text
+maxWidth-content 
+borderColor-Card
+backgroundColor-checked-Switch
+outlineStyle-Checkbox-error--focus
+borderColor-Button-secondary-outlined--hover--active
 ```
-<propertyName>-<ComponentId>-<trait1>-<trait2>--<state1>--<state2>--<stateN>
+
+Most theme variables are composed of two segments, like the first two examples. However, more extended theme variables exist with multiple segments, such as the last three above.
+
+The following pattern summarizes formally the name of a theme variable:
+
+```text
+<propertyName>-<part-or-aspect>-<ComponentId>-<variant>--<state>
 ```
 
-In this convention, the `<ComponentId>` part is optional.
+**`propertyName`**
 
-- Those theme variables that do not use the `<ComponentId>` segment are _app-bound_ variables, for they define visuals that can be applied to the entire application, including multiple types of components.
-- The variables with a `<ComponentId>` segment are _component-bound_ variables, which influence only the component's appearance defined by the corresponding ID.
+Each theme variable starts with a name, identifying the visual attribute the particular theme property defines. This segment uses camel-casing, the counterpart of CSS style names with kebab-casing.
 
-The `<propertyName>` segment names a property (and optionally a part of a component) the particular theme variable affects. This segment should use lowercase letters and dashes. The property name can be a single word or multiple words separated with a dash (`-`). Here are a few examples:
+For example, the `maxWidth` property name has the same semantics as the `max-width` CSS style.
 
-- `color`: Text color
-- `backgroundColor`: Background color
-- `backgroundColor-indicator`: The background color of the "indicator" part of a specific component.
-- `text-size`: The size of the text
-- `lineHeight`: The height of a text line
-- `paddingHorizontal`: The value declaring the horizontal padding space
+<Callout type="info" emoji="💡">
+Though there are exceptions, most theme variables are projected to the counterpart CSS style at the end of the day (using the same syntax and semantics). Also, only about one-tenth of CSS style names have their pair in xmlui.
+</Callout>
 
-The `<trait1>` and `<trait2>` segments describe one or two trait values regarding a particular property (`<propertyName>`).
+**`ComponentId`**
 
-For example, the `Button` component has two traits that define its appearance. The `themeColor` trait defines the set of colors to use with the button; its available values are `primary`, `secondary`, and `attention`. The `variant` trait specifies the general appearance of the button (whether it has a border at all, etc.) with the values of `solid`, `outlined`, or `ghost`. The `themeColor` is the first trait, and `variant` is the second. So, we can use (among the others) these theme variables with button colors:
+Most theme variables belong to a specific component (we call them *component-bound theme variables*). A `ComponentId` always starts with an uppercase letter and follows Pascal-casing. If no `ComponentId` is in the variable name, we call it an *app-bound theme variable*.
 
-- `backgroundColor-Button-primary-solid`: Defines the background color of a button that is set up to use the `primary` theme color, displayed with the `solid` variant.
-- `borderColor-Button-attention-ghost`: Specifies the border color of a ghost button displayed with the `attention` theme color.
+For example, the `borderColor-Card` name uses the `Card` as `ComponentId`, suggesting that it sets the border color of the `Card` component.
 
-The `<state1>`, ..., `<stateN>` values define visual states that may modify the appearance of a particular UI element or component (regarding a specific trait). Here are a few examples:
+<Callout type="info" emoji="💡">
+We call theme variables without a `ComponentId` segment *app-bound* variables, as they do not belong to a particular component. They set some visual traits that belong to the entire app or multiple components.
+</Callout>
 
-- `hover`: The mouse is hovered over the component
-- `active`: The particular component is being activated by the user (for example, a user presses down the mouse button while over a button element)
-- `focus`: The particular element (e.g., a textbox) currently has the focus
 
-When defining a theme variable, you can define multiple state values (in any order). Let's see a few examples:
+**`aspect-or-part`**
 
-- `backgroundColor-Button-primary-solid--hover`: The background color to use with a `solid` button with the `primary` theme color while the mouse hovers over it.
-- `borderColor-Button-attention-ghost--focus`: Specifies the border color of a focused ghost button displayed with the `attention` theme color.
+When a particular theme variable belongs to a part (or specific visual aspect) of the component we name in `ComponentId`, this variable name segment refers to that part or aspect. For example, `backgroundColor-checked-Switch` refers to the background color to use when a `Switch` component is checked (turned on).
 
-## Theme Property Names [#property-names]
+**`variant`**
 
-XMLUI utilizes numerous visual properties you can use in place of `<propertyName>`. The following list summarizes their names and description:
+Some components may have visual variants that use different style attributes. For example, a button has three different variants: `solid` (with background), `outlined` (with a border), and `ghost` (no border or background unless hovered). Adding the *variant* segment after `ComponentId` specifies the theme variable's particular variant.
+
+For example, the `borderColor-Button-outlined` theme variable sets the border color only for the `outlined` variant of buttons and keeps the border color of others intact.
+
+<Callout type="info" emoji="💡">
+Some components (such as `Button`) have multiple properties representing a variant (it also has a `themeColor`). In this case, you can add multiple `variant` segments to the theme variable.
+</Callout>
+
+
+**`state`**
+
+Components may have different visual traits according to their state in the UI. For example, a button may have a different background color when the mouse hovers over it.
+
+The `state` segment of a theme variable specifies the particular state of the component the theme variable affects; it starts with a double dash. For example, the `backgroundColor-Button-primary-solid--hover` theme variable sets the background color of a button with the `primary` theme color and `solid` variant when the mouse hovers over it.
+
+This table summarizes the states you can use with theme variables:
 
 |Name|Description|
 |-|-|
-|`color‑bg`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of the component border|
-|`color‑border`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component. It uses the same value for the left, top, right, and bottom borders.|
-|`color‑border‑bottom`|This value specifies the bottom <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component.|
-|`color‑border‑horizontal`|This value specifies the horizontal <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component. It uses the same value for the left and right borders.|
-|`color‑border‑left`|This value specifies the left <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component.|
-|`color‑border‑right`|This value specifies the right <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component.|
-|`color‑border‑top`|This value specifies the top <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component.|
-|`color‑border‑vertical`|This value specifies the vertical <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component. It uses the same value for the top and bottom borders.|
-|`color‑decoration`|This value sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>color</SmartLink> of the component's text decoration.|
-|`color‑text`|The text <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>color</SmartLink> the component diplays|
-|`font‑family`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY }>font family</SmartLink> to display component text|
-|`font‑size`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the font to display component text|
-|`font‑weight`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT }>weight</SmartLink> of the font displaying component text|
-|`line‑decoration`|This value sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION }>line type</SmartLink> for the component's text decoration.|
-|`line‑height`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of the line that displays component text|
-|`offset‑decoration`|This value sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>distance</SmartLink> of the component's text decoration from its text.|
-|`padding`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the padding area. It uses the same value for the left, top, right, and bottom paddings.|
-|`padding‑bottom`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the bottom padding area.|
-|`padding‑horizontal`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the horizontal padding area. It uses the same value for the left and right paddings.|
-|`padding‑left`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the left padding area.|
-|`padding‑right`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the right padding area.|
-|`padding‑top`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the top padding area.|
-|`padding‑vertical`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the vertical padding area. It uses the same value for the top and bottom paddings.|
-|`radius`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING }>rounding</SmartLink> of the component's border|
-|`boxShadow`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>shadow</SmartLink> displayed with the component|
-|`style‑border`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's border line. It uses the same value for the left, top, right, and bottom borders.|
-|`style‑border‑bottom`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's bottom border.|
-|`style‑border‑horizontal`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's horizontal border. It uses the same value for the left and right borders.|
-|`style‑border‑left`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's left border.|
-|`style‑border‑right`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's right border.|
-|`style‑border‑top`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's top border.|
-|`style‑border‑vertical`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's vertical border. It uses the same value for the top and bottom borders.|
-|`style‑decoration`|This value sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION }>style</SmartLink> for the component's text decoration.|
-|`thickness‑border`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's border line. It uses the same value for the left, top, right, and bottom borders.|
-|`thickness‑border‑bottom`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's bottom border.|
-|`thickness‑border‑horizontal`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's horizontal border. It uses the same value for the left and right borders.|
-|`thickness‑border‑left`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's left border.|
-|`thickness‑border‑right`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's right border.|
-|`thickness‑border‑top`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's top border.|
-|`thickness‑border‑vertical`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's vertical border. It uses the same value for the left and right borders.|
-|`thickness‑decoration`|This value sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> for the component's text decoration line.|
+|`‑‑active`|The component is active. For example, the left mouse button is pressed while the pointer is over the component.|
+|`‑‑disabled`|The component is disabled; it does not accept user actions|
+|`‑‑focus`|The component has the keyboard focus and processes keypress-related events|
+|`‑‑hover`|Indicates the state when the mouse (pointer) hovers above the component's client area|
+
+You can add multiple state segments to a theme variable to define a combined state. For example, the `--active--hover` combination defines a visual trait when the component is activated and hovered.
+
+<Callout type="info" emoji="💡">
+You can use your custom state names for your components.
+</Callout>
+
+## Theme Property Names [#property-names]
+
+You can refer to numerous visual properties via the `propertyName` segment. The following table summarizes their names and descriptions:
+
+|Name|Description|
+|-|-|
+| **`backgroundColor`** | This property sets the background <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of an element. | 
+| **`borderBottom`** | This property is a shorthand to set an element's bottom border. It sets the values of `borderBottomWidth`, `borderBottomStyle` and `borderBottomColor`. | 
+| **`borderBottomColor`** | Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of an element's bottom border. | 
+| **`borderBottomStyle`** | Sets the line <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of an element's bottom border. | 
+| **`borderBottomWidth`** | Sets the width of an element's bottom border. | 
+| **`borderColor`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of an element's border. | 
+| **`borderEndEndRadius`** | This property defines a logical border radius on an element, which maps to the bottom-right radius with a left-to-right rendering direction and to the bottom-left radius with a right-to-left. | 
+| **`borderEndStartRadius`** | This property defines a logical border radius on an element, which maps to the bottom-left radius with a left-to-right rendering direction and to the bottom-right radius with a right-to-left. | 
+| **`borderHorizontal`** | This property sets the traits of the left and right borders. | 
+| **`borderHorizontalColor`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of the left and right borders. | 
+| **`borderHorizontalStyle`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the left and right borders. | 
+| **`borderHorizontalWidth`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of the left and right borders. | 
+| **`borderRadius`** | This property property <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING }>rounds</SmartLink> the corners of an element's outer border edge. You can set a single radius to make circular corners, or two radii to make elliptical corners. | 
+| **`borderLeft`** | This property is a shorthand to set an element's left border. It sets the values of `borderLeftWidth`, `borderLeftStyle` and `borderLeftColor`. | 
+| **`borderLeftColor`** | Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of an element's left border. | 
+| **`borderLeftStyle`** | Sets the line <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of an element's left border. | 
+| **`borderLeftWidth`** | Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of an element's left border. | 
+| **`borderRight`** | This property is a shorthand to set an element's right border. It sets the values of `borderRightWidth`, `borderRightStyle` and `borderRightColor`. | 
+| **`borderRightColor`** | Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of an element's right border. | 
+| **`borderRightStyle`** | Sets the line <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of an element's right border. | 
+| **`borderRightWidth`** | Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of an element's right border. | 
+| **`borderStartEndRadius`** | This property defines a logical border radius on an element, which maps to the top-right radius with a left-to-right rendering direction and to the top-left radius with a right-to-left. | 
+| **`borderStartStartRadius`** | This property defines a logical border radius on an element, which maps to the top-left radius with a left-to-right rendering direction and to the top-right radius with a right-to-left. | 
+| **`borderStyle`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of an element's border. | 
+| **`borderTop`** | This property is a shorthand to set an element's top border. It sets the values of `borderTopWidth`, `borderTopStyle` and `borderTopColor`. | 
+| **`borderTopColor`** | Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of an element's top border. | 
+| **`borderTopStyle`** | Sets the line <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of an element's top border. | 
+| **`borderTopWidth`** | Sets the width of an element's top border. | 
+| **`borderVertical`** | This property sets the traits of the top and bottom borders. | 
+| **`borderVerticalColor`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of the top and bottom borders. | 
+| **`borderVerticalStyle`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the top and bottom borders. | 
+| **`borderVerticalWidth`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of the top and bottom borders. | 
+| **`borderWidth`** | This property sets the width of an element's border. | 
+| **`boxShadow`** | This property adds shadow effects around an element's frame. | 
+| **`fontFamily`** | Specifies a prioritized list of one or more <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY }>font family</SmartLink> names and/or generic family names for the selected element. | 
+| **`fontSize`** | This property sets the size of the font. | 
+| **`fontStyle`** | This property sets whether a font should be styled with a normal, italic, or oblique face from its `fontFamily`. | 
+| **`fontWeight`** | Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT }>weight</SmartLink> (or boldness) of the font. | 
+| **`fontStretch`** | This property selects a normal, condensed, or expanded face from a font. | 
+| **`letterSpacing`** | This property sets the horizontal spacing behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together. | 
+| **`lineHeight`** | Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of a line box in which the text is displayed. | 
+| **`marginBottom`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of the margin area on the bottom of an element. | 
+| **`marginHorizontal`** | This property combines setting the values of the `marginLeft` and `marginRight` properties. | 
+| **`marginLeft`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of the margin area on the left of an element. | 
+| **`marginRight`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of the margin area on the right of an element. | 
+| **`marginTop`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of the margin area on the top of an element. | 
+| **`marginVertical`** | This property combines setting the values of the `marginTop` and `marginBottom` properties. | 
+| **`maxHeight`** | This property sets the maximum <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of an element. It prevents the used value of the height property from becoming larger than the value specified for `maxHeight`. | 
+| **`maxWidth`** | This property sets the maximum <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of an element. It prevents the used value of the width property from becoming larger than the value specified for `maxWidth`. | 
+| **`minHeight`** | This property sets the minimum <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of an element. It prevents the used value of the height property from becoming smaller than the value specified for `minHeight`. | 
+| **`minWidth`** | This property sets the minimum <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of an element. It prevents the used value of the width property from becoming smaller than the value specified for `minWidth`. | 
+| **`outlineColor`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of an element's outline. An outline is a line that is drawn around an element, outside the border. | 
+| **`outlineOffset`** | Sets the amount of space between an outline and the edge or border of an element. | 
+| **`outlineStyle`** | This property sets the style of an element's outline. | 
+| **`outlineWidth`** | property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of an element's outline. | 
+| **`overflowX`** | This property sets what shows when content overflows an element's left and right edges. This may be nothing, a scroll bar, or the overflow content. | 
+| **`overflowY`** | This property sets what shows when content overflows an element's top and bottom edges. This may be nothing, a scroll bar, or the overflow content. | 
+| **`paddingBottom`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of the padding area on the bottom of an element. | 
+| **`paddingHorizontal`** | This property combines setting the values of the `paddingLeft` and `paddingRight` properties. | 
+| **`paddingLeft`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of the padding area on the left of an element. | 
+| **`paddingRight`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of the padding area on the right of an element. | 
+| **`paddingTop`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of the padding area on the top of an element. | 
+| **`paddingVertical`** | This property combines setting the values of the `paddingTop` and `paddingBottom` properties. | 
+| **`textColor`** | This property sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of the text used for rendering a component. |
+| **`textDecoration`** | This is a shorthand property that sets the appearance of decorative lines on text combining the `textDecorationLine`, `textDecorationColor`, `textDecorationStyle`, and `textDecorationThickness` properties. |
+| **`textDecorationColor`** | Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of decorations added to text by `textDecorationLine`. |
+| **`textDecorationLine`** | Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION }>kind</SmartLink> of decoration that is used on text in an element, such as an underline or overline. |
+| **`textDecorationStyle`** | Sets the style of the decoration line that is used on text in an element, such as a line-through, underline, or overline. |
+| **`textDecorationThickness`** | Sets the stroke <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the decoration line that is used on text in an element, such as a line-through, underline, or overline. |
+| **`textTransform`** | This property specifies how to capitalize an element's text. |
+| **`textUnderlineOffset`** | The offset <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>distance</SmartLink> of an underlined text decoration line from its original position. |
 
 ## App-bound Traits [#app-bound-traits]
 
-Theme variables in this category are applied to the entire application, not just to particular components.
+You can use these app-bound theme variables within an app:
+
+| Theme Variable | Description |
+|-|-|
+
 
 ### Colors
 
