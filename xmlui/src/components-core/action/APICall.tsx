@@ -204,6 +204,7 @@ async function updateQueriesWithOptimisticValue({
   optimisticValue,
   lookupAction,
   getOptimisticValue,
+  cacheUpdater,
   uid,
 }: {
   stateContext: any;
@@ -214,8 +215,31 @@ async function updateQueriesWithOptimisticValue({
   optimisticValue: any;
   lookupAction: LookupAsyncFnInner;
   getOptimisticValue?: string;
+  cacheUpdater?: string;
   uid: symbol;
 }) {
+
+  const resolvedCacheUpdater = lookupAction(cacheUpdater, uid, {
+    context: stateContext
+  });
+  if(resolvedCacheUpdater){
+    await resolvedCacheUpdater({
+      updateCachedData: (queryUrl: string, updater: (draft)=>Promise<void>) => {
+        queryClient
+          .getQueryCache()
+          .getAll()
+          .forEach(async (query) => {
+            if (query.queryKey[0] === queryUrl) {
+              let draft = createDraft(queryClient.getQueryData(query.queryKey));
+              await updater(draft);
+              const newData = finishDraft(draft);
+              queryClient.setQueryData(query.queryKey, newData);
+            }
+          });
+      },
+    });
+    return { queryKeysToUpdate: [], optimisticValuesByQueryKeys: new Map() };
+  }
   const queryKeysToUpdate = findQueryKeysToUpdate(
     extractParam(stateContext, updates, appContext),
     queryClient,
@@ -272,6 +296,7 @@ export async function callApi(
     payloadType,
     when,
     getOptimisticValue,
+    cacheUpdater,
     inProgressNotificationMessage,
     completedNotificationMessage,
     errorNotificationMessage,
@@ -323,6 +348,7 @@ export async function callApi(
       optimisticValue,
       lookupAction,
       getOptimisticValue,
+      cacheUpdater,
       uid,
     },
   );

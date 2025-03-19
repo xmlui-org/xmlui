@@ -17,12 +17,13 @@ export async function getViteConfig({
   flatDistUiPrefix = "",
 }: ViteConfigData = {}) {
 
+
+  //TODO finish this (merge smart)
   let overrides = {};
   try{
     const configOverrides = await import(process.cwd() + `/vite.config-overrides`);
-    overrides = configOverrides.default;
-  } catch (e){
-  }
+    overrides = configOverrides.default || {};
+  } catch (e){}
 
   return defineConfig({
     plugins: [react(), svgr(), ViteYaml(), ViteUeml({}), ...(overrides.plugins || [])],

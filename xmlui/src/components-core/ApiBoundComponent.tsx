@@ -110,6 +110,7 @@ export function ApiBoundComponent({
             updates,
             optimisticValue,
             getOptimisticValue,
+            cacheUpdater,
             headers,
             payloadType,
             method,
@@ -144,6 +145,7 @@ export function ApiBoundComponent({
               optimisticValue: ${JSON.stringify(optimisticValue)}, 
               payloadType: ${JSON.stringify(payloadType)}, 
               getOptimisticValue: ${JSON.stringify(getOptimisticValue)}, 
+              cacheUpdater: ${JSON.stringify(cacheUpdater)}, 
               invalidates: ${invalidates === undefined ? undefined : JSON.stringify(invalidates)}, 
               when: ${when === undefined ? undefined : JSON.stringify(when)} }, { resolveBindingExpressions: true });
           }`;
