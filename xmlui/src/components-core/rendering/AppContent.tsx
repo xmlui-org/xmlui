@@ -161,9 +161,7 @@ export function AppContent({
     const mwTablet = getComputedStyle(root!).getPropertyValue(getVarKey("maxWidth-tablet"));
     setMaxWidthTablet(mwTablet);
     setMaxWidthTabletLower(createLowerDimensionValue(mwTablet));
-    const mwDesktop = getComputedStyle(root!).getPropertyValue(
-      getVarKey("maxWidth-desktop"),
-    );
+    const mwDesktop = getComputedStyle(root!).getPropertyValue(getVarKey("maxWidth-desktop"));
     setMaxWidthDesktop(mwDesktop);
     setMaxWidthDesktopLower(createLowerDimensionValue(mwDesktop));
     const mwLargeDesktop = getComputedStyle(root!).getPropertyValue(
@@ -214,23 +212,32 @@ export function AppContent({
 
   const location = useLocation();
   const lastHash = useRef("");
+  const [scrollForceRefresh, setScrollForceRefresh] = useState(0);
 
   // --- Listen to location change using useEffect with location as dependency
   // https://jasonwatmore.com/react-router-v6-listen-to-location-route-change-without-history-listen
+  // https://dev.to/mindactuate/scroll-to-anchor-element-with-react-router-v6-38op
   useEffect(() => {
+    let hash = "";
     if (location.hash) {
-      lastHash.current = location.hash.slice(1); // safe hash for further use after navigation
+      hash = location.hash.slice(1); // safe hash for further use after navigation
     }
+    if (lastHash.current !== hash) {
+      lastHash.current = hash;
+      if (!location.state?.preventHashScroll) {
+        requestAnimationFrame(() => {
+          document
+            .getElementById(lastHash.current)
+            ?.scrollIntoView({ behavior: "instant", block: "start" });
+        });
+      }
+    }
+  }, [location, scrollForceRefresh]);
 
-    if (lastHash.current && !location.state?.preventHashScroll) {
-      requestAnimationFrame(() => {
-        document
-          .getElementById(lastHash.current)
-          ?.scrollIntoView({ behavior: "instant", block: "start" });
-        lastHash.current = "";
-      });
-    }
-  }, [location]);
+  const forceRefreshAnchorScroll = useCallback(() => {
+    lastHash.current = "";
+    setScrollForceRefresh((prev) => prev + 1);
+  }, []);
 
   // --- We collect all the actions defined in the app and pass them to the app context
   const Actions = useMemo(() => {
@@ -344,28 +351,31 @@ export function AppContent({
 
       // --- Various utils
       ...miscellaneousUtils,
+
+      forceRefreshAnchorScroll,
     };
     return ret;
   }, [
     Actions,
-    activeThemeId,
-    activeThemeTone,
-    apiInterceptorContext,
-    availableThemeIds,
-    confirm,
+    appGlobals,
     debugEnabled,
     decorateComponentsWithTestId,
-    embed,
     environment,
-    appGlobals,
-    loggedInUser,
     mediaSize,
+    standalone,
     navigate,
     routerBaseName,
+    confirm,
+    activeThemeId,
+    activeThemeTone,
+    availableThemeIds,
     setActiveThemeId,
     setActiveThemeTone,
     toggleThemeTone,
-    standalone,
+    loggedInUser,
+    embed,
+    apiInterceptorContext,
+    forceRefreshAnchorScroll,
   ]);
 
   // --- We prepare the helper infrastructure for the `AppState` component, which manages
