@@ -11,13 +11,21 @@ type ViteConfigData = {
   flatDistUiPrefix?: string;
 };
 
-export function getViteConfig({
+export async function getViteConfig({
   flatDist = false,
   withRelativeRoot = false,
   flatDistUiPrefix = "",
 }: ViteConfigData = {}) {
+
+  let overrides = {};
+  try{
+    const configOverrides = await import(process.cwd() + `/vite.config-overrides`);
+    overrides = configOverrides.default;
+  } catch (e){
+  }
+
   return defineConfig({
-    plugins: [react(), svgr(), ViteYaml(), ViteUeml({})],
+    plugins: [react(), svgr(), ViteYaml(), ViteUeml({}), ...(overrides.plugins || [])],
     base: withRelativeRoot ? "" : undefined,
     // experimental: {
     //   renderBuiltUrl: (filename, {type, hostType, hostId}) =>{
@@ -29,6 +37,11 @@ export function getViteConfig({
     //     }
     //   }
     // },
+    define: overrides.define,
+    resolve: {
+      alias: overrides.resolve?.alias,
+    },
+    css: overrides.css,
     build: {
       rollupOptions: {
         input: path.resolve(process.cwd(), "index.html"),
