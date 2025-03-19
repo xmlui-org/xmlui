@@ -2,7 +2,7 @@
 
 .wrapper {
   z-index: 9999;
-  overflow: auto;
+  overflow: hidden;
   box-shadow: 0 2px 6px 0 rgba(58, 57, 68, 0.4);
   position: relative;
   bottom: 0;
@@ -58,8 +58,8 @@
 
 .content {
   flex: 1;
-  overflow: auto;
   position: relative;
+  overflow: auto;
 
   .copyButton {
     position: absolute;
