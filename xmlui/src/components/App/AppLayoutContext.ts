@@ -65,6 +65,7 @@ export interface IAppLayoutContext {
   logo?: string;
   logoDark?: string;
   logoLight?: string;
+  registerSubNavPanelSlot?: (slot: HTMLElement) => void;
 }
 
 export const AppLayoutContext = createContext<IAppLayoutContext | null>(null);

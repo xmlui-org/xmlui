@@ -56,6 +56,11 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   justify-content: $align-content-AppHeader;
 }
 
+.subNavPanelSlot{
+  display: flex;
+  flex-direction: row;
+}
+
 .logoAndTitle {
   display: flex;
   align-items: center;

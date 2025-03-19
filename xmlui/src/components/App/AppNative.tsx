@@ -183,6 +183,11 @@ export function App({
     });
   }, [location.pathname]);
 
+  const [subNavPanelSlot, setSubNavPanelSlot] = useState(null);
+  const registerSubNavPanelSlot = useCallback((element) => {
+    setSubNavPanelSlot(element);
+  }, []);
+
   const layoutContextValue = useMemo<IAppLayoutContext>(() => {
     return {
       hasRegisteredNavPanel,
@@ -202,6 +207,8 @@ export function App({
       toggleDrawer,
       navPanelDef,
       logoContentDef,
+      registerSubNavPanelSlot,
+      subNavPanelSlot,
     };
   }, [
     hasRegisteredNavPanel,
@@ -215,6 +222,8 @@ export function App({
     toggleDrawer,
     navPanelDef,
     logoContentDef,
+    registerSubNavPanelSlot,
+    subNavPanelSlot,
   ]);
 
   useEffect(() => {

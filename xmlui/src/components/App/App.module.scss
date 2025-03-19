@@ -161,6 +161,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
     .PagesWrapperInner {
       min-height: 100%;
+      height: 0;
     }
   }
 
