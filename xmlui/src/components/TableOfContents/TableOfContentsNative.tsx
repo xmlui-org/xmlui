@@ -27,8 +27,8 @@ export const TableOfContents = forwardRef(function TableOfContents(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const tocRef = useRef<HTMLDivElement>(null);
-  const [activeAnchorId, setActiveId] = useState(null);
-  const { headings, scrollToAnchor, subscribeToActiveAnchorChange } = useTableOfContents();
+  const { headings, scrollToAnchor, subscribeToActiveAnchorChange, activeAnchorId: initialActiveAnchorId } = useTableOfContents();
+  const [activeAnchorId, setActiveId] = useState(initialActiveAnchorId);
 
   useIsomorphicLayoutEffect(() => {
     return subscribeToActiveAnchorChange((id) => {

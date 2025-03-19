@@ -736,7 +736,7 @@ function addThemeVarDescriptions(component) {
   if (!component.themeVarDescriptions) {
     return "";
   }
-  let buffer = "\n\nThis component uses a few unique theme variables. The following table summarizes them:\n\n";
+  let buffer = "\n\n### Variable Explanations\n\n";
 
   buffer += createTable({
     headers: ["Theme Variable", "Description"],
@@ -746,7 +746,7 @@ function addThemeVarDescriptions(component) {
     ]),
   });
 
-  return buffer;
+  return buffer + "\n\n";
 }
 
 // Use this object/map to replace the occurrences of the keys and have them be replaced by links

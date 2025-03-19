@@ -327,6 +327,7 @@ export type AppContextObject = {
   readonly DateUtils: Record<string, any>;
   readonly embed: { isInIFrame: boolean };
   distinct: (arr: any[]) => any[];
+  forceRefreshAnchorScroll: ()=>void;
 };
 
 export type MediaBreakpointType = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
