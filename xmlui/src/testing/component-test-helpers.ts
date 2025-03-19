@@ -4,6 +4,8 @@ import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "../components-core/abstractions/standalone";
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
+import chroma, { Color } from "chroma-js";
+
 type EntryPoint = string | ComponentDef;
 type UnparsedAppDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
   entryPoint?: EntryPoint;
@@ -191,50 +193,92 @@ class TestSkipReason {
  */
 export const SKIP_REASON = new TestSkipReason();
 
-// ---
+// --- CSS types and parsers
 
 export function pixelStrToNum(pixelStr: string) {
   return Number(pixelStr.replace("px", ""));
 }
 
+export function parseAsCssBorder(str: string) {
+  const parts = str.split(/\s+(?=[a-z]+|\()/i);
+  if (parts.length > 3) {
+    throw new Error(`Provided value ${str} cannot be parsed as a CSS border`);
+  }
+  const style = parts.filter(isCSSBorderStyle);
+  if (style.length > 1) {
+    throw new Error(`Too many border styles provided in ${str}`);
+  }
+
+  const width = parts.filter(isNumericCSS);
+  if (width.length > 1) {
+    throw new Error(`Too many border widths provided in ${str}`);
+  }
+
+  const color = parts.filter(p => chroma.valid(p));
+  if (color.length > 1) {
+    throw new Error(`Too many border colors provided in ${str}`);
+  }
+
+  const result: CSSBorder = {
+    width: !!width[0] ? parseAsNumericCss(width[0]) : undefined,
+    style: style[0],
+    color: chroma(color[0]),
+  };
+  return result;
+
+}
+
+export interface NumericCSS {
+  value: number;
+  unit: CSSUnit;
+};
+
+const numericCSSRegex = /^([+-]?(?:\d+|\d*\.\d+))([a-z]*|%)$/;
+
+export function isNumericCSS(str: any): str is NumericCSS {
+  const parts = str.match(numericCSSRegex);
+  
+  if (!parts) return false;
+  if (parts.length < 3) return false;
+  if (isNaN(parseFloat(parts[1]))) return false;
+  if (!isCSSUnit(parts[2])) return false;
+
+  return true;
+}
+
 export function parseAsNumericCss(str: string) {
-  const parts = str.match(/^([+-]?(?:\d+|\d*\.\d+))([a-z]*|%)$/);
+  const parts = str.match(numericCSSRegex);
   if (!parts) {
     throw new Error(`Provided value ${str} cannot be parsed as a numeric CSS value`);
   }
   if (parts.length < 3) {
     throw new Error(`${parts[0]} is not a correct numeric CSS value`);
   }
-  if (!isCSSUnit(parts[2])) {
-    throw new Error(`${parts[2]} is not have a valid CSS unit`);
+  const value = parseFloat(parts[1]);
+  if (isNaN(value)) {
+    throw new Error(`${value} is not a valid number in ${str}`);
   }
-  const result: NumericCSS = {
-    value: parseFloat(parts[1]),
-    unit: parts[2] as CSSUnit,
-  };
+  const unit = parts[2];
+  if (!isCSSUnit(unit)) {
+    throw new Error(`${unit} is not have a valid CSS unit in ${str}`);
+  }
+  const result: NumericCSS = { value, unit };
   return result;
 }
 
-export function parseAsCssBorder(str: string) {
-  const parts = str.split(/\s+(?=[a-z]+|\()/i);
-  if (parts.length !== 3) {
-    throw new Error(`Provided value ${str} cannot be parsed as a CSS border`);
-  }
-  if (!isCSSBorderStyle(parts[1])) {
-    throw new Error(`${parts[1]} is not have a valid CSS border style`);
-  }
-  const result: CSSBorder = {
-    width: parseAsNumericCss(parts[0]),
-    style: parts[1] as CSSBorderStyle,
-    color: parts[2],
-  };
-  return result;
+export function numericCSSToString(cssValue: NumericCSS) {
+  return `${cssValue.value}${cssValue.unit}`;
 }
 
-export type NumericCSS = {
-  value: number;
-  unit: CSSUnit;
-};
+export type CSSColor = chroma.Color;
+
+export function isCSSColor(str: any): str is CSSColor {
+  return chroma.valid(str);
+}
+
+export function parseAsCSSColor(str: string): CSSColor {
+  return chroma(str);
+}
 
 const CSSUnitValues = [
   "px",
@@ -259,10 +303,10 @@ function isCSSUnit(str: string): str is CSSUnit {
   return CSSUnitValues.includes(str as any);
 }
 
-type CSSBorder = {
-  width: NumericCSS;
-  style: CSSBorderStyle;
-  color: string;
+export type CSSBorder = {
+  width?: NumericCSS;
+  style?: CSSBorderStyle;
+  color?: Color;
 };
 
 const CSSBorderStyleValues = [
@@ -277,8 +321,21 @@ const CSSBorderStyleValues = [
   "inset",
   "outset",
 ] as const;
-type CSSBorderStyle = (typeof CSSBorderStyleValues)[number];
+export type CSSBorderStyle = (typeof CSSBorderStyleValues)[number];
 
-function isCSSBorderStyle(str: string): str is CSSBorderStyle {
+export function isCSSBorderStyle(str: string): str is CSSBorderStyle {
   return CSSBorderStyleValues.includes(str as any);
+}
+export function parseAsCSSBorderStyle(str: string) {
+  if (!isCSSBorderStyle(str)) {
+    throw new Error(`Provided value ${str} cannot be parsed as a CSS border style`);
+  }
+  return str;
+}
+
+export const BorderSideValues = ["top", "bottom", "left", "right"] as const;
+export type BorderSide = (typeof BorderSideValues)[number];
+
+export function isBorderSide(str: string): str is BorderSide {
+  return BorderSideValues.includes(str as any);
 }

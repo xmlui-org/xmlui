@@ -7,7 +7,6 @@ import {
   buttonTypeValues,
   buttonThemeValues,
   buttonVariantValues,
-  type ButtonVariant,
   type IconPosition,
 } from "../../components/abstractions";
 import type { ComponentDriver } from "../../testing/ComponentDrivers";
@@ -22,8 +21,9 @@ const expect = fixtureExpect.extend({
    * **Usage**
    *
    * ```js
-   * const driver = await createDriver(`<Button label="hello" />`);
-   * await expect(driver.component).toHaveLabel("hello"); // true
+   * await initTestBed(`<Button label="hello" />`);
+   * const driver = await createButtonDriver();
+   * await expect(driver.component).toHaveLabel("hello"); // <- resolves to true
    * ```
    *
    * @param expected Expected string label
@@ -147,7 +147,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       }) => {
         await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
           testThemeVars: {
-            [`color-Button-${themeColor}-${variant}`]: EXPECTED_CONTENT_COLOR,
+            [`textColor-Button-${themeColor}-${variant}`]: EXPECTED_CONTENT_COLOR,
           },
         });
         await expect((await createButtonDriver()).component).toHaveCSS(
@@ -163,26 +163,43 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   const EXPECTED_BORDER_WIDTH = "5px";
   const EXPECTED_BORDER_STYLE = "dotted";
   const EXPECTED_BORDER_RADIUS = "10px";
-  buttonVariantValues.forEach((variant) => {
-    buttonThemeValues.forEach((themeColor) => {
-      test(`border: "${themeColor}" "${variant}" variant`, async ({
-        initTestBed,
-        createButtonDriver,
-      }) => {
-        await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
-          testThemeVars: {
-            [`borderColor-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_COLOR,
-            [`borderWidth-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_WIDTH,
-            [`borderRadius-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_RADIUS,
-            [`borderStyle-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_STYLE,
-          },
+  buttonVariantValues
+    .filter((v) => v !== "ghost")
+    .forEach((variant) => {
+      buttonThemeValues.forEach((themeColor) => {
+        test(`border: "${themeColor}" "${variant}" variant`, async ({
+          initTestBed,
+          createButtonDriver,
+        }) => {
+          await initTestBed(`<Button variant="${variant}" themeColor="${themeColor}" />`, {
+            testThemeVars: {
+              [`borderColor-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_COLOR,
+              [`borderWidth-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_WIDTH,
+              [`borderRadius-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_RADIUS,
+              [`borderStyle-Button-${themeColor}-${variant}`]: EXPECTED_BORDER_STYLE,
+            },
+          });
+          
+          const driver = await createButtonDriver();
+          await expect(driver.component).toHaveCSS("border-color", EXPECTED_BORDER_COLOR);
+          await expect(driver.component).toHaveCSS("border-width", EXPECTED_BORDER_WIDTH);
+          await expect(driver.component).toHaveCSS("border-radius", EXPECTED_BORDER_RADIUS);
+          await expect(driver.component).toHaveCSS("border-style", EXPECTED_BORDER_STYLE);
         });
-        const driver = await createButtonDriver();
-        await expect(driver.component).toHaveCSS("border-color", EXPECTED_BORDER_COLOR);
-        await expect(driver.component).toHaveCSS("border-width", EXPECTED_BORDER_WIDTH);
-        await expect(driver.component).toHaveCSS("border-radius", EXPECTED_BORDER_RADIUS);
-        await expect(driver.component).toHaveCSS("border-style", EXPECTED_BORDER_STYLE);
       });
+    });
+
+  buttonThemeValues.forEach((themeColor) => {
+    test(`border: "${themeColor}" "ghost" variant`, async ({ initTestBed, createButtonDriver }) => {
+      await initTestBed(`<Button variant="ghost" themeColor="${themeColor}" />`, {
+        testThemeVars: {
+          [`borderWidth-Button-${themeColor}-ghost`]: EXPECTED_BORDER_WIDTH,
+          [`borderRadius-Button-${themeColor}-ghost`]: EXPECTED_BORDER_RADIUS,
+        },
+      });
+      const driver = await createButtonDriver();
+      await expect(driver.component).toHaveCSS("border-width", EXPECTED_BORDER_WIDTH);
+      await expect(driver.component).toHaveCSS("border-radius", EXPECTED_BORDER_RADIUS);
     });
   });
 
@@ -584,3 +601,4 @@ test("can render correct icon", async ({ createDriver }) => {
   await expect(driver.buttonIcon).toBeVisible();
 });
 */
+

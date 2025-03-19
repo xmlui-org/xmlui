@@ -1,4 +1,4 @@
-import { expect as baseExpect, test as baseTest } from "@playwright/test";
+import { test as baseTest } from "@playwright/test";
 import type { Locator, Page } from "playwright-core";
 
 import type { ComponentDef } from "../abstractions/ComponentDefs";
@@ -7,6 +7,9 @@ import type { StandaloneAppDescription } from "../components-core/abstractions/s
 import {
   type ComponentDriver,
   type ComponentDriverParams,
+  AccordionDriver,
+  AppFooterDriver,
+  AppHeaderDriver,
   AvatarDriver,
   ButtonDriver,
   CardDriver,
@@ -33,8 +36,8 @@ import {
   VStackDriver,
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
-import { LintSeverity } from "../parsers/xmlui-parser/lint";
-import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
+
+export { expect } from "./assertions";
 
 // -----------------------------------------------------------------
 // --- Utility
@@ -52,54 +55,6 @@ async function getOnlyFirstLocator(page: Page, testId: string) {
   }
   return locators;
 }
-
-// -----------------------------------------------------------------
-// --- Extending Expect
-
-export const expect = baseExpect.extend({
-  /**
-   * Compares two numbers with an optional tolerance value. If the tolerance is set to 0 the comparator acts as `toEqual`.
-   * Used to compare element dimensions on different platforms because of half pixel rendering.
-   *
-   * **Usage**
-   *
-   * ```js
-   * const value = 8;
-   * expect(value).toEqualWithTolerance(10, 2); // true
-   * ```
-   *
-   * @param expected Expected value
-   * @param tolerance Tolerance value, **default is 1**
-   */
-  toEqualWithTolerance(provided: number, expected: number, tolerance: number = 1) {
-    const assertionName = "toEqualWithTolerance";
-    let pass = false;
-
-    if (provided >= expected - (tolerance || 0) && provided <= expected + (tolerance || 0)) {
-      pass = true;
-    }
-
-    const message = pass
-      ? () =>
-          this.utils.matcherHint(assertionName, provided, expected, { isNot: this.isNot }) +
-          "\n\n" +
-          `Expected: ${this.isNot ? "not" : ""}${this.utils.printExpected(expected)}\n` +
-          `Received: ${this.utils.printReceived(provided)}`
-      : () =>
-          this.utils.matcherHint(assertionName, provided, expected, { isNot: this.isNot }) +
-          "\n\n" +
-          `Expected: ${this.utils.printExpected(expected)}\n` +
-          `Received: ${this.utils.printReceived(provided)}`;
-
-    return {
-      message,
-      pass,
-      name: assertionName,
-      expected,
-      actual: undefined,
-    };
-  },
-});
 
 class Clipboard {
   private page: Page;
@@ -127,13 +82,13 @@ class Clipboard {
    */
   async copyFrom(driver: ComponentDriver) {
     await driver.focus();
-    await driver.dblclick()
-    await this.page.keyboard.press('Control+c');
+    await driver.dblclick();
+    await this.page.keyboard.press("Control+c");
   }
 
   async pasteTo(driver: ComponentDriver) {
     await driver.focus();
-    await this.page.keyboard.press('Control+v');
+    await this.page.keyboard.press("Control+v");
   }
 }
 
@@ -142,7 +97,7 @@ function mapThemeRelatedVars(description: TestBedDescription): TestBedDescriptio
 
   if (themes) {
     return { themes, defaultTheme: defaultTheme ?? "xmlui", ...rest };
-  } 
+  }
 
   const testTheme = {
     id: "test",
@@ -151,13 +106,15 @@ function mapThemeRelatedVars(description: TestBedDescription): TestBedDescriptio
     themeVars: testThemeVars,
   };
 
-  return {  themes: [testTheme], defaultTheme: "test", ...rest };
+  return { themes: [testTheme], defaultTheme: "test", ...rest };
 }
 
 // -----------------------------------------------------------------
 // --- TestBed and Driver Fixtures
 
-type TestBedDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & { testThemeVars?: Record<string, string> };
+type TestBedDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
+  testThemeVars?: Record<string, string>;
+};
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
   // NOTE: the base Playwright test can be extended with fixture methods
@@ -166,13 +123,9 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   testStateViewTestId: "test-state-view-testid",
 
   initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use) => {
-    await use(
-      async (
-        source: string,
-        description?: TestBedDescription,
-      ) => {
-        // --- Initialize XMLUI App
-        const { errors, component } = xmlUiMarkupToComponent(`
+    await use(async (source: string, description?: TestBedDescription) => {
+      // --- Initialize XMLUI App
+      const { errors, component } = xmlUiMarkupToComponent(`
           <Fragment var.testState="{null}">
             ${source}
             <Stack width="0" height="0">
@@ -182,28 +135,26 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
             </Stack>
           </Fragment>
         `);
-        // `, 0, undefined, {lintSeverity: LintSeverity.Error, collectedMetadata: collectedComponentMetadata});
 
-        if (errors.length > 0) {
-          throw { errors };
-        }
-        const entryPoint = component as ComponentDef;
+      if (errors.length > 0) {
+        throw { errors };
+      }
+      const entryPoint = component as ComponentDef;
 
-        if (source !== "" && entryPoint.children) {
-          const sourceBaseComponent = entryPoint.children[0];
-          if (!sourceBaseComponent.testId) {
-            sourceBaseComponent.testId = baseComponentTestId;
-          }
+      if (source !== "" && entryPoint.children) {
+        const sourceBaseComponent = entryPoint.children[0];
+        if (!sourceBaseComponent.testId) {
+          sourceBaseComponent.testId = baseComponentTestId;
         }
-        
-        const themedDescription = mapThemeRelatedVars(description);
-        await initComponent(page, { ...themedDescription, entryPoint });
-        return {
-          testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
-          clipboard: new Clipboard(page),
-        };
-      },
-    );
+      }
+
+      const themedDescription = mapThemeRelatedVars(description);
+      await initComponent(page, { ...themedDescription, entryPoint });
+      return {
+        testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
+        clipboard: new Clipboard(page),
+      };
+    });
   },
 
   createDriver: async <T extends new (...args: ComponentDriverParams[]) => any>(
@@ -339,12 +290,29 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(CardDriver, testIdOrLocator);
     });
-  }
+  },
+  createAccordionDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(AccordionDriver, testIdOrLocator);
+    });
+  },
+  createAppHeaderDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(AppHeaderDriver, testIdOrLocator);
+    });
+  },
+  createAppFooterDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(AppFooterDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
 
-type ComponentDriverMethod<T extends ComponentDriver> = (testIdOrLocator?: string | Locator) => Promise<T>;
+type ComponentDriverMethod<T extends ComponentDriver> = (
+  testIdOrLocator?: string | Locator,
+) => Promise<T>;
 
 type TestDriverExtenderProps = {
   testStateViewTestId: string;
@@ -352,7 +320,7 @@ type TestDriverExtenderProps = {
   initTestBed: (
     source: string,
     description?: TestBedDescription,
-  ) => Promise<{ testStateDriver: TestStateDriver, clipboard: Clipboard }>;
+  ) => Promise<{ testStateDriver: TestStateDriver; clipboard: Clipboard }>;
   createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
     driverClass: T,
     testIdOrLocator?: string | Locator,
@@ -380,4 +348,7 @@ type TestDriverExtenderProps = {
   createVStackDriver: ComponentDriverMethod<VStackDriver>;
   createLinkDriver: ComponentDriverMethod<LinkDriver>;
   createCardDriver: ComponentDriverMethod<CardDriver>;
+  createAccordionDriver: ComponentDriverMethod<AccordionDriver>;
+  createAppHeaderDriver: ComponentDriverMethod<AppHeaderDriver>;
+  createAppFooterDriver: ComponentDriverMethod<AppFooterDriver>;
 };
