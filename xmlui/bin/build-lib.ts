@@ -54,13 +54,13 @@ export const buildLib = async ({ watchMode, mode = "production" }) => {
           globals: {
             react: "React",
             "react-dom": "ReactDOM",
-            "react/jsx-runtime": "react/jsx-runtime"
+            "jsx": "react/jsx-runtime"
           },
         },
       },
     },
     plugins: mode === "metadata" ? [] : [react(), libInjectCss()],
   };
-  
+
   await viteBuild(defineConfig(config));
 };

@@ -333,7 +333,7 @@ $THEME-VAR-PREFIX: xmlui;
 // =====================================================================================================================
 // Helper functions for theme variables
 
-// This function composes padding variables for a given subject taking into 
+// This function composes padding variables for a given subject taking into
 // account all possible padding directions
 @function composePaddingVars($themeVars, $subject) {
   $tmp: appendThemeVar($themeVars, "padding-#{$subject}") !global;
@@ -358,7 +358,7 @@ $THEME-VAR-PREFIX: xmlui;
   padding-bottom: getThemeVar($themeVars, "paddingBottom-#{$subject}");
 }
 
-// This function composes padding variables for a given subject taking into 
+// This function composes padding variables for a given subject taking into
 // account all possible padding directions
 @function composeBorderVars($themeVars, $subject) {
   $tmp: appendThemeVar($themeVars, "border-#{$subject}") !global;
@@ -404,7 +404,7 @@ $THEME-VAR-PREFIX: xmlui;
   $tmpColorVertical: getThemeVar($tmp, "borderVerticalColor-#{$subject}");
   $tmp: appendThemeVarWithDefault($tmp, "borderTopColor-#{$subject}", $tmpColorVertical) !global;
   $tmp: appendThemeVarWithDefault($tmp, "borderBottomColor-#{$subject}", $tmpColorVertical) !global;
-  
+
   $tmpRadius: appendThemeVar($tmp, "borderRadius-#{$subject}") !global;
   $tmpRadiusAll: getThemeVar($tmpRadius, "borderRadius-#{$subject}") !global;
   $tmp: appendThemeVarWithDefault($tmp, "borderStartStartRadius-#{$subject}", $tmpRadiusAll) !global;
@@ -490,7 +490,6 @@ $space-96: createVar(space-96);
 // Generic style variables
 
 $textColor-primary: createVar(textColor-primary);
-$backgroundColor-primary: createVar(backgroundColor-primary);
 $textColor-attention: createVar(textColor-attention);
 $backgroundColor-attention: createVar(backgroundColor-attention);
 $textColor-subtitle: createVar(textColor-subtitle);
