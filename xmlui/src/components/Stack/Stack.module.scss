@@ -7,9 +7,6 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$backgroundColor-Stack--hover: createThemeVar("backgroundColor-Stack--hover");
-$border-Stack--hover: createThemeVar("border-Stack--hover");
-
 .base {
   display: flex;
   /* default flexbox alignment */
@@ -18,11 +15,6 @@ $border-Stack--hover: createThemeVar("border-Stack--hover");
   min-height: 0;
   min-width: 0;
   gap: var(--stack-gap-default);
-
-  &:hover {
-    background-color: $backgroundColor-Stack--hover;
-    border: $border-Stack--hover;
-  }
 
   &.hoverContainer{
     :global(.display-on-hover){
