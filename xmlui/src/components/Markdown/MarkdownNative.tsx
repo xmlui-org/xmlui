@@ -33,7 +33,8 @@ export const Markdown = memo(function Markdown({
   if (typeof children !== "string") {
     return null;
   }
-  children = removeIndents ? removeTextIndents(children) : children;
+
+  const _children = removeIndents ? removeTextIndents(children) : children;
   
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
@@ -156,13 +157,17 @@ export const Markdown = memo(function Markdown({
           },
         }}
       >
-        {children as any}
+        {_children}
       </ReactMarkdown>
     </div>
   );
 });
 
-function removeTextIndents(input: string): string {
+function removeTextIndents(input: string) {
+  if (!input) {
+    return "";
+  }
+
   const lines = input.split("\n");
 
   // Find the shortest starting whitespace length

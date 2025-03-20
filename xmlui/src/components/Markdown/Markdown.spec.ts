@@ -6,9 +6,7 @@ import { expect, test } from "../../testing/fixtures";
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("Markdown renders", async ({ initTestBed, createMarkdownDriver }) => {
     await initTestBed(`<Markdown />`);
-    const driver = await createMarkdownDriver();
-
-    await expect(driver.component).toBeAttached();
+    await expect((await createMarkdownDriver()).component).toBeAttached();
   });
 
   test("handles empty binding expression", async ({ initTestBed, createMarkdownDriver }) => {
