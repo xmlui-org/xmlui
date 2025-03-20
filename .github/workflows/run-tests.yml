@@ -19,6 +19,10 @@ jobs:
         with:
           node-version: 18
           cache: "npm"
+
+      - name: increase node memory limit
+        run: echo "export NODE_OPTIONS=--max_old_space_size=4096" >> $GITHUB_ENV
+
       - name: npm install
         run: npm ci --prefer-offline
 
