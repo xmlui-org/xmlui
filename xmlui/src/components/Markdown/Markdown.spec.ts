@@ -47,7 +47,10 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toHaveText(expected);
   });
 
-  test("handles nested objects in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
+  test("handles nested objects in binding expressions", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
     const expected = "{ a : 1, b: { c: 1 } }";
     await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(`{"a":1,"b":{"c":1}}`);
@@ -59,7 +62,9 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   }) => {
     const expected = "{ a: () => { const x = 1; console.log(x); return null; } }";
     await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
-    await expect((await createMarkdownDriver()).component).toHaveText(`{"a":"() => { const x = 1; console.log(x); return null; }"}`);
+    await expect((await createMarkdownDriver()).component).toHaveText(
+      `{"a":"() => { const x = 1; console.log(x); return null; }"}`,
+    );
   });
 
   test("handles arrays nested in objects in binding expressions", async ({
@@ -77,7 +82,9 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   }) => {
     const expected = "() => { return [1, 2, 3]; }";
     await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
-    await expect((await createMarkdownDriver()).component).toHaveText(`() => { return [1, 2, 3]; }`);
+    await expect((await createMarkdownDriver()).component).toHaveText(
+      `() => { return [1, 2, 3]; }`,
+    );
   });
 
   test("handles complex expressions", async ({ initTestBed, createMarkdownDriver }) => {
@@ -131,3 +138,44 @@ test.skip(
   SKIP_REASON.TO_BE_IMPLEMENTED(),
   async ({ initTestBed }) => {},
 );
+
+test("4space/1 tab indent is not code block by default", async ({
+  initTestBed,
+  createMarkdownDriver,
+}) => {
+  // Note the formatting here: the line breaks and indentations are intentional
+  const expected = `
+    _I did not expect this_
+  `;
+  await initTestBed(`<Markdown><![CDATA[${expected}]]></Markdown>`);
+  await expect((await createMarkdownDriver()).component).toHaveText("I did not expect this");
+});
+
+test("removeIndents=false: 4space/1 tab indent is accounted for", async ({
+  initTestBed,
+  createMarkdownDriver,
+}) => {
+  // Note the formatting here: the lack of indentations is intentional
+  const expected = `
+_I did not expect this_
+  `;
+  await initTestBed(`<Markdown removeIndents="false"><![CDATA[${expected}]]></Markdown>`);
+  await expect((await createMarkdownDriver()).component).toHaveText("I did not expect this");
+});
+
+test("removeIndents=false: 4space/1 tab indent maps to a code block", async ({
+  initTestBed,
+  createMarkdownDriver,
+}) => {
+  // Note the formatting here: the indentations are intentional
+  const expected = `
+    _I did not expect this_
+  `;
+  await initTestBed(`<Markdown removeIndents="false"><![CDATA[${expected}]]></Markdown>`);
+  const component = (await createMarkdownDriver()).component;
+  await expect(component).toHaveText("_I did not expect this_");
+});
+
+// TEMP: will use this shorty in next test commit
+// console.log(typeof (await component.innerHTML()));
+// DOMParser().parseFromString()
