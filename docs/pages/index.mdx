@@ -39,7 +39,7 @@ You can **bind components to work together**.
 ```ueml copy /myTextBox/ /myTextBox.value/
 <App>
   <TextBox id="myTextBox" placeholder="Type something" />
-  <Text variant="title">You typed: {myTextBox.value}</Text>
+  <Text>You typed: {myTextBox.value}</Text>
 </App>
 ```
 
@@ -48,7 +48,7 @@ You can **bind components to work together**.
   app={`
     <App>
       <TextBox id="myTextBox" placeholder="Type something" />
-      <Text variant="title">You typed: {myTextBox.value}</Text>
+      <Text>You typed: {myTextBox.value}</Text>
     </App>
   `}
 />
