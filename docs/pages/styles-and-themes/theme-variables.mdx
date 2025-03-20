@@ -79,7 +79,7 @@ This table summarizes the states you can use with theme variables:
 |`‑‑focus`|The component has the keyboard focus and processes keypress-related events|
 |`‑‑hover`|Indicates the state when the mouse (pointer) hovers above the component's client area|
 
-You can add multiple state segments to a theme variable to define a combined state. For example, the `--active--hover` combination defines a visual trait when the component is activated and hovered.
+You can add multiple state segments to a theme variable to define a combined state. For example, the `‑‑active‑‑hover` combination defines a visual trait when the component is activated and hovered.
 
 <Callout type="info" emoji="💡">
 You can use your custom state names for your components.
@@ -189,6 +189,13 @@ You can use these app-bound theme variables within an app:
 | **`boxShadow‑spread‑2`** | A box shadow that spreads around all edges of a component (more extended than `boxShadow‑spread`). |
 | **`boxShadow‑xl`** | A box shadow that gives an elevated look to a component (bigger than `boxShadow-md`). |
 | **`boxShadow‑xxl`** | A box shadow that gives an elevated look to a component (bigger than `boxShadow-xl`). |
+| **`color-danger`** | This theme variable sets the base color shade for components using the "danger" color. |
+| **`color-info`** | This theme variable sets the base color shade for components using the "info" color. |
+| **`color-primary`** | This theme variable sets the base color shade for components using the primary color. |
+| **`color-secondary`** | This theme variable sets the base color shade for components using the secondary color. |
+| **`color-success`** | This theme variable sets the base color shade for components using the "success" color. |
+| **`color-surface`** | This theme variable sets the base color shade for surface areas (component backgrounds). |
+| **`color-warn`** | This theme variable sets the base color shade for components using the "warning" color. |
 | **`fontFamily‑monospace`** | This theme variable specifies the font family for text elements marked with "monospace". |
 | **`fontFamily‑sans‑serif`** | This theme variable specifies the font family for text elements marked with "sans-serif". |
 | **`fontSize`** | This theme variable sets the default font size of text elements. |
@@ -228,17 +235,21 @@ You can use these app-bound theme variables within an app:
 | **`textColor‑secondary`** | This theme variable sets the color of text elements using the "secondary" color. |
 | **`textColor‑subtitle`** | This theme variable sets the color of text elements using the "subtitle" variant. |
 
-### Colors
+## Colors in Themes
 
-XMLUI defines these variables representing base colors:
+XMLUI provides a palette of 77 colors for each theme out of the box. These colors are combinations of seven colors with 11 shades for each. 
+
+These theme variables represent the base colors:
+
 - `color-surface`: The color for the surface (background) areas
 - `color-primary`: The primary color of the app (buttons, badges, checkboxes, etc.)
 - `color-secondary`: The secondary color of the app (buttons, badges, checkboxes, etc.)
 - `color-warn`: The color to use for warnings
 - `color-danger`: The color for signing dangerous situations (for example, the color of a Delete button)
 - `color-success`: The color for signing success
+- `color-info`: The color for signing information
 
-These are base colors; when you specify them, XMLUI automatically creates several shade variants (using 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, and 950 as prefixes) from the lightest to the darkest.
+When you set a particular base color, xmlui creates several shade variants (using 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, and 950 as prefixes) from the lightest to the darkest. It uses the specified base color for shade 500 and calculates five darker shades (400, 300, 200, 100, and 50, from lighter to darker) plus five lighter shades (600, 700, 800, 900, and 950, from darker to lighter).
 
 For example, when you set the the `color-primary` variable to `#008000`, XMLUI creates these shades:
 
@@ -267,11 +278,11 @@ When selecting the primary color, choose one representing the middle shade (500)
   `}
 />
 
-### Default Colors
+### Default Color Shade Sets
 
 XMLUI declares these default color shade sets:
 
-#### Surface
+**Surface**:
 
 <Playground
   name="Surface Colors"
@@ -283,7 +294,7 @@ XMLUI declares these default color shade sets:
   `}
 />
 
-#### Primary
+**Primary**:
 
 <Playground
   name="Primary Colors"
@@ -295,7 +306,7 @@ XMLUI declares these default color shade sets:
   `}
 />
 
-#### Secondary
+**Secondary**:
 
 <Playground
   name="Secondary Colors"
@@ -307,7 +318,7 @@ XMLUI declares these default color shade sets:
   `}
 />
 
-#### Warn
+**Warn**:
 
 <Playground
   name="Warn Colors"
@@ -319,7 +330,7 @@ XMLUI declares these default color shade sets:
   `}
 />
 
-#### Danger
+**Danger**:
 
 <Playground
   name="Danger Colors"
@@ -331,7 +342,7 @@ XMLUI declares these default color shade sets:
   `}
 />
 
-#### Success
+**Success**:
 
 <Playground
   name="Success Colors"
@@ -343,7 +354,19 @@ XMLUI declares these default color shade sets:
   `}
 />
 
-#### Default Text Colors
+**Info**:
+
+<Playground
+  name="Info Colors"
+  components={[swatch, palette]}
+  app={`
+    <App>
+      <Palette name="info" />
+    </App>
+  `}
+/>
+
+### Default Text Colors
 
 - `textColor-primary`: The text color used by components that build on the primary color
 - `textColor-secondary`: The text color used by components that build on the secondary color
@@ -384,7 +407,7 @@ XMLUI declares these default color shade sets:
   `}
 />
 
-#### Default Background Colors
+### Default Background Colors
 
 - `backgroundColor`: The default background color for all components
 - `backgroundColor-primary`: The background color used by components that build on the secondary color
@@ -416,7 +439,7 @@ XMLUI declares these default color shade sets:
   `}
 />
 
-#### Validation Colors
+### Validation Colors
 
 These colors represent validation states:
 - `color-info`: Color of components with informational messages
@@ -439,9 +462,11 @@ These colors represent validation states:
   `}
 />
 
-### Fonts
+## Fonts
 
-#### Font Family
+You can influence the default font settings of a particular theme with the following theme variables:
+
+### Font Family
 
 These theme variables set the default font styles:
 - `fontFamily`: The default font family used in the app
@@ -470,7 +495,7 @@ These theme variables set the default font styles:
   `}
 />
 
-#### Line Height
+### Line Height
 
 These theme variables define a set of line heights:
 
@@ -511,7 +536,7 @@ These theme variables define a set of line heights:
   `}
 />
 
-#### Font Size
+### Font Size
 
 The `fontSize` theme variables allow you to set your themes' normal font size (`fontSize-normal`). You can use this set of theme variables to define font sizes relative to `fontSize`:
 
@@ -557,7 +582,7 @@ The `fontSize` theme variables allow you to set your themes' normal font size (`
   `}
 />
 
-#### Font Weight
+### Font Weight
 
 The `fontWeight` theme variables allow you to set your themes' normal font weight (`fontWeight-normal`). You can use this set of theme variables to define font sizes relative to `fontWeight`:
 
@@ -593,7 +618,7 @@ The `fontWeight` theme variables allow you to set your themes' normal font weigh
   `}
 />
 
-### Shadows
+## Shadows
 
 XMLUI defines a few stock shadow resources:
 
@@ -603,7 +628,7 @@ XMLUI defines a few stock shadow resources:
   app={shadowSizes}
 />
 
-### Spacing
+## Spacing
 
 XMLUI uses a relative scale with spacing (paddings, margins, gaps, etc.). This scale uses a unit defined with `space-base`, which you can set in your theme. When referring to a particular spacing, you can use values like `space-0`, `space-1`, ..., `space-12`, ..., and `space-96`, as the following example shows:
 
@@ -612,7 +637,7 @@ XMLUI uses a relative scale with spacing (paddings, margins, gaps, etc.). This s
   app={spacingSizes}
 />
 
-### Spacing in Layout Containers [#spacing-in-layout-containers]
+## Spacing in Layout Containers [#spacing-in-layout-containers]
 
 Besides the spacing theme variables, layout containers provide a few others that can be themed. Use these theme variables to provide consistent spacing with layout containers.
 
