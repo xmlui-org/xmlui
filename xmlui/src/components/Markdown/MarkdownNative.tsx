@@ -7,7 +7,6 @@ import { visit } from "unist-util-visit";
 import styles from "./Markdown.module.scss";
 import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
 
-import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Image } from "../Image/ImageNative";
@@ -21,18 +20,21 @@ type MarkdownProps = {
   style?: CSSProperties;
 };
 
+export const defaultProps: Pick<MarkdownProps, "removeIndents"> = {
+  removeIndents: true,
+};
+
 export const Markdown = memo(function Markdown({
   extractValue,
-  removeIndents = false,
+  removeIndents = defaultProps.removeIndents,
   children,
   style,
 }: MarkdownProps) {
   if (typeof children !== "string") {
     return null;
   }
-
   children = removeIndents ? removeTextIndents(children) : children;
-
+  
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
       <ReactMarkdown

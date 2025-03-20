@@ -3,15 +3,18 @@ import styles from "./Markdown.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Markdown } from "./MarkdownNative";
+import { defaultProps, Markdown } from "./MarkdownNative";
 
 const COMP = "Markdown";
 
 export const MarkdownMd = createMetadata({
-  description: `\`${COMP}\` displays plain text styled using markdown syntax.`,
+  description: `\`${COMP}\` displays plain text styled with markdown syntax.`,
   themeVars: parseScssVar(styles.themeVars),
   props: {
-    content: d("This property sets the markdown content to display."),
+    content: {
+      description: "This property sets the markdown content to display.",
+      valueType: "string",
+    },
     removeIndents: {
       description:
         "This boolean property specifies whether leading indents should be " +
@@ -19,7 +22,7 @@ export const MarkdownMd = createMetadata({
         "indent found at the start of the content lines is removed from the " +
         "beginning of every line.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.removeIndents,
     },
   },
   defaultThemeVars: {
@@ -57,7 +60,10 @@ export const markdownComponentRenderer = createComponentRenderer(
     return (
       <Markdown
         style={layoutCss}
-        removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, false)}
+        removeIndents={extractValue.asOptionalBoolean(
+          node.props.removeIndents,
+          defaultProps.removeIndents,
+        )}
         extractValue={extractValue}
       >
         {renderedChildren}
