@@ -91,7 +91,7 @@ export function start(){
     if (!document) {
       return [];
     }
-    const parseResult = getParseResult(document);
+    const parseResult = parseDocument(document);
     return handleCompletion({ parseResult: parseResult.parseResult, getText: parseResult.getText, metaByComp: collectedComponentMetadata }, document.offsetAt(position));
   });
 
@@ -106,9 +106,10 @@ export function start(){
       return null;
     }
 
-    const parseResult = getParseResult(document);
+    const { parseResult, getText } = parseDocument(document);
     const ctx = {
       parseResult,
+      getText,
       metaByComp: collectedComponentMetadata
     }
     const hoverRes = handleHover(ctx, document.offsetAt(position));
@@ -128,12 +129,12 @@ export function start(){
     };
   });
 
-  const parseResults = new Map();
-  function getParseResult(document: TextDocument): {
+  const parsedDocuments = new Map();
+  function parseDocument(document: TextDocument): {
     parseResult: ParseResult;
     getText: GetText;
   } {
-    const parseForDoc = parseResults.get(document.uri);
+    const parseForDoc = parsedDocuments.get(document.uri);
     if (parseForDoc !== undefined) {
       if (parseForDoc.version === document.version) {
         return {
@@ -144,7 +145,7 @@ export function start(){
     }
     const parser = createXmlUiParser(document.getText());
     const parseResult = parser.parse();
-    parseResults.set(document.uri, {
+    parsedDocuments.set(document.uri, {
       parseResult,
       version: document.version,
       getText: parser.getText,

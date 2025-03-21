@@ -1,9 +1,9 @@
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
-import { findTokenAtPos, toDbgString } from "../../parsers/xmlui-parser/utils"
+import { findTokenAtPos, toDbgString } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
-import * as docGen from "./docs-generation"
+import * as docGen from "./docs-generation";
 import type { ComponentMetadataCollection } from "../../components/collectedComponentMetadata";
 
 type SimpleHover = null | {
@@ -15,15 +15,19 @@ type SimpleHover = null | {
 };
 
 type HoverContex = {
-  parseResult: {parseResult: ParseResult, getText: GetText},
-  metaByComp: ComponentMetadataCollection
-}
+  parseResult: ParseResult;
+  getText: GetText;
+  metaByComp: ComponentMetadataCollection;
+};
 /**
  * @returns The hover content string
  */
-export function handleHover({ parseResult: { parseResult: { node }, getText }, metaByComp}: HoverContex, position: number): SimpleHover {
+export function handleHover(
+  { parseResult: { node }, getText, metaByComp }: HoverContex,
+  position: number,
+): SimpleHover {
   const findRes = findTokenAtPos(node, position);
-  console.log("findres: ",findRes);
+  console.log("findres: ", findRes);
 
   if (findRes === undefined) {
     return null;
@@ -31,16 +35,26 @@ export function handleHover({ parseResult: { parseResult: { node }, getText }, m
   const { chainAtPos } = findRes;
 
   const atNode = chainAtPos.at(-1)!;
-  const parentNode =chainAtPos.at(-2);
+  const parentNode = chainAtPos.at(-2);
   console.log("hovering: ", atNode, parentNode);
   switch (atNode.kind) {
     case SyntaxKind.Identifier:
-      switch (parentNode?.kind){
-        case SyntaxKind.TagNameNode:{
-          return hoverName({ collectedComponentMetadata: metaByComp, tagNameNode: parentNode, identNode: atNode, getText });
+      switch (parentNode?.kind) {
+        case SyntaxKind.TagNameNode: {
+          return hoverName({
+            collectedComponentMetadata: metaByComp,
+            tagNameNode: parentNode,
+            identNode: atNode,
+            getText,
+          });
         }
-        case SyntaxKind.AttributeKeyNode:{
-          return hoverAttr({ metaByComp, attrKeyNode: parentNode, parentStack: chainAtPos.slice(0, -2), getText });
+        case SyntaxKind.AttributeKeyNode: {
+          return hoverAttr({
+            metaByComp,
+            attrKeyNode: parentNode,
+            parentStack: chainAtPos.slice(0, -2),
+            getText,
+          });
         }
       }
       break;
@@ -54,59 +68,61 @@ function hoverAttr({
   parentStack,
   getText,
 }: {
-  metaByComp: ComponentMetadataCollection,
-  attrKeyNode: Node,
-  parentStack: Node[],
-  getText: GetText
+  metaByComp: ComponentMetadataCollection;
+  attrKeyNode: Node;
+  parentStack: Node[];
+  getText: GetText;
 }): SimpleHover {
-  if (parentStack.at(-1).kind !== SyntaxKind.AttributeNode){
+  if (parentStack.at(-1).kind !== SyntaxKind.AttributeNode) {
     return null;
   }
-  if (parentStack.at(-2).kind !== SyntaxKind.AttributeListNode){
+  if (parentStack.at(-2).kind !== SyntaxKind.AttributeListNode) {
     return null;
   }
   // console.log(parentStack.map(n => toDbgString(n, getText)));
   const tag = parentStack.at(-3);
-  if (tag?.kind !== SyntaxKind.ElementNode){
+  if (tag?.kind !== SyntaxKind.ElementNode) {
     return null;
   }
 
   const tagNameNode = findTagNameNodeInStack(parentStack);
-  if (!tagNameNode){
+  if (!tagNameNode) {
     return null;
   }
-  const compName = compNameForTagNameNode(tagNameNode, getText)
+  const compName = compNameForTagNameNode(tagNameNode, getText);
 
   const component = metaByComp[compName];
-  if (!component){
+  if (!component) {
     return null;
   }
   const attrKeyChildren = attrKeyNode.children!;
-  const identIdx = attrKeyChildren.findIndex(c => c.kind === SyntaxKind.Identifier);
+  const identIdx = attrKeyChildren.findIndex((c) => c.kind === SyntaxKind.Identifier);
 
-
-  if (identIdx === -1){
+  if (identIdx === -1) {
     return null;
   }
 
-  console.log("here")
+  console.log("here");
   const attrIdent = attrKeyChildren[identIdx];
-  const propIsNamespaceDefinition = attrKeyChildren[identIdx + 1]?.kind === SyntaxKind.Colon && attrKeyChildren[identIdx + 2]?.kind === SyntaxKind.Identifier && getText(attrIdent) === "xmlns";
+  const propIsNamespaceDefinition =
+    attrKeyChildren[identIdx + 1]?.kind === SyntaxKind.Colon &&
+    attrKeyChildren[identIdx + 2]?.kind === SyntaxKind.Identifier &&
+    getText(attrIdent) === "xmlns";
 
-  if (propIsNamespaceDefinition){
+  if (propIsNamespaceDefinition) {
     return {
       value: `Defines a namespace. TODO Further Documentation needed.`,
-      range:{
+      range: {
         pos: attrKeyNode.pos,
-        end: attrKeyNode.end
-      }
-    }
+        end: attrKeyNode.end,
+      },
+    };
   }
 
   const propName = getText(attrIdent);
 
-  const propMetadata = component.props?.[propName]
-  if (!propMetadata){
+  const propMetadata = component.props?.[propName];
+  if (!propMetadata) {
     return null;
   }
   const value = docGen.generatePropDescription(propName, propMetadata);
@@ -114,23 +130,23 @@ function hoverAttr({
     value,
     range: {
       pos: attrKeyNode.pos,
-      end: attrKeyNode.end
-    }
-  }
+      end: attrKeyNode.end,
+    },
+  };
 }
 
 function hoverName({
   collectedComponentMetadata,
   tagNameNode,
   identNode,
-  getText
+  getText,
 }: {
-  collectedComponentMetadata: ComponentMetadataCollection,
+  collectedComponentMetadata: ComponentMetadataCollection;
   tagNameNode: Node;
   identNode: Node;
   getText: GetText;
 }): SimpleHover {
-  const compName = compNameForTagNameNode(tagNameNode, getText)
+  const compName = compNameForTagNameNode(tagNameNode, getText);
   if (!compName) {
     return null;
   }
@@ -143,7 +159,7 @@ function hoverName({
     value,
     range: {
       pos: identNode.pos,
-      end: identNode.end
-    }
+      end: identNode.end,
+    },
   };
 }
