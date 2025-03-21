@@ -231,7 +231,8 @@ export function useDevTools() {
 
 export function useInspector(node: ComponentDef, uid: symbol) {
   const context = useContext(InspectorContext);
-  const shouldInspect = (node.props as any)?.inspect;
+  const inspectValue = (node.props as any)?.inspect;
+  const shouldInspect = inspectValue === true || inspectValue === "true";
   const inspectId = useId();
   const refreshInspection = useCallback(() => {
     context?.refresh(inspectId);
