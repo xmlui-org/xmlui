@@ -20,7 +20,6 @@ import { PageableLoader } from "../loader/PageableLoader";
 import { Loader } from "../loader/Loader";
 import { useAppContext } from "../AppContext";
 import { useShallowCompareMemoize } from "../utils/hooks";
-import { removeNullProperties } from "../utils/misc";
 
 type LoaderProps = {
   loader: DataLoaderDef;
