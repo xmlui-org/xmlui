@@ -417,9 +417,12 @@ export const ListNative = forwardRef(function DynamicHeightList(
   );
 
   const scrollToBottom = useEvent(() => {
+    const scrollPaddingTop =
+      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     if (rows.length) {
-      virtualizerRef.current?.scrollToIndex(rows.length - 1, {
+      virtualizerRef.current?.scrollToIndex(rows.length + 1, {
         align: "end",
+        offset: scrollPaddingTop
       });
     }
   });
@@ -446,14 +449,6 @@ export const ListNative = forwardRef(function DynamicHeightList(
       scrollToIndex(index);
     }
   });
-
-  useIsomorphicLayoutEffect(() => {
-    if (parentRef.current && hasOutsideScroll && scrollRef.current) {
-      offsetsRef.current.offsetTop =
-        parentRef.current.getBoundingClientRect().top -
-        scrollRef.current.getBoundingClientRect().top;
-    }
-  }, [hasOutsideScroll]);
 
   useIsomorphicLayoutEffect(() => {
     registerComponentApi?.({
@@ -501,7 +496,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 scrollRef={scrollElementRef}
                 shift={shift}
                 onScroll={onScroll}
-                startMargin={offsetsRef.current.offsetTop}
+                startMargin={hasOutsideScroll ? ((parentRef.current?.offsetTop - scrollRef.current?.offsetTop) || 0) : 0}
                 item={Item as CustomItemComponent}
                 count={rows.length ?? 0}
               >
