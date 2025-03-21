@@ -1,6 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
-
-const levels = ["h1", "h2", "h3", "h4", "h5", "h6"];
+import { headingLevels } from "./abstractions";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("Heading is rendered", async ({ initTestBed, createHeadingDriver }) => {
@@ -10,7 +9,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect(driver.component).toBeAttached();
   });
 
-  levels.forEach((htmlElement) => {
+  headingLevels.forEach((htmlElement) => {
     test(`HtmlTag '${htmlElement}' is rendered`, async ({ initTestBed, createHeadingDriver }) => {
       await initTestBed(`<h1 />`);
       const driver = await createHeadingDriver();
@@ -101,7 +100,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     return headingSizes;
   }
   // NOTE: we don't explicitly test h6, since all other headings have tested for its size
-  levels
+  headingLevels
     .filter((l) => l !== "h6")
     .forEach((level, idx) => {
       test(`compare ${level} size to other levels`, async ({
@@ -359,7 +358,7 @@ test("Heading accepts custom props", async ({
   await expect(headingDriver.component).toHaveAttribute("boolean", "true");
 });
 
-levels.forEach((level) => {
+headingLevels.forEach((level) => {
   test(`HtmlTag '${level}' accepts custom props`, async ({
     initTestBed,
     createHeadingDriver,

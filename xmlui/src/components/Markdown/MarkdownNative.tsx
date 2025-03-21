@@ -35,7 +35,7 @@ export const Markdown = memo(function Markdown({
   }
 
   const _children = removeIndents ? removeTextIndents(children) : children;
-  
+
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
       <ReactMarkdown

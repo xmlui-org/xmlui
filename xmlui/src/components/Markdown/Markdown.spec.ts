@@ -142,11 +142,13 @@ test("4space/1 tab indent is not code block by default", async ({
   createMarkdownDriver,
 }) => {
   // Note the formatting here: the line breaks and indentations are intentional
-  const expected = `
+  const code = `
     _I did not expect this_
   `;
-  await initTestBed(`<Markdown><![CDATA[${expected}]]></Markdown>`);
-  await expect((await createMarkdownDriver()).component).toHaveText("I did not expect this");
+  await initTestBed(`<Markdown><![CDATA[${code}]]></Markdown>`);
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("I did not expect this");
+  expect(await driver.hasHtmlElement("em")).toBeTruthy();
 });
 
 test("removeIndents=false: 4space/1 tab indent is accounted for", async ({
@@ -154,11 +156,13 @@ test("removeIndents=false: 4space/1 tab indent is accounted for", async ({
   createMarkdownDriver,
 }) => {
   // Note the formatting here: the lack of indentations is intentional
-  const expected = `
+  const code = `
 _I did not expect this_
   `;
-  await initTestBed(`<Markdown removeIndents="false"><![CDATA[${expected}]]></Markdown>`);
-  await expect((await createMarkdownDriver()).component).toHaveText("I did not expect this");
+  await initTestBed(`<Markdown removeIndents="false"><![CDATA[${code}]]></Markdown>`);
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("I did not expect this");
+  expect(await driver.hasHtmlElement("em")).toBeTruthy();
 });
 
 test("removeIndents=false: 4space/1 tab indent maps to a code block", async ({
@@ -166,14 +170,11 @@ test("removeIndents=false: 4space/1 tab indent maps to a code block", async ({
   createMarkdownDriver,
 }) => {
   // Note the formatting here: the indentations are intentional
-  const expected = `
+  const code = `
     _I did not expect this_
   `;
-  await initTestBed(`<Markdown removeIndents="false"><![CDATA[${expected}]]></Markdown>`);
-  const component = (await createMarkdownDriver()).component;
-  await expect(component).toHaveText("_I did not expect this_");
+  await initTestBed(`<Markdown removeIndents="false"><![CDATA[${code}]]></Markdown>`);
+  const driver = await createMarkdownDriver();
+  await expect(driver.component).toHaveText("_I did not expect this_");
+  expect(await driver.hasHtmlElement(["pre", "code"])).toBeTruthy();
 });
-
-// TEMP: will use this shorty in next test commit
-// console.log(typeof (await component.innerHTML()));
-// DOMParser().parseFromString()
