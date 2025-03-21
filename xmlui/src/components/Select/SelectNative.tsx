@@ -22,6 +22,7 @@ import {
   ScrollUpButton,
   Trigger as SelectTrigger,
   Value as SelectValue,
+
   Viewport as SelectViewport,
 } from "@radix-ui/react-select";
 import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
@@ -132,7 +133,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
 
   const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
 
-  const stringValue = value + "";
+  const stringValue = value ? value + "" : undefined;
   const onValChange = useCallback(
     (val: string) => {
       const valueWithMatchingType = Array.from(options.values()).find(
@@ -142,6 +143,8 @@ const SimpleSelect = forwardRef(function SimpleSelect(
     },
     [onValueChange, options],
   );
+
+  useEffect(() => {}, []);
 
   return (
     <OptionTypeProvider Component={SelectOption}>
@@ -161,7 +164,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
           autoFocus={autoFocus}
         >
           <div className={styles.selectValue}>
-            <SelectValue placeholder={placeholder} />
+            <SelectValue placeholder={placeholder}/>
           </div>
           <SelectIcon asChild>
             <Icon name="chevrondown" />
@@ -364,6 +367,7 @@ export const Select = forwardRef(function Select(
                       [styles.disabled]: !enabled,
                       [styles.multi]: multiSelect,
                     })}
+                    placeholder={placeholder}
                     autoFocus={autoFocus}
                   >
                     {multiSelect ? (
