@@ -97,34 +97,6 @@ export const DataSourceMd = createMetadata({
         `the previous and next page. This property defines the selector that extracts ` +
         `the next page information from the response deserialized to an object.`,
     },
-    // Add CSV-specific props
-    dataType: {
-      description: `Type of data to fetch. Set to "csv" to use CSV parsing functionality.`,
-      valueType: "string",
-      availableValues: ["json", "csv"],
-      defaultValue: "json",
-    },
-    // CSV-specific configuration
-    delimiter: {
-      description: `Character that separates values in the CSV (default: ','), only used when dataType="csv"`,
-      defaultValue: ",",
-      valueType: "string",
-    },
-    hasHeaderRow: {
-      description: `Whether the CSV has a header row to use as field names (default: true), only used when dataType="csv"`,
-      defaultValue: true,
-      valueType: "boolean",
-    },
-    skipEmptyLines: {
-      description: `Whether to skip empty lines in the CSV (default: true), only used when dataType="csv"`,
-      defaultValue: true,
-      valueType: "boolean",
-    },
-    dynamicTyping: {
-      description: `Whether to automatically convert strings to numbers/booleans where appropriate (default: true), only used when dataType="csv"`,
-      defaultValue: true,
-      valueType: "boolean",
-    },
   },
   events: {
     loaded: d(
