@@ -5,7 +5,6 @@ import {
   type ReactNode,
   useContext,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -17,9 +16,7 @@ import styles from "./Heading.module.scss";
 import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
-
-const HeadingLevelKeys = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
-export type HeadingLevel = (typeof HeadingLevelKeys)[number];
+import type { HeadingLevel } from "./abstractions";
 
 export type HeadingProps = {
   uid?: string;
@@ -35,25 +32,26 @@ export type HeadingProps = {
   [furtherProps: string]: any;
 };
 
-export const defaultProps: Pick<HeadingProps, "level" | "ellipses" | "omitFromToc"> = {
+export const defaultProps: Pick<HeadingProps, "level" | "ellipses" | "omitFromToc" | "maxLines"> = {
   level: "h1",
   ellipses: true,
   omitFromToc: false,
+  maxLines: 0,
 };
 
 export const Heading = forwardRef(function Heading(
   {
     uid,
-    level = "h1",
+    level = defaultProps.level,
     children,
     sx,
     style,
     title,
-    maxLines = 0,
+    maxLines = defaultProps.maxLines,
     preserveLinebreaks,
-    ellipses = true,
+    ellipses = defaultProps.ellipses,
     className,
-    omitFromToc = false,
+    omitFromToc = defaultProps.omitFromToc,
     ...furtherProps
   }: HeadingProps,
   forwardedRef: ForwardedRef<HTMLHeadingElement>,
@@ -81,7 +79,7 @@ export const Heading = forwardRef(function Heading(
 
   useIsomorphicLayoutEffect(() => {
     if (elementRef.current && anchorId && !omitFromToc) {
-      console.log("HERE", {anchorId, registerHeading, level, omitFromToc});
+      console.log("HERE", { anchorId, registerHeading, level, omitFromToc });
       return registerHeading?.({
         id: anchorId,
         level: parseInt(level.replace("h", "")),
@@ -90,7 +88,6 @@ export const Heading = forwardRef(function Heading(
       });
     }
   }, [anchorId, registerHeading, level, omitFromToc]);
-
 
   return (
     <Element
