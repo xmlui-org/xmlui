@@ -177,6 +177,7 @@ export const Container = memo(
             return {
               uid: componentUid,
               state: stateRef.current,
+              getCurrentState: ()=> stateRef.current,
               dispatch,
               appContext: evalAppContext,
               navigate,

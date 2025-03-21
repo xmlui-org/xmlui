@@ -224,6 +224,7 @@ async function updateQueriesWithOptimisticValue({
   });
   if(resolvedCacheUpdater){
     await resolvedCacheUpdater({
+      clientTxId,
       updateCachedData: (queryUrl: string, updater: (draft)=>Promise<void>) => {
         queryClient
           .getQueryCache()
@@ -281,7 +282,7 @@ type APICall = {
 } & ApiOperationDef;
 
 export async function callApi(
-  { state, appContext, lookupAction, uid: containerUid }: ActionExecutionContext,
+  { state, appContext, lookupAction, uid: containerUid, getCurrentState }: ActionExecutionContext,
   {
     confirmTitle,
     confirmMessage,
@@ -382,8 +383,9 @@ export async function callApi(
 
     const onSuccessFn = lookupAction(onSuccess, uid, {
       eventName: "success",
+      context: getCurrentState()
     });
-    await onSuccessFn?.(result, stateContext["$param"]);
+    await onSuccessFn?.(result, clientTxId);
 
     updateQueriesWithResult(
       queryKeysToUpdate,
