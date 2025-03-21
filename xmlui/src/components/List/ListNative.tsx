@@ -428,13 +428,19 @@ export const ListNative = forwardRef(function DynamicHeightList(
   });
 
   const scrollToTop = useEvent(() => {
+    const scrollPaddingTop =
+      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
     if (rows.length) {
-      virtualizerRef.current?.scrollToIndex(0, { align: "start" });
+      virtualizerRef.current?.scrollToIndex(0, { align: "start", offset: -scrollPaddingTop });
     }
   });
 
   const scrollToIndex = useEvent((index) => {
-    virtualizerRef.current?.scrollToIndex(index);
+    const scrollPaddingTop =
+      parseInt(getComputedStyle(scrollRef.current).scrollPaddingTop, 10) || 0;
+    virtualizerRef.current?.scrollToIndex(index, {
+      offset: -scrollPaddingTop,
+    });
   });
 
   const scrollToId = useEvent((id) => {
