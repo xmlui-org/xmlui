@@ -23,14 +23,14 @@ export type XmluiCompletionItem = Override<CompletionItem, { data?: XmluiComplet
 
 type CompletionResolveContext = {
   item: XmluiCompletionItem,
-  collectedComponentMetadata: ComponentMetadataCollection
+  metaByComp: ComponentMetadataCollection
 }
-export function handleCompletionResolve({ item, collectedComponentMetadata}: CompletionResolveContext): CompletionItem {
+export function handleCompletionResolve({ item, metaByComp: metaByComp}: CompletionResolveContext): CompletionItem {
   const metadataAccessInfo = item?.data?.metadataAccessInfo;
   if (metadataAccessInfo) {
-    collectedComponentMetadata.Alert.props
+    metaByComp.Alert.props
     const { componentName } = metadataAccessInfo;
-    const componentMeta = collectedComponentMetadata[componentName];
+    const componentMeta = metaByComp[componentName];
     if ("prop" in metadataAccessInfo) {
       const propName = metadataAccessInfo.prop;
       const propMeta = componentMeta.props[propName]

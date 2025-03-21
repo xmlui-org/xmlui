@@ -16,12 +16,12 @@ type SimpleHover = null | {
 
 type HoverContex = {
   parseResult: {parseResult: ParseResult, getText: GetText},
-  collectedComponentMetadata: ComponentMetadataCollection
+  metaByComp: ComponentMetadataCollection
 }
 /**
  * @returns The hover content string
  */
-export function handleHover({ parseResult: { parseResult: { node }, getText }, collectedComponentMetadata}: HoverContex, position: number): SimpleHover {
+export function handleHover({ parseResult: { parseResult: { node }, getText }, metaByComp}: HoverContex, position: number): SimpleHover {
   const findRes = findTokenAtPos(node, position);
   console.log("findres: ",findRes);
 
@@ -37,10 +37,10 @@ export function handleHover({ parseResult: { parseResult: { node }, getText }, c
     case SyntaxKind.Identifier:
       switch (parentNode?.kind){
         case SyntaxKind.TagNameNode:{
-          return hoverName({ collectedComponentMetadata, tagNameNode: parentNode, identNode: atNode, getText });
+          return hoverName({ collectedComponentMetadata: metaByComp, tagNameNode: parentNode, identNode: atNode, getText });
         }
         case SyntaxKind.AttributeKeyNode:{
-          return hoverAttr({ collectedComponentMetadata, attrKeyNode: parentNode, parentStack: chainAtPos.slice(0, -2), getText });
+          return hoverAttr({ metaByComp, attrKeyNode: parentNode, parentStack: chainAtPos.slice(0, -2), getText });
         }
       }
       break;
@@ -49,12 +49,12 @@ export function handleHover({ parseResult: { parseResult: { node }, getText }, c
 }
 
 function hoverAttr({
-  collectedComponentMetadata,
+  metaByComp,
   attrKeyNode,
   parentStack,
   getText,
 }: {
-  collectedComponentMetadata: ComponentMetadataCollection,
+  metaByComp: ComponentMetadataCollection,
   attrKeyNode: Node,
   parentStack: Node[],
   getText: GetText
@@ -77,7 +77,7 @@ function hoverAttr({
   }
   const compName = compNameForTagNameNode(tagNameNode, getText)
 
-  const component = collectedComponentMetadata[compName];
+  const component = metaByComp[compName];
   if (!component){
     return null;
   }

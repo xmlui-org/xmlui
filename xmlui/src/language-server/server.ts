@@ -96,7 +96,7 @@ export function start(){
   });
 
   connection.onCompletionResolve((completionItem: XmluiCompletionItem) => {
-    return handleCompletionResolve({collectedComponentMetadata, item: completionItem})
+    return handleCompletionResolve({metaByComp: collectedComponentMetadata, item: completionItem})
   });
 
   connection.onHover(({ position, textDocument }: HoverParams) => {
@@ -109,7 +109,7 @@ export function start(){
     const parseResult = getParseResult(document);
     const ctx = {
       parseResult,
-      collectedComponentMetadata
+      metaByComp: collectedComponentMetadata
     }
     const hoverRes = handleHover(ctx, document.offsetAt(position));
     if (hoverRes === null){
