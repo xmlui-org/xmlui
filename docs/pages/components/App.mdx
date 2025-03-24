@@ -266,17 +266,6 @@ This component does not expose any methods.
 
 ## Styling
 
-The `App` component has these theme variables:
-
-- `max‑content‑width‑App`: This theme variable defines the maximum [width](./appearance/common-units/#size-values) of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size.
-- `boxShadow‑header‑App`: This variable sets the [boxShadow](./appearance/common-units/#boxShadow-values) to display around the app's header.
-- `boxShadow‑Pages‑App`: This variable sets the style of [boxShadow](./appearance/common-units/#boxShadow-values) to display around the app's navigation panel (menu).
-- `width-navPanel-App`: This theme variable sets the [width](./appearance/common-units/#size-values) of the navigation panel (menu) when the app is displayed with one of the vertical layouts.
-
-> **Note**: There are other app-related components,
-> such as [*`AppHeader`*](./AppHeader), [*`NavPanel`*](./NavPanel), and [`Footer`](./Footer),
-> that can be styled to establish the app's visual appearance.
-
 ### Theme Variables
 
 | Variable | Default Value (Light) | Default Value (Dark) |
@@ -284,6 +273,15 @@ The `App` component has these theme variables:
 | [backgroundColor](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | $boxShadow-spread | $boxShadow-spread |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-pages-App | $boxShadow-spread | $boxShadow-spread |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | $boxShadow-spread | $boxShadow-spread |
 | [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
 | [width](../styles-and-themes/common-units/#size)-navPanel-App | $space-64 | $space-64 |
+
+### Variable Explanations
+
+| Theme Variable | Description |
+| --- | --- |
+| **`maxWidth‑content‑App`** | This theme variable defines the maximum width of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size. |
+| **`boxShadow‑header‑App`** | This theme variable sets the shadow of the app's header section. |
+| **`boxShadow‑navPanel‑App`** | This theme variable sets the shadow of the app's navigation panel section (visible only in vertical layouts). |
+| **`width‑navPanel‑App`** | This theme variable sets the width of the navigation panel when the app is displayed with one of the vertical layouts. |

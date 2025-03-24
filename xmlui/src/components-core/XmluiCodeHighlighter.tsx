@@ -9,6 +9,7 @@ let highlighter: HighlighterCore | null = null;
 
 export function XmluiCodeHighlighter({ value }: { value: string }) {
   const { activeThemeTone } = useTheme();
+
   const [initialized, setInitialized] = useState(false);
   useEffect(() => {
     async function load() {
@@ -24,6 +25,7 @@ export function XmluiCodeHighlighter({ value }: { value: string }) {
       }
       setInitialized(true);
     }
+
     load();
   }, []);
 
@@ -52,15 +54,17 @@ export function XmluiCodeHighlighter({ value }: { value: string }) {
   }, [initialized, value]);
 
   return (
-    <div
-      className={classnames(styles.wrapper, {
-        [styles.dark]: activeThemeTone === "dark",
-        [styles.light]: activeThemeTone === "light",
-      })}
-      dangerouslySetInnerHTML={{
-        __html: html,
-      }}
-    />
+    <div className={styles.wrapper}>
+      <div
+        className={classnames(styles.innerWrapper, {
+          [styles.dark]: activeThemeTone === "dark",
+          [styles.light]: activeThemeTone === "light",
+        })}
+        dangerouslySetInnerHTML={{
+          __html: html,
+        }}
+      />
+    </div>
   );
 }
 

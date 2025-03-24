@@ -2,7 +2,7 @@ import { Callout } from "nextra/components";
 
 # Markdown [#component-markdown]
 
-`Markdown` displays plain text styled using markdown syntax.
+`Markdown` displays plain text styled with markdown syntax.
 
 ## Using Markdown
 
@@ -256,7 +256,7 @@ Use this property when the text you provide is not static but a result of calcul
   `}
 />
 
-### `removeIndents (default: false)`
+### `removeIndents (default: true)`
 
 This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.
 
@@ -294,6 +294,14 @@ This boolean property specifies whether leading indents should be removed from t
 </App>
   `}
 />
+
+### `url`
+
+Optional URL to load the markdown content from.
+
+### `value`
+
+Bound data value, typically populated by a DataSource.
 
 ## Events
 

@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -40,8 +40,8 @@
     "@radix-ui/react-tabs": "1.1.0",
     "@radix-ui/react-visually-hidden": "1.0.3",
     "@remix-run/react": "2.9.1",
-    "@tanstack/react-query": "4.32.6",
-    "@tanstack/react-query-devtools": "4.32.6",
+    "@tanstack/react-query": "^4.36.1",
+    "@tanstack/react-query-devtools": "^4.36.1",
     "@tanstack/react-table": "8.17.3",
     "@tanstack/react-virtual": "3.10.8",
     "@types/chroma-js": "^3.1.1",
@@ -79,6 +79,7 @@
     "react-measure": "2.5.2",
     "react-popper": "2.3.0",
     "react-resizable-panels": "2.0.19",
+    "react-rnd": "^10.5.2",
     "react-router-dom": "6.23.0",
     "react-select": "5.7.4",
     "react-sticky-el": "^2.1.1",

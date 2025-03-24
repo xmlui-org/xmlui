@@ -560,12 +560,21 @@ function useStandalone(
       } catch (e) {}
 
       // --- Fetch the themes according to the configuration
-      const themePromises = config?.themes?.map((themePath) => {
-        return fetchWithoutCache(themePath).then((value) =>
-          value.json(),
+      let themePromises: Promise<ThemeDefinition>[];
+      if ((config?.themes ?? []).length === 0 && config?.defaultTheme) {
+        // --- Special case, we have only a single "defaultTheme" in the configuration
+        const fetchDefaultTheme = fetchWithoutCache(`themes/${config?.defaultTheme}.json`).then(
+          (value) => value.json(),
         ) as Promise<ThemeDefinition>;
-      });
-
+        themePromises = [fetchDefaultTheme];
+      } else {
+        // --- In any other case, we fetch all themes defined in the configuration
+        themePromises = config?.themes?.map((themePath) => {
+          return fetchWithoutCache(themePath).then((value) =>
+            value.json(),
+          ) as Promise<ThemeDefinition>;
+        });
+      }
       // --- Fetch component files according to the configuration
       const componentPromises = config?.components?.map(async (componentPath) => {
         const value = await fetchWithoutCache(componentPath);

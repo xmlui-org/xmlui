@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useMemo } from "react";
 import { usePlayground } from "../hooks/usePlayground";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
-import { CompoundComponentDef, StandaloneExtensionManager } from "xmlui";
+import { ComponentDef, CompoundComponentDef, StandaloneExtensionManager } from "xmlui";
 import { AppRoot } from "../../../xmlui/src/components-core/rendering/AppRoot";
 import type { ThemeTone } from "../../../xmlui/src/components-core/theming/abstractions";
 import styles from "./Preview.module.scss";
@@ -52,9 +52,13 @@ export function Preview() {
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
     }
     const compoundComponents: CompoundComponentDef[] = appDescription.components.map(
-      (src: { name: string; component: string }) => {
+      (src: { name: string; component: string | ComponentDef }) => {
+        const isErrorReportComponent = typeof src.component !== "string";
+        if (isErrorReportComponent) {
+          return src;
+        }
         let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
-          src.component,
+          src.component as string,
         );
         if (errors.length > 0) {
           return errReportComponent(errors, `${src.name}.xmlui`, erroneousCompoundComponentName);

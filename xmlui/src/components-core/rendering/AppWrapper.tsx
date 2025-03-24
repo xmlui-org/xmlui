@@ -3,18 +3,19 @@ import { BrowserRouter, HashRouter, MemoryRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 
-import { ComponentLike } from "../../abstractions/ComponentDefs";
-import { ContributesDefinition } from "../../components/ComponentProvider";
+import type { ComponentLike } from "../../abstractions/ComponentDefs";
+import type { ContributesDefinition } from "../../components/ComponentProvider";
 import { ConfirmationModalContextProvider } from "../../components/ModalDialog/ConfirmationModalContextProvider";
-import { ApiInterceptorDefinition } from "../interception/abstractions";
-import { ThemeTone } from "../theming/abstractions";
+import type { ApiInterceptorDefinition } from "../interception/abstractions";
+import type { ThemeTone } from "../theming/abstractions";
 import { EMPTY_OBJECT } from "../constants";
 import { IconProvider } from "../../components/IconProvider";
 import ThemeProvider from "../theming/ThemeProvider";
 import { InspectorProvider } from "../InspectorContext";
-import { GlobalProps, queryClient } from "./AppRoot";
+import type { GlobalProps} from "./AppRoot";
+import { queryClient } from "./AppRoot";
 import { AppContent } from "./AppContent";
-import { ContainerWrapperDef } from "./ContainerWrapper";
+import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { ErrorBoundary } from "./ErrorBoundary";
 
 export type AppWrapperProps = {
@@ -136,7 +137,6 @@ export const AppWrapper = ({
                 routerBaseName={baseName}
                 globalProps={globalProps}
                 standalone={standalone}
-                trackContainerHeight={trackContainerHeight}
                 decorateComponentsWithTestId={decorateComponentsWithTestId}
                 debugEnabled={debugEnabled}
               />

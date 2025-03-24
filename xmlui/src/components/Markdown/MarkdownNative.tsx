@@ -7,7 +7,6 @@ import { visit } from "unist-util-visit";
 import styles from "./Markdown.module.scss";
 import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
 
-import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Image } from "../Image/ImageNative";
@@ -21,9 +20,13 @@ type MarkdownProps = {
   style?: CSSProperties;
 };
 
+export const defaultProps: Pick<MarkdownProps, "removeIndents"> = {
+  removeIndents: true,
+};
+
 export const Markdown = memo(function Markdown({
   extractValue,
-  removeIndents = false,
+  removeIndents = defaultProps.removeIndents,
   children,
   style,
 }: MarkdownProps) {
@@ -31,7 +34,7 @@ export const Markdown = memo(function Markdown({
     return null;
   }
 
-  children = removeIndents ? removeTextIndents(children) : children;
+  const _children = removeIndents ? removeTextIndents(children) : children;
 
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
@@ -154,13 +157,17 @@ export const Markdown = memo(function Markdown({
           },
         }}
       >
-        {children as any}
+        {_children}
       </ReactMarkdown>
     </div>
   );
 });
 
-function removeTextIndents(input: string): string {
+function removeTextIndents(input: string) {
+  if (!input) {
+    return "";
+  }
+
   const lines = input.split("\n");
 
   // Find the shortest starting whitespace length

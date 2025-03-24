@@ -12,12 +12,11 @@ import type { ComponentDef } from "../abstractions/ComponentDefs";
 import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
 import { useTheme } from "./theming/ThemeContext";
-import { ModalDialog } from "../components/ModalDialog/ModalDialogNative";
 import classnames from "classnames";
-import { XmluiCodeHighlighter } from "./XmluiCodeHighlighter";
 import { Button } from "../components/Button/ButtonNative";
 import Icon from "../components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
+import { DevTools } from "./DevTools";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {
@@ -26,10 +25,15 @@ interface IInspectorContext {
   attach: (node: ComponentDef, uid: symbol, inspectId: string) => void;
   detach: (uid: symbol, inspectId: string) => void;
   refresh: (inspectId: string) => void;
+  devToolsSize?: number;
+  setDevToolsSize: (size: number) => void;
+  devToolsSide?: "bottom" | "left" | "right";
+  setDevToolsSide: (side: "bottom" | "left" | "right") => void;
+  devToolsEnabled?: boolean;
 }
 
 // --- The context object that is used to store the inspector information.
-const InspectorContext = createContext<IInspectorContext | null>(null);
+export const InspectorContext = createContext<IInspectorContext | null>(null);
 
 export function InspectorProvider({
   children,
@@ -39,6 +43,10 @@ export function InspectorProvider({
   sources?: Record<string, string>;
 }) {
   const [inspectable, setInspectable] = useState<Record<string, any>>({});
+  const [inspectedNode, setInspectedNode] = useState<ComponentDef | null>(null);
+  const [showCode, setShowCode] = useState(false);
+  const [devToolsSize, setDevToolsSize] = useState(0);
+  const [devToolsSide, setDevToolsSide] = useState<"bottom" | "left" | "right">("bottom");
 
   const contextValue: IInspectorContext = useMemo(() => {
     return {
@@ -74,20 +82,30 @@ export function InspectorProvider({
           return ret;
         });
       },
+      devToolsSize,
+      setDevToolsSize,
+      devToolsSide,
+      setDevToolsSide,
+      devToolsEnabled: showCode,
     };
-  }, [sources]);
+  }, [devToolsSide, devToolsSize, showCode, sources]);
 
   return (
     <InspectorContext.Provider value={contextValue}>
       {children}
+      {showCode && inspectedNode && (
+        <DevTools setIsOpen={setShowCode} node={inspectedNode} key={inspectedNode?.uid} />
+      )}
       {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
         inspectable &&
         Object.values(inspectable).map((item: any) => {
           return (
             <InspectButton
+              setShowCode={setShowCode}
               key={item.inspectId + +"-" + item.key}
               inspectId={item.inspectId}
               node={item.node}
+              setInspectedNode={setInspectedNode}
             />
           );
         })}
@@ -95,54 +113,17 @@ export function InspectorProvider({
   );
 }
 
-function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
-  const { sources } = useContext(InspectorContext)!;
-  const value = useMemo(() => {
-    const compSrc = props.node.debug?.source;
-    if (!compSrc) {
-      return "";
-    }
-    if (!sources) {
-      return "";
-    }
-    const { start, end, fileId } = compSrc;
-    const slicedSrc = sources[fileId].slice(start, end);
-
-    let dropEmptyLines = true;
-    const prunedLines: Array<string> = [];
-    let trimBeginCount: number | undefined = undefined;
-    slicedSrc.split("\n").forEach((line) => {
-      if (line.trim() === "" && dropEmptyLines) {
-        //drop empty lines from the beginning
-        return;
-      } else {
-        dropEmptyLines = false;
-        prunedLines.push(line);
-        const startingWhiteSpaces = line.search(/\S|$/);
-        if (
-          line.trim() !== "" &&
-          (trimBeginCount === undefined || startingWhiteSpaces < trimBeginCount)
-        ) {
-          trimBeginCount = startingWhiteSpaces;
-        }
-      }
-    });
-    return prunedLines.map((line) => line.slice(trimBeginCount)).join("\n");
-  }, [props.node.debug?.source, sources]);
-  return (
-    <ModalDialog
-      isInitiallyOpen={true}
-      onClose={props.onClose}
-      style={{ width: "auto", maxWidth: "100%", minWidth: 400 }}
-    >
-      <div style={{ overflow: "auto", height: "100%" }}>
-        <XmluiCodeHighlighter value={value} />
-      </div>
-    </ModalDialog>
-  );
-}
-
-function InspectButton({ inspectId, node }: { inspectId: string; node: ComponentDef }) {
+function InspectButton({
+  inspectId,
+  node,
+  setInspectedNode,
+  setShowCode,
+}: {
+  inspectId: string;
+  node: ComponentDef;
+  setInspectedNode: (node: ComponentDef | null) => void;
+  setShowCode: (show: boolean) => void;
+}) {
   const { root } = useTheme();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLButtonElement | null>(null);
@@ -156,7 +137,7 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
         },
       },
       {
-        name: 'flip',
+        name: "flip",
         enabled: false,
         // options: {
         //   fallbackPlacements: ['top', 'right'],
@@ -165,7 +146,6 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
     ],
   });
   const [visible, setVisible] = useState(false);
-  const [showCode, setShowCode] = useState(false);
   const timeoutRef = useRef<number | null>(null);
   const hoverRef = useRef<boolean>(false);
 
@@ -227,20 +207,32 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
             }}
             onClick={() => {
               setShowCode(true);
+              setInspectedNode(node);
             }}
           >
-            <Icon name={"inspect"} size={"md"}/>
+            <Icon name={"inspect"} size={"md"} />
           </Button>,
           root,
         )}
-      {showCode && <InspectModal onClose={() => setShowCode(false)} node={node} />}
     </>
   );
 }
 
+export function useDevTools() {
+  const context = useContext(InspectorContext);
+  return {
+    devToolsSize: context?.devToolsSize,
+    setDevToolsSize: context?.setDevToolsSize,
+    devToolsSide: context?.devToolsSide,
+    setDevToolsSide: context?.setDevToolsSide,
+    devToolsEnabled: context?.devToolsEnabled,
+  };
+}
+
 export function useInspector(node: ComponentDef, uid: symbol) {
   const context = useContext(InspectorContext);
-  const shouldInspect = (node.props as any)?.inspect;
+  const inspectValue = (node.props as any)?.inspect;
+  const shouldInspect = inspectValue === true || inspectValue === "true";
   const inspectId = useId();
   const refreshInspection = useCallback(() => {
     context?.refresh(inspectId);

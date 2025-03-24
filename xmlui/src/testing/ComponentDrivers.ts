@@ -266,7 +266,13 @@ export class FormItemDriver extends ComponentDriver {
 // --- Markdown
 
 export class MarkdownDriver extends ComponentDriver {
-  // TODO: methods to handle text node content and applied styles
+  async hasHtmlElement(elements: string | string[]) {
+    const contents = await this.component.innerHTML();
+    elements = typeof elements === "string" ? [elements] : elements;
+    return elements
+      .map((e) => `<${e}`)
+      .reduce((acc, curr) => acc && contents.includes(curr), true);
+  }
 }
 
 // --- Items
@@ -382,6 +388,14 @@ export class VStackDriver extends StackDriver {}
 
 export class LinkDriver extends ComponentDriver {}
 
+// --- NavLink
+
+export class NavLinkDriver extends ComponentDriver {}
+
+// --- NavPanel
+
+export class NavPanelDriver extends ComponentDriver {}
+
 // --- Card
 
 export class CardDriver extends ComponentDriver {}
@@ -397,3 +411,11 @@ export class AppHeaderDriver extends ComponentDriver {}
 // --- AppFooter
 
 export class AppFooterDriver extends ComponentDriver {}
+
+// --- Badge
+
+export class BadgeDriver extends ComponentDriver {}
+
+// --- NoResult
+
+export class NoResultDriver extends ComponentDriver {}

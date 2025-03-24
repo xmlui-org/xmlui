@@ -12,13 +12,17 @@ on:
 jobs:
   client-tests:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
+      
     steps:
       - name: checkout the repo
         uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: "npm"
+
       - name: npm install
         run: npm ci --prefer-offline
 

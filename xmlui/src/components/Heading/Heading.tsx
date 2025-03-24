@@ -7,8 +7,9 @@ import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Heading, type HeadingLevel, defaultProps } from "./HeadingNative";
+import { Heading, defaultProps } from "./HeadingNative";
 import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
+import type { HeadingLevel } from "./abstractions";
 
 const COMP = "Heading";
 

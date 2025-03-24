@@ -136,19 +136,6 @@ This component does not expose any methods.
 
 ## Styling
 
-The `AppHeader` component uses these theme variables to customize its appearance:
-
-- `backgroundColor-AppHeader`: sets the background color of the header
-- `padding` (including all `padding` variants, such as `paddingLeft` and others)
-- `borderColor` (including all `borderColor` variants, such as `borderLeftColor` and others)
-- `borderStyle` (including all `borderStyle` variants, such as `borderLeftStyle` and others)
-- `borderWidth` (including all `borderWidth` variants, such as `borderLeftWidth` and others)
-
-The `AppHeader` component allows these theme variables to customize the logo within the header:
-
-- `padding-logo-AppHeader` (including all `padding` variants, such as `paddingLeft-logo-AppHeader` and others)
-- `width-logo-AppHeader`: sets the width of the displayed logo
-
 ### Theme Variables
 
 | Variable | Default Value (Light) | Default Value (Dark) |
@@ -161,6 +148,8 @@ The `AppHeader` component allows these theme variables to customize the logo wit
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)EndEndRadius-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)EndStartRadius-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -170,14 +159,12 @@ The `AppHeader` component allows these theme variables to customize the logo wit
 | [borderLeftStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderLeftWidth](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | 0px | 0px |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-end-end-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-end-start-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-start-end-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-start-start-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRight](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)StartEndRadius-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)StartStartRadius-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderTop](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderTopColor](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -210,4 +197,5 @@ The `AppHeader` component allows these theme variables to customize the logo wit
 
 | Theme Variable | Description |
 | --- | --- |
-| **`width-logo-AppHeader`** | Sets the width of the displayed logo |
+| **`padding‑logo‑AppHeader`** | This theme variable sets the padding of the logo in the app header (including all `padding` variants, such as `paddingLeft-logo-AppHeader` and others). |
+| **`width‑logo‑AppHeader`** | Sets the width of the displayed logo |

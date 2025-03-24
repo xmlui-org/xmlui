@@ -9,8 +9,8 @@ $themeVars: ();
 
 $component: "AutoComplete";
 $themeVars: t.composeBorderVars($themeVars, $component);
-$themeVars: t.composePaddingVars($themeVars, "#{$component}-badge");
-$themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
+$themeVars: t.composePaddingVars($themeVars, "badge-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, "badge-#{$component}");
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
@@ -91,8 +91,8 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   width: fit-content;
   height: fit-content;
   min-width: 0;
-  @include t.paddingVars($themeVars, "#{$component}-badge");
-  @include t.borderVars($themeVars, "#{$component}-badge");
+  @include t.paddingVars($themeVars, "badge-#{$component}");
+  @include t.borderVars($themeVars, "badge-#{$component}");
   transition: color 0.2s, background-color 0.2s;
   user-select: none;
   cursor: pointer;
@@ -100,18 +100,18 @@ $themeVars: t.composeBorderVars($themeVars, "#{$component}-badge");
   gap: t.$space-1;
   justify-content: center;
   align-items: center;
-  font-size: createThemeVar("Input:fontSize-#{$component}-badge");
-  background-color: createThemeVar("Input:backgroundColor-#{$component}-badge");
-  color: createThemeVar("Input:textColor-#{$component}-badge");
+  font-size: createThemeVar("Input:fontSize-badge-#{$component}");
+  background-color: createThemeVar("Input:backgroundColor-badge-#{$component}");
+  color: createThemeVar("Input:textColor-badge#{$component}");
 
   &:hover {
-    background-color: createThemeVar("Input:backgroundColor-#{$component}-badge--hover");
-    color: createThemeVar("Input:textColor-#{$component}-badge--hover");
+    background-color: createThemeVar("Input:backgroundColor-badge-#{$component}--hover");
+    color: createThemeVar("Input:textColor-badge#{$component}--hover");
   }
 
   &:active {
-    background-color: createThemeVar("Input:backgroundColor-#{$component}-badge--active");
-    color: createThemeVar("Input:textColor-#{$component}-badge--active");
+    background-color: createThemeVar("Input:backgroundColor-badge-#{$component}--active");
+    color: createThemeVar("Input:textColor-badge#{$component}--active");
   }
 }
 
