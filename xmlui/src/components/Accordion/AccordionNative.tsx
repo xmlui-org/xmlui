@@ -19,7 +19,7 @@ type Props = {
   onDisplayDidChange?: (changedValue: string[]) => void;
 };
 
-export const propDefaults: Pick<
+export const defaultProps: Pick<
   Props,
   "hideIcon" | "collapsedIcon" | "triggerPosition" | "rotateExpanded"
 > = {
@@ -33,13 +33,13 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
   {
     style,
     children,
-    hideIcon = propDefaults.hideIcon,
+    hideIcon = defaultProps.hideIcon,
     expandedIcon,
-    collapsedIcon = propDefaults.collapsedIcon,
-    triggerPosition = propDefaults.triggerPosition,
+    collapsedIcon = defaultProps.collapsedIcon,
+    triggerPosition = defaultProps.triggerPosition,
     onDisplayDidChange = noop,
     registerComponentApi,
-    rotateExpanded = propDefaults.rotateExpanded,
+    rotateExpanded = defaultProps.rotateExpanded,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {

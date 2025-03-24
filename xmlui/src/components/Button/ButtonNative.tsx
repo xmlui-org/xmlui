@@ -44,9 +44,16 @@ type Props = {
   | "className"
 >;
 
-export const propDefaults: Pick<
+export const defaultProps: Pick<
   Props,
-  "type" | "iconPosition" | "contentPosition" | "orientation" | "variant" | "themeColor" | "size"
+  | "type"
+  | "iconPosition"
+  | "contentPosition"
+  | "orientation"
+  | "variant"
+  | "themeColor"
+  | "size"
+  | "autoFocus"
 > = {
   type: "button",
   iconPosition: "start",
@@ -55,19 +62,20 @@ export const propDefaults: Pick<
   variant: "solid",
   themeColor: "primary",
   size: "sm",
+  autoFocus: false,
 };
 
 export const Button = React.forwardRef(function Button(
   {
     id,
-    type = propDefaults.type,
+    type = defaultProps.type,
     icon,
-    iconPosition = propDefaults.iconPosition,
-    contentPosition = propDefaults.contentPosition,
-    orientation = propDefaults.orientation,
-    variant = propDefaults.variant,
-    themeColor = propDefaults.themeColor,
-    size = propDefaults.size,
+    iconPosition = defaultProps.iconPosition,
+    contentPosition = defaultProps.contentPosition,
+    orientation = defaultProps.orientation,
+    variant = defaultProps.variant,
+    themeColor = defaultProps.themeColor,
+    size = defaultProps.size,
     disabled,
     children,
     formId,
@@ -77,7 +85,7 @@ export const Button = React.forwardRef(function Button(
     style,
     gap,
     className,
-    autoFocus,
+    autoFocus = defaultProps.autoFocus,
     ...rest
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,

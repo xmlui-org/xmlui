@@ -11,7 +11,7 @@ import {
   dFocus,
 } from "../../components/metadata-helpers";
 import { triggerPositionNames } from "../../components/abstractions";
-import { AccordionComponent, propDefaults } from "./AccordionNative";
+import { AccordionComponent, defaultProps } from "./AccordionNative";
 
 const COMP = "Accordion";
 
@@ -29,14 +29,14 @@ export const AccordionMd = createMetadata({
       description: `This property indicates the position where the trigger icon should be displayed. The \`start\` ` +
         `value signs the trigger is before the header text (template), and \`end\` indicates that it ` +
         `follows the header.`,
-      defaultValue: propDefaults.triggerPosition,
+      defaultValue: defaultProps.triggerPosition,
       valueType: "string",
       availableValues: triggerPositionNames,
     },
     collapsedIcon: {
       description: `This property is the name of the icon that is displayed when the accordion is collapsed.`,
       valueType: "string",
-      defaultValue: propDefaults.collapsedIcon,
+      defaultValue: defaultProps.collapsedIcon,
     },
     expandedIcon: {
       description: `This property is the name of the icon that is displayed when the accordion is expanded.`,
@@ -44,13 +44,13 @@ export const AccordionMd = createMetadata({
     },
     hideIcon: {
       description: `This property indicates that the trigger icon is not displayed (\`true\`).`,
-      defaultValue: propDefaults.hideIcon,
+      defaultValue: defaultProps.hideIcon,
       valueType: "boolean",
     },
     rotateExpanded: {
       description: `This optional property defines the rotation angle of the expanded icon (relative to the collapsed icon).`,
       valueType: "string",
-      defaultValue: propDefaults.rotateExpanded,
+      defaultValue: defaultProps.rotateExpanded,
     },
   },
   events: {
