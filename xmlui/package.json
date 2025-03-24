@@ -65,6 +65,7 @@
     "monaco-editor": "0.34.1",
     "msw": "2.0.1",
     "oidc-client-ts": "2.1.0",
+    "papaparse": "^5.5.2",
     "react": "18.2.0",
     "react-currency-input-field": "3.6.9",
     "react-datepicker": "4.25.0",
