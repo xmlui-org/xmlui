@@ -13,6 +13,7 @@ import {
   smartFormatDate,
   smartFormatDateTime
 } from "../utils/date-utils";
+import { differenceInMinutes, isSameDay, isThisYear, isToday } from "date-fns";
 
 export const dateFunctions = {
   isoDateString,
@@ -27,5 +28,8 @@ export const dateFunctions = {
   smartFormatDate,
   isToday: isDateToday,
   isYesterday: isDateYesterday,
-  isTomorrow: isDateTomorrow
+  isTomorrow: isDateTomorrow,
+  differenceInMinutes,
+  isSameDay,
+  isThisYear,
 };
