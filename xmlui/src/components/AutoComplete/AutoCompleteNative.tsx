@@ -251,8 +251,10 @@ export const AutoComplete = forwardRef(function AutoComplete(
       optionRenderer,
       options,
       inputValue,
+      open,
+      setOpen,
     };
-  }, [inputValue, multi, optionRenderer, options, toggleOption, value]);
+  }, [inputValue, multi, optionRenderer, options, toggleOption, value, open, setOpen]);
 
   return (
     <AutoCompleteContext.Provider value={autoCompleteContextValue}>
@@ -418,7 +420,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
 });
 
 function CreatableItem() {
-  const { value, options, inputValue, onChange } = useAutoComplete();
+  const { value, options, inputValue, onChange, setOpen } = useAutoComplete();
   const { onOptionAdd } = useOption();
   if (
     isOptionsExist(options, [{ value: inputValue, label: inputValue }]) ||
@@ -440,6 +442,7 @@ function CreatableItem() {
         const newOption = { value, label: value, enabled: true, labelText: value };
         onOptionAdd(newOption);
         onChange(value);
+        setOpen(false);
       }}
     >
       {`Create "${inputValue}"`}
@@ -456,7 +459,7 @@ function CreatableItem() {
 
 function AutoCompleteOption({ value, label, enabled = true, keywords }: Option) {
   const id = useId();
-  const { value: selectedValue, onChange, optionRenderer, multi } = useAutoComplete();
+  const { value: selectedValue, onChange, optionRenderer, multi, setOpen } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
 
   return (
@@ -472,6 +475,7 @@ function AutoCompleteOption({ value, label, enabled = true, keywords }: Option) 
       }}
       onSelect={() => {
         onChange(value);
+        setOpen(false);
       }}
       data-state={selected ? "checked" : undefined}
       keywords={keywords}
