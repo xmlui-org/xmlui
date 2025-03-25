@@ -87,3 +87,23 @@ export type EvalTreeOptions = {
 
 // This function gets an object to pass as an implicit context when invoking a function on "objectWithFunction"
 type ImplicitContextGetter = (objectWithFunction: any) => ActionExecutionContext;
+
+/**
+ * Creates an evaluation context with the given parts
+ * @param parts Parts of the evaluation context
+ * @returns New evaluation context
+ */
+export function createEvalContext (parts: Partial<BindingTreeEvaluationContext>): BindingTreeEvaluationContext {
+  return {
+    ...{
+      mainThread: {
+        childThreads: [],
+        blocks: [{ vars: {} }],
+        loops: [],
+        breakLabelValue: -1
+      },
+      localContext: {}
+    },
+    ...parts
+  };
+}
