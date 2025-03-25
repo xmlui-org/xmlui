@@ -3,7 +3,7 @@ import styles from "../../components/AutoComplete/AutoComplete.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { MemoizedItem } from "../../components/container-helpers";
+import { MemoizedItem } from "../container-helpers";
 import {
   dPlaceholder,
   dInitialValue,
@@ -20,8 +20,8 @@ import {
   dFocus,
   dSetValueApi,
   dMulti,
-} from "../../components/metadata-helpers";
-import { AutoComplete } from "../../components/AutoComplete/AutoCompleteNative";
+} from "../metadata-helpers";
+import { AutoComplete } from "./AutoCompleteNative";
 
 const COMP = "AutoComplete";
 
@@ -70,30 +70,32 @@ export const AutoCompleteMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
-    
+
   },
   defaultThemeVars: {
     [`backgroundColor-menu-${COMP}`]: "$backgroundColor-primary",
     [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
+    [`borderWidth-menu-${COMP}`]: "1px",
+    [`borderColor-menu-${COMP}`]: "$borderColor",
     [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
     [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--active",
     [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
     [`minHeight-Input`]: "39px",
-    [`backgroundColor-badge-${COMP}`]: "$color-primary-500",
-    [`fontSize-badge-${COMP}`]: "$fontSize-small",
-    [`paddingHorizontal-badge-${COMP}`]: "$space-1",
-    [`paddingVertical-badge-${COMP}`]: "$space-1",
+    [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
+    [`fontSize-${COMP}-badge`]: "$fontSize-small",
+    [`paddingHorizontal-${COMP}-badge`]: "$space-1",
+    [`paddingVertical-${COMP}-badge`]: "$space-1",
     light: {
-      [`backgroundColor-badge-${COMP}--hover`]: "$color-primary-400",
-      [`backgroundColor-badge-${COMP}--active`]: "$color-primary-500",
+      [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
+      [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
       [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
-      [`textColor-badge-${COMP}`]: "$color-surface-50",
+      [`textColor-${COMP}-badge`]: "$color-surface-50",
     },
     dark: {
-      [`backgroundColor-badge${COMP}--hover`]: "$color-primary-600",
-      [`backgroundColor-badge${COMP}--active`]: "$color-primary-500",
-      [`textColor-badge-${COMP}`]: "$color-surface-50",
+      [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-600",
+      [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
+      [`textColor-${COMP}-badge`]: "$color-surface-50",
       [`textColor-item-${COMP}--disabled`]: "$color-surface-800",
     },
   },

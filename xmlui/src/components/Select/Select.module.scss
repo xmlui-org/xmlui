@@ -67,7 +67,7 @@ $componentName: "Select";
   }
 }
 
-.selectTrigger {
+button.selectTrigger  {
   min-height: 2.6rem;
   display: flex;
   padding: t.$space-1 t.$space-2;
@@ -90,6 +90,7 @@ $componentName: "Select";
   &.valid {
     @include variant("success");
   }
+
 }
 
 .selectTrigger:disabled {
