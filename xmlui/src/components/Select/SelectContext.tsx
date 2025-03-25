@@ -2,10 +2,10 @@ import type { ReactNode} from "react";
 import {createContext, useContext} from "react";
 
 import type {Option} from "../abstractions";
-import type { SingleValueType, ValueType } from "../Select/SelectNative";
+import type { SingleValueType, ValueType } from "./SelectNative";
 
 type SelectContextValue = {
-  multi?: boolean;
+  multiSelect?: boolean;
   value: ValueType | null;
   onChange?: (selectedValue: SingleValueType) => void;
   optionLabelRenderer: (option: Option) => ReactNode;

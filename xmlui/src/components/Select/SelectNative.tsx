@@ -22,7 +22,6 @@ import {
   ScrollUpButton,
   Trigger as SelectTrigger,
   Value as SelectValue,
-
   Viewport as SelectViewport,
 } from "@radix-ui/react-select";
 import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
@@ -164,7 +163,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
           autoFocus={autoFocus}
         >
           <div className={styles.selectValue}>
-            <SelectValue placeholder={placeholder}/>
+            <SelectValue placeholder={placeholder} />
           </div>
           <SelectIcon asChild>
             <Icon name="chevrondown" />
@@ -500,9 +499,12 @@ export const ComboboxOption = forwardRef(function Combobox(
 ) {
   const id = useId();
   const { label, value, enabled = true, keywords } = option;
-  const { value: selectedValue, onChange, multi, optionLabelRenderer } = useSelect();
-  const selected =
-    Array.isArray(selectedValue) && multi ? selectedValue.includes(value) : selectedValue === value;
+  const { value: selectedValue, onChange, multiSelect, optionLabelRenderer } = useSelect();
+  const selected = useMemo(() => {
+    return Array.isArray(selectedValue) && multiSelect
+      ? selectedValue.includes(value)
+      : selectedValue === value;
+  }, [selectedValue, value, multiSelect]);
 
   return (
     <CmdItem
@@ -510,7 +512,7 @@ export const ComboboxOption = forwardRef(function Combobox(
       ref={forwardedRef}
       key={id}
       disabled={!enabled}
-      value={value}
+      value={`${value}`}
       className={styles.multiComboboxOption}
       onSelect={() => {
         onChange(value);
@@ -519,6 +521,7 @@ export const ComboboxOption = forwardRef(function Combobox(
       keywords={keywords}
     >
       {optionLabelRenderer ? optionLabelRenderer({ label, value }) : label}
+      {JSON.stringify(selected)}
       {selected && <Icon name="checkmark" />}
     </CmdItem>
   );
