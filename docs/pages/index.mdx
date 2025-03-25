@@ -19,7 +19,7 @@ import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui"
   understand, modify, and maintain without digging through complex scripts.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   Hello, World from XMLUI!
 </App>
@@ -36,7 +36,7 @@ import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui"
 
 You can **bind components to work together**.
 
-```ueml copy /myTextBox/ /myTextBox.value/
+```xmlui copy /myTextBox/ /myTextBox.value/
 <App>
   <TextBox id="myTextBox" placeholder="Type something" />
   <Text>You typed: {myTextBox.value}</Text>
@@ -60,7 +60,7 @@ You can **bind components to work together**.
   and properties. This reduces dependency on heavy JavaScript frameworks and lowers the learning curve.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <!-- Add a concise sample here -->
 ```
 
@@ -71,7 +71,7 @@ You can **bind components to work together**.
   manually trigger refreshes or write additional logic, streamlining the development process.
 </Callout>
 
-```ueml copy /countTimes3="{3 * count}"/ /countTimes3/
+```xmlui copy /countTimes3="{3 * count}"/ /countTimes3/
 <App
   var.count="{0}"
   var.countTimes3="{3 * count}" >
@@ -98,7 +98,7 @@ Each time the button is clicked, `count` is incremented, causing `countTimes3` t
   `}
 />
 
-```ueml copy
+```xmlui copy
 <!-- Add a concise sample here that uses backend data with the reactive nature -->
 ```
 
@@ -109,7 +109,7 @@ Each time the button is clicked, `count` is incremented, causing `countTimes3` t
   single theme variable, and the updated look cascades throughout the entire interface automatically.
 </Callout>
 
-```ueml copy {5, 9}
+```xmlui copy {5, 9}
 <App>
   <HStack verticalAlignment="center">
     <Button label="First" />
@@ -157,7 +157,7 @@ The `color-primary` theme variable affects all components using the primary colo
 
 Reusable components are in a separate markup file:
 
-```ueml copy filename="components/MySquare.xmlui" /MySquare/
+```xmlui copy filename="components/MySquare.xmlui" /MySquare/
 <Component name="MySquare">
   <Stack
     width="{$props.size}"
@@ -169,7 +169,7 @@ Reusable components are in a separate markup file:
 
 The app can immediately leverage the reusable component:
 
-```ueml copy filename="Main.xmlui" /MySquare/
+```xmlui copy filename="Main.xmlui" /MySquare/
 <App var.lastClicked="none">
   <HStack>
     <MySquare size="24px" color="red" onClick="lastClicked = 'red'" />
@@ -212,7 +212,7 @@ The app can immediately leverage the reusable component:
   without extra tooling, ensuring that dynamic content is readily available and easy to incorporate.
 </Callout>
 
-```ueml copy /data=/
+```xmlui copy /data=/
 <App>
   <List data="https://api.spacexdata.com/v4/history">
     <Card title="{$item.title}" subtitle="{$item.details}"/>

@@ -21,7 +21,7 @@ Each component has a rectangular UI patch for rendering its content (and nested 
 
 The following app contains two components, an `App`, and a `Text`:
 
-```ueml copy
+```xmlui copy
 <App>
   <Text>Hello from XMLUI</Text>
 </App>
@@ -53,7 +53,7 @@ When rendering its children, a component may render them with vertical or horizo
 
 `App` uses vertical orientation, while `HStack` (horizontal stack) applies horizontal orientation.
 
-```ueml copy
+```xmlui copy
 <App>
   <Text>First item</Text>
   <HStack>
@@ -89,7 +89,7 @@ Some languages (such as Hebrew and Arabic) are read from right to left. XMLUI co
 
 This example shows what happens when the browser uses right-to-left direction:
 
-```ueml copy /direction="rtl"/
+```xmlui copy /direction="rtl"/
 <App direction="rtl">
   <Text>First item</Text>
   <HStack>
@@ -125,7 +125,7 @@ Each component may apply padding and constrain the viewport its children can use
 
 The following sample demonstrates it:
 
-```ueml copy
+```xmlui copy
 <App>
   <Text>First item</Text>
   <HStack>
@@ -175,7 +175,7 @@ Each component has a strategy for determining its contents' dimensions (height a
 
 By default, the VStack component determines its dimensions according to its content. However, if we want to display a 40px high and 60px wide orange-red box with empty content, we must explicitly set dimensions (and background color), as the default strategy won't work.
 
-```ueml copy
+```xmlui copy
 <App>
   <VStack height="40px" width="60px" backgroundColor="orangered" />
 </App>
@@ -270,7 +270,7 @@ All fundamental layout containers apply a default gap, ensuring that child compo
 
 The following sample shows how a `HStack` renders button children:
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button>First button</Button>
@@ -296,7 +296,7 @@ The following sample shows how a `HStack` renders button children:
 
 You can remove the gaps if you intend to omit them entirely:
 
-```ueml copy /gap="0"/
+```xmlui copy /gap="0"/
 <App>
   <HStack gap="0">
     <Button>First button</Button>
@@ -324,7 +324,7 @@ XMLUI offers several predefined gap values. Instead of inline literals (such as 
 
 The following sample demonstrated using them:
 
-```ueml copy /gap="$gap-tight"/ /gap="$gap-loose"/
+```xmlui copy /gap="$gap-tight"/ /gap="$gap-loose"/
 <App>
   <VStack>
     <HStack gap="$gap-tight">
@@ -373,7 +373,7 @@ All layout container renders their children in declaration order; they consider 
 
 Let's see a few samples to see how they work! The samples use the following code (replacing `Some_Container`) with a particular layout container:
 
-```ueml copy /Some_Container/ /width="80%"/
+```xmlui copy /Some_Container/ /width="80%"/
 <App>
   <Some_Container>
     <Stack height="20px" width="20%" backgroundColor="orangered" />
@@ -451,7 +451,7 @@ If you set an explicit height (with the `height` layout property), the layout co
 
 Check these examples:
 
-```ueml copy
+```xmlui copy
 <VStack
   backgroundColor="cyan"
   horizontalAlignment="center"
@@ -472,7 +472,7 @@ Check these examples:
   `}
 />
 
-```ueml copy /height="160px"/
+```xmlui copy /height="160px"/
 <VStack
   height="160px"
   backgroundColor="cyan"
@@ -499,7 +499,7 @@ Check how the stack height changed (the cyan background) between the two example
 
 When you explicitly set the height of a layout container, and the content is taller, that will overflow from the container:
 
-```ueml copy /height="40px"/
+```xmlui copy /height="40px"/
 <VStack height="40px" backgroundColor="cyan">
   <Text fontSize="3rem">This is some text within a Stack</Text>
 </VStack>
@@ -523,7 +523,7 @@ Unless you use an explicit width, a layout container uses the entire width of it
 
 Check these examples:
 
-```ueml copy
+```xmlui copy
 <VStack
   backgroundColor="cyan"
   horizontalAlignment="center"
@@ -544,7 +544,7 @@ Check these examples:
   `}
 />
 
-```ueml copy /width="400px"/
+```xmlui copy /width="400px"/
 <VStack
   width="400px"
   backgroundColor="cyan"
@@ -573,7 +573,7 @@ When you explicitly set the width of a layout container, and the content is wide
 
 For example, when you use text, the content can be broken into multiple lines, like in the following example:
 
-```ueml copy /width="400px"/
+```xmlui copy /width="400px"/
 <VStack width="400px" backgroundColor="cyan">
   <Text fontSize="2rem">This is some text within a Stack</Text>
 </VStack>
@@ -590,7 +590,7 @@ For example, when you use text, the content can be broken into multiple lines, l
 
 Other components, such as a box, may overflow horizontally:
 
-```ueml copy /width="300px"/ /width="400px"/
+```xmlui copy /width="300px"/ /width="400px"/
 <VStack width="300px" backgroundColor="cyan">
   <HStack height="40px" border="2px solid red" width="400px"/>
 </VStack>
@@ -625,7 +625,7 @@ You can find more information about the values of `horizontalAlignment` and `ver
 
 Here are a few samples. The following aligns the children of an `HStack` horizontally in the center:
 
-```ueml copy /horizontalAlignment="center"/
+```xmlui copy /horizontalAlignment="center"/
 <HStack horizontalAlignment="center">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="36px" width="36px" />
@@ -647,7 +647,7 @@ Here are a few samples. The following aligns the children of an `HStack` horizon
 
 This sample aligns the children of a `VStack` horizontally to the end (right edge):
 
-```ueml copy /horizontalAlignment="end"/
+```xmlui copy /horizontalAlignment="end"/
 <VStack  horizontalAlignment="end">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="36px" width="36px" />
@@ -670,7 +670,7 @@ This sample aligns the children of a `VStack` horizontally to the end (right edg
 
 This sample aligns the children of an `HStack` vertically in the center:
 
-```ueml copy /verticalAlignment="center"/
+```xmlui copy /verticalAlignment="center"/
 <HStack verticalAlignment="center">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="72px" width="36px" />
@@ -701,7 +701,7 @@ With this flag set, a `HStack` renders its items in the opposite reading order o
 
 See the following example for `HStack`:
 
-```ueml copy /reverse="true"/
+```xmlui copy /reverse="true"/
 <HStack reverse="true">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="36px" width="36px" />
@@ -723,9 +723,9 @@ See the following example for `HStack`:
 
 This example uses a `VStack`:
 
-```ueml copy /reverse="true"/
+```xmlui copy /reverse="true"/
 
-```ueml copy /reverse="true"/
+```xmlui copy /reverse="true"/
 <VStack reverse="true">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="36px" width="36px" />
@@ -753,7 +753,7 @@ A `VStack` component displays each of its children in a new row. If a child has 
 
 Here is an example:
 
-```ueml copy
+```xmlui copy
 <VStack>
   <H2 backgroundColor="orangered">I'm a heading with colored background</H2>
   <Button>I'm a button</Button>
@@ -780,7 +780,7 @@ When you use a `VStack` child with percentage height, the effective height is ca
 
 Such a setup may cause overflow if the sum of percentages equals 100%, as the gaps between children are also included in the stack height. The following example demonstrates an overflow:
 
-```ueml copy
+```xmlui copy
 <VStack height="200px" border="4px dotted green">
   <Stack backgroundColor="cyan" height="50%" />
   <Stack backgroundColor="orangered" height="50%" />
@@ -799,7 +799,7 @@ Such a setup may cause overflow if the sum of percentages equals 100%, as the ga
 
 When the stack does not apply gaps, there is no overflow:
 
-```ueml copy /gap="0"/
+```xmlui copy /gap="0"/
 <VStack gap="0" height="200px" border="4px dotted green">
   <Stack backgroundColor="cyan" height="50%" />
   <Stack backgroundColor="orangered" height="50%" />
@@ -824,7 +824,7 @@ When you use a `VStack` child height with star-sizing, the effective height is c
 
 Such a configuration will not cause overflow. Here is a sample:
 
-```ueml copy
+```xmlui copy
 <VStack height="240px" border="4px dotted green">
   <Stack backgroundColor="cyan" height="*" />
   <H3>I'm a heading</H3>
@@ -851,7 +851,7 @@ A `HStack` component displays each of its children in a single row. If a child h
 
 Here is an example:
 
-```ueml copy
+```xmlui copy
 <HStack>
   <H2 backgroundColor="orangered">I'm a heading with colored background</H2>
   <Button>I'm a button</Button>
@@ -878,7 +878,7 @@ When you use a `HStack` child with percentage width, the effective width is calc
 
 Such a setup may cause horizontal overflow if the sum of percentages equals 100%, as the gaps between children are also included in the stack height. The following example demonstrates this effect:
 
-```ueml copy
+```xmlui copy
 <HStack border="4px dotted green" height="200px">
   <Stack backgroundColor="cyan" width="50%" />
   <Stack backgroundColor="orangered" width="50%" />
@@ -898,7 +898,7 @@ Such a setup may cause horizontal overflow if the sum of percentages equals 100%
 
 When the stack does not apply gaps, there is no overflow:
 
-```ueml copy /gap="0"/
+```xmlui copy /gap="0"/
 <HStack gap="0" border="4px dotted green" height="200px">
   <Stack backgroundColor="cyan" width="50%" />
   <Stack backgroundColor="orangered" width="50%" />
@@ -923,7 +923,7 @@ When you use a `HStack` child width with star-sizing, the effective height is ca
 
 Such a configuration will not cause overflow. Here is a sample:
 
-```ueml copy
+```xmlui copy
 <HStack height="60px" border="4px dotted green">
   <Stack backgroundColor="cyan" width="*" />
   <H3>I'm a heading</H3>
@@ -950,7 +950,7 @@ Such a configuration will not cause overflow. Here is a sample:
 
 In the following example, the fourth child does not fit in the first line entirely, so it overflows:
 
-```ueml copy {2}
+```xmlui copy {2}
 <HStack>
   <Stack backgroundColor="red" height="36px" width="25%" />
   <Stack backgroundColor="green" height="36px" width="40%" />
@@ -974,7 +974,7 @@ In the following example, the fourth child does not fit in the first line entire
 
 By setting the `wrapContent` flag, the forth child gets into a new line:
 
-```ueml copy {2} /wrapContent="true"/
+```xmlui copy {2} /wrapContent="true"/
 <HStack wrapContent="true">
   <Stack backgroundColor="red" height="36px" width="25%" />
   <Stack backgroundColor="green" height="36px" width="40%" />
@@ -1004,7 +1004,7 @@ The `HStack` component respects the reading direction set in the browser and ren
 
 The following example shows how a the right-to-left reading direction renders the Stack:
 
-```ueml copy {2} /direction="rtl"/
+```xmlui copy {2} /direction="rtl"/
 <HStack direction="rtl">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="36px" width="36px" />
@@ -1026,7 +1026,7 @@ The following example shows how a the right-to-left reading direction renders th
 
 The Stack has a property, `reverse`, which you can use to reverse the rendering order suggested by the current reading direction. While the `direction` value affects only the horizontal stack, the `reverse` value affects the vertical one, too.
 
-```ueml copy {2}
+```xmlui copy {2}
 <HStack padding="1rem" gap="1rem" reverse="true">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="36px" width="36px" />
@@ -1047,7 +1047,7 @@ The Stack has a property, `reverse`, which you can use to reverse the rendering 
   `}
 />
 
-```ueml copy {2}
+```xmlui copy {2}
 <VStack padding="1rem" gap="1rem" reverse="true">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="36px" width="36px" />
@@ -1073,7 +1073,7 @@ The Stack has a `wrapContent` property to start a new line (or column) when the 
 
 In the following example, the fourth child does not fit in the first line entirely, so it overflows:
 
-```ueml copy {2}
+```xmlui copy {2}
 <HStack padding="1rem" gap="1rem">
   <Stack backgroundColor="red" height="36px" width="25%" />
   <Stack backgroundColor="green" height="36px" width="40%" />
@@ -1097,7 +1097,7 @@ In the following example, the fourth child does not fit in the first line entire
 
 By setting the `wrapContent` flag, the forth child gets into a new line:
 
-```ueml copy {2}
+```xmlui copy {2}
 <HStack padding="1rem" gap="1rem" wrapContent="true">
   <Stack backgroundColor="red" height="36px" width="25%" />
   <Stack backgroundColor="green" height="36px" width="40%" />
@@ -1126,7 +1126,7 @@ By setting the `wrapContent` flag, the forth child gets into a new line:
 <Callout type="info" emoji="💡">
 `CHStack` is a shorthand version of `Stack` with a horizontal orientation with its contents centered.
 
-```ueml copy {2-4}
+```xmlui copy {2-4}
 <Stack
   orientation="horizontal"
   verticalAlignment="center"
@@ -1137,7 +1137,7 @@ By setting the `wrapContent` flag, the forth child gets into a new line:
 
 Here is an example:
 
-```ueml copy
+```xmlui copy
 <CHStack height="100px" width="200px" backgroundColor="lightgray">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="72px" width="36px" />
@@ -1162,7 +1162,7 @@ Here is an example:
 <Callout type="info" emoji="💡">
 `CVStack` is a shorthand version of `Stack` with a vertical orientation with its contents centered.
 
-```ueml copy {2-4}
+```xmlui copy {2-4}
 <Stack
   orientation="vertical"
   verticalAlignment="center"
@@ -1173,7 +1173,7 @@ Here is an example:
 
 Here is an example:
 
-```ueml copy
+```xmlui copy
 <CVStack height="200px" width="100px" backgroundColor="lightgray">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="36px" width="72px" />
@@ -1208,7 +1208,7 @@ When you use an `HStack` with percentage sizing and the sum width of children is
 
 The following sample demonstrates such a situation:
 
-```ueml copy
+```xmlui copy
 <HStack>
   <Stack backgroundColor="red" height="36px" width="25%" />
   <Stack backgroundColor="green" height="36px" width="50%" />
@@ -1233,7 +1233,7 @@ The following sample demonstrates such a situation:
 The `FlowLayout` component handles this sizing issue by adjusting the child component dimensions accounting for the gaps.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <FlowLayout>
   <Stack backgroundColor="red" height="36px" width="25%" />
   <Stack backgroundColor="green" height="36px" width="50%" />
@@ -1261,7 +1261,7 @@ The FlowLayout component caps the size of items exceeding the available width.
 
 In the following sample, the red box is too wide. Nonetheless, the `FlowLayout` trims it back to 100% width:
 
-```ueml copy /width="1000000px"/
+```xmlui copy /width="1000000px"/
 <FlowLayout>
   <Stack backgroundColor="red" height="36px" width="1000000px" />
   <Stack backgroundColor="green" height="36px" width="50%" />
@@ -1291,7 +1291,7 @@ Note how the extreme width of the first child is capped to the space available f
 
 In a `Stack`, `SpaceFiller` pushes the children following it to the other end of the container:
 
-```ueml copy {3}
+```xmlui copy {3}
 <HStack>
   <Stack width="36px" height="36px" backgroundColor="red" />
   <SpaceFiller />
@@ -1312,7 +1312,7 @@ In a `Stack`, `SpaceFiller` pushes the children following it to the other end of
 
 In a `FlowLayout`, `SpaceFiller` acts as a line break for a row. The children following the `SpaceFiller` enters a new line.
 
-```ueml copy {3}
+```xmlui copy {3}
 <FlowLayout>
   <Stack width="20%" height="36px" backgroundColor="red" />
   <SpaceFiller />
@@ -1341,7 +1341,7 @@ The `Splitter` component divides a container (such as a window, panel, pane, etc
 
 The following example demonstrates a horizontal splitter, which sets some constraints on the size of the primary section:
 
-```ueml copy /orientation="horizontal"/
+```xmlui copy /orientation="horizontal"/
 <HSplitter
   height="100%"
   minPrimarySize="10%"

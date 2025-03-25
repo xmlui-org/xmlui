@@ -11,7 +11,7 @@ import { COMPOUND_COMP_ID } from "./transform";
 const attrBreakRegex = /[\r\n<>'"&]/;
 
 /**
- * Helper class for UEML serialization and parsing
+ * Helper class for XMLUI serialization and parsing
  */
 export class XmlUiHelper {
   /**
@@ -171,7 +171,7 @@ export class XmlUiHelper {
   }
 
   /**
-   * Transform the specified component definition into an UEML node
+   * Transform the specified component definition into an XMLUI node
    * @param def Component definitions
    * @param options Transformation options
    */
@@ -185,7 +185,7 @@ export class XmlUiHelper {
   }
 
   /**
-   * Transform the specified object into an UEML nodes
+   * Transform the specified object into an XMLUI nodes
    * @param def Object definition
    * @param options Transformation options
    */
@@ -198,7 +198,7 @@ export class XmlUiHelper {
   }
 
   /**
-   * Transforms the specified simple component definition into an UEML node
+   * Transforms the specified simple component definition into an XMLUI node
    * @param def Component definition
    * @param options Transformation options
    */
@@ -388,7 +388,7 @@ export class XmlUiHelper {
   }
 
   /**
-   * Transforms a value into an UEML element
+   * Transforms a value into an XMLUI element
    * @param nodeName Name of the value node
    * @param name Optional (property) name
    * @param value Value to transform
@@ -512,7 +512,7 @@ export class XmlUiHelper {
   }
 
   /**
-   * Add a property to the specified UEML element
+   * Add a property to the specified XMLUI element
    * @param element XML element
    * @param name Element name
    * @param value Element value
@@ -632,7 +632,7 @@ export class XmlUiHelper {
 }
 
 /**
- * Options to use with markup transformation from memory format to UEML structure
+ * Options to use with markup transformation from memory format to XMLUI structure
  */
 export type XmlUiTransformOptions = {
   preserveLineBreaks?: boolean;

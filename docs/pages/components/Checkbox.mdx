@@ -16,7 +16,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```ueml copy {4-5, 9-10}
+```xmlui copy {4-5, 9-10}
 <App>
   Enabled checkboxes:
   <HStack>
@@ -57,7 +57,7 @@ This prop is commonly used if there are several other checkboxes linked to one c
 
 The following sample binds the state of two checkboxes to one and updates the state of the top checkbox accordingly. When the states of the bound checkboxes are different, the top checkbox is set to indeterminate:
 
-```ueml copy {4}
+```xmlui copy {4}
 <App var.indeterminate="{false}">
   <Checkbox
     label="Indeterminate Checkbox"
@@ -110,7 +110,7 @@ This property is used to define a custom checkbox input template
 
 This property sets the label of the component.
 
-```ueml copy
+```xmlui copy
 <App>
   <Checkbox label="Example label" initialValue="true" />
   <Checkbox label="Another label" intialValue="false" />
@@ -144,7 +144,7 @@ Available values:
 | `top` | The top of the input |
 | `bottom` | The bottom of the input |
 
-```ueml copy
+```xmlui copy
 <App>
   <Checkbox label="Top label" labelPosition="top" initialValue="true" />
   <Checkbox label="End label" labelPosition="end" initialValue="true" />
@@ -173,7 +173,7 @@ This property sets the width of the `Checkbox`.
 
 Set this property to `true` to disallow changing the component value.
 
-```ueml copy {3}
+```xmlui copy {3}
 <App>
   <Checkbox readOnly="true" label="Checked" initialValue="true" />
   <Checkbox readOnly="true" label="Unchecked" intialValue="false" />
@@ -212,7 +212,7 @@ Available values:
 
 This event is triggered when value of Checkbox has changed.
 
-```ueml copy
+```xmlui copy
 <App verticalAlignment="center" var.changes="">
   <Checkbox label="Changeable" onDidChange="changes += '+'" />
   <Checkbox label="Readonly" readOnly="true" onDidChange="changes += '-'" />
@@ -237,7 +237,7 @@ This event is triggered when the Checkbox has received the focus.
 
 Click the `Checkbox` in the example demo to change the label text. Note how clicking elsewhere resets the text to the original.
 
-```ueml copy {4,5}
+```xmlui copy {4,5}
 <App var.focused="{false}" verticalAlignment="center">
   <Checkbox
     value="true"
@@ -276,7 +276,7 @@ You can use this method to set the component's current value programmatically (`
 
 You can use this method to set the checkbox's current value programmatically (`true`: checked, `false`: unchecked).
 
-```ueml copy {10,13,15}
+```xmlui copy {10,13,15}
 <App var.changes="">
   <Checkbox
     id="checkbox"

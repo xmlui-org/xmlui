@@ -18,7 +18,7 @@ If this boolean prop is set to true, the `NumberBox` input will be focused when 
 
 Controls whether the input field is enabled (`true`) or disabled (`false`).
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox enabled="false" />
 </App>
@@ -39,7 +39,7 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
 
 This string prop enables the display of an icon on the right side (left-to-right display) of the input field by providing a valid [icon name]().
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox endIcon="email" />
 </App>
@@ -56,7 +56,7 @@ This string prop enables the display of an icon on the right side (left-to-right
 
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -77,7 +77,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 This string prop enables the display of a custom string on the right side (left-to-right display) of the input field.
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox endText=".com" />
 </App>
@@ -94,7 +94,7 @@ This string prop enables the display of a custom string on the right side (left-
 
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -114,7 +114,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 %-PROP-START hasSpinBox
 
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox hasSpinBox="true" initialValue="3" />
   <NumberBox hasSpinBox="false" initialValue="34" />
@@ -137,7 +137,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 The initial value displayed in the input field.
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox initialValue="123" />
 </App>
@@ -156,7 +156,7 @@ The initial value displayed in the input field.
 
 %-PROP-START integersOnly
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox integersOnly="true" initialValue="42" />
   <NumberBox integersOnly="false" initialValue="{Math.PI}" />
@@ -183,7 +183,7 @@ otherwise it can only be an integer.
 
 Try to enter a bigger value into the input field below than the maximum allowed.
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox maxValue="100" initialValue="99" />
 </App>
@@ -204,7 +204,7 @@ Try to enter a bigger value into the input field below than the maximum allowed.
 
 Try to enter a bigger value into the input field below than the minimum allowed.
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox minValue="-100" initialValue="-99" />
 </App>
@@ -225,7 +225,7 @@ Try to enter a bigger value into the input field below than the minimum allowed.
 
 A placeholder text that is visible in the input field when its empty.
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox placeholder="This is a placeholder" />
 </App>
@@ -248,7 +248,7 @@ The default stepping value is **1**.
 
 Note that only integers are allowed to be entered.
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox initialValue="10" step="10" />
 </App>
@@ -269,7 +269,7 @@ Note that only integers are allowed to be entered.
 
 If true, the component's value cannot be modified with user interactions.
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox initialValue="123" readOnly="true" />
 </App>
@@ -290,7 +290,7 @@ If true, the component's value cannot be modified with user interactions.
 
 This string prop enables the display of an icon on the left side (left-to-right display) of the input field by providing a valid [icon name]().
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox startIcon="hyperlink" />
 </App>
@@ -307,7 +307,7 @@ This string prop enables the display of an icon on the left side (left-to-right 
 
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -328,7 +328,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 This string prop enables the display of a custom string on the left side (left-to-right display) of the input field.
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox startText="www." />
 </App>
@@ -345,7 +345,7 @@ This string prop enables the display of a custom string on the left side (left-t
 
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`endText`](#endtext).
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -372,7 +372,7 @@ This prop is used to visually indicate status changes reacting to form field val
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox />
   <NumberBox validationStatus="valid" />
@@ -400,7 +400,7 @@ This prop is used to visually indicate status changes reacting to form field val
 This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
 By default, this property is set to `false`.
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox initialValue="123" zeroOrPositive="true" />
 </App>
@@ -429,7 +429,7 @@ See an example in the `setValue` API method.
 
 You can use this method to set the component's current value programmatically.
 
-```ueml copy {3, 9, 12}
+```xmlui copy {3, 9, 12}
 <App>
   <NumberBox
     id="numberbox"
@@ -474,7 +474,7 @@ This event is triggered after the user has changed the field value.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```ueml copy {2}
+```xmlui copy {2}
 <App var.field="0">
   <NumberBox initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
@@ -497,7 +497,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 
 This event is triggered when the `NumberBox` receives focus. The following sample demonstrates this event.
 
-```ueml copy {3-4}
+```xmlui copy {3-4}
 <App var.focused="{false}">
   <NumberBox
     onGotFocus="focused = true"

@@ -10,7 +10,7 @@ A `Link` component represents a navigation target within the app or a reference 
 
 You can use the `label` and `icon` properties of a `Link` to set its text and icon to display. If you want a custom appearance, you can nest your visual representation into `Link`:
 
-```ueml copy {1,6}
+```xmlui copy {1,6}
 <App>
   <Link to="https://ncrm.azurewebsites.net/" target="_blank">
     <HStackverticalAlignment="center">
@@ -41,7 +41,7 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 
 Indicates whether this link is active or not. If so, it will have a distinct visual appearance.
 
-```ueml copy /active="true"/ /active="false"/
+```xmlui copy /active="true"/ /active="false"/
 <App>
   <Link>I'm an inactive link (by default)</Link>
   <Link active="true">I'm an active link</Link>
@@ -64,7 +64,7 @@ Indicates whether this link is active or not. If so, it will have a distinct vis
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```ueml copy /enabled="true"/ /enabled="false"/
+```xmlui copy /enabled="true"/ /enabled="false"/
 <App>
   <Link>I'm an enabled link (by default)</Link>
   <Link enabled="false">I'm a disabled link</Link>
@@ -87,7 +87,7 @@ This boolean property value indicates whether the component responds to user eve
 
 This property allows you to add an icon (specify the icon's name) to the link.
 
-```ueml copy
+```xmlui copy
 <App>
   <Link icon="home" label="Home" />
   <Link icon="drive">Drives</Link>
@@ -128,7 +128,7 @@ Available values:
 
 The following sample opens its link in a new tab:
 
-```ueml copy
+```xmlui copy
 <App>
   <Link to="https://docs.xmlui.com/" target="_blank">
     Open XMLUI overview in a new tab

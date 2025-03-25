@@ -23,7 +23,7 @@ const xmluiScriptExtension = new RegExp(`.${codeBehindFileExtension}$`);
 const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
 
 /**
- * Transform UEML files to JS objects.
+ * Transform XMLUI files to JS objects.
  */
 export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugin {
   let itemIndex = 0;

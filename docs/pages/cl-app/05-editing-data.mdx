@@ -17,7 +17,7 @@ There are several ways to add data editing functionality to an app. In this arti
 
 Let's change the layout of the `Contacts` component to add a button above the list (and wrap the button and the list into a `VStack`). Later, when you click this button, it will display a dialog for adding a new contact item.
 
-```ueml copy {3-6, 10} filename="Contacts.xmlui"
+```xmlui copy {3-6, 10} filename="Contacts.xmlui"
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <VStack>
@@ -40,7 +40,7 @@ The `HStack` section adds a button above the list:
 
 Next, you should add a context menu to each contact item. This menu appears on the right side of a list item with the following markup in the `Contacts` component:
 
-```ueml copy {18-24} filename="Contacts.xmlui"
+```xmlui copy {18-24} filename="Contacts.xmlui"
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <VStack>
@@ -82,7 +82,7 @@ The `DropdownMenu` definition adds the context menu to the contact items. You ca
 When you add a new contact's details or edit a contact, the app displays a form in a modal dialog.
 Create a component, `ContactForm`  (`ContactForm.xmlui` within the `components` folder), to display the dialog:
   
-```ueml copy {5} filename="ContactForm.xmlui" 
+```xmlui copy {5} filename="ContactForm.xmlui" 
 <Component name="ContactForm">
   <ModalDialog id="dialog" title="Add a new Contact">
     <Text>Contact Form</Text>
@@ -101,7 +101,7 @@ Whatever parameters you pass to the exposed `open` method, XMLUI conveys to the 
 
 Add a `ContactForm` component to `Contacts`, and set up click event handler in the New Contact button to display this dialog:
 
-```ueml copy {2, 6} filename="Contacts.xmlui" /onClick="contactForm.open()"/
+```xmlui copy {2, 6} filename="Contacts.xmlui" /onClick="contactForm.open()"/
 <Component name="Contacts">
   <ContactForm id="contactForm" />
   <DataSource id="categories" url="/api/categories" />
@@ -124,7 +124,7 @@ The dialog is not displayed unless you explicitly invoke its exposed `open` meth
 
 You can reuse this dialog when editing data. Modify the markup of `ContactRow`:
 
-```ueml copy {3, 10} filename="ContactRow.xmlui" /onClick="contactForm.open()"/
+```xmlui copy {3, 10} filename="ContactRow.xmlui" /onClick="contactForm.open()"/
 <Component name="ContactRow">
   <DataSource id="categories" url="/api/categories" />
   <ContactForm id="contactForm" />
@@ -148,7 +148,7 @@ You use the same dialog in the `ContactRow` component here. Clicking the Edit ac
 
 The dialog always displays its title as "Add a new Contact" whether you invoke it with the "Add button" or the "Edit" menu command. Modify the dialog to test the parameter passed to the `open` function (you invoke it from the `Contacts` component). The `$param` value represents the first parameter passed to `open`.
 
-```ueml copy {1, 4, 7} filename="ContactForm.xmlui" /$param/
+```xmlui copy {1, 4, 7} filename="ContactForm.xmlui" /$param/
 <Component name="ContactForm">
   <ModalDialog 
     id="dialog" 
@@ -167,7 +167,7 @@ You can also use the `$params` (plural form) value, an array of parameters (`ope
 
 Modify `Contacts` to pass the contact item to edit when opening the dialog:
 
-```ueml copy {10} filename="Contacts.xmlui" /onClick="contactForm.open($item)"/
+```xmlui copy {10} filename="Contacts.xmlui" /onClick="contactForm.open($item)"/
 <Component name="ContactRow">
   <DataSource id="categories" url="/api/categories" />
   <ContactForm id="contactForm" />
@@ -196,7 +196,7 @@ The current contact dialog has no functionality. To flesh it out, create a form 
 
 Replace the `Text` with the highlighted `Form` in `ContactForm`:
 
-```ueml copy {5-32} filename="ContactForm.xmlui"
+```xmlui copy {5-32} filename="ContactForm.xmlui"
 <Component name="ContactForm">
   <ModalDialog 
     id="dialog" 
@@ -285,7 +285,7 @@ Most of the time, submitting a form invokes a particular (REST) API endpoint wit
 Remove the form's `onSubmit` event handler and add the highlighted code to the form:
 
 
-```ueml copy {8-9} filename="ContactForm.xmlui" /submitUrl/ /submitMethod/
+```xmlui copy {8-9} filename="ContactForm.xmlui" /submitUrl/ /submitMethod/
 <Component name="ContactForm">
   <ModalDialog 
     id="dialog" 
@@ -319,7 +319,7 @@ Similarly, you can modify a contact. After the changes are saved, the modified c
 
 To delete a record, invoke the API endpoint directly from the context menu defined in `Contacts`.
 
-```ueml copy {11-18} filename="Contacts.xmlui"
+```xmlui copy {11-18} filename="Contacts.xmlui"
 <Component name="Contacts">
   <ContactForm id="contactForm" />
   <DataSource id="categories" url="/api/categories" />

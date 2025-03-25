@@ -12,7 +12,7 @@ The `EmojiSelector` component provides users with a graphical interface to brows
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-```ueml copy
+```xmlui copy
 <App>
   <EmojiSelector autoFocus="true" />
 </App>
@@ -34,7 +34,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 This event is fired when the user selects an emoticon from this component.
 
-```ueml copy /onSelect="(emoji) => { selected = emoji }"/
+```xmlui copy /onSelect="(emoji) => { selected = emoji }"/
 <App>
   <HStack var.selected="">
     <EmojiSelector onSelect="(emoji) => { selected = emoji }" />

@@ -6,7 +6,7 @@
 
 You can use the `label` and `icon` properties of a `Link` to set its text and icon to display. If you want a custom appearance, you can nest your visual representation into `Link`:
 
-```ueml copy {1,6}
+```xmlui copy {1,6}
 <App>
   <Link to="https://ncrm.azurewebsites.net/" target="_blank">
     <HStackverticalAlignment="center">
@@ -35,7 +35,7 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 
 %-PROP-START active
 
-```ueml copy /active="true"/ /active="false"/
+```xmlui copy /active="true"/ /active="false"/
 <App>
   <Link>I'm an inactive link (by default)</Link>
   <Link active="true">I'm an active link</Link>
@@ -58,7 +58,7 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 
 %-PROP-START enabled
 
-```ueml copy /enabled="true"/ /enabled="false"/
+```xmlui copy /enabled="true"/ /enabled="false"/
 <App>
   <Link>I'm an enabled link (by default)</Link>
   <Link enabled="false">I'm a disabled link</Link>
@@ -81,7 +81,7 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 
 %-PROP-START icon
 
-```ueml copy
+```xmlui copy
 <App>
   <Link icon="home" label="Home" />
   <Link icon="drive">Drives</Link>
@@ -108,7 +108,7 @@ If you want to specify paddings and gaps or put the icon to the right of the lin
 
 The following sample opens its link in a new tab:
 
-```ueml copy
+```xmlui copy
 <App>
   <Link to="https://docs.xmlui.com/" target="_blank">
     Open XMLUI overview in a new tab

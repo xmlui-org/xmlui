@@ -11,7 +11,7 @@ The following app demonstrates two different patterns for using `Redirect`.
 1. When you navigate to the "Redirect #1" page, it immediately redirects the app to the "Accounts" page. By default, the  `when` property of `Redirect` (and any other component) is "true", so redirection immediately happens.
 2. The "Redirect #2" page expects you to click the button before redirecting. The button click sets the `when` property of `Redirect` to true, and redirection happens at that moment.
 
-```ueml copy {14, 20}
+```xmlui copy {14, 20}
 <App>
   <NavPanel>
     <NavLink to="/">Home</NavLink>

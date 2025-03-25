@@ -22,7 +22,7 @@ The data is provided as JSON. In the source code samples, the `data={[...]}` dec
 All samples use table columns with the following definition unless noted otherwise
 (The `...` declaration nested into `<Table>` represents this column definition):
 
-```ueml copy
+```xmlui copy
 <Table data='{[...]}'>
   <Column bindTo="name"/>
   <Column bindTo="quantity"/>
@@ -46,7 +46,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 The component receives data via this property. The `data` property is a list of items that the `Table` can display.
 
-```ueml copy /data='{[...]}'/
+```xmlui copy /data='{[...]}'/
 <App>
   <Table data='{[...]}'>
     <Column bindTo="name"/>
@@ -72,7 +72,7 @@ The component receives data via this property. The `data` property is a list of 
 You can also provide the `Table` with data directly from an API via this property.
 Here, the component displays rocket information coming from the official SpaceX API.
 
-```ueml copy /data='https://api.spacexdata.com/v3/rockets'/
+```xmlui copy /data='https://api.spacexdata.com/v3/rockets'/
 <App>
   <Table data='https://api.spacexdata.com/v3/rockets'>
     <Column header="Image" size="140px">
@@ -110,7 +110,7 @@ Setting it to `false` limits selection to a single row.
 
 By default, the value of this property is `true`.
 
-```ueml copy /enableMultiRowSelection="false"/
+```xmlui copy /enableMultiRowSelection="false"/
 <App>
   <Table data='{[...]}' 
     rowsSelectable="true" 
@@ -143,7 +143,7 @@ This optional property is used to specify the height of the table header.
 
 It accepts common [size values](./appearance/common-units.mdx#size-values).
 
-```ueml copy /headerHeight="60px"/
+```xmlui copy /headerHeight="60px"/
 <App>
   <Table data='{[...]}' headerHeight="60px">
     <Column bindTo="name"/>
@@ -173,7 +173,7 @@ Set the header visibility using this property. Set it to `true` to hide the head
 Set the header visibility using this property. Set it to `true` to hide the header.
 The default value is `false`.
 
-```ueml copy /hideHeader="true"/
+```xmlui copy /hideHeader="true"/
 <App>
   <Table data='{[...]}' hideHeader="true">
     <Column bindTo="name"/>
@@ -204,7 +204,7 @@ Allows setting the icon displayed in the Table column header when sorting is ena
 Allows the customization of the icon displayed in a Table column header when when sorting is enabled
 and sorting is not done according to the column. Use the "-" (dash) value to sign that you do not want to display an icon when a table column is not sorted.
 
-```ueml copy /iconNoSort="close"/
+```xmlui copy /iconNoSort="close"/
 <App>
   <Table data='{[...]}' sortBy="quantity" iconNoSort="close">
     <Column bindTo="name" canSort="true" />
@@ -234,7 +234,7 @@ Allows setting the icon displayed in the Table column header when sorting is ena
 Allows the customization of the icon displayed in a Table column header when sorting is enabled,
 sorting is done according to the column, and the column is sorted in ascending order.
 
-```ueml copy /iconSortAsc="chevronup"/
+```xmlui copy /iconSortAsc="chevronup"/
 <App>
   <Table data='{[...]}' sortBy="quantity" iconSortAsc="chevronup">
     <Column bindTo="name" canSort="true" />
@@ -264,7 +264,7 @@ Allows setting the icon displayed in the Table column header when sorting is ena
 Allows the customization of the icon displayed in a Table column header when sorting is enabled,
 sorting is done according to the column, and the column is sorted in descending order.
 
-```ueml copy /iconSortDesc="chevrondown"/
+```xmlui copy /iconSortDesc="chevrondown"/
 <App>
   <Table data='{[...]}' sortBy="quantity" iconSortDesc="chevrondown">
     <Column bindTo="name" canSort="true" />
@@ -293,7 +293,7 @@ Select a column header and set it to descending ordering.
 
 This property adds pagination controls to the `Table`.
 
-```ueml copy /isPaginated="true"/
+```xmlui copy /isPaginated="true"/
 <App>
   <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
     <Column bindTo="name"/>
@@ -323,7 +323,7 @@ This boolean property indicates if the component is fetching (or processing) dat
 This boolean property indicates if the component is fetching (or processing) data.
 This property is useful when data is loaded conditionally or receiving it takes some time.
 
-```ueml copy
+```xmlui copy
 <App>
   <Table loading="true">
     <Column bindTo="name"/>
@@ -348,7 +348,7 @@ This property is useful when data is loaded conditionally or receiving it takes 
 
 A property to customize what to display if the table does not contain any data.
 
-```ueml copy {3-5}
+```xmlui copy {3-5}
 <App>
   <Table>
     <property name="noDataTemplate">
@@ -383,7 +383,7 @@ Page sizes are only accepted in an array, even if the array contains one item.
 
 Note that this property only works if the [`isPaginated`](#ispaginated) property is set to `true`.
 
-```ueml copy /pageSizes="{[3, 6, 12]}"/
+```xmlui copy /pageSizes="{[3, 6, 12]}"/
 <App>
   <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
     <Column bindTo="name"/>
@@ -412,7 +412,7 @@ This property defines a predicate function with a return value that determines i
 
 The following example disables all table rows where the item's quantity exceeds 6:
 
-```ueml copy {3}
+```xmlui copy {3}
 <App>
   <Table data='{[...]}'
     rowDisabledPredicate="{(item) => item.quantity > 6}">
@@ -447,7 +447,7 @@ Indicates whether the rows are selectable (`true`) or not (`false`).
 
 The default value is `false`.
 
-```ueml copy /rowsSelectable="true"/
+```xmlui copy /rowsSelectable="true"/
 <App>
   <Table data='{[...]}' rowsSelectable="true">
     <Column bindTo="name"/>
@@ -474,7 +474,7 @@ The default value is `false`.
 
 This property is used to determine which data attributes to sort by.
 
-```ueml copy /sortBy="quantity"/
+```xmlui copy /sortBy="quantity"/
 <App>
   <Table data='{[...]}' sortBy="quantity">
     <Column bindTo="name"/>
@@ -501,7 +501,7 @@ This property is used to determine which data attributes to sort by.
 
 This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set.
 
-```ueml copy /sortDirection="descending"/
+```xmlui copy /sortDirection="descending"/
 <App>
   <Table data='{[...]}' sortBy="quantity" sortDirection="descending">
     <Column bindTo="name"/>
@@ -532,7 +532,7 @@ This event is triggered when the table's current selection (the rows selected) c
 
 Of course, if multiple-row selection is not allowed (`enableMultipleRowSelection` is false), this array will contain zero or one item.
 
-```ueml copy {4}
+```xmlui copy {4}
 <App var.selection="">
   <Text>Current selection (row IDs): [{selection}]</Text>
   <Table data='{[...]}'
@@ -571,7 +571,7 @@ This event is fired when the table data sorting has changed. It has two argument
 
 Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColumnDef` components which enable custom ordering.
 
-```ueml copy {4}
+```xmlui copy {4}
 <App var.sortedBy="">
   <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
   <Table data='{[...]}'
@@ -606,7 +606,7 @@ This event is fired before the table data is sorted. It has two arguments: the c
 
 The following example uses the `willSort` event to refuse sorting by name:
 
-```ueml copy {4}
+```xmlui copy {4}
 <App var.sortedBy="">
   <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
   <Table data='{[...]}'
@@ -645,7 +645,7 @@ clicking that column header still does not sort because `willSort` prevents it:
 
 This method clears the list of currently selected table rows.
 
-```ueml copy /clearSelection()/ /selectId(1)/ /selectId([2, 4])/ /selectAll()/
+```xmlui copy /clearSelection()/ /selectId(1)/ /selectId([2, 4])/ /selectAll()/
 <App>
   <HStack>
     <Button label="Select all" onClick="table.selectAll()" />

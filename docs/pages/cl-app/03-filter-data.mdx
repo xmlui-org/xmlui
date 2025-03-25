@@ -23,7 +23,7 @@ In this article, you will implement the filtering functionality with both option
 
 Add a few new menu items with their corresponding pages to the app definition in the `Main.xmlui` file. Change the `/contacts` URL representing all contacts to `/contacts/all`. Set up each page to display only the related filter's name:
 
-```ueml copy {13-17, 21, 24-27} filename="Main.xmlui"
+```xmlui copy {13-17, 21, 24-27} filename="Main.xmlui"
 <App 
   layout="vertical-sticky" 
   name="Contact List Tutorial" 
@@ -73,7 +73,7 @@ In this scenario, you will fetch all the data from the backend but filter it bef
 
 Previously, you used a URL, `/api/contacts` to display the contact data in a `List`:
 
-```ueml copy {4} filename="Main.xmlui"
+```xmlui copy {4} filename="Main.xmlui"
 <App>
   <!-- Omitted -->
   <Page url="/contacts/all">
@@ -89,7 +89,7 @@ With the new app pages, you will use the same URL five times and filter the data
 
 Add a `DataSource` declaration to `Main.xmlui` before the `<Pages>` tag:
 
-```ueml copy {7} filename="Main.xmlui" /id="contactsDs"/
+```xmlui copy {7} filename="Main.xmlui" /id="contactsDs"/
 <App 
   layout="vertical-sticky" 
   name="Contact List Tutorial" 
@@ -104,7 +104,7 @@ Add a `DataSource` declaration to `Main.xmlui` before the `<Pages>` tag:
 
 Update the contacts page to use this `DataSource` (refer to the identifier of `DataSource`):
 
-```ueml copy {4} filename="Main.xmlui" /contactsDs/
+```xmlui copy {4} filename="Main.xmlui" /contactsDs/
 <App>
   <!-- Omitted -->
   <Page url="/contacts/all">
@@ -137,14 +137,14 @@ It's time to create a reusable component for the contact list and use that to re
  
 First, create a new file, `Contacts.xmlui` in the `components` folder, and add this piece of code:
 
-```ueml copy filename="Contacts.xmlui"
+```xmlui copy filename="Contacts.xmlui"
 <Component name="Contacts">
 </Component>
 ```
 
 This component is empty; fill it with content! Copy the contents of the All contacts page (omit the wrapping `Page` tag):
 
-```ueml copy {2-16} filename="Contacts.xmlui"
+```xmlui copy {2-16} filename="Contacts.xmlui"
 <Component name="Contacts">
   <List data="{contactsDs}">
     <Card var.categoryName="{getCategoryNameById($item.categoryId)}">
@@ -170,7 +170,7 @@ In this example, you will use the first approach (using the filtered data), as t
 
 Change the `List` component to use the data received through a property:
 
-```ueml copy filename="Contacts.xmlui" /data="{$props.data}"/
+```xmlui copy filename="Contacts.xmlui" /data="{$props.data}"/
 <Component name="Contacts">
   <List data="{$props.data}">
     <!-- Unchanged -->
@@ -185,7 +185,7 @@ The `$props` context value represents the properties the `Contacts` component re
 
 Update the Contact `Page` (the one with the `/contacts/all` URL) in `Main.xmlui` to use the new `Contacts` component:
 
-```ueml copy {5} filename="Main.xmlui" /data="{contactsDs}"/
+```xmlui copy {5} filename="Main.xmlui" /data="{contactsDs}"/
 <!-- Omitted -->
 <Pages>
   <Page url="/">Dashboard</Page>
@@ -205,7 +205,7 @@ We moved the contact list markup into the `Contacts` component but forgot about 
 
 Categories use the `Datasource` with the `categories` id in `Main.xmlui` (you find it before the`<Pages>` tag). Move this `DataSource` into `Contacts.xmlui`:
 
-```ueml copy {2} filename="Contacts.xmlui"
+```xmlui copy {2} filename="Contacts.xmlui"
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <!-- Unchanged -->
@@ -268,7 +268,7 @@ The `allContacts`, `overdueContacts`, `todayContacts`, `upcomingContacts`, and `
 
 Update all remaining contact pages in `Main.xmlui` to use `Contacts` with filtered data:
 
-```ueml copy filename="Main.xmlui" /{overdueContacts}/ /{todayContacts}/ /{upcomingContacts}/ /{completedContacts}/
+```xmlui copy filename="Main.xmlui" /{overdueContacts}/ /{todayContacts}/ /{upcomingContacts}/ /{completedContacts}/
 <App> 
   <!-- Omitted -->
   <Pages>
@@ -304,7 +304,7 @@ From a UX point of view, it would be good to display the number of contacts in a
 
 Update the `NavLabel` components in `Main.xmlui`:
 
-```ueml copy {4-8} filename="Main.xmlui"
+```xmlui copy {4-8} filename="Main.xmlui"
 <!-- Omitted -->
 <NavPanel>
   <NavLink label="Dashboard" to="/" />
@@ -337,7 +337,7 @@ In this section, you will change the code to get filtered contact data from the 
 As you leverage five different URLs to get the data, you do not need the `DataSource` referring to the `/api/contacts` URL (its id is `contactsDs`). Remove this `DataSource` from `Main.xmlui`. Change the `data` properties of `Contacts` instances to use the corresponding URLs:
 
 
-```ueml copy {5, 8, 11, 14, 17} filename="Main.xmlui"
+```xmlui copy {5, 8, 11, 14, 17} filename="Main.xmlui"
 <!-- Omitted -->
 <Pages>
   <Page url="/">Dashboard</Page>
@@ -375,7 +375,7 @@ each representing a particular contact section.
 
 Add a new `DataSource` to the `Main.xmlui` file to fetch the contact counts:
 
-```ueml copy {2} filename="Main.xmlui"
+```xmlui copy {2} filename="Main.xmlui"
 <!-- After AppHeader -->
 <DataSource id="contactCounts" url="/api/contactcounts" />
 <NavPanel>
@@ -386,7 +386,7 @@ Add a new `DataSource` to the `Main.xmlui` file to fetch the contact counts:
 
 Update the menu item labels to use the contact counts retrieved from the server:
 
-```ueml copy {4-8} filename="Main.xmlui"
+```xmlui copy {4-8} filename="Main.xmlui"
 <!-- Omitted -->
 <NavPanel>
   <NavLink label="Dashboard" to="/" />

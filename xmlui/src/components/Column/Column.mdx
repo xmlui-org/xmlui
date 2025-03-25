@@ -12,7 +12,7 @@ Throught this documentation page the data used is the same that is found in the 
 
 %-PROP-START bindTo
 
-```ueml copy {3}
+```xmlui copy {3}
 <App>
   <Table data='{[...]}'>
     <Column bindTo="name" />
@@ -37,7 +37,7 @@ Throught this documentation page the data used is the same that is found in the 
 
 Click on either the `Name` or the `Quantity` column headers to order the data by that attribute.
 
-```ueml copy /canSort/
+```xmlui copy /canSort/
 <App>
   <Table data='{[...]}'>
     <Column canSort="true" bindTo="name" />
@@ -64,7 +64,7 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
 
 %-PROP-START header
 
-```ueml copy {3-4}
+```xmlui copy {3-4}
 <App>
   <Table data='{[...]}'>
     <Column header="Food Name" bindTo="name" />
@@ -91,7 +91,7 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
 
 %-PROP-START pinTo
 
-```ueml copy /pinTo="left"/ /pinTo="right"/
+```xmlui copy /pinTo="left"/ /pinTo="right"/
 <App>
   <Table data='{[...]}' height="100%">
     <Column bindTo="id" width="50px" pinTo="left" />
@@ -126,7 +126,7 @@ Scroll the table contents horizontally to see how the pinned columns are display
 This prop provides customization to render any sort of components in the cells of the column.
 Access the data's attributes via the `$item` in a binding expression.
 
-```ueml copy {3-5}
+```xmlui copy {3-5}
 <Table data="https://api.spacexdata.com/v3/rockets">
     <Column header="Image" size="140px">
       <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
@@ -152,7 +152,7 @@ Access the data's attributes via the `$item` in a binding expression.
 
 The following example sets the second column to an absolute size (size pixels), while the first and third columns have star sizes:
 
-```ueml copy {4}
+```xmlui copy {4}
 <App>
   <Table data='{[...]}'>
     <Column bindTo="name" canResize="true" width="3*" />

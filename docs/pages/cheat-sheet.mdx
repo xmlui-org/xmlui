@@ -12,7 +12,7 @@ You can influence components' visual appearance (and behavior) by setting compon
 
 Component properties are represented with attributes in the markup. Set this attribute value with a literal string.
 
-```ueml copy /value="I'm a text!"/
+```xmlui copy /value="I'm a text!"/
 <Text value="I'm a text!" />
 ```
 
@@ -20,7 +20,7 @@ Component properties are represented with attributes in the markup. Set this att
 
 You can use expressions to set up a property value. Expressions are wrapped in curly braces (between `{` and `}` characters).
 
-```ueml copy /{6 * 7}/
+```xmlui copy /{6 * 7}/
 <!-- Displays: "Life, universe, and everything: 42" -->
 <Text value="Life, universe, and everything: {6 * 7}" />
 ```
@@ -29,7 +29,7 @@ You can use expressions to set up a property value. Expressions are wrapped in c
 
 This construct is helpful when you want to set a property value to a component declaration (for example, you define a template with a property).
 
-```ueml copy
+```xmlui copy
 <Items data="{[1, 2, 3]}">
   <property name="itemTemplate">
     <Text value="This item is: {$item}" />
@@ -41,7 +41,7 @@ This construct is helpful when you want to set a property value to a component d
 
 By setting a component's `when` attribute to `false`, you can omit it from the markup tree (as if the definition were not there).
 
-```ueml copy
+```xmlui copy
 <Text when="false" value="I'm omitted from the markup" />
 ```
 
@@ -51,7 +51,7 @@ Naturally, components omitted from the markup (`when` set to `false`) are not vi
 
 You can assign an identifier to the component with the `id` attribute and use that to access its exposed properties.
 
-```ueml copy /id="myTextBox"/ /{myTextBox.value}/
+```xmlui copy /id="myTextBox"/ /{myTextBox.value}/
 <App>
   <TextBox id="myTextBox" placeholder="Type something" />
   <Text variant="title">You typed: {myTextBox.value}</Text>
@@ -64,7 +64,7 @@ This way, you can bind components: changing a particular property of one will tr
 
 You can assign an identifier to the component with the `id` attribute and use that to invoke its exposed methods.
 
-```ueml copy /id="myTextBox"/ /{myTextBox.value}/
+```xmlui copy /id="myTextBox"/ /{myTextBox.value}/
 <App>
   <Checkbox 
     id="myCheckbox" 
@@ -83,7 +83,7 @@ The expressions in XMLUI use the same syntax and semantics as JavaScript. For de
 
 Expressions are wrapped between curly braces; the engine evaluates them and replaces them with their actual value.
 
-```ueml copy
+```xmlui copy
 <App>
   <Text value="{1 + 2 * 3}" /> <!-- Displays 7 -->
   <Text>{6 * 7}</Text>         <!-- Displays 42 -->
@@ -95,7 +95,7 @@ Expressions are wrapped between curly braces; the engine evaluates them and repl
 
 You can use multiple expressions combined with literal string segments in property values or component text.
 
-```ueml copy
+```xmlui copy
 <App>
   <Text value="10 times 10 is {10*10} and not {9 * 10}" />
 </App>
@@ -105,7 +105,7 @@ You can use multiple expressions combined with literal string segments in proper
 
 Use `\{` as an escape for the opening curly brace. You do not need to escape the closing curly brace.
 
-```ueml copy
+```xmlui copy
 <Text value="\{1 + 2 * 3}" /> <!-- Displays {1 + 2 * 3} -->
 ```
 
@@ -117,7 +117,7 @@ Variables are scoped; their name must be unique in the declaring scope. When you
 
 **Declare a variable with the `var.` prefix**
 
-```ueml copy /var.myVar/ /{myVar}/
+```xmlui copy /var.myVar/ /{myVar}/
 <App var.myVar="Hello, World!">
   <Text>{myVar}</Text> <!-- Displays: Hello, World! -->
 </App>
@@ -125,7 +125,7 @@ Variables are scoped; their name must be unique in the declaring scope. When you
 
 **Declare a variable with the `<variable>` helper tag and a nested value**
 
-```ueml copy {2-4} /name="myVar"/ /{myVar}/
+```xmlui copy {2-4} /name="myVar"/ /{myVar}/
 <App>
   <variable name="myVar">
     Hello, World!
@@ -146,7 +146,7 @@ var myVar="Hello, World!";
 ```
     </div>
     <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```ueml copy filename="Main.xmlui" /{myVar}/
+```xmlui copy filename="Main.xmlui" /{myVar}/
 <App>
   <Text>{myVar}</Text>
 </App>
@@ -158,7 +158,7 @@ var myVar="Hello, World!";
 
 The same variable name can be declared in nested scopes. The engine resolves the name to the variable in the closest (innermost) scope.
 
-```ueml copy
+```xmlui copy
 <App var.myVar="Hello, from App!">
   <H1>{myVar}</H1> <!-- Displays: Hello, from App! -->
   <VStack var.myVar="Hello, from VStack!">
@@ -171,7 +171,7 @@ The same variable name can be declared in nested scopes. The engine resolves the
 
 If you initialize them with an expression, the engine detects any changes on which the variable value depends. When a change happens, the engine refreshes the UI.
 
-```ueml copy
+```xmlui copy
 <App var.count="{0}" var.countTimes3="{3 * count}" >
   <Button
     label="Click to increment!"
@@ -188,13 +188,13 @@ Any time `count` is incremented, `count3Times` follows the change and will alway
 
 You can define an event handler for a particular component event using an attribute with the `on` prefix followed by the event name:
 
-```ueml copy /onClick="toast('Clicked!')"/
+```xmlui copy /onClick="toast('Clicked!')"/
 <Button label="Click me" onClick="toast('Clicked!')" />
 ```
 
 **Declare an event handler with the `<event>` helper tag and nested value**
 
-```ueml copy
+```xmlui copy
 <Button label="Click me">
   <event name="click">
     toast('Clicked!')
@@ -216,7 +216,7 @@ function displayToast() {
 ```
     </div>
     <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```ueml copy filename="Main.xmlui" /{myVar}/
+```xmlui copy filename="Main.xmlui" /{myVar}/
 <Button 
   label="Click me" 
   onClick="displayToast" />
@@ -238,7 +238,7 @@ function myButton_onClick() {
 ```
     </div>
     <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```ueml copy filename="Main.xmlui" /{myVar}/
+```xmlui copy filename="Main.xmlui" /{myVar}/
 <Button
   id="myButton" 
   label="Click me" />
@@ -254,7 +254,7 @@ Use auto-binding of event handlers with care. Though your markup is shorter, you
 
 The XMLUI engine supports using an `APICall` component definition as an event handler. This option is available only with the component markup (not in the code-behind file) using the `<event>` helper tag:
 
-```ueml copy
+```xmlui copy
 <Button label="Delete Customer">
   <event name="click">
     <APICall 
@@ -288,7 +288,7 @@ XMLUI has a few fundamental components you can use to establish the app's layout
 
 Setting the `data` property of data-aware components (such as `List`, `Items`, `Table`, and others) to a string fetches the data from the specified URL (with the GET verb).
 
-```ueml copy
+```xmlui copy
 <List data="/api/products">
   <Card title="{$item.name}" subtitle="{$item.description}"/>
 </List>
@@ -296,7 +296,7 @@ Setting the `data` property of data-aware components (such as `List`, `Items`, `
 
 **Use a URL with the GET operation (filtered list)**
 
-```ueml copy
+```xmlui copy
 <App var.category="electronics">
   <Button label="Use books" onClick="category = 'books'" />
   <List data="/api/products/{category}" >
@@ -309,7 +309,7 @@ Setting the `data` property of data-aware components (such as `List`, `Items`, `
 
 You can combine the value of a particular input with the URL.
 
-```ueml copy /{myTextBox.value}/ /myTextBox/ 
+```xmlui copy /{myTextBox.value}/ /myTextBox/ 
 <App>
   <TextBox id="myTextBox" placeholder="Search value" />
   <List data="/api/products?search={myTextBox.value}" >
@@ -322,7 +322,7 @@ You can combine the value of a particular input with the URL.
 
 If you must use a verb other than GET, you can use a `DataSource` that provides more control over the request. The identifier of the `DataSource` is in the `data` property.
 
-```ueml copy {2} /method="post"/ /{productSource}/ /productSource/
+```xmlui copy {2} /method="post"/ /{productSource}/ /productSource/
 <App>
   <DataSource id="productSource" url="/api/products" method="post" />
   <List data="{productSource}" >
@@ -335,7 +335,7 @@ If you must use a verb other than GET, you can use a `DataSource` that provides 
 
 You can set a request header in a `DataSource` component.
 
-```ueml copy {2-5} /headers/ /{productSource}/ /productSource/
+```xmlui copy {2-5} /headers/ /{productSource}/ /productSource/
 <App>
   <DataSource 
     id="productSource" 
@@ -351,7 +351,7 @@ You can set a request header in a `DataSource` component.
 
 If the data you want to use is just a part of the response, you can drill down to the response segment with your data.
 
-```ueml copy {2} /{productSource}/ /productSource/ /resultSelector="items"/
+```xmlui copy {2} /{productSource}/ /productSource/ /resultSelector="items"/
 <App>
   <DataSource id="productSource" url="/api/products" resultSelector="items"/>
   <List data="{productSource}" >
@@ -366,7 +366,7 @@ This example assumes the response contains a `metadata` property (to ignore) and
 
 You can refer to the `value` property of a `DataSource` and use that to filter or modify the result.
 
-```ueml copy {2} /{productSource}/ /productSource/ /resultSelector="items"/
+```xmlui copy {2} /{productSource}/ /productSource/ /resultSelector="items"/
 <App>
   <DataSource id="productSource" url="/api/products" resultSelector="items"/>
   <List data="{productSource.value.filter(p => p.weight > 100)}" >

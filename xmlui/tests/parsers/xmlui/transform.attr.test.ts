@@ -4,7 +4,7 @@ import { ButtonMd } from "../../../src/components/Button/Button";
 import { transformSource } from "./xmlui";
 import { StackMd } from "../../../src/components/Stack/Stack";
 
-describe("Ueml transform - attributes", () => {
+describe("Xmlui transform - attributes", () => {
   it("Invalid attribute name fails #1", () => {
     try {
       transformSource("<Stack prop.sub.sub='a' />");

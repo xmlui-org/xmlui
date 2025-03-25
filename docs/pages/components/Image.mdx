@@ -14,7 +14,7 @@ This is useful in two cases:
 1. Accessibility: screen readers read the prop value to users so they know what the image is about.
 2. The text is also displayed when the image can't be loaded for some reason (network errors, content blocking, etc.).
 
-```ueml copy
+```xmlui copy
 <App>
   <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" />
 </App>
@@ -37,7 +37,7 @@ The animation object to be applied to the component
 
 This property sets a preferred aspect ratio for the image, which will be used in the calculation of auto sizes and some other layout functions.
 
-```ueml copy
+```xmlui copy
 <App>
   <Image 
     src="/resources/images/components/image/breakfast.jpg" 
@@ -63,7 +63,7 @@ This property sets how the image content should be resized to fit its container.
 | `contain` | The replaced content is scaled to maintain its aspect ratio while fitting within the image's container. The entire image is made to fill the container. |
 | `cover`   | The image is sized to maintain its aspect ratio while filling the element's entire content box. If the image's aspect ratio does not match the aspect ratio of its container, then the image will be clipped to fit. |
 
-```ueml copy /fit/
+```xmlui copy /fit/
 <App>
   <HStack padding="1rem" height="280px" gap="1rem">
     <Image 
@@ -109,7 +109,7 @@ This event is triggered when the Image is clicked.
 
 This event is triggered when the image is clicked.
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <Stack height="280px" width="400px">
     <Image
@@ -146,7 +146,7 @@ The `Image` component does not support styling.
 Nonetheless, you can use layout properties and theme variables.
 The following markup uses the `borderRadius` layout property to set rounded borders:
 
-```ueml copy {6}
+```xmlui copy {6}
 <App>
   <Stack height="280px" width="400px" >
     <Image 

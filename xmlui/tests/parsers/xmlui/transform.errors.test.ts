@@ -1,7 +1,7 @@
 import { describe, expect, it, assert } from "vitest";
 import { transformSource } from "./xmlui";
 
-describe("Ueml transform - errors", () => {
+describe("Xmlui transform - errors", () => {
 
   it("Missing name in compound component", () => {
     try {

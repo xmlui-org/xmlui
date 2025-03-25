@@ -4,7 +4,7 @@
 
 The primary use of a `NavGroup` is to create an application menu with submenus, as the following example shows:
 
-```ueml copy {4,6,10,13}
+```xmlui copy {4,6,10,13}
 <App layout="condensed">
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -64,7 +64,7 @@ Here, the highlighted `NavGroup` element nests other `NavLink` and `NavGroup` el
 
 You do not have to use `NavGroup` within `NavPanel`; you can nest it into other components to represent a menu, like in the following example:
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack verticalAlignment="center">
     <Text>Use this menu:</Text>
@@ -112,7 +112,7 @@ This property defines an optional icon to display along with the `NavGroup` labe
 
 Look at this example:
 
-```ueml copy {3, 5}
+```xmlui copy {3, 5}
 <App>
   <HStack verticalAlignment="center">
     <NavGroup icon="email" label="Send To" >
@@ -168,7 +168,7 @@ You can use these properties to change the styling of the `NavGroup` component:
 
 The following sample demonstrates using these theme variables and the `Theme` component:
 
-```ueml copy
+```xmlui copy
 <App>
   <Theme
     backgroundColor-dropdown-NavGroup="cyan"

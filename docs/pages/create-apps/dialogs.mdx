@@ -15,7 +15,7 @@ When you try the examples in this section, pop them up into a separate window an
 
 The following example shows a simple dialog with details about a user. This sample demonstrates the declarative mode of displaying the dialog.
 
-```ueml copy /when="{isDialogShown}"/ /onClose="isDialogShown = false"/ /onClick="isDialogShown = true"/
+```xmlui copy /when="{isDialogShown}"/ /onClose="isDialogShown = false"/ /onClick="isDialogShown = true"/
 <App>
   <variable name="isDialogShown" value="{false}"/>
   <ModalDialog
@@ -84,7 +84,7 @@ The declarative approach allows you to provide deep links to open modal dialogs.
   You can imperatively invoke the `open()` and `close()` exposed functions of a `ModalDialog` component instance via its ID.
 </Callout>
 
-```ueml copy {3} /onClick="dialog.open()"/ /onClick="dialog.close()"/
+```xmlui copy {3} /onClick="dialog.open()"/ /onClick="dialog.close()"/
 <App>
   <ModalDialog
     id="dialog"
@@ -145,7 +145,7 @@ The declarative approach allows you to provide deep links to open modal dialogs.
   When embedding a form in a dialog, the form's cancel and successful submit actions (unless you change this logic) automatically close the dialog hosting the form.
 </Callout>
 
-```ueml copy {2-8} /onClick="dialog.open()"/
+```xmlui copy {2-8} /onClick="dialog.open()"/
 <App>
   <ModalDialog id="dialog">
     <Form data="{{ name: 'Leslie', age: 32 }}">
@@ -204,7 +204,7 @@ The following code contains only a `dialog.open` action, which displays the dial
 
 The `ModalDialog` component lets you customize some parts of it directly. For example, you can hide the close button displayed in the top-right dialog corner and add a restyled title to dialogs.
 
-```ueml copy /closeButtonVisible="false"/
+```xmlui copy /closeButtonVisible="false"/
 <App>
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog" closeButtonVisible="false">

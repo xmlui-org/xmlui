@@ -1,6 +1,6 @@
 %-PROP-START placeholder
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox placeholder="This is a placeholder" />
 </App>
@@ -19,7 +19,7 @@
 
 %-PROP-START initialValue
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox initialValue="Example text" />
 </App>
@@ -40,7 +40,7 @@
 
 Try to enter a longer value into the input field below.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox maxLength="16" />
 </App>
@@ -59,7 +59,7 @@ Try to enter a longer value into the input field below.
 
 %-PROP-START readOnly
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox initialValue="Example text" readOnly="true" />
 </App>
@@ -78,7 +78,7 @@ Try to enter a longer value into the input field below.
 
 %-PROP-START enabled
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox enabled="false" />
 </App>
@@ -97,7 +97,7 @@ Try to enter a longer value into the input field below.
 
 %-PROP-START validationStatus
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox />
   <TextBox validationStatus="valid" />
@@ -122,7 +122,7 @@ Try to enter a longer value into the input field below.
 
 %-PROP-START startText
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startText="www." />
 </App>
@@ -139,7 +139,7 @@ Try to enter a longer value into the input field below.
 
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`endText`](#endtext).
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -158,7 +158,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 %-PROP-START startIcon
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startIcon="hyperlink" />
 </App>
@@ -175,7 +175,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -194,7 +194,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 %-PROP-START endText
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox endText=".com" />
 </App>
@@ -211,7 +211,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -230,7 +230,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 %-PROP-START endIcon
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox endIcon="email" />
 </App>
@@ -247,7 +247,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -268,7 +268,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```ueml copy {3}
+```xmlui copy {3}
 <App var.field="">
   <TextBox initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
@@ -293,7 +293,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 Clicking on the `TextBox` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to its original.
 
-```ueml copy {4-5}
+```xmlui copy {4-5}
 <App>
   <TextBox
     initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
@@ -324,7 +324,7 @@ Note how clicking elsewhere resets the text to its original.
 
 In the example below, typing in the `TextBox` will also display the length of the text typed into it above the field:
 
-```ueml copy {2-3}
+```xmlui copy {2-3}
 <App>
   <Text value="TextBox content length: {inputComponent.value.length}" />
   <TextBox id="inputComponent" />
@@ -345,7 +345,7 @@ In the example below, typing in the `TextBox` will also display the length of th
 
 %-API-START setValue
 
-```ueml copy {10}
+```xmlui copy {10}
 <App var.changes="">
   <TextBox
     id="inputField"
@@ -386,7 +386,7 @@ In the example below, typing in the `TextBox` will also display the length of th
 
 %-API-START focus
 
-```ueml copy {2-3}
+```xmlui copy {2-3}
 <App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
   <TextBox id="inputComponent" />

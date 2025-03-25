@@ -18,7 +18,7 @@ type Options = {
   id: number;
   activeTheme?: string;
   activeTone?: string;
-  language: "ueml" | "json";
+  language: "xmlui" | "json";
   emulatedApi?: string;
   fixedTheme?: boolean;
 };
@@ -275,7 +275,7 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
       state.options.content = action.payload.content || "app";
       if (state.options.content === "app") {
         state.text = state.appDescription.app;
-        state.options.language = "ueml";
+        state.options.language = "xmlui";
       } else if (state.options.content === "config") {
         state.text = JSON.stringify(state.appDescription.config, null, 2);
         state.options.language = "json";
@@ -288,7 +288,7 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
           state.appDescription.components.find(
             (component: CompoundComponentDef) => component.name === state.options.content,
           )?.component || "";
-        state.options.language = "ueml";
+        state.options.language = "xmlui";
       } else if (
         state.appDescription.config.themes
           .map((t) => t.id.toLowerCase())

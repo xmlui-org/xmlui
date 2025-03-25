@@ -88,7 +88,7 @@ export const DemoPlayground = ({
           previewMode: previewOnly,
           allowStandalone,
           id: 0,
-          language: "ueml",
+          language: "xmlui",
           fixedTheme,
         }),
       );

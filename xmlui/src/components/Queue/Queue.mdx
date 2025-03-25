@@ -8,7 +8,7 @@ The following sample demonstrates these concepts. When the user clicks the butto
 
 A `ChangeListener` instance observes queue length changes and stores the actual length to display that in the UI.
 
-```ueml copy {9-24}
+```xmlui copy {9-24}
 <App
   var.queued="{0}"
   var.queueLength="{0}"
@@ -87,7 +87,7 @@ Try the app by clicking the button several times. Check how the queue processes 
 
 The following example stores and displays this item when a new item is put into the queue:
 
-```ueml copy {5} /enqueueItem/
+```xmlui copy {5} /enqueueItem/
 <App var.queued="{0}" var.itemIds="">
   <Button
     label="Add a new item to the queue"
@@ -140,7 +140,7 @@ This method removes an item from the queue. The parameter of this method is the 
 
 The following example emulates a file-processing application. When a file is about to save (in the `process` event), the processing fails with files that deny overwrite. In such a case, the `processError` event handler asks the user to confirm the overwrite action. In case of confirmation, the queue uses the `remove` action to discard the faulty queue item and enqueues the file again with the `accept` behavior so that it won't fail next time.
 
-```ueml copy {21}
+```xmlui copy {21}
 <App var.queued="{0}" var.processed="" var.skipped="{0}">
   <Button
     label="Add a new file to the queue"
@@ -223,7 +223,7 @@ The following example emulates a file-processing application. When a file is abo
 
 The following sample displays a tick mark every time the queue is emptied:
 
-```ueml copy {13}
+```xmlui copy {13}
 <App
   var.queued="{0}"
   var.queueEmptied=""
@@ -291,7 +291,7 @@ The parameter of the event handler is an object with these properties:
 
 The following sample uses the `didProcess` event handler to add a tick symbol to the progress whenever an item has been processed:
 
-```ueml copy {13}
+```xmlui copy {13}
 <App
   var.queued="{0}"
   var.progressLine=""
@@ -366,7 +366,7 @@ If the event handler returns false, the queue does not sign the error in the UI.
 
 The following sample generates an error for every fourth item, and gives an error feedback with the `processError` event handler:
 
-```ueml copy {10-12, 17}
+```xmlui copy {10-12, 17}
 <App
   var.queued="{0}"
   var.progressLine=""
@@ -440,7 +440,7 @@ The parameter of the event handler is an object with these properties:
 
 The following sample declares a `willProcess` event handler that will skip processing (summing) items less than 0.5; the handler counts the number of skipped items.
 
-```ueml copy {9}
+```xmlui copy {9}
 <App
   var.queued="{0}"
   var.skipped="{0}"

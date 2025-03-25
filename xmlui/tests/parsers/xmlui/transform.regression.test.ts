@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
-describe("Ueml transform - regression", () => {
+describe("Xmlui transform - regression", () => {
   it("prop with multiple component #1", () => {
     const cd = transformSource(`
     <Table width="50%">

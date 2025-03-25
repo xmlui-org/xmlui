@@ -2,7 +2,7 @@
 
 This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:
 
-```ueml copy
+```xmlui copy
  <DataSource
   id="ds"
   url="/api/shopping-list" 
@@ -15,7 +15,7 @@ This property customizes the success message displayed in a toast after the fini
 
 This property customizes the message displayed in a toast when the API invocation results in an error. The `$error.statusCode` context variable can refer to the response's status code, while `$error. details` to the response body. For example, you can use the following code snippet to display the status code and the details:
 
-```ueml copy
+```xmlui copy
  <DataSource
   id="ds"
   method="post"
@@ -73,7 +73,7 @@ Here is a sample response from the HubSpot API.
 This `resultSelector` builds an array of the `properties` objects.
 
 
-```ueml copy
+```xmlui copy
 <DataSource 
   id="contacts" 
   url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
@@ -83,7 +83,7 @@ This `resultSelector` builds an array of the `properties` objects.
 
 This `List` uses the array.
 
-```ueml copy 
+```xmlui copy 
 <List data="{contacts}" title="Hubspot Contacts"> 
   <Card gap="0" width="20em">
     <Text fontWeight="bold">
@@ -104,7 +104,7 @@ This `List` uses the array.
 
 This `resultSelector` filters the array of the `properties` objects to include only contacts with non-null `custom_notes`.
 
-```ueml copy
+```xmlui copy
 <DataSource 
   id="contacts" 
   resultSelector="results.filter(contact => contact.properties.custom_notes !== null).map(contact => contact.properties)"
@@ -115,7 +115,7 @@ This `resultSelector` filters the array of the `properties` objects to include o
 
 This `Table` uses the filtered array.
 
-```ueml copy
+```xmlui copy
 <Table title="HubSpot contacts" data="{contacts}">
   <Column bindTo="firstname" />
   <Column bindTo="lastname" />

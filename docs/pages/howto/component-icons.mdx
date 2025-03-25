@@ -7,7 +7,7 @@ import {Callout} from 'nextra/components'
 
 Changing the graphical element displayed by an `Icon` component is as easy as entering a different name in the `name` property:
 
-```ueml copy
+```xmlui copy
 <Icon name="email" />
 ```
 
@@ -108,7 +108,7 @@ The `Table` component also supports this case by providing the following propert
 In the next example, the first `Table` component to the left retains the default sort by ascending order icon,
 while the second `Table` to the right uses the `chevronup` icon instead.
 
-```ueml copy /iconSortAsc="chevronup"/
+```xmlui copy /iconSortAsc="chevronup"/
 <App>
   <HStack>
     <VStack width="50%">
@@ -178,7 +178,7 @@ Note, how the icon resource only appears in the left `Table` and not on the righ
 }
 ```
 
-```ueml copy /iconSortAsc="chevronup"/ filename="Main.xmlui"
+```xmlui copy /iconSortAsc="chevronup"/ filename="Main.xmlui"
 <HStack>
   <VStack width="50%">
     Component-specific icon:
