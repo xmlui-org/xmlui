@@ -23,7 +23,7 @@ When you pass an explicit (non-string) value to the `data` property, the framewo
 
 Here is a sample demonstrating this case:
 
-```ueml copy
+```xmlui copy
 <App>
   <List data="{['one', 'two', 'three']}">
     <Card title="{$item}" />
@@ -51,7 +51,7 @@ This code passes an array of strings to `data`. A `List` component displays each
 
 When you pass a string value to `data`, XMLUI considers it a URL and fetches the data from it. When the fetch is complete, the UI is refreshed accordingly.
 
-```ueml copy
+```xmlui copy
 <App>
   <List data="https://api.spacexdata.com/v4/launchpads">
     <Card title="{$item.name}" />
@@ -77,7 +77,7 @@ This markup uses the endpoint in `data` to fetch launchpad information from the 
 
 When you use a string value in `data` but not a valid URL or the data fetch results in an error, the `data` is set to an empty value. The following example demonstrates this case:
 
-```ueml copy
+```xmlui copy
 <App var.myData="{[]}">
   <Button label="Fetch Data" onClick="myData = 'bla-bla-bla'" />
   <List data="{myData}">
@@ -109,7 +109,7 @@ When you click the button again, the value of `data` does not change (it remains
 
 You can bind the `data` property to a `DataSource` instance. Similarly to a single URL, `DataSource` fetches the data from that URL. 
 
-```ueml copy /rocketsData/
+```xmlui copy /rocketsData/
 <App>
   <DataSource id="rocketsData" url="https://api.spacexdata.com/v4/rockets" />
   <List data="{rocketsData}">
@@ -137,7 +137,7 @@ This sample has the same effect as using a URL in the `data` property. However, 
 
 Note that a `DataSource` identifier can be shared among multiple components, intrinsic and/or user-defined.
 
-```ueml copy /rocketsData/
+```xmlui copy /rocketsData/
 <App>
   <DataSource id="rocketsData" url="https://api.spacexdata.com/v4/rockets" />
   <List data="{rocketsData}">
@@ -147,7 +147,7 @@ Note that a `DataSource` identifier can be shared among multiple components, int
 </App>
 ```
 
-```ueml copy
+```xmlui copy
 <Component name="MyCustomRocketDisplay">
   <Items data="{$props.source}">
     <Text>
@@ -179,7 +179,7 @@ You can use `DataSource` with any component (even if that one does not handle da
 
 In the following example, you use the `value` property to set the contents of `H3`:
 
-```ueml copy /fruits.value/
+```xmlui copy /fruits.value/
 <App>
   <DataSource id='fruits' url='/api/fruits'/>
   <HStack verticalAlignment="center">
@@ -225,7 +225,7 @@ In the following example, you use the `value` property to set the contents of `H
 
 `DataSource` exposes a method, `refetch`, which you can use imperatively to re-query the data. The following markup demonstrates using it:
 
-```ueml copy /coords.refetch()/
+```xmlui copy /coords.refetch()/
 <App>
   <DataSource id='coords' url='/api/coords'/>
   <Button label="Refresh" onClick="coords.refetch()" />
@@ -265,7 +265,7 @@ In the following example, you use the `value` property to set the contents of `H
 
 `DataSource` allows you to periodically poll the backend for data. Use the `pollIntervalInSeconds` property to set this period, as the following example shows:
 
-```ueml copy /pollIntervalInSeconds="3"/
+```xmlui copy /pollIntervalInSeconds="3"/
 <App var.pollCount="{0}">
   <DataSource 
     id='rand' 
@@ -314,7 +314,7 @@ Besides getting the data, this app uses the `loaded` event of `DataSource` to co
 You can quickly determine if a data fetch operation is in progress. `DataSource` offers a property, `inProgress,` which indicates whether the data is currently being fetched. The following sample shows using this property:
 
 
-```ueml copy /orders.inProgress/
+```xmlui copy /orders.inProgress/
 <App var.pollCount="{0}">
   <DataSource id='orders' url='/api/monthly-total' />
   <Button onClick="orders.refetch()">Query #of total orders</Button>
@@ -357,7 +357,7 @@ When you bind a `DataSource` component instance to a property, XMLUI starts the 
 
 The following sample demonstrates this scenario:
 
-```ueml copy /orders.value.title/ /orders.value.author/
+```xmlui copy /orders.value.title/ /orders.value.author/
 <App>
   <DataSource id='orders' url='/api/title-info' />
   <Card title="{orders.value.title}" subtitle="{orders.value.author}" />
@@ -394,7 +394,7 @@ Some API endpoints may ask for a particular header. You can send it with the req
 
 In the following example, the backend requires a header named `x-api-key` with the value of `1111` to accept the request.
 
-```ueml copy /headers="{{ 'x-api-key': '1111' }}/
+```xmlui copy /headers="{{ 'x-api-key': '1111' }}/
 <App>
   <DataSource id='orders' url='/api/title-info-header' headers="{{ 'x-api-key': '1111' }}" />
   <Card title="{orders.value.title}" subtitle="{orders.value.author}" />
@@ -456,7 +456,7 @@ For example, let's assume we have this response:
 
 The actual data is in the "info" property; "meta" is additional, and we do not want to display it. We can tighten the response to the actual data with `resultSelector`:
 
-```ueml copy /resultSelector="info"/
+```xmlui copy /resultSelector="info"/
 <App>
   <DataSource id='cities' url='/api/cities' resultSelector="info" />
   <VStack>
@@ -518,7 +518,7 @@ An intuitive option is to transform the data retrieved from a `DataSource` in th
 
 The following example orders a list of friends' data by descending age:
 
-```ueml copy /friends.value.toSorted((a, b) => b.age - a.age)/
+```xmlui copy /friends.value.toSorted((a, b) => b.age - a.age)/
 <App>
   <DataSource id='friends' url='/api/friends' />
   <VStack>
@@ -587,7 +587,7 @@ Let's assume we have this hotel review information retrieved from the backend:
 
 We are interested in the average value of reviews. With `transformResult`, we can transform the entire resultset and add a new field to each hotel row with the average review points:
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <DataSource 
     id='reviews' 
@@ -660,7 +660,7 @@ var sortedReviews = reviews.value
 
 Due to XMLUI's reactive nature, `sortedReviews` is evaluated every time the data is fetched (as `reviews.value` changes). In the `Table` component's `data` property, you refer to the `sortedReviews` variable to ensure the transformed value is displayed.
 
-```ueml copy /sortedReviews/
+```xmlui copy /sortedReviews/
 <App>
   <DataSource 
     id='reviews' url='/api/cafe-reviews'  />
@@ -740,7 +740,7 @@ Besides managing the request-response protocol, `APICall` provides a few UI serv
 
 The following sample demonstrates how to use `APICall` to send a request with a particular body. The sample allows you to add a new fruit to a list; you send the new fruit's name in the request body.
 
-```ueml copy  {6-12}
+```xmlui copy  {6-12}
 <App>
   <DataSource id='myFruits' url='/api/my-fruits' />
   <HStack>
@@ -819,7 +819,7 @@ Observe the `onSuccess` event handler: the code deletes the textbox after comple
 
 The following example demonstrates these features:
 
-```ueml copy {10, 12} /confirmTitle/ /confirmMessage/ /completedNotificationMessage/
+```xmlui copy {10, 12} /confirmTitle/ /confirmMessage/ /completedNotificationMessage/
 <App>
   <List data="/api/components">
     <HStack padding="$padding-tight" verticalAlignment="center">
@@ -902,7 +902,7 @@ Besides using `APICall` in event handlers, you can use this component imperative
 
 Though you primarily use `DataSource` to fetch data, you can also use `APICall`. The following example demonstrates how to do this.
 
-```ueml copy {2}
+```xmlui copy {2}
 <App var.launchpadData="{[]}">
   <APICall id="launchpads" url="https://api.spacexdata.com/v4/launchpads" method="get" />
   <Button 
@@ -942,7 +942,7 @@ This app displays the data stored in the `launchpadData` variable, initialized t
 
 You can pass parameters to an `APICall` component and use that parameter to prepare the request. The following sample passes an identifier (of a rocket) in the `execute` methods. The `APICall` accesses that through its `$param` context value:
 
-```ueml copy {3} /5e9d0d95eda69955f709d1eb/ /$param/
+```xmlui copy {3} /5e9d0d95eda69955f709d1eb/ /$param/
 <App 
   var.rocketData="">
   <APICall id="rocket" url="https://api.spacexdata.com/v4/rockets/{$param}" method="get" />
@@ -978,7 +978,7 @@ You can pass parameters to an `APICall` component and use that parameter to prep
 
 As the following sample demonstrates, you can pass multiple parameters to `APICall` when invoking the execute method.
 
-```ueml copy {4-8} /$params[0]/ /$params[1]/ /execute/
+```xmlui copy {4-8} /$params[0]/ /$params[1]/ /execute/
 <App>
   <DataSource id='myNames' url='/api/my-names' />
   <HStack>
@@ -1074,7 +1074,7 @@ Learn more about this component in the <SmartLink href={COMPONENT_ITEMS}>`Items`
 
 The following sample uses the `data` property to define the source of backend data displayed in the component:
 
-```ueml copy {3-5}
+```xmlui copy {3-5}
 <App>
   <Items data="https://api.spacexdata.com/v3/rockets">
     <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
@@ -1100,7 +1100,7 @@ If you plan to work with many items (more than a few dozen), use the [`List`](./
 
 Items also can be used when you provide a list of options for components such as `Select`:
 
-```ueml copy {3-5}
+```xmlui copy {3-5}
 <App>
   <Select id="landpads">
     <Items data="https://api.spacexdata.com/v4/landpads">
@@ -1137,7 +1137,7 @@ Learn more about this component in the <SmartLink href={COMPONENT_LIST}>`List`</
 
 The following sample demonstrates using `List`:
 
-```ueml copy
+```xmlui copy
 <App>
   <List data="https://api.spacexdata.com/v4/ships">
     <HStack padding="$padding-tight">
@@ -1169,7 +1169,7 @@ The following sample demonstrates using `List`:
 
 You can order the items on the list with its `orderBy` property, which names a field and a sorting direction. Observe how the following sample uses a `DataSource` and maps the result into a new data array to create the `launchCount` field:
 
-```ueml copy /orderBy="{{ field: 'launchCount', direction: 'desc' }}"/
+```xmlui copy /orderBy="{{ field: 'launchCount', direction: 'desc' }}"/
 <App>
   <DataSource id="shipsData" url="https://api.spacexdata.com/v4/ships" />
   <List 
@@ -1209,7 +1209,7 @@ As you expect, the list displays ships in descending order by the number of thei
 
 As the following sample demonstrates, a `List` can group its items according to a particular field. You can optionally define a section header and footer for the list.
 
-```ueml copy {10-12} /groupBy="type"/
+```xmlui copy {10-12} /groupBy="type"/
 <App>
   <List data="https://api.spacexdata.com/v4/ships"
     groupBy="type">
@@ -1257,7 +1257,7 @@ Learn more about this component in the <SmartLink href={COMPONENT_TABLE}>`Table`
 
 The following sample demonstrates using `Table`. You can use `Column` components to specify table column templates.
 
-```ueml copy
+```xmlui copy
 <App>
   <Table data="https://api.spacexdata.com/v4/rockets">
     <Column header="Image" width="100px">

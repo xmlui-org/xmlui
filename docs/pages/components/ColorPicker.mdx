@@ -8,7 +8,7 @@ This component allows the user to select a color with the browser's default colo
 
 This component allows you to edit or select a color using RGB, HSL, or CSS HEX notation. It displays a popup over the UI and lets you use the mouse or keyboard to edit or select a color.
 
-```ueml copy
+```xmlui copy
 <App>
   <ColorPicker id="colorPicker" label="Select your favorite color" />
   <Text>Selected color: {colorPicker.value}</Text>
@@ -39,7 +39,7 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the component's initial value.
 
-```ueml copy /initialValue="#ff0080"/
+```xmlui copy /initialValue="#ff0080"/
 <App>
   <ColorPicker 
     id="colorPicker" 
@@ -93,7 +93,7 @@ This property sets the width of the `ColorPicker`.
 
 Set this property to `true` to disallow changing the component value.
 
-```ueml copy /initialValue="#ff0080"/
+```xmlui copy /initialValue="#ff0080"/
 <App>
   <ColorPicker initialValue="#ffff00" label="Cannot be edited" readOnly />
 </App>
@@ -124,7 +124,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-```ueml copy /initialValue="#ff0080"/
+```xmlui copy /initialValue="#ff0080"/
 <App>
   <ColorPicker initialValue="#c0c0ff" label="Valid" validationStatus="valid" />
   <ColorPicker initialValue="#c0c0ff" label="Warning" validationStatus="warning" />
@@ -167,7 +167,7 @@ This method sets the focus on the ColorPicker.
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-```ueml copy /setValue/
+```xmlui copy /setValue/
 <App>
   <App>
     <ColorPicker id="colorPicker" label="Select your favorite color" initialValue="#808080" />

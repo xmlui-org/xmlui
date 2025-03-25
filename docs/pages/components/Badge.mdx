@@ -12,7 +12,7 @@ The `Badge` component supports the mapping of a list of colors using the `value`
 
 1. Only change the background color
 
-```ueml copy {2}
+```xmlui copy {2}
 <App var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
   <Badge value="important" colorMap="{simpleColorMap}" />
 </App>
@@ -29,7 +29,7 @@ The `Badge` component supports the mapping of a list of colors using the `value`
 
 2. Change the background and label color
 
-```ueml copy {2-5}
+```xmlui copy {2-5}
 <App 
   var.simpleColorMap="{{ 
     important: { label: 'red', background: 'pink' }, 
@@ -60,7 +60,7 @@ The `Badge` component supports the mapping of a list of colors using the `value`
 
 The text that the component displays
 
-```ueml copy
+```xmlui copy
 <App>
   <Badge value="Example badge" />
 </App>  
@@ -80,7 +80,7 @@ Modifies the shape of the component. Comes in the regular `badge` variant or the
 
 Available values: `badge` **(default)**, `pill`
 
-```ueml copy
+```xmlui copy
 <App>
   <Badge value="Example badge" variant="badge" />
   <Badge value="Example pill" variant="pill" />

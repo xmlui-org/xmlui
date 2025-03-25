@@ -14,7 +14,7 @@ It is a small visual element, which is used to graphically represent functions, 
 
 This optional property provides a way to handle situations when the provided [icon name](#name) is not found in the registry.
 
-```ueml copy /fallback="trash"/
+```xmlui copy /fallback="trash"/
 <App>
   <Icon name="noicon" fallback="trash" />
 </App>
@@ -36,7 +36,7 @@ This string property specifies the name of the icon to display. All icons have u
 The engine looks up the icon in its [registry]() and determines which icon is associated with the name that the component will show.
 Nothing is displayed if the icon name is not found in the registry.
 
-```ueml copy /name/
+```xmlui copy /name/
 <App>
   <HStack>
     <Icon name="message" />
@@ -71,7 +71,7 @@ This property defines the size of the `Icon`. Note that setting the `height` and
 
 Available values: `xs`, `sm`, `md`, `lg`
 
-```ueml copy /size/
+```xmlui copy /size/
 <App>
   <HStack>
     <Icon name="like" />

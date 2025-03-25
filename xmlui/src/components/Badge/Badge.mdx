@@ -1,6 +1,6 @@
 %-PROP-START value
 
-```ueml copy
+```xmlui copy
 <App>
   <Badge value="Example badge" />
 </App>  
@@ -18,7 +18,7 @@
 
 %-PROP-START variant
 
-```ueml copy
+```xmlui copy
 <App>
   <Badge value="Example badge" variant="badge" />
   <Badge value="Example pill" variant="pill" />
@@ -41,7 +41,7 @@
 
 1. Only change the background color
 
-```ueml copy {2}
+```xmlui copy {2}
 <App var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
   <Badge value="important" colorMap="{simpleColorMap}" />
 </App>
@@ -58,7 +58,7 @@
 
 2. Change the background and label color
 
-```ueml copy {2-5}
+```xmlui copy {2-5}
 <App 
   var.simpleColorMap="{{ 
     important: { label: 'red', background: 'pink' }, 

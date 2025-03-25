@@ -137,7 +137,7 @@ Let's see a few samples!
 
 The following markup displays the first button's panel with the default theme and the second panel with the "xmlui-green" theme:
 
-```ueml copy /themeId="xmlui-green"/
+```xmlui copy /themeId="xmlui-green"/
   <App>
     <HStack>
       <Button>Button with default theme</Button>
@@ -165,7 +165,7 @@ The following markup displays the first button's panel with the default theme an
 
 The next sample demonstrates that you can use the `tone` property of `Theme` to set a different tone for a UI patch.
 
-```ueml copy /tone="dark"/ /tone="light"/
+```xmlui copy /tone="dark"/ /tone="light"/
 <App>
   <Theme tone="light">
     <Card title="Card with light tone" />
@@ -193,7 +193,7 @@ The next sample demonstrates that you can use the `tone` property of `Theme` to 
 
 In addition to theme IDs and tones, you can modify particular theme variables, as the following sample demonstrates:
 
-```ueml copy /color-primary="orangered"/ /borderRadius-Card="40px"/ /color-primary="mediumpurple"/
+```xmlui copy /color-primary="orangered"/ /borderRadius-Card="40px"/ /color-primary="mediumpurple"/
 <App>
   <Theme color-primary="orangered" borderRadius-Card="40px">
     <Card title="Card with custom text color and border radius" />
@@ -235,7 +235,7 @@ When you create a new theme, XMLUI automatically inherits from the default theme
 
 Let's assume you run this app with the default theme:
 
-```ueml copy
+```xmlui copy
 <App>
   <H1>AcmeUI App</H1>
   <Text>Welcome to the AcmeUI intranet home page!</Text>
@@ -669,7 +669,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     Components can form a theming hierarchy. For example, many components represent some input fields, as the following
     example shows:
 
-    ```ueml {3,4}
+    ```xmlui {3,4}
     <Form id="driveForm" data="{{car: 'Toyota Celica', year: '1999'}}" padding=1em>
       <FlowLayout paddingBottom=1em gap=1em>
         <FormItem width="50%" label="Car Type" bindTo="car" autoFocus="true" type="text"/>

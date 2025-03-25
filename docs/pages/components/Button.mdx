@@ -24,7 +24,7 @@ Available values:
 | `start` | Justify the content to the left (to the right if in right-to-left) |
 | `end` | Justify the content to the right (to the left if in right-to-left) |
 
-```ueml copy
+```xmlui copy
 <App>
   <Button width="200px" icon="drive" label="Button" contentPosition="center" />
   <Button width="200px" icon="drive" label="Button" contentPosition="start" />
@@ -54,7 +54,7 @@ Available values:
 
 The value of this property indicates whether the button accepts actions (`true`) or does not react to them (`false`).
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button label="I am enabled (by default)" />
@@ -83,7 +83,7 @@ The value of this property indicates whether the button accepts actions (`true`)
 
 This string value denotes an icon name. The framework will render an icon if XMLUI recognizes the icon by its name. If no label is specified and an icon is set, the Button displays only that icon.
 
-```ueml
+```xmlui
   <App>
     <HStack>
       <Button icon="drive" label="Let there be drive" />
@@ -117,7 +117,7 @@ Available values:
 | `start` | The icon will appear at the start (left side when the left-to-right direction is set) **(default)** |
 | `end` | The icon will appear at the end (right side when the left-to-right direction is set) |
 
-```ueml
+```xmlui
 <App>
   <HStack>
     <Button icon="drive" label="Left" />
@@ -160,7 +160,7 @@ Available values:
 
 This property is an optional string to set a label for the Button. If no label is specified and an icon is set, the Button will modify its styling to look like a small icon button. When the Button has nested children, it will display them and ignore the value of the `label` prop.
 
-```ueml copy
+```xmlui copy
 <App>
   <Button label="I am the button label" />
   <Button />
@@ -211,7 +211,7 @@ Available values:
 | `md` | Medium button |
 | `lg` | Large button |
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button icon="drive" label="default" />
@@ -265,7 +265,7 @@ Available values:
 | `primary` | Primary theme color **(default)** |
 | `secondary` | Secondary theme color |
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button label="Button" themeColor="primary" />
@@ -313,7 +313,7 @@ Available values:
 | `outlined` | The button is displayed with a border and a transparent background. |
 | `ghost` | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. |
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button label="default (solid)" />
@@ -345,7 +345,7 @@ Available values:
 
 This event is triggered when the Button is clicked.
 
-```ueml copy
+```xmlui copy
 <App>
   <Button label="Click me!" onClick="toast('Button clicked')" />
 </App>
@@ -365,7 +365,7 @@ This event is triggered when the Button is clicked.
 
 This event is triggered when the Button has received the focus.
 
-```ueml copy
+```xmlui copy
 <App var.text="No event" >
   <HStack verticalAlignment="center" >
     <Button label="First, click me!" 
@@ -481,7 +481,7 @@ Using a set of buttons with a fixed width or height is often helpful. So `Button
 
 Avoid setting the `width-Button` and `height-Button` styles in the theme definition. Instead, wrap the affected button group into a `Theme` component as in the following example:
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Theme width-Button="120px">

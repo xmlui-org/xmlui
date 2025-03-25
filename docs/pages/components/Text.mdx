@@ -15,7 +15,7 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
 
 This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
 
-```ueml copy /ellipses="false"/
+```xmlui copy /ellipses="false"/
 <App>
   <VStack width="120px">
     <Text
@@ -62,7 +62,7 @@ This property indicates whether ellipses should be displayed when the text is cr
 
 This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines.
 
-```ueml copy
+```xmlui copy
 <App>
   <Text
     maxWidth="120px"
@@ -91,7 +91,7 @@ This property determines the maximum number of lines the component can wrap to. 
 
 This property indicates if linebreaks should be preserved when displaying text.
 
-```ueml copy {7}
+```xmlui copy {7}
 <App>
   <HStack>
     <Text
@@ -145,7 +145,7 @@ This property indicates if linebreaks should be preserved when displaying text.
 
 The text to be displayed. This value can also be set via nesting the text into the `Text` component.
 
-```ueml copy
+```xmlui copy
 <App>
   <Text value="An example text" />
   <Text>An example text</Text>

@@ -9,7 +9,7 @@ The `Card` component is a container for cohesive elements, often rendered visual
 `Card` is a container; it does not have any explicit properties.
 You can nest the card's content into the `<Card>` tag:
 
-```ueml copy
+```xmlui copy
 <App>
   <Card maxWidth="200px">
     <HStack verticalAlignment="center">
@@ -40,7 +40,7 @@ You can nest the card's content into the `<Card>` tag:
 There are also prestyled properties one can make use of, detailed in the [Properties section](#properties).
 Prestyled elements always appear above other children.
 
-```ueml copy
+```xmlui copy
 <App>
   <Card
     avatarUrl="https://i.pravatar.cc/100"
@@ -94,7 +94,7 @@ Available values:
 | `horizontal` | The component will fill the available space horizontally |
 | `vertical` | The component will fill the available space vertically **(default)** |
 
-```ueml copy /orientation="horizontal"/
+```xmlui copy /orientation="horizontal"/
 <App>
   <Card title="Example Title" subtitle="Example Subtitle" orientation="horizontal">
     <SpaceFiller />
@@ -125,7 +125,7 @@ Indicates whether the Card should be displayed
 
 Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is automatically set to true but can still be hidden.
 
-```ueml copy /showAvatar="true"/
+```xmlui copy /showAvatar="true"/
 <App>
   <Card maxWidth="300px" avatarUrl="https://i.pravatar.cc/100" />
   <Card maxWidth="300px" showAvatar="true" title="Example Card" />
@@ -151,7 +151,7 @@ This prop sets the prestyled subtitle.
 
 This prop sets the prestyled subtitle.
 
-```ueml copy /subtitle="Example Subtitle"/
+```xmlui copy /subtitle="Example Subtitle"/
 <App>
   <Card maxWidth="300px" subtitle="Example Subtitle" />
 </App>
@@ -172,7 +172,7 @@ This prop sets the prestyled title.
 
 This prop sets the prestyled title.
 
-```ueml copy
+```xmlui copy
 <App>
   <Card maxWidth="300px" title="Example Title" />
 </App>
@@ -195,7 +195,7 @@ This event is triggered when the Card is clicked.
 
 This event is triggered when the `Card` is clicked.
 
-```ueml copy
+```xmlui copy
 <App>
   <Card maxWidth="300px" onClick="toast('Clicked!')">
     <HStack verticalAlignment="center">

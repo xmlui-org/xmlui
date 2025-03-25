@@ -52,7 +52,7 @@ export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
     content: "app",
     previewMode: false,
     id: 0,
-    language: "ueml",
+    language: "xmlui",
   },
   text: "",
   appDescription: {

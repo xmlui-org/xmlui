@@ -7,7 +7,7 @@
 You can use the `label` and `icon` properties of a `NavLink` to set its text and icon to display.
 If you want a custom appearance, you can nest define custom visuals for the `NavLink` by nesting:
 
-```ueml copy {6-14}
+```xmlui copy {6-14}
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -60,7 +60,7 @@ If you want a custom appearance, you can nest define custom visuals for the `Nav
 By default, activating (clicking) a link navigates to the target URL.
 However, you can create a link that executes an explicit action responding to the `click` event instead of the default navigation:
 
-```ueml copy {7}
+```xmlui copy {7}
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -98,7 +98,7 @@ However, you can create a link that executes an explicit action responding to th
 
 %-PROP-START label
 
-```ueml copy /label="Home"/
+```xmlui copy /label="Home"/
 <App layout="horizontal">
   <NavPanel>
     <NavLink to="/" label="Home" />
@@ -134,7 +134,7 @@ you need to manually set this property for the active state to be displayed prop
 
 The default value for this property is `false`.
 
-```ueml copy /vertical="true"/
+```xmlui copy /vertical="true"/
 <App layout="horizontal">
   <NavPanel>
     <NavLink to="/" label="Home" vertical="true" />
@@ -164,7 +164,7 @@ The default value for this property is `false`.
 
 %-PROP-START icon
 
-```ueml copy {6-7}
+```xmlui copy {6-7}
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -204,7 +204,7 @@ The default value for this property is `false`.
 
 %-PROP-START displayActive
 
-```ueml copy /displayActive="false"/
+```xmlui copy /displayActive="false"/
 <App layout="horizontal">
   <NavPanel>
     <NavLink to="/" label="Home" displayActive="false" />
@@ -236,7 +236,7 @@ The default value for this property is `false`.
 
 In the following app, the "Hotels" link is disabled:
 
-```ueml copy {8}
+```xmlui copy {8}
 <App layout="horizontal">
   <AppHeader>
     <H1>MyTravel App</H1>
@@ -282,7 +282,7 @@ In the following app, the "Hotels" link is disabled:
 
 The following example opens the "About XMLUI" link in a new tab:
 
-```ueml copy {7}
+```xmlui copy {7}
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>

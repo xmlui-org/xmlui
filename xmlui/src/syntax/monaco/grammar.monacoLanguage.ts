@@ -1,5 +1,5 @@
-export const UEMLGrammar: any = {
-  id: "ueml",
+export const XmluiGrammar: any = {
+  id: "xmlui",
   config: {
     comments: {
       blockComment: ["<!--", "-->"],
@@ -20,7 +20,7 @@ export const UEMLGrammar: any = {
   },
   language: {
     defaultToken: "",
-    tokenPostfix: ".ueml",
+    tokenPostfix: ".xmlui",
     ignoreCase: false,
     identifier: /[a-zA-Z$_][-\w.$]*/,
     tokenizer: {

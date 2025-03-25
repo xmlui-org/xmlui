@@ -20,7 +20,7 @@ Optional size value indicating the gap between child elements.
 
 In the following example we use pixels, characters (shorthand `ch`), and the `em` CSS unit size which is a relative size to the font size of the element (See size values).
 
-```ueml copy {3, 10}
+```xmlui copy {3, 10}
 <App>
   <Stack orientation="horizontal" backgroundColor="cyan"
       gap="80px">
@@ -71,7 +71,7 @@ Available values: `start` **(default)**, `center`, `end`
 The `start` and `end` values can be affected by i18n if the layout is in a right-to-left writing style.
 </Callout>
 
-```ueml copy {3}
+```xmlui copy {3}
 <App>
   <Stack width="100%" horizontalAlignment="center" backgroundColor="cyan">
     <Stack width="36px" height="36px" backgroundColor="red" />
@@ -102,7 +102,7 @@ Optional boolean property to reverse the order of child elements.
 
 Default is **false**, which indicates a left-to-right layout.
 
-```ueml copy /reverse="true"/
+```xmlui copy /reverse="true"/
 <App>
   <Stack backgroundColor="cyan">
     <Stack gap="10px" orientation="horizontal">
@@ -145,7 +145,7 @@ Manages the vertical content alignment for each child element in the Stack.
 
 Available values: `start` **(default)**, `center`, `end`
 
-```ueml copy {2}
+```xmlui copy {2}
 <App>
   <Stack height="100px" verticalAlignment="end" backgroundColor="cyan">
     <Stack width="36px" height="36px" backgroundColor="red" />
@@ -170,7 +170,7 @@ Optional boolean which wraps the content if set to true and the available space 
 
 Optional boolean which wraps the content if set to true and the available space is not big enough. Works in all orientations.
 
-```ueml copy /wrapContent="true"/
+```xmlui copy /wrapContent="true"/
 <App>
   <Stack wrapContent="true" width="140px" orientation="horizontal" backgroundColor="cyan">
     <Stack height="40px" width="40px" backgroundColor="blue" />
@@ -203,7 +203,7 @@ This event is triggered when the Stack is clicked.
 
 Describes the logic that fires when the component is clicked.
 
-```ueml copy {4}
+```xmlui copy {4}
 <App>
   <HStack var.shown="{false}">
     <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />

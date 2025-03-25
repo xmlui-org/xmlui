@@ -13,7 +13,7 @@ Layout properties allow you to set up the visual appearance of components on a c
 
 This code snippet renders a text:
 
-```ueml copy
+```xmlui copy
 <App>
   <Text>I'm a Text without explicit layout properties</Text>
 </App>
@@ -30,7 +30,7 @@ This code snippet renders a text:
 
 This sample explicitly sets a few layout properties of Text:
 
-```ueml copy
+```xmlui copy
 <App>
   <Text
     backgroundColor="cyan"
@@ -73,7 +73,7 @@ In this section, you will learn how to use this toolset.
 
 In the following example, all properties of the `HStack` and `CHStack` components are layout properties. Some of them set dimensions; others set colors or other style elements:
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack height="100%">
     <CHStack border="1px dotted blue" color="black" width="80px" height="40px">Black</CHStack>
@@ -112,7 +112,7 @@ Reusable components may help such maintenance nightmares. You can extract the co
 
 To remove the pain of setting all `width` and `height` occurrences in the previous example (when using layout properties), define a reusable component instead. This new component will be called `MyBox` with preset dimension values. However, border and color values are allowed to be changed from the outside via properties:
 
-```ueml copy filename="MyBox.xmlui"
+```xmlui copy filename="MyBox.xmlui"
 <Component name="MyBox">
   <CHStack
     border="{$props.border}"
@@ -126,7 +126,7 @@ To remove the pain of setting all `width` and `height` occurrences in the previo
 
 Now, with the `MyBox` component, the previous UI declaration is more straightforward:
 
-```ueml copy filename="main.xmlui"
+```xmlui copy filename="main.xmlui"
 <App>
   <HStack height="100%">
     <MyBox border="1px dotted blue" color="black">Black</MyBox>
@@ -140,7 +140,7 @@ Now, with the `MyBox` component, the previous UI declaration is more straightfor
 
 Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Altering the `width` and `height` properties within `MyBox` has its effect on all boxes:
 
-```ueml copy {6} filename="MyBox.xmlui"
+```xmlui copy {6} filename="MyBox.xmlui"
 <Component name="MyBox">
   <CHStack
     border="{$props.border}"
@@ -188,7 +188,7 @@ XMLUI uses themes. A theme is a set of theme variables with their actual values,
 
 You can extract the values of layout properties into theme variables. For example, the hard-wired dimensions of `MyBox` can be put into theme variables:
 
-```ueml copy /$width-MyBox/ /$height-MyBox/
+```xmlui copy /$width-MyBox/ /$height-MyBox/
 <Component name="MyBox">
   <CHStack
     border="{$props.border}"
@@ -282,7 +282,7 @@ The dimension properties use <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}
 
 The XMLUI percentage value is relative to the size of the viewport a parent container offers for a particular child element. Here is an example to demonstrate how percentage values are used:
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Stack width="20%" height="36px" backgroundColor="red" />
@@ -330,7 +330,7 @@ You can change the default component width and height with these layout properti
 
 The following sample demonstrates the width-related properties.
 
-```ueml copy
+```xmlui copy
 <App>
   <VStack width="50%" height="36px" backgroundColor="red" />
   <VStack width="30%" minWidth="200px" height="36px" backgroundColor="green" />
@@ -367,7 +367,7 @@ Individual components, such as <SmartLink href={COMPONENT_TEXT}>`Text`</SmartLin
 
 The following example demonstrates how the horizontal overflow property works:
 
-```ueml copy /overflowX/
+```xmlui copy /overflowX/
 <App>
   <VStack width="180px" height="40px" backgroundColor="cyan" overflowX="hidden">
     <Text maxLines="1">
@@ -418,7 +418,7 @@ Due to the `overflowX="scroll"` setting, you can see a horizontal scrollbar at t
 
 The following example demonstrates how the vertical overflow property works:
 
-```ueml copy /overflowY/
+```xmlui copy /overflowY/
 <App>
   <VStack width="180px" height="40px" backgroundColor="cyan" overflowY="hidden">
     <Text maxLines="1">
@@ -478,7 +478,7 @@ This model works with the following boxes nested in each other (see an example f
 
 The engine defines several layout properties to set up the box model of a particular component. Here is an example:
 
-```ueml copy
+```xmlui copy
 <App height="100%" backgroundColor="cyan">
   <VStack height="85%"
     backgroundColor="red"
@@ -593,7 +593,7 @@ The engine supports these layout properties to set component colors:
 
 > **Note**: Besides these colors, <SmartLink href="#border">borders</SmartLink> and <SmartLink href="#boxShadow">shadows</SmartLink> also can declare their display colors.
 
-```ueml copy
+```xmlui copy
 <App>
   <H2 backgroundColor="green" color="white">The Power of Green Economy</H2>
 </App>
@@ -608,7 +608,7 @@ The engine supports these layout properties to set component colors:
   `}
 />
 
-```ueml copy
+```xmlui copy
 <App>
   <H2 backgroundColor="green" color="white" opacity="0.5">
     The Power of Green Economy
@@ -645,7 +645,7 @@ Several properties allow you to set the appearance of text elements displayed in
 |`textAlign`|This property sets the horizontal <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_TEXT_ALIGNMENT}>alignment</SmartLink> of the inline-rendered content (e.g., text) inside its block-rendered parent.|
 |`textAlignLast`|This property sets how the last line of a block or a line, right before a forced line break, is <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_TEXT_ALIGNMENT}>aligned</SmartLink>.|
 
-```ueml copy
+```xmlui copy
 <App>
   <Text fontFamily="'Courier New', monospace">
     This should be monospace
@@ -680,7 +680,7 @@ Several properties allow you to set the appearance of text elements displayed in
 
 You can add <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SHADOW}>shadow effects</SmartLink> around a component's frame and set up one or more shadow effects.
 
-```ueml copy {2}
+```xmlui copy {2}
 <App>
   <VStack width="200px" padding="20px" border="2px solid #202020"
     boxShadow="12px 12px 5px orangered" >
@@ -718,7 +718,7 @@ Components that lay out their children according to their strategy (such as `Sta
 
 This property sets the direction of text, table columns, and horizontal overflow. Use `rtl` for languages written from right to left (like Hebrew or Arabic), and `ltr` for those written from left to right (like English and most other languages). By default, the prop's value is `ltr`.
 
-```ueml copy {6}
+```xmlui copy {6}
 <App>
   <Text width="300px" backgroundColor="cyan">
     This goes from left to right

@@ -8,7 +8,7 @@ Variables in xmlui are a straightforward tool for managing states. However, a va
 
 In the following example, the main file of the app declares a variable, `enhancedMode`, which is toggled with a checkbox:
 
-```ueml copy filename="Main.xmlui" /enhancedMode/
+```xmlui copy filename="Main.xmlui" /enhancedMode/
 <App var.enhancedMode="{false}">
   <VStack gap="$space-4" padding="$space-4">
     <Checkbox
@@ -24,7 +24,7 @@ In the following example, the main file of the app declares a variable, `enhance
 Two components, `Component1` and `Component2`, use the value of `enhancedMode`. Because of the aforementioned scoping issue, the app must explicitly pass the variable's value to those components so that they can use it. These components utilize the value to render their UI:
 
 
-```ueml copy filename="Component1.xmlui" /enhancedMode/
+```xmlui copy filename="Component1.xmlui" /enhancedMode/
 <Component name="Component1">
   <H3 when="{$props.enhancedMode}">I am in enhanced mode!</H3>
   <Text when="{!$props.enhancedMode}">Enhanced mode turned off.</Text>
@@ -33,7 +33,7 @@ Two components, `Component1` and `Component2`, use the value of `enhancedMode`. 
 
 When you define an `AppState`, you can set its `initialValue` property to initialize the state value.
 
-```ueml copy filename="Component2.xmlui" /enhancedMode/
+```xmlui copy filename="Component2.xmlui" /enhancedMode/
 <Component name="Component2">
   <Button enabled="{$props.enhancedMode}">Set enhanced options</Button>
 </Component>
@@ -80,7 +80,7 @@ This situation is where `AppState` comes into the picture. With an `AppState` in
 
 Let's turn the previous example into one using `AppState`! The following code shows how we change the main app file:
 
-```ueml copy filename="Main.xmlui" /appState.update/ /appState.value/
+```xmlui copy filename="Main.xmlui" /appState.update/ /appState.value/
 <App>
   <AppState id="appState" initialValue="{{ enhancedMode: false }}"/>
   <VStack gap="$space-4" padding="$space-4">
@@ -98,7 +98,7 @@ When you define an `AppState`, you can set its `initialValue` property to initia
 
 The components may use their own `AppState` object to access the state value:
 
-```ueml copy filename="Component1.xmlui" /state.value.enhancedMode/
+```xmlui copy filename="Component1.xmlui" /state.value.enhancedMode/
 <Component name="Component1">
   <AppState id="state" />
   <H3 when="{state.value.enhancedMode}">I am in enhanced mode!</H3>
@@ -106,7 +106,7 @@ The components may use their own `AppState` object to access the state value:
 </Component>
 ```
 
-```ueml copy filename="Component2.xmlui" /state.value.enhancedMode/
+```xmlui copy filename="Component2.xmlui" /state.value.enhancedMode/
 <Component name="Component2">
   <AppState id="state" />
   <Button enabled="{state.value.enhancedMode}">Set enhanced options</Button>
@@ -152,7 +152,7 @@ With the `AppState` component, you can use separate state objects. The `bucket` 
 
 If you want to run the sample with explicit state buckets (for example, with the `settings` bucket id), you should change the `AppState` declarations accordingly:
 
-```ueml /bucket="settings"/
+```xmlui /bucket="settings"/
 <!-- Main.xmlui -->
 <AppState id="appState" bucket="settings" initialValue="{{ enhancedMode: false }}"/>
 

@@ -26,7 +26,7 @@ The data is provided as JSON.
 Note how the `List` infers the given data and provides a simple layout for it.
 To tweak what data and how it is displayed, see the [`itemTemplate` section](#itemtemplate).
 
-```ueml copy
+```xmlui copy
 <App>
   <List data='{[...]}' />
 </App>
@@ -47,7 +47,7 @@ You can also provide the `List` with data directly from an API via this property
 In the example below, the `List` also uses the `itemTemplate` property to access the data attributes as well.
 See the [itemTemplate section](#itemtemplate).
 
-```ueml copy {2}
+```xmlui copy {2}
 <App>
   <List data='https://api.spacexdata.com/v3/rockets'>
     <property name="itemTemplate">
@@ -88,7 +88,7 @@ For the `defaultGroups` property to work, the data must be sectioned using the [
 and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 </Callout>
 
-```ueml copy {4}
+```xmlui copy {4}
 <App>
   <List
     data='{[...]}'
@@ -126,7 +126,7 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
 
 %-PROP-START emptyListTemplate
 
-```ueml copy
+```xmlui copy
 <App>
   <List>
     <property name="emptyListTemplate">
@@ -158,7 +158,7 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
 
 %-PROP-START idKey
 
-```ueml /idKey="key"/
+```xmlui /idKey="key"/
 <App>
   <List idKey="key" data='{[...]}' />
 </App>
@@ -180,7 +180,7 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
 
 Note how in the example below the `$item` is used to access the `name`, `quantity` and `unit` attributes.
 
-```ueml copy {3-14}
+```xmlui copy {3-14}
 <App>
   <List data='{[...]}'>
     <property name="itemTemplate">
@@ -226,7 +226,7 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 
 %-PROP-START limit
 
-```ueml /limit="4"/
+```xmlui /limit="4"/
 <App>
   <List limit="4" data='{[...]}' />
 </App>
@@ -246,7 +246,7 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 
 %-PROP-START loading
 
-```ueml copy
+```xmlui copy
 <App>
   <List loading="true" />
 </App>
@@ -266,7 +266,7 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 
 %-PROP-START orderBy
 
-```ueml /orderBy="{{ field: 'quantity', direction: 'desc' }}"/
+```xmlui /orderBy="{{ field: 'quantity', direction: 'desc' }}"/
 <App>
   <List orderBy="{{ field: 'quantity', direction: 'desc' }}" data='{[...]}' />
 </App>
@@ -306,7 +306,7 @@ For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeade
 or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 </Callout>
 
-```ueml copy {3}
+```xmlui copy {3}
 <App>
   <List
     data='{[...]}'
@@ -352,7 +352,7 @@ The structure of `$group` in a `groupFooterTemplate` is the following:
 
 This example displays a separator line in the groups' footer:
 
-```ueml copy {8-12}
+```xmlui copy {8-12}
 <App>
   <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
     <property name="groupHeaderTemplate">
@@ -402,7 +402,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 | items     | The items filtered from the original data list that fall into this section.                                   |
 | key       | The attribute name to section by provided via `groupBy`                                                       |
 
-```ueml copy {3-7}
+```xmlui copy {3-7}
 <App>
   <List data='{[...]}' groupBy="category">
     <property name="groupHeaderTemplate">
@@ -434,7 +434,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 
 %-PROP-START selectedIndex
 
-```ueml /selectedIndex="5"/
+```xmlui /selectedIndex="5"/
 <App>
   <List selectedIndex="5" data='{[...]}' />
 </App>
@@ -454,7 +454,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 
 %-PROP-START scrollAnchor
 
-```ueml /scrollAnchor="bottom"/
+```xmlui /scrollAnchor="bottom"/
 <App>
   <List scrollAnchor="bottom" data='{${JSON.stringify(data, null, 2)}}' />
 </App>
@@ -474,7 +474,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 
 %-PROP-START availableGroups
 
-```ueml {5}
+```xmlui {5}
 <App>
   <List
     data="{[...]}"
@@ -511,7 +511,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 
 Note how the `List` on the right has different borders:
 
-```ueml /borderCollapse/
+```xmlui /borderCollapse/
 <App>
   <HStack>
     <List data="{[...]}" groupBy="category" borderCollapse="false" width="$space-48">
@@ -563,7 +563,7 @@ Note how the `List` on the right has different borders:
 
 Note how the groups in the right `List` are expanded by default:
 
-```ueml {3, 10}
+```xmlui {3, 10}
 <App>
   <HStack gap="$space-2">
     <List data="{[...]}" groupBy="category" groupsInitiallyExpanded="false" width="$space-48">
@@ -615,7 +615,7 @@ Note how the groups in the right `List` are expanded by default:
 
 Note how the `meats` category is not displayed in the right `List`:
 
-```ueml {7, 19}
+```xmlui {7, 19}
 <App>
   <HStack gap="$space-2">
     <List
@@ -684,7 +684,7 @@ Note how the `meats` category is not displayed in the right `List`:
 
 The following example demonstrates `scrollToBottom` and all the other scroll methods:
 
-```ueml copy /scrollToBottom/ /scrollToTop/ /scrollToIndex/ /scrollToId/
+```xmlui copy /scrollToBottom/ /scrollToTop/ /scrollToIndex/ /scrollToId/
 <App layout="condensed-sticky">
   <AppHeader>
     <HStack>

@@ -9,7 +9,7 @@ It is a small visual element, which is used to graphically represent functions, 
 The engine looks up the icon in its [registry]() and determines which icon is associated with the name that the component will show.
 Nothing is displayed if the icon name is not found in the registry.
 
-```ueml copy /name/
+```xmlui copy /name/
 <App>
   <HStack>
     <Icon name="message" />
@@ -42,7 +42,7 @@ Nothing is displayed if the icon name is not found in the registry.
 
 %-PROP-START fallback
 
-```ueml copy /fallback="trash"/
+```xmlui copy /fallback="trash"/
 <App>
   <Icon name="noicon" fallback="trash" />
 </App>
@@ -61,7 +61,7 @@ Nothing is displayed if the icon name is not found in the registry.
 
 %-PROP-START size
 
-```ueml copy /size/
+```xmlui copy /size/
 <App>
   <HStack>
     <Icon name="like" />

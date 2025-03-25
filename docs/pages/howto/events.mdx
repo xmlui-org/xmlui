@@ -8,7 +8,7 @@ In this article, you will learn how to manage a few typical situations related t
 
 In the following example, a button's click event handler runs for 3 seconds. Nonetheless, you can click the button several times before the 3 seconds expires:
 
-```ueml copy
+```xmlui copy
 <App var.logClick="">
   <Button label="I'm running for 3 seconds, click me!"
     onClick="
@@ -43,7 +43,7 @@ XMLUI has built-in support to check if a particular event handler is in progress
 
 The following sample demonstrates how you can use it. Here, the button is enabled only if the click event handler is not running:
 
-```ueml copy {4} /clickInProgress/
+```xmlui copy {4} /clickInProgress/
 <App var.logClick="">
   <Button
     id="myButton"
@@ -84,7 +84,7 @@ Though the `<event>InProgress` property (see <SmartLink href="#test-if-an-event-
 
 For this purpose, you must use a variable tracking the progress as the following sample demonstrates:
 
-```ueml copy /phase/
+```xmlui copy /phase/
 <App var.phase="n/a">
   <Button
     id="myButton"
@@ -133,7 +133,7 @@ Click the button and check how it reports progress:
 
 You can combine the report progress mechanism with a `ChangeListener` component to catch progress change events:
 
-```ueml copy
+```xmlui copy
 <App var.phase="n/a" var.logEntries="">
   <ChangeListener
     listenTo="{phase}"

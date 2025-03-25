@@ -7,7 +7,7 @@ import themeGallery from "../styles-and-themes/samples/theme-gallery-brief.xmlui
   **XMLUI apps** are declarative. You define an app with an XMLUI (XML) markup. [Learn more!](./learning/xmlui-markup)
 </Callout>
 
-```ueml
+```xmlui
 <App>
   Hello, world!
 </App>
@@ -16,7 +16,7 @@ import themeGallery from "../styles-and-themes/samples/theme-gallery-brief.xmlui
   **Components** are the basic building blocks of XMLUI apps. A component is an XML element (tag) in the markup. [Learn more!](./learning/xmlui-markup/#tags)
 </Callout>
 
-```ueml /Avatar/
+```xmlui /Avatar/
 <Avatar url="https://i.pravatar.cc/100" size="md" />
 ```
 
@@ -26,7 +26,7 @@ import themeGallery from "../styles-and-themes/samples/theme-gallery-brief.xmlui
   Components have **properties** that determine their appearance and behavior. Properties are declared as XML attributes when they can be represented with strings.
 </Callout>
 
-```ueml /url/ /size/
+```xmlui /url/ /size/
 <Avatar url="https://i.pravatar.cc/100" size="md" />
 ```
 
@@ -36,7 +36,7 @@ import themeGallery from "../styles-and-themes/samples/theme-gallery-brief.xmlui
   When properties cannot be represented with a string, you nest them into their related component with the **`<property>` tag**. [Learn more!](./learning/xmlui-markup/#properties)
 </Callout>
 
-```ueml {2-4}
+```xmlui {2-4}
 <DropdownMenu>
   <property name="triggerTemplate">
     <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
@@ -53,7 +53,7 @@ import themeGallery from "../styles-and-themes/samples/theme-gallery-brief.xmlui
   Besides literal values, component property values may have **expressions** (wrapped between curly braces). These use simple expression syntax, and the engine will evaluate them.
 </Callout>
 
-```ueml /{customer.name}/
+```xmlui /{customer.name}/
 <Button label="Click to delete {customer.name}" />
 ```
 
@@ -65,7 +65,7 @@ If the `customer.name` expression evaluates to "Jane Templeton", the button's la
   Defining **event handlers** with expressions or short scripts (with statements, loops, and other constructs) can change how components respond to particular events. [Learn more!](./learning/xmlui-markup/#event-handlers)
 </Callout>
 
-```ueml /onClick/
+```xmlui /onClick/
 <Button label="See order ID" onClick="toast('Current order: ' + orderId)" />
 ```
 When the user clicks this button, the app will pop up a toast with the ID held by the `orderId` value.
@@ -74,14 +74,14 @@ When the user clicks this button, the app will pop up a toast with the ID held b
   Components may have an **ID**. Other components can utilize this ID to refer to **exposed component members** (values and methods).
 </Callout>
 
-```ueml /id=myText/
+```xmlui /id=myText/
 <TextBox id="myText" />
 <Text>Value in the textbox: {myText.value}</Text>
 ```
 
 As the user types in the textbox, the text value is displayed in the `Text` component beneath it.
 
-```ueml /id=myText/
+```xmlui /id=myText/
 <List id="accountsList" />
 <!-- Some other components -->
 <Button label="Last account" onClick="accountsList.scrollToEnd()">
@@ -93,7 +93,7 @@ When the user clicks the button, the list above scrolls to the bottom to show th
   Components can be hidden (or shown) in the UI conditionally. The **`when` attribute** of a component determines whether it is visible.
 </Callout>
 
-```ueml /when="{useCompression.value}"/
+```xmlui /when="{useCompression.value}"/
 <Checkbox id="useCompression" label="Use compression" />
 <Checkbox when="{useCompression.value}" label="Use lossless compression" />
 <Checkbox label="Convert to grayscale" />
@@ -108,7 +108,7 @@ The "Use lossless compression" checkbox is visible only when the "Use compressio
   Many XMLUI components handle data fetching from an API (using GET) in the `data` property.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <List data="https://api.spacexdata.com/v3/history">
   <property name="itemTemplate">
     <Card title="{$item.title}" subtitle="{$item.details}"/>
@@ -123,7 +123,7 @@ The `List` component fetches data from the specified URL (an array of items). Wi
   Components can **invoke API endpoints that mutate data**. You can use the **`<event>` tag** to bind the invocation of a particular endpoint to a component's event handler. An **APICall component** can declare the details of the invocation.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <Button label="Delete completed tasks">
   <event name="click">
     <APICall url="/api/tasks/completed" method="delete" />
@@ -142,7 +142,7 @@ The `List` component fetches data from the specified URL (an array of items). Wi
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
   <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /calcButton/
+```xmlui copy filename="Main.xmlui (markup)" /calcButton/
 <Button id="calcButton"
   label="Calculate delay" />
 
@@ -168,7 +168,7 @@ The button's ID is `calcButton`. The framework observes the `calcButton_onClick`
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
   <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
+```xmlui copy filename="Main.xmlui (markup)" /handleOnClick/
 <Button
   label="Calculate delay"
   onClick="handleOnClick()" />
@@ -191,7 +191,7 @@ The button is the `Main.xmlui` file utilizes the `handleOnClick` function declar
   Using wrapping braces, you can add **inline code expressions** to **property** and **element text values**. You can use the JavaScript syntax for them; the framework evaluates them using JavaScript semantics.
 </Callout>
 
-```ueml copy /{tasks.length}/ /initialValue="{customer.name}"/ /delay="{calculatedDelay * (1 + reservePercentage * 0.01)} minutes"/
+```xmlui copy /{tasks.length}/ /initialValue="{customer.name}"/ /delay="{calculatedDelay * (1 + reservePercentage * 0.01)} minutes"/
 <Text>There are {tasks.length} tasks in the list.</Text>
 <TextBox initialValue="{customer.name}">
 ```
@@ -201,7 +201,7 @@ The button is the `Main.xmlui` file utilizes the `handleOnClick` function declar
   (You can break the code into multiple lines.)
 </Callout>
 
-```ueml copy /onClick/
+```xmlui copy /onClick/
 <Button label="Calculate delay" onClick="
   const delay = 500 * 2;
   toast('Delay calculated: ' + delay);
@@ -217,7 +217,7 @@ The button is the `Main.xmlui` file utilizes the `handleOnClick` function declar
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
   <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
+```xmlui copy filename="Main.xmlui (markup)" /handleOnClick/
 <Button
   label="Click to increment!"
   onClick="count++" />
@@ -245,7 +245,7 @@ You can use **local variables** within (and only within) function declarations. 
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
   <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
+```xmlui copy filename="Main.xmlui (markup)" /handleOnClick/
 <Button
   label="Calculate the sum of 1 to 10"
   onClick="calculate()" />
@@ -270,7 +270,7 @@ The calculate function uses the local variable `i` and stores the sum of values 
   Components may have properties that accept other component definitions (markup) as their value. We call them **template properties**.
 </Callout>
 
-```ueml copy {2-4} /property name="itemTemplate"/
+```xmlui copy {2-4} /property name="itemTemplate"/
 <List items="{['apple', 'banana', 'cherry', 'orange']}">
   <property name="itemTemplate">
     <Text variant="mono">{$item}</Text>
@@ -295,7 +295,7 @@ In the markup above, `$item` in `<Text variant="mono">{$item}</Text>` is a conte
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
   <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /calcButton/
+```xmlui copy filename="Main.xmlui (markup)" /calcButton/
 <InfoCard icon="email" label="Send email" />
 <InfoCard icon="phone" label="Start call" />
 <InfoCard icon="home" label="Back to home" />
@@ -305,7 +305,7 @@ In the markup above, `$item` in `<Text variant="mono">{$item}</Text>` is a conte
 ```
   </div>
   <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```ueml copy filename="InfoCard.xmlui (reusable component)"
+```xmlui copy filename="InfoCard.xmlui (reusable component)"
 <Component name="InfoCard">
   <Card>
     <Icon name="{$props.icon}" />
@@ -410,7 +410,7 @@ These modifications set the primary theme color to purplish and add a bigger cor
   You can use dozens of **inline layout properties** with components such as setting component dimensions, colors, typography, etc.
 </Callout>
 
-```ueml copy {3-7}
+```xmlui copy {3-7}
 <Button
   label="My custom style"
   color="yellow"

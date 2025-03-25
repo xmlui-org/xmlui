@@ -16,7 +16,7 @@ See also: [\`HSplitter\`](./HSplitter.mdx), [\`VSplitter\`](./VSplitter.mdx).
 
 Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged. The default value is `false`, meaning the resizer is visible all the time.
 
-```ueml copy /floating="true"/
+```xmlui copy /floating="true"/
 <App>
   <Splitter height="200px" floating="true">
     <Stack backgroundColor="lightblue" height="100%" />
@@ -41,7 +41,7 @@ Toggles whether the resizer is visible (`false`) or not (`true`) when not hovere
 
 This optional number property sets the initial size of the primary section. The unit of the size value is in pixels or percentages.
 
-```ueml copy /initialPrimarySize="40%"/
+```xmlui copy /initialPrimarySize="40%"/
 <App>
   <Splitter height="200px" initialPrimarySize="40%">
     <Stack backgroundColor="lightblue" height="100%" />
@@ -66,7 +66,7 @@ This optional number property sets the initial size of the primary section. The 
 
 This property sets the maximum size the primary section can have. The unit of the size value is in pixels or percentages.
 
-```ueml copy /maxPrimarySize="80%"/
+```xmlui copy /maxPrimarySize="80%"/
 <App>
   <Splitter height="200px" maxPrimarySize="80%">
     <Stack backgroundColor="lightblue" height="100%" />
@@ -91,7 +91,7 @@ This property sets the maximum size the primary section can have. The unit of th
 
 This property sets the minimum size the primary section can have. The unit of the size value is in pixels or percentages.
 
-```ueml copy /minPrimarySize="40px"/
+```xmlui copy /minPrimarySize="40px"/
 <App>
   <Splitter height="200px" minPrimarySize="40px">
     <Stack backgroundColor="lightblue" height="100%" />
@@ -118,7 +118,7 @@ Sets whether the `Splitter` divides the container horizontally and lays out the 
 
 Available values: `horizontal`, `vertical` **(default)**
 
-```ueml copy /orientation="horizontal"/
+```xmlui copy /orientation="horizontal"/
 <App>
   <Splitter height="200px" orientation="horizontal">
     <Stack backgroundColor="lightblue" height="100%" />
@@ -143,7 +143,7 @@ Available values: `horizontal`, `vertical` **(default)**
 
 The divider can be customized using XMLUI components via this property.
 
-```ueml copy {2-4}
+```xmlui copy {2-4}
 <App>
   <Splitter height="200px">
     <property name="splitterTemplate">
@@ -174,7 +174,7 @@ The divider can be customized using XMLUI components via this property.
 
 This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.
 
-```ueml copy /swapped="true"/
+```xmlui copy /swapped="true"/
 <App>
   <Splitter height="200px" swapped="true">
     <Stack backgroundColor="lightblue" height="100%" />
@@ -201,7 +201,7 @@ This optional booelan property indicates whether the `Splitter` sections are lay
 
 This event fires when the component is resized.
 
-```ueml copy {2}
+```xmlui copy {2}
 <App height="200px" var.counter="{0}">
   <Splitter onResize="counter++">
     <Stack backgroundColor="lightblue" height="100%">

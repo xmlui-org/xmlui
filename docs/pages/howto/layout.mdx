@@ -17,7 +17,7 @@ However, these alignments seem to be ignored if the stack does not have an expli
 
 In this case, the stack's height is the same as its contents, so all vertical alignments (start, end, and center) will display the child component as it is. The following sample demonstrates this:
 
-```ueml copy /verticalAlignment="center"/
+```xmlui copy /verticalAlignment="center"/
 <App backgroundColor="lightgray">
   <VStack verticalAlignment="center" backgroundColor="cyan">
     This is some text within a Stack
@@ -41,7 +41,7 @@ Though you expect the text to be aligned vertically in the middle of the app, it
 
 With an explicit size, you will see the effect of `verticalAlignment`:
 
-```ueml copy /height="100px"/
+```xmlui copy /height="100px"/
 <App backgroundColor="lightgray">
   <VStack verticalAlignment="center" height="100px" backgroundColor="cyan">
     This is some text within a Stack
@@ -69,7 +69,7 @@ When you nest components into each other, the vertical alignment may produce sur
 
 Here is an example using a Table. The unexpected result is when you click Clear data, as the "Nothing here!" text appears at the top of the table's placeholder, though you use this definition for `noDataTemplate`:
 
-```ueml copy /height="100%"/ /verticalAlignment="center"/
+```xmlui copy /height="100%"/ /verticalAlignment="center"/
 <property name="noDataTemplate">
   <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
     Nothing here!
@@ -109,7 +109,7 @@ Click the Clear data (and the Reload data) buttons to check the issue:
 
 When you look at the markup, you can see that the outermost `VStack` has an explicit height, set to "100%":
 
-```ueml copy /height="100%"/
+```xmlui copy /height="100%"/
 <App
   backgroundColor="cyan"
   height="100%"
@@ -136,7 +136,7 @@ The cause of the issue is that the `noDataTemplate` is within the `Table` compon
 
 You can quickly fix this issue by specifying the table height explicitly:
 
-```ueml /height="*"/
+```xmlui /height="*"/
 <Table data='{tableData}' height="*" backgroundColor="lightgreen">
   <!-- Unchanged -->
 </Table>
@@ -182,7 +182,7 @@ The "*" is start sizing. It means that the container should stretch itself to it
 
 You can easily create complex layouts with a few layout containers within `App`, as the following sample demonstrates:
 
-```ueml copy
+```xmlui copy
 <App height="100%" scrollWholePage="false">
   <Theme thickness-resizer-Splitter="4px" backgroundColor-resizer-Splitter="blue">
     <VStack height="100%" gap="0">

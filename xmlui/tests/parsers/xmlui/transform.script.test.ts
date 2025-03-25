@@ -3,7 +3,7 @@ import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractio
 import { Expression, ModuleErrors } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 import { transformSource } from "./xmlui";
 
-describe("Ueml transform - script", () => {
+describe("Xmlui transform - script", () => {
 
   it("Script works with empty text #2", () => {
     const cd = transformSource(`<Stack><script>   </script></Stack>`) as ComponentDef;

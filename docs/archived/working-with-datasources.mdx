@@ -34,7 +34,7 @@ Test the backend by adding code that triggers an API endpoint. There is a specif
 
 To fetch this simple data, replace the contents of the `Main.xmlui` file with the following:
 
-```ueml copy filename="Main.xmlui" 
+```xmlui copy filename="Main.xmlui" 
 <App layout="vertical-full-header">
   <AppHeader>
     <Text variant="title">DataSource Tutorial</Text>
@@ -68,7 +68,7 @@ This property is useful for components that can display a list of items (such as
 Add the highlighted `NavLink` and `Page` components to the code in the "Main.xmlui" file to populate the `List` component with data!
 For the sake of brevity, from now on, we omit the majority of the existing code and shorten the instructions like here:
 
-```ueml copy filename="Main.xmlui" {2, 4-6}
+```xmlui copy filename="Main.xmlui" {2, 4-6}
 <!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Simple Data Load" to="/get-data" />
 <!-- Append this Page as the last within Pages -->
@@ -80,7 +80,7 @@ For the sake of brevity, from now on, we omit the majority of the existing code 
 
 This short form replaces the entire contents of the `Main.xmlui` file, which should be after following the instructions:
 
-```ueml copy filename="Main.xmlui" {7,14-16}
+```xmlui copy filename="Main.xmlui" {7,14-16}
 <App layout="vertical-full-header">
   <AppHeader>
     <Text variant="title">DataSource Tutorial</Text>
@@ -126,7 +126,7 @@ However, you have to use the `DataSource` component instead of the `data` proper
 
 In the `Main.xmlui` file, create a new page with a `DataSource` component and a `List` using the `data` property:
 
-```ueml copy filename="Main.xmlui" {2, 4-7}
+```xmlui copy filename="Main.xmlui" {2, 4-7}
 <!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Filtering Data" to="/filter" />
 <!-- Append this Page as the last within Pages -->
@@ -141,7 +141,7 @@ The `DataSource` component manages the gritty-nitty details of fetching the data
 
 This modification will still list the same data.You can manipulate it like a regular Javascript array. Change the `data` property of `List` to apply a filter condition:
 
-```ueml copy filename="Main.xmlui" /.filter(item => !item.inPantry)/
+```xmlui copy filename="Main.xmlui" /.filter(item => !item.inPantry)/
 <!-- Omitted -->
 <Page url="/filter">
   <DataSource id="filteredGroceries" url="/api/shopping-list" />
@@ -160,7 +160,7 @@ The filtered list contains fewer items, only those for which the `inPantry` prop
 By default, the `List` has a loading spinner that is automatically rendered when data is loaded via the `data` prop.
 You can try it with this code:
 
-```ueml copy filename="Main.xmlui" {2, 4-6}
+```xmlui copy filename="Main.xmlui" {2, 4-6}
 <!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Loading Indicators" to="/loading" />
 <!-- Append this Page as the last within Pages -->
@@ -181,7 +181,7 @@ However, if you use the `data` property of `List` to specify the data, the compo
 
 If you want the `List` to know that data fetching is in progress, use the `loading` property. Update the `Main.xmlui` file:
 
-```ueml copy filename="Main.xmlui" /loading="{slowGroceries.inProgress}"/
+```xmlui copy filename="Main.xmlui" /loading="{slowGroceries.inProgress}"/
 <!-- Omitted -->
 <Page url="/loading">
   <DataSource id="slowGroceries" url="/api/shopping-list-slow" />
@@ -201,7 +201,7 @@ Luckily, the `DataSource` component provides a handy property called `resultSele
 
 Add the following lines highlighted below in the code block:
 
-```ueml copy filename="Main.xmlui" {2, 4-7}
+```xmlui copy filename="Main.xmlui" {2, 4-7}
 <!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Granular Data Selection" to="/result-selector" />
 <!-- Append this Page as the last within Pages -->
@@ -230,7 +230,7 @@ The reason for this unexpected message is that the response coming from the `/ap
 
 The `meta` attribute contains some extra information regarding the data coming through but you are only interested in the actual list of shopping items. You can opt to select the `items` key like so:
 
-```ueml copy filename="Main.xmlui" /selectedGroceries.value.items/
+```xmlui copy filename="Main.xmlui" /selectedGroceries.value.items/
 <!-- Omitted -->
 <Page url="/result-selector">
   <DataSource id="selectedGroceries" url="/api/shopping-list-meta" />
@@ -241,7 +241,7 @@ The `meta` attribute contains some extra information regarding the data coming t
 
 If you refer to this `DataSource` in several locations, you have to consider the shape of the response and apply the `items` property in each reference. However, you can use the `resultSelector` property of `DataSource` instead to make your code easier to maintain:
 
-```ueml copy filename="Main.xmlui" /resultSelector="items"/
+```xmlui copy filename="Main.xmlui" /resultSelector="items"/
 <!-- Omitted -->
 <Page url="/result-selector">
   <DataSource id="selectedGroceries" url="/api/shopping-list-meta" resultSelector="items" />
@@ -260,7 +260,7 @@ In the <SmartLink href="#filtering-incoming-data">Filtering Incoming Data</Smart
 
 Add a new route with the URL `/query-params`:
 
-```ueml copy filename="Main.xmlui" {2, 4-7}
+```xmlui copy filename="Main.xmlui" {2, 4-7}
 <!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Using Query Parameters" to="/query-params" />
 <!-- Append this Page as the last within Pages -->
@@ -273,7 +273,7 @@ Add a new route with the URL `/query-params`:
 
 Specifying query parameters is done using key-value pairs in the `queryParams` property:
 
-```ueml copy filename="Main.xmlui" /queryParams="{{ limit: 4, inPantry: true }}"/
+```xmlui copy filename="Main.xmlui" /queryParams="{{ limit: 4, inPantry: true }}"/
 <!-- Omitted -->
 <Page url="/query-params">
   <DataSource 
@@ -304,7 +304,7 @@ In the following example, the backend requires a header named `x-api-key` to be 
 
 To add headers to the requests you make, start by adding a new `Page`:
 
-```ueml copy filename="Main.xmlui" {2, 4-7}
+```xmlui copy filename="Main.xmlui" {2, 4-7}
 <!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Using Headers" to="/headers" />
 <!-- Append this Page as the last within Pages -->
@@ -317,7 +317,7 @@ To add headers to the requests you make, start by adding a new `Page`:
 
 When you move to the newly added page, it does not display data (instead, it displays an error), as the invoked API expects information in the `x-api-key` header. Modify the code to send this header:
 
-```ueml copy filename="Main.xmlui" /headers="{{ 'x-api-key': '0001' }}"/
+```xmlui copy filename="Main.xmlui" /headers="{{ 'x-api-key': '0001' }}"/
 <!-- Omitted -->
 <Page url="/headers">
   <DataSource 
@@ -347,7 +347,7 @@ This marks the currently displayed data as stale and enforces a new request to t
 
 Add another `Page` and `NavLink` to the `Pages` and `NavPanel` components respectively:
 
-```ueml copy filename="Main.xmlui" {2, 4-7}
+```xmlui copy filename="Main.xmlui" {2, 4-7}
 <!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Refetching" to="/refetch" />
 <!-- Append this Page as the last within Pages -->
@@ -360,7 +360,7 @@ Add another `Page` and `NavLink` to the `Pages` and `NavPanel` components respec
 
 Next, add a Button to tie the `refetch` function to the Button's `onClick` method:
 
-```ueml copy filename="Main.xmlui" {4-7}
+```xmlui copy filename="Main.xmlui" {4-7}
 <!-- Omitted -->
 <Page url="/refetch">
   <DataSource id="refetchedGroceries" url="/api/shopping-list" />
@@ -376,7 +376,7 @@ Next, add a Button to tie the `refetch` function to the Button's `onClick` metho
 Finally, to see how many times the refetch happened, add a `Text` element with a variable called counter.
 You also need to increase the counter when the `refetch` is fired:
 
-```ueml copy filename="Main.xmlui" {2, 7, 8}
+```xmlui copy filename="Main.xmlui" {2, 7, 8}
 <!-- Omitted -->
 <Page url="/refetch" var.counter="{0}">
   <DataSource id="refetchedGroceries" url="/api/shopping-list" />
@@ -401,7 +401,7 @@ In this scenario, you will request data from the `/api/shopping-item-unconventio
 
 Add another `Page` and `NavLink` to the `Pages` and `NavPanel` components respectively:
 
-```ueml copy filename="Main.xmlui" {2, 4}
+```xmlui copy filename="Main.xmlui" {2, 4}
 <!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Unconventional Endpoints" to="/unconventional" />
 <!-- Append this Page as the last within Pages -->
@@ -414,7 +414,7 @@ Add another `Page` and `NavLink` to the `Pages` and `NavPanel` components respec
 
 However, this request will not work, as there is no GET endpoint for the specified URL. Let's modify the request to use a POST and pass the parameter of the request in its body:
 
-```ueml copy filename="Main.xmlui" {2, 6-8}/
+```xmlui copy filename="Main.xmlui" {2, 6-8}/
 <!-- Omitted -->
 <Page url="/unconventional" var.itemId="{10}">
   <DataSource 
@@ -440,7 +440,7 @@ In this section you will modify the original `List` to load its content in pages
 
 First, add a new `Page` with a simple data list:
 
-```ueml copy filename="Main.xmlui" {2, 4}
+```xmlui copy filename="Main.xmlui" {2, 4}
 <!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Paging" to="/pagination" />
 <!-- Append this Page as the last within Pages -->
@@ -455,7 +455,7 @@ First, add a new `Page` with a simple data list:
 
 Next, you will set the page size in the request query parameters (`queryParams`) and also set the next page selector (`nextPageSelector`):
 
-```ueml copy filename="Main.xmlui" {6-7}
+```xmlui copy filename="Main.xmlui" {6-7}
 <!-- Omitted -->
 <Page url="/pagination">
   <DataSource
@@ -476,7 +476,7 @@ the first is the page size (`size`), the second is the item ID set in the `nextP
 
 One last thing is to create a trigger to keep fetching new pages. Add a `Button` component with the following `click` event and a `Text` component to display the number of loaded items:
 
-```ueml copy filename="Main.xmlui" {3-6}
+```xmlui copy filename="Main.xmlui" {3-6}
 <!-- Omitted -->
 <Page url="/pagination">
   <HStack gap="1rem">
@@ -516,7 +516,7 @@ In this section, you will set up polling to fetch a number of newly added grocer
 
 Add a new `Page` and set the `pollIntervalInSeconds` property to the `DataSource` specifying a reasonably large re-fetch frequency to see it in action:
 
-```ueml copy filename="Main.xmlui" {2, 4}
+```xmlui copy filename="Main.xmlui" {2, 4}
 <!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Polling" to="/polling" />
 <!-- Append this Page as the last within Pages -->

@@ -46,7 +46,7 @@ Available values:
 
 Here are a few samples demonstrating the usage of the `layout` property. All samples use this markup, except the value of `App`'s layout and a few marked code snippets:
 
-```ueml
+```xmlui
 <App layout="(specific layout value)">
   <!-- AppHeader omitted for "vertical" and "vertical-sticky" -->
   <AppHeader>
@@ -125,7 +125,7 @@ Stores information about the currently logged in user.
 Stores information about the currently logged in user.
 Currently, there is no restriction on what the user data must look like.
 
-```ueml copy /loggedInUser="{{ name: 'Joe', token: '1234' }}"/
+```xmlui copy /loggedInUser="{{ name: 'Joe', token: '1234' }}"/
 <App loggedInUser="{{ name: 'Joe', token: '1234' }}">
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -189,7 +189,7 @@ This boolean property specifies whether the whole page should scroll (`true`) or
 This boolean property specifies whether the whole page should scroll (true) or just the content area (false).
 The default value is `true`.
 
-```ueml copy /scrollWholePage="false"/
+```xmlui copy /scrollWholePage="false"/
 <App scrollWholePage="false">
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -241,7 +241,7 @@ This event fires when the `App` component finishes rendering on the page.
 This event fires when the `App` component finishes rendering on the page.
 Use it as `onReady` when inlining it on the component.
 
-```ueml copy /onReady="isAppReady = true"/
+```xmlui copy /onReady="isAppReady = true"/
 <App onReady="isAppReady = true">
   <variable name="isAppReady" value="{false}"/>
   <Text value="{isAppReady ? 'App is ready' : 'Sadly, App is not ready'}" />
