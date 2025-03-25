@@ -521,7 +521,6 @@ export const ComboboxOption = forwardRef(function Combobox(
       keywords={keywords}
     >
       {optionLabelRenderer ? optionLabelRenderer({ label, value }) : label}
-      {JSON.stringify(selected)}
       {selected && <Icon name="checkmark" />}
     </CmdItem>
   );
