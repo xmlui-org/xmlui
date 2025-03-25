@@ -7,7 +7,7 @@ import {
   Tooltip,
   Legend as RLegend,
 } from "recharts";
-import type { PieSectorDataItem } from "recharts/types/polar/Pie";
+import { PieSectorDataItem } from "recharts/types/polar/Pie";
 import styles from "./PieChartNative.module.scss";
 import { useColors } from "xmlui";
 import type { CSSProperties, ReactNode } from "react";
@@ -96,7 +96,7 @@ export function PieChart({
             dataKey={dataKey}
             nameKey={nameKey}
             innerRadius={innerRadius}
-            label={showLabel}
+            label={showLabel ? ({ name }) => name : false}
             activeShape={({ outerRadius = 0, ...props }: PieSectorDataItem) => (
               <Sector {...props} outerRadius={outerRadius + 10} />
             )}
