@@ -1,7 +1,7 @@
 import { describe, it } from "vitest";
 import { transformSource } from "./xmlui";
 
-describe("Ueml transform - child elements", () => {
+describe("Xmlui transform - child elements", () => {
   it("Invalid element name fails #1", () => {
     const source = `
     <App>

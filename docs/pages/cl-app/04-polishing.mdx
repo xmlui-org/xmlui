@@ -29,7 +29,7 @@ The "true" value of the `contactCounts.inProgress` property indicates whether th
 
 Update the task count expression in the menu item labels to leverage the new, improved display:
 
-```ueml copy {4-8} filename="Main.xmlui"
+```xmlui copy {4-8} filename="Main.xmlui"
 <!-- Omitted -->
 <NavPanel>
   <NavLink label="Dashboard" to="/" />
@@ -78,7 +78,7 @@ The `loading` function displays the "loading..." text while the data is fetched 
 
 To display the section information, add the `groupBy` property to the `List` and define the template to display section headers:
 
-```ueml copy {5-11} filename="Contacts.xmlui" /groupBy="section"/ /map(extendWithSection)/
+```xmlui copy {5-11} filename="Contacts.xmlui" /groupBy="section"/ /map(extendWithSection)/
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <List data="{$props.data.map(extendWithSection)}"
@@ -116,7 +116,7 @@ The sections of a list can be expanded or collapsed. Unless you declare otherwis
 
 Update the `List` definition in `Contacts`:
 
-```ueml copy {5-19} filename="Contacts.xmlui" /$space-normal/ /$space-tight/
+```xmlui copy {5-19} filename="Contacts.xmlui" /$space-normal/ /$space-tight/
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <List data="{$props.data.map(extendWithSection)}"
@@ -154,7 +154,7 @@ The order of sections displayed above could be more helpful using a different or
 
 Modify the `List` accordingly:
 
-```ueml copy {4} filename="Contacts.xmlui"
+```xmlui copy {4} filename="Contacts.xmlui"
 <!-- Omitted -->
 <List 
   items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"

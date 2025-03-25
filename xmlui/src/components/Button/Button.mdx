@@ -10,7 +10,7 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START contentPosition
 
-```ueml copy
+```xmlui copy
 <App>
   <Button width="200px" icon="drive" label="Button" contentPosition="center" />
   <Button width="200px" icon="drive" label="Button" contentPosition="start" />
@@ -40,7 +40,7 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START icon
 
-```ueml
+```xmlui
   <App>
     <HStack>
       <Button icon="drive" label="Let there be drive" />
@@ -67,7 +67,7 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START iconPosition
 
-```ueml
+```xmlui
 <App>
   <HStack>
     <Button icon="drive" label="Left" />
@@ -110,7 +110,7 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START label
 
-```ueml copy
+```xmlui copy
 <App>
   <Button label="I am the button label" />
   <Button />
@@ -141,7 +141,7 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START variant
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button label="default (solid)" />
@@ -171,7 +171,7 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START themeColor
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button label="Button" themeColor="primary" />
@@ -199,7 +199,7 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START enabled
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button label="I am enabled (by default)" />
@@ -228,7 +228,7 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START size
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button icon="drive" label="default" />
@@ -274,7 +274,7 @@ Use the `Button` component to trigger various actions.
 
 %-EVENT-START click
 
-```ueml copy
+```xmlui copy
 <App>
   <Button label="Click me!" onClick="toast('Button clicked')" />
 </App>
@@ -294,7 +294,7 @@ Use the `Button` component to trigger various actions.
 
 %-EVENT-START gotFocus
 
-```ueml copy
+```xmlui copy
 <App var.text="No event" >
   <HStack verticalAlignment="center" >
     <Button label="First, click me!" 
@@ -408,7 +408,7 @@ Using a set of buttons with a fixed width or height is often helpful. So `Button
 
 Avoid setting the `width-Button` and `height-Button` styles in the theme definition. Instead, wrap the affected button group into a `Theme` component as in the following example:
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Theme width-Button="120px">

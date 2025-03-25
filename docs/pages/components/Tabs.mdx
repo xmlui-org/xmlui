@@ -12,7 +12,7 @@ Other child components will not be displayed.
 The `TabItem` component has a `label` prop to define the tab button label text.
 Content is provided to a tab via placing child components under the `TabItem`.
 
-```ueml copy
+```xmlui copy
 <App>
   <Tabs>
     <TabItem label="Account">
@@ -54,7 +54,7 @@ Content is provided to a tab via placing child components under the `TabItem`.
 
 This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab.
 
-```ueml copy /activeTab="2"/
+```xmlui copy /activeTab="2"/
 <App>
   <Tabs activeTab="2">
     <TabItem label="Account">
@@ -96,7 +96,7 @@ This property indicates the orientation of the component. In horizontal orientat
 
 Available values: `horizontal`, `vertical` **(default)**
 
-```ueml copy /orientation="horizontal"/
+```xmlui copy /orientation="horizontal"/
 <App>
   <Tabs orientation="horizontal">
     <TabItem label="Account">
@@ -136,7 +136,7 @@ Available values: `horizontal`, `vertical` **(default)**
 
 This property declares the template for the clickable tab area.
 
-```ueml copy {2-4}
+```xmlui copy {2-4}
 <App>
   <Tabs>
     <property name="tabTemplate">

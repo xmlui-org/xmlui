@@ -6,7 +6,7 @@ This component represents a dropdown menu with a trigger. When the user clicks t
 
 You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
 
-```ueml copy
+```xmlui copy
 <App>
   <DropdownMenu label="DropdownMenu">
     <MenuItem>Item 1</MenuItem>
@@ -58,7 +58,7 @@ Available values are:
 - `start`: Menu items are aligned to the start of the trigger component (default).
 - `end`: Menu items are aligned to the end of the trigger component.
 
-```ueml copy {8}
+```xmlui copy {8}
 <App>
   <HStack>
     <DropdownMenu label="Start-aligned menu (open it!)">
@@ -100,7 +100,7 @@ Available values are:
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```ueml copy {4, 11}
+```xmlui copy {4, 11}
 <App>
   <HStack>
     <DropdownMenu
@@ -193,7 +193,7 @@ Available values:
 
 This property allows you to define a custom trigger instead of the default one provided by `DropdownMenu`.
 
-```ueml copy {3-5}
+```xmlui copy {3-5}
 <App>
   <DropdownMenu label="(ignored)">
     <property name="triggerTemplate">
@@ -229,7 +229,7 @@ This property allows you to define a custom trigger instead of the default one p
 
 This event fires when the `DropdownMenu` component is opened.
 
-```ueml copy {6}
+```xmlui copy {6}
 <App>
   <variable name="counter" value="{0}" />
   <Text value="Number of times the dropdown was opened: {counter}" />
@@ -267,7 +267,7 @@ This event fires when the `DropdownMenu` component is opened.
 
 This method command closes the dropdown.
 
-```ueml copy {4}
+```xmlui copy {4}
 <App>
   <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
     <EmojiSelector

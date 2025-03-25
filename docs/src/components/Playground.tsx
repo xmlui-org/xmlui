@@ -89,7 +89,7 @@ export const Playground = ({
           previewMode: previewOnly,
           allowStandalone,
           id: 0,
-          language: "ueml",
+          language: "xmlui",
           fixedTheme,
         }),
       );

@@ -6,7 +6,7 @@ See the [`DropdownMenu` component](./DropdownMenu) for using this component in m
 
 %-PROP-START icon
 
-```ueml copy /icon/
+```xmlui copy /icon/
 <App>
   <DropdownMenu label="DropdownMenu">
     <MenuItem icon="drive">Item 1</MenuItem>
@@ -34,7 +34,7 @@ See the [`DropdownMenu` component](./DropdownMenu) for using this component in m
 
 %-PROP-START iconPosition
 
-```ueml copy /iconPosition/
+```xmlui copy /iconPosition/
 <App>
   <DropdownMenu label="DropdownMenu">
     <MenuItem icon="drive" iconPosition="start">Item 1</MenuItem>
@@ -62,7 +62,7 @@ See the [`DropdownMenu` component](./DropdownMenu) for using this component in m
 
 %-PROP-START active
 
-```ueml copy /active="true"/
+```xmlui copy /active="true"/
 <App>
   <DropdownMenu label="DropdownMenu">
     <MenuItem icon="drive" active="true">Item 1</MenuItem>
@@ -94,7 +94,7 @@ This event is fired when the user clicks the menu item. With an event handler, y
 
 If both properties are defined, `click` takes precedence.
 
-```ueml copy /onClick/
+```xmlui copy /onClick/
 <DropdownMenu label="DropdownMenu">
   <MenuItem onClick="toast('Item 1 clicked')">Item 1</MenuItem>
   <MenuItem onClick="toast('Item 2 clicked')">Item 2</MenuItem>

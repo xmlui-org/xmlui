@@ -2,7 +2,7 @@
 
 You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
 
-```ueml copy
+```xmlui copy
 <App>
   <DropdownMenu label="DropdownMenu">
     <MenuItem>Item 1</MenuItem>
@@ -44,7 +44,7 @@ Available values are:
 - `start`: Menu items are aligned to the start of the trigger component (default).
 - `end`: Menu items are aligned to the end of the trigger component.
 
-```ueml copy {8}
+```xmlui copy {8}
 <App>
   <HStack>
     <DropdownMenu label="Start-aligned menu (open it!)">
@@ -86,7 +86,7 @@ Available values are:
 
 %-PROP-START triggerTemplate
 
-```ueml copy {3-5}
+```xmlui copy {3-5}
 <App>
   <DropdownMenu label="(ignored)">
     <property name="triggerTemplate">
@@ -120,7 +120,7 @@ Available values are:
 
 %-PROP-START enabled
 
-```ueml copy {4, 11}
+```xmlui copy {4, 11}
 <App>
   <HStack>
     <DropdownMenu
@@ -168,11 +168,11 @@ Available values are:
 
 %-PROP-END
 
-```ueml copy {6}
+```xmlui copy {6}
 
 %-EVENT-START willOpen
 
-```ueml copy {6}
+```xmlui copy {6}
 <App>
   <variable name="counter" value="{0}" />
   <Text value="Number of times the dropdown was opened: {counter}" />
@@ -208,7 +208,7 @@ Available values are:
 
 %-API-START close
 
-```ueml copy {4}
+```xmlui copy {4}
 <App>
   <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
     <EmojiSelector

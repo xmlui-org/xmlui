@@ -17,7 +17,7 @@ The component accepts `Option` components as children defining a particular opti
 `Option` requires a `value` property and while also having a `label` that is displayed in the list.
 If the `label` is not specified `value` is shown.
 
-```ueml copy
+```xmlui copy
 <App>
   <Select>
     <Option value="opt1" label="first"/>
@@ -43,7 +43,7 @@ If the `label` is not specified `value` is shown.
 
 You can use `Select` with dynamic options:
 
-```ueml copy
+```xmlui copy
 <App>
   <Select>
     <Items data="{['one', 'two', 'three']}" >
@@ -77,7 +77,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 This property sets the height of the dropdown list.
 
-```ueml copy /dropdownHeight="180px"/
+```xmlui copy /dropdownHeight="180px"/
 <App>
   <Select dropdownHeight="180px">
     <Option value="opt1" label="first"/>
@@ -119,7 +119,7 @@ This optional property provides the ability to customize what is displayed when 
 
 Click on the second field to see the custom empty list indicator.
 
-```ueml copy {9-11}
+```xmlui copy {9-11}
 <App>
   <VStack>
     <Text value="Default:" />
@@ -161,7 +161,7 @@ Click on the second field to see the custom empty list indicator.
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```ueml copy
+```xmlui copy
 <App>
   <Select enabled="false" />
 </App>
@@ -180,7 +180,7 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the component's initial value.
 
-```ueml copy
+```xmlui copy
 <App>
   <Select initialValue="opt3">
     <Option value="opt1" label="first"/>
@@ -237,7 +237,7 @@ This property sets the maximum length of the input it accepts.
 
 The `true` value of the property indicates if the user can select multiple items.
 
-```ueml copy /multiSelect="true"/
+```xmlui copy /multiSelect="true"/
 <App>
   <Select multiSelect="true" dropdownHeight="180px" >
     <Option value="opt1" label="first"/>
@@ -279,7 +279,7 @@ This property allows replacing the default template to display an option in the 
 
 In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`. 
 
-```ueml copy {3-9} /optionLabelTemplate/
+```xmlui copy {3-9} /optionLabelTemplate/
 <App>
   <Select initialValue="{0}" placeholder="Select..." searchable>
     <property name="optionLabelTemplate">
@@ -323,7 +323,7 @@ In the template definition, you can use the `$item` context property to access t
 
 A placeholder text that is visible in the input field when its empty.
 
-```ueml copy
+```xmlui copy
 <App>
   <Select placeholder="Please select an item">
     <Option value="opt1" label="first"/>
@@ -371,7 +371,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-```ueml copy
+```xmlui copy
 <App>
   <Select />
   <Select validationStatus="valid" />
@@ -398,7 +398,7 @@ This property allows replacing the default template to display a selected value 
 
 In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`.  The `$itemContext` property provides a `removeItem` method to delete a value from the current selection.
 
-```ueml copy {3-15} /valueTemplate/
+```xmlui copy {3-15} /valueTemplate/
 <App>
   <Select initialValue="{0}" placeholder="Select..." multiSelect>
     <property name="valueTemplate">
@@ -456,7 +456,7 @@ In the template definition, you can use the `$item` context property to access t
 
 This event is triggered when value of Select has changed.
 
-```ueml copy /onDidChange="(newItem) => newValue = newItem"/
+```xmlui copy /onDidChange="(newItem) => newValue = newItem"/
 <App>
   <variable name="newValue" value="" />
   <Text value="{newValue}" />
@@ -488,7 +488,7 @@ This event is triggered when value of Select has changed.
 
 This event is triggered when the Select has received the focus.
 
-```ueml copy {5-6}
+```xmlui copy {5-6}
 <App>
   <variable name="isFocused" value="{false}" />
   <Text value="Input control is focused: {isFocused}" />
@@ -530,7 +530,7 @@ This event is triggered when the Select has lost the focus.
 
 This method sets the focus on the Select.
 
-```ueml copy /onClick="inputControl.focus()"/
+```xmlui copy /onClick="inputControl.focus()"/
 <App>
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <Select id="inputControl">
@@ -560,7 +560,7 @@ This method sets the focus on the Select.
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-```ueml copy
+```xmlui copy
 <App>
   <Select id="inputControl">
     <Option value="opt1" label="first"/>

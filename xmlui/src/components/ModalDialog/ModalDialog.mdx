@@ -18,7 +18,7 @@ It also lends to itself that these events can be triggered programmatically from
 Note the `id` property of the `ModalDialog` in the example below and how it is used to call the [`open`](#open-api) and [`close`](#close-api)
 operations of the component in the `onClick` event handlers.
 
-```ueml copy
+```xmlui copy
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog">
@@ -51,7 +51,7 @@ The `when` property accepts a primitive boolean or a binding expression resolvin
 Using the `when` property in a `ModalDialog` dialog component is commonly used with deep linking:
 showing the modal in conjunction with an updated URL so that the opened state of the modal dialog is referable.
 
-```ueml copy /when="{isDialogShown}"/
+```xmlui copy /when="{isDialogShown}"/
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <variable name="isDialogShown" value="{false}"/>
   <Button label="Open Dialog" onClick="isDialogShown = true" />
@@ -82,7 +82,7 @@ Setting the `when` property is the most straightforward way for deep-linked moda
 
 The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx), that it also accepts child components.
 
-```ueml copy {3-8}
+```xmlui copy {3-8}
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog">
@@ -118,7 +118,7 @@ When a form is nested into a modal dialog, closing the form (canceling it or com
 
 %-PROP-START fullScreen
 
-```ueml copy /fullScreen="true"/
+```xmlui copy /fullScreen="true"/
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" fullScreen="true" title="Example Dialog" />
@@ -142,7 +142,7 @@ Click the button to display a full-screen dialog. The icon at the top-right corn
 
 %-PROP-START title
 
-```ueml copy {3}
+```xmlui copy {3}
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Title" />
@@ -164,7 +164,7 @@ Click the button to display a full-screen dialog. The icon at the top-right corn
 
 %-PROP-START closeButtonVisible
 
-```ueml copy /closeButtonVisible="false"/
+```xmlui copy /closeButtonVisible="false"/
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" closeButtonVisible="false" title="Example Dialog" />
@@ -190,7 +190,7 @@ Click outside the dialog to close it.
 
 In this example, the `close` event counts how many times you closed the dialog:
 
-```ueml copy {6-8}
+```xmlui copy {6-8}
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="myDialog.open()" />
   <ModalDialog
@@ -228,7 +228,7 @@ Open and close the dialog several times to test that it changes the counter.
 
 In this example, the `open` event counts how many times you opened the dialog:
 
-```ueml copy {6-8}
+```xmlui copy {6-8}
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="myDialog.open()" />
   <ModalDialog

@@ -6,7 +6,7 @@ The component accepts `Option` components as children defining a particular opti
 `Option` requires a `value` property and while also having a `label` that is displayed in the list.
 If the `label` is not specified `value` is shown.
 
-```ueml copy
+```xmlui copy
 <App>
   <Select>
     <Option value="opt1" label="first"/>
@@ -32,7 +32,7 @@ If the `label` is not specified `value` is shown.
 
 You can use `Select` with dynamic options:
 
-```ueml copy
+```xmlui copy
 <App>
   <Select>
     <Items data="{['one', 'two', 'three']}" >
@@ -60,7 +60,7 @@ You can use `Select` with dynamic options:
 
 %-PROP-START initialValue
 
-```ueml copy
+```xmlui copy
 <App>
   <Select initialValue="opt3">
     <Option value="opt1" label="first"/>
@@ -88,7 +88,7 @@ You can use `Select` with dynamic options:
 
 %-PROP-START optionTemplate
 
-```ueml copy
+```xmlui copy
 <App>
   <Select>
     <property name="optionTemplate">
@@ -128,7 +128,7 @@ You can use `Select` with dynamic options:
 
 %-PROP-START placeholder
 
-```ueml copy
+```xmlui copy
 <App>
   <Select placeholder="Please select an item">
     <Option value="opt1" label="first"/>
@@ -156,7 +156,7 @@ You can use `Select` with dynamic options:
 
 %-PROP-START validationStatus
 
-```ueml copy
+```xmlui copy
 <App>
   <Select />
   <Select validationStatus="valid" />
@@ -181,7 +181,7 @@ You can use `Select` with dynamic options:
 
 %-PROP-START enabled
 
-```ueml copy
+```xmlui copy
 <App>
   <Select enabled="false" />
 </App>
@@ -202,7 +202,7 @@ You can use `Select` with dynamic options:
 
 Click on the second field to see the custom empty list indicator.
 
-```ueml copy {9-11}
+```xmlui copy {9-11}
 <App>
   <VStack>
     <Text value="Default:" />
@@ -244,7 +244,7 @@ Click on the second field to see the custom empty list indicator.
 
 %-PROP-START dropdownHeight
 
-```ueml copy /dropdownHeight="180px"/
+```xmlui copy /dropdownHeight="180px"/
 <App>
   <Select dropdownHeight="180px">
     <Option value="opt1" label="first"/>
@@ -284,7 +284,7 @@ Click on the second field to see the custom empty list indicator.
 
 %-PROP-START multiSelect
 
-```ueml copy /multiSelect="true"/
+```xmlui copy /multiSelect="true"/
 <App>
   <Select multiSelect="true" dropdownHeight="180px" >
     <Option value="opt1" label="first"/>
@@ -326,7 +326,7 @@ Click on the second field to see the custom empty list indicator.
 
 In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`. 
 
-```ueml copy {3-9} /optionLabelTemplate/
+```xmlui copy {3-9} /optionLabelTemplate/
 <App>
   <Select initialValue="{0}" placeholder="Select..." searchable>
     <property name="optionLabelTemplate">
@@ -372,7 +372,7 @@ In the template definition, you can use the `$item` context property to access t
 
 In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`.  The `$itemContext` property provides a `removeItem` method to delete a value from the current selection.
 
-```ueml copy {3-15} /valueTemplate/
+```xmlui copy {3-15} /valueTemplate/
 <App>
   <Select initialValue="{0}" placeholder="Select..." multiSelect>
     <property name="valueTemplate">
@@ -429,7 +429,7 @@ In the template definition, you can use the `$item` context property to access t
 
 %-EVENT-START didChange
 
-```ueml copy /onDidChange="(newItem) => newValue = newItem"/
+```xmlui copy /onDidChange="(newItem) => newValue = newItem"/
 <App>
   <variable name="newValue" value="" />
   <Text value="{newValue}" />
@@ -461,7 +461,7 @@ In the template definition, you can use the `$item` context property to access t
 
 %-EVENT-START gotFocus
 
-```ueml copy {5-6}
+```xmlui copy {5-6}
 <App>
   <variable name="isFocused" value="{false}" />
   <Text value="Input control is focused: {isFocused}" />
@@ -497,7 +497,7 @@ In the template definition, you can use the `$item` context property to access t
 
 %-API-START focus
 
-```ueml copy /onClick="inputControl.focus()"/
+```xmlui copy /onClick="inputControl.focus()"/
 <App>
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <Select id="inputControl">
@@ -527,7 +527,7 @@ In the template definition, you can use the `$item` context property to access t
 
 %-API-START setValue
 
-```ueml copy
+```xmlui copy
 <App>
   <Select id="inputControl">
     <Option value="opt1" label="first"/>

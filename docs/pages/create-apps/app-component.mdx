@@ -14,7 +14,7 @@ import { COMPONENT_APP, COMPONENT_APPHEADER, COMPONENT_FOOTER, COMPONENT_NAVPANE
 
 You can use any component as your app's root. For example, you can display a simple text with this markup:
 
-```ueml copy
+```xmlui copy
 <Text>Hello from XMLUI!</Text>
 ```
 
@@ -50,7 +50,7 @@ The `App` component creates its layout by combining several components into an i
 
 In the markup, `App` has placeholders to define the particular parts of the UI:
 
-```ueml copy
+```xmlui copy
 <App>
   <AppHeader>
     <!-- Here comes the header -->
@@ -101,7 +101,7 @@ When all placeholders are empty (like in the previous sample markup), `App` rend
 
 You can set the application logo using the `logo` property of `App`:
 
-```ueml copy
+```xmlui copy
 <App logo="resources/logo.svg">
   <!-- ... -->
 </App>
@@ -138,7 +138,7 @@ Also, XMLUI considers any content added within the `App` tag but outside the lay
 
 Look at this example:
 
-```ueml copy
+```xmlui copy
 <App>
   <H1>Welcome to my humble app!</H1>
   <Footer>
@@ -177,7 +177,7 @@ You can set the layout in several ways:
 
 To get acquainted with these layouts, the samples below show different layout settings with this markup (using the `layout` property with the demonstrated variant):
 
-```ueml copy
+```xmlui copy
 <App layout="...">
   <AppHeader title="Example App"/>
   <NavPanel>
@@ -311,7 +311,7 @@ The `AppHeader` placeholder declares the UI patch to display in the app's header
 
 When the `App` does not contain an `AppHeader` placeholder, the app does not display a header in any layout mode:
 
-```ueml copy
+```xmlui copy
 <App layout="horizontal">
   <H1>Main Content</H1>
   <Footer>
@@ -337,7 +337,7 @@ When the `App` does not contain an `AppHeader` placeholder, the app does not dis
 
 If the `App` contains an `AppHeader` empty placeholder, it displays an empty header unless you define a logo. The following example does not define a logo, so the header remains empty:
 
-```ueml copy {2}
+```xmlui copy {2}
 <App layout="condensed">
   <AppHeader/>
   <H1>Main Content</H1>
@@ -365,7 +365,7 @@ If the `App` contains an `AppHeader` empty placeholder, it displays an empty hea
 
 If the `App` contains an empty `AppHeader` placeholder but defines a logo, the header displays the logo. The following example uses the same app markup as the previous one; however, it defines a logo in the `App` component's `logo` property:
 
-```ueml copy
+```xmlui copy
 <App layout="condensed" logo="resources/logo.svg">
   <AppHeader/>
   <H1>Main Content</H1>
@@ -394,7 +394,7 @@ If the `App` contains an empty `AppHeader` placeholder but defines a logo, the h
 
 When the `AppHeader` section contains a definition, the `App` component displays that in the header:
 
-```ueml copy
+```xmlui copy
 <App layout="condensed">
   <AppHeader>
     <H1>AcmeApp</H1>
@@ -437,7 +437,7 @@ The `App` Component has these properties to define a logo resource:
 - `logo-dark`: the URI of the logo to be used when the current theme uses a dark tone. This property overrides - `logo` when the dark tone is active.
 - `logo-light`: the URI of the logo to be used with a light tone. This property overrides `logo` when the dark tone is active.
 
-```ueml copy {3-4}
+```xmlui copy {3-4}
 <App
   layout="condensed"
   logo="resources/logo.svg"
@@ -503,7 +503,7 @@ The following entries in `config.json` display the same logo as the examples in 
 Though your app contains a logo definition, you can prevent it from displaying it with the header by setting the `AppHeader` placeholder's `showLogo` property to `false`.
 </Callout>
 
-```ueml copy /showLogo="false"/
+```xmlui copy /showLogo="false"/
 <App
   layout="condensed"
   logo="resources/logo.svg"
@@ -533,7 +533,7 @@ You can show the app's logo not only in the header but in other parts of the app
 
 The following example turns off the logo in the header and displays it in the main content:
 
-```ueml {11} copy
+```xmlui {11} copy
 <App
   layout="condensed"
   logo="resources/logo.svg"
@@ -578,7 +578,7 @@ The following example turns off the logo in the header and displays it in the ma
 The `AppHeader` component placeholder has a property, `logoTemplate`, which you can use to define your custom logo.
 </Callout>
 
-```ueml {3-8} copy
+```xmlui {3-8} copy
 <App>
   <AppHeader>
     <property name="logoTemplate">
@@ -627,7 +627,7 @@ The `App` component has two placeholders that help you create the app's navigati
 
 The links and the targets are bound through URLs. When the user selects a navigation link (menu command), XMLUI ensures that the matching UI part is displayed as the main content.
 
-```ueml copy
+```xmlui copy
 <App layout="horizontal-sticky">
   <AppHeader><H1>MyTravel App</H1></AppHeader>
   <NavPanel>
@@ -679,7 +679,7 @@ With the `<Footer>` placeholder, you can define the markup part that should be d
 
 Here is an example:
 
-```ueml {5-9} copy
+```xmlui {5-9} copy
 <App>
   <AppHeader>
     <H3>AcmeDrive</H3>

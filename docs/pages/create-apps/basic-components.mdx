@@ -32,7 +32,7 @@ In this article, you will learn some basic usage patterns of them.
 
 Use the `Button` component to let users trigger various actions on the UI.
 
-```ueml copy
+```xmlui copy
 <App>
   <Button label="Click me!" onClick="toast('Button clicked')" />
   <Button label="Can't Click Here" enabled="{false}" />
@@ -54,7 +54,7 @@ Use the `Button` component to let users trigger various actions on the UI.
   Certain buttons can be emphasized by using properties such as `variant`, `themeColor` and `size`.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button label="Solid" themeColor="primary" />
@@ -115,7 +115,7 @@ Use the `Button` component to let users trigger various actions on the UI.
   Buttons can also have icons to provide visual cues.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Button icon="close" variant="ghost" themeColor="secondary" />
@@ -148,7 +148,7 @@ The `Checkbox` component allows users to make binary choices by toggling an inpu
 
 It works the same way as the [Switch](#switch) component - the only difference is that the `Checkbox` also has an indeterminate state.
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     Enabled checkboxes:
@@ -198,7 +198,7 @@ This state is visual only, the actual value of the checkbox is still either `tru
   Get the data of an input control by assigning an ID to it and using dot notation to access its `value`.
 </Callout>
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <Checkbox
     indeterminate="true"
@@ -229,7 +229,7 @@ The `Switch` component allows users to make binary choices by toggling an input 
 
 It works the same way as the [Checkbox](#checkbox) component - the only difference is that the `Checkbox` also has an indeterminate state.
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     Enabled switches:
@@ -278,7 +278,7 @@ Find out more in the <SmartLink href={COMPONENT_SWITCH}>Switch reference</SmartL
 
 This component can contain a set of radio group buttons (`RadioGroupOption`) and enable the selection of only one of them at any one time.
 
-```ueml copy
+```xmlui copy
 <App>
   <RadioGroup id="group1" initialValue="first">
     <HStack>
@@ -309,7 +309,7 @@ This component can contain a set of radio group buttons (`RadioGroupOption`) and
 
 Both the grouping component (`RadioGroup`) and its options (`RadioGroupOption`) can be enabled and disabled.
 
-```ueml copy /enabled="false"/
+```xmlui copy /enabled="false"/
 <App>
   <HStack>
     <RadioGroup initialValue="first">
@@ -360,7 +360,7 @@ Details can be found in the <SmartLink href={COMPONENT_RADIOGROUP}>RadioGroup co
 
 Enables the selection of a date or a range of dates in a specified format from an interactive display.
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker dateFormat="dd/MM/yyyy" initialValue="25/05/2024" />
   <DatePicker dateFormat="yyyy-MM-dd" initialValue="25/05/2024" />
@@ -384,7 +384,7 @@ Enables the selection of a date or a range of dates in a specified format from a
   Use the `mode` property to specify the number of selectable dates: "single" or "range".
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker initialValue="25/05/2024" mode="single" />
   <DatePicker initialValue="{{ from: '25/05/2024', to: '25/07/2024' }}" mode="range" />
@@ -408,7 +408,7 @@ For further details see the <SmartLink href={COMPONENT_DATEPICKER}>DatePicker co
 
 A `NumberBox` component allows users to input numeric values: integer or floating point numbers.
 
-```ueml copy
+```xmlui copy
 <App>
   <NumberBox initialValue="123" />
   <NumberBox initialValue="123" hasSpinBox="false" />
@@ -433,7 +433,7 @@ A `NumberBox` component allows users to input numeric values: integer or floatin
   You can provide different kinds of constraints on what numbers the input field accepts.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <VStack>
     Integers Only
@@ -485,7 +485,7 @@ See the <SmartLink href={COMPONENT_NUMBERBOX}>NumberBox component reference</Sma
 Provides a dropdown with a list of options to choose from.
 For selecting multiple items from a list, refer to the [MultiSelect component](#multiselect).
 
-```ueml copy
+```xmlui copy
 <App>
   <Select>
     <Option value="opt1" label="first" />
@@ -528,7 +528,7 @@ See the <SmartLink href={COMPONENT_SELECT}>Select component reference</SmartLink
 The `TextArea` component provides is a multiline text input component.
 To add new lines to the input field, press `Shift` + `Enter`.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextArea initialValue="I am a TextArea component." placeholder="Enter text..." />
   <TextArea initialValue="I am a disabled TextArea component." enabled="false" />
@@ -552,7 +552,7 @@ To add new lines to the input field, press `Shift` + `Enter`.
   Note that if either `autoSize`, `maxRows` or `minRows` is set, the `rows` property has no effect.
 </Callout>
 
-```ueml copy {6, 14} /rows="3"/
+```xmlui copy {6, 14} /rows="3"/
 <App>
   <!-- Display exactly three rows no matter the content -->
   <TextArea rows="3" initialValue="Lorem ipsum dolor sit amet..." />
@@ -603,7 +603,7 @@ To add new lines to the input field, press `Shift` + `Enter`.
   Limit how the user can resize the `TextArea`.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <TextArea
     resize="vertical"
@@ -641,7 +641,7 @@ See the <SmartLink href={COMPONENT_TEXTAREA}>TextArea component reference</Smart
 
 The TextBox is an input component that allows users to input and edit textual data.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox initialValue="I am a TextBox" placeholder="Write something here..." />
   <TextBox initialValue="I am a TextBox" enabled="false" />
@@ -668,7 +668,7 @@ A `Link` component represents a hyperlink used to link from one page to another 
   **Note:** The `target` property set to "_blank" ensures the link opens in a new tab.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <Link to="https://docs.xmlui.com/" target="_blank">
     XMLUI introduction
@@ -693,7 +693,7 @@ A `Link` component represents a hyperlink used to link from one page to another 
   Add an icon and text via relevant properties to leverage built-in styling.
 </Callout>
 
-```ueml copy {3-4}
+```xmlui copy {3-4}
 <App>
   <Link
     label="XMLUI introduction"
@@ -726,7 +726,7 @@ Also see the <SmartLink href={COMPONENT_LINK}>Link component reference</SmartLin
 
 The `Badge` is a text label that accepts a color map to define its background color and, optionally, its label color.
 
-```ueml copy
+```xmlui copy
 <App>
   <variable name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
   Regular Badge
@@ -781,7 +781,7 @@ Also see the <SmartLink href={COMPONENT_BADGE}>Badge component reference</SmartL
 The `Card` component is a container for grouping other UI elements.
 It visually separates its content from its surroundings.
 
-```ueml copy
+```xmlui copy
 <App>
   <Card>
     <HStack>
@@ -812,7 +812,7 @@ It visually separates its content from its surroundings.
   The component also provides prestyled elements that are accessible via the Card properties.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <Card
     avatarUrl="https://i.pravatar.cc/100"
@@ -850,7 +850,7 @@ It visually separates its content from its surroundings.
 
 This component is the representation of an icon.
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Icon name="message" />
@@ -880,7 +880,7 @@ This component is the representation of an icon.
   No icon is rendered if no fallback is specified.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     No icon displayed:
@@ -921,7 +921,7 @@ See the <SmartLink href={COMPONENT_ICON}>Icon component reference</SmartLink> to
 The `Image` component can display complex graphical images.
 It functions as a container for a picture.
 
-```ueml copy
+```xmlui copy
 <App>
   <Image src="/resources/images/components/image/breakfast.jpg" width="240px" />
   <Image 
@@ -953,7 +953,7 @@ See the <SmartLink href={COMPONENT_IMAGE}>Image component reference</SmartLink> 
 
 A `ProgressBar` component visually represents the progress of a task or process.
 
-```ueml copy
+```xmlui copy
 <App>
   <ProgressBar value="0"/>
   <ProgressBar value="0.2"/>
@@ -986,7 +986,7 @@ See the <SmartLink href={COMPONENT_PROGRESSBAR}>ProgressBar component reference<
 
 The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value.
 
-```ueml copy
+```xmlui copy
 <App>
   <Spinner />
 </App>
@@ -1007,7 +1007,7 @@ The `Spinner` component is an animated indicator that represents a particular ac
 
 Use the buttons to toggle between the two `Spinners` in the demo app:
 
-```ueml copy
+```xmlui copy
 <App>
   <variable name="noDelay" value="{true}" />
   <variable name="yesDelay" value="{false}" />
@@ -1051,7 +1051,7 @@ For further details see the <SmartLink href={COMPONENT_SPINNER}>Spinner componen
 
 A `ContentSeparator` is a component that divides or separates content visually within a layout.
 
-```ueml copy {5, 10, 15}
+```xmlui copy {5, 10, 15}
 <App>
   <Heading level="h2">
     Lorem Ipsum

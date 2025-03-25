@@ -342,7 +342,7 @@ The operators are grouped according to their precedence, starting with the highe
 
 You can use functions as variable values. XMLUI accepts both an arrow expression (arrow function) or a standard JavaScript function declaration as an expression. So, these variable declarations are valid in XMLUI:
 
-```ueml copy /x => x*x/ /function(x) { return x * x; }/
+```xmlui copy /x => x*x/ /function(x) { return x * x; }/
 <App 
   var.mySqr="{x => x*x}"
   var.mySqrOther="{function(x) { return x * x; }}">
@@ -353,7 +353,7 @@ You can use functions as variable values. XMLUI accepts both an arrow expression
 
 Function declarations support the rest parameters:
 
-```ueml copy {2, 3}
+```xmlui copy {2, 3}
 <App 
   var.myArgs="{(a, b, ...others) => { return others.length + 2; }}"
   var.myArgsOther="{function(a, b, ...others) { return others.length + 2; }}">
@@ -364,7 +364,7 @@ Function declarations support the rest parameters:
 
 You can use arrow expressions and function declarations with immediate invocations:
 
-```ueml copy {2, 3}
+```xmlui copy {2, 3}
 <App>
   <Text>5**3 is {(n => n ** 3)(5)}</Text> <!-- Displays 125 -->
   <Text> <!-- Displays 81 -->
@@ -583,7 +583,7 @@ Because the update mechanism triggers only after executing an entire XMLUI state
 
 Look at this example, where variables `b` and `c` form a circular reference and depend on variable `a`. Clicking the button increments `a` and triggers the update mechanism:
 
-```ueml
+```xmlui
 <App 
   var.a="{0}" 
   var.b="{a + (c ?? 0) * 2}" 

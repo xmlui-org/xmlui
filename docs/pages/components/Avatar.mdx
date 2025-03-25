@@ -10,7 +10,7 @@ The `Avatar` component represents a user, group (or other entity's) avatar with 
 
 This property sets the name value the Avatar uses to display initials.
 
-```ueml copy
+```xmlui copy
 <App>
   <Avatar name="John, Doe" />
 </App>
@@ -38,7 +38,7 @@ Available values:
 | `md` | Medium button |
 | `lg` | Large button |
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Avatar name="Dorothy Ellen Fuller" />
@@ -69,7 +69,7 @@ Available values:
 
 This property specifies the URL of the image to display in the Avatar.
 
-```ueml copy
+```xmlui copy
 <App>
   <Avatar url="https://i.pravatar.cc/100" size="md" />
 </App>
@@ -90,7 +90,7 @@ This property specifies the URL of the image to display in the Avatar.
 
 This event is triggered when the avatar is clicked.
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack verticalAlignment="center">
     <Avatar name="Molly Dough" size="md" onClick="toast('Avatar clicked')" />

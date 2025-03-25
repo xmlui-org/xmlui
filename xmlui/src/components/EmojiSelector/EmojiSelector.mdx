@@ -1,6 +1,6 @@
 %-PROP-START autoFocus
 
-```ueml copy
+```xmlui copy
 <App>
   <EmojiSelector autoFocus="true" />
 </App>
@@ -20,7 +20,7 @@
 
 %-EVENT-START select
 
-```ueml copy /onSelect="(emoji) => { selected = emoji }"/
+```xmlui copy /onSelect="(emoji) => { selected = emoji }"/
 <App>
   <HStack var.selected="">
     <EmojiSelector onSelect="(emoji) => { selected = emoji }" />

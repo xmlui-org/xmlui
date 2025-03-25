@@ -13,7 +13,7 @@ See the [reference docs](./SpaceFiller.mdx) for details.
 
 The `gap` property defines the gap between items in the same row and between rows. The `FlowLayout` component creates a new row when an item is about to overflow the current row.
 
-```ueml copy
+```xmlui copy
 <App>
   <FlowLayout gap="$space-12">
     <Stack width="25%" height="32px" backgroundColor="red" />
@@ -50,7 +50,7 @@ In this markup, only four items fit in a single row. The `gap` property sets the
 
 This markup demonstrates different `gap` values:
 
-```ueml copy
+```xmlui copy
 <App>
   <FlowLayout>
     <Stack width="25%" height="32px" backgroundColor="red" />
@@ -119,7 +119,7 @@ All items within a `FlowLayout` instance fit in a single row, so `gap` affects o
 
 The `columnGap` property specifies the space between items in a single row; it overrides the `gap` value.
 
-```ueml copy
+```xmlui copy
 <App>
   <FlowLayout columnGap="$space-8">
   <Stack width="25%" height="32px" backgroundColor="red" />
@@ -159,7 +159,7 @@ You can observe no gap between the rows of the `FlowLayout`, as `columnGap` keep
 
 The `rowGap` property specifies the space between the `FlowLayout` rows; it overrides the `gap` value.
 
-```ueml copy
+```xmlui copy
 <App>
   <FlowLayout rowGap="2px">
     <Stack width="25%" height="32px" backgroundColor="red" />
