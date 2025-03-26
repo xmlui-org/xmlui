@@ -43,14 +43,46 @@ type Props = {
   to?: string;
   node: NavGroupComponentDef;
   renderChild: RenderChildFn;
+  iconHorizontalExpanded?: string;
+  iconHorizontalCollapsed?: string;
+  iconVerticalExpanded?: string;
+  iconVerticalCollapsed?: string;
+};
+
+export const defaultProps: Pick<
+  Props,
+  | "iconHorizontalExpanded"
+  | "iconHorizontalCollapsed"
+  | "iconVerticalExpanded"
+  | "iconVerticalCollapsed"
+> = {
+  iconHorizontalExpanded: "chevronleft",
+  iconHorizontalCollapsed: "chevronright",
+  iconVerticalExpanded: "chevronup",
+  iconVerticalCollapsed: "chevrondown",
 };
 
 const NavGroupContext = createContext({
   level: -1,
+  iconHorizontalCollapsed: defaultProps.iconHorizontalCollapsed,
+  iconHorizontalExpanded: defaultProps.iconHorizontalExpanded,
+  iconVerticalCollapsed: defaultProps.iconVerticalCollapsed,
+  iconVerticalExpanded: defaultProps.iconVerticalExpanded,
 });
 
 export const NavGroup = forwardRef(function NavGroup(
-  { node, style, label, icon, renderChild, to }: Props,
+  {
+    node,
+    style,
+    label,
+    icon,
+    renderChild,
+    to,
+    iconHorizontalCollapsed,
+    iconHorizontalExpanded,
+    iconVerticalCollapsed,
+    iconVerticalExpanded,
+  }: Props,
   ref,
 ) {
   const { level } = useContext(NavGroupContext);
@@ -68,6 +100,10 @@ export const NavGroup = forwardRef(function NavGroup(
   const navGroupContextValue = useMemo(() => {
     return {
       level: level + 1,
+      iconHorizontalCollapsed: iconHorizontalCollapsed ?? defaultProps.iconHorizontalCollapsed,
+      iconHorizontalExpanded: iconHorizontalExpanded ?? defaultProps.iconHorizontalExpanded,
+      iconVerticalCollapsed: iconVerticalCollapsed ?? defaultProps.iconVerticalCollapsed,
+      iconVerticalExpanded: iconVerticalExpanded ?? defaultProps.iconVerticalExpanded,
     };
   }, [level]);
 
@@ -115,7 +151,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   },
   ref,
 ) {
-  const { level } = useContext(NavGroupContext);
+  const { level, iconVerticalCollapsed, iconVerticalExpanded } = useContext(NavGroupContext);
   const [expanded, setExpanded] = useState(false);
 
   const toggleStyle = {
@@ -128,7 +164,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
       <NavLink style={toggleStyle} onClick={() => setExpanded((prev) => !prev)} icon={icon} to={to}>
         {label}
         <div style={{ flex: 1 }} />
-        <Icon name={expanded ? "chevronup" : "chevrondown"} />
+        <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
       {expanded &&
         renderChild(node.children, {
@@ -168,7 +204,13 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
   },
   ref,
 ) {
-  const { level } = useContext(NavGroupContext);
+  const {
+    level,
+    iconHorizontalCollapsed,
+    iconHorizontalExpanded,
+    iconVerticalCollapsed,
+    iconVerticalExpanded,
+  } = useContext(NavGroupContext);
   const { root } = useTheme();
 
   let Wrapper = DropdownMenu;
@@ -179,17 +221,17 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     Trigger = DropdownMenuSubTrigger as any;
     Content = DropdownMenuSubContent;
   }
+  const [expanded, setExpanded] = useState(false);
   return (
-    <Wrapper>
+    <Wrapper onOpenChange={(open) => setExpanded(open)}>
       <Trigger asChild>
         <NavLink icon={icon} style={{ flexShrink: 0 }} vertical={level >= 1} to={to}>
-          <span
-            className={classnames(styles.withNavGroupChevron, {
-              [styles.pointRight]: level >= 1,
-            })}
-          >
-            {label}
-          </span>
+          {label}
+          <div style={{ flex: 1 }} />
+          {level === 0 && <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
+          {level >= 1 && (
+            <Icon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
+          )}
         </NavLink>
       </Trigger>
       <DropdownMenuPortal container={root}>

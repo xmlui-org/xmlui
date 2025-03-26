@@ -6,7 +6,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Icon } from "../Icon/IconNative";
 import { dLabel } from "../metadata-helpers";
-import { NavGroup } from "./NavGroupNative";
+import { defaultProps, NavGroup } from "./NavGroupNative";
 
 const COMP = "NavGroup";
 
@@ -16,8 +16,42 @@ export const NavGroupMd = createMetadata({
     `(\`NavLink\` components). It can be displayed as a submenu in the App's UI.`,
   props: {
     label: dLabel(),
-    icon: d(`This property defines an optional icon to display along with the \`${COMP}\` label.`),
-    to: d(`This property defines an optional navigation link.`),
+    to: {
+      description: `This property defines an optional navigation link.`,
+      valueType: "string",
+    },
+    icon: {
+      description: `This property defines an optional icon to display along with the \`${COMP}\` label.`,
+      valueType: "string",
+    },
+    iconHorizontalExpanded: {
+      description: 
+        "Set a custom icon to display when the navigation menu is expanded, " +
+        "is in a **horizontal** app layout, and is in a navigation submenu.",
+      valueType: "string",
+      defaultValue: defaultProps.iconHorizontalExpanded,
+    },
+    iconVerticalExpanded: {
+      description: 
+        "Set a custom icon to display when the navigation menu is expanded, " +
+        "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
+      valueType: "string",
+      defaultValue: defaultProps.iconVerticalExpanded,
+    },
+    iconHorizontalCollapsed: {
+      description: 
+        "Set a custom icon to display when the navigation menu is collapsed, " +
+        "is in a **horizontal** app layout, and is in a navigation submenu.",
+      valueType: "string",
+      defaultValue: defaultProps.iconHorizontalCollapsed,
+    },
+    iconVerticalCollapsed: {
+      description:
+        "Set a custom icon to display when the navigation menu is collapsed, " +
+        "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
+      valueType: "string",
+      defaultValue: defaultProps.iconVerticalCollapsed,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -38,6 +72,10 @@ export const navGroupComponentRenderer = createComponentRenderer(
         icon={<Icon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />}
         node={node}
         renderChild={renderChild}
+        iconHorizontalExpanded={extractValue.asOptionalString(node.props.iconHorizontalExpanded)}
+        iconVerticalExpanded={extractValue.asOptionalString(node.props.iconVerticalExpanded)}
+        iconHorizontalCollapsed={extractValue.asOptionalString(node.props.iconHorizontalCollapsed)}
+        iconVerticalCollapsed={extractValue.asOptionalString(node.props.iconVerticalCollapsed)}
       />
     );
   },

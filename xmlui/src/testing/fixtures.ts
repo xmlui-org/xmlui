@@ -23,6 +23,7 @@ import {
   LinkDriver,
   ListDriver,
   MarkdownDriver,
+  NavGroupDriver,
   NavLinkDriver,
   NavPanelDriver,
   NoResultDriver,
@@ -295,6 +296,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(NavLinkDriver, testIdOrLocator);
     });
   },
+  createNavGroupDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(NavGroupDriver, testIdOrLocator);
+    });
+  },
   createNavPanelDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(NavPanelDriver, testIdOrLocator);
@@ -372,6 +378,7 @@ type TestDriverExtenderProps = {
   createVStackDriver: ComponentDriverMethod<VStackDriver>;
   createLinkDriver: ComponentDriverMethod<LinkDriver>;
   createNavLinkDriver: ComponentDriverMethod<NavLinkDriver>;
+  createNavGroupDriver: ComponentDriverMethod<NavGroupDriver>;
   createNavPanelDriver: ComponentDriverMethod<NavPanelDriver>;
   createCardDriver: ComponentDriverMethod<CardDriver>;
   createAccordionDriver: ComponentDriverMethod<AccordionDriver>;
