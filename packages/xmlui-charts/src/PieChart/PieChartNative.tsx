@@ -9,13 +9,13 @@ import {
 } from "recharts";
 import { PieSectorDataItem } from "recharts/types/polar/Pie";
 import styles from "./PieChartNative.module.scss";
-import { useColors } from "xmlui";
 import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 
 import { TooltipContent } from "../Tooltip/TooltipContent";
+import { useTheme } from "xmlui";
 
 export type PieChartProps = {
   data: any[];
@@ -53,27 +53,17 @@ export function PieChart({
   children,
   showLegend = defaultProps.showLegend,
 }: PieChartProps) {
-  const colors = useColors(
-    {
-      name: "color-primary-500",
-      format: "hex",
-    },
-    {
-      name: "color-primary-400",
-      format: "hex",
-    },
-    {
-      name: "color-primary-300",
-      format: "hex",
-    },
-    {
-      name: "color-primary-200",
-      format: "hex",
-    },
-  );
+  const { getThemeVar } = useTheme();
+  const colorValues = useMemo(()=>{
+    return [
+      getThemeVar("color-primary-500"),
+      getThemeVar("color-primary-400"),
+      getThemeVar("color-primary-300"),
+      getThemeVar("color-primary-200"),
+    ]
+  }, [getThemeVar]);
 
   const chartData = useMemo(() => {
-    const colorValues = Object.values(colors);
     if (!data) return [];
     return data?.map((item, index) => {
       return {
@@ -81,7 +71,7 @@ export function PieChart({
         fill: colorValues[index % colorValues.length] as string,
       };
     });
-  }, [colors, data]);
+  }, [colorValues, data]);
 
   const chartContextValue = useChartContextValue({ dataKey, nameKey });
 
