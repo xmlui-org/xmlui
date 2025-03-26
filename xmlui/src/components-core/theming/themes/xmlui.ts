@@ -14,7 +14,6 @@ export const XmlUiThemeDefinition: ThemeDefinition = {
     // "font.inter": "https://rsms.me/inter/inter.css",
   },
   themeVars: {
-    "boxShadow-header-App": "none",
     "font-size": "15px",
     "boxShadow-Input": "$boxShadow-sm",
   },
