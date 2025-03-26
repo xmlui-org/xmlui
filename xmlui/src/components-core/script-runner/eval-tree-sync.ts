@@ -161,6 +161,7 @@ function evalBindingExpressionTree(
   switch (expr.type) {
     case "TempLitE":
       return evalTemplateLiteral(evaluator, thisStack, expr, evalContext, thread);
+      
     case "LitE":
       return evalLiteral(thisStack, expr);
 

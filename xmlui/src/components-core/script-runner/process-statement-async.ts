@@ -43,7 +43,7 @@ export async function processStatementQueueAsync(
   statements: Statement[],
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThread,
-  onStatementCompleted?: OnStatementCompletedCallback
+  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<QueueInfo> {
   if (!thread) {
     // --- Create the main thread for the queue
@@ -81,7 +81,12 @@ export async function processStatementQueueAsync(
 
     let outcome: ProcessOutcome | undefined;
     try {
-      outcome = await processStatementAsync(queueItem!.statement, evalContext, thread, onStatementCompleted);
+      outcome = await processStatementAsync(
+        queueItem!.statement,
+        evalContext,
+        thread,
+        onStatementCompleted,
+      );
     } catch (err) {
       if (thread.tryBlocks && thread.tryBlocks.length > 0) {
         // --- We have a try block to handle this error
@@ -100,7 +105,10 @@ export async function processStatementQueueAsync(
         if (err instanceof ThrowStatementError) {
           reportEngineError(err);
         } else {
-          reportEngineError(new StatementExecutionError(err as any, queueItem!.statement?.source), err);
+          reportEngineError(
+            new StatementExecutionError(err as any, queueItem!.statement?.source),
+            err,
+          );
         }
       }
     }
@@ -149,7 +157,7 @@ async function processStatementAsync(
   statement: Statement,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback
+  onStatementCompleted: OnStatementCompletedCallback,
 ): Promise<ProcessOutcome> {
   // --- These items should be put in the statement queue after return
   let toUnshift: StatementQueueItem[] = [];
@@ -202,7 +210,7 @@ async function processStatementAsync(
         throw new Error("'var' declarations are not allowed within functions");
       }
       break;
-  
+
     case "EmptyS":
       // --- Nothing to do
       break;
@@ -230,7 +238,12 @@ async function processStatementAsync(
 
     case "ExprS":
       // --- Just evaluate it
-      const statementValue = await evalBindingAsync(statement.expression, evalContext, thread, onStatementCompleted);
+      const statementValue = await evalBindingAsync(
+        statement.expression,
+        evalContext,
+        thread,
+        onStatementCompleted,
+      );
       if (thread.blocks && thread.blocks.length !== 0) {
         thread.blocks[thread.blocks.length - 1].returnValue = statementValue;
       }
@@ -243,7 +256,7 @@ async function processStatementAsync(
         evalContext,
         onStatementCompleted,
         thread,
-        ...(evalContext.eventArgs ?? [])
+        ...(evalContext.eventArgs ?? []),
       );
       if (thread.blocks && thread.blocks.length !== 0) {
         thread.blocks[thread.blocks.length - 1].returnValue = arrowFuncValue;
@@ -256,7 +269,13 @@ async function processStatementAsync(
       if (!block) {
         throw new Error("Missing block scope");
       }
-      await processDeclarationsAsync(block, evalContext, thread, onStatementCompleted, statement.declarations);
+      await processDeclarationsAsync(
+        block,
+        evalContext,
+        thread,
+        onStatementCompleted,
+        statement.declarations,
+      );
       break;
     }
 
@@ -266,13 +285,25 @@ async function processStatementAsync(
       if (!block) {
         throw new Error("Missing block scope");
       }
-      await processDeclarationsAsync(block, evalContext, thread, onStatementCompleted, statement.declarations, true);
+      await processDeclarationsAsync(
+        block,
+        evalContext,
+        thread,
+        onStatementCompleted,
+        statement.declarations,
+        true,
+      );
       break;
     }
 
     case "IfS":
       // --- Evaluate the condition
-      const condition = !!(await evalBindingAsync(statement.condition, evalContext, thread, onStatementCompleted));
+      const condition = !!(await evalBindingAsync(
+        statement.condition,
+        evalContext,
+        thread,
+        onStatementCompleted,
+      ));
       if (condition) {
         toUnshift = mapToItem(statement.thenBranch);
       } else if (statement.elseBranch) {
@@ -318,7 +349,12 @@ async function processStatementAsync(
       let loopScope = statement.guard ? innermostLoopScope(thread) : createLoopScope(thread);
 
       // --- Evaluate the loop condition
-      const condition = !!(await evalBindingAsync(statement.condition, evalContext, thread, onStatementCompleted));
+      const condition = !!(await evalBindingAsync(
+        statement.condition,
+        evalContext,
+        thread,
+        onStatementCompleted,
+      ));
       if (condition) {
         toUnshift = provideLoopBody(loopScope!, statement, thread.breakLabelValue);
       } else {
@@ -336,7 +372,12 @@ async function processStatementAsync(
       }
 
       // --- Evaluate the loop condition
-      const condition = !!(await evalBindingAsync(statement.condition, evalContext, thread, onStatementCompleted));
+      const condition = !!(await evalBindingAsync(
+        statement.condition,
+        evalContext,
+        thread,
+        onStatementCompleted,
+      ));
       if (condition) {
         toUnshift = provideLoopBody(innermostLoopScope(thread), statement, thread.breakLabelValue);
       } else {
@@ -365,7 +406,10 @@ async function processStatementAsync(
         throw new Error("Missing loop scope");
       }
 
-      if (loopScope.tryBlockDepth >= 0 && loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length) {
+      if (
+        loopScope.tryBlockDepth >= 0 &&
+        loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length
+      ) {
         // --- Mark the loop's try scope to exit with "continue"
         for (let i = loopScope.tryBlockDepth; i < thread.tryBlocks!.length; i++) {
           thread.tryBlocks![loopScope.tryBlockDepth]!.exitType = "continue";
@@ -394,7 +438,10 @@ async function processStatementAsync(
       }
 
       // --- Break is in a loop construct
-      if (loopScope.tryBlockDepth >= 0 && loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length) {
+      if (
+        loopScope.tryBlockDepth >= 0 &&
+        loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length
+      ) {
         // --- Mark the loop's try scope to exit with "break"
         for (let i = loopScope.tryBlockDepth; i < thread.tryBlocks!.length; i++) {
           thread.tryBlocks![loopScope.tryBlockDepth]!.exitType = "break";
@@ -622,7 +669,7 @@ async function processStatementAsync(
 
     case "ThrowS": {
       throw new ThrowStatementError(
-        await evalBindingAsync(statement.expression, evalContext, thread, onStatementCompleted)
+        await evalBindingAsync(statement.expression, evalContext, thread, onStatementCompleted),
       );
     }
 
@@ -806,7 +853,7 @@ export async function processDeclarationsAsync(
   declarations: VarDeclaration[],
   addConst = false,
   useValue = false,
-  baseValue = undefined
+  baseValue = undefined,
 ): Promise<void> {
   for (let i = 0; i < declarations.length; i++) {
     let value: any;
@@ -820,7 +867,12 @@ export async function processDeclarationsAsync(
   }
 
   // --- Visit a variable
-  function visitDeclaration(block: BlockScope, decl: VarDeclaration, baseValue: any, addConst: boolean): void {
+  function visitDeclaration(
+    block: BlockScope,
+    decl: VarDeclaration,
+    baseValue: any,
+    addConst: boolean,
+  ): void {
     // --- Process each declaration
     if (decl.id) {
       visitIdDeclaration(block, decl.id, baseValue, addConst);
@@ -834,7 +886,12 @@ export async function processDeclarationsAsync(
   }
 
   // --- Visits a single ID declaration
-  function visitIdDeclaration(block: BlockScope, id: string, baseValue: any, addConst: boolean): void {
+  function visitIdDeclaration(
+    block: BlockScope,
+    id: string,
+    baseValue: any,
+    addConst: boolean,
+  ): void {
     if (block.vars[id]) {
       throw new Error(`Variable ${id} is already declared in the current scope.`);
     }
@@ -846,7 +903,12 @@ export async function processDeclarationsAsync(
   }
 
   // --- Visits an array destructure declaration
-  function visitArrayDestruct(block: BlockScope, arrayD: ArrayDestructure[], baseValue: any, addConst: boolean): void {
+  function visitArrayDestruct(
+    block: BlockScope,
+    arrayD: ArrayDestructure[],
+    baseValue: any,
+    addConst: boolean,
+  ): void {
     for (let i = 0; i < arrayD.length; i++) {
       const arrDecl = arrayD[i];
       const value = baseValue?.[i];
@@ -865,7 +927,7 @@ export async function processDeclarationsAsync(
     block: BlockScope,
     objectD: ObjectDestructure[],
     baseValue: any,
-    addConst: boolean
+    addConst: boolean,
   ): void {
     for (let i = 0; i < objectD.length; i++) {
       const objDecl = objectD[i];

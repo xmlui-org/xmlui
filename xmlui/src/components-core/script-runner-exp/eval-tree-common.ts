@@ -48,7 +48,7 @@ type IdentifierScope = "global" | "app" | "localContext" | "block";
 function getIdentifierScope(
   expr: Identifier,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThreadExp
+  thread?: LogicalThreadExp,
 ): { type?: IdentifierScope; scope: any } {
   let type: IdentifierScope | undefined;
   let scope: any;
@@ -123,7 +123,7 @@ export function evalIdentifier(
   thisStack: any[],
   expr: Identifier,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp
+  thread: LogicalThreadExp,
 ): any {
   // --- Check the ID in the cache
   let value: any;
@@ -149,8 +149,8 @@ export function evalIdentifier(
 export function getRootIdScope(
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThreadExp
-): { type: IdentifierScope | undefined, name: string } | null {
+  thread?: LogicalThreadExp,
+): { type: IdentifierScope | undefined; name: string } | null {
   switch (expr.type) {
     case T_IDENTIFIER:
       const idScope = getIdentifierScope(expr, evalContext, thread);
@@ -168,11 +168,13 @@ export function evalMemberAccessCore(
   thisStack: any[],
   expr: MemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp
+  thread: LogicalThreadExp,
 ): any {
   const parentObj = getExprValue(expr.obj, thread)?.value;
   const value =
-    expr.opt || evalContext.options?.defaultToOptionalMemberAccess ? parentObj?.[expr.member] : parentObj[expr.member];
+    expr.opt || evalContext.options?.defaultToOptionalMemberAccess
+      ? parentObj?.[expr.member]
+      : parentObj[expr.member];
   setExprValue(
     expr,
     {
@@ -180,7 +182,7 @@ export function evalMemberAccessCore(
       valueIndex: expr.member,
       value,
     },
-    thread
+    thread,
   );
   thisStack.push(value);
 
@@ -193,11 +195,13 @@ export function evalCalculatedMemberAccessCore(
   thisStack: any[],
   expr: CalculatedMemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp
+  thread: LogicalThreadExp,
 ): any {
   const parentObj = getExprValue(expr.obj, thread)?.value;
   const memberObj = getExprValue(expr.member, thread)?.value;
-  const value = evalContext.options?.defaultToOptionalMemberAccess ? parentObj?.[memberObj] : parentObj[memberObj];
+  const value = evalContext.options?.defaultToOptionalMemberAccess
+    ? parentObj?.[memberObj]
+    : parentObj[memberObj];
   setExprValue(
     expr,
     {
@@ -205,7 +209,7 @@ export function evalCalculatedMemberAccessCore(
       valueIndex: memberObj,
       value,
     },
-    thread
+    thread,
   );
   thisStack.push(value);
 
@@ -215,15 +219,13 @@ export function evalCalculatedMemberAccessCore(
 
 // --- Evaluates a unary expression (sync & async context)
 export function evalUnaryCore(
-  expr: UnaryExpression,
-  thisStack: any[],
-  evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp
+  operand: any,
+  operator: string,
+  thisStack: any[]
 ): any {
   let value: any;
-  const operand = getExprValue(expr.expr, thread);
   const operValue = operand?.value;
-  switch (expr.op) {
+  switch (operator) {
     case "typeof":
       value = typeof operValue;
       break;
@@ -247,9 +249,8 @@ export function evalUnaryCore(
       value = ~operValue;
       break;
     default:
-      throw new Error(`Unknown unary operator: ${expr.op}`);
+      throw new Error(`Unknown unary operator: ${operator}`);
   }
-  setExprValue(expr, { value }, thread);
 
   // --- Done.
   thisStack.push(value);
@@ -261,7 +262,7 @@ export function evalBinaryCore(
   expr: BinaryExpression,
   thisStack: any[],
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp
+  thread: LogicalThreadExp,
 ): any {
   let value: any;
   const l = getExprValue(expr.left, thread)?.value;
@@ -356,11 +357,15 @@ export function evalAssignmentCore(
   thisStack: any[],
   expr: AssignmentExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp
+  thread: LogicalThreadExp,
 ): any {
   const leftValue = getExprValue(expr.leftValue, thread);
   const newValue = getExprValue(expr.expr, thread)?.value;
-  if (!leftValue.valueScope || leftValue.valueIndex === undefined || leftValue.valueIndex === null) {
+  if (
+    !leftValue.valueScope ||
+    leftValue.valueIndex === undefined ||
+    leftValue.valueIndex === null
+  ) {
     throw new Error(`Evaluation of ${expr.op} requires a left-hand value.`);
   }
 
@@ -444,7 +449,7 @@ export function evalPreOrPostCore(
   thisStack: any[],
   expr: PrefixOpExpression | PostfixOpExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp
+  thread: LogicalThreadExp,
 ): any {
   const operand = getExprValue(expr.expr, thread);
   if (!operand.valueScope || operand.valueIndex === undefined) {
@@ -465,8 +470,8 @@ export function evalPreOrPostCore(
         ? ++operand.valueScope[operand.valueIndex]
         : operand.valueScope[operand.valueIndex]++
       : expr.type === T_PREFIX_OP_EXPRESSION
-      ? --operand.valueScope[operand.valueIndex]
-      : operand.valueScope[operand.valueIndex]--;
+        ? --operand.valueScope[operand.valueIndex]
+        : operand.valueScope[operand.valueIndex]--;
 
   setExprValue(expr, { value }, thread);
   thisStack.push(value);
@@ -477,7 +482,7 @@ export function evalPreOrPostCore(
 export function evalArrow(
   thisStack: any[],
   expr: ArrowExpression,
-  thread: LogicalThreadExp
+  thread: LogicalThreadExp,
 ): ArrowExpression {
   const lazyArrow = {
     ...expr,
@@ -510,4 +515,8 @@ function isConstVar(id: string, thread: LogicalThreadExp): boolean {
 
   // --- Not in block context
   return false;
+}
+
+export function evalTemplateLiteralCore(segmentValues: any[]): string {
+  return segmentValues.map((value) => (typeof value === "string" ? value : `${value}`)).join("");
 }
