@@ -108,6 +108,50 @@ You do not have to use `NavGroup` within `NavPanel`; you can nest it into other 
 `}
 />
 
+### Custom Icons
+
+You can also provide custom icons for a specific NavGroup component via it's respective property:
+- [iconHorizontalCollapsed](#iconHorizontalCollapsed)
+- [iconHorizontalExpanded](#iconHorizontalExpanded)
+- [iconVerticalCollapsed](#iconVerticalCollapsed)
+- [iconVerticalExpanded](#iconVerticalExpanded)
+
+See the following for an example of all variants:
+
+```xmlui copy /layout="horizontal"/ {3, 5}
+<App layout="horizontal">
+  <NavGroup icon="email" label="Send To"
+    iconVerticalExpanded="arrowup" iconVerticalCollapsed="arrowbottom">
+    <NavLink icon="arrowup" label="Boss" />
+    <NavGroup icon="users" label="Team"
+      iconHorizontalExpanded="arrowleft" iconHorizontalCollapsed="arrowright">
+      <NavLink label="Jane" />
+      <NavLink label="Will" />
+    </NavGroup>
+    <NavLink icon="cube" label="Support" />
+  </NavGroup>
+</App>
+```
+
+<Playground
+  name="Example: custom icons in horizontal layout"
+  height={220}
+  app={`
+    <App layout="horizontal">
+      <NavGroup icon="email" label="Send To"
+        iconVerticalExpanded="arrowup" iconVerticalCollapsed="arrowbottom">
+        <NavLink icon="arrowup" label="Boss" />
+        <NavGroup icon="users" label="Team"
+          iconHorizontalExpanded="arrowleft" iconHorizontalCollapsed="arrowright">
+          <NavLink label="Jane" />
+          <NavLink label="Will" />
+        </NavGroup>
+        <NavLink icon="cube" label="Support" />
+      </NavGroup>
+    </App>
+  `}
+/>
+
 ## Properties
 
 ### `icon`
@@ -154,13 +198,37 @@ Look at this example:
   `}
 />
 
+### `iconHorizontalCollapsed (default: "chevronright")`
+
+Set a custom icon to display when the navigation menu is collapsed, is in a **horizontal** app layout, and is in a navigation submenu.
+
+For an example, see the [Custom Icons section](#custom-icons).
+
+### `iconHorizontalExpanded (default: "chevronleft")`
+
+Set a custom icon to display when the navigation menu is expanded, is in a **horizontal** app layout, and is in a navigation submenu.
+
+For an example, see the [Custom Icons section](#custom-icons).
+
+### `iconVerticalCollapsed (default: "chevrondown")`
+
+Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
+
+For an example, see the [Custom Icons section](#custom-icons).
+
+### `iconVerticalExpanded (default: "chevronup")`
+
+Set a custom icon to display when the navigation menu is expanded, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
+
+For an example, see the [Custom Icons section](#custom-icons).
+
 ### `label`
 
 This property sets the label of the component.
 
 This property sets the text displayed as the name of the `NavGroup`.
 
-For an example, see the [section on the icon prop](#icon).
+For an example, see the [section on the icon property](#icon).
 
 ### `to`
 
