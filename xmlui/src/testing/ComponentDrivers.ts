@@ -392,6 +392,14 @@ export class LinkDriver extends ComponentDriver {}
 
 export class NavLinkDriver extends ComponentDriver {}
 
+// --- NavGroup
+
+export class NavGroupDriver extends ComponentDriver {
+  getIcons() {
+    return this.locator.locator("> svg").or(this.locator.locator("> img"));
+  }
+}
+
 // --- NavPanel
 
 export class NavPanelDriver extends ComponentDriver {}

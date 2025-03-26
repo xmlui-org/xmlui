@@ -32,32 +32,6 @@ $borderRadius-dropdown-NavGroup: createThemeVar("borderRadius-dropdown-NavGroup"
   }
 }
 
-.withNavGroupChevron {
-  display: inline-flex;
-  align-items: center;
-  &:after{
-    content: "";
-    display: inline-block;
-    vertical-align: 0.306em;
-    width: 0.36em;
-    height: 0.36em;
-    border-bottom: 1px solid currentColor;
-    border-left: 1px solid currentColor;
-    margin-right: 0.1em;
-    margin-left: 0.4em;
-    transform: rotate(-45deg);
-  }
-
-  &.pointRight{
-    flex: 1;
-    &:after{
-      margin-left: auto;
-      transform: rotate(-135deg);
-    }
-  }
-}
-
-
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVars: t.json-stringify($themeVars);
