@@ -40,16 +40,9 @@ export const TabsMd = createMetadata({
     [`borderColor-active-${COMP}`]: "$color-primary",
     [`borderWidth-${COMP}`]: "2px",
     [`backgroundColor-trigger-${COMP}`]: "$backgroundColor-primary",
-    light: {
-      [`backgroundColor-trigger-${COMP}--hover`]: "$color-primary-50",
-      [`backgroundColor-list-${COMP}`]: "$color-primary-50",
-      [`textColor-trigger-${COMP}`]: "$color-primary-100",
-    },
-    dark: {
-      [`backgroundColor-trigger-${COMP}--hover`]: "$color-primary-800",
-      [`backgroundColor-list-${COMP}`]: "$color-primary-800",
-      [`textColor-trigger-${COMP}`]: "$color-primary-100",
-    },
+    [`backgroundColor-trigger-${COMP}--hover`]: "$color-primary-50",
+    [`backgroundColor-list-${COMP}`]: "$color-primary-50",
+    [`textColor-trigger-${COMP}`]: "$color-primary-100",
   },
 });
 

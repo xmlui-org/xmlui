@@ -70,18 +70,10 @@ export const CheckboxMd = createMetadata({
     [`backgroundColor-checked-${COMP}-warning`]: `$borderColor-${COMP}-warning`,
     [`borderColor-checked-${COMP}-success`]: `$borderColor-${COMP}-success`,
     [`backgroundColor-checked-${COMP}-success`]: `$borderColor-${COMP}-success`,
-    light: {
-      [`backgroundColor-indicator-${COMP}`]: "$backgroundColor-primary",
-      [`borderColor-checked-${COMP}`]: "$color-primary-500",
-      [`backgroundColor-checked-${COMP}`]: "$color-primary-500",
-      [`backgroundColor-${COMP}--disabled`]: "$color-surface-200",
-    },
-    dark: {
-      [`backgroundColor-indicator-${COMP}`]: "$backgroundColor-primary",
-      [`borderColor-checked-${COMP}`]: "$color-primary-400",
-      [`backgroundColor-checked-${COMP}`]: "$color-primary-400",
-      [`backgroundColor-${COMP}--disabled`]: "$color-surface-800",
-    },
+    [`backgroundColor-indicator-${COMP}`]: "$backgroundColor-primary",
+    [`borderColor-checked-${COMP}`]: "$color-primary-500",
+    [`backgroundColor-checked-${COMP}`]: "$color-primary-500",
+    [`backgroundColor-${COMP}--disabled`]: "$color-surface-200",
   },
 });
 

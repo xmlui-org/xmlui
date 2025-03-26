@@ -49,12 +49,7 @@ export const AppHeaderMd = createMetadata({
     ...paddingSubject(`logo-${COMP}`, { horizontal: "$space-0", vertical: "$space-4" }),
     ...paddingSubject(COMP, { horizontal: "$space-4", vertical: "$space-0" }),
     [`borderRadius-${COMP}`]: "0px",
-    light: {
-      [`backgroundColor-${COMP}`]: "white",
-    },
-    dark: {
-      [`backgroundColor-${COMP}`]: "$color-surface-900",
-    },
+    [`backgroundColor-${COMP}`]: "$color-surface-raised",
   },
 });
 

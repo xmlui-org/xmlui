@@ -74,22 +74,12 @@ export const AccordionMd = createMetadata({
     [`border-${COMP}`]: "0px solid $borderColor",
     [`width-icon-${COMP}`]: "",
     [`height-icon-${COMP}`]: "",
-    light: {
-      [`backgroundColor-header-${COMP}`]: "$color-primary-500",
-      [`backgroundColor-header-${COMP}-hover`]: "$color-primary-400",
-      [`color-header-${COMP}`]: "$color-surface-50",
-      [`color-content-${COMP}`]: "$textColor-primary",
-      [`backgroundColor-content-${COMP}`]: "transparent",
-      [`color-icon-${COMP}`]: "$color-surface-50",
-    },
-    dark: {
-      [`backgroundColor-header-${COMP}`]: "$color-primary-500",
-      [`backgroundColor-header-${COMP}-hover`]: "$color-primary-600",
-      [`color-header-${COMP}`]: "$color-surface-50",
-      [`color-content-${COMP}`]: "$textColor-primary",
-      [`backgroundColor-content-${COMP}`]: "transparent",
-      [`color-icon-${COMP}`]: "$color-surface-50",
-    },
+    [`backgroundColor-header-${COMP}`]: "$color-primary-500",
+    [`backgroundColor-header-${COMP}-hover`]: "$color-primary-400",
+    [`color-header-${COMP}`]: "$color-surface-50",
+    [`color-content-${COMP}`]: "$textColor-primary",
+    [`backgroundColor-content-${COMP}`]: "transparent",
+    [`color-icon-${COMP}`]: "$color-surface-50",
   },
 });
 

@@ -2230,12 +2230,7 @@ export const HtmlThMd = createMetadata({
     "padding-HtmlTh": "$space-2",
     "fontSize-HtmlTh": "$fontSize-tiny",
     "fontWeight-HtmlTh": "$fontWeight-bold",
-    light: {
-      "backgroundColor-HtmlTh--hover": "$color-surface-200",
-    },
-    dark: {
-      "backgroundColor-HtmlTh--hover": "$color-surface-800",
-    },
+    "backgroundColor-HtmlTh--hover": "$color-surface-200",
   },
 });
 
@@ -2260,13 +2255,8 @@ export const HtmlTheadMd = createMetadata({
   themeVars: parseScssVar(styles.themeVarsThead),
   defaultThemeVars: {
     "textTransform-HtmlThead": "uppercase",
-    light: {
-      "backgroundColor-HtmlThead": "$color-surface-100",
-      "textColor-HtmlThead": "$color-surface-500",
-    },
-    dark: {
-      "backgroundColor-HtmlThead": "$color-surface-950",
-    },
+    "backgroundColor-HtmlThead": "$color-surface-100",
+    "textColor-HtmlThead": "$color-surface-500",
   },
 });
 
@@ -2315,12 +2305,7 @@ export const HtmlTrMd = createMetadata({
   defaultThemeVars: {
     "fontSize-HtmlTr": "$fontSize-small",
     "backgroundColor-row-HtmlTr": "inherit",
-    light: {
-      "backgroundColor-HtmlTr--hover": "$color-primary-50",
-    },
-    dark: {
-      "backgroundColor-HtmlTr--hover": "$color-primary-900",
-    },
+    "backgroundColor-HtmlTr--hover": "$color-primary-50",
   },
 });
 

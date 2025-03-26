@@ -53,12 +53,7 @@ export const CardMd = createMetadata({
     [`border-${COMP}`]: "1px solid $borderColor",
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`boxShadow-${COMP}`]: "none",
-    light: {
-      [`backgroundColor-${COMP}`]: "white",
-    },
-    dark: {
-      [`backgroundColor-${COMP}`]: "$color-surface-900",
-    },
+    [`backgroundColor-${COMP}`]: "$color-surface-raised",
   },
 });
 

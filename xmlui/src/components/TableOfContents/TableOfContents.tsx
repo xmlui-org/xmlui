@@ -64,18 +64,10 @@ export const TableOfContentsMd = createMetadata({
     [`textTransform-${COMP}Item`]: "none",
     [`verticalAlign-${COMP}Item`]: "baseline",
     [`letterSpacing-${COMP}Item`]: "0",
-    light: {
-      [`color-${COMP}Item`]: "$textColor-primary",
-      [`borderColor-${COMP}Item`]: "$borderColor",
-      [`borderColor-${COMP}Item--active`]: "$color-primary-500",
-      [`color-${COMP}Item--active`]: "$color-primary-500",
-    },
-    dark: {
-      [`color-${COMP}Item`]: "$textColor-primary",
-      [`borderColor-${COMP}Item`]: "$borderColor",
-      [`borderColor-${COMP}Item--active`]: "$color-primary-500",
-      [`color-${COMP}Item--active`]: "$textColor-secondary",
-    },
+    [`color-${COMP}Item`]: "$textColor-primary",
+    [`borderColor-${COMP}Item`]: "$borderColor",
+    [`borderColor-${COMP}Item--active`]: "$color-primary-500",
+    [`color-${COMP}Item--active`]: "$color-primary-500",
   },
 });
 

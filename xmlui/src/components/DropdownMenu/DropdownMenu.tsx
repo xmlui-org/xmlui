@@ -69,7 +69,7 @@ export const DropdownMenuMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-${DDMCOMP}`]: "$backgroundColor-primary",
+    [`backgroundColor-${DDMCOMP}`]: "$color-surface-raised",
     [`minWidth-${DDMCOMP}`]: "160px",
     [`boxShadow-${DDMCOMP}`]: "$boxShadow-xl",
     [`borderStyle-${DDMCOMP}-content`]: "solid",

@@ -54,15 +54,8 @@ export const LinkMd = createMetadata({
     [`fontSize-${COMP}`]: "inherit",
     [`gap-icon-${COMP}`]: "$gap-tight",
     [`padding-icon-${COMP}`]: "$space-0_5",
-
-    light: {
-      [`textColor-${COMP}`]: "$color-primary-500",
-      [`textColor-${COMP}--active`]: "$color-primary-500",
-    },
-    dark: {
-      [`textColor-${COMP}`]: "$color-primary-500",
-      [`textColor-${COMP}--active`]: "$color-primary-500",
-    },
+    [`textColor-${COMP}`]: "$color-primary-500",
+    [`textColor-${COMP}--active`]: "$color-primary-500",
   },
 });
 

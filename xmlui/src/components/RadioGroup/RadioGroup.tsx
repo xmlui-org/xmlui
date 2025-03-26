@@ -62,18 +62,10 @@ export const RadioGroupMd = createMetadata({
     [`textColor-${RGOption}-error`]: `$borderColor-${RGOption}-error`,
     [`textColor-${RGOption}-warning`]: `$borderColor-${RGOption}-warning`,
     [`textColor-${RGOption}-success`]: `$borderColor-${RGOption}-success`,
-    light: {
-      [`backgroundColor-checked-${RGOption}-default`]: "$color-primary-500",
-      [`borderColor-${RGOption}-default`]: "$color-surface-500",
-      [`borderColor-${RGOption}-default--hover`]: "$color-surface-700",
-      [`borderColor-${RGOption}-default--active`]: "$color-primary-500",
-    },
-    dark: {
-      [`backgroundColor-checked-${RGOption}-default`]: "$color-primary-500",
-      [`borderColor-${RGOption}-default`]: "$color-surface-500",
-      [`borderColor-${RGOption}-default--hover`]: "$color-surface-300",
-      [`borderColor-${RGOption}-default--active`]: "$color-primary-400",
-    },
+    [`backgroundColor-checked-${RGOption}-default`]: "$color-primary-500",
+    [`borderColor-${RGOption}-default`]: "$color-surface-500",
+    [`borderColor-${RGOption}-default--hover`]: "$color-surface-700",
+    [`borderColor-${RGOption}-default--active`]: "$color-primary-500",
   },
 });
 

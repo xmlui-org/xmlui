@@ -1,4 +1,5 @@
 export const palette = {
+  $colorSurface0: "$color-surface-0",
   $colorSurface50: "$color-surface-50",
   $colorSurface100: "$color-surface-100",
   $colorSurface200: "$color-surface-200",

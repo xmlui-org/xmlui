@@ -76,18 +76,10 @@ export const NavLinkMd = createMetadata({
     [`outlineStyle-${COMP}--focus`]: "$outlineStyle--focus",
     [`outlineOffset-${COMP}--focus`]: "-1px",
     [`borderRadius-indicator-${COMP}`]: "$borderRadius",
-
-    light: {
-      [`color-icon-${COMP}`]: "$color-surface-500",
-      [`color-indicator-${COMP}--active`]: "$color-primary-500",
-      [`color-indicator-${COMP}--pressed`]: "$color-primary-500",
-      [`color-indicator-${COMP}--hover`]: "$color-primary-600",
-    },
-    dark: {
-      [`color-indicator-${COMP}--active`]: "$color-primary-500",
-      [`color-indicator-${COMP}--pressed`]: "$color-primary-500",
-      [`color-indicator-${COMP}--hover`]: "$color-primary-400",
-    },
+    [`color-icon-${COMP}`]: "$color-surface-500",
+    [`color-indicator-${COMP}--active`]: "$color-primary-500",
+    [`color-indicator-${COMP}--pressed`]: "$color-primary-500",
+    [`color-indicator-${COMP}--hover`]: "$color-primary-600",
   },
 });
 

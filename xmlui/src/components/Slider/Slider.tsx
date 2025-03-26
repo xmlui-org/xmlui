@@ -80,15 +80,8 @@ export const SliderMd = createMetadata({
     [`borderColor-thumb-${COMP}`]: "$color-surface-50",
     [`backgroundColor-thumb-${COMP}`]: "$color-primary",
     [`boxShadow-thumb-${COMP}`]: "$boxShadow-md",
-
-    light: {
-      [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-300",
-      [`backgroundColor-range-${COMP}--disabled`]: "$color-surface-400",
-    },
-    dark: {
-      [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-600",
-      [`backgroundColor-range-${COMP}--disabled`]: "$color-surface-800",
-    },
+    [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-300",
+    [`backgroundColor-range-${COMP}--disabled`]: "$color-surface-400",
   },
 });
 
