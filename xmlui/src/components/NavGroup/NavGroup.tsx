@@ -25,22 +25,30 @@ export const NavGroupMd = createMetadata({
       valueType: "string",
     },
     iconHorizontalExpanded: {
-      description: "Set an icon to display when the menu is expanded an a **horizontal** app layout.",
+      description: 
+        "Set a custom icon to display when the navigation menu is expanded, " +
+        "is in a **horizontal** app layout, and is in a navigation submenu.",
       valueType: "string",
       defaultValue: defaultProps.iconHorizontalExpanded,
     },
     iconVerticalExpanded: {
-      description: "Set an icon to display when the menu is expanded an a **vertical** app layout.",
+      description: 
+        "Set a custom icon to display when the navigation menu is expanded, " +
+        "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
       valueType: "string",
       defaultValue: defaultProps.iconVerticalExpanded,
     },
     iconHorizontalCollapsed: {
-      description: "Set an icon to display when the menu is collapsed an a **horizontal** app layout.",
+      description: 
+        "Set a custom icon to display when the navigation menu is collapsed, " +
+        "is in a **horizontal** app layout, and is in a navigation submenu.",
       valueType: "string",
       defaultValue: defaultProps.iconHorizontalCollapsed,
     },
     iconVerticalCollapsed: {
-      description: "Set an icon to display when the menu is collapsed an a **vertical** app layout.",
+      description:
+        "Set a custom icon to display when the navigation menu is collapsed, " +
+        "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
       valueType: "string",
       defaultValue: defaultProps.iconVerticalCollapsed,
     },
