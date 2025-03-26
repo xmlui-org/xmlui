@@ -149,6 +149,8 @@ registerIconRenderer("users", (props: IconBaseProps) => <FiUsers {...props} />);
 registerIconRenderer("refresh", (props: IconBaseProps) => <FiRefreshCcw {...props} />);
 registerIconRenderer("chevrondown", (props: IconBaseProps) => <FiChevronDown {...props} />);
 registerIconRenderer("chevronup", (props: IconBaseProps) => <FiChevronUp {...props} />);
+registerIconRenderer("chevronright", (props: IconBaseProps) => <ChevronRightIcon {...props} />);
+registerIconRenderer("chevronleft", (props: IconBaseProps) => <ChevronLeftIcon {...props} />);
 registerIconRenderer("dotmenu", (props: IconBaseProps) => <DotMenuIcon {...props} />);
 registerIconRenderer("dotmenuhorizontal", (props: IconBaseProps) => (
   <DotMenuHorizontalIcon {...props} />
@@ -189,8 +191,6 @@ registerIconRenderer("plus", (props: IconBaseProps) => <PlusIcon {...props} />);
 registerIconRenderer("inspect", (props: IconBaseProps) => <InspectIcon {...props} />);
 registerIconRenderer("plus-circle", (props: IconBaseProps) => <AiOutlinePlusCircle {...props} />);
 registerIconRenderer("filledplus", (props: IconBaseProps) => <FillPlusCircleIcon {...props} />);
-registerIconRenderer("chevronright", (props: IconBaseProps) => <ChevronRightIcon {...props} />);
-registerIconRenderer("chevronleft", (props: IconBaseProps) => <ChevronLeftIcon {...props} />);
 registerIconRenderer("checkmark", (props: IconBaseProps) => <CheckIcon {...props} />);
 registerIconRenderer("valid", (props: IconBaseProps) => <FiCheckCircle {...props} />);
 registerIconRenderer("info", (props: IconBaseProps) => <FiAlertOctagon {...props} />);
