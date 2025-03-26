@@ -22,7 +22,7 @@
     "generate-docs": "node scripts/generate-docs/get-docs.mjs",
     "prepare-docs-data": "npm run build:xmlui-metadata",
     "generate-all-docs": "npm run build:xmlui-metadata && npm run build:ext-meta && npm run generate-docs",
-    "create-themes": "npm run prepare-docs-data && node scripts/generate-docs/create-theme-files.mjs"
+    "export-themes": "npm run prepare-docs-data && node scripts/generate-docs/create-theme-files.mjs"
   },
   "dependencies": {
     "@eslint-community/regexpp": "4.10.0",
