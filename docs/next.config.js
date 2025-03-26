@@ -52,7 +52,7 @@ const withNextra = require("nextra")({
 /** @type {import('next').NextConfig} */
 let nextConfig = {
   fileLoader: true,
-  //output: "export",
+  output: "export",
   distDir: "dist",
   trailingSlash: true,
   images: {
