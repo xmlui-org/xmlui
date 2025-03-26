@@ -16,7 +16,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox enabled="false" />
 </App>
@@ -35,7 +35,7 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox endIcon="email" />
 </App>
@@ -52,7 +52,7 @@ This property sets an icon to appear on the end (right side when the left-to-rig
 
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -71,7 +71,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox endText=".com" />
 </App>
@@ -88,7 +88,7 @@ This property sets a text to appear on the end (right side when the left-to-righ
 
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -107,7 +107,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 This property sets the component's initial value.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox initialValue="Example text" />
 </App>
@@ -153,7 +153,7 @@ This property sets the maximum length of the input it accepts.
 
 Try to enter a longer value into the input field below.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox maxLength="16" />
 </App>
@@ -172,7 +172,7 @@ Try to enter a longer value into the input field below.
 
 A placeholder text that is visible in the input field when its empty.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox placeholder="This is a placeholder" />
 </App>
@@ -191,7 +191,7 @@ A placeholder text that is visible in the input field when its empty.
 
 Set this property to `true` to disallow changing the component value.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox initialValue="Example text" readOnly="true" />
 </App>
@@ -214,7 +214,7 @@ Set this property to `true` to indicate it must have a value before submitting t
 
 This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startIcon="hyperlink" />
 </App>
@@ -231,7 +231,7 @@ This property sets an icon to appear at the start (left side when the left-to-ri
 
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -250,7 +250,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startText="www." />
 </App>
@@ -267,7 +267,7 @@ This property sets a text to appear at the start (left side when the left-to-rig
 
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`endText`](#endtext).
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
@@ -294,7 +294,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-```ueml copy
+```xmlui copy
 <App>
   <TextBox />
   <TextBox validationStatus="valid" />
@@ -323,7 +323,7 @@ This event is triggered when value of TextBox has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```ueml copy {3}
+```xmlui copy {3}
 <App var.field="">
   <TextBox initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
@@ -348,7 +348,7 @@ This event is triggered when the TextBox has received the focus.
 Clicking on the `TextBox` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to its original.
 
-```ueml copy {4-5}
+```xmlui copy {4-5}
 <App>
   <TextBox
     initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
@@ -383,7 +383,7 @@ This event is triggered when the TextBox has lost the focus.
 
 This method sets the focus on the TextBox.
 
-```ueml copy {2-3}
+```xmlui copy {2-3}
 <App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
   <TextBox id="inputComponent" />
@@ -404,7 +404,7 @@ This method sets the focus on the TextBox.
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-```ueml copy {10}
+```xmlui copy {10}
 <App var.changes="">
   <TextBox
     id="inputField"
@@ -447,7 +447,7 @@ You can query the component's value. If no value is set, it will retrieve `undef
 
 In the example below, typing in the `TextBox` will also display the length of the text typed into it above the field:
 
-```ueml copy {2-3}
+```xmlui copy {2-3}
 <App>
   <Text value="TextBox content length: {inputComponent.value.length}" />
   <TextBox id="inputComponent" />

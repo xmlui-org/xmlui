@@ -3,7 +3,7 @@ import type { UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
-import { default as ViteUeml } from "./vite-ueml-plugin";
+import { default as ViteXmlui } from "./vite-xmlui-plugin";
 import * as path from "path";
 
 type ViteConfigData = {
@@ -25,7 +25,7 @@ export async function getViteConfig({
   } catch (e) {}
 
   return defineConfig({
-    plugins: [react(), svgr(), ViteYaml(), ViteUeml({}), ...(overrides.plugins || [])],
+    plugins: [react(), svgr(), ViteYaml(), ViteXmlui({}), ...(overrides.plugins || [])],
     base: withRelativeRoot ? "" : undefined,
     // experimental: {
     //   renderBuiltUrl: (filename, {type, hostType, hostId}) =>{

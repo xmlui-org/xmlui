@@ -4,7 +4,7 @@ import { Callout } from 'nextra/components'
 
 ## Use a vertical stack
 
-```ueml copy
+```xmlui copy
 <VStack>
   <Text value="First" /> <!-- Displays on top -->
   <Text value="Second" /> <!-- Displays in the middle -->
@@ -14,7 +14,7 @@ import { Callout } from 'nextra/components'
 
 ## Use a horizontal stack
 
-```ueml copy
+```xmlui copy
 <HStack>
   <Text value="First" /> <!-- Displays on the left -->
   <Text value="Second" /> <!-- Displays in the middle -->
@@ -26,7 +26,7 @@ import { Callout } from 'nextra/components'
 
 The orientation toggles between vertical and horizontal when you click within the stack (any child item).
 
-```ueml copy
+```xmlui copy
 <Stack 
   var.isVertical="{true}"
   orientation="{isVertical ? 'vertical' : 'horizontal'}"
@@ -43,7 +43,7 @@ Use `VStack` or `HStack` explicitly whenever possible. Use `Stack` when you need
 
 ## Reverse the order of stack items
 
-```ueml copy /reverse="true"/
+```xmlui copy /reverse="true"/
 <VStack reverse="true">
   <Text value="First" /> <!-- Displays at the bottom -->
   <Text value="Second" /> <!-- Displays in the middle -->
@@ -59,7 +59,7 @@ The `reverse` property also works with `HStack` using the same analogy.
 
 All stack components, by default, add a (non-zero) gap between adjacent items. If you want to avoid gaps, use `gap="0"`. 
 
-```ueml copy /gap="0"/
+```xmlui copy /gap="0"/
 <VStack gap="0">
   <Text value="First" />
   <Text value="Second" />
@@ -71,7 +71,7 @@ All stack components, by default, add a (non-zero) gap between adjacent items. I
 
 The `HStack` component renders all its child items side-by-side, even if they overflow the current viewport. With content wrapping, children that would otherwise overflow will enter a new row.
 
-```ueml copy /wrapContent="true"/
+```xmlui copy /wrapContent="true"/
 <HStack wrapContent="true">
   <Text value="Item #1, longer than usual." />
   <Text value="Item #2, longer than usual." />

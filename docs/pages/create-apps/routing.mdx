@@ -93,7 +93,7 @@ You can turn it off in the app's configuration file, as this example shows:
 
 XMLUI uses the specified links as absolute links (starting with a slash) or relative links, as the following example shows:
 
-```ueml copy
+```xmlui copy
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -146,7 +146,7 @@ You can test it running the app; the `/contacts` link will match the related `Pa
 
 You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a valid identifier. In the target, you can query the value of these placeholders through the `$routeParams` context variable:
 
-```ueml copy
+```xmlui copy
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -195,7 +195,7 @@ The following example demonstrates using them:
 
 Besides rout parameters, XMLUI supports using query parameters with routes, as the following example demonstrates:
 
-```ueml copy /{$queryParams.from}-{$queryParams.to}/
+```xmlui copy /{$queryParams.from}-{$queryParams.to}/
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -247,7 +247,7 @@ The third link uses two query parameters, "from" and "to". The target page uses 
 
 When the app visits a particular target in its available routes, the `NavLink` component matching with the visited route is marked as active, and it gets a visual indication (a blueish left border), like in this example:
 
-```ueml copy
+```xmlui copy
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -289,7 +289,7 @@ When you start the app, the route is "/" (by default) and matches the Home page'
 
 As a `NavLink` activity is based on matching, multiple active links may exist simultaneously. The following example demonstrates such a situation:
 
-```ueml copy {4-5}
+```xmlui copy {4-5}
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>

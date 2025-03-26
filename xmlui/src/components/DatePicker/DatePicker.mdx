@@ -1,6 +1,6 @@
 %-API-START setValue
 
-```ueml copy {3, 9, 12}
+```xmlui copy {3, 9, 12}
 <App>
   <DatePicker
     id="picker"
@@ -41,7 +41,7 @@
 
 %-PROP-START initialValue
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker initialValue="05/25/2024" />
 </App>  
@@ -61,7 +61,7 @@
 
 %-PROP-START placeholder
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker placeholder="This is a placeholder" />
 </App>  
@@ -81,7 +81,7 @@
 
 %-PROP-START enabled
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker enabled="false" />
 </App>  
@@ -107,7 +107,7 @@
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker />
   <DatePicker validationStatus="valid" />
@@ -133,7 +133,7 @@
 
 %-PROP-START mode
 
-```ueml copy {2-3}
+```xmlui copy {2-3}
 <App>
   <DatePicker mode="single" />
   <DatePicker mode="range" />
@@ -171,7 +171,7 @@ The table below shows the available date formats:
 | yyyyMMdd   | 20240525   |
 | MMddyyyy   | 05252024   |
 
-```ueml copy /dateFormat="dd-MM-yyyy"/
+```xmlui copy /dateFormat="dd-MM-yyyy"/
 <App>
   <DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
 </App>
@@ -191,7 +191,7 @@ The table below shows the available date formats:
 
 %-PROP-START showWeekNumber
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker showWeekNumber="true" />
 </App>
@@ -221,7 +221,7 @@ The table below shows the available date formats:
 | Friday    | 5      |
 | Saturday  | 6      |
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker weekStartsOn="1" />
 </App>
@@ -241,7 +241,7 @@ The table below shows the available date formats:
 
 %-PROP-START fromDate
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker fromDate="05/24/2024" />
 </App>
@@ -261,7 +261,7 @@ The table below shows the available date formats:
 
 %-PROP-START toDate
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker toDate="05/26/2024" />
 </App>
@@ -281,7 +281,7 @@ The table below shows the available date formats:
 
 %-PROP-START disabledDates
 
-```ueml copy
+```xmlui copy
 <App>
   <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
 </App>  
@@ -303,7 +303,7 @@ The table below shows the available date formats:
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```ueml copy {2}
+```xmlui copy {2}
 <App var.field="">
   <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
@@ -328,7 +328,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 Clicking on the `DatePicker` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```ueml copy {4-5}
+```xmlui copy {4-5}
 <App var.isFocused="false">
   <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
   <DatePicker

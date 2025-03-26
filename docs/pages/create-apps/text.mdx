@@ -24,7 +24,7 @@ This article goes into the nitty-gritty details of working with text components.
   When you nest text in any component that renders its children (such as layout containers and many others), the engine converts them to a body of text.
 </Callout>
 
-```ueml copy {2, 4}
+```xmlui copy {2, 4}
 <App>
   This is a text!
   <Button label="I'm just a button" />
@@ -53,7 +53,7 @@ This "implicit" text is often unsuitable for a particular context, as you intend
 
 The following example shows how you can use the `Text` component:
 
-```ueml copy {2, 4}
+```xmlui copy {2, 4}
 <App>
   <Text fontSize="1.5rem" color="purple">This is a text!</Text>
   <Button label="I'm just a button" />
@@ -79,7 +79,7 @@ Besides the `Text` component, other components rendering text do so with custom 
   Use the heading family of components (`Heading`, `H1`, `H2`, ..., and `H6`) display the text as headings.
 </Callout>
 
-```ueml copy {2, 4}
+```xmlui copy {2, 4}
 <App>
   <H1>My Main Title</H1>
   This document contains several sections.
@@ -112,7 +112,7 @@ Components displaying text offer two ways to do so:
 
 In the following example, all text-related components use their corresponding property to set their text:
 
-```ueml copy {2, 3}
+```xmlui copy {2, 3}
 <App>
   <H2 value="Text Content with Properties" />
   <Text value="This text is set in the 'value' property of 'Text'." />
@@ -142,7 +142,7 @@ There is a significant difference between the two ways you can define text:
 
 Whitespace collapsing is a helpful feature. The following code shows how this feature combines text into one continuous text that is broken into multiple lines (this ensures better readability):
 
-```ueml copy
+```xmlui copy
 <App>
   This is a long text broken into multiple lines
 
@@ -180,7 +180,7 @@ Whitespace collapsing is a helpful feature. The following code shows how this fe
 
 The following sample demonstrates the differences between the two ways of specifying text content:
 
-```ueml copy
+```xmlui copy
 <App>
   <H3 value="       Text with a lot   of   spaces (property)    "></H3>
   <H3>     Text with a lot   of
@@ -208,7 +208,7 @@ The following sample demonstrates the differences between the two ways of specif
 
 See this in action in the following example:
 
-```ueml copy
+```xmlui copy
 <App>
   <variable name="myValue"
     value="    Text   with   spaces to show   seconds: { getDate().getSeconds() }"/>
@@ -244,7 +244,7 @@ If that context uses inline rendering, the text is rendered inline; otherwise, i
 
 In the following sample, `HStack` uses an inline context, so text segments render in a line:
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     Show me a trash
@@ -271,7 +271,7 @@ In the following sample, `HStack` uses an inline context, so text segments rende
 In the following sample, `VStack` uses a block context.
 So, the engine renders text segments as blocks in new lines:
 
-```ueml copy
+```xmlui copy
 <App>
   <VStack>
     Show me a trash
@@ -303,7 +303,7 @@ So, the engine renders text segments as blocks in new lines:
 
 They behave the same way as the `&nbsp;` HTML entity.
 
-```ueml copy
+```xmlui copy
 <App>
   <H2>Here are four non-breakable spaces between square brackets: [&nbsp;&nbsp;&nbsp;&nbsp;]</H2>
 </App>
@@ -326,7 +326,7 @@ However, with long text, you need to control how that text is broken into new li
 
 By default, a long text breaks into multiple lines (understanding word boundaries):
 
-```ueml copy
+```xmlui copy
 <App>
   <Text width="200px" backgroundColor="olive">
     This long text does not fit into a width constraint of 200 pixels.
@@ -348,7 +348,7 @@ By default, a long text breaks into multiple lines (understanding word boundarie
 
 With very long words, where word boundaries do not work, the text is broken within a word:
 
-```ueml copy
+```xmlui copy
 <App>
   <Text width="200px" backgroundColor="goldenrod">
     ThisLongTextDoesNotFitInTheGivenContrants of a 200 pixel width (and long words).
@@ -375,7 +375,7 @@ With very long words, where word boundaries do not work, the text is broken with
   If the text does not fit into a single line its ending will be cropped and the cropping is indicated by ellipses.
 </Callout>
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <Text
     width="200px"
@@ -405,7 +405,7 @@ With very long words, where word boundaries do not work, the text is broken with
   If you do want to hide the ellipses, set the `ellipses` property to `false`.
 </Callout>
 
-```ueml copy {6}
+```xmlui copy {6}
 <App>
   <Text
     width="200px"
@@ -442,7 +442,7 @@ With very long words, where word boundaries do not work, the text is broken with
 If the text fits into the allowed range, it is fully rendered.
 Otherwise, it will be cropped at the maximum specified. For example, the following sample allows up to two lines:
 
-```ueml copy {2}
+```xmlui copy {2}
 <App>
   <Text
     width="200px"
@@ -480,7 +480,7 @@ Occasionally, you need to preserve linebreaks within a text.
   You can set the `preserveLinebreaks` property to `true` to preserve line breaks in a text.
 </Callout>
 
-```ueml copy {4}
+```xmlui copy {4}
 <App>
   <Text
     backgroundColor="goldenrod"
@@ -530,7 +530,7 @@ However, when the container width and height are constrained, it cannot accommod
 
 The following example tries to contain a long text into a 200x60 pixel box:
 
-```ueml copy
+```xmlui copy
 <App>
   <VStack width="200px" height="60px" backgroundColor="goldenrod" >
     <Text>
@@ -571,7 +571,7 @@ By default, this value is set to `visible`, so the container displays the overfl
 
 Observe in the sample below, not the text, but how the `overflowY` property of the container is set:
 
-```ueml copy {3}
+```xmlui copy {3}
 <App>
   <VStack
     overflowY="hidden"
@@ -607,7 +607,7 @@ Observe in the sample below, not the text, but how the `overflowY` property of t
   You can set `overflowY` to `scroll` to make the container display a vertical scrollbar to reach the non-visible parts of the overflowing text.
 </Callout>
 
-```ueml copy {2}
+```xmlui copy {2}
 <App>
   <VStack
     overflowY="scroll"
@@ -645,7 +645,7 @@ The text accommodates the available space of the container if not specified othe
   Change the size constraints of the component to make text adhere to those constraints rather than the ones of the parent component.
 </Callout>
 
-```ueml copy {4}
+```xmlui copy {4}
 <App>
   <VStack height="40px" width="300px" backgroundColor="goldenrod">
     <Text
@@ -686,7 +686,7 @@ Besides `overflowY`, XMLUI containers provide another layout property, `overflow
   To enable and handle horizontal scrolling, use the `overflowX` property.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <VStack
     overflowX="scroll"
@@ -731,7 +731,7 @@ Besides `overflowY`, XMLUI containers provide another layout property, `overflow
 The `Text` component is useful to render a body of text.
 It provides a number of style variants for customization, all of which can be set via the `variant` property:
 
-```ueml copy
+```xmlui copy
 <Text variant="paragraph">This is an example paragraph</Text>
 ```
 
@@ -832,7 +832,7 @@ It has the same heading levels as the ones you can find in HTML.
 
 The `level` property to sets the level of a heading:
 
-```ueml copy
+```xmlui copy
 <Heading level="h2" value="Heading Level 2" />
 ```
 
@@ -864,7 +864,7 @@ See more in the <SmartLink href={COMPONENT_HEADING}>Heading component reference<
   You can also use specialized components named after the levels for a shorthand version.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <!-- Both render the a level 2 heading -->
   <Heading level="h2" value="Heading Level 2" />
@@ -898,7 +898,7 @@ This component lets you write text which can be styled using markdown.
   The text needs to be wrapped in `<![CDATA[` and `]]>` XMLUI tags to preserve whitespaces.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <Markdown>
   <![CDATA[
 # This is a heading

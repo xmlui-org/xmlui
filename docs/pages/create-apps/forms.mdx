@@ -14,7 +14,7 @@ import {
 
 The following example demonstrates the fundamental XMLUI concepts regarding forms:
 
-```ueml copy
+```xmlui copy
 <App>
   <Form data="{{ name: 'Joe', age: 43 }}">
     <FlowLayout>
@@ -59,7 +59,7 @@ The code can be broken down into the following:
   However, there is no restriction on what components you can use within a form.
 </Callout>
 
-```ueml copy {8-10}
+```xmlui copy {8-10}
 <App>
   <Form
     data="{{ search: 'Seattle' }}"
@@ -99,7 +99,7 @@ The code can be broken down into the following:
 
 The following example shows this by placing a regular `Checkbox` component in the `Form`.
 
-```ueml copy {8}
+```xmlui copy {8}
 <App>
   <Form
     data="{{ search: 'Seattle', caseSensitive: 'false' }}"
@@ -154,7 +154,7 @@ you can nest a form's content into a `FlowLayout` and use the width property of 
   Unless you specify an explicit item width, each nested `FormItem` (within a `FlowLayout`) will fill the entire width of the form.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <Form data="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}">
     <FlowLayout>
@@ -188,7 +188,7 @@ you can nest a form's content into a `FlowLayout` and use the width property of 
 
 Set each item's width to "50%" to create a two-column layout:
 
-```ueml copy
+```xmlui copy
 <App>
   <Form
     data="{{
@@ -232,7 +232,7 @@ Set each item's width to "50%" to create a two-column layout:
   This feature tells a component to fill up all remaining space in a row if other sibling component have their sizes specified.
 </Callout>
 
-```ueml copy {14-15}
+```xmlui copy {14-15}
 <App>
   <Form
     data="{{
@@ -328,7 +328,7 @@ The following sections contain examples of using `FormItem` with different input
 
 The `checkbox` type represents a checkbox input component:
 
-```ueml copy {4-6}
+```xmlui copy {4-6}
 <App>
   <Form data="{{ option1: true, option2: false, option3: true }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
@@ -358,7 +358,7 @@ The `checkbox` type represents a checkbox input component:
 
 The `datePicker` type represents a date picker input component:
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <Form
     data="{{ birthDate: '2021-04-08' }}"
@@ -386,7 +386,7 @@ The `datePicker` type represents a date picker input component:
 
 The `file` type represents an input component allowing you to select one or multiple files:
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <Form
     data="{{ articles: null }}"
@@ -414,7 +414,7 @@ The `file` type represents an input component allowing you to select one or mult
 
 The `integer` type represents an input component for integer values:
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <Form
     data="{{ age: 30 }}"
@@ -442,7 +442,7 @@ The `integer` type represents an input component for integer values:
 
 The `number` type represents an input component for numeric values (integer or floating-point):
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <Form
     data="{{ distance: 192.5 }}"
@@ -470,7 +470,7 @@ The `number` type represents an input component for numeric values (integer or f
 
 The `radioGroup` type represents a group of mutually exclusive radio buttons (only one of them can be selected):
 
-```ueml copy {5-10}
+```xmlui copy {5-10}
 <App>
   <Form
     data="{{ title: 'Mr.' }}"
@@ -508,7 +508,7 @@ The `radioGroup` type represents a group of mutually exclusive radio buttons (on
 
 The `select` type represents a dropdown list; only the listed items can be selected:
 
-```ueml copy {5-10}
+```xmlui copy {5-10}
 <App>
   <Form
     data="{{ size: 'xs' }}"
@@ -547,7 +547,7 @@ The `select` type represents a dropdown list; only the listed items can be selec
 
 The `switch` type represents a switch component to toggle a boolean value:
 
-```ueml copy {5-7}
+```xmlui copy {5-7}
 <App>
   <Form
     data="{{ showBorder: true, showText: false, hideShadow: true }}"
@@ -579,7 +579,7 @@ The `switch` type represents a switch component to toggle a boolean value:
 
 The `text` type represents a textbox to enter textual data:
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <Form
     data="{{ name: 'Joe' }}"
@@ -607,7 +607,7 @@ The `text` type represents a textbox to enter textual data:
 
 The `textarea` type represents a multiline textbox to enter textual data:
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <Form
     data="{{ description: 'This is a description' }}"
@@ -636,7 +636,7 @@ The `textarea` type represents a multiline textbox to enter textual data:
 You can create your custom input component leveraging the XMLUI forms infrastructure.
 You can nest your custom component's markup into the wrapping `FormItem` as the following sample shows:
 
-```ueml copy {5-13}
+```xmlui copy {5-13}
 <App>
   <Form
     data="{{ userAvailable: false }}"
@@ -689,7 +689,7 @@ The `$data` context variable allows you to access the current data within the fo
 
 The following example demonstrates how you can enable a field according to another's value.
 
-```ueml copy
+```xmlui copy
 <App>
   <Form data="{{ isEnabled: true, name: 'Joe' }}">
     <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
@@ -713,7 +713,7 @@ The following example demonstrates how you can enable a field according to anoth
 
 You can reference field values in any other component within the form as well:
 
-```ueml copy {5}
+```xmlui copy {5}
 <App>
   <Form data="{{ firstname: 'John', lastname: 'Doe' }}">
     <FormItem label="Firstname" bindTo="firstname" />
@@ -744,7 +744,7 @@ By updating any input field, the text with the full name will update accordingly
 The XMLUI forms infrastructure helps you manage the form data easily.
 The `data` property can be accessed directly and you can drill down to relevant data attributes:
 
-```ueml copy /street/
+```xmlui copy /street/
 <App>
   <Form
     data="{{
@@ -779,20 +779,20 @@ The `data` property can be accessed directly and you can drill down to relevant 
 There are two ways to provide data to an XMLUI component.
 The first is by defining the data directly:
 
-```ueml copy
+```xmlui copy
 <Form data="{{ name: 'Joe', age: 43 }}" />
 ```
 
 The second is to use a URL to get data from an API endpoint:
 
-```ueml
+```xmlui
 <Form data="/path/to/resource" />
 ```
 
 The attributes of the provided data can be accessed using the `FormItem` component via the `bindTo` property.
 The `FormItem` is designed to work with the `Form` component and access the value that it is "bound to" from an arbitrary depth in the component tree under the `Form`.
 
-```ueml {2} copy
+```xmlui {2} copy
 <Form data="{{ name: 'Joe' }}">
   <FormItem bindTo="name" />
 </Form>
@@ -804,7 +804,7 @@ By default, the `Form` component provides a submit button to save the modified d
 How this data will be used can be customized via the `onSubmit` event.
 All examples below are equal:
 
-```ueml copy
+```xmlui copy
 <App>
   <Form onSubmit="toast('Saved!')" />
   <Form event:submit="toast('Saved!')" />
@@ -819,7 +819,7 @@ In both cases, you use our Javascript-like scripting language to describe the lo
 
 When working with the callback function, you can access a `toSave` function parameter that contains the form data:
 
-```ueml copy
+```xmlui copy
 <Form
   data="{{ name: 'Joe', age: 43 }}"
   onSubmit="(toSave) => toast(JSON.stringify(toSave))" />
@@ -837,7 +837,7 @@ A `FormItem` has several properties related to validation, all of which will be 
 
 This property defines the minimum length of a text input value.
 
-```ueml copy
+```xmlui copy
 <App>
   <Form data="{{ name: 'Billy Bob' }}">
     <FormItem bindTo="name" minLength="10" label="minLength" />
@@ -863,7 +863,7 @@ Delete at least 5 characters from the input field below and click outside the fi
 
 This property defines the maximum length of a text input value.
 
-```ueml copy
+```xmlui copy
 <App>
   <Form data="{{ name: 'Billy Bob' }}">
     <FormItem bindTo="name" maxLength="11" label="maxLength" />
@@ -889,7 +889,7 @@ Try to enter more than 11 characters in the input field below - the input field 
 Sometimes, you do not want to constrain the number of characters in the text box; however, you want longer text to be marked as invalid.
 Set the `syncToValidation` property to "false" in order to do so.
 
-```ueml copy /syncToValidation="false"/
+```xmlui copy /syncToValidation="false"/
 <App>
   <Form data="{{ name: 'Billy Bob' }}">
     <FormItem bindTo="name" maxLength="11" syncToValidation="false" label="maxLength" />
@@ -916,7 +916,7 @@ However, as you click outside, the validation message will indicate that the tex
 
 The input value must be at least the specified value. The given value is inclusive.
 
-```ueml copy
+```xmlui copy
 <App>
   <Form data="{{ age: 30 }}">
     <FormItem bindTo="age" type="number" minValue="32" label="minValue" />
@@ -940,7 +940,7 @@ The input value must be at least the specified value. The given value is inclusi
 
 The input value must be smaller than the specified value. The given value is inclusive.
 
-```ueml copy
+```xmlui copy
 <App>
   <Form data="{{ age: 30 }}" >
     <FormItem bindTo="age" type="number" maxValue="29" label="maxValue" />
@@ -964,7 +964,7 @@ The input value must be smaller than the specified value. The given value is inc
 
 Evaluate predefined regex patterns. These patterns are the following: "email", "url", "phone".
 
-```ueml copy
+```xmlui copy
 <App>
   <Form data="{{
       mobile: '+13456123456',
@@ -1002,7 +1002,7 @@ See the <SmartLink href={COMPONENT_FORMITEM}>pattern property of the FormItem</S
 
 Evaluate a user-defined custom regex pattern.
 
-```ueml copy
+```xmlui copy
 <App>
   <Form data="{{ password: 'hello' }}">
     <!-- Only all uppercase letters are accepted -->
@@ -1032,7 +1032,7 @@ Evaluate a user-defined custom regex pattern.
 
 You also can combine more than one validation on a `FormItem`:
 
-```ueml copy
+```xmlui copy
 <App>
   <Form data="{{ site: 'http://www.example.com' }}">
     <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" label="Multiple Validations" />
@@ -1064,7 +1064,7 @@ You also can combine more than one validation on a `FormItem`:
 Every validation type has a corresponding severity associated with it.
 See the <SmartLink href={COMPONENT_FORMITEM}>FormItem article</SmartLink> for each.
 
-```ueml copy /patternInvalidSeverity/
+```xmlui copy /patternInvalidSeverity/
 <App>
   <Form data="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}" >
     <FormItem
@@ -1103,7 +1103,7 @@ See the <SmartLink href={COMPONENT_FORMITEM}>FormItem article</SmartLink> for ea
 Every validation type has a corresponding severity associated with it.
 See the <SmartLink href={COMPONENT_FORMITEM}>FormItem article</SmartLink> for each.
 
-```ueml copy {7}
+```xmlui copy {7}
 <App>
   <Form data="{{ age: 20 }}" >
     <FormItem
@@ -1148,7 +1148,7 @@ Submitting the form via the `APICall` component triggers a visual confirmation o
 If the submission is successful, a success `Toast` component will appear for a few seconds.
 Otherwise, an error `Toast` component will show the error that occured.
 
-```ueml copy {3-8, 15-20}
+```xmlui copy {3-8, 15-20}
 <App>
   <Form data="{{ name: 'Joe' }}">
     <event name="submit">

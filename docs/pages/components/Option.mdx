@@ -8,7 +8,7 @@ import { Callout } from "nextra/components";
 
 ### With `AutoComplete`
 
-```ueml copy {4-6}
+```xmlui copy {4-6}
 <App>
   <Text value="Selected ID: {myComp.value}"/>
   <AutoComplete id="myComp">
@@ -36,7 +36,7 @@ import { Callout } from "nextra/components";
 
 ### With `Select`
 
-```ueml copy {4-6}
+```xmlui copy {4-6}
 <App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
@@ -76,7 +76,7 @@ This property defines the text to display for the option. If `label` is not defi
     If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
@@ -116,7 +116,7 @@ This property defines the value of the option. If `value` is not defined, `Optio
     If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">

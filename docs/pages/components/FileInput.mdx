@@ -18,7 +18,7 @@ The text box of the input field is read only.
 
 A list of file types the input controls accepts provided as a string array.
 
-```ueml
+```xmlui
 <App>
   <FileInput acceptsFileType="{['.txt', '.jpg']}" />
 </App>  
@@ -41,7 +41,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 The ID of the icon to display in the button
 
-```ueml
+```xmlui
 <App>
   <FileInput buttonIcon="drive" buttonLabel="Let there be drive" />
   <FileInput buttonIcon="drive" />
@@ -64,7 +64,7 @@ This optional string determines the location of the button icon.
 
 Available values: `start`, `end`
 
-```ueml
+```xmlui
 <App>
   <FileInput buttonIcon="drive" buttonLabel="End" buttonIconPosition="end" />
 </App>
@@ -88,7 +88,7 @@ This property is an optional string to set a label for the button part.
 If no label is specified and an icon is set, the button will modify its styling to look like an icon button.
 By default the label reads `Browse`.
 
-```ueml copy
+```xmlui copy
 <App >
   <FileInput />
   <FileInput buttonLabel="I am the button label" />
@@ -124,7 +124,7 @@ Available values:
 | `md` | Medium button |
 | `lg` | Large button |
 
-```ueml copy
+```xmlui copy
 <App>
   <FileInput buttonSize="lg" />
 </App>
@@ -147,7 +147,7 @@ The button color scheme (primary, secondary, attention)
 
 Available values: `attention`, `primary`, `secondary`
 
-```ueml copy
+```xmlui copy
 <App>
   <FileInput buttonThemeColor="secondary" />
 </App>
@@ -170,7 +170,7 @@ The button variant to use
 
 Available values: `solid`, `outlined`, `ghost`
 
-```ueml copy
+```xmlui copy
 <App>
   <FileInput buttonLabel="outlined" buttonVariant="outlined" />
 </App>
@@ -191,7 +191,7 @@ Details on different button variants can be found in the [`Button` variants sect
 
 This boolean property indicates whether the component allows selecting directories (`true`) or files only (`false`).
 
-```ueml copy
+```xmlui copy
 <App>
   <FileInput directory="true" />
 </App>  
@@ -210,7 +210,7 @@ This boolean property indicates whether the component allows selecting directori
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```ueml copy
+```xmlui copy
 <App>
   <FileInput enabled="false" />
 </App>
@@ -258,7 +258,7 @@ This property sets the width of the `FileInput`.
 
 This boolean property enables to add not just one (`false`), but multiple files to the field (`true`). This is done either by dragging onto the field or by selecting multiple files in the browser menu after clicking the input field button.
 
-```ueml copy
+```xmlui copy
 <App>
   <FileInput multiple="false" />
   <FileInput multiple="true" />
@@ -305,7 +305,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```ueml copy
+```xmlui copy
 <App>
   <FileInput />
   <FileInput validationStatus="valid" />
@@ -334,7 +334,7 @@ This event is triggered when value of FileInput has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in accordingly.
 
-```ueml copy {2}
+```xmlui copy {2}
 <App var.field="">
   <FileInput onDidChange="(file) => field = file[0]?.name" />
   <Text value="{field}" />
@@ -358,7 +358,7 @@ This event is triggered when the FileInput has received the focus.
 Clicking on the `FileInput` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```ueml copy {3-4}
+```xmlui copy {3-4}
 <App>
   <FileInput
     buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
@@ -395,7 +395,7 @@ This event is triggered when the FileInput has lost the focus.
 
 This method sets the focus on the FileInput.
 
-```ueml copy {2-3}
+```xmlui copy {2-3}
 <App>
   <HStack>
     <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
@@ -420,7 +420,7 @@ This method sets the focus on the FileInput.
 
 This API command triggers the file browsing dialog to open.
 
-```ueml copy {3-4}
+```xmlui copy {3-4}
 <App>
   <HStack>
     <Button label="Open FileInput" onClick="fileInputComponent.open()" />
@@ -452,7 +452,7 @@ By setting an ID for the component, you can refer to the value of the field if s
 In the example below, select a file using the file browser of the `FileInput` component
 and note how the `Text` component displays the selected file's name:
 
-```ueml copy {2-3}
+```xmlui copy {2-3}
 <App>
   <HStack>
     <Text value="Selected file name: {fileInputComponent.value}" />

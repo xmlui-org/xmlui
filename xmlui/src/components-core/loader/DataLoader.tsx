@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
+import Papa from "papaparse";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type {
@@ -81,17 +82,78 @@ function DataLoader({
 
   const doLoad = useCallback(
     async (abortSignal?: AbortSignal, pageParams?: any) => {
-      return await api.execute({
-        abortSignal,
-        operation: loader.props as any,
-        params: {
-          ...state,
-          $pageParams: pageParams,
-        },
-        resolveBindingExpressions: true,
-      });
+      // For CSV data type, handle directly rather than using RestApiProxy
+      if (loader.props.dataType === "csv") {
+        try {
+          const method = extractParam(state, loader.props.method, appContext) || "GET";
+          const headers = extractParam(state, loader.props.headers, appContext) || {};
+
+          const fetchOptions: RequestInit = {
+            method,
+            headers,
+          };
+
+          if (abortSignal) {
+            fetchOptions.signal = abortSignal;
+          }
+
+          if (rawBody) {
+            fetchOptions.body = rawBody;
+          }
+
+          const response = await fetch(url, fetchOptions);
+
+          if (!response.ok) {
+            throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
+          }
+
+          const csvText = await response.text();
+
+          return new Promise((resolve, reject) => {
+            Papa.parse(csvText, {
+              header: true,
+              skipEmptyLines: true,
+              complete: (results) => {
+                if (results.errors && results.errors.length) {
+                  console.warn("CSV parsing warnings:", results.errors);
+                  const fatalErrors = results.errors.filter(() => true);
+                  if (fatalErrors.length) {
+                    reject(new Error(`CSV parsing error: ${fatalErrors[0].message}`));
+                    return;
+                  }
+                }
+                resolve(results.data);
+              },
+              error: (error) => {
+                reject(error);
+              },
+            });
+          });
+        } catch (error) {
+          console.error("Error loading CSV:", error);
+          throw error;
+        }
+      } else {
+        return await api.execute({
+          abortSignal,
+          operation: loader.props as any,
+          params: {
+            ...state,
+            $pageParams: pageParams,
+          },
+          resolveBindingExpressions: true,
+        });
+      }
     },
-    [api, loader.props, state],
+    [
+      api,
+      loader.props,
+      state,
+      url,
+      body,
+      rawBody,
+      appContext
+    ],
   );
 
   const queryId = useMemo(() => {
@@ -241,6 +303,7 @@ export const DataLoaderMd = createMetadata({
     completedNotificationMessage: d("The message to show when the loader completes"),
     errorNotificationMessage: d("The message to show when an error occurs"),
     transformResult: d("Function for transforming the datasource result"),
+    dataType: d("Type of data to fetch (default: json, or csv)"),
   },
   events: {
     loaded: d("Event to trigger when the data is loaded"),
@@ -262,7 +325,7 @@ export const dataLoaderRenderer = createLoaderRenderer(
     lookupAction,
     lookupSyncCallback,
   }) => {
-    // --- Check for reuqired properties
+    // --- Check for required properties
     if (!loader.props?.url || !loader.props.url.trim()) {
       throw new Error("You must specify a non-empty (not whitespace-only) 'url' property for DataSource");
     }

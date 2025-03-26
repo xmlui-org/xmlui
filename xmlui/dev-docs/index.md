@@ -10,4 +10,5 @@ This article helps you understand the implementation details of xmlui so that yo
 - [Component Rendering](./component-rendering.md)
 - ...
 - [Helper Components](./helper-components)
+- [Component Review Checklist](./component-review-checklist.md)
 - [Glossary of Terms](./glossary.md/#some-other)

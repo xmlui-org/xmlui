@@ -24,7 +24,7 @@ If set to `true`, this boolean property enables the `TextArea` to resize automat
 
 Write multiple lines in the `TextArea` in the demo below to see how it resizes automatically.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextArea autoSize="true" />
 </App>
@@ -44,7 +44,7 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```ueml copy
+```xmlui copy
 <App>
   <TextArea enabled="false" />
 </App>
@@ -66,7 +66,7 @@ This optional boolean property indicates whether pressing the `Enter` key on the
 Press `Enter` after writing something in the `TextArea` in the demo below.
 See [Using Forms](../learning/forms.mdx) for details.
 
-```ueml copy
+```xmlui copy
 <App>
   <Form onSubmit="toast.success(JSON.stringify(address.value))">
     <TextArea
@@ -101,7 +101,7 @@ This property sets the component's initial value.
 
 The initial value displayed in the input field.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextArea initialValue="Example text" />
 </App>
@@ -151,7 +151,7 @@ This optional property sets the maximum number of text rows the `TextArea` can g
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
-```ueml copy {3}
+```xmlui copy {3}
 <App>
   <TextArea
     maxRows="3"
@@ -185,7 +185,7 @@ This optional property sets the minimum number of text rows the `TextArea` can s
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
-```ueml copy /minRows="3"/
+```xmlui copy /minRows="3"/
 <App>
   <TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />
 </App>
@@ -205,7 +205,7 @@ This optional property sets the minimum number of text rows the `TextArea` can s
 
 A placeholder text that is visible in the input field when its empty.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextArea placeholder="This is a placeholder" />
 </App>
@@ -224,7 +224,7 @@ A placeholder text that is visible in the input field when its empty.
 
 Set this property to `true` to disallow changing the component value.
 
-```ueml copy /readOnly="{true}"/
+```xmlui copy /readOnly="{true}"/
 <App>
   <TextArea initialValue="Example text" readOnly="{true}" />
 </App>
@@ -262,7 +262,7 @@ When you allow vertical resizing, you can limit the sizable range according to `
 
 Drag the small resize indicators at the bottom right on each of the controls in the demo.
 
-```ueml copy /resize/
+```xmlui copy /resize/
 <App>
   <TextArea resize="vertical" minRows="1" maxRows="8" />
   <TextArea resize="both" />
@@ -286,7 +286,7 @@ Specifies the number of rows the component initially has.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextArea rows="10" />
 </App>
@@ -315,7 +315,7 @@ Available values:
 
 This prop is used to visually indicate status changes reacting to form field validation.
 
-```ueml copy
+```xmlui copy
 <App>
   <TextArea />
   <TextArea validationStatus="valid" />
@@ -344,7 +344,7 @@ This event is triggered when value of TextArea has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```ueml copy {3}
+```xmlui copy {3}
 <App var.field="">
   <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
@@ -369,7 +369,7 @@ This event is triggered when the TextArea has received the focus.
 Clicking on the `TextArea` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```ueml copy {4-5}
+```xmlui copy {4-5}
 <App>
   <TextArea
     initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
@@ -402,7 +402,7 @@ This event is triggered when the TextArea has lost the focus.
 
 This method sets the focus on the TextArea.
 
-```ueml copy {2-3}
+```xmlui copy {2-3}
 <App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
   <TextArea id="inputComponent" />
@@ -423,7 +423,7 @@ This method sets the focus on the TextArea.
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-```ueml copy {9}
+```xmlui copy {9}
 <App var.changes="">
   <TextArea
     id="inputField"
@@ -462,7 +462,7 @@ You can query the component's value. If no value is set, it will retrieve `undef
 
 In the example below, typing in the `TextArea` will also display the length of the text typed into it above the field:
 
-```ueml copy {2-3}
+```xmlui copy {2-3}
 <App>
   <Text value="TextArea content length: {inputComponent.value.length}" />
   <TextArea id="inputComponent" />

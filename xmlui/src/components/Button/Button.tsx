@@ -13,7 +13,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dClick, dGotFocus, dLostFocus, dOrientation } from "../../components/metadata-helpers";
 import { Icon } from "../Icon/IconNative";
-import { Button, propDefaults } from "./ButtonNative";
+import { Button, defaultProps } from "./ButtonNative";
 
 const COMP = "Button";
 
@@ -25,28 +25,28 @@ export const ButtonMd = createMetadata({
       description: "Indicates if the button should receive focus when the page loads.",
       isRequired: false,
       type: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.autoFocus,
     },
     variant: {
       description: "The button variant determines the level of emphasis the button should possess.",
       isRequired: false,
       type: "string",
       availableValues: buttonVariantMd,
-      defaultValue: propDefaults.variant,
+      defaultValue: defaultProps.variant,
     },
     themeColor: {
       description: "Sets the button color scheme defined in the application theme.",
       isRequired: false,
       type: "string",
       availableValues: buttonThemeMd,
-      defaultValue: propDefaults.themeColor,
+      defaultValue: defaultProps.themeColor,
     },
     size: {
       description: "Sets the size of the button.",
       isRequired: false,
       type: "string",
       availableValues: sizeMd,
-      defaultValue: propDefaults.size,
+      defaultValue: defaultProps.size,
     },
     label: {
       description:
@@ -62,7 +62,7 @@ export const ButtonMd = createMetadata({
         `rarely need to set this property explicitly.`,
       availableValues: buttonTypesMd,
       valueType: "string",
-      defaultValue: propDefaults.type,
+      defaultValue: defaultProps.type,
     },
     enabled: {
       description:
@@ -71,7 +71,7 @@ export const ButtonMd = createMetadata({
       type: "boolean",
       defaultValue: true,
     },
-    orientation: dOrientation(propDefaults.orientation),
+    orientation: dOrientation(defaultProps.orientation),
     icon: {
       description:
         `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
@@ -83,7 +83,7 @@ export const ButtonMd = createMetadata({
       description: `This optional string determines the location of the icon in the ${COMP}.`,
       availableValues: iconPositionMd,
       type: "string",
-      defaultValue: propDefaults.iconPosition,
+      defaultValue: defaultProps.iconPosition,
     },
     contentPosition: {
       description:
@@ -91,7 +91,7 @@ export const ButtonMd = createMetadata({
         `inside the ${COMP} component.`,
       availableValues: alignmentOptionMd,
       type: "string",
-      defaultValue: propDefaults.contentPosition,
+      defaultValue: defaultProps.contentPosition,
     },
   },
   events: {

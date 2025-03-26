@@ -26,7 +26,7 @@ This property binds a particular input field to one of the attributes of the `Fo
 
 Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data looks like compared to the one set in `data`.
 
-```ueml copy /bindTo="firstname"/
+```xmlui copy /bindTo="firstname"/
 <App>
   <Form
     data="{{ firstname: 'James', lastname: 'Clewell' }}"
@@ -57,7 +57,7 @@ This optional number prop determines the time interval between two runs of a cus
 
 Note how changing the input in the demo below will result in a slight delay of input checks noted by the appearance of a new "I" character.
 
-```ueml copy /customValidationsDebounce="3000"/
+```xmlui copy /customValidationsDebounce="3000"/
 <App>
   <Form
     var.validations="Validations: "
@@ -94,7 +94,7 @@ Note how changing the input in the demo below will result in a slight delay of i
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```ueml copy {3-4}
+```xmlui copy {3-4}
 <App>
   <Form>
     <FormItem label="Firstname" enabled="true" />
@@ -119,7 +119,7 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the component's initial value.
 
-```ueml copy {3} /initialValue/
+```xmlui copy {3} /initialValue/
 <App>
   <Form data="{{ firstname: 'Michael', lastname: undefined }}">
     <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
@@ -148,7 +148,7 @@ This property is used to define a custom input template.
 
 This property sets the label of the component.
 
-```ueml copy /label="Firstname"/
+```xmlui copy /label="Firstname"/
 <App>
   <Form>
     <FormItem label="Firstname" />
@@ -187,7 +187,7 @@ Available values:
 Different input components have different layout methods
 (i.e. `TextBox` labels are positioned at the top, `Checkbox` labels are on the right side).
 
-```ueml copy /label="Firstname"/
+```xmlui copy /label="Firstname"/
 <App>
   <Form>
     <FormItem label="Start Label" labelPosition="start" />
@@ -222,7 +222,7 @@ This optional string property is used to customize the message that is displayed
 
 In the app, type a name longer than four characters in both fields, then leave the edited field. The two fields will display different error messages; the second uses the customized one.
 
-```ueml copy /lengthInvalidMessage="Name is too long!"/
+```xmlui copy /lengthInvalidMessage="Name is too long!"/
 <App>
   <Form
     data="{{ firstname: 'James', lastname: 'Clewell' }}"
@@ -255,7 +255,7 @@ Available values: `error` **(default)**, `warning`, `valid`
 
 In the app, type a name longer than four characters in both fields, then leave the edited field. The two fields will display different error messages; the second uses a warning instead of an error.
 
-```ueml copy /lengthInvalidSeverity="warning"/
+```xmlui copy /lengthInvalidSeverity="warning"/
 <App>
   <Form
     data="{{ firstname: 'James', lastname: 'Clewell' }}"
@@ -289,7 +289,7 @@ but setting such a value programmatically still results in a validation check.
 
 In the demo below, try to enter an input longer than 4 characters or submit the form as is.
 
-```ueml copy /maxLength="4"/
+```xmlui copy /maxLength="4"/
 <App>
   <Form
     data="{{ firstname: 'James' }}"
@@ -325,7 +325,7 @@ but setting such a value programmatically still results in a validation check.
 
 In the demo below, enter an input greater than 99 or just submit the form as is.
 
-```ueml copy /maxValue="99"/
+```xmlui copy /maxValue="99"/
 <App>
   <Form
     data="{{ age: 100 }}"
@@ -354,7 +354,7 @@ Checks whether the input has a minimum length of a specified value.
 
 In the demo below, enter an input shorter than 4 characters or just submit the form as is.
 
-```ueml copy /minLength="4"/
+```xmlui copy /minLength="4"/
 <App>
   <Form
     data="{{ firstname: '' }}"
@@ -386,7 +386,7 @@ but setting such a value programmatically still results in a validation check.
 
 In the demo below, enter an input smaller than 18 or just submit the form as is.
 
-```ueml copy /minValue="18"/
+```xmlui copy /minValue="18"/
 <App>
   <Form
     data="{{ age: 0 }}"
@@ -423,7 +423,7 @@ Checks whether the input fits a predefined regular expression.
 
 In the demo below, enter an input that is not solely one lowercase string or just submit the form as is.
 
-```ueml copy /pattern="email"/
+```xmlui copy /pattern="email"/
 <App>
   <Form
     data="{{ userEmail: 'mailto' }}"
@@ -452,7 +452,7 @@ This optional string property is used to customize the message that is displayed
 
 In the demo below, enter anything that does not look like an email and click outside to see the regular and custom message.
 
-```ueml copy /patternInvalidMessage="This does not look like an email"/
+```xmlui copy /patternInvalidMessage="This does not look like an email"/
 <App>
   <Form
     data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
@@ -489,7 +489,7 @@ Available values: `error` **(default)**, `warning`, `valid`
 
 In the demo below, enter a string of characters that does not look like an email to see the difference in feedback.
 
-```ueml copy /patternInvalidSeverity="warning"/
+```xmlui copy /patternInvalidSeverity="warning"/
 <App>
   <Form
     data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
@@ -521,7 +521,7 @@ This optional string property is used to customize the message that is displayed
 In the demo below, enter any value that is out of range in the input fields and click outside to see the regular and custom message.
 Just submitting the form as is also produces the same error.
 
-```ueml copy /rangeInvalidMessage="Out of range!"/
+```xmlui copy /rangeInvalidMessage="Out of range!"/
 <App>
   <Form
     data="{{ age: 100, customAge: 100 }}"
@@ -565,7 +565,7 @@ Available values: `error` **(default)**, `warning`, `valid`
 In the demo below, enter any value that is out of range in the input fields and click outside to see the regular and custom message.
 Just submitting the form as is also produces the same error.
 
-```ueml copy /rangeInvalidSeverity="warning"/
+```xmlui copy /rangeInvalidSeverity="warning"/
 <App>
   <Form
     data="{{ age: 100, customAge: 100 }}"
@@ -605,7 +605,7 @@ Checks whether the input fits the provided regular expression.
 
 In the demo below, enter an input that is not solely one lowercase string or just submit the form as is.
 
-```ueml copy /regex="^[a-z]+$"/
+```xmlui copy /regex="^[a-z]+$"/
 <App>
   <Form
     data="{{ password: 'PASSWORD123' }}"
@@ -634,7 +634,7 @@ This optional string property is used to customize the message that is displayed
 
 In the demo below, enter a password that is not a lowercase string and click outside to see the regular and custom message.
 
-```ueml copy /regexInvalidMessage="Password must be all lowercase"/
+```xmlui copy /regexInvalidMessage="Password must be all lowercase"/
 <App>
   <Form
     data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
@@ -672,7 +672,7 @@ Available values: `error` **(default)**, `warning`, `valid`
 In the demo below, enter a password that is not a lowercase string and click outside to see the regular and custom message.
 Just submitting the form as is also produces the same error.
 
-```ueml copy /regexInvalidSeverity="warning"/
+```xmlui copy /regexInvalidSeverity="warning"/
 <App>
   <Form
     data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
@@ -701,7 +701,7 @@ Just submitting the form as is also produces the same error.
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-```ueml copy /required="true"/
+```xmlui copy /required="true"/
 <App>
   <Form
     data="{{ name: undefined }}"
@@ -730,7 +730,7 @@ This optional string property is used to customize the message that is displayed
 
 In the demo below, leave the field empty and click outside to see the regular and custom message.
 
-```ueml copy /requiredInvalidMessage="Lastname is required!"/
+```xmlui copy /requiredInvalidMessage="Lastname is required!"/
 <App>
   <Form
     data="{{ firstname: undefined, lastname: undefined }}"
@@ -812,7 +812,7 @@ This event is used to define a custom validation function.
 
 In the demo below, leave the field as is and submit the form or enter an input that is not all capital letters.
 
-```ueml copy {7}
+```xmlui copy {7}
 <App>
   <Form
     data="{{ name: 'James' }}"

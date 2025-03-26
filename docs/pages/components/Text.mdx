@@ -15,7 +15,7 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
 
 This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
 
-```ueml copy /ellipses="false"/
+```xmlui copy /ellipses="false"/
 <App>
   <VStack width="120px">
     <Text
@@ -62,7 +62,7 @@ This property indicates whether ellipses should be displayed when the text is cr
 
 This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines.
 
-```ueml copy
+```xmlui copy
 <App>
   <Text
     maxWidth="120px"
@@ -91,7 +91,7 @@ This property determines the maximum number of lines the component can wrap to. 
 
 This property indicates if linebreaks should be preserved when displaying text.
 
-```ueml copy {7}
+```xmlui copy {7}
 <App>
   <HStack>
     <Text
@@ -145,7 +145,7 @@ This property indicates if linebreaks should be preserved when displaying text.
 
 The text to be displayed. This value can also be set via nesting the text into the `Text` component.
 
-```ueml copy
+```xmlui copy
 <App>
   <Text value="An example text" />
   <Text>An example text</Text>
@@ -581,28 +581,6 @@ with the following theme variables:
 | [color](../styles-and-themes/common-units/#color)-Text-placeholder | $color-surface-500 | $color-surface-500 |
 | [color](../styles-and-themes/common-units/#color)-Text-secondary | $textColor-secondary | $textColor-secondary |
 | [color](../styles-and-themes/common-units/#color)-Text-subheading | $textColor-secondary | $textColor-secondary |
-| font-style-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-style-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text | $fontFamily | $fontFamily |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -671,7 +649,27 @@ with the following theme variables:
 | [fontStretch](../styles-and-themes/common-units/#fontStretch)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontStretch](../styles-and-themes/common-units/#fontStretch)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontStretch](../styles-and-themes/common-units/#fontStretch)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-cite | italic | italic |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-var | italic | italic |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-abbr | $fontWeight-bold | $fontWeight-bold |

@@ -76,6 +76,7 @@ export default ({ mode }) => {
       },
     },
     build: {
+      minify:false,
       emptyOutDir: false,
       outDir: "dist",
       lib: lib,

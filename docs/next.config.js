@@ -13,11 +13,11 @@ const withNextra = require("nextra")({
       getHighlighter: async (options) => {
         const myLanguageGrammar = JSON.parse(fs.readFileSync("../xmlui/src/syntax/grammar.tmLanguage.json"));
 
-        const uemlLanguage = {
+        const xmluiLanguage = {
           id: "xmlui",
           scopeName: "source.xmlui",
           grammar: myLanguageGrammar,
-          aliases: ["ueml", "xmlui"],
+          aliases: ["xmlui"],
         };
 
         const highlighter = await shiki.getHighlighter({
@@ -25,7 +25,7 @@ const withNextra = require("nextra")({
           theme,
           langs: [...shiki.BUNDLED_LANGUAGES],
         });
-        await highlighter.loadLanguage(uemlLanguage);
+        await highlighter.loadLanguage(xmluiLanguage);
 
         highlighter.setColorReplacements({
           "#000001": "var(--syntax-token-component)",

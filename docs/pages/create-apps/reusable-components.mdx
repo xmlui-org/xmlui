@@ -14,7 +14,7 @@ This article will teach you the gritty-nitty details of component creation and c
   Use the `<Component>` tag to declare a reusable component in the markup. This tag has a mandatory attribute, `name`, a unique identifier to the component.
 </Callout>
 
-```ueml copy filename="components/LabeledValue.xmlui"
+```xmlui copy filename="components/LabeledValue.xmlui"
 <Component name="LabeledValue">
   <HStack>
     <Text>Label:</Text>
@@ -25,7 +25,7 @@ This article will teach you the gritty-nitty details of component creation and c
 
 You can immediately use the new component type, `LabeledValue`, putting it into your app using the `<LabeledValue>` tag:
 
-```ueml copy filename="Main.xmlui"
+```xmlui copy filename="Main.xmlui"
 <App>
   <LabeledValue />
   -- Separator text --
@@ -70,7 +70,7 @@ Though reusable components with a static appearance may be helpful, the real pow
 
 With a few additions, you can allow `LabeledValue` to receive a `label` and a `value` specification:
 
-```ueml copy
+```xmlui copy
 <Component name="LabeledValue">
   <HStack>
     <Text>{$props.label}:</Text>
@@ -83,7 +83,7 @@ The `$props` context value defines the properties passed to the custom component
 
 Use the same markup to pass property values to reusable components as you do for built-in components:
 
-```ueml
+```xmlui
 <App>
   <LabeledValue label="Firstname" value="Cameron" />
   -- Separator text --
@@ -113,7 +113,7 @@ XMLUI does not require defining component properties in advance. You just use yo
 
 Sometimes, it is helpful to have default values for properties. XMLUI makes it simple using the `??` operator, as you can see in the following component definition:
 
-```ueml
+```xmlui
 <Component name="LabeledValue">
   <HStack>
     <Text>{$props.label ?? '[label]'}:</Text>
@@ -149,7 +149,7 @@ Sometimes, it is helpful to have default values for properties. XMLUI makes it s
 
 Create a new reusable component, `<IncButton>`, which increments its value for every click. This component can notify its environment about increments by firing an event. This event receives the current counter as an event parameter:
 
-```ueml copy {4}
+```xmlui copy {4}
 <Component name="IncButton">
   <Button
     label="Click to increment: {count}" var.count="{0}"
@@ -161,7 +161,7 @@ The `emitEvent` function emits the `"incremented"` event attached to the reusabl
 
 The following app uses the new event to append the number of clicks to a text. The handler of the `incremented` event (`onIncremented`) declares an arrow function where `v` represents the event value, namely, the count of clicks:
 
-```ueml copy
+```xmlui copy
 <App var.text="">
   <IncButton onIncremented="v => text += ' ' + v" />
   <Text value="{text}" />
@@ -197,7 +197,7 @@ You can invoke these methods in other components to execute an operation or quer
 
 The following code snippet shows a modified `<IncButton>` component that exposes a method, `setValue`, to set the button's counter value from outside the component:
 
-```ueml copy {4}
+```xmlui copy {4}
 <Component
   name="IncButton"
   var.count="{0}"
@@ -214,7 +214,7 @@ The updated component stores the counter value in a variable belonging to the en
 
 The following app adds a second button to set the current value of `<IncButton>` to 123 on a click. Here, we provide an `id` for `<IncButton>` to refer to it from the second button:
 
-```ueml copy {3,6}
+```xmlui copy {3,6}
 <App>
   <HStack>
     <IncButton id="myIncButton" />
@@ -253,7 +253,7 @@ Try using this simple app:
 
 Here, `Slot` is nested into `VStack` to mark the location to inject `MyStack` children:
 
-```ueml copy {4}
+```xmlui copy {4}
 <Component name="MyStack">
   <H2>This is my special Stack</H2>
   <VStack backgroundColor="cyan">
@@ -264,7 +264,7 @@ Here, `Slot` is nested into `VStack` to mark the location to inject `MyStack` ch
 
 This sample injects children into `MyStack`:
 
-```ueml copy {2-4}
+```xmlui copy {2-4}
 <App>
   <MyStack>
   These are the children injected into the
@@ -307,7 +307,7 @@ The `Slot` may display default content when the reusable component instance does
 
 In this example, `Slot` declares a default view:
 
-```ueml copy {3}
+```xmlui copy {3}
 <Component name="MyGreeting">
   <Slot>
     <H2>Hi There!</H2>
@@ -317,7 +317,7 @@ In this example, `Slot` declares a default view:
 
 The following sample displays two `MyGreeting` instances. The first does not define children (content for `Slot`); the second does:
 
-```ueml copy
+```xmlui copy
 <App>
   <MyGreeting />
   <MyGreeting>
@@ -357,7 +357,7 @@ The `Slot` in a reusable component may define arbitrary properties it passes as 
 
 The following component, `RandomNumberDisplay`, generates a random number between its `minValue` and `maxValue` properties and delegates displaying that number to its consumer.
 
-```ueml copy /number="{randomNumber}"/
+```xmlui copy /number="{randomNumber}"/
 <Component name="RandomNumberDisplay">
   <variable 
     name="randomNumber" 
@@ -368,7 +368,7 @@ The following component, `RandomNumberDisplay`, generates a random number betwee
 
 Here, the app uses `RandomNumberDisplay` to generate a number between 10 and 19, which it displays in a shaded box with 4 times zoom. The app receives the random number passed to the `number` property within the component declaration of `RandomNumberDisplay` in the `$number` context value.
 
-```ueml copy {3-7} /$number/
+```xmlui copy {3-7} /$number/
 <App>
   <RandomNumberDisplay minValue="{10}" maxValue="{20}">
     <CHStack 
@@ -411,7 +411,7 @@ A reusable component may define named `Slot` elements (each having a unique `nam
 
 In the following example, `FancyCard` has a named slot (`titleTemplate`) with default slot content and a `title` context value, which wraps the title in several asterisks:
 
-```ueml copy {4-6}
+```xmlui copy {4-6}
 <Component name="FancyCard">
   <VStack border="2px solid orangered" padding="$padding-loose">
     <variable name="fancyTitle" value="*** {$props.title} ***" />
@@ -427,7 +427,7 @@ In the following example, `FancyCard` has a named slot (`titleTemplate`) with de
 
 The app uses two instances of `FancyCard`. The first does not have a definition for the `titleTemplate`; the engine uses the default content declared in `FancyCard`. The second instance has template content that renders the title in a shaded box. This template content uses the asterisk-wrapped title via the `$title` context value.
 
-```ueml copy {6-10}
+```xmlui copy {6-10}
 <App>
   <FancyCard title="Demo Card #1">
     This is my fancy card content #1
@@ -485,7 +485,7 @@ In this section, you will learn a few details about how reusable components are 
 
 Let's create a reusable component, `MyBoxes`, with this markup:
 
-```ueml copy
+```xmlui copy
 <Component name="MyBoxes">
   <Stack width="100px" height="36px" backgroundColor="purple" />
   <Stack width="50px" height="36px" backgroundColor="orange" />
@@ -502,7 +502,7 @@ Let's create a reusable component, `MyBoxes`, with this markup:
 
 Nest the `MyBoxes` instances into an `HStack`:
 
-```ueml copy /width="50%"/
+```xmlui copy /width="50%"/
 <App>
   <HStack>
     <MyBoxes width="50%" />
@@ -513,7 +513,7 @@ Nest the `MyBoxes` instances into an `HStack`:
 
 The engine renders this markup as if your declaration was this (it ignores the `width="50%` of the first `MyBoxes`) instance:
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <Stack width="100px" height="36px" backgroundColor="purple" />
@@ -550,7 +550,7 @@ Because stacks use a non-zero gap by default, you see this gap between the child
 
 When you wrap `MyBoxes` into a `VStack`:
 
-```ueml copy
+```xmlui copy
 <App>
   <VStack>
     <MyBoxes width="50%" />
@@ -561,7 +561,7 @@ When you wrap `MyBoxes` into a `VStack`:
 
 The engine renders the markup as if it were this one:
 
-```ueml copy
+```xmlui copy
 <App>
   <VStack>
     <Stack width="100px" height="36px" backgroundColor="purple" />
@@ -603,7 +603,7 @@ Thus, the markup with `MyBoxes` in a wrapping `VStack` renders this:
 
 Assume you use `MyBoxes` with a `FlowLayout`, like in this example:
 
-```ueml copy
+```xmlui copy
 <App>
   <FlowLayout>
     <MyBoxes width="50%" />
@@ -614,7 +614,7 @@ Assume you use `MyBoxes` with a `FlowLayout`, like in this example:
 
 Because of the internal wrapping, the engine renders a markup like this:
 
-```ueml copy /width="50%"/
+```xmlui copy /width="50%"/
 <App>
   <FlowLayout>
     <FlowLayoutItem width="50%">
@@ -661,7 +661,7 @@ Because of the internal wrapping, the engine renders a markup like this:
 
 You can explicitly wrap the children of a reusable component into a layout container to mark your intention regarding their arrangement. For example, if you want the purple and orange boxes in a horizontal layout (within the component), you can explicitly declare that intention:
 
-```ueml copy /HStack gap="0" border="2px dotted green"/
+```xmlui copy /HStack gap="0" border="2px dotted green"/
 <Component name="MyBoxes">
   <HStack gap="0" border="2px dotted green" >
     <Stack width="100px" height="36px" backgroundColor="purple" />
@@ -676,7 +676,7 @@ You can explicitly wrap the children of a reusable component into a layout conta
 
 Wrap two `MyBoxes` instances into an `HStack`:
 
-```ueml copy
+```xmlui copy
 <App>
   <FlowLayout>
     <MyBoxes width="50%" />
@@ -774,7 +774,7 @@ The display with a `FlowLayout`:
 
 When you use a layout container within a reusable component, you can assign an explicit width to that container, like in this example:
 
-```ueml copy /width="180px"/
+```xmlui copy /width="180px"/
 <Component name="MyBoxes">
   <HStack gap="0" border="2px dotted green" width="180px" >
     <Stack width="100px" height="36px" backgroundColor="purple" />
@@ -787,7 +787,7 @@ The purple and orange boxes are in a horizontal stack set to 180 pixels wide. Th
 
 Place two `MyBoxes` instances in an `HStack`:
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <MyBoxes width="50%" />
@@ -824,7 +824,7 @@ Here, the dotted green background signs the boundary of the `HStack`, which arra
 
 Now, place `MyBoxes` into a `VStack`:
 
-```ueml copy
+```xmlui copy
 <App>
   <VStack>
     <MyBoxes width="50%" />
@@ -859,7 +859,7 @@ You can see that each `MyBoxes` instance is rendered exactly as previously. None
 
 Try using `MyBoxes` in a `FlowLayout`:
 
-```ueml copy
+```xmlui copy
 <App>
   <FlowLayout>
     <MyBoxes width="50%" />

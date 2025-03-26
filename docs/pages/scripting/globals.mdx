@@ -134,6 +134,14 @@ This property returns `true` if the app is a standalone XMLUI app; otherwise (fo
 
 ## Date Utilities
 
+### `differenceInMinutes`
+
+```ts
+function differenceInMinutes: (date1: number | Date, date2: number | Date): number;
+```
+
+This function returns the difference between the two date parameters in minutes.
+
 ### `formatDate`
 
 ```ts
@@ -198,13 +206,29 @@ function isoDateString(date?: string): string;
 
 This function converts the input string into a date value and returns the ISO 8601 string representation of the date. It can pass dates between the UI and backend APIs in a standard format.
 
-### `isToday`
+### `differenceInMinutes`
 
 ```ts
-function isToday(date?: string | Date): boolean;
+function differenceInMinutes: (date1: number | Date, date2: number | Date): number;
 ```
 
-This function checks if the specified date is today.
+This function returns the difference between the two date parameters in minutes.
+
+### `isSameDay`
+
+```ts
+function isSameDay: (dateLeft: number | Date, dateRight: number | Date): boolean;
+```
+
+This function checks if the two dates specified in the parameters are on the same calendar day.
+
+### `isThisYear`
+
+```ts
+function (date: Date | number): boolean;
+```
+
+This function checks if the specified date is in this calendar year.
 
 ### `isTomorrow`
 

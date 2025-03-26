@@ -10,7 +10,7 @@ This section details the XMLUI markup fundamentals. The markup is almost identic
   XMLUI **comments** use the same syntax as XML/XHTML comments.
 </Callout>
 
-```ueml
+```xmlui
 <!-- This is an XMLUI comment, it could be an XML or XHTML comment, too -->
 ```
 
@@ -18,7 +18,7 @@ This section details the XMLUI markup fundamentals. The markup is almost identic
   XMLUI allows you to use **comments within tags**.
 </Callout>
 
-```ueml
+```xmlui
 <Button <!-- This is a comment --> label="Click me!" />
 ```
 
@@ -34,7 +34,7 @@ XML and XHTML does not allow comments within an element. However, XMLUI does; yo
   transforms them accordingly.
 </Callout>
 
-```ueml /Button/ /Text/ /VStack/
+```xmlui /Button/ /Text/ /VStack/
 <!-- Simple tag without nested children -->
 <Button label="Click Me!" />
 
@@ -55,7 +55,7 @@ XML and XHTML does not allow comments within an element. However, XMLUI does; yo
 
 In the following code, `<property>` is a helper tag. XMLUI uses the `<property>` helper to specify the value of a property, which cannot be represented as a string.
 
-```ueml /property/
+```xmlui /property/
 <DropdownMenu>
   <property name="triggerTemplate">
     <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
@@ -68,7 +68,7 @@ In the following code, `<property>` is a helper tag. XMLUI uses the `<property>`
 
 The order of component tags reflects their display order. However, the order of helper tags embedded into other tags is invariant; they can have any order and still resulting the same effect. So, the following markup renders the same UI as the previous one:
 
-```ueml
+```xmlui
 <DropdownMenu>
   <MenuItem>Item 1</MenuItem>
   <MenuItem>Item 2</MenuItem>
@@ -85,7 +85,7 @@ The order of component tags reflects their display order. However, the order of 
   XMLUI reserves namespaces for future extensions. When you use them, the framework simply ignores them.
 </Callout>
 
-```ueml
+```xmlui
 <myPackage:Button label="Click me!" />
 ```
 
@@ -97,7 +97,7 @@ This declaration renders a `Button` as if you used it without a namespace.
 
 The following markup would not compile:
 
-```ueml
+```xmlui
 <some:Text>
   This is wrong.
 </other:Text>
@@ -120,7 +120,7 @@ Attribute names start with a letter and may be continued with letters, digits, a
 
 In the following code snippet, all attribute values are accepted:
 
-```ueml
+```xmlui
 <Button label='Click Me!' color="#a0a0a0" width=`50%` padding=".2rem" />
 ```
 
@@ -134,7 +134,7 @@ In the following code snippet, all attribute values are accepted:
 
 In the following code snippet, the `onClick` attribute of `<Button>` contains three line breaks (one before `isRunning`, one before `while`, and a third one after `count++;`):
 
-```ueml copy
+```xmlui copy
 <Button label="Infinite loop: {count}" onClick="
   isRunning = true;
   while (isRunning) count++;
@@ -150,13 +150,13 @@ In the following code snippet, the `onClick` attribute of `<Button>` contains th
 
 For example, you could use this markup to sign an active menu item:
 
-```ueml
+```xmlui
 <MenuItem label="Open" active="true" />
 ```
 
 With key-only attributes, you can make this markup more concise:
 
-```ueml
+```xmlui
 <MenuItem label="Open" active />
 ```
 ### Quoteless Attributes
@@ -169,13 +169,13 @@ With key-only attributes, you can make this markup more concise:
 
 The following `Text` component's `value` is an expression that matches the "quoteless" criterium:
 
-```ueml
+```xmlui
 <Text value="re-fetch" />
 ```
 
 Thus, you can omit the double quotes when defining it:
 
-```ueml
+```xmlui
 <Text value=re-fetch />
 ```
 
@@ -195,7 +195,7 @@ Thus, you can omit the double quotes when defining it:
 
 So, each of these text pairs represents the same text:
 
-```ueml
+```xmlui
 <Text>You're so beautiful</Text>
 <Text>You&apos;re so beautiful</Text>
 
@@ -244,7 +244,7 @@ This markup will output the following:
   In the markup, you can **nest child items into any component**. Each of these children can be a tag or a text value.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <VStack>
   This is a text segment before a Button component.
   <Button label="I'm a non-functional Button"/>
@@ -273,7 +273,7 @@ This markup will output the following:
   that HTML applies. The engine removes extra spaces, tabs, and line breaks:
 </Callout>
 
-```ueml copy
+```xmlui copy
 <Text>
   Though      this is a multiline text     declaration (with several line breaks),
   the engine        collapses whitespaces.
@@ -303,7 +303,7 @@ The engine will display the following text after collapsing whitespaces:
   text into quotes.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <Text>
   "I'm a text containing a left angle: <"
 </Text>
@@ -330,7 +330,7 @@ You can use double quotes (`"`), single quotes (`'`), or backticks (`` ` ``) as 
   characters (prevents whitespace collapsing).
 </Callout>
 
-```ueml
+```xmlui
 <MarkDown>
   <![CDATA[
 # Who's that then?
@@ -385,7 +385,7 @@ K-n-n-n-n-n-n-n-niggits! A newt?
 <Callout type="info" emoji="💡">
 </Callout>
 
-```ueml
+```xmlui
 <HStack>
   <VStack width="25%">
     This is Button #1!
@@ -438,7 +438,7 @@ K-n-n-n-n-n-n-n-niggits! A newt?
   app or a component, your **definition must have a single root tag**.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <!-- You can nest child components into this slot -->
 </App>
@@ -450,7 +450,7 @@ K-n-n-n-n-n-n-n-niggits! A newt?
 
 The engine raises an error if the app or component markup contains multiple root tags:
 
-```ueml copy
+```xmlui copy
 <!-- This markup is not valid -->
 <Button label="Click me!" />
 <Text>Clicked!</Text>
@@ -461,7 +461,7 @@ The engine raises an error if the app or component markup contains multiple root
   any visual or functional overhear to your app.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <!-- Now, this markup is valid -->
 <Fragment>
   <Button label="Click me!"/>
@@ -476,7 +476,7 @@ The engine raises an error if the app or component markup contains multiple root
   property.
 </Callout>
 
-```ueml
+```xmlui
 <Button label="Click me!"/>
 ```
 
@@ -485,7 +485,7 @@ The engine raises an error if the app or component markup contains multiple root
   <property>` tag**. Use the tag's **`name` attribute** to identify the property.
 </Callout>
 
-```ueml {2 - 4} /property/
+```xmlui {2 - 4} /property/
 <DropdownMenu>
   <property name="triggerTemplate">
     <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
@@ -503,7 +503,7 @@ The engine raises an error if the app or component markup contains multiple root
   <property>` tag, you can use it to represent string data; specify that with the `value` attribute.
 </Callout>
 
-```ueml /property/ /name/ /value/
+```xmlui /property/ /name/ /value/
 <Button>
   <property name="label" value="Click me!"/>
 </Button>
@@ -524,7 +524,7 @@ The engine raises an error if the app or component markup contains multiple root
 
 **Connect Button click to APICall**
 
-```ueml copy /onClick/
+```xmlui copy /onClick/
 <Button label="Change Name">
   <event name="click">
     <APICall
@@ -541,7 +541,7 @@ The engine raises an error if the app or component markup contains multiple root
 **Connect MenuItem click to APICall**
 
 
-```ueml copy /onClick/
+```xmlui copy /onClick/
 <MenuItem label="Delete">
   <event name="click">
     <APICall
@@ -557,7 +557,7 @@ The engine raises an error if the app or component markup contains multiple root
 **Connect Form submit to APICall**
 
 
-```ueml copy /onClick/
+```xmlui copy /onClick/
 <Form data="{{ age: 43 }}">
   <event name="submit">
     <APICall
@@ -574,7 +574,7 @@ The engine raises an error if the app or component markup contains multiple root
 
 **Connect Checkbox change to APICall**
 
-```ueml copy /onClick/
+```xmlui copy /onClick/
 <Column header = "fave">
   <Checkbox initialValue="{$item.fave}">
     <event name="didChange">
@@ -596,7 +596,7 @@ The engine raises an error if the app or component markup contains multiple root
   attribute with the `var.` prefix followed by the variable's name.
 </Callout>
 
-```ueml /var./
+```xmlui /var./
 <Button label="Click me!" var.greeting="Hello!"/>
 ```
 
@@ -607,7 +607,7 @@ This markup assigns a variable named `greeting` to the `Button` with the initial
 </Callout>
 
 
-```ueml /var./
+```xmlui /var./
 <Button label="Click me!">
   <variable name="greeting" value="Hello!">
 </Button>
@@ -615,7 +615,7 @@ This markup assigns a variable named `greeting` to the `Button` with the initial
 
 And similarly to `<property>`, XMLUI accepts nested text for the variable's initial value.
 
-```ueml /var./
+```xmlui /var./
 <Button label="Click me!">
   <variable name="greeting">Hello!</variable>
 </Button>
@@ -627,7 +627,7 @@ And similarly to `<property>`, XMLUI accepts nested text for the variable's init
   intended type, use binding expressions.**
 </Callout>
 
-```ueml
+```xmlui
 <!-- count is a string, "0" -->
 <Button label="Click me!">
   <variable name="count" value="0"/>
@@ -655,7 +655,7 @@ And similarly to `<property>`, XMLUI accepts nested text for the variable's init
   You can use a binding expression to define a **compound value**.
 </Callout>
 
-```ueml /{x: 100, y: 40}/
+```xmlui /{x: 100, y: 40}/
 <Fragment>
   <variable name="origin" value="{{x: 100, y: 40}}"/>
 </Fragment>
@@ -671,7 +671,7 @@ object literal defines a hash object with `x` and `y` properties.
   within the app's `components` folder. Use the `name` attribute to assign a unique name to the component.
 </Callout>
 
-```ueml copy /Component name="IncButton"/ /Component/
+```xmlui copy /Component name="IncButton"/ /Component/
 <Component name="IncButton">
   <variable name="count" value="{0}"/>
   <Button label="Click to increment: {count}" onClick="count++"/>
@@ -684,7 +684,7 @@ object literal defines a hash object with `x` and `y` properties.
 
 You can add the new component to your app with the `<IncButton>` tag.
 
-```ueml /IncButton/
+```xmlui /IncButton/
 <App>
   <!-- Other components -->
   <IncButton/>
@@ -699,7 +699,7 @@ To declare them, you can use two notations (according to your preference):
 
 With `method.` prefix:
 
-```ueml copy {4} /method.setValue/
+```xmlui copy {4} /method.setValue/
 <Component
   name="IncButton"
   var.count="{0}"
@@ -710,7 +710,7 @@ With `method.` prefix:
 
 With the `<method>` tag:
 
-```ueml copy {3} /value="v => count = v"/ /setValue/
+```xmlui copy {3} /value="v => count = v"/ /setValue/
 <Component name="IncButton"
   <variable name="count" value="{0}"/>
   <method name="setValue" value="v => count = v"/>

@@ -14,7 +14,7 @@ As whitespaces (such as spaces and line breaks) have significance in Markdown, y
 
 Indentation is also essential in Markdown. Start the markdown text in the first column as the following sample shows:
 
-```ueml copy
+```xmlui copy
 <App layout="horizontal-sticky">
   <Markdown>
     <![CDATA[
@@ -184,7 +184,7 @@ Empty `${}` expressions are removed.
 Objects, functions and arrays will be stringified if you place them in `Markdown`.
 Function calls are executed and their return values inlined as strings into markdown.
 
-```ueml copy {5-9}
+```xmlui copy {5-9}
 <App>
   <variable name="x" value="{() => { return 'testing' }}" />
   <Markdown>
@@ -225,7 +225,7 @@ This property sets the markdown content to display.
 
 Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
 
-```ueml copy
+```xmlui copy
 <App>
   <VStack>
     <Items data="{[
@@ -260,7 +260,7 @@ Use this property when the text you provide is not static but a result of calcul
 
 This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.
 
-```ueml copy /removeIndents="true"/
+```xmlui copy /removeIndents="true"/
 <App layout="horizontal-sticky" padding="1rem">
   <Markdown removeIndents="true">
     <![CDATA[
@@ -294,14 +294,6 @@ This boolean property specifies whether leading indents should be removed from t
 </App>
   `}
 />
-
-### `url`
-
-Optional URL to load the markdown content from.
-
-### `value`
-
-Bound data value, typically populated by a DataSource.
 
 ## Events
 
@@ -362,7 +354,7 @@ Use a theme that sets these theme variable values:
 }
 ```
 
-```ueml copy
+```xmlui copy
 <App>
   <Markdown>
     <![CDATA[
@@ -429,7 +421,7 @@ Check this sample:
 }
 ```
 
-```ueml copy
+```xmlui copy
 <App>
   <Markdown>
     <![CDATA[
@@ -495,7 +487,7 @@ Here is a sample:
 }
 ```
 
-```ueml copy
+```xmlui copy
 <App>  
   <Markdown>
     <![CDATA[
@@ -553,7 +545,7 @@ Check this sample:
 }
 ```
 
-```ueml copy
+```xmlui copy
 <App>
   <Markdown>
     <![CDATA[
@@ -610,7 +602,7 @@ Look at this example:
 }
 ```
 
-```ueml copy
+```xmlui copy
 <App>
   <Markdown>
     <![CDATA[

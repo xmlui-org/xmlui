@@ -8,7 +8,7 @@
 
 This property defines the initial value of the selected option within the group.
 
-```ueml copy /initialValue="first"/
+```xmlui copy /initialValue="first"/
 <App>
   <RadioGroup initialValue="first">
     <HStack padding="$space-normal">
@@ -41,7 +41,7 @@ This property defines the initial value of the selected option within the group.
 
 This property indicates whether the input accepts user actions (`true`) or not (`false`). The default value is `true`.
 
-```ueml copy /enabled="false"/
+```xmlui copy /enabled="false"/
 <App>
   <RadioGroup initialValue="first" enabled="false">
     <HStack padding="$space-normal">
@@ -80,7 +80,7 @@ This prop is used to visually indicate status changes reacting to form field val
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```ueml copy
+```xmlui copy
 <App>
   <HStack>
     <RadioGroup initialValue="first" validationStatus="error">
@@ -127,7 +127,7 @@ This prop is used to visually indicate status changes reacting to form field val
 
 You can use this method to set the component's current value programmatically.
 
-```ueml copy {2, 7-8}
+```xmlui copy {2, 7-8}
 <App>
   <RadioGroup id="radio">
     <Option label="First Item" value="first"/>
@@ -162,7 +162,7 @@ You can use this method to set the component's current value programmatically.
 
 This event is triggered after the user has changed the field value. The following example uses this event to display the selected option's value:
 
-```ueml copy /onDidChange="(val) => field = val"/
+```xmlui copy /onDidChange="(val) => field = val"/
 <App var.field="">
   <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
     <Option label="First Item" value="first"/>

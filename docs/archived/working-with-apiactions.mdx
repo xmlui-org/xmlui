@@ -29,7 +29,7 @@ Follow these steps to add the emulated backend to the app:
 The tutorial will cover interacting with a shopping list: adding and removing items, modifying existing ones, etc.
 To display the shopping list and test whether the emulated backend is working, copy the following into the `Main.xmlui` file removing the existing boilerplate code:
 
-```ueml copy filename="Main.xmlui"
+```xmlui copy filename="Main.xmlui"
 <App layout="vertical-full-header">
   <AppHeader>
     <Text variant="title">APICall Tutorial</Text>
@@ -69,7 +69,7 @@ The first operation you will learn is creating new items and saving them on the 
 
 The easiest way to do so is to create a `Button` component that will send some wired-in data to the backend when clicked:
 
-```ueml copy filename="Main.xmlui" {3-18}
+```xmlui copy filename="Main.xmlui" {3-18}
 <!-- Omitted -->
 <Page url="/">
   <Button label="Add New">
@@ -114,7 +114,7 @@ In the real world, a form would be used to enter new data. Working with forms is
 
 Adding a delete feature ensures unwanted shopping items can be removed. Change the item template of the `List` to display a Delete button to the right of each item with `APICall` set up to the URL that carries out the delete operation:
 
-```ueml copy filename="Main.xmlui"
+```xmlui copy filename="Main.xmlui"
 <!-- Omitted -->
 <List data="/api/shopping-list">
   <property name="itemTemplate">
@@ -150,7 +150,7 @@ When you click the list's first item's (Carrots) delete button, the backend remo
 
 In most cases, you only want the users to delete items after confirmation. `APICall` allows you to display a confirmation dialog by setting a few properties. Add the highlighted lines to `APICall`:
 
-```ueml copy filename="Main.xmlui" {11-13}
+```xmlui copy filename="Main.xmlui" {11-13}
 <!-- Omitted -->
 <Card>
   <HStack verticalAlignment="center" gap="0.5rem">
@@ -181,7 +181,7 @@ With this simple change, you need to confirm the deletion of an item; otherwise,
 
 It is also easy to use `APICall` to update data items. Update the markup according to the highlighted code to display a textbox with the item name and a button to save name changes:
 
-```ueml copy filename="Main.xmlui" {5, 7-15}
+```xmlui copy filename="Main.xmlui" {5, 7-15}
 <!-- Omitted -->
 <Card>
   <HStack verticalAlignment="center" gap="0.5rem">
@@ -214,7 +214,7 @@ You can add query parameters to `APICall` using the `queryParams` property.
 
 In the following example, the `POST /api/shopping-list` endpoint accepts a `highlight` query parameter, which indicates that the name of the newly added item should be highlighted (converted to all uppercase and added three exclamation marks for demonstration purposes):
 
-```ueml copy filename="Main.xmlui" {15}
+```xmlui copy filename="Main.xmlui" {15}
 <!-- Omitted -->
 <Page url="/">
   <Button label="Add New">
@@ -246,7 +246,7 @@ When you click the Add New button, `APICall` will send a POST request with the `
 
 The `queryParam` property accepts a hash object with key and value pairs. Instead of using the JavaScript object literal syntax, you can use the XMLUI syntax to write the same object in a different way:
 
-```ueml copy {12-14} filename="Main.xmlui"
+```xmlui copy {12-14} filename="Main.xmlui"
 <APICall
   url="/api/shopping-list"
   method="post"
@@ -270,7 +270,7 @@ Several APIs require particular request headers to execute the operation. In suc
 
 In the following example, the backend requires a header named `x-api-key` with the value of "1111" when you call `POST /api/shopping-list-headers` method (to authenticate the client); otherwise, it does not add a new item to the inventory:
 
-```ueml copy filename="Main.xmlui" {7}
+```xmlui copy filename="Main.xmlui" {7}
 <!-- Omitted -->
 <Page url="/">
   <Button label="Add New">
@@ -311,7 +311,7 @@ The `APICall` component has several event handlers that the UI can utilize to pe
 
 In the following example, the UI will follow the state of the request and display a corresponding message. Add the `requestState` variable and the text messages to the markup:
 
-```ueml copy filename="Main.xmlui" {2, 7-9}
+```xmlui copy filename="Main.xmlui" {2, 7-9}
 <!-- Omitted -->
 <Card var.requestState="none">
   <HStack verticalAlignment="center" gap="0.5rem">
@@ -331,7 +331,7 @@ In the following example, the UI will follow the state of the request and displa
 Finally, add the event handlers to the `APICall` component and update the `url` prop to target a demonstration version (running slower) of the endpoint previously used:
   
 
-```ueml copy filename="Main.xmlui" {5, 8-10}
+```xmlui copy filename="Main.xmlui" {5, 8-10}
 <!-- Omitted -->
 <Button label="Change Name">
   <event name="click">
@@ -370,7 +370,7 @@ The XMLUI framework has a built-in notification system that shows request inform
 The following example provides functionality similar to the previous example with event handlers. However, instead of event handlers, it uses notification messages:
 
 
-```ueml copy filename="Main.xmlui" {13-14}
+```xmlui copy filename="Main.xmlui" {13-14}
 <!-- Omitted -->
 <Card>
   <HStack verticalAlignment="center" gap="0.5rem">

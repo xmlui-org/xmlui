@@ -173,6 +173,29 @@ export type AppContextObject = {
    */
   smartFormatDateTime: (date: string | Date) => string | undefined;
 
+  /**
+   * This functions creates the difference between two dates in minutes.
+   * @param date1 First date
+   * @param date2 Second date
+   * @returns The difference in minutes
+   */
+  differenceInMinutes: (date1: number | Date, date2: number | Date) => number;
+
+  /**
+   * This function checks if the specified dates are on the same day.
+   * @param dateLeft First date
+   * @param dateRight Second Date
+   * @returns True, if the dates are on the same day; otherwise, false.
+   */
+  isSameDay: (dateLeft: number | Date, dateRight: number | Date) => boolean;
+
+  /**
+   * This function checks if the specified date is in the current calendar year.
+   * @param date Date to check
+   * @returns True, if the date is in the current year; otherwise, false.
+   */
+  isThisYear: (date: Date | number) => boolean;
+
   // ==============================================================================================
   // Math Utilities
 
@@ -324,7 +347,6 @@ export type AppContextObject = {
   delay: (timeInMs: number, callback?: any) => Promise<void>;
   toHashObject: (arr: any[], keyProp: string, valueProp: string) => any;
   findByField: (arr: any[], field: string, value: any) => any;
-  readonly DateUtils: Record<string, any>;
   readonly embed: { isInIFrame: boolean };
   distinct: (arr: any[]) => any[];
   forceRefreshAnchorScroll: ()=>void;

@@ -41,7 +41,7 @@ You can learn more details about the subset of JavaScript supported by XMLUI in 
 
 This technique works well when the code snippets are short and close to the components using them.
 
-```ueml copy /onClick=/ /{result}/
+```xmlui copy /onClick=/ /{result}/
 <App var.result="???" >
   <Button
     label="Calculate the sum of 1 to 100"
@@ -68,7 +68,7 @@ XMLUI **automatically binds component markup** with code-behind files. This tech
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /showDelay/
+```xmlui copy filename="Main.xmlui (markup)" /showDelay/
 <Button 
   id="calcButton"
   label="Show delay"
@@ -106,7 +106,7 @@ You can access the exposed methods and properties of the particular component th
   Expressions are the primary tools for binding components to work one with the state of another.
 </Callout>
 
-```ueml copy /myText/ /myText.value/
+```xmlui copy /myText/ /myText.value/
 <App>
   <TextBox id="myText" initialValue="Hello!" />
   <Text>You typed: {myText.value}</Text>
@@ -141,7 +141,7 @@ In the small app above, when you type something in the text box, every key you p
   When you set property values, **you can mix** literal strings with expressions.
 </Callout>
 
-```ueml copy
+```xmlui copy
 <App>
   <Text>I am a string literal.</Text>
   <Text>{"I am" + " an " + "expression."}</Text>
@@ -167,7 +167,7 @@ Here, the first text uses a string literal, the second is a sheer expression, an
 
 Variables are indispensable to the UI logic as they store some state. You can use expressions to set a variable's initial value:
 
-```ueml copy {2}
+```xmlui copy {2}
 <App
   var.myValue="{6 * 7}">
   Life, universe, and everything: {myValue}
@@ -196,7 +196,7 @@ The following code has the same behavior as the previous one.
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /showDelay/
+```xmlui copy filename="Main.xmlui (markup)" /showDelay/
 <App>
   Life, universe, and everything: {myValue}
 </App>
@@ -219,7 +219,7 @@ var myValue = 42;
 
 The following sample demonstrates this concept:
 
-```ueml copy
+```xmlui copy
 <App
   var.stringValue="true"
   var.boolValue="{true}"
@@ -255,7 +255,7 @@ Check the variable types in the output:
   XMLUI variables are **reactive**: whenever their dependencies change, their value is reevaluated.
 </Callout>
 
-```ueml copy /var.countTimes3="{3 * count}"/ /{countTimes3}/
+```xmlui copy /var.countTimes3="{3 * count}"/ /{countTimes3}/
 <App var.count="{0}" var.countTimes3="{3 * count}" >
   <Button
     label="Click to increment!"
@@ -290,7 +290,7 @@ Clicking the button increments only the `count` variable. Because `countTimes3` 
 
 In an event handler, the entire attribute value is an XMLUI Script code snippet, so you do not need to wrap the code into curly braces:
 
-```ueml copy {3}
+```xmlui copy {3}
 <App>
   <Button
     label="Greet me!"
@@ -321,7 +321,7 @@ Event handlers often contain not only expressions but also **statements**.
   local variables declared with `let` and `const` **are not reactive**.
 </Callout>
 
-```ueml copy /let sum = 0/ /let i = 1/
+```xmlui copy /let sum = 0/ /let i = 1/
 <App var.result="???" >
   <Button
     label="Calculate the sum of 1 to 100"
@@ -360,7 +360,7 @@ The following code has the same behavior as the previous one.
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /calculate/ /result/
+```xmlui copy filename="Main.xmlui (markup)" /calculate/ /result/
 <App>
     <Button
         label="Calculate the sum of 1 to 100"
@@ -393,7 +393,7 @@ For example, in the following markup, the button has the id `calcButton`. The en
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /result/
+```xmlui copy filename="Main.xmlui (markup)" /result/
 <App>
     <Button
         id="calcButton"
@@ -422,7 +422,7 @@ function calcButton_onClick() {
 
 In the following example, the `didChange` event of `TextBox` has a single argument: the new value after the change.
 
-```ueml copy
+```xmlui copy
 <App var.message="(not changed yet)">
   <TextBox
     initialValue="Hello!"
@@ -540,7 +540,7 @@ These are the main reasons XMLUI prefers this technique:
 
 These keywords are not even part of the XMLUI scripting syntax. The framework will ensure that even if you start an infinite loop in the code, the UI remains responsive:
 
-```ueml /loopRuns = true; while (loopRuns) count++;/
+```xmlui /loopRuns = true; while (loopRuns) count++;/
 <App var.count="{0}" var.loopRuns="{false}">
   <HStack>
     <Button enabled="{!loopRuns}"
@@ -596,7 +596,7 @@ This behavior has a significant consequence: **You cannot use property values of
 
 For example, in the following markup, using the `delay()` function would raise an error with this message: "Promises (async function calls) are not allowed in binding expressions":
 
-```ueml copy
+```xmlui copy
 <Text value="My value {delay(100), 123}" />
 ```
 

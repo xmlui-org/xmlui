@@ -21,7 +21,7 @@ When using the **`data` property** (with any component), the framework infers fr
 
 To see how it works, replace the `Page` tag with the `/contacts` URL to use the following contents:
 
-```ueml copy {2-4} filename="Main.xmlui"
+```xmlui copy {2-4} filename="Main.xmlui"
 <!-- Omitted -->
 <Page url="/contacts">
   <List data="/api/contacts" />
@@ -55,7 +55,7 @@ The `List` component is versatile and provides several services, making it easy 
 
 The default display of the list uses the `fullName` and then `categoryId` fields. If you want to change the default view of an item, you can modify the template used to show a particular item. Modify the `List` component's definition to use a different template:
 
-```ueml copy {2-4} filename="Main.xmlui"
+```xmlui copy {2-4} filename="Main.xmlui"
 <!-- Omitted -->
 <List data="/api/contacts">
   <Card title="{$item.fullName}" subtitle="{$item.comments}" />
@@ -74,7 +74,7 @@ When processing the data, `List` uses a special property, `$item`, to refer to t
 
 Let's change the layout of the items to something more attractive and helpful. Modify the nested items of `List` as in the following code snippet:
 
-```ueml copy {3-14} filename="Main.xmlui"
+```xmlui copy {3-14} filename="Main.xmlui"
 <!-- Omitted -->
 <List data="/api/contacts">
   <Card>
@@ -116,7 +116,7 @@ XMLUI has a `Badge` component that can use a color map (name and color pairs). W
 
 1. Add a `DataSource` component to the markup before the `NavPanel` tag with the `categories` identifier. This `DataSource` component will fetch all category data from the backend.
 
-```ueml copy {11} filename="Main.xmlui" /id="categories"/
+```xmlui copy {11} filename="Main.xmlui" /id="categories"/
 <App 
   layout="vertical-sticky" 
   name="Contact List Tutorial" 
@@ -175,7 +175,7 @@ into a hash object:
 
 3. Change the definition of `Card` within the list:
 
-```ueml copy {3,11} filename="Main.xmlui" /var.categoryName/ /categoriesColorMap/ /categoryName/
+```xmlui copy {3,11} filename="Main.xmlui" /var.categoryName/ /categoriesColorMap/ /categoryName/
 <!-- Omitted -->
 <List data="/api/contacts">
   <Card var.categoryName="{getCategoryNameById($item.categoryId)}">

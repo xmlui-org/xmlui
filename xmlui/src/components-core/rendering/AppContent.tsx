@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { get } from "lodash-es";
 import toast from "react-hot-toast";
-import { differenceInMinutes, isSameDay, isThisYear, isToday } from "date-fns";
 
 import { version } from "../../../package.json";
 
@@ -344,7 +343,6 @@ export function AppContent({
       setLoggedInUser,
 
       delay,
-      DateUtils,
       embed,
       apiInterceptorContext,
       getPropertyByPath: get,
@@ -430,26 +428,6 @@ export function AppContent({
     </AppContext.Provider>
   );
 }
-
-// --- We pass these functions to the global app context
-const DateUtils = {
-  differenceInMinutes: (date1: string | Date, date2: string | Date) => {
-    return differenceInMinutes(new Date(date1), new Date(date2));
-  },
-  isSameDay: (dateLeft: string | Date | undefined, dateRight: string | Date | undefined) => {
-    // console.log("IS SAME DAY", dateLeft, dateRight);
-    if (!dateLeft || !dateRight) {
-      return false;
-    }
-    return isSameDay(new Date(dateLeft), new Date(dateRight));
-  },
-  isToday: (date: string | Date | number) => {
-    return isToday(new Date(date));
-  },
-  isThisYear: (date: string | Date | number) => {
-    return isThisYear(new Date(date));
-  },
-};
 
 // --- We pass this funtion to the global app context
 function signError(error: Error | string) {
