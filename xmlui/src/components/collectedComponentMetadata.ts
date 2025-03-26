@@ -183,6 +183,10 @@ import {
 import { SliderMd } from "./Slider/Slider";
 import { ColorPickerMd } from "./ColorPicker/ColorPicker";
 
+import { ThemeDefinition } from "../abstractions/ThemingDefs";
+import { RootThemeDefinition } from "../components-core/theming/themes/root";
+import { XmlUiCyanThemeDefinition, XmlUiGrayThemeDefinition, XmlUiGreenThemeDefinition, XmlUiOrangeThemeDefinition, XmlUiPurpleThemeDefinition, XmlUiRedThemeDefinition, XmlUiThemeDefinition } from "../components-core/theming/themes/xmlui";
+
 export type ComponentMetadataCollection = Record<string, ComponentMetadata>;
 export const collectedComponentMetadata: ComponentMetadataCollection = {
   // --- HTML tags
@@ -383,3 +387,14 @@ export const collectedComponentMetadata: ComponentMetadataCollection = {
   ToneChangerButton: ToneChangerButtonMd,
   Tree: TreeMd,
 };
+
+export const collectedThemes: Record<string, ThemeDefinition> = {
+  root: RootThemeDefinition,
+  xmlui: XmlUiThemeDefinition,
+  xmluiGreen: XmlUiGreenThemeDefinition,
+  xmluiGray: XmlUiGrayThemeDefinition,
+  xmluiOrange: XmlUiOrangeThemeDefinition,
+  xmluiPurple: XmlUiPurpleThemeDefinition,
+  xmluiCyan: XmlUiCyanThemeDefinition,
+  xmluiRed: XmlUiRedThemeDefinition,
+}
