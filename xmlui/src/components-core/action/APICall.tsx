@@ -142,10 +142,10 @@ function updateQueriesWithResult(
           (item: any) =>
             item.id === optimisticValue.id && item._initiatorClientTxId === clientTxId
               ? result || {
-                  ...item,
-                  _optimisticValue: undefined,
-                  _initiatorClientTxId: undefined,
-                }
+              ...item,
+              _optimisticValue: undefined,
+              _initiatorClientTxId: undefined,
+            }
               : item,
         );
       } else {
@@ -196,17 +196,16 @@ function updateQueriesWithResult(
 }
 
 async function updateQueriesWithOptimisticValue({
-  stateContext,
-  updates,
-  appContext,
-  queryClient,
-  clientTxId,
-  optimisticValue,
-  lookupAction,
-  getOptimisticValue,
-  cacheUpdater,
-  uid,
-}: {
+                                                  stateContext,
+                                                  updates,
+                                                  appContext,
+                                                  queryClient,
+                                                  clientTxId,
+                                                  optimisticValue,
+                                                  lookupAction,
+                                                  getOptimisticValue,
+                                                  uid,
+                                                }: {
   stateContext: any;
   updates: string | string[] | undefined;
   appContext: AppContextObject;
@@ -215,32 +214,8 @@ async function updateQueriesWithOptimisticValue({
   optimisticValue: any;
   lookupAction: LookupAsyncFnInner;
   getOptimisticValue?: string;
-  cacheUpdater?: string;
   uid: symbol;
 }) {
-
-  const resolvedCacheUpdater = lookupAction(cacheUpdater, uid, {
-    context: stateContext
-  });
-  if(resolvedCacheUpdater){
-    await resolvedCacheUpdater({
-      clientTxId,
-      updateCachedData: (queryUrl: string, updater: (draft)=>Promise<void>) => {
-        queryClient
-          .getQueryCache()
-          .getAll()
-          .forEach(async (query) => {
-            if (query.queryKey[0] === queryUrl) {
-              let draft = createDraft(queryClient.getQueryData(query.queryKey));
-              await updater(draft);
-              const newData = finishDraft(draft);
-              queryClient.setQueryData(query.queryKey, newData);
-            }
-          });
-      },
-    });
-    return { queryKeysToUpdate: [], optimisticValuesByQueryKeys: new Map() };
-  }
   const queryKeysToUpdate = findQueryKeysToUpdate(
     extractParam(stateContext, updates, appContext),
     queryClient,
@@ -282,7 +257,7 @@ type APICall = {
 } & ApiOperationDef;
 
 export async function callApi(
-  { state, appContext, lookupAction, uid: containerUid, getCurrentState }: ActionExecutionContext,
+  { state, appContext, lookupAction, getCurrentState }: ActionExecutionContext,
   {
     confirmTitle,
     confirmMessage,
@@ -297,7 +272,6 @@ export async function callApi(
     payloadType,
     when,
     getOptimisticValue,
-    cacheUpdater,
     inProgressNotificationMessage,
     completedNotificationMessage,
     errorNotificationMessage,
@@ -349,7 +323,6 @@ export async function callApi(
       optimisticValue,
       lookupAction,
       getOptimisticValue,
-      cacheUpdater,
       uid,
     },
   );
@@ -385,7 +358,7 @@ export async function callApi(
       eventName: "success",
       context: getCurrentState()
     });
-    await onSuccessFn?.(result, clientTxId);
+    await onSuccessFn?.(result, stateContext["$param"]);
 
     updateQueriesWithResult(
       queryKeysToUpdate,

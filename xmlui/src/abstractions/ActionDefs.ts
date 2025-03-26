@@ -29,6 +29,9 @@ export type LookupActionOptions = {
    * This property declares the script code to use as a default for a particular event handler.
    */
   defaultHandler?: string;
+
+  // extra context to pass to the action
+  context?: any;
 };
 
 /**
@@ -95,6 +98,8 @@ export interface ActionExecutionContext {
    * The state of the container that the action is executed in.
    */
   state: ContainerState;
+
+  getCurrentState: ()=>ContainerState;
 
   /**
    * The appContext object passed to the current app

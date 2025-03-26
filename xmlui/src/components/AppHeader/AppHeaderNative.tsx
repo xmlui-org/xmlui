@@ -27,6 +27,7 @@ type Props = {
   toggleDrawer?: () => void;
   hasRegisteredNavPanel?: boolean;
   titleContent?: ReactNode;
+  registerSubNavPanelSlot?: (node: HTMLElement)=>void;
 };
 
 function tryLoadImage(url: string, onLoaded: () => void, onError: () => void) {

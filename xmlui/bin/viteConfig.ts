@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import type { UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
@@ -16,14 +17,12 @@ export async function getViteConfig({
   withRelativeRoot = false,
   flatDistUiPrefix = "",
 }: ViteConfigData = {}) {
-
-
   //TODO finish this (merge smart)
-  let overrides = {};
-  try{
+  let overrides: UserConfig = {};
+  try {
     const configOverrides = await import(process.cwd() + `/vite.config-overrides`);
     overrides = configOverrides.default || {};
-  } catch (e){}
+  } catch (e) {}
 
   return defineConfig({
     plugins: [react(), svgr(), ViteYaml(), ViteUeml({}), ...(overrides.plugins || [])],
@@ -66,7 +65,9 @@ export async function getViteConfig({
           chunkFileNames: flatDist
             ? `${flatDistUiPrefix}internal_chunks_[name].[hash].js`
             : "internal/chunks/[name].[hash].js",
-          entryFileNames: flatDist ? `${flatDistUiPrefix}internal_[name].[hash].js` : "internal/[name].[hash].js",
+          entryFileNames: flatDist
+            ? `${flatDistUiPrefix}internal_[name].[hash].js`
+            : "internal/[name].[hash].js",
         },
         // treeshake: {
         //   preset: "recommended",

@@ -8,6 +8,7 @@ import { SubNavPanel } from "./SubNavPanelNative";
 const COMP = "SubNavPanel";
 
 export const NavPanelMd = createMetadata({
+  status: "experimental",
   props: {
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -20,8 +21,7 @@ export const subNavPanelRenderer = createComponentRenderer(
   NavPanelMd,
   ({ node, renderChild, layoutCss, layoutContext }) => {
     return (
-        <SubNavPanel
-        >
+        <SubNavPanel>
           {renderChild(node.children)}
         </SubNavPanel>
     );
