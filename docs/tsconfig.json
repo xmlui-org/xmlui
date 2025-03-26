@@ -6,7 +6,10 @@
       "dom.iterable",
       "esnext"
     ],
-    "types": ["vite/client", "node"],
+    "types": [
+      "vite/client",
+      "node"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -34,8 +37,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src"
-, "pages/_app.jsx", "scripts/create-component-docs.js"  ],
+    "src",
+    "pages/_app.jsx",
+    "scripts/create-component-docs.js",
+  ],
   "exclude": [
     "node_modules"
   ]
