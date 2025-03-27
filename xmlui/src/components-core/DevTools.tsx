@@ -201,7 +201,12 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
-            <Button onClick={() => setIsOpen(false)} size={"xs"} variant={"ghost"} icon={<Icon name={"close"} />}/>
+            <Button
+              onClick={() => setIsOpen(false)}
+              size={"xs"}
+              variant={"ghost"}
+              icon={<Icon name={"close"} />}
+            />
           </div>
         </List>
         <Content value={"code"} className={styles.content}>
