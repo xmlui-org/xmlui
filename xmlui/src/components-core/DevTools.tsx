@@ -145,14 +145,14 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
     >
       <Root defaultValue={"code"} className={styles.tabs} style={{ width: "100%", height: "100%" }}>
         <List className={styles.list}>
-          <div>
+          <div className={styles.tabItems}>
             <Trigger value={"code"}>
-              <Button variant={"ghost"} size={"xs"}>
+              <Button variant={"ghost"} size={"sm"}>
                 Code
               </Button>
             </Trigger>
             <Trigger value={"console"}>
-              <Button variant={"ghost"} size={"xs"}>
+              <Button variant={"ghost"} size={"sm"}>
                 Console
               </Button>
             </Trigger>
