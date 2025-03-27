@@ -79,7 +79,6 @@ export const Heading = forwardRef(function Heading(
 
   useIsomorphicLayoutEffect(() => {
     if (elementRef.current && anchorId && !omitFromToc) {
-      console.log("HERE", { anchorId, registerHeading, level, omitFromToc });
       return registerHeading?.({
         id: anchorId,
         level: parseInt(level.replace("h", "")),
