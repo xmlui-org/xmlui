@@ -176,7 +176,7 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
                         }}
                         variant={"ghost"}
                       >
-                        <BiDockLeft color={"currentColor"} />
+                        <BiDockLeft color={"currentColor"} size={16} />
                       </Button>
                       <Button
                         style={{ padding: 8 }}
@@ -185,7 +185,7 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
                         }}
                         variant={"ghost"}
                       >
-                        <BiDockBottom color={"currentColor"} />
+                        <BiDockBottom color={"currentColor"} size={16} />
                       </Button>
                       <Button
                         style={{ padding: 8 }}
@@ -194,7 +194,7 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
                         }}
                         variant={"ghost"}
                       >
-                        <BiDockRight color={"currentColor"} />
+                        <BiDockRight color={"currentColor"} size={16} />
                       </Button>
                     </div>
                   </DropdownMenu.Item>
