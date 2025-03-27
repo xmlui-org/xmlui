@@ -28,6 +28,7 @@ import {
   NavPanelDriver,
   NoResultDriver,
   NumberBoxDriver,
+  OptionDriver,
   RadioGroupDriver,
   RangeDriver,
   SelectDriver,
@@ -163,7 +164,7 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   },
 
   createDriver: async <T extends new (...args: ComponentDriverParams[]) => any>(
-    { page, baseComponentTestId, testStateViewTestId },
+    { page, baseComponentTestId },
     use,
   ) => {
     await use(async (driverClass: T, testIdOrLocator?: string | Locator) => {
@@ -336,6 +337,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(NoResultDriver, testIdOrLocator);
     });
   },
+  createOptionDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(OptionDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
@@ -386,4 +392,5 @@ type TestDriverExtenderProps = {
   createAppFooterDriver: ComponentDriverMethod<AppFooterDriver>;
   createBadgeDriver: ComponentDriverMethod<BadgeDriver>;
   createNoResultDriver: ComponentDriverMethod<NoResultDriver>;
+  createOptionDriver: ComponentDriverMethod<OptionDriver>;
 };
