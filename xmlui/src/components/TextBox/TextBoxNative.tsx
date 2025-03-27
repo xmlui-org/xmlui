@@ -142,8 +142,6 @@ export const TextBox = forwardRef(function TextBox(
       labelBreak={labelBreak}
       required={required}
       enabled={enabled}
-      onFocus={onFocus}
-      onBlur={onBlur}
       style={style}
       ref={ref}
     >
