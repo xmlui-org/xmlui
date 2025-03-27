@@ -1,7 +1,5 @@
-import type { Locator } from "@playwright/test";
-
 import { SKIP_REASON } from "../../testing/component-test-helpers";
-import { expect as fixtureExpect, test } from "../../testing/fixtures";
+import { expect, test } from "../../testing/fixtures";
 import {
   alignmentOptionValues,
   buttonTypeValues,
@@ -11,59 +9,6 @@ import {
 } from "../../components/abstractions";
 import type { ComponentDriver } from "../../testing/ComponentDrivers";
 
-// --- Setup
-
-const expect = fixtureExpect.extend({
-  /**
-   * Asserts whether the Button component has the expected label either through the `label` property
-   * or as a text node child.
-   *
-   * **Usage**
-   *
-   * ```js
-   * await initTestBed(`<Button label="hello" />`);
-   * const driver = await createButtonDriver();
-   * await expect(driver.component).toHaveLabel("hello"); // <- resolves to true
-   * ```
-   *
-   * @param expected Expected string label
-   */
-  async toHaveExplicitLabel(locator: Locator, expected: string) {
-    const assertionName = "toHaveLabel";
-    let pass = false;
-
-    const label = await locator.evaluate(
-      (element) =>
-        [...element.childNodes]
-          .filter((e) => e.nodeType === Node.TEXT_NODE && e.textContent.trim())
-          .map((e) => e.textContent.trim())?.[0],
-    );
-
-    if (label === expected) {
-      pass = true;
-    }
-
-    const message = pass
-      ? () =>
-          this.utils.matcherHint(assertionName, locator, expected, { isNot: this.isNot }) +
-          "\n\n" +
-          `Expected: ${this.isNot ? "not" : ""}${this.utils.printExpected(expected)}\n` +
-          `Received: ${this.utils.printReceived(label)}`
-      : () =>
-          this.utils.matcherHint(assertionName, locator, expected, { isNot: this.isNot }) +
-          "\n\n" +
-          `Expected: ${this.utils.printExpected(expected)}\n` +
-          `Received: ${this.utils.printReceived(label)}`;
-
-    return {
-      message,
-      pass,
-      name: assertionName,
-      expected,
-      actual: undefined,
-    };
-  },
-});
 
 // --- Smoke
 

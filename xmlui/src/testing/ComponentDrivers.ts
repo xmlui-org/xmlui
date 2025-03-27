@@ -229,7 +229,7 @@ export class FormDriver extends ComponentDriver {
   ) {
     const requestPromise = this.page.waitForRequest(
       (request) =>
-        request.url().endsWith(endpoint) &&
+        request.url().includes(endpoint) &&
         request.method().toLowerCase() === requestMethod.toLowerCase(),
       { timeout },
     );
@@ -239,12 +239,16 @@ export class FormDriver extends ComponentDriver {
 
   async getSubmitResponse(
     endpoint = "/entities",
-    requestMethod = "POST",
-    trigger: SubmitTrigger = "click",
+    responseStatus = 200,
     timeout = 5000,
   ) {
-    const request = await this.getSubmitRequest(endpoint, requestMethod, trigger, timeout);
-    return request.response();
+    const responsePromise = this.page.waitForResponse(
+      (response) =>
+        response.url().includes(endpoint) &&
+        response.status() === responseStatus,
+      { timeout },
+    );
+    return responsePromise;
   }
 }
 
@@ -257,10 +261,9 @@ export class FormItemDriver extends ComponentDriver {
   }
 
   // TODO: Need to check for input type
-  // TODO: Remove this method and use input.fill directly
-  async fillField(value: any) {
+  /* async fillField(value: any) {
     await this.input.fill(value);
-  }
+  } */
 }
 
 // --- Markdown
@@ -427,3 +430,7 @@ export class BadgeDriver extends ComponentDriver {}
 // --- NoResult
 
 export class NoResultDriver extends ComponentDriver {}
+
+// --- Option
+
+export class OptionDriver extends ComponentDriver {}
