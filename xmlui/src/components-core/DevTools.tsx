@@ -12,6 +12,7 @@ import { BiDockBottom, BiDockLeft, BiDockRight } from "react-icons/bi";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { HiOutlineDotsVertical } from "react-icons/all";
 import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
+import Icon from "../components/Icon/IconNative";
 
 type Props = {
   setIsOpen: (isOpen: boolean) => void;
@@ -144,14 +145,14 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
     >
       <Root defaultValue={"code"} className={styles.tabs} style={{ width: "100%", height: "100%" }}>
         <List className={styles.list}>
-          <div>
+          <div className={styles.tabItems}>
             <Trigger value={"code"}>
-              <Button variant={"ghost"} size={"xs"}>
+              <Button variant={"ghost"} size={"sm"}>
                 Code
               </Button>
             </Trigger>
             <Trigger value={"console"}>
-              <Button variant={"ghost"} size={"xs"}>
+              <Button variant={"ghost"} size={"sm"}>
                 Console
               </Button>
             </Trigger>
@@ -175,7 +176,7 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
                         }}
                         variant={"ghost"}
                       >
-                        <BiDockLeft color={"currentColor"} />
+                        <BiDockLeft color={"currentColor"} size={16} />
                       </Button>
                       <Button
                         style={{ padding: 8 }}
@@ -184,7 +185,7 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
                         }}
                         variant={"ghost"}
                       >
-                        <BiDockBottom color={"currentColor"} />
+                        <BiDockBottom color={"currentColor"} size={16} />
                       </Button>
                       <Button
                         style={{ padding: 8 }}
@@ -193,22 +194,31 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
                         }}
                         variant={"ghost"}
                       >
-                        <BiDockRight color={"currentColor"} />
+                        <BiDockRight color={"currentColor"} size={16} />
                       </Button>
                     </div>
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
-            <Button onClick={() => setIsOpen(false)} size={"xs"} variant={"ghost"}>
-              Close
-            </Button>
+            <Button
+              onClick={() => setIsOpen(false)}
+              size={"xs"}
+              variant={"ghost"}
+              icon={<Icon name={"close"} />}
+            />
           </div>
         </List>
         <Content value={"code"} className={styles.content}>
           <XmluiCodeHighlighter value={value} />
           <div className={styles.copyButton}>
-            <Button onClick={copyToClipboard} variant={"solid"} themeColor={"secondary"} style={{ padding: 8 }} size={"sm"}>
+            <Button
+              onClick={copyToClipboard}
+              variant={"solid"}
+              themeColor={"secondary"}
+              style={{ padding: 8 }}
+              size={"sm"}
+            >
               {copied ? (
                 <HiOutlineClipboardDocumentCheck size={16} />
               ) : (

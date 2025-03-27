@@ -13,6 +13,7 @@
 
 .actions {
   display: inline-flex;
+  align-items: center;
   justify-content: flex-end;
 }
 
@@ -20,6 +21,11 @@
   display: flex;
   flex-direction: column;
   background-color: themes.$backgroundColor;
+}
+
+.tabItems {
+  display: flex;
+  flex-direction: row;
 }
 
 .sideButtons {
@@ -54,6 +60,7 @@
 .menu {
   position: relative;
   z-index: 9999;
+  padding: themes.$space-1_5;
 }
 
 .content {
