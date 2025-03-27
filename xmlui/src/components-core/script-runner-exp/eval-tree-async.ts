@@ -361,11 +361,13 @@ async function evalUnaryAsync(
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp,
 ): Promise<any> {
-  const operand = await evaluator(thisStack, expr.expr, evalContext, thread);
+  await evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
-  const value = evalUnaryCore(operand, expr.op, thisStack);
-  setExprValue(expr, { value }, thread);
-  return value;
+  if (expr.op !== "delete") {
+    const operand = await completePromise(getExprValue(expr.expr, thread));
+    setExprValue(expr.expr, { value: operand }, thread);
+  }
+  return evalUnaryCore(expr, thisStack, evalContext, thread);
 }
 
 async function evalBinaryAsync(
@@ -378,6 +380,7 @@ async function evalBinaryAsync(
   await evaluator(thisStack, expr.left, evalContext, thread);
   thisStack.pop();
   const l = await completePromise(getExprValue(expr.left, thread)?.value);
+  setExprValue(expr.left, { value: l }, thread);
   if (expr.op === "&&" && !l) {
     setExprValue(expr, { value: l }, thread);
     return l;
@@ -388,6 +391,8 @@ async function evalBinaryAsync(
   }
   await evaluator(thisStack, expr.right, evalContext, thread);
   thisStack.pop();
+  const r = await completePromise(getExprValue(expr.right, thread)?.value);
+  setExprValue(expr.right, { value: r }, thread);
   return evalBinaryCore(expr, thisStack, evalContext, thread);
 }
 

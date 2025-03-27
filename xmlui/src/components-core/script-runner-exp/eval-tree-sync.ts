@@ -388,11 +388,9 @@ function evalUnary(
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp,
 ): any {
-  const operand = evaluator(thisStack, expr.expr, evalContext, thread);
+  evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
-  const value = evalUnaryCore(operand, expr.op, thisStack);
-  setExprValue(expr, { value }, thread);
-  return value;
+  return evalUnaryCore(expr, thisStack, evalContext, thread);
 }
 
 function evalBinary(

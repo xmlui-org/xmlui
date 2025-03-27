@@ -219,13 +219,15 @@ export function evalCalculatedMemberAccessCore(
 
 // --- Evaluates a unary expression (sync & async context)
 export function evalUnaryCore(
-  operand: any,
-  operator: string,
-  thisStack: any[]
+  expr: UnaryExpression,
+  thisStack: any[],
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThreadExp,
 ): any {
   let value: any;
+  const operand = getExprValue(expr.expr, thread);
   const operValue = operand?.value;
-  switch (operator) {
+  switch (expr.op) {
     case "typeof":
       value = typeof operValue;
       break;
@@ -249,8 +251,9 @@ export function evalUnaryCore(
       value = ~operValue;
       break;
     default:
-      throw new Error(`Unknown unary operator: ${operator}`);
+      throw new Error(`Unknown unary operator: ${expr.op}`);
   }
+  setExprValue(expr, { value }, thread);
 
   // --- Done.
   thisStack.push(value);
