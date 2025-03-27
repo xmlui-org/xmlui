@@ -1005,6 +1005,7 @@ export class Lexer {
       return makeToken();
     }
   }
+
   getStartingPhaseThenReset(): LexerPhase {
     if (this._phaseExternallySet !== null) {
       const phase = this._phaseExternallySet;
@@ -1013,6 +1014,7 @@ export class Lexer {
     }
     return LexerPhase.Start;
   }
+
   /**
    * Fetches the next RegEx token from the input stream
    */
