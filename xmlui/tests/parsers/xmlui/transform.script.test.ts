@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
-import { Expression, ModuleErrors } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+import { Expression, ModuleErrors, T_ARROW_EXPRESSION, T_BINARY_EXPRESSION, T_LITERAL } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 import { transformSource } from "./xmlui";
 
 describe("Xmlui transform - script", () => {
@@ -120,8 +120,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.vars).length).equal(1);
-    expect(collected.vars.a.source).equal("3");
-    expect((collected.vars.a.tree as Expression).type).equal("LitE");
+    expect((collected.vars.a.tree as Expression).type).equal(T_LITERAL);
   });
 
   it("Script collect - Single var #2", () => {
@@ -137,8 +136,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.vars).length).equal(1);
-    expect(collected.vars.a.source).equal("1 < 2");
-    expect((collected.vars.a.tree as Expression).type).equal("BinaryE");
+    expect((collected.vars.a.tree as Expression).type).equal(T_BINARY_EXPRESSION);
   });
 
   it("Script collect - Single var #3", () => {
@@ -154,8 +152,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.vars).length).equal(1);
-    expect(collected.vars.a.source).equal("() => Math.floor(c/d)");
-    expect((collected.vars.a.tree as Expression).type).equal("ArrowE");
+    expect((collected.vars.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Multiple var", () => {
@@ -171,10 +168,8 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.vars).length).equal(2);
-    expect(collected.vars.a.source).equal("3");
-    expect((collected.vars.a.tree as Expression).type).equal("LitE");
-    expect(collected.vars.b.source).equal("() => Math.floor(c/d)");
-    expect((collected.vars.b.tree as Expression).type).equal("ArrowE");
+    expect((collected.vars.a.tree as Expression).type).equal(T_LITERAL);
+    expect((collected.vars.b.tree as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Duplicated var fails", () => {
@@ -207,8 +202,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(1);
-    expect(collected.functions.a.source).equal("(b, c, d) => { return Math.floor(c/d) }");
-    expect((collected.functions.a.tree as Expression).type).equal("ArrowE");
+    expect((collected.functions.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Single function #2", () => {
@@ -224,8 +218,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(1);
-    expect(collected.functions.a.source).equal("() => { let x = 3; return x * 2 }");
-    expect((collected.functions.a.tree as Expression).type).equal("ArrowE");
+    expect((collected.functions.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Multiple function #1", () => {
@@ -242,10 +235,8 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(2);
-    expect(collected.functions.a.source).equal("() => { let x = 3; return x * 2 }");
-    expect((collected.functions.a.tree as Expression).type).equal("ArrowE");
-    expect(collected.functions.b.source).equal("(c, d, e) => { return c + d + e }");
-    expect((collected.functions.b.tree as Expression).type).equal("ArrowE");
+    expect((collected.functions.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.functions.b.tree as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Duplicated function fails", () => {
@@ -279,8 +270,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(1);
-    expect(collected.functions.myButton_onClick.source).equal("(eventArgs) => { console.log(allTasks.length) }");
-    expect((collected.functions.myButton_onClick.tree as Expression).type).equal("ArrowE");
+    expect((collected.functions.myButton_onClick.tree as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script creates Fragment #2", () => {

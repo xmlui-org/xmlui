@@ -741,7 +741,7 @@ async function createArrowFunctionAsync(
       functionBlock.vars[expr.name] = expr;
       functionBlock.constVars = new Set([expr.name]);
     }
-    
+
     // --- Assign argument values to names
     const arrowBlock: BlockScope = { vars: {} };
     workingThread.blocks ??= [];
@@ -969,10 +969,16 @@ async function evalTemplateLiteralAsync(
   onStatementCompleted: OnStatementCompletedCallback,
 ): Promise<any> {
   const segmentValues = new Array(expr.segments.length);
-  for (let i = 0; i <  expr.segments.length; ++i){
-    const evaledValue = await evaluator(thisStack, expr.segments[i], evalContext, thread, onStatementCompleted);
+  for (let i = 0; i < expr.segments.length; ++i) {
+    const evaledValue = await evaluator(
+      thisStack,
+      expr.segments[i],
+      evalContext,
+      thread,
+      onStatementCompleted,
+    );
     thisStack.pop();
-    segmentValues[i] = (evaledValue);
+    segmentValues[i] = evaledValue;
   }
   return evalTemplateLiteralCore(segmentValues);
 }

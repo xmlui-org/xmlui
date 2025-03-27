@@ -360,7 +360,7 @@ export const Container = memo(
 
     const getOrCreateEventHandlerFn = useEvent(
       (src: string | ArrowExpression, uid: symbol, options?: LookupActionOptions) => {
-        const stringSrc = typeof src === "string" ? src : src.statement.source;
+        const stringSrc = typeof src === "string" ? src : src.statement.nodeId;
         const fnCacheKey = `${options?.eventName};${stringSrc}`;
         const handler = (...eventArgs: any[]) => {
           return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
@@ -378,7 +378,7 @@ export const Container = memo(
 
     const getOrCreateSyncCallbackFn = useCallback(
       (arrowExpression: ArrowExpression, uid: symbol) => {
-        const fnCacheKey = `sync-callback-${arrowExpression.source}`;
+        const fnCacheKey = `sync-callback-${arrowExpression.nodeId}`;
         if (!fnsRef.current[uid]?.[fnCacheKey]) {
           fnsRef.current[uid] = fnsRef.current[uid] || {};
           fnsRef.current[uid][fnCacheKey] = memoizeOne((arrowExpression) => {

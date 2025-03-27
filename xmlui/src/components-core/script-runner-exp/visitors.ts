@@ -281,6 +281,7 @@ export function collectVariableDependencies(
               case T_IDENTIFIER: {
                 decl = {
                   type: T_VAR_DECLARATION,
+                  nodeId: argSpec.nodeId,
                   id: argSpec.name,
                 };
                 break;
@@ -288,6 +289,7 @@ export function collectVariableDependencies(
               case T_DESTRUCTURE: {
                 decl = {
                   type: T_VAR_DECLARATION,
+                  nodeId: argSpec.nodeId,
                   id: argSpec.id,
                   aDestr: argSpec.aDestr,
                   oDestr: argSpec.oDestr,
@@ -298,6 +300,7 @@ export function collectVariableDependencies(
                 restFound = true;
                 decl = {
                   type: T_VAR_DECLARATION,
+                  nodeId: argSpec.nodeId,
                   id: (argSpec.expr as Identifier).name,
                 };
                 break;

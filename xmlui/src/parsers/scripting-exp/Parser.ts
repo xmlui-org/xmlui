@@ -125,6 +125,12 @@ enum StrParseState {
   UcpTail,
 }
 
+let lastNodeId = 0;
+
+export function createXmlUiTreeNodeId(): number {
+  return ++lastNodeId;
+} 
+
 /**
  * This class parses a binding expression and transforms it into an evaluable expression tree
  */
@@ -1086,6 +1092,7 @@ export class Parser {
         }
         catchV = {
           type: T_IDENTIFIER,
+          nodeId: createXmlUiTreeNodeId(),
           name: nextToken.text,
           startToken: nextToken,
           endToken: nextToken,
@@ -1445,7 +1452,7 @@ export class Parser {
           return null;
         }
         imports.push({
-          id: { type: T_IDENTIFIER, name: nextToken.text },
+          id: { type: T_IDENTIFIER, nodeId: createXmlUiTreeNodeId(), name: nextToken.text },
           source: id,
         });
         this._lexer.get();
@@ -1455,7 +1462,7 @@ export class Parser {
           return null;
         }
         imports.push({
-          id: { type: T_IDENTIFIER, name: id },
+          id: { type: T_IDENTIFIER, nodeId: createXmlUiTreeNodeId(), name: id },
           source: id,
         });
       }
@@ -2636,6 +2643,7 @@ export class Parser {
         } else if (traits.keywordLike) {
           nameExpr = {
             type: T_IDENTIFIER,
+            nodeId: createXmlUiTreeNodeId(),
             name: nextToken.text,
             startToken: nextToken,
             endToken: nextToken,
@@ -2859,6 +2867,7 @@ export class Parser {
     }
     return Object.assign({}, stump, {
       type,
+      nodeId: createXmlUiTreeNodeId(),
       startToken,
       endToken,
     });
@@ -2879,6 +2888,7 @@ export class Parser {
   ): T {
     return Object.assign({}, stump, {
       type,
+      nodeId: createXmlUiTreeNodeId(),
       startToken,
       endToken,
     } as Statement);

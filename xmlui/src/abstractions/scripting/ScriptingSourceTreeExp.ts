@@ -12,6 +12,9 @@ export interface ScripNodeBase {
   // Node type discriminator
   type: ScriptNode["type"];
 
+  // The unique id of the node
+  nodeId: number;
+
   // The start token of the node
   startToken?: ScriptingToken;
 

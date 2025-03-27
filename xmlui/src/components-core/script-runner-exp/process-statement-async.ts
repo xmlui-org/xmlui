@@ -66,12 +66,15 @@ import {
   toStatementItems,
   guard,
 } from "./process-statement-common";
+import { createXmlUiTreeNodeId } from "../../parsers/scripting-exp/Parser";
+import { OnStatementCompletedCallback } from "../script-runner/process-statement-async";
 
 // --- Helper function to process the entire queue asynchronously
 export async function processStatementQueueAsync(
   statements: Statement[],
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThreadExp,
+  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<QueueInfo> {
   if (!thread) {
     // --- Create the main thread for the queue
@@ -118,6 +121,7 @@ export async function processStatementQueueAsync(
         queueItem?.execInfo ?? {},
         evalContext,
         thread,
+        onStatementCompleted
       );
     } catch (err) {
       if (thread.tryBlocks && thread.tryBlocks.length > 0) {
@@ -161,7 +165,8 @@ export async function processStatementQueueAsync(
     }
 
     // --- Sign that the statement has been completed
-    await evalContext?.onStatementCompleted?.(evalContext, queueItem!.statement);
+     await evalContext?.onStatementCompleted?.(evalContext, queueItem!.statement);
+    await onStatementCompleted?.(evalContext as any, queueItem!.statement as any);
 
     // --- Provide diagnostics
     if (queue.length > diagInfo.maxQueueLength) {
@@ -194,6 +199,7 @@ async function processStatementAsync(
   execInfo: StatementRunTimeInfo,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp,
+  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<ProcessOutcome> {
   // --- These items should be put in the statement queue after return
   let toUnshift: StatementQueueItem[] = [];
@@ -271,7 +277,7 @@ async function processStatementAsync(
 
     case T_EXPRESSION_STATEMENT:
       // --- Just evaluate it
-      const statementValue = await evalBindingAsync(statement.expr, evalContext, thread);
+      const statementValue = await evalBindingAsync(statement.expr, evalContext, thread, onStatementCompleted);
       if (thread.blocks && thread.blocks.length !== 0) {
         thread.blocks[thread.blocks.length - 1].returnValue = statementValue;
       }
@@ -283,6 +289,7 @@ async function processStatementAsync(
         statement.expr,
         evalContext,
         thread,
+        onStatementCompleted,
         ...(evalContext.eventArgs ?? []),
       );
       if (thread.blocks && thread.blocks.length !== 0) {
@@ -483,7 +490,11 @@ async function processStatementAsync(
 
           if (statement.upd) {
             const updateStmt: StatementWithInfo = {
-              statement: { type: T_EXPRESSION_STATEMENT, expr: statement.upd },
+              statement: {
+                type: T_EXPRESSION_STATEMENT,
+                nodeId: createXmlUiTreeNodeId(),
+                expr: statement.upd,
+              },
             };
             toUnshift = mapStatementsToQueueItems([
               { statement: statement.body },

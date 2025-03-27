@@ -64,6 +64,7 @@ import type {
   ProcessOutcome,
 } from "./statement-queue";
 import { StatementQueue, mapStatementsToQueueItems, mapToItem } from "./statement-queue";
+import { createXmlUiTreeNodeId } from "../../parsers/scripting-exp/Parser";
 
 const SYNC_EVAL_TIMEOUT = 1000;
 
@@ -484,7 +485,11 @@ function processStatement(
 
           if (statement.upd) {
             const updateStmt: StatementWithInfo = {
-              statement: { type: T_EXPRESSION_STATEMENT, expr: statement.upd },
+              statement: {
+                type: T_EXPRESSION_STATEMENT,
+                nodeId: createXmlUiTreeNodeId(),
+                expr: statement.upd,
+              },
             };
             toUnshift = mapStatementsToQueueItems([
               { statement: statement.body },

@@ -47,6 +47,7 @@ import {
   type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import type { ResolutionScope } from "../../parsers/scripting-exp/ResolutionScope";
+import { createXmlUiTreeNodeId } from "../../parsers/scripting-exp/Parser";
 
 /**
  * Resolves identifier
@@ -559,6 +560,7 @@ export function resolveIdentifiers(
               case T_IDENTIFIER: {
                 decl = {
                   type: T_VAR_DECLARATION,
+                  nodeId: createXmlUiTreeNodeId(),
                   id: argSpec.name,
                 };
                 break;
@@ -566,6 +568,7 @@ export function resolveIdentifiers(
               case T_DESTRUCTURE: {
                 decl = {
                   type: T_VAR_DECLARATION,
+                  nodeId: createXmlUiTreeNodeId(),
                   id: argSpec.id,
                   aDestr: argSpec.aDestr,
                   oDestr: argSpec.oDestr,

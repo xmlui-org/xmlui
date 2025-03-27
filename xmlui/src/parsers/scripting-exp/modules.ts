@@ -145,7 +145,7 @@ export function parseScriptModule(
       importedModules: [],
       imports: {},
       functions,
-      statements: [],
+      statements: statements,
       sources: new Map(),
       executed: false,
     };

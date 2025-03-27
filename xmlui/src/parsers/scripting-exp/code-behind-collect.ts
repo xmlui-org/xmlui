@@ -50,11 +50,10 @@ export function collectCodeBehindFromSource(
       case T_VAR_STATEMENT:
         stmt.decls.forEach((decl) => {
           if (decl.id.name in result.vars) {
-            throw new Error(`Duplicated var declaration: '${decl.id}'`);
+            throw new Error(`Duplicated var declaration: '${decl.id.name}'`);
           }
           result.vars[decl.id.name] = {
             [PARSED_MARK_PROP]: true,
-            source: decl.expr.source,
             tree: decl.expr,
           };
         });
@@ -107,10 +106,6 @@ export function collectCodeBehindFromSource(
     if (stmt.id.name in result.functions) {
       throw new Error(`Duplicated function declaration: '${stmt.id.name}'`);
     }
-    const funcSource =
-      stmt.args.length === 1
-        ? `${stmt.args[0].source} => ${stmt.stmt.source}`
-        : `(${stmt.args.map((a) => a.source).join(", ")}) => ${stmt.stmt.source}`;
     const arrow: ArrowExpression = {
       type: T_ARROW_EXPRESSION,
       args: stmt.args.slice(),
@@ -136,12 +131,10 @@ export function collectCodeBehindFromSource(
 
     collectedFunctions[resolvedModuleName].functions[stmt.id.name] = {
       [PARSED_MARK_PROP]: true,
-      source: funcSource,
       tree: arrow,
     };
     result.functions[stmt.id.name] = {
       [PARSED_MARK_PROP]: true,
-      source: funcSource,
       tree: arrow,
     };
   }
