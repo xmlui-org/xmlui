@@ -820,7 +820,7 @@ async function createArrowFunctionAsync(
     }
 
     // --- Process the statement with a new processor
-    await processStatementQueueAsync(statements, runTimeEvalContext, workingThread);
+    await processStatementQueueAsync(statements, runTimeEvalContext, workingThread, runTimeOnStatementCompleted);
 
     // --- Return value is in a return value slot
     returnValue = workingThread.returnValue;

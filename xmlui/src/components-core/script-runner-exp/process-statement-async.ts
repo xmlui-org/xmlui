@@ -121,7 +121,7 @@ export async function processStatementQueueAsync(
         queueItem?.execInfo ?? {},
         evalContext,
         thread,
-        onStatementCompleted
+        onStatementCompleted,
       );
     } catch (err) {
       if (thread.tryBlocks && thread.tryBlocks.length > 0) {
@@ -165,7 +165,7 @@ export async function processStatementQueueAsync(
     }
 
     // --- Sign that the statement has been completed
-     await evalContext?.onStatementCompleted?.(evalContext, queueItem!.statement);
+    await evalContext?.onStatementCompleted?.(evalContext, queueItem!.statement);
     await onStatementCompleted?.(evalContext as any, queueItem!.statement as any);
 
     // --- Provide diagnostics
@@ -277,7 +277,12 @@ async function processStatementAsync(
 
     case T_EXPRESSION_STATEMENT:
       // --- Just evaluate it
-      const statementValue = await evalBindingAsync(statement.expr, evalContext, thread, onStatementCompleted);
+      const statementValue = await evalBindingAsync(
+        statement.expr,
+        evalContext,
+        thread,
+        onStatementCompleted,
+      );
       if (thread.blocks && thread.blocks.length !== 0) {
         thread.blocks[thread.blocks.length - 1].returnValue = statementValue;
       }
