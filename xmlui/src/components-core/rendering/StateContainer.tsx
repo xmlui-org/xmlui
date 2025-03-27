@@ -19,19 +19,19 @@ import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "../abstractions/containers";
-import { CodeDeclaration, ModuleErrors } from "../../abstractions/scripting/ScriptingSourceTree";
+import { CodeDeclaration, ModuleErrors, T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import { EMPTY_OBJECT } from "../constants";
 import { collectFnVarDeps } from "../rendering/collectFnVarDeps";
 import { createContainerReducer } from "../rendering/reducer";
 import { useDebugView } from "../DebugViewProvider";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
-import { collectVariableDependencies } from "../script-runner/visitors";
+import { collectVariableDependencies } from "../script-runner-exp/visitors";
 import { useShallowCompareMemoize, useReferenceTrackedApi } from "../utils/hooks";
 import { Container } from "./Container";
-import { PARSED_MARK_PROP } from "../../parsers/scripting/code-behind-collect";
+import { PARSED_MARK_PROP } from "../../parsers/scripting-exp/code-behind-collect";
 import { useAppContext } from "../AppContext";
-import { parseParameterString } from "../script-runner/ParameterParser";
-import { evalBinding } from "../script-runner/eval-tree-sync";
+import { parseParameterString } from "../script-runner-exp/ParameterParser";
+import { evalBinding } from "../script-runner-exp/eval-tree-sync";
 import { extractParam } from "../utils/extractParam";
 import { pickFromObject, shallowCompare } from "../utils/misc";
 import {
@@ -143,7 +143,7 @@ export const StateContainer = memo(
     const functionDeps = useMemo(() => {
       const fnDeps: Record<string, Array<string>> = {};
       Object.entries(varDefinitions).forEach(([key, value]) => {
-        if (isParsedValue(value) && value.tree.type === "ArrowE") {
+        if (isParsedValue(value) && value.tree.type === T_ARROW_EXPRESSION) {
           fnDeps[key] = collectVariableDependencies(value.tree, referenceTrackedApi);
         }
       });

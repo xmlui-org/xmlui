@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
-import { Expression, ModuleErrors } from "../../../src/abstractions/scripting/ScriptingSourceTree";
+import { Expression, ModuleErrors } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 import { transformSource } from "./xmlui";
 
 describe("Xmlui transform - script", () => {

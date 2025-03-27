@@ -1,5 +1,6 @@
 import type { GenericToken } from "../../parsers/common/GenericToken";
 import type { TokenType } from "../../parsers/scripting-exp/TokenType";
+import { ScriptParserErrorMessage } from "./ScriptParserError";
 
 // --- All binding expression tree node types
 type ScriptNode = Statement | Expression;
@@ -308,11 +309,12 @@ export interface FunctionDeclaration extends ScripNodeBase {
   exp?: boolean;
 }
 
-export type ImportedItem = { id: Identifier, source: string };
+export type ImportedItem = { id: Identifier; source: string };
 export interface ImportDeclaration extends ScripNodeBase {
   type: IMPORT_DECLARATION;
   imports: ImportedItem[];
   moduleFile: string;
+  module?: ScriptModule | null;
 }
 
 // =====================================================================================================================
@@ -525,3 +527,36 @@ export interface CompoundPropertyValue {
   type: "CPV";
   parts: (string | Expression)[];
 }
+
+/**
+ * Represents a parsed and resolved module
+ */
+export type ScriptModule = {
+  type: "ScriptModule";
+  name: string;
+  parent?: ScriptModule | null;
+  exports: Record<string, any>;
+  imports: Record<string, Record<string, any>>;
+  importedModules: ScriptModule[];
+  functions: Record<string, FunctionDeclaration>;
+  statements: Statement[];
+  sources: Map<Statement, string>;
+  executed: boolean;
+};
+
+/**
+ * Represents a module error
+ */
+export type ModuleErrors = Record<string, ScriptParserErrorMessage[]>;
+
+export type CollectedDeclarations = {
+  vars: Record<string, CodeDeclaration>;
+  functions: Record<string, CodeDeclaration>;
+  moduleErrors?: ModuleErrors;
+};
+
+export type CodeDeclaration = {
+  source?: string;
+  tree: Expression;
+  [x: string]: unknown;
+};

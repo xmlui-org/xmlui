@@ -1,11 +1,11 @@
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import type { ModuleResolver } from "../../abstractions/scripting/modules";
-import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
+import { collectCodeBehindFromSource } from "../scripting-exp/code-behind-collect";
 import type { Node } from "./syntax-node";
 import type { ErrorCodes } from "./ParserError";
 import { SyntaxKind } from "./syntax-kind";
 import { ParserError, errorMessages } from "./ParserError";
-import { Parser } from "../scripting/Parser";
+import { Parser } from "../scripting-exp/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 

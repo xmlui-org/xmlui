@@ -29,7 +29,8 @@ import {
   Statement,
   ArrowExpression,
   ArrowExpressionStatement,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+  T_ARROW_EXPRESSION_STATEMENT,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "../abstractions/containers";
 import { useAppContext } from "../AppContext";
@@ -41,9 +42,9 @@ import {
   RegisterComponentApiFnInner,
 } from "../rendering/ContainerWrapper";
 import { useDebugView } from "../DebugViewProvider";
-import { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
-import { processStatementQueueAsync } from "../script-runner/process-statement-async";
-import { processStatementQueue } from "../script-runner/process-statement-sync";
+import { BindingTreeEvaluationContext } from "../script-runner-exp/BindingTreeEvaluationContext";
+import { processStatementQueueAsync } from "../script-runner-exp/process-statement-async";
+import { processStatementQueue } from "../script-runner-exp/process-statement-sync";
 import { extractParam, shouldKeep } from "../utils/extractParam";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
 import { useEvent, generatedId, capitalizeFirstLetter, delay } from "../utils/misc";
@@ -211,8 +212,8 @@ export const Container = memo(
           } else {
             statements = [
               {
-                type: "ArrowS",
-                expression: cloneDeep(source), //TODO illesg (talk it through why we need to deep clone, it it's omitted, it gets slower every time we run it)
+                type: T_ARROW_EXPRESSION_STATEMENT,
+                expr: cloneDeep(source), //TODO illesg (talk it through why we need to deep clone, it it's omitted, it gets slower every time we run it)
               } as ArrowExpressionStatement,
             ];
           }
@@ -339,8 +340,8 @@ export const Container = memo(
         };
         try {
           const arrowStmt = {
-            type: "ArrowS",
-            expression: arrowExpression,
+            type: T_ARROW_EXPRESSION_STATEMENT,
+            expr: arrowExpression,
           } as ArrowExpressionStatement;
 
           processStatementQueue([arrowStmt], evalContext);

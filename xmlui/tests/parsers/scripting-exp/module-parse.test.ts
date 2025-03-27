@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   ModuleErrors,
-  ScriptModule,
   isModuleErrors,
   parseScriptModule,
 } from "../../../src/parsers/scripting-exp/modules";
+import { ScriptModule } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 const ROOT_MODULE = "test";
 

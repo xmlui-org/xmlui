@@ -1,4 +1,5 @@
 import {
+  ScriptModule,
   T_FUNCTION_DECLARATION,
   T_IMPORT_DECLARATION,
   T_VAR_STATEMENT,
@@ -10,19 +11,6 @@ import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
 import { TokenType } from "./TokenType";
-
-/**
- * Represents a parsed and resolved module
- */
-export type ScriptModule = {
-  type: "ScriptModule";
-  name: string;
-  parent?: ScriptModule | null;
-  exports: Record<string, FunctionDeclaration>;
-  imports: Record<string, FunctionDeclaration>;
-  importedModules: ScriptModule[];
-  functions: Record<string, FunctionDeclaration>;
-};
 
 /**
  * Represents a module error
@@ -157,6 +145,9 @@ export function parseScriptModule(
       importedModules: [],
       imports: {},
       functions,
+      statements: [],
+      sources: new Map(),
+      executed: false,
     };
 
     // --- Sign this module as parsed
