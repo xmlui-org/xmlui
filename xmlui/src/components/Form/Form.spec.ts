@@ -9,9 +9,33 @@ import { expect, test } from "../../testing/fixtures";
 // --- Smoke
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
+
   test("renders component", async ({ initTestBed, createFormDriver }) => {
     await initTestBed(`<Form />`);
     await expect((await createFormDriver()).component).toBeAttached();
+  });
+
+  test("mock service responds", async ({ initTestBed, createFormDriver }) => {
+    await initTestBed(
+      `
+      <Form submitUrl="/test" />`,
+      {
+        apiInterceptor: {
+          operations: {
+            test: {
+              url: "/test",
+              method: "post",
+              handler: `return true;`,
+            },
+          },
+        },
+      },
+    );
+    const driver = await createFormDriver();
+    await driver.submitForm()
+
+    const request = await driver.getSubmitResponse("/test");
+    expect(request.ok()).toEqual(true);
   });
 
   // --- data
@@ -176,7 +200,7 @@ test.fixme(
   "data accepts relative URL endpoint",
   SKIP_REASON.TEST_NOT_WORKING(`
     Fails with CI mode, but otherwise works.
-    
+
     npm run build:test-bed;
     CI=true npm run test:e2e
     `),
@@ -548,7 +572,7 @@ test.skip(
     Somehow the initTestBed does not initialize the Form properly,
     thus the test will fail.
     Doing the same with the "initApp" or initComponent functions will work.
-    
+
     Need to investigate.
     `),
   async ({ initTestBed, createFormDriver, createFormItemDriver }) => {
@@ -576,7 +600,7 @@ test.skip(
   },
 );
 // ORIGINAL TEST BELOW
-/* 
+/*
 test("edit form works with data url", async ({ page }) => {
   await initApp(page, {
     entryPoint: `
