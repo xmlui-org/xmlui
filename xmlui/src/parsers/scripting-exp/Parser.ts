@@ -2971,10 +2971,10 @@ export class Parser {
    * @param token Literal token
    */
   private parseStringLiteral(token: Token, quoteSurrounded: boolean = true): Literal {
-    const input =
-      token.text.length < 2 || !quoteSurrounded
-        ? token.text
-        : token.text.substring(1, token.text.length - 1);
+    let input = token.text;
+    if (quoteSurrounded) {
+      input = token.text.length < 2 ? "" : input.substring(1, input.length - 1);
+    }
     let result = "";
     let state: StrParseState = StrParseState.Normal;
     let collect = 0;
@@ -3031,7 +3031,7 @@ export class Parser {
               state = StrParseState.UX1;
               break;
             default:
-              result += "\\" + ch;
+              result += ch;
               break;
           }
           break;

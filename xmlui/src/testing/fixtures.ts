@@ -23,10 +23,12 @@ import {
   LinkDriver,
   ListDriver,
   MarkdownDriver,
+  NavGroupDriver,
   NavLinkDriver,
   NavPanelDriver,
   NoResultDriver,
   NumberBoxDriver,
+  OptionDriver,
   RadioGroupDriver,
   RangeDriver,
   SelectDriver,
@@ -162,7 +164,7 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   },
 
   createDriver: async <T extends new (...args: ComponentDriverParams[]) => any>(
-    { page, baseComponentTestId, testStateViewTestId },
+    { page, baseComponentTestId },
     use,
   ) => {
     await use(async (driverClass: T, testIdOrLocator?: string | Locator) => {
@@ -295,6 +297,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(NavLinkDriver, testIdOrLocator);
     });
   },
+  createNavGroupDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(NavGroupDriver, testIdOrLocator);
+    });
+  },
   createNavPanelDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(NavPanelDriver, testIdOrLocator);
@@ -328,6 +335,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   createNoResultDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(NoResultDriver, testIdOrLocator);
+    });
+  },
+  createOptionDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(OptionDriver, testIdOrLocator);
     });
   },
 });
@@ -372,6 +384,7 @@ type TestDriverExtenderProps = {
   createVStackDriver: ComponentDriverMethod<VStackDriver>;
   createLinkDriver: ComponentDriverMethod<LinkDriver>;
   createNavLinkDriver: ComponentDriverMethod<NavLinkDriver>;
+  createNavGroupDriver: ComponentDriverMethod<NavGroupDriver>;
   createNavPanelDriver: ComponentDriverMethod<NavPanelDriver>;
   createCardDriver: ComponentDriverMethod<CardDriver>;
   createAccordionDriver: ComponentDriverMethod<AccordionDriver>;
@@ -379,4 +392,5 @@ type TestDriverExtenderProps = {
   createAppFooterDriver: ComponentDriverMethod<AppFooterDriver>;
   createBadgeDriver: ComponentDriverMethod<BadgeDriver>;
   createNoResultDriver: ComponentDriverMethod<NoResultDriver>;
+  createOptionDriver: ComponentDriverMethod<OptionDriver>;
 };

@@ -213,7 +213,7 @@ test(
     await expect(formItemDriver.component).not.toHaveText(/Name is too short!/);
 
     // Step 2: Fill input field with less than 3 chars to trigger minLength validation
-    await formItemDriver.fillField("Bo");
+    await formItemDriver.input.fill("Bo");
 
     await expect(formItemDriver.component).not.toHaveText(/This field is required/);
     await expect(formItemDriver.component).toHaveText(/Name is too short!/);

@@ -104,6 +104,50 @@ You do not have to use `NavGroup` within `NavPanel`; you can nest it into other 
 `}
 />
 
+### Custom Icons
+
+You can also provide custom icons for a specific NavGroup component via it's respective property:
+- [iconHorizontalCollapsed](#iconHorizontalCollapsed)
+- [iconHorizontalExpanded](#iconHorizontalExpanded)
+- [iconVerticalCollapsed](#iconVerticalCollapsed)
+- [iconVerticalExpanded](#iconVerticalExpanded)
+
+See the following for an example of all variants:
+
+```xmlui copy /layout="horizontal"/ {3, 5}
+<App layout="horizontal">
+  <NavGroup icon="email" label="Send To"
+    iconVerticalExpanded="arrowup" iconVerticalCollapsed="arrowbottom">
+    <NavLink icon="arrowup" label="Boss" />
+    <NavGroup icon="users" label="Team"
+      iconHorizontalExpanded="arrowleft" iconHorizontalCollapsed="arrowright">
+      <NavLink label="Jane" />
+      <NavLink label="Will" />
+    </NavGroup>
+    <NavLink icon="cube" label="Support" />
+  </NavGroup>
+</App>
+```
+
+<Playground
+  name="Example: custom icons in horizontal layout"
+  height={220}
+  app={`
+    <App layout="horizontal">
+      <NavGroup icon="email" label="Send To"
+        iconVerticalExpanded="arrowup" iconVerticalCollapsed="arrowbottom">
+        <NavLink icon="arrowup" label="Boss" />
+        <NavGroup icon="users" label="Team"
+          iconHorizontalExpanded="arrowleft" iconHorizontalCollapsed="arrowright">
+          <NavLink label="Jane" />
+          <NavLink label="Will" />
+        </NavGroup>
+        <NavLink icon="cube" label="Support" />
+      </NavGroup>
+    </App>
+  `}
+/>
+
 %-DESC-END
 
 %-PROP-START icon
@@ -150,11 +194,35 @@ Look at this example:
 
 %-PROP-END
 
+%-PROP-START iconHorizontalCollapsed
+
+For an example, see the [Custom Icons section](#custom-icons).
+
+%-PROP-END
+
+%-PROP-START iconHorizontalExpanded
+
+For an example, see the [Custom Icons section](#custom-icons).
+
+%-PROP-END
+
+%-PROP-START iconVerticalCollapsed
+
+For an example, see the [Custom Icons section](#custom-icons).
+
+%-PROP-END
+
+%-PROP-START iconVerticalExpanded
+
+For an example, see the [Custom Icons section](#custom-icons).
+
+%-PROP-END
+
 %-PROP-START label
 
 This property sets the text displayed as the name of the `NavGroup`.
 
-For an example, see the [section on the icon prop](#icon).
+For an example, see the [section on the icon property](#icon).
 
 %-PROP-END
 

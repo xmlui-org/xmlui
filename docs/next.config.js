@@ -1,5 +1,4 @@
 const withTM = require("next-transpile-modules")(["react-icons", "xmlui-charts", "xmlui", "xmlui-animations", "xmlui-pdf"]);
-const withSvgr = require("next-plugin-svgr");
 const shiki = require("shiki");
 const fs = require("fs");
 const theme = require("../xmlui/src/syntax/textMate/xmlui.json");
@@ -60,13 +59,50 @@ let nextConfig = {
     unoptimized: true,
   },
   env: {
-    VITE_MOCK_ENABLED: true,
+    VITE_MOCK_ENABLED: 'true',
   },
   reactStrictMode: true,
   webpack: (config, options) => {
+
+    // custom loader for xmlui files
     config.module.rules.push({
       test: /\.xmlui$/i,
       use: "raw-loader",
+    });
+
+    const fileLoaderRule = config.module.rules.find((rule) =>
+      rule.test?.test?.('.svg')
+    );
+
+    if (fileLoaderRule) {
+      fileLoaderRule.exclude = /\.svg$/i;
+    }
+
+    config.module.rules.push({
+      test: /\.svg$/i,
+      issuer: /\.(mdx)$/,
+      use: [
+        {
+          loader: 'svg-url-loader',
+          options: {
+            icon: false,
+          },
+        },
+      ],
+    });
+
+    config.module.rules.push({
+      test: /\.svg$/i,
+      issuer: /\.(js|ts|jsx|tsx)$/,
+      use: [
+        {
+          loader: '@svgr/webpack',
+          options: {
+            icon: true,
+            titleProp: true,
+          },
+        },
+      ],
     });
 
     config.module.rules.push({
@@ -114,4 +150,4 @@ let nextConfig = {
   },
 };
 
-module.exports = withNextra(withTM(withSvgr(nextConfig)));
+module.exports = withNextra(withTM(nextConfig));
