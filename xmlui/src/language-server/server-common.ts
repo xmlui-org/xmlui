@@ -154,5 +154,6 @@ export function start(connection: Connection){
   documents.listen(connection);
 
   // Listen on the connection
+  console.log("starting to listen")
   connection.listen();
 }
