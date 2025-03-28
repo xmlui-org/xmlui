@@ -1,4 +1,51 @@
-import { type Statement, type Expression, T_BLOCK_STATEMENT, T_EMPTY_STATEMENT, T_EXPRESSION_STATEMENT, T_ARROW_EXPRESSION_STATEMENT, T_LET_STATEMENT, T_CONST_STATEMENT, T_VAR_STATEMENT, T_IF_STATEMENT, T_RETURN_STATEMENT, T_BREAK_STATEMENT, T_CONTINUE_STATEMENT, T_WHILE_STATEMENT, T_DO_WHILE_STATEMENT, T_FOR_STATEMENT, T_FOR_IN_STATEMENT, T_FOR_OF_STATEMENT, T_THROW_STATEMENT, T_TRY_STATEMENT, T_SWITCH_STATEMENT, T_FUNCTION_DECLARATION, T_IMPORT_DECLARATION, T_UNARY_EXPRESSION, T_BINARY_EXPRESSION, T_SEQUENCE_EXPRESSION, T_CONDITIONAL_EXPRESSION, T_FUNCTION_INVOCATION_EXPRESSION, T_MEMBER_ACCESS_EXPRESSION, T_CALCULATED_MEMBER_ACCESS_EXPRESSION, T_IDENTIFIER, T_LITERAL, T_ARRAY_LITERAL, T_OBJECT_LITERAL, T_SPREAD_EXPRESSION, T_ASSIGNMENT_EXPRESSION, T_NO_ARG_EXPRESSION, T_ARROW_EXPRESSION, T_PREFIX_OP_EXPRESSION, T_POSTFIX_OP_EXPRESSION, T_VAR_DECLARATION, T_DESTRUCTURE, T_OBJECT_DESTRUCTURE, T_ARRAY_DESTRUCTURE, T_REACTIVE_VAR_DECLARATION, T_TEMPLATE_LITERAL_EXPRESSION, T_SWITCH_CASE } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import {
+  type Statement,
+  type Expression,
+  T_BLOCK_STATEMENT,
+  T_EMPTY_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+  T_ARROW_EXPRESSION_STATEMENT,
+  T_LET_STATEMENT,
+  T_CONST_STATEMENT,
+  T_VAR_STATEMENT,
+  T_IF_STATEMENT,
+  T_RETURN_STATEMENT,
+  T_BREAK_STATEMENT,
+  T_CONTINUE_STATEMENT,
+  T_WHILE_STATEMENT,
+  T_DO_WHILE_STATEMENT,
+  T_FOR_STATEMENT,
+  T_FOR_IN_STATEMENT,
+  T_FOR_OF_STATEMENT,
+  T_THROW_STATEMENT,
+  T_TRY_STATEMENT,
+  T_SWITCH_STATEMENT,
+  T_FUNCTION_DECLARATION,
+  T_UNARY_EXPRESSION,
+  T_BINARY_EXPRESSION,
+  T_SEQUENCE_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
+  T_FUNCTION_INVOCATION_EXPRESSION,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_IDENTIFIER,
+  T_LITERAL,
+  T_ARRAY_LITERAL,
+  T_OBJECT_LITERAL,
+  T_SPREAD_EXPRESSION,
+  T_ASSIGNMENT_EXPRESSION,
+  T_NO_ARG_EXPRESSION,
+  T_ARROW_EXPRESSION,
+  T_PREFIX_OP_EXPRESSION,
+  T_POSTFIX_OP_EXPRESSION,
+  T_VAR_DECLARATION,
+  T_DESTRUCTURE,
+  T_OBJECT_DESTRUCTURE,
+  T_ARRAY_DESTRUCTURE,
+  T_REACTIVE_VAR_DECLARATION,
+  T_TEMPLATE_LITERAL_EXPRESSION,
+  T_SWITCH_CASE,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 const unreachable = (_x: never) => {};
 
@@ -23,7 +70,7 @@ type StmtVisitor<TState = any> = (
   visited: Statement,
   state: VisitorState<TState>,
   parent?: VisitSubject,
-  tag?: string
+  tag?: string,
 ) => VisitorState<TState>;
 
 /* This visitor is called usually twice on every expression when give to a `visitNode` function
@@ -34,7 +81,7 @@ type ExprVisitor<TState = any> = (
   visited: Expression,
   state: VisitorState<TState>,
   parent?: VisitSubject,
-  tag?: string
+  tag?: string,
 ) => VisitorState<TState>;
 
 /*Walk through the ast, executing visitors on the nodes
@@ -50,7 +97,7 @@ export function visitNode<TState = any>(
   stmtVisitor?: StmtVisitor<TState>,
   exprVisitor?: ExprVisitor<TState>,
   parent?: VisitSubject,
-  tag?: string
+  tag?: string,
 ): VisitorState<TState> {
   // --- Stop visiting if cancelled
   if (state.cancel) {
@@ -282,7 +329,14 @@ export function visitNode<TState = any>(
         }
         if (state.cancel) return state;
         if (subject.finallyB) {
-          state = visitNode(subject.finallyB, state, stmtVisitor, exprVisitor, subject, "finallyBlock");
+          state = visitNode(
+            subject.finallyB,
+            state,
+            stmtVisitor,
+            exprVisitor,
+            subject,
+            "finallyBlock",
+          );
         }
         if (state.cancel) return state;
       }
@@ -297,11 +351,25 @@ export function visitNode<TState = any>(
         if (state.cancel) return state;
         for (const switchCase of subject.cases) {
           if (switchCase.caseE)
-            state = visitNode(switchCase.caseE, state, stmtVisitor, exprVisitor, subject, "caseExpression");
+            state = visitNode(
+              switchCase.caseE,
+              state,
+              stmtVisitor,
+              exprVisitor,
+              subject,
+              "caseExpression",
+            );
           if (state.cancel) return state;
           if (switchCase.stmts === undefined) continue;
           for (const statement of switchCase.stmts) {
-            state = visitNode(statement, state, stmtVisitor, exprVisitor, subject, "switchStatement");
+            state = visitNode(
+              statement,
+              state,
+              stmtVisitor,
+              exprVisitor,
+              subject,
+              "switchStatement",
+            );
             if (state.cancel) return state;
           }
         }
@@ -321,13 +389,6 @@ export function visitNode<TState = any>(
         state = visitNode(subject.stmt, state, stmtVisitor, exprVisitor, subject, "statement");
         if (state.cancel) return state;
       }
-      state = stmtVisitor?.(false, subject, state, parent, tag) || state;
-      return state;
-    }
-
-    case T_IMPORT_DECLARATION: {
-      state = stmtVisitor?.(true, subject, state, parent, tag) || state;
-      if (state.cancel) return state;
       state = stmtVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }

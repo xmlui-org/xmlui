@@ -112,8 +112,6 @@ describe("Lexer - miscellaneous", () => {
     { src: "default", exp: TokenType.Default },
     { src: "delete", exp: TokenType.Delete },
     { src: "function", exp: TokenType.Function },
-    { src: "export", exp: TokenType.Export },
-    { src: "import", exp: TokenType.Import },
     { src: "as", exp: TokenType.As },
     { src: "from", exp: TokenType.From },
   ];

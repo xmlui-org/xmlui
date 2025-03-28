@@ -109,8 +109,6 @@ export enum TokenType {
   Default,
   Delete,
   Function,
-  Export,
-  Import,
   As,
   From,
 }

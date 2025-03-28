@@ -232,14 +232,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     }
   }
 
-  const codeBehind = collectCodeBehindFromSource(
-    "Main",
-    code,
-    () => {
-      return "";
-    },
-    (a) => a,
-  );
+  const codeBehind = collectCodeBehindFromSource("Main", code);
   if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
     return {
       component: errReportModuleErrors(codeBehind.moduleErrors, response.url),

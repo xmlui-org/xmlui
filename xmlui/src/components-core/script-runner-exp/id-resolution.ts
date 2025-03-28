@@ -20,7 +20,6 @@ import {
   T_FUNCTION_INVOCATION_EXPRESSION,
   T_IDENTIFIER,
   T_IF_STATEMENT,
-  T_IMPORT_DECLARATION,
   T_LET_STATEMENT,
   T_LITERAL,
   T_MEMBER_ACCESS_EXPRESSION,
@@ -318,11 +317,6 @@ export function resolveIdentifiers(
         blockScopes.pop();
         return;
       }
-      case T_IMPORT_DECLARATION:
-        for (const item of expr.imports) {
-          visitNode(item.id);
-        }
-        return;
     }
   }
 

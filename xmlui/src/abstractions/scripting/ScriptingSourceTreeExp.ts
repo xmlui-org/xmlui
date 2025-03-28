@@ -43,7 +43,6 @@ export const T_THROW_STATEMENT = 17;
 export const T_TRY_STATEMENT = 18;
 export const T_SWITCH_STATEMENT = 19;
 export const T_FUNCTION_DECLARATION = 20;
-export const T_IMPORT_DECLARATION = 21;
 
 // --- Expression node type values
 export const T_UNARY_EXPRESSION = 100;
@@ -94,7 +93,6 @@ type THROW_STATEMENT = typeof T_THROW_STATEMENT;
 type TRY_STATEMENT = typeof T_TRY_STATEMENT;
 type SWITCH_STATEMENT = typeof T_SWITCH_STATEMENT;
 type FUNCTION_DECLARATION = typeof T_FUNCTION_DECLARATION;
-type IMPORT_DECLARATION = typeof T_IMPORT_DECLARATION;
 
 // --- Expression node types
 type UNARY_EXPRESSION = typeof T_UNARY_EXPRESSION;
@@ -147,8 +145,7 @@ export type Statement =
   | ThrowStatement
   | TryStatement
   | SwitchStatement
-  | FunctionDeclaration
-  | ImportDeclaration;
+  | FunctionDeclaration;
 
 export type LoopStatement = WhileStatement | DoWhileStatement;
 
@@ -309,15 +306,6 @@ export interface FunctionDeclaration extends ScripNodeBase {
   id: Identifier;
   args: Expression[];
   stmt: BlockStatement;
-  exp?: boolean;
-}
-
-export type ImportedItem = { id: Identifier; source: string };
-export interface ImportDeclaration extends ScripNodeBase {
-  type: IMPORT_DECLARATION;
-  imports: ImportedItem[];
-  moduleFile: string;
-  module?: ScriptModule | null;
 }
 
 // =====================================================================================================================
@@ -539,8 +527,6 @@ export type ScriptModule = {
   name: string;
   parent?: ScriptModule | null;
   exports: Record<string, any>;
-  imports: Record<string, Record<string, any>>;
-  importedModules: ScriptModule[];
   functions: Record<string, FunctionDeclaration>;
   statements: Statement[];
   sources: Map<Statement, string>;
