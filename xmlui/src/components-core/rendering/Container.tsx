@@ -233,67 +233,64 @@ export const Container = memo(
             });
           }
           let mainThreadBlockingRuns = 0;
-          await processStatementQueueAsync(
-            statements,
-            evalContext,
-            undefined,
-            async (evalContext) => {
-              if (changes.length) {
-                mainThreadBlockingRuns = 0;
-                changes.forEach((change) => {
-                  statePartChanged(
-                    change.pathArray,
-                    cloneDeep(change.newValue),
-                    change.target,
-                    change.action,
-                  );
-                });
-                let resolve = null;
-                const stateUpdatedPromise = new Promise((res) => {
-                  resolve = () => {
-                    res(null);
-                  };
-                });
-                const key = generatedId();
-                statementPromises.current.set(key, resolve);
-                // We use this to tell react that this update is not high-priority.
-                //   If we don't put it to a transition, the whole app would be blocked if we run a long,
-                //   update intensive queue (e.g. an infinite loop which
-                //   increments a counter, see playground example learning/01_Experiments/01_Event_Framework/app ).
-                //   Before this solution, we used a setTimeout(..., 0); hack, but some browsers (chrome especially)
-                //   do some funky stuff with the background tabs (e.g. all the setTimeouts are
-                //   maximized to run in 1 time / minute, doesn't matter if it's timeout is 0)
-                //   As of 2023. June 20, this solution works with backgrounded tabs, too.
-                startTransition(() => {
-                  setVersion((prev) => prev + 1);
-                });
+          evalContext.onStatementCompleted = async (evalContext) => {
+            if (changes.length) {
+              mainThreadBlockingRuns = 0;
+              changes.forEach((change) => {
+                statePartChanged(
+                  change.pathArray,
+                  cloneDeep(change.newValue),
+                  change.target,
+                  change.action,
+                );
+              });
+              let resolve = null;
+              const stateUpdatedPromise = new Promise((res) => {
+                resolve = () => {
+                  res(null);
+                };
+              });
+              const key = generatedId();
+              statementPromises.current.set(key, resolve);
+              // We use this to tell react that this update is not high-priority.
+              //   If we don't put it to a transition, the whole app would be blocked if we run a long,
+              //   update intensive queue (e.g. an infinite loop which
+              //   increments a counter, see playground example learning/01_Experiments/01_Event_Framework/app ).
+              //   Before this solution, we used a setTimeout(..., 0); hack, but some browsers (chrome especially)
+              //   do some funky stuff with the background tabs (e.g. all the setTimeouts are
+              //   maximized to run in 1 time / minute, doesn't matter if it's timeout is 0)
+              //   As of 2023. June 20, this solution works with backgrounded tabs, too.
+              startTransition(() => {
+                setVersion((prev) => prev + 1);
+              });
 
-                //TODO this could be a problem - if this container gets unmounted, we still have to wait for the update,
-                //  but in that case this update probably happened in the parent (e.g. a button's event handler removes the whole container
-                //  where the button lives, but it still has some statements to run).
-                // with this solution the statement execution doesn't stop, and we fallback waiting with a setTimeout(0)
-                if (mountedRef.current) {
-                  await stateUpdatedPromise;
-                } else {
-                  await delay(0);
-                }
-                statementPromises.current.delete(key);
-                changes = [];
+              //TODO this could be a problem - if this container gets unmounted, we still have to wait for the update,
+              //  but in that case this update probably happened in the parent (e.g. a button's event handler removes the whole container
+              //  where the button lives, but it still has some statements to run).
+              // with this solution the statement execution doesn't stop, and we fallback waiting with a setTimeout(0)
+              if (mountedRef.current) {
+                await stateUpdatedPromise;
               } else {
-                //in this else branch normally we block the main thread (we don't wait for any state promise to be resolved),
-                // so in a long-running (typically infinite loop) situation, where there aren't any changes in the state
-                // we block the main thread indefinitely... this 'mainThreadBlockingRuns' var solution makes sure that
-                // we pause in every 100 runs, and let the main thread breath a bit, so it's not frozen for the whole time
-                // (we clear that counter above, too, where we use a startTransition call to de-prioritize this work)
-                mainThreadBlockingRuns++;
-                if (mainThreadBlockingRuns > 100) {
-                  mainThreadBlockingRuns = 0;
-                  await delay(0);
-                }
+                await delay(0);
               }
-              evalContext.localContext = getComponentStateClone();
-            },
-          );
+              statementPromises.current.delete(key);
+              changes = [];
+            } else {
+              //in this else branch normally we block the main thread (we don't wait for any state promise to be resolved),
+              // so in a long-running (typically infinite loop) situation, where there aren't any changes in the state
+              // we block the main thread indefinitely... this 'mainThreadBlockingRuns' var solution makes sure that
+              // we pause in every 100 runs, and let the main thread breath a bit, so it's not frozen for the whole time
+              // (we clear that counter above, too, where we use a startTransition call to de-prioritize this work)
+              mainThreadBlockingRuns++;
+              if (mainThreadBlockingRuns > 100) {
+                mainThreadBlockingRuns = 0;
+                await delay(0);
+              }
+            }
+            evalContext.localContext = getComponentStateClone();
+          };
+
+          await processStatementQueueAsync(statements, evalContext);
 
           if (canSignEventLifecycle()) {
             // --- Sign the event handler has successfully completed
