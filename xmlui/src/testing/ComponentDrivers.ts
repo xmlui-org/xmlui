@@ -237,24 +237,60 @@ export class FormDriver extends ComponentDriver {
     return requestPromise;
   }
 
-  async getSubmitResponse(
-    endpoint = "/entities",
-    responseStatus = 200,
-    timeout = 5000,
-  ) {
+  async getSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
     const responsePromise = this.page.waitForResponse(
-      (response) =>
-        response.url().includes(endpoint) &&
-        response.status() === responseStatus,
+      (response) => response.url().includes(endpoint) && response.status() === responseStatus,
       { timeout },
     );
     return responsePromise;
   }
+
+  /**
+   * Gets the validation summary component inside the Form.
+   * Uses the 'data-validation-summary' attribute to find the component
+   */
+  async getValidationSummary() {
+    return this.component.locator("[data-validation-summary='true']");
+  }
+
+  /**
+   * Gets the validation display components inside the Form.
+   * Uses the 'data-validation-display-severity' attribute to find the components.
+   * The attribute contains the severity of the validation.
+   */
+  async getValidationDisplays() {
+    return this.component
+      .locator("[data-validation-summary='true']")
+      .locator("[data-validation-display-severity]");
+  }
+
+  async getValidationDisplaysBySeverity(severity: string) {
+    return this.component
+      .locator("[data-validation-summary='true']")
+      .locator(`[data-validation-display-severity="${severity}"]`);
+  }
+
+  // TODO: it would be a nice to have features to get validation displays and map them automatically
+  /* async getValidationDisplaysAsDriver() {
+    const displays = await this.getValidationDisplays();
+    const displayList: ValidationDisplayDriver[] = [];
+
+    const displayNum = await displays.count();
+    for (let i = 0; i < displayNum; i++) {
+      const element = displays.nth(i);
+      displayList.push(new ValidationDisplayDriver({ locator: element, page: this.page }));
+    }
+    return displayList;
+  } */
 }
 
 // --- FormItem
 
 export class FormItemDriver extends ComponentDriver {
+  get validationStatusTag() {
+    return "data-validation-status";
+  }
+
   // TODO, TEMP: get input under FormItem
   get input() {
     return this.locator.locator("input");
@@ -264,6 +300,37 @@ export class FormItemDriver extends ComponentDriver {
   /* async fillField(value: any) {
     await this.input.fill(value);
   } */
+
+  async getValidationStatusIndicator() {
+    return this.component.locator(`[${this.validationStatusTag}]`);
+  }
+}
+
+// --- ValidationSummary
+
+export class ValidationSummaryDriver extends ComponentDriver {
+  /**
+   * Gets the validation display components inside the Form.
+   * Uses the 'data-validation-display-severity' attribute to find the components.
+   * The attribute contains the severity of the validation.
+   */
+  async getValidationDisplays() {
+    return this.component
+      .locator("[data-validation-summary='true']")
+      .locator("[data-validation-display-severity]");
+  }
+}
+
+// --- ValidationDisplay
+
+export class ValidationDisplayDriver extends ComponentDriver {
+  async getSeverity() {
+    return this.component.getAttribute("data-validation-display-severity");
+  }
+
+  async getText() {
+    return this.component.locator("li").textContent();
+  }
 }
 
 // --- Markdown
@@ -272,9 +339,7 @@ export class MarkdownDriver extends ComponentDriver {
   async hasHtmlElement(elements: string | string[]) {
     const contents = await this.component.innerHTML();
     elements = typeof elements === "string" ? [elements] : elements;
-    return elements
-      .map((e) => `<${e}`)
-      .reduce((acc, curr) => acc && contents.includes(curr), true);
+    return elements.map((e) => `<${e}`).reduce((acc, curr) => acc && contents.includes(curr), true);
   }
 }
 
