@@ -1,5 +1,4 @@
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
-import type { ModuleResolver } from "../../abstractions/scripting/modules";
 import { collectCodeBehindFromSource } from "../scripting-exp/code-behind-collect";
 import type { Node } from "./syntax-node";
 import type { ErrorCodes } from "./ParserError";

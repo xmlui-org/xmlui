@@ -2,9 +2,9 @@ import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
 import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import {
+  T_ARROW_EXPRESSION,
   T_EMPTY_STATEMENT,
   T_FUNCTION_DECLARATION,
-  type ArrowExpression,
   type FunctionDeclaration,
   type LoopStatement,
   type Statement,
@@ -218,12 +218,12 @@ export function hoistFunctionDeclarations(thread: LogicalThreadExp, statements: 
 
       // --- Turn the function into an arrow expression
       const arrowExpression = {
-        type: "ArrowE",
+        type: T_ARROW_EXPRESSION,
         args: funcDecl.args,
         statement: funcDecl.stmt,
         closureContext: obtainClosures(thread),
         _ARROW_EXPR_: true,
-      } as unknown as ArrowExpression;
+      };
 
       // --- Remove the functions from the closure list
 
