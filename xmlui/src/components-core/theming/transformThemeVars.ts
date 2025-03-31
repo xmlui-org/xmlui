@@ -708,17 +708,17 @@ function generateBaseTonesForColor(
     }
 
     return {
-      [`${varName}-50`]: color50.toString(),
-      [`${varName}-100`]: color100.toString(),
-      [`${varName}-200`]: color200.toString(),
-      [`${varName}-300`]: color300.toString(),
-      [`${varName}-400`]: color400.toString(),
-      [`${varName}-500`]: color500.toString(),
-      [`${varName}-600`]: color600.toString(),
-      [`${varName}-700`]: color700.toString(),
-      [`${varName}-800`]: color800.toString(),
-      [`${varName}-900`]: color900.toString(),
-      [`${varName}-950`]: color950.toString(),
+      [`const-${varName}-50`]: color50.toString(),
+      [`const-${varName}-100`]: color100.toString(),
+      [`const-${varName}-200`]: color200.toString(),
+      [`const-${varName}-300`]: color300.toString(),
+      [`const-${varName}-400`]: color400.toString(),
+      [`const-${varName}-500`]: color500.toString(),
+      [`const-${varName}-600`]: color600.toString(),
+      [`const-${varName}-700`]: color700.toString(),
+      [`const-${varName}-800`]: color800.toString(),
+      [`const-${varName}-900`]: color900.toString(),
+      [`const-${varName}-950`]: color950.toString(),
     };
   } catch (e) {
     console.error("Error generating base tones for color:", varName);

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { ReactNode, useLayoutEffect, useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./AppHeader.module.scss";
@@ -12,6 +12,7 @@ import { Logo } from "../../components/Logo/LogoNative";
 import { useAppLayoutContext } from "../../components/App/AppLayoutContext";
 import { Button } from "../../components/Button/ButtonNative";
 import { NavLink } from "../../components/NavLink/NavLinkNative";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 type Props = {
   children?: ReactNode;
@@ -26,6 +27,7 @@ type Props = {
   toggleDrawer?: () => void;
   hasRegisteredNavPanel?: boolean;
   titleContent?: ReactNode;
+  registerSubNavPanelSlot?: (node: HTMLElement)=>void;
 };
 
 function tryLoadImage(url: string, onLoaded: () => void, onError: () => void) {
@@ -66,9 +68,11 @@ export const AppHeader = ({
   hasRegisteredNavPanel,
   title,
   titleContent,
+  registerSubNavPanelSlot,
 }: Props) => {
   const { mediaSize } = useAppContext();
   const logoUrl = useLogoUrl();
+  const subNavPanelSlot = useRef(null);
   const safeLogoTitle =
     mediaSize.sizeIndex < 2 ? null : !titleContent && title ? (
       <NavLink to={"/"} displayActive={false} style={{ paddingLeft: 0 }}>
@@ -77,6 +81,10 @@ export const AppHeader = ({
     ) : (
       titleContent
     );
+
+  useIsomorphicLayoutEffect(()=>{
+    registerSubNavPanelSlot?.(subNavPanelSlot.current);
+  }, []);
 
   return (
     <div className={classnames(styles.header, className)} style={style}>
@@ -113,6 +121,7 @@ export const AppHeader = ({
               </>
             ))}
         </div>
+        <div ref={subNavPanelSlot} className={styles.subNavPanelSlot}/>
         <div className={styles.childrenWrapper}>{children}</div>
         {profileMenu && <div className={styles.rightItems}>{profileMenu}</div>}
       </div>
@@ -152,6 +161,7 @@ export function AppContextAwareAppHeader({
     hasRegisteredNavPanel,
     navPanelDef,
     logoContentDef,
+    registerSubNavPanelSlot,
   } = appLayoutContext || {};
 
   // console.log("APP LAYOUT CONTEXT", appLayoutContext);
@@ -171,6 +181,7 @@ export function AppContextAwareAppHeader({
       className={className}
       title={title}
       titleContent={titleContent}
+      registerSubNavPanelSlot={registerSubNavPanelSlot}
     >
       {layout?.startsWith("condensed") && navPanelVisible && (
         <div style={{ minWidth: 0 }}>{renderChild(navPanelDef)}</div>

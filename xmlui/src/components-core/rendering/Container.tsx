@@ -156,7 +156,7 @@ export const Container = memo(
         let changes: Array<any> = [];
         const getComponentStateClone = () => {
           changes.length = 0;
-          const poj = cloneDeep({ ...stateRef.current });
+          const poj = cloneDeep({ ...stateRef.current, ...(options?.context || {}) });
           poj["$this"] = stateRef.current[componentUid];
           return buildProxy(poj, (changeInfo) => {
             const idRoot = (changeInfo.pathArray as string[])?.[0];
@@ -178,6 +178,7 @@ export const Container = memo(
             return {
               uid: componentUid,
               state: stateRef.current,
+              getCurrentState: ()=> stateRef.current,
               dispatch,
               appContext: evalAppContext,
               navigate,
@@ -357,6 +358,9 @@ export const Container = memo(
 
     const getOrCreateEventHandlerFn = useEvent(
       (src: string | ArrowExpression, uid: symbol, options?: LookupActionOptions) => {
+        if(Array.isArray(src)) {
+          throw new Error("Multiple event handlers are not supported");
+        }
         const stringSrc = typeof src === "string" ? src : src.statement.nodeId;
         const fnCacheKey = `${options?.eventName};${stringSrc}`;
         const handler = (...eventArgs: any[]) => {

@@ -86,18 +86,10 @@ export const AutoCompleteMd = createMetadata({
     [`fontSize-${COMP}-badge`]: "$fontSize-small",
     [`paddingHorizontal-${COMP}-badge`]: "$space-1",
     [`paddingVertical-${COMP}-badge`]: "$space-1",
-    light: {
-      [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
-      [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
-      [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
-      [`textColor-${COMP}-badge`]: "$color-surface-50",
-    },
-    dark: {
-      [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-600",
-      [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
-      [`textColor-${COMP}-badge`]: "$color-surface-50",
-      [`textColor-item-${COMP}--disabled`]: "$color-surface-800",
-    },
+    [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
+    [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
+    [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
+    [`textColor-${COMP}-badge`]: "$const-color-surface-50",
   },
 });
 

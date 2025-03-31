@@ -34,13 +34,15 @@ export const start = async ({
   }
 
   try {
+    let viteConfig = await getViteConfig({});
     const server = await createServer({
-      ...getViteConfig({ }),
+      ...viteConfig,
       server: {
         port,
         proxy: proxyDef,
       },
       define: {
+        ...viteConfig.define,
         "process.env.VITE_BUILD_MODE": JSON.stringify("ALL"),
         "process.env.VITE_DEV_MODE": true,
         "process.env.VITE_STANDALONE": process.env.VITE_STANDALONE,

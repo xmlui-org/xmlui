@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import type { UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
@@ -11,13 +12,20 @@ type ViteConfigData = {
   flatDistUiPrefix?: string;
 };
 
-export function getViteConfig({
+export async function getViteConfig({
   flatDist = false,
   withRelativeRoot = false,
   flatDistUiPrefix = "",
 }: ViteConfigData = {}) {
+  //TODO finish this (merge smart)
+  let overrides: UserConfig = {};
+  try {
+    const configOverrides = await import(process.cwd() + `/vite.config-overrides`);
+    overrides = configOverrides.default || {};
+  } catch (e) {}
+
   return defineConfig({
-    plugins: [react(), svgr(), ViteYaml(), ViteXmlui({})],
+    plugins: [react(), svgr(), ViteYaml(), ViteXmlui({}), ...(overrides.plugins || [])],
     base: withRelativeRoot ? "" : undefined,
     // experimental: {
     //   renderBuiltUrl: (filename, {type, hostType, hostId}) =>{
@@ -29,6 +37,11 @@ export function getViteConfig({
     //     }
     //   }
     // },
+    define: overrides.define,
+    resolve: {
+      alias: overrides.resolve?.alias,
+    },
+    css: overrides.css,
     build: {
       rollupOptions: {
         input: path.resolve(process.cwd(), "index.html"),
@@ -52,7 +65,9 @@ export function getViteConfig({
           chunkFileNames: flatDist
             ? `${flatDistUiPrefix}internal_chunks_[name].[hash].js`
             : "internal/chunks/[name].[hash].js",
-          entryFileNames: flatDist ? `${flatDistUiPrefix}internal_[name].[hash].js` : "internal/[name].[hash].js",
+          entryFileNames: flatDist
+            ? `${flatDistUiPrefix}internal_[name].[hash].js`
+            : "internal/[name].[hash].js",
         },
         // treeshake: {
         //   preset: "recommended",

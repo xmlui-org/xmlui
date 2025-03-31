@@ -16,6 +16,7 @@ export const NavGroupMd = createMetadata({
     `(\`NavLink\` components). It can be displayed as a submenu in the App's UI.`,
   props: {
     label: dLabel(),
+    initiallyExpanded: d('This property defines whether the group is initially expanded or collapsed.'),
     to: {
       description: `This property defines an optional navigation link.`,
       valueType: "string",
@@ -25,21 +26,21 @@ export const NavGroupMd = createMetadata({
       valueType: "string",
     },
     iconHorizontalExpanded: {
-      description: 
+      description:
         "Set a custom icon to display when the navigation menu is expanded, " +
         "is in a **horizontal** app layout, and is in a navigation submenu.",
       valueType: "string",
       defaultValue: defaultProps.iconHorizontalExpanded,
     },
     iconVerticalExpanded: {
-      description: 
+      description:
         "Set a custom icon to display when the navigation menu is expanded, " +
         "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
       valueType: "string",
       defaultValue: defaultProps.iconVerticalExpanded,
     },
     iconHorizontalCollapsed: {
-      description: 
+      description:
         "Set a custom icon to display when the navigation menu is collapsed, " +
         "is in a **horizontal** app layout, and is in a navigation submenu.",
       valueType: "string",
@@ -71,6 +72,7 @@ export const navGroupComponentRenderer = createComponentRenderer(
         to={extractValue.asOptionalString(node.props.to)}
         icon={<Icon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />}
         node={node}
+        initiallyExpanded={extractValue.asBoolean(node.props.initiallyExpanded)}
         renderChild={renderChild}
         iconHorizontalExpanded={extractValue.asOptionalString(node.props.iconHorizontalExpanded)}
         iconVerticalExpanded={extractValue.asOptionalString(node.props.iconVerticalExpanded)}

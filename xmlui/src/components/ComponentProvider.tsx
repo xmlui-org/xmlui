@@ -239,6 +239,7 @@ import {
 } from "./HtmlTags/HtmlTags";
 import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
 import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
+import { subNavPanelRenderer } from "./SubNavPanel/SubNavPanel";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -402,6 +403,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_NavPanel !== "false") {
       this.registerCoreComponent(navPanelRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_SubNavPanel !== "false") {
+      this.registerCoreComponent(subNavPanelRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Pages !== "false") {
       this.registerCoreComponent(pagesRenderer);

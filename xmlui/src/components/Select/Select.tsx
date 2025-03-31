@@ -79,7 +79,7 @@ export const SelectMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-menu-${COMP}`]: "$backgroundColor-primary",
+    [`backgroundColor-menu-${COMP}`]: "$color-surface-raised",
     [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
     [`borderWidth-menu-${COMP}`]: "1px",
@@ -94,18 +94,10 @@ export const SelectMd = createMetadata({
     [`paddingVertical-${COMP}-badge`]: "$space-1",
     [`opacity-text-item-${COMP}--disabled`]: "0.5",
     [`opacity-${COMP}--disabled`]: "0.5",
-    light: {
-      [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
-      [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
-      [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
-      [`textColor-${COMP}-badge`]: "$color-surface-50",
-    },
-    dark: {
-      [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-600",
-      [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
-      [`textColor-${COMP}-badge`]: "$color-surface-50",
-      [`textColor-item-${COMP}--disabled`]: "$color-surface-800",
-    },
+    [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
+    [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
+    [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
+    [`textColor-${COMP}-badge`]: "$color-surface-50",
   },
 });
 

@@ -21,14 +21,8 @@ export const ProgressBarMd = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`borderRadius-indicator-${COMP}`]: "0px",
     [`thickness-${COMP}`]: "$space-2",
-    light: {
-      [`backgroundColor-${COMP}`]: "$color-surface-200",
-      [`color-indicator-${COMP}`]: "$color-primary-500",
-    },
-    dark: {
-      [`backgroundColor-${COMP}`]: "$color-surface-700",
-      [`color-indicator-${COMP}`]: "$color-primary-500",
-    },
+    [`backgroundColor-${COMP}`]: "$color-surface-200",
+    [`color-indicator-${COMP}`]: "$color-primary-500",
   },
 });
 

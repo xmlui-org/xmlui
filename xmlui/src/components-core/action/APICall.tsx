@@ -142,10 +142,10 @@ function updateQueriesWithResult(
           (item: any) =>
             item.id === optimisticValue.id && item._initiatorClientTxId === clientTxId
               ? result || {
-                  ...item,
-                  _optimisticValue: undefined,
-                  _initiatorClientTxId: undefined,
-                }
+              ...item,
+              _optimisticValue: undefined,
+              _initiatorClientTxId: undefined,
+            }
               : item,
         );
       } else {
@@ -196,16 +196,16 @@ function updateQueriesWithResult(
 }
 
 async function updateQueriesWithOptimisticValue({
-  stateContext,
-  updates,
-  appContext,
-  queryClient,
-  clientTxId,
-  optimisticValue,
-  lookupAction,
-  getOptimisticValue,
-  uid,
-}: {
+                                                  stateContext,
+                                                  updates,
+                                                  appContext,
+                                                  queryClient,
+                                                  clientTxId,
+                                                  optimisticValue,
+                                                  lookupAction,
+                                                  getOptimisticValue,
+                                                  uid,
+                                                }: {
   stateContext: any;
   updates: string | string[] | undefined;
   appContext: AppContextObject;
@@ -257,7 +257,7 @@ type APICall = {
 } & ApiOperationDef;
 
 export async function callApi(
-  { state, appContext, lookupAction, uid: containerUid }: ActionExecutionContext,
+  { state, appContext, lookupAction, getCurrentState }: ActionExecutionContext,
   {
     confirmTitle,
     confirmMessage,
@@ -356,6 +356,7 @@ export async function callApi(
 
     const onSuccessFn = lookupAction(onSuccess, uid, {
       eventName: "success",
+      context: getCurrentState()
     });
     await onSuccessFn?.(result, stateContext["$param"]);
 

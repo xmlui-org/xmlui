@@ -22,6 +22,7 @@ import { ContainerActionKind } from "./abstractions/containers";
 import { createValueExtractor } from "./rendering/valueExtractor";
 import { useReferenceTrackedApi } from "./utils/hooks";
 import { AppContextObject } from "../abstractions/AppContextDefs";
+import { flushSync } from "react-dom";
 
 interface LoaderRendererContext {
   node: ComponentDef;

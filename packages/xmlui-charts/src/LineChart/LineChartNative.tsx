@@ -6,12 +6,12 @@ import {
   Tooltip,
   Legend as RLegend,
 } from "recharts";
-import { useColors } from "xmlui";
 import type { ReactNode } from "react";
 import type React from "react";
 import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
+import { useTheme } from "xmlui";
 
 export type LineChartProps = {
   data: any[];
@@ -42,27 +42,17 @@ export function LineChart({
   children,
   showLegend = false,
 }: LineChartProps) {
-  const colors = useColors(
-    {
-      name: "color-primary-500",
-      format: "hex",
-    },
-    {
-      name: "color-primary-400",
-      format: "hex",
-    },
-    {
-      name: "color-primary-300",
-      format: "hex",
-    },
-    {
-      name: "color-primary-200",
-      format: "hex",
-    },
-  );
+  const { getThemeVar } = useTheme();
+  const colorValues = useMemo(()=>{
+    return [
+      getThemeVar("color-primary-500"),
+      getThemeVar("color-primary-400"),
+      getThemeVar("color-primary-300"),
+      getThemeVar("color-primary-200"),
+    ]
+  }, [getThemeVar]);
 
   const config = useMemo(() => {
-    const colorValues = Object.values(colors);
     return Object.assign(
       {},
       ...dataKeys.map((key, index) => {
@@ -74,7 +64,7 @@ export function LineChart({
         };
       }),
     );
-  }, [colors, dataKeys]);
+  }, [colorValues, dataKeys]);
 
   const chartContextValue = useChartContextValue({ nameKey, dataKeys });
 

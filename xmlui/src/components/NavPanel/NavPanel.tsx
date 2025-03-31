@@ -24,12 +24,7 @@ export const NavPanelMd = createMetadata({
     [`paddingVertical-logo-${COMP}`]: "$space-4",
     [`paddingHorizontal-logo-${COMP}`]: "$space-4",
     [`marginBottom-logo-${COMP}`]: "$space-4",
-    light: {
-      [`boxShadow-${COMP}-vertical`]: "4px 0 4px 0 rgb(0 0 0 / 10%)",
-    },
-    dark: {
-      [`boxShadow-${COMP}-vertical`]: "4px 0 6px 0 rgba(0, 0, 0, 0.2)",
-    },
+    [`boxShadow-${COMP}-vertical`]: "4px 0 4px 0 rgb(0 0 0 / 10%)",
   },
 });
 

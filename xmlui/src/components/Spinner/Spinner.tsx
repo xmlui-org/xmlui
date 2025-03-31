@@ -28,12 +28,7 @@ export const SpinnerMd = createMetadata({
   defaultThemeVars: {
     [`size-${COMP}`]: "$space-10",
     [`thickness-${COMP}`]: "$space-0_5",
-    light: {
-      [`borderColor-${COMP}`]: "$color-surface-400",
-    },
-    dark: {
-      [`borderColor-${COMP}`]: "$color-surface-600",
-    },
+    [`borderColor-${COMP}`]: "$color-surface-400",
   },
 });
 

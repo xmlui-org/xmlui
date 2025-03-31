@@ -151,7 +151,7 @@ export const AppWrapper = ({
   const Router = previewMode ? MemoryRouter : useHashBasedRouting ? HashRouter : BrowserRouter;
 
   return (
-    <React.StrictMode>
+    // <React.StrictMode>
       <ErrorBoundary node={node} location={"root-outer"}>
         <QueryClientProvider client={queryClient}>
           {/* No router in the REMIX environment */}
@@ -165,6 +165,6 @@ export const AppWrapper = ({
           )}
         </QueryClientProvider>
       </ErrorBoundary>
-    </React.StrictMode>
+    // </React.StrictMode>
   );
 };

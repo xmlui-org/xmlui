@@ -104,11 +104,11 @@ export const build = async ({
   });
 
   await viteBuild({
-    ...getViteConfig({
+    ...(await getViteConfig({
       flatDist,
       withRelativeRoot,
       flatDistUiPrefix,
-    }),
+    })),
     define: {
       "process.env.VITE_BUILD_MODE": JSON.stringify(buildMode),
       "process.env.VITE_DEV_MODE": false,

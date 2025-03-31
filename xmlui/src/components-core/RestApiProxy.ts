@@ -6,7 +6,7 @@ import type { BindingTreeEvaluationContext } from "./script-runner-exp/BindingTr
 import { T_ARROW_EXPRESSION_STATEMENT, type ArrowExpressionStatement } from "../abstractions/scripting/ScriptingSourceTreeExp";
 
 import { extractParam } from "./utils/extractParam";
-import { randomUUID } from "./utils/misc";
+import { randomUUID, readCookie } from "./utils/misc";
 import { GenericBackendError } from "./EngineError";
 import { processStatementQueue } from "./script-runner-exp/process-statement-sync";
 
@@ -108,11 +108,16 @@ export default class RestApiProxy {
     const conf = appContext?.appGlobals || { apiUrl: "" };
     const { apiUrl, errorResponseTransform } = conf;
     this.appContext = appContext;
+
+    const xsrfHeaders = {
+      "X-XSRF-TOKEN": readCookie('XSRF-TOKEN')
+    };
     this.config = {
       apiUrl,
       errorResponseTransform,
       headers: {
         ...appContext?.appGlobals?.headers,
+        ...xsrfHeaders
       }
     };
   }

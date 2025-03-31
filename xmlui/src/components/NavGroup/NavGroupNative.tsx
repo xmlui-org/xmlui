@@ -43,6 +43,7 @@ type Props = {
   to?: string;
   node: NavGroupComponentDef;
   renderChild: RenderChildFn;
+  initiallyExpanded: boolean;
   iconHorizontalExpanded?: string;
   iconHorizontalCollapsed?: string;
   iconVerticalExpanded?: string;
@@ -78,6 +79,7 @@ export const NavGroup = forwardRef(function NavGroup(
     icon,
     renderChild,
     to,
+    initiallyExpanded,
     iconHorizontalCollapsed,
     iconHorizontalExpanded,
     iconVerticalCollapsed,
@@ -118,6 +120,7 @@ export const NavGroup = forwardRef(function NavGroup(
           node={node}
           renderChild={renderChild}
           ref={ref}
+          initiallyExpanded={initiallyExpanded}
         />
       ) : (
         <DropDownNavGroup
@@ -141,6 +144,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     renderChild,
     node,
     to,
+    initiallyExpanded = false,
   }: {
     style?: CSSProperties;
     label: string;
@@ -148,11 +152,12 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     node: NavGroupComponentDef;
     renderChild: RenderChildFn;
     to?: string;
+    initiallyExpanded?: boolean;
   },
   ref,
 ) {
   const { level, iconVerticalCollapsed, iconVerticalExpanded } = useContext(NavGroupContext);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(initiallyExpanded);
 
   const toggleStyle = {
     ...style,
