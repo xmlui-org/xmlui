@@ -20,7 +20,6 @@ import {
   T_FUNCTION_INVOCATION_EXPRESSION,
   T_IDENTIFIER,
   T_IF_STATEMENT,
-  T_IMPORT_DECLARATION,
   T_LET_STATEMENT,
   T_LITERAL,
   T_MEMBER_ACCESS_EXPRESSION,
@@ -47,6 +46,7 @@ import {
   type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import type { ResolutionScope } from "../../parsers/scripting-exp/ResolutionScope";
+import { createXmlUiTreeNodeId } from "../../parsers/scripting-exp/Parser";
 
 /**
  * Resolves identifier
@@ -317,11 +317,6 @@ export function resolveIdentifiers(
         blockScopes.pop();
         return;
       }
-      case T_IMPORT_DECLARATION:
-        for (const item of expr.imports) {
-          visitNode(item.id);
-        }
-        return;
     }
   }
 
@@ -559,6 +554,7 @@ export function resolveIdentifiers(
               case T_IDENTIFIER: {
                 decl = {
                   type: T_VAR_DECLARATION,
+                  nodeId: createXmlUiTreeNodeId(),
                   id: argSpec.name,
                 };
                 break;
@@ -566,6 +562,7 @@ export function resolveIdentifiers(
               case T_DESTRUCTURE: {
                 decl = {
                   type: T_VAR_DECLARATION,
+                  nodeId: createXmlUiTreeNodeId(),
                   id: argSpec.id,
                   aDestr: argSpec.aDestr,
                   oDestr: argSpec.oDestr,

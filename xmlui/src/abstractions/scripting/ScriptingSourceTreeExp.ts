@@ -1,5 +1,6 @@
 import type { GenericToken } from "../../parsers/common/GenericToken";
 import type { TokenType } from "../../parsers/scripting-exp/TokenType";
+import { ScriptParserErrorMessage } from "./ScriptParserError";
 
 // --- All binding expression tree node types
 type ScriptNode = Statement | Expression;
@@ -10,6 +11,9 @@ type ScriptingToken = GenericToken<TokenType>;
 export interface ScripNodeBase {
   // Node type discriminator
   type: ScriptNode["type"];
+
+  // The unique id of the node
+  nodeId: number;
 
   // The start token of the node
   startToken?: ScriptingToken;
@@ -39,7 +43,6 @@ export const T_THROW_STATEMENT = 17;
 export const T_TRY_STATEMENT = 18;
 export const T_SWITCH_STATEMENT = 19;
 export const T_FUNCTION_DECLARATION = 20;
-export const T_IMPORT_DECLARATION = 21;
 
 // --- Expression node type values
 export const T_UNARY_EXPRESSION = 100;
@@ -90,7 +93,6 @@ type THROW_STATEMENT = typeof T_THROW_STATEMENT;
 type TRY_STATEMENT = typeof T_TRY_STATEMENT;
 type SWITCH_STATEMENT = typeof T_SWITCH_STATEMENT;
 type FUNCTION_DECLARATION = typeof T_FUNCTION_DECLARATION;
-type IMPORT_DECLARATION = typeof T_IMPORT_DECLARATION;
 
 // --- Expression node types
 type UNARY_EXPRESSION = typeof T_UNARY_EXPRESSION;
@@ -143,8 +145,7 @@ export type Statement =
   | ThrowStatement
   | TryStatement
   | SwitchStatement
-  | FunctionDeclaration
-  | ImportDeclaration;
+  | FunctionDeclaration;
 
 export type LoopStatement = WhileStatement | DoWhileStatement;
 
@@ -305,14 +306,6 @@ export interface FunctionDeclaration extends ScripNodeBase {
   id: Identifier;
   args: Expression[];
   stmt: BlockStatement;
-  exp?: boolean;
-}
-
-export type ImportedItem = { id: Identifier, source: string };
-export interface ImportDeclaration extends ScripNodeBase {
-  type: IMPORT_DECLARATION;
-  imports: ImportedItem[];
-  moduleFile: string;
 }
 
 // =====================================================================================================================
@@ -525,3 +518,34 @@ export interface CompoundPropertyValue {
   type: "CPV";
   parts: (string | Expression)[];
 }
+
+/**
+ * Represents a parsed and resolved module
+ */
+export type ScriptModule = {
+  type: "ScriptModule";
+  name: string;
+  parent?: ScriptModule | null;
+  exports: Record<string, any>;
+  functions: Record<string, FunctionDeclaration>;
+  statements: Statement[];
+  sources: Map<Statement, string>;
+  executed: boolean;
+};
+
+/**
+ * Represents a module error
+ */
+export type ModuleErrors = Record<string, ScriptParserErrorMessage[]>;
+
+export type CollectedDeclarations = {
+  vars: Record<string, CodeDeclaration>;
+  functions: Record<string, CodeDeclaration>;
+  moduleErrors?: ModuleErrors;
+};
+
+export type CodeDeclaration = {
+  source?: string;
+  tree: Expression;
+  [x: string]: unknown;
+};

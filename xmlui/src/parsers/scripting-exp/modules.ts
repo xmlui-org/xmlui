@@ -1,28 +1,13 @@
 import {
+  ScriptModule,
   T_FUNCTION_DECLARATION,
-  T_IMPORT_DECLARATION,
-  T_VAR_STATEMENT,
   type FunctionDeclaration,
   type Statement,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
-import { ModuleResolver } from "../../abstractions/scripting/modules";
 import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
 import { TokenType } from "./TokenType";
-
-/**
- * Represents a parsed and resolved module
- */
-export type ScriptModule = {
-  type: "ScriptModule";
-  name: string;
-  parent?: ScriptModule | null;
-  exports: Record<string, FunctionDeclaration>;
-  imports: Record<string, FunctionDeclaration>;
-  importedModules: ScriptModule[];
-  functions: Record<string, FunctionDeclaration>;
-};
 
 /**
  * Represents a module error
@@ -47,23 +32,19 @@ export function isModuleErrors(result: ScriptModule | ModuleErrors): result is M
  */
 export function parseScriptModule(
   moduleName: string,
-  source: string,
-  moduleResolver: ModuleResolver,
-  restrictiveMode = true,
+  source: string
 ): ScriptModule | ModuleErrors {
   // --- Keep track of parsed modules to avoid circular references
   const parsedModules = new Map<string, ScriptModule>();
   const moduleErrors: ModuleErrors = {};
 
-  const parsedModule = doParseModule(moduleName, source, moduleResolver, true);
+  const parsedModule = doParseModule(moduleName, source);
   return !parsedModule || Object.keys(moduleErrors).length > 0 ? moduleErrors : parsedModule;
 
   // --- Do the parsing, allow recursion
   function doParseModule(
     moduleName: string,
-    source: string,
-    moduleResolver: ModuleResolver,
-    topLevel = false,
+    source: string
   ): ScriptModule | null | undefined {
     // --- Do not parse the same module twice
     if (parsedModules.has(moduleName)) {
@@ -96,45 +77,8 @@ export function parseScriptModule(
 
     const errors: ParserErrorMessage[] = [];
 
-    // --- Check for forbidden "var" declarations
-    statements.forEach((stmt) => {
-      if (topLevel) {
-        // --- Restrict top-level statements
-        switch (stmt.type) {
-          case T_VAR_STATEMENT:
-          case T_FUNCTION_DECLARATION:
-          case T_IMPORT_DECLARATION:
-            break;
-          default:
-            if (restrictiveMode) {
-              addErrorMessage("W028", stmt, stmt.type);
-            }
-            break;
-        }
-      } else {
-        switch (stmt.type) {
-          case T_VAR_STATEMENT:
-            addErrorMessage("W027", stmt);
-            break;
-          case T_FUNCTION_DECLARATION:
-            if (restrictiveMode && !stmt.exp) {
-              addErrorMessage("W029", stmt);
-            }
-            break;
-          case T_IMPORT_DECLARATION:
-            break;
-          default:
-            if (restrictiveMode) {
-              addErrorMessage("W028", stmt, stmt.type);
-            }
-            break;
-        }
-      }
-    });
-
     // --- Collect functions
     const functions: Record<string, FunctionDeclaration> = {};
-    const exports: Record<string, FunctionDeclaration> = {};
     statements
       .filter((stmt) => stmt.type === T_FUNCTION_DECLARATION)
       .forEach((stmt) => {
@@ -144,9 +88,6 @@ export function parseScriptModule(
           return;
         }
         functions[func.id.name] = func;
-        if (func.exp) {
-          exports[func.id.name] = func;
-        }
       });
 
     // --- Successful module parsing
@@ -154,50 +95,14 @@ export function parseScriptModule(
       type: "ScriptModule",
       name: moduleName,
       exports,
-      importedModules: [],
-      imports: {},
       functions,
+      statements: statements,
+      sources: new Map(),
+      executed: false,
     };
 
     // --- Sign this module as parsed
     parsedModules.set(moduleName, parsedModule);
-
-    // --- Load imported modules and resolve imports
-    const importedModules: ScriptModule[] = [];
-    const imports: Record<string, FunctionDeclaration> = {};
-    for (let i = 0; i < statements.length; i++) {
-      const stmt = statements[i];
-      if (stmt.type !== T_IMPORT_DECLARATION) {
-        continue;
-      }
-
-      // --- Find the imported module
-      const source = moduleResolver(moduleName, stmt.moduleFile);
-      if (source === null) {
-        addErrorMessage("W022", stmt, stmt.moduleFile);
-        continue;
-      }
-
-      // --- Parse the imported module
-      const imported = doParseModule(stmt.moduleFile, source, moduleResolver);
-
-      if (!imported) {
-        // --- Error in the imported module
-        return;
-      }
-
-      // --- Successful import
-      importedModules.push(imported);
-
-      // --- Extract imported names
-      for (const item of stmt.imports) {
-        if (imported.exports[item.source]) {
-          imports[item.id.name] = imported.exports[item.source];
-        } else {
-          addErrorMessage("W023", stmt, stmt.moduleFile, item.source);
-        }
-      }
-    }
 
     // --- Catch errors
     if (errors.length > 0) {
@@ -205,12 +110,7 @@ export function parseScriptModule(
       return null;
     }
 
-    // --- All imported modules use this module as a parent
-    importedModules.forEach((m) => (m.parent = parsedModule));
-
     // --- Done.
-    parsedModule.importedModules = importedModules;
-    parsedModule.imports = imports;
     return parsedModule;
 
     function addErrorMessage(code: ErrorCodes, stmt: Statement, ...args: any[]): void {

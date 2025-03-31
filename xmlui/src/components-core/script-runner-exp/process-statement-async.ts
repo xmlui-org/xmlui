@@ -17,7 +17,6 @@ import {
   T_FUNCTION_DECLARATION,
   T_IDENTIFIER,
   T_IF_STATEMENT,
-  T_IMPORT_DECLARATION,
   T_LET_STATEMENT,
   T_LITERAL,
   T_RETURN_STATEMENT,
@@ -66,6 +65,8 @@ import {
   toStatementItems,
   guard,
 } from "./process-statement-common";
+import { createXmlUiTreeNodeId } from "../../parsers/scripting-exp/Parser";
+import { OnStatementCompletedCallback } from "../script-runner/process-statement-async";
 
 // --- Helper function to process the entire queue asynchronously
 export async function processStatementQueueAsync(
@@ -194,6 +195,7 @@ async function processStatementAsync(
   execInfo: StatementRunTimeInfo,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp,
+  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<ProcessOutcome> {
   // --- These items should be put in the statement queue after return
   let toUnshift: StatementQueueItem[] = [];
@@ -201,41 +203,6 @@ async function processStatementAsync(
 
   // --- Process the statement according to its type
   switch (statement.type) {
-    case T_IMPORT_DECLARATION:
-      // TODO: Implement module imports
-      // // --- Get module information
-      // const thisModule = statement.module;
-      // if (!thisModule) {
-      //   throw new Error("Missing module");
-      // }
-      // const parentModule = statement.module?.parent;
-      // if (!parentModule) {
-      //   throw new Error("Missing parent module");
-      // }
-
-      // // --- At this point the imported module is set
-      // if (!statement.module!.executed) {
-      //   // --- Run the module, it has not been executed yet
-      //   const childEvalContext = createEvalContext({
-      //     cancellationToken: evalContext.cancellationToken,
-      //     timeout: evalContext.timeout ?? 1000
-      //   });
-      //   statement.module!.executed = true;
-      //   executeScriptModule(statement.module!, childEvalContext);
-      // }
-
-      // // --- Import the module's exported variables into the parent module
-      // const topVars = evalContext.mainThread!.blocks![0].vars!;
-      // const topConst = evalContext.mainThread!.blocks![0].constVars!;
-      // for (const key of Object.keys(statement.imports)) {
-      //   if (key in topVars) {
-      //     throw new Error(`Import ${key} already exists`);
-      //   }
-      //   topVars[key] = statement.module!.exports.get(statement.imports[key]);
-      //   topConst.add(key);
-      // }
-      break;
-
     case T_FUNCTION_DECLARATION:
       // --- Function declarations are already hoisted, nothing to do
       break;
@@ -271,7 +238,12 @@ async function processStatementAsync(
 
     case T_EXPRESSION_STATEMENT:
       // --- Just evaluate it
-      const statementValue = await evalBindingAsync(statement.expr, evalContext, thread);
+      const statementValue = await evalBindingAsync(
+        statement.expr,
+        evalContext,
+        thread,
+        onStatementCompleted,
+      );
       if (thread.blocks && thread.blocks.length !== 0) {
         thread.blocks[thread.blocks.length - 1].returnValue = statementValue;
       }
@@ -483,7 +455,11 @@ async function processStatementAsync(
 
           if (statement.upd) {
             const updateStmt: StatementWithInfo = {
-              statement: { type: T_EXPRESSION_STATEMENT, expr: statement.upd },
+              statement: {
+                type: T_EXPRESSION_STATEMENT,
+                nodeId: createXmlUiTreeNodeId(),
+                expr: statement.upd,
+              },
             };
             toUnshift = mapStatementsToQueueItems([
               { statement: statement.body },

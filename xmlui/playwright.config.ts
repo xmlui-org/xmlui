@@ -20,8 +20,11 @@ export default defineConfig({
   testMatch: "*.spec.ts",
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.SINGLE_WORKER ? 1 : undefined,
+
+  /*
+  Default Github job runners have 4 cores
+  https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories */
+  workers: process.env.CI ? 4 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI ? [["github"], ["html"]] : [["html"]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

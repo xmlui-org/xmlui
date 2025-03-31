@@ -2,13 +2,13 @@ import type { AxiosResponse } from "axios";
 import {isPlainObject, isUndefined, omitBy} from "lodash-es";
 
 import type { AppContextObject } from "../abstractions/AppContextDefs";
-import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
-import type { ArrowExpressionStatement } from "../abstractions/scripting/ScriptingSourceTree";
+import type { BindingTreeEvaluationContext } from "./script-runner-exp/BindingTreeEvaluationContext";
+import { T_ARROW_EXPRESSION_STATEMENT, type ArrowExpressionStatement } from "../abstractions/scripting/ScriptingSourceTreeExp";
 
 import { extractParam } from "./utils/extractParam";
 import { randomUUID, readCookie } from "./utils/misc";
 import { GenericBackendError } from "./EngineError";
-import { processStatementQueue } from "./script-runner/process-statement-sync";
+import { processStatementQueue } from "./script-runner-exp/process-statement-sync";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 
@@ -284,8 +284,8 @@ export default class RestApiProxy {
       };
       try {
         const arrowStmt = {
-          type: "ArrowS",
-          expression: value,
+          type: T_ARROW_EXPRESSION_STATEMENT,
+          expr: value,
         } as ArrowExpressionStatement;
 
         processStatementQueue([arrowStmt], evalContext);

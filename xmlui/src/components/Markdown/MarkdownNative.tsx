@@ -12,6 +12,7 @@ import { LocalLink } from "../Link/LinkNative";
 import { Image } from "../Image/ImageNative";
 import { Toggle } from "../Toggle/Toggle";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 type MarkdownProps = {
   extractValue: ValueExtractor;
@@ -384,11 +385,10 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
   function parseArrowFunc(extracted: Record<string, any>): string {
     if (
       extracted.hasOwnProperty("type") &&
-      extracted.type === "ArrowE" &&
-      extracted?._ARROW_EXPR_ &&
-      extracted.hasOwnProperty("source")
+      extracted.type === T_ARROW_EXPRESSION &&
+      extracted?._ARROW_EXPR_
     ) {
-      return extracted.source;
+      return "[xmlui function]";
     }
     return "";
   }

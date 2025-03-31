@@ -1000,28 +1000,6 @@ describe("ID resolution", () => {
     expect(scope.topLevelNames["myOther"]).toBe(true);
   });
 
-  it("Import extends scope #1", () => {
-    // --- Act
-    const parser = new Parser(`import { myId } from "module";`);
-    const stmts = parser.parseStatements()!;
-    const scope = resolveIdentifiers(stmts);
-
-    // --- Assert
-    expect(Object.keys(scope.topLevelNames).length).toBe(1);
-    expect(scope.topLevelNames["myId"]).toBe(true);
-  });
-
-  it("Import extends scope #2", () => {
-    // --- Act
-    const parser = new Parser(`import { myId as myAlias } from "module";`);
-    const stmts = parser.parseStatements()!;
-    const scope = resolveIdentifiers(stmts);
-
-    // --- Assert
-    expect(Object.keys(scope.topLevelNames).length).toBe(1);
-    expect(scope.topLevelNames["myAlias"]).toBe(true);
-  });
-
   it("Arrow arg does not extend scope #1", () => {
     // --- Act
     const parser = new Parser(`(myId) => {}`);

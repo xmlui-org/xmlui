@@ -4,7 +4,7 @@
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
-    "build:test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles",
+    "build:test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
     "build:bin": "tsc -p tsconfig.bin.json",
     "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
@@ -231,6 +231,6 @@
     "url": "https://github.com/xmlui-com/xmlui.git"
   },
   "msw": {
-    "workerDirectory": "src/testing/infrastructure"
+    "workerDirectory": "src/testing/infrastructure/public"
   }
 }

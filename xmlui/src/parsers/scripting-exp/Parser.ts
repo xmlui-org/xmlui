@@ -24,7 +24,6 @@ import {
   type FunctionInvocationExpression,
   type Identifier,
   type IfStatement,
-  type ImportDeclaration,
   type LetStatement,
   type Literal,
   type MemberAccessExpression,
@@ -46,7 +45,6 @@ import {
   type VarDeclaration,
   type VarStatement,
   type WhileStatement,
-  type ImportedItem,
   type TemplateLiteralExpression,
   T_EMPTY_STATEMENT,
   T_BREAK_STATEMENT,
@@ -78,7 +76,6 @@ import {
   T_ARRAY_LITERAL,
   T_SPREAD_EXPRESSION,
   T_FUNCTION_DECLARATION,
-  T_IMPORT_DECLARATION,
   T_ARROW_EXPRESSION,
   T_CONDITIONAL_EXPRESSION,
   T_ASSIGNMENT_EXPRESSION,
@@ -124,6 +121,12 @@ enum StrParseState {
   Ucp6,
   UcpTail,
 }
+
+let lastNodeId = 0;
+
+export function createXmlUiTreeNodeId(): number {
+  return ++lastNodeId;
+} 
 
 /**
  * This class parses a binding expression and transforms it into an evaluable expression tree
@@ -265,10 +268,6 @@ export class Parser {
           return this.parseSwitchStatement();
         case TokenType.Function:
           return this.parseFunctionDeclaration();
-        case TokenType.Export:
-          return this.parseExport();
-        case TokenType.Import:
-          return this.parseImport();
         default:
           return this.isExpressionStart(startToken)
             ? this.parseExpressionStatement(allowSequence)
@@ -1086,6 +1085,7 @@ export class Parser {
         }
         catchV = {
           type: T_IDENTIFIER,
+          nodeId: createXmlUiTreeNodeId(),
           name: nextToken.text,
           startToken: nextToken,
           endToken: nextToken,
@@ -1384,112 +1384,6 @@ export class Parser {
       },
       startToken,
       stmt.endToken,
-    );
-  }
-
-  /**
-   * Parses an export statement
-   *
-   * exportStatement
-   *   : "export" functionDeclaration
-   *   ;
-   */
-  private parseExport(): FunctionDeclaration | null {
-    this._lexer.get();
-    const nextToken = this._lexer.peek();
-    if (nextToken.type === TokenType.Function) {
-      if (this._statementLevel > 1) {
-        this.reportError("W030", nextToken);
-        return null;
-      }
-      const funcDecl = this.parseFunctionDeclaration();
-      return funcDecl === null ? null : { ...funcDecl, exp: true };
-    }
-    this.reportError("W024", nextToken);
-    return null;
-  }
-
-  /**
-   * Parse an import declaration
-   *
-   * importDeclaration
-   *   : "import" "{" importItem ("," importItem)* [ "," ] "}" from module
-   *   ;
-   *
-   * importItem
-   *   : identifier [ "as" identifier ]
-   *   ;
-   */
-  private parseImport(): ImportDeclaration | null {
-    const startToken = this._lexer.get();
-    this.expectToken(TokenType.LBrace, "W012");
-    const imports: ImportedItem[] = [];
-    let nextToken = this._lexer.peek();
-    while (nextToken.type !== TokenType.RBrace) {
-      if (nextToken.type !== TokenType.Identifier) {
-        this.reportError("W003", nextToken);
-        return null;
-      }
-      const id = nextToken.text;
-      this._lexer.get();
-      nextToken = this._lexer.peek();
-      if (nextToken.type === TokenType.As) {
-        this._lexer.get();
-        nextToken = this._lexer.peek();
-        if (nextToken.type !== TokenType.Identifier) {
-          this.reportError("W003", nextToken);
-          return null;
-        }
-        if (imports.find((item) => item.id.name === nextToken.text)) {
-          this.reportError("W019", nextToken, nextToken.text);
-          return null;
-        }
-        imports.push({
-          id: { type: T_IDENTIFIER, name: nextToken.text },
-          source: id,
-        });
-        this._lexer.get();
-      } else {
-        if (imports.find((item) => item.id.name === id)) {
-          this.reportError("W019", nextToken, id);
-          return null;
-        }
-        imports.push({
-          id: { type: T_IDENTIFIER, name: id },
-          source: id,
-        });
-      }
-      nextToken = this._lexer.peek();
-      if (nextToken.type === TokenType.Comma) {
-        this._lexer.get();
-        nextToken = this._lexer.peek();
-      }
-    }
-
-    // --- Skip the closing brace
-    this._lexer.get();
-
-    // --- Check for "from"
-    this.expectToken(TokenType.From, "W025");
-
-    // --- Get the module name
-    const moduleToken = this._lexer.peek();
-    if (moduleToken.type !== TokenType.StringLiteral) {
-      this.reportError("W026", moduleToken);
-      return null;
-    }
-    this._lexer.get();
-    const literal = this.parseStringLiteral(moduleToken);
-
-    // --- Done.
-    return this.createStatementNode<ImportDeclaration>(
-      T_IMPORT_DECLARATION,
-      {
-        imports,
-        moduleFile: literal.value,
-      },
-      startToken,
-      moduleToken,
     );
   }
 
@@ -2636,6 +2530,7 @@ export class Parser {
         } else if (traits.keywordLike) {
           nameExpr = {
             type: T_IDENTIFIER,
+            nodeId: createXmlUiTreeNodeId(),
             name: nextToken.text,
             startToken: nextToken,
             endToken: nextToken,
@@ -2859,6 +2754,7 @@ export class Parser {
     }
     return Object.assign({}, stump, {
       type,
+      nodeId: createXmlUiTreeNodeId(),
       startToken,
       endToken,
     });
@@ -2879,6 +2775,7 @@ export class Parser {
   ): T {
     return Object.assign({}, stump, {
       type,
+      nodeId: createXmlUiTreeNodeId(),
       startToken,
       endToken,
     } as Statement);

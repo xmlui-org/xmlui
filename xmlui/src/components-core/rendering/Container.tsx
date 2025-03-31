@@ -29,7 +29,8 @@ import {
   Statement,
   ArrowExpression,
   ArrowExpressionStatement,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+  T_ARROW_EXPRESSION_STATEMENT,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "../abstractions/containers";
 import { useAppContext } from "../AppContext";
@@ -41,9 +42,9 @@ import {
   RegisterComponentApiFnInner,
 } from "../rendering/ContainerWrapper";
 import { useDebugView } from "../DebugViewProvider";
-import { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
-import { processStatementQueueAsync } from "../script-runner/process-statement-async";
-import { processStatementQueue } from "../script-runner/process-statement-sync";
+import { BindingTreeEvaluationContext } from "../script-runner-exp/BindingTreeEvaluationContext";
+import { processStatementQueueAsync } from "../script-runner-exp/process-statement-async";
+import { processStatementQueue } from "../script-runner-exp/process-statement-sync";
 import { extractParam, shouldKeep } from "../utils/extractParam";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
 import { useEvent, generatedId, capitalizeFirstLetter, delay } from "../utils/misc";
@@ -212,8 +213,8 @@ export const Container = memo(
           } else {
             statements = [
               {
-                type: "ArrowS",
-                expression: cloneDeep(source), //TODO illesg (talk it through why we need to deep clone, it it's omitted, it gets slower every time we run it)
+                type: T_ARROW_EXPRESSION_STATEMENT,
+                expr: cloneDeep(source), //TODO illesg (talk it through why we need to deep clone, it it's omitted, it gets slower every time we run it)
               } as ArrowExpressionStatement,
             ];
           }
@@ -233,67 +234,64 @@ export const Container = memo(
             });
           }
           let mainThreadBlockingRuns = 0;
-          await processStatementQueueAsync(
-            statements,
-            evalContext,
-            undefined,
-            async (evalContext) => {
-              if (changes.length) {
-                mainThreadBlockingRuns = 0;
-                changes.forEach((change) => {
-                  statePartChanged(
-                    change.pathArray,
-                    cloneDeep(change.newValue),
-                    change.target,
-                    change.action,
-                  );
-                });
-                let resolve = null;
-                const stateUpdatedPromise = new Promise((res) => {
-                  resolve = () => {
-                    res(null);
-                  };
-                });
-                const key = generatedId();
-                statementPromises.current.set(key, resolve);
-                // We use this to tell react that this update is not high-priority.
-                //   If we don't put it to a transition, the whole app would be blocked if we run a long,
-                //   update intensive queue (e.g. an infinite loop which
-                //   increments a counter, see playground example learning/01_Experiments/01_Event_Framework/app ).
-                //   Before this solution, we used a setTimeout(..., 0); hack, but some browsers (chrome especially)
-                //   do some funky stuff with the background tabs (e.g. all the setTimeouts are
-                //   maximized to run in 1 time / minute, doesn't matter if it's timeout is 0)
-                //   As of 2023. June 20, this solution works with backgrounded tabs, too.
-                startTransition(() => {
-                  setVersion((prev) => prev + 1);
-                });
+          evalContext.onStatementCompleted = async (evalContext) => {
+            if (changes.length) {
+              mainThreadBlockingRuns = 0;
+              changes.forEach((change) => {
+                statePartChanged(
+                  change.pathArray,
+                  cloneDeep(change.newValue),
+                  change.target,
+                  change.action,
+                );
+              });
+              let resolve = null;
+              const stateUpdatedPromise = new Promise((res) => {
+                resolve = () => {
+                  res(null);
+                };
+              });
+              const key = generatedId();
+              statementPromises.current.set(key, resolve);
+              // We use this to tell react that this update is not high-priority.
+              //   If we don't put it to a transition, the whole app would be blocked if we run a long,
+              //   update intensive queue (e.g. an infinite loop which
+              //   increments a counter, see playground example learning/01_Experiments/01_Event_Framework/app ).
+              //   Before this solution, we used a setTimeout(..., 0); hack, but some browsers (chrome especially)
+              //   do some funky stuff with the background tabs (e.g. all the setTimeouts are
+              //   maximized to run in 1 time / minute, doesn't matter if it's timeout is 0)
+              //   As of 2023. June 20, this solution works with backgrounded tabs, too.
+              startTransition(() => {
+                setVersion((prev) => prev + 1);
+              });
 
-                //TODO this could be a problem - if this container gets unmounted, we still have to wait for the update,
-                //  but in that case this update probably happened in the parent (e.g. a button's event handler removes the whole container
-                //  where the button lives, but it still has some statements to run).
-                // with this solution the statement execution doesn't stop, and we fallback waiting with a setTimeout(0)
-                if (mountedRef.current) {
-                  await stateUpdatedPromise;
-                } else {
-                  await delay(0);
-                }
-                statementPromises.current.delete(key);
-                changes = [];
+              //TODO this could be a problem - if this container gets unmounted, we still have to wait for the update,
+              //  but in that case this update probably happened in the parent (e.g. a button's event handler removes the whole container
+              //  where the button lives, but it still has some statements to run).
+              // with this solution the statement execution doesn't stop, and we fallback waiting with a setTimeout(0)
+              if (mountedRef.current) {
+                await stateUpdatedPromise;
               } else {
-                //in this else branch normally we block the main thread (we don't wait for any state promise to be resolved),
-                // so in a long-running (typically infinite loop) situation, where there aren't any changes in the state
-                // we block the main thread indefinitely... this 'mainThreadBlockingRuns' var solution makes sure that
-                // we pause in every 100 runs, and let the main thread breath a bit, so it's not frozen for the whole time
-                // (we clear that counter above, too, where we use a startTransition call to de-prioritize this work)
-                mainThreadBlockingRuns++;
-                if (mainThreadBlockingRuns > 100) {
-                  mainThreadBlockingRuns = 0;
-                  await delay(0);
-                }
+                await delay(0);
               }
-              evalContext.localContext = getComponentStateClone();
-            },
-          );
+              statementPromises.current.delete(key);
+              changes = [];
+            } else {
+              //in this else branch normally we block the main thread (we don't wait for any state promise to be resolved),
+              // so in a long-running (typically infinite loop) situation, where there aren't any changes in the state
+              // we block the main thread indefinitely... this 'mainThreadBlockingRuns' var solution makes sure that
+              // we pause in every 100 runs, and let the main thread breath a bit, so it's not frozen for the whole time
+              // (we clear that counter above, too, where we use a startTransition call to de-prioritize this work)
+              mainThreadBlockingRuns++;
+              if (mainThreadBlockingRuns > 100) {
+                mainThreadBlockingRuns = 0;
+                await delay(0);
+              }
+            }
+            evalContext.localContext = getComponentStateClone();
+          };
+
+          await processStatementQueueAsync(statements, evalContext);
 
           if (canSignEventLifecycle()) {
             // --- Sign the event handler has successfully completed
@@ -340,8 +338,8 @@ export const Container = memo(
         };
         try {
           const arrowStmt = {
-            type: "ArrowS",
-            expression: arrowExpression,
+            type: T_ARROW_EXPRESSION_STATEMENT,
+            expr: arrowExpression,
           } as ArrowExpressionStatement;
 
           processStatementQueue([arrowStmt], evalContext);
@@ -363,7 +361,7 @@ export const Container = memo(
         if(Array.isArray(src)) {
           throw new Error("Multiple event handlers are not supported");
         }
-        const stringSrc = typeof src === "string" ? src : src.statement.source;
+        const stringSrc = typeof src === "string" ? src : src.statement.nodeId;
         const fnCacheKey = `${options?.eventName};${stringSrc}`;
         const handler = (...eventArgs: any[]) => {
           return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
@@ -381,7 +379,7 @@ export const Container = memo(
 
     const getOrCreateSyncCallbackFn = useCallback(
       (arrowExpression: ArrowExpression, uid: symbol) => {
-        const fnCacheKey = `sync-callback-${arrowExpression.source}`;
+        const fnCacheKey = `sync-callback-${arrowExpression.nodeId}`;
         if (!fnsRef.current[uid]?.[fnCacheKey]) {
           fnsRef.current[uid] = fnsRef.current[uid] || {};
           fnsRef.current[uid][fnCacheKey] = memoizeOne((arrowExpression) => {
