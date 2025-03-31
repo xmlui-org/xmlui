@@ -73,7 +73,6 @@ export async function processStatementQueueAsync(
   statements: Statement[],
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThreadExp,
-  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<QueueInfo> {
   if (!thread) {
     // --- Create the main thread for the queue
@@ -120,7 +119,6 @@ export async function processStatementQueueAsync(
         queueItem?.execInfo ?? {},
         evalContext,
         thread,
-        onStatementCompleted,
       );
     } catch (err) {
       if (thread.tryBlocks && thread.tryBlocks.length > 0) {
@@ -165,7 +163,6 @@ export async function processStatementQueueAsync(
 
     // --- Sign that the statement has been completed
     await evalContext?.onStatementCompleted?.(evalContext, queueItem!.statement);
-    await onStatementCompleted?.(evalContext as any, queueItem!.statement as any);
 
     // --- Provide diagnostics
     if (queue.length > diagInfo.maxQueueLength) {
@@ -258,7 +255,6 @@ async function processStatementAsync(
         statement.expr,
         evalContext,
         thread,
-        onStatementCompleted,
         ...(evalContext.eventArgs ?? []),
       );
       if (thread.blocks && thread.blocks.length !== 0) {
