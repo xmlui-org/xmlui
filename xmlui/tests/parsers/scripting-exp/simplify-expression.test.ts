@@ -61,7 +61,6 @@ describe("Parser - simplify expression", () => {
     "for (let i of x) { x++; }",
     "switch (x) { case 1: x++; break; default: x--; }",
     "function f() { x++; }",
-    "import {x} from 'module';",
   ];
 
   stmtNoUpdateCases.forEach((c) => {

@@ -45,7 +45,7 @@ export function evalLiteral(thisStack: any[], expr: Literal, thread: LogicalThre
 type IdentifierScope = "global" | "app" | "localContext" | "block";
 
 // --- Gets the scope of an identifier
-function getIdentifierScope(
+export function getIdentifierScope(
   expr: Identifier,
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThreadExp,

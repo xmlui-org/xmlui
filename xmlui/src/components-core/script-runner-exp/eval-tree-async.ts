@@ -67,6 +67,7 @@ import {
 import { ensureMainThread } from "./process-statement-common";
 import { getAsyncProxy } from "./asyncProxy";
 import { isBannedFunction } from "./bannedFunctions";
+import { OnStatementCompletedCallback } from "../script-runner/process-statement-async";
 
 type EvaluatorAsyncFunction = (
   thisStack: any[],
@@ -86,6 +87,7 @@ export async function evalBindingAsync(
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp | undefined,
+  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<any> {
   // --- Prepare the evaluation context
   const thisStack: any[] = [];
@@ -98,6 +100,7 @@ export async function evalBindingAsync(
     expr,
     evalContext,
     thread ?? evalContext.mainThread!,
+    onStatementCompleted,
   );
 }
 
@@ -149,6 +152,7 @@ async function evalBindingExpressionTreeAsync(
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp,
+  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<any> {
   if (!evalContext.options) {
     evalContext.options = { defaultToOptionalMemberAccess: true };
@@ -162,7 +166,14 @@ async function evalBindingExpressionTreeAsync(
   try {
     switch (expr.type) {
       case T_TEMPLATE_LITERAL_EXPRESSION:
-        return evalTemplateLiteralAsync(evaluator, thisStack, expr, evalContext, thread);
+        return evalTemplateLiteralAsync(
+          evaluator,
+          thisStack,
+          expr,
+          evalContext,
+          thread,
+          onStatementCompleted,
+        );
 
       case T_LITERAL:
         return evalLiteral(thisStack, expr, thread);
@@ -198,18 +209,44 @@ async function evalBindingExpressionTreeAsync(
         return await evalBinaryAsync(evaluator, thisStack, expr, evalContext, thread);
 
       case T_CONDITIONAL_EXPRESSION:
-        return await evalConditionalAsync(evaluator, thisStack, expr, evalContext, thread);
+        return await evalConditionalAsync(
+          evaluator,
+          thisStack,
+          expr,
+          evalContext,
+          thread,
+          onStatementCompleted,
+        );
 
       case T_ASSIGNMENT_EXPRESSION:
-        return await evalAssignmentAsync(evaluator, thisStack, expr, evalContext, thread);
+        return await evalAssignmentAsync(
+          evaluator,
+          thisStack,
+          expr,
+          evalContext,
+          thread,
+        );
 
       case T_PREFIX_OP_EXPRESSION:
       case T_POSTFIX_OP_EXPRESSION:
-        return await evalPreOrPostAsync(evaluator, thisStack, expr, evalContext, thread);
+        return await evalPreOrPostAsync(
+          evaluator,
+          thisStack,
+          expr,
+          evalContext,
+          thread,
+          onStatementCompleted,
+        );
 
       case T_FUNCTION_INVOCATION_EXPRESSION:
         // --- Special async handling
-        return await evalFunctionInvocationAsync(evaluator, thisStack, expr, evalContext, thread);
+        return await evalFunctionInvocationAsync(
+          evaluator,
+          thisStack,
+          expr,
+          evalContext,
+          thread,
+        );
 
       case T_ARROW_EXPRESSION:
         return evalArrow(thisStack, expr, thread);
@@ -402,8 +439,14 @@ async function evalConditionalAsync(
   expr: ConditionalExpression,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp,
+  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<any> {
-  const condition = await evaluator(thisStack, expr.cond, evalContext, thread);
+  const condition = await evaluator(
+    thisStack,
+    expr.cond,
+    evalContext,
+    thread,
+  );
   thisStack.pop();
   const value = await evaluator(
     thisStack,
@@ -445,6 +488,7 @@ async function evalPreOrPostAsync(
   expr: PrefixOpExpression | PostfixOpExpression,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp,
+  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<any> {
   const rootScope = getRootIdScope(expr.expr, evalContext, thread);
   const updatesState = rootScope && rootScope.type !== "block";
@@ -473,7 +517,12 @@ async function evalFunctionInvocationAsync(
 
   // --- Check for contexted object
   if (expr.obj.type === T_MEMBER_ACCESS_EXPRESSION) {
-    hostObject = await evaluator(thisStack, expr.obj.obj, evalContext, thread);
+    hostObject = await evaluator(
+      thisStack,
+      expr.obj.obj,
+      evalContext,
+      thread,
+    );
     functionObj = evalMemberAccessCore(thisStack, expr.obj, evalContext, thread);
     if (expr.obj.obj.type === T_IDENTIFIER && hostObject?._SUPPORT_IMPLICIT_CONTEXT) {
       implicitContextObject = hostObject;
@@ -661,7 +710,14 @@ async function createArrowFunctionAsync(
           let argVals: any[] = [];
           for (const arg of restArgs) {
             if (arg?._EXPRESSION_) {
-              argVals.push(await evaluator([], arg, runTimeEvalContext, runtimeThread));
+              argVals.push(
+                await evaluator(
+                  [],
+                  arg,
+                  runTimeEvalContext,
+                  runtimeThread,
+                ),
+              );
             } else {
               argVals.push(arg);
             }
@@ -679,7 +735,12 @@ async function createArrowFunctionAsync(
           // --- Get the actual value to work with
           let argVal = args[i + 3];
           if (argVal?._EXPRESSION_) {
-            argVal = await evaluator([], argVal, runTimeEvalContext, runtimeThread);
+            argVal = await evaluator(
+              [],
+              argVal,
+              runTimeEvalContext,
+              runtimeThread,
+            );
           }
           await processDeclarationsAsync(
             arrowBlock,
@@ -722,7 +783,11 @@ async function createArrowFunctionAsync(
     }
 
     // --- Process the statement with a new processor
-    await processStatementQueueAsync(statements, runTimeEvalContext, workingThread);
+    await processStatementQueueAsync(
+      statements,
+      runTimeEvalContext,
+      workingThread,
+    );
 
     // --- Return value is in a return value slot
     returnValue = workingThread.returnValue;
@@ -801,10 +866,16 @@ async function evalTemplateLiteralAsync(
   expr: TemplateLiteralExpression,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp,
+  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<any> {
   const segmentValues = new Array(expr.segments.length);
   for (let i = 0; i < expr.segments.length; ++i) {
-    const evaledValue = await evaluator(thisStack, expr.segments[i], evalContext, thread);
+    const evaledValue = await evaluator(
+      thisStack,
+      expr.segments[i],
+      evalContext,
+      thread,
+    );
     thisStack.pop();
     segmentValues[i] = evaledValue;
   }

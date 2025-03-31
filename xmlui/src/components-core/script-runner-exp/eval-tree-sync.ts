@@ -43,7 +43,7 @@ import {
   type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import { Parser } from "../../parsers/scripting-exp/Parser";
+import { createXmlUiTreeNodeId, Parser } from "../../parsers/scripting-exp/Parser";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { isBannedFunction } from "./bannedFunctions";
 import {
@@ -713,6 +713,7 @@ function createArrowFunction(
         statements = [
           {
             type: T_RETURN_STATEMENT,
+            nodeId: createXmlUiTreeNodeId(),
             expr: expr.statement.expr,
           },
         ];

@@ -8,7 +8,7 @@ import { ParserError } from "../parsers/xmlui-parser/ParserError";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import { Node } from "../parsers/xmlui-parser/syntax-node";
 import { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
-import { ModuleErrors } from "../abstractions/scripting/ScriptingSourceTree";
+import { ModuleErrors } from "../abstractions/scripting/ScriptingSourceTreeExp";
 
 interface ErrorWithLineColInfo extends ParseError {
   line: number;
@@ -38,7 +38,7 @@ export function xmlUiMarkupToComponent(
     return { component: null, errors: errorsWithLines, erroneousCompoundComponentName };
   }
   try {
-    const component = nodeToComponentDef(node, getText, fileId, moduleResolver);
+    const component = nodeToComponentDef(node, getText, fileId);
     const transformResult = { component , errors: [] };
     return transformResult
   } catch (e) {

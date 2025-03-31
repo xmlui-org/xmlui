@@ -19,6 +19,7 @@ import {
   mapStatementsToQueueItems,
 } from "./statement-queue";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import { createXmlUiTreeNodeId } from "../../parsers/scripting-exp/Parser";
 
 export function innermostLoopScope(thread: LogicalThreadExp): LoopScope {
   if (!thread.loops || thread.loops.length === 0) {
@@ -78,7 +79,10 @@ export function guard(statement: Statement): StatementWithInfo {
 
 // --- Create a closing statement that removes the block scope
 export function closing(): StatementWithInfo {
-  return { statement: { type: T_EMPTY_STATEMENT }, execInfo: { removeBlockScope: true } };
+  return {
+    statement: { type: T_EMPTY_STATEMENT, nodeId: createXmlUiTreeNodeId() },
+    execInfo: { removeBlockScope: true },
+  };
 }
 
 // --- Create a list of body statements according to the specified loop statement and scope

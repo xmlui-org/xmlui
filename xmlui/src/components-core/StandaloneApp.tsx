@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 
@@ -9,7 +9,7 @@ import type {
   CompoundComponentDef,
 } from "../abstractions/ComponentDefs";
 import type { ThemeDefinition, ThemeTone } from "./theming/abstractions";
-import type { CollectedDeclarations } from "../abstractions/scripting/ScriptingSourceTree";
+import type { CollectedDeclarations } from "../abstractions/scripting/ScriptingSourceTreeExp";
 
 import "../index.scss";
 import { AppRoot } from "./rendering/AppRoot";
@@ -28,11 +28,11 @@ import {
   codeBehindFileExtension,
   componentFileExtension,
 } from "../parsers/xmlui-parser/fileExtensions";
-import { Parser } from "../parsers/scripting/Parser";
+import { Parser } from "../parsers/scripting-exp/Parser";
 import {
   collectCodeBehindFromSource,
   removeCodeBehindTokensFromTree,
-} from "../parsers/scripting/code-behind-collect";
+} from "../parsers/scripting-exp/code-behind-collect";
 import { ComponentRegistry } from "../components/ComponentProvider";
 import { checkXmlUiMarkup } from "./markup-check";
 import StandaloneExtensionManager from "./StandaloneExtensionManager";
@@ -232,14 +232,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     }
   }
 
-  const codeBehind = collectCodeBehindFromSource(
-    "Main",
-    code,
-    () => {
-      return "";
-    },
-    (a) => a,
-  );
+  const codeBehind = collectCodeBehindFromSource("Main", code);
   if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
     return {
       component: errReportModuleErrors(codeBehind.moduleErrors, response.url),

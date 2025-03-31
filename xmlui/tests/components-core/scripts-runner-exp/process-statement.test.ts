@@ -2018,7 +2018,6 @@ describe("Process statements (exp)", () => {
     // --- Act/Assert
     await processStatementQueueAsync(statements, evalContext);
     const thread = evalContext.mainThread!;
-    //expect(thread.blocks!.length).equal(1);
     expect(thread.returnValue).equal("f1,2,3");
   });
 });
