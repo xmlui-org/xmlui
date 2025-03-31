@@ -242,7 +242,6 @@ async function processStatementAsync(
         statement.expr,
         evalContext,
         thread,
-        onStatementCompleted,
       );
       if (thread.blocks && thread.blocks.length !== 0) {
         thread.blocks[thread.blocks.length - 1].returnValue = statementValue;
