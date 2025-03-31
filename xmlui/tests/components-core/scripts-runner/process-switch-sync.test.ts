@@ -2,7 +2,7 @@ import { describe, expect, it, assert } from "vitest";
 import {createEvalContext, parseStatements} from "./test-helpers";
 import {processStatementQueue} from "../../../src/components-core/script-runner/process-statement-sync";
 
-describe("Process switch statements (sync)", () => {
+describe("Process switch statements (sync) (exp)", () => {
     it("no case", () => {
         // --- Arrange
         const source = `

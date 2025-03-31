@@ -4,7 +4,7 @@ import { processStatementQueueAsync } from "../../../src/components-core/script-
 import { createEvalContext, parseStatements } from "./test-helpers";
 import { buildProxy } from "../../../src/components-core/rendering/buildProxy";
 
-describe("Process statements", () => {
+describe("Process statements (exp)", () => {
   it("expression statement #1", async () => {
     // --- Arrange
     const source = "x = 3 * x;";
@@ -2018,7 +2018,6 @@ describe("Process statements", () => {
     // --- Act/Assert
     await processStatementQueueAsync(statements, evalContext);
     const thread = evalContext.mainThread!;
-    //expect(thread.blocks!.length).equal(1);
     expect(thread.returnValue).equal("f1,2,3");
   });
 });

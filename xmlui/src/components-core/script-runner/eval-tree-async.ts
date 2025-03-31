@@ -1,36 +1,53 @@
 import { isPlainObject } from "lodash-es";
 
-import type {
-  ArrayLiteral,
-  ArrowExpression,
-  AssignmentExpression,
-  BinaryExpression,
-  CalculatedMemberAccessExpression,
-  ConditionalExpression,
-  Expression,
-  FunctionInvocationExpression,
-  Identifier,
-  MemberAccessExpression,
-  ObjectLiteral,
-  PostfixOpExpression,
-  PrefixOpExpression,
-  ReturnStatement,
-  SequenceExpression,
-  Statement,
-  TemplateLiteralExpression,
-  UnaryExpression,
-  VarDeclaration,
-} from "../../abstractions/scripting/ScriptingSourceTree";
-import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
-import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import type { ICustomOperations } from "./ICustomOperations";
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-
 import {
-  OnStatementCompletedCallback,
-  processDeclarationsAsync,
-  processStatementQueueAsync,
-} from "./process-statement-async";
+  T_ARRAY_LITERAL,
+  T_ARROW_EXPRESSION,
+  T_ASSIGNMENT_EXPRESSION,
+  T_BINARY_EXPRESSION,
+  T_BLOCK_STATEMENT,
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
+  T_DESTRUCTURE,
+  T_EMPTY_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+  T_FUNCTION_INVOCATION_EXPRESSION,
+  T_IDENTIFIER,
+  T_LITERAL,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_OBJECT_LITERAL,
+  T_POSTFIX_OP_EXPRESSION,
+  T_PREFIX_OP_EXPRESSION,
+  T_RETURN_STATEMENT,
+  T_SEQUENCE_EXPRESSION,
+  T_SPREAD_EXPRESSION,
+  T_TEMPLATE_LITERAL_EXPRESSION,
+  T_UNARY_EXPRESSION,
+  T_VAR_DECLARATION,
+  TemplateLiteralExpression,
+  type ArrayLiteral,
+  type ArrowExpression,
+  type AssignmentExpression,
+  type BinaryExpression,
+  type CalculatedMemberAccessExpression,
+  type ConditionalExpression,
+  type Expression,
+  type FunctionInvocationExpression,
+  type Identifier,
+  type MemberAccessExpression,
+  type ObjectLiteral,
+  type PostfixOpExpression,
+  type PrefixOpExpression,
+  type ReturnStatement,
+  type SequenceExpression,
+  type Statement,
+  type UnaryExpression,
+  type VarDeclaration,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
+import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import { processDeclarationsAsync, processStatementQueueAsync } from "./process-statement-async";
 import {
   evalArrow,
   evalAssignmentCore,
@@ -42,7 +59,10 @@ import {
   evalPreOrPostCore,
   evalTemplateLiteralCore,
   evalUnaryCore,
+  getExprValue,
+  getRootIdScope,
   isPromise,
+  setExprValue,
 } from "./eval-tree-common";
 import { ensureMainThread } from "./process-statement-common";
 import { getAsyncProxy } from "./asyncProxy";
@@ -52,8 +72,7 @@ type EvaluatorAsyncFunction = (
   thisStack: any[],
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ) => Promise<any>;
 
 /**
@@ -66,18 +85,19 @@ type EvaluatorAsyncFunction = (
 export async function evalBindingAsync(
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread | undefined,
-  onStatementCompleted?: OnStatementCompletedCallback,
+  thread: LogicalThreadExp | undefined,
 ): Promise<any> {
+  // --- Prepare the evaluation context
   const thisStack: any[] = [];
   ensureMainThread(evalContext);
   thread ??= evalContext.mainThread;
+
+  // --- Evaluate the expression using the context
   return await evalBindingExpressionTreeAsync(
     thisStack,
     expr,
     evalContext,
     thread ?? evalContext.mainThread!,
-    onStatementCompleted,
   );
 }
 
@@ -92,12 +112,11 @@ export async function evalBindingAsync(
 export async function executeArrowExpression(
   expr: ArrowExpression,
   evalContext: BindingTreeEvaluationContext,
-  onStatementCompleted: OnStatementCompletedCallback,
-  thread?: LogicalThread,
+  thread?: LogicalThreadExp,
   ...args: any[]
 ): Promise<any> {
   // --- Just an extra safety check
-  if (expr.type !== "ArrowE") {
+  if (expr.type !== T_ARROW_EXPRESSION) {
     throw new Error("executeArrowExpression expects an 'ArrowExpression' object.");
   }
 
@@ -111,13 +130,7 @@ export async function executeArrowExpression(
   // --- #1: The names of arrow function arguments
   // --- #2: The evaluation context the arrow function runs in
   // --- #others: The real arguments of the arrow function
-  return await nativeFunction(
-    expr.args,
-    evalContext,
-    thread ?? evalContext.mainThread,
-    onStatementCompleted,
-    ...args,
-  );
+  return await nativeFunction(expr.args, evalContext, thread ?? evalContext.mainThread, ...args);
 }
 
 /**
@@ -135,157 +148,73 @@ async function evalBindingExpressionTreeAsync(
   thisStack: any[],
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
   if (!evalContext.options) {
     evalContext.options = { defaultToOptionalMemberAccess: true };
   }
 
   // --- Prepare evaluation
-  let customOp: ICustomOperations | null = null;
   const evaluator: EvaluatorAsyncFunction = evalBindingExpressionTreeAsync;
-
-  // --- Reset the expression scope
-  expr.valueScope = expr.valueIndex = undefined;
 
   // --- Process the expression according to its type
 
   try {
     switch (expr.type) {
-      case "TempLitE":
-        return evalTemplateLiteralAsync(
-          evaluator,
-          thisStack,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
-      case "LitE":
-        return evalLiteral(thisStack, expr);
+      case T_TEMPLATE_LITERAL_EXPRESSION:
+        return evalTemplateLiteralAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "IdE":
+      case T_LITERAL:
+        return evalLiteral(thisStack, expr, thread);
+
+      case T_IDENTIFIER:
         return evalIdentifier(thisStack, expr, evalContext, thread);
 
-      case "MembE":
-        return await evalMemberAccessAsync(
-          evaluator,
-          thisStack,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
+      case T_MEMBER_ACCESS_EXPRESSION:
+        return await evalMemberAccessAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "CMembE":
+      case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
         return await evalCalculatedMemberAccessAsync(
           evaluator,
           thisStack,
           expr,
           evalContext,
           thread,
-          onStatementCompleted,
         );
 
-      case "SeqE":
-        return await evalSequenceAsync(
-          evaluator,
-          thisStack,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
+      case T_SEQUENCE_EXPRESSION:
+        return await evalSequenceAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "ALitE":
-        return await evalArrayLiteralAsync(
-          evaluator,
-          thisStack,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
+      case T_ARRAY_LITERAL:
+        return await evalArrayLiteralAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "OLitE":
-        return await evalObjectLiteralAsync(
-          evaluator,
-          thisStack,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
+      case T_OBJECT_LITERAL:
+        return await evalObjectLiteralAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "UnaryE":
-        return await evalUnaryAsync(
-          evaluator,
-          thisStack,
-          customOp,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
+      case T_UNARY_EXPRESSION:
+        return await evalUnaryAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "BinaryE":
-        return await evalBinaryAsync(
-          evaluator,
-          thisStack,
-          customOp,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
+      case T_BINARY_EXPRESSION:
+        return await evalBinaryAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "CondE":
-        return await evalConditionalAsync(
-          evaluator,
-          thisStack,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
+      case T_CONDITIONAL_EXPRESSION:
+        return await evalConditionalAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "AsgnE":
-        return await evalAssignmentAsync(
-          evaluator,
-          thisStack,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
+      case T_ASSIGNMENT_EXPRESSION:
+        return await evalAssignmentAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "PrefE":
-      case "PostfE":
-        return await evalPreOrPostAsync(
-          evaluator,
-          thisStack,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
+      case T_PREFIX_OP_EXPRESSION:
+      case T_POSTFIX_OP_EXPRESSION:
+        return await evalPreOrPostAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "InvokeE":
+      case T_FUNCTION_INVOCATION_EXPRESSION:
         // --- Special async handling
-        return await evalFunctionInvocationAsync(
-          evaluator,
-          thisStack,
-          expr,
-          evalContext,
-          thread,
-          onStatementCompleted,
-        );
+        return await evalFunctionInvocationAsync(evaluator, thisStack, expr, evalContext, thread);
 
-      case "ArrowE":
+      case T_ARROW_EXPRESSION:
         return evalArrow(thisStack, expr, thread);
 
-      case "SpreadE":
+      case T_SPREAD_EXPRESSION:
         throw new Error("Cannot use spread expression (...) with the current intermediate value.");
 
       default:
@@ -302,17 +231,13 @@ async function evalMemberAccessAsync(
   thisStack: any[],
   expr: MemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
-  const parentObj = await evaluator(
-    thisStack,
-    expr.object,
-    evalContext,
-    thread,
-    onStatementCompleted,
-  );
-  return evalMemberAccessCore(parentObj, thisStack, expr, evalContext);
+  await evaluator(thisStack, expr.obj, evalContext, thread);
+  // --- At this point we definitely keep the parent object on `thisStack`, as it will be the context object
+  // --- of a FunctionInvocationExpression, if that follows the MemberAccess. Other operations would call
+  // --- `thisStack.pop()` to remove the result from the previous `evalBindingExpressionTree` call.
+  return evalMemberAccessCore(thisStack, expr, evalContext, thread);
 }
 
 async function evalCalculatedMemberAccessAsync(
@@ -320,29 +245,13 @@ async function evalCalculatedMemberAccessAsync(
   thisStack: any[],
   expr: CalculatedMemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
-  const parentObj = await evaluator(
-    thisStack,
-    expr.object,
-    evalContext,
-    thread,
-    onStatementCompleted,
-  );
+  await evaluator(thisStack, expr.obj, evalContext, thread);
+  await evaluator(thisStack, expr.member, evalContext, thread);
 
-  // --- At this point we definitely keep the parent object on `thisStack`, as it will be the context object
-  // --- of a FunctionInvocationExpression, if that follows the MemberAccess. Other operations would call
-  // --- `thisStack.pop()` to remove the result from the previous `evalBindingExpressionTree` call.
-  const memberObj = await evaluator(
-    thisStack,
-    expr.member,
-    evalContext,
-    thread,
-    onStatementCompleted,
-  );
   thisStack.pop();
-  return evalCalculatedMemberAccessCore(parentObj, memberObj, thisStack, expr, evalContext);
+  return evalCalculatedMemberAccessCore(thisStack, expr, evalContext, thread);
 }
 
 async function evalSequenceAsync(
@@ -350,16 +259,16 @@ async function evalSequenceAsync(
   thisStack: any[],
   expr: SequenceExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
-  if (!expr.expressions || expr.expressions.length === 0) {
+  if (!expr.exprs || expr.exprs.length === 0) {
     throw new Error(`Missing expression sequence`);
   }
-  const result = expr.expressions.map(async (e) => {
-    const exprValue = await evaluator(thisStack, e, evalContext, thread, onStatementCompleted);
+  const result = expr.exprs.map(async (e) => {
+    const value = await evaluator(thisStack, e, evalContext, thread);
+    setExprValue(e, { value }, thread);
     thisStack.pop();
-    return exprValue;
+    return value;
   });
   const lastObj = result[result.length - 1];
   thisStack.push(lastObj);
@@ -371,31 +280,27 @@ async function evalArrayLiteralAsync(
   thisStack: any[],
   expr: ArrayLiteral,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
-  const arrayValue: any[] = [];
+  const value: any[] = [];
   for (const item of expr.items) {
-    if (item.type === "SpreadE") {
-      const spreadArray = await evaluator(
-        thisStack,
-        item.operand,
-        evalContext,
-        thread,
-        onStatementCompleted,
-      );
+    if (item.type === T_SPREAD_EXPRESSION) {
+      const spreadArray = await evaluator(thisStack, item.expr, evalContext, thread);
       thisStack.pop();
       if (!Array.isArray(spreadArray)) {
         throw new Error("Spread operator within an array literal expects an array operand.");
       }
-      arrayValue.push(...spreadArray);
+      value.push(...spreadArray);
     } else {
-      arrayValue.push(await evaluator(thisStack, item, evalContext, thread, onStatementCompleted));
+      value.push(await evaluator(thisStack, item, evalContext, thread));
       thisStack.pop();
-      thisStack.push(arrayValue);
+      thisStack.push(value);
     }
   }
-  return arrayValue;
+
+  // --- Done.
+  setExprValue(expr, { value }, thread);
+  return value;
 }
 
 async function evalObjectLiteralAsync(
@@ -403,20 +308,13 @@ async function evalObjectLiteralAsync(
   thisStack: any[],
   expr: ObjectLiteral,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
   const objectHash: any = {};
   for (const prop of expr.props) {
     if (!Array.isArray(prop)) {
       // --- We're using a spread expression
-      const spreadItems = await evaluator(
-        thisStack,
-        prop.operand,
-        evalContext,
-        thread,
-        onStatementCompleted,
-      );
+      const spreadItems = await evaluator(thisStack, prop.expr, evalContext, thread);
       thisStack.pop();
       if (Array.isArray(spreadItems)) {
         // --- Spread of an array
@@ -435,26 +333,23 @@ async function evalObjectLiteralAsync(
     // --- We're using key/[value] pairs
     let key: any;
     switch (prop[0].type) {
-      case "LitE":
+      case T_LITERAL:
         key = prop[0].value;
         break;
-      case "IdE":
+      case T_IDENTIFIER:
         key = prop[0].name;
         break;
       default:
-        key = await evaluator(thisStack, prop[0], evalContext, thread, onStatementCompleted);
+        key = await evaluator(thisStack, prop[0], evalContext, thread);
         thisStack.pop();
         break;
     }
-    objectHash[key] = await evaluator(
-      thisStack,
-      prop[1],
-      evalContext,
-      thread,
-      onStatementCompleted,
-    );
+    objectHash[key] = await evaluator(thisStack, prop[1], evalContext, thread);
     thisStack.pop();
   }
+
+  // --- Done.
+  setExprValue(expr, { value: objectHash }, thread);
   thisStack.push(objectHash);
   return objectHash;
 }
@@ -462,45 +357,39 @@ async function evalObjectLiteralAsync(
 async function evalUnaryAsync(
   evaluator: EvaluatorAsyncFunction,
   thisStack: any[],
-  customOp: ICustomOperations | null,
   expr: UnaryExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
-  const operand = await evaluator(
-    thisStack,
-    expr.operand,
-    evalContext,
-    thread,
-    onStatementCompleted,
-  );
+  await evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
-  return evalUnaryCore(expr, operand, thisStack, customOp);
+  return evalUnaryCore(expr, thisStack, evalContext, thread);
 }
 
 async function evalBinaryAsync(
   evaluator: EvaluatorAsyncFunction,
   thisStack: any[],
-  customOp: ICustomOperations | null,
   expr: BinaryExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
-  const l = await evaluator(thisStack, expr.left, evalContext, thread, onStatementCompleted);
+  await evaluator(thisStack, expr.left, evalContext, thread);
   thisStack.pop();
-  if (expr.operator === "&&" && !l) {
-    thisStack.push(l);
+  const l = await completePromise(getExprValue(expr.left, thread)?.value);
+  setExprValue(expr.left, { value: l }, thread);
+  if (expr.op === "&&" && !l) {
+    setExprValue(expr, { value: l }, thread);
     return l;
   }
-  if (expr.operator === "||" && l) {
-    thisStack.push(l);
+  if (expr.op === "||" && l) {
+    setExprValue(expr, { value: l }, thread);
     return l;
   }
-  const r = await evaluator(thisStack, expr.right, evalContext, thread, onStatementCompleted);
+  await evaluator(thisStack, expr.right, evalContext, thread);
   thisStack.pop();
-  return evalBinaryCore(l, r, thisStack, customOp, expr.operator);
+  const r = await completePromise(getExprValue(expr.right, thread)?.value);
+  setExprValue(expr.right, { value: r }, thread);
+  return evalBinaryCore(expr, thisStack, evalContext, thread);
 }
 
 async function evalConditionalAsync(
@@ -508,35 +397,18 @@ async function evalConditionalAsync(
   thisStack: any[],
   expr: ConditionalExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
-  const condition = await evaluator(
-    thisStack,
-    expr.condition,
-    evalContext,
-    thread,
-    onStatementCompleted,
-  );
+  const condition = await evaluator(thisStack, expr.cond, evalContext, thread);
   thisStack.pop();
-  return await evaluator(
+  const value = await evaluator(
     thisStack,
-    condition ? expr.consequent : expr.alternate,
+    condition ? expr.thenE : expr.elseE,
     evalContext,
     thread,
-    onStatementCompleted,
   );
-}
-
-async function runAssignment(
-  evalContext: BindingTreeEvaluationContext,
-  doAssignment: () => Promise<any>,
-) {
-  const updateHook = evalContext.onUpdateHook || (async (updateFn) => await updateFn());
-
-  return await updateHook(async () => {
-    return await doAssignment();
-  });
+  setExprValue(expr, { value }, thread);
+  return value;
 }
 
 async function evalAssignmentAsync(
@@ -544,23 +416,23 @@ async function evalAssignmentAsync(
   thisStack: any[],
   expr: AssignmentExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
-  return runAssignment(evalContext, async () => {
-    const leftValue = expr.leftValue;
-    await evaluator(thisStack, leftValue, evalContext, thread, onStatementCompleted);
-    thisStack.pop();
-    const newValue = await evaluator(
-      thisStack,
-      expr.operand,
-      evalContext,
-      thread,
-      onStatementCompleted,
-    );
-    thisStack.pop();
-    return evalAssignmentCore(leftValue, newValue, thisStack, expr, thread);
-  });
+  const leftValue = expr.leftValue;
+  const rootScope = getRootIdScope(leftValue, evalContext, thread);
+  const updatesState = rootScope && rootScope.type !== "block";
+  if (updatesState && evalContext.onWillUpdate) {
+    evalContext.onWillUpdate(rootScope, rootScope.name, "assignment");
+  }
+  await evaluator(thisStack, leftValue, evalContext, thread);
+  thisStack.pop();
+  await evaluator(thisStack, expr.expr, evalContext, thread);
+  thisStack.pop();
+  const value = evalAssignmentCore(thisStack, expr, evalContext, thread);
+  if (updatesState && evalContext.onDidUpdate) {
+    evalContext.onDidUpdate(rootScope, rootScope.name, "assignment");
+  }
+  return value;
 }
 
 async function evalPreOrPostAsync(
@@ -568,15 +440,20 @@ async function evalPreOrPostAsync(
   thisStack: any[],
   expr: PrefixOpExpression | PostfixOpExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
-  return runAssignment(evalContext, async () => {
-    const operand = expr.operand;
-    await evaluator(thisStack, operand, evalContext, thread, onStatementCompleted);
-    thisStack.pop();
-    return evalPreOrPostCore(operand, thisStack, expr, evalContext, thread);
-  });
+  const rootScope = getRootIdScope(expr.expr, evalContext, thread);
+  const updatesState = rootScope && rootScope.type !== "block";
+  if (updatesState && evalContext.onWillUpdate) {
+    evalContext.onWillUpdate(rootScope, rootScope.name, "pre-post");
+  }
+  await evaluator(thisStack, expr.expr, evalContext, thread);
+  thisStack.pop();
+  const value = evalPreOrPostCore(thisStack, expr, evalContext, thread);
+  if (updatesState && evalContext.onDidUpdate) {
+    evalContext.onDidUpdate(rootScope, rootScope.name, "pre-post");
+  }
+  return value;
 }
 
 async function evalFunctionInvocationAsync(
@@ -584,35 +461,22 @@ async function evalFunctionInvocationAsync(
   thisStack: any[],
   expr: FunctionInvocationExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
   let functionObj: any;
   let implicitContextObject: any = null;
   let hostObject: any;
 
   // --- Check for contexted object
-  if (expr.object.type === "MembE") {
-    hostObject = await evaluator(
-      thisStack,
-      expr.object.object,
-      evalContext,
-      thread,
-      onStatementCompleted,
-    );
-    functionObj = evalMemberAccessCore(hostObject, thisStack, expr.object, evalContext);
-    if (expr.object.object.type === "IdE" && hostObject?._SUPPORT_IMPLICIT_CONTEXT) {
+  if (expr.obj.type === T_MEMBER_ACCESS_EXPRESSION) {
+    hostObject = await evaluator(thisStack, expr.obj.obj, evalContext, thread);
+    functionObj = evalMemberAccessCore(thisStack, expr.obj, evalContext, thread);
+    if (expr.obj.obj.type === T_IDENTIFIER && hostObject?._SUPPORT_IMPLICIT_CONTEXT) {
       implicitContextObject = hostObject;
     }
   } else {
     // --- Get the object on which to invoke the function
-    functionObj = await evaluator(
-      thisStack,
-      expr.object,
-      evalContext,
-      thread,
-      onStatementCompleted,
-    );
+    functionObj = await evaluator(thisStack, expr.obj, evalContext, thread);
   }
   thisStack.pop();
 
@@ -625,43 +489,41 @@ async function evalFunctionInvocationAsync(
       functionObj.args,
       evalContext,
       thread,
-      onStatementCompleted,
       ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true })),
     );
     functionObj = await createArrowFunctionAsync(evaluator, functionObj as ArrowExpression);
-  } else if (expr.object.type === "ArrowE") {
+  } else if (expr.obj.type === T_ARROW_EXPRESSION) {
     // --- We delay evaluating expression values. We pass the argument names as the first parameter, and then
     // --- all parameter expressions
     functionArgs.push(
-      expr.object.args.map((a) => (a as Identifier).name),
+      expr.obj.args.map((a) => (a as Identifier).name),
       evalContext,
       thread,
-      onStatementCompleted,
       ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true })),
     );
   } else {
     // --- We evaluate the argument values to pass to a JavaScript function
     for (let i = 0; i < expr.arguments.length; i++) {
       const arg = expr.arguments[i];
-      if (arg.type === "SpreadE") {
-        const funcArg = await evaluator([], arg.operand, evalContext, thread, onStatementCompleted);
+      if (arg.type === T_SPREAD_EXPRESSION) {
+        const funcArg = await evaluator([], arg.expr, evalContext, thread);
         if (!Array.isArray(funcArg)) {
           throw new Error("Spread operator within a function invocation expects an array operand.");
         }
         functionArgs.push(...funcArg);
       } else {
-        if (arg.type === "ArrowE") {
+        if (arg.type === T_ARROW_EXPRESSION) {
           const funcArg = await createArrowFunctionAsync(evaluator, arg);
           const wrappedFunc = async (...args: any[]) => {
-            return funcArg(arg.args, evalContext, thread, onStatementCompleted, ...args);
+            return funcArg(arg.args, evalContext, thread, ...args);
           };
           functionArgs.push(wrappedFunc);
         } else {
-          const funcArg = await evaluator([], arg, evalContext, thread, onStatementCompleted);
+          const funcArg = await evaluator([], arg, evalContext, thread);
           if (funcArg?._ARROW_EXPR_) {
             const wrappedFuncArg = await createArrowFunctionAsync(evaluator, funcArg);
             const wrappedFunc = (...args: any[]) =>
-              wrappedFuncArg(funcArg.args, evalContext, thread, onStatementCompleted, ...args);
+              wrappedFuncArg(funcArg.args, evalContext, thread, ...args);
             functionArgs.push(wrappedFunc);
           } else {
             functionArgs.push(funcArg);
@@ -698,17 +560,24 @@ async function evalFunctionInvocationAsync(
   functionObj = getAsyncProxy(functionObj, functionArgs, currentContext);
 
   // --- Now, invoke the function
-  try {
-    const value = evalContext.options?.defaultToOptionalMemberAccess
-      ? (functionObj as Function)?.call(currentContext, ...functionArgs)
-      : (functionObj as Function).call(currentContext, ...functionArgs);
-
-    let returnValue = await completePromise(value);
-    thisStack.push(returnValue);
-    return returnValue;
-  } catch (err) {
-    throw err;
+  const rootScope = getRootIdScope(expr.obj, evalContext, thread);
+  const updatesState = rootScope && rootScope.type !== "block";
+  if (updatesState && evalContext.onWillUpdate) {
+    evalContext.onWillUpdate(rootScope, rootScope.name, "function-call");
   }
+  const value = evalContext.options?.defaultToOptionalMemberAccess
+    ? (functionObj as Function)?.call(currentContext, ...functionArgs)
+    : (functionObj as Function).call(currentContext, ...functionArgs);
+
+  let returnValue = await completePromise(value);
+  if (updatesState && evalContext.onDidUpdate) {
+    evalContext.onDidUpdate(rootScope, rootScope.name, "function-call");
+  }
+
+  // --- Done.
+  setExprValue(expr, { value: returnValue }, thread);
+  thisStack.push(returnValue);
+  return returnValue;
 }
 
 async function createArrowFunctionAsync(
@@ -719,17 +588,16 @@ async function createArrowFunctionAsync(
   return async (...args: any[]) => {
     // --- Prepare the variables to pass
     const runTimeEvalContext = args[1] as BindingTreeEvaluationContext;
-    const runtimeThread = args[2] as LogicalThread;
-    const runTimeOnStatementCompleted = args[3] as OnStatementCompletedCallback;
+    const runtimeThread = args[2] as LogicalThreadExp;
 
     // --- Create the thread that runs the arrow function
-    const workingThread: LogicalThread = {
+    const workingThread: LogicalThreadExp = {
       parent: runtimeThread,
       childThreads: [],
       blocks: [{ vars: {} }],
       loops: [],
       breakLabelValue: -1,
-      closures: expr.closureContext,
+      closures: (expr as any).closureContext,
     };
     runtimeThread.childThreads.push(workingThread);
 
@@ -753,49 +621,43 @@ async function createArrowFunctionAsync(
       const argSpec = argSpecs[i];
       let decl: VarDeclaration | undefined;
       switch (argSpec.type) {
-        case "IdE": {
+        case T_IDENTIFIER: {
           decl = {
-            type: "VarD",
+            type: T_VAR_DECLARATION,
             id: argSpec.name,
           } as VarDeclaration;
           break;
         }
-        case "Destr": {
+        case T_DESTRUCTURE: {
           decl = {
-            type: "VarD",
+            type: T_VAR_DECLARATION,
             id: argSpec.id,
-            arrayDestruct: argSpec.arrayDestruct,
-            objectDestruct: argSpec.objectDestruct,
+            aDestr: argSpec.aDestr,
+            oDestr: argSpec.oDestr,
           } as VarDeclaration;
           break;
         }
-        case "SpreadE": {
+        case T_SPREAD_EXPRESSION: {
           restFound = true;
           decl = {
-            type: "VarD",
-            id: (argSpec.operand as unknown as Identifier).name,
+            type: T_VAR_DECLARATION,
+            id: (argSpec.expr as unknown as Identifier).name,
           } as VarDeclaration;
           break;
         }
+
         default:
           throw new Error("Unexpected arrow argument specification");
       }
+
       if (decl) {
         if (restFound) {
           // --- Get the rest of the arguments
-          const restArgs = args.slice(i + 4);
+          const restArgs = args.slice(i + 3);
           let argVals: any[] = [];
           for (const arg of restArgs) {
             if (arg?._EXPRESSION_) {
-              argVals.push(
-                await evaluator(
-                  [],
-                  arg,
-                  runTimeEvalContext,
-                  runtimeThread,
-                  runTimeOnStatementCompleted,
-                ),
-              );
+              argVals.push(await evaluator([], arg, runTimeEvalContext, runtimeThread));
             } else {
               argVals.push(arg);
             }
@@ -804,7 +666,6 @@ async function createArrowFunctionAsync(
             arrowBlock,
             runTimeEvalContext,
             runtimeThread,
-            runTimeOnStatementCompleted,
             [decl],
             false,
             true,
@@ -812,21 +673,14 @@ async function createArrowFunctionAsync(
           );
         } else {
           // --- Get the actual value to work with
-          let argVal = args[i + 4];
+          let argVal = args[i + 3];
           if (argVal?._EXPRESSION_) {
-            argVal = await evaluator(
-              [],
-              argVal,
-              runTimeEvalContext,
-              runtimeThread,
-              runTimeOnStatementCompleted,
-            );
+            argVal = await evaluator([], argVal, runTimeEvalContext, runtimeThread);
           }
           await processDeclarationsAsync(
             arrowBlock,
             runTimeEvalContext,
             runtimeThread,
-            runTimeOnStatementCompleted,
             [decl],
             false,
             true,
@@ -841,21 +695,21 @@ async function createArrowFunctionAsync(
     let statements: Statement[];
 
     switch (expr.statement.type) {
-      case "EmptyS":
+      case T_EMPTY_STATEMENT:
         statements = [];
         break;
-      case "ExprS":
+      case T_EXPRESSION_STATEMENT:
         // --- Create a new thread for the call
         statements = [
           {
-            type: "RetS",
-            expression: expr.statement.expression,
+            type: T_RETURN_STATEMENT,
+            expr: expr.statement.expr,
           } as ReturnStatement,
         ];
         break;
-      case "BlockS":
+      case T_BLOCK_STATEMENT:
         // --- Create a new thread for the call
-        statements = expr.statement.statements;
+        statements = expr.statement.stmts;
         break;
       default:
         throw new Error(
@@ -864,12 +718,7 @@ async function createArrowFunctionAsync(
     }
 
     // --- Process the statement with a new processor
-    await processStatementQueueAsync(
-      statements,
-      runTimeEvalContext,
-      workingThread,
-      runTimeOnStatementCompleted,
-    );
+    await processStatementQueueAsync(statements, runTimeEvalContext, workingThread);
 
     // --- Return value is in a return value slot
     returnValue = workingThread.returnValue;
@@ -942,41 +791,16 @@ async function completePromise(input: any): Promise<any> {
   }
 }
 
-/**
- * Gets the context of the variable
- * @param id Identifier to test
- * @param thread Thread to use for evaluation
- */
-export function isConstVar(id: string, thread: LogicalThread): boolean {
-  // --- Start search the block context
-  if (thread.blocks) {
-    for (let idx = thread.blocks.length; idx >= 0; idx--) {
-      const constContext = thread.blocks[idx]?.constVars;
-      if (constContext && constContext.has(id)) return true;
-    }
-  }
-
-  // --- Not in block context
-  return false;
-}
-
 async function evalTemplateLiteralAsync(
   evaluator: EvaluatorAsyncFunction,
   thisStack: any[],
   expr: TemplateLiteralExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
-  onStatementCompleted: OnStatementCompletedCallback,
+  thread: LogicalThreadExp,
 ): Promise<any> {
   const segmentValues = new Array(expr.segments.length);
   for (let i = 0; i < expr.segments.length; ++i) {
-    const evaledValue = await evaluator(
-      thisStack,
-      expr.segments[i],
-      evalContext,
-      thread,
-      onStatementCompleted,
-    );
+    const evaledValue = await evaluator(thisStack, expr.segments[i], evalContext, thread);
     thisStack.pop();
     segmentValues[i] = evaledValue;
   }

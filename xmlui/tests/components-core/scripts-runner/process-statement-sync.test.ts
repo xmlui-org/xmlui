@@ -6,9 +6,10 @@ import { buildProxy } from "../../../src/components-core/rendering/buildProxy";
 import {
   ArrowExpressionStatement,
   ExpressionStatement,
-} from "../../../src/abstractions/scripting/ScriptingSourceTree";
+  T_ARROW_EXPRESSION_STATEMENT,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
-describe("Process statements (sync)", () => {
+describe("Process statements (sync) (exp)", () => {
   it("expression statement #1", () => {
     // --- Arrange
     const source = "x = 3 * x;";
@@ -1168,8 +1169,8 @@ describe("Process statements (sync)", () => {
 
     const statements = parseStatements(source);
     const arrowStmt = {
-      type: "ArrowS",
-      expression: (statements[0] as ExpressionStatement).expression,
+      type: T_ARROW_EXPRESSION_STATEMENT,
+      expr: (statements[0] as ExpressionStatement).expr,
     } as ArrowExpressionStatement;
 
     // --- Act

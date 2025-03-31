@@ -6,7 +6,7 @@ import {
   ExpressionStatement,
   T_ARROW_EXPRESSION_STATEMENT,
 } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
-import { processStatementQueueAsync } from "../../../src/components-core/script-runner-exp/process-statement-async";
+import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 
 describe("Function proxies", () => {
   it("Array.prototype.filter #1", async () => {

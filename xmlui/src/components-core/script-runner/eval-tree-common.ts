@@ -1,158 +1,54 @@
-import type {
-  ArrowExpression,
-  AssignmentExpression,
-  BinaryOpSymbols,
-  CalculatedMemberAccessExpression,
-  Expression,
-  Identifier,
-  Literal,
-  MemberAccessExpression,
-  PostfixOpExpression,
-  PrefixOpExpression,
-  UnaryExpression,
-} from "../../abstractions/scripting/ScriptingSourceTree";
-import { LogicalThread } from "../../abstractions/scripting/LogicalThread";
-import { obtainClosures } from "../../parsers/scripting/modules";
-import { customOperationsRegistry } from "./custom-operations-registry";
-import { isCustomUiData } from "./custom-ui-data";
-import { isConstVar } from "./eval-tree-async";
-import { CustomOperationType } from "./ICustomOperations";
+import type { LogicalThreadExp, ValueResult } from "../../abstractions/scripting/LogicalThreadExp";
+import {
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_IDENTIFIER,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_PREFIX_OP_EXPRESSION,
+  type ArrowExpression,
+  type AssignmentExpression,
+  type BinaryExpression,
+  type CalculatedMemberAccessExpression,
+  type Expression,
+  type Identifier,
+  type Literal,
+  type MemberAccessExpression,
+  type PostfixOpExpression,
+  type PrefixOpExpression,
+  type UnaryExpression,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import type { ICustomOperations } from "./ICustomOperations";
+
+// --- Get the cached expression value
+export function getExprValue(expr: Expression, thread: LogicalThreadExp): any {
+  return thread?.valueCache?.get(expr)?.value;
+}
+
+// --- Set the cached expression value
+export function setExprValue(expr: Expression, value: any, thread: LogicalThreadExp): void {
+  thread.valueCache ??= new Map();
+  thread.valueCache.set(expr, { value });
+}
 
 // --- Type guard to check for a Promise
 export function isPromise(obj: any): obj is Promise<any> {
   return obj && typeof obj.then === "function";
 }
 
-// --- Gets the optional custom operation for the specified operation type
-export function getCustomOperations(
-  opType: CustomOperationType,
-  firstOperand: any,
-  secondOperand?: any
-): ICustomOperations | null {
-  // --- The first operand must be a useful value or object
-  if (firstOperand === null || firstOperand === undefined) return null;
-
-  // --- Is the first operand a custom UI type?
-  if (!isCustomUiData(firstOperand)) return null;
-
-  // --- Has the custom type registered a custom calculator object?
-  const calculator = customOperationsRegistry.getOperationsObjectByKey(firstOperand._custom_data_type_);
-  if (!calculator) return null;
-
-  // --- The calculator defines the requested operation?
-  let exists = false;
-  switch (opType) {
-    case CustomOperationType.MemberAccess:
-      exists = !!calculator.memberAccess;
-      break;
-    case CustomOperationType.CalculatedMemberAccess:
-      exists = !!calculator.calculatedMemberAccess;
-      break;
-    case CustomOperationType.UnaryPlus:
-      exists = !!calculator.unaryPlus;
-      break;
-    case CustomOperationType.UnaryMinus:
-      exists = !!calculator.unaryMinus;
-      break;
-    case CustomOperationType.LogicalNot:
-      exists = !!calculator.logicalNot;
-      break;
-    case CustomOperationType.BitwiseNot:
-      exists = !!calculator.bitwiseNot;
-      break;
-    case CustomOperationType.Multiply:
-      exists = !!calculator.multiply;
-      break;
-    case CustomOperationType.Divide:
-      exists = !!calculator.divide;
-      break;
-    case CustomOperationType.Remainder:
-      exists = !!calculator.remainder;
-      break;
-    case CustomOperationType.Add:
-      exists = !!calculator.add;
-      break;
-    case CustomOperationType.Subtract:
-      exists = !!calculator.subtract;
-      break;
-    case CustomOperationType.SignedRightShift:
-      exists = !!calculator.signedRightShift;
-      break;
-    case CustomOperationType.UnsignedRightShift:
-      exists = !!calculator.unsignedRightShift;
-      break;
-    case CustomOperationType.LeftShift:
-      exists = !!calculator.leftShift;
-      break;
-    case CustomOperationType.LessThan:
-      exists = !!calculator.lessThan;
-      break;
-    case CustomOperationType.LessThanOrEqual:
-      exists = !!calculator.lessThanOrEqual;
-      break;
-    case CustomOperationType.GreaterThan:
-      exists = !!calculator.greaterThan;
-      break;
-    case CustomOperationType.GreaterThanOrEqual:
-      exists = !!calculator.greaterThanOrEqual;
-      break;
-    case CustomOperationType.Equal:
-      exists = !!calculator.equal;
-      break;
-    case CustomOperationType.StrictEqual:
-      exists = !!calculator.strictEqual;
-      break;
-    case CustomOperationType.NotEqual:
-      exists = !!calculator.notEqual;
-      break;
-    case CustomOperationType.StrictNotEqual:
-      exists = !!calculator.strictNotEqual;
-      break;
-    case CustomOperationType.BitwiseAnd:
-      exists = !!calculator.bitwiseAnd;
-      break;
-    case CustomOperationType.BitwiseXor:
-      exists = !!calculator.bitwiseXor;
-      break;
-    case CustomOperationType.BitwiseOr:
-      exists = !!calculator.bitwiseOr;
-      break;
-    case CustomOperationType.LogicalAnd:
-      exists = !!calculator.logicalAnd;
-      break;
-    case CustomOperationType.LogicalOr:
-      exists = !!calculator.logicalOr;
-      break;
-    case CustomOperationType.NullCoalesce:
-      exists = !!calculator.nullCoalesce;
-      break;
-  }
-
-  // --- The calculator object must support the specified operation
-  if (!exists) return null;
-
-  // --- Does the operation support the provided second operand?
-  return secondOperand !== undefined
-    ? calculator.supportSecondOperand(opType, secondOperand)
-      ? calculator
-      : null
-    : calculator;
-}
-
 // --- Evaluates a literal value (sync & async context)
-export function evalLiteral(thisStack: any[], expr: Literal): any {
+export function evalLiteral(thisStack: any[], expr: Literal, thread: LogicalThreadExp): any {
+  setExprValue(expr, { value: expr.value }, thread);
   thisStack.push(expr.value);
   return expr.value;
 }
 
 type IdentifierScope = "global" | "app" | "localContext" | "block";
 
+// --- Gets the scope of an identifier
 export function getIdentifierScope(
   expr: Identifier,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThread
+  thread?: LogicalThreadExp,
 ): { type?: IdentifierScope; scope: any } {
   let type: IdentifierScope | undefined;
   let scope: any;
@@ -164,7 +60,7 @@ export function getIdentifierScope(
     type = "global";
   } else {
     // --- Iterate trough threads from the current to the parent
-    let currentThread: LogicalThread | undefined = thread ?? evalContext.mainThread;
+    let currentThread: LogicalThreadExp | undefined = thread ?? evalContext.mainThread;
     while (currentThread && !scope) {
       if (currentThread.blocks) {
         // --- Search the block-scopes
@@ -227,245 +123,264 @@ export function evalIdentifier(
   thisStack: any[],
   expr: Identifier,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThreadExp,
 ): any {
+  // --- Check the ID in the cache
+  let value: any;
+  // --- The cache does not contain the value.
+  // --- We need to find the value and store it in the cache.
   const idScope = getIdentifierScope(expr, evalContext, thread);
   const valueScope = idScope.scope;
   let valueIndex: string | number = expr.name;
-  let idObj: any;
+  value = valueScope[valueIndex];
+  const newValue: ValueResult = {
+    valueScope,
+    valueIndex,
+    value,
+  };
+  setExprValue(expr, newValue, thread);
 
-  // --- Get the variable value
-  expr.valueScope = valueScope;
-  expr.valueIndex = valueIndex;
-  idObj = valueScope[valueIndex];
+  // --- Done.
+  thisStack.push(value);
+  return value;
+}
 
-  // --- Done
-  expr.value = idObj;
-  thisStack.push(idObj);
-  return idObj;
+// --- Gets the scope of the root ID
+export function getRootIdScope(
+  expr: Expression,
+  evalContext: BindingTreeEvaluationContext,
+  thread?: LogicalThreadExp,
+): { type: IdentifierScope | undefined; name: string } | null {
+  switch (expr.type) {
+    case T_IDENTIFIER:
+      const idScope = getIdentifierScope(expr, evalContext, thread);
+      return { type: idScope.type, name: expr.name };
+    case T_MEMBER_ACCESS_EXPRESSION:
+      return getRootIdScope(expr.obj, evalContext, thread);
+    case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
+      return getRootIdScope(expr.obj, evalContext, thread);
+  }
+  return null;
 }
 
 // --- Evaluates a member access expression (sync & async context)
 export function evalMemberAccessCore(
-  parentObj: any,
   thisStack: any[],
   expr: MemberAccessExpression,
-  evalContext: BindingTreeEvaluationContext
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThreadExp,
 ): any {
-  // --- At this point we definitely keep the parent object on `thisStack`, as it will be the context object
-  // --- of a FunctionInvocationExpression, if that follows the MemberAccess. Other operations would call
-  // --- `thisStack.pop()` to remove the result from the previous `evalBindingExpressionTree` call.
-  expr.valueScope = parentObj;
-  expr.valueIndex = expr.member;
-  const memberObj =
-    expr.isOptional || evalContext.options?.defaultToOptionalMemberAccess
+  const parentObj = getExprValue(expr.obj, thread)?.value;
+  const value =
+    expr.opt || evalContext.options?.defaultToOptionalMemberAccess
       ? parentObj?.[expr.member]
       : parentObj[expr.member];
-  thisStack.push(memberObj);
+  setExprValue(
+    expr,
+    {
+      valueScope: parentObj,
+      valueIndex: expr.member,
+      value,
+    },
+    thread,
+  );
+  thisStack.push(value);
 
   // --- Done.
-  return memberObj;
+  return value;
 }
-
-
 
 // --- Evaluates a calculated member access expression (sync & async context)
 export function evalCalculatedMemberAccessCore(
-  parentObj: any,
-  memberObj: any,
   thisStack: any[],
   expr: CalculatedMemberAccessExpression,
-  evalContext: BindingTreeEvaluationContext
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThreadExp,
 ): any {
-  // --- At this point we definitely keep the parent object on `thisStack`, as it will be the context object
-  // --- of a FunctionInvocationExpression, if that follows the MemberAccess. Other operations would call
-  // --- `thisStack.pop()` to remove the result from the previous `evalBindingExpressionTree` call.
-  expr.valueScope = parentObj;
-  expr.valueIndex = memberObj;
-  const calcMemberObj = evalContext.options?.defaultToOptionalMemberAccess
+  const parentObj = getExprValue(expr.obj, thread)?.value;
+  const memberObj = getExprValue(expr.member, thread)?.value;
+  const value = evalContext.options?.defaultToOptionalMemberAccess
     ? parentObj?.[memberObj]
     : parentObj[memberObj];
-  thisStack.push(calcMemberObj);
+  setExprValue(
+    expr,
+    {
+      valueScope: parentObj,
+      valueIndex: memberObj,
+      value,
+    },
+    thread,
+  );
+  thisStack.push(value);
 
   // --- Done.
-  return calcMemberObj;
+  return value;
 }
 
 // --- Evaluates a unary expression (sync & async context)
 export function evalUnaryCore(
   expr: UnaryExpression,
-  operand: any,
   thisStack: any[],
-  customOp: ICustomOperations | null
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThreadExp,
 ): any {
-  let unaryObj: any;
-  switch (expr.operator) {
+  let value: any;
+  const operand = getExprValue(expr.expr, thread);
+  const operValue = operand?.value;
+  switch (expr.op) {
     case "typeof":
-      unaryObj = typeof operand;
+      value = typeof operValue;
       break;
     case "delete":
-      if (expr.operand.valueScope && expr.operand.valueIndex) {
-        return delete expr.operand.valueScope[expr.operand.valueIndex];
+      if (operand.valueScope && operand.valueIndex) {
+        value = delete operand.valueScope[operand.valueIndex];
+      } else {
+        value = false;
       }
-      return false;
+      break;
     case "+":
-      customOp = getCustomOperations(CustomOperationType.UnaryPlus, operand);
-      unaryObj = customOp ? customOp.unaryPlus!(operand) : operand;
+      value = operValue;
       break;
     case "-":
-      customOp = getCustomOperations(CustomOperationType.UnaryMinus, operand);
-      unaryObj = customOp ? customOp.unaryPlus!(operand) : -operand;
+      value = -operValue;
       break;
     case "!":
-      customOp = getCustomOperations(CustomOperationType.LogicalNot, operand);
-      unaryObj = customOp ? customOp.unaryPlus!(operand) : !operand;
+      value = !operValue;
       break;
     case "~":
-      customOp = getCustomOperations(CustomOperationType.BitwiseNot, operand);
-      unaryObj = customOp ? customOp.unaryPlus!(operand) : ~operand;
+      value = ~operValue;
       break;
     default:
-      throw new Error(`Unknown unary operator: ${expr.operator}`);
+      throw new Error(`Unknown unary operator: ${expr.op}`);
   }
-  thisStack.push(unaryObj);
-  return unaryObj;
+  setExprValue(expr, { value }, thread);
+
+  // --- Done.
+  thisStack.push(value);
+  return value;
 }
 
 // --- Evaluates a binary operation (sync & async context)
 export function evalBinaryCore(
-  l: any,
-  r: any,
+  expr: BinaryExpression,
   thisStack: any[],
-  customOp: ICustomOperations | null,
-  opSymbol: BinaryOpSymbols
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThreadExp,
 ): any {
-  let binaryObj: any;
-  switch (opSymbol) {
+  let value: any;
+  const l = getExprValue(expr.left, thread)?.value;
+  const r = getExprValue(expr.right, thread)?.value;
+  switch (expr.op) {
     case "**":
-      binaryObj = l ** r;
+      value = l ** r;
       break;
     case "*":
-      customOp = getCustomOperations(CustomOperationType.Multiply, l, r);
-      binaryObj = customOp ? customOp.multiply!(l, r) : l * r;
+      value = l * r;
       break;
     case "/":
-      customOp = getCustomOperations(CustomOperationType.Divide, l, r);
-      binaryObj = customOp ? customOp.divide!(l, r) : l / r;
+      value = l / r;
       break;
     case "%":
-      customOp = getCustomOperations(CustomOperationType.Remainder, l, r);
-      binaryObj = customOp ? customOp.remainder!(l, r) : l % r;
+      value = l % r;
       break;
     case "+":
-      customOp = getCustomOperations(CustomOperationType.Add, l, r);
-      binaryObj = customOp ? customOp.add!(l, r) : l + r;
+      value = l + r;
       break;
     case "-":
-      customOp = getCustomOperations(CustomOperationType.Subtract, l, r);
-      binaryObj = customOp ? customOp.subtract!(l, r) : l - r;
+      value = l - r;
       break;
     case ">>":
-      customOp = getCustomOperations(CustomOperationType.SignedRightShift, l, r);
-      binaryObj = customOp ? customOp.signedRightShift!(l, r) : l >> r;
+      value = l >> r;
       break;
     case ">>>":
-      customOp = getCustomOperations(CustomOperationType.UnsignedRightShift, l, r);
-      binaryObj = customOp ? customOp.unsignedRightShift!(l, r) : l >>> r;
+      value = l >>> r;
       break;
     case "<<":
-      customOp = getCustomOperations(CustomOperationType.LeftShift, l, r);
-      binaryObj = customOp ? customOp.leftShift!(l, r) : l << r;
+      value = l << r;
       break;
     case "<":
-      customOp = getCustomOperations(CustomOperationType.LessThan, l, r);
-      binaryObj = customOp ? customOp.lessThan!(l, r) : l < r;
+      value = l < r;
       break;
     case "<=":
-      customOp = getCustomOperations(CustomOperationType.LessThanOrEqual, l, r);
-      binaryObj = customOp ? customOp.lessThanOrEqual!(l, r) : l <= r;
+      value = l <= r;
       break;
     case ">":
-      customOp = getCustomOperations(CustomOperationType.GreaterThan, l, r);
-      binaryObj = customOp ? customOp.greaterThan!(l, r) : l > r;
+      value = l > r;
       break;
     case ">=":
-      customOp = getCustomOperations(CustomOperationType.GreaterThanOrEqual, l, r);
-      binaryObj = customOp ? customOp.greaterThanOrEqual!(l, r) : l >= r;
+      value = l >= r;
       break;
     case "in":
-      binaryObj = l in r;
+      value = l in r;
       break;
     case "==":
-      customOp = getCustomOperations(CustomOperationType.Equal, l, r);
       // eslint-disable-next-line eqeqeq
-      binaryObj = customOp ? customOp.equal!(l, r) : l == r;
+      value = l == r;
       break;
     case "!=":
-      customOp = getCustomOperations(CustomOperationType.NotEqual, l, r);
       // eslint-disable-next-line eqeqeq
-      binaryObj = customOp ? customOp.notEqual!(l, r) : l != r;
+      value = l != r;
       break;
     case "===":
-      customOp = getCustomOperations(CustomOperationType.StrictEqual, l, r);
-      binaryObj = customOp ? customOp.strictEqual!(l, r) : l === r;
+      value = l === r;
       break;
     case "!==":
-      customOp = getCustomOperations(CustomOperationType.StrictNotEqual, l, r);
-      binaryObj = customOp ? customOp.strictNotEqual!(l, r) : l !== r;
+      value = l !== r;
       break;
     case "&":
-      customOp = getCustomOperations(CustomOperationType.BitwiseAnd, l, r);
-      binaryObj = customOp ? customOp.bitwiseAnd!(l, r) : l & r;
+      value = l & r;
       break;
     case "^":
-      customOp = getCustomOperations(CustomOperationType.BitwiseXor, l, r);
-      binaryObj = customOp ? customOp.bitwiseXor!(l, r) : l ^ r;
+      value = l ^ r;
       break;
     case "|":
-      customOp = getCustomOperations(CustomOperationType.BitwiseOr, l, r);
-      binaryObj = customOp ? customOp.bitwiseOr!(l, r) : l | r;
+      value = l | r;
       break;
     case "&&":
-      customOp = getCustomOperations(CustomOperationType.LogicalAnd, l, r);
-      binaryObj = customOp ? customOp.logicalAnd!(l, r) : l && r;
+      value = l && r;
       break;
     case "||":
-      customOp = getCustomOperations(CustomOperationType.LogicalOr, l, r);
-      binaryObj = customOp ? customOp.logicalOr!(l, r) : l || r;
+      value = l || r;
       break;
     case "??":
-      customOp = getCustomOperations(CustomOperationType.NullCoalesce, l, r);
-      binaryObj = customOp ? customOp.nullCoalesce!(l, r) : l ?? r;
+      value = l ?? r;
       break;
     default:
-      throw new Error(`Unknown binary operator: ${opSymbol}`);
+      throw new Error(`Unknown binary operator: ${expr.op}`);
   }
-  thisStack.push(binaryObj);
-  return binaryObj;
+  setExprValue(expr, { value }, thread);
+
+  // --- Done.
+  thisStack.push(value);
+  return value;
 }
 
 // --- Evaluates an assignment operation (sync & async context)
 export function evalAssignmentCore(
-  leftValue: Expression,
-  newValue: any,
   thisStack: any[],
   expr: AssignmentExpression,
-  thread: LogicalThread
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThreadExp,
 ): any {
-  if (!leftValue.valueScope || leftValue.valueIndex === undefined || leftValue.valueIndex === null) {
-    throw new Error(
-      `Evaluation of ${expr.operator} requires a left-hand value., valueScope: ${leftValue.valueScope}, valueIndex: ${leftValue.valueIndex}`
-    );
+  const leftValue = getExprValue(expr.leftValue, thread);
+  const newValue = getExprValue(expr.expr, thread)?.value;
+  if (
+    !leftValue.valueScope ||
+    leftValue.valueIndex === undefined ||
+    leftValue.valueIndex === null
+  ) {
+    throw new Error(`Evaluation of ${expr.op} requires a left-hand value.`);
   }
 
   const leftScope = leftValue.valueScope;
   const leftIndex = leftValue.valueIndex;
   if (typeof leftScope !== "object" || leftScope === null) {
-    throw new Error(`Unknown left-hand value ${leftValue?.source}, ${expr.source}`);
+    // TODO: Specify the error location in the error message
+    throw new Error(`Unknown left-hand value`);
   }
 
   // --- Check for const value
-  if (expr.leftValue.type === "IdE") {
+  if (expr.leftValue.type === T_IDENTIFIER) {
     if (isConstVar(expr.leftValue.name, thread)) {
       throw new Error("A const variable cannot be modified");
     }
@@ -476,7 +391,7 @@ export function evalAssignmentCore(
   }
 
   thisStack.pop();
-  switch (expr.operator) {
+  switch (expr.op) {
     case "=":
       leftScope[leftIndex] = newValue;
       break;
@@ -527,51 +442,82 @@ export function evalAssignmentCore(
       break;
   }
   const value = leftScope[leftIndex];
+  setExprValue(expr, { value }, thread);
   thisStack.push(value);
   return value;
 }
 
 // --- Evaluates a prefix/postfix operator (sync & async context)
 export function evalPreOrPostCore(
-  operand: Expression,
   thisStack: any[],
   expr: PrefixOpExpression | PostfixOpExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThreadExp,
 ): any {
+  const operand = getExprValue(expr.expr, thread);
   if (!operand.valueScope || operand.valueIndex === undefined) {
-    throw new Error(`Evaluation of ${expr.operator} requires a left-hand value.`);
+    throw new Error(`Evaluation of ${expr.op} requires a left-hand value.`);
   }
 
   // --- Check for const value
-  if (expr.operand.type === "IdE") {
-    if (isConstVar(expr.operand.name, thread)) {
+  if (expr.expr.type === T_IDENTIFIER) {
+    if (isConstVar(expr.expr.name, thread)) {
       // --- We cannot modify a const value
       throw new Error("A const variable cannot be modified");
     }
   }
 
   const value =
-    expr.operator === "++"
-      ? expr.type === "PrefE"
+    expr.op === "++"
+      ? expr.type === T_PREFIX_OP_EXPRESSION
         ? ++operand.valueScope[operand.valueIndex]
         : operand.valueScope[operand.valueIndex]++
-      : expr.type === "PrefE"
-      ? --operand.valueScope[operand.valueIndex]
-      : operand.valueScope[operand.valueIndex]--;
+      : expr.type === T_PREFIX_OP_EXPRESSION
+        ? --operand.valueScope[operand.valueIndex]
+        : operand.valueScope[operand.valueIndex]--;
+
+  setExprValue(expr, { value }, thread);
   thisStack.push(value);
   return value;
 }
 
 // --- Evaluates an arrow expression (lazy, sync & async context)
-export function evalArrow(thisStack: any[], expr: ArrowExpression, thread: LogicalThread): ArrowExpression {
+export function evalArrow(
+  thisStack: any[],
+  expr: ArrowExpression,
+  thread: LogicalThreadExp,
+): ArrowExpression {
   const lazyArrow = {
     ...expr,
     _ARROW_EXPR_: true,
     closureContext: obtainClosures(thread),
   } as ArrowExpression;
+  setExprValue(expr, { value: lazyArrow }, thread);
   thisStack.push(lazyArrow);
   return lazyArrow;
+}
+
+export function obtainClosures(thread: LogicalThreadExp): BlockScope[] {
+  const closures = thread.blocks?.slice(0) ?? [];
+  return thread.parent ? [...obtainClosures(thread.parent), ...closures] : closures;
+}
+
+/**
+ * Gets the context of the variable
+ * @param id Identifier to test
+ * @param thread Thread to use for evaluation
+ */
+function isConstVar(id: string, thread: LogicalThreadExp): boolean {
+  // --- Start search the block context
+  if (thread.blocks) {
+    for (let idx = thread.blocks.length; idx >= 0; idx--) {
+      const constContext = thread.blocks[idx]?.constVars;
+      if (constContext && constContext.has(id)) return true;
+    }
+  }
+
+  // --- Not in block context
+  return false;
 }
 
 export function evalTemplateLiteralCore(segmentValues: any[]): string {

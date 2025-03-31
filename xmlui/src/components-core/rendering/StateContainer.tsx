@@ -25,13 +25,13 @@ import { collectFnVarDeps } from "../rendering/collectFnVarDeps";
 import { createContainerReducer } from "../rendering/reducer";
 import { useDebugView } from "../DebugViewProvider";
 import { ErrorBoundary } from "../rendering/ErrorBoundary";
-import { collectVariableDependencies } from "../script-runner-exp/visitors";
+import { collectVariableDependencies } from "../script-runner/visitors";
 import { useShallowCompareMemoize, useReferenceTrackedApi } from "../utils/hooks";
 import { Container } from "./Container";
 import { PARSED_MARK_PROP } from "../../parsers/scripting-exp/code-behind-collect";
 import { useAppContext } from "../AppContext";
-import { parseParameterString } from "../script-runner-exp/ParameterParser";
-import { evalBinding } from "../script-runner-exp/eval-tree-sync";
+import { parseParameterString } from "../script-runner/ParameterParser";
+import { evalBinding } from "../script-runner/eval-tree-sync";
 import { extractParam } from "../utils/extractParam";
 import { pickFromObject, shallowCompare } from "../utils/misc";
 import {

@@ -4,10 +4,10 @@ import { isPlainObject, isString } from "lodash-es";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { MemoedVars } from "../abstractions/ComponentRenderer";
-import { parseParameterString } from "../script-runner-exp/ParameterParser";
+import { parseParameterString } from "../script-runner/ParameterParser";
 import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
 import { isPrimitive, pickFromObject, shallowCompare } from "../utils/misc";
-import { collectVariableDependencies } from "../script-runner-exp/visitors";
+import { collectVariableDependencies } from "../script-runner/visitors";
 import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";

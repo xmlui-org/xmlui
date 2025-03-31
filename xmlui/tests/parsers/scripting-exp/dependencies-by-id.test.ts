@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveIdentifiers } from "../../../src/components-core/script-runner-exp/id-resolution";
+import { resolveIdentifiers } from "../../../src/components-core/script-runner/id-resolution";
 import { Parser } from "../../../src/parsers/scripting-exp/Parser";
 import { ResolutionScope } from "../../../src/parsers/scripting-exp/ResolutionScope";
 

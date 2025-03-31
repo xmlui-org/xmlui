@@ -2,7 +2,7 @@ import { createEvalContext, parseStatements } from "./test-helpers";
 import { describe, expect, it, assert } from "vitest";
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 
-describe("Process switch statements", () => {
+describe("Process switch statements (exp)", () => {
   it("no case", async () => {
     // --- Arrange
     const source = `

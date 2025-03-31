@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
 
-describe("Process statements - destructure", () => {
+describe("Process statements - destructure (exp)", () => {
     it("let array destructure #1", async () => {
         // --- Arrange
         const source = "let [a, b] = [3, 6]; x = a; y = b;";

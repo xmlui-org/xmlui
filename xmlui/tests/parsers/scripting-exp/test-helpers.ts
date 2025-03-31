@@ -1,4 +1,4 @@
-import { BindingTreeEvaluationContext } from "../../../src/components-core/script-runner-exp/BindingTreeEvaluationContext";
+import { BindingTreeEvaluationContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
 import { Parser } from "../../../src/parsers/scripting-exp/Parser";
 import {Expression, Statement} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 

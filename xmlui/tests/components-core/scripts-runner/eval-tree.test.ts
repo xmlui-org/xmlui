@@ -1,6 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 
-import { Parser } from "../../../src/parsers/scripting/Parser";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
 import {
   evalBinding,
   evalBindingExpression
@@ -8,7 +8,7 @@ import {
 import { createEvalContext } from "./test-helpers";
 import { evalBindingAsync } from "../../../src/components-core/script-runner/eval-tree-async";
 
-describe("Evaluate binding expression tree", () => {
+describe("Evaluate binding expression tree (exp)", () => {
   const literalCases = [
     { src: "undefined", exp: undefined },
     { src: "null", exp: null },

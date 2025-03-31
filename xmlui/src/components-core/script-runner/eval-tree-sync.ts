@@ -1,33 +1,51 @@
-import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
-import type {
-  ArrayLiteral,
-  ArrowExpression,
-  AssignmentExpression,
-  BinaryExpression,
-  CalculatedMemberAccessExpression,
-  ConditionalExpression,
-  Expression,
-  FunctionInvocationExpression,
-  MemberAccessExpression,
-  ObjectLiteral,
-  PostfixOpExpression,
-  PrefixOpExpression,
-  ReturnStatement,
-  SequenceExpression,
-  Statement,
+import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import {
+  Identifier,
+  T_ARRAY_LITERAL,
+  T_ARROW_EXPRESSION,
+  T_ASSIGNMENT_EXPRESSION,
+  T_BINARY_EXPRESSION,
+  T_BLOCK_STATEMENT,
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
+  T_DESTRUCTURE,
+  T_EMPTY_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+  T_FUNCTION_INVOCATION_EXPRESSION,
+  T_IDENTIFIER,
+  T_LITERAL,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_OBJECT_LITERAL,
+  T_POSTFIX_OP_EXPRESSION,
+  T_PREFIX_OP_EXPRESSION,
+  T_RETURN_STATEMENT,
+  T_SEQUENCE_EXPRESSION,
+  T_SPREAD_EXPRESSION,
+  T_TEMPLATE_LITERAL_EXPRESSION,
+  T_UNARY_EXPRESSION,
+  T_VAR_DECLARATION,
   TemplateLiteralExpression,
-  UnaryExpression,
-  VarDeclaration,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+  type ArrayLiteral,
+  type ArrowExpression,
+  type AssignmentExpression,
+  type BinaryExpression,
+  type CalculatedMemberAccessExpression,
+  type ConditionalExpression,
+  type Expression,
+  type FunctionInvocationExpression,
+  type MemberAccessExpression,
+  type ObjectLiteral,
+  type PostfixOpExpression,
+  type PrefixOpExpression,
+  type SequenceExpression,
+  type Statement,
+  type UnaryExpression,
+  type VarDeclaration,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import { Identifier } from "../../abstractions/scripting/ScriptingSourceTreeExp";
-import { Parser } from "../../parsers/scripting/Parser";
+import { createXmlUiTreeNodeId, Parser } from "../../parsers/scripting-exp/Parser";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import type { ICustomOperations } from "./ICustomOperations";
-import { ensureMainThread } from "./process-statement-common";
-import { processDeclarations, processStatementQueue } from "./process-statement-sync";
 import { isBannedFunction } from "./bannedFunctions";
-import { getSyncProxy } from "./syncProxy";
 import {
   evalArrow,
   evalAssignmentCore,
@@ -37,17 +55,22 @@ import {
   evalLiteral,
   evalMemberAccessCore,
   evalPreOrPostCore,
-  evalUnaryCore,
-  isPromise,
   evalTemplateLiteralCore,
+  evalUnaryCore,
+  getExprValue,
+  getRootIdScope,
+  isPromise,
+  setExprValue,
 } from "./eval-tree-common";
+import { ensureMainThread } from "./process-statement-common";
+import { processDeclarations, processStatementQueue } from "./process-statement-sync";
 
 // --- The type of function we use to evaluate a (partial) expression tree
 type EvaluatorFunction = (
   thisStack: any[],
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ) => any;
 
 /**
@@ -60,7 +83,7 @@ type EvaluatorFunction = (
 export function evalBindingExpression(
   source: string,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThread,
+  thread?: LogicalThreadExp,
 ): any {
   // --- Use the main thread by default
   thread ??= evalContext.mainThread;
@@ -91,7 +114,7 @@ export function evalBindingExpression(
 export function evalBinding(
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThread,
+  thread?: LogicalThreadExp,
 ): any {
   const thisStack: any[] = [];
   ensureMainThread(evalContext);
@@ -109,11 +132,11 @@ export function evalBinding(
 export function executeArrowExpressionSync(
   expr: ArrowExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThread,
+  thread?: LogicalThreadExp,
   ...args: any[]
 ): Promise<any> {
   // --- Just an extra safety check
-  if (expr.type !== "ArrowE") {
+  if (expr.type !== T_ARROW_EXPRESSION) {
     throw new Error("executeArrowExpression expects an 'ArrowExpression' object.");
   }
 
@@ -121,7 +144,7 @@ export function executeArrowExpressionSync(
   const evaluator: EvaluatorFunction = evalBindingExpressionTree;
 
   // --- Compiles the Arrow function to a JavaScript function
-  const nativeFunction = createArrowFunction(evaluator, expr);
+  const nativeFunction = createArrowFunction(evaluator, expr, evalContext);
 
   // --- Run the compiled arrow function. Note, we have two prefix arguments:
   // --- #1: The names of arrow function arguments
@@ -144,62 +167,58 @@ function evalBindingExpressionTree(
   thisStack: any[],
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
   if (!evalContext.options) {
     evalContext.options = { defaultToOptionalMemberAccess: true };
   }
 
   // --- Prepare evaluation
-  let customOp: ICustomOperations | null = null;
   const evaluator: EvaluatorFunction = evalBindingExpressionTree;
-
-  // --- Reset the expression scope
-  expr.valueScope = expr.valueIndex = undefined;
 
   // --- Process the expression according to its type
   switch (expr.type) {
-    case "TempLitE":
+    case T_TEMPLATE_LITERAL_EXPRESSION:
       return evalTemplateLiteral(evaluator, thisStack, expr, evalContext, thread);
-      
-    case "LitE":
-      return evalLiteral(thisStack, expr);
 
-    case "IdE":
+    case T_LITERAL:
+      return evalLiteral(thisStack, expr, thread);
+
+    case T_IDENTIFIER:
       return evalIdentifier(thisStack, expr, evalContext, thread);
 
-    case "MembE":
+    case T_MEMBER_ACCESS_EXPRESSION:
       return evalMemberAccess(evaluator, thisStack, expr, evalContext, thread);
 
-    case "CMembE":
+    case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
       return evalCalculatedMemberAccess(evaluator, thisStack, expr, evalContext, thread);
 
-    case "SeqE":
+    case T_SEQUENCE_EXPRESSION:
       return evalSequence(evaluator, thisStack, expr, evalContext, thread);
 
-    case "ALitE":
+    case T_ARRAY_LITERAL:
       return evalArrayLiteral(evaluator, thisStack, expr, evalContext, thread);
 
-    case "OLitE":
+    case T_OBJECT_LITERAL:
       return evalObjectLiteral(evaluator, thisStack, expr, evalContext, thread);
 
-    case "UnaryE":
-      return evalUnary(evaluator, thisStack, customOp, expr, evalContext, thread);
+    case T_UNARY_EXPRESSION:
+      return evalUnary(evaluator, thisStack, expr, evalContext, thread);
 
-    case "BinaryE":
-      return evalBinary(evaluator, thisStack, customOp, expr, evalContext, thread);
+    case T_BINARY_EXPRESSION:
+      return evalBinary(evaluator, thisStack, expr, evalContext, thread);
 
-    case "CondE":
+    case T_CONDITIONAL_EXPRESSION:
       return evalConditional(evaluator, thisStack, expr, evalContext, thread);
 
-    case "AsgnE":
+    case T_ASSIGNMENT_EXPRESSION:
       return evalAssignment(evaluator, thisStack, expr, evalContext, thread);
 
-    case "PrefE":
-    case "PostfE":
+    case T_PREFIX_OP_EXPRESSION:
+    case T_POSTFIX_OP_EXPRESSION:
       return evalPreOrPost(evaluator, thisStack, expr, evalContext, thread);
 
-    case "InvokeE":
+    case T_FUNCTION_INVOCATION_EXPRESSION:
       // --- Special sync handling
       const funcResult = evalFunctionInvocation(evaluator, thisStack, expr, evalContext, thread);
       if (isPromise(funcResult)) {
@@ -207,11 +226,11 @@ function evalBindingExpressionTree(
       }
       return funcResult;
 
-    case "ArrowE":
+    case T_ARROW_EXPRESSION:
       // --- Special sync handling
       return evalArrow(thisStack, expr, thread);
 
-    case "SpreadE":
+    case T_SPREAD_EXPRESSION:
       throw new Error("Cannot use spread expression (...) with the current intermediate value.");
 
     default:
@@ -224,7 +243,7 @@ function evalTemplateLiteral(
   thisStack: any[],
   expr: TemplateLiteralExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
   const segmentValues = expr.segments.map((s) => {
     const evaledValue = evaluator(thisStack, s, evalContext, thread);
@@ -239,10 +258,13 @@ function evalMemberAccess(
   thisStack: any[],
   expr: MemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
-  const parentObj = evaluator(thisStack, expr.object, evalContext, thread);
-  return evalMemberAccessCore(parentObj, thisStack, expr, evalContext);
+  evaluator(thisStack, expr.obj, evalContext, thread);
+  // --- At this point we definitely keep the parent object on `thisStack`, as it will be the context object
+  // --- of a FunctionInvocationExpression, if that follows the MemberAccess. Other operations would call
+  // --- `thisStack.pop()` to remove the result from the previous `evalBindingExpressionTree` call.
+  return evalMemberAccessCore(thisStack, expr, evalContext, thread);
 }
 
 function evalCalculatedMemberAccess(
@@ -250,16 +272,13 @@ function evalCalculatedMemberAccess(
   thisStack: any[],
   expr: CalculatedMemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
-  const parentObj = evaluator(thisStack, expr.object, evalContext, thread);
+  evaluator(thisStack, expr.obj, evalContext, thread);
+  evaluator(thisStack, expr.member, evalContext, thread);
 
-  // --- At this point we definitely keep the parent object on `thisStack`, as it will be the context object
-  // --- of a FunctionInvocationExpression, if that follows the MemberAccess. Other operations would call
-  // --- `thisStack.pop()` to remove the result from the previous `evalBindingExpressionTree` call.
-  const memberObj = evaluator(thisStack, expr.member, evalContext, thread);
   thisStack.pop();
-  return evalCalculatedMemberAccessCore(parentObj, memberObj, thisStack, expr, evalContext);
+  return evalCalculatedMemberAccessCore(thisStack, expr, evalContext, thread);
 }
 
 function evalSequence(
@@ -267,15 +286,16 @@ function evalSequence(
   thisStack: any[],
   expr: SequenceExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
-  if (!expr.expressions || expr.expressions.length === 0) {
+  if (!expr.exprs || expr.exprs.length === 0) {
     throw new Error(`Missing expression sequence`);
   }
-  const result = expr.expressions.map((e) => {
-    const exprValue = evaluator(thisStack, e, evalContext, thread);
+  const result = expr.exprs.map((e) => {
+    const value = evaluator(thisStack, e, evalContext, thread);
+    setExprValue(e, { value }, thread);
     thisStack.pop();
-    return exprValue;
+    return value;
   });
   const lastObj = result[result.length - 1];
   thisStack.push(lastObj);
@@ -287,24 +307,27 @@ function evalArrayLiteral(
   thisStack: any[],
   expr: ArrayLiteral,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
-  const arrayValue: any[] = [];
+  const value: any[] = [];
   for (const item of expr.items) {
-    if (item.type === "SpreadE") {
-      const spreadArray = evaluator(thisStack, item.operand, evalContext, thread);
+    if (item.type === T_SPREAD_EXPRESSION) {
+      const spreadArray = evaluator(thisStack, item.expr, evalContext, thread);
       thisStack.pop();
       if (!Array.isArray(spreadArray)) {
         throw new Error("Spread operator within an array literal expects an array operand.");
       }
-      arrayValue.push(...spreadArray);
+      value.push(...spreadArray);
     } else {
-      arrayValue.push(evaluator(thisStack, item, evalContext, thread));
+      value.push(evaluator(thisStack, item, evalContext, thread));
       thisStack.pop();
-      thisStack.push(arrayValue);
+      thisStack.push(value);
     }
   }
-  return arrayValue;
+
+  // --- Done.
+  setExprValue(expr, { value }, thread);
+  return value;
 }
 
 function evalObjectLiteral(
@@ -312,13 +335,13 @@ function evalObjectLiteral(
   thisStack: any[],
   expr: ObjectLiteral,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
   const objectHash: any = {};
   for (const prop of expr.props) {
     if (!Array.isArray(prop)) {
       // --- We're using a spread expression
-      const spreadItems = evaluator(thisStack, prop.operand, evalContext, thread);
+      const spreadItems = evaluator(thisStack, prop.expr, evalContext, thread);
       thisStack.pop();
       if (Array.isArray(spreadItems)) {
         // --- Spread of an array
@@ -337,10 +360,10 @@ function evalObjectLiteral(
     // --- We're using key/[value] pairs
     let key: any;
     switch (prop[0].type) {
-      case "LitE":
+      case T_LITERAL:
         key = prop[0].value;
         break;
-      case "IdE":
+      case T_IDENTIFIER:
         key = prop[0].name;
         break;
       default:
@@ -351,6 +374,9 @@ function evalObjectLiteral(
     objectHash[key] = evaluator(thisStack, prop[1], evalContext, thread);
     thisStack.pop();
   }
+
+  // --- Done.
+  setExprValue(expr, { value: objectHash }, thread);
   thisStack.push(objectHash);
   return objectHash;
 }
@@ -358,37 +384,36 @@ function evalObjectLiteral(
 function evalUnary(
   evaluator: EvaluatorFunction,
   thisStack: any[],
-  customOp: ICustomOperations | null,
   expr: UnaryExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
-  const operand = evaluator(thisStack, expr.operand, evalContext, thread);
+  evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
-  return evalUnaryCore(expr, operand, thisStack, customOp);
+  return evalUnaryCore(expr, thisStack, evalContext, thread);
 }
 
 function evalBinary(
   evaluator: EvaluatorFunction,
   thisStack: any[],
-  customOp: ICustomOperations | null,
   expr: BinaryExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
-  const l = evaluator(thisStack, expr.left, evalContext, thread);
+  evaluator(thisStack, expr.left, evalContext, thread);
   thisStack.pop();
-  if (expr.operator === "&&" && !l) {
-    thisStack.push(l);
+  const l = getExprValue(expr.left, thread)?.value;
+  if (expr.op === "&&" && !l) {
+    setExprValue(expr, { value: l }, thread);
     return l;
   }
-  if (expr.operator === "||" && l) {
-    thisStack.push(l);
+  if (expr.op === "||" && l) {
+    setExprValue(expr, { value: l }, thread);
     return l;
   }
-  const r = evaluator(thisStack, expr.right, evalContext, thread);
+  evaluator(thisStack, expr.right, evalContext, thread);
   thisStack.pop();
-  return evalBinaryCore(l, r, thisStack, customOp, expr.operator);
+  return evalBinaryCore(expr, thisStack, evalContext, thread);
 }
 
 function evalConditional(
@@ -396,11 +421,13 @@ function evalConditional(
   thisStack: any[],
   expr: ConditionalExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
-  const condition = evaluator(thisStack, expr.condition, evalContext, thread);
+  const condition = evaluator(thisStack, expr.cond, evalContext, thread);
   thisStack.pop();
-  return evaluator(thisStack, condition ? expr.consequent : expr.alternate, evalContext, thread);
+  const value = evaluator(thisStack, condition ? expr.thenE : expr.elseE, evalContext, thread);
+  setExprValue(expr, { value }, thread);
+  return value;
 }
 
 function evalAssignment(
@@ -408,14 +435,23 @@ function evalAssignment(
   thisStack: any[],
   expr: AssignmentExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
   const leftValue = expr.leftValue;
+  const rootScope = getRootIdScope(leftValue, evalContext, thread);
+  const updatesState = rootScope && rootScope.type !== "block";
+  if (updatesState && evalContext.onWillUpdate) {
+    evalContext.onWillUpdate(rootScope, rootScope.name, "assignment");
+  }
   evaluator(thisStack, leftValue, evalContext, thread);
   thisStack.pop();
-  const newValue = evaluator(thisStack, expr.operand, evalContext, thread);
+  evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
-  return evalAssignmentCore(leftValue, newValue, thisStack, expr, thread);
+  const value = evalAssignmentCore(thisStack, expr, evalContext, thread);
+  if (updatesState && evalContext.onDidUpdate) {
+    evalContext.onDidUpdate(rootScope, rootScope.name, "assignment");
+  }
+  return value;
 }
 
 function evalPreOrPost(
@@ -423,12 +459,20 @@ function evalPreOrPost(
   thisStack: any[],
   expr: PrefixOpExpression | PostfixOpExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
-  const operand = expr.operand;
-  evaluator(thisStack, operand, evalContext, thread);
+  const rootScope = getRootIdScope(expr.expr, evalContext, thread);
+  const updatesState = rootScope && rootScope.type !== "block";
+  if (updatesState && evalContext.onWillUpdate) {
+    evalContext.onWillUpdate(rootScope, rootScope.name, "pre-post");
+  }
+  evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
-  return evalPreOrPostCore(operand, thisStack, expr, evalContext, thread);
+  const value = evalPreOrPostCore(thisStack, expr, evalContext, thread);
+  if (updatesState && evalContext.onDidUpdate) {
+    evalContext.onDidUpdate(rootScope, rootScope.name, "pre-post");
+  }
+  return value;
 }
 
 function evalFunctionInvocation(
@@ -436,21 +480,21 @@ function evalFunctionInvocation(
   thisStack: any[],
   expr: FunctionInvocationExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
 ): any {
   let functionObj: any;
   let implicitContextObject: any = null;
 
   // --- Check for contexted object
-  if (expr.object.type === "MembE" && expr.object.object.type === "IdE") {
-    const hostObject = evaluator(thisStack, expr.object.object, evalContext, thread);
-    functionObj = evalMemberAccessCore(hostObject, thisStack, expr.object, evalContext);
+  if (expr.obj.type === T_MEMBER_ACCESS_EXPRESSION && expr.obj.obj.type === T_IDENTIFIER) {
+    const hostObject = evaluator(thisStack, expr.obj.obj, evalContext, thread);
+    functionObj = evalMemberAccessCore(thisStack, expr.obj, evalContext, thread);
     if (hostObject?._SUPPORT_IMPLICIT_CONTEXT) {
       implicitContextObject = hostObject;
     }
   } else {
     // --- Get the object on which to invoke the function
-    functionObj = evaluator(thisStack, expr.object, evalContext, thread);
+    functionObj = evaluator(thisStack, expr.obj, evalContext, thread);
   }
   thisStack.pop();
 
@@ -465,12 +509,12 @@ function evalFunctionInvocation(
       thread,
       ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true })),
     );
-    functionObj = createArrowFunction(evaluator, functionObj as ArrowExpression);
-  } else if (expr.object.type === "ArrowE") {
+    functionObj = createArrowFunction(evaluator, functionObj as ArrowExpression, evalContext);
+  } else if (expr.obj.type === T_ARROW_EXPRESSION) {
     // --- We delay evaluating expression values. We pass the argument names as the first parameter, and then
     // --- all parameter expressions
     functionArgs.push(
-      expr.object.args,
+      expr.obj.args,
       evalContext,
       thread,
       ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true })),
@@ -479,21 +523,21 @@ function evalFunctionInvocation(
     // --- We evaluate the argument values to pass to a JavaScript function
     for (let i = 0; i < expr.arguments.length; i++) {
       const arg = expr.arguments[i];
-      if (arg.type === "SpreadE") {
-        const funcArg = evaluator([], arg.operand, evalContext, thread);
+      if (arg.type === T_SPREAD_EXPRESSION) {
+        const funcArg = evaluator([], arg.expr, evalContext, thread);
         if (!Array.isArray(funcArg)) {
           throw new Error("Spread operator within a function invocation expects an array operand.");
         }
         functionArgs.push(...funcArg);
       } else {
-        if (arg.type === "ArrowE") {
-          const funcArg = createArrowFunction(evaluator, arg);
+        if (arg.type === T_ARROW_EXPRESSION) {
+          const funcArg = createArrowFunction(evaluator, arg, evalContext);
           const wrappedFunc = (...args: any[]) => funcArg(arg.args, evalContext, thread, ...args);
           functionArgs.push(wrappedFunc);
         } else {
           const funcArg = evaluator([], arg, evalContext, thread);
           if (funcArg?._ARROW_EXPR_) {
-            const wrappedFuncArg = createArrowFunction(evaluator, funcArg);
+            const wrappedFuncArg = createArrowFunction(evaluator, funcArg, evalContext);
             const wrappedFunc = (...args: any[]) =>
               wrappedFuncArg(funcArg.args, evalContext, thread, ...args);
             functionArgs.push(wrappedFunc);
@@ -527,33 +571,44 @@ function evalFunctionInvocation(
   // --- We use context for "this"
   const currentContext = thisStack.length > 0 ? thisStack.pop() : evalContext.localContext;
 
-  // --- We need to use proxies for JavaScript functions (such as Array.prototype.sort) using
-  // --- in-place changes on DataSource values
-  functionObj = getSyncProxy(functionObj, functionArgs, currentContext);
-
   // --- Now, invoke the function
+  const rootScope = getRootIdScope(expr.obj, evalContext, thread);
+  const updatesState = rootScope && rootScope.type !== "block";
+  if (updatesState && evalContext.onWillUpdate) {
+    evalContext.onWillUpdate(rootScope, rootScope.name, "function-call");
+  }
   const value = evalContext.options?.defaultToOptionalMemberAccess
     ? (functionObj as Function)?.call(currentContext, ...functionArgs)
     : (functionObj as Function).call(currentContext, ...functionArgs);
+
+  if (updatesState && evalContext.onDidUpdate) {
+    evalContext.onDidUpdate(rootScope, rootScope.name, "function-call");
+  }
+
+  setExprValue(expr, { value }, thread);
   thisStack.push(value);
   return value;
 }
 
-function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression): Function {
+function createArrowFunction(
+  evaluator: EvaluatorFunction,
+  expr: ArrowExpression,
+  evalContext: BindingTreeEvaluationContext,
+): Function {
   // --- Use this function, it evaluates the arrow function
   return (...args: any[]) => {
     // --- Prepare the variables to pass
     const runTimeEvalContext = args[1] as BindingTreeEvaluationContext;
-    const runtimeThread = args[2] as LogicalThread;
+    const runtimeThread = args[2] as LogicalThreadExp;
 
     // --- Create the thread that runs the arrow function
-    const workingThread: LogicalThread = {
+    const workingThread: LogicalThreadExp = {
       parent: runtimeThread,
       childThreads: [],
       blocks: [{ vars: {} }],
       loops: [],
       breakLabelValue: -1,
-      closures: expr.closureContext,
+      closures: (expr as any).closureContext,
     };
     runtimeThread.childThreads.push(workingThread);
 
@@ -577,32 +632,32 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
       const argSpec = argSpecs[i];
       let decl: VarDeclaration | undefined;
       switch (argSpec.type) {
-        case "IdE": {
+        case T_IDENTIFIER: {
           decl = {
-            type: "VarD",
+            type: T_VAR_DECLARATION,
             id: argSpec.name,
           } as VarDeclaration;
           break;
         }
-        case "Destr": {
+        case T_DESTRUCTURE: {
           decl = {
-            type: "VarD",
+            type: T_VAR_DECLARATION,
             id: argSpec.id,
-            arrayDestruct: argSpec.arrayDestruct,
-            objectDestruct: argSpec.objectDestruct,
+            aDestr: argSpec.aDestr,
+            oDestr: argSpec.oDestr,
           } as VarDeclaration;
           break;
         }
-        case "SpreadE": {
+        case T_SPREAD_EXPRESSION: {
           restFound = true;
           decl = {
-            type: "VarD",
-            id: (argSpec.operand as unknown as Identifier).name,
+            type: T_VAR_DECLARATION,
+            id: (argSpec.expr as unknown as Identifier).name,
           } as VarDeclaration;
           break;
         }
+
         default:
-          console.log(argSpec);
           throw new Error("Unexpected arrow argument specification");
       }
       if (decl) {
@@ -650,21 +705,22 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
     let statements: Statement[];
 
     switch (expr.statement.type) {
-      case "EmptyS":
+      case T_EMPTY_STATEMENT:
         statements = [];
         break;
-      case "ExprS":
+      case T_EXPRESSION_STATEMENT:
         // --- Create a new thread for the call
         statements = [
           {
-            type: "RetS",
-            expression: expr.statement.expression,
-          } as ReturnStatement,
+            type: T_RETURN_STATEMENT,
+            nodeId: createXmlUiTreeNodeId(),
+            expr: expr.statement.expr,
+          },
         ];
         break;
-      case "BlockS":
+      case T_BLOCK_STATEMENT:
         // --- Create a new thread for the call
-        statements = expr.statement.statements;
+        statements = expr.statement.stmts;
         break;
       default:
         throw new Error(
