@@ -16,7 +16,6 @@ export const NavGroupMd = createMetadata({
     `(\`NavLink\` components). It can be displayed as a submenu in the App's UI.`,
   props: {
     label: dLabel(),
-    icon: d(`This property defines an optional icon to display along with the \`${COMP}\` label.`),
     initiallyExpanded: d('This property defines whether the group is initially expanded or collapsed.'),
     to: {
       description: `This property defines an optional navigation link.`,

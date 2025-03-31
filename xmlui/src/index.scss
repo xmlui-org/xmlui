@@ -114,10 +114,10 @@
     box-shadow: none
   }
 
-  *:focus-visible {
-    outline: t.$focus-outline;
-    outline-offset: t.$outlineOffset--focus;
-  }
+  //*:focus-visible {
+  //  outline: t.$focus-outline;
+  //  outline-offset: t.$outlineOffset--focus;
+  //}
 
   progress {
     vertical-align: baseline
