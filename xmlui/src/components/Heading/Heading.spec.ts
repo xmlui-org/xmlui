@@ -110,13 +110,12 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
         const headingSizes = await sizeComparisonSetup(initTestBed, createHeadingDriver);
 
         for (let i = idx + 1; i < headingSizes.length; i++) {
-          console.log(
+          /* console.log(
             `${level} width: ${headingSizes[idx].width} and height: ${headingSizes[idx].height}`,
           );
           console.log(
             `compared to h${i + 1} width: ${headingSizes[i].width} and height: ${headingSizes[i].height}`,
-          );
-
+          ); */
           expect(headingSizes[idx].width).toBeGreaterThanOrEqual(headingSizes[i].width);
           expect(headingSizes[idx].height).toBeGreaterThanOrEqual(headingSizes[i].height);
         }
