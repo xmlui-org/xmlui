@@ -39,6 +39,8 @@ import {
   TextAreaDriver,
   TextBoxDriver,
   TextDriver,
+  ValidationDisplayDriver,
+  ValidationSummaryDriver,
   VStackDriver,
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
@@ -200,6 +202,16 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   createFormItemDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(FormItemDriver, testIdOrLocator);
+    });
+  },
+  createValidationSummaryDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ValidationSummaryDriver, testIdOrLocator);
+    });
+  },
+  createValidationDisplayDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(ValidationDisplayDriver, testIdOrLocator);
     });
   },
   createSplitterDriver: async ({ createDriver }, use) => {
@@ -365,6 +377,8 @@ type TestDriverExtenderProps = {
   createAvatarDriver: ComponentDriverMethod<AvatarDriver>;
   createFormDriver: ComponentDriverMethod<FormDriver>;
   createFormItemDriver: ComponentDriverMethod<FormItemDriver>;
+  createValidationSummaryDriver: ComponentDriverMethod<ValidationSummaryDriver>;
+  createValidationDisplayDriver: ComponentDriverMethod<ValidationDisplayDriver>;
   createSplitterDriver: ComponentDriverMethod<SplitterDriver>;
   createMarkdownDriver: ComponentDriverMethod<MarkdownDriver>;
   createItemsDriver: ComponentDriverMethod<ItemsDriver>;

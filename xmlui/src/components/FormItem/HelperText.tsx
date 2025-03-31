@@ -27,6 +27,7 @@ export const HelperText = ({ text = "", status, style }: Props) => {
 
   return (
     <div
+      data-validation-status={status}
       style={style}
       className={classnames(styles.helper, {
         [styles.valid]: status === "valid",

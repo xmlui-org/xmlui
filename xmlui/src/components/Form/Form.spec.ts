@@ -3,13 +3,9 @@ import { labelPositionValues } from "../abstractions";
 import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
-// TODO: evaluate and add tests from 'conditional-field-in-form-submit.spec.ts',
-// as well as other places that may be relevant
-
 // --- Smoke
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
-
   test("renders component", async ({ initTestBed, createFormDriver }) => {
     await initTestBed(`<Form />`);
     await expect((await createFormDriver()).component).toBeAttached();
@@ -32,7 +28,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       },
     );
     const driver = await createFormDriver();
-    await driver.submitForm()
+    await driver.submitForm();
 
     const request = await driver.getSubmitResponse("/test");
     expect(request.ok()).toEqual(true);
@@ -50,19 +46,16 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 
   // --- $data
 
-  test(
-    "$data is correctly bound to form data",
-    async ({ initTestBed, createButtonDriver }) => {
-      await initTestBed(`
+  test("$data is correctly bound to form data", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`
         <Form data="{{ field: 'test' }}">
           <FormItem label="testField" bindTo="field">
             <Button testId="custom" label="{$data.field}" />
           </FormItem>
         </Form> `);
-      const driver = await createButtonDriver("custom");
-      await expect(driver.component).toHaveExplicitLabel("test");
-    },
-  );
+    const driver = await createButtonDriver("custom");
+    await expect(driver.component).toHaveExplicitLabel("test");
+  });
 
   test(
     "$data is correctly undefined if data is not set in props",
@@ -78,6 +71,36 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       await expect(driver.component).toHaveExplicitLabel(undefined);
     },
   );
+
+  // --- --- enabled
+
+  test.skip(
+    "Form buttons and contained FormItems are enabled",
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ initTestBed }) => {},
+  );
+
+  test.skip(
+    "Form buttons and contained FormItems are disabled",
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ initTestBed }) => {},
+  );
+
+  // --- --- submit
+
+  test("submit only triggers when enabled", async ({ initTestBed, createFormDriver }) => {
+    const { testStateDriver } = await initTestBed(
+      `
+      <Form enabled="false" data="{{ name: 'John' }}" onSubmit="testState = true">
+        <FormItem bindTo="name" />
+      </Form>`,
+    );
+    const driver = await createFormDriver();
+    await expect(driver.getSubmitButton()).toBeDisabled();
+
+    await driver.submitForm("keypress");
+    await expect.poll(testStateDriver.testState).toEqual(null);
+  });
 });
 
 // --- Testing
@@ -149,20 +172,6 @@ test.skip(
   async ({ initTestBed }) => {},
 );
 
-// --- --- enabled
-
-test.skip(
-  "Form buttons and contained FormItems are enabled",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
-
-test.skip(
-  "Form buttons and contained FormItems are disabled",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
-
 // --- --- data
 
 test("data accepts an object", async ({ initTestBed, createFormItemDriver }) => {
@@ -196,36 +205,27 @@ test(`data accepts empty array`, async ({ initTestBed, createFormDriver }) => {
 });
 
 // TODO
-test.fixme(
-  "data accepts relative URL endpoint",
-  SKIP_REASON.TEST_NOT_WORKING(`
-    Fails with CI mode, but otherwise works.
-
-    npm run build:test-bed;
-    CI=true npm run test:e2e
-    `),
-  async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(
-      `
+test.fixme("data accepts relative URL endpoint", async ({ initTestBed, createFormItemDriver }) => {
+  await initTestBed(
+    `
       <Form data="/test">
         <FormItem testId="inputField" bindTo="name" />
       </Form>`,
-      {
-        apiInterceptor: {
-          operations: {
-            test: {
-              url: "/test",
-              method: "get",
-              handler: `return { name: 'John' };`,
-            },
+    {
+      apiInterceptor: {
+        operations: {
+          test: {
+            url: "/test",
+            method: "get",
+            handler: `return { name: 'John' };`,
           },
         },
       },
-    );
-    const driver = await createFormItemDriver("inputField");
-    await expect(driver.component).toHaveValue("John");
-  },
-);
+    },
+  );
+  const driver = await createFormItemDriver("inputField");
+  await expect(driver.component).toHaveValue("John");
+});
 
 // TODO
 test.fixme(
@@ -296,10 +296,7 @@ test.skip(
 
 // --- submitUrl
 
-// Fails with CI mode, but otherwise works
-// npm run build:test-bed;
-// CI=true npm run test:e2e
-test.fixme("form submits to correct url", async ({ initTestBed, createFormDriver }) => {
+test("form submits to correct url", async ({ initTestBed, createFormDriver }) => {
   const endpoint = "/test";
   await initTestBed(
     `
@@ -320,6 +317,7 @@ test.fixme("form submits to correct url", async ({ initTestBed, createFormDriver
   );
   const driver = await createFormDriver();
 
+  await driver.submitForm();
   const response = await driver.getSubmitResponse(endpoint);
   expect(response.ok()).toBe(true);
   expect(new URL(response.url()).pathname).toBe(endpoint);
@@ -410,20 +408,6 @@ test("submit triggers when pressing Enter", async ({ initTestBed, createFormDriv
   expect(request.failure()).toBeNull();
 });
 
-test("submit only triggers when enabled", async ({ initTestBed, createFormDriver }) => {
-  const { testStateDriver } = await initTestBed(
-    `
-    <Form enabled="false" data="{{ name: 'John' }}" onSubmit="testState = true">
-      <FormItem bindTo="name" />
-    </Form>`,
-  );
-  const driver = await createFormDriver();
-  await expect(driver.getSubmitButton()).toBeDisabled();
-
-  await driver.submitForm("keypress");
-  await expect.poll(testStateDriver.testState).toEqual(null);
-});
-
 test("user cannot submit with clientside errors present", async ({
   initTestBed,
   createFormDriver,
@@ -452,29 +436,146 @@ test.skip(
 
 // --- backend validation summary
 
-test.skip(
-  "submitting with errors shows validation summary",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+const errorDisplayInterceptor: ApiInterceptorDefinition = {
+  initialize: `
+    $state.items = {
+      [10]: { name: "Smith", id: 10 }
+    };
+    $state.currentId = 10;
+  `,
+  operations: {
+    "no-validation-error": {
+      url: "/no-validation-error",
+      method: "post",
+      handler: `return true;`,
+    },
+    "general-validation-error": {
+      url: "/general-validation-error",
+      method: "post",
+      handler: `
+        throw Errors.HttpError(404,
+          {
+            message: "General error message from the backend",
+            issues: [
+              { message: "Error for the whole form", severity: "error" },
+              { message: "Warning for the whole form", severity: "warning" },
+            ]
+          }
+        );
+      `,
+    },
+    "field-validation-error": {
+      url: "/field-validation-error",
+      method: "post",
+      handler: `
+        throw Errors.HttpError(404,
+          {
+            message: "Field error message from the backend",
+            issues: [
+              { field: "test", message: "Display warning", severity: "warning" },
+            ]
+          }
+        );
+      `,
+    },
+  },
+};
 
-test.skip(
-  "submitting without errors does not show summary",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("submitting with errors shows validation summary", async ({
+  initTestBed,
+  createFormDriver,
+}) => {
+  await initTestBed(`<Form submitUrl="/general-validation-error" submitMethod="post" />`, {
+    apiInterceptor: errorDisplayInterceptor,
+  });
+  const driver = await createFormDriver();
+  await driver.submitForm();
+  await expect(await driver.getValidationSummary()).toBeVisible();
+});
 
-test.skip(
-  "general error messages are rendered in the summary",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("submitting without errors does not show summary", async ({
+  initTestBed,
+  createFormDriver,
+}) => {
+  await initTestBed(`<Form submitUrl="/no-validation-error" submitMethod="post" />`, {
+    apiInterceptor: errorDisplayInterceptor,
+  });
+  const driver = await createFormDriver();
+  await driver.submitForm();
+  await expect(await driver.getValidationSummary()).not.toBeVisible();
+});
 
-test.skip(
-  "field-related errors are rendered at the correct FormItems",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("general error messages are rendered in the summary", async ({
+  initTestBed,
+  createFormDriver,
+  createValidationDisplayDriver,
+}) => {
+  await initTestBed(`<Form submitUrl="/general-validation-error" submitMethod="post" />`, {
+    apiInterceptor: errorDisplayInterceptor,
+  });
+  const formDriver = await createFormDriver();
+  await formDriver.submitForm();
+
+  // TODO: strip this down -> it's verbose but hard to read
+  const warningDisplay = await createValidationDisplayDriver(
+    await formDriver.getValidationDisplaysBySeverity("warning"),
+  );
+  const errorDisplay = await createValidationDisplayDriver(
+    await formDriver.getValidationDisplaysBySeverity("error"),
+  );
+
+  expect(await warningDisplay.getText()).toContain("Warning for the whole form");
+  expect(await errorDisplay.getText()).toContain("Error for the whole form");
+});
+
+test("field-related errors are rendered at FormItems", async ({
+  initTestBed,
+  createFormDriver,
+  createFormItemDriver,
+}) => {
+  await initTestBed(
+    `
+      <Form submitUrl="/field-validation-error" submitMethod="post">
+        <FormItem testId="testField" bindTo="test" label="test" />
+      </Form>`,
+    {
+      apiInterceptor: errorDisplayInterceptor,
+    },
+  );
+  const formDriver = await createFormDriver();
+  const fieldDriver = await createFormItemDriver("testField");
+
+  await formDriver.submitForm();
+  await expect(await fieldDriver.getValidationStatusIndicator()).toHaveAttribute(
+    fieldDriver.validationStatusTag,
+    "warning",
+  );
+});
+
+test("field-related errors map to correct FormItems", async ({
+  initTestBed,
+  createFormDriver,
+  createFormItemDriver,
+}) => {
+  await initTestBed(
+    `
+      <Form submitUrl="/field-validation-error" submitMethod="post">
+        <FormItem testId="testField" bindTo="test" label="test" />
+        <FormItem testId="testField2" bindTo="test2" label="test2" />
+      </Form>`,
+    {
+      apiInterceptor: errorDisplayInterceptor,
+    },
+  );
+  const formDriver = await createFormDriver();
+  const fieldDriver = await createFormItemDriver("testField");
+
+  await formDriver.submitForm();
+  await expect(await fieldDriver.getValidationStatusIndicator()).toHaveAttribute(
+    fieldDriver.validationStatusTag,
+    "warning",
+  );
+});
 
 test.skip(
   "field-related errors disappear if user updates FormItems",

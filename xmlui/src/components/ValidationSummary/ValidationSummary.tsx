@@ -5,9 +5,13 @@ import classnames from "classnames";
 import styles from "./ValidationSummary.module.scss";
 
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
-import type { SingleValidationResult, ValidationResult, ValidationSeverity } from "../Form/FormContext";
+import type {
+  SingleValidationResult,
+  ValidationResult,
+  ValidationSeverity,
+} from "../Form/FormContext";
 import { Stack } from "../Stack/StackNative";
-import {Icon} from "../Icon/IconNative";
+import { Icon } from "../Icon/IconNative";
 import { Text } from "../Text/TextNative";
 import { SpaceFiller } from "../SpaceFiller/SpaceFillerNative";
 import { Button } from "../Button/ButtonNative";
@@ -43,9 +47,21 @@ export function ValidationSummary({
   }, [fieldValidationResults, generalValidationResults]);
 
   return (
-    <div ref={animateContainerRef} className={styles.summaryContainer}>
-      <ValidationDisplay issues={groupedInvalidResults.warning} severity={"warning"} heading={"Validation warnings"} />
-      <ValidationDisplay issues={groupedInvalidResults.error} severity={"error"} heading={"Validation errors"} />
+    <div
+      ref={animateContainerRef}
+      className={styles.summaryContainer}
+      data-validation-summary
+    >
+      <ValidationDisplay
+        issues={groupedInvalidResults.warning}
+        severity={"warning"}
+        heading={"Validation warnings"}
+      />
+      <ValidationDisplay
+        issues={groupedInvalidResults.error}
+        severity={"error"}
+        heading={"Validation errors"}
+      />
     </div>
   );
 }
@@ -59,7 +75,12 @@ type ValidationDisplayProps = {
 
 type ValidationIssue = { field?: string; message: string };
 
-const ValidationDisplay = ({ heading, issues = EMPTY_ARRAY, severity = "error", onClose }: ValidationDisplayProps) => {
+const ValidationDisplay = ({
+  heading,
+  issues = EMPTY_ARRAY,
+  severity = "error",
+  onClose,
+}: ValidationDisplayProps) => {
   const [animateContainerRef] = useAutoAnimate({ duration: 100 });
   if (issues.length === 0) {
     return null;
@@ -73,6 +94,7 @@ const ValidationDisplay = ({ heading, issues = EMPTY_ARRAY, severity = "error", 
         [styles.error]: severity === "error",
       })}
       style={{ paddingTop: !onClose ? "0.5rem" : undefined }}
+      data-validation-display-severity={severity}
     >
       <Stack orientation="horizontal" verticalAlignment="center" style={{ gap: "0.5rem" }}>
         <Icon className={styles.heading} name={severity} size="md" />

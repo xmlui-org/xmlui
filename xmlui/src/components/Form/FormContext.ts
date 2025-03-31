@@ -69,7 +69,7 @@ export const validationSeverityMd: PropertyValueDescription[] = [
   { value: "valid", description: "Visual indicator for an input that is accepted" },
   { value: "warning", description: "Visual indicator for an input that produced a warning" },
   { value: "error", description: "Visual indicator for an input that produced an error" },
-]
+];
 
 export type ValidateEventHandler = ((value: any) => Promise<ValidateFunctionResult>) | undefined;
 

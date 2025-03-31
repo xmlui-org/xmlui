@@ -161,6 +161,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.BACKEND_VALIDATION_ARRIVED: {
+      //console.log(state.validationResults[field]) //action.payload.fieldValidationResults
       state.submitInProgress = false;
       state.generalValidationResults = action.payload.generalValidationResults;
       Object.keys(state.validationResults).forEach((key) => {
@@ -170,6 +171,15 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       });
       Object.entries(action.payload.fieldValidationResults).forEach(
         ([field, singleValidationResults]) => {
+          if (!state.validationResults[field]) {
+            state.validationResults[field] = {
+              isValid: false,
+              validations: [],
+              partial: false,
+              validatedValue: state.subject[field],
+            };
+          }
+          
           state.validationResults[field].validations = [
             ...(state.validationResults[field]?.validations || []),
             ...((singleValidationResults as Array<SingleValidationResult>) || []),
