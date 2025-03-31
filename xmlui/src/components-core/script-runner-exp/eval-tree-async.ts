@@ -87,7 +87,6 @@ export async function evalBindingAsync(
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp | undefined,
-  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<any> {
   // --- Prepare the evaluation context
   const thisStack: any[] = [];
@@ -100,7 +99,6 @@ export async function evalBindingAsync(
     expr,
     evalContext,
     thread ?? evalContext.mainThread!,
-    onStatementCompleted,
   );
 }
 
@@ -152,7 +150,6 @@ async function evalBindingExpressionTreeAsync(
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp,
-  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<any> {
   if (!evalContext.options) {
     evalContext.options = { defaultToOptionalMemberAccess: true };
@@ -172,7 +169,6 @@ async function evalBindingExpressionTreeAsync(
           expr,
           evalContext,
           thread,
-          onStatementCompleted,
         );
 
       case T_LITERAL:
@@ -215,7 +211,6 @@ async function evalBindingExpressionTreeAsync(
           expr,
           evalContext,
           thread,
-          onStatementCompleted,
         );
 
       case T_ASSIGNMENT_EXPRESSION:
@@ -235,7 +230,6 @@ async function evalBindingExpressionTreeAsync(
           expr,
           evalContext,
           thread,
-          onStatementCompleted,
         );
 
       case T_FUNCTION_INVOCATION_EXPRESSION:
@@ -400,10 +394,6 @@ async function evalUnaryAsync(
 ): Promise<any> {
   await evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
-  if (expr.op !== "delete") {
-    const operand = await completePromise(getExprValue(expr.expr, thread));
-    setExprValue(expr.expr, { value: operand }, thread);
-  }
   return evalUnaryCore(expr, thisStack, evalContext, thread);
 }
 
@@ -488,7 +478,6 @@ async function evalPreOrPostAsync(
   expr: PrefixOpExpression | PostfixOpExpression,
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThreadExp,
-  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<any> {
   const rootScope = getRootIdScope(expr.expr, evalContext, thread);
   const updatesState = rootScope && rootScope.type !== "block";

@@ -213,7 +213,7 @@ export const Container = memo(
             statements = [
               {
                 type: T_ARROW_EXPRESSION_STATEMENT,
-                expr: cloneDeep(source), //TODO illesg (talk it through why we need to deep clone, it it's omitted, it gets slower every time we run it)
+                expr: source, //TODO illesg (talk it through why we need to deep clone, it it's omitted, it gets slower every time we run it)
               } as ArrowExpressionStatement,
             ];
           }
@@ -379,9 +379,7 @@ export const Container = memo(
         if (!fnsRef.current[uid]?.[fnCacheKey]) {
           fnsRef.current[uid] = fnsRef.current[uid] || {};
           fnsRef.current[uid][fnCacheKey] = memoizeOne((arrowExpression) => {
-            // console.log('busting sync callback cache', arrowExpression);
             return (...eventArgs: any[]) => {
-              // console.log("calling sync callback", arrowExpression);
               return runCodeSync(arrowExpression, ...eventArgs);
             };
           });
