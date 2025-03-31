@@ -4,8 +4,8 @@ import { isPlainObject } from "lodash-es";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 
-import { parseParameterString } from "../script-runner-exp/ParameterParser";
-import { evalBinding } from "../script-runner-exp/eval-tree-sync";
+import { parseParameterString } from "../script-runner/ParameterParser";
+import { evalBinding } from "../script-runner/eval-tree-sync";
 import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 

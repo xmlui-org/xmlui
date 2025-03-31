@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { evalBindingExpression } from "../../../src/components-core/script-runner/eval-tree-sync";
 import { createEvalContext } from "./test-helpers";
 
-describe("Evaluate prefix/postfix expressions", () => {
+describe("Evaluate prefix/postfix expressions (exp)", () => {
   const prePostCases1 = [
     { src: "++x", ctx: { x: 0 }, exp: 1, varExp: 1 },
     { src: "--x", ctx: { x: 0 }, exp: -1, varExp: -1 },

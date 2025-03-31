@@ -42,9 +42,9 @@ import {
   RegisterComponentApiFnInner,
 } from "../rendering/ContainerWrapper";
 import { useDebugView } from "../DebugViewProvider";
-import { BindingTreeEvaluationContext } from "../script-runner-exp/BindingTreeEvaluationContext";
-import { processStatementQueueAsync } from "../script-runner-exp/process-statement-async";
-import { processStatementQueue } from "../script-runner-exp/process-statement-sync";
+import { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
+import { processStatementQueueAsync } from "../script-runner/process-statement-async";
+import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { extractParam, shouldKeep } from "../utils/extractParam";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
 import { useEvent, generatedId, capitalizeFirstLetter, delay } from "../utils/misc";

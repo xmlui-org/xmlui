@@ -4,7 +4,7 @@ import { processStatementQueue } from "../../../src/components-core/script-runne
 import { createEvalContext, parseStatements } from "./test-helpers";
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 
-describe("Process implicit context", () => {
+describe("Process implicit context (exp)", () => {
   it("Implicit context #1", async () => {
     // --- Arrange
     const source = "x = Impl.myCalc(23);";

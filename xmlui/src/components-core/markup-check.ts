@@ -1,6 +1,6 @@
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
-import { parseParameterString } from "./script-runner-exp/ParameterParser";
+import { parseParameterString } from "./script-runner/ParameterParser";
 import { Parser } from "../parsers/scripting-exp/Parser";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { viewportSizeNames } from "../components/abstractions";

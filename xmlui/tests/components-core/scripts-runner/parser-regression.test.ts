@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { Parser } from "../../../src/parsers/scripting/Parser";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
 import { evalBinding } from "../../../src/components-core/script-runner/eval-tree-sync";
 import { createEvalContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
 
-describe("Parser - regression", () => {
+describe("Parser - regression (exp)", () => {
   it("Function call: 'true.toString()'", () => {
     // --- Arrange
     const wParser = new Parser("true.toString()");

@@ -4,7 +4,7 @@ import { processStatementQueueAsync } from "../../../src/components-core/script-
 import {createEvalContext, parseStatements} from "./test-helpers";
 import { processStatementQueue } from "../../../src/components-core/script-runner/process-statement-sync";
 
-describe("Process functions", () => {
+describe("Process functions (exp)", () => {
   it("Function async #1", async () => {
     // --- Arrange
     const source = `

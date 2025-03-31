@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { evalBindingExpression } from "../../../src/components-core/script-runner/eval-tree-sync";
 import {createEvalContext} from "./test-helpers";
 
-describe("Evaluate arrow expressions", () => {
+describe("Evaluate arrow expressions (exp)", () => {
   it("Arrow #1", () => {
     // --- Arrange
     const source = "(x => 2 * x)(4)";

@@ -53,7 +53,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements();
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts?.length).equal(0);
   });
 
@@ -65,7 +64,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_EMPTY_STATEMENT);
   });
@@ -78,7 +76,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(2);
     expect(stmts[0].type).equal(T_EMPTY_STATEMENT);
     expect(stmts[1].type).equal(T_EMPTY_STATEMENT);
@@ -113,7 +110,6 @@ describe("Parser - statements", () => {
       const stmts = wParser.parseStatements();
 
       // --- Assert
-      expect(isDeepFrozen(stmts)).equal(true);
       expect(stmts?.length).equal(1);
       expect(stmts?.[0].type).equal(T_EXPRESSION_STATEMENT);
       const exprStmt = stmts?.[0] as ExpressionStatement;
@@ -129,7 +125,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_LET_STATEMENT);
     const letStmt = stmts[0] as LetStatement;
@@ -208,7 +203,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_CONST_STATEMENT);
     const constStmt = stmts[0] as ConstStatement;
@@ -243,7 +237,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_VAR_STATEMENT);
     const constStmt = stmts[0] as VarStatement;
@@ -261,7 +254,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_VAR_STATEMENT);
     const constStmt = stmts[0] as VarStatement;
@@ -282,7 +274,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
@@ -297,7 +288,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
@@ -313,7 +303,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
@@ -329,7 +318,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
@@ -345,7 +333,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
@@ -362,7 +349,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
@@ -383,7 +369,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
@@ -400,7 +385,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
@@ -417,7 +401,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
@@ -434,7 +417,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
@@ -451,7 +433,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
@@ -468,7 +449,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
@@ -485,7 +465,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_RETURN_STATEMENT);
     const returnStmt = stmts[0] as ReturnStatement;
@@ -500,7 +479,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_RETURN_STATEMENT);
     const returnStmt = stmts[0] as ReturnStatement;
@@ -515,7 +493,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_BREAK_STATEMENT);
   });
@@ -528,7 +505,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_CONTINUE_STATEMENT);
   });
@@ -541,7 +517,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_WHILE_STATEMENT);
     const whileStmt = stmts[0] as WhileStatement;
@@ -557,7 +532,6 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_WHILE_STATEMENT);
     const whileStmt = stmts[0] as WhileStatement;
@@ -573,7 +547,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_WHILE_STATEMENT);
     const whileStmt = stmts[0] as WhileStatement;
@@ -593,7 +567,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_DO_WHILE_STATEMENT);
     const whileStmt = stmts[0] as DoWhileStatement;
@@ -609,7 +583,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_DO_WHILE_STATEMENT);
     const whileStmt = stmts[0] as DoWhileStatement;
@@ -625,7 +599,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_DO_WHILE_STATEMENT);
     const whileStmt = stmts[0] as DoWhileStatement;
@@ -645,7 +619,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
@@ -663,7 +637,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
@@ -681,7 +655,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
@@ -699,7 +673,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
@@ -717,7 +691,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
@@ -749,7 +723,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
@@ -767,7 +741,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
@@ -785,7 +759,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_THROW_STATEMENT);
     const throwStmt = stmts[0] as ThrowStatement;
@@ -800,7 +774,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_TRY_STATEMENT);
     const tryStmt = stmts[0] as TryStatement;
@@ -818,7 +792,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_TRY_STATEMENT);
     const tryStmt = stmts[0] as TryStatement;
@@ -836,7 +810,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_TRY_STATEMENT);
     const tryStmt = stmts[0] as TryStatement;
@@ -854,7 +828,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_TRY_STATEMENT);
     const tryStmt = stmts[0] as TryStatement;
@@ -872,7 +846,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_TRY_STATEMENT);
     const tryStmt = stmts[0] as TryStatement;
@@ -890,7 +864,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -908,7 +882,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -930,7 +904,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -953,7 +927,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -977,7 +951,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -1004,7 +978,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -1032,7 +1006,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -1061,7 +1035,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -1093,7 +1067,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -1125,7 +1099,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -1157,7 +1131,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -1192,7 +1166,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
@@ -1242,7 +1216,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
@@ -1260,7 +1234,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
@@ -1292,7 +1266,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
@@ -1324,7 +1298,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
@@ -1342,7 +1316,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
@@ -1360,7 +1334,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
@@ -1378,7 +1352,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
@@ -1396,7 +1370,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
@@ -1428,7 +1402,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
@@ -1460,7 +1434,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
@@ -1478,7 +1452,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
@@ -1496,7 +1470,7 @@ describe("Parser - statements", () => {
     const stmts = wParser.parseStatements()!;
 
     // --- Assert
-    expect(isDeepFrozen(stmts)).equal(true);
+
     expect(stmts.length).equal(1);
     expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
@@ -1506,12 +1480,3 @@ describe("Parser - statements", () => {
     expect(forStmt.body.type).equal(T_BLOCK_STATEMENT);
   });
 });
-
-function isDeepFrozen(obj: any): any {
-  return (
-    Object.isFrozen(obj) &&
-    (obj === null ||
-      obj === undefined ||
-      Object.keys(obj).every((prop) => typeof obj[prop] !== "object" || isDeepFrozen(obj[prop])))
-  );
-}

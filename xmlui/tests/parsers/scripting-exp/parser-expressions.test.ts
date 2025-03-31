@@ -47,7 +47,6 @@ describe("Parser - miscellaneous expressions", () => {
       expect(expr).not.equal(null);
       if (!expr) return;
 
-      expect(isDeepFrozen(expr)).equal(true);
       expect(expr.type).equal(T_SEQUENCE_EXPRESSION);
       const sequence = expr as SequenceExpression;
       expect(sequence.exprs.length).equal(c.len);
@@ -74,7 +73,6 @@ describe("Parser - miscellaneous expressions", () => {
       // --- Assert
       expect(expr).not.equal(null);
       if (!expr) return;
-      expect(isDeepFrozen(expr)).equal(true);
       expect(expr.type).equal(T_FUNCTION_INVOCATION_EXPRESSION);
       const invocation = expr as FunctionInvocationExpression;
       expect(invocation.obj.type).equal(T_IDENTIFIER);
@@ -108,7 +106,6 @@ describe("Parser - miscellaneous expressions", () => {
       // --- Assert
       expect(expr).not.equal(null);
       if (!expr) return;
-      expect(isDeepFrozen(expr)).equal(true);
       expect(expr.type).equal(T_FUNCTION_INVOCATION_EXPRESSION);
       const invocation = expr as FunctionInvocationExpression;
       expect(invocation.obj.type).equal(c.exp);
@@ -137,7 +134,6 @@ describe("Parser - miscellaneous expressions", () => {
       // --- Assert
       expect(expr).not.equal(null);
       if (!expr) return;
-      expect(isDeepFrozen(expr)).equal(true);
       expect(expr.type).equal(T_MEMBER_ACCESS_EXPRESSION);
       const memberAcc = expr as MemberAccessExpression;
       expect(memberAcc.member).eq("b");
@@ -160,7 +156,6 @@ describe("Parser - miscellaneous expressions", () => {
       // --- Assert
       expect(expr).not.equal(null);
       if (!expr) return;
-      expect(isDeepFrozen(expr)).equal(true);
       expect(expr.type).equal(T_SPREAD_EXPRESSION);
       const spread = expr as SpreadExpression;
       expect(spread.expr.type).equal(c.exp);
@@ -184,7 +179,6 @@ describe("Parser - miscellaneous expressions", () => {
       // --- Assert
       expect(expr).not.equal(null);
       if (!expr) return;
-      expect(isDeepFrozen(expr)).equal(true);
       expect(expr.type).equal(T_PREFIX_OP_EXPRESSION);
       const prefixExpr = expr as PrefixOpExpression;
       expect(prefixExpr.expr.type).equal(c.exp);
@@ -209,7 +203,6 @@ describe("Parser - miscellaneous expressions", () => {
       // --- Assert
       expect(expr).not.equal(null);
       if (!expr) return;
-      expect(isDeepFrozen(expr)).equal(true);
       expect(expr.type).equal(T_POSTFIX_OP_EXPRESSION);
       const postfixExpr = expr as PostfixOpExpression;
       expect(postfixExpr.expr.type).equal(c.exp);
@@ -218,11 +211,3 @@ describe("Parser - miscellaneous expressions", () => {
   });
 });
 
-function isDeepFrozen(obj: any): any {
-  return (
-    Object.isFrozen(obj) &&
-    (obj === null ||
-      obj === undefined ||
-      Object.keys(obj).every((prop) => typeof obj[prop] !== "object" || isDeepFrozen(obj[prop])))
-  );
-}

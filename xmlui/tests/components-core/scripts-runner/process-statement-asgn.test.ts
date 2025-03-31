@@ -4,7 +4,7 @@ import { processStatementQueueAsync } from "../../../src/components-core/script-
 import { processStatementQueue } from "../../../src/components-core/script-runner/process-statement-sync";
 import { createEvalContext, parseStatements } from "./test-helpers";
 
-describe("Process statements - assignments", () => {
+describe("Process statements - assignments (exp)", () => {
   const asgnOps = [
     "=",
     "+=",

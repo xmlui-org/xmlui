@@ -20,12 +20,12 @@ import {
   type Identifier,
   type Statement,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
-import type { QueueInfo } from "../script-runner-exp/statement-queue";
-import type { BindingTreeEvaluationContext } from "../script-runner-exp/BindingTreeEvaluationContext";
+import type { QueueInfo } from "../script-runner/statement-queue";
+import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
 
 import { Parser } from "../../parsers/scripting-exp/Parser";
-import { processStatementQueueAsync } from "../script-runner-exp/process-statement-async";
+import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { reportEngineError } from "../reportEngineError";
 import { ScriptParseError } from "../EngineError";
 

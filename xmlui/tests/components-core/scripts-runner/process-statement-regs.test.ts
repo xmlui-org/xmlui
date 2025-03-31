@@ -4,7 +4,7 @@ import { processStatementQueueAsync } from "../../../src/components-core/script-
 import { processStatementQueue } from "../../../src/components-core/script-runner/process-statement-sync";
 import { createEvalContext, parseExpression, parseStatements } from "./test-helpers";
 
-describe("Process statements regression", () => {
+describe("Process statements regression (exp)", () => {
   it("while with break #2", async () => {
     // --- Arrange
     const source = "let x = 0; while (true) {x++ ; if (x > 3) break;}; x++";
@@ -570,7 +570,6 @@ describe("Process statements regression", () => {
       statements,
       evalContext,
       evalContext.mainThread,
-      async () => {},
     );
 
     // --- Assert

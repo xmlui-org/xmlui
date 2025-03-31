@@ -2,9 +2,9 @@ import { describe, expect, it, assert } from "vitest";
 
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
-import { ArrowExpressionStatement } from "../../../src/abstractions/scripting/ScriptingSourceTree";
+import { ArrowExpressionStatement, T_ARROW_EXPRESSION, T_ARROW_EXPRESSION_STATEMENT, T_EXPRESSION_STATEMENT } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
-describe("Process statements", () => {
+describe("Process statements (exp)", () => {
   it("Event with arrow function", async () => {
     // --- Arrange
     const source = "(x, y) => 2 * x + y";
@@ -15,16 +15,16 @@ describe("Process statements", () => {
     const statements = parseStatements(source);
     if (
       statements?.length !== 1 ||
-      statements[0].type !== "ExprS" ||
-      statements[0].expression.type !== "ArrowE"
+      statements[0].type !== T_EXPRESSION_STATEMENT ||
+      statements[0].expr.type !== T_ARROW_EXPRESSION
     ) {
       assert.fail("Arrow expression expected");
     }
 
     // --- Act
     const arrowStmt = {
-      type: "ArrowS",
-      expression: statements[0].expression
+      type: T_ARROW_EXPRESSION_STATEMENT,
+      expr: statements[0].expr
     } as ArrowExpressionStatement;
     const diag = await processStatementQueueAsync([arrowStmt], evalContext);
 

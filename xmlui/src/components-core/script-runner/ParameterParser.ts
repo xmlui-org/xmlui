@@ -1,5 +1,5 @@
-import type { Expression } from "../../abstractions/scripting/ScriptingSourceTree";
-import { Parser } from "../../parsers/scripting/Parser";
+import type { Expression } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import { Parser } from "../../parsers/scripting-exp/Parser";
 
 /**
  * This function parses a parameter string and splits them into string literal and binding expression sections

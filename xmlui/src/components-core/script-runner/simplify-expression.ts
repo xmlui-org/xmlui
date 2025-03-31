@@ -49,7 +49,6 @@ import {
   T_FUNCTION_DECLARATION,
   T_LITERAL,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
-import { deepFreeze } from "../../parsers/common/utils";
 
 export function simplifyExpression(expr?: Expression): Expression | undefined {
   let orig = expr;
@@ -145,7 +144,7 @@ export function simplifyExpression(expr?: Expression): Expression | undefined {
 function simplifyExpressionList(exprs: Expression[]): Expression[] {
   const newExprList = exprs.map(simplifyExpression);
   const isUpdated = newExprList.some((expr, i) => expr !== exprs[i]);
-  return isUpdated ? deepFreeze(newExprList) : exprs;
+  return isUpdated ? newExprList : exprs;
 }
 
 export function simplifyStatement(stmt?: Statement): Statement | undefined {
@@ -247,7 +246,7 @@ function simplifyStatementList(stmts?: Statement[]): Statement[] | undefined {
   if (!stmts) return stmts;
   const newStmtList = stmts.map(simplifyStatement);
   const isUpdated = newStmtList.some((stmt, i) => stmt !== stmts[i]);
-  return isUpdated ? deepFreeze(newStmtList) : stmts;
+  return isUpdated ? newStmtList : stmts;
 }
 
 function simplifyDestructure(destr: ArrayDestructure | ObjectDestructure): ArrayDestructure | ObjectDestructure {
@@ -257,11 +256,11 @@ function simplifyDestructure(destr: ArrayDestructure | ObjectDestructure): Array
     newArrayDestr?.some((destr, i) => destr !== destr.aDestr![i]) ||
     newObjectDestr?.some((destr, i) => destr !== destr.oDestr![i]);
   return isUpdated
-    ? deepFreeze({
+    ? {
         ...destr,
         aDestr: newArrayDestr,
         oDestr: newObjectDestr,
-      })
+      } as any
     : destr;
 }
 
@@ -274,19 +273,19 @@ function simplifyVarDeclaration(destr: VarDeclaration): VarDeclaration {
     newObjectDestr?.some((destr, i) => destr !== destr.oDestr![i]) ||
     newEpr !== destr.expr;
   return isUpdated
-    ? deepFreeze({
+    ? {
         ...destr,
         aDestr: newArrayDestr,
         oDestr: newObjectDestr,
         expr: newEpr,
-      })
+      } as any
     : destr;
 }
 
 function simplifyVarDeclarationList(decls: VarDeclaration[]): VarDeclaration[] {
   const newDeclList = decls.map(simplifyVarDeclaration);
   const isUpdated = newDeclList.some((decl, i) => decl !== decls[i]);
-  return isUpdated ? deepFreeze(newDeclList) : decls;
+  return isUpdated ? newDeclList : decls;
 }
 
 function simplifyObjectLiteral(obj: ObjectLiteral): ObjectLiteral {
@@ -294,7 +293,7 @@ function simplifyObjectLiteral(obj: ObjectLiteral): ObjectLiteral {
     if (Array.isArray(prop)) {
       const prop0 = simplifyExpression(prop[0]);
       const prop1 = simplifyExpression(prop[1]);
-      return prop0 !== prop[0] || prop1 !== prop[1] ? deepFreeze([prop0, prop1]) : prop;
+      return prop0 !== prop[0] || prop1 !== prop[1] ? [prop0, prop1] : prop;
     } else {
       return {
         ...prop,
@@ -303,17 +302,17 @@ function simplifyObjectLiteral(obj: ObjectLiteral): ObjectLiteral {
     }
   });
   const isUpdated = newProps.some((prop, i) => prop !== obj.props[i]);
-  return isUpdated ? deepFreeze({ ...obj, props: newProps }) : obj;
+  return isUpdated ? { ...obj, props: newProps } as any : obj;
 }
 
 function updateExpr<T extends Expression>(expr: T, props: Partial<T>): T {
   const isUpdated = Object.keys(props).some((key: any) => (expr as any)[key] !== (props as any)[key]);
-  return isUpdated ? deepFreeze({ ...expr, ...props }) : expr;
+  return isUpdated ? { ...expr, ...props } as any : expr;
 }
 
 function updateStmt<T extends Statement>(stmt: T, props: Partial<T>): T {
   const isUpdated = Object.keys(props).some((key: any) => (stmt as any)[key] !== (props as any)[key]);
-  return isUpdated ? deepFreeze({ ...stmt, ...props }) : stmt;
+  return isUpdated ? { ...stmt, ...props } as any : stmt;
 }
 
 function simplifyUnaryExpression(unary: UnaryExpression): Expression {
@@ -338,7 +337,7 @@ function simplifyUnaryExpression(unary: UnaryExpression): Expression {
       // --- Intentionally ignored. In case of error, we keep the original value
     }
     if (newValue !== unary.expr.value) {
-      return deepFreeze({ type: "LitE", value: newValue });
+      return { type: "LitE", value: newValue } as any;
     }
   }
   return unary;
@@ -420,7 +419,7 @@ function simplifyBinaryExpression(binary: BinaryExpression): Expression {
       // --- Intentionally ignored. In case of error, we keep the original value
     }
     if (newValue !== undefined) {
-      return deepFreeze({ type: T_LITERAL, value: newValue });
+      return { type: T_LITERAL, value: newValue } as any;
     }
   } else if (binary.op === "+" && binary.left.type === T_LITERAL && binary.left.value === 0) {
     return binary.right;
@@ -433,9 +432,9 @@ function simplifyBinaryExpression(binary: BinaryExpression): Expression {
   } else if (binary.op === "*" && binary.right.type === T_LITERAL && binary.right.value === 1) {
     return binary.left;
   } else if (binary.op === "*" && binary.right.type === T_LITERAL && binary.right.value === 0) {
-    return deepFreeze({ type: "LitE", value: 0 });
+    return { type: "LitE", value: 0 } as any;
   } else if (binary.op === "*" && binary.left.type === T_LITERAL && binary.left.value === 0) {
-    return deepFreeze({ type: "LitE", value: 0 });
+    return { type: "LitE", value: 0 } as any;
   } else if (binary.op === "/" && binary.right.type === T_LITERAL && binary.right.value === 1) {
     return binary.left;
   }

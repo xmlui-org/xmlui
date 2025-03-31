@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { evalBindingAsync } from "../../../src/components-core/script-runner/eval-tree-async";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
 import {createEvalContext} from "./test-helpers";
-import { Parser } from "../../../src/parsers/scripting/Parser";
 
-describe("Evaluate arrow expressions", () => {
+describe("Evaluate arrow expressions (epx)", () => {
   it("Arrow #1", async () => {
     // --- Arrange
     const source = "(x => 2 * x)(4)";

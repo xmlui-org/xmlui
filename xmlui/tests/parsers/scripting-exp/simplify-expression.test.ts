@@ -4,7 +4,7 @@ import { Identifier, Literal } from "../../../src/abstractions/scripting/Scripti
 import {
   simplifyExpression,
   simplifyStatement,
-} from "../../../src/components-core/script-runner-exp/simplify-expression";
+} from "../../../src/components-core/script-runner/simplify-expression";
 
 describe("Parser - simplify expression", () => {
   const exprNoUpdateCases = [

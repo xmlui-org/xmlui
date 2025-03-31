@@ -3,7 +3,7 @@ import { describe, expect, it, assert } from "vitest";
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
 
-describe("Process try statements", () => {
+describe("Process try statements (exp)", () => {
   it("throw", async () => {
     // --- Arrange
     const source = `

@@ -69,7 +69,6 @@ export function collectCodeBehindFromSource(
       type: T_ARROW_EXPRESSION,
       args: stmt.args.slice(),
       statement: stmt.stmt,
-      // TODO: handle closure context
       // closureContext: obtainClosures({
       //   childThreads: [],
       //   blocks: [{ vars: {} }],

@@ -91,7 +91,6 @@ import {
   T_DESTRUCTURE,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import type { GenericToken } from "../common/GenericToken";
-import { deepFreeze } from "../common/utils";
 import { InputStream } from "../common/InputStream";
 import { Lexer } from "./Lexer";
 import { ParserError, errorMessages } from "./ParserError";
@@ -126,7 +125,7 @@ let lastNodeId = 0;
 
 export function createXmlUiTreeNodeId(): number {
   return ++lastNodeId;
-} 
+}
 
 /**
  * This class parses a binding expression and transforms it into an evaluable expression tree
@@ -213,7 +212,7 @@ export class Parser {
         this.skipToken(TokenType.Semicolon);
       }
     }
-    return deepFreeze(statements);
+    return statements;
   }
 
   /**
@@ -1398,9 +1397,9 @@ export class Parser {
    *   ;
    */
   parseExpr(allowSequence = true): Expression | null {
-    return deepFreeze(
-      allowSequence ? this.parseSequenceExpression() : this.parseCondOrSpreadOrAsgnOrArrowExpr(),
-    );
+    return allowSequence
+      ? this.parseSequenceExpression()
+      : this.parseCondOrSpreadOrAsgnOrArrowExpr();
   }
 
   /**

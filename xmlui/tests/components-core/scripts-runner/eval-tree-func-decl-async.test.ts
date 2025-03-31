@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { evalBindingAsync } from "../../../src/components-core/script-runner/eval-tree-async";
 import {createEvalContext} from "./test-helpers";
-import { Parser } from "../../../src/parsers/scripting/Parser";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
 
-describe("Evaluate function expressions", () => {
+describe("Evaluate function expressions (exp)", () => {
   it("Funcion decl #1", async () => {
     // --- Arrange
     const source = "(function(x) { return 2 * x })(4)";
