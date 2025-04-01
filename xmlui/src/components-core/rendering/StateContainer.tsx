@@ -28,7 +28,7 @@ import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { useShallowCompareMemoize, useReferenceTrackedApi } from "../utils/hooks";
 import { Container } from "./Container";
-import { PARSED_MARK_PROP } from "../../parsers/scripting-exp/code-behind-collect";
+import { PARSED_MARK_PROP } from "../../parsers/scripting/code-behind-collect";
 import { useAppContext } from "../AppContext";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";

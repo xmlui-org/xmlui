@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { resolveIdentifiers } from "../../../src/components-core/script-runner/id-resolution";
-import { parsePropertyValue } from "../../../src/parsers/scripting-exp/property-parsing";
-import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import { parsePropertyValue } from "../../../src/parsers/scripting/property-parsing";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   T_FUNCTION_DECLARATION,
   T_IDENTIFIER,

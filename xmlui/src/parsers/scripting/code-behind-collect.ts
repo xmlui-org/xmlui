@@ -1,25 +1,24 @@
-import type {
-  ArrowExpression,
-  CodeDeclaration,
-  CollectedDeclarations,
-  Expression,
-  FunctionDeclaration,
-  ScriptModule,
-  Statement,
-} from "../../abstractions/scripting/ScriptingSourceTree";
-import type { ModuleResolver } from "../../abstractions/scripting/modules";
+import {
+  T_ARROW_EXPRESSION,
+  T_FUNCTION_DECLARATION,
+  T_VAR_STATEMENT,
+  type ArrowExpression,
+  type CodeDeclaration,
+  type CollectedDeclarations,
+  type Expression,
+  type FunctionDeclaration,
+  type Statement,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
-import { isModuleErrors, obtainClosures, parseScriptModule } from "./modules";
+import { isModuleErrors, parseScriptModule } from "./modules";
 
 export const PARSED_MARK_PROP = "__PARSED__";
 
 // --- Collect module statements from a parsed module
 export function collectCodeBehindFromSource(
   moduleName: string,
-  source: string,
-  moduleResolver: ModuleResolver,
-  moduleNameResolver: (moduleName: string) => string,
+  source: string
 ): CollectedDeclarations {
   const result: CollectedDeclarations = {
     vars: {},
@@ -27,115 +26,63 @@ export function collectCodeBehindFromSource(
     functions: {},
   };
 
-  const collectedFunctions: Record<
-    string,
-    { collectedImportsFrom: boolean; functions?: Record<string, CodeDeclaration> }
-  > = {};
+  const collectedFunctions: Record<string, CodeDeclaration> = {};
 
   // --- Parse the module (recursively, including imported modules) in restrictive mode
-  const parsedModule = parseScriptModule(moduleName, source, moduleResolver, true);
+  const parsedModule = parseScriptModule(moduleName, source);
   if (isModuleErrors(parsedModule)) {
     return { ...result, moduleErrors: parsedModule };
   }
 
-  const mainModuleResolvedName = moduleNameResolver(parsedModule.name);
-
   // --- Collect statements from the module
   parsedModule.statements.forEach((stmt) => {
     switch (stmt.type) {
-      case "VarS":
-        stmt.declarations.forEach((decl) => {
-          if (decl.id in result.vars) {
-            throw new Error(`Duplicated var declaration: '${decl.id}'`);
+      case T_VAR_STATEMENT:
+        stmt.decls.forEach((decl) => {
+          if (decl.id.name in result.vars) {
+            throw new Error(`Duplicated var declaration: '${decl.id.name}'`);
           }
-          result.vars[decl.id] = {
+          result.vars[decl.id.name] = {
             [PARSED_MARK_PROP]: true,
-            source: decl.expression.source,
-            tree: decl.expression,
+            tree: decl.expr,
           };
         });
         break;
-      case "FuncD":
-        addFunctionDeclaration(mainModuleResolvedName, stmt);
-        break;
-      case "ImportD":
-        // --- Do nothing
+      case T_FUNCTION_DECLARATION:
+        addFunctionDeclaration(stmt);
         break;
       default:
         throw new Error(`'${stmt.type}' is not allowed in a code-behind module.`);
     }
   });
-  collectFuncs(parsedModule);
-
   return result;
 
-  /** TODO: this exposes all the functions that were imported by any imported module
-   * to the root module. Has the effect of imported functions beeing global to the root of the import tree.*/
-  function collectFuncs(currentModule: ScriptModule) {
-    const resolvedModuleName = moduleNameResolver(currentModule.name);
-    if (collectedFunctions?.[resolvedModuleName]?.collectedImportsFrom) {
-      return;
-    }
-    for (const modName in currentModule.imports) {
-      const resolvedImportedModuleName = moduleNameResolver(modName);
-      // if (mainModuleResolvedName === resolvedImportedModuleName) {
-      //   continue;
-      // }
-      const mod = currentModule.imports[modName];
-      for (const obj of Object.values(mod)) {
-        if (obj.type === "FuncD") {
-          addFunctionDeclaration(resolvedImportedModuleName, obj);
-        }
-      }
-    }
-    collectedFunctions[resolvedModuleName] ??= { collectedImportsFrom: true };
-    collectedFunctions[resolvedModuleName].collectedImportsFrom = true;
-    for (let nextModule of currentModule.importedModules) {
-      collectFuncs(nextModule);
-    }
-  }
-
   // --- Collect function declaration data
-  function addFunctionDeclaration(resolvedModuleName: string, stmt: FunctionDeclaration): void {
-    if (collectedFunctions?.[resolvedModuleName]?.functions?.[stmt.name] !== undefined) {
+  function addFunctionDeclaration(stmt: FunctionDeclaration): void {
+    if (collectedFunctions?.[stmt.id.name] !== undefined) {
       return;
     }
-    if (stmt.name in result.functions) {
-      throw new Error(`Duplicated function declaration: '${stmt.name}'`);
+    if (stmt.id.name in result.functions) {
+      throw new Error(`Duplicated function declaration: '${stmt.id.name}'`);
     }
-    const funcSource =
-      stmt.args.length === 1
-        ? `${stmt.args[0].source} => ${stmt.statement.source}`
-        : `(${stmt.args.map((a) => a.source).join(", ")}) => ${stmt.statement.source}`;
     const arrow: ArrowExpression = {
-      type: "ArrowE",
+      type: T_ARROW_EXPRESSION,
       args: stmt.args.slice(),
-      statement: stmt.statement,
-      closureContext: obtainClosures({
-        childThreads: [],
-        blocks: [{ vars: {} }],
-        loops: [],
-        breakLabelValue: -1,
-      }),
+      statement: stmt.stmt,
+      // closureContext: obtainClosures({
+      //   childThreads: [],
+      //   blocks: [{ vars: {} }],
+      //   loops: [],
+      //   breakLabelValue: -1,
+      // }),
     } as ArrowExpression;
 
-    // --- Remove the circular reference from the function to its closure context
-    const functionSelf = arrow.closureContext![0]?.vars?.[stmt.name] as FunctionDeclaration;
-    if (functionSelf?.closureContext) {
-      delete functionSelf.closureContext;
-    }
-
-    collectedFunctions[resolvedModuleName] ??= { functions: {}, collectedImportsFrom: false };
-    collectedFunctions[resolvedModuleName].functions ??= {};
-
-    collectedFunctions[resolvedModuleName].functions[stmt.name] = {
+    collectedFunctions[stmt.id.name] = {
       [PARSED_MARK_PROP]: true,
-      source: funcSource,
       tree: arrow,
     };
-    result.functions[stmt.name] = {
+    result.functions[stmt.id.name] = {
       [PARSED_MARK_PROP]: true,
-      source: funcSource,
       tree: arrow,
     };
   }
@@ -162,15 +109,8 @@ export function removeCodeBehindTokensFromTree(declarations: CollectedDeclaratio
     const nodeVisitor = (before: boolean, visited: Expression | Statement, state: VisitorState) => {
       if (before) {
         if (visited) {
-          delete visited.startPosition;
-          delete visited.endPosition;
-          delete visited.startLine;
-          delete visited.endLine;
-          delete visited.startColumn;
-          delete visited.endColumn;
-          delete visited.startToken;
+          delete visited.startToken
           delete visited.endToken;
-          // delete visited.source;
         }
       }
       return state;

@@ -8,6 +8,48 @@ export class ParserError extends Error {
   }
 }
 
+// Describes the structure of error messages
+export interface ParserErrorMessage {
+  code: ErrorCodes;
+  text: string;
+  position?: number;
+  line?: number;
+  column?: number;
+}
+
+export type ErrorCodes =
+  | "W001"
+  | "W002"
+  | "W003"
+  | "W004"
+  | "W005"
+  | "W006"
+  | "W007"
+  | "W008"
+  | "W009"
+  | "W010"
+  | "W011"
+  | "W012"
+  | "W013"
+  | "W014"
+  | "W015"
+  | "W016"
+  | "W017"
+  | "W018"
+  | "W019"
+  | "W020"
+  | "W021"
+  | "W022"
+  | "W023"
+  | "W024"
+  | "W025"
+  | "W026"
+  | "W027"
+  | "W028"
+  | "W029"
+  | "W030"
+  | "W031";
+
 // Error message type description
 type ErrorText = Record<string, string>;
 
@@ -36,11 +78,11 @@ export const errorMessages: ErrorText = {
   W021: "'{0}' is already exported from the module",
   W022: "Cannot find module '{0}'",
   W023: "Module '{0}' does not export '{1}'",
-  W024: "'function' or 'const' expected",
+  W024: "'function' expected",
   W025: "'from' expected",
   W026: "A string literal expected",
-  W027: "Variables can be declared only in the top level module",
-  W028: "Invalid statement used in a module",
+  W027: "Cannot declare var ('{0}') in an imported module",
+  W028: "Invalid statement used in a module.",
   W029: "An imported module can contain only exported functions",
   W030: "Nested declarations cannot be exported",
   W031: "An identifier in a declaration cannot start with '$'"

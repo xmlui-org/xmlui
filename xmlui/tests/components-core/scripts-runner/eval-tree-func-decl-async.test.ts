@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { evalBindingAsync } from "../../../src/components-core/script-runner/eval-tree-async";
 import {createEvalContext} from "./test-helpers";
-import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 
 describe("Evaluate function expressions (exp)", () => {
   it("Funcion decl #1", async () => {

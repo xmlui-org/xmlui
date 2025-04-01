@@ -3,7 +3,7 @@ import type { Plugin } from "vite";
 import {
   collectCodeBehindFromSource,
   removeCodeBehindTokensFromTree,
-} from "../src/parsers/scripting-exp/code-behind-collect";
+} from "../src/parsers/scripting/code-behind-collect";
 import {
   codeBehindFileExtension,
   componentFileExtension,

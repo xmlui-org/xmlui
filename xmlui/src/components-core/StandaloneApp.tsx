@@ -28,11 +28,11 @@ import {
   codeBehindFileExtension,
   componentFileExtension,
 } from "../parsers/xmlui-parser/fileExtensions";
-import { Parser } from "../parsers/scripting-exp/Parser";
+import { Parser } from "../parsers/scripting/Parser";
 import {
   collectCodeBehindFromSource,
   removeCodeBehindTokensFromTree,
-} from "../parsers/scripting-exp/code-behind-collect";
+} from "../parsers/scripting/code-behind-collect";
 import { ComponentRegistry } from "../components/ComponentProvider";
 import { checkXmlUiMarkup } from "./markup-check";
 import StandaloneExtensionManager from "./StandaloneExtensionManager";

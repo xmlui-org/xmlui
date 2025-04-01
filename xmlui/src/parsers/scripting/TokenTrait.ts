@@ -1,4 +1,4 @@
-import { TokenType } from "../../abstractions/scripting/Token";
+import { TokenType } from "./TokenType";
 
 // Describes the special traits of a token
 type TokenTrait = {
@@ -111,8 +111,6 @@ export const tokenTraits: Record<TokenType, TokenTrait> = {
   [TokenType.Default]: { keywordLike: true },
   [TokenType.Delete]: { expressionStart: true, canBeUnary: true, keywordLike: true },
   [TokenType.Function]: { keywordLike: true, expressionStart: true },
-  [TokenType.Export]: { keywordLike: true },
-  [TokenType.Import]: { keywordLike: true },
   [TokenType.As]: { keywordLike: true },
   [TokenType.From]: { keywordLike: true },
 };

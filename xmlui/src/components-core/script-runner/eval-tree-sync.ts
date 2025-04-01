@@ -43,7 +43,7 @@ import {
   type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import { createXmlUiTreeNodeId, Parser } from "../../parsers/scripting-exp/Parser";
+import { createXmlUiTreeNodeId, Parser } from "../../parsers/scripting/Parser";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { isBannedFunction } from "./bannedFunctions";
 import {

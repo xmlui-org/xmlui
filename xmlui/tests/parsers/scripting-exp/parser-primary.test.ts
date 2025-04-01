@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   Identifier,
   T_BINARY_EXPRESSION,

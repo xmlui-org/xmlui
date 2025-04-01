@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 
 describe("Parser - error cases", () => {
   const issueCases = [

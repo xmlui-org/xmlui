@@ -1,5 +1,5 @@
 import { describe, expect, it, assert } from "vitest";
-import { parsePropertyValue } from "../../../src/parsers/scripting-exp/property-parsing";
+import { parsePropertyValue } from "../../../src/parsers/scripting/property-parsing";
 import {
   CompoundPropertyValue,
   SingleExpressionValue,

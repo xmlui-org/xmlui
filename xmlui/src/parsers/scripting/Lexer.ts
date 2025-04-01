@@ -1,8 +1,10 @@
 import { parseRegExpLiteral } from "@eslint-community/regexpp";
 
-import type { Token } from "../../abstractions/scripting/Token";
-import { TokenType } from "../../abstractions/scripting/Token";
+import type { GenericToken } from "../common/GenericToken";
 import { InputStream } from "../common/InputStream";
+import { TokenType } from "./TokenType";
+
+type Token = GenericToken<TokenType>;
 
 /**
  * This enum indicates the current lexer phase
@@ -48,8 +50,8 @@ enum LexerPhase {
   RealExponent,
   RealExponentSign,
   RealExponentTail,
-  StringTemplateLiteral,
   StringTemplateLiteralBackSlash,
+  StringTemplateLiteral,
   String,
   StringBackSlash,
   StringHexa1,
@@ -103,7 +105,6 @@ export class Lexer {
   private _lastFetchPosition = 0;
 
   private _phaseExternallySet: null | LexerPhase = null;
-
   /**
    * Initializes the tokenizer with the input stream
    * @param input Input source code stream
@@ -173,12 +174,11 @@ export class Lexer {
    */
   getTail(): string {
     return this._ahead.length > 0
-      ? this.input.getTail(this._ahead[0].location.startPosition)
+      ? this.input.getTail(this._ahead[0].startPosition)
       : this.input.getTail(this._lastFetchPosition);
   }
 
-  /**
-   * Parsing template literals requires a context sensitive lexer.
+  /** Parsing template literals requires a context sensitive lexer.
    * This method has to be called by the parser when the lexer needs to scan a string inside a template literal.
    * Call this after the first opening backing and after the parser is done with parsing a placeholder, after the right brace.
    */
@@ -211,7 +211,7 @@ export class Lexer {
     this._lastFetchPosition = this.input.position;
 
     // --- State variables
-    let stringState = null;
+    let stringState: string | null = null;
     let text = "";
     let tokenType = TokenType.Eof;
     let lastEndPos = input.position;
@@ -402,18 +402,6 @@ export class Lexer {
         // ====================================================================
         // Process comments
 
-        // A dollar sign is also a valid variable name. When it isn't a dollar left brace, we continue as if it was an identifier
-        case LexerPhase.Dollar:
-          if (ch === "{") {
-            return completeToken(TokenType.DollarLBrace);
-          }
-          phase = LexerPhase.IdTail;
-          useResolver = true;
-          tokenType = TokenType.Identifier;
-          if (!isIdContinuation(ch)) {
-            makeToken();
-          }
-          break;
         // --- Looking for the end of whitespace
         case LexerPhase.InWhiteSpace:
           if (ch !== " " && ch !== "\t" && ch !== "\r" && ch !== "\n") {
@@ -683,10 +671,7 @@ export class Lexer {
         case LexerPhase.DecimalOrReal:
           if (isDecimalDigit(ch) || ch === "_") {
             break;
-          } else if (
-            ch === "." &&
-            (this.input.peek() === null || isDecimalDigit(this.input.peek()!))
-          ) {
+          } else if (ch === "." && (this.input.peek() === null || isDecimalDigit(this.input.peek()!))) {
             phase = LexerPhase.RealFractionalFirst;
             tokenType = TokenType.Unknown;
           } else if (ch === "e" || ch === "E") {
@@ -740,6 +725,19 @@ export class Lexer {
         case LexerPhase.RealExponentTail:
           if (!isDecimalDigit(ch)) {
             return makeToken();
+          }
+          break;
+
+        // A dollar sign is also a valid variable name. When it isn't a dollar left brace, we continue as if it was an identifier
+        case LexerPhase.Dollar:
+          if (ch === "{") {
+            return completeToken(TokenType.DollarLBrace);
+          }
+          phase = LexerPhase.IdTail;
+          useResolver = true;
+          tokenType = TokenType.Identifier;
+          if (!isIdContinuation(ch)) {
+            makeToken();
           }
           break;
 
@@ -980,21 +978,17 @@ export class Lexer {
       if (useResolver) {
         tokenType =
           resolverHash.get(text) ??
-          (isIdStart(text[0]) && text[text.length - 1] !== "'"
-            ? TokenType.Identifier
-            : TokenType.Unknown);
+          (isIdStart(text[0]) && text[text.length - 1] !== "'" ? TokenType.Identifier : TokenType.Unknown);
       }
       return {
         text,
         type: tokenType,
-        location: {
-          startPosition: startPos,
-          endPosition: lastEndPos,
-          startLine: line,
-          endLine: line,
-          startColumn,
-          endColumn: lastEndColumn,
-        },
+        startPosition: startPos,
+        endPosition: lastEndPos,
+        startLine: line,
+        endLine: line,
+        startColumn,
+        endColumn: lastEndColumn,
       };
     }
 
@@ -1026,8 +1020,7 @@ export class Lexer {
    */
   private fetchRegEx(): RegExpLexerResult {
     // --- Get the tail
-    const tailPosition =
-      this._ahead.length > 0 ? this._ahead[0].location.startPosition : this._lastFetchPosition;
+    const tailPosition = this._ahead.length > 0 ? this._ahead[0].startPosition : this._lastFetchPosition;
     const tail = this.input.getTail(tailPosition);
 
     // --- Parse the tail. If no error, the entire tail is the RegExp
@@ -1135,8 +1128,6 @@ resolverHash.set("case", TokenType.Case);
 resolverHash.set("default", TokenType.Default);
 resolverHash.set("delete", TokenType.Delete);
 resolverHash.set("function", TokenType.Function);
-resolverHash.set("export", TokenType.Export);
-resolverHash.set("import", TokenType.Import);
 resolverHash.set("as", TokenType.As);
 resolverHash.set("from", TokenType.From);
 
@@ -1169,13 +1160,7 @@ function isIdStart(ch: string): boolean {
  * @param ch Character to test
  */
 function isIdContinuation(ch: string): boolean {
-  return (
-    (ch >= "a" && ch <= "z") ||
-    (ch >= "A" && ch <= "Z") ||
-    (ch >= "0" && ch <= "9") ||
-    ch === "_" ||
-    ch === "$"
-  );
+  return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || (ch >= "0" && ch <= "9") || ch === "_" || ch === "$";
 }
 
 /**

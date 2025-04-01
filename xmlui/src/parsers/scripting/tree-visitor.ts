@@ -1,4 +1,51 @@
-import type { Statement, Expression } from "../../abstractions/scripting/ScriptingSourceTree";
+import {
+  type Statement,
+  type Expression,
+  T_BLOCK_STATEMENT,
+  T_EMPTY_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+  T_ARROW_EXPRESSION_STATEMENT,
+  T_LET_STATEMENT,
+  T_CONST_STATEMENT,
+  T_VAR_STATEMENT,
+  T_IF_STATEMENT,
+  T_RETURN_STATEMENT,
+  T_BREAK_STATEMENT,
+  T_CONTINUE_STATEMENT,
+  T_WHILE_STATEMENT,
+  T_DO_WHILE_STATEMENT,
+  T_FOR_STATEMENT,
+  T_FOR_IN_STATEMENT,
+  T_FOR_OF_STATEMENT,
+  T_THROW_STATEMENT,
+  T_TRY_STATEMENT,
+  T_SWITCH_STATEMENT,
+  T_FUNCTION_DECLARATION,
+  T_UNARY_EXPRESSION,
+  T_BINARY_EXPRESSION,
+  T_SEQUENCE_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
+  T_FUNCTION_INVOCATION_EXPRESSION,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_IDENTIFIER,
+  T_LITERAL,
+  T_ARRAY_LITERAL,
+  T_OBJECT_LITERAL,
+  T_SPREAD_EXPRESSION,
+  T_ASSIGNMENT_EXPRESSION,
+  T_NO_ARG_EXPRESSION,
+  T_ARROW_EXPRESSION,
+  T_PREFIX_OP_EXPRESSION,
+  T_POSTFIX_OP_EXPRESSION,
+  T_VAR_DECLARATION,
+  T_DESTRUCTURE,
+  T_OBJECT_DESTRUCTURE,
+  T_ARRAY_DESTRUCTURE,
+  T_REACTIVE_VAR_DECLARATION,
+  T_TEMPLATE_LITERAL_EXPRESSION,
+  T_SWITCH_CASE,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 const unreachable = (_x: never) => {};
 
@@ -23,7 +70,7 @@ type StmtVisitor<TState = any> = (
   visited: Statement,
   state: VisitorState<TState>,
   parent?: VisitSubject,
-  tag?: string
+  tag?: string,
 ) => VisitorState<TState>;
 
 /* This visitor is called usually twice on every expression when give to a `visitNode` function
@@ -34,7 +81,7 @@ type ExprVisitor<TState = any> = (
   visited: Expression,
   state: VisitorState<TState>,
   parent?: VisitSubject,
-  tag?: string
+  tag?: string,
 ) => VisitorState<TState>;
 
 /*Walk through the ast, executing visitors on the nodes
@@ -50,7 +97,7 @@ export function visitNode<TState = any>(
   stmtVisitor?: StmtVisitor<TState>,
   exprVisitor?: ExprVisitor<TState>,
   parent?: VisitSubject,
-  tag?: string
+  tag?: string,
 ): VisitorState<TState> {
   // --- Stop visiting if cancelled
   if (state.cancel) {
@@ -68,11 +115,11 @@ export function visitNode<TState = any>(
   }
 
   switch (subject.type) {
-    case "BlockS": {
+    case T_BLOCK_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        for (const statement of subject.statements) {
+        for (const statement of subject.stmts) {
           state = visitNode(statement, state, stmtVisitor, exprVisitor, subject, "statements");
           if (state.cancel) return state;
         }
@@ -81,32 +128,32 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "EmptyS": {
+    case T_EMPTY_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "ExprS": {
+    case T_EXPRESSION_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.expression, state, stmtVisitor, exprVisitor, subject, "expression");
+        state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "expression");
         if (state.cancel) return state;
       }
       state = stmtVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "ArrowS": {
-      //cannot reach that
+    case T_ARROW_EXPRESSION_STATEMENT: {
+      //--- Cannot reach that
       return state;
     }
 
-    case "LetS": {
+    case T_LET_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        for (const declaration of subject.declarations) {
+        for (const declaration of subject.decls) {
           state = visitNode(declaration, state, stmtVisitor, exprVisitor, subject, "declarations");
           if (state.cancel) return state;
         }
@@ -115,11 +162,11 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "ConstS": {
+    case T_CONST_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        for (const declaration of subject.declarations) {
+        for (const declaration of subject.decls) {
           state = visitNode(declaration, state, stmtVisitor, exprVisitor, subject, "declarations");
           if (state.cancel) return state;
         }
@@ -128,11 +175,11 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "VarS": {
+    case T_VAR_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        for (const declaration of subject.declarations) {
+        for (const declaration of subject.decls) {
           state = visitNode(declaration, state, stmtVisitor, exprVisitor, subject, "declarations");
           if (state.cancel) return state;
         }
@@ -141,54 +188,54 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "IfS": {
+    case T_IF_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.condition, state, stmtVisitor, exprVisitor, subject, "condition");
+        state = visitNode(subject.cond, state, stmtVisitor, exprVisitor, subject, "condition");
         if (state.cancel) return state;
-        if (subject.thenBranch) {
-          state = visitNode(subject.thenBranch, state, stmtVisitor, exprVisitor, subject, "thenBranch");
+        if (subject.thenB) {
+          state = visitNode(subject.thenB, state, stmtVisitor, exprVisitor, subject, "thenBranch");
         }
         if (state.cancel) return state;
-        if (subject.elseBranch) {
-          state = visitNode(subject.elseBranch, state, stmtVisitor, exprVisitor, subject, "elseBranch");
-        }
-        if (state.cancel) return state;
-      }
-      state = stmtVisitor?.(false, subject, state, parent, tag) || state;
-
-      return state;
-    }
-
-    case "RetS": {
-      state = stmtVisitor?.(true, subject, state, parent, tag) || state;
-      if (state.cancel) return state;
-      if (!state.skipChildren) {
-        if (subject.expression) {
-          state = visitNode(subject.expression, state, stmtVisitor, exprVisitor, subject, "expression");
+        if (subject.elseB) {
+          state = visitNode(subject.elseB, state, stmtVisitor, exprVisitor, subject, "elseBranch");
         }
         if (state.cancel) return state;
       }
       state = stmtVisitor?.(false, subject, state, parent, tag) || state;
+
       return state;
     }
 
-    case "BrkS": {
-      state = stmtVisitor?.(true, subject, state, parent, tag) || state;
-      return state;
-    }
-
-    case "ContS": {
-      state = stmtVisitor?.(true, subject, state, parent, tag) || state;
-      return state;
-    }
-
-    case "WhileS": {
+    case T_RETURN_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.condition, state, stmtVisitor, exprVisitor, subject, "condition");
+        if (subject.expr) {
+          state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "expression");
+        }
+        if (state.cancel) return state;
+      }
+      state = stmtVisitor?.(false, subject, state, parent, tag) || state;
+      return state;
+    }
+
+    case T_BREAK_STATEMENT: {
+      state = stmtVisitor?.(true, subject, state, parent, tag) || state;
+      return state;
+    }
+
+    case T_CONTINUE_STATEMENT: {
+      state = stmtVisitor?.(true, subject, state, parent, tag) || state;
+      return state;
+    }
+
+    case T_WHILE_STATEMENT: {
+      state = stmtVisitor?.(true, subject, state, parent, tag) || state;
+      if (state.cancel) return state;
+      if (!state.skipChildren) {
+        state = visitNode(subject.cond, state, stmtVisitor, exprVisitor, subject, "condition");
         if (state.cancel) return state;
         state = visitNode(subject.body, state, stmtVisitor, exprVisitor, subject, "body");
         if (state.cancel) return state;
@@ -197,20 +244,20 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "DoWS": {
+    case T_DO_WHILE_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
         state = visitNode(subject.body, state, stmtVisitor, exprVisitor, subject, "body");
         if (state.cancel) return state;
-        state = visitNode(subject.condition, state, stmtVisitor, exprVisitor, subject, "condition");
+        state = visitNode(subject.cond, state, stmtVisitor, exprVisitor, subject, "condition");
         if (state.cancel) return state;
       }
       state = stmtVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "ForS": {
+    case T_FOR_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
@@ -218,12 +265,12 @@ export function visitNode<TState = any>(
           state = visitNode(subject.init, state, stmtVisitor, exprVisitor, subject, "init");
         }
         if (state.cancel) return state;
-        if (subject.condition) {
-          state = visitNode(subject.condition, state, stmtVisitor, exprVisitor, subject, "condition");
+        if (subject.cond) {
+          state = visitNode(subject.cond, state, stmtVisitor, exprVisitor, subject, "condition");
         }
         if (state.cancel) return state;
-        if (subject.update) {
-          state = visitNode(subject.update, state, stmtVisitor, exprVisitor, subject, "update");
+        if (subject.upd) {
+          state = visitNode(subject.upd, state, stmtVisitor, exprVisitor, subject, "update");
         }
         if (state.cancel) return state;
         state = visitNode(subject.body, state, stmtVisitor, exprVisitor, subject, "body");
@@ -233,11 +280,11 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "ForInS": {
+    case T_FOR_IN_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.expression, state, stmtVisitor, exprVisitor, subject, "expression");
+        state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "expression");
         if (state.cancel) return state;
         state = visitNode(subject.body, state, stmtVisitor, exprVisitor, subject, "body");
         if (state.cancel) return state;
@@ -246,11 +293,11 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "ForOfS": {
+    case T_FOR_OF_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.expression, state, stmtVisitor, exprVisitor, subject, "expression");
+        state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "expression");
         if (state.cancel) return state;
         state = visitNode(subject.body, state, stmtVisitor, exprVisitor, subject, "body");
         if (state.cancel) return state;
@@ -259,49 +306,70 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "ThrowS": {
+    case T_THROW_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.expression, state, stmtVisitor, exprVisitor, subject, "expression");
+        state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "expression");
         if (state.cancel) return state;
       }
       state = stmtVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
-    case "TryS": {
+    case T_TRY_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        if (subject.tryBlock) {
-          state = visitNode(subject.tryBlock, state, stmtVisitor, exprVisitor, subject, "tryBlock");
+        if (subject.tryB) {
+          state = visitNode(subject.tryB, state, stmtVisitor, exprVisitor, subject, "tryBlock");
         }
         if (state.cancel) return state;
-        if (subject.catchBlock) {
-          state = visitNode(subject.catchBlock, state, stmtVisitor, exprVisitor, subject, "catchBlock");
+        if (subject.catchB) {
+          state = visitNode(subject.catchB, state, stmtVisitor, exprVisitor, subject, "catchBlock");
         }
         if (state.cancel) return state;
-        if (subject.finallyBlock) {
-          state = visitNode(subject.finallyBlock, state, stmtVisitor, exprVisitor, subject, "finallyBlock");
+        if (subject.finallyB) {
+          state = visitNode(
+            subject.finallyB,
+            state,
+            stmtVisitor,
+            exprVisitor,
+            subject,
+            "finallyBlock",
+          );
         }
         if (state.cancel) return state;
       }
       state = stmtVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
-    case "SwitchS": {
+    case T_SWITCH_STATEMENT: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.expression, state, stmtVisitor, exprVisitor, subject, "expression");
+        state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "expression");
         if (state.cancel) return state;
         for (const switchCase of subject.cases) {
-          if (switchCase.caseExpression)
-            state = visitNode(switchCase.caseExpression, state, stmtVisitor, exprVisitor, subject, "caseExpression");
+          if (switchCase.caseE)
+            state = visitNode(
+              switchCase.caseE,
+              state,
+              stmtVisitor,
+              exprVisitor,
+              subject,
+              "caseExpression",
+            );
           if (state.cancel) return state;
-          if (switchCase.statements === undefined) continue;
-          for (const statement of switchCase.statements) {
-            state = visitNode(statement, state, stmtVisitor, exprVisitor, subject, "switchStatement");
+          if (switchCase.stmts === undefined) continue;
+          for (const statement of switchCase.stmts) {
+            state = visitNode(
+              statement,
+              state,
+              stmtVisitor,
+              exprVisitor,
+              subject,
+              "switchStatement",
+            );
             if (state.cancel) return state;
           }
         }
@@ -310,7 +378,7 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "FuncD": {
+    case T_FUNCTION_DECLARATION: {
       state = stmtVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
@@ -318,33 +386,26 @@ export function visitNode<TState = any>(
           state = visitNode(expr, state, stmtVisitor, exprVisitor, subject, "arg");
           if (state.cancel) return state;
         }
-        state = visitNode(subject.statement, state, stmtVisitor, exprVisitor, subject, "statement");
+        state = visitNode(subject.stmt, state, stmtVisitor, exprVisitor, subject, "statement");
         if (state.cancel) return state;
       }
       state = stmtVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "ImportD": {
-      state = stmtVisitor?.(true, subject, state, parent, tag) || state;
-      if (state.cancel) return state;
-      state = stmtVisitor?.(false, subject, state, parent, tag) || state;
-      return state;
-    }
-
     // ================= Expressions =================
-    case "UnaryE": {
+    case T_UNARY_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.operand, state, stmtVisitor, exprVisitor, subject, "operand");
+        state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "operand");
         if (state.cancel) return state;
       }
       state = exprVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "BinaryE": {
+    case T_BINARY_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
@@ -357,11 +418,11 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "SeqE": {
+    case T_SEQUENCE_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        for (const expr of subject.expressions) {
+        for (const expr of subject.exprs) {
           state = visitNode(expr, state, stmtVisitor, exprVisitor, subject, "expression");
           if (state.cancel) return state;
         }
@@ -370,22 +431,22 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "CondE": {
+    case T_CONDITIONAL_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.condition, state, stmtVisitor, exprVisitor, subject, "condition");
+        state = visitNode(subject.cond, state, stmtVisitor, exprVisitor, subject, "condition");
         if (state.cancel) return state;
-        state = visitNode(subject.consequent, state, stmtVisitor, exprVisitor, subject, "consequent");
+        state = visitNode(subject.thenE, state, stmtVisitor, exprVisitor, subject, "consequent");
         if (state.cancel) return state;
-        state = visitNode(subject.alternate, state, stmtVisitor, exprVisitor, subject, "alternate");
+        state = visitNode(subject.elseE, state, stmtVisitor, exprVisitor, subject, "alternate");
         if (state.cancel) return state;
       }
       state = exprVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "InvokeE": {
+    case T_FUNCTION_INVOCATION_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
@@ -393,29 +454,29 @@ export function visitNode<TState = any>(
           state = visitNode(arg, state, stmtVisitor, exprVisitor, subject, "argument");
           if (state.cancel) return state;
         }
-        state = visitNode(subject.object, state, stmtVisitor, exprVisitor, subject, "object");
+        state = visitNode(subject.obj, state, stmtVisitor, exprVisitor, subject, "object");
         if (state.cancel) return state;
       }
       state = exprVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "MembE": {
+    case T_MEMBER_ACCESS_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.object, state, stmtVisitor, exprVisitor, subject, "object");
+        state = visitNode(subject.obj, state, stmtVisitor, exprVisitor, subject, "object");
         if (state.cancel) return state;
       }
       state = exprVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "CMembE": {
+    case T_CALCULATED_MEMBER_ACCESS_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.object, state, stmtVisitor, exprVisitor, subject, "object");
+        state = visitNode(subject.obj, state, stmtVisitor, exprVisitor, subject, "object");
         if (state.cancel) return state;
         state = visitNode(subject.member, state, stmtVisitor, exprVisitor, subject, "member");
         if (state.cancel) return state;
@@ -424,17 +485,17 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "IdE": {
+    case T_IDENTIFIER: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "LitE": {
+    case T_LITERAL: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "ALitE": {
+    case T_ARRAY_LITERAL: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
@@ -447,7 +508,7 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "OLitE": {
+    case T_OBJECT_LITERAL: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
@@ -469,22 +530,22 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "SpreadE": {
+    case T_SPREAD_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.operand, state, stmtVisitor, exprVisitor, subject, "operand");
+        state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "operand");
         if (state.cancel) return state;
       }
       state = exprVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "AsgnE": {
+    case T_ASSIGNMENT_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.operand, state, stmtVisitor, exprVisitor, subject, "operand");
+        state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "operand");
         if (state.cancel) return state;
         state = visitNode(subject.leftValue, state, stmtVisitor, exprVisitor, subject, "leftValue");
         if (state.cancel) return state;
@@ -493,12 +554,12 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "NoArgE": {
+    case T_NO_ARG_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "ArrowE": {
+    case T_ARROW_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
@@ -513,75 +574,38 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "PrefE":
-    case "PostfE": {
+    case T_PREFIX_OP_EXPRESSION:
+    case T_POSTFIX_OP_EXPRESSION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        state = visitNode(subject.operand, state, stmtVisitor, exprVisitor, subject, "operand");
+        state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "operand");
         if (state.cancel) return state;
       }
       state = exprVisitor?.(false, subject, state, parent, tag) || state;
       return state;
     }
 
-    case "VarD": {
+    case T_VAR_DECLARATION: {
       state = exprVisitor?.(true, subject, state, parent, tag) || state;
       if (state.cancel) return state;
       if (!state.skipChildren) {
-        if (subject.arrayDestruct !== undefined) {
-          for (const expr of subject.arrayDestruct) {
+        if (subject.aDestr !== undefined) {
+          for (const expr of subject.aDestr) {
             state = visitNode(expr, state, stmtVisitor, exprVisitor, subject);
             if (state.cancel) return state;
           }
         }
 
-        if (subject.objectDestruct !== undefined) {
-          for (const expr of subject.objectDestruct) {
+        if (subject.oDestr !== undefined) {
+          for (const expr of subject.oDestr) {
             state = visitNode(expr, state, stmtVisitor, exprVisitor, subject);
             if (state.cancel) return state;
           }
         }
 
-        if (subject.expression) {
-          state = visitNode(subject.expression, state, stmtVisitor, exprVisitor, subject, "expression");
-        }
-        if (state.cancel) return state;
-      }
-      state = exprVisitor?.(false, subject, state, parent, tag) || state;
-      return state;
-    }
-
-    case "Destr":
-    case "ODestr":
-    case "ADestr": {
-      state = exprVisitor?.(true, subject, state, parent, tag) || state;
-      if (state.cancel) return state;
-      if (!state.skipChildren) {
-        if (subject.arrayDestruct !== undefined) {
-          for (const expr of subject.arrayDestruct) {
-            state = visitNode(expr, state, stmtVisitor, exprVisitor, subject);
-            if (state.cancel) return state;
-          }
-        }
-
-        if (subject.objectDestruct !== undefined) {
-          for (const expr of subject.objectDestruct) {
-            state = visitNode(expr, state, stmtVisitor, exprVisitor, subject);
-            if (state.cancel) return state;
-          }
-        }
-      }
-      state = exprVisitor?.(false, subject, state, parent, tag) || state;
-      return state;
-    }
-
-    case "RVarD": {
-      state = exprVisitor?.(true, subject, state, parent, tag) || state;
-      if (state.cancel) return state;
-      if (!state.skipChildren) {
-        if (subject.expression) {
-          state = visitNode(subject.expression, state, stmtVisitor, exprVisitor, subject, "expression");
+        if (subject.expr) {
+          state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "expression");
         }
         if (state.cancel) return state;
       }
@@ -589,8 +613,48 @@ export function visitNode<TState = any>(
       return state;
     }
 
-    case "TempLitE":
+    case T_DESTRUCTURE:
+    case T_OBJECT_DESTRUCTURE:
+    case T_ARRAY_DESTRUCTURE: {
+      state = exprVisitor?.(true, subject, state, parent, tag) || state;
+      if (state.cancel) return state;
+      if (!state.skipChildren) {
+        if (subject.aDestr !== undefined) {
+          for (const expr of subject.aDestr) {
+            state = visitNode(expr, state, stmtVisitor, exprVisitor, subject);
+            if (state.cancel) return state;
+          }
+        }
+
+        if (subject.oDestr !== undefined) {
+          for (const expr of subject.oDestr) {
+            state = visitNode(expr, state, stmtVisitor, exprVisitor, subject);
+            if (state.cancel) return state;
+          }
+        }
+      }
+      state = exprVisitor?.(false, subject, state, parent, tag) || state;
+      return state;
+    }
+
+    case T_REACTIVE_VAR_DECLARATION: {
+      state = exprVisitor?.(true, subject, state, parent, tag) || state;
+      if (state.cancel) return state;
+      if (!state.skipChildren) {
+        if (subject.expr) {
+          state = visitNode(subject.expr, state, stmtVisitor, exprVisitor, subject, "expression");
+        }
+        if (state.cancel) return state;
+      }
+      state = exprVisitor?.(false, subject, state, parent, tag) || state;
+      return state;
+    }
+
+    case T_TEMPLATE_LITERAL_EXPRESSION:
       // TODO: Implement this
+      return state;
+
+    case T_SWITCH_CASE:
       return state;
 
     default:

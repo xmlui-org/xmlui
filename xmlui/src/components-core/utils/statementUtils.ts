@@ -24,7 +24,7 @@ import type { QueueInfo } from "../script-runner/statement-queue";
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
 
-import { Parser } from "../../parsers/scripting-exp/Parser";
+import { Parser } from "../../parsers/scripting/Parser";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
 import { reportEngineError } from "../reportEngineError";
 import { ScriptParseError } from "../EngineError";

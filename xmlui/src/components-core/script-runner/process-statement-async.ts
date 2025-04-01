@@ -65,7 +65,7 @@ import {
   toStatementItems,
   guard,
 } from "./process-statement-common";
-import { createXmlUiTreeNodeId } from "../../parsers/scripting-exp/Parser";
+import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
 
 // --- Helper function to process the entire queue asynchronously
 export async function processStatementQueueAsync(

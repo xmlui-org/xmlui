@@ -19,7 +19,7 @@ import {
   mapStatementsToQueueItems,
 } from "./statement-queue";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import { createXmlUiTreeNodeId } from "../../parsers/scripting-exp/Parser";
+import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
 
 export function innermostLoopScope(thread: LogicalThreadExp): LoopScope {
   if (!thread.loops || thread.loops.length === 0) {

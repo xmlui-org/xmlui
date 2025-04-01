@@ -63,7 +63,7 @@ import type {
   ProcessOutcome,
 } from "./statement-queue";
 import { StatementQueue, mapStatementsToQueueItems, mapToItem } from "./statement-queue";
-import { createXmlUiTreeNodeId } from "../../parsers/scripting-exp/Parser";
+import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
 
 const SYNC_EVAL_TIMEOUT = 1000;
 
