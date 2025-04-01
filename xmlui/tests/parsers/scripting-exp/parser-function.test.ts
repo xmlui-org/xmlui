@@ -1,6 +1,6 @@
 import { describe, expect, assert, it } from "vitest";
 
-import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   Destructure,
   FunctionDeclaration,

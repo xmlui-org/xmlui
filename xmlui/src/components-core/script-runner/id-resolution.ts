@@ -45,8 +45,8 @@ import {
   type Statement,
   type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
-import type { ResolutionScope } from "../../parsers/scripting-exp/ResolutionScope";
-import { createXmlUiTreeNodeId } from "../../parsers/scripting-exp/Parser";
+import type { ResolutionScope } from "../../parsers/scripting/ResolutionScope";
+import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
 
 /**
  * Resolves identifier

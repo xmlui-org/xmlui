@@ -1,5 +1,5 @@
 import { describe, expect, it, assert } from "vitest";
-import { parsePropertyValue } from "../../../src/parsers/scripting-exp/property-parsing";
+import { parsePropertyValue } from "../../../src/parsers/scripting/property-parsing";
 import {
   CompoundPropertyValue,
   SingleExpressionValue,
@@ -7,7 +7,7 @@ import {
   T_BINARY_EXPRESSION,
   T_OBJECT_LITERAL,
 } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
-import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 
 describe("Parameter property parsing", () => {
   it("Regression #1", () => {

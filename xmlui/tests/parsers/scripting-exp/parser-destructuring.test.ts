@@ -1,5 +1,5 @@
 import { describe, expect, it, assert } from "vitest";
-import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   ConstStatement,
   LetStatement,

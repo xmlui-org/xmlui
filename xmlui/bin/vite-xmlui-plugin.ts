@@ -3,13 +3,13 @@ import type { Plugin } from "vite";
 import {
   collectCodeBehindFromSource,
   removeCodeBehindTokensFromTree,
-} from "../src/parsers/scripting-exp/code-behind-collect";
+} from "../src/parsers/scripting/code-behind-collect";
 import {
   codeBehindFileExtension,
   componentFileExtension,
   moduleFileExtension,
 } from "../src/parsers/xmlui-parser/fileExtensions";
-import { Parser } from "../src/parsers/scripting-exp/Parser";
+import { Parser } from "../src/parsers/scripting/Parser";
 import * as fs from "fs";
 import * as path from "path";
 import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";

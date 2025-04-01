@@ -1,5 +1,5 @@
 import type { GenericToken } from "../../parsers/common/GenericToken";
-import type { TokenType } from "../../parsers/scripting-exp/TokenType";
+import type { TokenType } from "../../parsers/scripting/TokenType";
 import { ScriptParserErrorMessage } from "./ScriptParserError";
 
 // --- All binding expression tree node types

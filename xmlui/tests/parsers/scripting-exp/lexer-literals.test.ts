@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Lexer } from "../../../src/parsers/scripting-exp/Lexer";
-import { TokenType } from "../../../src/parsers/scripting-exp/TokenType";
+import { Lexer } from "../../../src/parsers/scripting/Lexer";
+import { TokenType } from "../../../src/parsers/scripting/TokenType";
 import { InputStream } from "../../../src/parsers/common/InputStream";
 
 describe("Lexer - literal", () => {

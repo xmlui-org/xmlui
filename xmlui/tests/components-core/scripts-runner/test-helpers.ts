@@ -1,6 +1,6 @@
 import { Expression, Statement } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 import { BindingTreeEvaluationContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
-import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 
 export function createEvalContext (parts: Partial<BindingTreeEvaluationContext>): BindingTreeEvaluationContext {
   return {

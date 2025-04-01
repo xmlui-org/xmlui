@@ -3,7 +3,7 @@ import {
   ModuleErrors,
   isModuleErrors,
   parseScriptModule,
-} from "../../../src/parsers/scripting-exp/modules";
+} from "../../../src/parsers/scripting/modules";
 import { ScriptModule } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 const ROOT_MODULE = "test";

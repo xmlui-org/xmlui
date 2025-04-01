@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   ArrayLiteral,
   Expression,
@@ -17,8 +17,8 @@ import {
   T_UNARY_EXPRESSION,
   T_OBJECT_LITERAL,
 } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
-import { tokenTraits } from "../../../src/parsers/scripting-exp/TokenTrait";
-import { TokenType } from "../../../src/parsers/scripting-exp/TokenType";
+import { tokenTraits } from "../../../src/parsers/scripting/TokenTrait";
+import { TokenType } from "../../../src/parsers/scripting/TokenType";
 
 describe("Parser - literals", () => {
   const boolCases = [
