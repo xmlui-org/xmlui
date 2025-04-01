@@ -9,7 +9,7 @@ import {
   componentFileExtension,
   moduleFileExtension,
 } from "../src/parsers/xmlui-parser/fileExtensions";
-import { Parser } from "../src/parsers/scripting/Parser";
+import { Parser } from "../src/parsers/scripting-exp/Parser";
 import * as fs from "fs";
 import * as path from "path";
 import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";

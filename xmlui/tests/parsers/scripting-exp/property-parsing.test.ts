@@ -7,7 +7,7 @@ import {
   T_BINARY_EXPRESSION,
   T_OBJECT_LITERAL,
 } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
-import { Parser } from "../../../src/parsers/scripting/Parser";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
 
 describe("Parameter property parsing", () => {
   it("Regression #1", () => {
