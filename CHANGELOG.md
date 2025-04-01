@@ -1,5 +1,13 @@
 # xmlui Changelog
 
+## 0.9.0
+
+New scripting engine
+
+## 0.8.0
+
+Theme variables renamed
+
 ## v0.7.0
 
 ### Breaking changes:
