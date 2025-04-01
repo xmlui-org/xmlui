@@ -69,14 +69,12 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$co
 
   &.vertical {
     cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);
-    width: 100%;
     height: t.useVar($thickness-resizer-Splitter, 5px);
   }
 
   &.horizontal {
     cursor: t.useVar($cursor-resizer-horizontal-Splitter, ew-resize);
     width: t.useVar($thickness-resizer-Splitter, 5px);
-    height: 100%;
   }
 }
 
