@@ -1,7 +1,7 @@
 import type { ComponentDef, CompoundComponentDef } from "../../../xmlui/src/abstractions/ComponentDefs";
 import { XmlUiHelper } from "../../../xmlui/src/parsers/xmlui-parser/xmlui-serializer";
 import { decompress } from "../components/utils";
-import type { ThemeDefinition } from "../../../xmlui/src/components-core/theming/abstractions";
+import type { ThemeDefinition } from "../../../xmlui/src/abstractions/ThemingDefs";
 import type { PlaygroundState } from "../state/store";
 import { SolidThemeDefinition } from "../../../xmlui/src/components-core/theming/themes/solid";
 import { XmlUiThemeDefinition } from "../../../xmlui/src/components-core/theming/themes/xmlui";

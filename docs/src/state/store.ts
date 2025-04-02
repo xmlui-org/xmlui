@@ -1,4 +1,4 @@
-import type { ThemeDefinition } from "../../../xmlui/src/components-core/theming/abstractions";
+import type { ThemeDefinition } from "../../../xmlui/src/abstractions/ThemingDefs";
 import type { Dispatch } from "react";
 import { createContext } from "react";
 import produce from "immer";

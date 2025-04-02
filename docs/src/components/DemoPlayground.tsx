@@ -12,7 +12,7 @@ import { PlaygroundContent } from "../../src/components/PlaygroundContent";
 import { Header } from "../../src/components/Header";
 import styles from "./StandalonePlayground.module.scss";
 import type { ApiInterceptorDefinition } from "../../../xmlui/src/components-core/interception/abstractions";
-import type { ThemeDefinition } from "../../../xmlui/src/components-core/theming/abstractions";
+import type { ThemeDefinition } from "../../../xmlui/src/abstractions/ThemingDefs";
 import { ErrorBoundary } from "../../../xmlui/src/components-core/rendering/ErrorBoundary";
 
 type DemoPlaygroundProps = {

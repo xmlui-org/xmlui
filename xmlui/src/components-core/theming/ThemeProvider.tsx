@@ -1,8 +1,5 @@
 import type React from "react";
 
-import type { ThemeScope, AppThemes, ThemeTone, ThemeDefinition, FontDef } from "./abstractions";
-import { ThemeToneKeys } from "./abstractions";
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   generateBaseFontSizes,
@@ -31,6 +28,14 @@ import {
 } from "../theming/themes/xmlui";
 import { SolidThemeDefinition } from "../theming/themes/solid";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
+import {
+  AppThemes,
+  FontDef,
+  ThemeDefinition,
+  ThemeScope,
+  ThemeTone,
+  ThemeToneKeys,
+} from "../../abstractions/ThemingDefs";
 
 export function useCompiledTheme(
   activeTheme: ThemeDefinition | undefined,

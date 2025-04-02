@@ -7,7 +7,6 @@ import type { ComponentLike } from "../../abstractions/ComponentDefs";
 import type { ContributesDefinition } from "../../components/ComponentProvider";
 import { ConfirmationModalContextProvider } from "../../components/ModalDialog/ConfirmationModalContextProvider";
 import type { ApiInterceptorDefinition } from "../interception/abstractions";
-import type { ThemeTone } from "../theming/abstractions";
 import { EMPTY_OBJECT } from "../constants";
 import { IconProvider } from "../../components/IconProvider";
 import ThemeProvider from "../theming/ThemeProvider";
@@ -17,6 +16,7 @@ import { queryClient } from "./AppRoot";
 import { AppContent } from "./AppContent";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { ErrorBoundary } from "./ErrorBoundary";
+import { ThemeTone } from "../../abstractions/ThemingDefs";
 
 export type AppWrapperProps = {
   // --- The root node of the application definition; the internal

@@ -15,7 +15,6 @@ import {
   useIsWindowFocused,
   useMediaQuery,
 } from "../utils/hooks";
-import { ThemeToneKeys } from "../theming/abstractions";
 import { getVarKey } from "../theming/themeVars";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { EMPTY_OBJECT, noop } from "../constants";
@@ -31,6 +30,7 @@ import { renderChild } from "./renderChild";
 import { GlobalProps, queryClient } from "./AppRoot";
 import { ContainerWrapperDef } from "./ContainerWrapper";
 import { useLocation, useNavigate } from "@remix-run/react";
+import { ThemeToneKeys } from "../../abstractions/ThemingDefs";
 
 // --- The properties of the AppContent component
 type AppContentProps = {

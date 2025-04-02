@@ -8,7 +8,6 @@ import type {
   ComponentLike,
   CompoundComponentDef,
 } from "../abstractions/ComponentDefs";
-import type { ThemeDefinition, ThemeTone } from "./theming/abstractions";
 import type { CollectedDeclarations } from "../abstractions/scripting/ScriptingSourceTreeExp";
 
 import "../index.scss";
@@ -46,6 +45,7 @@ import {
   printComponentLints,
 } from "../parsers/xmlui-parser/lint";
 import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
+import { ThemeDefinition, ThemeTone } from "../abstractions/ThemingDefs";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;

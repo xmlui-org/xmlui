@@ -10,16 +10,12 @@ import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
 import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
-import type {
-  ThemeDefinition,
-  ThemeScope,
-  ThemeTone,
-} from "../../components-core/theming/abstractions";
 import { getVarKey } from "../../components-core/theming/themeVars";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { NotificationToast } from "./NotificationToast";
 import { useDevTools } from "../../components-core/InspectorContext";
+import { ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 
 function getClassName(css: string) {
   return `theme-${calculateHash(css)}`;
