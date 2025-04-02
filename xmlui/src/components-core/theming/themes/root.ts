@@ -39,7 +39,7 @@ const {
 export const RootThemeDefinition: ThemeDefinition = {
   id: "root",
   resources: {
-    "font.inter": "https://rsms.me/inter/inter.css",
+    // "font.inter": "https://rsms.me/inter/inter.css",
   },
   themeVars: {
     // --- The unit of measurement for all sizes/spaces
