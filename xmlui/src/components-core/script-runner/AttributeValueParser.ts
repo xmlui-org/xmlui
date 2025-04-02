@@ -2,6 +2,8 @@ import { ParsedPropertyValue } from "../../abstractions/scripting/Compilation";
 import { Expression } from "../../abstractions/scripting/ScriptingSourceTree";
 import { Parser } from "../../parsers/scripting/Parser";
 
+let lastParseId = 0;
+
 /**
  * This function parses a parameter string and splits them into string literal and binding expression sections
  * @param source String to parse
@@ -10,6 +12,7 @@ import { Parser } from "../../parsers/scripting/Parser";
 export function parseAttributeValue(source: string): ParsedPropertyValue {
   const result: ParsedPropertyValue = {
     __PARSED: true,
+    parseId: ++lastParseId,
     segments: [],
   };
   if (source === undefined || source === null) return result;
