@@ -7,9 +7,9 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$accent-Blockquote: createThemeVar("accent-Blockquote");
+$accentColor-Blockquote: createThemeVar("accentColor-Blockquote");
 $accentWidth-Blockquote: createThemeVar("accentWidth-Blockquote");
-$backgroundColor-Blockquote: createThemeVar("backgroundColor-Blockquote");
+$backgroundColor-Blockquote: createThemeVar("backgroundColor-Admonition");
 $paddingLeft-Blockquote: createThemeVar("paddingLeft-Blockquote");
 $borderRadius-Blockquote: createThemeVar("borderRadius-Blockquote");
 $marginTop-Blockquote: createThemeVar("marginTop-Blockquote");
@@ -21,19 +21,10 @@ $borderRadius-Admonition: createThemeVar("borderRadius-Admonition");
 $iconSize-Admonition: createThemeVar("iconSize-Admonition");
 $marginTop-Admonition: createThemeVar("marginTop-Admonition");
 $marginBottom-Admonition: createThemeVar("marginBottom-Admonition");
-
-$color-HtmlAnchor: createThemeVar("color-HtmlAnchor");
-$color-HtmlAnchor--hover: createThemeVar("color-HtmlAnchor--hover");
-$color-HtmlAnchor--visited: createThemeVar("color-HtmlAnchor--visited");
-$color-HtmlAnchor--active: createThemeVar("color-HtmlAnchor--active");
-$color-HtmlAnchor--text-decoration: createThemeVar("color-HtmlAnchor--text-decoration");
-$target-HtmlAnchor: createThemeVar("target-HtmlAnchor");
+$marginLeft-Admonition-content: createThemeVar("marginLeft-Admonition-content");
 
 $marginTop-HtmlVideo: createThemeVar("marginTop-HtmlVideo");
 $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
-
-$marginTop-Text: createThemeVar("marginTop-Text");
-$marginBottom-Text: createThemeVar("marginBottom-Text");
 
 .markdownContent {
   // --- Blockquote
@@ -47,7 +38,7 @@ $marginBottom-Text: createThemeVar("marginBottom-Text");
     padding-left: $paddingLeft-Blockquote;
 
     &::before {
-      background-color: $accent-Blockquote;
+      background-color: $accentColor-Blockquote;
       position: absolute;
       top: 0;
       left: 0;
@@ -73,6 +64,10 @@ $marginBottom-Text: createThemeVar("marginBottom-Text");
     padding: 0.5rem;
     display: flex;
     align-items: flex-start;
+  }
+
+  .admonitionContent {
+    margin-left: $marginLeft-Admonition-content;
   }
 
   .admonitionIcon {

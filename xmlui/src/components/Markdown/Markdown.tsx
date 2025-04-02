@@ -24,11 +24,24 @@ export const MarkdownMd = createMetadata({
   },
 
   defaultThemeVars: {
+    "borderRadius-Admonition": "$space-4",
+    "iconSize-Admonition": "1.5rem",
+    "padding-Admonition": "1rem",
+    "marginBottom-Admonition": "1rem",
+    "marginLeft-Admonition-content":".5rem",
+
+    "accentWidth-Blockquote": "3px",
+    "accentColor-Blockquote": "$color-surface-500",
+    "padding-Blockquote": ".5rem",
+    "marginBottom-Blockquote": "1rem",
+
+    "marginBottom-Text-codefence": ".5rem",
+    "marginBottom-Text-markdown": ".5rem",
+
     light: {
       // --- No light-specific theme vars
     },
     dark: {
-      "backgroundColor-Text": "white"
       // --- No dark-specific theme vars
     },
   },
