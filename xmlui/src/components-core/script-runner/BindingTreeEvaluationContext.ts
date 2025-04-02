@@ -1,6 +1,6 @@
-import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
-import type { ArrowExpression, Statement } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { ArrowExpression, Statement } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
 /**
@@ -20,7 +20,7 @@ export type BindingTreeEvaluationContext = {
   appContext?: any;
 
   // --- The main execution thread;
-  mainThread?: LogicalThreadExp;
+  mainThread?: LogicalThread;
 
   // --- The cancellation token to signal the cancellation of an operation
   cancellationToken?: CancellationToken;

@@ -8,7 +8,7 @@ import {
   type Expression,
   type FunctionDeclaration,
   type Statement,
-} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
 import { isModuleErrors, parseScriptModule } from "./modules";

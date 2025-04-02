@@ -5,7 +5,7 @@ import {
   ArrowExpressionStatement,
   ExpressionStatement,
   T_ARROW_EXPRESSION_STATEMENT,
-} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 
 describe("Function proxies", () => {

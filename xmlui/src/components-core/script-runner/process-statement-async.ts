@@ -1,6 +1,6 @@
 import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import {
   T_ARROW_EXPRESSION_STATEMENT,
   T_ASSIGNMENT_EXPRESSION,
@@ -32,7 +32,7 @@ import {
   type ObjectDestructure,
   type Statement,
   type VarDeclaration,
-} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import { StatementExecutionError, ThrowStatementError } from "../EngineError";
 import { reportEngineError } from "../reportEngineError";
 import {
@@ -71,7 +71,7 @@ import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
 export async function processStatementQueueAsync(
   statements: Statement[],
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThreadExp,
+  thread?: LogicalThread,
 ): Promise<QueueInfo> {
   if (!thread) {
     // --- Create the main thread for the queue
@@ -193,7 +193,7 @@ async function processStatementAsync(
   statement: Statement,
   execInfo: StatementRunTimeInfo,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): Promise<ProcessOutcome> {
   // --- These items should be put in the statement queue after return
   let toUnshift: StatementQueueItem[] = [];
@@ -835,7 +835,7 @@ type IdDeclarationVisitor = (id: string) => void;
 export async function processDeclarationsAsync(
   block: BlockScope,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
   declarations: VarDeclaration[],
   addConst = false,
   useValue = false,

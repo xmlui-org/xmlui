@@ -1,5 +1,5 @@
 import type { RenderChildFn } from "./RendererDefs";
-import type { CollectedDeclarations } from "./scripting/ScriptingSourceTreeExp";
+import type { CollectedDeclarations } from "./scripting/ScriptingSourceTree";
 import { DefaultThemeVars } from "./ThemingDefs";
 
 /**

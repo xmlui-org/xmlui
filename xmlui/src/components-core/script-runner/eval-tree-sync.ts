@@ -1,4 +1,4 @@
-import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import {
   Identifier,
   T_ARRAY_LITERAL,
@@ -41,7 +41,7 @@ import {
   type Statement,
   type UnaryExpression,
   type VarDeclaration,
-} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import { createXmlUiTreeNodeId, Parser } from "../../parsers/scripting/Parser";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
@@ -70,7 +70,7 @@ type EvaluatorFunction = (
   thisStack: any[],
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ) => any;
 
 /**
@@ -83,7 +83,7 @@ type EvaluatorFunction = (
 export function evalBindingExpression(
   source: string,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThreadExp,
+  thread?: LogicalThread,
 ): any {
   // --- Use the main thread by default
   thread ??= evalContext.mainThread;
@@ -114,7 +114,7 @@ export function evalBindingExpression(
 export function evalBinding(
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThreadExp,
+  thread?: LogicalThread,
 ): any {
   const thisStack: any[] = [];
   ensureMainThread(evalContext);
@@ -132,7 +132,7 @@ export function evalBinding(
 export function executeArrowExpressionSync(
   expr: ArrowExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThreadExp,
+  thread?: LogicalThread,
   ...args: any[]
 ): Promise<any> {
   // --- Just an extra safety check
@@ -167,7 +167,7 @@ function evalBindingExpressionTree(
   thisStack: any[],
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   if (!evalContext.options) {
     evalContext.options = { defaultToOptionalMemberAccess: true };
@@ -243,7 +243,7 @@ function evalTemplateLiteral(
   thisStack: any[],
   expr: TemplateLiteralExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   const segmentValues = expr.segments.map((s) => {
     const evaledValue = evaluator(thisStack, s, evalContext, thread);
@@ -258,7 +258,7 @@ function evalMemberAccess(
   thisStack: any[],
   expr: MemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   evaluator(thisStack, expr.obj, evalContext, thread);
   // --- At this point we definitely keep the parent object on `thisStack`, as it will be the context object
@@ -272,7 +272,7 @@ function evalCalculatedMemberAccess(
   thisStack: any[],
   expr: CalculatedMemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   evaluator(thisStack, expr.obj, evalContext, thread);
   evaluator(thisStack, expr.member, evalContext, thread);
@@ -286,7 +286,7 @@ function evalSequence(
   thisStack: any[],
   expr: SequenceExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   if (!expr.exprs || expr.exprs.length === 0) {
     throw new Error(`Missing expression sequence`);
@@ -307,7 +307,7 @@ function evalArrayLiteral(
   thisStack: any[],
   expr: ArrayLiteral,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   const value: any[] = [];
   for (const item of expr.items) {
@@ -335,7 +335,7 @@ function evalObjectLiteral(
   thisStack: any[],
   expr: ObjectLiteral,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   const objectHash: any = {};
   for (const prop of expr.props) {
@@ -386,7 +386,7 @@ function evalUnary(
   thisStack: any[],
   expr: UnaryExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   evaluator(thisStack, expr.expr, evalContext, thread);
   thisStack.pop();
@@ -398,7 +398,7 @@ function evalBinary(
   thisStack: any[],
   expr: BinaryExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   evaluator(thisStack, expr.left, evalContext, thread);
   thisStack.pop();
@@ -421,7 +421,7 @@ function evalConditional(
   thisStack: any[],
   expr: ConditionalExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   const condition = evaluator(thisStack, expr.cond, evalContext, thread);
   thisStack.pop();
@@ -435,7 +435,7 @@ function evalAssignment(
   thisStack: any[],
   expr: AssignmentExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   const leftValue = expr.leftValue;
   const rootScope = getRootIdScope(leftValue, evalContext, thread);
@@ -459,7 +459,7 @@ function evalPreOrPost(
   thisStack: any[],
   expr: PrefixOpExpression | PostfixOpExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   const rootScope = getRootIdScope(expr.expr, evalContext, thread);
   const updatesState = rootScope && rootScope.type !== "block";
@@ -480,7 +480,7 @@ function evalFunctionInvocation(
   thisStack: any[],
   expr: FunctionInvocationExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): any {
   let functionObj: any;
   let implicitContextObject: any = null;
@@ -599,10 +599,10 @@ function createArrowFunction(
   return (...args: any[]) => {
     // --- Prepare the variables to pass
     const runTimeEvalContext = args[1] as BindingTreeEvaluationContext;
-    const runtimeThread = args[2] as LogicalThreadExp;
+    const runtimeThread = args[2] as LogicalThread;
 
     // --- Create the thread that runs the arrow function
-    const workingThread: LogicalThreadExp = {
+    const workingThread: LogicalThread = {
       parent: runtimeThread,
       childThreads: [],
       blocks: [{ vars: {} }],

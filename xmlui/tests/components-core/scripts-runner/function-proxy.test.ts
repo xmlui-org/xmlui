@@ -6,7 +6,7 @@ import {
   ArrowExpressionStatement,
   ExpressionStatement,
   T_ARROW_EXPRESSION_STATEMENT,
-} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Function proxies (exp)", () => {
   it("Array.prototype.filter #1", async () => {

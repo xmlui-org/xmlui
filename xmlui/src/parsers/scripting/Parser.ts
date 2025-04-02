@@ -89,7 +89,7 @@ import {
   T_LITERAL,
   T_TEMPLATE_LITERAL_EXPRESSION,
   T_DESTRUCTURE,
-} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import type { GenericToken } from "../common/GenericToken";
 import { InputStream } from "../common/InputStream";
 import { Lexer } from "./Lexer";

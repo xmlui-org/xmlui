@@ -1,4 +1,4 @@
-import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import {
@@ -32,7 +32,7 @@ import {
   type ObjectDestructure,
   type Statement,
   type VarDeclaration,
-} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import { reportEngineError } from "../reportEngineError";
 import { StatementExecutionError, ThrowStatementError } from "../EngineError";
 import {
@@ -71,7 +71,7 @@ const SYNC_EVAL_TIMEOUT = 1000;
 export function processStatementQueue(
   statements: Statement[],
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThreadExp,
+  thread?: LogicalThread,
 ): QueueInfo {
   if (!thread) {
     // --- Create the main thread for the queue
@@ -196,7 +196,7 @@ function processStatement(
   statement: Statement,
   execInfo: StatementRunTimeInfo,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
 ): ProcessOutcome {
   // --- These items should be put in the statement queue after return
   let toUnshift: StatementQueueItem[] = [];
@@ -827,7 +827,7 @@ function processStatement(
 export function processDeclarations(
   block: BlockScope,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
   declarations: VarDeclaration[],
   addConst = false,
   useValue = false,

@@ -1,4 +1,4 @@
-import { Expression, PropertyValue } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import { Expression, PropertyValue } from "../../abstractions/scripting/ScriptingSourceTree";
 import { Parser } from "./Parser";
 
 /**

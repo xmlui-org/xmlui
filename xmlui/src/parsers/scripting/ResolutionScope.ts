@@ -1,4 +1,4 @@
-import { FunctionDeclaration, Identifier } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import { FunctionDeclaration, Identifier } from "../../abstractions/scripting/ScriptingSourceTree";
 
 // --- and statements are resolved
 export type ResolutionScope = {

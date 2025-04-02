@@ -6,7 +6,7 @@ import {
   SinglePropertyValue,
   T_BINARY_EXPRESSION,
   T_OBJECT_LITERAL,
-} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 import { Parser } from "../../../src/parsers/scripting/Parser";
 
 describe("Parameter property parsing", () => {
