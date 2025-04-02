@@ -69,6 +69,7 @@
   overflow: auto;
 
   .copyButton {
+    z-index: 9999;
     position: absolute;
     top: 16px;
     right: 16px;
@@ -86,5 +87,12 @@
     .copyButton {
       display: flex;
     }
+  }
+}
+
+.xmluiEditor {
+  height: 100%;
+  width: 100%;
+  .monaco-editor {
   }
 }
