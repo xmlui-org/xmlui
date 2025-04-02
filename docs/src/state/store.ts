@@ -177,7 +177,6 @@ export function activeThemeChanged(activeTheme: string) {
 }
 
 export function editorStatusChanged(editorStatus: "loading" | "loaded") {
-  console.log("editorStatusChanged", editorStatus);
   return {
     type: PlaygroundActionKind.EDITOR_STATUS_CHANGED,
     payload: {

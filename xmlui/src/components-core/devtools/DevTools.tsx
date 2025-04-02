@@ -1,23 +1,22 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import { Rnd } from "react-rnd";
-import { XmluiCodeHighlighter } from "./XmluiCodeHighlighter";
-import { useTheme } from "./theming/ThemeContext";
+import { useTheme } from "../theming/ThemeContext";
 import { createPortal } from "react-dom";
-import { InspectorContext, useDevTools } from "./InspectorContext";
-import { Button } from "../components/Button/ButtonNative";
+import { InspectorContext, useDevTools } from "../InspectorContext";
+import { Button } from "../../components/Button/ButtonNative";
 import styles from "./DevTools.module.scss";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
 import { BiDockBottom, BiDockLeft, BiDockRight } from "react-icons/bi";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { HiOutlineDotsVertical } from "react-icons/all";
+import { HiOutlineDotsVertical } from "react-icons/hi";
 import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
-import Icon from "../components/Icon/IconNative";
+import Icon from "../../components/Icon/IconNative";
 import loader from "@monaco-editor/loader";
-import { XmluiGrammar } from "./syntax/monaco/grammar.monacoLanguage";
-import { XmluiScripGrammar } from "./syntax/monaco/xmluiscript.monacoLanguage";
-import xmluiLight from "./syntax/monaco/xmlui-light";
-import xmluiDark from "./syntax/monaco/xmlui-dark";
+import { XmluiGrammar } from "../../syntax/monaco/grammar.monacoLanguage";
+import { XmluiScripGrammar } from "../../syntax/monaco/xmluiscript.monacoLanguage";
+import xmluiLight from "../../syntax/monaco/xmlui-light";
+import xmluiDark from "../../syntax/monaco/xmlui-dark";
 
 type Props = {
   setIsOpen: (isOpen: boolean) => void;
@@ -31,6 +30,8 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
   const [copied, setCopied] = useState(false);
   const monacoEditorInstance = useRef(null);
   const editorRef = useRef(null);
+  const [activeTab, setActiveTab] = useState("code");
+  const monacoSetupDone = useRef(false);
 
   const copyToClipboard = () => {
     setCopied(true);
@@ -74,6 +75,62 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
     return prunedLines.map((line) => line.slice(trimBeginCount)).join("\n");
   }, [node.debug?.source, sources]);
 
+  useEffect(() => {
+    if (activeTab === "code") {
+      if (monacoEditorInstance.current) {
+        monacoEditorInstance.current.layout();
+      } else if (editorRef.current) {
+        loader.init().then((monaco) => {
+          if (!editorRef.current || monacoEditorInstance.current) return;
+
+          if (!monacoSetupDone.current) {
+            monaco.languages.register({ id: XmluiGrammar.id });
+            monaco.languages.setMonarchTokensProvider(XmluiGrammar.id, XmluiGrammar.language);
+            monaco.languages.setLanguageConfiguration(XmluiGrammar.id, XmluiGrammar.config);
+
+            monaco.languages.register({ id: XmluiScripGrammar.id });
+            monaco.languages.setMonarchTokensProvider(
+              XmluiScripGrammar.id,
+              XmluiScripGrammar.language,
+            );
+            monaco.languages.setLanguageConfiguration(
+              XmluiScripGrammar.id,
+              XmluiScripGrammar.config,
+            );
+
+            monaco.editor.defineTheme("xmlui-light", xmluiLight);
+            monaco.editor.defineTheme("xmlui-dark", xmluiDark);
+
+            monacoSetupDone.current = true;
+          }
+
+          monaco.editor.setTheme(activeThemeTone === "dark" ? "xmlui-dark" : "xmlui-light");
+
+          monacoEditorInstance.current = monaco.editor.create(editorRef.current, {
+            value,
+            language: "xmlui",
+            readOnly: true,
+            scrollBeyondLastLine: false,
+            overviewRulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+            minimap: { enabled: false },
+            padding: {
+              top: 10,
+              bottom: 10
+            }
+          });
+        });
+      }
+    }
+
+    return () => {
+      if (monacoEditorInstance.current) {
+        monacoEditorInstance.current.dispose();
+        monacoEditorInstance.current = null;
+      }
+    };
+  }, [activeTab, activeThemeTone, value]);
+
   const getInitialSize = useCallback(() => {
     switch (side) {
       case "bottom":
@@ -103,6 +160,12 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
   const [position, setPosition] = useState(getInitialPosition());
 
   useEffect(() => {
+    if (monacoEditorInstance?.current && activeTab === "code") {
+      monacoEditorInstance.current.layout();
+    }
+  }, [activeTab, size, position]);
+
+  useEffect(() => {
     const handleResize = () => {
       setSize(getInitialSize());
       setPosition(getInitialPosition());
@@ -125,38 +188,6 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
       setDevToolsSize(size.width);
     }
   }, [setDevToolsSide, setDevToolsSize, side, size]);
-
-  useEffect(() => {
-    loader.init().then((monaco) => {
-      if (!editorRef.current || monacoEditorInstance.current) return;
-
-      monaco.languages.register({ id: XmluiGrammar.id });
-      monaco.languages.setMonarchTokensProvider(XmluiGrammar.id, XmluiGrammar.language);
-      monaco.languages.setLanguageConfiguration(XmluiGrammar.id, XmluiGrammar.config);
-
-      monaco.languages.register({ id: XmluiScripGrammar.id });
-      monaco.languages.setMonarchTokensProvider(XmluiScripGrammar.id, XmluiScripGrammar.language);
-      monaco.languages.setLanguageConfiguration(XmluiScripGrammar.id, XmluiScripGrammar.config);
-
-      monaco.editor.defineTheme("xmlui-light", xmluiLight);
-      monaco.editor.defineTheme("xmlui-dark", xmluiDark);
-
-      monaco.editor.setTheme(activeThemeTone === "dark" ? "xmlui-dark" : "xmlui-light");
-
-      monacoEditorInstance.current = monaco.editor.create(editorRef.current, {
-        value,
-        language: "xmlui",
-        readOnly: true,
-      });
-    });
-
-    return () => {
-      if (monacoEditorInstance.current) {
-        monacoEditorInstance.current.dispose();
-        monacoEditorInstance.current = null;
-      }
-    };
-  }, []);
 
   return createPortal(
     <Rnd
@@ -185,7 +216,12 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
       }}
       bounds={"window"}
     >
-      <Root defaultValue={"code"} className={styles.tabs} style={{ width: "100%", height: "100%" }} >
+      <Root
+        defaultValue={"code"}
+        className={styles.tabs}
+        style={{ width: "100%", height: "100%" }}
+        onValueChange={setActiveTab}
+      >
         <List className={styles.list}>
           <div className={styles.tabItems}>
             <Trigger value={"code"}>

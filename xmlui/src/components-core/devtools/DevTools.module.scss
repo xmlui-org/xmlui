@@ -1,4 +1,4 @@
-@use "./theming/themes" as themes;
+@use "../theming/themes" as themes;
 
 .wrapper {
   z-index: 9999;
@@ -93,6 +93,4 @@
 .xmluiEditor {
   height: 100%;
   width: 100%;
-  .monaco-editor {
-  }
 }
