@@ -2,11 +2,13 @@ import { type CSSProperties, memo, type ReactNode } from "react";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import { visit } from "unist-util-visit";
 
 import styles from "./Markdown.module.scss";
 import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
 
+import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Image } from "../Image/ImageNative";
@@ -21,13 +23,9 @@ type MarkdownProps = {
   style?: CSSProperties;
 };
 
-export const defaultProps: Pick<MarkdownProps, "removeIndents"> = {
-  removeIndents: true,
-};
-
 export const Markdown = memo(function Markdown({
   extractValue,
-  removeIndents = defaultProps.removeIndents,
+  removeIndents = false,
   children,
   style,
 }: MarkdownProps) {
@@ -35,34 +33,41 @@ export const Markdown = memo(function Markdown({
     return null;
   }
 
-  const _children = removeIndents ? removeTextIndents(children) : children;
+  children = removeIndents ? removeTextIndents(children) : children;
 
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }]]}
+        rehypePlugins={[rehypeRaw]}
         components={{
+          details({ children, node, ...props }) {
+            return <details className={htmlTagStyles.htmlDetails} {...props} >{children}</details>;
+          },
+          video({ children, node, ...props }) {
+            return <video className={htmlTagStyles.htmlVideo} {...props} >{children}</video>;
+          },
           h1({ children }) {
-            return <h1 className={htmlTagStyles.htmlH1}>{children}</h1>;
+            return <Heading level="h1">{children}</Heading>;
           },
           h2({ children }) {
-            return <h2 className={htmlTagStyles.htmlH2}>{children}</h2>;
+            return <Heading level="h2">{children}</Heading>;
           },
           h3({ children }) {
-            return <h3 className={htmlTagStyles.htmlH3}>{children}</h3>;
+            return <Heading level="h3">{children}</Heading>;
           },
           h4({ children }) {
-            return <h4 className={htmlTagStyles.htmlH4}>{children}</h4>;
+            return <Heading level="h4">{children}</Heading>;
           },
           h5({ children }) {
-            return <h5 className={htmlTagStyles.htmlH5}>{children}</h5>;
+            return <Heading level="h5">{children}</Heading>;
           },
           h6({ children }) {
-            return <h6 className={htmlTagStyles.htmlH6}>{children}</h6>;
+            return <Heading level="h6">{children}</Heading>;
           },
           p({ id, children }) {
             return (
-              <Text uid={id}>
+              <Text uid={id} variant="markdown">
                 {children}
               </Text>
             );
@@ -117,9 +122,16 @@ export const Markdown = memo(function Markdown({
           hr() {
             return <HorizontalRule />;
           },
-          a({ href, children }) {
-            return <LocalLink to={href || "/"}>{children}</LocalLink>;
+
+          a({ children, href, ...props }) {
+            const allowedProps = ['style', 'disabled', 'active', 'icon', 'onClick'];
+            return (
+              <LocalLink to={href} {...allowedProps}>
+                {children}
+              </LocalLink>
+            );
           },
+
           img({ src, alt }) {
             return <Image src={src} alt={alt} />;
           },
@@ -158,17 +170,13 @@ export const Markdown = memo(function Markdown({
           },
         }}
       >
-        {_children}
+        {children as any}
       </ReactMarkdown>
     </div>
   );
 });
 
-function removeTextIndents(input: string) {
-  if (!input) {
-    return "";
-  }
-
+function removeTextIndents(input: string): string {
   const lines = input.split("\n");
 
   // Find the shortest starting whitespace length
@@ -277,10 +285,11 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
     );
   }
 
-  // Render regular blockquote
   return (
     <blockquote className={styles.blockquote} style={style}>
-      {children}
+      <div className={styles.blockquoteContainer}>
+        {children}
+      </div>
     </blockquote>
   );
 };

@@ -7,6 +7,8 @@ import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { PropsTrasform } from "../../components-core/utils/extractParam";
 
+console.log('styles', styles)
+
 export const HtmlAMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `a` tag.",
@@ -571,6 +573,8 @@ export const htmlDelTagRenderer = createComponentRenderer(
   },
 );
 
+
+
 export const HtmlDetailsMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `details` tag.",
@@ -578,6 +582,11 @@ export const HtmlDetailsMd = createMetadata({
   props: {
     open: d("Specifies that the details are visible (open)"),
   },
+  themeVars: parseScssVar(styles.themeVarsDetails),
+  defaultThemeVars: {
+    "marginTop-HtmlDetails": "1rem",
+    "marginBottom-HtmlDetails": "1rem",
+  }
 });
 
 export const htmlDetailsTagRenderer = createComponentRenderer(
@@ -588,7 +597,7 @@ export const htmlDetailsTagRenderer = createComponentRenderer(
     const { open } = p.asOptionalBoolean("open");
     const props = p.asRest();
     return (
-      <details style={layoutCss} open={open ?? false} {...props}>
+      <details style={layoutCss} className={styles.htmlDetails} open={open ?? false} {...props}>
         {renderChild(node.children)}
       </details>
     );
@@ -2433,6 +2442,11 @@ export const HtmlVideoMd = createMetadata({
     ),
     src: d("Specifies the URL of the video file"),
     width: d("Specifies the width of the video player"),
+  },
+  themeVars: parseScssVar(styles.themeVarsVideo),
+  defaultThemeVars: {
+    "marginTop-HtmlVideo": "1rem",
+    "marginBottom-HtmlVideo": "1rem",
   },
 });
 

@@ -41,6 +41,9 @@ $component: "Text";
   padding: 0;
   min-height: fit-content;
 
+  &.markdown {
+    @include textVariant("markdown");
+  }
   //text inside text should be inline
   .text {
     display: inline;
