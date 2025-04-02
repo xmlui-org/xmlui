@@ -39,3 +39,5 @@ We intend to use this checklist when reviewing components.
   - Can we test the typical usage patterns of the component through unit tests/e2e tests?
   - Can we test the styling of the component with e2e tests?
   - Do we miss any important aspect of testing the component?
+10. Accessibility
+  - Is the component accessible according to WCAG guidelines? ([see accessibility article](./accessibility.md))
