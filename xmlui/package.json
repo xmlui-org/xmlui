@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -183,7 +183,7 @@
         },
         "./vite-xmlui-plugin": {
           "import": "./dist/scripts/bin/vite-xmlui-plugin.js",
-          "require": "./dist/scripts/bin/vite-xmui-plugin.js"
+          "require": "./dist/scripts/bin/vite-xmlui-plugin.js"
         }
       }
     }
