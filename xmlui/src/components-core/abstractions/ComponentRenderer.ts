@@ -2,7 +2,7 @@ import type { Dispatch, MutableRefObject, RefObject } from "react";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { LookupAsyncFnInner, LookupSyncFnInner } from "../../abstractions/ActionDefs";
-import type { CodeDeclaration } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { CodeDeclaration } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { ComponentMetadata, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ComponentRendererContextBase } from "../../abstractions/RendererDefs";
 import type {

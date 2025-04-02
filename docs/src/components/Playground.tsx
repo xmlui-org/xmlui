@@ -7,7 +7,7 @@ import {
   playgroundReducer,
   toneChanged,
 } from "../state/store";
-import type { ThemeDefinition } from "../../../xmlui/src/components-core/theming/abstractions";
+import type { ThemeDefinition } from "../../../xmlui/src/abstractions/ThemingDefs";
 import {INITIAL_PLAYGROUND_STATE, preprocessCode} from "../utils/helpers";
 import { PlaygroundContent } from "../components/PlaygroundContent";
 import { useTheme } from "nextra-theme-docs";

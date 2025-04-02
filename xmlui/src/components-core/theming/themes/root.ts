@@ -1,5 +1,5 @@
-import type { ThemeDefinition } from "../abstractions";
 
+import { ThemeDefinition } from "../../../abstractions/ThemingDefs";
 import { palette } from "./palette";
 
 const {

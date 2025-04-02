@@ -1,6 +1,14 @@
 import type { BlockScope } from "./BlockScope";
 import type { LoopScope } from "./LoopScope";
-import type { TryScope } from "./TryScope";
+import type { TryScope } from "./TryScopeExp";
+import type { Expression } from "./ScriptingSourceTree";
+
+// Result of evaluating a binding expression
+export type ValueResult = {
+  value: any;
+  valueScope?: any;
+  valueIndex?: number | string;
+};
 
 // Represents a logical thread instance
 export type LogicalThread = {
@@ -9,6 +17,9 @@ export type LogicalThread = {
 
   // --- Child threads forked directly from this thread
   childThreads: LogicalThread[];
+
+  // --- Optional cache for expression values
+  valueCache?: Map<Expression, ValueResult>;
 
   // --- Available closures
   closures?: BlockScope[];

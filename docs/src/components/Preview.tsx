@@ -4,7 +4,7 @@ import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import { ComponentDef, CompoundComponentDef, StandaloneExtensionManager } from "xmlui";
 import { AppRoot } from "../../../xmlui/src/components-core/rendering/AppRoot";
-import type { ThemeTone } from "../../../xmlui/src/components-core/theming/abstractions";
+import type { ThemeTone } from "../../../xmlui/src/abstractions/ThemingDefs";
 import styles from "./Preview.module.scss";
 import {
   errReportComponent,

@@ -19,10 +19,10 @@ import {
   type FunctionInvocationExpression,
   type Identifier,
   type Statement,
-} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import type { QueueInfo } from "../script-runner/statement-queue";
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
-import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 
 import { Parser } from "../../parsers/scripting/Parser";
 import { processStatementQueueAsync } from "../script-runner/process-statement-async";
@@ -263,7 +263,7 @@ export function prepareHandlerStatements(
 export async function runEventHandlerCode(
   source: string,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThreadExp,
+  thread?: LogicalThread,
 ): Promise<QueueInfo> {
   const statements = prepareHandlerStatements(parseHandlerCode(source));
   return await processStatementQueueAsync(statements, evalContext, thread);

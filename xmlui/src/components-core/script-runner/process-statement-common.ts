@@ -1,5 +1,5 @@
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import {
   T_ARROW_EXPRESSION,
@@ -9,7 +9,7 @@ import {
   type LoopStatement,
   type Statement,
   type TryStatement,
-} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import type { TryScope } from "../../abstractions/scripting/TryScopeExp";
 
 import { obtainClosures } from "./eval-tree-common";
@@ -21,26 +21,26 @@ import {
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
 
-export function innermostLoopScope(thread: LogicalThreadExp): LoopScope {
+export function innermostLoopScope(thread: LogicalThread): LoopScope {
   if (!thread.loops || thread.loops.length === 0) {
     throw new Error("Missing loop scope");
   }
   return thread.loops[thread.loops.length - 1];
 }
 
-export function innermostBlockScope(thread: LogicalThreadExp): BlockScope | undefined {
+export function innermostBlockScope(thread: LogicalThread): BlockScope | undefined {
   if (!thread.blocks || thread.blocks.length === 0) return undefined;
   return thread.blocks[thread.blocks.length - 1];
 }
 
-export function innermostTryScope(thread: LogicalThreadExp): TryScope {
+export function innermostTryScope(thread: LogicalThread): TryScope {
   if (!thread.tryBlocks || thread.tryBlocks.length === 0) {
     throw new Error("Missing try scope");
   }
   return thread.tryBlocks[thread.tryBlocks.length - 1];
 }
 
-export function createLoopScope(thread: LogicalThreadExp, continueOffset = 0): LoopScope {
+export function createLoopScope(thread: LogicalThread, continueOffset = 0): LoopScope {
   thread.loops ??= [];
   const breakDepth = thread.blocks?.length ?? 0;
   const tryDepth = thread.tryBlocks?.length ?? 0;
@@ -55,7 +55,7 @@ export function createLoopScope(thread: LogicalThreadExp, continueOffset = 0): L
   return loopScope;
 }
 
-export function releaseLoopScope(thread: LogicalThreadExp, skipContinuation = true): void {
+export function releaseLoopScope(thread: LogicalThread, skipContinuation = true): void {
   const loopScope = innermostLoopScope(thread);
   if (skipContinuation) {
     thread.loops?.pop();
@@ -104,7 +104,7 @@ export function provideLoopBody(
 }
 
 // --- Create a list of body statements according to the specified try statement scope
-export function createTryScope(thread: LogicalThreadExp, tryStatement: TryStatement): TryScope {
+export function createTryScope(thread: LogicalThread, tryStatement: TryStatement): TryScope {
   thread.tryBlocks ??= [];
   const loopScope: TryScope = {
     statement: tryStatement,
@@ -116,7 +116,7 @@ export function createTryScope(thread: LogicalThreadExp, tryStatement: TryStatem
 }
 
 // --- Provide a body for the try block
-export function provideTryBody(thread: LogicalThreadExp, tryScope: TryScope): StatementQueueItem[] {
+export function provideTryBody(thread: LogicalThread, tryScope: TryScope): StatementQueueItem[] {
   // --- Stay in the error handling block, add the body and the guard condition
   const guardStatement = guard(tryScope.statement);
 
@@ -136,7 +136,7 @@ export function provideTryBody(thread: LogicalThreadExp, tryScope: TryScope): St
 
 // --- Provide a body for the catch block
 export function provideCatchBody(
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
   tryScope: TryScope,
 ): StatementQueueItem[] {
   // --- Stay in the error handling block, add the body and the guard condition
@@ -158,7 +158,7 @@ export function provideCatchBody(
 
 // --- Provide a body for the finally block
 export function provideFinallyBody(
-  thread: LogicalThreadExp,
+  thread: LogicalThread,
   tryScope: TryScope,
 ): StatementQueueItem[] {
   // --- Stay in the error handling block, add the body and the guard condition
@@ -189,7 +189,7 @@ export function provideFinallyErrorBody(tryScope: TryScope): StatementQueueItem[
 }
 
 // --- Ensure that the evaluation context has a main thread
-export function ensureMainThread(evalContext: BindingTreeEvaluationContext): LogicalThreadExp {
+export function ensureMainThread(evalContext: BindingTreeEvaluationContext): LogicalThread {
   if (!evalContext.mainThread) {
     evalContext.mainThread = {
       childThreads: [],
@@ -206,7 +206,7 @@ export function ensureMainThread(evalContext: BindingTreeEvaluationContext): Log
 }
 
 // --- Hoist function definitions to the innermost block scope
-export function hoistFunctionDeclarations(thread: LogicalThreadExp, statements: Statement[]): void {
+export function hoistFunctionDeclarations(thread: LogicalThread, statements: Statement[]): void {
   const block = innermostBlockScope(thread);
   if (!block) {
     throw new Error("Missing block scope");

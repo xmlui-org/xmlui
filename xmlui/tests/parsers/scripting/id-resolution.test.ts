@@ -5,7 +5,7 @@ import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   T_FUNCTION_DECLARATION,
   T_IDENTIFIER,
-} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("ID resolution", () => {
   it("PropertyValue does not extend scope", () => {

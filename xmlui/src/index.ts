@@ -20,15 +20,14 @@ import { Button } from "./components/Button/ButtonNative";
 import { Splitter } from "./components/Splitter/SplitterNative";
 import { useTheme } from "./components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
-import type { ThemeDefinition } from "./components-core/theming/abstractions";
 import { getColor } from "./components-core/utils/css-utils";
 import { useColors } from "./components-core/utils/hooks";
 import type { ComponentRendererDef, RendererContext } from "./abstractions/RendererDefs";
 import { parseScssVar } from "./components-core/theming/themeVars";
 import type {RegisterComponentApiFn} from "./abstractions/RendererDefs";
 import type { ComponentMetadata } from "./abstractions/ComponentDefs";
-import { findTokenAtPos } from "./parsers/xmlui-parser/utils";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
+import { ThemeDefinition } from "./abstractions/ThemingDefs";
 
 export type {
   ThemeDefinition,

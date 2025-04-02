@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Parser } from "../../../src/parsers/scripting/Parser";
-import { Identifier, Literal } from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+import { Identifier, Literal } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 import {
   simplifyExpression,
   simplifyStatement,

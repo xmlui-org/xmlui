@@ -44,7 +44,7 @@ import {
   type PropertyValue,
   type Statement,
   type VarDeclaration,
-} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import type { ResolutionScope } from "../../parsers/scripting/ResolutionScope";
 import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
 

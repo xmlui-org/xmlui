@@ -12,7 +12,7 @@ import { LocalLink } from "../Link/LinkNative";
 import { Image } from "../Image/ImageNative";
 import { Toggle } from "../Toggle/Toggle";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
 
 type MarkdownProps = {
   extractValue: ValueExtractor;

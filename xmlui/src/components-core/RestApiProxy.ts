@@ -3,7 +3,7 @@ import {isPlainObject, isUndefined, omitBy} from "lodash-es";
 
 import type { AppContextObject } from "../abstractions/AppContextDefs";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
-import { T_ARROW_EXPRESSION_STATEMENT, type ArrowExpressionStatement } from "../abstractions/scripting/ScriptingSourceTreeExp";
+import { T_ARROW_EXPRESSION_STATEMENT, type ArrowExpressionStatement } from "../abstractions/scripting/ScriptingSourceTree";
 
 import { extractParam } from "./utils/extractParam";
 import { randomUUID, readCookie } from "./utils/misc";

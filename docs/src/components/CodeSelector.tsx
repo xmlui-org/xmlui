@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import * as RadixSelect from "@radix-ui/react-select";
 import selectStyles from "./Select.module.scss";
 import { usePlayground } from "../hooks/usePlayground";
-import type { ThemeDefinition } from "../../../xmlui/src/components-core/theming/abstractions";
+import type { ThemeDefinition } from "../../../xmlui/src/abstractions/ThemingDefs";
 import type { CompoundComponentDef } from "../../../xmlui/src/abstractions/ComponentDefs";
 import { contentChanged } from "../state/store";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";

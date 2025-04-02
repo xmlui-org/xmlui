@@ -12,7 +12,7 @@ import {
   T_MEMBER_ACCESS_EXPRESSION,
   T_SEQUENCE_EXPRESSION,
   T_UNARY_EXPRESSION,
-} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - Binary operations", () => {
   const binaryOpCases = [

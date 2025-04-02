@@ -30,7 +30,7 @@ import {
   ArrowExpression,
   ArrowExpressionStatement,
   T_ARROW_EXPRESSION_STATEMENT,
-} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "../abstractions/containers";
 import { useAppContext } from "../AppContext";

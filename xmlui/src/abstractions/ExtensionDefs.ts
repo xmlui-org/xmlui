@@ -1,6 +1,6 @@
 import type { ComponentRendererDef } from "./RendererDefs";
 import type { CompoundComponentDef } from "./ComponentDefs";
-import type { ThemeDefinition } from "../components-core/theming/abstractions";
+import { ThemeDefinition } from "./ThemingDefs";
 
 export type ComponentExtension = ComponentRendererDef | CompoundComponentDef;
 
