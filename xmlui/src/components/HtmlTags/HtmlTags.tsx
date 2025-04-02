@@ -7,8 +7,6 @@ import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { PropsTrasform } from "../../components-core/utils/extractParam";
 
-console.log('styles', styles)
-
 export const HtmlAMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `a` tag.",
