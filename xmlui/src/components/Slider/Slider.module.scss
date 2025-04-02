@@ -9,6 +9,7 @@ $themeVars: ();
 
 $componentName: "Slider";
 
+// Basic variant mixin for consistent theming
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}-#{$variantName}");
   border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}");
@@ -27,7 +28,14 @@ $componentName: "Slider";
   }
 }
 
+// Container for the slider
+.sliderContainer {
+  width: 100%;
+  position: relative;
+  padding: t.$space-2 0;
+}
 
+// Root element
 .sliderRoot {
   position: relative;
   display: flex;
@@ -35,14 +43,17 @@ $componentName: "Slider";
   touch-action: none;
   user-select: none;
   align-items: center;
+  height: 20px;
 }
 
+// Track element
 .sliderTrack {
   position: relative;
   height: 8px;
   width: 100%;
   flex-grow: 1;
   overflow: hidden;
+  border-radius: 9999px;
   background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}");
 
   @include variant("default");
@@ -57,36 +68,65 @@ $componentName: "Slider";
     @include variant("success");
   }
 
-  &[data-disabled] {
+  &.disabled, &[data-disabled] {
     background-color: createThemeVar("Input:backgroundColor-track-#{$componentName}--disabled");
   }
 }
 
+// Range element
 .sliderRange {
   position: absolute;
   height: 100%;
   background-color: createThemeVar("Input:backgroundColor-range-#{$componentName}");
-  &[data-disabled] {
+  border-radius: 9999px;
+
+  &.disabled, &[data-disabled] {
     background-color: createThemeVar("Input:backgroundColor-range-#{$componentName}--disabled");
   }
 }
 
+// Thumb element
 .sliderThumb {
   display: block;
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: createThemeVar("Input:borderWidth-thumb-#{$componentName}") createThemeVar("Input:borderStyle-thumb-#{$componentName}") createThemeVar("Input:borderColor-thumb-#{$componentName}");
+  border: createThemeVar("Input:borderWidth-thumb-#{$componentName}")
+          createThemeVar("Input:borderStyle-thumb-#{$componentName}")
+          createThemeVar("Input:borderColor-thumb-#{$componentName}");
   background-color: createThemeVar("Input:backgroundColor-thumb-#{$componentName}");
   box-shadow: createThemeVar("Input:boxShadow-thumb-#{$componentName}");
+  position: relative;
   transition: background-color 0.2s;
   outline: none;
 
+  &.disabled, &[data-disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 }
 
-.sliderThumb:disabled {
-  pointer-events: none;
+/* States */
+.disabled {
   opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.readOnly {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.error {
+  border-color: createThemeVar("Input:borderColor-#{$componentName}-error");
+}
+
+.warning {
+  border-color: createThemeVar("Input:borderColor-#{$componentName}-warning");
+}
+
+.valid {
+  border-color: createThemeVar("Input:borderColor-#{$componentName}-success");
 }
 
 // --- We export the theme variables to add them to the component renderer

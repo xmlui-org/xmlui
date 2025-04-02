@@ -36,6 +36,22 @@ type Props = {
   enabled?: boolean;
   rangeStyle?: CSSProperties;
   thumbStyle?: CSSProperties;
+  showValues?: boolean;
+  valueFormat?: (value: number) => string;
+};
+
+// Helper function to ensure value is properly formatted
+const formatValue = (val: number | number[] | undefined, defaultVal: number = 0): number[] => {
+  if (val === undefined) {
+    return [defaultVal];
+  }
+  if (typeof val === "number") {
+    return [val];
+  }
+  if (Array.isArray(val) && val.length > 0) {
+    return val;
+  }
+  return [defaultVal];
 };
 
 export const Slider = forwardRef(
@@ -43,8 +59,8 @@ export const Slider = forwardRef(
     {
       style,
       step = 1,
-      min,
-      max,
+      min = 0,
+      max = 10,
       inverted,
       updateState,
       onDidChange = noop,
@@ -66,27 +82,61 @@ export const Slider = forwardRef(
       minStepsBetweenThumbs,
       rangeStyle,
       thumbStyle,
+      showValues = true,
+      valueFormat = (value) => value.toString(),
     }: Props,
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
     const inputRef = useRef(null);
-    const [localValue, setLocalValue] = React.useState([]);
 
+    // Initialize localValue properly
+    const [localValue, setLocalValue] = React.useState<number[]>([]);
+
+    // Process initialValue on mount
     useEffect(() => {
-      if (typeof value === "object") {
-        setLocalValue(value);
-      } else if (typeof value === "number") {
-        setLocalValue([value]);
+      let initialVal;
+
+      if (typeof initialValue === "string") {
+        try {
+          // Try to parse as JSON first (for arrays)
+          initialVal = JSON.parse(initialValue);
+        } catch (e) {
+          // If not JSON, try to parse as number
+          const num = parseFloat(initialValue);
+          if (!isNaN(num)) {
+            initialVal = num;
+          }
+        }
+      } else {
+        initialVal = initialValue;
       }
-    }, [value]);
 
+      // Format the value properly
+      const formattedValue = formatValue(initialVal, min);
+      setLocalValue(formattedValue);
+
+      // Notify parent component
+      if (updateState) {
+        updateState({
+          value: formattedValue.length === 1 ? formattedValue[0] : formattedValue
+        }, { initial: true });
+      }
+    }, [initialValue, min, updateState]);
+
+    // Sync with external value changes
     useEffect(() => {
-      updateState({ value: initialValue }, { initial: true });
-    }, [initialValue, updateState]);
+      if (value !== undefined) {
+        const formattedValue = formatValue(value, min);
+        setLocalValue(formattedValue);
+      }
+    }, [value, min]);
 
     const updateValue = useCallback(
       (value: number | number[]) => {
-        updateState({ value });
+        if (updateState) {
+          updateState({ value });
+        }
+        // Call onDidChange without extra arguments to maintain type compatibility
         onDidChange(value);
       },
       [onDidChange, updateState],
@@ -94,8 +144,15 @@ export const Slider = forwardRef(
 
     const onInputChange = useCallback(
       (value: number[]) => {
+        setLocalValue(value);
+
+        // 👇 Force the DOM element to reflect the latest value synchronously
+        if (inputRef.current) {
+          inputRef.current.value = value;
+        }
+
         if (value.length > 1) {
-          updateValue(value);
+          updateValue(value); // calls updateState + onDidChange
         } else if (value.length === 1) {
           updateValue(value[0]);
         }
@@ -103,7 +160,7 @@ export const Slider = forwardRef(
       [updateValue],
     );
 
-    // --- Manage obtaining and losing the focus
+    // Component APIs
     const handleOnFocus = useCallback(() => {
       onFocus?.();
     }, [onFocus]);
@@ -127,10 +184,19 @@ export const Slider = forwardRef(
       });
     }, [focus, registerComponentApi, setValue]);
 
+    // Ensure we always have at least one thumb
+    const displayValue = localValue.length > 0 ? localValue : [min];
+
+    // Format the current values as a string
+    const valuesText = displayValue.map(v => valueFormat(v)).join(', ');
+
+    // Create a custom label that includes the current values
+    const displayLabel = label ? (showValues ? `${label} ${valuesText}` : label) : (showValues ? valuesText : '');
+
     return (
       <ItemWithLabel
         labelPosition={labelPosition as any}
-        label={label}
+        label={displayLabel}
         labelWidth={labelWidth}
         labelBreak={labelBreak}
         required={required}
@@ -140,40 +206,56 @@ export const Slider = forwardRef(
         style={style}
         ref={forwardedRef}
       >
-        <Root
-          minStepsBetweenThumbs={minStepsBetweenThumbs}
-          ref={inputRef}
-          tabIndex={tabIndex}
-          aria-readonly={readOnly}
-          className={classnames(styles.sliderRoot)}
-          style={style}
-          max={max}
-          min={min}
-          inverted={inverted}
-          step={step}
-          disabled={!enabled}
-          onFocus={handleOnFocus}
-          onBlur={handleOnBlur}
-          onValueChange={onInputChange}
-          aria-required={required}
-          value={localValue}
-          autoFocus={autoFocus}
-        >
-          <Track
-            className={classnames(styles.sliderTrack, {
+        <div className={styles.sliderContainer}>
+          <Root
+            minStepsBetweenThumbs={minStepsBetweenThumbs || 1}
+            ref={inputRef}
+            tabIndex={tabIndex}
+            aria-readonly={readOnly}
+            className={classnames(styles.sliderRoot, {
               [styles.disabled]: !enabled,
-              [styles.readOnly]: readOnly,
-              [styles.error]: validationStatus === "error",
-              [styles.warning]: validationStatus === "warning",
-              [styles.valid]: validationStatus === "valid",
+              [styles.readOnly]: readOnly
             })}
+            style={style}
+            max={max}
+            min={min}
+            inverted={inverted}
+            step={step}
+            disabled={!enabled}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
+            onValueChange={onInputChange}
+            aria-required={required}
+            value={displayValue}
+            autoFocus={autoFocus}
           >
-            <Range className={styles.sliderRange} style={rangeStyle} />
-          </Track>
-          {localValue?.map((_, index) => (
-            <Thumb key={index} className={styles.sliderThumb} style={thumbStyle} />
-          ))}
-        </Root>
+            <Track
+              className={classnames(styles.sliderTrack, {
+                [styles.disabled]: !enabled,
+                [styles.readOnly]: readOnly,
+                [styles.error]: validationStatus === "error",
+                [styles.warning]: validationStatus === "warning",
+                [styles.valid]: validationStatus === "valid",
+              })}
+              style={rangeStyle ? { ...rangeStyle } : undefined}
+            >
+              <Range
+                className={classnames(styles.sliderRange, {
+                  [styles.disabled]: !enabled
+                })}
+              />
+            </Track>
+            {displayValue.map((_, index) => (
+              <Thumb
+                key={index}
+                className={classnames(styles.sliderThumb, {
+                  [styles.disabled]: !enabled
+                })}
+                style={thumbStyle ? { ...thumbStyle } : undefined}
+              />
+            ))}
+          </Root>
+        </div>
       </ItemWithLabel>
     );
   },
