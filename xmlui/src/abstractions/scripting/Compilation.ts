@@ -39,6 +39,8 @@ export type FileCompilation = {
 export type ParsedPropertyValue = {
   // --- We recognize this as a parsed property value
   __PARSED: true;
+
+  // --- ID used for caching the parsed property value
   parseId: number;
 
   // --- The property segments
