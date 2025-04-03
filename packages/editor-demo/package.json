@@ -1,15 +1,77 @@
 {
-  "name": "editor-demo",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+  "name": "monaco-languageclient-examples",
+  "version": "2025.3.6",
+  "description": "Monaco Language client examples",
+  "author": {
+    "name": "TypeFox GmbH",
+    "url": "http://www.typefox.io"
   },
+  "homepage": "https://github.com/TypeFox/monaco-languageclient/blob/main/packages/examples/README.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TypeFox/monaco-languageclient.git",
+    "directory": "packages/examples"
+  },
+  "bugs": {
+    "url": "https://github.com/TypeFox/monaco-languageclient/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
+    },
+    "./json-client": {
+      "types": "./dist/json/client/wrapperWs.d.ts",
+      "default": "./dist/json/client/wrapperWs.js"
+    },
+    "./python-client": {
+      "types": "./dist/python/client/main.d.ts",
+      "default": "./dist/python/client/main.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "dist/index"
+      ],
+      "node": [
+        "dist/node"
+      ],
+      "json-client": [
+        "dist/json/client/wrapperWs"
+      ],
+      "python-client": [
+        "dist/python/client/main"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=18.19.0",
+    "npm": ">=10.2.3"
+  },
+  "volta": {
+    "node": "22.14.0",
+    "npm": "10.9.2"
+  },
+  "files": [
+    "dist",
+    "src",
+    "*.html",
+    "*.ts",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "dependencies": {
+    "@codingame/esbuild-import-meta-url-plugin": "^1.0.3",
     "@codingame/monaco-vscode-configuration-service-override": "~15.0.2",
     "@codingame/monaco-vscode-cpp-default-extension": "~15.0.2",
     "@codingame/monaco-vscode-debug-service-override": "~15.0.2",
@@ -25,8 +87,8 @@
     "@codingame/monaco-vscode-lifecycle-service-override": "~15.0.2",
     "@codingame/monaco-vscode-localization-service-override": "~15.0.2",
     "@codingame/monaco-vscode-preferences-service-override": "~15.0.2",
-    "@codingame/monaco-vscode-python-default-extension": "~15.0.2",
     "@codingame/monaco-vscode-remote-agent-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-rollup-vsix-plugin": "^15.0.3",
     "@codingame/monaco-vscode-search-result-default-extension": "~15.0.2",
     "@codingame/monaco-vscode-search-service-override": "~15.0.2",
     "@codingame/monaco-vscode-secret-storage-service-override": "~15.0.2",
@@ -41,23 +103,41 @@
     "@codingame/monaco-vscode-typescript-basics-default-extension": "~15.0.2",
     "@codingame/monaco-vscode-typescript-language-features-default-extension": "~15.0.2",
     "@codingame/monaco-vscode-views-service-override": "~15.0.2",
-    "@typefox/monaco-editor-react": "^6.6.0",
-    "langium": "^3.4.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "@typefox/monaco-editor-react": "~6.6.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "cors": "^2.8.5",
+    "express": "~4.21.2",
+    "jszip": "~3.10.1",
+    "langium": "~3.4.0",
+    "monaco-editor-wrapper": "~6.6.0",
+    "monaco-languageclient": "~9.5.0",
+    "pyright": "~1.1.396",
+    "react": "~19.0.0",
+    "react-dom": "~19.0.0",
+    "request-light": "~0.8.0",
+    "vscode": "npm:@codingame/monaco-vscode-extension-api@~15.0.2",
+    "vscode-json-languageservice": "~5.4.2",
+    "vscode-languageclient": "~9.0.1",
+    "vscode-languageserver": "~9.0.1",
+    "vscode-uri": "~3.1.0",
+    "vscode-ws-jsonrpc": "~3.4.0",
+    "ws": "~8.18.0",
+    "wtd-core": "~4.0.1",
     "xmlui": "*"
   },
   "devDependencies": {
-    "@eslint/js": "^9.21.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react": "^4.3.4",
-    "eslint": "^9.21.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^15.15.0",
-    "typescript": "~5.7.2",
-    "typescript-eslint": "^8.24.1",
-    "vite": "^6.2.0"
+    "@types/cors": "^2.8.17",
+    "@types/emscripten": "~1.40.0",
+    "@types/express": "~5.0.0",
+    "@types/ws": "~8.18.0",
+    "langium-cli": "~3.4.0",
+    "mini-coi": "~0.4.2",
+    "ts-node": "~10.9.1",
+    "vite-plugin-static-copy": "~2.3.0",
+    "vscode-languageserver-types": "~3.17.5"
+  },
+  "scripts": {
+    "dev": "vite dev",
+    "compile": "tsc "
   }
 }

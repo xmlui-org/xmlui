@@ -2,12 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <title>React: Langium Statemachine Language Client & Language Server (Worker)</title>
   </head>
+
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div class="exampleHeadelineDiv">
+      <b class="exampleHeadeline"
+        >React: Langium Statemachine Language Client & Language Server (Worker)</b
+      >
+      - [<a href="../../index.html">Back to Index</a>]
+      <br />
+      <button type="button" id="button-start">Start</button>
+      <label>Enable Strict mode:</label><input type="checkbox" id="checkbox-strictmode" />
+      <button type="button" id="button-dispose">Dispose</button>
+    </div>
+    <div id="react-root"></div>
+    <script type="module">
+      import { runStatemachineReact } from "./src/main-react.tsx";
+
+      runStatemachineReact();
+    </script>
   </body>
 </html>
