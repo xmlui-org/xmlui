@@ -178,11 +178,11 @@ export function Theme({
           {!!faviconUrl && <link rel="icon" type="image/svg+xml" href={faviconUrl} />}
           {fontLinks?.map((fontLink) => <link href={fontLink} rel={"stylesheet"} key={fontLink} />)}
         </Helmet>
-        <style type="text/css">{`:root {${css}}`}</style>
+        <style type="text/css">{`.${className}  {${css}}`}</style>
         <div
           style={inspectStyle}
           id={"_ui-engine-theme-root"}
-          className={classnames(styles.baseRootComponent)}
+          className={classnames(styles.baseRootComponent, className)}
           ref={(el) => {
             if (el) {
               setRoot(el);
