@@ -69,13 +69,17 @@ Set this property to `true` to disallow changing the component value.
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
+### `showValues (default: true)`
+
+This property controls whether the slider shows the current values of the thumbs.
+
 ### `step`
 
 This property defines the increment value for the slider, determining the allowed intervals between selectable values.
 
 ### `thumbStyle`
 
-This property allows yout top apply custom styles to the thumb elements of the slider.
+This property allows you to apply custom styles to the thumb elements of the slider.
 
 ### `validationStatus (default: "none")`
 
@@ -88,6 +92,10 @@ Available values:
 | `valid` | Visual indicator for an input that is accepted |
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
+
+### `valueFormat`
+
+This property allows you to customize how the values are displayed.
 
 ## Events
 
@@ -125,15 +133,16 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider | $color-primary | $color-primary |
 | [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider | $color-primary | $color-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider--disabled | $color-surface-400 | $color-surface-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider--disabled | $color-surface-400 | $color-surface-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-primary | $color-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-primary | $color-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider--disabled | $color-surface-400 | $color-surface-800 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider--disabled | $color-surface-400 | $color-surface-800 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-primary-500 | $color-primary-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-primary-500 | $color-primary-400 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-300 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-300 |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-600 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-600 |
+| [borderColor](../styles-and-themes/common-units/#color)-Slider-default | transparent | transparent |
+| [borderColor](../styles-and-themes/common-units/#color)-Slider-default | transparent | transparent |
 | [borderColor](../styles-and-themes/common-units/#color)-Slider-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-Slider-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-Slider-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -145,25 +154,29 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [borderColor](../styles-and-themes/common-units/#color)-Slider-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-Slider-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderColor](../styles-and-themes/common-units/#color)-Slider-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-surface-50 | $color-surface-50 |
-| [borderColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-surface-50 | $color-surface-50 |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-surface-50 | $color-surface-950 |
+| [borderColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-surface-50 | $color-surface-950 |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider-default | $borderRadius | $borderRadius |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider-default | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Slider-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Slider-default | solid | solid |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Slider-default | solid | solid |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Slider-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Slider-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Slider-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-thumb-Slider | solid | solid |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-thumb-Slider | solid | solid |
-| [borderWidth](../styles-and-themes/common-units/#size)-Slider-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-Slider-default | 0 | 0 |
+| [borderWidth](../styles-and-themes/common-units/#size)-Slider-default | 0 | 0 |
 | [borderWidth](../styles-and-themes/common-units/#size)-Slider-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-Slider-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-Slider-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-thumb-Slider | 2px | 2px |
 | [borderWidth](../styles-and-themes/common-units/#size)-thumb-Slider | 2px | 2px |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider-default | none | none |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider-default | none | none |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -177,3 +190,5 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider | $boxShadow-md | $boxShadow-md |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider | $boxShadow-md | $boxShadow-md |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--focus | $boxShadow-xl | $boxShadow-xl |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | $boxShadow-lg | $boxShadow-lg |
