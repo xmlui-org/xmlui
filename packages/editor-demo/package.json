@@ -138,6 +138,7 @@
   },
   "scripts": {
     "dev": "vite dev",
+    "build": "tsc --noEmit && vite build",
     "compile": "tsc "
   }
 }
