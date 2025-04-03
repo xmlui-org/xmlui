@@ -1,9 +1,12 @@
 import type { AxiosResponse } from "axios";
-import {isPlainObject, isUndefined, omitBy} from "lodash-es";
+import { isPlainObject, isUndefined, omitBy } from "lodash-es";
 
 import type { AppContextObject } from "../abstractions/AppContextDefs";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
-import { T_ARROW_EXPRESSION_STATEMENT, type ArrowExpressionStatement } from "../abstractions/scripting/ScriptingSourceTree";
+import {
+  T_ARROW_EXPRESSION_STATEMENT,
+  type ArrowExpressionStatement,
+} from "../abstractions/scripting/ScriptingSourceTree";
 
 import { extractParam } from "./utils/extractParam";
 import { randomUUID, readCookie } from "./utils/misc";
@@ -64,14 +67,18 @@ async function parseResponseJson(response: AxiosResponse | Response) {
         resp = await response.clone().text();
       } catch (e) {
         console.error("Failed to parse response as text or JSON", response.body);
-      }      
+      }
     }
   }
   return resp;
 }
 
 //TODO illesg unit test.....
-function appendFormFieldValue({ key, value }: { key: string; value: any }, formData: FormData, prevKey: string = key) {
+function appendFormFieldValue(
+  { key, value }: { key: string; value: any },
+  formData: FormData,
+  prevKey: string = key,
+) {
   if (value === undefined || value === null) {
     return;
   }
@@ -92,7 +99,7 @@ function appendFormFieldValue({ key, value }: { key: string; value: any }, formD
           value: objVal,
         },
         formData,
-        concatenatedObjectKey
+        concatenatedObjectKey,
       );
     });
   } else {
@@ -109,16 +116,19 @@ export default class RestApiProxy {
     const { apiUrl, errorResponseTransform } = conf;
     this.appContext = appContext;
 
-    const xsrfHeaders = {
-      "X-XSRF-TOKEN": readCookie('XSRF-TOKEN')
-    };
+    const xsrfToken = readCookie("XSRF-TOKEN");
+    const xsrfHeaders = xsrfToken
+      ? {
+          "X-XSRF-TOKEN": readCookie("XSRF-TOKEN"),
+        }
+      : {};
     this.config = {
       apiUrl,
       errorResponseTransform,
       headers: {
         ...appContext?.appGlobals?.headers,
-        ...xsrfHeaders
-      }
+        ...xsrfHeaders,
+      },
     };
   }
 
@@ -152,14 +162,20 @@ export default class RestApiProxy {
             //we can't access content-disposition header if it's a CORS request: The suggested workaround was adding Access-Control-Expose-Headers:Content-Disposition to the response header on the server.
             // more info here: https://github.com/matthew-andrews/isomorphic-fetch/issues/67
             let fileName = (operation as DownloadOperationDef).fileName || "unknown";
-            if (response.headers && response.headers.get && typeof response.headers.get === "function") {
+            if (
+              response.headers &&
+              response.headers.get &&
+              typeof response.headers.get === "function"
+            ) {
               const contentDisposition = response.headers.get("Content-Disposition")?.toString();
               if (contentDisposition) {
                 const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
                 if (fileNameMatch && fileNameMatch.length === 2) fileName = fileNameMatch[1];
               }
             }
-            return isAxiosResponse(response) ? response.data : new File([await response.clone().blob()], fileName);
+            return isAxiosResponse(response)
+              ? response.data
+              : new File([await response.clone().blob()], fileName);
           }
         : undefined,
       transactionId,
@@ -184,7 +200,11 @@ export default class RestApiProxy {
     transactionId?: string;
     resolveBindingExpressions?: boolean;
   }) => {
-    const { file, asForm, formParams } = this.extractParam(resolveBindingExpressions, operation, params);
+    const { file, asForm, formParams } = this.extractParam(
+      resolveBindingExpressions,
+      operation,
+      params,
+    );
 
     const uploadParams = {
       chunkStart: chunk?.chunkStart,
@@ -201,9 +221,11 @@ export default class RestApiProxy {
       const data = new FormData();
       data.append(file.name, chunk?.blob || file);
       if (formParams) {
-        Object.entries(this.extractParam(resolveBindingExpressions, formParams, params)).forEach(([key, value]) => {
-          data.append(key, value as string);
-        });
+        Object.entries(this.extractParam(resolveBindingExpressions, formParams, params)).forEach(
+          ([key, value]) => {
+            data.append(key, value as string);
+          },
+        );
       }
 
       return await this.executeOperation({
@@ -239,13 +261,17 @@ export default class RestApiProxy {
               resolveBindingExpressions,
               rawBody: evt.target.result,
               headers: {
-                ...this.extractParam(resolveBindingExpressions, operation.headers || {}, contextParams),
+                ...this.extractParam(
+                  resolveBindingExpressions,
+                  operation.headers || {},
+                  contextParams,
+                ),
                 "Content-Type": file.type,
               },
               onUploadProgress,
               abortSignal,
               transactionId,
-            })
+            }),
           );
         } catch (e) {
           reject(e);
@@ -268,11 +294,16 @@ export default class RestApiProxy {
   }) => {
     return this.generateFullApiUrl(
       this.extractParam(resolveBindingExpressions, operation.url, params),
-      this.extractParam(resolveBindingExpressions, operation.queryParams, params)
+      this.extractParam(resolveBindingExpressions, operation.queryParams, params),
     );
   };
 
-  private extractParam = (resolveAsBindingExpression: boolean, value: any, params = {}, strict?: boolean) => {
+  private extractParam = (
+    resolveAsBindingExpression: boolean,
+    value: any,
+    params = {},
+    strict?: boolean,
+  ) => {
     const localContext = { $adapterConfig: this.config, ...params };
     if (resolveAsBindingExpression) {
       return extractParam(localContext, value, this.appContext, strict);
@@ -291,7 +322,8 @@ export default class RestApiProxy {
         processStatementQueue([arrowStmt], evalContext);
 
         if (evalContext.mainThread?.blocks?.length) {
-          return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue;
+          return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1]
+            .returnValue;
         }
         return undefined;
       } catch (e) {
@@ -309,11 +341,19 @@ export default class RestApiProxy {
     resolveBindingExpressions,
     relativePath = this.extractParam(resolveBindingExpressions, operation.url, contextParams),
     method = this.extractParam(resolveBindingExpressions, operation.method, contextParams),
-    queryParams = this.extractParam(resolveBindingExpressions, operation.queryParams, contextParams),
+    queryParams = this.extractParam(
+      resolveBindingExpressions,
+      operation.queryParams,
+      contextParams,
+    ),
     body = this.extractParam(resolveBindingExpressions, operation.body, contextParams, true),
     rawBody = this.extractParam(resolveBindingExpressions, operation.rawBody, contextParams),
     headers = this.extractParam(resolveBindingExpressions, operation.headers, contextParams),
-    payloadType = this.extractParam(resolveBindingExpressions, operation.payloadType, contextParams) || "json",
+    payloadType = this.extractParam(
+      resolveBindingExpressions,
+      operation.payloadType,
+      contextParams,
+    ) || "json",
     onUploadProgress,
     parseResponse = this.tryParseResponse,
     transactionId,
@@ -334,8 +374,11 @@ export default class RestApiProxy {
     resolveBindingExpressions: boolean;
   }) => {
     const includeClientTxId = method && method !== "get" && !!transactionId;
-    const headersWithoutContentType = {...this.getHeaders(), ["Content-Type"]: undefined};
-    const aggregatedHeaders = omitBy({ ...(body ? this.getHeaders() : headersWithoutContentType), ...headers }, isUndefined) as Record<string, string>;
+    const headersWithoutContentType = { ...this.getHeaders(), ["Content-Type"]: undefined };
+    const aggregatedHeaders = omitBy(
+      { ...(body ? this.getHeaders() : headersWithoutContentType), ...headers },
+      isUndefined,
+    ) as Record<string, string>;
     if (includeClientTxId) {
       aggregatedHeaders["x-ue-client-tx-id"] = transactionId;
     }
@@ -367,7 +410,7 @@ export default class RestApiProxy {
       method: method,
       headers: aggregatedHeaders,
       signal: abortSignal,
-      body: requestBody
+      body: requestBody,
     };
     if (onUploadProgress) {
       console.log("Falling back to axios. Reason: onUploadProgress specified");
@@ -429,9 +472,11 @@ export default class RestApiProxy {
       try {
         return new GenericBackendError(
           this.config.errorResponseTransform
-            ? this.extractParam(true, this.config.errorResponseTransform, { $response: response.data })
+            ? this.extractParam(true, this.config.errorResponseTransform, {
+                $response: response.data,
+              })
             : response.data,
-            response.status
+          response.status,
         );
       } catch {}
     } else {
@@ -441,12 +486,14 @@ export default class RestApiProxy {
           this.config.errorResponseTransform
             ? this.extractParam(true, this.config.errorResponseTransform, { $response: respObject })
             : respObject,
-            response.status
+          response.status,
         );
       } catch {}
     }
 
-    return new Error(`[!] Server responded with an error: ${response.status} - ${response.statusText}`);
+    return new Error(
+      `[!] Server responded with an error: ${response.status} - ${response.statusText}`,
+    );
   };
 
   private getHeaders = (): Record<string, string> => {
