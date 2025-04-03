@@ -13,10 +13,10 @@ import type { CodeContent, LanguageClientConfigs, WrapperConfig } from 'monaco-e
 import { configureDefaultWorkerFactory } from 'monaco-editor-wrapper/workers/workerLoaders';
 
 // cannot be imported with assert as json contains comments
-import statemachineLanguageConfig from './language-configuration.json?raw';
-import responseStatemachineTm from '../syntaxes/statemachine.tmLanguage.json?raw';
+import xmluiLanguageConfig from './language-configuration.json?raw';
+import xmluiTmGrammar from '../syntaxes/xmlui.tmLanguage.json?raw';
 
-export const createLangiumGlobalConfig = (params: {
+export const createMonacoWrapperConfig = (params: {
     languageServerId: string,
     useLanguageClient: boolean,
     codeContent: CodeContent,
@@ -26,24 +26,24 @@ export const createLangiumGlobalConfig = (params: {
     htmlContainer: HTMLElement
 }): WrapperConfig => {
     const extensionFilesOrContents = new Map<string, string | URL>();
-    extensionFilesOrContents.set(`/${params.languageServerId}-statemachine-configuration.json`, statemachineLanguageConfig);
-    extensionFilesOrContents.set(`/${params.languageServerId}-statemachine-grammar.json`, responseStatemachineTm);
+    extensionFilesOrContents.set(`/${params.languageServerId}-xmlui-configuration.json`, xmluiLanguageConfig);
+    extensionFilesOrContents.set(`/${params.languageServerId}-xmlui-grammar.json`, xmluiTmGrammar);
 
     const languageClientConfigs: LanguageClientConfigs | undefined = params.useLanguageClient && params.worker ? {
         configs: {
-            statemachine: {
-                clientOptions: {
-                    documentSelector: ['statemachine']
-                },
-                connection: {
-                    options: {
-                        $type: 'WorkerDirect',
-                        worker: params.worker,
-                        messagePort: params.messagePort,
-                    },
-                    messageTransports: params.messageTransports
-                }
-            }
+          xmlui: {
+              clientOptions: {
+                  documentSelector: ['xmlui']
+              },
+              connection: {
+                  options: {
+                      $type: 'WorkerDirect',
+                      worker: params.worker,
+                      messagePort: params.messagePort,
+                  },
+                  messageTransports: params.messageTransports
+              }
+          },
         }
     } : undefined;
 
@@ -68,9 +68,9 @@ export const createLangiumGlobalConfig = (params: {
         },
         extensions: [{
             config: {
-                name: 'statemachine-example',
-                publisher: 'TypeFox',
-                version: '1.0.0',
+                name: 'xmlui-vscode',
+                publisher: 'norbidotdev',
+                version: '0.0.1',
                 engines: {
                     vscode: '*'
                 },
@@ -79,12 +79,15 @@ export const createLangiumGlobalConfig = (params: {
                         id: 'xmlui',
                         extensions: ['.xmlui'],
                         aliases: ['Xmlui', 'XMLUI'],
-                        configuration: `./${params.languageServerId}-statemachine-configuration.json`
+                        configuration: `./${params.languageServerId}-xmlui-configuration.json`
                     }],
                     grammars: [{
                         language: 'xmlui',
                         scopeName: 'source.xmlui',
-                        path: `./${params.languageServerId}-statemachine-grammar.json`
+                        path: `./${params.languageServerId}-xmlui-grammar.json`,
+                        embeddedLanguages: {
+                          "meta.embedded.block.javascrip": "javascript"
+                        }
                     }]
                 }
             },

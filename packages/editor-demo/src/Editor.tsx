@@ -1,12 +1,11 @@
 import React from "react";
 import { MonacoEditorReactComp } from "@typefox/monaco-editor-react";
-import { createLangiumGlobalConfig } from "./config/wrapperStatemachineConfig.js";
+import { createMonacoWrapperConfig } from "./config/monacoWrapperConfig.js";
 import { BrowserMessageReader, BrowserMessageWriter } from "vscode-languageclient/browser.js";
 
 import workerUrl from "xmlui/language-server-web-worker?worker&url";
 
-const text = "<Button />";
-export default function Editor() {
+export default function Editor(props: any) {
   const worker = new Worker(workerUrl, {
     type: "module",
     name: "Xmlui Language Server",
@@ -16,11 +15,11 @@ export default function Editor() {
   reader.listen((message) => {
     console.log("Received message from worker:", message);
   });
-  const wrapperConfig = createLangiumGlobalConfig({
-    languageServerId: "react",
+  const wrapperConfig = createMonacoWrapperConfig({
+    languageServerId: "xmlui",
     useLanguageClient: true,
     codeContent: {
-      text,
+      text: props.text,
       uri: "/workspace/example.xmlui",
     },
     worker,

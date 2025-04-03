@@ -11,7 +11,7 @@ export const init = async () => {
   const root = ReactDOM.createRoot(document.getElementById("react-root")!);
   root.render(
     <div style={{ height: "85vh" }}>
-      <Editor />
+      <Editor text="<Button />" />
     </div>,
   );
 };
