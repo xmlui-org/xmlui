@@ -192,6 +192,13 @@ export function generatePaddingSegments(theme?: Record<string, string>) {
 
   // --- Iterate through theme variables and split padding values
   Object.entries(theme).forEach(([key, value]) => {
+    if (value === null || value === undefined) {
+      // --- We want to allow theme files to use null or undefined as a synonim for 
+      // --- "pretend this theme variable is not defined".
+      delete result[key];
+      return;
+    }
+
     // --- Check the "paddingHorizontal" theme variables
     let match = paddingHorizontalRegEx.exec(key);
     if (match) {
