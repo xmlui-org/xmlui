@@ -84,8 +84,9 @@ const renderCustomizedLabel = (props: any) => {
         y={ey}
         textAnchor={textAnchor}
         className={styles.pieLabel}
+        fill="currentColor"
         fontSize={12}
-      >{props.payload.name}</text>
+      >{props.name}</text>
     </g>
   );
 };
