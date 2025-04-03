@@ -11,7 +11,7 @@
     "build:xmlui-metadata": "vite build --mode metadata",
     "build:ext-meta": "node scripts/build-extension-packages/build-extension-packages.mjs",
     "build": "rimraf dist && tsc && npm run build:bin && npm run build:xmlui-metadata && npm run build:xmlui && npm run build:xmlui-standalone",
-    "build:extensions": "cd ../packages/xmlui-animations && npm run build && cd ../xmlui-charts && npm run build && cd ../xmlui-pdf && npm run build",
+    "build:extensions": "cd ../packages/xmlui-animations && npm run build && cd ../xmlui-charts && npm run build && cd ../xmlui-pdf && npm run build && cd ../xmlui-spreadsheet && npm run build",
     "test": "npm run test:unit",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
