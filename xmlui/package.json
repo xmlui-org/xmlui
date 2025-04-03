@@ -170,6 +170,10 @@
           "import": "./dist/language-server.mjs",
           "require": "./dist/language-server.mjs"
         },
+        "./language-server-web-worker": {
+          "import": "./dist/language-server-web-worker.mjs",
+          "require": "./dist/language-server-web-worker.mjs"
+        },
         "./parser": {
           "import": "./dist/xmlui-parser.mjs",
           "require": "./dist/xmlui-parser.mjs"
@@ -213,6 +217,10 @@
     "./language-server": {
       "import": "./src/language-server/server.ts",
       "require": "./src/language-server/server.ts"
+    },
+    "./language-server-web-worker": {
+      "import": "./src/language-server/server-web-worker.ts",
+      "require": "./src/language-server/server-web-worker.ts"
     }
   },
   "browserslist": {
