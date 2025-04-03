@@ -25,7 +25,7 @@ type MarkdownProps = {
 
 export const Markdown = memo(function Markdown({
   extractValue,
-  removeIndents = false,
+  removeIndents = true,
   children,
   style,
 }: MarkdownProps) {
@@ -177,6 +177,10 @@ export const Markdown = memo(function Markdown({
 });
 
 function removeTextIndents(input: string): string {
+  if (!input) {
+    return "";
+  }
+  
   const lines = input.split("\n");
 
   // Find the shortest starting whitespace length
