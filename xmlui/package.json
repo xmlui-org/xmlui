@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -91,6 +91,7 @@
     "react-virtualized-auto-sizer": "1.0.24",
     "react-window": "1.8.10",
     "recharts": "^2.15.1",
+    "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "sass": "1.55.0",
     "scroll-into-view-if-needed": "^3.1.0",
@@ -169,6 +170,10 @@
           "import": "./dist/language-server.mjs",
           "require": "./dist/language-server.mjs"
         },
+        "./language-server-web-worker": {
+          "import": "./dist/language-server-web-worker.mjs",
+          "require": "./dist/language-server-web-worker.mjs"
+        },
         "./parser": {
           "import": "./dist/xmlui-parser.mjs",
           "require": "./dist/xmlui-parser.mjs"
@@ -212,6 +217,10 @@
     "./language-server": {
       "import": "./src/language-server/server.ts",
       "require": "./src/language-server/server.ts"
+    },
+    "./language-server-web-worker": {
+      "import": "./src/language-server/server-web-worker.ts",
+      "require": "./src/language-server/server-web-worker.ts"
     }
   },
   "browserslist": {
