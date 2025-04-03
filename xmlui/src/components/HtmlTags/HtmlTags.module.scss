@@ -267,6 +267,61 @@ $marginBottom-HtmlHeading: createThemeVarHeading("marginBottom-HtmlHeading");
   margin-bottom: $marginBottom-HtmlHeading;
 }
 
+// --- Video
+
+$themeVarsVideo: (
+);
+
+@function createThemeVarVideo($componentVariable) {
+  $themeVarsVideo: t.appendThemeVar($themeVarsVideo, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsVideo, $componentVariable);
+}
+
+$marginTop-HtmlVideo: createThemeVarVideo("marginTop-HtmlVideo");
+$marginBottom-HtmlVideo: createThemeVarVideo("marginBottom-HtmlVideo");
+
+.htmlVideo {
+  margin-top: $marginTop-HtmlVideo;
+  margin-bottom: $marginBottom-HtmlVideo;
+}
+
+// --- Details
+
+$themeVarsDetails: (
+);
+
+@function createThemeVarDetails($componentVariable) {
+  $themeVarsDetails: t.appendThemeVar($themeVarsDetails, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsDetails, $componentVariable);
+}
+
+$marginTop-HtmlDetails: createThemeVarDetails("marginTop-HtmlDetails");
+$marginBottom-HtmlDetails: createThemeVarDetails("marginBottom-HtmlDetails");
+
+.htmlDetails {
+  margin-top: $marginTop-HtmlDetails;
+  margin-bottom: $marginBottom-HtmlDetails;
+}
+
+// --- Details
+
+$themeVarsDetails: (
+);
+
+@function createThemeVarDetails($componentVariable) {
+  $themeVarsDetails: t.appendThemeVar($themeVarsDetails, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsDetails, $componentVariable);
+}
+
+$marginTop-HtmlDetails: createThemeVarDetails("marginTop-HtmlDetails");
+$marginBottom-HtmlDetails: createThemeVarDetails("marginBottom-HtmlDetails");
+
+.htmlDetails {
+  margin-top: $marginTop-HtmlDetails;
+  margin-bottom: $marginBottom-HtmlDetails;
+}
+
+
 
 // --- We export the theme variables to add them to the component renderer
 :export {
@@ -279,5 +334,7 @@ $marginBottom-HtmlHeading: createThemeVarHeading("marginBottom-HtmlHeading");
   themeVarsTd: t.json-stringify($themeVarsTd);
   themeVarsList: t.json-stringify($themeVarsList);
   themeVarsHeading: t.json-stringify($themeVarsHeading);
-  
+  themeVarsVideo: t.json-stringify($themeVarsVideo);
+  themeVarsDetails: t.json-stringify($themeVarsDetails);
+
 }
