@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -91,6 +91,7 @@
     "react-virtualized-auto-sizer": "1.0.24",
     "react-window": "1.8.10",
     "recharts": "^2.15.1",
+    "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "sass": "1.55.0",
     "scroll-into-view-if-needed": "^3.1.0",
