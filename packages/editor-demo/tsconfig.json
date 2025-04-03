@@ -32,6 +32,6 @@
     "jsx": "react",
     "verbatimModuleSyntax": true
   },
-  "include": ["/src/**/*.ts", "/src/**/*.json", "/src/**/*.tsx", "*.d.ts"],
+  "include": ["src"],
   "exclude": ["dist/**/*", "lib/**/*", "node_modules/**/*"]
 }

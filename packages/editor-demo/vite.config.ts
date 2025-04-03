@@ -10,8 +10,6 @@ import importMetaUrlPlugin from '@codingame/esbuild-import-meta-url-plugin';
 import vsixPlugin from '@codingame/monaco-vscode-rollup-vsix-plugin';
 import react from '@vitejs/plugin-react';
 
-const clangdWasmLocation = 'packages/examples/resources/clangd/wasm/clangd.wasm';
-
 export const definedViteConfig = defineConfig({
     build: {
         target: 'ES2022',
@@ -59,8 +57,6 @@ export const definedViteConfig = defineConfig({
     ],
     define: {
         rootDirectory: JSON.stringify(__dirname),
-        // Server-provided Content-Length header may be gzipped, get the real size in build time
-        __WASM_SIZE__: fs.existsSync(clangdWasmLocation) ? fs.statSync(clangdWasmLocation).size : 0
     },
     worker: {
         format: 'es'
