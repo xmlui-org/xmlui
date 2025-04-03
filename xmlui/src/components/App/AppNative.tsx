@@ -73,7 +73,7 @@ export function App({
   name,
 }: Props) {
   const { getThemeVar } = useTheme();
-  const { setActiveThemeTone, setActiveThemeId } = useThemes();
+  const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
 
   const mounted = useRef(false);
 
@@ -113,7 +113,7 @@ export function App({
     return () => {
       mounted.current = false;
     };
-  }, [defaultTone, defaultTheme, setActiveThemeTone, setActiveThemeId]);
+  }, [defaultTone, defaultTheme, setActiveThemeTone, setActiveThemeId, themes]);
 
   useEffect(() => {
     onReady();
