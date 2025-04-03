@@ -76,14 +76,14 @@ export const createLangiumGlobalConfig = (params: {
                 },
                 contributes: {
                     languages: [{
-                        id: 'statemachine',
-                        extensions: ['.statemachine'],
-                        aliases: ['statemachine', 'Statemachine'],
+                        id: 'xmlui',
+                        extensions: ['.xmlui'],
+                        aliases: ['Xmlui', 'XMLUI'],
                         configuration: `./${params.languageServerId}-statemachine-configuration.json`
                     }],
                     grammars: [{
-                        language: 'statemachine',
-                        scopeName: 'source.statemachine',
+                        language: 'xmlui',
+                        scopeName: 'source.xmlui',
                         path: `./${params.languageServerId}-statemachine-grammar.json`
                     }]
                 }

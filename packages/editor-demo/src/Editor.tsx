@@ -21,7 +21,7 @@ export default function Editor() {
     useLanguageClient: true,
     codeContent: {
       text,
-      uri: "/workspace/example.statemachine",
+      uri: "/workspace/example.xmlui",
     },
     worker,
     messageTransports: { reader, writer },

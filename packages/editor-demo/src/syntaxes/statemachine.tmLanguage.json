@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "scopeName": "source.statemachine",
+  "scopeName": "source.xmlui",
   "patterns": [{ "include": "#root" }],
   "repository": {
     "root": {
