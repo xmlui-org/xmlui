@@ -19,7 +19,7 @@ export const MarkdownMd = createMetadata({
         "indent found at the start of the content lines is removed from the " +
         "beginning of every line.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: true,
     },
   },
 
@@ -76,7 +76,7 @@ export const markdownComponentRenderer = createComponentRenderer(
     return (
       <Markdown
         style={layoutCss}
-        removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, false)}
+        removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         extractValue={extractValue}
       >
         {renderedChildren}
