@@ -80,9 +80,9 @@ $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
 
 .container:not(.active) {
   text-underline-offset: $textUnderlineOffset-Link;
+  text-decoration-line: $textDecorationLine-Link;
   &:not([disabled]) {
     &:hover {
-      text-decoration-line: $textDecorationLine-Link;
       text-decoration-color: $textDecorationColor-Link;
       text-decoration-style: $textDecorationStyle-Link;
       text-decoration-thickness: $textDecorationThickness-Link;
@@ -92,7 +92,6 @@ $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
       }
     }
     &:active {
-      text-decoration-line: $textDecorationLine-Link;
       text-decoration-color: $textDecorationColor-Link;
       text-decoration-style: $textDecorationStyle-Link;
       text-decoration-thickness: $textDecorationThickness-Link;

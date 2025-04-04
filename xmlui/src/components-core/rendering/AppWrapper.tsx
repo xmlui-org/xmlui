@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { BrowserRouter, HashRouter, MemoryRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Helmet, HelmetProvider } from "react-helmet-async";
@@ -82,6 +82,8 @@ export type AppWrapperProps = {
   // --- purposes. This property is a dictionary of filename and file content
   // --- pairs.
   sources?: Record<string, string>;
+
+  children?: ReactNode;
 };
 
 /**
@@ -104,6 +106,7 @@ export const AppWrapper = ({
   resources,
   resourceMap,
   sources,
+  children
 }: AppWrapperProps) => {
   if (previewMode) {
     // --- Prevent leaking the meta items to the parent document,
@@ -138,8 +141,7 @@ export const AppWrapper = ({
                 globalProps={globalProps}
                 standalone={standalone}
                 decorateComponentsWithTestId={decorateComponentsWithTestId}
-                debugEnabled={debugEnabled}
-              />
+                debugEnabled={debugEnabled}>{children}</AppContent>
             </ConfirmationModalContextProvider>
           </InspectorProvider>
         </ThemeProvider>
