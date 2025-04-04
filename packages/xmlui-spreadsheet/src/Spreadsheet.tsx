@@ -7,6 +7,9 @@ export const SpreadsheetMd = createMetadata({
   description: "XMLUI Spreadsheet",
   status: "experimental",
   props: {
+    worksheets: {
+      description: "This property sets the initial value of the spreadsheet's worksheets.",
+    },
   },
   themeVars: parseScssVar({}),
   defaultThemeVars: {},
@@ -16,8 +19,6 @@ export const spreadsheetComponentRenderer = createComponentRenderer(
   COMP,
   SpreadsheetMd,
   ({ extractValue, node, layoutCss, renderChild }: any) => {
-    return (
-      <JSpreadsheet />
-    );
+    return <JSpreadsheet worksheets={extractValue(node.props.worksheets)} />;
   },
 );

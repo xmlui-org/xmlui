@@ -18,6 +18,7 @@
     "jszip": "^3.10.1"
   },
   "devDependencies": {
+    "@jspreadsheet/formula": "^2.0.2",
     "@types/jspreadsheet-ce": "^4.7.9",
     "xmlui": "*"
   },

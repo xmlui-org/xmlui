@@ -3,30 +3,16 @@ import jspreadsheet from "jspreadsheet-ce";
 import "jspreadsheet-ce/dist/jspreadsheet.css";
 
 interface JSpreadsheetProps {
+  worksheets: jspreadsheet.WorksheetOptions[];
 }
 
-const JSpreadsheet: React.FC<JSpreadsheetProps> = ({ }) => {
+const JSpreadsheet: React.FC<JSpreadsheetProps> = ({ worksheets }) => {
   const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (tableRef.current) {
       jspreadsheet(tableRef.current, {
-        worksheets: [
-          {
-            data: [
-              ["Hello", 13123, "", "Yes", true, "#AA4411"],
-              ["World!", 8, "", "No", false, "#99BE23"],
-            ],
-            columns: [
-              { type: "text", title: "Text" },
-              { type: "numeric", title: "Numeric", mask: "$ #.##,00", decimal: "," },
-              { type: "calendar", title: "Calendar" },
-              { type: "dropdown", source: ["Yes", "No", "Maybe"] },
-              { type: "checkbox", title: "Checkbox" },
-              { type: "color", title: "Color", width: 50, render: "square" },
-            ],
-          },
-        ],
+        worksheets,
       });
     }
   }, []);
