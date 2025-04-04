@@ -52,7 +52,7 @@ export function collectCodeBehindFromSource(
         addFunctionDeclaration(stmt);
         break;
       default:
-        throw new Error(`'${stmt.type}' is not allowed in a code-behind module.`);
+        throw new Error(`Only reactive variable and function definitions are allowed in a code-behind module.`);
     }
   });
   return result;
