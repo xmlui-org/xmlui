@@ -49,6 +49,7 @@ export function AppRoot({
   resourceMap,
   sources,
   extensionManager,
+  children
 }: AppWrapperProps & { extensionManager?: StandaloneExtensionManager }) {
   // --- Make sure, the root node is wrapped in a `Theme` component. Also, 
   // --- the root node must be wrapped in a `Container` component managing 
@@ -81,7 +82,7 @@ export function AppRoot({
   // --- Start with an error-free state
   resetErrors();
 
-  // --- Render the app providing a component registry (in which the engine finds a 
+  // --- Render the app providing a component registry (in which the engine finds a
   // --- component definition by its name). Ensure the app has a context for debugging.
   return (
     <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
@@ -101,8 +102,7 @@ export function AppRoot({
           standalone={standalone}
           trackContainerHeight={trackContainerHeight}
           previewMode={previewMode}
-          sources={sources}
-        />
+          sources={sources}>{children}</AppWrapper>
       </DebugViewProvider>
     </ComponentProvider>
   );
