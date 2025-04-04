@@ -118,6 +118,7 @@ export const ContainerWrapper = memo(
       parentRenderContext,
       layoutContextRef,
       uidInfoRef,
+      ...rest
     }: Props,
     ref,
   ) {
@@ -138,6 +139,7 @@ export const ContainerWrapper = memo(
           uidInfoRef={uidInfoRef}
           isImplicit={node.type !== "Container" && containerizedNode.uses === undefined} //in this case it's an auto-wrapped component
           ref={ref}
+          {...rest}
         />
       </ErrorBoundary>
     );

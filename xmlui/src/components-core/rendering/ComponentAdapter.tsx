@@ -36,6 +36,7 @@ import { resolveLayoutProps } from "../theming/layout-resolver";
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   onUnmount: (uid: symbol) => void;
+  children?: ReactNode;
 };
 
 /**
@@ -61,6 +62,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     memoedVarsRef,
     onUnmount,
     uidInfoRef,
+    children,
     ...rest
   }: Props,
   ref: React.ForwardedRef<any>,
@@ -341,11 +343,11 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     return cloneElement(renderedNode, {
       ref: ref ? composeRefs(ref, (renderedNode as any).ref) : (renderedNode as any).ref,
       ...mergeProps({ ...renderedNode.props, ...mouseEventHandlers }, rest),
-    } as any);
+    } as any, children);
   }
 
   // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.
-  return React.isValidElement(renderedNode) ? renderedNode : <>{renderedNode}</>;
+  return (React.isValidElement(renderedNode) && !!children) ? cloneElement(renderedNode, null, children) : renderedNode;
 });
 
 /**

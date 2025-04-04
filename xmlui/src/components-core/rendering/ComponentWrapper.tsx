@@ -80,6 +80,7 @@ export const ComponentWrapper = memo(
           parentRegisterComponentApi={registerComponentApi}
           uidInfoRef={uidInfoRef}
           ref={ref}
+          {...rest}
         />
       );
     } else {

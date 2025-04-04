@@ -1,4 +1,13 @@
-import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { get } from "lodash-es";
 import toast from "react-hot-toast";
 
@@ -61,7 +70,7 @@ export function AppContent({
   trackContainerHeight,
   decorateComponentsWithTestId,
   debugEnabled,
-  children
+  children,
 }: AppContentProps) {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const debugView = useDebugView();
@@ -425,8 +434,9 @@ export function AppContent({
   return (
     <AppContext.Provider value={appContextValue}>
       <AppStateContext.Provider value={appStateContextValue}>
-        {renderedRoot}
-        {children}
+        {children && isValidElement(renderedRoot)
+          ? cloneElement(renderedRoot, null, children)
+          : null}
       </AppStateContext.Provider>
     </AppContext.Provider>
   );

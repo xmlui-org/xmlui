@@ -70,6 +70,7 @@ export const StateContainer = memo(
       layoutContextRef,
       uidInfoRef,
       isImplicit,
+      ...rest
     }: Props,
     ref,
   ) {
@@ -240,6 +241,7 @@ export const StateContainer = memo(
           isImplicit={isImplicit}
           ref={ref}
           uidInfoRef={uidInfoRef}
+          {...rest}
         />
       </ErrorBoundary>
     );

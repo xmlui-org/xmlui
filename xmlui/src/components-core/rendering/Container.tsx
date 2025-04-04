@@ -1,16 +1,18 @@
 import React, {
+  cloneElement,
   Dispatch,
-  SetStateAction,
-  MutableRefObject,
-  RefObject,
-  memo,
   forwardRef,
-  useRef,
-  useTransition,
-  useEffect,
-  useCallback,
   Fragment,
   isValidElement,
+  memo,
+  MutableRefObject,
+  ReactNode,
+  RefObject,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useTransition,
 } from "react";
 import { useLocation, useNavigate } from "@remix-run/react";
 import { cloneDeep, isArray } from "lodash-es";
@@ -19,16 +21,16 @@ import memoizeOne from "memoize-one";
 
 import {
   LookupActionOptions,
-  LookupSyncFnInner,
   LookupAsyncFnInner,
+  LookupSyncFnInner,
 } from "../../abstractions/ActionDefs";
 import { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import { ContainerState } from "../../abstractions/ContainerDefs";
 import { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
 import {
-  Statement,
   ArrowExpression,
   ArrowExpressionStatement,
+  Statement,
   T_ARROW_EXPRESSION_STATEMENT,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
@@ -47,8 +49,8 @@ import { processStatementQueueAsync } from "../script-runner/process-statement-a
 import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { extractParam, shouldKeep } from "../utils/extractParam";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
-import { useEvent, generatedId, capitalizeFirstLetter, delay } from "../utils/misc";
-import { prepareHandlerStatements, parseHandlerCode } from "../utils/statementUtils";
+import { capitalizeFirstLetter, delay, generatedId, useEvent } from "../utils/misc";
+import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUtils";
 import { StateViewer } from "../../components/StateViewer/StateViewerNative";
 import { renderChild } from "./renderChild";
 import { useTheme } from "../theming/ThemeContext";
@@ -72,6 +74,7 @@ type Props = {
   parentDispatch: ContainerDispatcher;
   parentRenderContext?: ParentRenderContext;
   uidInfoRef?: RefObject<Record<string, any>>;
+  children?: ReactNode;
 };
 
 // React component to display a view container and implement its behavior
@@ -93,6 +96,7 @@ export const Container = memo(
       memoedVarsRef,
       isImplicit,
       uidInfoRef: parentUidInfoRef,
+      children,
     }: Props,
     ref,
   ) {
@@ -178,7 +182,7 @@ export const Container = memo(
             return {
               uid: componentUid,
               state: stateRef.current,
-              getCurrentState: ()=> stateRef.current,
+              getCurrentState: () => stateRef.current,
               dispatch,
               appContext: evalAppContext,
               navigate,
@@ -358,7 +362,7 @@ export const Container = memo(
 
     const getOrCreateEventHandlerFn = useEvent(
       (src: string | ArrowExpression, uid: symbol, options?: LookupActionOptions) => {
-        if(Array.isArray(src)) {
+        if (Array.isArray(src)) {
           throw new Error("Multiple event handlers are not supported");
         }
         const stringSrc = typeof src === "string" ? src : src.statement.nodeId;
@@ -626,7 +630,9 @@ export const Container = memo(
     const containerContent = (
       <>
         {renderedLoaders}
-        {renderedChildren}
+        {!!children && isValidElement(renderedChildren)
+          ? cloneElement(renderedChildren, null, children)
+          : renderedChildren}
       </>
     );
     return (
