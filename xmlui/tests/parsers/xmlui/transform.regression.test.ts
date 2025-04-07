@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, assert, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
+import { P } from "msw/lib/core/GraphQLHandler-b42ca96f";
+import { ParserError } from "../../../src/parsers/xmlui-parser";
 
 describe("Xmlui transform - regression", () => {
   it("prop with multiple component #1", () => {
@@ -81,7 +83,7 @@ const b = 2;
     </Text>
     `) as ComponentDef;
     expect(cd.type).equal("Text");
-    expect((cd.events as any).click).toBe("\nconst a = 1;\n\nconst b = 2;\n")
+    expect((cd.events as any).click.source).toBe("\nconst a = 1;\n\nconst b = 2;\n");
   });
 
   it("method keeps whitespaces", () => {
@@ -94,7 +96,7 @@ const b = 2;
     </Text>
     `) as ComponentDef;
     expect(cd.type).equal("Text");
-    expect((cd.api as any).myMethod).toBe("\nconst a = 1;\n\nconst b = 2;\n")
+    expect((cd.api as any).myMethod).toBe("\nconst a = 1;\n\nconst b = 2;\n");
   });
 
   it("Var removes whitespaces", () => {
@@ -107,7 +109,7 @@ const b = 2;
     </Text>
     `) as ComponentDef;
     expect(cd.type).equal("Text");
-    expect(cd.vars!.myVar).toBe(" const a = 1; const b = 2; ")
+    expect(cd.vars!.myVar).toBe(" const a = 1; const b = 2; ");
   });
 
   it("Component with html tag", () => {
@@ -117,6 +119,16 @@ const b = 2;
     </Component>
     `) as CompoundComponentDef;
     expect(cd.name).toBe("MyComp");
-    expect((cd.component).type).toBe("h1");
+    expect(cd.component.type).toBe("h1");
+  });
+
+  it("Markup with event error #1", () => {
+    try {
+      transformSource(`<Button onClick="<" />`) as ComponentDef;
+    } catch (e) {
+      expect((e as ParserError).code).toBe("W002");
+      return;
+    }
+    assert.fail("Exception expected");
   });
 });
