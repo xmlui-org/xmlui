@@ -1,6 +1,7 @@
 import { describe, expect, it, assert } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
+import { ExpressionStatement, Identifier, Statement, T_EXPRESSION_STATEMENT, T_IDENTIFIER } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Xmlui transform - child elements", () => {
   it("Comments ignored, whitespace collapsed", () => {
@@ -328,7 +329,14 @@ describe("Xmlui transform - child elements", () => {
     it("implicit events with attr works #1", () => {
       const cd = transformSource("<Stack onClick='doIt' />") as ComponentDef;
       expect(cd.type).equal("Stack");
-      expect((cd.events! as any).click).equal("doIt");
+      const event = (cd.events! as any).click;
+      expect(event.__PARSED).toBe(true);
+      const stmts = event.statements as Statement[];
+      expect(stmts.length).equal(1);
+      expect(stmts[0].type).equal(T_EXPRESSION_STATEMENT);
+      expect((stmts[0] as ExpressionStatement).expr.type).equal(T_IDENTIFIER);
+      const id = (stmts[0] as ExpressionStatement).expr as Identifier;
+      expect(id.name).equal("doIt");
     });
 
     it("event fails with missing name attribute", () => {
@@ -363,7 +371,7 @@ describe("Xmlui transform - child elements", () => {
         "<Stack><event name='myEvent' value='doIt'/></Stack>",
       ) as ComponentDef;
       expect(cd.type).equal("Stack");
-      expect((cd.events! as any).myEvent).equal("doIt");
+      expect((cd.events! as any).myEvent.source).equal("doIt");
     });
 
     it("event with name/value attr works #2", () => {
@@ -374,8 +382,8 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
       expect(cd.type).equal("Stack");
-      expect((cd.events! as any).myEvent).equal("doIt");
-      expect((cd.events! as any).other).equal("move");
+      expect((cd.events! as any).myEvent.source).equal("doIt");
+      expect((cd.events! as any).other.source).equal("move");
     });
 
     it("event with name and text works #1", () => {
@@ -383,7 +391,7 @@ describe("Xmlui transform - child elements", () => {
         "<Stack><event name='myEvent'>doIt</event></Stack>",
       ) as ComponentDef;
       expect(cd.type).equal("Stack");
-      expect((cd.events! as any).myEvent).equal("doIt");
+      expect((cd.events! as any).myEvent.source).equal("doIt");
     });
 
     it("event with name and text works #2", () => {
@@ -394,8 +402,8 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
       expect(cd.type).equal("Stack");
-      expect((cd.events! as any).myEvent).equal("doIt");
-      expect((cd.events! as any).other).equal("move");
+      expect((cd.events! as any).myEvent.source).equal("doIt");
+      expect((cd.events! as any).other.source).equal("move");
     });
 
     it("events with name results null", () => {

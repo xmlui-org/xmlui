@@ -30,6 +30,7 @@ import {
   ArrowExpression,
   ArrowExpressionStatement,
   T_ARROW_EXPRESSION_STATEMENT,
+  T_ARROW_EXPRESSION,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "../abstractions/containers";
@@ -55,6 +56,7 @@ import { useTheme } from "../theming/ThemeContext";
 import { LoaderComponent } from "../LoaderComponent";
 import { AppContextObject } from "../../abstractions/AppContextDefs";
 import { EMPTY_ARRAY } from "../constants";
+import { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 
 type Props = {
   node: ContainerWrapperDef;
@@ -144,7 +146,7 @@ export const Container = memo(
 
     const runCodeAsync = useEvent(
       async (
-        source: string | ArrowExpression,
+        source: string | ParsedEventValue | ArrowExpression,
         componentUid: symbol,
         options: LookupActionOptions | undefined,
         ...eventArgs: any[]
@@ -178,7 +180,7 @@ export const Container = memo(
             return {
               uid: componentUid,
               state: stateRef.current,
-              getCurrentState: ()=> stateRef.current,
+              getCurrentState: () => stateRef.current,
               dispatch,
               appContext: evalAppContext,
               navigate,
@@ -210,6 +212,15 @@ export const Container = memo(
               );
             }
             statements = parsedStatementsRef.current[source];
+          } else if (isParsedEventValue(source)) {
+            const parseId = source.parseId.toString();
+            if (!parsedStatementsRef.current[parseId]) {
+              parsedStatementsRef.current[parseId] = prepareHandlerStatements(
+                source.statements,
+                evalContext,
+              );
+            }
+            statements = parsedStatementsRef.current[parseId];
           } else {
             statements = [
               {
@@ -357,23 +368,56 @@ export const Container = memo(
     );
 
     const getOrCreateEventHandlerFn = useEvent(
-      (src: string | ArrowExpression, uid: symbol, options?: LookupActionOptions) => {
-        if(Array.isArray(src)) {
+      (
+        src: string | ParsedEventValue | ArrowExpression,
+        uid: symbol,
+        options?: LookupActionOptions,
+      ) => {
+        if (Array.isArray(src)) {
           throw new Error("Multiple event handlers are not supported");
         }
-        const stringSrc = typeof src === "string" ? src : src.statement.nodeId;
-        const fnCacheKey = `${options?.eventName};${stringSrc}`;
-        const handler = (...eventArgs: any[]) => {
-          return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
-        };
-        if (options?.ephemeral) {
-          return handler;
+
+        if (typeof src === "string") {
+          // --- We have a string event handler
+          const fnCacheKey = `${options?.eventName};${src}`;
+          const handler = (...eventArgs: any[]) => {
+            return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
+          };
+          if (options?.ephemeral) {
+            return handler;
+          }
+          if (!fnsRef.current[uid]?.[fnCacheKey]) {
+            fnsRef.current[uid] = fnsRef.current[uid] || {};
+            fnsRef.current[uid][fnCacheKey] = handler;
+          }
+          return fnsRef.current[uid][fnCacheKey];
         }
-        if (!fnsRef.current[uid]?.[fnCacheKey]) {
-          fnsRef.current[uid] = fnsRef.current[uid] || {};
-          fnsRef.current[uid][fnCacheKey] = handler;
+
+        if (isParsedEventValue(src)) {
+          // --- We have the syntax tree to execute, no need to cache
+          return (...eventArgs: any[]) => {
+            return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
+          };
         }
-        return fnsRef.current[uid][fnCacheKey];
+
+        if (isArrowExpression(src)) {
+          // --- We have an arrow expression to execute
+          const fnCacheKey = `${options?.eventName};${src.statement.nodeId}`;
+          const handler = (...eventArgs: any[]) => {
+            return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
+          };
+          if (options?.ephemeral) {
+            return handler;
+          }
+          if (!fnsRef.current[uid]?.[fnCacheKey]) {
+            fnsRef.current[uid] = fnsRef.current[uid] || {};
+            fnsRef.current[uid][fnCacheKey] = handler;
+          }
+          return fnsRef.current[uid][fnCacheKey];
+        }
+
+        // --- We have an unknown event handler
+        throw new Error("Invalid event handler");
       },
     );
 
@@ -765,4 +809,16 @@ function renderLoaders({
       />
     );
   }
+}
+
+function isParsedEventValue(
+  value: string | ParsedEventValue | ArrowExpression,
+): value is ParsedEventValue {
+  return (value as ParsedEventValue).__PARSED === true;
+}
+
+function isArrowExpression(
+  value: string | ParsedEventValue | ArrowExpression,
+): value is ArrowExpression {
+  return (value as ArrowExpression).type === T_ARROW_EXPRESSION;
 }

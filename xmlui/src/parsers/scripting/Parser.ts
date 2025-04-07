@@ -268,9 +268,11 @@ export class Parser {
         case TokenType.Function:
           return this.parseFunctionDeclaration();
         default:
-          return this.isExpressionStart(startToken)
-            ? this.parseExpressionStatement(allowSequence)
-            : null;
+          if (this.isExpressionStart(startToken)) {
+            return this.parseExpressionStatement(allowSequence);
+          }
+          this.reportError("W002", startToken, startToken.text);
+          return null;
       }
     } finally {
       this._statementLevel--;
@@ -2696,6 +2698,8 @@ export class Parser {
     this._parseErrors.push({
       code: errorCode,
       text: errorText,
+      line: token.startLine,
+      column: token.startColumn,
     });
     throw new ParserError(errorText, errorCode);
 
