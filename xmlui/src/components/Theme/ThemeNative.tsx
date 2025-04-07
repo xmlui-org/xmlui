@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { ReactNode, useId, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { createPortal } from "react-dom";
 import classnames from "classnames";
@@ -43,6 +43,7 @@ type Props = {
   tone?: ThemeTone;
   toastDuration?: number;
   themeVars?: Record<string, string>;
+  children?: ReactNode;
 };
 
 export function Theme({
@@ -54,6 +55,7 @@ export function Theme({
   toastDuration = 5000,
   themeVars = EMPTY_OBJECT,
   layoutContext,
+  children
 }: Props) {
   const generatedId = useId();
 
@@ -191,6 +193,7 @@ export function Theme({
         >
           <ErrorBoundary node={node} location={"theme-root"}>
             {renderChild(node.children)}
+            {children}
           </ErrorBoundary>
           <NotificationToast toastDuration={toastDuration} />
         </div>

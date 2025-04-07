@@ -36,6 +36,7 @@ import { resolveLayoutProps } from "../theming/layout-resolver";
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   onUnmount: (uid: symbol) => void;
+  children?: ReactNode;
 };
 
 /**
@@ -61,6 +62,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     memoedVarsRef,
     onUnmount,
     uidInfoRef,
+    children,
     ...rest
   }: Props,
   ref: React.ForwardedRef<any>,
@@ -292,7 +294,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
       const testId = safeNode.testId || safeNode.uid;
       const resolvedUid = extractParam(state, testId, appContext, true);
-
       renderedNode = (
         <ComponentDecorator
           attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId }}
@@ -307,7 +308,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
                 { ...(renderedNode as ReactElement).props, ...mouseEventHandlers },
                 rest,
               ),
-            } as any,
+            } as any
           )}
         </ComponentDecorator>
       );
@@ -338,14 +339,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     // --- For radix UI/accessibility, read more here:
     // --- https://www.radix-ui.com/primitives/docs/guides/composition
 
+    const childrenArray = !children ? [] : Array.isArray(children) ? children : [children];
     return cloneElement(renderedNode, {
       ref: ref ? composeRefs(ref, (renderedNode as any).ref) : (renderedNode as any).ref,
       ...mergeProps({ ...renderedNode.props, ...mouseEventHandlers }, rest),
-    } as any);
+    } as any, ...(childrenArray));
   }
-
   // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.
-  return React.isValidElement(renderedNode) ? renderedNode : <>{renderedNode}</>;
+  return (React.isValidElement(renderedNode) && !!children) ? cloneElement(renderedNode, null, children) : renderedNode;
 });
 
 /**

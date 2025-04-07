@@ -7,7 +7,7 @@ import {
   useRef,
   useMemo,
   useReducer,
-  useCallback,
+  useCallback, ReactNode
 } from "react";
 import produce from "immer";
 import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
@@ -53,6 +53,7 @@ type Props = {
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   uidInfoRef?: RefObject<Record<string, any>>;
   isImplicit?: boolean;
+  children?: ReactNode;
 };
 
 // A React component that wraps a view container into an error boundary
@@ -70,6 +71,8 @@ export const StateContainer = memo(
       layoutContextRef,
       uidInfoRef,
       isImplicit,
+      children,
+      ...rest
     }: Props,
     ref,
   ) {
@@ -240,7 +243,7 @@ export const StateContainer = memo(
           isImplicit={isImplicit}
           ref={ref}
           uidInfoRef={uidInfoRef}
-        />
+          {...rest}>{children}</Container>
       </ErrorBoundary>
     );
   }),

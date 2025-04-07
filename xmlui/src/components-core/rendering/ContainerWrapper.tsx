@@ -1,4 +1,4 @@
-import { forwardRef, memo, MutableRefObject, RefObject, useMemo } from "react";
+import { forwardRef, memo, MutableRefObject, ReactNode, RefObject, useMemo } from "react";
 import type { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import { LayoutContext } from "../../abstractions/RendererDefs";
 import { ContainerDispatcher } from "../abstractions/ComponentRenderer";
@@ -99,6 +99,7 @@ type Props = {
   parentRenderContext?: ParentRenderContext;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   uidInfoRef?: RefObject<Record<string, any>>;
+  children?: ReactNode;
 };
 
 /**
@@ -118,6 +119,8 @@ export const ContainerWrapper = memo(
       parentRenderContext,
       layoutContextRef,
       uidInfoRef,
+      children,
+      ...rest
     }: Props,
     ref,
   ) {
@@ -138,7 +141,7 @@ export const ContainerWrapper = memo(
           uidInfoRef={uidInfoRef}
           isImplicit={node.type !== "Container" && containerizedNode.uses === undefined} //in this case it's an auto-wrapped component
           ref={ref}
-        />
+          {...rest}>{children}</StateContainer>
       </ErrorBoundary>
     );
   }),
