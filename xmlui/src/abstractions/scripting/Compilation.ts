@@ -1,6 +1,6 @@
 import { ComponentDef, CompoundComponentDef } from "../ComponentDefs";
 import { ThemeDefinition } from "../ThemingDefs";
-import { Expression } from "./ScriptingSourceTree";
+import { Expression, Statement } from "./ScriptingSourceTree";
 
 // --- Contains the compilation result of a project
 export type ProjectCompilation = {
@@ -34,6 +34,13 @@ export type FileCompilation = {
   // --- Other (non-core) component names this component depends on
   dependencies: string[];
 };
+
+export type ParsedEventValue = {
+  __PARSED: true;
+  parseId: number;
+  statements: Statement[];
+  source?: string;
+}
 
 // --- The parsed property value (if defined by an attribute value)
 export type ParsedPropertyValue = {

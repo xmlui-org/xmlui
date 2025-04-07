@@ -7,6 +7,7 @@ import { ParserError, errorMessages } from "./ParserError";
 import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
+import { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -37,6 +38,8 @@ const HelperNode = {
   item: "item",
   field: "field",
 } as const;
+
+let lastParseId = 0;
 
 export function nodeToComponentDef(
   node: Node,
@@ -312,7 +315,7 @@ export function nodeToComponentDef(
             (name, value) => {
               if (!isComponent(comp)) return;
               comp.events ??= {};
-              comp.events[name] = value;
+              comp.events[name] = parseEvent(value);
             },
             (name) => {
               if (onPrefixRegex.test(name)) {
@@ -440,11 +443,11 @@ export function nodeToComponentDef(
           comp.api[name] = value;
         } else if (startSegment === "event") {
           comp.events ??= {};
-          comp.events[name] = value;
+          comp.events[name] = parseEvent(value);
         } else if (onPrefixRegex.test(name)) {
           comp.events ??= {};
           const eventName = name[2].toLowerCase() + name.substring(3);
-          comp.events[eventName] = value;
+          comp.events[eventName] = parseEvent(value);
         } else {
           comp.props ??= {};
           comp.props[name] = value;
@@ -452,6 +455,7 @@ export function nodeToComponentDef(
         return;
     }
   }
+
   function collectObjectOrArray(usesStack: Map<string, string>[], children?: Node[]): any {
     let result: any = null;
 
@@ -676,6 +680,7 @@ export function nodeToComponentDef(
       setter(name, updatedValue);
     }
   }
+
   function collectUsesElements(comp: ComponentDef | CompoundComponentDef, uses: Node): void {
     // --- Compound component do not have a uses
     if (!isComponent(comp)) {
@@ -1007,6 +1012,31 @@ export function nodeToComponentDef(
       }
     }
   }
+
+  function parseEvent(value: any): any {
+    if (typeof value !== "string") {
+      // --- It must be a component definition in the event code
+      return value;
+    }
+
+    // --- Parse the event code
+    const parser = new Parser(value);
+    try {
+      const statements = parser.parseStatements();
+      return {
+        __PARSED: true,
+        statements,
+        parseId: ++lastParseId,
+        // TODO: retrieve the event source code only in dev mode
+        source: value,
+      } as ParsedEventValue;
+    } catch {
+      if (parser.errors.length > 0) {
+        const errMsg = parser.errors[0];
+        throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+      }
+    }
+  }
 }
 
 function createTextNodeCDataElement(textValue: string): Node {
@@ -1169,6 +1199,7 @@ function desugarKeyOnlyAttrs(attrs: Node[]) {
     }
   }
 }
+
 function desugarQuotelessAttrs(attrs: Node[], getText: GetText) {
   for (let attr of attrs) {
     const attrValue = attr.children?.[2] as TransformNode;

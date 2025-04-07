@@ -2,7 +2,7 @@ import { expect, test } from "../../testing/fixtures";
 
 test("options with number type keeps number type - outside of forms", async ({ initTestBed, createSelectDriver }) => {
   const { testStateDriver } = await initTestBed(
-    `<Select onDidChange="(value) => testState = value">
+    `<Select onDidChange="(value) => {console.log('bla'); testState = value; }">
       <Option value="{1}" label="One"/>
       <Option value="{2}" label="Two"/>
      </Select>`,
