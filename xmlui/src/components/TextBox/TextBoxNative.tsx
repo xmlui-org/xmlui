@@ -1,4 +1,4 @@
-import { type CSSProperties, type ForwardedRef, forwardRef } from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef, useId } from "react";
 import React, { useCallback, useEffect, useRef } from "react";
 import classnames from "classnames";
 
@@ -71,6 +71,7 @@ export const TextBox = forwardRef(function TextBox(
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
+  id = id || useId();
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (autoFocus) {
@@ -136,6 +137,7 @@ export const TextBox = forwardRef(function TextBox(
 
   return (
     <ItemWithLabel
+      id={id}
       labelPosition={labelPosition as any}
       label={label}
       labelWidth={labelWidth}

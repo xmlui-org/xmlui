@@ -174,14 +174,14 @@ test.skip(
 
 // --- --- data
 
-test("data accepts an object", async ({ initTestBed, createFormItemDriver }) => {
+test("data accepts an object", async ({ initTestBed, createFormItemDriver, createTextBoxDriver }) => {
   await initTestBed(`
     <Form data="{{ field1: 'test' }}">
       <FormItem testId="inputField" bindTo="field1" />
     </Form>
   `);
   const driver = await createFormItemDriver("inputField");
-  await expect(driver.input).toHaveValue("test");
+  await expect((await createTextBoxDriver(driver.input)).field).toHaveValue("test");
 });
 
 test(`data accepts primitive`, async ({ initTestBed, createFormDriver }) => {
@@ -205,7 +205,7 @@ test(`data accepts empty array`, async ({ initTestBed, createFormDriver }) => {
 });
 
 // TODO
-test.fixme("data accepts relative URL endpoint", async ({ initTestBed, createFormItemDriver }) => {
+test.fixme("data accepts relative URL endpoint", async ({ initTestBed, createFormItemDriver, createTextBoxDriver }) => {
   await initTestBed(
     `
       <Form data="/test">
@@ -224,7 +224,7 @@ test.fixme("data accepts relative URL endpoint", async ({ initTestBed, createFor
     },
   );
   const driver = await createFormItemDriver("inputField");
-  await expect(driver.component).toHaveValue("John");
+  await expect((await createTextBoxDriver(driver.input)).field).toHaveValue("John");
 });
 
 // TODO
@@ -233,7 +233,7 @@ test.fixme(
   SKIP_REASON.TEST_NOT_WORKING(
     "Mock's not working for some reason, can access unmocked URLs though",
   ),
-  async ({ initTestBed, createFormDriver, createFormItemDriver }) => {
+  async ({ initTestBed, createFormDriver, createFormItemDriver, createTextBoxDriver }) => {
     // data="https://api.spacexdata.com/v3/history/1"
     await initTestBed(`
     <Form data="https://example.com/test">
@@ -244,7 +244,7 @@ test.fixme(
     const formItemDriver = await createFormItemDriver("inputField");
 
     await formDriver.mockExternalApi("**/*/test", { body: { name: "John" } });
-    await expect(formItemDriver.component).toHaveValue("John");
+    await expect((await createTextBoxDriver(formItemDriver.input)).field).toHaveValue("John");
   },
 );
 
@@ -645,6 +645,7 @@ test("create form works with submitUrl", async ({
   initTestBed,
   createFormDriver,
   createFormItemDriver,
+  createTextBoxDriver,
 }) => {
   await initTestBed(
     `
@@ -655,9 +656,10 @@ test("create form works with submitUrl", async ({
     { apiInterceptor: smartCrudInterceptor },
   );
   const formDriver = await createFormDriver();
-  const inputDriver = await createFormItemDriver("nameInput");
+  const inputElement = (await createFormItemDriver("nameInput")).input;
+  const fieldDriver = await createTextBoxDriver(inputElement);
 
-  await inputDriver.input.fill("John");
+  await fieldDriver.field.fill("John");
   await formDriver.submitForm("click");
 
   const response = await formDriver.getSubmitResponse();
@@ -676,7 +678,7 @@ test.skip(
 
     Need to investigate.
     `),
-  async ({ initTestBed, createFormDriver, createFormItemDriver }) => {
+  async ({ initTestBed, createFormDriver, createFormItemDriver, createTextBoxDriver }) => {
     await initTestBed(
       `
       <Form submitUrl="/entities/10">
@@ -686,11 +688,12 @@ test.skip(
       { apiInterceptor: smartCrudInterceptor },
     );
     const formDriver = await createFormDriver();
-    const inputDriver = await createFormItemDriver("nameInput");
+    const inputElement = (await createFormItemDriver("nameInput")).input;
+    const fieldDriver = await createTextBoxDriver(inputElement);
 
-    await expect(inputDriver.input).toHaveValue("Smith");
+    await expect(fieldDriver.field).toHaveValue("Smith");
 
-    await inputDriver.input.fill("EDITED-Smith");
+    await fieldDriver.field.fill("EDITED-Smith");
     await formDriver.submitForm("click");
 
     const response = await formDriver.getSubmitResponse();
@@ -730,6 +733,7 @@ test("regression: data url through modal context", async ({
   createButtonDriver,
   createFormDriver,
   createFormItemDriver,
+  createTextBoxDriver,
 }) => {
   await initTestBed(
     `
@@ -747,13 +751,14 @@ test("regression: data url through modal context", async ({
     },
   );
   const formDriver = await createFormDriver("modalForm");
-  const inputDriver = await createFormItemDriver("nameInput");
+  const inputElement = (await createFormItemDriver("nameInput")).input;
+  const inputDriver = await createTextBoxDriver(inputElement);
 
   (await createButtonDriver("openModalButton")).click();
 
-  await expect(inputDriver.input).toHaveValue("Smith");
+  await expect(inputDriver.field).toHaveValue("Smith");
 
-  await inputDriver.input.fill("EDITED-Smith");
+  await inputDriver.field.fill("EDITED-Smith");
   await formDriver.submitForm("click");
 
   const response = await formDriver.getSubmitResponse();
@@ -770,6 +775,7 @@ test("can submit with invisible required field", async ({
   createFormDriver,
   createFormItemDriver,
   createOptionDriver,
+  createTextBoxDriver,
 }) => {
   const { testStateDriver } = await initTestBed(`
     <Form onSubmit="testState = true">
@@ -787,11 +793,12 @@ test("can submit with invisible required field", async ({
   const formDriver = await createFormDriver();
   const selectDriver = await createFormItemDriver("select");
   const optionDriver = await createOptionDriver("publicKey");
-  const textfieldDriver = await createFormItemDriver("name2");
+  const textfieldElement = (await createFormItemDriver("name2")).input;
+  const textfieldDriver = await createTextBoxDriver(textfieldElement);
 
   await selectDriver.component.click();
   await optionDriver.click();
-  await textfieldDriver.input.fill("John");
+  await textfieldDriver.field.fill("John");
   await formDriver.submitForm();
 
   await expect.poll(testStateDriver.testState).toEqual(true);
@@ -801,6 +808,7 @@ test("conditional fields keep the state", async ({
   initTestBed,
   createFormItemDriver,
   createOptionDriver,
+  createTextBoxDriver,
 }) => {
   await initTestBed(`
     <Form>
@@ -817,13 +825,15 @@ test("conditional fields keep the state", async ({
   `);
   const option1Driver = await createFormItemDriver("password");
   const option2Driver = await createOptionDriver("publicKey");
-  const textfield1Driver = await createFormItemDriver("name1");
-  const textfield2Driver = await createFormItemDriver("name2");
+  const textfield1Element = (await createFormItemDriver("name1")).input;
+  const textfield1Driver = await createTextBoxDriver(textfield1Element);
+  const textfield2Element = (await createFormItemDriver("name2")).input;
+  const textfield2Driver = await createTextBoxDriver(textfield2Element);
 
-  await textfield1Driver.input.fill("name1");
+  await textfield1Driver.field.fill("name1");
   await option2Driver.click();
-  await textfield2Driver.input.fill("name2");
+  await textfield2Driver.field.fill("name2");
   await option1Driver.click();
 
-  await expect(textfield1Driver.input).toHaveValue("name1");
+  await expect(textfield1Driver.field).toHaveValue("name1");
 });

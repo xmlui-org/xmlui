@@ -284,28 +284,6 @@ export class FormDriver extends ComponentDriver {
   } */
 }
 
-// --- FormItem
-
-export class FormItemDriver extends ComponentDriver {
-  get validationStatusTag() {
-    return "data-validation-status";
-  }
-
-  // TODO, TEMP: get input under FormItem
-  get input() {
-    return this.locator.locator("input");
-  }
-
-  // TODO: Need to check for input type
-  /* async fillField(value: any) {
-    await this.input.fill(value);
-  } */
-
-  async getValidationStatusIndicator() {
-    return this.component.locator(`[${this.validationStatusTag}]`);
-  }
-}
-
 // --- ValidationSummary
 
 export class ValidationSummaryDriver extends ComponentDriver {
@@ -499,3 +477,57 @@ export class NoResultDriver extends ComponentDriver {}
 // --- Option
 
 export class OptionDriver extends ComponentDriver {}
+
+// --- FormItem
+
+// NOTE: Do not delete these comments.
+// This is an untested proposal to shorten code length.
+// Now, you have to provide the .input element for a specific control driver:
+//
+// element = FormItemDriver().input -> TextBoxDriver(element)
+//
+// This can be shortened to FormItemDriver().input.as("TextBoxDriver") if we extend
+// the locator object only for the return type of the "input" getter to support the "as" method
+//
+/* type DriverMap = {
+  TextBoxDriver: TextBoxDriver;
+  NumberBoxDriver: NumberBoxDriver;
+};
+
+const driverConstructors: { 
+  [K in keyof DriverMap]: new (obj: ComponentDriverParams) => DriverMap[K] 
+} = {
+  TextBoxDriver,
+  NumberBoxDriver
+};
+
+export interface ExtendedLocator extends Locator {
+  as?: <K extends keyof DriverMap>(type: K) => DriverMap[K];
+}
+
+export const extendLocator = (
+  locator: Locator,
+): ExtendedLocator => ({
+  ...locator,
+  locator: (selector, options) =>
+    extendLocator(locator.locator(selector, options)),
+  as: (type) => { return new driverConstructors[type]({ locator, page: locator.page() }); }
+}); */
+
+export class FormItemDriver extends ComponentDriver {
+  get input() {
+    return (this.component.locator(">input").or(this.component)).first();
+  }
+
+  get label() {
+    return this.component.locator("label");
+  }
+
+  get validationStatusTag() {
+    return "data-validation-status";
+  }
+  
+  async getValidationStatusIndicator() {
+    return this.component.locator(`[${this.validationStatusTag}]`);
+  }
+}

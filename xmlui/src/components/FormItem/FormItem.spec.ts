@@ -1,180 +1,128 @@
 import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
+import { formControlTypes } from "../Form/FormContext";
 
-const types = [
-  "checkbox",
-  "datePicker",
-  "file",
-  "integer",
-  "number",
-  "radioGroup",
-  "select",
-  "switch",
-  "text",
-  "textarea",
-];
+const formControlTypeMap: Record<string, string> = {
+  text: "TextBoxDriver",
+  password: "TextBoxDriver",
+  number: "NumberBoxDriver",
+  textarea: "TextAreaDriver",
+  checkbox: "CheckboxDriver",
+  radio: "RadioGroupDriver",
+  select: "SelectDriver",
+};
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
-  // NOTE: This throws an error when running `npm run test:e2e`:
-  // "Error: Can't call test() inside a describe() suite of a different test type."
-  //
-  /* test2("label show for formItem", async ({ initTestBed, initTestBed }) => {
-    const source = `
-        <Form >
-          <FormItem testId="form-item" label="test-label" />
-        </Form>`;
-
-    await initTestBed(source);
-    await initTestBed(FormItemDriver, "form-item");
-    await expect(driver.component).toHaveText("test-label");
+  test("component renders", async ({ initTestBed, createFormItemDriver }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" />
+      </Form>`);
+    await expect((await createFormItemDriver("formItem")).component).toBeAttached();
   });
 
-  // using a label breaks the testId. Could use a locator insted.
-  test2(
-    "WITH DRIVER can check type=checkbox formItem",
-    async ({ page, initTestBed, initTestBed }) => {
-      // const source = `
-      // <Form>
-      //   <FormItem type=checkbox testId="form-item" label="hello" />
-      // </Form>`;
-      const source = `
-      <Form>
-        <FormItem type=checkbox testId="form-item" />
-      </Form>`;
+  // --- label
 
-      await initTestBed(source);
-      await initTestBed(FormItemDriver, "form-item");
-      // await initTestBed(FormItemDriver, page.getByRole("checkbox"));
-      await expect(driver.component).not.toBeChecked();
-      await driver.component.check();
-      await expect(driver.component).toBeChecked();
+  test("label renders", async ({ initTestBed, createFormItemDriver }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" label="test-label" />
+      </Form>`);
+    await expect((await createFormItemDriver("formItem")).label).toHaveText("test-label");
+  });
+
+  // --- type
+
+  test(`type 'text' renders`, async ({
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" type="text" />
+      </Form>`);
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createTextBoxDriver(formItemDriver.input);
+    await expect(inputDriver.field).toBeAttached();
+  });
+
+  test(`type 'number' renders`, async ({
+    initTestBed,
+    createFormItemDriver,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" type="number" />
+      </Form>`);
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createNumberBoxDriver(formItemDriver.input);
+    await expect(inputDriver.field).toBeAttached();
+  });
+
+  test(`type 'integer' renders`, async ({
+    initTestBed,
+    createFormItemDriver,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" type="integer" />
+      </Form>`);
+    const formItemDriver = await createFormItemDriver("formItem");
+    const inputDriver = await createNumberBoxDriver(formItemDriver.input);
+    await expect(inputDriver.field).toBeAttached();
+  });
+
+  // Filtering some cases, see following tests
+  formControlTypes
+    .filter((t) => t !== "autocomplete" && t !== "slider")
+    .forEach((type) => {
+      test(`label displayed for type '${type}'`, async ({ initTestBed, createFormItemDriver }) => {
+        await initTestBed(`
+      <Form>
+        <FormItem testId="formItem" type="${type}" label="test" />
+      </Form>`);
+        const formItemDriver = await createFormItemDriver("formItem");
+        await expect(formItemDriver.label).toHaveText("test");
+      });
+    });
+  // Cases not working
+  test.fixme(
+    `label displayed for type 'autocomplete'`,
+    SKIP_REASON.XMLUI_BUG(
+      "There are two labels in Autocomplete: one is ours, the other comes from cmdk -> this results in an error",
+    ),
+    async ({ initTestBed, createFormItemDriver }) => {
+      await initTestBed(`
+  <Form>
+    <FormItem testId="formItem" type="autocomplete" label="test" />
+  </Form>`);
+      const formItemDriver = await createFormItemDriver("formItem");
+      await expect(formItemDriver.label).toHaveText("test");
     },
   );
-
-  // or could allow ourselves not to use drivers where they aren't necesary.
-  test2("can check type=checkbox formItem", async ({ page, initTestBed, initTestBed }) => {
-    const source = `
-        <Form>
-          <FormItem type=checkbox testId="form-item" label=hithere/>
-        </Form>`;
-
-    await initTestBed(source);
-    const checkbox = page.getByRole("checkbox");
-
-    await expect(checkbox).not.toBeChecked();
-    await checkbox.check();
-    await expect(checkbox).toBeChecked();
-  }); */
-
-  test.skip(
-    "maxValue invalidates oversized input for number",
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
+  test.fixme(
+    `label displayed for type 'slider'`,
+    SKIP_REASON.XMLUI_BUG(
+      `
+  There are two labels in Slider: one is in FormItem, 
+  the other is in the Slider but should not be displayed.
+  The second one currently contains the selected value ->
+  this should be moved to a separate element.
+  `,
+    ),
+    async ({ initTestBed, createFormItemDriver }) => {
+      await initTestBed(`
+  <Form>
+    <FormItem testId="formItem" type="autocomplete" label="test" />
+  </Form>`);
+      const formItemDriver = await createFormItemDriver("formItem");
+      await expect(formItemDriver.label).toHaveText("test");
+    },
   );
 });
-
-/* types
-'checkbox'
-'datePicker'
-'file'
-'integer'
-'number'
-'radioGroup'
-'select'
-'switch'
-'text'
-'textarea'
-*/
-
-test.skip(
-  "type 'checkbox' renders right aria role",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {
-    await initTestBed(`future markup here`);
-    //expect(driver.component).toHaveRole("checkbox");
-  },
-);
-
-test.skip(
-  "type 'datePicker' renders right aria role",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {
-    await initTestBed(`future markup here`);
-    //expect(driver.component).toHaveRole("application");
-  },
-);
-
-test.skip(
-  "type 'file' renders right aria role",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {
-    await initTestBed(`future markup here`);
-    //expect(driver.component).toHaveRole("button");
-  },
-);
-
-test.skip(
-  "type 'integer' renders right aria role",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {
-    await initTestBed(`future markup here`);
-    // expect(driver.component).toHaveRole("spinbutton")
-  },
-);
-
-test.skip(
-  "type 'number' renders right aria role",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {
-    await initTestBed(`future markup here`);
-    // expect(driver.component).toHaveRole("spinbutton")
-  },
-);
-
-test.skip(
-  "type 'radioGroup' renders right aria role",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {
-    await initTestBed(`future markup here`);
-    //expect(driver.component).toHaveRole("radiogroup");
-  },
-);
-
-test.skip(
-  "type 'select' renders right aria role",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {
-    await initTestBed(`future markup here`);
-    //expect(driver.component).toHaveRole("combobox");
-  },
-);
-
-test.skip(
-  "type 'switch' renders right aria role",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {
-    await initTestBed(`future markup here`);
-    //expect(driver.component).toHaveRole("switch");
-  },
-);
-
-test.skip(
-  "type 'text' renders right aria role",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {
-    await initTestBed(`future markup here`);
-    //expect(driver.component).toHaveRole("textbox");
-  },
-);
-
-test.skip(
-  "type 'textarea' renders right aria role",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {
-    await initTestBed(`future markup here`);
-    //expect(driver.component).toHaveRole("textbox");
-  },
-);
 
 test.skip(
   "not setting label should show validation messages when invalid",
@@ -188,10 +136,13 @@ test.skip(
   async ({ initTestBed }) => {},
 );
 
-test(
-  "only run other validations if required field is filled",
-  async ({ initTestBed, createFormDriver, createFormItemDriver }) => {
-    await initTestBed(`
+test("only run other validations if required field is filled", async ({
+  initTestBed,
+  createFormDriver,
+  createFormItemDriver,
+  createTextBoxDriver,
+}) => {
+  await initTestBed(`
     <Form data="{{ name: '' }}" onSubmit="testState = true">
       <FormItem
         testId="testField"
@@ -202,25 +153,29 @@ test(
         required="true"
         requiredInvalidMessage="This field is required" />
     </Form>`);
-    const formDriver = await createFormDriver();
-    const formItemDriver = await createFormItemDriver("testField");
+  const formDriver = await createFormDriver();
+  const formItemDriver = await createFormItemDriver("testField");
+  const textInputDriver = await createTextBoxDriver(formItemDriver.input);
 
-    // Step 1: Submit form without filling in required field to trigger validation display
-    await formDriver.submitForm();
+  // Step 1: Submit form without filling in required field to trigger validation display
+  await formDriver.submitForm();
 
-    // TODO: Need to get validation messages via locators
-    await expect(formItemDriver.component).toHaveText(/This field is required/);
-    await expect(formItemDriver.component).not.toHaveText(/Name is too short!/);
+  // TODO: Need to get validation messages via locators
+  await expect(formItemDriver.component).toHaveText(/This field is required/);
+  await expect(formItemDriver.component).not.toHaveText(/Name is too short!/);
 
-    // Step 2: Fill input field with less than 3 chars to trigger minLength validation
-    await formItemDriver.input.fill("Bo");
+  // Step 2: Fill input field with less than 3 chars to trigger minLength validation
+  await textInputDriver.field.fill("Bo");
 
-    await expect(formItemDriver.component).not.toHaveText(/This field is required/);
-    await expect(formItemDriver.component).toHaveText(/Name is too short!/);
-  },
-);
+  await expect(formItemDriver.component).not.toHaveText(/This field is required/);
+  await expect(formItemDriver.component).toHaveText(/Name is too short!/);
+});
 
-test("other validations run if field is not required", async ({ initTestBed, createFormDriver, createFormItemDriver }) => {
+test("other validations run if field is not required", async ({
+  initTestBed,
+  createFormDriver,
+  createFormItemDriver,
+}) => {
   await initTestBed(`
     <Form data="{{ name: '' }}" onSubmit="testState = true">
       <FormItem
@@ -242,7 +197,7 @@ test("other validations run if field is not required", async ({ initTestBed, cre
   await expect(formItemDriver.component).toHaveText(/Name is too short!/);
 });
 
-types.forEach((testCase) => {
+formControlTypes.forEach((testCase) => {
   test.skip(
     `autofocus for type '${testCase}' works`,
     SKIP_REASON.TO_BE_IMPLEMENTED(),
@@ -292,14 +247,6 @@ test.skip(
   SKIP_REASON.TO_BE_IMPLEMENTED(),
   async ({ initTestBed }) => {},
 );
-
-types.forEach((testCase) => {
-  test.skip(
-    `label displayed for type '${testCase}'`,
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ initTestBed }) => {},
-  );
-});
 
 // discuss if the thing we are testing here is even good
 // test.skip("long label spans multiple lines with labelBreak=true ", async ({initTestBed}) =>{ })
