@@ -1,28 +1,25 @@
-import { Expression, PropertyValue } from "../../abstractions/scripting/ScriptingSourceTree";
-import { Parser } from "./Parser";
+import { ParsedPropertyValue } from "../../abstractions/scripting/Compilation";
+import { Expression } from "../../abstractions/scripting/ScriptingSourceTree";
+import { Parser } from "../../parsers/scripting/Parser";
+
+let lastParseId = 0;
 
 /**
  * This function parses a parameter string and splits them into string literal and binding expression sections
  * @param source String to parse
  * @returns Parameter string sections
  */
-export function parsePropertyValue(source: any): PropertyValue | undefined | null {
-  if (typeof source !== "string") {
-    return {
-      type: "SPV",
-      value: source,
-    };
-  }
-
-  // --- We parse only string values
-  if (source === undefined || source === null) return null;
-  const parts: (string | Expression)[] = [];
+export function parseAttributeValue(source: string): ParsedPropertyValue {
+  const result: ParsedPropertyValue = {
+    __PARSED: true,
+    parseId: ++lastParseId,
+    segments: [],
+  };
+  if (source === undefined || source === null) return result;
 
   let phase = ParsePhase.StringLiteral;
   let section = "";
   let escape = "";
-  const parser = new Parser();
-
   for (let i = 0; i < source.length; i++) {
     const ch = source[i];
     switch (phase) {
@@ -33,7 +30,9 @@ export function parsePropertyValue(source: any): PropertyValue | undefined | nul
         } else if (ch === "{") {
           // --- A new expression starts, close the previous string literal
           if (section !== "") {
-            parts.push(section);
+            result.segments.push({
+              literal: section,
+            });
           }
           // --- Start a new section
           section = "";
@@ -62,7 +61,7 @@ export function parsePropertyValue(source: any): PropertyValue | undefined | nul
 
       case ParsePhase.ExprStart:
         const exprSource = source.substring(i);
-        parser.setSource(source.substring(i));
+        const parser = new Parser(source.substring(i));
         let expr: Expression | null = null;
         try {
           expr = parser.parseExpr();
@@ -74,8 +73,10 @@ export function parsePropertyValue(source: any): PropertyValue | undefined | nul
           // --- Unclosed expression, back to its beginning
           throw new Error(`Unclosed expression: '${source}'\n'${exprSource}'`);
         } else {
-          // --- Successfully parsed expression
-          parts.push(expr!);
+          // --- Successfully parsed expression, get dependencies
+          result.segments.push({
+            expr,
+          });
 
           // --- Skip the parsed part of the expression, and start a new literal section
           i = source.length - tail.length;
@@ -90,30 +91,25 @@ export function parsePropertyValue(source: any): PropertyValue | undefined | nul
   switch (phase) {
     case ParsePhase.StringLiteral:
       if (section !== "") {
-        parts.push(section);
+        result.segments.push({
+          literal: section,
+        });
       }
       break;
     case ParsePhase.Escape:
-      parts.push(section + escape);
+      result.segments.push({
+        literal: section + escape,
+      });
       break;
     case ParsePhase.ExprStart:
-      parts.push(section + "{");
+      result.segments.push({
+        literal: section + "{",
+      });
       break;
   }
 
   // --- Done.
-  if (parts.length === 0) {
-    return { type: "SPV", value: "" };
-  }
-  if (parts.length === 1) {
-    return typeof parts[0] === "string"
-      ? { type: "SPV", value: parts[0] }
-      : { type: "SEV", expr: parts[0] };
-  }
-  return {
-    type: "CPV",
-    parts,
-  };
+  return result;
 }
 
 enum ParsePhase {

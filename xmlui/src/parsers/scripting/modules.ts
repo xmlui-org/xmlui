@@ -98,7 +98,6 @@ export function parseScriptModule(
       functions,
       statements: statements,
       sources: new Map(),
-      executed: false,
     };
 
     // --- Sign this module as parsed

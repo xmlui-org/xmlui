@@ -499,26 +499,6 @@ export interface PostfixOpExpression extends ExpressionBase {
   expr: Expression;
 }
 
-// =====================================================================================================================
-// Property values (including binding expressions)
-
-export type PropertyValue = SinglePropertyValue | SingleExpressionValue | CompoundPropertyValue;
-
-export interface SinglePropertyValue {
-  type: "SPV";
-  value: any;
-}
-
-export interface SingleExpressionValue {
-  type: "SEV";
-  expr: Expression;
-}
-
-export interface CompoundPropertyValue {
-  type: "CPV";
-  parts: (string | Expression)[];
-}
-
 /**
  * Represents a parsed and resolved module
  */
@@ -530,7 +510,6 @@ export type ScriptModule = {
   functions: Record<string, FunctionDeclaration>;
   statements: Statement[];
   sources: Map<Statement, string>;
-  executed: boolean;
 };
 
 /**
