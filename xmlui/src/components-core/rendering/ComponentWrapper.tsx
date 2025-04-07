@@ -1,4 +1,4 @@
-import { forwardRef, memo, RefObject, useMemo, useRef } from "react";
+import { forwardRef, memo, ReactNode, RefObject, useMemo, useRef } from "react";
 
 import { ComponentDef } from "../../abstractions/ComponentDefs";
 import { extractParam } from "../utils/extractParam";
@@ -27,8 +27,9 @@ export const ComponentWrapper = memo(
       memoedVarsRef,
       cleanup,
       uidInfoRef,
+      children,
       ...rest
-    }: ChildRendererContext & { resolvedKey: string },
+    }: ChildRendererContext & { resolvedKey: string, children?: ReactNode },
     ref,
   ) {
     // --- We pass the layout context to the child components, so we need to
@@ -66,6 +67,7 @@ export const ComponentWrapper = memo(
       );
     }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
 
+
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
       return (
@@ -80,8 +82,7 @@ export const ComponentWrapper = memo(
           parentRegisterComponentApi={registerComponentApi}
           uidInfoRef={uidInfoRef}
           ref={ref}
-          {...rest}
-        />
+          {...rest}>{children}</ContainerWrapper>
       );
     } else {
       // --- This component should be rendered as a regular component
@@ -101,8 +102,7 @@ export const ComponentWrapper = memo(
           layoutContextRef={stableLayoutContext}
           ref={ref}
           uidInfoRef={uidInfoRef}
-          {...rest}
-        />
+          {...rest}>{children}</ComponentAdapter>
       );
     }
   }),

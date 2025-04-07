@@ -434,9 +434,9 @@ export function AppContent({
   return (
     <AppContext.Provider value={appContextValue}>
       <AppStateContext.Provider value={appStateContextValue}>
-        {children && isValidElement(renderedRoot)
+        {(!!children && isValidElement(renderedRoot))
           ? cloneElement(renderedRoot, null, children)
-          : null}
+          : renderedRoot}
       </AppStateContext.Provider>
     </AppContext.Provider>
   );
