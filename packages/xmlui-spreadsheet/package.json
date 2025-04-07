@@ -1,0 +1,43 @@
+{
+  "name": "xmlui-spreadsheet",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "prepublishOnly": "npm run build",
+    "build": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  },
+  "dependencies": {
+    "jspdf": "^3.0.1",
+    "jspreadsheet-ce": "^5.0.1",
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "@jspreadsheet/formula": "^2.0.2",
+    "@types/jspreadsheet-ce": "^4.7.9",
+    "xmlui": "*"
+  },
+  "main": "./dist/xmlui-spreadsheet.js",
+  "module": "./dist/xmlui-spreadsheet.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-spreadsheet.mjs",
+      "require": "./dist/xmlui-spreadsheet.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

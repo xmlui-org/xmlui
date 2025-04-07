@@ -1,0 +1,3 @@
+resources/vsix
+dist/
+tsconfig.tsbuildinfo

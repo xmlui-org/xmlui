@@ -16,7 +16,7 @@ import classnames from "classnames";
 import { Button } from "../components/Button/ButtonNative";
 import Icon from "../components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
-import { DevTools } from "./DevTools";
+import { DevTools } from "./devtools/DevTools";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {

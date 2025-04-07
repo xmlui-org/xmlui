@@ -822,7 +822,7 @@ const themeKeywordLinks = {
   textDecorationStyle: "[textDecorationStyle](../styles-and-themes/common-units/#textDecoration)",
   textDecorationThickness:
     "[textDecorationThickness](../styles-and-themes/common-units/#textDecoration)",
-  transform: "[transform](../styles-and-themes/common-units/#textTransform)",
+  textTransform: "[textTransform](../styles-and-themes/common-units/#textTransform)",
   "maxWidth-content": "[maxWidth-content](../styles-and-themes/common-units/#size)",
   outlineStyle: "[outlineStyle](../styles-and-themes/common-units/#border)",
   outlineWidth: "[outlineWidth](../styles-and-themes/common-units/#size)",

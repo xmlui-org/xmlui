@@ -59,7 +59,18 @@ export const SliderMd = createMetadata({
     readOnly: dReadonly(),
     validationStatus: dValidationStatus(),
     rangeStyle: d(`This property allows you to apply custom styles to the range element of the slider.`),
-    thumbStyle: d(`This property allows yout top apply custom styles to the thumb elements of the slider.`)
+    thumbStyle: d(`This property allows you to apply custom styles to the thumb elements of the slider.`),
+    showValues: d(
+      `This property controls whether the slider shows the current values of the thumbs.`,
+      null,
+      "boolean",
+      true
+    ),
+    valueFormat: d(
+      `This property allows you to customize how the values are displayed.`,
+      null,
+      "any"
+    )
   },
   events: {
     didChange: dDidChange(COMP),
@@ -80,8 +91,26 @@ export const SliderMd = createMetadata({
     [`borderColor-thumb-${COMP}`]: "$color-surface-50",
     [`backgroundColor-thumb-${COMP}`]: "$color-primary",
     [`boxShadow-thumb-${COMP}`]: "$boxShadow-md",
-    [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-300",
-    [`backgroundColor-range-${COMP}--disabled`]: "$color-surface-400",
+    [`boxShadow-thumb-${COMP}--hover`]: "$boxShadow-lg",
+    [`boxShadow-thumb-${COMP}--focus`]: "$boxShadow-xl",
+    [`borderRadius-${COMP}-default`]: "$borderRadius",
+    [`borderColor-${COMP}-default`]: "transparent",
+    [`borderWidth-${COMP}-default`]: "0",
+    [`borderStyle-${COMP}-default`]: "solid",
+    [`boxShadow-${COMP}-default`]: "none",
+
+    light: {
+      [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-300",
+      [`backgroundColor-range-${COMP}--disabled`]: "$color-surface-400",
+      [`backgroundColor-thumb-${COMP}`]: "$color-primary-500",
+      [`borderColor-thumb-${COMP}`]: "$color-surface-50",
+    },
+    dark: {
+      [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-600",
+      [`backgroundColor-range-${COMP}--disabled`]: "$color-surface-800",
+      [`backgroundColor-thumb-${COMP}`]: "$color-primary-400",
+      [`borderColor-thumb-${COMP}`]: "$color-surface-950",
+    },
   },
 });
 
@@ -92,6 +121,7 @@ export const sliderComponentRenderer = createComponentRenderer(
     node,
     extractValue,
     lookupEventHandler,
+    lookupSyncCallback,
     layoutCss,
     updateState,
     state,
@@ -122,6 +152,8 @@ export const sliderComponentRenderer = createComponentRenderer(
         required={extractValue.asOptionalBoolean(node.props.required)}
         rangeStyle={extractValue(node.props?.rangeStyle)}
         thumbStyle={extractValue(node.props?.thumbStyle)}
+        showValues={extractValue.asOptionalBoolean(node.props?.showValues)}
+        valueFormat={lookupSyncCallback(node.props?.valueFormat)}
       />
     );
   },

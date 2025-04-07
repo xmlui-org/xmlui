@@ -7,14 +7,86 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$accentColor-Blockquote: createThemeVar("accentColor-Blockquote");
+$accentWidth-Blockquote: createThemeVar("accentWidth-Blockquote");
+$backgroundColor-Blockquote: createThemeVar("backgroundColor-Admonition");
+$paddingLeft-Blockquote: createThemeVar("paddingLeft-Blockquote");
+$borderRadius-Blockquote: createThemeVar("borderRadius-Blockquote");
+$marginTop-Blockquote: createThemeVar("marginTop-Blockquote");
+$marginBottom-Blockquote: createThemeVar("marginBottom-Blockquote");
 
-// --- Defaults for Markdown component
+$backgroundColor-Admonition: createThemeVar("backgroundColor-Admonition");
+$paddingLeft-Admonition: createThemeVar("paddingLeft-Admonition");
+$borderRadius-Admonition: createThemeVar("borderRadius-Admonition");
+$iconSize-Admonition: createThemeVar("iconSize-Admonition");
+$marginTop-Admonition: createThemeVar("marginTop-Admonition");
+$marginBottom-Admonition: createThemeVar("marginBottom-Admonition");
+$marginLeft-Admonition-content: createThemeVar("marginLeft-Admonition-content");
+
+$marginTop-HtmlVideo: createThemeVar("marginTop-HtmlVideo");
+$marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
 
 .markdownContent {
-  // Common spacing for block elements
-  h1, h2, h3, h4, h5, h6, p, ul, ol, table, blockquote, hr {
-    margin-top: 1em;
-    margin-bottom: .5;
+  // --- Blockquote
+
+  .blockquote {
+    position: relative;
+    margin-top: $marginTop-Blockquote;
+    margin-bottom: $marginBottom-Blockquote;
+    background-color: $backgroundColor-Blockquote;
+    border-radius: $borderRadius-Blockquote;
+    padding-left: $paddingLeft-Blockquote;
+
+    &::before {
+      background-color: $accentColor-Blockquote;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      content: "";
+      height: 100%;
+      width: $accentWidth-Blockquote;
+    }
+  }
+
+  .blockquoteContainer {
+    padding: 0.5rem;
+  }
+
+  .admonitionBlockquote {
+    margin-top: $marginTop-Admonition;
+    margin-bottom: $marginBottom-Admonition;
+    background-color: $backgroundColor-Admonition;
+    border-radius: $borderRadius-Admonition;
+  }
+
+  .admonitionContainer {
+    padding: 0.5rem;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .admonitionContent {
+    margin-left: $marginLeft-Admonition-content;
+  }
+
+  .admonitionIcon {
+    font-size: $iconSize-Admonition;
+    line-height: 1;
+  }
+
+  .admonitionContent {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admonitionBlockquote {
+    .admonitionContent {
+      [class*="text_"][class*="markdown_"] {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+    }
   }
 
   // First element should have no top margin
@@ -26,107 +98,27 @@ $themeVars: ();
   > *:last-child {
     margin-bottom: 0;
   }
-
-  // Specific margins for horizontal rule
-  hr {
-    border: 0;
-    height: 1px;
-    background-color: #ddd;
-    margin: 1.5em 0;
-  }
-}
-
-// --- HorizontalRule
-
-$borderColor-HorizontalRule: createThemeVar("borderColor-HorizontalRule");
-$borderWidth-HorizontalRule: createThemeVar("borderWidth-HorizontalRule");
-$borderStyle-HorizontalRule: createThemeVar("borderStyle-HorizontalRule");
-
-.horizontalRule {
-  border: $borderWidth-HorizontalRule $borderStyle-HorizontalRule $borderColor-HorizontalRule;
-}
-
-$backgroundColor-Blockquote: createThemeVar("backgroundColor-Blockquote");
-$accent-Blockquote: createThemeVar("accent-Blockquote");
-$borderRadius-Blockquote: createThemeVar("borderRadius-Blockquote");
-$boxShadow-Blockquote: createThemeVar("boxShadow-Blockquote");
-$padding-Blockquote: createThemeVar("padding-Blockquote");
-$margin-Blockquote: createThemeVar("margin-Blockquote");
-
-// --- Blockquote
-
-.blockquote {
-  position: relative;
-  border-radius: $borderRadius-Blockquote;
-  background-color: $backgroundColor-Blockquote;
-  box-shadow: $boxShadow-Blockquote;
-  padding: $padding-Blockquote;
-  margin-top: $margin-Blockquote;
-  margin-bottom: $margin-Blockquote;
-
-  &::before {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    content: "";
-    height: 100%;
-    width: 2px;
-    background-color: $accent-Blockquote;
-  }
-}
-
-$backgroundColor-Admonition: createThemeVar("backgroundColor-Admonition");
-$textColor-Admonition: createThemeVar("textColor-Admonition");
-$size-icon-Admonition: createThemeVar("size-icon-Admonition");
-
-
-.admonitionBlockquote {
-  position: relative;
-  border-radius: $borderRadius-Blockquote;
-  background-color: $backgroundColor-Admonition;
-  box-shadow: $boxShadow-Blockquote;
-  padding: $padding-Blockquote;
-  margin: $margin-Blockquote;
-  color: $textColor-Admonition;
-}
-
-.admonitionContainer {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.admonitionIcon {
-  font-size: $size-icon-Admonition;
-  padding-top: 0;
-  flex-shrink: 0;
-}
-
-.admonitionContent {
-  flex: 1;
-  min-width: 0;
 }
 
 // --- UnorderedList
+/*
 
 $paddingLeft-UnorderedList: createThemeVar("paddingLeft-UnorderedList");
 
-// the basic <ul> and <ol> styles are the same in tabler.io too 
+// the basic <ul> and <ol> styles are the same in tabler.io too
 .unorderedList {
-  list-style-type: revert; 
-  list-style-position: outside; 
+  list-style-type: revert;
+  list-style-position: outside;
   padding-left: $paddingLeft-UnorderedList;
 }
 
 // --- OrderedList
-
 $paddingLeft-OrderedList: createThemeVar("paddingLeft-OrderedList");
 
-// the basic <ul> and <ol> styles are the same in tabler.io too 
+// the basic <ul> and <ol> styles are the same in tabler.io too
 .orderedList {
-  list-style-type: revert; 
-  list-style-position: outside; 
+  list-style-type: revert;
+  list-style-position: outside;
   padding-left: $paddingLeft-OrderedList;
 }
 
@@ -142,16 +134,7 @@ $color-marker-ListItem: createThemeVar("color-marker-ListItem");
 .listItem::marker {
   color: $color-marker-ListItem;
 }
-
-// -- Heading
-
-$marginTop-HtmlHeading: createThemeVar("marginTop-HtmlHeading");
-$marginBottom-HtmlHeading: createThemeVar("marginBottom-HtmlHeading");
-
-.htmlHeading {
-  margin-top: $marginTop-HtmlHeading;
-  margin-bottom: $marginBottom-HtmlHeading;
-}
+*/
 
 // --- We export the theme variables to add them to the component renderer
 :export {

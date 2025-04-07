@@ -3,12 +3,12 @@ import styles from "./Markdown.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { defaultProps, Markdown } from "./MarkdownNative";
+import { Markdown } from "./MarkdownNative";
 
 const COMP = "Markdown";
 
 export const MarkdownMd = createMetadata({
-  description: `\`${COMP}\` displays plain text styled with markdown syntax.`,
+  description: `\`${COMP}\` displays plain text styled using markdown syntax.`,
   themeVars: parseScssVar(styles.themeVars),
   props: {
     content: d("This property sets the markdown content to display."),
@@ -19,19 +19,25 @@ export const MarkdownMd = createMetadata({
         "indent found at the start of the content lines is removed from the " +
         "beginning of every line.",
       valueType: "boolean",
-      defaultValue: defaultProps.removeIndents,
+      defaultValue: true,
     },
   },
+
   defaultThemeVars: {
-    "borderColor-HorizontalRule": "$borderColor",
-    "borderWidth-HorizontalRule": "1px",
-    "borderStyle-HorizontalRule": "solid",
-    "accent-Blockquote": "$color-primary",
-    "padding-Blockquote": "$space-2 $space-6",
-    "margin-Blockquote": "$space-2",
-    "paddingLeft-UnorderedList": "$space-6",
-    "paddingLeft-OrderedList": "$space-6",
-    "paddingLeft-ListItem": "$space-1",
+    "borderRadius-Admonition": "$space-4",
+    "iconSize-Admonition": "1.5rem",
+    "padding-Admonition": "1rem",
+    "marginBottom-Admonition": "1rem",
+    "marginLeft-Admonition-content":".5rem",
+
+    "accentWidth-Blockquote": "3px",
+    "accentColor-Blockquote": "$color-surface-500",
+    "padding-Blockquote": ".5rem",
+    "marginBottom-Blockquote": "1rem",
+
+    "marginBottom-Text-codefence": ".5rem",
+    "marginBottom-Text-markdown": ".5rem",
+
     light: {
       // --- No light-specific theme vars
     },
@@ -70,10 +76,7 @@ export const markdownComponentRenderer = createComponentRenderer(
     return (
       <Markdown
         style={layoutCss}
-        removeIndents={extractValue.asOptionalBoolean(
-          node.props.removeIndents,
-          defaultProps.removeIndents,
-        )}
+        removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         extractValue={extractValue}
       >
         {renderedChildren}
@@ -81,3 +84,5 @@ export const markdownComponentRenderer = createComponentRenderer(
     );
   },
 );
+
+export { Markdown } from './MarkdownNative';

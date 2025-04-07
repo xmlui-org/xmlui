@@ -76,6 +76,8 @@ type SelectProps = {
   labelPosition?: string;
   labelWidth?: string;
   labelBreak?: boolean;
+  inProgress?: boolean;
+  inProgressNotificationMessage?: string;
 };
 
 const SimpleSelect = forwardRef(function SimpleSelect(
@@ -218,6 +220,8 @@ export const Select = forwardRef(function Select(
     labelWidth,
     labelBreak,
     required = false,
+    inProgress = false,
+    inProgressNotificationMessage = "Loading...",
   }: SelectProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
@@ -449,6 +453,9 @@ export const Select = forwardRef(function Select(
                             <button autoFocus aria-hidden="true" className={styles.srOnly} />
                           )}
                           <CmdList className={styles.commandList}>
+                            {inProgress && (
+                              <div className={styles.loading}>{inProgressNotificationMessage}</div>
+                            )}
                             {Array.from(options).map(({ value, label, enabled, keywords }) => (
                               <ComboboxOption
                                 key={value}
@@ -458,7 +465,7 @@ export const Select = forwardRef(function Select(
                                 keywords={keywords}
                               />
                             ))}
-                            <CmdEmpty>{emptyListNode}</CmdEmpty>
+                            {!inProgress && <CmdEmpty>{emptyListNode}</CmdEmpty>}
                           </CmdList>
                         </Cmd>
                       </PopoverContent>

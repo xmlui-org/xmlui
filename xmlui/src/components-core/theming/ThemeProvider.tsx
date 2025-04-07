@@ -1,6 +1,4 @@
-import type React from "react";
-
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   generateBaseFontSizes,
   generateBaseSpacings,
@@ -258,6 +256,12 @@ function ThemeProvider({
     }
     return defaultTone;
   });
+
+  useEffect(() => {
+    if (defaultTone) {
+      setActiveThemeTone(defaultTone);
+    }
+  }, [defaultTone]);
 
   const themes: Array<ThemeDefinition> = useMemo(() => {
     return [...custThemes, ...builtInThemes];

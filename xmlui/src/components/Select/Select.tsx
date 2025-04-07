@@ -60,6 +60,12 @@ export const SelectMd = createMetadata({
     ),
     multiSelect: dMulti(),
     searchable: d(`This property enables the search functionality in the dropdown list.`),
+    inProgress: d(
+      `This property indicates whether the component is in progress. It can be used to show a loading message.`,
+    ),
+    inProgressNotificationMessage: d(
+      `This property indicates the message to display when the component is in progress.`,
+    ),
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -118,6 +124,8 @@ export const selectComponentRenderer = createComponentRenderer(
       <Select
         multiSelect={extractValue.asOptionalBoolean(node.props.multiSelect)}
         style={layoutCss}
+        inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
+        inProgressNotificationMessage={extractValue.asOptionalString(node.props.inProgressNotificationMessage)}
         updateState={updateState}
         searchable={extractValue.asOptionalBoolean(node.props.searchable)}
         initialValue={extractValue(node.props.initialValue)}

@@ -59,7 +59,6 @@ export const DemoPlayground = ({
 
   useEffect(() => {
     if (app) {
-      console.log("hahaha", preprocessCode(app));
       dispatch(
         appDescriptionInitialized({
           config: {
