@@ -506,7 +506,6 @@ export type ScriptModule = {
   type: "ScriptModule";
   name: string;
   parent?: ScriptModule | null;
-  exports: Record<string, any>;
   functions: Record<string, FunctionDeclaration>;
   statements: Statement[];
   sources: Map<Statement, string>;
