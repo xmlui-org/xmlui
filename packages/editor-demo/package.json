@@ -1,7 +1,21 @@
 {
-  "name": "xmlui-editor-demo",
-  "version": "0.0.1",
-  "author": "norbidotdev",
+  "name": "monaco-languageclient-examples",
+  "version": "2025.3.6",
+  "description": "Monaco Language client examples",
+  "author": {
+    "name": "TypeFox GmbH",
+    "url": "http://www.typefox.io"
+  },
+  "homepage": "https://github.com/TypeFox/monaco-languageclient/blob/main/packages/examples/README.md",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TypeFox/monaco-languageclient.git",
+    "directory": "packages/examples"
+  },
+  "bugs": {
+    "url": "https://github.com/TypeFox/monaco-languageclient/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -54,14 +68,35 @@
   ],
   "dependencies": {
     "@codingame/esbuild-import-meta-url-plugin": "^1.0.3",
+    "@codingame/monaco-vscode-configuration-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-editor-api": "~15.0.2",
+    "@codingame/monaco-vscode-environment-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-explorer-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-files-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-keybindings-service-override": "~15.0.2",
     "@codingame/monaco-vscode-lifecycle-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-preferences-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-remote-agent-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-rollup-vsix-plugin": "^15.0.3",
+    "@codingame/monaco-vscode-search-result-default-extension": "~15.0.2",
+    "@codingame/monaco-vscode-search-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-secret-storage-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-standalone-json-language-features": "~15.0.2",
+    "@codingame/monaco-vscode-standalone-languages": "~15.0.2",
+    "@codingame/monaco-vscode-storage-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-testing-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-textmate-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-theme-defaults-default-extension": "~15.0.2",
+    "@codingame/monaco-vscode-theme-service-override": "~15.0.2",
+    "@codingame/monaco-vscode-views-service-override": "~15.0.2",
     "@typefox/monaco-editor-react": "~6.6.0",
     "@vitejs/plugin-react": "^4.3.4",
     "monaco-editor-wrapper": "~6.6.0",
+    "monaco-languageclient": "~9.5.0",
     "react": "~19.0.0",
     "react-dom": "~19.0.0",
     "vscode": "npm:@codingame/monaco-vscode-extension-api@~15.0.2",
-    "vscode-languageclient": "^9.0.1",
+    "vscode-languageclient": "~9.0.1",
     "xmlui": "*"
   },
   "devDependencies": {
