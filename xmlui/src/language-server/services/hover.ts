@@ -4,7 +4,7 @@ import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
 import * as docGen from "./docs-generation";
-import type { ComponentMetadataCollection } from "../../components/collectedComponentMetadata";
+import type { ComponentMetadataCollection } from "./common";
 
 type SimpleHover = null | {
   value: string;
