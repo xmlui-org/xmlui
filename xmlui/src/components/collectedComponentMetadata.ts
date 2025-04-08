@@ -187,8 +187,7 @@ import { ThemeDefinition } from "../abstractions/ThemingDefs";
 import { RootThemeDefinition } from "../components-core/theming/themes/root";
 import { XmlUiCyanThemeDefinition, XmlUiGrayThemeDefinition, XmlUiGreenThemeDefinition, XmlUiOrangeThemeDefinition, XmlUiPurpleThemeDefinition, XmlUiRedThemeDefinition, XmlUiThemeDefinition } from "../components-core/theming/themes/xmlui";
 
-export type ComponentMetadataCollection = Record<string, ComponentMetadata>;
-export const collectedComponentMetadata: ComponentMetadataCollection = {
+export const collectedComponentMetadata = {
   // --- HTML tags
   a: HtmlAMd,
   address: HtmlAddressMd,

@@ -14,15 +14,14 @@ import {
 } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 
-// import { collectedComponentMetadata } from "./xmlui-metadata.mjs";
-import collectedComponentMetadataUntyped from "./xmlui-metadata.mjs";
+import collectedComponentMetadata from "./xmlui-metadata-generated.mjs";
 import type {XmluiCompletionItem} from "./services/completion";
 import { handleCompletion, handleCompletionResolve} from "./services/completion";
 import {handleHover} from "./services/hover";
 import { createXmlUiParser, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
-import { ComponentMetadataCollection } from '../components/collectedComponentMetadata';
+import { ComponentMetadataCollection } from './services/common';
 
-const collectedComponentMetadata = collectedComponentMetadataUntyped as ComponentMetadataCollection;
+const metaByComp = collectedComponentMetadata as ComponentMetadataCollection;
 
 export function start(connection: Connection){
   // Also include all preview / proposed LSP features.
@@ -92,11 +91,11 @@ export function start(connection: Connection){
       return [];
     }
     const parseResult = parseDocument(document);
-    return handleCompletion({ parseResult: parseResult.parseResult, getText: parseResult.getText, metaByComp: collectedComponentMetadata }, document.offsetAt(position));
+    return handleCompletion({ parseResult: parseResult.parseResult, getText: parseResult.getText, metaByComp }, document.offsetAt(position));
   });
 
   connection.onCompletionResolve((completionItem: XmluiCompletionItem) => {
-    return handleCompletionResolve({metaByComp: collectedComponentMetadata, item: completionItem})
+    return handleCompletionResolve({metaByComp, item: completionItem})
   });
 
   connection.onHover(({ position, textDocument }: HoverParams) => {
@@ -110,7 +109,7 @@ export function start(connection: Connection){
     const ctx = {
       parseResult,
       getText,
-      metaByComp: collectedComponentMetadata
+      metaByComp
     }
     const hoverRes = handleHover(ctx, document.offsetAt(position));
     if (hoverRes === null){
