@@ -53,11 +53,11 @@
     "LICENSE"
   ],
   "dependencies": {
+    "vscode-languageclient": "~9.0.1",
     "@codingame/esbuild-import-meta-url-plugin": "^1.0.3",
     "@codingame/monaco-vscode-keybindings-service-override": "~15.0.2",
     "@codingame/monaco-vscode-lifecycle-service-override": "~15.0.2",
     "@codingame/monaco-vscode-editor-api": "~15.0.2",
-    "@codingame/monaco-vscode-environment-service-override": "~15.0.2",
     "@codingame/monaco-vscode-explorer-service-override": "~15.0.2",
     "@codingame/monaco-vscode-files-service-override": "~15.0.2",
     "@codingame/monaco-vscode-preferences-service-override": "~15.0.2",
@@ -79,7 +79,6 @@
     "react": "~19.0.0",
     "react-dom": "~19.0.0",
     "vscode": "npm:@codingame/monaco-vscode-extension-api@~15.0.2",
-    "vscode-languageclient": "~9.0.1",
     "xmlui": "*"
   },
   "devDependencies": {
