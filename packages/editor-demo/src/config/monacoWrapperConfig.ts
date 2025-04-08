@@ -1,4 +1,3 @@
-import getKeybindingsServiceOverride from '@codingame/monaco-vscode-keybindings-service-override';
 import getLifecycleServiceOverride from '@codingame/monaco-vscode-lifecycle-service-override';
 import { LogLevel } from '@codingame/monaco-vscode-api';
 import { MessageTransports } from 'vscode-languageclient';
@@ -46,7 +45,6 @@ export const createMonacoWrapperConfig = (params: {
         logLevel: LogLevel.Debug,
         vscodeApiConfig: {
             serviceOverrides: {
-                ...getKeybindingsServiceOverride(),
                 ...getLifecycleServiceOverride(),
             },
             userConfiguration: {
