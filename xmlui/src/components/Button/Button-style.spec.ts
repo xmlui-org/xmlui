@@ -284,7 +284,7 @@ variantsWithBorder.forEach((variant) => {
       await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
     });
 
-    test.skip(`border, border-thickness ${variant} ${themeColor}`, 
+    test(`border, border-thickness ${variant} ${themeColor}`, 
       SKIP_REASON.TEST_NOT_WORKING("borderWidth is disregarded because the regular border overrides it... somehow"),
       async ({ initTestBed, createButtonDriver }) => {
       const EXPECTED_COLOR = "rgb(255, 0, 0)";

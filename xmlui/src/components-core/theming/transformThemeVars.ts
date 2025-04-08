@@ -303,7 +303,7 @@ export function generateBorderSegments(theme?: Record<string, string>) {
 
       // --- We have a border value to segment
       const border = getBorderSegments(value);
-      result[`borderWidth-${remainder}`] = border.thickness;
+      result[`borderWidth-${remainder}`] ??= border.thickness;
       result[`borderStyle-${remainder}`] ??= border.style;
       result[`borderColor-${remainder}`] ??= border.color;
     }
