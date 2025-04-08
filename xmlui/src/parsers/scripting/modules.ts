@@ -94,7 +94,6 @@ export function parseScriptModule(
     const parsedModule: ScriptModule = {
       type: "ScriptModule",
       name: moduleName,
-      exports,
       functions,
       statements: statements,
       sources: new Map(),

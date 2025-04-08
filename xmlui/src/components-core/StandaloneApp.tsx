@@ -222,6 +222,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
   try {
     parser.parseStatements();
   } catch (e) {
+    console.error("Error parsing code behind", e);
     // throw new Error(`Failed to fetch ${response.url}`);
     if (parser.errors.length > 0) {
       return {
@@ -232,21 +233,25 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     }
   }
 
-  const codeBehind = collectCodeBehindFromSource("Main", code);
-  if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
-    return {
-      component: errReportModuleErrors(codeBehind.moduleErrors, response.url),
-      file: response.url,
-      hasError: true,
-    };
-  }
+  try {
+    const codeBehind = collectCodeBehindFromSource("Main", code);
+    if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
+      return {
+        component: errReportModuleErrors(codeBehind.moduleErrors, response.url),
+        file: response.url,
+        hasError: true,
+      };
+    }
 
-  // --- Remove the code-behind tokens from the tree shrinking the tree
-  removeCodeBehindTokensFromTree(codeBehind);
-  return {
-    codeBehind: codeBehind,
-    file: response.url,
-  };
+    // --- Remove the code-behind tokens from the tree shrinking the tree
+    removeCodeBehindTokensFromTree(codeBehind);
+    return {
+      codeBehind: codeBehind,
+      file: response.url,
+    };
+  } catch (e) {
+    console.error("Error collecting code behind", e);
+  }
 }
 
 // --- Tests is the given path matches the speified file name
@@ -690,13 +695,13 @@ function useStandalone(
             const componentPromise = fetchWithoutCache(
               `components/${componentPath}.${componentFileExtension}`,
             );
-
             // --- Promises for the component code-behind files
             const componentCodeBehindPromise = new Promise(async (resolve) => {
               try {
-                const codeBehindWrapper = await parseCodeBehindResponse(
-                  await fetchWithoutCache(`components/${componentPath}.${codeBehindFileExtension}`),
+                const codeBehind = await fetchWithoutCache(
+                  `components/${componentPath}.${codeBehindFileExtension}`,
                 );
+                const codeBehindWrapper = await parseCodeBehindResponse(codeBehind);
                 if (codeBehindWrapper.hasError) {
                   errorComponents.push(codeBehindWrapper.component as ComponentDef);
                 }
