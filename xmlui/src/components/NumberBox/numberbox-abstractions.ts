@@ -17,6 +17,10 @@ export function mapToRepresentation(value: string | number | empty) {
   return "";
 }
 
+export function isOutOfBounds(value: number, min: number, max: number) {
+  return value < min || value > max;
+}
+
 export function clamp(value: number, min: number, max: number) {
   let clamped = value;
   if (value < min) clamped = min;
