@@ -1,49 +1,43 @@
-import React, { useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import { Rnd } from "react-rnd";
-import { useTheme } from "../theming/ThemeContext";
-import { createPortal } from "react-dom";
-import { InspectorContext, useDevTools } from "../InspectorContext";
-import { Button } from "../../components/Button/ButtonNative";
-import styles from "./DevTools.module.scss";
+import { Icon, useTheme, useDevTools, Button } from "xmlui";
+import styles from "./DevToolsNative.module.scss";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
 import { BiDockBottom, BiDockLeft, BiDockRight } from "react-icons/bi";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
-import Icon from "../../components/Icon/IconNative";
 import loader from "@monaco-editor/loader";
-import { XmluiGrammar } from "../../syntax/monaco/grammar.monacoLanguage";
-import { XmluiScripGrammar } from "../../syntax/monaco/xmluiscript.monacoLanguage";
-import xmluiLight from "../../syntax/monaco/xmlui-light";
-import xmluiDark from "../../syntax/monaco/xmlui-dark";
+import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
+import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
+import xmluiLight from "../syntax/monaco/xmlui-light";
+import xmluiDark from "../syntax/monaco/xmlui-dark";
 
-type Props = {
-  setIsOpen: (isOpen: boolean) => void;
-  node: any;
-};
-
-export const DevTools = ({ setIsOpen, node }: Props) => {
+export const DevTools = () => {
   const [side, setSide] = useState<"bottom" | "left" | "right">("bottom");
   const { root, activeThemeTone } = useTheme();
-  const { setDevToolsSize, setDevToolsSide } = useDevTools();
+  const context = useDevTools();
+  const { setDevToolsSize, setDevToolsSide, inspectedNode, sources, setIsOpen } = context;
   const [copied, setCopied] = useState(false);
-  const monacoEditorInstance = useRef(null);
+  const monacoEditorInstance = useRef<any>(null);
   const editorRef = useRef(null);
   const [activeTab, setActiveTab] = useState("code");
   const monacoSetupDone = useRef(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const copyToClipboard = () => {
     setCopied(true);
+
     if (monacoEditorInstance?.current) {
       const code = monacoEditorInstance?.current?.getValue();
       navigator.clipboard.writeText(code);
     }
   };
 
-  const { sources } = useContext(InspectorContext)!;
   const value = useMemo(() => {
-    const compSrc = node.debug?.source;
+    const compSrc = inspectedNode?.debug?.source;
+
     if (!compSrc) {
       return "";
     }
@@ -73,7 +67,7 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
       }
     });
     return prunedLines.map((line) => line.slice(trimBeginCount)).join("\n");
-  }, [node.debug?.source, sources]);
+  }, [inspectedNode, sources]);
 
   useEffect(() => {
     if (activeTab === "code") {
@@ -82,7 +76,6 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
       } else if (editorRef.current) {
         loader.init().then((monaco) => {
           if (!editorRef.current || monacoEditorInstance.current) return;
-
           if (!monacoSetupDone.current) {
             monaco.languages.register({ id: XmluiGrammar.id });
             monaco.languages.setMonarchTokensProvider(XmluiGrammar.id, XmluiGrammar.language);
@@ -116,8 +109,8 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
             minimap: { enabled: false },
             padding: {
               top: 10,
-              bottom: 10
-            }
+              bottom: 10,
+            },
           });
         });
       }
@@ -181,15 +174,15 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
   }, [getInitialPosition, getInitialSize]);
 
   useEffect(() => {
-    setDevToolsSide(side);
+    setDevToolsSide?.(side);
     if (side === "bottom") {
-      setDevToolsSize(size.height);
+      setDevToolsSize?.(size.height);
     } else {
-      setDevToolsSize(size.width);
+      setDevToolsSize?.(size.width);
     }
   }, [setDevToolsSide, setDevToolsSize, side, size]);
 
-  return createPortal(
+  return (
     <Rnd
       className={styles.wrapper}
       size={size}
@@ -224,20 +217,20 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
       >
         <List className={styles.list}>
           <div className={styles.tabItems}>
-            <Trigger value={"code"}>
+            <Trigger value={"code"} asChild>
               <Button variant={"ghost"} size={"sm"}>
                 Code
               </Button>
             </Trigger>
-            <Trigger value={"console"}>
+            <Trigger value={"console"} asChild>
               <Button variant={"ghost"} size={"sm"}>
                 Console
               </Button>
             </Trigger>
           </div>
           <div className={styles.actions}>
-            <DropdownMenu.Root>
-              <DropdownMenu.Trigger>
+            <DropdownMenu.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
+              <DropdownMenu.Trigger asChild>
                 <Button variant={"ghost"} size={"xs"}>
                   <HiOutlineDotsVertical color={"currentColor"} />
                 </Button>
@@ -290,26 +283,19 @@ export const DevTools = ({ setIsOpen, node }: Props) => {
         <Content value={"code"} className={styles.content}>
           <div ref={editorRef} className={styles.xmluiEditor} />
           <div className={styles.copyButton}>
-            <Button
-              onClick={copyToClipboard}
-              variant={"solid"}
-              themeColor={"secondary"}
-              style={{ padding: 8 }}
-              size={"sm"}
-            >
+            <button onClick={copyToClipboard} style={{ padding: 8 }}>
               {copied ? (
                 <HiOutlineClipboardDocumentCheck size={16} />
               ) : (
                 <HiOutlineClipboardDocument size={16} />
               )}
-            </Button>
+            </button>
           </div>
         </Content>
         <Content value={"console"} className={styles.content}>
           Debug console
         </Content>
       </Root>
-    </Rnd>,
-    root,
+    </Rnd>
   );
 };
