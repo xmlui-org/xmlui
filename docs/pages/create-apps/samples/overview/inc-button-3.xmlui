@@ -1,6 +1,6 @@
 <Component name="IncButton">
   <Button label="Click to increment: {count}">
-    <variable name=count value={0} />
-    <event name=click value="count++; emitEvent('incremented', count)" />
+    <variable name="count" value="{0}" />
+    <event name="click" value="count++; emitEvent('incremented', count)" />
   </Button>
 </Component>
