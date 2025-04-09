@@ -1,21 +1,7 @@
 {
-  "name": "monaco-languageclient-examples",
-  "version": "2025.3.6",
-  "description": "Monaco Language client examples",
-  "author": {
-    "name": "TypeFox GmbH",
-    "url": "http://www.typefox.io"
-  },
-  "homepage": "https://github.com/TypeFox/monaco-languageclient/blob/main/packages/examples/README.md",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/TypeFox/monaco-languageclient.git",
-    "directory": "packages/examples"
-  },
-  "bugs": {
-    "url": "https://github.com/TypeFox/monaco-languageclient/issues"
-  },
+  "name": "xmlui-editor-demo",
+  "version": "0.0.1",
+  "author": "norbidotdev",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
