@@ -1,18 +1,5 @@
 <App xmlns:XMLUIExtensions="component-ns" xmlns:My="app-ns">
-    <Stack height="100vh">
-        <XMLUIExtensions:Editor value='
-<Card width=50%" height="350px" inspect="true">
-        <DataSource id="trafficSummarySrc" url="/data/trafficSummary.json"/>
-        <Text variant="tableheading">Traffic summary</Text>
-        <Spinner when="{trafficSummarySrc.inProgress}"/>
-        <XMLUIExtensions:PieChart
-                data="{trafficSummarySrc.value}"
-                dataKey="web"
-                nameKey="label"
-                height="*"
-        />
-    </Card>
-'
-        />
+    <Stack height="100vh" inspect="true">
+        stack to inspect
     </Stack>
 </App>

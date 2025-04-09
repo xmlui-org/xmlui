@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import { Rnd } from "react-rnd";
-import { Icon, useTheme } from "xmlui";
-import { useDevTools } from "../../../../xmlui/src/components-core/InspectorContext";
+import { Icon, useTheme, useDevTools, Button } from "xmlui";
 import styles from "./DevToolsNative.module.scss";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
 import { BiDockBottom, BiDockLeft, BiDockRight } from "react-icons/bi";
@@ -14,7 +13,6 @@ import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
 import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
 import xmluiLight from "../syntax/monaco/xmlui-light";
 import xmluiDark from "../syntax/monaco/xmlui-dark";
-import { Button } from "../../../../xmlui/src/components/Button/ButtonNative";
 
 export const DevTools = () => {
   const [side, setSide] = useState<"bottom" | "left" | "right">("bottom");
