@@ -97,13 +97,7 @@ export function InspectorProvider({
       setDevToolsSide,
       devToolsEnabled: showCode,
     };
-  }, [devToolsSide, devToolsSize, sources, inspectedNode]);
-
-  const renderDevTools = useCallback(() => {
-    if (inspectedNode !== null) {
-      return devToolsEntry?.renderer({} as any);
-    }
-  }, [inspectedNode]);
+  }, [devToolsSide, devToolsSize, sources, inspectedNode, showCode]);
 
   return (
     <InspectorContext.Provider value={contextValue}>
@@ -236,8 +230,6 @@ function InspectButton({
 
 export function useDevTools() {
   const context = useContext(InspectorContext);
-
-  console.log("useDevTools", context);
 
   return {
     inspectedNode: context?.inspectedNode,
