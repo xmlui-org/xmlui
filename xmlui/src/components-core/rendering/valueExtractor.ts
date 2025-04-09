@@ -4,31 +4,21 @@ import { isPlainObject, isString } from "lodash-es";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { MemoedVars } from "../abstractions/ComponentRenderer";
-import { parseParameterString } from "../script-runner/ParameterParser";
 import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
 import { isPrimitive, pickFromObject, shallowCompare } from "../utils/misc";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { parseAttributeValue } from "../script-runner/AttributeValueParser";
+import { ParsedPropertyValue, PropertySegment } from "../../abstractions/scripting/Compilation";
 
-function parseStringArray(input: string): string[] {
-  const trimmedInput = input.trim();
-
-  if (trimmedInput.startsWith("[") && trimmedInput.endsWith("]")) {
-    const content = trimmedInput.slice(1, -1);
-    const items = content.split(",").map((item) => item.trim());
-    return items.map((item) => item.replace(/^['"]|['"]$/g, ""));
-  } else {
-    throw new Error("Invalid array format");
-  }
-}
-
-function collectParams(expression: any) {
+function collectParams(expression: any): PropertySegment[] {
   const params = [];
 
   if (typeof expression === "string") {
-    params.push(...parseParameterString(expression));
+    const parsedString = parseAttributeValue(expression) as ParsedPropertyValue;
+    params.push(...parsedString.segments);
   } else if (Array.isArray(expression)) {
     expression.forEach((exp) => {
       params.push(...collectParams(exp));
@@ -99,8 +89,8 @@ export function createValueExtractor(
         getDependencies: memoizeOne((_expressionString, referenceTrackedApi) => {
           let ret = new Set<string>();
           params.forEach((param) => {
-            if (param.type === "expression") {
-              ret = new Set([...ret, ...collectVariableDependencies(param.value, referenceTrackedApi)]);
+            if (param.expr) {
+              ret = new Set([...ret, ...collectVariableDependencies(param.expr, referenceTrackedApi)]);
             }
           });
           return Array.from(ret);
@@ -164,20 +154,6 @@ export function createValueExtractor(
       text = replaced;
     }
     return text;
-  };
-
-  // ---Extract an array of strings
-  extractor.asOptionalStringArray = (expression?: any) => {
-    const value = extractor(expression);
-    if (value === undefined || value === null) return [];
-    if (typeof value === "string" && value.trim() !== "") {
-      //console.log(parseStringArray(value));
-      return parseStringArray(value);
-    }
-    if (Array.isArray(value)) {
-      return value.map((item) => item.toString());
-    }
-    throw new Error(`An array of strings expected but ${typeof value} received.`);
   };
 
   // --- Extract a numeric value

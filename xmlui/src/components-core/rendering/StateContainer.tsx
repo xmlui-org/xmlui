@@ -7,7 +7,8 @@ import {
   useRef,
   useMemo,
   useReducer,
-  useCallback, ReactNode
+  useCallback,
+  ReactNode,
 } from "react";
 import produce from "immer";
 import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
@@ -19,7 +20,7 @@ import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "../abstractions/containers";
-import { CodeDeclaration, ModuleErrors, T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
+import { ModuleErrors, T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
 import { EMPTY_OBJECT } from "../constants";
 import { collectFnVarDeps } from "../rendering/collectFnVarDeps";
 import { createContainerReducer } from "../rendering/reducer";
@@ -28,11 +29,8 @@ import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { useShallowCompareMemoize, useReferenceTrackedApi } from "../utils/hooks";
 import { Container } from "./Container";
-import { PARSED_MARK_PROP } from "../../parsers/scripting/code-behind-collect";
 import { useAppContext } from "../AppContext";
-import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
-import { extractParam } from "../utils/extractParam";
 import { pickFromObject, shallowCompare } from "../utils/misc";
 import {
   ContainerWrapperDef,
@@ -40,6 +38,7 @@ import {
   ComponentApi,
   StatePartChangedFn,
 } from "./ContainerWrapper";
+import { isExpression, isParsedAttributeValue, parseAttributeValue } from "../script-runner/AttributeValueParser";
 
 // --- Properties of the MemoizedErrorProneContainer component
 type Props = {
@@ -146,8 +145,10 @@ export const StateContainer = memo(
     const functionDeps = useMemo(() => {
       const fnDeps: Record<string, Array<string>> = {};
       Object.entries(varDefinitions).forEach(([key, value]) => {
-        if (isParsedValue(value) && value.tree.type === T_ARROW_EXPRESSION) {
-          fnDeps[key] = collectVariableDependencies(value.tree, referenceTrackedApi);
+        if (isParsedAttributeValue(value)) {
+          fnDeps[key] = collectVariableDependencies(value.segments[0].expr, referenceTrackedApi);
+        } else if (value.type === T_ARROW_EXPRESSION) {
+          fnDeps[key] = collectVariableDependencies(value, referenceTrackedApi);
         }
       });
       return collectFnVarDeps(fnDeps);
@@ -243,7 +244,10 @@ export const StateContainer = memo(
           isImplicit={isImplicit}
           ref={ref}
           uidInfoRef={uidInfoRef}
-          {...rest}>{children}</Container>
+          {...rest}
+        >
+          {children}
+        </Container>
       </ErrorBoundary>
     );
   }),
@@ -344,116 +348,86 @@ function useVars(
       if (key === "$props") {
         // --- We already resolved props in a compound component
         ret[key] = value;
-      } else {
-        if (!isParsedValue(value) && typeof value !== "string") {
-          ret[key] = value;
-        } else {
-          // --- Resolve each variable's value, without going into the details of arrays and objects
-          if (!memoedVars.current.has(value)) {
-            memoedVars.current.set(value, {
-              getDependencies: memoizeOne((value, referenceTrackedApi) => {
-                if (isParsedValue(value)) {
-                  return collectVariableDependencies(value.tree, referenceTrackedApi);
-                }
-                // console.log(`GETTING DEPENDENCY FOR ${value} with:`, referenceTrackedApi);
-                const params = parseParameterString(value);
-                let ret = new Set<string>();
-                params.forEach((param) => {
-                  if (param.type === "expression") {
-                    ret = new Set([
-                      ...ret,
-                      ...collectVariableDependencies(param.value, referenceTrackedApi),
-                    ]);
-                  }
-                });
-                return Array.from(ret);
-              }),
-              obtainValue: memoizeOne(
-                (value, state, appContext, strict, deps, appContextDeps) => {
-                  // console.log(
-                  //   "VARS, BUST, obtain value called with",
-                  //   value,
-                  //   { state, appContext },
-                  //   {
-                  //     deps,
-                  //     appContextDeps,
-                  //   }
-                  // );
-                  try {
-                    return isParsedValue(value)
-                      ? evalBinding(value.tree, {
-                          localContext: state,
-                          appContext,
-                          options: {
-                            defaultToOptionalMemberAccess: true,
-                          },
-                        })
-                      : extractParam(state, value, appContext, strict);
-                  } catch (e) {
-                    console.log(state);
-                    throw new ParseVarError(value, e);
-                  }
-                },
-                (
-                  [
-                    _newExpression,
-                    _newState,
-                    _newAppContext,
-                    _newStrict,
-                    newDeps,
-                    newAppContextDeps,
-                  ],
-                  [
-                    _lastExpression,
-                    _lastState,
-                    _lastAppContext,
-                    _lastStrict,
-                    lastDeps,
-                    lastAppContextDeps,
-                  ],
-                ) => {
-                  return (
-                    shallowCompare(newDeps, lastDeps) &&
-                    shallowCompare(newAppContextDeps, lastAppContextDeps)
-                  );
-                },
-              ),
-            });
-          }
-          const stateContext: ContainerState = { ...ret, ...componentState };
-
-          let dependencies: Array<string> = [];
-          if (fnDeps[key]) {
-            dependencies = fnDeps[key];
-          } else {
-            memoedVars.current
-              .get(value)!
-              .getDependencies(value, referenceTrackedApi)
-              .forEach((dep) => {
-                if (fnDeps[dep]) {
-                  dependencies.push(...fnDeps[dep]);
-                } else {
-                  dependencies.push(dep);
-                }
-              });
-            dependencies = [...new Set(dependencies)];
-          }
-          const stateDepValues = pickFromObject(stateContext, dependencies);
-          const appContextDepValues = pickFromObject(appContext, dependencies);
-          // console.log("VARS, obtain value called with", stateDepValues, appContextDepValues);
-
-          ret[key] = memoedVars.current
-            .get(value)!
-            .obtainValue(
-              value,
-              stateContext,
-              appContext,
-              true,
-              stateDepValues,
-              appContextDepValues,
-            );
-        }
+      } else if (!isParsedAttributeValue(value) && !isExpression(value)) {
+        console.log("VARS", key, value);
+        throw new Error(`Handle this case ${key}: ${value}`);
       }
+
+      // --- At this point we have parsed vales
+      // --- Resolve each variable's value, without going into the details of arrays and objects
+      if (!memoedVars.current.has(value)) {
+        memoedVars.current.set(value, {
+          getDependencies: memoizeOne((value, referenceTrackedApi) => {
+            if (isParsedAttributeValue(value)) {
+              // --- We parsed this variable from markup
+              return collectVariableDependencies(value.segments[0].expr, referenceTrackedApi);
+            } else if (isExpression(value)) {
+              // --- We parsed this variable from code-behind
+              return collectVariableDependencies(value, referenceTrackedApi);
+            } else {
+              throw new Error("Unknown variable type");
+            }
+          }),
+          obtainValue: memoizeOne(
+            (value, state, appContext, _strict, _deps, _appContextDeps) => {
+              try {
+                const toEvaluate = isExpression(value) ? value : value.segments[0].expr;
+                return evalBinding(toEvaluate, {
+                  localContext: state,
+                  appContext,
+                  options: {
+                    defaultToOptionalMemberAccess: true,
+                  },
+                });
+              } catch (e) {
+                console.log(state);
+                throw new ParseVarError(value, e);
+              }
+            },
+            (
+              [_newExpression, _newState, _newAppContext, _newStrict, newDeps, newAppContextDeps],
+              [
+                _lastExpression,
+                _lastState,
+                _lastAppContext,
+                _lastStrict,
+                lastDeps,
+                lastAppContextDeps,
+              ],
+            ) => {
+              return (
+                shallowCompare(newDeps, lastDeps) &&
+                shallowCompare(newAppContextDeps, lastAppContextDeps)
+              );
+            },
+          ),
+        });
+      }
+      const stateContext: ContainerState = { ...ret, ...componentState };
+
+      let dependencies: Array<string> = [];
+      if (fnDeps[key]) {
+        dependencies = fnDeps[key];
+      } else {
+        memoedVars.current
+          .get(value)!
+          .getDependencies(value, referenceTrackedApi)
+          .forEach((dep) => {
+            if (fnDeps[dep]) {
+              dependencies.push(...fnDeps[dep]);
+            } else {
+              dependencies.push(dep);
+            }
+          });
+        dependencies = [...new Set(dependencies)];
+      }
+      const stateDepValues = pickFromObject(stateContext, dependencies);
+      const appContextDepValues = pickFromObject(appContext, dependencies);
+      // console.log("VARS, obtain value called with", stateDepValues, appContextDepValues);
+
+      ret[key] = memoedVars.current
+        .get(value)!
+        .obtainValue(value, stateContext, appContext, true, stateDepValues, appContextDepValues);
     });
     return ret;
   }, [appContext, componentState, fnDeps, memoedVars, referenceTrackedApi, vars]);
@@ -487,9 +461,4 @@ class ParseVarError extends Error {
   constructor(varName: string, originalError: any) {
     super(`Error on var: ${varName} - ${originalError?.message || "unknown"}`);
   }
-}
-
-//true if it's coming from a code behind or a script tag
-function isParsedValue(value: any): value is CodeDeclaration {
-  return value && typeof value === "object" && value[PARSED_MARK_PROP];
 }

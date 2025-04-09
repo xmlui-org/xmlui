@@ -8,6 +8,7 @@ import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
 import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { isParsedAttributeValue } from "../script-runner/AttributeValueParser";
 
 /**
  * Extract the value of the specified parameter from the given view container state
@@ -25,38 +26,33 @@ export function extractParam(
   strict: boolean = false, // --- In this case we only allow string binding expression
   extractContext: { didResolve: boolean } = { didResolve: false },
 ): any {
-  if (typeof param === "string") {
-    const paramSegments = parseParameterString(param);
-    if (paramSegments.length === 0) {
-      // --- The param is an empty string, retrieve it
-      return param;
-    }
-
-    if (paramSegments.length === 1) {
-      // --- We have a single string literal or expression
-      if (paramSegments[0].type === "literal") {
-        // --- No expression to evaluate
-        return paramSegments[0].value;
-      } else {
-        // --- We have a single expression to evaluate
+  if (isParsedAttributeValue(param)) {
+    // --- The param is a parsed attribute value
+    if (param.segments.length === 1) {
+      // --- We have a single literal or expression
+      if (param.segments[0].expr) {
+        // --- Expression
         extractContext.didResolve = true;
-        return evalBinding(paramSegments[0].value, {
+        return evalBinding(param.segments[0].expr, {
           localContext: state,
           appContext,
           options: {
             defaultToOptionalMemberAccess: true,
           },
         });
+      } else {
+        // --- Literal
+        return param.segments[0].literal;
       }
     }
-    // --- At this point, we have multiple segments. Evaluate all expressions and convert them to strings
+
+    // --- We have multiple segments. Evaluate all expressions and convert them to strings
     let result = "";
-    paramSegments.forEach((ps) => {
-      if (ps.type === "literal") {
-        result += ps.value;
-      } else {
+    param.segments.forEach((ps) => {
+      if (ps.expr) {
+        // --- Expression: add its string representation
         extractContext.didResolve = true;
-        const exprValue = evalBinding(ps.value, {
+        const exprValue = evalBinding(ps.expr, {
           localContext: state,
           appContext,
           options: {
@@ -70,10 +66,63 @@ export function extractParam(
         } else if (exprValue?.toString) {
           result += exprValue.toString();
         }
+      } else {
+        // --- Literal: add its value
+        result += ps.literal;
       }
     });
     return result;
   }
+
+  // if (typeof param === "string") {
+  //   const paramSegments = parseParameterString(param);
+  //   if (paramSegments.length === 0) {
+  //     // --- The param is an empty string, retrieve it
+  //     return param;
+  //   }
+
+  //   if (paramSegments.length === 1) {
+  //     // --- We have a single string literal or expression
+  //     if (paramSegments[0].type === "literal") {
+  //       // --- No expression to evaluate
+  //       return paramSegments[0].value;
+  //     } else {
+  //       // --- We have a single expression to evaluate
+  //       extractContext.didResolve = true;
+  //       return evalBinding(paramSegments[0].value, {
+  //         localContext: state,
+  //         appContext,
+  //         options: {
+  //           defaultToOptionalMemberAccess: true,
+  //         },
+  //       });
+  //     }
+  //   }
+  //   // --- At this point, we have multiple segments. Evaluate all expressions and convert them to strings
+  //   let result = "";
+  //   paramSegments.forEach((ps) => {
+  //     if (ps.type === "literal") {
+  //       result += ps.value;
+  //     } else {
+  //       extractContext.didResolve = true;
+  //       const exprValue = evalBinding(ps.value, {
+  //         localContext: state,
+  //         appContext,
+  //         options: {
+  //           defaultToOptionalMemberAccess: true,
+  //         },
+  //       });
+  //       if (exprValue === null) {
+  //         result += "null";
+  //       } else if (exprValue === undefined) {
+  //         result += "undefined";
+  //       } else if (exprValue?.toString) {
+  //         result += exprValue.toString();
+  //       }
+  //     }
+  //   });
+  //   return result;
+  // }
 
   if (strict) {
     // --- As we allow only string parameters as binding expressions, we return with the provided
@@ -289,13 +338,6 @@ export class PropsTrasform<T extends NodeProps> {
     >;
   }
 
-  asOptionalStringArray<K extends keyof T>(...key: K[]) {
-    return this.mapValues(key, this.extractValue.asOptionalString) as Record<
-      string,
-      ReturnType<ValueExtractor["asOptionalStringArray"]>
-    >;
-  }
-
   asDisplayText<K extends keyof T>(...key: K[]) {
     return this.mapValues(key, this.extractValue.asDisplayText) as Record<
       string,
@@ -332,7 +374,7 @@ export class PropsTrasform<T extends NodeProps> {
    */
   asRest(): T {
     const filteredKeys = Object.keys(this.nodeProps).filter(
-      (propKey) => !this.usedKeys.includes(propKey as keyof T)
+      (propKey) => !this.usedKeys.includes(propKey as keyof T),
     );
     return this.mapValues(filteredKeys, this.extractValue) as T;
   }

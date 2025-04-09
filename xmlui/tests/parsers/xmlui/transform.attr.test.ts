@@ -3,6 +3,7 @@ import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { ButtonMd } from "../../../src/components/Button/Button";
 import { transformSource } from "./xmlui";
 import { StackMd } from "../../../src/components/Stack/Stack";
+import { ParsedPropertyValue } from "../../../src/abstractions/scripting/Compilation";
 
 describe("Xmlui transform - attributes", () => {
   it("Invalid attribute name fails #1", () => {
@@ -47,12 +48,20 @@ describe("Xmlui transform - attributes", () => {
 
   it("key-only attr is true", () => {
     const cd = transformSource("<Button enabled />") as ComponentDef<typeof ButtonMd>;
-    expect(cd.props.enabled).equal("true");
+    const value = (cd.props as any).enabled as ParsedPropertyValue;
+    expect(value.__PARSED).toEqual(true);
+    expect(value.parseId).toBeGreaterThan(0);
+    expect(value.segments.length).toEqual(1);
+    expect(value.segments[0].literal).toEqual("true");
   });
 
   it("quoteless attr", () => {
     const cd = transformSource("<Stack orientation=horizontal/>") as ComponentDef<typeof StackMd>;
-    expect(cd.props.orientation).equal("horizontal");
+    const value = (cd.props as any).orientation as ParsedPropertyValue;
+    expect(value.__PARSED).toEqual(true);
+    expect(value.parseId).toBeGreaterThan(0);
+    expect(value.segments.length).toEqual(1);
+    expect(value.segments[0].literal).toEqual("horizontal");
   });
 
   it("uid works", () => {

@@ -93,12 +93,6 @@ export type ValueExtractor = {
   asOptionalString<T extends string>(expression?: any, defValue?: string): T | undefined;
 
   /**
-   * Get an optional string value from an expression
-   * @param expression Value expression
-   */
-  asOptionalStringArray(expression?: any): (string | undefined)[];
-
-  /**
    * Get a display string value from an expression
    * @param expression Value expression
    */
