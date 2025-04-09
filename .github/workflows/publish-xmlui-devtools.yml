@@ -15,7 +15,7 @@ jobs:
   #        working-directory: client/packages/dummy-pkg
   #      - run: npm test
   #        working-directory: client/packages/dummy-pkg
-
+  publish-gpr:
     #    needs: build
     runs-on: ubuntu-latest
     permissions:
