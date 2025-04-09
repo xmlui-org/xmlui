@@ -1,4 +1,12 @@
+/* --------------------------------------------------------------------------------------------
+ * Copyright (c) 2024 TypeFox and others.
+ * Licensed under the MIT License. See LICENSE in the package root for license information.
+ * ------------------------------------------------------------------------------------------ */
+
+import getKeybindingsServiceOverride from '@codingame/monaco-vscode-keybindings-service-override';
 import getLifecycleServiceOverride from '@codingame/monaco-vscode-lifecycle-service-override';
+import getLocalizationServiceOverride from '@codingame/monaco-vscode-localization-service-override';
+import { createDefaultLocaleConfiguration } from 'monaco-languageclient/vscode/services';
 import { LogLevel } from '@codingame/monaco-vscode-api';
 import { MessageTransports } from 'vscode-languageclient';
 import type { CodeContent, LanguageClientConfigs, WrapperConfig } from 'monaco-editor-wrapper';
@@ -45,7 +53,9 @@ export const createMonacoWrapperConfig = (params: {
         logLevel: LogLevel.Debug,
         vscodeApiConfig: {
             serviceOverrides: {
+                ...getKeybindingsServiceOverride(),
                 ...getLifecycleServiceOverride(),
+                ...getLocalizationServiceOverride(createDefaultLocaleConfiguration()),
             },
             userConfiguration: {
                 json: JSON.stringify({

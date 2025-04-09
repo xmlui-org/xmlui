@@ -1,6 +1,13 @@
+/* --------------------------------------------------------------------------------------------
+ * Copyright (c) 2024 TypeFox and others.
+ * Licensed under the MIT License. See LICENSE in the package root for license information.
+ * ------------------------------------------------------------------------------------------ */
+
 import { defineConfig } from 'vite';
+import fs from 'node:fs';
 import * as path from 'node:path';
 import importMetaUrlPlugin from '@codingame/esbuild-import-meta-url-plugin';
+import vsixPlugin from '@codingame/monaco-vscode-rollup-vsix-plugin';
 import react from '@vitejs/plugin-react';
 
 export const definedViteConfig = defineConfig({
@@ -44,6 +51,7 @@ export const definedViteConfig = defineConfig({
         ]
     },
     plugins: [
+        vsixPlugin(),
         react()
     ],
     define: {

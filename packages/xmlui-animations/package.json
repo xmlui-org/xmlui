@@ -13,11 +13,9 @@
     "build:meta": "xmlui build-lib --mode=metadata"
   },
   "dependencies": {
-    "@react-spring/rafz": "^9.7.5",
     "@react-spring/web": "^9.7.5"
   },
   "devDependencies": {
-    "@react-spring/types": "^9.7.5",
     "xmlui": "*"
   },
   "main": "./dist/xmlui-animations.js",
