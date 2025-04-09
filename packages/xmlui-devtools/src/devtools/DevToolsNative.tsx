@@ -273,7 +273,7 @@ export const DevTools = () => {
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
             <Button
-              onClick={() => setIsOpen(false)}
+              onClick={() => setIsOpen?.(false)}
               size={"xs"}
               variant={"ghost"}
               icon={<Icon name={"close"} />}
