@@ -16,7 +16,7 @@ import classnames from "classnames";
 import { Button } from "../components/Button/ButtonNative";
 import Icon from "../components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
-import { DevTools } from "./devtools/DevTools";
+import { useComponentRegistry } from "../components/ComponentRegistryContext";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {
@@ -30,6 +30,8 @@ interface IInspectorContext {
   devToolsSide?: "bottom" | "left" | "right";
   setDevToolsSide: (side: "bottom" | "left" | "right") => void;
   devToolsEnabled?: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  inspectedNode: any;
 }
 
 // --- The context object that is used to store the inspector information.
@@ -42,11 +44,16 @@ export function InspectorProvider({
   children: React.ReactNode;
   sources?: Record<string, string>;
 }) {
+  const { root } = useTheme();
   const [inspectable, setInspectable] = useState<Record<string, any>>({});
   const [inspectedNode, setInspectedNode] = useState<ComponentDef | null>(null);
   const [showCode, setShowCode] = useState(false);
   const [devToolsSize, setDevToolsSize] = useState(0);
   const [devToolsSide, setDevToolsSide] = useState<"bottom" | "left" | "right">("bottom");
+
+  const componentRegistry = useComponentRegistry();
+
+  const devToolsEntry = componentRegistry.lookupComponentRenderer("XMLUIDevtools.DevTools");
 
   const contextValue: IInspectorContext = useMemo(() => {
     return {
@@ -82,20 +89,29 @@ export function InspectorProvider({
           return ret;
         });
       },
+      inspectedNode,
+      setIsOpen: setShowCode,
       devToolsSize,
       setDevToolsSize,
       devToolsSide,
       setDevToolsSide,
       devToolsEnabled: showCode,
     };
-  }, [devToolsSide, devToolsSize, showCode, sources]);
+  }, [devToolsSide, devToolsSize, sources, inspectedNode]);
+
+  const renderDevTools = useCallback(() => {
+    if (inspectedNode !== null) {
+      return devToolsEntry?.renderer({} as any);
+    }
+  }, [inspectedNode]);
 
   return (
     <InspectorContext.Provider value={contextValue}>
       {children}
-      {showCode && inspectedNode && (
-        <DevTools setIsOpen={setShowCode} node={inspectedNode} key={inspectedNode?.uid} />
-      )}
+      {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
+        showCode &&
+        inspectedNode !== null &&
+        createPortal(devToolsEntry?.renderer({} as any), root)}
       {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
         inspectable &&
         Object.values(inspectable).map((item: any) => {
@@ -206,8 +222,8 @@ function InspectButton({
               setVisible(false);
             }}
             onClick={() => {
-              setShowCode(true);
               setInspectedNode(node);
+              setShowCode(true);
             }}
           >
             <Icon name={"inspect"} size={"md"} />
@@ -220,7 +236,13 @@ function InspectButton({
 
 export function useDevTools() {
   const context = useContext(InspectorContext);
+
+  console.log("useDevTools", context);
+
   return {
+    inspectedNode: context?.inspectedNode,
+    sources: context?.sources,
+    setIsOpen: context?.setIsOpen,
     devToolsSize: context?.devToolsSize,
     setDevToolsSize: context?.setDevToolsSize,
     devToolsSide: context?.devToolsSide,

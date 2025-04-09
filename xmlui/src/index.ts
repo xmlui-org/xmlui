@@ -24,10 +24,11 @@ import { getColor } from "./components-core/utils/css-utils";
 import { useColors } from "./components-core/utils/hooks";
 import type { ComponentRendererDef, RendererContext } from "./abstractions/RendererDefs";
 import { parseScssVar } from "./components-core/theming/themeVars";
-import type {RegisterComponentApiFn} from "./abstractions/RendererDefs";
+import type { RegisterComponentApiFn } from "./abstractions/RendererDefs";
 import type { ComponentMetadata } from "./abstractions/ComponentDefs";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
 import { ThemeDefinition } from "./abstractions/ThemingDefs";
+import { useDevTools } from "./components-core/InspectorContext";
 
 export type {
   ThemeDefinition,
@@ -62,4 +63,5 @@ export {
   getColor,
   useColors,
   toCssVar,
+  useDevTools,
 };
