@@ -373,6 +373,11 @@ describe("Xmlui parser - expected errors", () => {
     expect(nameId.kind).toEqual(SyntaxKind.Identifier);
     expect(getText(nameId)).equal("Stack");
   });
+
+  it("Unmatched tag names", () => {
+    const { errors } = parseSource("<Stack></NotStack>");
+    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
+  });
 });
 
 describe("Xmlui parser - child nodes", () => {
