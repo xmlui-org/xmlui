@@ -145,7 +145,8 @@
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "4.20.0",
-    "@rollup/rollup-win32-x64-msvc": "4.20.0"
+    "@rollup/rollup-win32-x64-msvc": "4.20.0",
+    "@esbuild/linux-x64": "0.25.2"
   },
   "files": [
     "dist",
