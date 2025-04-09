@@ -3,42 +3,6 @@
   "version": "0.0.1",
   "author": "norbidotdev",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./node": {
-      "types": "./dist/node.d.ts",
-      "default": "./dist/node.js"
-    },
-    "./json-client": {
-      "types": "./dist/json/client/wrapperWs.d.ts",
-      "default": "./dist/json/client/wrapperWs.js"
-    },
-    "./python-client": {
-      "types": "./dist/python/client/main.d.ts",
-      "default": "./dist/python/client/main.js"
-    }
-  },
-  "typesVersions": {
-    "*": {
-      ".": [
-        "dist/index"
-      ],
-      "node": [
-        "dist/node"
-      ],
-      "json-client": [
-        "dist/json/client/wrapperWs"
-      ],
-      "python-client": [
-        "dist/python/client/main"
-      ]
-    }
-  },
   "engines": {
     "node": ">=18.19.0",
     "npm": ">=10.2.3"
