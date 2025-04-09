@@ -13,7 +13,8 @@
     "build:meta": "xmlui build-lib --mode=metadata"
   },
   "dependencies": {
-    "@monaco-editor/loader": "^1.5.0"
+    "@monaco-editor/loader": "^1.5.0",
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "xmlui": "*"
