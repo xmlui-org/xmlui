@@ -238,32 +238,8 @@ describe("Xmlui parser", () => {
   });
 
   it("Attribute quoteless", () => {
-    const { node, getText, errors } = parseSource("<Stack attr=val/>");
-    const rootElem = node.children![0];
-    const nameNode = rootElem.children[1];
-    const nameId = nameNode.children[0];
-    const attrList = rootElem.children[2];
-    const attr0 = attrList.children[0];
-    const attr0Key = attr0.children[0];
-    const attr0Name = attr0Key.children[0];
-    const attr0Value = attr0.children[2];
-    const close = rootElem.children[3];
-
-    expect(errors.length).toEqual(0);
-
-    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
-    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
-    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
-    expect(getText(nameId)).equal("Stack");
-
-    expect(attr0.kind).toEqual(SyntaxKind.AttributeNode);
-    expect(attr0Name.kind).toEqual(SyntaxKind.Identifier);
-    expect(attr0Value.kind).toEqual(SyntaxKind.Identifier);
-
-    expect(getText(attr0Name)).equal("attr");
-    expect(getText(attr0Value)).equal("val");
-
-    expect(close.kind).toEqual(SyntaxKind.NodeClose);
+    const { errors } = parseSource("<Stack attr=val/>");
+    expect(errors[0].code).toEqual(ErrCodes.expAttrValue);
   });
 
   it("Attribute with dash works", () => {
