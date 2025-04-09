@@ -1,6 +1,6 @@
 <VStack>
-  <HStack gap=.2rem>
-    <IncButton id=myIncButton />
+  <HStack gap=".2rem">
+    <IncButton id="myIncButton" />
     <Button label="Set count to 123!" onClick="myIncButton.setValue(123)" />
-  </HStack>  
+  </HStack>
 </VStack>

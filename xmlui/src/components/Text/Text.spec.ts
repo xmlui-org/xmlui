@@ -121,7 +121,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     <Fragment>
       <Text testId="textShort">Short</Text>
       <Text testId="textLong" preserveLinebreaks="true"
-        value="Though this long 
+        value="Though this long
 text does not fit into a single line,
 please do not break it!"
       />
@@ -209,7 +209,7 @@ Object.entries(TextVariantElement).forEach(([variant, htmlElement]) => {
     initTestBed,
     createTextDriver,
   }) => {
-    await initTestBed(`<Text variant=${variant} />`);
+    await initTestBed(`<Text variant="${variant}" />`);
     const driver = await createTextDriver();
 
     const tagName = await driver.getComponentTagName();
