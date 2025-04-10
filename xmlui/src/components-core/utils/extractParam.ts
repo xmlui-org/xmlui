@@ -9,6 +9,7 @@ import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { isParsedAttributeValue } from "../script-runner/AttributeValueParser";
 import { ParsedPropertyValue } from "../../abstractions/scripting/Compilation";
+import { T_LITERAL } from "../../abstractions/scripting/ScriptingSourceTree";
 
 /**
  * Extract the value of the specified parameter from the given view container state
@@ -33,13 +34,14 @@ export function extractParam(
       if (param.segments[0].expr !== undefined) {
         // --- Expression
         extractContext.didResolve = true;
-        return evalBinding(param.segments[0].expr, {
+        const evaluated = evalBinding(param.segments[0].expr, {
           localContext: state,
           appContext,
           options: {
             defaultToOptionalMemberAccess: true,
           },
         });
+        return evaluated;
       } else {
         // --- Literal
         return param.segments[0].literal;

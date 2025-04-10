@@ -1,6 +1,6 @@
 import type { MutableRefObject } from "react";
 import memoizeOne from "memoize-one";
-import { isPlainObject, isString } from "lodash-es";
+import { isString } from "lodash-es";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { MemoedVars } from "../abstractions/ComponentRenderer";
@@ -10,27 +10,7 @@ import { collectVariableDependencies } from "../script-runner/visitors";
 import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { isParsedAttributeValue, parseAttributeValue } from "../script-runner/AttributeValueParser";
-import { ParsedPropertyValue, PropertySegment } from "../../abstractions/scripting/Compilation";
-
-function collectParams(expression: any): PropertySegment[] {
-  const params = [];
-
-  if (typeof expression === "string") {
-    const parsedString = parseAttributeValue(expression) as ParsedPropertyValue;
-    params.push(...parsedString.segments);
-  } else if (Array.isArray(expression)) {
-    expression.forEach((exp) => {
-      params.push(...collectParams(exp));
-    });
-  } else if (isPlainObject(expression)) {
-    Object.entries(expression).forEach(([key, value]) => {
-      params.push(...collectParams(value));
-    });
-  }
-
-  return params;
-}
+import { isParsedAttributeValue } from "../script-runner/AttributeValueParser";
 
 export function asOptionalBoolean(value: any, defValue?: boolean | undefined) {
   if (value === undefined || value === null) return defValue;
@@ -88,14 +68,14 @@ export function createValueExtractor(
     }
 
     // --- Use the parseId as the cache key
-    const parseId = expression.parseId;
+    const parseId = expression.parseId.toString();
     if (!memoedVarsRef.current.has(parseId)) {
       memoedVarsRef.current.set(parseId, {
-        getDependencies: memoizeOne((_expressionString, referenceTrackedApi) => {
+        getDependencies: memoizeOne((_, referenceTrackedApi) => {
           // --- We parsed this variable from markup
           const deps: string[] = [];
           expression.segments.forEach((segment) => {
-            if (segment.expr) {
+            if (segment.expr !== undefined) {
               deps.push(...collectVariableDependencies(segment.expr, referenceTrackedApi));
             }
           });

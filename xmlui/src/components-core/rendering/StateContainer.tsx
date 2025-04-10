@@ -153,7 +153,7 @@ export const StateContainer = memo(
         if (isParsedAttributeValue(value)) {
           const deps: string[] = [];
           value.segments.forEach((segment) => {
-            if (segment.expr) {
+            if (segment.expr !== undefined) {
               deps.push(...collectVariableDependencies(segment.expr, referenceTrackedApi));
             }
           });
@@ -371,7 +371,7 @@ function useVars(
               // --- We parsed this variable from markup
               const deps: string[] = [];
               value.segments.forEach((segment) => {
-                if (segment.expr) {
+                if (segment.expr !== undefined) {
                   deps.push(...collectVariableDependencies(segment.expr, referenceTrackedApi));
                 }
               });
@@ -399,7 +399,7 @@ function useVars(
                   });
                 } else if (isParsedAttributeValue(value)) {
                   // --- We parsed this variable from markup
-                  extractParam(state, value, appContext);
+                  return extractParam(state, value, appContext);
                 } else {
                   return value;
                 }
