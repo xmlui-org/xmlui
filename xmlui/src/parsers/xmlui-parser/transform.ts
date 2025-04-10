@@ -444,7 +444,7 @@ export function nodeToComponentDef(
         comp.testId = value;
         return;
       case "when":
-        comp.when = value;
+        comp.when = parseProperty(value);
         return;
       default:
         if (startSegment === "var") {
