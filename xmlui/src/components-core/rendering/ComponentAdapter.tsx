@@ -293,7 +293,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     ) {
       // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
       const testId = safeNode.testId || safeNode.uid;
-      const resolvedUid = extractParam(state, testId, appContext, true);
+      const resolvedUid = extractParam(state, testId, appContext);
       renderedNode = (
         <ComponentDecorator
           attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId }}

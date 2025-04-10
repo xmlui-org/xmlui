@@ -302,11 +302,10 @@ export default class RestApiProxy {
     resolveAsBindingExpression: boolean,
     value: any,
     params = {},
-    strict?: boolean,
   ) => {
     const localContext = { $adapterConfig: this.config, ...params };
     if (resolveAsBindingExpression) {
-      return extractParam(localContext, value, this.appContext, strict);
+      return extractParam(localContext, value, this.appContext);
     }
     if (value?._ARROW_EXPR_) {
       //TODO illesg review, this whole processstatement is because of the chunked uploads (headers as function)
@@ -346,7 +345,7 @@ export default class RestApiProxy {
       operation.queryParams,
       contextParams,
     ),
-    body = this.extractParam(resolveBindingExpressions, operation.body, contextParams, true),
+    body = this.extractParam(resolveBindingExpressions, operation.body, contextParams),
     rawBody = this.extractParam(resolveBindingExpressions, operation.rawBody, contextParams),
     headers = this.extractParam(resolveBindingExpressions, operation.headers, contextParams),
     payloadType = this.extractParam(

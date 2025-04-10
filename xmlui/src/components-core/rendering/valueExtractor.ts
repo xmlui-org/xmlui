@@ -92,7 +92,7 @@ export function createValueExtractor(
         }),
         obtainValue: memoizeOne(
           (expression, state, appContext, strict, deps, appContextDeps) => {
-            return extractParam(state, expression, appContext, strict);
+            return extractParam(state, expression, appContext);
           },
           (
             [_newExpression, _newState, _newAppContext, _newStrict, newDeps, newAppContextDeps],

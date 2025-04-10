@@ -23,7 +23,6 @@ export function extractParam(
   state: ContainerState,
   param: any,
   appContext: AppContextObject | undefined = undefined,
-  strict: boolean = false, // --- In this case we only allow string binding expression
   extractContext: { didResolve: boolean } = { didResolve: false },
 ): any {
   if (isParsedAttributeValue(param)) {
@@ -75,17 +74,11 @@ export function extractParam(
     return result;
   }
 
-  if (strict) {
-    // --- As we allow only string parameters as binding expressions, we return with the provided
-    // --- *not string* parameter without transforming it
-    return param;
-  }
-
   // --- Resolve each array item
   if (Array.isArray(param)) {
     const arrayExtractContext = { didResolve: false };
     let resolvedChildren = param.map((childParam) =>
-      extractParam(state, childParam, appContext, false, arrayExtractContext),
+      extractParam(state, childParam, appContext, arrayExtractContext),
     );
     if (arrayExtractContext.didResolve) {
       extractContext.didResolve = true;
@@ -99,7 +92,7 @@ export function extractParam(
     const objectExtractContext = { didResolve: false };
     const substitutedObject: Record<string, any> = {};
     Object.entries(param).forEach(([key, value]) => {
-      substitutedObject[key] = extractParam(state, value, appContext, false, objectExtractContext);
+      substitutedObject[key] = extractParam(state, value, appContext, objectExtractContext);
     });
     if (objectExtractContext.didResolve) {
       extractContext.didResolve = true;
@@ -155,7 +148,7 @@ export function shouldKeep(
   if (when === undefined) {
     return true;
   }
-  const whenValue = extractParam(componentState, when, appContext, true);
+  const whenValue = extractParam(componentState, when, appContext);
   return typeof whenValue === "string" ? (whenValue === "false" ? false : true) : !!whenValue;
 }
 

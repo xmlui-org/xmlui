@@ -60,7 +60,7 @@ export function renderChild({
 
   // --- A TextNode value may contain nexted expressions, so we extract it.
   if (node.type === "TextNode") {
-    return extractParam(state, nodeValue, appContext, true);
+    return extractParam(state, nodeValue, appContext);
   }
 
   // --- Rendering a Slot requires some preparations, as TextNode and
@@ -110,7 +110,7 @@ export function renderChild({
   // --- In other cases, we extract the component ID, and then render the component.
   // --- A component's ID is generally a string with identifier syntax. However, some
   // --- internal components have IDs with expressions, so we evaluate them.
-  const key = extractParam(state, node.uid, appContext, true);
+  const key = extractParam(state, node.uid, appContext);
 
   return (
     <ComponentWrapper

@@ -49,7 +49,6 @@ export const ComponentWrapper = memo(
       state,
       nodeWithTransformedLoaders.props?.data,
       appContext,
-      true,
     ), [appContext, nodeWithTransformedLoaders.props?.data, state]);
 
     // --- String values in the "data" prop are treated as URLs. This boolean
