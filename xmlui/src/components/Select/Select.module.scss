@@ -8,6 +8,8 @@ $themeVars: ();
 }
 
 $componentName: "Select";
+$themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
+
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
@@ -67,7 +69,7 @@ $componentName: "Select";
   }
 }
 
-button.selectTrigger  {
+button.selectTrigger {
   min-height: 2.6rem;
   display: flex;
   padding: t.$space-1 t.$space-2;
@@ -282,14 +284,17 @@ button.selectTrigger  {
 }
 
 .multiComboboxOption {
-  padding: 0.5rem 1rem;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  background-color: createThemeVar("backgroundColor-item-#{$componentName}");
+  .multiComboboxOptionContent {
+    width: 100%;
+    gap: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: createThemeVar("backgroundColor-item-#{$componentName}");
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
+  }
 
   &[data-selected=true] {
     background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
@@ -306,14 +311,9 @@ button.selectTrigger  {
 .selectItem {
   position: relative;
   display: flex;
-  width: 100%;
   cursor: default;
   user-select: none;
   align-items: center;
-  border-radius: 4px;
-  padding-top: .5em;
-  padding-bottom: .5em;
-  padding-inline: 1em;
   outline: none;
   font-size: createThemeVar("fontSize-#{$componentName}");
 
@@ -323,6 +323,17 @@ button.selectTrigger  {
 
   &[data-state=checked] {
     background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
+  }
+
+  .selectItemContent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    cursor: default;
+    user-select: none;
+    align-items: center;
+    outline: none;
+    @include t.paddingVars($themeVars, "item-#{$componentName}");
   }
 }
 
