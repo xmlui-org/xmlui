@@ -12,88 +12,91 @@ import xmluiLanguageConfig from './language-configuration.json?raw';
 import xmluiTmGrammar from '../syntax/xmlui.tmLanguage.json?raw';
 
 export const createMonacoWrapperConfig = (params: {
-    languageServerId: string,
-    useLanguageClient: boolean,
-    codeContent: CodeContent,
-    worker?: Worker,
-    messagePort?: MessagePort,
-    messageTransports?: MessageTransports,
-    htmlContainer: HTMLElement
+  languageServerId: string,
+  useLanguageClient: boolean,
+  codeContent: CodeContent,
+  worker?: Worker,
+  messagePort?: MessagePort,
+  messageTransports?: MessageTransports,
+  htmlContainer: HTMLElement
 }): WrapperConfig => {
-    const extensionFilesOrContents = new Map<string, string | URL>();
-    extensionFilesOrContents.set(`/${params.languageServerId}-xmlui-configuration.json`, xmluiLanguageConfig);
-    extensionFilesOrContents.set(`/${params.languageServerId}-xmlui-grammar.json`, xmluiTmGrammar);
+  const extensionFilesOrContents = new Map<string, string | URL>();
+  extensionFilesOrContents.set(`/${params.languageServerId}-xmlui-configuration.json`, xmluiLanguageConfig);
+  extensionFilesOrContents.set(`/${params.languageServerId}-xmlui-grammar.json`, xmluiTmGrammar);
 
-    const languageClientConfigs: LanguageClientConfigs | undefined = params.useLanguageClient && params.worker ? {
-        configs: {
-          xmlui: {
-              clientOptions: {
-                  documentSelector: ['xmlui']
-              },
-              connection: {
-                  options: {
-                      $type: 'WorkerDirect',
-                      worker: params.worker,
-                      messagePort: params.messagePort,
-                  },
-                  messageTransports: params.messageTransports
-              }
+  const languageClientConfigs: LanguageClientConfigs | undefined = params.useLanguageClient && params.worker ? {
+    configs: {
+      xmlui: {
+        clientOptions: {
+          documentSelector: ['xmlui']
+        },
+        connection: {
+          options: {
+            $type: 'WorkerDirect',
+            worker: params.worker,
+            messagePort: params.messagePort,
           },
+          messageTransports: params.messageTransports
         }
-    } : undefined;
+      },
+    }
+  } : undefined;
 
-    return {
-        $type: 'extended',
-        htmlContainer: params.htmlContainer,
-        logLevel: LogLevel.Debug,
-        vscodeApiConfig: {
-            serviceOverrides: {
-                ...getKeybindingsServiceOverride(),
-                ...getLifecycleServiceOverride(),
-                ...getLocalizationServiceOverride(createDefaultLocaleConfiguration()),
-            },
-            userConfiguration: {
-                json: JSON.stringify({
-                    'workbench.colorTheme': 'Default Dark Modern',
-                    'editor.guides.bracketPairsHorizontal': 'active',
-                    'editor.wordBasedSuggestions': 'off',
-                    'editor.experimental.asyncTokenization': true
-                })
-            },
+  return {
+    $type: 'extended',
+    htmlContainer: params.htmlContainer,
+    logLevel: LogLevel.Debug,
+    vscodeApiConfig: {
+      serviceOverrides: {
+        ...getKeybindingsServiceOverride(),
+        ...getLifecycleServiceOverride(),
+        ...getLocalizationServiceOverride(createDefaultLocaleConfiguration()),
+      },
+      userConfiguration: {
+        json: JSON.stringify({
+          'workbench.colorTheme': 'Default Dark Modern',
+          'editor.guides.bracketPairsHorizontal': 'active',
+          'editor.wordBasedSuggestions': 'off',
+          'editor.experimental.asyncTokenization': true
+        })
+      },
+    },
+    extensions: [{
+      config: {
+        name: 'xmlui-vscode',
+        publisher: 'norbidotdev',
+        version: '0.0.1',
+        engines: {
+          vscode: '*'
         },
-        extensions: [{
-            config: {
-                name: 'xmlui-vscode',
-                publisher: 'norbidotdev',
-                version: '0.0.1',
-                engines: {
-                    vscode: '*'
-                },
-                contributes: {
-                    languages: [{
-                        id: 'xmlui',
-                        extensions: ['.xmlui'],
-                        aliases: ['Xmlui', 'XMLUI'],
-                        configuration: `./${params.languageServerId}-xmlui-configuration.json`
-                    }],
-                    grammars: [{
-                        language: 'xmlui',
-                        scopeName: 'source.xmlui',
-                        path: `./${params.languageServerId}-xmlui-grammar.json`,
-                        embeddedLanguages: {
-                          "meta.embedded.block.javascrip": "javascript"
-                        }
-                    }]
-                }
-            },
-            filesOrContents: extensionFilesOrContents
-        }],
-        editorAppConfig: {
-            codeResources: {
-                modified: params.codeContent
-            },
-            monacoWorkerFactory: configureDefaultWorkerFactory
-        },
-        languageClientConfigs
-    };
+        contributes: {
+          languages: [{
+            id: 'xmlui',
+            extensions: ['.xmlui'],
+            aliases: ['Xmlui', 'XMLUI'],
+            configuration: `./${params.languageServerId}-xmlui-configuration.json`
+          }],
+          grammars: [{
+            language: 'xmlui',
+            scopeName: 'source.xmlui',
+            path: `./${params.languageServerId}-xmlui-grammar.json`,
+            embeddedLanguages: {
+              "meta.embedded.block.javascrip": "javascript"
+            }
+          }]
+        }
+      },
+      filesOrContents: extensionFilesOrContents
+    }],
+    editorAppConfig: {
+      codeResources: {
+        modified: params.codeContent
+      },
+      editorOptions: {
+        readOnly: true
+      },
+      monacoWorkerFactory: configureDefaultWorkerFactory
+    },
+    languageClientConfigs
+  };
 };
