@@ -151,7 +151,15 @@ export const StateContainer = memo(
       const fnDeps: Record<string, Array<string>> = {};
       Object.entries(varDefinitions).forEach(([key, value]) => {
         if (isParsedAttributeValue(value)) {
-          fnDeps[key] = collectVariableDependencies(value.segments[0].expr, referenceTrackedApi);
+          const deps: string[] = [];
+          value.segments.forEach((segment) => {
+            if (segment.expr) {
+              deps.push(...collectVariableDependencies(segment.expr, referenceTrackedApi));
+            }
+          });
+
+          // --- Remove duplicates
+          fnDeps[key] = [...new Set(deps)];
         } else if (value.type === T_ARROW_EXPRESSION) {
           fnDeps[key] = collectVariableDependencies(value, referenceTrackedApi);
         }

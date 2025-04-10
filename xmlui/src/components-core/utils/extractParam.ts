@@ -30,7 +30,7 @@ export function extractParam(
     // --- The param is a parsed attribute value
     if (param.segments.length === 1) {
       // --- We have a single literal or expression
-      if (param.segments[0].expr) {
+      if (param.segments[0].expr !== undefined) {
         // --- Expression
         extractContext.didResolve = true;
         return evalBinding(param.segments[0].expr, {
@@ -49,7 +49,7 @@ export function extractParam(
     // --- We have multiple segments. Evaluate all expressions and convert them to strings
     let result = "";
     param.segments.forEach((ps) => {
-      if (ps.expr) {
+      if (ps.expr !== undefined) {
         // --- Expression: add its string representation
         extractContext.didResolve = true;
         const exprValue = evalBinding(ps.expr, {
