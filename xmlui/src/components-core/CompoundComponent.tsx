@@ -42,7 +42,7 @@ export const CompoundComponent = forwardRef(
       const resolvedProps: any = {};
       if (node.props) {
         Object.entries(node.props).forEach(([key, value]) => {
-          const extractedProp = extractValue(value, true);
+          const extractedProp = extractValue(value);
           if (extractedProp?._ARROW_EXPR_) {
             // --- Ensure arrow functions are called synchronously
             resolvedProps[key] = lookupSyncCallback(extractedProp);

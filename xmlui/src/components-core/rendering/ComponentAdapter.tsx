@@ -377,7 +377,7 @@ function slotRenderer(
     slotProps = {};
     Object.keys(node.props).forEach((key) => {
       if (key !== "name") {
-        let extractedValue = extractValue(node.props[key], true);
+        let extractedValue = extractValue(node.props[key]);
         if (extractedValue?._ARROW_EXPR_) {
           extractedValue = lookupAction(extractedValue);
         }

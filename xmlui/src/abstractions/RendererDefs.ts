@@ -77,7 +77,7 @@ export type ValueExtractor = {
    * @param expression Value expression
    * @param strict Strict matching?
    */
-  (expression?: any, strict?: boolean): any;
+  (expression?: any): any;
 
   /**
    * Get a string value from an expression

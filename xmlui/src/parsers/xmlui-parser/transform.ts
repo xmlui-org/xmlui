@@ -147,7 +147,7 @@ export function nodeToComponentDef(
     if (varsAttrs.length > 0) {
       vars = {};
       varsAttrs.forEach((attr) => {
-        vars![attr.name] = parseProperty(attr.value);
+        vars![attr.name] = parsePropertyExpression(attr.value);
       });
     }
 
@@ -312,7 +312,7 @@ export function nodeToComponentDef(
             (name, value) => {
               if (!isComponent(comp)) return;
               comp.props ??= {};
-              comp.props[name] = comp.type === "TextNodeCData" ? value: parseProperty(value);
+              comp.props[name] = comp.type === "TextNodeCData" ? value : parsePropertyExpression(value);
             },
           );
           return;
@@ -327,7 +327,7 @@ export function nodeToComponentDef(
             (name, value) => {
               if (!isComponent(comp)) return;
               comp.events ??= {};
-              comp.events[name] = parseEvent(value);
+              comp.events[name] = parseEventCode(value);
             },
             (name) => {
               if (onPrefixRegex.test(name)) {
@@ -444,25 +444,25 @@ export function nodeToComponentDef(
         comp.testId = value;
         return;
       case "when":
-        comp.when = parseProperty(value);
+        comp.when = parsePropertyExpression(value);
         return;
       default:
         if (startSegment === "var") {
           comp.vars ??= {};
-          comp.vars[name] = parseProperty(value);
+          comp.vars[name] = parsePropertyExpression(value);
         } else if (startSegment === "method") {
           comp.api ??= {};
           comp.api[name] = value;
         } else if (startSegment === "event") {
           comp.events ??= {};
-          comp.events[name] = parseEvent(value);
+          comp.events[name] = parseEventCode(value);
         } else if (onPrefixRegex.test(name)) {
           comp.events ??= {};
           const eventName = name[2].toLowerCase() + name.substring(3);
-          comp.events[eventName] = parseEvent(value);
+          comp.events[eventName] = parseEventCode(value);
         } else {
           comp.props ??= {};
-          comp.props[name] = comp.type === "TextNodeCData" ? value: parseProperty(value);
+          comp.props[name] = comp.type === "TextNodeCData" ? value : parsePropertyExpression(value);
         }
         return;
     }
@@ -1024,10 +1024,9 @@ export function nodeToComponentDef(
       }
     }
   }
-
 }
 
-function parseEvent(value: any): any {
+export function parseEventCode(value: any): any {
   if (typeof value !== "string") {
     // --- It must be a component definition in the event code
     return value;
@@ -1052,7 +1051,7 @@ function parseEvent(value: any): any {
   }
 }
 
-function parseProperty(value: any): any {
+export function parsePropertyExpression(value: any): any {
   if (typeof value !== "string") {
     // --- It must be a component definition in the property value
     return value;
@@ -1164,7 +1163,7 @@ function mergeValue(oldValue: any, itemValue: any): any {
         return oldValue;
       }
     } else if (isParsedAttributeValue(oldValue)) {
-      return [oldValue, parseProperty(itemValue)];
+      return [oldValue, parsePropertyExpression(itemValue)];
     } else {
       return [oldValue, itemValue];
     }
