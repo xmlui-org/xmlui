@@ -78,11 +78,8 @@ describe("Xmlui transform - child elements", () => {
   it("CData as child", () => {
     const cd = transformSource("<H1><![CDATA[hi]]></H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
-    const value = (cd.children[0].props as any).value as ParsedPropertyValue;
-    expect(value.__PARSED).toEqual(true);
-    expect(value.parseId).toBeGreaterThan(0);
-    expect(value.segments.length).toEqual(1);
-    expect(value.segments[0].literal).toEqual("hi");
+    const value = (cd.children[0].props as any).value;
+    expect(value).toEqual("hi");
   });
 
   it("string literal then text as child", () => {
@@ -98,21 +95,15 @@ describe("Xmlui transform - child elements", () => {
   it("string literal then CData as child", () => {
     const cd = transformSource("<H1>'hi     ' <![CDATA[there]]></H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
-    const value = (cd.children[0].props as any).value as ParsedPropertyValue;
-    expect(value.__PARSED).toEqual(true);
-    expect(value.parseId).toBeGreaterThan(0);
-    expect(value.segments.length).toEqual(1);
-    expect(value.segments[0].literal).toEqual("hi there");
+    const value = (cd.children[0].props as any).value;
+    expect(value).toEqual("hi there");
   });
 
   it("string literal #2 then CData as child", () => {
     const cd = transformSource("<H1>'hi'    <![CDATA[there]]></H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
-    const value = (cd.children[0].props as any).value as ParsedPropertyValue;
-    expect(value.__PARSED).toEqual(true);
-    expect(value.parseId).toBeGreaterThan(0);
-    expect(value.segments.length).toEqual(1);
-    expect(value.segments[0].literal).toEqual("hithere");
+    const value = (cd.children[0].props as any).value;
+    expect(value).toEqual("hithere");
   });
 
   it("string literal, text, CData as child", () => {
@@ -120,11 +111,8 @@ describe("Xmlui transform - child elements", () => {
       "<H1>hi   <![CDATA[there]]> 'all'  <![CDATA[people]]></H1>",
     ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
-    const value = (cd.children[0].props as any).value as ParsedPropertyValue;
-    expect(value.__PARSED).toEqual(true);
-    expect(value.parseId).toBeGreaterThan(0);
-    expect(value.segments.length).toEqual(1);
-    expect(value.segments[0].literal).toEqual("hi thereallpeople");
+    const value = (cd.children[0].props as any).value;
+    expect(value).toEqual("hi thereallpeople");
   });
 
   it("text and element as child #1", () => {

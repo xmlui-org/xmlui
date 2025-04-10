@@ -89,11 +89,8 @@ describe("Xmlui transform - entity escape", () => {
 
   it("&amp; ignored inside CData", () => {
     const cd = transformSource("<Stack><![CDATA[&amp;]]></Stack>") as ComponentDef;
-    const value = (cd.children[0].props as any).value as ParsedPropertyValue;
-    expect(value.__PARSED).toEqual(true);
-    expect(value.parseId).toBeGreaterThan(0);
-    expect(value.segments.length).toEqual(1);
-    expect(value.segments[0].literal).toEqual("&amp;");
+    const value = (cd.children[0].props as any).value;
+    expect(value).toEqual("&amp;");
   });
 
   it("attr - &amp;", () => {

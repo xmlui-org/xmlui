@@ -477,6 +477,24 @@ describe("Xmlui parser - child nodes", () => {
     expect(getText(child1)).equal("<![CDATA[   ]]>");
   });
 
+  it("cdata #1", () => {
+    const { node, getText } = parseSource(`<Stack><![CDATA[haho]]></Stack>`);
+    const rootElem = node.children![0];
+    const nameNode = rootElem.children[1];
+    const nameId = nameNode.children[0];
+    const childElements = rootElem.children[3];
+    const child = childElements.children[0];
+
+    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+    expect(getText(nameId)).equal("Stack");
+
+    expect(childElements.kind).toEqual(SyntaxKind.ContentListNode);
+    expect(child.kind).toEqual(SyntaxKind.CData);
+    expect(getText(child)).equal("<![CDATA[haho]]>");
+  });
+
   it("helper tags", () => {
     const { node, getText } = parseSource(
       "<Stack><property name='myProp'>hello</property></Stack>",

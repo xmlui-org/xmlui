@@ -312,7 +312,7 @@ export function nodeToComponentDef(
             (name, value) => {
               if (!isComponent(comp)) return;
               comp.props ??= {};
-              comp.props[name] = parseProperty(value);
+              comp.props[name] = comp.type === "TextNodeCData" ? value: parseProperty(value);
             },
           );
           return;
@@ -347,7 +347,7 @@ export function nodeToComponentDef(
             (name, value) => {
               if (!isComponent(comp)) return;
               comp.vars ??= {};
-              comp.vars[name] = value;
+              comp.vars[name] = value as any;
             },
           );
           return;
@@ -462,7 +462,7 @@ export function nodeToComponentDef(
           comp.events[eventName] = parseEvent(value);
         } else {
           comp.props ??= {};
-          comp.props[name] = parseProperty(value);
+          comp.props[name] = comp.type === "TextNodeCData" ? value: parseProperty(value);
         }
         return;
     }

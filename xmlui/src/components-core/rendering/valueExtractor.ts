@@ -57,10 +57,12 @@ export function createValueExtractor(
       return expression;
     }
 
+
     if (typeof expression !== "string" && strict) {
       // --- If strict is true, we expect a string expression
       return expression;
     }
+
 
     if (!isParsedAttributeValue(expression)) {
       // --- All other cases should use an already parsed expression

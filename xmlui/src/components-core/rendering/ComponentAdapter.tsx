@@ -216,7 +216,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     const resolvedLayoutProps: Record<string, any> = {};
     layoutOptionKeys.forEach((key) => {
       if (safeNode.props && key in safeNode.props) {
-        resolvedLayoutProps[key] = valueExtractor(safeNode.props[key], true);
+        resolvedLayoutProps[key] = valueExtractor(safeNode.props[key]);
       }
     });
 
