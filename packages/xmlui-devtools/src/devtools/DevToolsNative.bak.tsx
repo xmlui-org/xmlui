@@ -9,8 +9,10 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 import loader from "@monaco-editor/loader";
-
-import { Editor } from "../editor/Editor";
+import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
+import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
+import xmluiLight from "../syntax/monaco/xmlui-light";
+import xmluiDark from "../syntax/monaco/xmlui-dark";
 
 export const DevTools = () => {
   const [side, setSide] = useState<"bottom" | "left" | "right">("bottom");
@@ -19,12 +21,10 @@ export const DevTools = () => {
   const { setDevToolsSize, setDevToolsSide, inspectedNode, sources, setIsOpen } = context;
   const [copied, setCopied] = useState(false);
   const monacoEditorInstance = useRef<any>(null);
+  const editorRef = useRef(null);
   const [activeTab, setActiveTab] = useState("code");
+  const monacoSetupDone = useRef(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const handleEditorInstanceChange = useCallback((instance: any) => {
-    monacoEditorInstance.current = instance;
-  }, []);
 
   const copyToClipboard = () => {
     setCopied(true);
@@ -68,6 +68,61 @@ export const DevTools = () => {
     });
     return prunedLines.map((line) => line.slice(trimBeginCount)).join("\n");
   }, [inspectedNode, sources]);
+
+  useEffect(() => {
+    if (activeTab === "code") {
+      if (monacoEditorInstance.current) {
+        monacoEditorInstance.current.layout();
+      } else if (editorRef.current) {
+        loader.init().then((monaco) => {
+          if (!editorRef.current || monacoEditorInstance.current) return;
+          if (!monacoSetupDone.current) {
+            monaco.languages.register({ id: XmluiGrammar.id });
+            monaco.languages.setMonarchTokensProvider(XmluiGrammar.id, XmluiGrammar.language);
+            monaco.languages.setLanguageConfiguration(XmluiGrammar.id, XmluiGrammar.config);
+
+            monaco.languages.register({ id: XmluiScripGrammar.id });
+            monaco.languages.setMonarchTokensProvider(
+              XmluiScripGrammar.id,
+              XmluiScripGrammar.language,
+            );
+            monaco.languages.setLanguageConfiguration(
+              XmluiScripGrammar.id,
+              XmluiScripGrammar.config,
+            );
+
+            monaco.editor.defineTheme("xmlui-light", xmluiLight);
+            monaco.editor.defineTheme("xmlui-dark", xmluiDark);
+
+            monacoSetupDone.current = true;
+          }
+
+          monaco.editor.setTheme(activeThemeTone === "dark" ? "xmlui-dark" : "xmlui-light");
+
+          monacoEditorInstance.current = monaco.editor.create(editorRef.current, {
+            value,
+            language: "xmlui",
+            readOnly: true,
+            scrollBeyondLastLine: false,
+            overviewRulerLanes: 0,
+            hideCursorInOverviewRuler: true,
+            minimap: { enabled: false },
+            padding: {
+              top: 10,
+              bottom: 10,
+            },
+          });
+        });
+      }
+    }
+
+    return () => {
+      if (monacoEditorInstance.current) {
+        monacoEditorInstance.current.dispose();
+        monacoEditorInstance.current = null;
+      }
+    };
+  }, [activeTab, activeThemeTone, value]);
 
   const getInitialSize = useCallback(() => {
     switch (side) {
@@ -226,12 +281,7 @@ export const DevTools = () => {
           </div>
         </List>
         <Content value={"code"} className={styles.content}>
-          <Editor
-            text={value}
-            activeThemeTone={activeThemeTone}
-            className={styles.xmluiEditor}
-            onEditorInstanceChange={handleEditorInstanceChange}
-          />
+          <div ref={editorRef} className={styles.xmluiEditor} />
           <div className={styles.copyButton}>
             <button onClick={copyToClipboard} style={{ padding: 8 }}>
               {copied ? (

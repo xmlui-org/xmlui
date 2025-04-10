@@ -1,9 +1,9 @@
-import { Editor as MonacoEditor, useMonaco } from "@monaco-editor/react";
-import { CSSProperties, useEffect } from "react";
-import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
-import xmluiLight from "../syntax/monaco/xmlui-light";
-import xmluiDark from "../syntax/monaco/xmlui-dark";
-import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
+import React, { useMemo, useEffect, CSSProperties } from "react";
+import { MonacoEditorReactComp } from "@typefox/monaco-editor-react";
+import { createMonacoWrapperConfig } from "./config/monacoWrapperConfig.js";
+import { BrowserMessageReader, BrowserMessageWriter } from "vscode-languageclient/browser.js";
+
+import workerUrl from "xmlui/language-server-web-worker?worker&url";
 
 export type EditorProps = {
   readOnly?: boolean;
@@ -16,50 +16,45 @@ export type EditorProps = {
   activeThemeTone?: string;
 };
 
-export const Editor = ({
-  readOnly = true,
-  language = "xmlui",
-  value,
-  onChange = () => {},
-  onMount = () => {},
-  saveViewState = false,
-  activeThemeTone = "light",
-}: EditorProps) => {
-  const monaco = useMonaco();
+function createWorkerSetup() {
+  const worker = new Worker(workerUrl, {
+    type: "module",
+    name: "Xmlui Language Server",
+  });
+  const reader = new BrowserMessageReader(worker);
+  const writer = new BrowserMessageWriter(worker);
+
+  const { dispose: disposeMsgListener } = reader.listen((message) => {
+    console.log("Received message from worker:", message);
+  });
+
+  return { worker, reader, writer, disposeMsgListener };
+}
+
+export function Editor(props: any) {
+  const { worker, reader, writer, disposeMsgListener } = useMemo(() => createWorkerSetup(), []);
 
   useEffect(() => {
-    if (monaco) {
-      //xmlui markup
-      monaco.languages.register({ id: XmluiGrammar.id });
-      monaco.languages.setMonarchTokensProvider(XmluiGrammar.id, XmluiGrammar.language);
-      monaco.languages.setLanguageConfiguration(XmluiGrammar.id, XmluiGrammar.config);
-      monaco.editor.defineTheme("xmlui-light", xmluiLight);
-      monaco.editor.defineTheme("xmlui-dark", xmluiDark);
-      if (language === "xmlui") {
-        monaco.editor.setTheme(activeThemeTone === "dark" ? "xmlui-dark" : "xmlui-light");
-      }
-      //xmluiscript
-      monaco.languages.register({ id: XmluiScripGrammar.id });
-      monaco.languages.setMonarchTokensProvider(XmluiScripGrammar.id, XmluiScripGrammar.language);
-      monaco.languages.setLanguageConfiguration(XmluiScripGrammar.id, XmluiScripGrammar.config);
-    }
-  }, [monaco, language, activeThemeTone]);
-
-  return (
-    <MonacoEditor
-      saveViewState={saveViewState}
-      onChange={onChange}
-      onMount={onMount}
-      key={"devtools"}
-      options={{
-        readOnly: readOnly,
-        scrollBeyondLastLine: false,
-        minimap: { enabled: false },
-        overviewRulerLanes: 0,
-        hideCursorInOverviewRuler: true,
-      }}
-      language={language}
-      value={value}
-    />
+    return () => {
+      disposeMsgListener();
+      worker.terminate();
+    };
+  }, [worker, disposeMsgListener]);
+  const wrapperConfig = useMemo(
+    () =>
+      createMonacoWrapperConfig({
+        languageServerId: "xmlui",
+        useLanguageClient: true,
+        codeContent: {
+          text: props.text,
+          uri: "/workspace/example.xmlui",
+        },
+        worker,
+        messageTransports: { reader, writer },
+        htmlContainer: document.getElementById("monaco-editor-root")!,
+      }),
+    [worker, reader, writer, props.text],
   );
-};
+
+  return <MonacoEditorReactComp style={{ height: "100%" }} wrapperConfig={wrapperConfig} />;
+}
