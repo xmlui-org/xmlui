@@ -4,11 +4,11 @@ import { isPlainObject } from "lodash-es";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 
-import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
 import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { isParsedAttributeValue } from "../script-runner/AttributeValueParser";
+import { ParsedPropertyValue } from "../../abstractions/scripting/Compilation";
 
 /**
  * Extract the value of the specified parameter from the given view container state
@@ -73,56 +73,6 @@ export function extractParam(
     });
     return result;
   }
-
-  // if (typeof param === "string") {
-  //   const paramSegments = parseParameterString(param);
-  //   if (paramSegments.length === 0) {
-  //     // --- The param is an empty string, retrieve it
-  //     return param;
-  //   }
-
-  //   if (paramSegments.length === 1) {
-  //     // --- We have a single string literal or expression
-  //     if (paramSegments[0].type === "literal") {
-  //       // --- No expression to evaluate
-  //       return paramSegments[0].value;
-  //     } else {
-  //       // --- We have a single expression to evaluate
-  //       extractContext.didResolve = true;
-  //       return evalBinding(paramSegments[0].value, {
-  //         localContext: state,
-  //         appContext,
-  //         options: {
-  //           defaultToOptionalMemberAccess: true,
-  //         },
-  //       });
-  //     }
-  //   }
-  //   // --- At this point, we have multiple segments. Evaluate all expressions and convert them to strings
-  //   let result = "";
-  //   paramSegments.forEach((ps) => {
-  //     if (ps.type === "literal") {
-  //       result += ps.value;
-  //     } else {
-  //       extractContext.didResolve = true;
-  //       const exprValue = evalBinding(ps.value, {
-  //         localContext: state,
-  //         appContext,
-  //         options: {
-  //           defaultToOptionalMemberAccess: true,
-  //         },
-  //       });
-  //       if (exprValue === null) {
-  //         result += "null";
-  //       } else if (exprValue === undefined) {
-  //         result += "undefined";
-  //       } else if (exprValue?.toString) {
-  //         result += exprValue.toString();
-  //       }
-  //     }
-  //   });
-  //   return result;
-  // }
 
   if (strict) {
     // --- As we allow only string parameters as binding expressions, we return with the provided
@@ -197,14 +147,15 @@ export function withStableObjectReference(object: any) {
 }
 
 export function shouldKeep(
-  when: string | boolean | undefined,
+  when: string | boolean | ParsedPropertyValue | undefined,
   componentState: ContainerState,
   appContext?: AppContextObject,
 ) {
   if (when === undefined) {
     return true;
   }
-  return extractParam(componentState, when, appContext, true);
+  const whenValue = extractParam(componentState, when, appContext, true);
+  return typeof whenValue === "string" ? (whenValue === "false" ? false : true) : !!whenValue;
 }
 
 /**

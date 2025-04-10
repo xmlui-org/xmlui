@@ -48,7 +48,7 @@ export interface ComponentDefCore {
    * component with its children chain is rendered; otherwise, the entire component hierarchy is omitted
    * from the rendered tree.
    */
-  when?: string | boolean;
+  when?: string | boolean | ParsedPropertyValue;
 
   /**
    * Some components work with data obtained asynchronously. Fetching this data requires some state
