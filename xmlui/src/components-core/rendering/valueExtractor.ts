@@ -10,7 +10,7 @@ import { collectVariableDependencies } from "../script-runner/visitors";
 import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { isParsedAttributeValue } from "../script-runner/AttributeValueParser";
+import { isParsedAttributeValue, parseAttributeValue } from "../script-runner/AttributeValueParser";
 
 export function asOptionalBoolean(value: any, defValue?: boolean | undefined) {
   if (value === undefined || value === null) return defValue;
@@ -52,17 +52,22 @@ export function createValueExtractor(
       return expression;
     }
 
-    if (isPrimitive(expression) && !isString(expression) || !isParsedAttributeValue(expression)) {
+    // TODO: Modify the loaders and events to be able to eliminate this branch
+    if (typeof expression === "string") {
+      expression = parseAttributeValue(expression);
+    }
+
+    if ((isPrimitive(expression) && !isString(expression)) || !isParsedAttributeValue(expression)) {
       // --- Primitive values (except string) are returned as is
       return expression;
     }
 
-
-    if (typeof expression !== "string" && strict) {
-      // --- If strict is true, we expect a string expression
-      return expression;
+    if (typeof expression !== "string") {
+      if (strict) {
+        // --- If strict is true, we expect a string expression
+        return expression;
+      }
     }
-
 
     if (!isParsedAttributeValue(expression)) {
       // --- All other cases should use an already parsed expression
@@ -87,7 +92,6 @@ export function createValueExtractor(
         }),
         obtainValue: memoizeOne(
           (expression, state, appContext, strict, deps, appContextDeps) => {
-            // console.log("COMP, BUST, obtain value called with", expression, state, appContext, deps,  appContextDeps);
             return extractParam(state, expression, appContext, strict);
           },
           (
@@ -109,7 +113,7 @@ export function createValueExtractor(
         ),
       });
     }
-    
+
     // --- Obtain the cached value from the cache (now, it must be there)
     // --- Note, we ignore the first parameter of getDependencies in the cached function
     const expressionDependencies = memoedVarsRef.current

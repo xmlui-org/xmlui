@@ -133,7 +133,7 @@ export const CompoundComponent = forwardRef(
     const safeLayoutContext = layoutContext
       ? { ...layoutContext, wrapChild: undefined }
       : layoutContext;
-    const ret = renderChild(nodeWithPropsAndEvents, safeLayoutContext, memoedParentRenderContext);
+    const ret = renderChild(nodeWithPropsAndEvents as any, safeLayoutContext, memoedParentRenderContext);
     if (forwardedRef && ret && isValidElement(ret)) {
       return React.cloneElement(ret, {
         ref: composeRefs(forwardedRef, (ret as any).ref),

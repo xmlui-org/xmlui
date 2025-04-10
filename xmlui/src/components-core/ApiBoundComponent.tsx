@@ -6,6 +6,7 @@ import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs"
 import type { UploadActionComponent } from "./action/FileUploadAction";
 import type { DownloadActionComponent } from "./action/FileDownloadAction";
 import type { ApiActionComponent } from "../components/APICall/APICall";
+import { isParsedAttributeValue } from "./script-runner/AttributeValueParser";
 
 type ApiBoundComponentProps = {
   uid: symbol;
@@ -219,10 +220,6 @@ export function ApiBoundComponent({
     }
     return wrapped;
   }, [apiBoundEvents, apiBoundProps, node, uid]);
-
-  // useEffect(() => {
-  //   console.log("wrapped with adapter changed", wrappedWithAdapter);
-  // }, [wrappedWithAdapter]);
 
   const renderedChild = renderChild(
     wrappedWithAdapter,
