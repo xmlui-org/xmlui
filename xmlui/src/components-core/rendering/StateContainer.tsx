@@ -38,7 +38,12 @@ import {
   ComponentApi,
   StatePartChangedFn,
 } from "./ContainerWrapper";
-import { isExpression, isParsedAttributeValue, parseAttributeValue } from "../script-runner/AttributeValueParser";
+import {
+  isExpression,
+  isParsedAttributeValue,
+  parseAttributeValue,
+} from "../script-runner/AttributeValueParser";
+import { extractParam } from "../utils/extractParam";
 
 // --- Properties of the MemoizedErrorProneContainer component
 type Props = {
@@ -186,13 +191,11 @@ export const StateContainer = memo(
     const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
       setComponentApis(
         produce((draft) => {
-          // console.log("-----BUST----setComponentApis");
           if (!draft[uid]) {
             draft[uid] = {};
           }
           Object.entries(api).forEach(([key, value]) => {
             if (draft[uid][key] !== value) {
-              // console.log(`-----BUST------new api for ${uid}`, draft[uid][key], value)
               draft[uid][key] = value;
             }
           });
@@ -293,11 +296,9 @@ function useCombinedState(...states: (ContainerState | undefined)[]) {
   const combined: ContainerState = useMemo(() => {
     let ret: ContainerState = {};
     states.forEach((state = EMPTY_OBJECT) => {
-      // console.log("st", state);
       if (state !== EMPTY_OBJECT) {
         ret = { ...ret, ...state };
       }
-      // console.log("ret", ret);
     });
     return ret;
   }, [states]);
@@ -344,13 +345,13 @@ function useVars(
   const resolvedVars = useMemo(() => {
     const ret: any = {};
 
-    Object.entries(vars).forEach(([key, value]) => {
+    Object.keys(vars).forEach((key) => {
+      const value = vars[key];
       if (key === "$props") {
         // --- We already resolved props in a compound component
         ret[key] = value;
       } else if (!isParsedAttributeValue(value) && !isExpression(value)) {
-        console.log("VARS", key, value);
-        throw new Error(`Handle this case ${key}: ${value}`);
+        ret[key] = value;
       }
 
       // --- At this point we have parsed vales
@@ -373,20 +374,27 @@ function useVars(
               // --- We parsed this variable from code-behind
               return collectVariableDependencies(value, referenceTrackedApi);
             } else {
-              throw new Error("Unknown variable type");
+              return [];
+              //throw new Error("Unknown variable type");
             }
           }),
           obtainValue: memoizeOne(
             (value, state, appContext, _strict, _deps, _appContextDeps) => {
               try {
-                const toEvaluate = isExpression(value) ? value : value.segments[0].expr;
-                return evalBinding(toEvaluate, {
-                  localContext: state,
-                  appContext,
-                  options: {
-                    defaultToOptionalMemberAccess: true,
-                  },
-                });
+                if (isExpression(value)) {
+                  return evalBinding(value, {
+                    localContext: state,
+                    appContext,
+                    options: {
+                      defaultToOptionalMemberAccess: true,
+                    },
+                  });
+                } else if (isParsedAttributeValue(value)) {
+                  // --- We parsed this variable from markup
+                  extractParam(state, value, appContext);
+                } else {
+                  return value;
+                }
               } catch (e) {
                 console.log(state);
                 throw new ParseVarError(value, e);
@@ -411,6 +419,7 @@ function useVars(
           ),
         });
       }
+
       const stateContext: ContainerState = { ...ret, ...componentState };
 
       let dependencies: Array<string> = [];
@@ -429,12 +438,12 @@ function useVars(
           });
         dependencies = [...new Set(dependencies)];
       }
+
       const stateDepValues = pickFromObject(stateContext, dependencies);
       const appContextDepValues = pickFromObject(appContext, dependencies);
-      // console.log("VARS, obtain value called with", stateDepValues, appContextDepValues);
 
       ret[key] = memoedVars.current
-        .get(value)!
+        .get(value)
         .obtainValue(value, stateContext, appContext, true, stateDepValues, appContextDepValues);
     });
     return ret;
