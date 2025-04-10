@@ -4,3 +4,5 @@ export default {
   namespace: "XMLUIDevtools",
   components: [devToolsComponentRenderer],
 };
+
+export { Editor } from "./editor/Editor";
