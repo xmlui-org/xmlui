@@ -1,4 +1,4 @@
-const withTM = require("next-transpile-modules")(["react-icons", "xmlui-charts", "xmlui", "xmlui-animations", "xmlui-pdf"]);
+const withTM = require("next-transpile-modules")(["react-icons", "xmlui-charts", "xmlui", "xmlui-animations", "xmlui-pdf", "xmlui-devtools"]);
 const shiki = require("shiki");
 const fs = require("fs");
 const theme = require("../xmlui/src/syntax/textMate/xmlui.json");
