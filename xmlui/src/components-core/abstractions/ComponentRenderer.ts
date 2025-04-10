@@ -10,7 +10,7 @@ import type {
   RegisterComponentApiFnInner,
 } from "../rendering/ContainerWrapper";
 import type { ContainerAction } from "./containers";
-import { PropertySegment } from "../../abstractions/scripting/Compilation";
+import { ParsedPropertyValue, PropertySegment } from "../../abstractions/scripting/Compilation";
 import { Expression } from "../../abstractions/scripting/ScriptingSourceTree";
 
 /**
@@ -66,7 +66,7 @@ export type MemoedVars = Map<
       referenceTrackedApi: Record<string, ComponentApi>,
     ) => Array<string>;
     obtainValue: (
-      expression: Expression,
+      parsedValue: ParsedPropertyValue,
       state: ContainerState,
       appContext: AppContextObject | undefined,
       strict: boolean | undefined,

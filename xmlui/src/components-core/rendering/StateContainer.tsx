@@ -360,7 +360,15 @@ function useVars(
           getDependencies: memoizeOne((value, referenceTrackedApi) => {
             if (isParsedAttributeValue(value)) {
               // --- We parsed this variable from markup
-              return collectVariableDependencies(value.segments[0].expr, referenceTrackedApi);
+              const deps: string[] = [];
+              value.segments.forEach((segment) => {
+                if (segment.expr) {
+                  deps.push(...collectVariableDependencies(segment.expr, referenceTrackedApi));
+                }
+              });
+
+              // --- Remove duplicates
+              return [...new Set(deps)];
             } else if (isExpression(value)) {
               // --- We parsed this variable from code-behind
               return collectVariableDependencies(value, referenceTrackedApi);

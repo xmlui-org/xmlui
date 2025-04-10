@@ -10,7 +10,7 @@ import { collectVariableDependencies } from "../script-runner/visitors";
 import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { parseAttributeValue } from "../script-runner/AttributeValueParser";
+import { isParsedAttributeValue, parseAttributeValue } from "../script-runner/AttributeValueParser";
 import { ParsedPropertyValue, PropertySegment } from "../../abstractions/scripting/Compilation";
 
 function collectParams(expression: any): PropertySegment[] {
@@ -38,7 +38,6 @@ export function asOptionalBoolean(value: any, defValue?: boolean | undefined) {
     return value !== 0;
   }
   if (typeof value === "string") {
-
     value = value.trim().toLowerCase();
     if (value === "") {
       return false;
@@ -64,36 +63,45 @@ export function createValueExtractor(
   state: ContainerState,
   appContext: AppContextObject | undefined,
   referenceTrackedApi: Record<string, ComponentApi>,
-  memoedVarsRef: MutableRefObject<MemoedVars>
+  memoedVarsRef: MutableRefObject<MemoedVars>,
 ): ValueExtractor {
   // --- Extract the parameter and retrieve as is is
   const extractor = (expression?: any, strict?: boolean): any => {
     if (!expression) {
-      return expression;
-    }
-    if (isPrimitive(expression) && !isString(expression)) {
+      // --- No expression, return undefined
       return expression;
     }
 
-    let expressionString = expression;
-    if (typeof expression !== "string") {
-      if (strict) {
-        return expression;
-      }
-      expressionString = JSON.stringify(expression);
+    if (isPrimitive(expression) && !isString(expression) || !isParsedAttributeValue(expression)) {
+      // --- Primitive values (except string) are returned as is
+      return expression;
     }
 
-    if (!memoedVarsRef.current.has(expressionString)) {
-      const params = collectParams(expression);
-      memoedVarsRef.current.set(expressionString, {
+    if (typeof expression !== "string" && strict) {
+      // --- If strict is true, we expect a string expression
+      return expression;
+    }
+
+    if (!isParsedAttributeValue(expression)) {
+      // --- All other cases should use an already parsed expression
+      throw new Error("Parsed expression expected.");
+    }
+
+    // --- Use the parseId as the cache key
+    const parseId = expression.parseId;
+    if (!memoedVarsRef.current.has(parseId)) {
+      memoedVarsRef.current.set(parseId, {
         getDependencies: memoizeOne((_expressionString, referenceTrackedApi) => {
-          let ret = new Set<string>();
-          params.forEach((param) => {
-            if (param.expr) {
-              ret = new Set([...ret, ...collectVariableDependencies(param.expr, referenceTrackedApi)]);
+          // --- We parsed this variable from markup
+          const deps: string[] = [];
+          expression.segments.forEach((segment) => {
+            if (segment.expr) {
+              deps.push(...collectVariableDependencies(segment.expr, referenceTrackedApi));
             }
           });
-          return Array.from(ret);
+
+          // --- Remove duplicates
+          return [...new Set(deps)];
         }),
         obtainValue: memoizeOne(
           (expression, state, appContext, strict, deps, appContextDeps) => {
@@ -102,26 +110,40 @@ export function createValueExtractor(
           },
           (
             [_newExpression, _newState, _newAppContext, _newStrict, newDeps, newAppContextDeps],
-            [_lastExpression, _lastState, _lastAppContext, _lastStrict, lastDeps, lastAppContextDeps]
+            [
+              _lastExpression,
+              _lastState,
+              _lastAppContext,
+              _lastStrict,
+              lastDeps,
+              lastAppContextDeps,
+            ],
           ) => {
-            return shallowCompare(newDeps, lastDeps) && shallowCompare(newAppContextDeps, lastAppContextDeps);
-          }
+            return (
+              shallowCompare(newDeps, lastDeps) &&
+              shallowCompare(newAppContextDeps, lastAppContextDeps)
+            );
+          },
         ),
       });
     }
+    
+    // --- Obtain the cached value from the cache (now, it must be there)
+    // --- Note, we ignore the first parameter of getDependencies in the cached function
     const expressionDependencies = memoedVarsRef.current
-      .get(expressionString)!
-      .getDependencies(expressionString, referenceTrackedApi);
+      .get(parseId)!
+      .getDependencies(parseId.toString(), referenceTrackedApi);
     const depValues = pickFromObject(state, expressionDependencies);
     const appContextDepValues = pickFromObject(appContext, expressionDependencies);
-    // console.log("COMP, obtain value called with", depValues, appContextDepValues, expressionDependencies);
-    return memoedVarsRef.current.get(expressionString)!.obtainValue!(
+
+    // --- Return the memoed var getting the value from the current context
+    return memoedVarsRef.current.get(parseId)!.obtainValue!(
       expression,
       state,
       appContext,
       strict,
       depValues,
-      appContextDepValues
+      appContextDepValues,
     );
   };
 
