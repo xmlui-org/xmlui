@@ -58,6 +58,7 @@ type SelectProps = {
   placeholder?: string;
   updateState?: UpdateStateFn;
   optionLabelRenderer?: (item: Option) => ReactNode;
+  optionRenderer?: (item: Option) => ReactNode;
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   emptyListTemplate?: ReactNode;
   style?: CSSProperties;
@@ -208,6 +209,7 @@ export const Select = forwardRef(function Select(
     registerComponentApi,
     emptyListTemplate,
     optionLabelRenderer,
+    optionRenderer,
     valueRenderer,
     style,
     dropdownHeight,
@@ -333,9 +335,10 @@ export const Select = forwardRef(function Select(
       multiSelect,
       value,
       optionLabelRenderer,
+      optionRenderer,
       onChange: toggleOption,
     }),
-    [multiSelect, toggleOption, value, optionLabelRenderer],
+    [multiSelect, toggleOption, value, optionLabelRenderer, optionRenderer],
   );
 
   return (
@@ -506,7 +509,13 @@ export const ComboboxOption = forwardRef(function Combobox(
 ) {
   const id = useId();
   const { label, value, enabled = true, keywords } = option;
-  const { value: selectedValue, onChange, multiSelect, optionLabelRenderer } = useSelect();
+  const {
+    value: selectedValue,
+    onChange,
+    multiSelect,
+    optionLabelRenderer,
+    optionRenderer,
+  } = useSelect();
   const selected = useMemo(() => {
     return Array.isArray(selectedValue) && multiSelect
       ? selectedValue.includes(value)
@@ -527,8 +536,14 @@ export const ComboboxOption = forwardRef(function Combobox(
       data-state={selected ? "checked" : undefined}
       keywords={keywords}
     >
-      {optionLabelRenderer ? optionLabelRenderer({ label, value }) : label}
-      {selected && <Icon name="checkmark" />}
+      {optionRenderer ? (
+        optionRenderer({ label, value, enabled, keywords })
+      ) : (
+        <div className={styles.multiComboboxOptionContent}>
+          {optionLabelRenderer ? optionLabelRenderer({ label, value }) : label}
+          {selected && <Icon name="checkmark" />}
+        </div>
+      )}
     </CmdItem>
   );
 });
@@ -560,7 +575,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
   (option, ref) => {
     const { value, label, enabled = true } = option;
     const { onOptionRemove, onOptionAdd } = useOption();
-    const { optionLabelRenderer } = useSelect();
+    const { optionLabelRenderer, optionRenderer } = useSelect();
 
     useLayoutEffect(() => {
       onOptionAdd(option);
@@ -569,14 +584,20 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
 
     return (
       <SelectItem ref={ref} className={styles.selectItem} value={value + ""} disabled={!enabled}>
-        <SelectItemText>
-          {optionLabelRenderer ? optionLabelRenderer({ value, label }) : label}
-        </SelectItemText>
-        <span className={styles.selectItemIndicator}>
-          <SelectItemIndicator>
-            <Icon name="checkmark" />
-          </SelectItemIndicator>
-        </span>
+        {optionRenderer ? (
+          optionRenderer({ label, value, enabled })
+        ) : (
+          <div className={styles.selectItemContent}>
+            <SelectItemText>
+              {optionLabelRenderer ? optionLabelRenderer({ value, label }) : label}
+            </SelectItemText>
+            <span className={styles.selectItemIndicator}>
+              <SelectItemIndicator>
+                <Icon name="checkmark" />
+              </SelectItemIndicator>
+            </span>
+          </div>
+        )}
       </SelectItem>
     );
   },

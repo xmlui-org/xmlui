@@ -282,14 +282,17 @@ button.selectTrigger  {
 }
 
 .multiComboboxOption {
-  padding: 0.5rem 1rem;
   display: flex;
-  gap: 1rem;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
   transition: background-color 0.2s ease;
   background-color: createThemeVar("backgroundColor-item-#{$componentName}");
+
+  .multiComboboxOptionContent {
+    padding: 0.5rem 1rem;
+    gap: 1rem;
+  }
 
   &[data-selected=true] {
     background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
@@ -310,10 +313,6 @@ button.selectTrigger  {
   cursor: default;
   user-select: none;
   align-items: center;
-  border-radius: 4px;
-  padding-top: .5em;
-  padding-bottom: .5em;
-  padding-inline: 1em;
   outline: none;
   font-size: createThemeVar("fontSize-#{$componentName}");
 
@@ -323,6 +322,14 @@ button.selectTrigger  {
 
   &[data-state=checked] {
     background-color: createThemeVar("backgroundColor-item-#{$componentName}--active");
+  }
+
+  .selectItemContent {
+    width: 100%;
+    height: 100%;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    padding-inline: 1em;
   }
 }
 

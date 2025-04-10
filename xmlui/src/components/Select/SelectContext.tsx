@@ -1,7 +1,7 @@
-import type { ReactNode} from "react";
-import {createContext, useContext} from "react";
+import type { ReactNode } from "react";
+import { createContext, useContext } from "react";
 
-import type {Option} from "../abstractions";
+import type { Option } from "../abstractions";
 import type { SingleValueType, ValueType } from "./SelectNative";
 
 type SelectContextValue = {
@@ -9,6 +9,7 @@ type SelectContextValue = {
   value: ValueType | null;
   onChange?: (selectedValue: SingleValueType) => void;
   optionLabelRenderer: (option: Option) => ReactNode;
+  optionRenderer: (option: Option) => ReactNode;
 };
 
 export const SelectContext = createContext<SelectContextValue>(null);
