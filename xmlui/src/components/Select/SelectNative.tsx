@@ -536,14 +536,16 @@ export const ComboboxOption = forwardRef(function Combobox(
       data-state={selected ? "checked" : undefined}
       keywords={keywords}
     >
-      {optionRenderer ? (
-        optionRenderer({ label, value, enabled, keywords })
-      ) : (
-        <div className={styles.multiComboboxOptionContent}>
-          {optionLabelRenderer ? optionLabelRenderer({ label, value }) : label}
-          {selected && <Icon name="checkmark" />}
-        </div>
-      )}
+      <div className={styles.multiComboboxOptionContent}>
+        {optionRenderer ? (
+          optionRenderer({ label, value, enabled, keywords })
+        ) : (
+          <>
+            {optionLabelRenderer ? optionLabelRenderer({ label, value }) : label}
+            {selected && <Icon name="checkmark" />}
+          </>
+        )}
+      </div>
     </CmdItem>
   );
 });
@@ -584,20 +586,26 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
 
     return (
       <SelectItem ref={ref} className={styles.selectItem} value={value + ""} disabled={!enabled}>
-        {optionRenderer ? (
-          optionRenderer({ label, value, enabled })
-        ) : (
-          <div className={styles.selectItemContent}>
-            <SelectItemText>
-              {optionLabelRenderer ? optionLabelRenderer({ value, label }) : label}
-            </SelectItemText>
-            <span className={styles.selectItemIndicator}>
-              <SelectItemIndicator>
-                <Icon name="checkmark" />
-              </SelectItemIndicator>
-            </span>
-          </div>
-        )}
+        <div className={styles.selectItemContent}>
+          {optionRenderer ? (
+            optionRenderer({
+              label: <SelectItemText>{label}</SelectItemText>,
+              value,
+              enabled,
+            })
+          ) : (
+            <>
+              <SelectItemText className={styles.selectItemContent}>
+                {optionLabelRenderer ? optionLabelRenderer({ value, label }) : label}
+              </SelectItemText>
+              <span className={styles.selectItemIndicator}>
+                <SelectItemIndicator>
+                  <Icon name="checkmark" />
+                </SelectItemIndicator>
+              </span>
+            </>
+          )}
+        </div>
       </SelectItem>
     );
   },

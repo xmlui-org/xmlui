@@ -101,6 +101,8 @@ export const SelectMd = createMetadata({
     [`fontSize-${COMP}-badge`]: "$fontSize-small",
     [`paddingHorizontal-${COMP}-badge`]: "$space-1",
     [`paddingVertical-${COMP}-badge`]: "$space-1",
+    [`paddingHorizontal-item-${COMP}`]: "$space-2",
+    [`paddingVertical-item-${COMP}`]: "$space-2",
     [`opacity-text-item-${COMP}--disabled`]: "0.5",
     [`opacity-${COMP}--disabled`]: "0.5",
     [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
