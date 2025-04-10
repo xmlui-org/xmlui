@@ -4,7 +4,6 @@ import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
 import xmluiLight from "../syntax/monaco/xmlui-light";
 import xmluiDark from "../syntax/monaco/xmlui-dark";
 import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
-import { useTheme } from "xmlui";
 
 export type EditorProps = {
   readOnly?: boolean;
@@ -17,7 +16,7 @@ export type EditorProps = {
   activeThemeTone?: string;
 };
 
-export function Editor({
+export const Editor = ({
   readOnly = true,
   language = "xmlui",
   value,
@@ -25,7 +24,7 @@ export function Editor({
   onMount = () => {},
   saveViewState = false,
   activeThemeTone = "light",
-}: EditorProps) {
+}: EditorProps) => {
   const monaco = useMonaco();
 
   useEffect(() => {
@@ -63,6 +62,4 @@ export function Editor({
       value={value}
     />
   );
-}
-
-export default Editor;
+};

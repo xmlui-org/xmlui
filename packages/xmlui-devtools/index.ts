@@ -11,3 +11,5 @@ if (import.meta.hot) {
 }
 
 export default DevTools;
+
+export { Editor } from "./src/editor/Editor";
