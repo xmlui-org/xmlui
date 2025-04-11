@@ -14,6 +14,7 @@ import {
   type ButtonAria,
 } from "../abstractions";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import { VisuallyHidden } from "../VisuallyHidden";
 
 type Props = {
   id?: string;
@@ -32,6 +33,7 @@ type Props = {
   gap?: string | number;
   accessibilityProps?: any;
   autoFocus?: boolean;
+  contextualLabel?: string;
 } & Pick<
   React.HTMLAttributes<HTMLButtonElement>,
   | "onClick"
@@ -86,6 +88,7 @@ export const Button = React.forwardRef(function Button(
     gap,
     className,
     autoFocus = defaultProps.autoFocus,
+    contextualLabel,
     ...rest
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
@@ -135,9 +138,26 @@ export const Button = React.forwardRef(function Button(
       onFocus={onFocus}
       onBlur={onBlur}
     >
-      {iconToLeft && icon}
+      {icon && iconToLeft && <>{icon}</>}
       {children}
-      {!iconToLeft && icon}
+      {icon && !children && <IconLabel icon={icon} accessibleName={contextualLabel} />}
+      {icon && !iconToLeft && <>{icon}</>}
     </button>
   );
 });
+
+type IconLabelProps = {
+  icon: React.ReactNode;
+  accessibleName?: string;
+};
+
+const IconLabel = ({ icon, accessibleName = "" }: IconLabelProps) => {
+  // NOTE: the icon object provided is a React object with accessible props attribute.
+  // Typing might be off, because TS thinks props is not accessible.
+  const iconProps: Record<string, any> | undefined = (icon as any).props;
+  return (
+    <VisuallyHidden>
+      <span>{accessibleName || iconProps?.name || iconProps?.alt}</span>
+    </VisuallyHidden>
+  );
+};

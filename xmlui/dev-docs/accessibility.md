@@ -90,9 +90,9 @@ This section touches upon the aspects of a11y that require the least amount of e
 
 #### Button
 
-- Pressing ENTER or SPACE does not give visual feedback on Button firing
+- Pressing ENTER or SPACE does not give visual feedback on Button firing -> _This is actually acceptable, since the WCAG does not specify it outright_
 - Need to evaluate when to add 'aria-label' to component
-- Button size must be at least 44x44px (because of touchscreens and human finger sizes)
+- Button size must be at least 44x44px (because of touchscreens and human finger sizes) -> _for mouse pointers, 24x24px is enough_
 - Icon & Label:
 	1. If label & icon: make icon aria-hidden
 	2. If only icon: aria-hidden on icon, add "visually-hidden" CSS style to a span with a text (which would have been aria-label) (Visually hidden CSS is really common, it might worth the effort to extract it to a separate component)

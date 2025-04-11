@@ -93,6 +93,10 @@ export const ButtonMd = createMetadata({
       type: "string",
       defaultValue: defaultProps.contentPosition,
     },
+    contextualLabel: {
+      description: `This optional value is used to provide an accessible name for the ${COMP} in the context of its usage.`,
+      type: "string",
+    },
   },
   events: {
     click: dClick(COMP),
@@ -171,7 +175,7 @@ export const buttonComponentRenderer = createComponentRenderer(
         themeColor={extractValue.asOptionalString(node.props.themeColor)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         size={extractValue.asOptionalString(node.props.size)}
-        icon={iconName && <Icon name={iconName} />}
+        icon={iconName && <Icon name={iconName} aria-hidden />}
         iconPosition={extractValue.asOptionalString(node.props.iconPosition)}
         orientation={extractValue.asOptionalString(node.props.orientation)}
         contentPosition={extractValue.asOptionalString(node.props.contentPosition)}
@@ -180,6 +184,7 @@ export const buttonComponentRenderer = createComponentRenderer(
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         style={layoutCss}
+        contextualLabel={extractValue.asOptionalString(node.props.contextualLabel)}
       >
         {renderChild(node.children, { type: "Stack", orientation: "horizontal" }) || label}
       </Button>
