@@ -52,10 +52,9 @@ export function createValueExtractor(
       return expression;
     }
 
-    // TODO: Modify the loaders and events to be able to eliminate this branch
+    // --- Parse parameters arriving as string
     if (typeof expression === "string") {
-      throw new Error("Unparsed attribute value (string) received.")
-      //expression = parseAttributeValue(expression);
+      expression = parseAttributeValue(expression);
     }
 
     if ((isPrimitive(expression) && !isString(expression)) || !isParsedAttributeValue(expression)) {
@@ -147,6 +146,10 @@ export function createValueExtractor(
   };
 
   extractor.asDisplayText = (expression?: any) => {
+    if (typeof expression === "string") {
+      // --- If the expression is a string, return it as is
+      return expression;
+    }
     let text = extractor(expression)?.toString();
     if (text) {
       let replaced = "";
