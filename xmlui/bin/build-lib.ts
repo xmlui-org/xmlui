@@ -12,6 +12,14 @@ export const buildLib = async ({ watchMode, mode = "production" }) => {
   const umdFileName = `${env.npm_package_name}.js`;
   const esFileName = `${env.npm_package_name}.mjs`;
 
+  let overrides: UserConfig = {};
+  try {
+    const configOverrides = await import(process.cwd() + `/vite.config-overrides`);
+    overrides = configOverrides.default || {};
+  } catch (e) {
+    // console.error(e);
+  }
+  
   const config: UserConfig = {
     esbuild: {
       target: "es2020",
@@ -59,7 +67,7 @@ export const buildLib = async ({ watchMode, mode = "production" }) => {
         },
       },
     },
-    plugins: mode === "metadata" ? [] : [react(), libInjectCss()],
+    plugins: mode === "metadata" ? [] : [react(), libInjectCss(), ...(overrides.plugins || [])],
   };
 
   await viteBuild(defineConfig(config));
