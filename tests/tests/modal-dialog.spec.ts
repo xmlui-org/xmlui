@@ -63,7 +63,7 @@ test("Imperative open - with param in title", async ({ page }) => {
   });
 
   await page.getByTestId('button').click();
-  await expect(page.getByTestId("modal")).toHaveText("PARAM_VALUE");
+  await expect(page.getByTestId("modal").getByRole("heading")).toHaveText("PARAM_VALUE");
 });
 
 test("Declarative open/close", async ({ page }) => {
