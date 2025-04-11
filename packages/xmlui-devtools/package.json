@@ -2,7 +2,6 @@
   "name": "xmlui-devtools",
   "version": "0.1.1",
   "sideEffects": false,
-  "type": "module",
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
