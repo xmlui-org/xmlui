@@ -39,6 +39,7 @@ import { useValidation, useValidationDisplay } from "./Validations";
 import { Slider } from "../Slider/SliderNative";
 import { ColorPicker } from "../ColorPicker/ColorPickerNative";
 import { HelperText } from "./HelperText";
+import { NumberBox2 } from "../NumberBox/NumberBox2Native";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
   checkbox: "end",
@@ -218,6 +219,20 @@ export const FormItem = memo(function FormItem({
           max={validations.maxValue}
           maxLength={maxTextLength ?? validations?.maxLength}
         ></NumberBox>
+      );
+      break;
+    }
+    case "number2": {
+      formControl = (
+        <NumberBox2
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          enabled={isEnabled}
+          min={validations.minValue}
+          max={validations.maxValue}
+        ></NumberBox2>
       );
       break;
     }

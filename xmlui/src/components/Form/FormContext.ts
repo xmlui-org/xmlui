@@ -107,6 +107,7 @@ export const formControlTypes = [
   "textarea",
   "checkbox",
   "number",
+  "number2",
   "integer",
   "file",
   "select",
