@@ -58,21 +58,22 @@ type Props = {
   onFocus?: () => void;
   onBlur?: () => void;
   registerComponentApi?: RegisterComponentApiFn;
-} & LabelProps & AdornmentProps;
+} & LabelProps &
+  AdornmentProps;
 
 type LabelProps = {
   label?: string;
   labelPosition?: string;
   labelWidth?: string;
   labelBreak?: boolean;
-}
+};
 
 type AdornmentProps = {
   startText?: string;
   startIcon?: string;
   endText?: string;
   endIcon?: string;
-}
+};
 
 export const NumberBox2 = forwardRef(function NumberBox2(
   {
@@ -150,7 +151,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
         updateState({ value: null });
         return;
       }
-      
+
       let parsedValue = parser.parse(value);
       parsedValue = clampInputValue(parsedValue);
 
@@ -244,7 +245,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
           placeholder={placeholder}
           inputMode={inputMode as any}
           className={classnames(styles.input)}
-          value={isEmptyLike(value) || isNaN(value) ? "" : formatter.format(+value)}
+          value={isEmptyLike(value) || isNaN(value) ? "" : value}
           onBeforeInput={(event: React.ChangeEvent<HTMLInputElement>) => {
             const target = event.target;
             let nextValue =
@@ -253,13 +254,12 @@ export const NumberBox2 = forwardRef(function NumberBox2(
               target.value.slice(target.selectionEnd ?? undefined);
 
             // validate
-            formatter.format(+value)
             if (!parser.isValidPartialNumber(nextValue)) {
               event.preventDefault();
             }
           }}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            updateState({ value: parser.parse(event.target.value) });
+            updateState({ value: event.target.value });
           }}
           onBlur={_onBlur}
           onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -364,16 +364,22 @@ function useLongPress(elementRef: HTMLElement | null, action: () => void, delay:
   }, [elementRef, action, delay]);
 }
 
-function handleChangingValue(value: string, parser: NumberParser, type: 'increase' | 'decrease', step = 1, min = -NUMBERBOX_MAX_VALUE, max = NUMBERBOX_MAX_VALUE) {
-  const currentInputValue = parser.parse(value ?? "")
+function handleChangingValue(
+  value: string,
+  parser: NumberParser,
+  type: "increase" | "decrease",
+  step = 1,
+  min = -NUMBERBOX_MAX_VALUE,
+  max = NUMBERBOX_MAX_VALUE,
+) {
+  const currentInputValue = parser.parse(value ?? "");
   if (isNaN(currentInputValue)) {
     return min ?? 0;
   }
 
-  if (type === 'increase') {
-    return clamp(currentInputValue + (step ?? 1), min, max)
-  }
-  else {
-    return clamp(currentInputValue - (step ?? 1), min, max)
+  if (type === "increase") {
+    return clamp(currentInputValue + (step ?? 1), min, max);
+  } else {
+    return clamp(currentInputValue - (step ?? 1), min, max);
   }
 }
