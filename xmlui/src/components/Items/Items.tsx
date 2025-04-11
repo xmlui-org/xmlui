@@ -21,6 +21,7 @@ export const ItemsMd = createMetadata({
     },
     itemTemplate: dComponent("The component template to display a single item"),
   },
+  childrenAsTemplate: "itemTemplate",
   contextVars: {
     $item: dComponent(
       "This value represents the current iteration item while the component renders its children.",
@@ -45,7 +46,7 @@ export const itemsComponentRenderer = createComponentRenderer(COMP, ItemsMd, (re
           <MemoizedItem
             key={key}
             contextVars={contextVars}
-            node={node.children || (node.props.itemTemplate as any)}
+            node={node.props.itemTemplate}
             renderChild={renderChild}
             layoutContext={layoutContext}
           />

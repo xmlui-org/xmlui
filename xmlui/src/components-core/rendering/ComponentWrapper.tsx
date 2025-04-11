@@ -5,6 +5,8 @@ import { extractParam } from "../utils/extractParam";
 import { ChildRendererContext } from "./renderChild";
 import { ContainerWrapper, ContainerWrapperDef, isContainerLike } from "./ContainerWrapper";
 import ComponentAdapter from "./ComponentAdapter";
+import { useComponentRegistry } from "../../components/ComponentRegistryContext";
+import { EMPTY_ARRAY } from "../constants";
 
 /**
  * The ComponentNode it the outermost React component wrapping an xmlui component.
@@ -29,21 +31,29 @@ export const ComponentWrapper = memo(
       uidInfoRef,
       children,
       ...rest
-    }: ChildRendererContext & { resolvedKey: string, children?: ReactNode },
+    }: ChildRendererContext & { resolvedKey: string; children?: ReactNode },
     ref,
   ) {
     // --- We pass the layout context to the child components, so we need to
     // --- make sure that it is stable
+    const componentRegistry = useComponentRegistry();
+    const { descriptor } = componentRegistry.lookupComponentRenderer(node.type) || {};
     const stableLayoutContext = useRef(layoutContext);
 
     // --- Transform the various data sources within the xmlui component definition
     const nodeWithTransformedLoaders = useMemo(() => {
       // --- If we have a DataSource child, we transform it to a loader on the node
-      let transformed = transformNodeWithChildDatasource(node); 
+      let transformed = node;
+      transformed = transformNodeWithChildrenAsTemplate(
+        transformed,
+        descriptor?.childrenAsTemplate,
+      );
+      transformed = transformNodeWithChildDatasource(transformed);
       transformed = transformNodeWithDataSourceRefProp(transformed, uidInfoRef);
       transformed = transformNodeWithRawDataProp(transformed);
+
       return transformed;
-    }, [node, uidInfoRef]);
+    }, [descriptor?.childrenAsTemplate, node, uidInfoRef]);
 
     // --- String values in the "data" prop are treated as URLs. This boolean
     // --- indicates whether the "data" prop is a string or not.
@@ -67,7 +77,6 @@ export const ComponentWrapper = memo(
       );
     }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
 
-
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
       return (
@@ -82,7 +91,10 @@ export const ComponentWrapper = memo(
           parentRegisterComponentApi={registerComponentApi}
           uidInfoRef={uidInfoRef}
           ref={ref}
-          {...rest}>{children}</ContainerWrapper>
+          {...rest}
+        >
+          {children}
+        </ContainerWrapper>
       );
     } else {
       // --- This component should be rendered as a regular component
@@ -102,11 +114,34 @@ export const ComponentWrapper = memo(
           layoutContextRef={stableLayoutContext}
           ref={ref}
           uidInfoRef={uidInfoRef}
-          {...rest}>{children}</ComponentAdapter>
+          {...rest}
+        >
+          {children}
+        </ComponentAdapter>
       );
     }
   }),
 );
+
+function transformNodeWithChildrenAsTemplate(node: ComponentDef, childrenAsTemplate: string) {
+  if (!childrenAsTemplate) {
+    return node;
+  }
+  if (!node.children || node.children.length === 0) {
+    return node;
+  }
+  if (node.props[childrenAsTemplate]) {
+    throw Error("'" + childrenAsTemplate + "' is already used as a property.");
+  }
+  return {
+    ...node,
+    props: {
+      ...node.props,
+      [childrenAsTemplate]: node.children,
+    },
+    children: EMPTY_ARRAY,
+  };
+}
 
 // --- Create a DataLoader component for each DataSource child within the
 // --- xmlui component
@@ -135,7 +170,7 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
     }
   });
 
-  // --- Return the transform node with the collected loaders 
+  // --- Return the transform node with the collected loaders
   // --- (or the original one)
   return didResolve
     ? {
@@ -146,7 +181,7 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
     : node;
 }
 
-// --- Properties may use loaders. We transform all of them to the virtual 
+// --- Properties may use loaders. We transform all of them to the virtual
 // --- DataSourceRef component type.
 function transformNodeWithDataSourceRefProp(
   node: ComponentDef,
@@ -194,7 +229,7 @@ function transformNodeWithDataProp(
     "data" in node.props &&
     resolvedDataPropIsString
   ) {
-    // --- We skip the transformation if the data property is a binding expression 
+    // --- We skip the transformation if the data property is a binding expression
     // --- for a loader value
     if (extractParam(uidInfoRef.current, node.props.data) === "loaderValue") {
       return node;

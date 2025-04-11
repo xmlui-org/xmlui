@@ -1,14 +1,8 @@
 import { type MutableRefObject, useCallback, useEffect, useMemo } from "react";
 
-import type {
-  ContainerDispatcher,
-  MemoedVars,
-} from "./abstractions/ComponentRenderer";
+import type { ContainerDispatcher, MemoedVars } from "./abstractions/ComponentRenderer";
 import type { RegisterComponentApiFn } from "../abstractions/RendererDefs";
-import type {
-  ContainerState,
-  RegisterComponentApiFnInner,
-} from "./rendering/ContainerWrapper";
+import type { ContainerState, RegisterComponentApiFnInner } from "./rendering/ContainerWrapper";
 import type { ComponentDef } from "../abstractions/ComponentDefs";
 import type {
   LookupAsyncFn,
@@ -22,7 +16,6 @@ import { ContainerActionKind } from "./abstractions/containers";
 import { createValueExtractor } from "./rendering/valueExtractor";
 import { useReferenceTrackedApi } from "./utils/hooks";
 import { AppContextObject } from "../abstractions/AppContextDefs";
-import { flushSync } from "react-dom";
 
 interface LoaderRendererContext {
   node: ComponentDef;
@@ -83,7 +76,7 @@ export function LoaderComponent({
   // --- Memoizes the action resolution by action definition value
   const memoedLookupSyncCallback: LookupSyncFn = useCallback(
     (action) => {
-      if(!action){
+      if (!action) {
         return undefined;
       }
       return lookupSyncCallback(valueExtractor(action), uid);
@@ -111,7 +104,6 @@ export function LoaderComponent({
     },
     [dispatch, uid],
   );
-
 
   const renderer = componentRegistry.lookupLoaderRenderer(node.type);
   if (!renderer) {

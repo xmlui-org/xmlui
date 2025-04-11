@@ -343,6 +343,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     return cloneElement(renderedNode, {
       ref: ref ? composeRefs(ref, (renderedNode as any).ref) : (renderedNode as any).ref,
       ...mergeProps({ ...renderedNode.props, ...mouseEventHandlers }, rest),
+      // ref: renderedNode.type === React.Fragment ? undefined : (ref ? composeRefs(ref, (renderedNode as any).ref) : (renderedNode as any).ref),
+      // ...mergeProps({ ...renderedNode.props, ...(renderedNode.type !== React.Fragment ? mouseEventHandlers : {}) }, rest),
     } as any, ...(childrenArray));
   }
   // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.
