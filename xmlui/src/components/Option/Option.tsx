@@ -26,6 +26,7 @@ export const OptionMd = createMetadata({
     enabled: dEnabled(),
     optionTemplate: d("This property is used to define a custom option template"),
   },
+  childrenAsTemplate: "optionTemplate"
 });
 
 const OptionNative = memo((props: Option) => {
@@ -41,7 +42,7 @@ export const optionComponentRenderer = createComponentRenderer(
     COMP,
     OptionMd,
     ({ node, extractValue, layoutCss, renderChild, layoutContext }) => {
-      const optionTemplate = node.children || node.props.optionTemplate;
+      const optionTemplate = node.props.optionTemplate;
       return (
           <OptionNative
               optionRenderer={

@@ -95,6 +95,7 @@ export const ListMd = createMetadata({
       defaultValue: true,
     },
   },
+  childrenAsTemplate: 'itemTemplate',
   apis: {
     scrollToTop: d("This method scrolls the list to the top."),
     scrollToBottom: d("This method scrolls the list to the bottom."),
@@ -123,7 +124,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
     lookupEventHandler,
     registerComponentApi,
   }) => {
-    const itemTemplate = node.props.itemTemplate || node.children;
+    const itemTemplate = node.props.itemTemplate;
     const hideEmptyGroups = extractValue.asOptionalBoolean(node.props.hideEmptyGroups, true);
     return (
       <ListNative
