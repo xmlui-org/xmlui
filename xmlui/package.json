@@ -29,6 +29,7 @@
   "dependencies": {
     "@eslint-community/regexpp": "4.10.0",
     "@formkit/auto-animate": "0.7.0",
+    "@internationalized/number": "^3.6.0",
     "@modyfi/vite-plugin-yaml": "1.1.0",
     "@monaco-editor/loader": "^1.5.0",
     "@popperjs/core": "2.11.6",
