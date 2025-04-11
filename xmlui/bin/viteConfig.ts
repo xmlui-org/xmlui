@@ -22,7 +22,9 @@ export async function getViteConfig({
   try {
     const configOverrides = await import(process.cwd() + `/vite.config-overrides`);
     overrides = configOverrides.default || {};
-  } catch (e) {}
+  } catch (e) {
+    // console.error(e);
+  }
 
   return defineConfig({
     plugins: [react(), svgr(), ViteYaml(), ViteXmlui({}), ...(overrides.plugins || [])],

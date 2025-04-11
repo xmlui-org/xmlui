@@ -240,7 +240,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
 
     if (eat(SyntaxKind.Equal)) {
-      if (!eat(SyntaxKind.StringLiteral) && !eat(SyntaxKind.Identifier)) {
+      if (!eat(SyntaxKind.StringLiteral)) {
         const attrFollowWithoutIdent = [SyntaxKind.NodeEnd, SyntaxKind.NodeClose];
         errRecover(Diag_Attr_Value_Expected, attrFollowWithoutIdent);
       }

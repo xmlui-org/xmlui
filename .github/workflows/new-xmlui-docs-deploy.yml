@@ -28,6 +28,9 @@ jobs:
       - run: npm run build
         working-directory: packages/xmlui-pdf
 
+      - run: npm run build
+        working-directory: packages/xmlui-devtools
+
       - name: build docs package
         run: npm run release-ci
         working-directory: docs

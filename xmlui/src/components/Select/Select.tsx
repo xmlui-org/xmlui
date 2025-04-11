@@ -49,6 +49,9 @@ export const SelectMd = createMetadata({
     optionLabelTemplate: dComponent(
       `This property allows replacing the default template to display an option in the dropdown list.`,
     ),
+    optionTemplate: dComponent(
+      `This property allows replacing the default template to display an option in the dropdown list.`,
+    ),
     valueTemplate: dComponent(
       `This property allows replacing the default template to display a selected value when ` +
         `multiple selections (\`multiSelect\` is \`true\`) are enabled.`,
@@ -98,6 +101,8 @@ export const SelectMd = createMetadata({
     [`fontSize-${COMP}-badge`]: "$fontSize-small",
     [`paddingHorizontal-${COMP}-badge`]: "$space-1",
     [`paddingVertical-${COMP}-badge`]: "$space-1",
+    [`paddingHorizontal-item-${COMP}`]: "$space-2",
+    [`paddingVertical-item-${COMP}`]: "$space-2",
     [`opacity-text-item-${COMP}--disabled`]: "0.5",
     [`opacity-${COMP}--disabled`]: "0.5",
     [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
@@ -151,6 +156,19 @@ export const selectComponentRenderer = createComponentRenderer(
                 return (
                   <MemoizedItem
                     node={node.props.optionLabelTemplate}
+                    item={item}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
+        optionRenderer={
+          node.props.optionTemplate
+            ? (item) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.optionTemplate}
                     item={item}
                     renderChild={renderChild}
                   />

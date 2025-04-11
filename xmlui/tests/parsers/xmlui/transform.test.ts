@@ -13,15 +13,6 @@ describe("Xmlui transform", () => {
     }
   });
 
-  it.todo("Unmatched tag names", () => {
-    try {
-      const cd = transformSource("<Stack></NotStack>");
-      assert.fail("Exception expected");
-    } catch (err) {
-      expect(err.toString().includes("T002")).equal(true);
-    }
-  });
-
   it("Empty component #1", () => {
     const cd = transformSource("<Stack />") as ComponentDef;
     expect(cd.type).equal("Stack");

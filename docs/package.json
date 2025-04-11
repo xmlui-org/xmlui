@@ -11,7 +11,6 @@
     "refresh-samples": "node scripts/refresh-samples.mjs"
   },
   "dependencies": {
-    "@monaco-editor/react": "4.5.2",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "2.0.6",
     "@radix-ui/react-icons": "1.3.0",
@@ -38,7 +37,8 @@
     "xmlui": "*",
     "xmlui-animations": "*",
     "xmlui-charts": "*",
-    "xmlui-pdf": "*"
+    "xmlui-pdf": "*",
+    "xmlui-devtools": "*"
   },
   "devDependencies": {
     "@babel/preset-react": "7.22.15",

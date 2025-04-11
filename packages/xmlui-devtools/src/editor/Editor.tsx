@@ -1,28 +1,31 @@
 import { Editor as MonacoEditor, useMonaco } from "@monaco-editor/react";
 import { CSSProperties, useEffect } from "react";
-import { XmluiGrammar } from "./syntax/monaco/grammar.monacoLanguage";
-import xmluiLight from "./syntax/monaco/xmlui-light";
-import xmluiDark from "./syntax/monaco/xmlui-dark";
-import { XmluiScripGrammar } from "./syntax/monaco/xmluiscript.monacoLanguage";
-import { useTheme } from "xmlui";
-import styles from "./EditorNative.module.scss";
+import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
+import xmluiLight from "../syntax/monaco/xmlui-light";
+import xmluiDark from "../syntax/monaco/xmlui-dark";
+import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
 
 export type EditorProps = {
   readOnly?: boolean;
   language?: string;
-  highlight?: boolean;
   style?: CSSProperties;
   value?: string;
+  saveViewState?: boolean;
+  onChange?: any;
+  onMount?: any;
+  activeThemeTone?: string;
 };
 
-export function Editor({
+export const Editor = ({
   readOnly = true,
   language = "xmlui",
-  highlight = true,
   value,
-}: EditorProps) {
+  onChange = () => {},
+  onMount = () => {},
+  saveViewState = false,
+  activeThemeTone = "light",
+}: EditorProps) => {
   const monaco = useMonaco();
-  const { activeThemeTone } = useTheme();
 
   useEffect(() => {
     if (monaco) {
@@ -44,8 +47,9 @@ export function Editor({
 
   return (
     <MonacoEditor
-      className={styles.editor}
-      saveViewState={true}
+      saveViewState={saveViewState}
+      onChange={onChange}
+      onMount={onMount}
       key={"devtools"}
       options={{
         readOnly: readOnly,
@@ -58,6 +62,4 @@ export function Editor({
       value={value}
     />
   );
-}
-
-export default Editor;
+};
