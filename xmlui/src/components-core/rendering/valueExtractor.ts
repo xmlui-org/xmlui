@@ -53,9 +53,10 @@ export function createValueExtractor(
     }
 
     // TODO: Modify the loaders and events to be able to eliminate this branch
-    // if (typeof expression === "string") {
-    //   expression = parseAttributeValue(expression);
-    // }
+    if (typeof expression === "string") {
+      throw new Error("Unparsed attribute value (string) received.")
+      //expression = parseAttributeValue(expression);
+    }
 
     if ((isPrimitive(expression) && !isString(expression)) || !isParsedAttributeValue(expression)) {
       // --- Primitive values (except string) are returned as is
