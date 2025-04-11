@@ -43,7 +43,7 @@ export function toUsableNumber(value: string | number | empty, isInteger = false
  * Check whether the input value is a usable number for operations.
  * Passes if it's of type number or a non-empty string that evaluates to a number.
  */
-function isUsableFloat(value: string | number | empty) {
+export function isUsableFloat(value: string | number | empty) {
   if (typeof value === "string" && value.length > 0) {
     return !Number.isNaN(+value) && naiveFloatBounding(value);
   }
@@ -64,7 +64,7 @@ function naiveFloatBounding(value: string) {
  * Passes if it's of type number and is an integer
  * or a non-empty string that evaluates to an integer.
  */
-function isUsableInteger(value: string | number | empty) {
+export function isUsableInteger(value: string | number | empty) {
   if (
     typeof value === "string" &&
     value.length > 0 &&
@@ -75,4 +75,54 @@ function isUsableInteger(value: string | number | empty) {
     return Number.isSafeInteger(value);
   }
   return false;
+}
+
+// TODO:
+
+class NumberFormatter2 {
+  private formatter: Intl.NumberFormat;
+  private model: {
+    value: number;
+    formatted: string;
+    stripped: string;
+
+    group: string;
+    decimal: string;
+    sign: string;
+    //exponent: string;
+  }
+  locale: string;
+  options?: Intl.NumberFormatOptions;
+
+  constructor(locale: string, options?: Intl.NumberFormatOptions) {
+    this.locale = locale;
+    this.options = options;
+    this.formatter = new Intl.NumberFormat(locale, options);
+  }
+
+  set input(value: string | number | empty) {
+
+  }
+
+  private buildModel() {
+    const parts = this.formatter.formatToParts(1234.5);
+    this.model.group = parts.find((p) => p.type === "group")?.value || "";
+    this.model.decimal = parts.find((p) => p.type === "decimal")?.value || "";
+  }
+
+  parse(value: string): number {
+    return 0;
+  }
+
+  format(value: number): string {
+    return this.formatter.format(value);
+  }
+
+  /**
+   * Strip all non-numeric characters but keep the type of string
+   * @param value 
+   */
+  sanitize(value: string): string {
+    return "";
+  }
 }

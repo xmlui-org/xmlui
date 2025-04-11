@@ -2,8 +2,10 @@ import React, {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
+  RefObject,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
 } from "react";
@@ -18,11 +20,13 @@ import {
   clamp,
   DECIMAL_SEPARATOR,
   DEFAULT_STEP,
+  empty,
   EXPONENTIAL_SEPARATOR,
   FLOAT_REGEXP,
   INT_REGEXP,
   isEmptyLike,
   isOutOfBounds,
+  isUsableFloat,
   mapToRepresentation,
   NUMBERBOX_MAX_VALUE,
   toUsableNumber,
@@ -43,6 +47,7 @@ type Props = {
   placeholder?: string;
   min?: number;
   max?: number;
+  maxFractionDigits?: number;
   enabled?: boolean;
   autoFocus?: boolean;
   readOnly?: boolean;
@@ -83,6 +88,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
     initialValue,
     min = -NUMBERBOX_MAX_VALUE,
     max = NUMBERBOX_MAX_VALUE,
+    maxFractionDigits = 3,
     enabled = true,
     placeholder,
     step,
@@ -113,9 +119,29 @@ export const NumberBox2 = forwardRef(function NumberBox2(
 
   // Formatter & Parser
   const locale = "en-US";
-  const formatter = useNumberFormatter(locale);
-  const parser = useNumberParser(locale);
+  const formatOptions: Intl.NumberFormatOptions = {
+    useGrouping: false,
+    maximumFractionDigits: maxFractionDigits,
+  };
+  const formatter = useNumberFormatter(locale, formatOptions);
+  const parser = useNumberParser(locale, formatOptions);
 
+  const initializeValue = useCallback(
+    (value: string | number | null, defaultValue: string = "") => {
+      return isEmptyLike(value) || isNaN(parser.parse(value.toString()))
+        ? defaultValue
+        : formatter.format(+value);
+    },
+    [formatter, parser],
+  );
+
+  // --- Convert to representable string value (from number | null | undefined)
+  const [valueStrRep, setValueStrRep] = React.useState<string>(initializeValue(value));
+  useLayoutEffect(() => {
+    setValueStrRep(initializeValue(value));
+  }, [value, initializeValue]);
+
+  const onFixCursorPosition = useCursorCorrection(valueStrRep, inputRef);
   const _step = toUsableNumber(step, true) ?? DEFAULT_STEP;
   const inputMode = useMemo(() => {
     // The inputMode attribute influences the software keyboard that is shown on touch devices.
@@ -124,7 +150,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
     // and based on testing on various devices to determine what keys are available in each inputMode.
     const hasDecimals = formatter.resolvedOptions().maximumFractionDigits! > 0;
     return hasDecimals ? "decimal" : "numeric";
-  }, []);
+  }, [formatter]);
 
   // --- Initialize the related field with the input's initial value
   useEffect(() => {
@@ -138,7 +164,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
     [min, max],
   );
 
-  const restrictInputValue = useCallback(
+  const clampAndSaveInput = useCallback(
     (value: string | number) => {
       if (isEmptyLike(value)) {
         updateState({ value: null });
@@ -160,18 +186,18 @@ export const NumberBox2 = forwardRef(function NumberBox2(
         updateState({ value });
         return;
       }
+
+      // value representation needs to be synchronized with the last parsed value
+      setValueStrRep((lastVal) => {
+        const formatted = formatter.format(parsedValue);
+        if (lastVal !== formatted) {
+          return formatted;
+        }
+        return lastVal;
+      });
       updateState({ value: parsedValue });
     },
     [clampInputValue, updateState, parser],
-  );
-
-  const _onBlur = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
-      restrictInputValue(value);
-      onDidChange(value);
-    },
-    [value, onDidChange],
   );
 
   // --- Stepper logic
@@ -194,6 +220,74 @@ export const NumberBox2 = forwardRef(function NumberBox2(
   // --- Register stepper logic to buttons
   useLongPress(upButton.current, increment);
   useLongPress(downButton.current, decrement);
+
+  // --- Handle input
+  const _onBeforeInput = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const target = event.target;
+      const nextValue = sanitizeNumberString(
+        target.value.slice(0, target.selectionStart ?? undefined) +
+          ((event.nativeEvent as InputEvent).data ?? "") +
+          target.value.slice(target.selectionEnd ?? undefined),
+        locale,
+        formatOptions,
+      );
+
+      // pre-validate
+      if (!parser.isValidPartialNumber(nextValue, min, max)) {
+        event.preventDefault();
+      }
+    },
+    [parser, min, max, locale, formatOptions],
+  );
+
+  const _onChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const strValue = event.target.value;
+      const parsed = clampInputValue(parser.parse(event.target.value));
+
+      // NOTE: This is the most important part.
+      // We only synchronize values when they are a valid number
+      // Otherwise we only update the local string representation and
+      // synchronize the value from state when the input is blurred.
+      if (canSynchronizeValue(strValue, locale, formatOptions)) {
+        updateState({ value: parsed });
+      } else {
+        setValueStrRep(strValue);
+      }
+
+      // TODO: this needs to be adjusted based on the number of group separators
+      onFixCursorPosition(event);
+      onDidChange(parsed);
+    },
+    [clampInputValue, parser, onDidChange, locale, formatOptions /* onFixCursorPosition */],
+  );
+
+  const _onBlur = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value;
+      clampAndSaveInput(value);
+      onBlur();
+    },
+    [onDidChange, clampAndSaveInput],
+  );
+
+  const _onKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === "Enter") {
+        clampAndSaveInput(value);
+      }
+      if (event.code === "ArrowUp") {
+        event.preventDefault();
+        increment();
+      }
+      if (event.code === "ArrowDown") {
+        event.preventDefault();
+        decrement();
+      }
+    },
+    [clampAndSaveInput, increment, decrement],
+  );
 
   // --- Register API events
   const focus = useCallback(() => {
@@ -243,38 +337,15 @@ export const NumberBox2 = forwardRef(function NumberBox2(
           ref={inputRef}
           type="text"
           placeholder={placeholder}
-          inputMode={inputMode as any}
+          inputMode={inputMode}
           className={classnames(styles.input)}
-          value={isEmptyLike(value) || isNaN(value) ? "" : value}
-          onBeforeInput={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const target = event.target;
-            let nextValue =
-              target.value.slice(0, target.selectionStart ?? undefined) +
-              ((event.nativeEvent as InputEvent).data ?? "") +
-              target.value.slice(target.selectionEnd ?? undefined);
-
-            // validate
-            if (!parser.isValidPartialNumber(nextValue)) {
-              event.preventDefault();
-            }
-          }}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            updateState({ value: event.target.value });
-          }}
+          value={valueStrRep}
+          min={min}
+          max={max}
+          onBeforeInput={_onBeforeInput}
+          onChange={_onChange}
           onBlur={_onBlur}
-          onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-            if (event.key === "Enter") {
-              restrictInputValue(value);
-            }
-            if (event.code === "ArrowUp") {
-              event.preventDefault();
-              increment();
-            }
-            if (event.code === "ArrowDown") {
-              event.preventDefault();
-              decrement();
-            }
-          }}
+          onKeyDown={_onKeyDown}
         />
         {hasSpinBox && (
           <div className={styles.spinnerBox}>
@@ -382,4 +453,208 @@ function handleChangingValue(
   } else {
     return clamp(currentInputValue - (step ?? 1), min, max);
   }
+}
+
+function sanitizeNumberString(
+  formattedString: string,
+  locale = "en-US",
+  options?: Intl.NumberFormatOptions,
+) {
+  const nf = new Intl.NumberFormat(locale, options);
+  const parts = nf.formatToParts(1234.56);
+
+  const groupSeparator = parts.find((part) => part.type === "group")?.value || "";
+  const decimalSeparator = parts.find((part) => part.type === "decimal")?.value || "";
+
+  // Replace separators with standard ones
+  let normalizedString =
+    groupSeparator === ""
+      ? formattedString
+      : formattedString.replace(new RegExp(`\\${groupSeparator}`, "g"), "");
+  normalizedString = normalizedString.replace(decimalSeparator, ".");
+  return normalizedString;
+}
+
+function canSynchronizeValue(value: string, locale?: string, options?: Intl.NumberFormatOptions) {
+  if (value.trim() === "") return true;
+  if (isNaN(value)) return false;
+  if (hasLeadingZeros(value, locale, options)) return false;
+  if (isFloatWithTrailingZeros(value, locale, options)) return false;
+  if (overMaximumFractionDigits(value, locale, options)) return false;
+  return true;
+}
+
+function hasLeadingZeros(input: string, locale = "en-US", options?: Intl.NumberFormatOptions) {
+  // Create a formatter to detect locale-specific separators
+  const formatter = new Intl.NumberFormat(locale, options);
+  const parts = formatter.formatToParts(1234.5);
+
+  const group = parts.find((p) => p.type === "group")?.value || "";
+  const decimal = parts.find((p) => p.type === "decimal")?.value || "";
+
+  // Normalize separators for parsing
+  const normalized = (
+    group === "" ? input : input.replace(new RegExp(`\\${group}`, "g"), "")
+  ).replace(decimal, ".");
+
+  if (!/^-?\d*\.?\d*$/.test(normalized)) return false;
+
+  const [integer, fraction] = normalized.split(".");
+
+  // Integer validation
+  if (!fraction) {
+    return integer.length > 1 && integer.startsWith("0");
+  }
+
+  // Float validation
+  const leadingIntegerZeros = integer.startsWith("0") && integer.length >= 1;
+  const leadingFractionZeros = (fraction.match(/^0+/) || [""])[0].length >= 2;
+
+  return leadingIntegerZeros || leadingFractionZeros;
+}
+
+function isFloatWithTrailingZeros(
+  input: string,
+  locale = "en-US",
+  options?: Intl.NumberFormatOptions,
+) {
+  // Create formatter to detect locale-specific separators
+  const formatter = new Intl.NumberFormat(locale, options);
+  const parts = formatter.formatToParts(1234.5);
+
+  const group = parts.find((p) => p.type === "group")?.value || "";
+  const decimal = parts.find((p) => p.type === "decimal")?.value || ".";
+
+  // Normalize separators for parsing
+  const normalized = (
+    group === "" ? input : input.replace(new RegExp(`\\${group}`, "g"), "")
+  ).replace(decimal, ".");
+
+  // Validate numeric format
+  if (!/^-?\d*\.?\d*$/.test(normalized)) return false;
+
+  // Check if it's a float (has decimal point)
+  if (!normalized.includes(".")) return false;
+
+  // Split into integer and fractional parts
+  const [_, fraction] = normalized.split(".");
+
+  // Must have fractional digits to be a float -> integers get a pass
+  if (!fraction || fraction.length === 0) return true;
+
+  // Check for trailing zeros in the fractional part
+  return /0+$/.test(fraction);
+}
+
+function overMaximumFractionDigits(
+  input: string,
+  locale = "en-US",
+  options?: Intl.NumberFormatOptions,
+) {
+  // Create a formatter to detect locale-specific separators
+  const formatter = new Intl.NumberFormat(locale, options);
+  const parts = formatter.formatToParts(1234.5);
+
+  const group = parts.find((p) => p.type === "group")?.value || "";
+  const decimal = parts.find((p) => p.type === "decimal")?.value || "";
+
+  // Normalize separators for parsing
+  const normalized = (
+    group === "" ? input : input.replace(new RegExp(`\\${group}`, "g"), "")
+  ).replace(decimal, ".");
+
+  if (!/^-?\d*\.?\d*$/.test(normalized)) return false;
+
+  const [_, fraction] = normalized.split(".");
+
+  // Integer validation
+  if (!fraction) {
+    return false;
+  }
+
+  // Float validation
+  return fraction.length > options.maximumFractionDigits!;
+}
+
+/**
+ * Solution comes from: https://giacomocerquone.com/blog/keep-input-cursor-still/
+ */
+function useCursorCorrection(value: string | number | null, inputRef: RefObject<HTMLInputElement>) {
+  const position = useRef({
+    beforeStart: 0,
+    beforeEnd: 0,
+  });
+
+  useLayoutEffect(() => {
+    inputRef.current.setSelectionRange(position.current.beforeStart, position.current.beforeEnd);
+  }, [value]);
+
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    position.current.beforeStart = event.target.selectionStart;
+    position.current.beforeEnd = event.target.selectionEnd;
+  };
+
+  return onInputChange;
+}
+
+// TODO: Buggy, does not account for our partially formatted values
+function useCursorCorrection1(
+  value: string | number | null,
+  inputRef: React.RefObject<HTMLInputElement>,
+) {
+  const position = useRef({
+    beforeStart: 0,
+    beforeEnd: 0,
+  });
+  const previousValue = useRef<string | number | null>(null);
+
+  useLayoutEffect(() => {
+    if (!inputRef.current) return;
+
+    // Initial setup for first render
+    if (previousValue.current === null) {
+      previousValue.current = value;
+      return;
+    }
+
+    const oldValue = String(previousValue.current);
+    const newValue = String(value ?? "");
+
+    // Adjust cursor positions based on digit offsets
+    const adjustPosition = (originalPos: number) => {
+      const targetDigitCount = countDigitsBefore(oldValue, originalPos);
+      return findNewPosition(newValue, targetDigitCount);
+    };
+
+    const newStart = adjustPosition(position.current.beforeStart);
+    const newEnd = adjustPosition(position.current.beforeEnd);
+
+    inputRef.current.setSelectionRange(newStart, newEnd);
+    previousValue.current = value;
+  }, [value, inputRef]);
+
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    position.current.beforeStart = event.target.selectionStart ?? 0;
+    position.current.beforeEnd = event.target.selectionEnd ?? 0;
+  };
+
+  return onInputChange;
+}
+
+// Helper functions
+function countDigitsBefore(s: string, pos: number): number {
+  let count = 0;
+  for (let i = 0; i < pos && i < s.length; i++) {
+    if (/\d/.test(s[i])) count++;
+  }
+  return count;
+}
+
+function findNewPosition(newValue: string, targetDigitCount: number): number {
+  let currentCount = 0;
+  for (let i = 0; i < newValue.length; i++) {
+    if (currentCount === targetDigitCount) return i;
+    if (/\d/.test(newValue[i])) currentCount++;
+  }
+  return newValue.length; // Fallback to end position
 }

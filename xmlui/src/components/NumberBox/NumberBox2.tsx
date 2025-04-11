@@ -70,6 +70,13 @@ export const NumberBoxMd2 = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    maxFractionDigits: {
+      description:
+        `This prop sets the maximum number of decimal places allowed in the input field. ` +
+        `If the number of decimal places is greater than this value, the value will be truncated to the maximum allowed decimal places. `,
+      valueType: "number",
+      defaultValue: 3,
+    },
     zeroOrPositive: {
       description:
         `This boolean property determines whether the input value can only be 0 or positive numbers ` +
@@ -128,6 +135,7 @@ export const numberBox2ComponentRenderer = createComponentRenderer(
       step={extractValue(node.props.step)}
       //integersOnly={extractValue.asOptionalBoolean(node.props.integersOnly)}
       //zeroOrPositive={extractValue.asOptionalBoolean(node.props.zeroOrPositive)}
+      maxFractionDigits={extractValue.asOptionalNumber(node.props.maxFractionDigits)}
       min={extractValue.asOptionalNumber(node.props.minValue)}
       max={extractValue.asOptionalNumber(node.props.maxValue)}
       startText={extractValue.asOptionalString(node.props.startText)}
