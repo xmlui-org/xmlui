@@ -213,6 +213,7 @@ export const StateContainer = memo(
               value: newValue,
               target,
               actionType: action,
+              localVars: resolvedLocalVars
             },
           });
         } else {
@@ -313,10 +314,8 @@ function useMergedState(localVars: ContainerState, componentState: ContainerStat
       if (ret[key] === undefined) {
         ret[key] = value;
       } else {
-        if (isPlainObject(ret[key]) && isPlainObject(value)) {
+        if ((isPlainObject(ret[key]) && isPlainObject(value)) || (Array.isArray(ret[key]) && Array.isArray(value))) {
           ret[key] = merge(cloneDeep(ret[key]), value);
-        } else if (Array.isArray(ret[key]) && Array.isArray(value)) {
-          ret[key] = Object.assign([], ret[key], value);
         } else {
           ret[key] = value;
         }

@@ -31,5 +31,6 @@ export interface ContainerAction {
     actionType?: any;
     state?: any;
     eventName?: any;
+    localVars?: any;
   };
 }
