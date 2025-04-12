@@ -1,12 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SQL Data Example</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script src="xmlui/xmlui-standalone.umd.js"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQL Data Example</title>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js'></script>
+  <script>
+    // Set to true to enable loader debug logs
+    window.loaderDebug = false;
+
+    config = {
+      locateFile: filename => `https://sql.js.org/dist/${filename}`
+    }
+
+    window.dbInitialized = false;
+
+    initSqlJs(config).then(function (SQL) {
+      //Create the database
+      window.db = new SQL.Database();
+      window.db.run("CREATE TABLE clients (id, name, email, phone)");
+      window.db.run("INSERT INTO clients VALUES (1, 'Willie Wonka', 'willie@example.com', '666-1234')");
+      window.db.run("INSERT INTO clients VALUES (2, 'Sally Smith', 'sally@example.com', '666-1234')");
+      window.db.run("INSERT INTO clients VALUES (3, 'Roger Rabbit', 'roger@example.com', '666-1234')");
+
+      // Set the initialization flag when done
+      window.dbInitialized = true;
+      console.log("SQLite database initialized successfully");
+    });
+    // Wait for database initialization with retry mechanism
+    const waitForDb = function (maxWaitTime = 5000, checkInterval = 50) {
+      return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+
+        function checkDb() {
+          if (window.dbInitialized && window.db) {
+            resolve(window.db);
+            return;
+          }
+
+          const elapsedTime = Date.now() - startTime;
+          if (elapsedTime > maxWaitTime) {
+            reject(new Error(`Timed out waiting for SQLite database initialization after ${maxWaitTime}ms`));
+            return;
+          }
+
+          setTimeout(checkDb, checkInterval);
+        }
+
+        checkDb();
+      });
+    };
+
+    window.query = function (sql, params) {
+      return new Promise((resolve, reject) => {
+        // Wait for the database to be initialized before executing the query
+        waitForDb()
+          .then(db => {
+            try {
+              const stmt = db.prepare(sql);
+
+              // Bind parameters if provided
+              if (params && Array.isArray(params)) {
+                params.forEach((param, index) => {
+                  stmt.bind({ [index + 1]: param });
+                });
+              }
+
+              const rows = [];
+              while (stmt.step()) {
+                rows.push(stmt.getAsObject());
+              }
+              stmt.free();
+              resolve(rows);
+            } catch (error) {
+              console.error("Error executing SQLite query:", error);
+              reject(error);
+            }
+          })
+          .catch(error => {
+            console.error("Database initialization error:", error);
+            reject(error);
+          });
+      });
+    }
+
+    window.insertRandom = function () {
+      const id = Math.floor(Math.random() * 1000);
+      const names = ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Williams', 'David Brown', 'Emily Davis', 'Michael Wilson'];
+      const name = names[Math.floor(Math.random() * names.length)];
+      const domains = ['example.com', 'test.org', 'mail.co', 'company.net'];
+      const domain = domains[Math.floor(Math.random() * domains.length)];
+      const email = name.toLowerCase().replace(' ', '.') + '@' + domain;
+      const phone = '555-' + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+
+      // Create the INSERT statement
+      const insertStatement = `INSERT INTO clients (id, name, email, phone) VALUES (${id}, '${name}', '${email}', '${phone}')`;
+
+      return insertStatement
+    }
+
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script src="xmlui/xmlui-standalone.umd.js"></script>
+</body>
+
 </html>

@@ -1,35 +1,170 @@
-<App>
+<App
+  var.remoteQuery='select * from clients'
+  var.localQuery='select * from clients'
+
+  var.dropQuery='drop table if exists clients'
+  var.createQuery='create table clients (id integer, name text, email email, phone text)'
+>
+  <!-- Note: To enable debugging of data loader, set window.loaderDebug = true in the console
+       or edit the index.html file -->
+  <!-- Remote SQL data source using API endpoint -->
   <DataSource
     id="sqlData"
     url="/query"
     method="POST"
     dataType="sql"
     body="{{
-      sql: 'SELECT * FROM clients'
+      sql: remoteQuery
     }}"
   />
 
-  <VStack width="100%" padding="20px" gap="20px">
-    <H2>SQL Client Data</H2>
+  <!-- Local in-memory SQLite data source -->
+  <DataSource
+    id="internalSqlData"
+    url="sqlite:memory"
+    method="POST"
+    dataType="sql"
+    body="{{
+      sql: localQuery
+    }}"
+  />
 
-    <!-- Simple status messaging -->
-    <Card padding="10px" backgroundColor="{sqlData.inProgress ? '#f0f0f0' : (sqlData.error ? '#ffdddd' : '#ddffdd')}">
-      <Text>
-        {sqlData.inProgress ? 'Loading...' :
-         (sqlData.error ? 'Error: ' + sqlData.error.message :
+  <HStack>
+
+    <VStack width="50%">
+      <H2>Remote SQL Client Data</H2>
+
+      <!-- SQL Query input for remote data -->
+      <Card padding="15px">
+        <VStack gap="10px">
+          <Text fontWeight="bold">Enter SQL Query:</Text>
+          <TextArea
+            id="remoteSqlInput"
+            rows="3"
+            placeholder="Enter SQL query..."
+            width="100%"
+          />
+          <VStack>
+            <HStack gap="10px">
+              <VStack>
+
+                <HStack>
+                  <Button backgroundColor="$color-secondary" onClick="{ ()=> { remoteSqlInput.setValue( 'select * from clients' ) } }">
+                    Select
+                  </Button>
+                  <Button backgroundColor="$color-secondary" onClick="{ () => { remoteSqlInput.setValue(dropQuery) } }">
+                    Drop
+                  </Button>
+                  <Button backgroundColor="$color-secondary" onClick="{ () => { remoteSqlInput.setValue(createQuery) } }">
+                    Create
+                  </Button>
+                  <Button backgroundColor="$color-secondary" onClick="{ () => { remoteSqlInput.setValue(insertRandom()) } }">
+                    Insert Random
+                  </Button>
+
+                </HStack>
+
+                <Button onClick="{ () => { remoteQuery = remoteSqlInput.value } }">
+                  Execute Query
+                </Button>
+
+              </VStack>
+            </HStack>
+          </VStack>
+        </VStack>
+      </Card>
+
+      <!-- Simple status messaging for remote data -->
+      <Card padding="10px"
+        backgroundColor="{sqlData.inProgress ? '#f0f0f0' : (sqlData.error ? '#ffdddd' : '#ddffdd')}">
+        <Text>
+          {sqlData.inProgress ? 'Loading...' :
+          (sqlData.error ? 'Error: ' + sqlData.error.message :
           (sqlData.value ? 'Data loaded successfully' : 'No data loaded yet'))}
-      </Text>
-    </Card>
+        </Text>
+      </Card>
 
-    <!-- Directly display data using the pattern from the invoices app -->
-    <Table
-      data="{sqlData.value}"
-      striped="true"
-      bordered="true">
-      <Column bindTo="id" />
-      <Column bindTo="name" />
-      <Column bindTo="email" />
-      <Column bindTo="phone" />
-    </Table>
-  </VStack>
+      <!-- Display remote data -->
+      <Table data="{sqlData.value}">
+        <Column bindTo="id" />
+        <Column bindTo="name" />
+        <Column bindTo="email" />
+        <Column bindTo="phone" />
+      </Table>
+
+    </VStack>
+
+    <VStack width="50%">
+
+      <H2>In-Memory SQLite Data</H2>
+
+      <!-- SQL Query input for local data -->
+      <Card padding="15px">
+        <VStack gap="10px">
+          <Text fontWeight="bold">Enter SQL Query:</Text>
+          <TextArea
+            id="localSqlInput"
+            rows="3"
+            initialValue="{ localQuery }"
+            placeholder="Enter SQL query..."
+            width="100%"
+          />
+
+          <VStack>
+            <HStack gap="10px">
+              <VStack>
+
+                <HStack>
+                  <Button backgroundColor="$color-secondary" onClick="{ ()=> { localSqlInput.setValue( 'select * from clients' ) } }">
+                    Select
+                  </Button>
+                  <Button backgroundColor="$color-secondary" onClick="{ () => { localSqlInput.setValue(dropQuery) } }">
+                    Drop
+                  </Button>
+                  <Button backgroundColor="$color-secondary" onClick="{ () => { localSqlInput.setValue(createQuery) } }">
+                    Create
+                  </Button>
+                  <Button backgroundColor="$color-secondary" onClick="{ () => { localSqlInput.setValue(insertRandom()) } }">
+                    Insert Random
+                  </Button>
+
+                </HStack>
+
+                <Button onClick="{ () => { localQuery = localSqlInput.value } }">
+                  Execute Query
+                </Button>
+
+              </VStack>
+            </HStack>
+          </VStack>
+
+        </VStack>
+
+
+      </Card>
+
+
+      <!-- Status messaging for in-memory data -->
+      <Card padding="10px"
+        backgroundColor="{internalSqlData.inProgress ? '#f0f0f0' : (internalSqlData.error ? '#ffdddd' : '#ddffdd')}">
+        <Text>
+          {internalSqlData.inProgress ? 'Loading...' :
+          (internalSqlData.error ? 'Error: ' + internalSqlData.error.message :
+          (internalSqlData.value ? 'Data loaded successfully' : 'No data loaded yet'))}
+        </Text>
+      </Card>
+
+      <!-- Display in-memory SQLite data -->
+      <Table data="{internalSqlData.value}">
+        <Column bindTo="id" />
+        <Column bindTo="name" />
+        <Column bindTo="email" />
+        <Column bindTo="phone" />
+      </Table>
+
+    </VStack>
+
+  </HStack>
+
+
 </App>
