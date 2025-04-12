@@ -3,6 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { createDraft, finishDraft } from "immer";
 import type {QueryFunction} from "@tanstack/query-core/src/types";
 
+// Helper function for conditional logging
+function loaderDebug(message: string, ...args: any[]) {
+  if (typeof window !== 'undefined' && (window as any).loaderDebug) {
+    console.log(message, ...args);
+  }
+}
+
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type {
   LoaderErrorFn,
@@ -64,12 +71,12 @@ export function Loader({
       {
         queryKey: useMemo(()=>queryId ? queryId : [uid, extractParam(state, loader.props, appContext)], [appContext, loader.props, queryId, state, uid]),
         queryFn: useCallback<QueryFunction>(async ({ signal }) => {
-          console.log("[Loader queryFn] Starting to fetch data...");
+          loaderDebug("[Loader queryFn] Starting to fetch data...");
           try {
             const newVar: any = await loaderFn(signal);
-            console.log("[Loader queryFn] Data received:", newVar);
+            loaderDebug("[Loader queryFn] Data received:", newVar);
             if (newVar === undefined) {
-              console.log("[Loader queryFn] Data is undefined, returning null");
+              loaderDebug("[Loader queryFn] Data is undefined, returning null");
               return null;
             }
             return newVar;
@@ -79,23 +86,23 @@ export function Loader({
           }
         }, [loaderFn]),
         select: useCallback((data: any)=>{
-          console.log("[Loader select] Data before transform:", data);
-          console.log("[Loader select] resultSelector:", loader.props.resultSelector);
-          console.log("[Loader select] transformResult function:", !!transformResult);
+          loaderDebug("[Loader select] Data before transform:", data);
+          loaderDebug("[Loader select] resultSelector:", loader.props.resultSelector);
+          loaderDebug("[Loader select] transformResult function:", !!transformResult);
           
           let result = data;
           const resultSelector = loader.props.resultSelector;
           if (resultSelector) {
-            console.log("[Loader select] Applying resultSelector");
+            loaderDebug("[Loader select] Applying resultSelector");
             result = extractParam(
                 { $response: data },
                 resultSelector.startsWith("{") ? resultSelector : `{$response.${resultSelector}}`
             );
-            console.log("[Loader select] Result after resultSelector:", result);
+            loaderDebug("[Loader select] Result after resultSelector:", result);
           }
           
           const finalResult = transformResult ? transformResult(result) : result;
-          console.log("[Loader select] Final result:", finalResult);
+          loaderDebug("[Loader select] Final result:", finalResult);
           return finalResult;
         }, [loader.props.resultSelector, transformResult]),
         retry: false
@@ -125,24 +132,24 @@ export function Loader({
 
 
   useLayoutEffect(() => {
-    console.log("[Loader] useLayoutEffect status:", status);
-    console.log("[Loader] useLayoutEffect data:", data);
-    console.log("[Loader] useLayoutEffect prevData:", prevData);
-    console.log("[Loader] useLayoutEffect data !== prevData:", data !== prevData);
+    loaderDebug("[Loader] useLayoutEffect status:", status);
+    loaderDebug("[Loader] useLayoutEffect data:", data);
+    loaderDebug("[Loader] useLayoutEffect prevData:", prevData);
+    loaderDebug("[Loader] useLayoutEffect data !== prevData:", data !== prevData);
     
     if (status === "success" && data !== prevData) {
-      console.log("[Loader] Calling loaderLoaded with data:", data);
+      loaderDebug("[Loader] Calling loaderLoaded with data:", data);
       loaderLoaded(data);
       //we do this to push the onLoaded callback to the next event loop.
       // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have
       // access to the latest loader value
       setTimeout(()=>{
-        console.log("[Loader] Calling onLoaded with data:", data);
-        console.log("[Loader] onLoaded function exists:", !!onLoaded);
+        loaderDebug("[Loader] Calling onLoaded with data:", data);
+        loaderDebug("[Loader] onLoaded function exists:", !!onLoaded);
         onLoaded?.(data);
       }, 0);
     } else if (status === "error" && error !== prevError) {
-      console.log("[Loader] Calling loaderError with error:", error);
+      loaderDebug("[Loader] Calling loaderError with error:", error);
       loaderError(error);
     }
   }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status]);
