@@ -1,5 +1,5 @@
-import type { Node, GetText} from "../../parsers/xmlui-parser";
-import { SyntaxKind } from "../../parsers/xmlui-parser";
+import type { Node, GetText} from "../../../parsers/xmlui-parser";
+import { SyntaxKind } from "../../../parsers/xmlui-parser";
 
 export function findTagNameNodeInStack(nodeStack: Node[]): Node{
 

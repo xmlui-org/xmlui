@@ -1,4 +1,4 @@
-import type { ComponentMetadata } from "../../abstractions/ComponentDefs"
+import type { ComponentMetadata } from "../../../abstractions/ComponentDefs"
 
 type RestrictedComponentMetadata = Pick<ComponentMetadata, "description" | "status" | "props" | "events" | "apis" | "contextVars" | "allowArbitraryProps" | "shortDescription">
 

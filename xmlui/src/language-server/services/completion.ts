@@ -4,10 +4,9 @@ import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { findTokenAtPos } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
-import * as docGen from "./docs-generation";
-import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
-import type { ComponentMetadataCollection } from "./common";
-import { isEmpty } from "lodash-es";
+import * as docGen from "./common/docs-generation";
+import { compNameForTagNameNode, findTagNameNodeInStack } from "./common/syntax-node-utilities";
+import type { ComponentMetadataCollection } from "./common/types";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
   Type,
@@ -38,6 +37,7 @@ type CompletionResolveContext = {
   item: XmluiCompletionItem;
   metaByComp: ComponentMetadataCollection;
 };
+
 export function handleCompletionResolve({
   item,
   metaByComp: metaByComp,
@@ -97,7 +97,7 @@ export function handleCompletion(
   if (completeForProp) {
     const tagNameNode = findTagNameNodeInStack(chainAtPos);
     const compName = compNameForTagNameNode(tagNameNode, getText);
-    return completionForNewProps(compName, metaByComp);
+    return completionForNewProp(compName, metaByComp);
   }
   return null;
 }
@@ -165,18 +165,21 @@ function handleCompletionInsideToken(
   }
   switch (parent.kind) {
     case SyntaxKind.TagNameNode: {
+      const tagNameNodeParent = chainAtPos.at(-3);
+      tagNameNodeParent.children!.findIndex(c => c === parent);
+      if (tagNameNodeParent.kind === SyntaxKind.Node)
       return allComponentNames(metaByComp);
     }
     case SyntaxKind.AttributeKeyNode: {
       const tagNameNode = findTagNameNodeInStack(chainAtPos);
       const compName = compNameForTagNameNode(tagNameNode, getText);
-      return completionForNewProps(compName, metaByComp);
+      return completionForNewProp(compName, metaByComp);
     }
   }
   return null;
 }
 
-function completionForNewProps(
+function completionForNewProp(
   compName: string,
   metaByComp: ComponentMetadataCollection,
 ): CompletionItem[] | null {
