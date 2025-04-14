@@ -16,6 +16,7 @@ import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 
 import { TooltipContent } from "../Tooltip/TooltipContent";
+import { generateColorPalette } from "../utils/colors";
 
 export type PieChartProps = {
   data: any[];
@@ -44,18 +45,7 @@ export const defaultProps: Pick<
 // Custom label renderer that draws connectors and places text outside the pie
 const renderCustomizedLabel = (props: any) => {
   const RADIAN = Math.PI / 180;
-  const {
-    cx,
-    cy,
-    midAngle,
-    outerRadius,
-    fill,
-    payload,
-    percent,
-    value,
-    name,
-    index
-  } = props;
+  const { cx, cy, midAngle, outerRadius, fill, payload, percent, value, name, index } = props;
 
   // Calculate positions for the label connector lines
   const sin = Math.sin(-RADIAN * midAngle);
@@ -71,11 +61,7 @@ const renderCustomizedLabel = (props: any) => {
   return (
     <g>
       {/* Connector line from pie to label */}
-      <path
-        d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`}
-        stroke={fill}
-        fill="none"
-      />
+      <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
       {/* Circle at the bend point */}
       <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
       {/* Name label */}
@@ -86,7 +72,9 @@ const renderCustomizedLabel = (props: any) => {
         className={styles.pieLabel}
         fill="currentColor"
         fontSize={12}
-      >{props.name}</text>
+      >
+        {props.name}
+      </text>
     </g>
   );
 };
@@ -132,23 +120,27 @@ export function PieChart({
   showLegend = defaultProps.showLegend,
 }: PieChartProps) {
   const { getThemeVar } = useTheme();
-  const colorValues = useMemo(()=>{
-    return [
+
+  const colorValues = useMemo(() => {
+    const baseColors = [
       getThemeVar("color-primary-500"),
       getThemeVar("color-primary-400"),
       getThemeVar("color-primary-300"),
       getThemeVar("color-primary-200"),
-    ]
-  }, [getThemeVar]);
+    ] as any;
+
+    return generateColorPalette({
+      count: data?.length || 1,
+      baseColors,
+    });
+  }, [data, getThemeVar]);
 
   const chartData = useMemo(() => {
     if (!data) return [];
-    return data?.map((item, index) => {
-      return {
-        ...item,
-        fill: colorValues[index % colorValues.length] as string,
-      };
-    });
+    return data.map((item, index) => ({
+      ...item,
+      fill: item.fill || colorValues[index % colorValues.length],
+    }));
   }, [colorValues, data]);
 
   const chartContextValue = useChartContextValue({ dataKey, nameKey });
