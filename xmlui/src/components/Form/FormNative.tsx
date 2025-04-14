@@ -161,7 +161,6 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.BACKEND_VALIDATION_ARRIVED: {
-      //console.log(state.validationResults[field]) //action.payload.fieldValidationResults
       state.submitInProgress = false;
       state.generalValidationResults = action.payload.generalValidationResults;
       Object.keys(state.validationResults).forEach((key) => {
@@ -553,7 +552,6 @@ export function FormWithContextVar({
   const submitUrl =
     extractValue.asOptionalString(node.props.submitUrl) ||
     extractValue.asOptionalString(node.props._data_url);
-
   return (
     <Form
       keepModalOpenOnSubmit={extractValue.asOptionalBoolean(node.props.keepModalOpenOnSubmit)}

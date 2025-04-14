@@ -10,20 +10,26 @@ export type ProjectCompilation = {
   // --- The compiled component files (with their optional code behind)
   components: FileCompilation[];
 
+  // --- The optional emulated API (if the project uses it at all)
+  emulatedApi?: object;
+
   // --- The compiled theme files
   themes: Record<string, ThemeDefinition>;
 };
 
 // --- The compilation result of a single file
 export type FileCompilation = {
-  // --- The file name
-  filename: string;
+  // --- The file name of the markup file
+  markupFilename: string;
+
+  // --- The file name of the code behind (if any)
+  codeBehindFilename?: string;
 
   // --- The component name (if the component is a compound component)
   componentName?: string;
 
   // --- The compiled markup of the main file or component file
-  definition: ComponentDef | CompoundComponentDef;
+  definition?: ComponentDef | CompoundComponentDef;
 
   // --- Optional markup source (used in dev mode)
   markupSource?: string;
@@ -32,7 +38,7 @@ export type FileCompilation = {
   codeBehindSource?: string;
 
   // --- Other (non-core) component names this component depends on
-  dependencies: string[];
+  dependencies?: string[];
 };
 
 export type ParsedEventValue = {
