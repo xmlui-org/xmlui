@@ -14,6 +14,7 @@ import { useMemo } from "react";
 import { useTheme } from "xmlui";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
+import { generateColorPalette } from "../utils/colors";
 
 export type BarChartProps = {
   data: any[];
@@ -67,15 +68,12 @@ export function BarChart({
   children,
   showLegend = defaultProps.showLegend,
 }: BarChartProps) {
-  const { getThemeVar } = useTheme();
-  const colorValues = useMemo(()=>{
-    return [
-      getThemeVar("color-primary-500"),
-      getThemeVar("color-primary-400"),
-      getThemeVar("color-primary-300"),
-      getThemeVar("color-primary-200"),
-    ]
-  }, [getThemeVar]);
+
+  const colorValues = useMemo(() => {
+    return generateColorPalette({
+      count: data?.length || 1,
+    });
+  }, [data]);
 
   const config = useMemo(() => {
     return Object.assign(
