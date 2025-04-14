@@ -2,7 +2,7 @@ import React, {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
-  RefObject,
+  type RefObject,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -86,12 +86,14 @@ export const NumberBox2 = forwardRef(function NumberBox2(
     style,
     value,
     initialValue,
-    min = -NUMBERBOX_MAX_VALUE,
+    zeroOrPositive = false,
+    min = zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE,
     max = NUMBERBOX_MAX_VALUE,
     maxFractionDigits = 3,
     enabled = true,
     placeholder,
     step,
+    integersOnly = false,
     validationStatus = "none",
     hasSpinBox = true,
     updateState = noop,
@@ -119,20 +121,34 @@ export const NumberBox2 = forwardRef(function NumberBox2(
 
   // Formatter & Parser
   const locale = "en-US";
-  const formatOptions: Intl.NumberFormatOptions = {
-    useGrouping: false,
-    maximumFractionDigits: maxFractionDigits,
-  };
+  const formatOptions: Intl.NumberFormatOptions = useMemo(() => {
+    return {
+      useGrouping: false,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: integersOnly ? 0 : maxFractionDigits,
+    };
+  }, [maxFractionDigits, integersOnly]);
   const formatter = useNumberFormatter(locale, formatOptions);
   const parser = useNumberParser(locale, formatOptions);
+
+  min = clamp(
+    toUsableNumber(min, true) ?? (zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE),
+    (zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE),
+    NUMBERBOX_MAX_VALUE,
+  );
+  max = clamp(
+    toUsableNumber(max, true) ?? (zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE),
+    (zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE),
+    NUMBERBOX_MAX_VALUE,
+  );
 
   const initializeValue = useCallback(
     (value: string | number | null, defaultValue: string = "") => {
       return isEmptyLike(value) || isNaN(parser.parse(value.toString()))
         ? defaultValue
-        : formatter.format(+value);
+        : formatter.format(clamp(+value, min, max));
     },
-    [formatter, parser],
+    [formatter, parser, min, max],
   );
 
   // --- Convert to representable string value (from number | null | undefined)
@@ -197,7 +213,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
       });
       updateState({ value: parsedValue });
     },
-    [clampInputValue, updateState, parser],
+    [clampInputValue, updateState, parser, formatter],
   );
 
   // --- Stepper logic
@@ -207,7 +223,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
     const currentValue = isEmptyLike(value) || isNaN(value) ? "0" : value.toString();
     const newValue = handleChangingValue(currentValue, parser, "increase", _step, min, max);
     updateState({ value: newValue });
-  }, [value, enabled, readOnly, parser, _step, min, max]);
+  }, [value, enabled, readOnly, parser, _step, min, max, updateState]);
 
   const decrement = useCallback(() => {
     if (!enabled) return;
@@ -215,7 +231,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
     const currentValue = isEmptyLike(value) || isNaN(value) ? "0" : value.toString();
     const newValue = handleChangingValue(currentValue, parser, "decrease", _step, min, max);
     updateState({ value: newValue });
-  }, [value, enabled, readOnly, parser, _step, min, max]);
+  }, [value, enabled, readOnly, parser, _step, min, max, updateState]);
 
   // --- Register stepper logic to buttons
   useLongPress(upButton.current, increment);
@@ -225,26 +241,27 @@ export const NumberBox2 = forwardRef(function NumberBox2(
   const _onBeforeInput = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const target = event.target;
-      const nextValue = sanitizeNumberString(
+      const nextValue = parser.parse(
         target.value.slice(0, target.selectionStart ?? undefined) +
-          ((event.nativeEvent as InputEvent).data ?? "") +
-          target.value.slice(target.selectionEnd ?? undefined),
-        locale,
-        formatOptions,
-      );
+        ((event.nativeEvent as InputEvent).data ?? "") +
+        target.value.slice(target.selectionEnd ?? undefined)
+      ).toString();
 
       // pre-validate
       if (!parser.isValidPartialNumber(nextValue, min, max)) {
         event.preventDefault();
       }
     },
-    [parser, min, max, locale, formatOptions],
+    [parser, min, max],
   );
 
   const _onChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const strValue = event.target.value;
-      const parsed = clampInputValue(parser.parse(event.target.value));
+      let parsed = clampInputValue(parser.parse(event.target.value));
+      if (integersOnly && Number.isInteger(parsed)) {
+        parsed = Math.trunc(parsed);
+      }
 
       // NOTE: This is the most important part.
       // We only synchronize values when they are a valid number
@@ -256,12 +273,25 @@ export const NumberBox2 = forwardRef(function NumberBox2(
         setValueStrRep(strValue);
       }
 
-      // TODO: this needs to be adjusted based on the number of group separators
+      // TODO: this needs to be adjusted based on the number of group separators (no group separators yet)
       onFixCursorPosition(event);
       onDidChange(parsed);
     },
-    [clampInputValue, parser, onDidChange, locale, formatOptions /* onFixCursorPosition */],
+    [
+      clampInputValue,
+      parser,
+      onDidChange,
+      locale,
+      formatOptions,
+      onFixCursorPosition,
+      updateState,
+      integersOnly,
+    ],
   );
+
+  const _onFocus = useCallback(() => {
+    onFocus?.();
+  }, [onFocus]);
 
   const _onBlur = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -269,7 +299,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
       clampAndSaveInput(value);
       onBlur();
     },
-    [onDidChange, clampAndSaveInput],
+    [clampAndSaveInput, onBlur],
   );
 
   const _onKeyDown = useCallback(
@@ -286,13 +316,21 @@ export const NumberBox2 = forwardRef(function NumberBox2(
         decrement();
       }
     },
-    [clampAndSaveInput, increment, decrement],
+    [clampAndSaveInput, increment, decrement, value],
   );
 
   // --- Register API events
   const focus = useCallback(() => {
     inputRef.current?.focus();
   }, []);
+
+  useEffect(() => {
+    if (autoFocus) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
+    }
+  }, [autoFocus]);
 
   const setValue = useEvent((newValue) => {
     updateState({ value: newValue });
@@ -332,21 +370,28 @@ export const NumberBox2 = forwardRef(function NumberBox2(
           inputRef.current?.focus();
         }}
       >
+        <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
         <input
           id={id}
           ref={inputRef}
           type="text"
           placeholder={placeholder}
+          required={required}
+          readOnly={readOnly}
+          disabled={!enabled}
           inputMode={inputMode}
           className={classnames(styles.input)}
           value={valueStrRep}
           min={min}
           max={max}
+          autoFocus={autoFocus}
           onBeforeInput={_onBeforeInput}
           onChange={_onChange}
+          onFocus={_onFocus}
           onBlur={_onBlur}
           onKeyDown={_onKeyDown}
         />
+        <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
         {hasSpinBox && (
           <div className={styles.spinnerBox}>
             <Button
@@ -383,13 +428,13 @@ export const NumberBox2 = forwardRef(function NumberBox2(
 function useNumberFormatter(locale: string, options?: Intl.NumberFormatOptions) {
   return useMemo(() => {
     return new NumberFormatter(locale, options);
-  }, []);
+  }, [locale, options]);
 }
 
 function useNumberParser(locale: string, options?: Intl.NumberFormatOptions) {
   return useMemo(() => {
     return new NumberParser(locale, options);
-  }, []);
+  }, [locale, options]);
 }
 
 function useLongPress(elementRef: HTMLElement | null, action: () => void, delay: number = 500) {
@@ -453,26 +498,6 @@ function handleChangingValue(
   } else {
     return clamp(currentInputValue - (step ?? 1), min, max);
   }
-}
-
-function sanitizeNumberString(
-  formattedString: string,
-  locale = "en-US",
-  options?: Intl.NumberFormatOptions,
-) {
-  const nf = new Intl.NumberFormat(locale, options);
-  const parts = nf.formatToParts(1234.56);
-
-  const groupSeparator = parts.find((part) => part.type === "group")?.value || "";
-  const decimalSeparator = parts.find((part) => part.type === "decimal")?.value || "";
-
-  // Replace separators with standard ones
-  let normalizedString =
-    groupSeparator === ""
-      ? formattedString
-      : formattedString.replace(new RegExp(`\\${groupSeparator}`, "g"), "");
-  normalizedString = normalizedString.replace(decimalSeparator, ".");
-  return normalizedString;
 }
 
 function canSynchronizeValue(value: string, locale?: string, options?: Intl.NumberFormatOptions) {
@@ -597,8 +622,8 @@ function useCursorCorrection(value: string | number | null, inputRef: RefObject<
   return onInputChange;
 }
 
-// TODO: Buggy, does not account for our partially formatted values
-function useCursorCorrection1(
+// TODO: Buggy, does not account for our partially formatted values, only for group separators
+/* function useCursorCorrection1(
   value: string | number | null,
   inputRef: React.RefObject<HTMLInputElement>,
 ) {
@@ -658,3 +683,4 @@ function findNewPosition(newValue: string, targetDigitCount: number): number {
   }
   return newValue.length; // Fallback to end position
 }
+ */

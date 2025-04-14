@@ -222,6 +222,10 @@ export const FormItem = memo(function FormItem({
       );
       break;
     }
+    // NOTE: This is a prototype for the new number field
+    // works as good as the regular number field but untested
+    // in production.
+    case "integer2":
     case "number2": {
       formControl = (
         <NumberBox2
@@ -232,7 +236,8 @@ export const FormItem = memo(function FormItem({
           enabled={isEnabled}
           min={validations.minValue}
           max={validations.maxValue}
-        ></NumberBox2>
+          integersOnly={type === "integer2"}
+        />
       );
       break;
     }
