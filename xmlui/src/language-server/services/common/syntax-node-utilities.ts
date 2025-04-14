@@ -1,3 +1,4 @@
+import { curry } from "lodash-es";
 import type { Node, GetText} from "../../../parsers/xmlui-parser";
 import { SyntaxKind } from "../../../parsers/xmlui-parser";
 
@@ -20,4 +21,52 @@ export function compNameForTagNameNode(tagNameNode: Node, getText: GetText): str
     }
     const nameNode = tagNameNode.children!.findLast(c => c.kind === SyntaxKind.Identifier)
     return getText(nameNode);
+}
+
+/**
+*
+* @param pathToElementNode nodes from the inner most node to the closest ElementNode
+* @returns
+*/
+export function insideClosingTag(pathToElementNode:Node[]): boolean {
+  if(pathToElementNode === null){
+    return false;
+  }
+
+  const elementNode = pathToElementNode.at(-1)!;
+  const nodeBeforeElementNode = pathToElementNode.at(-2);
+  const inputWasOnlyAnElementNode = !nodeBeforeElementNode
+
+  if (inputWasOnlyAnElementNode){
+    return false;
+  }
+
+  const idxClosingStartToken = elementNode.children!.findIndex((n) => n.kind === SyntaxKind.CloseNodeStart);
+  if(idxClosingStartToken === -1){
+    return false;
+  }
+
+  const idxElementNodeChild = elementNode.children!.findIndex((n) => n === nodeBeforeElementNode)
+  if(idxClosingStartToken <= idxElementNodeChild ){
+    return true;
+  }
+
+  // just in case the guard statements missed a case
+  return false;
+}
+
+export function pathToNodeInAscendands(chain: Node[], predicate: (node: Node) => boolean): Node[] | null {
+  let currentIdx = -1;
+  let current = chain.at(currentIdx);
+  let path = [current];
+
+  while(current){
+    if(predicate(current)){
+      return path;
+    }
+    currentIdx--;
+    current = chain.at(currentIdx);
+    path.push(current)
+  }
+  return null;
 }

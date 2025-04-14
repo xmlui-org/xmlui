@@ -5,7 +5,7 @@ import { FindTokenSuccess, findTokenAtPos } from "../../parsers/xmlui-parser/uti
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import * as docGen from "./common/docs-generation";
-import { compNameForTagNameNode, findTagNameNodeInStack } from "./common/syntax-node-utilities";
+import { compNameForTagNameNode, findTagNameNodeInStack, insideClosingTag, pathToNodeInAscendands } from "./common/syntax-node-utilities";
 import type { ComponentMetadataCollection } from "./common/types";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
@@ -91,6 +91,14 @@ export function handleCompletion(
       } else {
         return allComponentNames(metaByComp)
       }
+    case SyntaxKind.Identifier:
+
+      const pathToElementNode = pathToNodeInAscendands(chainBeforePos, (n) => n.kind === SyntaxKind.ElementNode);
+      if (pathToElementNode && insideClosingTag(pathToElementNode)){
+        const elementNode = pathToElementNode.at(-1);
+        return matchingTagName(elementNode, metaByComp, getText);
+      }
+      return allComponentNames(metaByComp);
   }
 
   const completeForProp = chainBeforePos.some(
@@ -107,12 +115,6 @@ export function handleCompletion(
   }
   return null;
 }
-
-type FindTokenSuccessHasBefore = {
-  chainAtPos: Node[];
-  chainBeforePos: Node[];
-  sharedParents: number;
-};
 
 function allComponentNames(md: ComponentMetadataCollection): CompletionItem[] {
   return Object.keys(md).map((compName) => CompletionItemBuilder.withComponent(compName).componentResolveData().build());
@@ -170,12 +172,9 @@ function handleCompletionInsideToken(
         return null;
       }
       const previousNode = tagNameNodeParent.children![tagNameNodeIdx - 1];
-      console.log({previousNode, tagNameNodeParent})
       if (previousNode.kind === SyntaxKind.CloseNodeStart && tagNameNodeParent.kind === SyntaxKind.ElementNode){
-        console.log("matching")
         return matchingTagName(tagNameNodeParent, metaByComp, getText)
       }
-      console.log("inside token")
       return allComponentNames(metaByComp);
     }
     case SyntaxKind.AttributeKeyNode: {
