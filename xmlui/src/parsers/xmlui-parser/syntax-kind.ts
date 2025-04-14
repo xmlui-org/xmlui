@@ -4,41 +4,41 @@ export const enum SyntaxKind {
   EndOfFileToken = 1,
 
   // Trivia (skipped tokens)
-  CommentTrivia,
-  NewLineTrivia,
-  WhitespaceTrivia,
+  CommentTrivia = 2,
+  NewLineTrivia = 3,
+  WhitespaceTrivia = 4,
 
   // Effective tokens
-  Identifier,
-  OpenNodeStart, // "<"
-  CloseNodeStart, // "</"
-  NodeEnd, // ">"
-  NodeClose, // "/>"
-  Colon, // ":"
-  Equal, // "="
-  StringLiteral,
-  CData, // "<![CDATA[" ... "]]>"
-  Script, // <script>...</script>
+  Identifier = 5,
+  OpenNodeStart = 6, // "<"
+  CloseNodeStart = 7, // "</"
+  NodeEnd = 8, // ">"
+  NodeClose = 9, // "/>"
+  Colon = 10, // ":"
+  Equal = 11, // "="
+  StringLiteral = 12,
+  CData = 13, // "<![CDATA[" ... "]]>"
+  Script = 14, // <script>...</script>
 
   // A token created by the parser which contains arbitrary text, but not the '<' character
-  TextNode,
+  TextNode = 15,
 
   // XMLUI entities
-  AmpersandEntity,
-  LessThanEntity,
-  GreaterThanEntity,
-  SingleQuoteEntity,
-  DoubleQuoteEntity,
+  AmpersandEntity = 16,
+  LessThanEntity = 17,
+  GreaterThanEntity = 18,
+  SingleQuoteEntity = 19,
+  DoubleQuoteEntity = 20,
 
   // Syntax node types
-  ElementNode,
-  AttributeNode,
-  AttributeKeyNode,
-  ContentListNode,
-  AttributeListNode,
-  TagNameNode,
+  ElementNode = 21,
+  AttributeNode = 22,
+  AttributeKeyNode = 23,
+  ContentListNode = 24,
+  AttributeListNode = 25,
+  TagNameNode = 26,
   // should be the last syntax node type
-  ErrorNode,
+  ErrorNode = 27,
 }
 
 export function isTrivia(token: SyntaxKind): boolean {

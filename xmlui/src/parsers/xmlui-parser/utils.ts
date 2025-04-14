@@ -40,7 +40,7 @@ export function tagNameNodesWithoutErrorsMatch(name1: Node, name2: Node, getText
 }
 
 /** If the position is in-between two tokens, the chain to the token just before the cursor is provided as well, but the shared parents are inside field chainAtPos */
-type FindTokenSuccess = {
+export type FindTokenSuccess = {
   chainAtPos: Node[];
 
   /** If the position is in-between two tokens, the chain to the token just before the position is provided.
