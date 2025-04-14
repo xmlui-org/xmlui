@@ -3,8 +3,6 @@ import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { ButtonMd } from "../../../src/components/Button/Button";
 import { transformSource } from "./xmlui";
 import { StackMd } from "../../../src/components/Stack/Stack";
-import { ParsedPropertyValue } from "../../../src/abstractions/scripting/Compilation";
-import { Identifier, T_IDENTIFIER } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Xmlui transform - attributes", () => {
   it("Invalid attribute name fails #1", () => {
@@ -49,11 +47,7 @@ describe("Xmlui transform - attributes", () => {
 
   it("key-only attr is true", () => {
     const cd = transformSource("<Button enabled />") as ComponentDef<typeof ButtonMd>;
-    const value = (cd.props as any).enabled as ParsedPropertyValue;
-    expect(value.__PARSED).toEqual(true);
-    expect(value.parseId).toBeGreaterThan(0);
-    expect(value.segments.length).toEqual(1);
-    expect(value.segments[0].literal).toEqual("true");
+    expect(cd.props.enabled).equal("true");
   });
 
   it("uid works", () => {
@@ -68,24 +62,9 @@ describe("Xmlui transform - attributes", () => {
     expect(cd.testId).equal("myStack");
   });
 
-  it("when works #1", () => {
+  it("when works", () => {
     const cd = transformSource("<Stack when='isOpen' />") as ComponentDef<typeof StackMd>;
     expect(cd.type).equal("Stack");
-    const value = (cd.when) as ParsedPropertyValue;
-    expect(value.__PARSED).toEqual(true);
-    expect(value.parseId).toBeGreaterThan(0);
-    expect(value.segments.length).toEqual(1);
-    expect(value.segments[0].literal).toEqual("isOpen");
-  });
-
-  it("when works #2", () => {
-    const cd = transformSource("<Stack when='{isOpen}' />") as ComponentDef<typeof StackMd>;
-    expect(cd.type).equal("Stack");
-    const value = (cd.when) as ParsedPropertyValue;
-    expect(value.__PARSED).toEqual(true);
-    expect(value.parseId).toBeGreaterThan(0);
-    expect(value.segments.length).toEqual(1);
-    expect(value.segments[0].expr.type).toEqual(T_IDENTIFIER);
-    expect((value.segments[0].expr as Identifier).name).toEqual("isOpen");
+    expect(cd.when).equal("isOpen");
   });
 });

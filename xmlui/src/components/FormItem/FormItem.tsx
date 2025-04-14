@@ -204,7 +204,6 @@ export const formItemComponentRenderer = createComponentRenderer(
     registerComponentApi,
   }) => {
     const {
-      initialValue,
       bindTo,
       autoFocus,
       label,
@@ -285,7 +284,6 @@ export const formItemComponentRenderer = createComponentRenderer(
         validationMode={extractValue.asOptionalString(validationMode)}
         registerComponentApi={registerComponentApi}
         maxTextLength={extractValue(maxTextLength)}
-        initialValue={extractValue(initialValue)}
         inputRenderer={
           inputTemplate
             ? (contextVars) => (

@@ -6,7 +6,6 @@ import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs"
 import type { UploadActionComponent } from "./action/FileUploadAction";
 import type { DownloadActionComponent } from "./action/FileDownloadAction";
 import type { ApiActionComponent } from "../components/APICall/APICall";
-import { parseEventCode, parsePropertyExpression } from "../parsers/xmlui-parser";
 
 type ApiBoundComponentProps = {
   uid: symbol;
@@ -57,7 +56,7 @@ export function ApiBoundComponent({
             file,
           } = actionComponent.props;
           const { success, error } = actionComponent.events || {};
-          events[key] = parseEventCode(`(eventArgs) => {
+          events[key] = `(eventArgs) => {
             return Actions.upload({
               asForm: ${JSON.stringify(asForm)}, 
               formParams: ${JSON.stringify(formParams)}, 
@@ -75,14 +74,14 @@ export function ApiBoundComponent({
               invalidates: ${
                 invalidates === undefined ? undefined : JSON.stringify(invalidates)
               }  }, { resolveBindingExpressions: true });
-          }`);
+          }`;
           break;
         }
         case "FileDownload": {
           const actionComponent = node.events![key] as DownloadActionComponent;
           const { url, queryParams, rawBody, body, headers, method, fileName } =
             actionComponent.props;
-          events[key] = parseEventCode(`(eventArgs) => {
+          events[key] = `(eventArgs) => {
             return Actions.download({
               queryParams: ${JSON.stringify(queryParams)}, 
               rawBody: ${JSON.stringify(rawBody)}, 
@@ -93,7 +92,7 @@ export function ApiBoundComponent({
               fileName: ${JSON.stringify(fileName)}, 
               params: { '$param': eventArgs },
             }, { resolveBindingExpressions: true });
-          }`);
+          }`;
           break;
         }
         case "APICall": {
@@ -121,7 +120,7 @@ export function ApiBoundComponent({
           } = actionComponent.props;
           const { success, error, progress, beforeRequest } = actionComponent.events || {};
 
-          events[key] = parseEventCode(`(eventArgs, options) => {
+          events[key] = `(eventArgs, options) => {
             return Actions.callApi({
               uid: ${JSON.stringify(uid)},
               headers: ${JSON.stringify(headers)}, 
@@ -147,7 +146,7 @@ export function ApiBoundComponent({
               getOptimisticValue: ${JSON.stringify(getOptimisticValue)}, 
               invalidates: ${invalidates === undefined ? undefined : JSON.stringify(invalidates)}, 
               when: ${when === undefined ? undefined : JSON.stringify(when)} }, { resolveBindingExpressions: true });
-          }`);
+          }`;
           break;
         }
         default: {
@@ -179,24 +178,24 @@ export function ApiBoundComponent({
           props: operation,
           events: loaderEvents,
         });
-        api[`fetch_${key}`] = parseEventCode(`() => { ${loaderUid}.refetch(); }`);
-        api[`update_${key}`] = parseEventCode(`(updaterFn) => { ${loaderUid}.update(updaterFn); }`);
-        api[`addItem_${key}`] = parseEventCode(`(element, index) => {  ${loaderUid}.addItem(element, index); }`);
-        api[`getItems_${key}`] = parseEventCode(`() => { return ${loaderUid}.getItems(); }`);
-        api[`deleteItem_${key}`] = parseEventCode(`(element) => { ${loaderUid}.deleteItem(element); }`);
+        api[`fetch_${key}`] = `() => { ${loaderUid}.refetch(); }`;
+        api[`update_${key}`] = `(updaterFn) => { ${loaderUid}.update(updaterFn); }`;
+        api[`addItem_${key}`] = `(element, index) => {  ${loaderUid}.addItem(element, index); }`;
+        api[`getItems_${key}`] = `() => { return ${loaderUid}.getItems(); }`;
+        api[`deleteItem_${key}`] = `(element) => { ${loaderUid}.deleteItem(element); }`;
         if (key === "data") {
           props._data_url = operation.url;
         }
       }
-      props[key] = parsePropertyExpression(`{ ${loaderUid}.value }`);
-      props.loading = parsePropertyExpression(`{${loaderUid}.inProgress === undefined ? true : ${loaderUid}.inProgress}`);
-      props.pageInfo = parsePropertyExpression(`{${loaderUid}.pageInfo}`);
-      events.requestFetchPrevPage = parseEventCode(`${loaderUid}.fetchPrevPage()`);
-      events.requestFetchNextPage = parseEventCode(`${loaderUid}.fetchNextPage()`);
+      props[key] = `{ ${loaderUid}.value }`;
+      props.loading = `{${loaderUid}.inProgress === undefined ? true : ${loaderUid}.inProgress}`;
+      props.pageInfo = `{${loaderUid}.pageInfo}`;
+      events.requestFetchPrevPage = `${loaderUid}.fetchPrevPage()`;
+      events.requestFetchNextPage = `${loaderUid}.fetchNextPage()`;
       // TODO if the user provides a requestRefetch handler, we should call it
       //  and then call the loader's refetch method if it returns !false;
       //  requestRefetch could receive parameters to select which apibound props to refetch
-      events.requestRefetch = parseEventCode(`()=> ${loaderUid}.refetch();`);
+      events.requestRefetch = `()=> ${loaderUid}.refetch();`;
     });
 
     const wrapped = {
@@ -220,6 +219,10 @@ export function ApiBoundComponent({
     }
     return wrapped;
   }, [apiBoundEvents, apiBoundProps, node, uid]);
+
+  // useEffect(() => {
+  //   console.log("wrapped with adapter changed", wrappedWithAdapter);
+  // }, [wrappedWithAdapter]);
 
   const renderedChild = renderChild(
     wrappedWithAdapter,

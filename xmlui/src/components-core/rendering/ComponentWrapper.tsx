@@ -45,15 +45,15 @@ export const ComponentWrapper = memo(
       return transformed;
     }, [node, uidInfoRef]);
 
-    const resolvedDataProp = useMemo(() => extractParam(
-      state,
-      nodeWithTransformedLoaders.props?.data,
-      appContext,
-    ), [appContext, nodeWithTransformedLoaders.props?.data, state]);
-
     // --- String values in the "data" prop are treated as URLs. This boolean
     // --- indicates whether the "data" prop is a string or not.
     const resolvedDataPropIsString = useMemo(() => {
+      const resolvedDataProp = extractParam(
+        state,
+        nodeWithTransformedLoaders.props?.data,
+        appContext,
+        true,
+      );
       return typeof resolvedDataProp === "string";
     }, [appContext, nodeWithTransformedLoaders.props?.data, state]);
 
@@ -62,7 +62,6 @@ export const ComponentWrapper = memo(
     const nodeWithTransformedDatasourceProp = useMemo(() => {
       return transformNodeWithDataProp(
         nodeWithTransformedLoaders,
-        resolvedDataProp,
         resolvedDataPropIsString,
         uidInfoRef,
       );
@@ -186,7 +185,6 @@ function transformNodeWithDataSourceRefProp(
 // --- If the "data" prop is a string, we transform it to a DataSource component
 function transformNodeWithDataProp(
   node: ComponentDef,
-  resolvedDataProp: any,
   resolvedDataPropIsString: boolean,
   uidInfoRef: RefObject<Record<string, any>>,
 ): ComponentDef {
@@ -198,8 +196,7 @@ function transformNodeWithDataProp(
   ) {
     // --- We skip the transformation if the data property is a binding expression 
     // --- for a loader value
-    const extractedData = extractParam(uidInfoRef.current, resolvedDataProp);
-    if (extractedData === "loaderValue") {
+    if (extractParam(uidInfoRef.current, node.props.data) === "loaderValue") {
       return node;
     }
     return {
@@ -209,7 +206,7 @@ function transformNodeWithDataProp(
         data: {
           type: "DataSource",
           props: {
-            url: resolvedDataProp,
+            url: node.props.data,
           },
         },
       },
