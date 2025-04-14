@@ -182,6 +182,44 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       });
     });
   });
+
+  // --- Accessibility
+
+  test("icon-only button has accessible name", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button icon="test" />`, {
+      resources: {
+        "icon.test": "resources/bell.svg",
+      },
+    });
+    await expect((await createButtonDriver()).component).toHaveText("test");
+  });
+
+  test("icon & label button uses label name only", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button icon="test" label="label" />`, {
+      resources: {
+        "icon.test": "resources/bell.svg",
+      },
+    });
+    await expect((await createButtonDriver()).component).toHaveText("label");
+  });
+
+  test("icon-only button uses contextualLabel", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button icon="test" contextualLabel="label" />`, {
+      resources: {
+        "icon.test": "resources/bell.svg",
+      },
+    });
+    await expect((await createButtonDriver()).component).toHaveText("label");
+  });
+
+  test("icon, label, contextualLabel button uses label", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button icon="test" label="label" contextualLabel="contextLabel" />`, {
+      resources: {
+        "icon.test": "resources/bell.svg",
+      },
+    });
+    await expect((await createButtonDriver()).component).toHaveText("label");
+  });
 });
 
 // --- E2E
