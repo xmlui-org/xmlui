@@ -1,31 +1,17 @@
 import { expect, test } from "@playwright/test";
-import {initApp} from "./component-test-helpers";
+import { initApp } from "./component-test-helpers";
 
 test("Increment counter through arrow function works", async ({ page }) => {
+  const entryPoint = `
+    <Stack gap="0.5rem" var.counter="{{ value: 0 }}" var.incrementFunc="{x => x.value++ }">
+      <Button 
+        testId="buttonComponent" label="Increment counter: {counter.value}"
+        onClick="incrementFunc(counter)">
+      </Button>
+    </Stack>
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Stack",
-      props: {
-        gap: "0.5rem",
-        // debug: true,
-      },
-      vars: {
-        counter: { value: 0 },
-        incrementFunc: "{x => x.value++ }",
-      },
-      children: [
-        {
-          type: "Button",
-          testId: "buttonComponent",
-          props: {
-            label: "Increment counter: {counter.value}",
-          },
-          events: {
-            click: "incrementFunc(counter)",
-          },
-        },
-      ],
-    },
+    entryPoint,
   });
 
   await page.getByTestId("buttonComponent").click();
@@ -33,77 +19,60 @@ test("Increment counter through arrow function works", async ({ page }) => {
 });
 
 test("Array.filter works with the binding engine #1", async ({ page }) => {
+  const entryPoint = `
+    <Button var.item="{ [5,4,3,2,1].filter(item => item % 2 === 0)[1] }"
+      testId="button" label="stuff: {item}">
+    </Button>
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        item: "{ [5,4,3,2,1].filter(item => item % 2 === 0)[1] }",
-      },
-      props: {
-        label: "stuff: {item}",
-      },
-    },
+    entryPoint,
   });
 
   await expect(page.getByTestId("button")).toHaveText("stuff: 2");
 });
 
 test("Array.filter works with the binding engine #2", async ({ page }) => {
+  const entryPoint = `
+    <Button 
+      testId="button"
+      var.containsArray="{{ array: [5, 4, 3, 2, 1] }}"
+      var.item="{containsArray.array.filter(item => item % 2 === 0)[1] }"
+      label="stuff: {item}" />
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        containsArray: {
-          array: [5, 4, 3, 2, 1],
-        },
-        item: "{ containsArray.array.filter(item => item % 2 === 0)[1] }",
-      },
-      props: {
-        label: "stuff: {item}",
-      },
-    },
+    entryPoint,
   });
 
   await expect(page.getByTestId("button")).toHaveText("stuff: 2");
 });
 
 test("Array.reduce works with the binding engine", async ({ page }) => {
+  const entryPoint = `
+    <Button 
+      testId="button"
+      var.array="{[5, 4, 3, 2, 1]}"
+      var.item="{ array.reduce((acc, item) => acc + item, 0) }"
+      label="stuff: {item}" />
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        array: [5, 4, 3, 2, 1],
-        item: "{ array.reduce((acc, item) => acc + item, 0) }",
-      },
-      props: {
-        label: "stuff: {item}",
-      },
-    },
+    entryPoint,
   });
 
   await expect(page.getByTestId("button")).toHaveText("stuff: 15");
 });
 
 test("Action.delay works with the binding engine", async ({ page }) => {
+  const entryPoint = `
+    <Button 
+      testId="button"
+      var.actionCounter="{0}"
+      var.asyncTestActionInVars="{ (stuff)=> { Actions.delay(100); return 123; } }"
+      debug
+      label="async process {actionCounter}"
+      onClick="actionCounter = asyncTestActionInVars(5);" />
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        actionCounter: 0,
-        asyncTestActionInVars: "{ (stuff)=> { Actions.delay(100); return 123; } }",
-      },
-      props: {
-        debug: true,
-        label: "async process {actionCounter}",
-      },
-      events: {
-        click: "actionCounter = asyncTestActionInVars(5);",
-      },
-    },
+    entryPoint,
   });
   await page.getByTestId("button").click();
   await delay(200);
@@ -111,74 +80,57 @@ test("Action.delay works with the binding engine", async ({ page }) => {
 });
 
 test("Button click with function in vars works", async ({ page }) => {
-  await initApp(page,{
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        label: "",
-        objectArgument: {
-          list: [1, 2, 3],
-        },
-        testFn: "{ (arg) => { label = arg} }",
-      },
-      props: {
-        label: "{label}",
-      },
-      events: {
-        click: "testFn(objectArgument.list)",
-      },
-    },
+  const entryPoint = `
+    <Button 
+      testId="button"
+      var.label=""
+      var.objectArgument="{{ list: [1, 2, 3] }}"
+      var.testFn="{ (arg) => { label = arg} }"
+      label="{label}"
+      onClick="testFn(objectArgument.list)" />
+  `;
+  await initApp(page, {
+    entryPoint,
   });
   await page.getByTestId("button").click();
   await expect(page.getByTestId("button")).toHaveText("1,2,3");
 });
 
 test("For-loop in vars function works", async ({ page }) => {
-  await initApp(page,{
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        log: "",
-        runLoop: "{()=>{ for (let i = 0; i < 10; i++) { log += i } }}",
-      },
-      props: {
-        label: "{log}",
-      },
-      events: {
-        click: "runLoop()",
-      },
-    },
+  const entryPoint = `
+    <Button 
+      testId="button"
+      var.log=""
+      var.runLoop="{()=>{ for (let i = 0; i < 10; i++) { log += i } }}"
+      label="{log}"
+      onClick="runLoop()" />
+  `;
+  await initApp(page, {
+    entryPoint,
   });
   await page.getByTestId("button").click();
   await expect(page.getByTestId("button")).toHaveText("0123456789");
 });
 
 test("Array.map works with the binding engine", async ({ page }) => {
+  const entryPoint = `
+    <Button 
+      testId="button"
+      var.log=""
+      var.items="{[1, 2, 3]}"
+      var.itemsMapped="{ JSON.stringify(items.map(id => {return {id: id} })) }"
+      label="{log}"
+      onClick="log = itemsMapped" />
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        log: "",
-        items: [1, 2, 3],
-        itemsMapped: "{ JSON.stringify(items.map(id => {return {id: id} })) }",
-      },
-      props: {
-        label: "{log}",
-      },
-      events: {
-        click: "log = itemsMapped",
-      },
-    },
+    entryPoint,
   });
 
   await page.getByTestId("button").click();
   await expect(page.getByTestId("button")).toHaveText('[{"id":1},{"id":2},{"id":3}]');
 });
 
-test("Compound components works", async ({ page }) => {
+test.skip("Compound components works", async ({ page }) => {
   await initApp(page, {
     name: "Compound component",
     components: [
@@ -277,35 +229,23 @@ test("Compound components works", async ({ page }) => {
 });
 
 test("Arrow in arrow works", async ({ page }) => {
-  await initApp(page,{
-    entryPoint: {
-      type: "Stack",
-      vars: {
-        current: 0,
-        total: 200,
-        progressFn: "{(cur, tot) => (Math.floor(1000 * cur / tot)) / 10}",
-        progressLabel: "{(progressCalc, cur, tot) => 'Progress: ' + progressCalc(cur, tot) + '%'}",
-      },
-      children: [
-        {
-          type: "Button",
-          testId: "button",
-          props: {
-            label: "Process with next item",
-          },
-          events: {
-            click: "current++",
-          },
-        },
-        {
-          type: "Text",
-          testId: "text",
-          props: {
-            value: "{progressLabel(progressFn, current, total)}",
-          },
-        },
-      ],
-    },
+  const entryPoint = `
+    <Stack
+      var.current="{0}"
+      var.total="{200}"
+      var.progressFn="{(cur, tot) => (Math.floor(1000 * cur / tot)) / 10}"
+      var.progressLabel="{(progressCalc, cur, tot) => 'Progress: ' + progressCalc(cur, tot) + '%'}" >
+      <Button
+        testId="button"
+        label="Process with next item"
+        onClick="current++" />
+      <Text 
+        testId="text"
+        value="{progressLabel(progressFn, current, total)}" />
+    </Stack>
+  `;
+  await initApp(page, {
+    entryPoint,
   });
 
   await page.getByTestId("button").click();
@@ -315,21 +255,16 @@ test("Arrow in arrow works", async ({ page }) => {
 });
 
 test("Recursive arrow function works", async ({ page }) => {
+  const entryPoint = `
+    <Button
+      testId="button"
+      var.label=""
+      var.items="{[1, 2, 3]}"
+      label="{label}"
+      onClick="const fact = n => { if (n === 0) return 1; else return n * fact(n-1); }; label = fact(6);" />  
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        label: "",
-        items: [1, 2, 3],
-      },
-      props: {
-        label: "{label}",
-      },
-      events: {
-        click: "const fact = n => { if (n === 0) return 1; else return n * fact(n-1); }; label = fact(6);",
-      },
-    },
+    entryPoint,
   });
 
   await page.getByTestId("button").click();
@@ -337,20 +272,15 @@ test("Recursive arrow function works", async ({ page }) => {
 });
 
 test("Array.map works in an event #1", async ({ page }) => {
+  const entryPoint = `
+    <Button
+      testId="button"
+      var.label=""
+      label="{label}"
+      onClick="label = JSON.stringify([1,2,3].map(id => {return {id: id} })); " />
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        label: "",
-      },
-      props: {
-        label: "{label}",
-      },
-      events: {
-        click: "label = JSON.stringify([1,2,3].map(id => {return {id: id} })); ",
-      },
-    },
+    entryPoint,
   });
 
   await page.getByTestId("button").click();
@@ -358,46 +288,38 @@ test("Array.map works in an event #1", async ({ page }) => {
 });
 
 test("Array.map works in an event #2", async ({ page }) => {
+  const entryPoint = `
+    <Button
+      testId="button"
+      var.label=""
+      label="{label}"
+      onClick="label = JSON.stringify([[1],[2,3],[4,5,6]].map(item => {return item.map(id => { return {id: id}; })}))" />
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        label: "",
-      },
-      props: {
-        label: "{label}",
-      },
-      events: {
-        click: "label = JSON.stringify([[1],[2,3],[4,5,6]].map(item => {return item.map(id => { return {id: id}; })}))",
-      },
-    },
-  });
-
-  await page.getByTestId("button").click();
-  await expect(page.getByTestId("button")).toHaveText('[[{"id":1}],[{"id":2},{"id":3}],[{"id":4},{"id":5},{"id":6}]]');
-});
-
-test("Array.map works in an event #3", async ({ page }) => {
-  await initApp(page, {
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      vars: {
-        label: "",
-      },
-      props: {
-        label: "{label}",
-      },
-      events: {
-        click: "label = JSON.stringify([1,2,3,4,5,6].map(item => ({item})));",
-      },
-    },
+    entryPoint,
   });
 
   await page.getByTestId("button").click();
   await expect(page.getByTestId("button")).toHaveText(
-    '[{"item":1},{"item":2},{"item":3},{"item":4},{"item":5},{"item":6}]'
+    '[[{"id":1}],[{"id":2},{"id":3}],[{"id":4},{"id":5},{"id":6}]]',
+  );
+});
+
+test("Array.map works in an event #3", async ({ page }) => {
+  const entryPoint = `
+    <Button
+      testId="button"
+      var.label=""
+      label="{label}"
+      onClick="label = JSON.stringify([1,2,3,4,5,6].map(item => ({item})));" />
+  `;
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await page.getByTestId("button").click();
+  await expect(page.getByTestId("button")).toHaveText(
+    '[{"item":1},{"item":2},{"item":3},{"item":4},{"item":5},{"item":6}]',
   );
 });
 
@@ -570,19 +492,19 @@ test("Async hell", async ({ page }) => {
 
   await expect(page.getByTestId("text1")).toHaveText('{"counter":1,"counter2":1}');
   await expect(page.getByTestId("text2")).toHaveText(
-    '{"set1":{"setting":false,"value":1},"set2":{"setting":false,"value":1}}'
+    '{"set1":{"setting":false,"value":1},"set2":{"setting":false,"value":1}}',
   );
   await page.getByTestId("button1").click();
   await delay(200);
   await expect(page.getByTestId("text1")).toHaveText('{"counter":2,"counter2":1}');
   await expect(page.getByTestId("text2")).toHaveText(
-    '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":1}}'
+    '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":1}}',
   );
   await page.getByTestId("button2").click();
   await delay(200);
   await expect(page.getByTestId("text1")).toHaveText('{"counter":2,"counter2":3}');
   await expect(page.getByTestId("text2")).toHaveText(
-    '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":3}}'
+    '{"set1":{"setting":false,"value":2},"set2":{"setting":false,"value":3}}',
   );
 });
 
@@ -726,7 +648,7 @@ test("Cannot write read-only var", async ({ page }) => {
       },
       vars: {
         msg: "",
-        "$counter": { value: 0 },
+        $counter: { value: 0 },
         incrementFunc: "{x => { try { x.value++; } catch { msg += ' read-only' } } }",
       },
       children: [

@@ -15,7 +15,7 @@ export type StandaloneAppDescription = {
   entryPoint?: ComponentLike;
 
   // --- Optional components used by the app in the entry point
-  components?: CompoundComponentDef[];
+  components?: CompoundComponentDef[] | string | string[];
 
   // --- Optional themes used by the app
   themes?: ThemeDefinition[];

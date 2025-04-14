@@ -347,7 +347,7 @@ export function nodeToComponentDef(
             (name, value) => {
               if (!isComponent(comp)) return;
               comp.vars ??= {};
-              comp.vars[name] = value as any;
+              comp.vars[name] = parsePropertyExpression(value);
             },
           );
           return;

@@ -147,7 +147,7 @@ function StandaloneApp({
         sources={sources}
         extensionManager={extensionManager}
         contributes={{
-          compoundComponents: components,
+          compoundComponents: components as any,
           themes,
         }}
       />
@@ -372,7 +372,7 @@ function resolveRuntime(runtime: Record<string, any>): {
   let components: Array<CompoundComponentDef> = [];
   if (config?.components) {
     // --- We have a list of components defined in the configuration file
-    components = config.components;
+    components = config.components as any;
   } else {
     // --- Use the components collected from the runtime files; merge the components
     // --- with their code behinds
