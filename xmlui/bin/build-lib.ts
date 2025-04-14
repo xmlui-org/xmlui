@@ -19,13 +19,15 @@ export const buildLib = async ({ watchMode, mode = "production" }) => {
   } catch (e) {
     // console.error(e);
   }
-  
+
   const config: UserConfig = {
     esbuild: {
       target: "es2020",
     },
     optimizeDeps: {
+      ...overrides.optimizeDeps,
       esbuildOptions: {
+        ...overrides.optimizeDeps.esbuildOptions,
         target: "es2020",
       },
     },
@@ -34,21 +36,27 @@ export const buildLib = async ({ watchMode, mode = "production" }) => {
         NODE_ENV: env.NODE_ENV,
       },
     },
+    worker: {
+      format: "es",
+    },
     build: {
       emptyOutDir: false,
       outDir: "dist",
       watch: watchMode ? {} : undefined,
-      sourcemap: watchMode ? "inline": false,
-      lib: mode === "metadata" ? {
-        entry: [path.resolve("meta", "componentsMetadata.ts")],
-        name: `${env.npm_package_name}-metadata`,
-        fileName: `${env.npm_package_name}-metadata`,
-      } : {
-        entry: [path.resolve("src", "index.tsx")],
-        formats: watchMode ? ["es"] : ["umd", "es"],
-        name: env.npm_package_name,
-        fileName: (format) => (format === "es" ? esFileName : umdFileName),
-      },
+      sourcemap: watchMode ? "inline" : false,
+      lib:
+        mode === "metadata"
+          ? {
+              entry: [path.resolve("meta", "componentsMetadata.ts")],
+              name: `${env.npm_package_name}-metadata`,
+              fileName: `${env.npm_package_name}-metadata`,
+            }
+          : {
+              entry: [path.resolve("src", "index.tsx")],
+              formats: watchMode ? ["es"] : ["umd", "es"],
+              name: env.npm_package_name,
+              fileName: (format) => (format === "es" ? esFileName : umdFileName),
+            },
       rollupOptions: {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external: mode === "metadata" ? [] : ["react", "react-dom", "xmlui", "react/jsx-runtime"],
@@ -62,7 +70,7 @@ export const buildLib = async ({ watchMode, mode = "production" }) => {
           globals: {
             react: "React",
             "react-dom": "ReactDOM",
-            "jsx": "react/jsx-runtime"
+            jsx: "react/jsx-runtime",
           },
         },
       },

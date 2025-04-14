@@ -5,6 +5,7 @@ import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
 import { default as ViteXmlui } from "./vite-xmlui-plugin";
 import * as path from "path";
+import importMetaUrlPlugin from '@codingame/esbuild-import-meta-url-plugin';
 
 type ViteConfigData = {
   flatDist?: boolean;
@@ -44,6 +45,13 @@ export async function getViteConfig({
       alias: overrides.resolve?.alias,
     },
     css: overrides.css,
+    optimizeDeps: {
+        esbuildOptions: {
+            plugins: [
+                importMetaUrlPlugin
+            ]
+        },
+    },
     build: {
       rollupOptions: {
         input: path.resolve(process.cwd(), "index.html"),

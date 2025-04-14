@@ -27,6 +27,7 @@
     "generate-langserver-metadata": "node scripts/get-langserver-metadata.mjs > src/language-server/xmlui-metadata-generated.mjs"
   },
   "dependencies": {
+    "@codingame/esbuild-import-meta-url-plugin": "^1.0.3",
     "@eslint-community/regexpp": "4.10.0",
     "@formkit/auto-animate": "0.7.0",
     "@internationalized/number": "^3.6.0",
