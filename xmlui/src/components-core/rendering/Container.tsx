@@ -381,47 +381,39 @@ export const Container = memo(
           throw new Error("Multiple event handlers are not supported");
         }
 
+        let fnCacheKey: string;
+        let handler: (...eventArgs: any[]) => Promise<any>;
         if (typeof src === "string") {
           // --- We have a string event handler
-          const fnCacheKey = `${options?.eventName};${src}`;
-          const handler = (...eventArgs: any[]) => {
+          fnCacheKey = `${options?.eventName};${src}`;
+          handler = (...eventArgs: any[]) => {
             return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
           };
-          if (options?.ephemeral) {
-            return handler;
-          }
-          if (!fnsRef.current[uid]?.[fnCacheKey]) {
-            fnsRef.current[uid] = fnsRef.current[uid] || {};
-            fnsRef.current[uid][fnCacheKey] = handler;
-          }
-          return fnsRef.current[uid][fnCacheKey];
-        }
-
-        if (isParsedEventValue(src)) {
+        } else if (isParsedEventValue(src)) {
           // --- We have the syntax tree to execute, no need to cache
-          return (...eventArgs: any[]) => {
+          fnCacheKey = `${options?.eventName};${src.parseId}`;
+          handler = (...eventArgs: any[]) => {
             return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
           };
-        }
-
-        if (isArrowExpression(src)) {
+        } else if (isArrowExpression(src)) {
           // --- We have an arrow expression to execute
-          const fnCacheKey = `${options?.eventName};${src.statement.nodeId}`;
-          const handler = (...eventArgs: any[]) => {
+          fnCacheKey = `${options?.eventName};${src.statement.nodeId}`;
+          handler = (...eventArgs: any[]) => {
             return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
           };
-          if (options?.ephemeral) {
-            return handler;
-          }
-          if (!fnsRef.current[uid]?.[fnCacheKey]) {
-            fnsRef.current[uid] = fnsRef.current[uid] || {};
-            fnsRef.current[uid][fnCacheKey] = handler;
-          }
-          return fnsRef.current[uid][fnCacheKey];
+        } else {
+          // --- We have an unknown event handler
+          throw new Error("Invalid event handler");
         }
 
-        // --- We have an unknown event handler
-        throw new Error("Invalid event handler");
+        if (options?.ephemeral) {
+          return handler;
+        }
+        if (!fnsRef.current[uid]?.[fnCacheKey]) {
+          fnsRef.current[uid] = fnsRef.current[uid] || {};
+          fnsRef.current[uid][fnCacheKey] = handler;
+        }
+        return fnsRef.current[uid][fnCacheKey];
       },
     );
 
