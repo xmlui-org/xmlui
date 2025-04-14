@@ -14,6 +14,7 @@ import type { ContainerState } from "../rendering/ContainerWrapper";
 import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { usePrevious } from "../utils/hooks";
+import { flushSync } from "react-dom";
 
 /**
  * The properties of the Loader component

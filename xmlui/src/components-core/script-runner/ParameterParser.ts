@@ -1,20 +1,13 @@
-import { ParsedPropertyValue } from "../../abstractions/scripting/Compilation";
-import { Expression } from "../../abstractions/scripting/ScriptingSourceTree";
+import type { Expression } from "../../abstractions/scripting/ScriptingSourceTree";
 import { Parser } from "../../parsers/scripting/Parser";
-
-let lastParseId = 0;
 
 /**
  * This function parses a parameter string and splits them into string literal and binding expression sections
  * @param source String to parse
  * @returns Parameter string sections
  */
-export function parseAttributeValue(source: string): ParsedPropertyValue {
-  const result: ParsedPropertyValue = {
-    __PARSED: true,
-    parseId: ++lastParseId,
-    segments: [],
-  };
+export function parseParameterString (source: string): (StringLiteralSection | ExpressionSection)[] {
+  const result: (StringLiteralSection | ExpressionSection)[] = [];
   if (source === undefined || source === null) return result;
 
   let phase = ParsePhase.StringLiteral;
@@ -30,8 +23,9 @@ export function parseAttributeValue(source: string): ParsedPropertyValue {
         } else if (ch === "{") {
           // --- A new expression starts, close the previous string literal
           if (section !== "") {
-            result.segments.push({
-              literal: section,
+            result.push({
+              type: "literal",
+              value: section
             });
           }
           // --- Start a new section
@@ -73,9 +67,10 @@ export function parseAttributeValue(source: string): ParsedPropertyValue {
           // --- Unclosed expression, back to its beginning
           throw new Error(`Unclosed expression: '${source}'\n'${exprSource}'`);
         } else {
-          // --- Successfully parsed expression, get dependencies
-          result.segments.push({
-            expr,
+          // --- Successfully parsed expression
+          result.push({
+            type: "expression",
+            value: expr!
           });
 
           // --- Skip the parsed part of the expression, and start a new literal section
@@ -91,19 +86,22 @@ export function parseAttributeValue(source: string): ParsedPropertyValue {
   switch (phase) {
     case ParsePhase.StringLiteral:
       if (section !== "") {
-        result.segments.push({
-          literal: section,
+        result.push({
+          type: "literal",
+          value: section
         });
       }
       break;
     case ParsePhase.Escape:
-      result.segments.push({
-        literal: section + escape,
+      result.push({
+        type: "literal",
+        value: section + escape
       });
       break;
     case ParsePhase.ExprStart:
-      result.segments.push({
-        literal: section + "{",
+      result.push({
+        type: "literal",
+        value: section + "{"
       });
       break;
   }
@@ -115,5 +113,21 @@ export function parseAttributeValue(source: string): ParsedPropertyValue {
 enum ParsePhase {
   StringLiteral,
   Escape,
-  ExprStart,
+  ExprStart
 }
+/**
+ * Represents a literal segment
+ */
+type StringLiteralSection = {
+  type: "literal";
+
+  // --- The string literal
+  value: string;
+};
+
+type ExpressionSection = {
+  type: "expression";
+
+  // --- The expression string to parse
+  value: Expression;
+};

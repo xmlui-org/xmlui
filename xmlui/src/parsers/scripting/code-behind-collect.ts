@@ -3,6 +3,7 @@ import {
   T_FUNCTION_DECLARATION,
   T_VAR_STATEMENT,
   type ArrowExpression,
+  type CodeDeclaration,
   type CollectedDeclarations,
   type Expression,
   type FunctionDeclaration,
@@ -12,10 +13,12 @@ import type { VisitorState } from "./tree-visitor";
 import { visitNode } from "./tree-visitor";
 import { isModuleErrors, parseScriptModule } from "./modules";
 
+export const PARSED_MARK_PROP = "__PARSED__";
+
 // --- Collect module statements from a parsed module
 export function collectCodeBehindFromSource(
   moduleName: string,
-  source: string,
+  source: string
 ): CollectedDeclarations {
   const result: CollectedDeclarations = {
     vars: {},
@@ -23,7 +26,7 @@ export function collectCodeBehindFromSource(
     functions: {},
   };
 
-  const collectedFunctions: Record<string, Expression> = {};
+  const collectedFunctions: Record<string, CodeDeclaration> = {};
 
   // --- Parse the module (recursively, including imported modules) in restrictive mode
   const parsedModule = parseScriptModule(moduleName, source);
@@ -39,16 +42,17 @@ export function collectCodeBehindFromSource(
           if (decl.id.name in result.vars) {
             throw new Error(`Duplicated var declaration: '${decl.id.name}'`);
           }
-          result.vars[decl.id.name] = decl.expr;
+          result.vars[decl.id.name] = {
+            [PARSED_MARK_PROP]: true,
+            tree: decl.expr,
+          };
         });
         break;
       case T_FUNCTION_DECLARATION:
         addFunctionDeclaration(stmt);
         break;
       default:
-        throw new Error(
-          `Only reactive variable and function definitions are allowed in a code-behind module.`,
-        );
+        throw new Error(`Only reactive variable and function definitions are allowed in a code-behind module.`);
     }
   });
   return result;
@@ -65,9 +69,22 @@ export function collectCodeBehindFromSource(
       type: T_ARROW_EXPRESSION,
       args: stmt.args.slice(),
       statement: stmt.stmt,
+      // closureContext: obtainClosures({
+      //   childThreads: [],
+      //   blocks: [{ vars: {} }],
+      //   loops: [],
+      //   breakLabelValue: -1,
+      // }),
     } as ArrowExpression;
 
-    result.functions[stmt.id.name] = collectedFunctions[stmt.id.name] = arrow;
+    collectedFunctions[stmt.id.name] = {
+      [PARSED_MARK_PROP]: true,
+      tree: arrow,
+    };
+    result.functions[stmt.id.name] = {
+      [PARSED_MARK_PROP]: true,
+      tree: arrow,
+    };
   }
 }
 
@@ -88,17 +105,17 @@ export function removeCodeBehindTokensFromTree(declarations: CollectedDeclaratio
     removeTokens(declarations.functions[key]);
   });
 
-  function removeTokens(declaration: Expression): void {
+  function removeTokens(declaration: CodeDeclaration): void {
     const nodeVisitor = (before: boolean, visited: Expression | Statement, state: VisitorState) => {
       if (before) {
         if (visited) {
-          delete visited.startToken;
+          delete visited.startToken
           delete visited.endToken;
         }
       }
       return state;
     };
 
-    visitNode(declaration, state, nodeVisitor, nodeVisitor);
+    visitNode(declaration.tree, state, nodeVisitor, nodeVisitor);
   }
 }

@@ -62,7 +62,7 @@ export const appHeaderComponentRenderer = createComponentRenderer(
     const titleTemplate = node.props.titleTemplate || node.slots?.titleSlot;
     return (
       <AppContextAwareAppHeader
-        profileMenu={renderChild(extractValue(node.props.profileMenuTemplate))} // NOTE: if this a component template, why is the default true?
+        profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))} // NOTE: if this a component template, why is the default true?
         title={extractValue(node.props.title)}
         showLogo={extractValue.asOptionalBoolean(node.props.showLogo, true)}
         titleContent={

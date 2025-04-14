@@ -18,6 +18,7 @@ interface ErrorWithLineColInfo extends ParseError {
 export function xmlUiMarkupToComponent(
   source: string,
   fileId: string | number = 0,
+  moduleResolver?: ModuleResolver,
 ): {
   component: null | ComponentDef | CompoundComponentDef;
   errors: ErrorWithLineColInfo[];
