@@ -1,5 +1,6 @@
 import type { RenderChildFn } from "./RendererDefs";
-import type { CollectedDeclarations } from "./scripting/ScriptingSourceTree";
+import { ParsedPropertyValue } from "./scripting/Compilation";
+import type { CollectedDeclarations, Expression } from "./scripting/ScriptingSourceTree";
 import { DefaultThemeVars } from "./ThemingDefs";
 
 /**
@@ -28,7 +29,7 @@ export interface ComponentDefCore {
    * Components may have user *variables*, which the UI logic uses to manage the application state.
    * This property holds the variables (name and value pairs) associated with this component definition.
    */
-  vars?: Record<string, any>;
+  vars?: Record<string, ParsedPropertyValue | Expression>;
 
   /**
    * Each component may have child components to constitute a hierarchy of components. This property
@@ -47,7 +48,7 @@ export interface ComponentDefCore {
    * component with its children chain is rendered; otherwise, the entire component hierarchy is omitted
    * from the rendered tree.
    */
-  when?: string | boolean;
+  when?: string | boolean | ParsedPropertyValue;
 
   /**
    * Some components work with data obtained asynchronously. Fetching this data requires some state
@@ -61,7 +62,7 @@ export interface ComponentDefCore {
    * Components may have functions that are used to perform some logic. This property holds the functions
    * (name and function body) associated with this component definition.
    */
-  functions?: Record<string, any>;
+  functions?: Record<string, Expression>;
 
   /**
    * Components managing state through variables or loaders are wrapped with containers responsible
