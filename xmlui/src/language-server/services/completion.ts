@@ -7,6 +7,7 @@ import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import * as docGen from "./docs-generation";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
 import type { ComponentMetadataCollection } from "./common";
+import { isEmpty } from "lodash-es";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
   Type,
@@ -22,13 +23,13 @@ type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Om
  */
 type XmluiCompletionData = {
   metadataAccessInfo:
-    | {
-        componentName: string;
-      }
-    | {
-        componentName: string;
-        prop: string;
-      };
+  | {
+    componentName: string;
+  }
+  | {
+    componentName: string;
+    prop: string;
+  };
 };
 
 export type XmluiCompletionItem = Override<CompletionItem, { data?: XmluiCompletionData }>;
@@ -43,7 +44,6 @@ export function handleCompletionResolve({
 }: CompletionResolveContext): CompletionItem {
   const metadataAccessInfo = item?.data?.metadataAccessInfo;
   if (metadataAccessInfo) {
-    metaByComp.Alert.props;
     const { componentName } = metadataAccessInfo;
     const componentMeta = metaByComp[componentName];
     if ("prop" in metadataAccessInfo) {
@@ -109,7 +109,7 @@ type FindTokenSuccessHasBefore = {
 };
 
 function allComponentNames(md: ComponentMetadataCollection): CompletionItem[] {
-  return Object.keys(md).map(componentCompletionItem);
+  return Object.keys(md).map((compName) => CompletionItemBuilder.withComponent(compName).componentResolveData().build());
 }
 
 function matchingTagName(
@@ -148,7 +148,7 @@ function matchingTagName(
     }
     name = getText(nameIdent);
     const value = nameSpace !== undefined ? nameSpace + ":" + name : name;
-    return [componentCompletionItem(value)];
+    return [CompletionItemBuilder.withComponent(value).build()];
   }
   return null;
 }
@@ -184,35 +184,9 @@ function completionForNewProps(
   if (!metadata || !metadata.props) {
     return null;
   }
-  return Object.keys(metadata.props).map((propName) => propCompletionItem(compName, propName));
-}
-
-function componentCompletionItem(name: string): XmluiCompletionItem {
-  return {
-    label: name,
-    kind: CompletionItemKind.Constructor,
-    labelDetails: {
-      description: "Core component",
-    },
-    data: {
-      metadataAccessInfo: {
-        componentName: name,
-      },
-    },
-  };
-}
-
-function propCompletionItem(componentName: string, name: string): XmluiCompletionItem {
-  return {
-    label: name,
-    kind: CompletionItemKind.Property,
-    data: {
-      metadataAccessInfo: {
-        prop: name,
-        componentName: componentName,
-      },
-    },
-  };
+  return Object.keys(metadata.props).map((propName) =>
+    CompletionItemBuilder.withProp(propName).propResolveData(compName).build()
+  );
 }
 
 function markupContent(content: string): MarkupContent {
@@ -220,4 +194,51 @@ function markupContent(content: string): MarkupContent {
     kind: MarkupKind.Markdown,
     value: content,
   };
+}
+
+class CompletionItemBuilder {
+  static withComponent(name: string){
+    const item: CompletionItem = {
+      label: name,
+      kind: CompletionItemKind.Constructor
+    };
+    return new CompletionItemBuilder(item);
+  }
+
+  static withProp(propName: string){
+    const item: CompletionItem = {
+      label: propName,
+      kind: CompletionItemKind.Property
+    };
+    return new CompletionItemBuilder(item);
+  }
+
+  private item: CompletionItem;
+
+  private constructor(item: CompletionItem) {
+    this.item = item;
+  }
+
+  componentResolveData(): this {
+    const data: XmluiCompletionData = {
+      metadataAccessInfo: { componentName: this.item.label }
+    }
+    this.item.data = data;
+    return this;
+  }
+
+  propResolveData(componentName: string): this {
+    const data: XmluiCompletionData = {
+      metadataAccessInfo: {
+        componentName,
+        prop: this.item.label
+      }
+    }
+    this.item.data = data;
+    return this;
+  }
+
+  build(): CompletionItem {
+    return this.item;
+  }
 }
