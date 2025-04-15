@@ -24,12 +24,14 @@ export const MarkdownMd = createMetadata({
   },
 
   defaultThemeVars: {
+    "backgroundColor-Admonition": "$color-warn-200",
     "borderRadius-Admonition": "$space-4",
     "iconSize-Admonition": "1.5rem",
     "padding-Admonition": "1rem",
     "marginBottom-Admonition": "1rem",
     "marginLeft-Admonition-content":".5rem",
 
+    "backgroundColor-Blockquote": "$color-warn-100",
     "accentWidth-Blockquote": "3px",
     "accentColor-Blockquote": "$color-surface-500",
     "padding-Blockquote": ".5rem",
