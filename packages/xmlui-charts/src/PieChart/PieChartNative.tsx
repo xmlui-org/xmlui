@@ -16,7 +16,6 @@ import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 
 import { TooltipContent } from "../Tooltip/TooltipContent";
-import { generateColorPalette } from "../utils/colors";
 
 export type PieChartProps = {
   data: any[];
@@ -119,11 +118,48 @@ export function PieChart({
   children,
   showLegend = defaultProps.showLegend,
 }: PieChartProps) {
+  const { getThemeVar } = useTheme();
+
   const colorValues = useMemo(() => {
-    return generateColorPalette({
-      count: data?.length || 1,
-    });
-  }, [data]);
+    return [
+      getThemeVar("color-primary-500"),
+      getThemeVar("color-primary-300"),
+      getThemeVar("color-success-500"),
+      getThemeVar("color-success-300"),
+      getThemeVar("color-warn-500"),
+      getThemeVar("color-warn-300"),
+      getThemeVar("color-danger-500"),
+      getThemeVar("color-danger-300"),
+      getThemeVar("color-info-500"),
+      getThemeVar("color-info-300"),
+      getThemeVar("color-secondary-500"),
+      getThemeVar("color-secondary-300"),
+      getThemeVar("color-primary-600"),
+      getThemeVar("color-primary-400"),
+      getThemeVar("color-success-600"),
+      getThemeVar("color-success-400"),
+      getThemeVar("color-warn-600"),
+      getThemeVar("color-warn-400"),
+      getThemeVar("color-danger-600"),
+      getThemeVar("color-danger-400"),
+      getThemeVar("color-info-600"),
+      getThemeVar("color-info-400"),
+      getThemeVar("color-secondary-600"),
+      getThemeVar("color-secondary-400"),
+      getThemeVar("color-primary-900"),
+      getThemeVar("color-primary-700"),
+      getThemeVar("color-success-900"),
+      getThemeVar("color-success-700"),
+      getThemeVar("color-warn-900"),
+      getThemeVar("color-warn-700"),
+      getThemeVar("color-danger-900"),
+      getThemeVar("color-danger-700"),
+      getThemeVar("color-info-900"),
+      getThemeVar("color-info-700"),
+      getThemeVar("color-secondary-900"),
+      getThemeVar("color-secondary-700"),
+    ];
+  }, [getThemeVar]);
 
   const chartData = useMemo(() => {
     if (!data) return [];
