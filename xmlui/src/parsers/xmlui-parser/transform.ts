@@ -441,7 +441,7 @@ export function nodeToComponentDef(
         comp.uid = value;
         return;
       case "testId":
-        comp.testId = value;
+        comp.testId = parsePropertyExpression(value);
         return;
       case "when":
         comp.when = parsePropertyExpression(value);
