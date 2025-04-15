@@ -1,9 +1,9 @@
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
+import { parseParameterString } from "./script-runner/ParameterParser";
 import { Parser } from "../parsers/scripting/Parser";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { viewportSizeNames } from "../components/abstractions";
-import { parseAttributeValue } from "./script-runner/AttributeValueParser";
 
 type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
 
@@ -136,7 +136,7 @@ export function checkXmlUiMarkup(
         const propValue = currentProps[propName];
         if (typeof propValue === "string") {
           try {
-            parseAttributeValue(propValue);
+            parseParameterString(propValue);
           } catch (error) {
             reportError("M006", def.type, propName, (error as any).message);
           }

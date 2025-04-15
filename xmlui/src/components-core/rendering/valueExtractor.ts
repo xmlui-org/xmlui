@@ -1,16 +1,46 @@
 import type { MutableRefObject } from "react";
 import memoizeOne from "memoize-one";
-import { isString } from "lodash-es";
+import { isPlainObject, isString } from "lodash-es";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { MemoedVars } from "../abstractions/ComponentRenderer";
+import { parseParameterString } from "../script-runner/ParameterParser";
 import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
 import { isPrimitive, pickFromObject, shallowCompare } from "../utils/misc";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { isParsedAttributeValue, parseAttributeValue } from "../script-runner/AttributeValueParser";
+
+function parseStringArray(input: string): string[] {
+  const trimmedInput = input.trim();
+
+  if (trimmedInput.startsWith("[") && trimmedInput.endsWith("]")) {
+    const content = trimmedInput.slice(1, -1);
+    const items = content.split(",").map((item) => item.trim());
+    return items.map((item) => item.replace(/^['"]|['"]$/g, ""));
+  } else {
+    throw new Error("Invalid array format");
+  }
+}
+
+function collectParams(expression: any) {
+  const params = [];
+
+  if (typeof expression === "string") {
+    params.push(...parseParameterString(expression));
+  } else if (Array.isArray(expression)) {
+    expression.forEach((exp) => {
+      params.push(...collectParams(exp));
+    });
+  } else if (isPlainObject(expression)) {
+    Object.entries(expression).forEach(([key, value]) => {
+      params.push(...collectParams(value));
+    });
+  }
+
+  return params;
+}
 
 export function asOptionalBoolean(value: any, defValue?: boolean | undefined) {
   if (value === undefined || value === null) return defValue;
@@ -18,6 +48,7 @@ export function asOptionalBoolean(value: any, defValue?: boolean | undefined) {
     return value !== 0;
   }
   if (typeof value === "string") {
+
     value = value.trim().toLowerCase();
     if (value === "") {
       return false;
@@ -43,93 +74,64 @@ export function createValueExtractor(
   state: ContainerState,
   appContext: AppContextObject | undefined,
   referenceTrackedApi: Record<string, ComponentApi>,
-  memoedVarsRef: MutableRefObject<MemoedVars>,
+  memoedVarsRef: MutableRefObject<MemoedVars>
 ): ValueExtractor {
   // --- Extract the parameter and retrieve as is is
   const extractor = (expression?: any, strict?: boolean): any => {
     if (!expression) {
-      // --- No expression, return undefined
+      return expression;
+    }
+    if (isPrimitive(expression) && !isString(expression)) {
       return expression;
     }
 
-    // --- Parse parameters arriving as string
-    if (typeof expression === "string") {
-      expression = parseAttributeValue(expression);
-    }
-
-    if ((isPrimitive(expression) && !isString(expression)) || !isParsedAttributeValue(expression)) {
-      // --- Primitive values (except string) are returned as is
-      return expression;
-    }
-
+    let expressionString = expression;
     if (typeof expression !== "string") {
       if (strict) {
-        // --- If strict is true, we expect a string expression
         return expression;
       }
+      expressionString = JSON.stringify(expression);
     }
 
-    if (!isParsedAttributeValue(expression)) {
-      // --- All other cases should use an already parsed expression
-      throw new Error("Parsed expression expected.");
-    }
-
-    // --- Use the parseId as the cache key
-    const parseId = expression.parseId.toString();
-    if (!memoedVarsRef.current.has(parseId)) {
-      memoedVarsRef.current.set(parseId, {
-        getDependencies: memoizeOne((_, referenceTrackedApi) => {
-          // --- We parsed this variable from markup
-          const deps: string[] = [];
-          expression.segments.forEach((segment) => {
-            if (segment.expr !== undefined) {
-              deps.push(...collectVariableDependencies(segment.expr, referenceTrackedApi));
+    if (!memoedVarsRef.current.has(expressionString)) {
+      const params = collectParams(expression);
+      memoedVarsRef.current.set(expressionString, {
+        getDependencies: memoizeOne((_expressionString, referenceTrackedApi) => {
+          let ret = new Set<string>();
+          params.forEach((param) => {
+            if (param.type === "expression") {
+              ret = new Set([...ret, ...collectVariableDependencies(param.value, referenceTrackedApi)]);
             }
           });
-
-          // --- Remove duplicates
-          return [...new Set(deps)];
+          return Array.from(ret);
         }),
         obtainValue: memoizeOne(
           (expression, state, appContext, strict, deps, appContextDeps) => {
-            return extractParam(state, expression, appContext);
+            // console.log("COMP, BUST, obtain value called with", expression, state, appContext, deps,  appContextDeps);
+            return extractParam(state, expression, appContext, strict);
           },
           (
             [_newExpression, _newState, _newAppContext, _newStrict, newDeps, newAppContextDeps],
-            [
-              _lastExpression,
-              _lastState,
-              _lastAppContext,
-              _lastStrict,
-              lastDeps,
-              lastAppContextDeps,
-            ],
+            [_lastExpression, _lastState, _lastAppContext, _lastStrict, lastDeps, lastAppContextDeps]
           ) => {
-            return (
-              shallowCompare(newDeps, lastDeps) &&
-              shallowCompare(newAppContextDeps, lastAppContextDeps)
-            );
-          },
+            return shallowCompare(newDeps, lastDeps) && shallowCompare(newAppContextDeps, lastAppContextDeps);
+          }
         ),
       });
     }
-
-    // --- Obtain the cached value from the cache (now, it must be there)
-    // --- Note, we ignore the first parameter of getDependencies in the cached function
     const expressionDependencies = memoedVarsRef.current
-      .get(parseId)!
-      .getDependencies(parseId.toString(), referenceTrackedApi);
+      .get(expressionString)!
+      .getDependencies(expressionString, referenceTrackedApi);
     const depValues = pickFromObject(state, expressionDependencies);
     const appContextDepValues = pickFromObject(appContext, expressionDependencies);
-
-    // --- Return the memoed var getting the value from the current context
-    return memoedVarsRef.current.get(parseId)!.obtainValue!(
+    // console.log("COMP, obtain value called with", depValues, appContextDepValues, expressionDependencies);
+    return memoedVarsRef.current.get(expressionString)!.obtainValue!(
       expression,
       state,
       appContext,
       strict,
       depValues,
-      appContextDepValues,
+      appContextDepValues
     );
   };
 
@@ -146,10 +148,6 @@ export function createValueExtractor(
   };
 
   extractor.asDisplayText = (expression?: any) => {
-    if (typeof expression === "string") {
-      // --- If the expression is a string, return it as is
-      return expression;
-    }
     let text = extractor(expression)?.toString();
     if (text) {
       let replaced = "";
@@ -166,6 +164,20 @@ export function createValueExtractor(
       text = replaced;
     }
     return text;
+  };
+
+  // ---Extract an array of strings
+  extractor.asOptionalStringArray = (expression?: any) => {
+    const value = extractor(expression);
+    if (value === undefined || value === null) return [];
+    if (typeof value === "string" && value.trim() !== "") {
+      //console.log(parseStringArray(value));
+      return parseStringArray(value);
+    }
+    if (Array.isArray(value)) {
+      return value.map((item) => item.toString());
+    }
+    throw new Error(`An array of strings expected but ${typeof value} received.`);
   };
 
   // --- Extract a numeric value

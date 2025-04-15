@@ -15,7 +15,6 @@ import { Image } from "../Image/ImageNative";
 import { Toggle } from "../Toggle/Toggle";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
-import { parseAttributeValue } from "../../components-core/script-runner/AttributeValueParser";
 
 type MarkdownProps = {
   extractValue: ValueExtractor;
@@ -358,11 +357,10 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
     const regex = /\$\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
     const parts: string[] = node.value.split(regex);
     if (parts.length > 1) {
+      node.type = "html";
       node.value = parts
         .map((part, index) => {
-          const extracted = index % 2 === 0 
-          ? part 
-          : extractValue(parseAttributeValue(`{${part}}`));
+          const extracted = index % 2 === 0 ? part : extractValue(`{${part}}`);
           const resultExpr = mapByType(extracted);
           // The result expression might be an object, in that case we stringify it here,
           // at the last step, so that there are no unnecessary apostrophes

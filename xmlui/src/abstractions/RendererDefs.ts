@@ -77,7 +77,7 @@ export type ValueExtractor = {
    * @param expression Value expression
    * @param strict Strict matching?
    */
-  (expression?: any): any;
+  (expression?: any, strict?: boolean): any;
 
   /**
    * Get a string value from an expression
@@ -91,6 +91,12 @@ export type ValueExtractor = {
    * @param defValue Default value, if the parameter value is undefined
    */
   asOptionalString<T extends string>(expression?: any, defValue?: string): T | undefined;
+
+  /**
+   * Get an optional string value from an expression
+   * @param expression Value expression
+   */
+  asOptionalStringArray(expression?: any): (string | undefined)[];
 
   /**
    * Get a display string value from an expression
