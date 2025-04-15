@@ -1,4 +1,4 @@
-import { nodeToComponentDef } from "../../../src/parsers/xmlui-parser/transform";
+import { nodeToComponentDef, resetTransformParseId } from "../../../src/parsers/xmlui-parser/transform";
 import type {
   ComponentDef,
   CompoundComponentDef,
@@ -6,12 +6,15 @@ import type {
 import { createXmlUiParser, ParseResult } from "../../../src/parsers/xmlui-parser/parser";
 import type { GetText } from "../../../src/parsers/xmlui-parser/parser";
 import { toDbgString } from "../../../src/parsers/xmlui-parser/utils";
+import { resetAttributeValueParseId } from "../../../src/components-core/script-runner/AttributeValueParser";
 
 export function transformSource(
   source: string,
   fileId?: number,
   printRes: boolean = false,
 ): ComponentDef | CompoundComponentDef | null {
+  resetTransformParseId();
+  resetAttributeValueParseId();
   const { getText, parse } = createXmlUiParser(source);
   const { node, errors } = parse();
   if (printRes) {

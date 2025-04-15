@@ -14,7 +14,6 @@ import type { ContainerState } from "../rendering/ContainerWrapper";
 import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { usePrevious } from "../utils/hooks";
-import { flushSync } from "react-dom";
 
 /**
  * The properties of the Loader component
@@ -64,39 +63,22 @@ export function Loader({
       {
         queryKey: useMemo(()=>queryId ? queryId : [uid, extractParam(state, loader.props, appContext)], [appContext, loader.props, queryId, state, uid]),
         queryFn: useCallback<QueryFunction>(async ({ signal }) => {
-          console.log("[Loader queryFn] Starting to fetch data...");
-          try {
-            const newVar: any = await loaderFn(signal);
-            console.log("[Loader queryFn] Data received:", newVar);
-            if (newVar === undefined) {
-              console.log("[Loader queryFn] Data is undefined, returning null");
-              return null;
-            }
-            return newVar;
-          } catch (error) {
-            console.error("[Loader queryFn] Error fetching data:", error);
-            throw error;
+          const newVar: any = await loaderFn(signal);
+          if (newVar === undefined) {
+            return null;
           }
+          return newVar;
         }, [loaderFn]),
         select: useCallback((data: any)=>{
-          console.log("[Loader select] Data before transform:", data);
-          console.log("[Loader select] resultSelector:", loader.props.resultSelector);
-          console.log("[Loader select] transformResult function:", !!transformResult);
-          
           let result = data;
           const resultSelector = loader.props.resultSelector;
           if (resultSelector) {
-            console.log("[Loader select] Applying resultSelector");
             result = extractParam(
                 { $response: data },
                 resultSelector.startsWith("{") ? resultSelector : `{$response.${resultSelector}}`
             );
-            console.log("[Loader select] Result after resultSelector:", result);
           }
-          
-          const finalResult = transformResult ? transformResult(result) : result;
-          console.log("[Loader select] Final result:", finalResult);
-          return finalResult;
+          return transformResult ? transformResult(result) : result;
         }, [loader.props.resultSelector, transformResult]),
         retry: false
       }
@@ -125,24 +107,15 @@ export function Loader({
 
 
   useLayoutEffect(() => {
-    console.log("[Loader] useLayoutEffect status:", status);
-    console.log("[Loader] useLayoutEffect data:", data);
-    console.log("[Loader] useLayoutEffect prevData:", prevData);
-    console.log("[Loader] useLayoutEffect data !== prevData:", data !== prevData);
-    
     if (status === "success" && data !== prevData) {
-      console.log("[Loader] Calling loaderLoaded with data:", data);
       loaderLoaded(data);
       //we do this to push the onLoaded callback to the next event loop.
       // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have
       // access to the latest loader value
       setTimeout(()=>{
-        console.log("[Loader] Calling onLoaded with data:", data);
-        console.log("[Loader] onLoaded function exists:", !!onLoaded);
         onLoaded?.(data);
       }, 0);
     } else if (status === "error" && error !== prevError) {
-      console.log("[Loader] Calling loaderError with error:", error);
       loaderError(error);
     }
   }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status]);

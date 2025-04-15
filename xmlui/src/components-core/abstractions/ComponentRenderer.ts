@@ -2,7 +2,6 @@ import type { Dispatch, MutableRefObject, RefObject } from "react";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { LookupAsyncFnInner, LookupSyncFnInner } from "../../abstractions/ActionDefs";
-import type { CodeDeclaration } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { ComponentMetadata, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ComponentRendererContextBase } from "../../abstractions/RendererDefs";
 import type {
@@ -11,6 +10,8 @@ import type {
   RegisterComponentApiFnInner,
 } from "../rendering/ContainerWrapper";
 import type { ContainerAction } from "./containers";
+import { ParsedPropertyValue, PropertySegment } from "../../abstractions/scripting/Compilation";
+import { Expression } from "../../abstractions/scripting/ScriptingSourceTree";
 
 /**
  * This interface defines the renderer context for the XMLUI core framework components. Its implementations
@@ -61,11 +62,11 @@ export type MemoedVars = Map<
   any,
   {
     getDependencies: (
-      value: string | CodeDeclaration,
+      value: string | Expression,
       referenceTrackedApi: Record<string, ComponentApi>,
     ) => Array<string>;
     obtainValue: (
-      expression: any,
+      parsedValue: ParsedPropertyValue,
       state: ContainerState,
       appContext: AppContextObject | undefined,
       strict: boolean | undefined,

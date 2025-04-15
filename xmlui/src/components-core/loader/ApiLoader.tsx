@@ -81,7 +81,7 @@ type ApiLoaderDef = ComponentDef<typeof ApiLoaderMd>;
 
 export const apiLoaderRenderer = createLoaderRenderer(
   "ApiLoader",
-  ({ loader, state, dispatch, loaderInProgressChanged, loaderLoaded, loaderError }) => {
+  ({ loader, state, loaderInProgressChanged, loaderLoaded, loaderError }) => {
     return (
       <ApiLoader
         loader={loader}

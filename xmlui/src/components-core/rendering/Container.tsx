@@ -676,7 +676,7 @@ export const Container = memo(
       <Fragment
         key={
           node.uid
-            ? `${resolvedKey}>${extractParam(componentState, node.uid, appContext, true)}`
+            ? `${resolvedKey}>${extractParam(componentState, node.uid, appContext)}`
             : undefined
         }
       >

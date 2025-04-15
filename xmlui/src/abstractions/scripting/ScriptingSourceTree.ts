@@ -1,5 +1,6 @@
 import type { GenericToken } from "../../parsers/common/GenericToken";
 import type { TokenType } from "../../parsers/scripting/TokenType";
+import { ParsedPropertyValue, PropertySegment } from "./Compilation";
 import { ScriptParserErrorMessage } from "./ScriptParserError";
 
 // --- All binding expression tree node types
@@ -517,13 +518,7 @@ export type ScriptModule = {
 export type ModuleErrors = Record<string, ScriptParserErrorMessage[]>;
 
 export type CollectedDeclarations = {
-  vars: Record<string, CodeDeclaration>;
-  functions: Record<string, CodeDeclaration>;
+  vars: Record<string, Expression>;
+  functions: Record<string, Expression>;
   moduleErrors?: ModuleErrors;
-};
-
-export type CodeDeclaration = {
-  source?: string;
-  tree: Expression;
-  [x: string]: unknown;
 };
