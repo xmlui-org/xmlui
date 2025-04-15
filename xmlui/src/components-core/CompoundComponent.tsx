@@ -42,7 +42,7 @@ export const CompoundComponent = forwardRef(
       const resolvedProps: any = {};
       if (node.props) {
         Object.entries(node.props).forEach(([key, value]) => {
-          const extractedProp = extractValue(value);
+          const extractedProp = extractValue(value, true);
           if (extractedProp?._ARROW_EXPR_) {
             // --- Ensure arrow functions are called synchronously
             resolvedProps[key] = lookupSyncCallback(extractedProp);
@@ -133,7 +133,7 @@ export const CompoundComponent = forwardRef(
     const safeLayoutContext = layoutContext
       ? { ...layoutContext, wrapChild: undefined }
       : layoutContext;
-    const ret = renderChild(nodeWithPropsAndEvents as any, safeLayoutContext, memoedParentRenderContext);
+    const ret = renderChild(nodeWithPropsAndEvents, safeLayoutContext, memoedParentRenderContext);
     if (forwardedRef && ret && isValidElement(ret)) {
       return React.cloneElement(ret, {
         ref: composeRefs(forwardedRef, (ret as any).ref),

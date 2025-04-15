@@ -99,6 +99,19 @@ const b = 2;
     expect((cd.api as any).myMethod).toBe("\nconst a = 1;\n\nconst b = 2;\n");
   });
 
+  it("Var removes whitespaces", () => {
+    const cd = transformSource(`
+    <Text><variable name="myVar">
+const a = 1;
+
+const b = 2;
+</variable>
+    </Text>
+    `) as ComponentDef;
+    expect(cd.type).equal("Text");
+    expect(cd.vars!.myVar).toBe(" const a = 1; const b = 2; ");
+  });
+
   it("Component with html tag", () => {
     const cd = transformSource(`
     <Component name="MyComp">

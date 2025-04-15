@@ -216,7 +216,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     const resolvedLayoutProps: Record<string, any> = {};
     layoutOptionKeys.forEach((key) => {
       if (safeNode.props && key in safeNode.props) {
-        resolvedLayoutProps[key] = valueExtractor(safeNode.props[key]);
+        resolvedLayoutProps[key] = valueExtractor(safeNode.props[key], true);
       }
     });
 
@@ -293,7 +293,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     ) {
       // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
       const testId = safeNode.testId || safeNode.uid;
-      const resolvedUid = extractParam(state, testId, appContext);
+      const resolvedUid = extractParam(state, testId, appContext, true);
       renderedNode = (
         <ComponentDecorator
           attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId }}
@@ -377,7 +377,7 @@ function slotRenderer(
     slotProps = {};
     Object.keys(node.props).forEach((key) => {
       if (key !== "name") {
-        let extractedValue = extractValue(node.props[key]);
+        let extractedValue = extractValue(node.props[key], true);
         if (extractedValue?._ARROW_EXPR_) {
           extractedValue = lookupAction(extractedValue);
         }

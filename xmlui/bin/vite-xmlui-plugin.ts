@@ -10,6 +10,7 @@ import {
   moduleFileExtension,
 } from "../src/parsers/xmlui-parser/fileExtensions";
 import { Parser } from "../src/parsers/scripting/Parser";
+import * as fs from "fs";
 import * as path from "path";
 import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";
 
@@ -24,7 +25,7 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
 /**
  * Transform XMLUI files to JS objects.
  */
-export default function viteXmluiPlugin(_pluginOptions: PluginOptions = {}): Plugin {
+export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plugin {
   let itemIndex = 0;
   return {
     name: "vite:transform-xmlui",
@@ -33,12 +34,36 @@ export default function viteXmluiPlugin(_pluginOptions: PluginOptions = {}): Plu
       const moduleNameResolver = (moduleName: string) => {
         return path.resolve(path.dirname(id), moduleName);
       };
+      const moduleResolver = (parentModule: string, moduleName: string) => {
+        // --- Try with .xmlui.xs extension, and then with .xs.
+        try {
+          const modulePath = path.resolve(
+            path.dirname(id),
+            `${moduleName}.${codeBehindFileExtension}`,
+          );
+          return fs.readFileSync(modulePath, {
+            encoding: "utf8",
+          });
+        } catch {
+          try {
+            return fs.readFileSync(
+              path.resolve(path.dirname(id), `${moduleName}.${moduleFileExtension}`),
+              {
+                encoding: "utf8",
+              },
+            );
+          } catch (err) {
+            throw err;
+          }
+        }
+      };
 
       if (xmluiExtension.test(id)) {
         const fileId = "" + itemIndex++;
         let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
           code,
           fileId,
+          moduleResolver,
         );
         if (errors.length > 0) {
           component = errReportComponent(errors, id, erroneousCompoundComponentName);
@@ -88,4 +113,3 @@ export default function viteXmluiPlugin(_pluginOptions: PluginOptions = {}): Plu
     // }
   };
 }
-

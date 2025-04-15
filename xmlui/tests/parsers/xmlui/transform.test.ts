@@ -1,7 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
-import { ParsedPropertyValue } from "../../../src/abstractions/scripting/Compilation";
 
 describe("Xmlui transform", () => {
   it("Empty code results in error", () => {
@@ -44,19 +43,13 @@ describe("Xmlui transform", () => {
   it("Compound component needs a component child #1", () => {
     const cd = transformSource("<Component name='MyComp'><!-- comment--></Component>") as CompoundComponentDef;
     expect((cd.component).type).equal("TextNode");
-    const value = (cd.component).props.value as ParsedPropertyValue;
-    expect(value.__PARSED).equal(true);
-    expect(value.parseId).toBeGreaterThan(0);
-    expect(value.segments).toHaveLength(0);
+    expect(((cd.component).props as any).value).equal("");
   });
 
   it("Compound component needs a component child #2", () => {
     const cd = transformSource("<Component name='MyComp'></Component>") as CompoundComponentDef;
     expect((cd.component).type).equal("TextNode");
-    const value = (cd.component).props.value as ParsedPropertyValue;
-    expect(value.__PARSED).equal(true);
-    expect(value.parseId).toBeGreaterThan(0);
-    expect(value.segments).toHaveLength(0);
+    expect(((cd.component).props as any).value).equal("");
   });
 
   it("Compound component cannot nest another one", () => {
