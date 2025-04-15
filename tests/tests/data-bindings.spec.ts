@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test";
 import { initApp } from "./component-test-helpers";
-import { ApiInterceptorDefinition } from "xmlui";
 
 const MyComponent = `
   <Component name="MyComponent">
@@ -8,7 +7,7 @@ const MyComponent = `
   </Component>
 `;
 
-const apiInterceptor: ApiInterceptorDefinition = {
+const apiInterceptor = {
   operations: {
     "load-api-data": {
       url: "/api/data",
@@ -94,7 +93,7 @@ test("datasource reference outside of implicit container", async ({ page }) => {
   await expect(page.getByTestId("dataValue")).toHaveText("STRING_DATA_FROM_API");
 });
 
-test.skip("datasource value as data", async ({ page }) => {
+test("datasource value as data", async ({ page }) => {
   await initApp(page, {
     entryPoint: `
       <Fragment>

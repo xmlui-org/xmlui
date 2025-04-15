@@ -70,7 +70,7 @@ export function lintApp({
     })
   };
 
-  const compoundCompLints: ComponentLints[] = (appDef.components ?? [] as any)
+  const compoundCompLints: ComponentLints[] = (appDef.components ?? [])
     .map((c) => {
       const lints = lint({
         component: c,

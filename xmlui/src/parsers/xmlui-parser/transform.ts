@@ -8,10 +8,6 @@ import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import { ParsedEventValue } from "../../abstractions/scripting/Compilation";
-import {
-  isParsedAttributeValue,
-  parseAttributeValue,
-} from "../../components-core/script-runner/AttributeValueParser";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -44,14 +40,6 @@ const HelperNode = {
 } as const;
 
 let lastParseId = 0;
-
-export function resetTransformParseId() {
-  lastParseId = 0;
-}
-
-export function createTransformParseId() {
-  return lastParseId++;
-}
 
 export function nodeToComponentDef(
   node: Node,
@@ -147,7 +135,7 @@ export function nodeToComponentDef(
     if (varsAttrs.length > 0) {
       vars = {};
       varsAttrs.forEach((attr) => {
-        vars![attr.name] = parsePropertyExpression(attr.value);
+        vars![attr.name] = attr.value;
       });
     }
 
@@ -312,7 +300,7 @@ export function nodeToComponentDef(
             (name, value) => {
               if (!isComponent(comp)) return;
               comp.props ??= {};
-              comp.props[name] = comp.type === "TextNodeCData" ? value : parsePropertyExpression(value);
+              comp.props[name] = value;
             },
           );
           return;
@@ -327,7 +315,7 @@ export function nodeToComponentDef(
             (name, value) => {
               if (!isComponent(comp)) return;
               comp.events ??= {};
-              comp.events[name] = parseEventCode(value);
+              comp.events[name] = parseEvent(value);
             },
             (name) => {
               if (onPrefixRegex.test(name)) {
@@ -347,7 +335,7 @@ export function nodeToComponentDef(
             (name, value) => {
               if (!isComponent(comp)) return;
               comp.vars ??= {};
-              comp.vars[name] = parsePropertyExpression(value);
+              comp.vars[name] = value;
             },
           );
           return;
@@ -441,28 +429,28 @@ export function nodeToComponentDef(
         comp.uid = value;
         return;
       case "testId":
-        comp.testId = parsePropertyExpression(value);
+        comp.testId = value;
         return;
       case "when":
-        comp.when = parsePropertyExpression(value);
+        comp.when = value;
         return;
       default:
         if (startSegment === "var") {
           comp.vars ??= {};
-          comp.vars[name] = parsePropertyExpression(value);
+          comp.vars[name] = value;
         } else if (startSegment === "method") {
           comp.api ??= {};
           comp.api[name] = value;
         } else if (startSegment === "event") {
           comp.events ??= {};
-          comp.events[name] = parseEventCode(value);
+          comp.events[name] = parseEvent(value);
         } else if (onPrefixRegex.test(name)) {
           comp.events ??= {};
           const eventName = name[2].toLowerCase() + name.substring(3);
-          comp.events[eventName] = parseEventCode(value);
+          comp.events[eventName] = parseEvent(value);
         } else {
           comp.props ??= {};
-          comp.props[name] = comp.type === "TextNodeCData" ? value : parsePropertyExpression(value);
+          comp.props[name] = value;
         }
         return;
     }
@@ -1023,47 +1011,29 @@ export function nodeToComponentDef(
       }
     }
   }
-}
 
-export function parseEventCode(value: any): any {
-  if (typeof value !== "string") {
-    // --- It must be a component definition in the event code
-    return value;
-  }
-
-  // --- Parse the event code
-  const parser = new Parser(value);
-  try {
-    const statements = parser.parseStatements();
-    return {
-      __PARSED: true,
-      statements,
-      parseId: ++lastParseId,
-      // TODO: retrieve the event source code only in dev mode
-      source: value,
-    } as ParsedEventValue;
-  } catch {
-    if (parser.errors.length > 0) {
-      const errMsg = parser.errors[0];
-      throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+  function parseEvent(value: any): any {
+    if (typeof value !== "string") {
+      // --- It must be a component definition in the event code
+      return value;
     }
-  }
-}
 
-export function parsePropertyExpression(value: any): any {
-  if (typeof value !== "string") {
-    // --- It must be a component definition in the property value
-    return value;
-  }
-
-  // --- Parse the event code
-  const parser = new Parser(value);
-  try {
-    return parseAttributeValue(value);
-  } catch {
-    if (parser.errors.length > 0) {
-      const errMsg = parser.errors[0];
-      throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+    // --- Parse the event code
+    const parser = new Parser(value);
+    try {
+      const statements = parser.parseStatements();
+      return {
+        __PARSED: true,
+        statements,
+        parseId: ++lastParseId,
+        // TODO: retrieve the event source code only in dev mode
+        source: value,
+      } as ParsedEventValue;
+    } catch {
+      if (parser.errors.length > 0) {
+        const errMsg = parser.errors[0];
+        throw new ParserError(`${errMsg.text} [${errMsg.line}: ${errMsg.column}]`, errMsg.code);
+      }
     }
   }
 }
@@ -1161,8 +1131,6 @@ function mergeValue(oldValue: any, itemValue: any): any {
         oldValue.push(itemValue);
         return oldValue;
       }
-    } else if (isParsedAttributeValue(oldValue)) {
-      return [oldValue, parsePropertyExpression(itemValue)];
     } else {
       return [oldValue, itemValue];
     }

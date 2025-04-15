@@ -2,38 +2,57 @@ import { expect, test } from "@playwright/test";
 import { initApp } from "./component-test-helpers";
 
 test("has app title", async ({ page }) => {
-  const entryPoint = `<Text />`;
   await initApp(page, {
     name: "Test app title",
-    entryPoint,
+    entryPoint: {
+      type: "Text",
+    },
   });
 
   await expect(page).toHaveTitle("Test app title");
 });
 
 test("can render text", async ({ page }) => {
-  const entryPoint = `<Text testId="textComponent" value="stuff" />`;
   await initApp(page, {
-    entryPoint,
+    entryPoint: {
+      type: "Text",
+      testId: "textComponent",
+      props: {
+        value: "stuff",
+      },
+    },
   });
 
   await expect(page.getByTestId("textComponent")).toHaveText("stuff");
 });
 
 test("can render button", async ({ page }) => {
-  const entryPoint = `
-    <Stack var.counter="{0}" >
-      <Button
-        testId="buttonComponent"
-        label="click me"
-        onClick="counter++" />
-      <Text
-        testId="textComponent"
-        value="{counter}" />
-    </Stack>
-  `;
   await initApp(page, {
-    entryPoint,
+    entryPoint: {
+      type: "Stack",
+      vars: {
+        counter: 0,
+      },
+      children: [
+        {
+          type: "Button",
+          testId: "buttonComponent",
+          props: {
+            label: "click me",
+          },
+          events: {
+            click: "counter++",
+          },
+        },
+        {
+          type: "Text",
+          testId: "textComponent",
+          props: {
+            value: "{counter}",
+          },
+        },
+      ],
+    },
   });
 
   await page.getByTestId("buttonComponent").click();

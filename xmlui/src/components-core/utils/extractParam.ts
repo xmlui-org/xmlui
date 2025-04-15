@@ -4,11 +4,10 @@ import { isPlainObject } from "lodash-es";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 
+import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
 import { LRUCache } from "../utils/LruCache";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { isParsedAttributeValue } from "../script-runner/AttributeValueParser";
-import { ParsedPropertyValue } from "../../abstractions/scripting/Compilation";
 
 /**
  * Extract the value of the specified parameter from the given view container state
@@ -23,36 +22,41 @@ export function extractParam(
   state: ContainerState,
   param: any,
   appContext: AppContextObject | undefined = undefined,
+  strict: boolean = false, // --- In this case we only allow string binding expression
   extractContext: { didResolve: boolean } = { didResolve: false },
 ): any {
-  if (isParsedAttributeValue(param)) {
-    // --- The param is a parsed attribute value
-    if (param.segments.length === 1) {
-      // --- We have a single literal or expression
-      if (param.segments[0].expr !== undefined) {
-        // --- Expression
+  if (typeof param === "string") {
+    const paramSegments = parseParameterString(param);
+    if (paramSegments.length === 0) {
+      // --- The param is an empty string, retrieve it
+      return param;
+    }
+
+    if (paramSegments.length === 1) {
+      // --- We have a single string literal or expression
+      if (paramSegments[0].type === "literal") {
+        // --- No expression to evaluate
+        return paramSegments[0].value;
+      } else {
+        // --- We have a single expression to evaluate
         extractContext.didResolve = true;
-        const evaluated = evalBinding(param.segments[0].expr, {
+        return evalBinding(paramSegments[0].value, {
           localContext: state,
           appContext,
           options: {
             defaultToOptionalMemberAccess: true,
           },
         });
-        return evaluated;
-      } else {
-        // --- Literal
-        return param.segments[0].literal;
       }
     }
-
-    // --- We have multiple segments. Evaluate all expressions and convert them to strings
+    // --- At this point, we have multiple segments. Evaluate all expressions and convert them to strings
     let result = "";
-    param.segments.forEach((ps) => {
-      if (ps.expr !== undefined) {
-        // --- Expression: add its string representation
+    paramSegments.forEach((ps) => {
+      if (ps.type === "literal") {
+        result += ps.value;
+      } else {
         extractContext.didResolve = true;
-        const exprValue = evalBinding(ps.expr, {
+        const exprValue = evalBinding(ps.value, {
           localContext: state,
           appContext,
           options: {
@@ -66,19 +70,22 @@ export function extractParam(
         } else if (exprValue?.toString) {
           result += exprValue.toString();
         }
-      } else {
-        // --- Literal: add its value
-        result += ps.literal;
       }
     });
     return result;
+  }
+
+  if (strict) {
+    // --- As we allow only string parameters as binding expressions, we return with the provided
+    // --- *not string* parameter without transforming it
+    return param;
   }
 
   // --- Resolve each array item
   if (Array.isArray(param)) {
     const arrayExtractContext = { didResolve: false };
     let resolvedChildren = param.map((childParam) =>
-      extractParam(state, childParam, appContext, arrayExtractContext),
+      extractParam(state, childParam, appContext, false, arrayExtractContext),
     );
     if (arrayExtractContext.didResolve) {
       extractContext.didResolve = true;
@@ -92,7 +99,7 @@ export function extractParam(
     const objectExtractContext = { didResolve: false };
     const substitutedObject: Record<string, any> = {};
     Object.entries(param).forEach(([key, value]) => {
-      substitutedObject[key] = extractParam(state, value, appContext, objectExtractContext);
+      substitutedObject[key] = extractParam(state, value, appContext, false, objectExtractContext);
     });
     if (objectExtractContext.didResolve) {
       extractContext.didResolve = true;
@@ -141,15 +148,14 @@ export function withStableObjectReference(object: any) {
 }
 
 export function shouldKeep(
-  when: string | boolean | ParsedPropertyValue | undefined,
+  when: string | boolean | undefined,
   componentState: ContainerState,
   appContext?: AppContextObject,
 ) {
   if (when === undefined) {
     return true;
   }
-  const whenValue = extractParam(componentState, when, appContext);
-  return typeof whenValue === "string" ? (whenValue === "false" ? false : true) : !!whenValue;
+  return extractParam(componentState, when, appContext, true);
 }
 
 /**
@@ -283,6 +289,13 @@ export class PropsTrasform<T extends NodeProps> {
     >;
   }
 
+  asOptionalStringArray<K extends keyof T>(...key: K[]) {
+    return this.mapValues(key, this.extractValue.asOptionalString) as Record<
+      string,
+      ReturnType<ValueExtractor["asOptionalStringArray"]>
+    >;
+  }
+
   asDisplayText<K extends keyof T>(...key: K[]) {
     return this.mapValues(key, this.extractValue.asDisplayText) as Record<
       string,
@@ -319,7 +332,7 @@ export class PropsTrasform<T extends NodeProps> {
    */
   asRest(): T {
     const filteredKeys = Object.keys(this.nodeProps).filter(
-      (propKey) => !this.usedKeys.includes(propKey as keyof T),
+      (propKey) => !this.usedKeys.includes(propKey as keyof T)
     );
     return this.mapValues(filteredKeys, this.extractValue) as T;
   }
