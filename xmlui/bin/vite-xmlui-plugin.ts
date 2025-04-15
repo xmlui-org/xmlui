@@ -34,36 +34,12 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       const moduleNameResolver = (moduleName: string) => {
         return path.resolve(path.dirname(id), moduleName);
       };
-      const moduleResolver = (parentModule: string, moduleName: string) => {
-        // --- Try with .xmlui.xs extension, and then with .xs.
-        try {
-          const modulePath = path.resolve(
-            path.dirname(id),
-            `${moduleName}.${codeBehindFileExtension}`,
-          );
-          return fs.readFileSync(modulePath, {
-            encoding: "utf8",
-          });
-        } catch {
-          try {
-            return fs.readFileSync(
-              path.resolve(path.dirname(id), `${moduleName}.${moduleFileExtension}`),
-              {
-                encoding: "utf8",
-              },
-            );
-          } catch (err) {
-            throw err;
-          }
-        }
-      };
 
       if (xmluiExtension.test(id)) {
         const fileId = "" + itemIndex++;
         let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
           code,
           fileId,
-          moduleResolver,
         );
         if (errors.length > 0) {
           component = errReportComponent(errors, id, erroneousCompoundComponentName);
@@ -91,10 +67,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           ? id.substring(0, id.length - (codeBehindFileExtension.length + 1))
           : id.substring(0, id.length - (moduleFileExtension.length + 1));
 
-        const codeBehind = collectCodeBehindFromSource(
-          moduleNameResolver(moduleName),
-          code,
-        );
+        const codeBehind = collectCodeBehindFromSource(moduleNameResolver(moduleName), code);
         removeCodeBehindTokensFromTree(codeBehind);
 
         // TODO: Add error handling.

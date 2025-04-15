@@ -46,6 +46,7 @@ import {
 } from "../parsers/xmlui-parser/lint";
 import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
 import { ThemeDefinition, ThemeTone } from "../abstractions/ThemingDefs";
+import { ProjectCompilation } from "../abstractions/scripting/Compilation";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -88,7 +89,7 @@ function StandaloneApp({
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
-  const standaloneApp = useStandalone(appDef, runtime, extensionManager);
+  const { standaloneApp } = useStandalone(appDef, runtime, extensionManager);
   usePrintVersionNumber(standaloneApp);
 
   if (!standaloneApp) {
@@ -285,6 +286,7 @@ function matchesFolder(path: string, folderName: string) {
 function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription {
   // --- Collect the components and their sources. We pass the sources to the standalone app
   // --- so that it can be used for error display and debugging purposes.
+  console.log("runtime", runtime);
   const sources: Record<string, string> = {};
   const componentsByFileName: Record<string, CompoundComponentDef> = {};
   const codeBehindsByFileName: Record<string, CollectedDeclarations> = {};
@@ -443,10 +445,11 @@ function useStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
   runtime: Record<string, any> = EMPTY_OBJECT,
   extensionManager?: StandaloneExtensionManager,
-): StandaloneAppDescription | null {
+): { standaloneApp: StandaloneAppDescription | null; projectCompilation?: ProjectCompilation } {
   const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(() => {
     // --- Initialize the standalone app
     const resolvedRuntime = resolveRuntime(runtime);
+    console.log("resolvedRuntime", resolvedRuntime);
     const appDef = mergeAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
 
     // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
@@ -464,6 +467,7 @@ function useStandalone(
     // --- No standalone app yet, we need to get that from the fetched source code
     return null;
   });
+  const [projectCompilation, setProjectCompilation] = useState<ProjectCompilation>(null);
 
   useIsomorphicLayoutEffect(() => {
     (async function () {
@@ -785,7 +789,7 @@ function useStandalone(
       setStandaloneApp(newAppDef);
     })();
   }, [runtime, standaloneAppDef]);
-  return standaloneApp;
+  return { standaloneApp };
 }
 
 /**
