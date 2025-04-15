@@ -28,6 +28,9 @@ export async function getViteConfig({
   }
 
   return defineConfig({
+    worker:{
+      format: "es"
+    },
     plugins: [react(), svgr(), ViteYaml(), ViteXmlui({}), ...(overrides.plugins || [])],
     base: withRelativeRoot ? "" : undefined,
     // experimental: {
@@ -45,13 +48,7 @@ export async function getViteConfig({
       alias: overrides.resolve?.alias,
     },
     css: overrides.css,
-    optimizeDeps: {
-        esbuildOptions: {
-            plugins: [
-                importMetaUrlPlugin
-            ]
-        },
-    },
+    optimizeDeps: overrides.optimizeDeps,
     build: {
       rollupOptions: {
         input: path.resolve(process.cwd(), "index.html"),

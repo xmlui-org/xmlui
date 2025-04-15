@@ -9,12 +9,13 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 import loader from "@monaco-editor/loader";
-import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
-import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
-import xmluiLight from "../syntax/monaco/xmlui-light";
-import xmluiDark from "../syntax/monaco/xmlui-dark";
+import { XmluiGrammar } from "../editor/syntax/monaco/grammar.monacoLanguage";
+import { XmluiScripGrammar } from "../editor/syntax/monaco/xmluiscript.monacoLanguage";
+import xmluiLight from "../editor/syntax/monaco/xmlui-light";
+import xmluiDark from "../editor/syntax/monaco/xmlui-dark";
 
 export const DevTools = () => {
+  console.log("DEVTOOLS BAK");
   const [side, setSide] = useState<"bottom" | "left" | "right">("bottom");
   const { root, activeThemeTone } = useTheme();
   const context = useDevTools();

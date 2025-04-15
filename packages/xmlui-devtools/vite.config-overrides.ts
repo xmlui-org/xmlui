@@ -1,11 +1,11 @@
 import vsixPlugin from '@codingame/monaco-vscode-rollup-vsix-plugin';
-import importMetaUrlPlugin from '@codingame/esbuild-import-meta-url-plugin';
+// import importMetaUrlPlugin from '@codingame/esbuild-import-meta-url-plugin';
 
 export default {
   optimizeDeps: {
       esbuildOptions: {
           plugins: [
-              importMetaUrlPlugin
+              // importMetaUrlPlugin
           ]
       },
       include: [

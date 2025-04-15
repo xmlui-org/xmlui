@@ -6,8 +6,7 @@ const COMP = "DevTools";
 export const EditorMd = createMetadata({
   description: "XMLUI DevTools component.",
   status: "experimental",
-  props: {
-  },
+  props: {},
   themeVars: parseScssVar({}),
   defaultThemeVars: {},
 });
@@ -16,8 +15,6 @@ export const devToolsComponentRenderer = createComponentRenderer(
   COMP,
   EditorMd,
   ({ extractValue, node, layoutCss, renderChild }: any) => {
-    return (
-      <DevTools />
-    );
+    return <DevTools />;
   },
 );
