@@ -75,7 +75,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         // should be checked for errors and warnings. If there are errors, throw an error.
 
         return {
-          code: dataToEsm(codeBehind),
+          code: dataToEsm({...codeBehind, src: code}),
           map: { mappings: "" },
         };
       }

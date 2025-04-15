@@ -16,6 +16,160 @@ test("Can render empty", async ({ page }) => {
   await expect(page.getByTestId("text0")).toBeEmpty();
 });
 
+test("Can render undefined #1", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">{undefined}</Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toBeEmpty();
+});
+
+test("Can render undefined #2", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">abc{undefined}def</Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("abcdef");
+});
+
+test("Can render undefined #3", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">{undefined}def</Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("def");
+});
+
+test("Can render undefined #4", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">abc{undefined}</Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("abc");
+});
+
+test("Can render null #1", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">{null}</Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toBeEmpty();
+});
+
+test("Can render null #2", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">abc{null}def</Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("abcdef");
+});
+
+test("Can render null #3", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">{null}def</Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("def");
+});
+
+test("Can render null #4", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">abc{null}</Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("abc");
+});
+
+test("Cuts leading whitespace #1", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">   {123}</Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("123");
+});
+
+test("Cuts leading whitespace #2", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">   {Math.sqrt(9)}</Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("3");
+});
+
+test("Cuts trailing whitespace #1", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">{123}  </Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("123");
+});
+
+test("Cuts trailing whitespace #2", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">{Math.sqrt(9)}   </Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("3");
+});
+
+test("Cuts wrapping whitespace #1", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">   {123}  </Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("123");
+});
+
+test("Cuts wrapping whitespace #2", async ({ page }) => {
+  const entryPoint = `<Text testId="text0">   {Math.sqrt(9)}   </Text>`;
+
+  await initApp(page, {
+    entryPoint,
+  });
+
+  await expect(page.getByTestId("text0")).toBeAttached();
+  await expect(page.getByTestId("text0")).toHaveText("3");
+});
+
 test("Implicit text", async ({ page }) => {
   const EXPECTED = "test content";
   const entryPoint = `<Fragment>${EXPECTED}</Fragment>`;
