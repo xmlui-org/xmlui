@@ -340,7 +340,8 @@ function useMergedState(localVars: ContainerState, componentState: ContainerStat
   return useShallowCompareMemoize(merged);
 }
 
-// This hook resolves variables to their current value (using binding expression evaluation)
+
+// --- This hook resolves variables to their current value (using binding expression evaluation)
 function useVars(
   vars: ContainerState = EMPTY_OBJECT,
   fnDeps: Record<string, Array<string>> = EMPTY_OBJECT,
@@ -358,7 +359,7 @@ function useVars(
       if (key === "$props") {
         // --- We already resolved props in a compound component
         ret[key] = value;
-      } else if (!isParsedAttributeValue(value) && !isExpression(value)) {
+      } else if (!isParsedAttributeValue(value) && !isExpression(value) && typeof value !== "string") {
         ret[key] = value;
       }
 

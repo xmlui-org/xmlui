@@ -130,92 +130,143 @@ test("Array.map works with the binding engine", async ({ page }) => {
   await expect(page.getByTestId("button")).toHaveText('[{"id":1},{"id":2},{"id":3}]');
 });
 
-test.skip("Compound components works", async ({ page }) => {
+test("Compound components works", async ({ page }) => {
+  const entryPoint = `
+    <TestButton
+      var.counter1="{0}"
+      var.counter2="{0}"
+      var.counter3="{0}"
+      id="test button used"
+      debug
+      label1="Button1 {counter1}"
+      label2="Button2 {counter2}"
+      label3="Button3 {counter3}"
+      onClick1="counter1++"
+      onClick2="counter2++"
+      onClick3="counter3++" />
+  `;
+  const components = [
+    `
+      <Component name="AnotherTestButton">
+        <Button
+          id="test button inner compound inner1"
+          debug
+          label="{$props.label}"
+          onClick="emitEvent('click')" />
+      </Component>
+    `,
+    `
+      <Component name="TestButton">
+        <Stack>
+          <Button
+            id="test button inner1"
+            testId="button1"
+            debug
+            label="{$props.label1}"
+            onClick="emitEvent('click1')" />
+          <Button
+            testId="button2"
+            id="test button inner2"
+            debug
+            label="{$props.label2}"
+            onClick="emitEvent('click2')" />
+          <AnotherTestButton
+            testId="button3"
+            id="test button inner compound"
+            debug
+            label="{$props.label3}"
+            onClick="emitEvent('click3')" />
+        </Stack>
+      </Component>
+    `,
+  ];
   await initApp(page, {
     name: "Compound component",
-    components: [
-      {
-        name: "AnotherTestButton",
-        component: {
-          type: "Button",
-          uid: "test button inner compound inner1",
-          props: {
-            debug: true,
-            label: "{$props.label}",
-          },
-          events: {
-            click: "emitEvent('click')",
-          },
-        },
-      },
-      {
-        name: "TestButton",
-        component: {
-          type: "Stack",
-          props: {
-            debug: true,
-          },
-          children: [
-            {
-              type: "Button",
-              uid: "test button inner1",
-              testId: "button1",
-              props: {
-                debug: true,
-                label: "{$props.label1}",
-              },
-              events: {
-                click: "emitEvent('click1')",
-              },
-            },
-            {
-              type: "Button",
-              testId: "button2",
-              uid: "test button inner2",
-              props: {
-                debug: true,
-                label: "{$props.label2}",
-              },
-              events: {
-                click: "emitEvent('click2')",
-              },
-            },
-            {
-              type: "AnotherTestButton",
-              testId: "button3",
-              uid: "test button inner compound",
-              props: {
-                debug: true,
-                label: "{$props.label3}",
-              },
-              events: {
-                click: "emitEvent('click3')",
-              },
-            },
-          ],
-        },
-      },
-    ],
-    entryPoint: {
-      type: "TestButton",
-      vars: {
-        counter1: 0,
-        counter2: 0,
-        counter3: 0,
-      },
-      uid: "test button used",
-      props: {
-        debug: true,
-        label1: "Button1 {counter1}",
-        label2: "Button2 {counter2}",
-        label3: "Button3 {counter3}",
-      },
-      events: {
-        click1: "counter1++",
-        click2: "counter2++",
-        click3: "counter3++",
-      },
-    },
+    components,
+    // : [
+    //   {
+    //     name: "AnotherTestButton",
+    //     component: {
+    //       type: "Button",
+    //       uid: "test button inner compound inner1",
+    //       props: {
+    //         debug: true,
+    //         label: "{$props.label}",
+    //       },
+    //       events: {
+    //         click: "emitEvent('click')",
+    //       },
+    //     },
+    //   },
+    //   {
+    //     name: "TestButton",
+    //     component: {
+    //       type: "Stack",
+    //       props: {
+    //         debug: true,
+    //       },
+    //       children: [
+    //         {
+    //           type: "Button",
+    //           uid: "test button inner1",
+    //           testId: "button1",
+    //           props: {
+    //             debug: true,
+    //             label: "{$props.label1}",
+    //           },
+    //           events: {
+    //             click: "emitEvent('click1')",
+    //           },
+    //         },
+    //         {
+    //           type: "Button",
+    //           testId: "button2",
+    //           uid: "test button inner2",
+    //           props: {
+    //             debug: true,
+    //             label: "{$props.label2}",
+    //           },
+    //           events: {
+    //             click: "emitEvent('click2')",
+    //           },
+    //         },
+    //         {
+    //           type: "AnotherTestButton",
+    //           testId: "button3",
+    //           uid: "test button inner compound",
+    //           props: {
+    //             debug: true,
+    //             label: "{$props.label3}",
+    //           },
+    //           events: {
+    //             click: "emitEvent('click3')",
+    //           },
+    //         },
+    //       ],
+    //     },
+    //   },
+    // ],
+    entryPoint,
+    // : {
+    //   type: "TestButton",
+    //   vars: {
+    //     counter1: 0,
+    //     counter2: 0,
+    //     counter3: 0,
+    //   },
+    //   uid: "test button used",
+    //   props: {
+    //     debug: true,
+    //     label1: "Button1 {counter1}",
+    //     label2: "Button2 {counter2}",
+    //     label3: "Button3 {counter3}",
+    //   },
+    //   events: {
+    //     click1: "counter1++",
+    //     click2: "counter2++",
+    //     click3: "counter3++",
+    //   },
+    // },
   });
   await page.getByTestId("button1").click();
   await page.getByTestId("button1").click();
@@ -324,50 +375,27 @@ test("Array.map works in an event #3", async ({ page }) => {
 });
 
 test("Access var in parent container", async ({ page }) => {
+  const entryPoint = `
+    <Fragment
+      var.isOpen="{false}">
+      <Text
+        testId="text"
+        value="isOpen: {isOpen}" />
+      <Fragment>
+        <Button
+          testId="button1"
+          label="toggle isOpen: {isOpen}"
+          onClick="isOpen = !isOpen" />
+        <Button
+          testId="button2"
+          var.fullyUnrelatedStuff="stuff"
+          label="other toggle (in another nested container) isOpen: {isOpen}"
+          onClick="isOpen = !isOpen" />
+      </Fragment>
+    </Fragment>  
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Fragment",
-      vars: {
-        isOpen: false,
-      },
-      children: [
-        {
-          type: "Text",
-          testId: "text",
-          props: {
-            value: "isOpen: {isOpen}",
-          },
-        },
-        {
-          type: "Fragment",
-          children: [
-            {
-              type: "Button",
-              testId: "button1",
-              props: {
-                label: "toggle isOpen: {isOpen}",
-              },
-              events: {
-                click: "isOpen = !isOpen",
-              },
-            },
-          ],
-        },
-        {
-          type: "Button",
-          testId: "button2",
-          vars: {
-            fullyUnrelatedStuff: "stuff",
-          },
-          props: {
-            label: "other toggle (in another nested container) isOpen: {isOpen}",
-          },
-          events: {
-            click: "isOpen = !isOpen",
-          },
-        },
-      ],
-    },
+    entryPoint,
   });
 
   await expect(page.getByTestId("text")).toHaveText("isOpen: false");
@@ -382,20 +410,15 @@ test("Access var in parent container", async ({ page }) => {
 });
 
 test("Setting null-values variable works", async ({ page }) => {
+  const entryPoint = `
+    <Button
+      testId="button"
+      label="{stuff}"
+      var.stuff="{null}"
+      onClick="stuff=0" />
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Button",
-      testId: "button",
-      props: {
-        label: "{stuff}",
-      },
-      vars: {
-        stuff: null,
-      },
-      events: {
-        click: "stuff=0",
-      },
-    },
+    entryPoint,
   });
 
   await page.getByTestId("button").click();
@@ -403,91 +426,58 @@ test("Setting null-values variable works", async ({ page }) => {
 });
 
 test("Async hell", async ({ page }) => {
-  await initApp(page, {
-    entryPoint: {
-      type: "Stack",
-      vars: {
-        asyncValue: {
-          valami: {
-            counter: 0,
-            counter2: 0,
-          },
-        },
-        stuff: {
+  const entryPoint = `
+    <Stack
+      var.asyncValue="{{
+        valami: {
+          counter: 0,
+          counter2: 0,
+        }
+      }}"
+      var.stuff="{{
           a: {
             b: {
               c: 0,
             },
           },
-        },
-        results: {},
-
-        getResult: "{()=> { delay(100); return asyncValue.valami.counter} }",
-        set1: `{()=> {
-      if( !results['set1'] ){ results['set1'] = {}; }
-      results['set1'].setting = true;
-      asyncValue.valami.counter += 1;
-      results['set1'].value = asyncValue.valami.counter; 
-      results['set1'].setting = false;
-     }}`,
-        set2: `{()=> {
-      if(!results['set2']){ results['set2'] = {}; };
-      results['set2'].setting = true;
-      const res = getResult();
-      asyncValue.valami.counter2 += res; 
-      results['set2'].value = asyncValue.valami.counter2; 
-      results['set2'].setting = false;
-    }}`,
-      },
-      children: [
-        {
-          type: "Text",
-          testId: "text1",
-          props: {
-            value: "{JSON.stringify(asyncValue.valami)}",
-          },
-        },
-        {
-          type: "Text",
-          testId: "text2",
-          props: {
-            value: "{JSON.stringify(results)}",
-          },
-        },
-        {
-          type: "Stack",
-          children: [
-            {
-              type: "Button",
-              testId: "button1",
-              props: {},
-              events: {
-                click: "set1();",
-              },
-            },
-          ],
-          events: {
-            mounted: "set1()",
-          },
-        },
-        {
-          type: "Stack",
-          children: [
-            {
-              type: "Button",
-              testId: "button2",
-              props: {},
-              events: {
-                click: "set2();",
-              },
-            },
-          ],
-          events: {
-            mounted: "set2()",
-          },
-        },
-      ],
-    },
+        }}"
+      var.results="{{}}"
+      var.getResult="{()=> { delay(100); return asyncValue.valami.counter} }"
+      var.set1="{()=> {
+          if( !results['set1'] ){ results['set1'] = {}; }
+          results['set1'].setting = true;
+          asyncValue.valami.counter += 1;
+          results['set1'].value = asyncValue.valami.counter; 
+          results['set1'].setting = false;
+        }}"
+      var.set2="{()=> {
+          if(!results['set2']){ results['set2'] = {}; };
+          results['set2'].setting = true;
+          const res = getResult();
+          asyncValue.valami.counter2 += res; 
+          results['set2'].value = asyncValue.valami.counter2; 
+          results['set2'].setting = false;
+        }}">
+      <Text
+        testId="text1"
+        value="{JSON.stringify(asyncValue.valami)}" />
+      <Text
+        testId="text2"
+        value="{JSON.stringify(results)}" />
+      <Stack onMounted="set1()">
+        <Button
+          testId="button1"
+          onClick="set1();" />
+      </Stack>
+      <Stack onMounted="set2()">
+        <Button
+          testId="button2"
+          onClick="set2();" />
+      </Stack>
+    </Stack>
+  `;
+  await initApp(page, {
+    entryPoint,
   });
 
   await expect(page.getByTestId("text1")).toHaveText('{"counter":1,"counter2":1}');
@@ -509,45 +499,27 @@ test("Async hell", async ({ page }) => {
 });
 
 test("Async return value works", async ({ page }) => {
+  const entryPoint = `
+    <Stack
+      var.counter="{0}"
+      var.getResult="{()=>{ delay(100); return 4; }}"
+      var.setAsync="{()=> { counter += getResult();  }}"
+      var.setAsyncWORKS="{()=> { const result = getResult(); counter += result;  }}" >
+      <Text
+        testId="text"
+        value="{counter}" />
+      <Button
+        testId="button1"
+        label="Doesn't work"
+        onClick="setAsync();" />
+      <Button
+        testId="button2"
+        label="Works"
+        onClick="setAsyncWORKS();" />
+    </Stack>
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Stack",
-      vars: {
-        counter: 0,
-        getResult: "{()=>{ delay(100); return 4; }}",
-        setAsync: "{()=> { counter += getResult();  }}",
-        setAsyncWORKS: "{()=> { const result = getResult(); counter += result;  }}",
-      },
-      children: [
-        {
-          type: "Text",
-          testId: "text",
-          props: {
-            value: "{counter}",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button1",
-          props: {
-            label: "Doesn't work",
-          },
-          events: {
-            click: "setAsync();",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button2",
-          props: {
-            label: "Works",
-          },
-          events: {
-            click: "setAsyncWORKS();",
-          },
-        },
-      ],
-    },
+    entryPoint,
   });
 
   await page.getByTestId("button1").click();
@@ -557,72 +529,39 @@ test("Async return value works", async ({ page }) => {
 });
 
 test("Array push direct/indirect works", async ({ page }) => {
+  const entryPoint = `
+    <Stack
+      var.array="{[]}"
+      var.objectWithArray="{{
+              arrayInside: [],
+            },
+          }" >
+      <Text
+        testId="text1"
+        value="{array}" />
+      <Text
+        testId="text2"
+        value="{objectWithArray.arrayInside}" />
+      <Button
+        testId="button1"
+        label="Push to array"
+        onClick="array.push('hello')" />
+      <Button
+        testId="button2"
+        label="Push to array in object"
+        onClick="objectWithArray.arrayInside.push('hello')" />
+      <Button
+        testId="button3"
+        label="Push to array (indirect)"
+        onClick="const n = array; n.push('hello')" />
+      <Button
+        testId="button4"
+        label="Push to array in object (indirect)"
+        onClick="const n = objectWithArray; n.arrayInside.push('hello')" />
+    </Stack>
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Stack",
-      vars: {
-        array: [],
-        objectWithArray: {
-          arrayInside: [],
-        },
-      },
-      children: [
-        {
-          type: "Text",
-          testId: "text1",
-          props: {
-            value: "{array}",
-          },
-        },
-        {
-          type: "Text",
-          testId: "text2",
-          props: {
-            value: "{objectWithArray.arrayInside}",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button1",
-          props: {
-            label: "Push to array",
-          },
-          events: {
-            click: "array.push('hello')",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button2",
-          props: {
-            label: "Push to array in object",
-          },
-          events: {
-            click: "objectWithArray.arrayInside.push('hello')",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button3",
-          props: {
-            label: "Push to array (indirect)",
-          },
-          events: {
-            click: "const n = array; n.push('hello')",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button4",
-          props: {
-            label: "Push to array in object (indirect)",
-          },
-          events: {
-            click: "const n = objectWithArray; n.arrayInside.push('hello')",
-          },
-        },
-      ],
-    },
+    entryPoint,
   });
 
   await page.getByTestId("button1").click();
@@ -640,40 +579,23 @@ test("Array push direct/indirect works", async ({ page }) => {
 });
 
 test("Cannot write read-only var", async ({ page }) => {
+  const entryPoint = `
+    <Stack gap="0.5rem"
+      var.msg=""
+      var.$counter="{{ value: 0 }}"
+      var.incrementFunc="{x => { try { x.value++; } catch { msg += ' read-only' } } }" >
+      <Button
+        testId="button1"
+        label="{$counter.value}{msg}"
+        onClick="incrementFunc($counter)" />
+      <Button
+        testId="button2"
+        label="{$counter.value} {msg}"
+        onClick="const n = $counter; incrementFunc(n)" />
+    </Stack>
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Stack",
-      props: {
-        gap: "0.5rem",
-      },
-      vars: {
-        msg: "",
-        $counter: { value: 0 },
-        incrementFunc: "{x => { try { x.value++; } catch { msg += ' read-only' } } }",
-      },
-      children: [
-        {
-          type: "Button",
-          testId: "button1",
-          props: {
-            label: "{$counter.value}{msg}",
-          },
-          events: {
-            click: "incrementFunc($counter)",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button2",
-          props: {
-            label: "{$counter.value} {msg}",
-          },
-          events: {
-            click: "const n = $counter; incrementFunc(n)",
-          },
-        },
-      ],
-    },
+    entryPoint,
   });
 
   await expect(page.getByTestId("button1")).toHaveText("0");
@@ -685,90 +607,42 @@ test("Cannot write read-only var", async ({ page }) => {
 });
 
 test("Event body transform to arrow works", async ({ page }) => {
+  const entryPoint = `
+    <Stack>
+      <Button
+        testId="button1"
+        var.val="{0}"
+        label="#1: {val}"
+        onClick="val = 23" />
+      <Button
+        testId="button2"
+        var.val="{0}"
+        label="#2: {val}"
+        onClick="{val = 23}" />
+      <Button
+        testId="button3"
+        var.val="{0}"
+        label="#3: {val}" 
+        onClick="() => val = 23" />
+      <Button
+        testId="button4"
+        var.val="{0}"
+        label="#4: {val}"
+        onClick="() => {val = 23}" />
+      <Button
+        testId="button5"
+        var.val="{0}"
+        label="#5: {val}"
+        onClick="(args) => val = args.toString()" />
+      <Button
+        testId="button6"
+        var.val="{0}"
+        label="#6: {val}"
+        onClick="{(args) => val = args.toString()}" />
+    </Stack>
+  `;
   await initApp(page, {
-    entryPoint: {
-      type: "Stack",
-      children: [
-        {
-          type: "Button",
-          testId: "button1",
-          vars: {
-            val: 0,
-          },
-          props: {
-            label: "#1: {val}",
-          },
-          events: {
-            click: "val = 23",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button2",
-          vars: {
-            val: 0,
-          },
-          props: {
-            label: "#2: {val}",
-          },
-          events: {
-            click: "{val = 23}",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button3",
-          vars: {
-            val: 0,
-          },
-          props: {
-            label: "#3: {val}",
-          },
-          events: {
-            click: "() => val = 23",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button4",
-          vars: {
-            val: 0,
-          },
-          props: {
-            label: "#4: {val}",
-          },
-          events: {
-            click: "() => {val = 23}",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button5",
-          vars: {
-            val: 0,
-          },
-          props: {
-            label: "#5: {val}",
-          },
-          events: {
-            click: "(args) => val = args.toString()",
-          },
-        },
-        {
-          type: "Button",
-          testId: "button6",
-          vars: {
-            val: 0,
-          },
-          props: {
-            label: "#6: {val}",
-          },
-          events: {
-            click: "{(args) => val = args.toString()}",
-          },
-        },
-      ],
-    },
+    entryPoint
   });
 
   await expect(page.getByTestId("button1")).toHaveText("#1: 0");
