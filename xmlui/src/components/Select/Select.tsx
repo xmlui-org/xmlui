@@ -79,6 +79,7 @@ export const SelectMd = createMetadata({
     focus: dFocus(COMP),
     setValue: dSetValueApi(),
     value: dValue(),
+    reset: d(`This method resets the component to its initial value, or clears the selection if no initial value was provided.`),
   },
   contextVars: {
     $item: d(`This property represents the value of an item in the dropdown list.`),

@@ -289,12 +289,22 @@ export const Select = forwardRef(function Select(
     toggleOption(newValue);
   });
 
+  const reset = useEvent(() => {
+    if (initialValue !== undefined) {
+      updateState({ value: initialValue });
+      onDidChange(initialValue);
+    } else {
+      clearValue();
+    }
+  });
+
   useEffect(() => {
     registerComponentApi?.({
       focus,
       setValue,
+      reset,
     });
-  }, [focus, registerComponentApi, setValue]);
+  }, [focus, registerComponentApi, setValue, reset]);
 
   // Render the "empty list" message
   const emptyListNode = useMemo(
