@@ -32,6 +32,25 @@ export function extractParam(
       return param;
     }
 
+    // --- Cut the first segment, if it is whitespace-only
+    if (paramSegments[0].type === "literal" && paramSegments[0].value.trim() === "") {
+      paramSegments.shift();
+    }
+    if (paramSegments.length === 0) {
+      // --- The param is an empty string, retrieve it
+      return param;
+    }
+
+    // --- Cut the last segment, if it is whitespace-only
+    const lastSegment = paramSegments[paramSegments.length - 1];
+    if (lastSegment.type === "literal" && lastSegment.value.trim() === "") {
+      paramSegments.pop();
+    }
+    if (paramSegments.length === 0) {
+      // --- The param is an empty string, retrieve it
+      return param;
+    }
+
     if (paramSegments.length === 1) {
       // --- We have a single string literal or expression
       if (paramSegments[0].type === "literal") {
@@ -63,11 +82,7 @@ export function extractParam(
             defaultToOptionalMemberAccess: true,
           },
         });
-        if (exprValue === null) {
-          result += "null";
-        } else if (exprValue === undefined) {
-          result += "undefined";
-        } else if (exprValue?.toString) {
+        if (exprValue?.toString) {
           result += exprValue.toString();
         }
       }
@@ -332,7 +347,7 @@ export class PropsTrasform<T extends NodeProps> {
    */
   asRest(): T {
     const filteredKeys = Object.keys(this.nodeProps).filter(
-      (propKey) => !this.usedKeys.includes(propKey as keyof T)
+      (propKey) => !this.usedKeys.includes(propKey as keyof T),
     );
     return this.mapValues(filteredKeys, this.extractValue) as T;
   }

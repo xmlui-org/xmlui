@@ -46,6 +46,7 @@ import {
 } from "../parsers/xmlui-parser/lint";
 import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
 import { ThemeDefinition, ThemeTone } from "../abstractions/ThemingDefs";
+import { ProjectCompilation } from "../abstractions/scripting/Compilation";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -88,7 +89,9 @@ function StandaloneApp({
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
-  const standaloneApp = useStandalone(appDef, runtime, extensionManager);
+  const { standaloneApp, projectCompilation } = useStandalone(appDef, runtime, extensionManager);
+  console.log("standaloneApp", standaloneApp);
+  console.log("projectCompilation", projectCompilation);
   usePrintVersionNumber(standaloneApp);
 
   if (!standaloneApp) {
@@ -282,9 +285,23 @@ function matchesFolder(path: string, folderName: string) {
  * While processing the files here, we can assume they are free from compilation
  * errors, as such errors would be observed in the compile phase.
  */
-function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription {
+function resolveRuntime(runtime: Record<string, any>): {
+  standaloneApp: StandaloneAppDescription;
+  projectCompilation?: ProjectCompilation;
+} {
   // --- Collect the components and their sources. We pass the sources to the standalone app
   // --- so that it can be used for error display and debugging purposes.
+  console.log("runtime", runtime);
+  const projectCompilation: ProjectCompilation = {
+    entrypoint: {
+      filename: "",
+      componentName: "Main",
+      definition: null,
+      dependencies: [],
+    },
+    components: [],
+    themes: {},
+  };
   const sources: Record<string, string> = {};
   const componentsByFileName: Record<string, CompoundComponentDef> = {};
   const codeBehindsByFileName: Record<string, CollectedDeclarations> = {};
@@ -306,15 +323,20 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
 
     // --- We assume that the entry point is either named "Main" or "App".
     if (matchesFileName(key, "Main") || matchesFileName(key, "App")) {
+      projectCompilation.entrypoint.filename = key;
       if (key.endsWith(codeBehindFileExtension)) {
         // --- "default" contains the functions and variables declared in the
         // --- code behind file.
         entryPointCodeBehind = value.default;
+        projectCompilation.entrypoint.codeBehindSource = value.default.src;
       } else {
         // --- "default" contains the component definition, the file index,
         // --- and the source code.
         entryPoint = value.default.component;
+        projectCompilation.entrypoint.definition = entryPoint;
+        projectCompilation.entrypoint.markupSource = value.default.src;
         if (value.default.file) {
+          // TODO: Remove this prop
           sources[value.default.file] = value.default.src;
         }
       }
@@ -387,12 +409,15 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
 
   // --- Done.
   return {
-    ...config,
-    entryPoint: entryPointWithCodeBehind,
-    components,
-    themes: config?.themes || themes,
-    apiInterceptor: config?.apiInterceptor || apiInterceptor,
-    sources,
+    standaloneApp: {
+      ...config,
+      entryPoint: entryPointWithCodeBehind,
+      components,
+      themes: config?.themes || themes,
+      apiInterceptor: config?.apiInterceptor || apiInterceptor,
+      sources,
+    },
+    projectCompilation,
   };
 }
 
@@ -443,11 +468,11 @@ function useStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
   runtime: Record<string, any> = EMPTY_OBJECT,
   extensionManager?: StandaloneExtensionManager,
-): StandaloneAppDescription | null {
+): { standaloneApp: StandaloneAppDescription | null; projectCompilation?: ProjectCompilation } {
   const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(() => {
     // --- Initialize the standalone app
     const resolvedRuntime = resolveRuntime(runtime);
-    const appDef = mergeAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
+    const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
 
     // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
     // --- we must have the app definition available.
@@ -465,10 +490,13 @@ function useStandalone(
     return null;
   });
 
+  const [projectCompilation, setProjectCompilation] = useState<ProjectCompilation>(null);
+
   useIsomorphicLayoutEffect(() => {
     (async function () {
       const resolvedRuntime = resolveRuntime(runtime);
-      const appDef = mergeAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
+      const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
+      setProjectCompilation(resolvedRuntime.projectCompilation);
 
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
       // --- we must have the app definition available.
@@ -785,7 +813,7 @@ function useStandalone(
       setStandaloneApp(newAppDef);
     })();
   }, [runtime, standaloneAppDef]);
-  return standaloneApp;
+  return { standaloneApp, projectCompilation };
 }
 
 /**
