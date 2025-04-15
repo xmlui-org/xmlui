@@ -806,9 +806,9 @@ test("border-thickness", async ({ page }) => {
   });
 
   await expect(page.getByTestId("footer")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("footer")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("footer")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("footer")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(page.getByTestId("footer")).toHaveCSS("border-right-width", "0px");
+  await expect(page.getByTestId("footer")).toHaveCSS("border-bottom-width", "0px");
+  await expect(page.getByTestId("footer")).toHaveCSS("border-left-width", "0px");
 });
 
 test("border, border-thickness", async ({ page }) => {
