@@ -15,7 +15,7 @@ export interface ComponentDefCore {
   uid?: string;
 
   // An optional identifier we use for e2e tests; it does not influence the rendering of a component.
-  testId?: string;
+  testId?: string | ParsedPropertyValue;
 
   /**
    * A component can define namespaces on it, with the <ComponentName xmlns:KEY="VALUE" /> syntax

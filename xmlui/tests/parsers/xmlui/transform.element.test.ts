@@ -200,7 +200,11 @@ describe("Xmlui transform - child elements", () => {
         "<Stack><variable name='myVar' value='123'/></Stack>",
       ) as ComponentDef;
       expect(cd.type).equal("Stack");
-      expect(cd.vars!.myVar).equal("123");
+      let value = cd.vars.myVar as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("123");
     });
 
     it("var with name/value attr works #2", () => {
@@ -211,8 +215,16 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
       expect(cd.type).equal("Stack");
-      expect(cd.vars!.myVar).equal("123");
-      expect(cd.vars!.other).equal("234");
+      let value = cd.vars.myVar as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("123");
+      value = cd.vars.other as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("234");
     });
 
     it("var with name and text works #1", () => {
@@ -220,7 +232,11 @@ describe("Xmlui transform - child elements", () => {
         "<Stack><variable name='myVar'>123</variable></Stack>",
       ) as ComponentDef;
       expect(cd.type).equal("Stack");
-      expect(cd.vars!.myVar).equal("123");
+      let value = cd.vars.myVar as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("123");
     });
 
     it("var with name and text works #2", () => {
@@ -231,8 +247,16 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
       expect(cd.type).equal("Stack");
-      expect(cd.vars!.myVar).equal("123");
-      expect(cd.vars!.other).equal("234");
+      let value = cd.vars.myVar as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("123");
+      value = cd.vars.other as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("234");
     });
 
     it("vars with name results null", () => {
@@ -246,7 +270,18 @@ describe("Xmlui transform - child elements", () => {
         "<Stack><variable name='myVar' value='123'/><variable name='myVar' value='234'/></Stack>",
       ) as ComponentDef;
       expect(cd.type).equal("Stack");
-      expect(cd.vars!.myVar).deep.equal(["123", "234"]);
+      let values = cd.vars.myVar as unknown as Array<ParsedPropertyValue>;
+      expect(values.length).toEqual(2);
+      let value = values[0] as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("123");
+      value = values[1] as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("234");
     });
   });
 
@@ -993,21 +1028,12 @@ describe("Xmlui transform - child elements", () => {
     it("Compound component #1", () => {
       const cd = transformSource(`
       <Component name='MyComp'><Stack /><variable name="myVar" value="123" /></Component>
-    `) as ComponentDef;
-      expect(cd).toMatchObject({
-        name: "MyComp",
-        component: {
-          type: "Fragment",
-          vars: {
-            myVar: "123",
-          },
-          children: [
-            {
-              type: "Stack",
-            },
-          ],
-        },
-      });
+    `) as CompoundComponentDef;
+      let value = (cd.component.vars as any).myVar as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("123");
     });
 
     it("Compound component #3", () => {
@@ -1017,24 +1043,12 @@ describe("Xmlui transform - child elements", () => {
         <Text />
         <variable name="myVar" value="123" />
       </Component>
-    `) as ComponentDef;
-      expect(cd).toMatchObject({
-        name: "MyComp",
-        component: {
-          type: "Fragment",
-          vars: {
-            myVar: "123",
-          },
-          children: [
-            {
-              type: "Stack",
-            },
-            {
-              type: "Text",
-            },
-          ],
-        },
-      });
+    `) as CompoundComponentDef;
+      let value = (cd.component.vars as any).myVar as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("123");
     });
 
     it("Compound component #4", () => {
@@ -1174,12 +1188,12 @@ describe("Xmlui transform - child elements", () => {
       const cd = transformSource(`
       <Component name='MyComp' var.myValue="123" var.other="{false}"><Stack /></Component>
     `) as CompoundComponentDef;
-      let value = (cd.component.vars.myValue as any) as ParsedPropertyValue;
+      let value = cd.component.vars.myValue as any as ParsedPropertyValue;
       expect(value.__PARSED).toEqual(true);
       expect(value.parseId).toBeGreaterThan(0);
       expect(value.segments.length).toEqual(1);
       expect(value.segments[0].literal).toEqual("123");
-      value = (cd.component.vars.other as any) as ParsedPropertyValue;
+      value = cd.component.vars.other as any as ParsedPropertyValue;
       expect(value.__PARSED).toEqual(true);
       expect(value.parseId).toBeGreaterThan(0);
       expect(value.segments.length).toEqual(1);
@@ -1190,30 +1204,18 @@ describe("Xmlui transform - child elements", () => {
     it("Compound component with vars #3", () => {
       const cd = transformSource(`
       <Component name='MyComp' var.myValue="123"><variable name="other" value="{false}" /><Stack /></Component>
-    `) as ComponentDef;
-      expect(cd).toMatchObject({
-        name: "MyComp",
-        component: {
-          children: [
-            {
-              type: "Stack",
-            },
-          ],
-          type: "Fragment",
-          vars: {
-            myValue: {
-              __PARSED: true,
-              parseId: 1,
-              segments: [
-                {
-                  literal: "123",
-                },
-              ],
-            },
-            other: "{false}",
-          },
-        },
-      });
+    `) as CompoundComponentDef;
+      let value = cd.component.vars.myValue as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].literal).toEqual("123");
+      value = cd.component.vars.other as ParsedPropertyValue;
+      expect(value.__PARSED).toEqual(true);
+      expect(value.parseId).toBeGreaterThan(0);
+      expect(value.segments.length).toEqual(1);
+      expect(value.segments[0].expr.type).toEqual(T_LITERAL);
+      expect((value.segments[0].expr as any).value).toEqual(false);
     });
 
     it("Compound component debug info", () => {

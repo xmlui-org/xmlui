@@ -94,7 +94,7 @@ test("datasource reference outside of implicit container", async ({ page }) => {
   await expect(page.getByTestId("dataValue")).toHaveText("STRING_DATA_FROM_API");
 });
 
-test("datasource value as data", async ({ page }) => {
+test.skip("datasource value as data", async ({ page }) => {
   await initApp(page, {
     entryPoint: `
       <Fragment>

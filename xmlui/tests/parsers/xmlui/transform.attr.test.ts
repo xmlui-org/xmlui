@@ -65,7 +65,11 @@ describe("Xmlui transform - attributes", () => {
   it("testId works", () => {
     const cd = transformSource("<Stack testId='myStack' />") as ComponentDef<typeof StackMd>;
     expect(cd.type).equal("Stack");
-    expect(cd.testId).equal("myStack");
+    const value = cd.testId as ParsedPropertyValue;
+    expect(value.__PARSED).toEqual(true);
+    expect(value.parseId).toBeGreaterThan(0);
+    expect(value.segments.length).toEqual(1);
+    expect(value.segments[0].literal).toEqual("myStack");
   });
 
   it("when works #1", () => {
