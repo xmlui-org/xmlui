@@ -6,6 +6,26 @@ The `Checkbox` component allows users to make binary choices, typically between 
 
 To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](../learning/using-components/forms).
 
+## Use children as Content Template
+
+The [inputTemplate](#inputtemplate) property can be replaced by setting the item template component directly as the Checkbox's child.
+In the following example, the two Checkbox are functionally the same:
+
+```xmlui copy
+<App>
+  <!-- This is the same -->
+  <Checkbox>
+    <property name="inputTemplate">
+      <Text>Template</Text>
+    </property>
+  </Checkbox>
+  <!-- As this -->
+  <Checkbox>
+    <Text>Template</Text>
+  </Checkbox>
+</App>
+```
+
 ## Properties
 
 ### `autoFocus (default: false)`
