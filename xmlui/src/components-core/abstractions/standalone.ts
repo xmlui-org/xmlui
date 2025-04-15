@@ -1,4 +1,5 @@
 import type { CompoundComponentDef, ComponentLike } from "../../abstractions/ComponentDefs";
+import { ProjectCompilation } from "../../abstractions/scripting/Compilation";
 import { ThemeDefinition } from "../../abstractions/ThemingDefs";
 import type { ApiInterceptorDefinition } from "../interception/abstractions";
 
@@ -14,7 +15,7 @@ export type StandaloneAppDescription = {
   entryPoint?: ComponentLike;
 
   // --- Optional components used by the app in the entry point
-  components?: CompoundComponentDef[];
+  components?: CompoundComponentDef[] | string | string[];
 
   // --- Optional themes used by the app
   themes?: ThemeDefinition[];
@@ -33,6 +34,9 @@ export type StandaloneAppDescription = {
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;
   sources?: Record<string, string>;
+
+  // --- The app's comilation result
+  compilation?: ProjectCompilation;
 };
 
 export type StandaloneJsonConfig = {

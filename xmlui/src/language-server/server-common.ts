@@ -19,7 +19,7 @@ import type {XmluiCompletionItem} from "./services/completion";
 import { handleCompletion, handleCompletionResolve} from "./services/completion";
 import {handleHover} from "./services/hover";
 import { createXmlUiParser, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
-import { ComponentMetadataCollection } from './services/common';
+import type { ComponentMetadataCollection } from './services/common/types';
 
 const metaByComp = collectedComponentMetadata as ComponentMetadataCollection;
 

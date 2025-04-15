@@ -4,6 +4,10 @@ import { Parser } from "../../parsers/scripting/Parser";
 
 let lastParseId = 0;
 
+export function resetAttributeValueParseId() {
+  lastParseId = 0;
+}
+
 /**
  * This function parses a parameter string and splits them into string literal and binding expression sections
  * @param source String to parse
@@ -110,6 +114,14 @@ export function parseAttributeValue(source: string): ParsedPropertyValue {
 
   // --- Done.
   return result;
+}
+
+export function isParsedAttributeValue(value: any): value is ParsedPropertyValue {
+  return value?.__PARSED === true && value?.segments;
+}
+
+export function isExpression(value: any): value is Expression {
+  return typeof value.type === "number" && typeof value.nodeId === "number";
 }
 
 enum ParsePhase {

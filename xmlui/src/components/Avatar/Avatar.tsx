@@ -47,7 +47,7 @@ export const avatarComponentRenderer = createComponentRenderer(
   ({ node, extractValue, lookupEventHandler, layoutCss, extractResourceUrl }) => {
     return (
       <Avatar
-        size={node.props?.size}
+        size={extractValue(node.props?.size)}
         url={extractResourceUrl(node.props.url)}
         name={extractValue(node.props.name)}
         style={layoutCss}

@@ -1,4 +1,4 @@
-import type { ComponentMetadata, ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
+import type { ComponentMetadata, ComponentPropertyMetadata } from "../../../abstractions/ComponentDefs";
 
 
 export function generateCompNameDescription(componentName: string, metadata: ComponentMetadata): string {

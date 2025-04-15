@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
-import { Expression, ModuleErrors, T_ARROW_EXPRESSION, T_BINARY_EXPRESSION, T_LITERAL } from "../../../src/abstractions/scripting/ScriptingSourceTree";
+import { Expression, Identifier, ModuleErrors, T_ARROW_EXPRESSION, T_BINARY_EXPRESSION, T_IDENTIFIER, T_LITERAL } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 import { transformSource } from "./xmlui";
+import { ParsedPropertyValue } from "../../../src/abstractions/scripting/Compilation";
 
 describe("Xmlui transform - script", () => {
 
@@ -120,7 +121,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.vars).length).equal(1);
-    expect((collected.vars.a.tree as Expression).type).equal(T_LITERAL);
+    expect((collected.vars.a as Expression).type).equal(T_LITERAL);
   });
 
   it("Script collect - Single var #2", () => {
@@ -136,7 +137,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.vars).length).equal(1);
-    expect((collected.vars.a.tree as Expression).type).equal(T_BINARY_EXPRESSION);
+    expect((collected.vars.a as Expression).type).equal(T_BINARY_EXPRESSION);
   });
 
   it("Script collect - Single var #3", () => {
@@ -152,7 +153,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.vars).length).equal(1);
-    expect((collected.vars.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.vars.a as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Multiple var", () => {
@@ -168,8 +169,8 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.vars).length).equal(2);
-    expect((collected.vars.a.tree as Expression).type).equal(T_LITERAL);
-    expect((collected.vars.b.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.vars.a as Expression).type).equal(T_LITERAL);
+    expect((collected.vars.b as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Duplicated var fails", () => {
@@ -202,7 +203,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(1);
-    expect((collected.functions.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.functions.a as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Single function #2", () => {
@@ -218,7 +219,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(1);
-    expect((collected.functions.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.functions.a as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Multiple function #1", () => {
@@ -235,8 +236,8 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(2);
-    expect((collected.functions.a.tree as Expression).type).equal(T_ARROW_EXPRESSION);
-    expect((collected.functions.b.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.functions.a as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.functions.b as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script collect - Duplicated function fails", () => {
@@ -270,7 +271,7 @@ Hello!
     // --- Assert
     const collected = cd.scriptCollected!;
     expect(Object.keys(collected.functions).length).equal(1);
-    expect((collected.functions.myButton_onClick.tree as Expression).type).equal(T_ARROW_EXPRESSION);
+    expect((collected.functions.myButton_onClick as Expression).type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Script creates Fragment #2", () => {
@@ -305,6 +306,11 @@ Hello!
     expect(child.children![0].type).equal("Stack");
     expect(child.children![0].children!.length).equal(1);
     const textNode = child.children![0].children![0];
-    expect((textNode.props as any).value).equal("{uppercaseItem}");  
+    const value = (textNode.props as any).value as ParsedPropertyValue;
+    expect(value.__PARSED).equal(true);
+    expect(value.parseId).toBeGreaterThan(0);
+    expect(value.segments.length).equal(1);
+    expect(value.segments[0].expr.type).equal(T_IDENTIFIER);
+    expect((value.segments[0].expr as Identifier).name).equal("uppercaseItem");
   });
 });

@@ -39,18 +39,24 @@ export function tagNameNodesWithoutErrorsMatch(name1: Node, name2: Node, getText
   return true;
 }
 
-/** If the position is in-between two tokens, the chain to the token just before the cursor is provided as well, but the shared parents are inside field chainAtPos */
-type FindTokenSuccess = {
+/** If the position is in-between two tokens, the chain to the token just before the cursor is provided as well*/
+export type FindTokenSuccess =
+{
   chainAtPos: Node[];
 
-  /** If the position is in-between two tokens, the chain to the token just before the position is provided.
-   stores syntax elements from the fork point to the token */
-  chainBeforePos?: Node[];
+  /** If the position is in-between two tokens, the chain to the token just before the position is provided. */
+  chainBeforePos: Node[];
 
-  /** Only undefined when chainBeforePos is.
-   * chainBeforePos starts with the first node or token after the fork point.
-   * This field specifies the index of the 0th element of the chainBeforePos if it's parents were part of the array as well. */
-  sharedParents?: number;
+  /**
+  * This field specifies the first index where
+  * `chainBeforePos` differs from chainAtPos
+  */
+  sharedParents: number;
+} |
+{
+  chainBeforePos: undefined;
+  chainAtPos: Node[];
+  sharedParents: undefined;
 };
 
 export function findTokenAtPos(node: Node, position: number): FindTokenSuccess | undefined {
@@ -62,13 +68,11 @@ export function findTokenAtPos(node: Node, position: number): FindTokenSuccess |
     return undefined;
   }
 
-  // if (position === node.end) {
-  //   return {
-  //     chainBeforePos: findLastToken(node),
-  //     sharedParents: 0,
-  //   };
-  // }
-  const res: FindTokenSuccess = { chainAtPos: chain };
+  const res: FindTokenSuccess = {
+    chainAtPos: chain,
+    chainBeforePos: undefined,
+    sharedParents: undefined
+  };
 
   while (node.children !== undefined && node.children.length > 0) {
     //todo: make it a binary search before finding a fork
@@ -83,10 +87,9 @@ export function findTokenAtPos(node: Node, position: number): FindTokenSuccess |
 
     if (nodeBeforePos !== undefined && position <= nodeAtPos.pos) {
       sharedParents = chain.length;
-      chainBeforePos = findLastToken(nodeBeforePos);
 
       return {
-        chainBeforePos,
+        chainBeforePos: chain.concat(findLastToken(nodeBeforePos)),
         sharedParents,
 
         chainAtPos: chain.concat(findFirstToken(nodeAtPos)),

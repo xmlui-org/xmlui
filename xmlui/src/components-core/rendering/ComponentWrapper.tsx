@@ -55,27 +55,27 @@ export const ComponentWrapper = memo(
       return transformed;
     }, [descriptor?.childrenAsTemplate, node, uidInfoRef]);
 
+    const resolvedDataProp = useMemo(
+      () => extractParam(state, nodeWithTransformedLoaders.props?.data, appContext),
+      [appContext, nodeWithTransformedLoaders.props?.data, state],
+    );
+
     // --- String values in the "data" prop are treated as URLs. This boolean
     // --- indicates whether the "data" prop is a string or not.
     const resolvedDataPropIsString = useMemo(() => {
-      const resolvedDataProp = extractParam(
-        state,
-        nodeWithTransformedLoaders.props?.data,
-        appContext,
-        true,
-      );
       return typeof resolvedDataProp === "string";
-    }, [appContext, nodeWithTransformedLoaders.props?.data, state]);
+    }, [appContext, nodeWithTransformedLoaders.props?.data, state, resolvedDataProp]);
 
     // --- If the "data" prop is a string, we transform it to a DataSource component
     // --- so that it can be fetched.
     const nodeWithTransformedDatasourceProp = useMemo(() => {
       return transformNodeWithDataProp(
         nodeWithTransformedLoaders,
+        resolvedDataProp,
         resolvedDataPropIsString,
         uidInfoRef,
       );
-    }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
+    }, [nodeWithTransformedLoaders, resolvedDataPropIsString, resolvedDataProp, uidInfoRef]);
 
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
@@ -193,7 +193,7 @@ function transformNodeWithDataSourceRefProp(
   let ret = { ...node };
   let resolved = false;
   Object.entries(node.props).forEach(([key, value]) => {
-    let uidInfoForDatasource: { type: string; uid: any; };
+    let uidInfoForDatasource: { type: string; uid: any };
     try {
       uidInfoForDatasource = extractParam(uidInfoRef.current, value);
     } catch (e) {}
@@ -220,6 +220,7 @@ function transformNodeWithDataSourceRefProp(
 // --- If the "data" prop is a string, we transform it to a DataSource component
 function transformNodeWithDataProp(
   node: ComponentDef,
+  resolvedDataProp: any,
   resolvedDataPropIsString: boolean,
   uidInfoRef: RefObject<Record<string, any>>,
 ): ComponentDef {
@@ -231,7 +232,8 @@ function transformNodeWithDataProp(
   ) {
     // --- We skip the transformation if the data property is a binding expression
     // --- for a loader value
-    if (extractParam(uidInfoRef.current, node.props.data) === "loaderValue") {
+    const extractedData = extractParam(uidInfoRef.current, resolvedDataProp);
+    if (extractedData === "loaderValue") {
       return node;
     }
     return {
@@ -241,13 +243,12 @@ function transformNodeWithDataProp(
         data: {
           type: "DataSource",
           props: {
-            url: node.props.data,
+            url: resolvedDataProp,
           },
         },
       },
     };
   }
-
   return node;
 }
 

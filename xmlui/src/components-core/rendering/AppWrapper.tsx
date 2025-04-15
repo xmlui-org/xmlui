@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { BrowserRouter, HashRouter, MemoryRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Helmet, HelmetProvider } from "react-helmet-async";
@@ -11,7 +11,7 @@ import { EMPTY_OBJECT } from "../constants";
 import { IconProvider } from "../../components/IconProvider";
 import ThemeProvider from "../theming/ThemeProvider";
 import { InspectorProvider } from "../InspectorContext";
-import type { GlobalProps} from "./AppRoot";
+import type { GlobalProps } from "./AppRoot";
 import { queryClient } from "./AppRoot";
 import { AppContent } from "./AppContent";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
@@ -106,7 +106,7 @@ export const AppWrapper = ({
   resources,
   resourceMap,
   sources,
-  children
+  children,
 }: AppWrapperProps) => {
   if (previewMode) {
     // --- Prevent leaking the meta items to the parent document,
@@ -141,7 +141,10 @@ export const AppWrapper = ({
                 globalProps={globalProps}
                 standalone={standalone}
                 decorateComponentsWithTestId={decorateComponentsWithTestId}
-                debugEnabled={debugEnabled}>{children}</AppContent>
+                debugEnabled={debugEnabled}
+              >
+                {children}
+              </AppContent>
             </ConfirmationModalContextProvider>
           </InspectorProvider>
         </ThemeProvider>
@@ -154,19 +157,17 @@ export const AppWrapper = ({
 
   return (
     // <React.StrictMode>
-      <ErrorBoundary node={node} location={"root-outer"}>
-        <QueryClientProvider client={queryClient}>
-          {/* No router in the REMIX environment */}
-          {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
+    <ErrorBoundary node={node} location={"root-outer"}>
+      <QueryClientProvider client={queryClient}>
+        {/* No router in the REMIX environment */}
+        {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
 
-          {/* Wrap the app in a router in other cases */}
-          {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
-            <Router basename={Router === HashRouter ? undefined : baseName}>
-              {dynamicChildren}
-            </Router>
-          )}
-        </QueryClientProvider>
-      </ErrorBoundary>
+        {/* Wrap the app in a router in other cases */}
+        {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
+          <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
+        )}
+      </QueryClientProvider>
+    </ErrorBoundary>
     // </React.StrictMode>
   );
 };

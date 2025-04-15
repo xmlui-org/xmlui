@@ -2,9 +2,9 @@ import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { findTokenAtPos, toDbgString } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
-import { compNameForTagNameNode, findTagNameNodeInStack } from "./syntax-node-utilities";
-import * as docGen from "./docs-generation";
-import type { ComponentMetadataCollection } from "./common";
+import { compNameForTagNameNode, findTagNameNodeInStack } from "./common/syntax-node-utilities";
+import * as docGen from "./common/docs-generation";
+import type { ComponentMetadataCollection } from "./common/types";
 
 type SimpleHover = null | {
   value: string;
