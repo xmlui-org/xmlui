@@ -302,6 +302,9 @@ export type ComponentMetadata<
   // Indicates that a particular component does not render any visual element on its own (Default: false)
   nonVisual?: boolean;
 
+  // childrenAsTemplate?: keyof TProps;
+  childrenAsTemplate?: string;
+
   opaque?: boolean;
 
   // List of theme variables available for the component
@@ -334,49 +337,13 @@ export function createMetadata<
   TEvents extends Record<string, ComponentPropertyMetadata>,
   TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
   TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
->({
-  description,
-  shortDescription,
-  specializedFrom,
-  status,
-  props,
-  events,
-  contextVars,
-  apis,
-  nonVisual,
-  opaque,
-  themeVars,
-  themeVarDescriptions,
-  defaultThemeVars,
-  toneSpecificThemeVars,
-  allowArbitraryProps,
-  docFolder,
-  isHtmlTag,
-}: ComponentMetadata<TProps, TEvents, TContextVars, TApis>): ComponentMetadata<
+>(metadata: ComponentMetadata<TProps, TEvents, TContextVars, TApis>): ComponentMetadata<
   TProps,
   TEvents,
   TContextVars,
   TApis
 > {
-  return {
-    description,
-    shortDescription,
-    specializedFrom,
-    status,
-    props,
-    events,
-    contextVars,
-    apis,
-    nonVisual,
-    opaque,
-    themeVars,
-    defaultThemeVars,
-    themeVarDescriptions,
-    toneSpecificThemeVars,
-    allowArbitraryProps,
-    docFolder,
-    isHtmlTag,
-  };
+  return metadata;
 }
 
 export function d(

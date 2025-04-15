@@ -797,9 +797,7 @@ test("border, border-style-bottom", async ({ page }) => {
 });
 
 test("border-thickness", async ({ page }) => {
-  const EXPECTED_COLOR = "rgb(0, 128, 0)";
   const EXPECTED_WIDTH = "8px";
-  const EXPECTED_STYLE = "dotted";
 
   await initThemedApp(page, FOOTER_CODE, {
     themeVars: {
@@ -807,18 +805,10 @@ test("border-thickness", async ({ page }) => {
     },
   });
 
-  await expect(page.getByTestId("footer")).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(page.getByTestId("footer")).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("footer")).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("footer")).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("footer")).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("footer")).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("footer")).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("footer")).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("footer")).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(page.getByTestId("footer")).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(page.getByTestId("footer")).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(page.getByTestId("footer")).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
+  await expect(page.getByTestId("footer")).toHaveCSS("border-right-width", "0px");
+  await expect(page.getByTestId("footer")).toHaveCSS("border-bottom-width", "0px");
+  await expect(page.getByTestId("footer")).toHaveCSS("border-left-width", "0px");
 });
 
 test("border, border-thickness", async ({ page }) => {

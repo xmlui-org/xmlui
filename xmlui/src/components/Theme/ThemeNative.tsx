@@ -107,6 +107,7 @@ export function Theme({
     let rangeClassName;
     if (!isRoot) {
       rangeClassName = `${fromClass} ~ *:has(~ .${toClass})`;
+      css += `color: var(${getVarKey("textColor-primary")});`;
     }
     return {
       className,

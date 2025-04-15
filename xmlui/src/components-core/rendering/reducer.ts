@@ -94,13 +94,14 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         break;
       }
       case ContainerActionKind.STATE_PART_CHANGED: {
-        const { path, value, target, actionType } = action.payload;
+        const { path, value, target, actionType, localVars } = action.payload;
         if (actionType === "unset") {
           unset(state, path);
-          storeNextValue(state);
         } else {
-          setWith(state, path, value, (nsValue) => {
-            if (nsValue === undefined && isPlainObject(target)) {
+          let tempValueInLocalVars = localVars;
+          setWith(state, path, value, (nsValue, key, nsObject) => {
+            tempValueInLocalVars = tempValueInLocalVars?.[key];
+            if (nsValue === undefined && tempValueInLocalVars === undefined && isPlainObject(target)) {
               // if we are setting a new object's key, lodash defaults it to an array, if the key is a number.
               // This way we can force it to be an object.
               // (example: we have an empty object in vars called usersTyped: {}, we set usersTyped[1] = Date.now().
@@ -110,10 +111,10 @@ export function createContainerReducer(debugView: IDebugViewContext) {
               // can force it, because in the target we have the target object value (given by the proxy change),so if
               // it's an object, it should be an object. Otherwise, we let lodash decide)
               const next = Object(nsValue);
-              storeNextValue(next);
               return next;
             }
           });
+          storeNextValue(state);
         }
         break;
       }

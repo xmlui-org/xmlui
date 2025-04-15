@@ -7,6 +7,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dComponent } from "../../components/metadata-helpers";
 import { appLayoutMd } from "./AppLayoutContext";
 import { App } from "./AppNative";
+import { useMemo } from "react";
 
 const COMP = "App";
 
@@ -76,7 +77,7 @@ export const AppMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
     "maxWidth‑content‑App":
-      "This theme variable defines the maximum width of the main content. If the main " + 
+      "This theme variable defines the maximum width of the main content. If the main " +
       "content is broader, the engine adds margins to keep the expected maximum size.",
     "boxShadow‑header‑App": "This theme variable sets the shadow of the app's header section.",
     "boxShadow‑navPanel‑App":
@@ -102,51 +103,105 @@ export const AppMd = createMetadata({
   },
 });
 
-export const appRenderer = createComponentRenderer(
-  COMP,
-  AppMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+function AppNode({ node, extractValue, renderChild, style, lookupEventHandler }) {
+  const {AppHeader, Footer, NavPanel, restChildren} = useMemo(()=>{
     let AppHeader: ComponentDef;
     let Footer: ComponentDef;
     let NavPanel: ComponentDef;
     const restChildren: any[] = [];
-    node.children?.forEach((child) => {
-      if (child.type === "AppHeader") {
-        AppHeader = child;
-      } else if (child.type === "Footer") {
-        Footer = child;
-      } else if (child.type === "NavPanel") {
-        NavPanel = child;
-      } else {
-        restChildren.push(child);
+    node.children?.forEach((rootChild) => {
+      let transformedChild = { ...rootChild };
+      if(rootChild.type === "Theme"){
+        transformedChild.children = rootChild.children?.filter((child) => {
+          if (child.type === "AppHeader") {
+            AppHeader = {
+              ...rootChild,
+              children: [
+                child
+              ]
+            };
+            return false;
+          } else if (child.type === "Footer") {
+            Footer = {
+              ...rootChild,
+              children: [
+                child
+              ]
+            };
+            return false;
+          } else if (child.type === "NavPanel") {
+            NavPanel = {
+              ...rootChild,
+              children: [
+                child
+              ]
+            };
+            return false;
+          }
+          return true;
+        })
+        if(!transformedChild.children.length){
+          transformedChild = null;
+        }
+      }
+      if (rootChild.type === "AppHeader") {
+        AppHeader = rootChild;
+      } else if (rootChild.type === "Footer") {
+        Footer = rootChild;
+      } else if (rootChild.type === "NavPanel") {
+        NavPanel = rootChild;
+      } else if(transformedChild !== null){
+        restChildren.push(transformedChild);
       }
     });
+    return {
+      AppHeader,
+      Footer,
+      NavPanel,
+      restChildren
+    }
+  }, [node.children]);
 
-    const layoutType = extractValue(node.props.layout);
+  const layoutType = extractValue(node.props.layout);
 
+  return (
+    <App
+      scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
+      noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
+      style={style}
+      layout={layoutType}
+      loggedInUser={extractValue(node.props.loggedInUser)}
+      onReady={lookupEventHandler("ready")}
+      header={renderChild(AppHeader)}
+      footer={renderChild(Footer)}
+      navPanel={renderChild(NavPanel)}
+      navPanelDef={NavPanel}
+      logoContentDef={node.props.logoTemplate}
+      renderChild={renderChild}
+      name={extractValue(node.props.name)}
+      logo={extractValue(node.props.logo)}
+      logoDark={extractValue(node.props["logo-dark"])}
+      logoLight={extractValue(node.props["logo-light"])}
+      defaultTone={extractValue(node.props.defaultTone)}
+      defaultTheme={extractValue(node.props.defaultTheme)}
+    >
+      {renderChild(restChildren)}
+    </App>
+  );
+}
+
+export const appRenderer = createComponentRenderer(
+  COMP,
+  AppMd,
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
     return (
-      <App
-        scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
-        noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
-        style={layoutCss}
-        layout={layoutType}
-        loggedInUser={extractValue(node.props.loggedInUser)}
-        onReady={lookupEventHandler("ready")}
-        header={renderChild(AppHeader)}
-        footer={renderChild(Footer)}
-        navPanel={renderChild(NavPanel)}
-        navPanelDef={NavPanel}
-        logoContentDef={node.props.logoTemplate}
+      <AppNode
+        node={node}
         renderChild={renderChild}
-        name={extractValue(node.props.name)}
-        logo={extractValue(node.props.logo)}
-        logoDark={extractValue(node.props["logo-dark"])}
-        logoLight={extractValue(node.props["logo-light"])}
-        defaultTone={extractValue(node.props.defaultTone)}
-        defaultTheme={extractValue(node.props.defaultTheme)}
-      >
-        {renderChild(restChildren)}
-      </App>
+        extractValue={extractValue}
+        style={layoutCss}
+        lookupEventHandler={lookupEventHandler}
+      />
     );
   },
 );

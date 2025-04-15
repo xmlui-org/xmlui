@@ -53,6 +53,7 @@ export const CheckboxMd = createMetadata({
       description: "This property is used to define a custom checkbox input template",
     },
   },
+  childrenAsTemplate: "inputTemplate",
   events: {
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
@@ -91,7 +92,7 @@ export const checkboxComponentRenderer = createComponentRenderer(
     renderChild,
     layoutContext,
   }) => {
-    const inputTemplate = node.children || node.props?.inputTemplate;
+    const inputTemplate = node.props.inputTemplate;
     return (
       <Toggle
         inputRenderer={
