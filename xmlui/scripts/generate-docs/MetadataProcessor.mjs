@@ -149,6 +149,9 @@ export class MetadataProcessor {
       result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
       result += "\n\n";
 
+      result += addChildrenTemplateSection(component);
+      result += "\n\n";
+
       result += addPropsSection(fileData, component);
       result += "\n\n";
 
@@ -396,6 +399,36 @@ function combineDescriptionAndDescriptionRef(
     return descriptionBuffer + "\n\n" + fileBuffer;
   }
   return descriptionBuffer || fileBuffer;
+}
+
+function addChildrenTemplateSection(component) {
+  if (!component.childrenAsTemplate) return "";
+  if (!component.props.hasOwnProperty(component.childrenAsTemplate)) {
+    return "";
+  }
+  const compName = component.displayName;
+  const childrenAsTemplate = component.childrenAsTemplate;
+  let buffer = "";
+  buffer += "## Use children as Content Template\n\n";
+  buffer +=
+    `The [${childrenAsTemplate}](#${childrenAsTemplate.toLowerCase()}) property can be replaced by ` +
+    `setting the item template component directly as the ${compName}'s child.\n`;
+  buffer += `In the following example, the two ${compName} are functionally the same:\n\n`;
+  buffer += "```xmlui copy\n";
+  buffer += "<App>\n";
+  buffer += `  <!-- This is the same -->\n`;
+  buffer += `  <${compName}>\n`;
+  buffer += `    <property name="${childrenAsTemplate}">\n`;
+  buffer += `      <Text>Template</Text>\n`;
+  buffer += `    </property>\n`;
+  buffer += `  </${compName}>\n`;
+  buffer += `  <!-- As this -->\n`;
+  buffer += `  <${compName}>\n`;
+  buffer += `    <Text>Template</Text>\n`;
+  buffer += `  </${compName}>\n`;
+  buffer += "</App>\n";
+  buffer += "```\n\n";
+  return buffer;  
 }
 
 function getSection(data, sectionRef, sectionId, transformer = (contents) => contents) {

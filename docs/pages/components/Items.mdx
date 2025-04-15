@@ -89,6 +89,26 @@ You can use also API bindings to display data:
   `}
 />
 
+## Use children as Content Template
+
+The [itemTemplate](#itemtemplate) property can be replaced by setting the item template component directly as the Items's child.
+In the following example, the two Items are functionally the same:
+
+```xmlui copy
+<App>
+  <!-- This is the same -->
+  <Items>
+    <property name="itemTemplate">
+      <Text>Template</Text>
+    </property>
+  </Items>
+  <!-- As this -->
+  <Items>
+    <Text>Template</Text>
+  </Items>
+</App>
+```
+
 ## Properties
 
 ### `data`
