@@ -327,6 +327,46 @@ In the template definition, you can use the `$item` context property to access t
   `}
 />
 
+### `optionTemplate`
+
+This property allows replacing the default template to display an option in the dropdown list.
+
+```xmlui copy
+<App>
+  <Select>
+    <property name="optionTemplate">
+      <HStack verticalAlignment="center" gap="$space-0_5">
+        <Icon name="info" />
+        <Text value="{$item.label}" variant="strong" />
+      </HStack>
+    </property>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: optionTemplate"
+    height={200}
+    app={`
+    <App>
+      <Select>
+        <property name="optionTemplate">
+          <HStack verticalAlignment="center" gap="$space-0_5">
+            <Icon name="info" />
+            <Text value="{$item.label}" variant="strong" />
+          </HStack>
+        </property>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
+  `}
+/>
+
 ### `placeholder`
 
 A placeholder text that is visible in the input field when its empty.
@@ -807,7 +847,14 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [outlineWidth](../styles-and-themes/common-units/#size)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [outlineWidth](../styles-and-themes/common-units/#size)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [outlineWidth](../styles-and-themes/common-units/#size)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-item-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingBottom](../styles-and-themes/common-units/#size)-item-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-item-Select | $space-2 | $space-2 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-item-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingRight](../styles-and-themes/common-units/#size)-item-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingTop](../styles-and-themes/common-units/#size)-item-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingVertical](../styles-and-themes/common-units/#size)-item-Select | $space-2 | $space-2 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
 | [textColor](../styles-and-themes/common-units/#color)-indicator-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [textColor](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-200 | $color-surface-200 |
