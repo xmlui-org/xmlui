@@ -5,7 +5,7 @@ This property customizes the success message displayed in a toast after the fini
 ```xmlui copy
  <DataSource
   id="ds"
-  url="/api/shopping-list" 
+  url="/api/shopping-list"
   completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
 ```
 
@@ -19,7 +19,7 @@ This property customizes the message displayed in a toast when the API invocatio
  <DataSource
   id="ds"
   method="post"
-  url="/api/shopping-list" 
+  url="/api/shopping-list"
   errorNotificationMessage="${error.statusCode}, {JSON.stringify($error.details)}" />
 ```
 
@@ -74,8 +74,8 @@ This `resultSelector` builds an array of the `properties` objects.
 
 
 ```xmlui copy
-<DataSource 
-  id="contacts" 
+<DataSource
+  id="contacts"
   url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
   resultSelector="results.map(item => item.properties )"
   headers='{{"Authorization":"Bearer not-a-real-token"}}'
@@ -83,8 +83,8 @@ This `resultSelector` builds an array of the `properties` objects.
 
 This `List` uses the array.
 
-```xmlui copy 
-<List data="{contacts}" title="Hubspot Contacts"> 
+```xmlui copy
+<List data="{contacts}" title="Hubspot Contacts">
   <Card gap="0" width="20em">
     <Text fontWeight="bold">
       {$item.firstname} {$item.lastname}
@@ -105,12 +105,12 @@ This `List` uses the array.
 This `resultSelector` filters the array of the `properties` objects to include only contacts with non-null `custom_notes`.
 
 ```xmlui copy
-<DataSource 
-  id="contacts" 
+<DataSource
+  id="contacts"
   resultSelector="results.filter(contact => contact.properties.custom_notes !== null).map(contact => contact.properties)"
   url="http:///{DOMAIN}/{CORS_PROXY}/api.hubapi.com/crm/v3/objects/contacts?properties=firstname,lastname,email,company,custom_notes"
   headers='{{"Authorization":"Bearer not-a-real-token"}}'
-  /> 
+  />
 ````
 
 This `Table` uses the filtered array.
@@ -123,6 +123,7 @@ This `Table` uses the filtered array.
   <Column bindTo="email" />
   <Column bindTo="custom_notes" />
 </Table>
+```
 
 
 %-PROP-END
