@@ -11,12 +11,14 @@ import { EMPTY_OBJECT } from "../constants";
 import { IconProvider } from "../../components/IconProvider";
 import ThemeProvider from "../theming/ThemeProvider";
 import { InspectorProvider } from "../InspectorContext";
-import type { GlobalProps} from "./AppRoot";
+import type { GlobalProps } from "./AppRoot";
 import { queryClient } from "./AppRoot";
 import { AppContent } from "./AppContent";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { ThemeTone } from "../../abstractions/ThemingDefs";
+import { LoggerProvider } from "../../logging/LoggerContext";
+import { LoggerInitializer } from "../../logging/LoggerInitializer";
 
 export type AppWrapperProps = {
   // --- The root node of the application definition; the internal
@@ -106,7 +108,7 @@ export const AppWrapper = ({
   resources,
   resourceMap,
   sources,
-  children
+  children,
 }: AppWrapperProps) => {
   if (previewMode) {
     // --- Prevent leaking the meta items to the parent document,
@@ -125,27 +127,33 @@ export const AppWrapper = ({
   const dynamicChildren = (
     <HelmetProvider>
       <Helmet defaultTitle={siteName} titleTemplate={`%s | ${siteName}`} />
-      <IconProvider>
-        <ThemeProvider
-          resourceMap={resourceMap}
-          themes={contributes.themes}
-          defaultTheme={defaultTheme}
-          defaultTone={defaultTone}
-          resources={resources}
-        >
-          <InspectorProvider sources={sources}>
-            <ConfirmationModalContextProvider>
-              <AppContent
-                rootContainer={node as ContainerWrapperDef}
-                routerBaseName={baseName}
-                globalProps={globalProps}
-                standalone={standalone}
-                decorateComponentsWithTestId={decorateComponentsWithTestId}
-                debugEnabled={debugEnabled}>{children}</AppContent>
-            </ConfirmationModalContextProvider>
-          </InspectorProvider>
-        </ThemeProvider>
-      </IconProvider>
+      <LoggerProvider>
+        <LoggerInitializer />
+        <IconProvider>
+          <ThemeProvider
+            resourceMap={resourceMap}
+            themes={contributes.themes}
+            defaultTheme={defaultTheme}
+            defaultTone={defaultTone}
+            resources={resources}
+          >
+            <InspectorProvider sources={sources}>
+              <ConfirmationModalContextProvider>
+                <AppContent
+                  rootContainer={node as ContainerWrapperDef}
+                  routerBaseName={baseName}
+                  globalProps={globalProps}
+                  standalone={standalone}
+                  decorateComponentsWithTestId={decorateComponentsWithTestId}
+                  debugEnabled={debugEnabled}
+                >
+                  {children}
+                </AppContent>
+              </ConfirmationModalContextProvider>
+            </InspectorProvider>
+          </ThemeProvider>
+        </IconProvider>
+      </LoggerProvider>
     </HelmetProvider>
   );
 
@@ -154,19 +162,17 @@ export const AppWrapper = ({
 
   return (
     // <React.StrictMode>
-      <ErrorBoundary node={node} location={"root-outer"}>
-        <QueryClientProvider client={queryClient}>
-          {/* No router in the REMIX environment */}
-          {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
+    <ErrorBoundary node={node} location={"root-outer"}>
+      <QueryClientProvider client={queryClient}>
+        {/* No router in the REMIX environment */}
+        {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
 
-          {/* Wrap the app in a router in other cases */}
-          {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
-            <Router basename={Router === HashRouter ? undefined : baseName}>
-              {dynamicChildren}
-            </Router>
-          )}
-        </QueryClientProvider>
-      </ErrorBoundary>
+        {/* Wrap the app in a router in other cases */}
+        {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
+          <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
+        )}
+      </QueryClientProvider>
+    </ErrorBoundary>
     // </React.StrictMode>
   );
 };

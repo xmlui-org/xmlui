@@ -29,6 +29,7 @@ import type { ComponentMetadata } from "./abstractions/ComponentDefs";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
 import { ThemeDefinition } from "./abstractions/ThemingDefs";
 import { useDevTools } from "./components-core/InspectorContext";
+import { useLogger } from "./logging/LoggerContext";
 
 export type {
   ThemeDefinition,
@@ -64,4 +65,5 @@ export {
   useColors,
   toCssVar,
   useDevTools,
+  useLogger
 };

@@ -94,3 +94,15 @@
   height: 100%;
   width: 100%;
 }
+
+.console {
+  padding: themes.$space-1_5;
+  background-color: themes.$backgroundColor;
+  color: themes.$textColor-primary;
+  flex: 1;
+}
+
+.timestamp {
+  color: themes.$textColor-secondary;
+  font-size: themes.$fontSize-normal;
+}

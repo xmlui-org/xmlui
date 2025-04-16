@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import { Rnd } from "react-rnd";
-import { Icon, useTheme, useDevTools, Button } from "xmlui";
+import { Icon, useTheme, useDevTools, Button, useLogger } from "xmlui";
 import styles from "./DevToolsNative.module.scss";
 import { Content, List, Root, Trigger } from "@radix-ui/react-tabs";
 import { BiDockBottom, BiDockLeft, BiDockRight } from "react-icons/bi";
@@ -14,6 +14,14 @@ import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
 import xmluiLight from "../syntax/monaco/xmlui-light";
 import xmluiDark from "../syntax/monaco/xmlui-dark";
 
+function trySafeStringify(obj: any): string {
+  try {
+    return JSON.stringify(obj);
+  } catch (e) {
+    return "[Circular]";
+  }
+}
+
 export const DevTools = () => {
   const [side, setSide] = useState<"bottom" | "left" | "right">("bottom");
   const { root, activeThemeTone } = useTheme();
@@ -25,6 +33,7 @@ export const DevTools = () => {
   const [activeTab, setActiveTab] = useState("code");
   const monacoSetupDone = useRef(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { logs } = useLogger();
 
   const copyToClipboard = () => {
     setCopied(true);
@@ -293,7 +302,18 @@ export const DevTools = () => {
           </div>
         </Content>
         <Content value={"console"} className={styles.content}>
-          Debug console
+          <div className={styles.console}>
+            {logs.map((log, idx) => (
+              <div key={idx}>
+                <span className={styles.timestamp}>{log.timestamp.toLocaleTimeString()}:</span>{" "}
+                {log.args.map((arg, i) => (
+                  <span key={i}>
+                    {typeof arg === "object" ? trySafeStringify(arg) : String(arg)}{" "}
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
         </Content>
       </Root>
     </Rnd>
