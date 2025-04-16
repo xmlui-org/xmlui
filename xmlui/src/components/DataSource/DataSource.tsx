@@ -73,7 +73,7 @@ export const DataSourceMd = createMetadata({
     },
     resultSelector: {
       description:
-        `Set a selector that extracts a part of the response data.`,
+        `Set an object key to extract a subset of the response data.`,
       valueType: "string",
     },
     transformResult: {
