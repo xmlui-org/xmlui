@@ -5,7 +5,7 @@ import { SelectionStore } from "./SelectionStoreNative";
 const COMP = "SelectionStore";
 
 export const SelectionStoreMd = createMetadata({
-  status: "deprecated",
+  status: "experimental",
   description:
     `The \`${COMP}\` is a non-visual component that may wrap components (items) and manage ` +
     `their selection state to accommodate the usage of other actions.`,
