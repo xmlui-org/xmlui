@@ -515,7 +515,7 @@ function useStandalone(
       const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
 
-      resolveComponentDependencies({
+      discoverCompilationDependencies({
         projectCompilation: resolvedRuntime.projectCompilation,
         extensionManager,
       });
@@ -960,7 +960,7 @@ function processAppLinting(
   }
 }
 
-function resolveComponentDependencies({
+function discoverCompilationDependencies({
   projectCompilation: { components, entrypoint },
   extensionManager,
 }: {
@@ -980,5 +980,50 @@ function resolveComponentDependencies({
   // probably a better idea to use a custom solution for dependecy resolution,
   // than to use the checkxmluimarkup, which does a lot more things than just collect the missing deps. Use the registry though!
 
+  const entrypointDependencies = discoverDirectComponentDependencies(
+    entrypoint.definition,
+    registry,
+  );
+  entrypoint.dependencies = Array.from(entrypointDependencies);
+
+  const compNameStack: string[] = [];
+  for (const componentCompilation of components) {
+    const compDependencies = discoverDirectComponentDependencies(
+      componentCompilation.definition.component,
+      registry,
+    );
+    compDependencies.delete(componentCompilation.definition.name);
+    componentCompilation.dependencies = Array.from(compDependencies);
+  }
+
+  // if one needs to, they can extend the dependencies to include transitive dependencies
+  //
   registry.destroy();
+}
+
+function discoverDirectComponentDependencies(
+  entrypoint: ComponentDef,
+  registry: ComponentRegistry,
+): Set<string> {
+  return discDepsHelp(entrypoint, registry, new Set<string>());
+}
+
+function discDepsHelp(
+  component: ComponentDef,
+  registry: ComponentRegistry,
+  deps: Set<string>,
+): Set<string> {
+  const compName = component.type;
+  if (!registry.hasComponent(compName)) {
+    deps.add(compName);
+  }
+  if (!component.children) {
+    return deps;
+  }
+
+  for (const child of component.children) {
+    discDepsHelp(child, registry, deps);
+  }
+
+  return deps;
 }
