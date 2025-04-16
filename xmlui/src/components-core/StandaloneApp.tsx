@@ -321,13 +321,13 @@ function resolveRuntime(runtime: Record<string, any>): {
 
     // --- We assume that the entry point is either named "Main" or "App".
     if (matchesFileName(key, "Main") || matchesFileName(key, "App")) {
-      projectCompilation.entrypoint.filename = key;
       if (key.endsWith(codeBehindFileExtension)) {
         // --- "default" contains the functions and variables declared in the
         // --- code behind file.
         entryPointCodeBehind = value.default;
         projectCompilation.entrypoint.codeBehindSource = value.default.src;
       } else {
+        projectCompilation.entrypoint.filename = key;
         // --- "default" contains the component definition, the file index,
         // --- and the source code.
         entryPoint = value.default.component;
