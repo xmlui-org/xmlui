@@ -130,6 +130,7 @@ function StandaloneApp({
   return (
     <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
       <AppRoot
+        projectCompilation={projectCompilation}
         decorateComponentsWithTestId={shouldDecorateWithTestId}
         node={entryPoint!}
         standalone={true}

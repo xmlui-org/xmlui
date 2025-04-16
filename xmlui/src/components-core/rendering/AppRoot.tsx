@@ -8,6 +8,7 @@ import { ComponentProvider } from "../../components/ComponentProvider";
 import { DebugViewProvider } from "../DebugViewProvider";
 import StandaloneExtensionManager from "../StandaloneExtensionManager";
 import { AppWrapper, AppWrapperProps } from "./AppWrapper";
+import { ProjectCompilation } from "../../abstractions/scripting/Compilation";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -27,9 +28,9 @@ export const queryClient = new QueryClient({
 });
 
 /**
- * This component is responsible for running a pre-compiled xmlui app. It 
- * receives the internal representation of the app markup and code (coming 
- * from either code-behind files or inlined markup expressions) and executes 
+ * This component is responsible for running a pre-compiled xmlui app. It
+ * receives the internal representation of the app markup and code (coming
+ * from either code-behind files or inlined markup expressions) and executes
  * the app accordingly.
  */
 export function AppRoot({
@@ -49,10 +50,14 @@ export function AppRoot({
   resourceMap,
   sources,
   extensionManager,
-  children
-}: AppWrapperProps & { extensionManager?: StandaloneExtensionManager }) {
-  // --- Make sure, the root node is wrapped in a `Theme` component. Also, 
-  // --- the root node must be wrapped in a `Container` component managing 
+  children,
+  projectCompilation,
+}: AppWrapperProps & {
+  extensionManager?: StandaloneExtensionManager;
+  projectCompilation?: ProjectCompilation;
+}) {
+  // --- Make sure, the root node is wrapped in a `Theme` component. Also,
+  // --- the root node must be wrapped in a `Container` component managing
   // --- the app's top-level state.
   const rootNode = useMemo(() => {
     const themedRoot =
@@ -79,6 +84,8 @@ export function AppRoot({
     };
   }, [node]);
 
+  console.log("projectCompilation: ", projectCompilation);
+
   // --- Start with an error-free state
   resetErrors();
 
@@ -102,7 +109,10 @@ export function AppRoot({
           standalone={standalone}
           trackContainerHeight={trackContainerHeight}
           previewMode={previewMode}
-          sources={sources}>{children}</AppWrapper>
+          sources={sources}
+        >
+          {children}
+        </AppWrapper>
       </DebugViewProvider>
     </ComponentProvider>
   );
