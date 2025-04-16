@@ -1,9 +1,9 @@
 import type { CSSProperties, ReactNode } from "react";
-import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
+import { Fragment, memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
-import type { ComponentDef, PropertyValueDescription } from "../../abstractions/ComponentDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { asOptionalBoolean } from "../../components-core/rendering/valueExtractor";
 import type {
   FormControlType,
@@ -112,6 +112,8 @@ export const FormItem = memo(function FormItem({
   const validationResult = useFormContextPart((value) => value.validationResults[bindTo]);
   const dispatch = useFormContextPart((value) => value.dispatch);
   const formEnabled = useFormContextPart((value) => value.enabled);
+  const lastUnboundId = useFormContextPart((value) => value.unboundItemsCount);
+  const [formItemId, setFormItemId] = useState(bindTo);
 
   const isEnabled = enabled && formEnabled;
 

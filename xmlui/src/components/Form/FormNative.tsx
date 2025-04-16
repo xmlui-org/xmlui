@@ -81,6 +81,12 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
     };
   }
   switch (action.type) {
+    case FormActionKind.FIELD_NEW_UNBOUND: {
+      state.unboundItemsCount ??= 0;
+      state.unboundItemsCount += 1;
+      break;
+    }
+
     case FormActionKind.FIELD_INITIALIZED: {
       if (!state.interactionFlags[uid].isDirty) {
         setByPath(state.subject, uid, action.payload.value);
@@ -208,6 +214,7 @@ interface FormState {
   generalValidationResults: Array<SingleValidationResult>;
   interactionFlags: Record<string, InteractionFlags>;
   submitInProgress?: boolean;
+  unboundItemsCount?: number;
 }
 
 const initialState: FormState = {
@@ -303,6 +310,7 @@ const Form = forwardRef(function (
       originalSubject: initialValue,
       validationResults: formState.validationResults,
       interactionFlags: formState.interactionFlags,
+      unboundItemsCount: formState.unboundItemsCount,
       dispatch,
       enabled: isEnabled,
     };
@@ -311,6 +319,7 @@ const Form = forwardRef(function (
     formState.interactionFlags,
     formState.subject,
     formState.validationResults,
+    formState.unboundItemsCount,
     initialValue,
     isEnabled,
     itemLabelBreak,
