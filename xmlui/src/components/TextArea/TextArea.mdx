@@ -278,7 +278,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 
 ```xmlui copy {3}
 <App var.field="">
-  <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
+  <TextArea autoFocus="true" initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
 </App>
 ```
@@ -288,7 +288,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
   height={160}
   app={`
   <App var.field="">
-    <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
+    <TextArea autoFocus="true" initialValue="{field}" onDidChange="(val) => field = val" />
     <Text value="{field}" />
   </App>
   `}

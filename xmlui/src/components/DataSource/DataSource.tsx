@@ -8,82 +8,77 @@ const COMP = "DataSource";
 export const DataSourceMd = createMetadata({
   status: "stable",
   description:
-    `The \`${COMP}\` component manages fetching data from a web API endpoint. This component ` +
+    `The \`${COMP}\` component manages fetching data from an API endpoint. This component ` +
     `automatically manages the complexity of the fetch operation and caching. To manipulate data ` +
     `on the backend, use the [\`APICall\`](./APICall.mdx) component.`,
   props: {
     method: {
-      description: `The method by which the data fetching request is made.`,
+      description: `Set the HTTP method.`,
       defaultValue: "get",
       availableValues: httpMethodNames,
     },
-    url: {
-      description: `This property represents the URL to fetch the data.`,
+    id: {
+      description:
+        `Set the ID used by other components to access the retrieved data in the `value` +
+        `property of a \`DataSource\`, or status info in the `loaded` and `error` properties.`,
       isRequired: true,
       valueType: "string",
-    },
-    rawBody: {
-      description:
-        `This property sets the request body to the value provided here without any conversion. ` +
-        `Use the \`body\` property if you want the object sent in JSON. When you define \`body\` ` +
-        `and \`rawBody\`, the latest one prevails.`,
+    }
+    url: {
+      description: `Set the URL.`,
+      isRequired: true,
       valueType: "string",
     },
     body: {
       description:
-        `This property sets the request body. The object you pass here will be serialized to JSON ` +
-        `when sending the request. Use the \`rawBody\` property to send another request body using ` +
-        `its native format. When you define \`body\` and \`rawBody\`, the latest one prevails.`,
+        `Set the request body. The object you pass is serialized as a JSON string.`,
+      valueType: "object",
+    },
+    rawBody: {
+      description:
+        `Set the request body with no serialization. Use it to send a payload  ` +
+        `that has already been serialized to a JSON string.`,
+      valueType: "string",
     },
     queryParams: {
       description:
-        `This property sets the request body. The object you pass here will be serialized to JSON ` +
-        `when sending the request. Use the \`rawBody\` property to send another request body ` +
-        `using its native format. When you define \`body\` and \`rawBody\`, the latest one prevails.`,
+        `Append key/value pairs to the URL.`
+      valueType: "object",
     },
     headers: {
       description:
-        `You can define request header values as key and value pairs, where the key is the ID of ` +
-        `the particular header and the value is that header's value.`,
+        `Set request headers. Pass an object whose keys are header names and values are header values.`,
+      valueType: "object",
     },
     pollIntervalInSeconds: {
       description:
-        `By setting this property, you can define periodic data fetching. The \`DataSource\` ` +
-        `component will refresh its data according to the time specified as seconds. When the ` +
-        `data changes during the refresh, it will trigger the update mechanism of XMLUI and ` +
-        `re-render the UI accordingly.`,
+        `Set the interval for periodic data fetching. If the data changes on refresh, ` +
+        `XMLUI will re-render components that refer directly or indirectly to the \`DataSource\`. `,
       valueType: "number",
     },
     inProgressNotificationMessage: {
       description:
-        `This property defines the message to display when the data fetch ` +
-        `operation is in progress.`,
+        `Set the message to display when the data fetch is in progress.`,
       valueType: "string",
     },
     completedNotificationMessage: {
       description:
-        `This property defines the message to display when the data fetch ` +
-        `operation has been completed.`,
+        `Set the message to display when the data fetch completes.`,
       valueType: "string",
     },
     errorNotificationMessage: {
       description:
-        `This property defines the message to display when the data fetch ` +
-        `operation results in an error.`,
+        `Set the message to display when the there is an error.`,
       valueType: "string",
     },
     resultSelector: {
       description:
-        `The response of a data-fetching query may include additional information that ` +
-        `the UI cannot (or does not intend) to process. With this property, you can define ` +
-        `a selector that extracts the data from the response body.`,
+        `Set an object key to extract a subset of the response data.`,
+      valueType: "string",
     },
     transformResult: {
       description:
-        "This property accepts a transformation function that receives the data coming from " +
-        "the backend after it has been through the evaluation of the optional \`resultSelector\` " +
-        "property. The function gets the entire result set and can transform it. The " +
-        "\`DataSource\` component `value` property will return the data from this function.",
+        `Set a function to perform a final transformation of the response data.`,
     },
     prevPageSelector: {
       description:
