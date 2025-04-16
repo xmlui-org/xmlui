@@ -25,7 +25,6 @@ interface IFormContext {
   itemLabelWidth?: string;
   itemLabelBreak?: boolean;
   itemLabelPosition?: string | LabelPosition;
-  unboundItemsCount?: number;
 }
 
 export type ValidationResult = {

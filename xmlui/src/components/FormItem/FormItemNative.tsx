@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { Fragment, memo, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, memo, useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
@@ -26,6 +26,7 @@ import {
   fieldInitialized,
   fieldLostFocus,
   fieldRemoved,
+  UNBOUND_FIELD_SUFFIX,
 } from "../Form/formActions";
 import { TextArea } from "../TextArea/TextAreaNative";
 import { useEvent } from "../../components-core/utils/misc";
@@ -96,6 +97,8 @@ export const FormItem = memo(function FormItem({
   inputRenderer,
   ...rest
 }: Props) {
+  const defaultId = useId();
+  const [formItemId, setFormItemId] = useState(bindTo);
   const labelWidthValue = useFormContextPart((value) => labelWidth || value.itemLabelWidth);
   const labelBreakValue = useFormContextPart((value) =>
     labelBreak !== undefined ? labelBreak : value.itemLabelBreak,
@@ -104,43 +107,43 @@ export const FormItem = memo(function FormItem({
     (value) => labelPosition || value.itemLabelPosition || DEFAULT_LABEL_POSITIONS[type],
   );
   const initialValueFromSubject = useFormContextPart<any>((value) =>
-    getByPath(value.originalSubject, bindTo),
+    getByPath(value.originalSubject, formItemId),
   );
   const initialValue =
     initialValueFromSubject === undefined ? rest.initialValue : initialValueFromSubject;
-  const value = useFormContextPart<any>((value) => getByPath(value.subject, bindTo));
-  const validationResult = useFormContextPart((value) => value.validationResults[bindTo]);
+  const value = useFormContextPart<any>((value) => getByPath(value.subject, formItemId));
+  const validationResult = useFormContextPart((value) => value.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value.dispatch);
   const formEnabled = useFormContextPart((value) => value.enabled);
-  const lastUnboundId = useFormContextPart((value) => value.unboundItemsCount);
-  const [formItemId, setFormItemId] = useState(bindTo);
 
   const isEnabled = enabled && formEnabled;
 
   useEffect(() => {
-    dispatch(fieldInitialized(bindTo, initialValue));
+    const newId = bindTo || `${defaultId}${UNBOUND_FIELD_SUFFIX}` ;
+    setFormItemId(newId);
+    dispatch(fieldInitialized(newId, initialValue));
   }, [bindTo, dispatch, initialValue]);
 
-  useValidation(validations, onValidate, value, dispatch, bindTo, customValidationsDebounce);
+  useValidation(validations, onValidate, value, dispatch, formItemId, customValidationsDebounce);
 
   const onStateChange = useCallback(
     ({ value }: any, options?: any) => {
       //we already handled the initial value in the useEffect with fieldInitialized(...);
       if (!options?.initial) {
-        dispatch(fieldChanged(bindTo, value));
+        dispatch(fieldChanged(formItemId, value));
       }
     },
-    [bindTo, dispatch],
+    [formItemId, dispatch],
   );
 
   useEffect(() => {
     return () => {
-      dispatch(fieldRemoved(bindTo));
+      dispatch(fieldRemoved(formItemId));
     };
-  }, [bindTo, dispatch]);
+  }, [formItemId, dispatch]);
 
   const { validationStatus, isHelperTextShown } = useValidationDisplay(
-    bindTo,
+    formItemId,
     value,
     validationResult,
     validationMode,
@@ -356,11 +359,11 @@ export const FormItem = memo(function FormItem({
   }
 
   const onFocus = useEvent(() => {
-    dispatch(fieldFocused(bindTo));
+    dispatch(fieldFocused(formItemId));
   });
 
   const onBlur = useEvent(() => {
-    dispatch(fieldLostFocus(bindTo));
+    dispatch(fieldLostFocus(formItemId));
   });
   const [animateContainerRef] = useAutoAnimate({ duration: 100 });
 

@@ -30,6 +30,7 @@ import {
   formSubmitted,
   formSubmitting,
   triedToSubmit,
+  UNBOUND_FIELD_SUFFIX,
 } from "../../components/Form/formActions";
 import { ModalDialog } from "../../components/ModalDialog/ModalDialogNative";
 import { Text } from "../../components/Text/TextNative";
@@ -81,12 +82,6 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
     };
   }
   switch (action.type) {
-    case FormActionKind.FIELD_NEW_UNBOUND: {
-      state.unboundItemsCount ??= 0;
-      state.unboundItemsCount += 1;
-      break;
-    }
-
     case FormActionKind.FIELD_INITIALIZED: {
       if (!state.interactionFlags[uid].isDirty) {
         setByPath(state.subject, uid, action.payload.value);
@@ -167,7 +162,6 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.BACKEND_VALIDATION_ARRIVED: {
-      //console.log(state.validationResults[field]) //action.payload.fieldValidationResults
       state.submitInProgress = false;
       state.generalValidationResults = action.payload.generalValidationResults;
       Object.keys(state.validationResults).forEach((key) => {
@@ -214,7 +208,6 @@ interface FormState {
   generalValidationResults: Array<SingleValidationResult>;
   interactionFlags: Record<string, InteractionFlags>;
   submitInProgress?: boolean;
-  unboundItemsCount?: number;
 }
 
 const initialState: FormState = {
@@ -310,7 +303,6 @@ const Form = forwardRef(function (
       originalSubject: initialValue,
       validationResults: formState.validationResults,
       interactionFlags: formState.interactionFlags,
-      unboundItemsCount: formState.unboundItemsCount,
       dispatch,
       enabled: isEnabled,
     };
@@ -319,7 +311,6 @@ const Form = forwardRef(function (
     formState.interactionFlags,
     formState.subject,
     formState.validationResults,
-    formState.unboundItemsCount,
     initialValue,
     isEnabled,
     itemLabelBreak,
@@ -352,7 +343,15 @@ const Form = forwardRef(function (
     const prevFocused = document.activeElement;
     dispatch(formSubmitting());
     try {
-      await onSubmit?.(formState.subject, {
+      // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
+      const filteredSubject = Object.entries(formState.subject).reduce((acc, [key, value]) => {
+        if (!key.endsWith(UNBOUND_FIELD_SUFFIX)) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as Record<string, any>);
+
+      await onSubmit?.(filteredSubject, {
         passAsDefaultBody: true,
       });
       dispatch(formSubmitted());

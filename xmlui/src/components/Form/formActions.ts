@@ -1,5 +1,7 @@
 import { SingleValidationResult, ValidationResult } from "../Form/FormContext";
 
+export const UNBOUND_FIELD_SUFFIX = "__UNBOUND_FIELD__";
+
 export enum FormActionKind {
   FIELD_LOST_FOCUS = "FormActionKind:FIELD_LOST_FOCUS",
   FIELD_VALUE_CHANGED = "FormActionKind:FIELD_VALUE_CHANGED",
@@ -7,7 +9,6 @@ export enum FormActionKind {
   FIELD_VALIDATED = "FormActionKind:FIELD_VALIDATED",
   FIELD_INITIALIZED = "FormActionKind:FIELD_INITIALIZED",
   FIELD_REMOVED = "FormActionKind:FIELD_REMOVED",
-  FIELD_NEW_UNBOUND = "FormActionKind:FIELD_NEW_UNBOUND",
   TRIED_TO_SUBMIT = "FormActionKind:TRIED_TO_SUBMIT",
   BACKEND_VALIDATION_ARRIVED = "FormActionKind:BACKEND_VALIDATION_ARRIVED",
   SUBMITTING = "FormActionKind:SUBMITTING",
@@ -27,12 +28,6 @@ export type FormAction = {
       }
     | any;
 };
-
-export function fieldNewUnbound() {
-  return {
-    type: FormActionKind.FIELD_NEW_UNBOUND,
-  };
-}
 
 export function fieldInitialized(uid: string, value: any) {
   return {
