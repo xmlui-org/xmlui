@@ -1,16 +1,19 @@
 import { loggerService } from "./LoggerService";
 
 export const xmlui = {
-  log: (msg: string) => {
-    loggerService.log(msg);
+  log: (...args: any[]) => {
+    loggerService.log(args);
   },
-  warn: (msg: string) => {
-    loggerService.warn(msg);
+  warn: (...args: any[]) => {
+    loggerService.warn(args);
   },
-  info: (msg: string) => {
-    loggerService.info(msg);
+  info: (...args: any[]) => {
+    loggerService.info(args);
   },
-  error: (msg: string) => {
-    loggerService.error(msg);
+  error: (...args: any[]) => {
+    loggerService.error(args);
+  },
+  trace: (...args: any[]) => {
+    loggerService.trace(args);
   },
 };

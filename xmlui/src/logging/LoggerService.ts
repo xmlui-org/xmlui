@@ -1,10 +1,13 @@
-type LoggerCallback = (message: string) => void;
+type LoggerCallback = (args: any[]) => void;
 
 class LoggerService {
   private static instance: LoggerService;
   private callback?: LoggerCallback;
+  private isDev: boolean;
 
-  private constructor() {}
+  private constructor() {
+    this.isDev = import.meta.env?.MODE === "development" || process.env.NODE_ENV === "development";
+  }
 
   public static getInstance(): LoggerService {
     if (!LoggerService.instance) {
@@ -14,34 +17,48 @@ class LoggerService {
   }
 
   public registerCallback(callback: LoggerCallback) {
-    this.callback = callback;
-  }
-
-  public log(message: string) {
-    console.log("[xmlui.log]", message);
-    if (this.callback) {
-      this.callback(message);
+    if (this.isDev) {
+      this.callback = callback;
     }
   }
 
-  public warn(message: string) {
-    console.warn("[xmlui.warn]", message);
+  public log(args: any[]) {
+    if (!this.isDev) return;
+    console.log("[xmlui.log]", ...args);
     if (this.callback) {
-      this.callback(message);
+      this.callback(args);
     }
   }
 
-  public info(message: string) {
-    console.info("[xmlui.info]", message);
+  public warn(args: any[]) {
+    if (!this.isDev) return;
+    console.warn("[xmlui.warn]", ...args);
     if (this.callback) {
-      this.callback(message);
+      this.callback(args);
     }
   }
 
-  public error(message: string) {
-    console.error("[xmlui.error]", message);
+  public info(args: any[]) {
+    if (!this.isDev) return;
+    console.info("[xmlui.info]", ...args);
     if (this.callback) {
-      this.callback(message);
+      this.callback(args);
+    }
+  }
+
+  public error(args: any[]) {
+    if (!this.isDev) return;
+    console.error("[xmlui.error]", ...args);
+    if (this.callback) {
+      this.callback(args);
+    }
+  }
+
+  public trace(args: any[]) {
+    if (!this.isDev) return;
+    console.trace("[xmlui.trace]", ...args);
+    if (this.callback) {
+      this.callback(args);
     }
   }
 }

@@ -2,12 +2,12 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 
 type LogEntry = {
   timestamp: Date;
-  message: string;
+  args: any[];
 };
 
 type LogContextType = {
   logs: LogEntry[];
-  addLog: (message: string) => void;
+  addLog: (args: any[]) => void;
 };
 
 const LogContext = createContext<LogContextType | undefined>(undefined);
@@ -15,8 +15,8 @@ const LogContext = createContext<LogContextType | undefined>(undefined);
 export const LoggerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
 
-  const addLog = useCallback((message: string) => {
-    const newEntry = { timestamp: new Date(), message };
+  const addLog = useCallback((args: any[]) => {
+    const newEntry = { timestamp: new Date(), args };
     setLogs(prev => [...prev, newEntry]);
   }, []);
 
