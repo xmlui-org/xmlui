@@ -135,7 +135,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
 
   const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
 
-  const stringValue = value ? value + "" : null;
+  const stringValue = value != undefined ? value + "" : null;
   const onValChange = useCallback(
     (val: string) => {
       const valueWithMatchingType = Array.from(options.values()).find(
