@@ -514,6 +514,11 @@ function useStandalone(
     (async function () {
       const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
+
+      resolveComponentDependencies({
+        projectCompilation: resolvedRuntime.projectCompilation,
+        extensionManager,
+      });
       setProjectCompilation(resolvedRuntime.projectCompilation);
 
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
@@ -953,4 +958,27 @@ function processAppLinting(
     }
     return null;
   }
+}
+
+function resolveComponentDependencies({
+  projectCompilation: { components, entrypoint },
+  extensionManager,
+}: {
+  projectCompilation: ProjectCompilation;
+  extensionManager?: StandaloneExtensionManager;
+}) {
+  //TODO: check if we need the first argument (contributes) to be provided as well
+  // do we want components from extensions to be included in the dependencies?
+  //
+  // new ComponentRegistry(
+  //   { compoundComponents: components.map((c) => c.definition) },
+  //   extensionManager,
+  // );
+
+  const registry = new ComponentRegistry({}, extensionManager);
+
+  // probably a better idea to use a custom solution for dependecy resolution,
+  // than to use the checkxmluimarkup, which does a lot more things than just collect the missing deps. Use the registry though!
+
+  registry.destroy();
 }
