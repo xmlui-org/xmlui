@@ -46,7 +46,7 @@ import {
 } from "../parsers/xmlui-parser/lint";
 import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
 import { ThemeDefinition, ThemeTone } from "../abstractions/ThemingDefs";
-import { ProjectCompilation } from "../abstractions/scripting/Compilation";
+import { ComponentCompilation, ProjectCompilation } from "../abstractions/scripting/Compilation";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -293,7 +293,6 @@ function resolveRuntime(runtime: Record<string, any>): {
   const projectCompilation: ProjectCompilation = {
     entrypoint: {
       filename: "",
-      componentName: "Main",
       definition: null,
       dependencies: [],
     },
@@ -351,11 +350,32 @@ function resolveRuntime(runtime: Record<string, any>): {
         // --- "default" contains the functions and variables declared in the
         // --- component's code behind file.
         codeBehindsByFileName[key] = value.default;
+        const componentCompilationForCodeBehind = projectCompilation.components.findLast(
+          ({ filename }) => {
+            const idxOfCodeBehindFileExtension = key.lastIndexOf(codeBehindFileExtension);
+            const idxOfComponentFileExtension = filename.lastIndexOf(componentFileExtension);
+            const extensionlessFilenamesMatch =
+              filename.substring(0, idxOfComponentFileExtension) ===
+              key.substring(0, idxOfCodeBehindFileExtension);
+
+            return extensionlessFilenamesMatch;
+          },
+        );
+
+        componentCompilationForCodeBehind.codeBehindSource = value.default.src;
       } else {
         // --- "default" contains the component definition, the file index,
         // --- and the source code.
         componentsByFileName[key] = value.default.component;
         sources[value.default.file] = value.default.src;
+
+        const componentCompilation: ComponentCompilation = {
+          definition: value.default.component,
+          filename: key,
+          markupSource: value.default.src,
+          dependencies: [],
+        };
+        projectCompilation.components.push(componentCompilation);
       }
     }
 
