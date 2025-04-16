@@ -19,11 +19,11 @@ export const DataSourceMd = createMetadata({
     },
     id: {
       description:
-        `Set the ID used by other components to access the retrieved data in the `value` +
-        `property of a \`DataSource\`, or status info in the `loaded` and `error` properties.`,
+        `Set the ID used by other components to access the retrieved data in the \`value\`` +
+        `property of a \`DataSource\`, or status info in the \`loaded\` and \`error\` properties.`,
       isRequired: true,
       valueType: "string",
-    }
+    },
     url: {
       description: `Set the URL.`,
       isRequired: true,
@@ -32,7 +32,7 @@ export const DataSourceMd = createMetadata({
     body: {
       description:
         `Set the request body. The object you pass is serialized as a JSON string.`,
-      valueType: "object",
+      valueType: "any",
     },
     rawBody: {
       description:
@@ -42,13 +42,13 @@ export const DataSourceMd = createMetadata({
     },
     queryParams: {
       description:
-        `Append key/value pairs to the URL.`
-      valueType: "object",
+        `Append key/value pairs to the URL.`,
+      valueType: "any",
     },
     headers: {
       description:
         `Set request headers. Pass an object whose keys are header names and values are header values.`,
-      valueType: "object",
+      valueType: "any",
     },
     pollIntervalInSeconds: {
       description:

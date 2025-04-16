@@ -135,35 +135,35 @@ function DataLoader({
         }
       } else if (loader.props.dataType === "sql") {
         try {
-          console.log("[SQL DataLoader] Starting SQL data load");
+          //console.log("[SQL DataLoader] Starting SQL data load");
           // Extract SQL query from the body or rawBody
           let sqlQuery: string = "";
           let sqlParams: any[] = [];
           
           // Try to extract SQL query and parameters from body or rawBody
           if (body && typeof body === 'object') {
-            console.log("[SQL DataLoader] Using body object:", body);
+            //console.log("[SQL DataLoader] Using body object:", body);
             sqlQuery = body.sql || "";
             sqlParams = body.params || [];
           } else if (rawBody) {
-            console.log("[SQL DataLoader] Using rawBody:", rawBody);
+            //console.log("[SQL DataLoader] Using rawBody:", rawBody);
             try {
               const parsedBody = JSON.parse(rawBody);
               sqlQuery = parsedBody.sql || "";
               sqlParams = parsedBody.params || [];
             } catch (e) {
               // If rawBody is not valid JSON, use it as the SQL query
-              console.log("[SQL DataLoader] rawBody is not valid JSON, using as SQL query");
+              //console.log("[SQL DataLoader] rawBody is not valid JSON, using as SQL query");
               sqlQuery = rawBody;
             }
           }
 
-          console.log("[SQL DataLoader] SQL Query:", sqlQuery);
-          console.log("[SQL DataLoader] SQL Params:", sqlParams);
+          //console.log("[SQL DataLoader] SQL Query:", sqlQuery);
+          //console.log("[SQL DataLoader] SQL Params:", sqlParams);
 
           // If SQL query is empty, throw an error
           if (!sqlQuery) {
-            console.error("[SQL DataLoader] SQL query is empty");
+            //console.error("[SQL DataLoader] SQL query is empty");
             throw new Error("SQL query is required for SQL data type");
           }
 
@@ -174,16 +174,16 @@ function DataLoader({
             "Content-Type": "application/json",
           };
 
-          console.log("[SQL DataLoader] Request URL:", queryUrl);
-          console.log("[SQL DataLoader] Request Method:", method);
-          console.log("[SQL DataLoader] Request Headers:", headers);
+          //console.log("[SQL DataLoader] Request URL:", queryUrl);
+          //console.log("[SQL DataLoader] Request Method:", method);
+          //console.log("[SQL DataLoader] Request Headers:", headers);
 
           const requestBody = JSON.stringify({
             sql: sqlQuery,
             params: sqlParams,
           });
 
-          console.log("[SQL DataLoader] Request Body:", requestBody);
+          //console.log("[SQL DataLoader] Request Body:", requestBody);
 
           const fetchOptions: RequestInit = {
             method,
@@ -195,9 +195,9 @@ function DataLoader({
             fetchOptions.signal = abortSignal;
           }
 
-          console.log("[SQL DataLoader] Sending fetch request...");
+          //console.log("[SQL DataLoader] Sending fetch request...");
           const response = await fetch(queryUrl, fetchOptions);
-          console.log("[SQL DataLoader] Response status:", response.status, response.statusText);
+          //console.log("[SQL DataLoader] Response status:", response.status, response.statusText);
 
           if (!response.ok) {
             console.error("[SQL DataLoader] Failed response:", response.status, response.statusText);
@@ -206,19 +206,19 @@ function DataLoader({
 
           // Parse response as JSON
           const jsonResult = await response.json();
-          console.log("[SQL DataLoader] Response data:", jsonResult);
+          //console.log("[SQL DataLoader] Response data:", jsonResult);
           
           // Check the structure of the response
           if (jsonResult && typeof jsonResult === 'object') {
-            console.log("[SQL DataLoader] Response keys:", Object.keys(jsonResult));
+            //console.log("[SQL DataLoader] Response keys:", Object.keys(jsonResult));
             
             // If response has rows property, check if it's in expected format
             if (jsonResult.rows) {
-              console.log("[SQL DataLoader] Response has 'rows' property:", jsonResult.rows);
-              console.log("[SQL DataLoader] rows is array:", Array.isArray(jsonResult.rows));
-              if (Array.isArray(jsonResult.rows) && jsonResult.rows.length > 0) {
-                console.log("[SQL DataLoader] First row:", jsonResult.rows[0]);
-              }
+              //console.log("[SQL DataLoader] Response has 'rows' property:", jsonResult.rows);
+              //console.log("[SQL DataLoader] rows is array:", Array.isArray(jsonResult.rows));
+              // if (Array.isArray(jsonResult.rows) && jsonResult.rows.length > 0) {
+              //   console.log("[SQL DataLoader] First row:", jsonResult.rows[0]);
+              // }
               
               // Return rows directly for easier table rendering
               return jsonResult.rows;
@@ -226,7 +226,7 @@ function DataLoader({
             
             // Check for other common SQL result formats
             if (jsonResult.results) {
-              console.log("[SQL DataLoader] Response has 'results' property");
+              //console.log("[SQL DataLoader] Response has 'results' property");
               return jsonResult.results;
             }
           }
@@ -275,11 +275,11 @@ function DataLoader({
   const loadingToastIdRef = useRef<string | undefined>(undefined);
   const inProgress: LoaderInProgressChangedFn = useCallback(
     (isInProgress) => {
-      console.log("[DataLoader] inProgress() called with isInProgress:", isInProgress);
-      console.log("[DataLoader] dataType:", loader.props.dataType);
+      //console.log("[DataLoader] inProgress() called with isInProgress:", isInProgress);
+      //console.log("[DataLoader] dataType:", loader.props.dataType);
       
       loaderInProgressChanged(isInProgress);
-      console.log("[DataLoader] After loaderInProgressChanged() call");
+      //console.log("[DataLoader] After loaderInProgressChanged() call");
       
       const inProgressMessage = extractParam(
         stateRef.current.state,
@@ -296,28 +296,28 @@ function DataLoader({
           toast.dismiss(loadingToastIdRef.current);
         }
       }
-      console.log("[DataLoader] inProgress() completed");
+      //console.log("[DataLoader] inProgress() completed");
     },
     [loader.props.inProgressNotificationMessage, loaderInProgressChanged, loader.props.dataType],
   );
 
   const loaded: LoaderLoadedFn = useCallback(
     (data, pageInfo) => {
-      console.log("[DataLoader] loaded() called with data:", data);
-      console.log("[DataLoader] loaded() pageInfo:", pageInfo);
-      console.log("[DataLoader] loader.props.dataType:", loader.props.dataType);
+      // console.log("[DataLoader] loaded() called with data:", data);
+      // console.log("[DataLoader] loaded() pageInfo:", pageInfo);
+      // console.log("[DataLoader] loader.props.dataType:", loader.props.dataType);
       
-      if (loader.props.dataType === "sql") {
-        console.log("[SQL DataLoader] Processing SQL result data in loaded()");
-        console.log("[SQL DataLoader] Data type:", typeof data);
-        console.log("[SQL DataLoader] Is array:", Array.isArray(data));
-        if (data && typeof data === 'object') {
-          console.log("[SQL DataLoader] Data keys:", Object.keys(data));
-        }
-      }
+      // if (loader.props.dataType === "sql") {
+      //   console.log("[SQL DataLoader] Processing SQL result data in loaded()");
+      //   console.log("[SQL DataLoader] Data type:", typeof data);
+      //   console.log("[SQL DataLoader] Is array:", Array.isArray(data));
+      //   if (data && typeof data === 'object') {
+      //     console.log("[SQL DataLoader] Data keys:", Object.keys(data));
+      //   }
+      // }
       
       loaderLoaded(data, pageInfo);
-      console.log("[DataLoader] After loaderLoaded() call");
+      // console.log("[DataLoader] After loaderLoaded() call");
       
       const completedMessage = extractParam(
         {
@@ -336,7 +336,7 @@ function DataLoader({
           toast.dismiss(loadingToastIdRef.current);
         }
       }
-      console.log("[DataLoader] loaded() completed");
+      //console.log("[DataLoader] loaded() completed");
     },
     [loader.props.completedNotificationMessage, loaderLoaded, loader.props.dataType],
   );
