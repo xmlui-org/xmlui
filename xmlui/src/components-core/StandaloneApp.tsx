@@ -90,8 +90,6 @@ function StandaloneApp({
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
   const { standaloneApp, projectCompilation } = useStandalone(appDef, runtime, extensionManager);
-  console.log("standaloneApp", standaloneApp);
-  console.log("projectCompilation", projectCompilation);
   usePrintVersionNumber(standaloneApp);
 
   if (!standaloneApp) {
@@ -291,7 +289,6 @@ function resolveRuntime(runtime: Record<string, any>): {
 } {
   // --- Collect the components and their sources. We pass the sources to the standalone app
   // --- so that it can be used for error display and debugging purposes.
-  console.log("runtime", runtime);
   const projectCompilation: ProjectCompilation = {
     entrypoint: {
       filename: "",

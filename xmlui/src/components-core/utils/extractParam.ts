@@ -204,6 +204,13 @@ export function resolveAndCleanProps<T extends Record<string, any>>(
     return acc;
   }, resultProps);
 
+  // --- Remove aliased CSS properties
+  delete resultProps.canShrink;
+  delete resultProps.radiusTopLeft;
+  delete resultProps.radiusTopRight;
+  delete resultProps.radiusBottomLeft;
+  delete resultProps.radiusBottomRight;
+
   return result as T;
 }
 
