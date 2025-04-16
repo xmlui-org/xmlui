@@ -30,6 +30,7 @@ import {
   formSubmitted,
   formSubmitting,
   triedToSubmit,
+  UNBOUND_FIELD_SUFFIX,
 } from "../../components/Form/formActions";
 import { ModalDialog } from "../../components/ModalDialog/ModalDialogNative";
 import { Text } from "../../components/Text/TextNative";
@@ -161,7 +162,6 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.BACKEND_VALIDATION_ARRIVED: {
-      //console.log(state.validationResults[field]) //action.payload.fieldValidationResults
       state.submitInProgress = false;
       state.generalValidationResults = action.payload.generalValidationResults;
       Object.keys(state.validationResults).forEach((key) => {
@@ -343,7 +343,15 @@ const Form = forwardRef(function (
     const prevFocused = document.activeElement;
     dispatch(formSubmitting());
     try {
-      await onSubmit?.(formState.subject, {
+      // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
+      const filteredSubject = Object.entries(formState.subject).reduce((acc, [key, value]) => {
+        if (!key.endsWith(UNBOUND_FIELD_SUFFIX)) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as Record<string, any>);
+
+      await onSubmit?.(filteredSubject, {
         passAsDefaultBody: true,
       });
       dispatch(formSubmitted());

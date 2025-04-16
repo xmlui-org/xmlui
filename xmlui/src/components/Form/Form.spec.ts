@@ -101,6 +101,24 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await driver.submitForm("keypress");
     await expect.poll(testStateDriver.testState).toEqual(null);
   });
+
+  test("submit with unbound fields", async ({ page, initTestBed, createFormDriver }) => {
+    await initTestBed(`
+      <Fragment var.output="none">
+        <Form testId="form"
+          data="{{ firstname: 'James', lastname: 'Clewell' }}"
+          onSubmit="args => output = JSON.stringify(args)">
+          <FormItem label="Firstname" bindTo="firstname" />
+          <FormItem label="Middle name" initialValue="Robert" />
+          <FormItem label="Lastname" />
+        </Form>
+        <Text testId="text">{output}</Text>
+      </Fragment>
+    `);
+    const driver = await createFormDriver("form");
+    await driver.submitForm();
+    await expect(page.getByTestId("text")).toHaveText('{"firstname":"James"}');
+  });
 });
 
 // --- Testing
@@ -174,7 +192,11 @@ test.skip(
 
 // --- --- data
 
-test("data accepts an object", async ({ initTestBed, createFormItemDriver, createTextBoxDriver }) => {
+test("data accepts an object", async ({
+  initTestBed,
+  createFormItemDriver,
+  createTextBoxDriver,
+}) => {
   await initTestBed(`
     <Form data="{{ field1: 'test' }}">
       <FormItem testId="inputField" bindTo="field1" />
@@ -205,27 +227,30 @@ test(`data accepts empty array`, async ({ initTestBed, createFormDriver }) => {
 });
 
 // TODO
-test.fixme("data accepts relative URL endpoint", async ({ initTestBed, createFormItemDriver, createTextBoxDriver }) => {
-  await initTestBed(
-    `
+test.fixme(
+  "data accepts relative URL endpoint",
+  async ({ initTestBed, createFormItemDriver, createTextBoxDriver }) => {
+    await initTestBed(
+      `
       <Form data="/test">
         <FormItem testId="inputField" bindTo="name" />
       </Form>`,
-    {
-      apiInterceptor: {
-        operations: {
-          test: {
-            url: "/test",
-            method: "get",
-            handler: `return { name: 'John' };`,
+      {
+        apiInterceptor: {
+          operations: {
+            test: {
+              url: "/test",
+              method: "get",
+              handler: `return { name: 'John' };`,
+            },
           },
         },
       },
-    },
-  );
-  const driver = await createFormItemDriver("inputField");
-  await expect((await createTextBoxDriver(driver.input)).field).toHaveValue("John");
-});
+    );
+    const driver = await createFormItemDriver("inputField");
+    await expect((await createTextBoxDriver(driver.input)).field).toHaveValue("John");
+  },
+);
 
 // TODO
 test.fixme(
