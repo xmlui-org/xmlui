@@ -419,7 +419,10 @@ describe("Evaluate binding expression tree (exp)", () => {
     { src: "alma.b < 3 || 12 > 3", con: { alma: { b: 123 } }, exp: true },
     { src: "12 + 23 * 4", con: {}, exp: 104 },
     { src: "(12 + 23) * 4", con: {}, exp: 140 },
-    { src: "12 * 23 + 4", con: {}, exp: 280 }
+    { src: "12 * 23 + 4", con: {}, exp: 280 },
+    { src: "alma.b ?? 12", con: { alma: { b: null } }, exp: 12 },
+    { src: "alma.b ?? 12", con: { alma: { b: undefined } }, exp: 12 },
+    { src: "alma.b ?? 12", con: { alma: { b: 234 } }, exp: 234 },
   ];
   binaryCases.forEach(c => {
     it(`Binary operation: ${c.src}/${JSON.stringify(c.con)}`, () => {

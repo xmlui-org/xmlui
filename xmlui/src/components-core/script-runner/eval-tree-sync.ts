@@ -327,6 +327,7 @@ function evalArrayLiteral(
 
   // --- Done.
   setExprValue(expr, { value }, thread);
+  thisStack.push(value);
   return value;
 }
 
@@ -405,10 +406,17 @@ function evalBinary(
   const l = getExprValue(expr.left, thread)?.value;
   if (expr.op === "&&" && !l) {
     setExprValue(expr, { value: l }, thread);
+    thisStack.push(l);
     return l;
   }
   if (expr.op === "||" && l) {
     setExprValue(expr, { value: l }, thread);
+    thisStack.push(l);
+    return l;
+  }
+  if (expr.op === "??" && l !== null && l !== undefined) {
+    setExprValue(expr, { value: l }, thread);
+    thisStack.push(l);
     return l;
   }
   evaluator(thisStack, expr.right, evalContext, thread);
@@ -486,10 +494,10 @@ function evalFunctionInvocation(
   let implicitContextObject: any = null;
 
   // --- Check for contexted object
-  if (expr.obj.type === T_MEMBER_ACCESS_EXPRESSION && expr.obj.obj.type === T_IDENTIFIER) {
+  if (expr.obj.type === T_MEMBER_ACCESS_EXPRESSION) {
     const hostObject = evaluator(thisStack, expr.obj.obj, evalContext, thread);
     functionObj = evalMemberAccessCore(thisStack, expr.obj, evalContext, thread);
-    if (hostObject?._SUPPORT_IMPLICIT_CONTEXT) {
+    if (expr.obj.obj.type === T_IDENTIFIER && hostObject?._SUPPORT_IMPLICIT_CONTEXT) {
       implicitContextObject = hostObject;
     }
   } else {
@@ -577,6 +585,7 @@ function evalFunctionInvocation(
   if (updatesState && evalContext.onWillUpdate) {
     evalContext.onWillUpdate(rootScope, rootScope.name, "function-call");
   }
+
   const value = evalContext.options?.defaultToOptionalMemberAccess
     ? (functionObj as Function)?.call(currentContext, ...functionArgs)
     : (functionObj as Function).call(currentContext, ...functionArgs);

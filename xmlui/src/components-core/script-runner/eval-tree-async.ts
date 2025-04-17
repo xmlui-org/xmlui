@@ -302,6 +302,7 @@ async function evalArrayLiteralAsync(
 
   // --- Done.
   setExprValue(expr, { value }, thread);
+  thisStack.push(value);
   return value;
 }
 
@@ -470,11 +471,10 @@ async function evalFunctionInvocationAsync(
 ): Promise<any> {
   let functionObj: any;
   let implicitContextObject: any = null;
-  let hostObject: any;
 
   // --- Check for contexted object
   if (expr.obj.type === T_MEMBER_ACCESS_EXPRESSION) {
-    hostObject = await evaluator(thisStack, expr.obj.obj, evalContext, thread);
+    const hostObject = await evaluator(thisStack, expr.obj.obj, evalContext, thread);
     await completeExprValue(expr.obj.obj, thread);
     functionObj = evalMemberAccessCore(thisStack, expr.obj, evalContext, thread);
     if (expr.obj.obj.type === T_IDENTIFIER && hostObject?._SUPPORT_IMPLICIT_CONTEXT) {
