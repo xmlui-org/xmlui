@@ -110,14 +110,14 @@ export const Markdown = memo(function Markdown({
           blockquote({ children }) {
             return <Blockquote>{children}</Blockquote>;
           },
-          ol({ children }) {
-            return <ol className={htmlTagStyles.htmlOl}>{children}</ol>;
+          ol({ children, node, ...props }) {
+            return <ol className={htmlTagStyles.htmlOl} {...props} >{children}</ol>;
           },
-          ul({ children }) {
-            return <ul className={htmlTagStyles.htmlUl}>{children}</ul>;
+          ul({ children, node, ...props }) {
+            return <ul className={htmlTagStyles.htmlUl} {...props} >{children}</ul>;
           },
-          li({ children }) {
-            return <li>{children}</li>; // No custom styling for li elements
+          li({ children, node, ...props }) {
+            return <li className={htmlTagStyles.htmlLi} {...props} >{children}</li>;
           },
           hr() {
             return <HorizontalRule />;
@@ -180,7 +180,7 @@ function removeTextIndents(input: string): string {
   if (!input) {
     return "";
   }
-  
+
   const lines = input.split("\n");
 
   // Find the shortest starting whitespace length

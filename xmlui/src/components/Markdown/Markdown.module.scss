@@ -89,8 +89,20 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     }
   }
 
+  li:has(> input[type="checkbox"]),
+  li:has(> input[type="checkbox"]) {
+    display: flex;
+    align-items: flex-start;
+
+    >input[type="checkbox"] {
+      margin-right: 8px;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+  }
+
   // First element should have no top margin
-  > *:first-child {
+    > *:first-child {
     margin-top: 0;
   }
 
@@ -99,6 +111,7 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     margin-bottom: 0;
   }
 }
+
 
 // --- UnorderedList
 /*
