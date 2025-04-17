@@ -90,6 +90,8 @@ function StandaloneApp({
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
   const { standaloneApp, projectCompilation } = useStandalone(appDef, runtime, extensionManager);
+
+  console.log({ projectCompilation });
   usePrintVersionNumber(standaloneApp);
 
   if (!standaloneApp) {
@@ -519,7 +521,21 @@ function useStandalone(
         projectCompilation: resolvedRuntime.projectCompilation,
         extensionManager,
       });
+
       setProjectCompilation(resolvedRuntime.projectCompilation);
+
+      const entryDeps = new Set(resolvedRuntime.projectCompilation.entrypoint.dependencies);
+      const depsByComponent = resolvedRuntime.projectCompilation.components.reduce(
+        (collection, componentCompilation) => {
+          return collection.set(
+            componentCompilation.definition.name,
+            new Set(componentCompilation.dependencies),
+          );
+        },
+        new Map<string, Set<string>>(),
+      );
+      const transDeps = getTransitiveDependencies(entryDeps, depsByComponent);
+      console.log("transDeps: ", transDeps);
 
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
       // --- we must have the app definition available.
@@ -977,9 +993,6 @@ function discoverCompilationDependencies({
 
   const registry = new ComponentRegistry({}, extensionManager);
 
-  // probably a better idea to use a custom solution for dependecy resolution,
-  // than to use the checkxmluimarkup, which does a lot more things than just collect the missing deps. Use the registry though!
-
   const entrypointDependencies = discoverDirectComponentDependencies(
     entrypoint.definition,
     registry,
@@ -996,8 +1009,6 @@ function discoverCompilationDependencies({
     componentCompilation.dependencies = Array.from(compDependencies);
   }
 
-  // if one needs to, they can extend the dependencies to include transitive dependencies
-  //
   registry.destroy();
 }
 
@@ -1026,4 +1037,34 @@ function discDepsHelp(
   }
 
   return deps;
+}
+
+/**
+ *
+ * @param directCompDepNames The direct dependencies (those are component names)
+ * of the component for which the transitive dependencies will be returned
+ * @param allDepsByCompName the direct dependencies (those are component names) of
+ * every component, grouped by the component name the dependencies belong to
+ */
+function getTransitiveDependencies(
+  directCompDepNames: Set<string>,
+  allDepsByCompName: Map<string, Set<string>>,
+) {
+  const discoveredDeps = new Set<string>();
+  return getTransitiveDependenciesHelp(directCompDepNames, allDepsByCompName, discoveredDeps);
+}
+
+function getTransitiveDependenciesHelp(
+  directCompDepNames: Set<string>,
+  allDepsByCompName: Map<string, Set<string>>,
+  discoveredDeps: Set<string>,
+) {
+  for (const directDep of directCompDepNames) {
+    if (!discoveredDeps.has(directDep)) {
+      discoveredDeps.add(directDep);
+      const depsOfDirectDep = allDepsByCompName.get(directDep);
+      getTransitiveDependenciesHelp(depsOfDirectDep, allDepsByCompName, discoveredDeps);
+    }
+  }
+  return discoveredDeps;
 }
