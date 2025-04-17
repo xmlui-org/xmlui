@@ -47,6 +47,9 @@ export const Markdown = memo(function Markdown({
           video({ children, node, ...props }) {
             return <video className={htmlTagStyles.htmlVideo} {...props} >{children}</video>;
           },
+          img({ children, node, ...props }) {
+            return <img className={htmlTagStyles.htmlImage} {...props} >{children}</img>;
+          },
           h1({ children }) {
             return <Heading level="h1">{children}</Heading>;
           },
@@ -131,10 +134,6 @@ export const Markdown = memo(function Markdown({
               </LocalLink>
             );
           },
-
-          img({ src, alt }) {
-            return <Image src={src} alt={alt} />;
-          },
           // TODO: somehow get the label from the containing li element
           input({ disabled, checked }) {
             return (
@@ -180,7 +179,7 @@ function removeTextIndents(input: string): string {
   if (!input) {
     return "";
   }
-  
+
   const lines = input.split("\n");
 
   // Find the shortest starting whitespace length
