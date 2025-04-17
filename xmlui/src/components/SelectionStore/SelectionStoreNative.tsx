@@ -43,7 +43,8 @@ export const SelectionStore = ({
   });
 
   const setSelectedRowIds = useEvent((rowIds: any) => {
-    updateState({ value: items.filter((item) => rowIds.includes(item[idKey])) });
+    const safeItems = items || EMPTY_ARRAY;
+    updateState({ value: safeItems.filter((item) => rowIds.includes(item[idKey])) });
   });
 
   const clearSelection = useEvent(() => {
