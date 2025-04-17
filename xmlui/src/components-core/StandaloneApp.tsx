@@ -250,6 +250,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     // --- Remove the code-behind tokens from the tree shrinking the tree
     removeCodeBehindTokensFromTree(codeBehind);
     return {
+      src: code,
       codeBehind: codeBehind,
       file: response.url,
     };
@@ -517,23 +518,6 @@ function useStandalone(
       const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
 
-      discoverCompilationDependencies({
-        projectCompilation: resolvedRuntime.projectCompilation,
-        extensionManager,
-      });
-
-      setProjectCompilation(resolvedRuntime.projectCompilation);
-
-      const entryDeps = resolvedRuntime.projectCompilation.entrypoint.dependencies;
-      const depsByComponent = resolvedRuntime.projectCompilation.components.reduce(
-        (collection, { definition: { name }, dependencies }) => {
-          return collection.set(name, dependencies);
-        },
-        new Map<string, Set<string>>(),
-      );
-      const transDeps = getTransitiveDependencies(entryDeps, depsByComponent);
-      console.log("transDeps: ", transDeps);
-
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
       // --- we must have the app definition available.
       if (
@@ -547,6 +531,23 @@ function useStandalone(
         if (lintErrorComponent) {
           appDef.entryPoint = lintErrorComponent;
         }
+
+        discoverCompilationDependencies({
+          projectCompilation: resolvedRuntime.projectCompilation,
+          extensionManager,
+        });
+
+        const entryDeps = resolvedRuntime.projectCompilation.entrypoint.dependencies;
+        const depsByComponent = resolvedRuntime.projectCompilation.components.reduce(
+          (collection, { definition: { name }, dependencies }) => {
+            return collection.set(name, dependencies);
+          },
+          new Map<string, Set<string>>(),
+        );
+        const transDeps = getTransitiveDependencies(entryDeps, depsByComponent);
+        console.log("transDeps: ", transDeps);
+
+        setProjectCompilation(resolvedRuntime.projectCompilation);
         setStandaloneApp(appDef);
         return;
       }
@@ -681,15 +682,29 @@ function useStandalone(
       // --- The main component source
       if (loadedEntryPoint.file) {
         sources[loadedEntryPoint.file] = loadedEntryPoint.src;
+
+        resolvedRuntime.projectCompilation.entrypoint.filename = MAIN_FILE;
+        resolvedRuntime.projectCompilation.entrypoint.definition = loadedEntryPoint.component;
+        resolvedRuntime.projectCompilation.entrypoint.markupSource = loadedEntryPoint.src;
+
+        if (loadedEntryPointCodeBehind?.src !== undefined) {
+          resolvedRuntime.projectCompilation.entrypoint.codeBehindSource =
+            loadedEntryPointCodeBehind.src;
+        }
       }
+      console.log(resolvedRuntime);
 
       // --- Components may have code-behind files
       loadedComponents.forEach((compWrapper) => {
+        console.log({ compWrapper });
         if (compWrapper?.file?.endsWith(`.${codeBehindFileExtension}`)) {
           codeBehinds[compWrapper.file] = compWrapper.codeBehind;
         } else {
           if (compWrapper.file) {
             sources[compWrapper.file] = compWrapper.src;
+            // resolvedRuntime.projectCompilation.entrypoint.filename = MAIN_FILE;
+            // resolvedRuntime.projectCompilation.entrypoint.definition = loadedEntryPoint.component;
+            // resolvedRuntime.projectCompilation.entrypoint.markupSource = loadedEntryPoint.src;
           }
         }
       });
@@ -771,13 +786,13 @@ function useStandalone(
                 }
                 resolve(
                   codeBehindWrapper.hasError
-                    ? codeBehindWrapper.component
-                    : (codeBehindWrapper.codeBehind as any),
+                    ? (codeBehindWrapper.component as CompoundComponentDef)
+                    : codeBehindWrapper,
                 );
               } catch {
                 resolve(null);
               }
-            }) as Promise<CollectedDeclarations>;
+            }) as Promise<CompoundComponentDef | ParsedResponse>;
 
             // --- Let the promises resolve
             const [componentMarkup, componentCodeBehind] = await Promise.all([
@@ -790,20 +805,37 @@ function useStandalone(
             if (compWrapper.hasError) {
               errorComponents.push(compWrapper.component as ComponentDef);
             }
-            sources[compWrapper.file] = compWrapper.src;
 
-            return {
+            sources[compWrapper.file] = compWrapper.src;
+            const compCompilation: ComponentCompilation = {
+              dependencies: new Set(),
+              filename: compWrapper.file,
+              markupSource: compWrapper.src,
+              definition: compWrapper.component as CompoundComponentDef,
+            };
+
+            if (componentCodeBehind && "src" in componentCodeBehind) {
+              compCompilation.codeBehindSource = componentCodeBehind.src;
+            }
+            resolvedRuntime.projectCompilation.components.push(compCompilation);
+
+            const compoundComp = {
               ...compWrapper.component,
               component: {
                 ...(compWrapper.component as any).component,
                 vars: {
                   ...(compWrapper.component as any).component.vars,
-                  ...componentCodeBehind?.vars,
+                  ...componentCodeBehind?.component?.vars,
                 },
-                functions: componentCodeBehind?.functions,
-                scriptError: componentCodeBehind?.moduleErrors,
               },
             };
+
+            if (componentCodeBehind && "codeBehind" in componentCodeBehind) {
+              compoundComp.component.functions = componentCodeBehind.codeBehind.functions;
+              compoundComp.component.scriptError = componentCodeBehind.codeBehind.moduleErrors;
+            }
+
+            return compoundComp;
           } catch (e) {
             componentsFailedToLoad.add(componentPath);
             return null;
@@ -846,6 +878,8 @@ function useStandalone(
       } else if (lintErrorComponent) {
         newAppDef.entryPoint = lintErrorComponent;
       }
+
+      setProjectCompilation(resolvedRuntime.projectCompilation);
       setStandaloneApp(newAppDef);
     })();
   }, [runtime, standaloneAppDef]);
