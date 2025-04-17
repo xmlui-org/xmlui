@@ -25,7 +25,7 @@ type CompilationUnit = {
   /** Optional code behind source (used in dev mode) */
   codeBehindSource?: string;
   /** Other (non-core) component names this component depends on */
-  dependencies: string[];
+  dependencies: Set<string>;
 };
 
 export type ComponentCompilation = CompilationUnit & {

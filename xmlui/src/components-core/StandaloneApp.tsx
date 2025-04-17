@@ -296,7 +296,7 @@ function resolveRuntime(runtime: Record<string, any>): {
     entrypoint: {
       filename: "",
       definition: null,
-      dependencies: [],
+      dependencies: new Set(),
     },
     components: [],
     themes: {},
@@ -375,7 +375,7 @@ function resolveRuntime(runtime: Record<string, any>): {
           definition: value.default.component,
           filename: key,
           markupSource: value.default.src,
-          dependencies: [],
+          dependencies: new Set(),
         };
         projectCompilation.components.push(componentCompilation);
       }
@@ -524,13 +524,10 @@ function useStandalone(
 
       setProjectCompilation(resolvedRuntime.projectCompilation);
 
-      const entryDeps = new Set(resolvedRuntime.projectCompilation.entrypoint.dependencies);
+      const entryDeps = resolvedRuntime.projectCompilation.entrypoint.dependencies;
       const depsByComponent = resolvedRuntime.projectCompilation.components.reduce(
-        (collection, componentCompilation) => {
-          return collection.set(
-            componentCompilation.definition.name,
-            new Set(componentCompilation.dependencies),
-          );
+        (collection, { definition: { name }, dependencies }) => {
+          return collection.set(name, dependencies);
         },
         new Map<string, Set<string>>(),
       );
@@ -983,30 +980,21 @@ function discoverCompilationDependencies({
   projectCompilation: ProjectCompilation;
   extensionManager?: StandaloneExtensionManager;
 }) {
-  //TODO: check if we need the first argument (contributes) to be provided as well
-  // do we want components from extensions to be included in the dependencies?
-  //
-  // new ComponentRegistry(
-  //   { compoundComponents: components.map((c) => c.definition) },
-  //   extensionManager,
-  // );
-
   const registry = new ComponentRegistry({}, extensionManager);
 
   const entrypointDependencies = discoverDirectComponentDependencies(
     entrypoint.definition,
     registry,
   );
-  entrypoint.dependencies = Array.from(entrypointDependencies);
+  entrypoint.dependencies = entrypointDependencies;
 
-  const compNameStack: string[] = [];
   for (const componentCompilation of components) {
     const compDependencies = discoverDirectComponentDependencies(
       componentCompilation.definition.component,
       registry,
     );
     compDependencies.delete(componentCompilation.definition.name);
-    componentCompilation.dependencies = Array.from(compDependencies);
+    componentCompilation.dependencies = compDependencies;
   }
 
   registry.destroy();
@@ -1016,10 +1004,10 @@ function discoverDirectComponentDependencies(
   entrypoint: ComponentDef,
   registry: ComponentRegistry,
 ): Set<string> {
-  return discDepsHelp(entrypoint, registry, new Set<string>());
+  return discoverDirectComponentDependenciesHelp(entrypoint, registry, new Set<string>());
 }
 
-function discDepsHelp(
+function discoverDirectComponentDependenciesHelp(
   component: ComponentDef,
   registry: ComponentRegistry,
   deps: Set<string>,
@@ -1033,7 +1021,7 @@ function discDepsHelp(
   }
 
   for (const child of component.children) {
-    discDepsHelp(child, registry, deps);
+    discoverDirectComponentDependenciesHelp(child, registry, deps);
   }
 
   return deps;
@@ -1050,21 +1038,17 @@ function getTransitiveDependencies(
   directCompDepNames: Set<string>,
   allDepsByCompName: Map<string, Set<string>>,
 ) {
-  const discoveredDeps = new Set<string>();
-  return getTransitiveDependenciesHelp(directCompDepNames, allDepsByCompName, discoveredDeps);
-}
+  const transitiveDeps = new Set<string>();
+  populateTransitiveDeps(directCompDepNames);
+  return transitiveDeps;
 
-function getTransitiveDependenciesHelp(
-  directCompDepNames: Set<string>,
-  allDepsByCompName: Map<string, Set<string>>,
-  discoveredDeps: Set<string>,
-) {
-  for (const directDep of directCompDepNames) {
-    if (!discoveredDeps.has(directDep)) {
-      discoveredDeps.add(directDep);
-      const depsOfDirectDep = allDepsByCompName.get(directDep);
-      getTransitiveDependenciesHelp(depsOfDirectDep, allDepsByCompName, discoveredDeps);
+  function populateTransitiveDeps(directCompDepNames: Set<string>) {
+    for (const directDep of directCompDepNames) {
+      if (!transitiveDeps.has(directDep)) {
+        transitiveDeps.add(directDep);
+        const depsOfDirectDep = allDepsByCompName.get(directDep);
+        populateTransitiveDeps(depsOfDirectDep);
+      }
     }
   }
-  return discoveredDeps;
 }
