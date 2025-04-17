@@ -32,9 +32,11 @@ export const SelectionStore = ({
   const valueInitializedRef = useRef(false);
 
   const refreshSelection = useEvent((allItems: any[] = EMPTY_ARRAY) => {
-    setItems(allItems);
-    let value = allItems.filter((item) => !!selectedItems.find((si) => si[idKey] === item[idKey]));
-    if(!isEqual(selectedItems, value) || !valueInitializedRef.current){
+    const safeAllItems = allItems || EMPTY_ARRAY;
+    const safeSelectedItems = selectedItems || EMPTY_ARRAY;
+    setItems(safeAllItems);
+    let value = safeAllItems.filter((item) => !!safeSelectedItems.find((si) => si[idKey] === item[idKey]));
+    if(!isEqual(safeSelectedItems, value) || !valueInitializedRef.current){
       valueInitializedRef.current = true;
       updateState({
         value: value,
