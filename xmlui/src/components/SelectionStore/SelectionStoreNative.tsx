@@ -1,4 +1,11 @@
-import React, { type ReactNode, useLayoutEffect, useMemo, useState, useContext, useRef } from "react";
+import React, {
+  type ReactNode,
+  useLayoutEffect,
+  useMemo,
+  useState,
+  useContext,
+  useRef,
+} from "react";
 import { isEqual, noop } from "lodash-es";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
@@ -14,12 +21,16 @@ type SelectionStoreProps = {
 };
 
 const EMPTY_SELECTION_STATE = {
-  value: EMPTY_ARRAY
-}
-export const StandaloneSelectionStore = ({children})=>{
+  value: EMPTY_ARRAY,
+};
+export const StandaloneSelectionStore = ({ children }) => {
   const [selection, setSelection] = useState(EMPTY_SELECTION_STATE);
-  return <SelectionStore updateState={setSelection} selectedItems={selection.value}>{children}</SelectionStore>;
-}
+  return (
+    <SelectionStore updateState={setSelection} selectedItems={selection.value}>
+      {children}
+    </SelectionStore>
+  );
+};
 
 export const SelectionStore = ({
   updateState = noop,
@@ -35,11 +46,13 @@ export const SelectionStore = ({
     const safeAllItems = allItems || EMPTY_ARRAY;
     const safeSelectedItems = selectedItems || EMPTY_ARRAY;
     setItems(safeAllItems);
-    let value = safeAllItems.filter((item) => !!safeSelectedItems.find((si) => si[idKey] === item[idKey]));
-    if(!isEqual(safeSelectedItems, value) || !valueInitializedRef.current){
+    let value = safeAllItems.filter(
+      (item) => !!safeSelectedItems.find((si) => si && item && si[idKey] === item[idKey]),
+    );
+    if (!isEqual(safeSelectedItems, value) || !valueInitializedRef.current) {
       valueInitializedRef.current = true;
       updateState({
-        value: value,
+        value,
       });
     }
   });
