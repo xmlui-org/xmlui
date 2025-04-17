@@ -217,38 +217,38 @@ $themeVarsList: (
 
 $marginTop-HtmlOl: createThemeVarList("marginTop-HtmlOl");
 $marginBottom-HtmlOl: createThemeVarList("marginBottom-HtmlOl");
+
 $marginTop-HtmlUl: createThemeVarList("marginTop-HtmlUl");
 $marginBottom-HtmlUl: createThemeVarList("marginBottom-HtmlUl");
+
+$marginTop-HtmlLi: createThemeVarList("marginTop-HtmlLi");
+$marginBottom-HtmlLi: createThemeVarList("marginBottom-HtmlLi");
+
 
 // Apply to both ul and ol elements
 .htmlUl {
   margin-top: $marginTop-HtmlUl;
   margin-bottom: $marginBottom-HtmlUl;
 }
+
 .htmlOl {
   margin-top: $marginTop-HtmlOl;
   margin-bottom: $marginBottom-HtmlOl;
 }
 
+.htmlLi {
+  margin-top: $marginTop-HtmlLi;
+  margin-bottom: $marginBottom-HtmlLi;
+}
+
+/*
+// Compress when nested
 li .htmlUl,
 li .htmlOl {
   margin-top: 0;
   margin-bottom: 0;
 }
-
-// Only apply flex layout to list items that contain checkboxes
-.htmlUl li:has(> input[type="checkbox"]),
-.htmlOl li:has(> input[type="checkbox"]) {
-  display: flex;
-  align-items: flex-start;
-
-  >input[type="checkbox"] {
-    margin-right: 8px;
-    margin-top: 4px;
-    flex-shrink: 0;
-  }
-}
-
+*/
 
 // --- Heading styling
 $themeVarsHeading: (
