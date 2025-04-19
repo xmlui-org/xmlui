@@ -40,7 +40,8 @@ export const MarkdownMd = createMetadata({
     "marginBottom-Text-codefence": ".5rem",
     "marginBottom-Text-markdown": ".5rem",
 
-    "marginTop-HtmlLi": "-0.5rem",
+    "marginTop-HtmlLi": ".5rem",
+    "marginBottom-HtmlLi": ".5rem",
 
     light: {
       // --- No light-specific theme vars
