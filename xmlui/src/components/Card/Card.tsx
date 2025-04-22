@@ -22,6 +22,11 @@ export const CardMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.showAvatar,
     },
+    avatarSize: {
+      description: `This prop sets the size of the avatar. The default value is \`sm\`.`,
+      availableValues: ["xs", "sm", "md", "lg"],
+      valueType: "string",
+    },
     title: {
       description: `This prop sets the prestyled title.`,
       valueType: "string",
@@ -54,7 +59,18 @@ export const CardMd = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`boxShadow-${COMP}`]: "none",
     [`backgroundColor-${COMP}`]: "$color-surface-raised",
+    [`gap-${COMP}`]: "var(--stack-gap-default)",
+    [`gap-title-${COMP}`]: "$gap-normal",
+    [`gap-avatar-${COMP}`]: "$gap-normal",
+    [`verticalAlignment-title-${COMP}`]: "center",
   },
+  themeVarDescriptions: {
+    [`gap-${COMP}`]: "The gap between the component's children.",
+    [`gap-title-${COMP}`]: "The gap between the title and the subtitle",
+    [`gap-avatar-${COMP}`]: "The gap between the avatar and the title panel",
+    [`horizontalAlignment-title-${COMP}`]: "The horizontal alignment of panel with the title and subtitle",
+    [`verticalAlignment-title-${COMP}`]: "The vertical alignment of the title and subtitle to the avatar",
+  }
 });
 
 export const cardComponentRenderer = createComponentRenderer(
@@ -69,6 +85,7 @@ export const cardComponentRenderer = createComponentRenderer(
         subtitle={extractValue.asOptionalString(node.props.subtitle)}
         avatarUrl={extractValue.asOptionalString(node.props.avatarUrl)}
         showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
+        avatarSize={extractValue.asOptionalString(node.props.avatarSize)}
         orientation={extractValue.asOptionalString(node.props.orientation)}
       >
         {renderChild(node.children, {
