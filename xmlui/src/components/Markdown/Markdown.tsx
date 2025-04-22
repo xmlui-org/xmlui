@@ -26,21 +26,22 @@ export const MarkdownMd = createMetadata({
   defaultThemeVars: {
     "backgroundColor-Admonition": "$color-warn-300",
     "borderRadius-Admonition": "$space-4",
-    "iconSize-Admonition": "1.5rem",
-    "padding-Admonition": "1rem",
-    "marginBottom-Admonition": "1rem",
-    "marginLeft-Admonition-content":".5rem",
+    "iconSize-Admonition": "$space-6",
+    "padding-Admonition": "$space-4",
+    "marginBottom-Admonition": "$space-4",
+    "marginLeft-Admonition-content":"$space-2",
 
     "backgroundColor-Blockquote": "$color-warn-200",
     "accentWidth-Blockquote": "3px",
     "accentColor-Blockquote": "$color-surface-500",
-    "padding-Blockquote": ".5rem",
-    "marginBottom-Blockquote": "1rem",
+    "padding-Blockquote": "$space-2",
+    "marginBottom-Blockquote": "$space-4",
 
-    "marginBottom-Text-codefence": ".5rem",
-    "marginBottom-Text-markdown": ".5rem",
+    "marginBottom-Text-codefence": "$space-2",
+    "marginBottom-Text-markdown": "$space-2",
 
-    "marginTop-HtmlLi": "-0.5rem",
+    "marginTop-HtmlLi": "$space-2",
+    "marginBottom-HtmlLi": "$space-2",
 
     light: {
       // --- No light-specific theme vars
