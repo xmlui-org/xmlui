@@ -43,6 +43,13 @@ $componentName: "DatePicker";
   }
 }
 
+$rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active");
+$rdp-bg-textColor-hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
+$rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
+$rdp-cell-size: 40px;
+$rdp-caption-font-size: 18px;
+$rdp-outline: 2px solid t.useVar($rdp-accent-color);
+$rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
 $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 
 .datePicker {
@@ -111,6 +118,11 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
   }
 }
 
+.root {
+  width: fit-content;
+  margin: 2rem;
+}
+
 .datePickerMenu {
   padding: 0;
   overflow-y: auto;
@@ -118,19 +130,8 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
   box-shadow: createThemeVar("Input:boxShadow-menu-DatePicker");
   background-color: createThemeVar("Input:backgroundColor-menu-DatePicker");
   border-radius: createThemeVar("Input:borderRadius-menu-DatePicker");
-}
+  border: 1px solid t.useVar($rdp-accent-color);
 
-$rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active");
-$rdp-bg-textColor-hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
-$rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
-$rdp-cell-size: 40px;
-$rdp-caption-font-size: 18px;
-$rdp-outline: 2px solid t.useVar($rdp-accent-color);
-$rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
-
-.root {
-  width: fit-content;
-  margin: 2rem;
 }
 
 /* Hide elements for devices that are not screen readers */
@@ -147,7 +148,6 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
   top: 0;
   width: 1px !important;
   height: 1px !important;
-  padding: 0 !important;
   overflow: hidden !important;
   clip: rect(1px, 1px, 1px, 1px) !important;
   border: 0 !important;
@@ -173,10 +173,6 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
   outline: none;
 }
 
-.button {
-  border: 2px solid transparent;
-}
-
 .button[disabled]:not(.day_selected) {
   opacity: 0.25;
 }
@@ -191,8 +187,35 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
   border: $rdp-outline;
 }
 
-.button:hover:not([disabled]):not(.day_selected) {
+.button_next:hover:not([disabled]):not(.day_selected),
+.button_previous:hover:not([disabled]):not(.day_selected) {
   background-color: t.useVar($rdp-bg-textColor-hover);
+}
+
+.button_next,
+.button_previous {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  appearance: none;
+}
+
+.button_next:disabled,
+.button_next[aria-disabled="true"],
+.button_previous:disabled,
+.button_previous[aria-disabled="true"] {
+  cursor: revert;
+  opacity: 0.25;
 }
 
 .months {
@@ -211,16 +234,10 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
   margin-right: 0;
 }
 
-.table {
-  margin: 0;
-  max-width: calc($rdp-cell-size * 7);
+.month_grid {
   border-collapse: collapse;
 }
 
-.with_weeknumber .table {
-  max-width: calc($rdp-cell-size * 8);
-  border-collapse: collapse;
-}
 
 .caption {
   display: flex;
@@ -250,11 +267,15 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
   padding: 0 0.25em;
   white-space: nowrap;
   color: currentColor;
-  border: 0;
   border: 2px solid transparent;
   font-family: inherit;
   font-size: $rdp-caption-font-size;
   font-weight: bold;
+}
+
+.chevron {
+  display: inline-block;
+  fill: t.$textColor-primary;
 }
 
 .nav {
@@ -288,6 +309,13 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
 /* ---------- */
 /* Dropdowns  */
 /* ---------- */
+
+.dropdowns {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: t.$space-1;
+}
 
 .dropdown_year,
 .dropdown_month {
@@ -326,39 +354,7 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
   border-radius: 6px;
 }
 
-.dropdown_icon {
-  margin: 0 0 0 5px;
-}
-
-.head {
-  border: 0;
-}
-
-.head_row,
-.row {
-  height: 100%;
-}
-
-.head_cell {
-  vertical-align: middle;
-  font-size: 0.75em;
-  font-weight: 700;
-  text-align: center;
-  height: 100%;
-  height: $rdp-cell-size;
-  padding: 0;
-  text-transform: uppercase;
-}
-
-.tbody {
-  border: 0;
-}
-
-.tfoot {
-  margin: 0.5em;
-}
-
-.cell {
+.day {
   width: $rdp-cell-size;
   height: 100%;
   height: $rdp-cell-size;
@@ -366,12 +362,19 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
   text-align: center;
 }
 
-.weeknumber {
-  font-size: 0.75em;
+.weekday {
+  font-weight: 500;
+  font-size: smaller;
+
 }
 
-.weeknumber,
-.day {
+.week_number {
+  font-size: 0.75em;
+  font-weight: 400;
+}
+
+.day_button {
+  background: none;
   display: flex;
   overflow: hidden;
   align-items: center;
@@ -385,23 +388,31 @@ $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
   border-radius: 100%;
 }
 
-.day_today:not(.day_outside) {
+.day_button:disabled {
+  cursor: not-allowed;
+  opacity: 0.2;
+  font-style: italic;
+}
+
+.today:not(.outside) {
   font-weight: bold;
 }
 
-.day_selected,
-.day_selected:focus-visible,
-.day_selected:hover {
+.selected,
+.selected:focus-visible,
+.selected:hover {
   color: t.useVar($rdp-selected-color);
   opacity: 1;
+  font-weight: bold;
+  border-radius: 100%;
   background-color: t.useVar($rdp-accent-color);
 }
 
-.day_outside {
-  opacity: 0.5;
+.outside {
+  opacity: 0.7;
 }
 
-.day_selected:focus-visible {
+.selected:focus-visible {
   /* Since the background is the same use again the outline */
   outline: $rdp-outline;
   outline-offset: 2px;
