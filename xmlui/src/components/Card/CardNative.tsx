@@ -18,6 +18,7 @@ type Props = {
   linkTo?: string;
   avatarUrl?: string;
   showAvatar?: boolean;
+  avatarSize?: string;
   orientation?: string;
   onClick?: any;
 };
@@ -37,6 +38,7 @@ export const Card = forwardRef(function Card(
     linkTo,
     avatarUrl,
     showAvatar = !!avatarUrl || defaultProps.showAvatar,
+    avatarSize,
     onClick,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -56,9 +58,9 @@ export const Card = forwardRef(function Card(
       onClick={onClick}
     >
       {[title, subtitle, avatarUrl, showAvatar].some(Boolean) && (
-        <Stack orientation="horizontal" verticalAlignment="center" style={{ gap: "1rem" }}>
-          {showAvatar && <Avatar url={avatarUrl} name={title} />}
-          <Stack orientation="vertical">
+        <div className={styles.avatarWrapper}>
+          {showAvatar && <Avatar url={avatarUrl} name={title} size={avatarSize}/>}
+          <div className={styles.titleWrapper}>
             {linkTo ? (
               title ? (
                 <LocalLink to={linkTo + ""}>
@@ -68,9 +70,13 @@ export const Card = forwardRef(function Card(
             ) : title ? (
               <Heading {...titleProps}>{title}</Heading>
             ) : null}
-            {subtitle !== undefined && <Text variant="small">{subtitle}</Text>}
-          </Stack>
-        </Stack>
+            {subtitle !== undefined && (
+              <>
+                <Text variant="small">{subtitle}</Text>
+              </>
+            )}
+          </div>
+        </div>
       )}
       {children}
     </div>

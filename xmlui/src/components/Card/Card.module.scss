@@ -13,6 +13,12 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 $boxShadow-Card: createThemeVar("boxShadow-Card");
 $backgroundColor-Card: createThemeVar("backgroundColor-Card");
 $borderRadius-Card: createThemeVar("borderRadius-Card");
+$gap-Card: createThemeVar("gap-Card");
+$gap-title-Card: createThemeVar("gap-title-Card");
+$gap-avatar-Card: createThemeVar("gap-avatar-Card");
+$horizontalAlignment-title-Card: createThemeVar("horizontalAlignment-title-Card");
+$verticalalAlignment-title-Card: createThemeVar("verticalAlignment-title-Card");
+
 
 .wrapper {
   @include t.borderVars($themeVars, $component);
@@ -21,12 +27,26 @@ $borderRadius-Card: createThemeVar("borderRadius-Card");
   background-color: $backgroundColor-Card;
   display: flex;
   flex-direction: column;
-  gap: var(--stack-gap-default);
+  gap: $gap-Card;
+
+  & .avatarWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: $verticalalAlignment-title-Card;
+    gap: $gap-avatar-Card;
+  }
+
+  & .titleWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: $horizontalAlignment-title-Card;
+    width: 100%;
+    gap: $gap-title-Card;
+  }
 
   &.horizontal {
     flex-direction: row;
     align-items: center;
-    padding-block: t.$space-2;    //TODO TEMP
   }
 
   &.vertical {  

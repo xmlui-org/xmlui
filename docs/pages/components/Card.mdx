@@ -75,6 +75,12 @@ Prestyled elements always appear above other children.
 
 ## Properties
 
+### `avatarSize`
+
+This prop sets the size of the avatar. The default value is `sm`.
+
+Available values: `xs`, `sm`, `md`, `lg`
+
 ### `avatarUrl`
 
 Show the avatar (`true`) or not (`false`). If not specified, the Card will show the first letters of the [`title`](#title).
@@ -325,6 +331,10 @@ The following theme definition changes the visual appearance of the card:
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [borderWidth](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Card | none | none |
+| [gap](../styles-and-themes/common-units/#size)-avatar-Card | $gap-normal | $gap-normal |
+| [gap](../styles-and-themes/common-units/#size)-Card | var(--stack-gap-default) | var(--stack-gap-default) |
+| [gap](../styles-and-themes/common-units/#size)-title-Card | $gap-normal | $gap-normal |
+| horizontalAlignment-title-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [padding](../styles-and-themes/common-units/#size)-Card | $space-4 | $space-4 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -332,3 +342,14 @@ The following theme definition changes the visual appearance of the card:
 | [paddingRight](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [paddingTop](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Card | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [verticalAlign](../styles-and-themes/common-units/#alignment)ment-title-Card | center | center |
+
+### Variable Explanations
+
+| Theme Variable | Description |
+| --- | --- |
+| **`gap-Card`** | The gap between the component's children. |
+| **`gap-title-Card`** | The gap between the title and the subtitle |
+| **`gap-avatar-Card`** | The gap between the avatar and the title panel |
+| **`horizontalAlignment-title-Card`** | The horizontal alignment of panel with the title and subtitle |
+| **`verticalAlignment-title-Card`** | The vertical alignment of the title and subtitle to the avatar |
