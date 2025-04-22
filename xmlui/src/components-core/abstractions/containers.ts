@@ -5,6 +5,7 @@
 export const enum ContainerActionKind {
   LOADER_LOADED = "ContainerActionKind:LOADER_LOADED",
   LOADER_IN_PROGRESS_CHANGED = "ContainerActionKind:LOADER_IN_PROGRESS_CHANGED",
+  LOADER_IS_REFETCHING_CHANGED = "ContainerActionKind:LOADER_IS_REFETCHING_CHANGED",
   LOADER_ERROR = "ContainerActionKind:LOADER_ERROR",
   EVENT_HANDLER_STARTED = "ContainerActionKind:EVENT_HANDLER_STARTED",
   EVENT_HANDLER_COMPLETED = "ContainerActionKind:EVENT_HANDLER_COMPLETED",
@@ -24,6 +25,7 @@ export interface ContainerAction {
     value?: any;
     byId?: any;
     inProgress?: any;
+    isRefetching?: any;
     loaded?: any;
     pageInfo?: any;
     path?: any;

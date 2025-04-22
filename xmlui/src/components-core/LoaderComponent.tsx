@@ -91,6 +91,13 @@ export function LoaderComponent({
     [dispatch, uid],
   );
 
+  const memoedLoaderIsRefetchingChanged = useCallback(
+    (isRefetching: boolean) => {
+      dispatch(loaderIsRefetchingChanged(uid, isRefetching));
+    },
+    [dispatch, uid],
+  );
+
   const memoedLoaderLoaded = useCallback(
     (data: any, pageInfo: any) => {
       dispatch(loaderLoaded(uid, data, pageInfo));
@@ -118,6 +125,7 @@ export function LoaderComponent({
     state,
     dispatch,
     loaderInProgressChanged: memoedLoaderInProgressChanged,
+    loaderIsRefetchingChanged: memoedLoaderIsRefetchingChanged,
     loaderLoaded: memoedLoaderLoaded,
     loaderError: memoedLoaderError,
     extractValue: valueExtractor,
@@ -134,6 +142,17 @@ function loaderInProgressChanged(uid: symbol, isInProgress: boolean) {
     payload: {
       uid,
       inProgress: isInProgress,
+    },
+  };
+}
+
+// Signs that a particular loader (`uid`) has just started refetching its data (or executing its operation).
+function loaderIsRefetchingChanged(uid: symbol, isRefetching: boolean) {
+  return {
+    type: ContainerActionKind.LOADER_IS_REFETCHING_CHANGED,
+    payload: {
+      uid,
+      isRefetching,
     },
   };
 }

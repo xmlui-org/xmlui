@@ -19,6 +19,7 @@ import { Loader } from "./Loader";
 type ApiLoaderProps = {
   loader: ApiLoaderDef;
   loaderInProgressChanged: LoaderInProgressChangedFn;
+  loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
   state: ContainerState;
@@ -31,6 +32,7 @@ type ApiLoaderProps = {
 function ApiLoader({
   loader,
   loaderInProgressChanged,
+  loaderIsRefetchingChanged,
   loaderLoaded,
   loaderError,
   state,
@@ -45,7 +47,6 @@ function ApiLoader({
     if (!loadable) {
       return;
     }
-    console.log("doLoad ", url);
     const response = await fetch(url);
     if (loader.props.raw) {
       return await response.text();
@@ -62,6 +63,7 @@ function ApiLoader({
       state={state}
       loader={loader}
       loaderInProgressChanged={loaderInProgressChanged}
+      loaderIsRefetchingChanged={loaderIsRefetchingChanged}
       loaderLoaded={loaderLoaded}
       loaderError={loaderError}
       loaderFn={doLoad}
@@ -81,12 +83,13 @@ type ApiLoaderDef = ComponentDef<typeof ApiLoaderMd>;
 
 export const apiLoaderRenderer = createLoaderRenderer(
   "ApiLoader",
-  ({ loader, state, dispatch, loaderInProgressChanged, loaderLoaded, loaderError }) => {
+  ({ loader, state, loaderInProgressChanged, loaderIsRefetchingChanged, loaderLoaded, loaderError }) => {
     return (
       <ApiLoader
         loader={loader}
         state={state}
         loaderInProgressChanged={loaderInProgressChanged}
+        loaderIsRefetchingChanged={loaderIsRefetchingChanged}
         loaderLoaded={loaderLoaded}
         loaderError={loaderError}
       />

@@ -45,6 +45,7 @@ type RendererContext<TMd extends ComponentMetadata> = {
   lookupSyncCallback: LookupSyncFn;
 
   loaderInProgressChanged: LoaderInProgressChangedFn;
+  loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
 };

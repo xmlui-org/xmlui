@@ -30,8 +30,7 @@ export const DataSourceMd = createMetadata({
       valueType: "string",
     },
     body: {
-      description:
-        `Set the request body. The object you pass is serialized as a JSON string.`,
+      description: `Set the request body. The object you pass is serialized as a JSON string.`,
       valueType: "any",
     },
     rawBody: {
@@ -41,13 +40,11 @@ export const DataSourceMd = createMetadata({
       valueType: "string",
     },
     queryParams: {
-      description:
-        `Append key/value pairs to the URL.`,
+      description: `Append key/value pairs to the URL.`,
       valueType: "any",
     },
     headers: {
-      description:
-        `Set request headers. Pass an object whose keys are header names and values are header values.`,
+      description: `Set request headers. Pass an object whose keys are header names and values are header values.`,
       valueType: "any",
     },
     pollIntervalInSeconds: {
@@ -57,28 +54,23 @@ export const DataSourceMd = createMetadata({
       valueType: "number",
     },
     inProgressNotificationMessage: {
-      description:
-        `Set the message to display when the data fetch is in progress.`,
+      description: `Set the message to display when the data fetch is in progress.`,
       valueType: "string",
     },
     completedNotificationMessage: {
-      description:
-        `Set the message to display when the data fetch completes.`,
+      description: `Set the message to display when the data fetch completes.`,
       valueType: "string",
     },
     errorNotificationMessage: {
-      description:
-        `Set the message to display when the there is an error.`,
+      description: `Set the message to display when the there is an error.`,
       valueType: "string",
     },
     resultSelector: {
-      description:
-        `Set an object key to extract a subset of the response data.`,
+      description: `Set an object key to extract a subset of the response data.`,
       valueType: "string",
     },
     transformResult: {
-      description:
-        `Set a function to perform a final transformation of the response data.`,
+      description: `Set a function to perform a final transformation of the response data.`,
     },
     prevPageSelector: {
       description:
@@ -95,9 +87,17 @@ export const DataSourceMd = createMetadata({
   },
   events: {
     loaded: d(
-      `The component triggers this event when the fetch operation has been completed ` +
-        `and the data is loaded. The argument of the event is the data loaded.`,
+      "The component triggers this event when the fetch operation has been completed " +
+        "and the data is loaded. The event has two arguments. The first is the data " +
+        "loaded; the second indicates if the event is a result of a refetch.",
     ),
     error: d(`This event fires when a request results in an error.`),
   },
+  apis: {
+    value: d("This property retrieves the data queried from the source after optional transformations."),
+    inProgress: d("This property indicates if the data is being fetched."),
+    isRefetching: d("This property indicates if the data is being re-fetched."),
+    loaded: d("This property indicates if the data has been loaded."),
+    refetch: d("This method requests the re-fetch of the data.")
+  }
 });

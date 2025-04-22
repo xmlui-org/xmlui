@@ -28,6 +28,7 @@ type LoaderProps = {
   onLoaded?: (...args: any[]) => void;
   onError?: (...args: any[]) => Promise<boolean>;
   loaderInProgressChanged: LoaderInProgressChangedFn;
+  loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
   transformResult?: TransformResultFn;
@@ -40,6 +41,7 @@ function DataLoader({
   onLoaded,
   onError,
   loaderInProgressChanged,
+  loaderIsRefetchingChanged,
   loaderLoaded,
   loaderError,
   transformResult,
@@ -385,6 +387,7 @@ function DataLoader({
       state={state}
       loader={loader}
       loaderInProgressChanged={inProgress}
+      loaderIsRefetchingChanged={loaderIsRefetchingChanged}
       loaderLoaded={loaded}
       loaderError={error}
       loaderFn={doLoad}
@@ -400,6 +403,7 @@ function DataLoader({
       state={state}
       loader={loader}
       loaderInProgressChanged={inProgress}
+      loaderIsRefetchingChanged={loaderIsRefetchingChanged}
       loaderLoaded={loaded}
       loaderError={error}
       loaderFn={doLoad}
@@ -445,6 +449,7 @@ export const dataLoaderRenderer = createLoaderRenderer(
     state,
     loaderLoaded,
     loaderInProgressChanged,
+    loaderIsRefetchingChanged,
     loaderError,
     registerComponentApi,
     lookupAction,
@@ -460,6 +465,7 @@ export const dataLoaderRenderer = createLoaderRenderer(
         loader={loader}
         state={state}
         loaderInProgressChanged={loaderInProgressChanged}
+        loaderIsRefetchingChanged={loaderIsRefetchingChanged}
         loaderLoaded={loaderLoaded}
         loaderError={loaderError}
         registerComponentApi={registerComponentApi}
