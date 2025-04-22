@@ -19,6 +19,7 @@ import { ErrorBoundary } from "./ErrorBoundary";
 import { ThemeTone } from "../../abstractions/ThemingDefs";
 import { LoggerProvider } from "../../logging/LoggerContext";
 import { LoggerInitializer } from "../../logging/LoggerInitializer";
+import { ProjectCompilation } from "../../abstractions/scripting/Compilation";
 
 export type AppWrapperProps = {
   // --- The root node of the application definition; the internal
@@ -84,6 +85,8 @@ export type AppWrapperProps = {
   // --- purposes. This property is a dictionary of filename and file content
   // --- pairs.
   sources?: Record<string, string>;
+
+  projectCompilation?: ProjectCompilation;
 
   children?: ReactNode;
 };

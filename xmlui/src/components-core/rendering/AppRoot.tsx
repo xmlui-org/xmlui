@@ -8,6 +8,7 @@ import { ComponentProvider } from "../../components/ComponentProvider";
 import { DebugViewProvider } from "../DebugViewProvider";
 import StandaloneExtensionManager from "../StandaloneExtensionManager";
 import { AppWrapper, AppWrapperProps } from "./AppWrapper";
+import { ComponentCompilation, ProjectCompilation } from "../../abstractions/scripting/Compilation";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -27,9 +28,9 @@ export const queryClient = new QueryClient({
 });
 
 /**
- * This component is responsible for running a pre-compiled xmlui app. It 
- * receives the internal representation of the app markup and code (coming 
- * from either code-behind files or inlined markup expressions) and executes 
+ * This component is responsible for running a pre-compiled xmlui app. It
+ * receives the internal representation of the app markup and code (coming
+ * from either code-behind files or inlined markup expressions) and executes
  * the app accordingly.
  */
 export function AppRoot({
@@ -49,10 +50,13 @@ export function AppRoot({
   resourceMap,
   sources,
   extensionManager,
-  children
-}: AppWrapperProps & { extensionManager?: StandaloneExtensionManager }) {
-  // --- Make sure, the root node is wrapped in a `Theme` component. Also, 
-  // --- the root node must be wrapped in a `Container` component managing 
+  children,
+  projectCompilation,
+}: AppWrapperProps & {
+  extensionManager?: StandaloneExtensionManager;
+}) {
+  // --- Make sure, the root node is wrapped in a `Theme` component. Also,
+  // --- the root node must be wrapped in a `Container` component managing
   // --- the app's top-level state.
   const rootNode = useMemo(() => {
     const themedRoot =
@@ -79,6 +83,14 @@ export function AppRoot({
     };
   }, [node]);
 
+  if (projectCompilation) {
+    const entryDeps = projectCompilation.entrypoint.dependencies;
+
+    const transDeps = getTransitiveDependencies(entryDeps, projectCompilation.components);
+    // console.log("projectCompilation: ", projectCompilation);
+    // console.log("transitive dependencies of entrypoint: ", transDeps);
+  }
+
   // --- Start with an error-free state
   resetErrors();
 
@@ -88,6 +100,7 @@ export function AppRoot({
     <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
       <DebugViewProvider debugConfig={globalProps?.debug}>
         <AppWrapper
+          projectCompilation={projectCompilation}
           resourceMap={resourceMap}
           apiInterceptor={apiInterceptor}
           node={rootNode as ComponentLike}
@@ -102,8 +115,45 @@ export function AppRoot({
           standalone={standalone}
           trackContainerHeight={trackContainerHeight}
           previewMode={previewMode}
-          sources={sources}>{children}</AppWrapper>
+          sources={sources}
+        >
+          {children}
+        </AppWrapper>
       </DebugViewProvider>
     </ComponentProvider>
   );
+}
+
+/**
+ *
+ * @param directCompDepNames The direct dependencies (those are component names)
+ * of the component for which the transitive dependencies will be returned
+ * @param components the compilation info of all the components of the project */
+function getTransitiveDependencies(
+  directCompDepNames: Set<string>,
+  components: ComponentCompilation[],
+) {
+  const allDepsByCompName: Map<string, Set<string>> = components.reduce(
+    function addDepsByNameToCollection(
+      collection: Map<string, Set<string>>,
+      { definition: { name }, dependencies },
+    ) {
+      return collection.set(name, dependencies);
+    },
+    new Map(),
+  );
+
+  const transitiveDeps = new Set<string>();
+  populateTransitiveDeps(directCompDepNames);
+  return transitiveDeps;
+
+  function populateTransitiveDeps(directCompDepNames: Set<string>) {
+    for (const directDep of directCompDepNames) {
+      if (!transitiveDeps.has(directDep)) {
+        transitiveDeps.add(directDep);
+        const depsOfDirectDep = allDepsByCompName.get(directDep);
+        populateTransitiveDeps(depsOfDirectDep);
+      }
+    }
+  }
 }
