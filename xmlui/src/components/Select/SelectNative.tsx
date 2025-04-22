@@ -597,7 +597,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
         <div className={styles.selectItemContent}>
           {optionRenderer ? (
             optionRenderer({
-              label: <SelectItemText>{label}</SelectItemText>,
+              label,
               value,
               enabled,
             })

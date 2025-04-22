@@ -26,7 +26,8 @@ import {
   dComponent,
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
-import { Select } from "../Select/SelectNative";
+import { Select } from "./SelectNative";
+import { SelectItemText } from "@radix-ui/react-select";
 
 const COMP = "Select";
 
@@ -79,7 +80,9 @@ export const SelectMd = createMetadata({
     focus: dFocus(COMP),
     setValue: dSetValueApi(),
     value: dValue(),
-    reset: d(`This method resets the component to its initial value, or clears the selection if no initial value was provided.`),
+    reset: d(
+      `This method resets the component to its initial value, or clears the selection if no initial value was provided.`,
+    ),
   },
   contextVars: {
     $item: d(`This property represents the value of an item in the dropdown list.`),
@@ -131,7 +134,9 @@ export const selectComponentRenderer = createComponentRenderer(
         multiSelect={extractValue.asOptionalBoolean(node.props.multiSelect)}
         style={layoutCss}
         inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
-        inProgressNotificationMessage={extractValue.asOptionalString(node.props.inProgressNotificationMessage)}
+        inProgressNotificationMessage={extractValue.asOptionalString(
+          node.props.inProgressNotificationMessage,
+        )}
         updateState={updateState}
         searchable={extractValue.asOptionalBoolean(node.props.searchable)}
         initialValue={extractValue(node.props.initialValue)}
@@ -171,7 +176,9 @@ export const selectComponentRenderer = createComponentRenderer(
                   <MemoizedItem
                     node={node.props.optionTemplate}
                     item={item}
-                    renderChild={renderChild}
+                    renderChild={(...args) => (
+                      <SelectItemText>{renderChild(...args)}</SelectItemText>
+                    )}
                   />
                 );
               }
