@@ -91,7 +91,6 @@ function StandaloneApp({
   // --- console.
   const { standaloneApp, projectCompilation } = useStandalone(appDef, runtime, extensionManager);
 
-  console.log({ projectCompilation });
   usePrintVersionNumber(standaloneApp);
 
   if (!standaloneApp) {
@@ -536,15 +535,6 @@ function useStandalone(
           projectCompilation: resolvedRuntime.projectCompilation,
           extensionManager,
         });
-
-        const entryDeps = resolvedRuntime.projectCompilation.entrypoint.dependencies;
-
-        const depsByComponent = componentCompilationsToNameDependencyPairs(
-          resolvedRuntime.projectCompilation.components,
-        );
-        const transDeps = getTransitiveDependencies(entryDeps, depsByComponent);
-        console.log("transDeps: ", transDeps);
-
         setProjectCompilation(resolvedRuntime.projectCompilation);
         setStandaloneApp(appDef);
         return;
@@ -584,7 +574,6 @@ function useStandalone(
           projectCompilation: resolvedRuntime.projectCompilation,
           extensionManager,
         });
-        console.log({ projCompInConfigMode: resolvedRuntime.projectCompilation });
         setProjectCompilation(resolvedRuntime.projectCompilation);
         setStandaloneApp(newAppDef);
         return;
@@ -696,11 +685,9 @@ function useStandalone(
             loadedEntryPointCodeBehind.src;
         }
       }
-      console.log(resolvedRuntime);
 
       // --- Components may have code-behind files
       loadedComponents.forEach((compWrapper) => {
-        console.log({ compWrapper });
         if (compWrapper?.file?.endsWith(`.${codeBehindFileExtension}`)) {
           codeBehinds[compWrapper.file] = compWrapper.codeBehind;
         } else {
@@ -888,14 +875,6 @@ function useStandalone(
         extensionManager,
       });
 
-      const entryDeps = resolvedRuntime.projectCompilation.entrypoint.dependencies;
-
-      const depsByComponent = componentCompilationsToNameDependencyPairs(
-        resolvedRuntime.projectCompilation.components,
-      );
-
-      const transDeps = getTransitiveDependencies(entryDeps, depsByComponent);
-      console.log("transDeps: ", transDeps);
       setProjectCompilation(resolvedRuntime.projectCompilation);
       setStandaloneApp(newAppDef);
     })();
@@ -1076,38 +1055,4 @@ function discoverDirectComponentDependenciesHelp(
   }
 
   return deps;
-}
-
-/**
- *
- * @param directCompDepNames The direct dependencies (those are component names)
- * of the component for which the transitive dependencies will be returned
- * @param allDepsByCompName the direct dependencies (those are component names) of
- * every component, grouped by the component name the dependencies belong to
- */
-function getTransitiveDependencies(
-  directCompDepNames: Set<string>,
-  allDepsByCompName: Map<string, Set<string>>,
-) {
-  const transitiveDeps = new Set<string>();
-  populateTransitiveDeps(directCompDepNames);
-  return transitiveDeps;
-
-  function populateTransitiveDeps(directCompDepNames: Set<string>) {
-    for (const directDep of directCompDepNames) {
-      if (!transitiveDeps.has(directDep)) {
-        transitiveDeps.add(directDep);
-        const depsOfDirectDep = allDepsByCompName.get(directDep);
-        populateTransitiveDeps(depsOfDirectDep);
-      }
-    }
-  }
-}
-
-function componentCompilationsToNameDependencyPairs(
-  components: ComponentCompilation[],
-): Map<string, Set<string>> {
-  return components.reduce((collection, { definition: { name }, dependencies }) => {
-    return collection.set(name, dependencies);
-  }, new Map<string, Set<string>>());
 }
