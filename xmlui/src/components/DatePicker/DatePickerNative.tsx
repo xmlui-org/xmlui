@@ -6,7 +6,6 @@ import { format, parse, isValid, parseISO } from "date-fns";
 import * as ReactDropdownMenu from "@radix-ui/react-dropdown-menu";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
-
 import styles from "./DatePicker.module.scss";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
@@ -235,9 +234,11 @@ export const DatePicker = forwardRef(function DatePicker(
     <div>
       <div className={styles.inlinePickerMenu}>
         <DayPicker
+          required={undefined}
+          captionLayout="dropdown"
           fixedWeeks
-          fromDate={startDate}
-          toDate={endDate}
+          startMonth={startDate}
+          endMonth={endDate}
           disabled={disabled}
           weekStartsOn={_weekStartsOn}
           showWeekNumber={showWeekNumber}
@@ -246,7 +247,7 @@ export const DatePicker = forwardRef(function DatePicker(
           mode={mode === "single" ? "single" : "range"}
           selected={selected}
           onSelect={handleSelect}
-          initialFocus={!inline}
+          autoFocus={!inline}
           numberOfMonths={mode === "range" ? 2 : 1}
         />
       </div>
@@ -292,24 +293,27 @@ export const DatePicker = forwardRef(function DatePicker(
       <ReactDropdownMenu.Portal container={root}>
         <ReactDropdownMenu.Content
           align={"start"}
+          sideOffset={5}
           className={styles.datePickerMenu}
           onFocus={handleOnMenuFocus}
           onBlur={handleOnMenuBlur}
           onInteractOutside={handleOnMenuBlur}
         >
           <DayPicker
+            required={undefined}
             fixedWeeks
-            fromDate={startDate}
-            toDate={endDate}
+            classNames={styles}
+            captionLayout="dropdown"
+            startMonth={startDate}
+            endMonth={endDate}
             disabled={disabled}
             weekStartsOn={_weekStartsOn}
             showWeekNumber={showWeekNumber}
             showOutsideDays
-            classNames={styles}
             mode={mode === "single" ? "single" : "range"}
             selected={selected}
             onSelect={handleSelect}
-            initialFocus
+            autoFocus={!inline}
             numberOfMonths={mode === "range" ? 2 : 1}
           />
         </ReactDropdownMenu.Content>
