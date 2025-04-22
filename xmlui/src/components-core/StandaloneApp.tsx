@@ -580,6 +580,12 @@ function useStandalone(
         if (lintErrorComponent) {
           newAppDef.entryPoint = lintErrorComponent;
         }
+        discoverCompilationDependencies({
+          projectCompilation: resolvedRuntime.projectCompilation,
+          extensionManager,
+        });
+        console.log({ projCompInConfigMode: resolvedRuntime.projectCompilation });
+        setProjectCompilation(resolvedRuntime.projectCompilation);
         setStandaloneApp(newAppDef);
         return;
       }
