@@ -538,11 +538,9 @@ function useStandalone(
         });
 
         const entryDeps = resolvedRuntime.projectCompilation.entrypoint.dependencies;
-        const depsByComponent = resolvedRuntime.projectCompilation.components.reduce(
-          (collection, { definition: { name }, dependencies }) => {
-            return collection.set(name, dependencies);
-          },
-          new Map<string, Set<string>>(),
+
+        const depsByComponent = componentCompilationsToNameDependencyPairs(
+          resolvedRuntime.projectCompilation.components,
         );
         const transDeps = getTransitiveDependencies(entryDeps, depsByComponent);
         console.log("transDeps: ", transDeps);
@@ -879,6 +877,19 @@ function useStandalone(
         newAppDef.entryPoint = lintErrorComponent;
       }
 
+      discoverCompilationDependencies({
+        projectCompilation: resolvedRuntime.projectCompilation,
+        extensionManager,
+      });
+
+      const entryDeps = resolvedRuntime.projectCompilation.entrypoint.dependencies;
+
+      const depsByComponent = componentCompilationsToNameDependencyPairs(
+        resolvedRuntime.projectCompilation.components,
+      );
+
+      const transDeps = getTransitiveDependencies(entryDeps, depsByComponent);
+      console.log("transDeps: ", transDeps);
       setProjectCompilation(resolvedRuntime.projectCompilation);
       setStandaloneApp(newAppDef);
     })();
@@ -1085,4 +1096,12 @@ function getTransitiveDependencies(
       }
     }
   }
+}
+
+function componentCompilationsToNameDependencyPairs(
+  components: ComponentCompilation[],
+): Map<string, Set<string>> {
+  return components.reduce((collection, { definition: { name }, dependencies }) => {
+    return collection.set(name, dependencies);
+  }, new Map<string, Set<string>>());
 }
