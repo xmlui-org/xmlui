@@ -21,6 +21,7 @@ type ExternalDataLoaderProps = {
   state: ContainerState;
   doNotRemoveNulls?: boolean;
   loaderInProgressChanged: LoaderInProgressChangedFn;
+  loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
 };
@@ -31,6 +32,7 @@ type ExternalDataLoaderProps = {
 function ExternalDataLoader({
   loader,
   loaderInProgressChanged,
+  loaderIsRefetchingChanged,
   loaderError,
   loaderLoaded,
   state,
@@ -41,7 +43,6 @@ function ExternalDataLoader({
   const headers: Record<string, string> = extractParam(state, loader.props.headers, appContext);
   const data = extractParam(state, loader.props.data, appContext);
 
-  console.log("resolve");
   const url = extractParam(state, loader.props.url, appContext);
   const urlLoadable = !!url;
 
@@ -49,7 +50,6 @@ function ExternalDataLoader({
     if (!urlLoadable) {
       return;
     }
-    console.log("doLoad ", url, data);
     const response = await fetch(url, {
       method: method || "POST",
       headers: {
@@ -62,7 +62,6 @@ function ExternalDataLoader({
     if (!doNotRemoveNulls) {
       removeNullProperties(responseObj);
     }
-    console.log("result", responseObj);
     return responseObj;
   }, [urlLoadable, headers, data, url, method, doNotRemoveNulls]);
 
@@ -71,6 +70,7 @@ function ExternalDataLoader({
       state={state}
       loader={loader}
       loaderInProgressChanged={loaderInProgressChanged}
+      loaderIsRefetchingChanged={loaderIsRefetchingChanged}
       loaderLoaded={loaderLoaded}
       loaderError={loaderError}
       loaderFn={doLoad}
@@ -92,12 +92,13 @@ type ExternalDataLoaderDef = ComponentDef<typeof ExternalDataLoaderMd>;
 
 export const externalDataLoaderRenderer = createLoaderRenderer(
   "ExternalDataLoader",
-  ({ loader, state, loaderInProgressChanged, loaderError, loaderLoaded }) => {
+  ({ loader, state, loaderInProgressChanged, loaderIsRefetchingChanged, loaderError, loaderLoaded }) => {
     return (
       <ExternalDataLoader
         loader={loader}
         state={state}
         loaderInProgressChanged={loaderInProgressChanged}
+        loaderIsRefetchingChanged={loaderIsRefetchingChanged}
         loaderLoaded={loaderLoaded}
         loaderError={loaderError}
       />

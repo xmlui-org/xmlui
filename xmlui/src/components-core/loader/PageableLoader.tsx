@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { InfiniteData } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import produce, { createDraft, finishDraft } from "immer";
@@ -16,6 +16,7 @@ import type {
 import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { usePrevious } from "../utils/hooks";
+import { is } from "immer/dist/internal";
 
 export type LoaderDirections = "FORWARD" | "BACKWARD" | "BIDIRECTIONAL";
 
@@ -28,6 +29,7 @@ type LoaderProps = {
   pollIntervalInSeconds?: number;
   onLoaded?: (...args: any[]) => void;
   loaderInProgressChanged: LoaderInProgressChangedFn;
+  loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
   transformResult?: TransformResultFn;
@@ -42,6 +44,7 @@ export function PageableLoader({
   pollIntervalInSeconds,
   onLoaded,
   loaderInProgressChanged,
+  loaderIsRefetchingChanged,
   loaderLoaded,
   loaderError,
   transformResult,
@@ -53,6 +56,7 @@ export function PageableLoader({
     [appContext, loader.props, queryId, state, uid],
   );
   const thizRef = useRef(queryKey);
+  const [isRefetching, setIsRefetching] = useState(false);
 
   const getPreviousPageParam = useCallback(
     (firstPage: any) => {
@@ -60,7 +64,7 @@ export function PageableLoader({
       const prevPageSelector = loader.props.prevPageSelector;
       if (prevPageSelector) {
         prevPageParam = extractParam(
-          { $response: firstPage.filter(item => !item._optimisticValue) },
+          { $response: firstPage.filter((item) => !item._optimisticValue) },
           prevPageSelector.startsWith("{") ? prevPageSelector : `{$response.${prevPageSelector}}`,
         );
       }
@@ -168,6 +172,10 @@ export function PageableLoader({
     loaderInProgressChanged(isFetching); //TODO isFetchingPrevPage / nextPage
   }, [isFetching, loaderInProgressChanged]);
 
+  useLayoutEffect(() => {
+    loaderIsRefetchingChanged(isRefetching); //TODO isFetchingPrevPage / nextPage
+  }, [isRefetching, loaderIsRefetchingChanged]);
+
   const pageInfo = useMemo(() => {
     return {
       hasPrevPage: hasPreviousPage,
@@ -191,10 +199,12 @@ export function PageableLoader({
       // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have
       // access to the latest loader value
       setTimeout(() => {
-        onLoaded?.(data);
+        onLoaded?.(data, isRefetching);
+        setIsRefetching(false);
       }, 0);
     } else if (status === "error" && prevError !== error) {
       loaderError(error);
+      setIsRefetching(false);
     }
   }, [
     data,
@@ -213,6 +223,7 @@ export function PageableLoader({
     let intervalId: NodeJS.Timeout;
     if (pollIntervalInSeconds) {
       intervalId = setInterval(() => {
+        setIsRefetching(true);
         refetch();
       }, pollIntervalInSeconds * 1000);
     }
@@ -235,7 +246,10 @@ export function PageableLoader({
     registerComponentApi({
       fetchPrevPage,
       fetchNextPage: stableFetchNextPage,
-      refetch,
+      refetch: async (options) => {
+        setIsRefetching(true);
+        refetch(options);
+      },
       update: async (updater) => {
         const oldData = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<any[]>;
         if (!oldData) {

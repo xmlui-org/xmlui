@@ -45,6 +45,11 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         storeNextValue(state[uid]);
         break;
       }
+      case ContainerActionKind.LOADER_IS_REFETCHING_CHANGED: {
+        state[uid] = { ...state[uid], isRefetching: action.payload.isRefetching };
+        storeNextValue(state[uid]);
+        break;
+      }
       case ContainerActionKind.LOADER_LOADED: {
         const { data, pageInfo } = action.payload;
         state[uid] = {
@@ -101,7 +106,11 @@ export function createContainerReducer(debugView: IDebugViewContext) {
           let tempValueInLocalVars = localVars;
           setWith(state, path, value, (nsValue, key, nsObject) => {
             tempValueInLocalVars = tempValueInLocalVars?.[key];
-            if (nsValue === undefined && tempValueInLocalVars === undefined && isPlainObject(target)) {
+            if (
+              nsValue === undefined &&
+              tempValueInLocalVars === undefined &&
+              isPlainObject(target)
+            ) {
               // if we are setting a new object's key, lodash defaults it to an array, if the key is a number.
               // This way we can force it to be an object.
               // (example: we have an empty object in vars called usersTyped: {}, we set usersTyped[1] = Date.now().
@@ -131,10 +140,9 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         nextState,
       };
 
-      // TODO: Logging to the console is a temporary solution. We should use a proper 
+      // TODO: Logging to the console is a temporary solution. We should use a proper
       // logging mechanism. Nonetheless, this works only with state transition logging
       // enabled (which is disabled by default).
-      console.log("Transition", loggedTransition);
       if (debugView.stateTransitions) {
         if (debugView.stateTransitions.length >= MAX_STATE_TRANSITION_LENGTH) {
           debugView.stateTransitions.shift();

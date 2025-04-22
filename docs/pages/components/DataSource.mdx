@@ -192,11 +192,29 @@ This event fires when a request results in an error.
 
 ### `loaded`
 
-The component triggers this event when the fetch operation has been completed and the data is loaded. The argument of the event is the data loaded.
+The component triggers this event when the fetch operation has been completed and the data is loaded. The event has two arguments. The first is the data loaded; the second indicates if the event is a result of a refetch.
 
 ## Exposed Methods
 
-This component does not expose any methods.
+### `inProgress`
+
+This property indicates if the data is being fetched.
+
+### `isRefetching`
+
+This property indicates if the data is being re-fetched.
+
+### `loaded`
+
+This property indicates if the data has been loaded.
+
+### `refetch`
+
+This method requests the re-fetch of the data.
+
+### `value`
+
+This property retrieves the data queried from the source after optional transformations.
 
 ## Styling
 

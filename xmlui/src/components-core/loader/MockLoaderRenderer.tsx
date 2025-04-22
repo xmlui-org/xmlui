@@ -16,6 +16,7 @@ import { Loader } from "./Loader";
 type MockLoaderProps = {
   loader: MockLoaderDef;
   loaderInProgressChanged: LoaderInProgressChangedFn;
+  loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
   state: ContainerState;
@@ -24,6 +25,7 @@ type MockLoaderProps = {
 function ApiLoader({
   loader,
   loaderInProgressChanged,
+  loaderIsRefetchingChanged,
   loaderError,
   loaderLoaded,
   state,
@@ -42,6 +44,7 @@ function ApiLoader({
       state={state}
       loader={loader}
       loaderInProgressChanged={loaderInProgressChanged}
+      loaderIsRefetchingChanged={loaderIsRefetchingChanged}
       loaderLoaded={loaderLoaded}
       loaderError={loaderError}
       loaderFn={doLoad}
@@ -67,6 +70,7 @@ export const mockLoaderRenderer = createLoaderRenderer(
         loader={loader}
         state={state}
         loaderInProgressChanged={loaderInProgressChanged}
+        loaderIsRefetchingChanged={loaderInProgressChanged}
         loaderLoaded={loaderLoaded}
         loaderError={loaderError}
       />
