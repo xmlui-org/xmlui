@@ -1,3 +1,15 @@
+%-DESC-START
+
+## Structural Sharing
+
+`DataSource` uses a technique called "structural sharing" to ensure that as many data references as possible will be kept intact and not cause extra UI refresh. If data is fetched from an API endpoint, you'll usually get a completely new reference by json parsing the response. However, `DataSource` will keep the original reference if *nothing* has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts.
+
+When you initiate the refetching of data (e.g., with the `refetch` method or setting the `pollIntervalInSeconds` property) and you retrieve data structurally equal with the cached data instance, `DataSource` will not fire the `loaded` event.
+
+By default, structural sharing is turned on. If you do not need this behavior, set the `structuralSharing` property to `false`.
+
+%-DESC-END
+
 %-PROP-START completedNotificationMessage
 
 This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:

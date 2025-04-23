@@ -20,15 +20,17 @@ type MockLoaderProps = {
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
   state: ContainerState;
+  structuralSharing?: boolean;
 };
 
-function ApiLoader({
+function MockLoader({
   loader,
   loaderInProgressChanged,
   loaderIsRefetchingChanged,
   loaderError,
   loaderLoaded,
   state,
+  structuralSharing
 }: MockLoaderProps) {
   const appContext = useAppContext();
   const waitTime: number = extractParam(state, loader.props.waitTime, appContext);
@@ -48,6 +50,7 @@ function ApiLoader({
       loaderLoaded={loaderLoaded}
       loaderError={loaderError}
       loaderFn={doLoad}
+      structuralSharing={structuralSharing}
     />
   );
 }
@@ -66,7 +69,7 @@ export const mockLoaderRenderer = createLoaderRenderer(
   "MockLoader",
   ({ loader, state, loaderInProgressChanged, loaderLoaded, loaderError }) => {
     return (
-      <ApiLoader
+      <MockLoader
         loader={loader}
         state={state}
         loaderInProgressChanged={loaderInProgressChanged}

@@ -33,6 +33,7 @@ type LoaderProps = {
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
   transformResult?: TransformResultFn;
+  structuralSharing?: boolean;
 };
 
 export function PageableLoader({
@@ -48,6 +49,7 @@ export function PageableLoader({
   loaderLoaded,
   loaderError,
   transformResult,
+  structuralSharing = true,
 }: LoaderProps) {
   const { uid } = loader;
   const appContext = useAppContext();
@@ -56,7 +58,6 @@ export function PageableLoader({
     [appContext, loader.props, queryId, state, uid],
   );
   const thizRef = useRef(queryKey);
-  const [isRefetching, setIsRefetching] = useState(false);
 
   const getPreviousPageParam = useCallback(
     (firstPage: any) => {
@@ -112,6 +113,7 @@ export function PageableLoader({
     refetch,
     fetchPreviousPage,
     fetchNextPage,
+    isRefetching,
   } = useInfiniteQuery({
     queryKey,
     queryFn: useCallback<QueryFunction>(
@@ -120,6 +122,7 @@ export function PageableLoader({
       },
       [loaderFn],
     ),
+    structuralSharing,
     select: useCallback(
       (data: any) => {
         let result = [];
@@ -200,11 +203,9 @@ export function PageableLoader({
       // access to the latest loader value
       setTimeout(() => {
         onLoaded?.(data, isRefetching);
-        setIsRefetching(false);
       }, 0);
     } else if (status === "error" && prevError !== error) {
       loaderError(error);
-      setIsRefetching(false);
     }
   }, [
     data,
@@ -223,7 +224,6 @@ export function PageableLoader({
     let intervalId: NodeJS.Timeout;
     if (pollIntervalInSeconds) {
       intervalId = setInterval(() => {
-        setIsRefetching(true);
         refetch();
       }, pollIntervalInSeconds * 1000);
     }
@@ -247,7 +247,6 @@ export function PageableLoader({
       fetchPrevPage,
       fetchNextPage: stableFetchNextPage,
       refetch: async (options) => {
-        setIsRefetching(true);
         refetch(options);
       },
       update: async (updater) => {

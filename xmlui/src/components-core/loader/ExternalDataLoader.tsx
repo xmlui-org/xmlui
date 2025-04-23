@@ -24,6 +24,7 @@ type ExternalDataLoaderProps = {
   loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
+  structuralSharing?: boolean;
 };
 
 /**
@@ -37,6 +38,7 @@ function ExternalDataLoader({
   loaderLoaded,
   state,
   doNotRemoveNulls,
+  structuralSharing = true,
 }: ExternalDataLoaderProps) {
   const appContext = useAppContext();
   const method = extractParam(state, loader.props.method, appContext);
@@ -74,6 +76,7 @@ function ExternalDataLoader({
       loaderLoaded={loaderLoaded}
       loaderError={loaderError}
       loaderFn={doLoad}
+      structuralSharing={structuralSharing}
     />
   );
 }

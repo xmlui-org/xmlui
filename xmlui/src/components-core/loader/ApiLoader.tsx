@@ -24,6 +24,7 @@ type ApiLoaderProps = {
   loaderError: LoaderErrorFn;
   state: ContainerState;
   doNotRemoveNulls?: boolean;
+  structuralSharing?: boolean;
 };
 
 /**
@@ -37,6 +38,7 @@ function ApiLoader({
   loaderError,
   state,
   doNotRemoveNulls,
+  structuralSharing = true,
 }: ApiLoaderProps) {
   const appContext = useAppContext();
 
@@ -67,6 +69,7 @@ function ApiLoader({
       loaderLoaded={loaderLoaded}
       loaderError={loaderError}
       loaderFn={doLoad}
+      structuralSharing={structuralSharing}
     />
   );
 }

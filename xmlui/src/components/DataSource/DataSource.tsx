@@ -84,6 +84,14 @@ export const DataSourceMd = createMetadata({
         `the previous and next page. This property defines the selector that extracts ` +
         `the next page information from the response deserialized to an object.`,
     },
+    structuralSharing: {
+      description:
+        "This property allows structural sharing. When turned on, `DataSource` will keep " +
+        "the original reference if nothing has changed in the data. If a subset has " +
+        "changed, `DataSource` will keep the unchanged parts and only replace the changed " +
+        "parts. If you do not need this behavior, set this property to `false`.",
+      defaultValue: "true",
+    },
   },
   events: {
     loaded: d(
@@ -94,10 +102,12 @@ export const DataSourceMd = createMetadata({
     error: d(`This event fires when a request results in an error.`),
   },
   apis: {
-    value: d("This property retrieves the data queried from the source after optional transformations."),
+    value: d(
+      "This property retrieves the data queried from the source after optional transformations.",
+    ),
     inProgress: d("This property indicates if the data is being fetched."),
     isRefetching: d("This property indicates if the data is being re-fetched."),
     loaded: d("This property indicates if the data has been loaded."),
-    refetch: d("This method requests the re-fetch of the data.")
-  }
+    refetch: d("This method requests the re-fetch of the data."),
+  },
 });
