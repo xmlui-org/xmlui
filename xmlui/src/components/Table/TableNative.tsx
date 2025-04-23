@@ -115,6 +115,7 @@ type TableProps = {
   hideNoDataView?: boolean;
   alwaysShowSelectionHeader?: boolean;
   registerComponentApi: RegisterComponentApiFn;
+  noBottomBorder?: boolean;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -176,6 +177,7 @@ export const Table = forwardRef(
       alwaysShowSelectionHeader = false,
       registerComponentApi,
       onSelectionDidChange,
+      noBottomBorder = false,
       // cols
     }: TableProps,
     forwardedRef,
@@ -692,6 +694,7 @@ export const Table = forwardRef(
                     [styles.selected]: row.getIsSelected(),
                     [styles.focused]: focusedIndex === rowIndex,
                     [styles.disabled]: rowDisabledPredicate(row.original),
+                    [styles.noBottomBorder]: noBottomBorder,
                   })}
                   ref={(el) => {
                     if (el && estimatedHeightRef.current === null) {
