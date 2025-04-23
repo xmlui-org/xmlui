@@ -112,6 +112,7 @@ export const AppWrapper = ({
   resourceMap,
   sources,
   children,
+  projectCompilation,
 }: AppWrapperProps) => {
   if (previewMode) {
     // --- Prevent leaking the meta items to the parent document,
@@ -140,7 +141,7 @@ export const AppWrapper = ({
             defaultTone={defaultTone}
             resources={resources}
           >
-            <InspectorProvider sources={sources}>
+            <InspectorProvider sources={sources} projectCompilation={projectCompilation}>
               <ConfirmationModalContextProvider>
                 <AppContent
                   rootContainer={node as ContainerWrapperDef}

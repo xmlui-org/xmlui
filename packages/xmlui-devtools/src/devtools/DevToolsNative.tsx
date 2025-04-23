@@ -13,6 +13,7 @@ import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
 import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
 import xmluiLight from "../syntax/monaco/xmlui-light";
 import xmluiDark from "../syntax/monaco/xmlui-dark";
+import { createQueryString } from "xmlui-docs/src/components/utils";
 
 function trySafeStringify(obj: any): string {
   try {
@@ -26,7 +27,14 @@ export const DevTools = () => {
   const [side, setSide] = useState<"bottom" | "left" | "right">("bottom");
   const { root, activeThemeTone } = useTheme();
   const context = useDevTools();
-  const { setDevToolsSize, setDevToolsSide, inspectedNode, sources, setIsOpen } = context;
+  const {
+    setDevToolsSize,
+    setDevToolsSide,
+    inspectedNode,
+    sources,
+    setIsOpen,
+    projectCompilation,
+  } = context;
   const [copied, setCopied] = useState(false);
   const monacoEditorInstance = useRef<any>(null);
   const editorRef = useRef(null);
@@ -75,8 +83,48 @@ export const DevTools = () => {
         }
       }
     });
-    return prunedLines.map((line) => line.slice(trimBeginCount)).join("\n");
+    return prunedLines
+      .map((line) => line.slice(trimBeginCount).replace(/inspect="true"/g, ""))
+      .join("\n")
   }, [inspectedNode, sources]);
+
+  const openLink = useCallback(async () => {
+    const appCode = {
+      app: value,
+      api: undefined,
+      availableThemes: [],
+      components:
+        projectCompilation?.components.map((c) => ({
+          name: c.definition.name,
+          component: c.markupSource,
+        })) || [],
+      config: {
+        appGlobals: {},
+        defaultTheme: "",
+        defaultTone: "",
+        logo: "",
+        name: "",
+        description: "",
+        resources: {},
+        themes: [],
+      },
+    };
+
+    const data = {
+      standalone: appCode,
+      options: {
+        fixedTheme: false,
+        swapped: false,
+        previewMode: false,
+        orientation: "vertical",
+        activeTheme: "xmlui",
+        content: "app",
+      },
+    };
+
+    const appQueryString = await createQueryString(JSON.stringify(data));
+    window.open(`http://localhost:3000/playground#${appQueryString}`, "_blank");
+  }, [value, projectCompilation]);
 
   useEffect(() => {
     if (activeTab === "code") {
@@ -281,6 +329,7 @@ export const DevTools = () => {
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
+            <Button onClick={openLink} size={"xs"} variant={"ghost"} icon={<Icon name={"new-window"} />} />
             <Button
               onClick={() => setIsOpen?.(false)}
               size={"xs"}

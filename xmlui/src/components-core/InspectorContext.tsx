@@ -17,6 +17,7 @@ import { Button } from "../components/Button/ButtonNative";
 import Icon from "../components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
 import { useComponentRegistry } from "../components/ComponentRegistryContext";
+import { ProjectCompilation } from "../abstractions/scripting/Compilation";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {
@@ -32,6 +33,7 @@ interface IInspectorContext {
   devToolsEnabled?: boolean;
   setIsOpen: (isOpen: boolean) => void;
   inspectedNode: any;
+  projectCompilation: ProjectCompilation | undefined;
 }
 
 // --- The context object that is used to store the inspector information.
@@ -40,9 +42,11 @@ export const InspectorContext = createContext<IInspectorContext | null>(null);
 export function InspectorProvider({
   children,
   sources,
+  projectCompilation,
 }: {
   children: React.ReactNode;
   sources?: Record<string, string>;
+  projectCompilation?: ProjectCompilation;
 }) {
   const { root } = useTheme();
   const [inspectable, setInspectable] = useState<Record<string, any>>({});
@@ -96,8 +100,9 @@ export function InspectorProvider({
       devToolsSide,
       setDevToolsSide,
       devToolsEnabled: showCode,
+      projectCompilation: projectCompilation,
     };
-  }, [devToolsSide, devToolsSize, sources, inspectedNode, showCode]);
+  }, [devToolsSide, devToolsSize, sources, inspectedNode, showCode, projectCompilation]);
 
   return (
     <InspectorContext.Provider value={contextValue}>
@@ -232,6 +237,7 @@ export function useDevTools() {
   const context = useContext(InspectorContext);
 
   return {
+    projectCompilation: context?.projectCompilation,
     inspectedNode: context?.inspectedNode,
     sources: context?.sources,
     setIsOpen: context?.setIsOpen,
