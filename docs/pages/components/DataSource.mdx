@@ -4,6 +4,14 @@ import { Callout } from "nextra/components";
 
 The `DataSource` component manages fetching data from an API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component.
 
+## Structural Sharing
+
+`DataSource` uses a technique called "structural sharing" to ensure that as many data references as possible will be kept intact and not cause extra UI refresh. If data is fetched from an API endpoint, you'll usually get a completely new reference by json parsing the response. However, `DataSource` will keep the original reference if *nothing* has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts.
+
+When you initiate the refetching of data (e.g., with the `refetch` method or setting the `pollIntervalInSeconds` property) and you retrieve data structurally equal with the cached data instance, `DataSource` will not fire the `loaded` event.
+
+By default, structural sharing is turned on. If you do not need this behavior, set the `structuralSharing` property to `false`.
+
 ## Properties
 
 ### `body`
@@ -175,6 +183,10 @@ This `Table` uses the filtered array.
   <Column bindTo="custom_notes" />
 </Table>
 ```
+
+### `structuralSharing (default: "true")`
+
+This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.
 
 ### `transformResult`
 

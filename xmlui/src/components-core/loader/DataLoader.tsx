@@ -32,6 +32,7 @@ type LoaderProps = {
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
   transformResult?: TransformResultFn;
+  structuralSharing?: boolean;
 };
 
 function DataLoader({
@@ -45,6 +46,7 @@ function DataLoader({
   loaderLoaded,
   loaderError,
   transformResult,
+  structuralSharing = true,
 }: LoaderProps) {
   const appContext = useAppContext();
   const url = extractParam(state, loader.props.url, appContext);
@@ -395,6 +397,7 @@ function DataLoader({
       pollIntervalInSeconds={pollIntervalInSeconds}
       onLoaded={onLoaded}
       transformResult={transformResult}
+      structuralSharing={structuralSharing}
     />
   ) : (
     <Loader
@@ -411,6 +414,7 @@ function DataLoader({
       registerComponentApi={registerComponentApi}
       onLoaded={onLoaded}
       transformResult={transformResult}
+      structuralSharing={structuralSharing}
     />
   );
 }
@@ -433,6 +437,7 @@ export const DataLoaderMd = createMetadata({
     errorNotificationMessage: d("The message to show when an error occurs"),
     transformResult: d("Function for transforming the datasource result"),
     dataType: d("Type of data to fetch (default: json, or csv, or sql)"),
+    structuralSharing: d("Whether to use structural sharing for the data"),
   },
   events: {
     loaded: d("Event to trigger when the data is loaded"),
@@ -454,6 +459,7 @@ export const dataLoaderRenderer = createLoaderRenderer(
     registerComponentApi,
     lookupAction,
     lookupSyncCallback,
+    extractValue
   }) => {
     // --- Check for required properties
     if (!loader.props?.url || !loader.props.url.trim()) {
@@ -472,6 +478,7 @@ export const dataLoaderRenderer = createLoaderRenderer(
         transformResult={lookupSyncCallback(loader.props.transformResult)}
         onLoaded={lookupAction(loader.events?.loaded, { eventName: "loaded" })}
         onError={lookupAction(loader.events?.error, { eventName: "error" })}
+        structuralSharing={extractValue.asOptionalBoolean(loader.props.structuralSharing)}
       />
     );
   },

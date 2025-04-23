@@ -32,6 +32,7 @@ type LoaderProps = {
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
   transformResult?: TransformResultFn;
+  structuralSharing?: boolean;
 };
 
 /**
@@ -52,10 +53,10 @@ export function Loader({
   loaderIsRefetchingChanged,
   loaderError,
   transformResult,
+  structuralSharing = true
 }: LoaderProps) {
   const { uid } = loader;
   const appContext = useAppContext();
-  const [isRefetching, setIsRefetching] = useState(false);
 
   // --- Rely on react-query to decide when data fetching should use the cache or when is should fetch the data from
   // --- its data source.
@@ -63,12 +64,12 @@ export function Loader({
   // --- status: Query execution status
   // --- error: Error information about the current query error (in "error" state)
   // --- refetch: The function that can be used to re-fetch the data (because of data/state changes)
-  const { data, status, isFetching, error, refetch } = useQuery({
+  const { data, status, isFetching, error, refetch, isRefetching } = useQuery({
     queryKey: useMemo(
       () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
       [appContext, loader.props, queryId, state, uid],
     ),
-    structuralSharing: false,
+    structuralSharing,
     queryFn: useCallback<QueryFunction>(
       async ({ signal }) => {
         // console.log("[Loader queryFn] Starting to fetch data...");
@@ -117,7 +118,6 @@ export function Loader({
     let intervalId: NodeJS.Timeout;
     if (pollIntervalInSeconds) {
       intervalId = setInterval(() => {
-        setIsRefetching(true);
         refetch();
       }, pollIntervalInSeconds * 1000);
     }
@@ -156,12 +156,10 @@ export function Loader({
         // console.log("[Loader] Calling onLoaded with data:", data);
         // console.log("[Loader] onLoaded function exists:", !!onLoaded);
         onLoaded?.(data, isRefetching);
-        setIsRefetching(false);
       }, 0);
     } else if (status === "error" && error !== prevError) {
       // console.log("[Loader] Calling loaderError with error:", error);
       loaderError(error);
-      setIsRefetching(false);
     }
   }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status, isRefetching]);
 
@@ -174,7 +172,6 @@ export function Loader({
   useEffect(() => {
     registerComponentApi?.({
       refetch: async (options) => {
-        setIsRefetching(true);
         refetch(options);
       },
       update: async (updater) => {
