@@ -97,10 +97,11 @@ export const DevTools = () => {
       app: value,
       api: undefined,
       availableThemes: [],
-      components: (projectCompilation?.components || []).map((c: any) => ({
-        name: c.definition.name,
-        component: c.markupSource,
-      })) || [],
+      components:
+        (projectCompilation?.components || []).map((c: any) => ({
+          name: c.definition.name,
+          component: c.markupSource,
+        })) || [],
       config: {
         appGlobals: {},
         defaultTheme: "",
@@ -126,7 +127,9 @@ export const DevTools = () => {
     };
 
     const appQueryString = await createQueryString(JSON.stringify(data));
-    window.open(`http://localhost:3000/playground#${appQueryString}`, "_blank");
+    const playgroundBaseUrl =
+      import.meta.env?.MODE === "development" ? "http://localhost:3000" : "https://docs.xmlui.com";
+    window.open(`${playgroundBaseUrl}/playground#${appQueryString}`, "_blank");
   }, [value, projectCompilation, inspectedNode]);
 
   useEffect(() => {
