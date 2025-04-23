@@ -60,7 +60,8 @@ export function renderChild({
 
   // --- A TextNode value may contain nexted expressions, so we extract it.
   if (node.type === "TextNode") {
-    return extractParam(state, nodeValue, appContext, true);
+    const extractedValue = extractParam(state, nodeValue, appContext, true);
+    return typeof extractedValue === "boolean" ? extractedValue.toString() : extractedValue;
   }
 
   // --- Rendering a Slot requires some preparations, as TextNode and
