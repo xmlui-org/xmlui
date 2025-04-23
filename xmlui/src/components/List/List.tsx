@@ -95,7 +95,7 @@ export const ListMd = createMetadata({
       defaultValue: true,
     },
   },
-  childrenAsTemplate: 'itemTemplate',
+  childrenAsTemplate: "itemTemplate",
   apis: {
     scrollToTop: d("This method scrolls the list to the top."),
     scrollToBottom: d("This method scrolls the list to the bottom."),
@@ -108,6 +108,11 @@ export const ListMd = createMetadata({
   },
   contextVars: {
     $item: d(`This property represents the value of an item in the data list.`),
+    $itemIndex: dComponent(
+      "This integer value represents the current row index (zero-based) while rendering children.",
+    ),
+    $isFirst: dComponent("This boolean value indicates if the component renders its first item."),
+    $isLast: dComponent("This boolean value indicates if the component renders its last item."),
   },
   themeVars: parseScssVar(styles.themeVars),
 });
@@ -147,7 +152,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         borderCollapse={extractValue.asOptionalBoolean(node.props.borderCollapse, true)}
         itemRenderer={
           itemTemplate &&
-          ((item, key) => {
+          ((item, key, rowIndex, count) => {
             return (
               <MemoizedItem
                 node={itemTemplate as any}
@@ -155,6 +160,11 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
                 key={key}
                 renderChild={renderChild}
                 layoutContext={layoutContext}
+                contextVars={{
+                  $itemIndex: rowIndex,
+                  $isFirst: rowIndex === 0,
+                  $isLast: rowIndex === count - 1,
+                }}
               />
             );
           })

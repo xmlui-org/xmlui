@@ -191,7 +191,7 @@ const defaultItemRenderer = (item: any, id: any) => {
 
 type DynamicHeightListProps = {
   items: any[];
-  itemRenderer?: (item: any, id: any) => ReactNode;
+  itemRenderer?: (item: any, id: any, index: number, count: number) => ReactNode;
   sectionRenderer?: (group: any, id: any) => ReactNode;
   sectionFooterRenderer?: (group: any, id: any) => ReactNode;
   loading?: boolean;
@@ -422,7 +422,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
     if (rows.length) {
       virtualizerRef.current?.scrollToIndex(rows.length + 1, {
         align: "end",
-        offset: scrollPaddingTop
+        offset: scrollPaddingTop,
       });
     }
   });
@@ -460,6 +460,8 @@ export const ListNative = forwardRef(function DynamicHeightList(
   }, [registerComponentApi, scrollToBottom, scrollToId, scrollToIndex, scrollToTop]);
   const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
 
+  const rowCount = rows?.length ?? 0;
+
   return (
     <ListItemTypeContext.Provider value={rowTypeContextValue}>
       <ListContext.Provider value={expandContextValue}>
@@ -496,9 +498,13 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 scrollRef={scrollElementRef}
                 shift={shift}
                 onScroll={onScroll}
-                startMargin={hasOutsideScroll ? ((parentRef.current?.offsetTop - scrollRef.current?.offsetTop) || 0) : 0}
+                startMargin={
+                  hasOutsideScroll
+                    ? parentRef.current?.offsetTop - scrollRef.current?.offsetTop || 0
+                    : 0
+                }
                 item={Item as CustomItemComponent}
-                count={rows.length ?? 0}
+                count={rowCount}
               >
                 {(rowIndex) => {
                   const row = rows[rowIndex];
@@ -506,7 +512,9 @@ export const ListNative = forwardRef(function DynamicHeightList(
                   switch (row._row_type) {
                     case RowType.SECTION:
                       return (
-                        <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>
+                        <Fragment key={key}>
+                          {sectionRenderer?.(row, key) || <div />}
+                        </Fragment>
                       );
                     case RowType.SECTION_FOOTER:
                       return (
@@ -515,7 +523,11 @@ export const ListNative = forwardRef(function DynamicHeightList(
                         </Fragment>
                       );
                     default:
-                      return <Fragment key={key}>{itemRenderer(row, key) || <div />}</Fragment>;
+                      return (
+                        <Fragment key={key}>
+                          {itemRenderer(row, key, rowIndex, rowCount) || <div />}
+                        </Fragment>
+                      );
                   }
                 }}
               </Virtualizer>
@@ -532,10 +544,12 @@ export function MemoizedSection({
   node,
   renderChild,
   item,
+  contextVars = EMPTY_OBJECT,
 }: {
   node: ComponentDef;
   item: any;
   renderChild: RenderChildFn;
+  contextVars?: Record<string, any>;
 }) {
   const { isExpanded, toggleExpanded } = useContext(ListContext);
   const id = item.id;
@@ -557,6 +571,11 @@ export function MemoizedSection({
       context={sectionContext}
       itemKey="$group"
       contextKey="$group"
+      contextVars={{
+        ...contextVars,
+        $isFirst: item.index === 0,
+        $isLast: item.index === item.count - 1,
+      }}
     />
   );
 }

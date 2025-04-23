@@ -10,7 +10,10 @@ The `List` component is a robust layout container that renders associated data i
 
 The component provides context values with which you can access some internal properties:
 
+- `$isFirst`: This boolean value indicates if the component renders its first item.
+- `$isLast`: This boolean value indicates if the component renders its last item.
 - `$item`: This property represents the value of an item in the data list.
+- `$itemIndex`: This integer value represents the current row index (zero-based) while rendering children.
 
 In the following examples all use the same list of data which looks like so:
 
