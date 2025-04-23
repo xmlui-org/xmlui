@@ -34,15 +34,16 @@ export const TabsMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "$backgroundColor-primary",
+    // [`backgroundColor-${COMP}`]: "transparent",
     [`borderStyle-${COMP}`]: "solid",
     [`borderColor-${COMP}`]: "$borderColor",
     [`borderColor-active-${COMP}`]: "$color-primary",
     [`borderWidth-${COMP}`]: "2px",
-    [`backgroundColor-trigger-${COMP}`]: "$backgroundColor-primary",
-    [`backgroundColor-trigger-${COMP}--hover`]: "$color-primary-50",
-    [`backgroundColor-list-${COMP}`]: "$color-primary-50",
-    [`textColor-trigger-${COMP}`]: "$color-primary-100",
+    // [`backgroundColor-trigger-${COMP}`]: "transparent",
+    [`backgroundColor-trigger-${COMP}--hover`]: "$color-surface-100",
+    [`padding-trigger-${COMP}`]: "$space-4",
+    // [`backgroundColor-list-${COMP}`]: "$color-primary-50",
+    // [`textColor-trigger-${COMP}`]: "$color-primary-100",
   },
 });
 

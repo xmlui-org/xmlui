@@ -58,6 +58,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "const-color-surface-800": "hsl(204, 30.3%, 27%)",
     "const-color-surface-900": "hsl(204, 30.3%, 16%)",
     "const-color-surface-950": "hsl(204, 30.3%, 13%)",
+    "const-color-surface-1000": "hsl(204, 30.3%, 9%)",
     "const-color-surface": "$const-color-surface-500",
 
     // --- Primary color shades (bluish)
@@ -296,6 +297,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-surface-800": "$const-color-surface-800",
         "color-surface-900": "$const-color-surface-900",
         "color-surface-950": "$const-color-surface-950",
+        "color-surface-1000": "$const-color-surface-1000",
         "color-surface": "$const-color-surface-500",
         "color-surface-base": "$color-surface-0",
         "color-surface-lower": "$color-surface-100",
@@ -390,7 +392,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     dark: {
       themeVars: {
         // --- Default surface color shades (form white to black)
-        "color-surface-0": "$const-color-surface-950",
+        "color-surface-0": "$const-color-surface-1000",
         "color-surface-50": "$const-color-surface-950",
         "color-surface-100": "$const-color-surface-900",
         "color-surface-200": "$const-color-surface-800",
@@ -402,6 +404,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-surface-800": "$const-color-surface-200",
         "color-surface-900": "$const-color-surface-100",
         "color-surface-950": "$const-color-surface-50",
+        "color-surface-1000": "$const-color-surface-0",
         "color-surface": "$const-color-surface-500",
         "color-surface-base": "$color-surface-0",
         "color-surface-lower": "$color-surface-0",

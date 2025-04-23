@@ -30,6 +30,8 @@ import StandaloneExtensionManager from "./components-core/StandaloneExtensionMan
 import { ThemeDefinition } from "./abstractions/ThemingDefs";
 import { useDevTools } from "./components-core/InspectorContext";
 import { useLogger } from "./logging/LoggerContext";
+import { TabItemComponent } from "./components/Tabs/TabItemNative";
+import { Tabs } from "./components/Tabs/TabsNative";
 
 export type {
   ThemeDefinition,
@@ -54,14 +56,16 @@ export {
   d,
   parseScssVar,
   startApp,
-  useTheme, //TODO REMOVE
-  AppRoot, //TODO remove, playground uses it
-  ErrorBoundary, //TODO remove, playground uses it
-  Icon, // TODO REMOVE from export
-  Stack, // TODO REMOVE from export
-  Button, // TODO REMOVE from export
-  Splitter, // TODO REMOVE from export
+  useTheme,
+  AppRoot,
+  ErrorBoundary,
+  Icon,
+  Stack,
+  Button,
+  Splitter,
   getColor,
+  TabItemComponent as TabItem,
+  Tabs,
   useColors,
   toCssVar,
   useDevTools,

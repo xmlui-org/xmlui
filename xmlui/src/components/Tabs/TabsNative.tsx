@@ -14,6 +14,7 @@ import styles from "./Tabs.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { TabContext, useTabContextValue } from "../Tabs/TabContext";
+import classnames from "classnames";
 
 type Props = {
   activeTab?: number;
@@ -22,16 +23,20 @@ type Props = {
   style?: CSSProperties;
   children?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
+  className?: string;
+  distributeEvenly?: boolean;
 };
 
 export const Tabs = forwardRef(function Tabs(
   {
     activeTab = 0,
-    orientation = "vertical",
+    orientation = "horizontal",
     tabRenderer,
     style,
     children,
     registerComponentApi,
+    className,
+    distributeEvenly = false,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -72,7 +77,7 @@ export const Tabs = forwardRef(function Tabs(
     <TabContext.Provider value={tabContextValue}>
       <RTabs.Root
         ref={forwardedRef}
-        className={styles.tabs}
+        className={classnames(styles.tabs, className)}
         value={`${currentTab}`}
         onValueChange={(tab) => {
           const newIndex = tabItems.findIndex((item) => item.id === tab);
@@ -87,16 +92,18 @@ export const Tabs = forwardRef(function Tabs(
         <RTabs.List className={styles.tabsList}>
           {tabItems.map((tab) =>
             tabRenderer ? (
-              <RTabs.Trigger key={tab.id} value={tab.id}>
+              <RTabs.Trigger key={tab.id} value={tab.id} asChild={true}>
                 {tabRenderer({ label: tab.label, isActive: tab.id === currentTab })}
               </RTabs.Trigger>
             ) : (
-              <RTabs.Trigger className={styles.tabTrigger} key={tab.id} value={tab.id}>
+              <RTabs.Trigger className={classnames(styles.tabTrigger, {
+                  [styles.distributeEvenly]: distributeEvenly
+              })} key={tab.id} value={tab.id}>
                 {tab.label}
               </RTabs.Trigger>
             ),
           )}
-          <div className={styles.filler} data-orientation={orientation} />
+          {(!distributeEvenly && !tabRenderer) && <div className={styles.filler} data-orientation={orientation} />}
         </RTabs.List>
         {children}
       </RTabs.Root>

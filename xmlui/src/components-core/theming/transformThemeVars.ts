@@ -674,6 +674,7 @@ function generateBaseTonesForColor(
       return {};
     }
     const baseColor = Color(color);
+    let color0;
     let color50;
     let color100;
     let color200;
@@ -685,7 +686,9 @@ function generateBaseTonesForColor(
     let color800;
     let color900;
     let color950;
+    let color1000;
     if (distributeEven) {
+      color0 = baseColor.lightness(100);
       color50 = baseColor.lightness(98);
       color100 = baseColor.lightness(95);
       color200 = baseColor.lightness(83);
@@ -697,10 +700,12 @@ function generateBaseTonesForColor(
       color800 = baseColor.lightness(27);
       color900 = baseColor.lightness(16);
       color950 = baseColor.lightness(13);
+      color1000 = baseColor.lightness(9);
     } else {
       const baseL = baseColor.hsl().l();
       const darkStep = baseL / 5;
       const lightStep = (100 - baseL) / 5;
+      color0 = baseColor.lightness(100);
       color50 = baseColor.lightness(baseL + lightStep * 4.5);
       color100 = baseColor.lightness(baseL + lightStep * 4);
       color200 = baseColor.lightness(baseL + lightStep * 3);
@@ -712,9 +717,11 @@ function generateBaseTonesForColor(
       color800 = baseColor.lightness(baseL - darkStep * 3);
       color900 = baseColor.lightness(baseL - darkStep * 4);
       color950 = baseColor.lightness(baseL - darkStep * 4.5);
+      color1000 = baseColor.lightness(baseL - darkStep * 5);
     }
 
     return {
+      [`const-${varName}-0`]: color0.toString(),
       [`const-${varName}-50`]: color50.toString(),
       [`const-${varName}-100`]: color100.toString(),
       [`const-${varName}-200`]: color200.toString(),
@@ -726,6 +733,7 @@ function generateBaseTonesForColor(
       [`const-${varName}-800`]: color800.toString(),
       [`const-${varName}-900`]: color900.toString(),
       [`const-${varName}-950`]: color950.toString(),
+      [`const-${varName}-1000`]: color1000.toString(),
     };
   } catch (e) {
     console.error("Error generating base tones for color:", varName);
