@@ -8,26 +8,32 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$themeVars: t.composePaddingVars($themeVars, "trigger-Tabs");
+
 $backgroundColor-Tabs: createThemeVar("backgroundColor-Tabs");
 $borderColor-Tabs: createThemeVar("borderColor-Tabs");
 $borderWidth-Tabs: createThemeVar("borderWidth-Tabs");
 $borderColor-active-Tabs: createThemeVar("borderColor-active-Tabs");
 $backgroundColor-trigger-Tabs: createThemeVar("backgroundColor-trigger-Tabs");
+$borderRadius-trigger-Tabs: createThemeVar("borderRadius-trigger-Tabs");
+$border-trigger-Tabs: createThemeVar("border-trigger-Tabs");
 $textColor-trigger-Tabs: createThemeVar("textColor-trigger-Tabs");
 $backgroundColor-trigger-Tabs--hover: createThemeVar("backgroundColor-trigger-Tabs--hover");
+$backgroundColor-trigger-Tabs--active: createThemeVar("backgroundColor-trigger-Tabs--active");
 $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
+$borderRadius-list-Tabs: createThemeVar("borderRadius-list-Tabs");
+$border-list-Tabs: createThemeVar("border-list-Tabs");
 
 .tabs {
   display: flex;
-  flex: 1 1 auto;
   width: 100%;
   background-color: $backgroundColor-Tabs;
   overflow: hidden;
-  &[data-orientation='horizontal'] {
+  &[data-orientation='vertical'] {
     flex-direction: row;
   }
 
-  &[data-orientation='vertical'] {
+  &[data-orientation='horizontal'] {
     flex-direction: column;
   }
 }
@@ -35,13 +41,13 @@ $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
 .filler {
   flex: 1 1 auto;
 
-  &[data-orientation='horizontal'] {
+  &[data-orientation='vertical'] {
     border-right-width: $borderWidth-Tabs;
     border-right-style: solid;
     border-right-color: $borderColor-Tabs;
   }
 
-  &[data-orientation='vertical'] {
+  &[data-orientation='horizontal'] {
     border-bottom-width: $borderWidth-Tabs;
     border-bottom-style: solid;
     border-bottom-color: $borderColor-Tabs;
@@ -50,24 +56,28 @@ $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
 
 
 .tabTrigger {
-  //flex: 1 1 auto;
-  font-family: inherit;
+  @include t.paddingVars($themeVars, "trigger-Tabs");
+  &.distributeEvenly{
+    flex: 1 1 auto;
+  }
+
   color: $textColor-trigger-Tabs;
   background-color: $backgroundColor-trigger-Tabs;
-  padding: t.$space-4;
+  border-radius: $borderRadius-trigger-Tabs;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: t.$fontSize-normal;
   line-height: 1;
   user-select: none;
-  border-color: transparent;
+  //border-color: transparent;
+  border: $border-trigger-Tabs;
 
   &:hover {
     background-color: $backgroundColor-trigger-Tabs--hover;
   }
 
-  &[data-orientation='horizontal'] {
+  &[data-orientation='vertical'] {
     border-right-width: $borderWidth-Tabs;
     border-right-style: solid;
     border-right-color: $borderColor-Tabs;
@@ -76,10 +86,11 @@ $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
       border-right-width: $borderWidth-Tabs;
       border-right-style: solid;
       border-right-color: $borderColor-active-Tabs;
+      background-color: $backgroundColor-trigger-Tabs--active;
     }
   }
 
-  &[data-orientation='vertical'] {
+  &[data-orientation='horizontal'] {
     border-bottom-width: $borderWidth-Tabs;
     border-bottom-style: solid;
     border-bottom-color: $borderColor-Tabs;
@@ -88,6 +99,7 @@ $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
       border-bottom-width: $borderWidth-Tabs;
       border-bottom-style: solid;
       border-bottom-color: $borderColor-active-Tabs;
+      background-color: $backgroundColor-trigger-Tabs--active;
     }
   }
 
@@ -98,6 +110,8 @@ $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
 
 .tabsList {
   background-color: $backgroundColor-list-Tabs;
+  border-radius: $borderRadius-list-Tabs;
+  border: $border-list-Tabs;
   position: relative;
   z-index: 99;
   overflow: hidden;
@@ -105,11 +119,11 @@ $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
   flex-shrink: 0;
   scrollbar-width: thin;
 
-  &[data-orientation='horizontal'] {
+  &[data-orientation='vertical'] {
     flex-direction: column;
   }
 
-  &[data-orientation='vertical'] {
+  &[data-orientation='horizontal'] {
     flex-direction: row;
   }
 }
