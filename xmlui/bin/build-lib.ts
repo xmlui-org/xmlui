@@ -55,7 +55,7 @@ export const buildLib = async ({ watchMode, mode = "production" }) => {
         output: {
           footer: (chunk) => {
             if (chunk.name === "index" && chunk.fileName === umdFileName) {
-              return `if(typeof window.xmlui !== "undefined"){window.xmlui.standalone.registerExtension(window['${env.npm_package_name}']);}`;
+              return `if(typeof window.xmlui !== "undefined"){window.xmlui.standalone.registerExtension(window['${env.npm_package_name}'].default || window['${env.npm_package_name}']);}`;
             }
             return "";
           },
