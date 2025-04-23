@@ -46,7 +46,7 @@ export function Preview() {
       contentRootRef.current = ReactDOM.createRoot(rootRef.current);
     }
     let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
-      appDescription.app,
+      `<Fragment xmlns:XMLUIExtensions="component-ns">${appDescription.app}</Fragment>`,
     );
     if (errors.length > 0) {
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
