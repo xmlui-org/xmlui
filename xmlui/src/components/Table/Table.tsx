@@ -99,6 +99,13 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    noBottomBorder: {
+      description:
+        `This property indicates whether the table should have a bottom border. When set to ` +
+        `\`true\`, the table does not have a bottom border. Otherwise, it has a bottom border.`,
+      valueType: "boolean",
+      defaultValue: false,
+    }
   },
   events: {
     sortingDidChange: d(
@@ -291,6 +298,7 @@ const TableWithColumns = forwardRef(
           alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
             node.props.alwaysShowSelectionHeader,
           )}
+          noBottomBorder={extractValue.asOptionalBoolean(node.props.noBottomBorder)}
         />
       </>
     );
