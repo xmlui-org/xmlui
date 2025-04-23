@@ -85,19 +85,22 @@ export const DevTools = () => {
     });
     return prunedLines
       .map((line) => line.slice(trimBeginCount).replace(/inspect="true"/g, ""))
-      .join("\n")
+      .join("\n");
   }, [inspectedNode, sources]);
 
-  const openLink = useCallback(async () => {
+  const popupPlayground = useCallback(async () => {
+    if (!inspectedNode) {
+      return;
+    }
+
     const appCode = {
       app: value,
       api: undefined,
       availableThemes: [],
-      components:
-        projectCompilation?.components.map((c) => ({
-          name: c.definition.name,
-          component: c.markupSource,
-        })) || [],
+      components: (projectCompilation?.components || []).map((c: any) => ({
+        name: c.definition.name,
+        component: c.markupSource,
+      })) || [],
       config: {
         appGlobals: {},
         defaultTheme: "",
@@ -124,7 +127,7 @@ export const DevTools = () => {
 
     const appQueryString = await createQueryString(JSON.stringify(data));
     window.open(`http://localhost:3000/playground#${appQueryString}`, "_blank");
-  }, [value, projectCompilation]);
+  }, [value, projectCompilation, inspectedNode]);
 
   useEffect(() => {
     if (activeTab === "code") {
@@ -329,7 +332,12 @@ export const DevTools = () => {
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
-            <Button onClick={openLink} size={"xs"} variant={"ghost"} icon={<Icon name={"new-window"} />} />
+            <Button
+              onClick={popupPlayground}
+              size={"xs"}
+              variant={"ghost"}
+              icon={<Icon name={"new-window"} />}
+            />
             <Button
               onClick={() => setIsOpen?.(false)}
               size={"xs"}
