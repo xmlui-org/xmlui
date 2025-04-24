@@ -211,6 +211,14 @@ export function resolveAndCleanProps<T extends Record<string, any>>(
   delete resultProps.radiusBottomLeft;
   delete resultProps.radiusBottomRight;
 
+  // --- Delete pseudo CSS properties
+  delete resultProps.paddingHorizontal;
+  delete resultProps.paddingVertical;
+  delete resultProps.marginHorizontal;
+  delete resultProps.marginVertical;
+  delete resultProps.borderHorizontal;
+  delete resultProps.borderVertical;
+
   return result as T;
 }
 

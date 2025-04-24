@@ -35,7 +35,7 @@ export function resolveLayoutProps(
 
   // --- Dimensions
   collectCss("width");
-  const horizontalStarSize = getHorizontalStartSize(result.cssProps.width, layoutContext);
+  const horizontalStarSize = getHorizontalStarSize(result.cssProps.width, layoutContext);
   if (horizontalStarSize !== null) {
     // --- We use "flex" when width is in start-size and allow shrinking
     result.cssProps.flex = horizontalStarSize;
@@ -45,7 +45,7 @@ export function resolveLayoutProps(
   collectCss("maxWidth");
 
   collectCss("height");
-  const verticalStarSize = getVerticalStartSize(result.cssProps.height, layoutContext);
+  const verticalStarSize = getVerticalStarSize(result.cssProps.height, layoutContext);
   if (verticalStarSize !== null) {
     // --- We use "flex" when width is in start-size and allow shrinking
     result.cssProps.flex = verticalStarSize;
@@ -270,7 +270,7 @@ export function resolveLayoutProps(
   }
 
   // --- Checks if the specified size is a star size and the orientation is horizontal
-  function getHorizontalStartSize(
+  function getHorizontalStarSize(
     size: string | number,
     layoutContext?: LayoutContext,
   ): number | null {
@@ -282,7 +282,7 @@ export function resolveLayoutProps(
   }
 
   // --- Checks if the specified size is a star size and the orientation is vertical
-  function getVerticalStartSize(
+  function getVerticalStarSize(
     size: string | number,
     layoutContext?: LayoutContext,
   ): number | null {
