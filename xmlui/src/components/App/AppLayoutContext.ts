@@ -6,6 +6,7 @@ const appLayoutNames = [
   "vertical",
   "vertical-sticky",
   "vertical-full-header",
+  "vertical-constrained-width",
   "condensed",
   "condensed-sticky",
   "horizontal",
