@@ -28,6 +28,7 @@ export const DevTools = () => {
   const { root, activeThemeTone } = useTheme();
   const context = useDevTools();
   const {
+    mockApi,
     setDevToolsSize,
     setDevToolsSide,
     inspectedNode,
@@ -95,7 +96,7 @@ export const DevTools = () => {
 
     const appCode = {
       app: value,
-      api: undefined,
+      api: mockApi,
       availableThemes: [],
       components:
         (projectCompilation?.components || []).map((c: any) => ({

@@ -141,7 +141,11 @@ export const AppWrapper = ({
             defaultTone={defaultTone}
             resources={resources}
           >
-            <InspectorProvider sources={sources} projectCompilation={projectCompilation}>
+            <InspectorProvider
+              sources={sources}
+              projectCompilation={projectCompilation}
+              mockApi={globalProps.demoMockApi}
+            >
               <ConfirmationModalContextProvider>
                 <AppContent
                   rootContainer={node as ContainerWrapperDef}
