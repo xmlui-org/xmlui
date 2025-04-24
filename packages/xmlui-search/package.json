@@ -1,0 +1,42 @@
+{
+  "name": "xmlui-search",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "prepublishOnly": "npm run build",
+    "build": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "main": "./dist/xmlui-search.js",
+  "module": "./dist/xmlui-search.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-search.mjs",
+      "require": "./dist/xmlui-search.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "fuse.js": "^7.1.0"
+  }
+}
