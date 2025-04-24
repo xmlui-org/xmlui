@@ -58,7 +58,7 @@ type SelectProps = {
   placeholder?: string;
   updateState?: UpdateStateFn;
   optionLabelRenderer?: (item: Option) => ReactNode;
-  optionRenderer?: (item: Option) => ReactNode;
+  optionRenderer?: (item: Option, value: any, inTrigger: boolean) => ReactNode;
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   emptyListTemplate?: ReactNode;
   style?: CSSProperties;
@@ -546,7 +546,7 @@ export const ComboboxOption = forwardRef(function Combobox(
     >
       <div className={styles.multiComboboxOptionContent}>
         {optionRenderer ? (
-          optionRenderer({ label, value, enabled, keywords })
+          optionRenderer({ label, value, enabled, keywords }, selectedValue as any, false)
         ) : (
           <>
             {optionLabelRenderer ? optionLabelRenderer({ label, value }) : label}
@@ -585,7 +585,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
   (option, ref) => {
     const { value, label, enabled = true } = option;
     const { onOptionRemove, onOptionAdd } = useOption();
-    const { optionLabelRenderer, optionRenderer } = useSelect();
+    const { optionLabelRenderer, optionRenderer, value: selectedValue, multiSelect } = useSelect();
 
     useLayoutEffect(() => {
       onOptionAdd(option);
@@ -600,7 +600,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
               label,
               value,
               enabled,
-            })
+            }, selectedValue as any, false)
           ) : (
             <>
               <SelectItemText className={styles.selectItemContent}>
