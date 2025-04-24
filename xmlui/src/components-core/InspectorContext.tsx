@@ -34,6 +34,8 @@ interface IInspectorContext {
   setIsOpen: (isOpen: boolean) => void;
   inspectedNode: any;
   projectCompilation: ProjectCompilation | undefined;
+  setInspectMode: (inspectMode: (prev: any) => boolean) => void;
+  inspectMode: boolean;
 }
 
 // --- The context object that is used to store the inspector information.
@@ -54,6 +56,8 @@ export function InspectorProvider({
   const [showCode, setShowCode] = useState(false);
   const [devToolsSize, setDevToolsSize] = useState(0);
   const [devToolsSide, setDevToolsSide] = useState<"bottom" | "left" | "right">("bottom");
+  const [inspectMode, setInspectMode] = useState(false);
+  const [lastInspectedElement, setLastInspectedElement] = useState<HTMLElement | null>(null);
 
   const componentRegistry = useComponentRegistry();
 
@@ -101,8 +105,18 @@ export function InspectorProvider({
       setDevToolsSide,
       devToolsEnabled: showCode,
       projectCompilation: projectCompilation,
+      setInspectMode,
+      inspectMode,
     };
-  }, [devToolsSide, devToolsSize, sources, inspectedNode, showCode, projectCompilation]);
+  }, [
+    devToolsSide,
+    devToolsSize,
+    sources,
+    inspectedNode,
+    showCode,
+    projectCompilation,
+    inspectMode,
+  ]);
 
   return (
     <InspectorContext.Provider value={contextValue}>
@@ -116,11 +130,13 @@ export function InspectorProvider({
         Object.values(inspectable).map((item: any) => {
           return (
             <InspectButton
+              inspectedNode={inspectedNode}
               setShowCode={setShowCode}
               key={item.inspectId + +"-" + item.key}
               inspectId={item.inspectId}
               node={item.node}
               setInspectedNode={setInspectedNode}
+              inspectMode={inspectMode}
             />
           );
         })}
@@ -131,17 +147,22 @@ export function InspectorProvider({
 function InspectButton({
   inspectId,
   node,
+  inspectedNode,
   setInspectedNode,
   setShowCode,
+  inspectMode,
 }: {
   inspectId: string;
   node: ComponentDef;
-  setInspectedNode: (node: ComponentDef | null) => void;
-  setShowCode: (show: boolean) => void;
+  inspectedNode: any;
+  setInspectedNode: (node: any) => void;
+  setShowCode: (show: any) => void;
+  inspectMode: boolean;
 }) {
   const { root } = useTheme();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLButtonElement | null>(null);
+  const element = useRef<HTMLButtonElement | null>(null);
   const { styles: popperStyles, attributes } = usePopper(referenceElement, popperElement, {
     placement: "top-end",
     modifiers: [
@@ -165,11 +186,63 @@ function InspectButton({
   const hoverRef = useRef<boolean>(false);
 
   useEffect(() => {
+    if (!referenceElement) {
+      return;
+    }
+    if (inspectedNode?.inspectId === inspectId) {
+      referenceElement.classList.add(styles.inspectedNode);
+    } else {
+      referenceElement.classList.remove(styles.inspectedNode);
+    }
+  }, [inspectId, inspectedNode, referenceElement]);
+
+  useEffect(() => {
+
+    if (inspectedNode) {
+      setShowCode(true);
+    } else {
+      setShowCode(false);
+    }
+  }, [inspectedNode]);
+
+  useEffect(() => {
     const htmlElement = document.querySelector(`[data-inspectId="${inspectId}"]`) as HTMLElement;
     if (!htmlElement) {
       return;
     }
+
     setReferenceElement(htmlElement);
+
+    if (inspectMode) {
+      htmlElement.classList.add(styles.inspectableNode);
+
+      const overlay = document.createElement("div");
+
+      overlay.classList.add(styles.inspectOverlay);
+      htmlElement.appendChild(overlay);
+
+      overlay.addEventListener("click", () => {
+        setInspectedNode((prev) => {
+          if (prev?.inspectId === inspectId) {
+            return null;
+          }
+          return { ...node, inspectId };
+        });
+      });
+    }
+
+    if (!inspectMode) {
+      htmlElement.classList.remove(styles.inspectableNode);
+
+      setInspectedNode(null);
+      setShowCode(false);
+      const overlay = htmlElement.querySelector(`.${styles.inspectOverlay}`);
+      if (overlay) {
+        overlay.remove();
+      }
+
+      htmlElement.classList.remove(styles.inspectedNode);
+    }
 
     function mouseenter() {
       if (timeoutRef.current) {
@@ -196,39 +269,41 @@ function InspectButton({
       htmlElement.removeEventListener("mouseenter", mouseenter);
       htmlElement.removeEventListener("mouseleave", mouseleave);
     };
-  }, [inspectId]);
+  }, [inspectId, node, inspectMode, setInspectedNode, setShowCode]);
 
   return (
     <>
-      {visible &&
-        !!root &&
-        createPortal(
-          <Button
-            variant={"ghost"}
-            className={classnames(styles.wrapper, "_debug-inspect-button")}
-            ref={(el) => setPopperElement(el)}
-            style={{ ...popperStyles.popper, padding: 0 }}
-            {...attributes.popper}
-            onMouseEnter={() => {
-              hoverRef.current = true;
-              if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-              }
-            }}
-            onMouseLeave={() => {
-              hoverRef.current = false;
-              setVisible(false);
-            }}
-            onClick={() => {
-              setInspectedNode(node);
-              setShowCode(true);
-            }}
-          >
-            <Icon name={"inspect"} size={"md"} />
-          </Button>,
-          root,
-        )}
+      {inspectMode
+        ? null
+        : visible &&
+          !!root &&
+          createPortal(
+            <Button
+              variant={"ghost"}
+              className={classnames(styles.wrapper, "_debug-inspect-button")}
+              ref={(el) => setPopperElement(el)}
+              style={{ ...popperStyles.popper, padding: 0 }}
+              {...attributes.popper}
+              onMouseEnter={() => {
+                hoverRef.current = true;
+                if (timeoutRef.current) {
+                  clearTimeout(timeoutRef.current);
+                  timeoutRef.current = null;
+                }
+              }}
+              onMouseLeave={() => {
+                hoverRef.current = false;
+                setVisible(false);
+              }}
+              onClick={() => {
+                setInspectedNode(node);
+                setShowCode(true);
+              }}
+            >
+              <Icon name={"inspect"} size={"md"} />
+            </Button>,
+            root,
+          )}
     </>
   );
 }
@@ -246,6 +321,14 @@ export function useDevTools() {
     devToolsSide: context?.devToolsSide,
     setDevToolsSide: context?.setDevToolsSide,
     devToolsEnabled: context?.devToolsEnabled,
+  };
+}
+
+export function useInspectMode() {
+  const context = useContext(InspectorContext);
+  return {
+    setInspectMode: context?.setInspectMode,
+    inspectMode: context?.inspectMode,
   };
 }
 
