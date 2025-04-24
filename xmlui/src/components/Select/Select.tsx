@@ -171,11 +171,15 @@ export const selectComponentRenderer = createComponentRenderer(
         }
         optionRenderer={
           node.props.optionTemplate
-            ? (item) => {
+            ? (item, val, inTrigger) => {
                 return (
                   <MemoizedItem
                     node={node.props.optionTemplate}
                     item={item}
+                    contextVars={{
+                      $selectedValue: val,
+                      $inTrigger: inTrigger
+                    }}
                     renderChild={(...args) => (
                       <SelectItemText>{renderChild(...args)}</SelectItemText>
                     )}
