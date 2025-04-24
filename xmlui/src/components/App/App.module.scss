@@ -13,7 +13,6 @@ $boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
 $backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
 $borderLeft-content-App: createThemeVar("borderLeft-content-App");
 $maxWidth-content-App: createThemeVar("maxWidth-content-App");
-$maxWidth-App: createThemeVar("maxWidth-App");
 $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
@@ -52,7 +51,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       position: static;
     }
     &.sticky {
-      .contentWrapper{
+      .contentWrapper {
         scroll-padding-top: var(--header-height);
       }
       .footerWrapper {
@@ -124,7 +123,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     scroll-padding-block: $scrollPaddingBlockPage;
 
     .header {
-      max-width: $maxWidth-App;
+      max-width: $maxWidth-content-App;
       margin: auto;
     }
 
@@ -134,6 +133,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
       top: var(--header-height);
     }
+
     .PagesWrapper {
       overflow: initial;
       min-height: calc(var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height));
@@ -157,7 +157,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
   &.scrollWholePage {
     scrollbar-gutter: stable both-edges;
-  
+
     .headerWrapper {
       & > div {
         padding-inline: var(--scrollbar-width);
@@ -185,20 +185,21 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     &.verticalConstrained {
       scroll-padding-top: var(--header-height);
       .content {
-        width: $maxWidth-App;
+        width: $maxWidth-content-App;
         margin-inline: calc(-1 * var(--scrollbar-width));
         margin: auto;
       }
+
       .contentWrapper {
         padding-inline: var(--scrollbar-width);
       }
-      
+
       .headerWrapper {
         & > div {
-          width: $maxWidth-App;
+          width: $maxWidth-content-App;
         }
       }
-  
+
       .footerWrapper {
         margin-inline: calc(-1 * var(--scrollbar-width));
         & > div {
@@ -206,7 +207,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         }
       }
     }
-
   }
 
   &:not(.scrollWholePage) {
@@ -218,6 +218,14 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     .contentWrapper {
       overflow: initial;
     }
+
+    &.verticalConstrained {
+      .content {
+        width: $maxWidth-content-App;
+        margin: auto;
+      }
+    }
+
     .PagesWrapper {
       overflow: auto;
       //scroll-padding-top: var(--header-height);
@@ -234,8 +242,8 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
   &.noScrollbarGutters {
     scrollbar-gutter: auto;
-    .PagesWrapper{
-        scrollbar-gutter: auto;
+    .PagesWrapper {
+      scrollbar-gutter: auto;
     }
   }
 }
@@ -331,7 +339,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   //bottom:  calc(-1 * var(--footer-height));
   //margin-bottom: calc(-1 * var(--footer-height));
 }
-
 
 // --- We export the theme variables to add them to the component renderer
 :export {
