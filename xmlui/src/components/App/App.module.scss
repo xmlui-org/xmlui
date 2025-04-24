@@ -13,6 +13,7 @@ $boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
 $backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
 $borderLeft-content-App: createThemeVar("borderLeft-content-App");
 $maxWidth-content-App: createThemeVar("maxWidth-content-App");
+$maxWidth-App: createThemeVar("maxWidth-App");
 $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
@@ -116,6 +117,44 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
   }
 
+  &.verticalConstrained {
+    min-height: 100%;
+    height: 100%;
+    overflow: auto;
+    scroll-padding-block: $scrollPaddingBlockPage;
+
+    .header {
+      max-width: $maxWidth-App;
+      margin: auto;
+    }
+
+    .navPanelWrapper {
+      width: $width-navPanel-App;
+      position: sticky;
+      height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
+      top: var(--header-height);
+    }
+    .PagesWrapper {
+      overflow: initial;
+      min-height: calc(var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height));
+      height: 100%;
+    }
+
+    .PagesWrapperInner {
+      height: 100%;
+      & > :global(.xmlui-page-root) {
+        height: 100%;
+      }
+    }
+
+    .footerWrapper {
+      position: sticky;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  }
+
   &.scrollWholePage {
     scrollbar-gutter: stable both-edges;
   
@@ -142,6 +181,32 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         padding-inline: var(--scrollbar-width);
       }
     }
+
+    &.verticalConstrained {
+      scroll-padding-top: var(--header-height);
+      .content {
+        width: $maxWidth-App;
+        margin-inline: calc(-1 * var(--scrollbar-width));
+        margin: auto;
+      }
+      .contentWrapper {
+        padding-inline: var(--scrollbar-width);
+      }
+      
+      .headerWrapper {
+        & > div {
+          width: $maxWidth-App;
+        }
+      }
+  
+      .footerWrapper {
+        margin-inline: calc(-1 * var(--scrollbar-width));
+        & > div {
+          padding-inline: var(--scrollbar-width);
+        }
+      }
+    }
+
   }
 
   &:not(.scrollWholePage) {
