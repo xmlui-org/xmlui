@@ -120,9 +120,8 @@ export function InspectorProvider({
     showCode,
     projectCompilation,
     inspectMode,
-    mockApi
+    mockApi,
   ]);
-  }
 
   return (
     <InspectorContext.Provider value={contextValue}>
@@ -168,7 +167,6 @@ function InspectButton({
   const { root } = useTheme();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLButtonElement | null>(null);
-  const element = useRef<HTMLButtonElement | null>(null);
   const { styles: popperStyles, attributes } = usePopper(referenceElement, popperElement, {
     placement: "top-end",
     modifiers: [
@@ -203,7 +201,6 @@ function InspectButton({
   }, [inspectId, inspectedNode, referenceElement]);
 
   useEffect(() => {
-
     if (inspectedNode) {
       setShowCode(true);
     } else {
@@ -223,7 +220,6 @@ function InspectButton({
       htmlElement.classList.add(styles.inspectableNode);
 
       const overlay = document.createElement("div");
-
       overlay.classList.add(styles.inspectOverlay);
       htmlElement.appendChild(overlay);
 
@@ -243,6 +239,7 @@ function InspectButton({
       setInspectedNode(null);
       setShowCode(false);
       const overlay = htmlElement.querySelector(`.${styles.inspectOverlay}`);
+
       if (overlay) {
         overlay.remove();
       }

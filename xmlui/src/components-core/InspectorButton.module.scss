@@ -35,6 +35,20 @@
   pointer-events: auto;
 }
 
+.inspectOverlay:hover {
+  background: rgba(32, 107, 196, 0.1);
+}
+
 .inspectedNode {
   outline: 2px solid themes.$color-primary-500;
+
+  .inspectOverlay {
+    background: rgba(32, 107, 196, 0.1);
+  }
+}
+
+.inspectIcon {
+  position: absolute;
+  right: 0;
+  top: -10px;
 }
