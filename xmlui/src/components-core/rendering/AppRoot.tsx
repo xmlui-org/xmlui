@@ -148,6 +148,7 @@ function getTransitiveDependencies(
   return transitiveDeps;
 
   function populateTransitiveDeps(directCompDepNames: Set<string>) {
+    if (!directCompDepNames) return;
     for (const directDep of directCompDepNames) {
       if (!transitiveDeps.has(directDep)) {
         transitiveDeps.add(directDep);
