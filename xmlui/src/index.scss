@@ -4,7 +4,7 @@
 @scope(#_ui-engine-theme-root){
   :scope{
     line-height: 1.5;
-    font-feature-settings: normal;
+    font-feature-settings: t.$font-feature-settings;
     font-variation-settings: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

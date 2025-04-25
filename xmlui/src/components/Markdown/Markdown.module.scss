@@ -7,6 +7,7 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$maxWidth-MarkDown: createThemeVar("maxWidth-Markdown");
 $accentColor-Blockquote: createThemeVar("accentColor-Blockquote");
 $accentWidth-Blockquote: createThemeVar("accentWidth-Blockquote");
 $backgroundColor-Blockquote: createThemeVar("backgroundColor-Blockquote");
@@ -27,6 +28,8 @@ $marginTop-HtmlVideo: createThemeVar("marginTop-HtmlVideo");
 $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
 
 .markdownContent {
+  max-width: $maxWidth-MarkDown;
+
   // --- Blockquote
 
   .blockquote {
@@ -50,7 +53,7 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   }
 
   .blockquoteContainer {
-    padding: 0.5rem;
+    padding: 0.5rem 0.5rem 0.1rem 0.5rem;
   }
 
   .admonitionBlockquote {

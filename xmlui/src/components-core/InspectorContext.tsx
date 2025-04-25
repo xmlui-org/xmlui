@@ -36,6 +36,7 @@ interface IInspectorContext {
   projectCompilation: ProjectCompilation | undefined;
   setInspectMode: (inspectMode: (prev: any) => boolean) => void;
   inspectMode: boolean;
+  mockApi: any;
 }
 
 // --- The context object that is used to store the inspector information.
@@ -45,10 +46,12 @@ export function InspectorProvider({
   children,
   sources,
   projectCompilation,
+  mockApi,
 }: {
   children: React.ReactNode;
   sources?: Record<string, string>;
   projectCompilation?: ProjectCompilation;
+  mockApi?: any;
 }) {
   const { root } = useTheme();
   const [inspectable, setInspectable] = useState<Record<string, any>>({});
@@ -107,6 +110,7 @@ export function InspectorProvider({
       projectCompilation: projectCompilation,
       setInspectMode,
       inspectMode,
+      mockApi,
     };
   }, [
     devToolsSide,
@@ -116,7 +120,9 @@ export function InspectorProvider({
     showCode,
     projectCompilation,
     inspectMode,
+    mockApi
   ]);
+  }
 
   return (
     <InspectorContext.Provider value={contextValue}>
@@ -321,6 +327,7 @@ export function useDevTools() {
     devToolsSide: context?.devToolsSide,
     setDevToolsSide: context?.setDevToolsSide,
     devToolsEnabled: context?.devToolsEnabled,
+    mockApi: context?.mockApi,
   };
 }
 
