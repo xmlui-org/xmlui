@@ -571,8 +571,6 @@ export const htmlDelTagRenderer = createComponentRenderer(
   },
 );
 
-
-
 export const HtmlDetailsMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `details` tag.",
@@ -584,7 +582,7 @@ export const HtmlDetailsMd = createMetadata({
   defaultThemeVars: {
     "marginTop-HtmlDetails": "1rem",
     "marginBottom-HtmlDetails": "1rem",
-  }
+  },
 });
 
 export const htmlDetailsTagRenderer = createComponentRenderer(
@@ -1138,7 +1136,7 @@ export const htmlImgTagRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, layoutCss, node.props);
     const { src } = p.asUrlResource("src");
-    const props = p.asRest();
+    const props = p.asRest() as Record<string, any>;
     return (
       <img style={layoutCss} src={src} {...props}>
         {renderChild(node.children)}
