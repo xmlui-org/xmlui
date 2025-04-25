@@ -241,6 +241,7 @@ import {
 import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
 import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
 import { subNavPanelRenderer } from "./SubNavPanel/SubNavPanel";
+import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -506,6 +507,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(autoCompleteComponentRenderer);
       this.registerCoreComponent(dropdownMenuComponentRenderer);
       this.registerCoreComponent(toneChangerButtonComponentRenderer);
+      this.registerCoreComponent(inspectButtonComponentRenderer);
       this.registerCoreComponent(formSectionRenderer);
       this.registerCoreComponent(dropdownMenuComponentRenderer);
       this.registerCoreComponent(menuItemRenderer);
@@ -716,6 +718,20 @@ export class ComponentRegistry {
     );
   }
 
+  // --- Registers a loader renderer using its definition
+  registerLoaderRenderer({ type, renderer }: LoaderRendererDef) {
+    this.loaders.set(type, renderer);
+  }
+
+  /**
+   * This method destroys the component registry; It unsubscribes from the component manager.
+   * This method is called when the component registry is no longer needed, e.g., when the
+   * component provider is unmounted (HMR).
+   */
+  destroy() {
+    this.extensionManager?.unSubscribeFromRegistrations(this.extensionRegistered);
+  }
+
   private extensionRegistered = (extension: Extension) => {
     extension.components?.forEach((c) => {
       if ("type" in c) {
@@ -724,6 +740,8 @@ export class ComponentRegistry {
       }
     });
   };
+
+  // --- Registers a renderable component using its renderer function
 
   private registerCoreComponent = (
     component: ComponentRendererDef | CompoundComponentRendererInfo,
@@ -747,7 +765,6 @@ export class ComponentRegistry {
     }
   };
 
-  // --- Registers a renderable component using its renderer function
   // --- and metadata
   private registerComponentRenderer = (
     {
@@ -806,20 +823,6 @@ export class ComponentRegistry {
   // --- Registers an action function using its definition
   private registerActionFn({ actionName: functionName, actionFn }: ActionRendererDef) {
     this.actionFns.set(functionName, actionFn);
-  }
-
-  // --- Registers a loader renderer using its definition
-  registerLoaderRenderer({ type, renderer }: LoaderRendererDef) {
-    this.loaders.set(type, renderer);
-  }
-
-  /**
-   * This method destroys the component registry; It unsubscribes from the component manager.
-   * This method is called when the component registry is no longer needed, e.g., when the
-   * component provider is unmounted (HMR).
-   */
-  destroy() {
-    this.extensionManager?.unSubscribeFromRegistrations(this.extensionRegistered);
   }
 }
 
