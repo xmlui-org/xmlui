@@ -343,11 +343,11 @@ export function App({
             className={classnames(styles.headerWrapper, styles.sticky)}
             ref={headerRefCallback}
           >
-            <div className={styles.header} style={{paddingInline: 0}}>
-            {header}
+            <div className={styles.header} style={{ paddingInline: 0 }}>
+              {header}
             </div>
           </header>
-          <div className={styles.content}>
+          <div className={classnames(styles.content, styles.verticalConstrained)}>
             {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
             <main className={styles.contentWrapper}>
               <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
@@ -474,7 +474,7 @@ export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
     case "vertical-sticky":
     case "vertical-full-header":
     case "vertical-constrained-width":
-        return "vertical";
+      return "vertical";
     default:
       return "horizontal";
   }
