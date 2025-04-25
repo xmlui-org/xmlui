@@ -42,13 +42,37 @@ export const Markdown = memo(function Markdown({
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
-            return <details className={htmlTagStyles.htmlDetails} {...props} >{children}</details>;
+            return (
+              <details className={htmlTagStyles.htmlDetails} {...props}>
+                {children}
+              </details>
+            );
           },
           video({ children, node, ...props }) {
-            return <video className={htmlTagStyles.htmlVideo} {...props} >{children}</video>;
+            return (
+              <video className={htmlTagStyles.htmlVideo} {...props}>
+                {children}
+              </video>
+            );
           },
           img({ children, node, ...props }) {
-            return <img className={htmlTagStyles.htmlImage} {...props} >{children}</img>;
+            const src = props?.src;
+            const popOut = props?.["data-popout"];
+            if (popOut) {
+              return (
+                <a href={src} target="_blank">
+                  <img className={htmlTagStyles.htmlImage} {...props}>
+                    {children}
+                  </img>
+                </a>
+              );
+            } else {
+              return (
+                <img className={htmlTagStyles.htmlImage} {...props}>
+                  {children}
+                </img>
+              );
+            }
           },
           h1({ children }) {
             return <Heading level="h1">{children}</Heading>;
@@ -114,20 +138,32 @@ export const Markdown = memo(function Markdown({
             return <Blockquote>{children}</Blockquote>;
           },
           ol({ children, node, ...props }) {
-            return <ol className={htmlTagStyles.htmlOl} {...props} >{children}</ol>;
+            return (
+              <ol className={htmlTagStyles.htmlOl} {...props}>
+                {children}
+              </ol>
+            );
           },
           ul({ children, node, ...props }) {
-            return <ul className={htmlTagStyles.htmlUl} {...props} >{children}</ul>;
+            return (
+              <ul className={htmlTagStyles.htmlUl} {...props}>
+                {children}
+              </ul>
+            );
           },
           li({ children, node, ...props }) {
-            return <li className={htmlTagStyles.htmlLi} {...props} >{children}</li>;
+            return (
+              <li className={htmlTagStyles.htmlLi} {...props}>
+                <Text>{children}</Text>
+              </li>
+            );
           },
           hr() {
             return <HorizontalRule />;
           },
 
           a({ children, href, ...props }) {
-            const allowedProps = ['style', 'disabled', 'active', 'icon', 'onClick'];
+            const allowedProps = ["style", "disabled", "active", "icon", "onClick"];
             return (
               <LocalLink to={href} {...allowedProps}>
                 {children}
@@ -141,7 +177,7 @@ export const Markdown = memo(function Markdown({
                 variant="checkbox"
                 readOnly={disabled}
                 value={checked}
-              /* label={value}
+                /* label={value}
                 labelPosition={"right"} */
               />
             );
@@ -206,26 +242,25 @@ type BlockquoteProps = {
   style?: CSSProperties;
 };
 
-
 const Blockquote = ({ children, style }: BlockquoteProps) => {
   // Helper function to extract text content from React nodes
   const extractTextContent = (node: React.ReactNode): string => {
-    if (typeof node === 'string') {
+    if (typeof node === "string") {
       return node;
     }
 
     if (React.isValidElement(node) && node.props && node.props.children) {
       if (Array.isArray(node.props.children)) {
-        return node.props.children.map(extractTextContent).join('');
+        return node.props.children.map(extractTextContent).join("");
       }
       return extractTextContent(node.props.children);
     }
 
-    return '';
+    return "";
   };
 
   // Extract all text content
-  const allText = React.Children.toArray(children).map(extractTextContent).join('');
+  const allText = React.Children.toArray(children).map(extractTextContent).join("");
 
   // Check for admonition pattern
   const match = allText.match(/\[!([A-Z]+)\]/);
@@ -236,17 +271,17 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
 
     // Map admonition type to emoji
     const emojiMap: Record<string, string> = {
-      info: '💡',
-      warning: '⚠️',
-      danger: '🚫',
-      note: '📝',
-      tip: '💬'
+      info: "💡",
+      warning: "⚠️",
+      danger: "🚫",
+      note: "📝",
+      tip: "💬",
     };
 
     // Process children to remove the admonition marker
     const processNode = (node: React.ReactNode): React.ReactNode => {
-      if (typeof node === 'string') {
-        return node.replace(/\[!([A-Z]+)\]\s*/, '');
+      if (typeof node === "string") {
+        return node.replace(/\[!([A-Z]+)\]\s*/, "");
       }
 
       if (React.isValidElement(node)) {
@@ -277,12 +312,10 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
     return (
       <blockquote className={styles.admonitionBlockquote} style={style}>
         <div className={styles.admonitionContainer}>
-          <div className={`${styles.admonitionIcon} ${styles[type] || ''}`}>
-            {emojiMap[type] || '💡'}
+          <div className={`${styles.admonitionIcon} ${styles[type] || ""}`}>
+            {emojiMap[type] || "💡"}
           </div>
-          <div className={styles.admonitionContent}>
-            {processedChildren}
-          </div>
+          <div className={styles.admonitionContent}>{processedChildren}</div>
         </div>
       </blockquote>
     );
@@ -290,9 +323,7 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
 
   return (
     <blockquote className={styles.blockquote} style={style}>
-      <div className={styles.blockquoteContainer}>
-        {children}
-      </div>
+      <div className={styles.blockquoteContainer}>{children}</div>
     </blockquote>
   );
 };
