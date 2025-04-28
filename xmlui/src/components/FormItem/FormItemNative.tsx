@@ -11,7 +11,7 @@ import type {
   ValidateEventHandler,
   ValidationMode,
 } from "../Form/FormContext";
-import { useFormContextPart } from "../Form/FormContext";
+import { useFormContext, useFormContextPart } from "../Form/FormContext";
 import { TextBox } from "../TextBox/TextBoxNative";
 import { Toggle } from "../Toggle/Toggle";
 import { FileInput } from "../FileInput/FileInputNative";
@@ -106,6 +106,7 @@ export const FormItem = memo(function FormItem({
   const labelPositionValue = useFormContextPart<any>(
     (value) => labelPosition || value.itemLabelPosition || DEFAULT_LABEL_POSITIONS[type],
   );
+  const resetVersion = useFormContext()?.resetVersion;
   const initialValueFromSubject = useFormContextPart<any>((value) =>
     getByPath(value.originalSubject, formItemId),
   );
@@ -123,6 +124,12 @@ export const FormItem = memo(function FormItem({
     setFormItemId(newId);
     dispatch(fieldInitialized(newId, initialValue));
   }, [bindTo, dispatch, initialValue]);
+
+  useEffect(() => {
+    if (resetVersion) {
+      dispatch(fieldInitialized(formItemId, initialValue, true));
+    }
+  }, [resetVersion, formItemId, initialValue, dispatch]);
 
   useValidation(validations, onValidate, value, dispatch, formItemId, customValidationsDebounce);
 
