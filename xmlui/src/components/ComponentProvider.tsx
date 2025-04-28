@@ -117,13 +117,10 @@ import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
 import { appStateComponentRenderer } from "./AppState/AppState";
 import { tableOfContentsRenderer } from "./TableOfContents/TableOfContents";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
-import { alertComponentRenderer } from "./Alert/Alert";
-import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
 import { codeComponentRenderer } from "../components-core/XmluiCodeHighlighter";
 import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
-import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
 import { carouselComponentRenderer } from "./Carousel/Carousel";
 import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
 import { createPropHolderComponent } from "../components-core/renderers";
@@ -240,7 +237,6 @@ import {
 } from "./HtmlTags/HtmlTags";
 import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
 import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
-import { subNavPanelRenderer } from "./SubNavPanel/SubNavPanel";
 import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
 
 /**
@@ -406,9 +402,6 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_NavPanel !== "false") {
       this.registerCoreComponent(navPanelRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_SubNavPanel !== "false") {
-      this.registerCoreComponent(subNavPanelRenderer);
-    }
     if (process.env.VITE_USED_COMPONENTS_Pages !== "false") {
       this.registerCoreComponent(pagesRenderer);
       this.registerCoreComponent(pageRenderer);
@@ -525,10 +518,7 @@ export class ComponentRegistry {
     // --- New Bootstrap-inspired components
     this.registerCoreComponent(carouselComponentRenderer);
     this.registerCoreComponent(accordionComponentRenderer);
-    this.registerCoreComponent(alertComponentRenderer);
-    this.registerCoreComponent(offCanvasComponentRenderer);
     this.registerCoreComponent(sliderComponentRenderer);
-    this.registerCoreComponent(buttonGroupComponentRenderer);
     this.registerCoreComponent(backdropComponentRenderer);
 
     this.registerCoreComponent(htmlATagRenderer);
