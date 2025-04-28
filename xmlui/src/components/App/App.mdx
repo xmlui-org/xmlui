@@ -1,15 +1,3 @@
-%-IMPORT-START
-
-import horizontal from "./doc-resources/horizontal.xmlui";
-import horizontalSticky from "./doc-resources/horizontal-sticky.xmlui";
-import condensed from "./doc-resources/condensed.xmlui";
-import condensedSticky from "./doc-resources/condensed-sticky.xmlui";
-import vertical from "./doc-resources/vertical.xmlui";
-import verticalSticky from "./doc-resources/vertical-sticky.xmlui";
-import verticalFullHeader from "./doc-resources/vertical-full-header.xmlui";
-
-%-IMPORT-END
-
 %-DESC-START
 
 <Callout type="info" emoji="📔">
@@ -56,23 +44,178 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `horizontal`
 
-<Playground name="Example: 'horizontal' layout" height={350} app={horizontal} />
+<Playground 
+  name="Example: 'horizontal' layout" 
+  height={350} 
+  app={`
+    <App layout="horizontal">
+      <AppHeader>
+        <property name="logoTemplate">
+          <Heading level="h3" value="Example App"/>
+        </property>
+      </AppHeader>
+      <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+          <NavLink label="Page 2" to="/page2"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+          <Page url="/">
+            <List data="https://api.spacexdata.com/v3/history">
+              <property name="itemTemplate">
+                <Card title="{$item.title}" subtitle="{$item.details}"/>
+              </property>
+            </List>
+          </Page>
+          <Page url="/page1">
+            <Text value="Page 1" />
+          </Page>
+          <Page url="/page2">
+            <Text value="Page 2" />
+          </Page>
+      </Pages>
+      <Footer>Powered by XMLUI</Footer>
+    </App>
+  `} />
 
 #### `horizontal-sticky`
 
-<Playground name="Example: 'horizontal-sticky' layout" height={350} app={horizontalSticky} />
+<Playground 
+  name="Example: 'horizontal-sticky' layout" 
+  height={350} 
+  app={`
+    <App layout="horizontal-sticky">
+      <AppHeader>
+        <property name="logoTemplate">
+          <Heading level="h3" value="Example App"/>
+        </property>
+      </AppHeader>
+      <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+          <NavLink label="Page 2" to="/page2"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+          <Page url="/">
+            <List data="https://api.spacexdata.com/v3/history">
+              <property name="itemTemplate">
+                <Card title="{$item.title}" subtitle="{$item.details}"/>
+              </property>
+            </List>
+          </Page>
+          <Page url="/page1">
+            <Text value="Page 1" />
+          </Page>
+          <Page url="/page2">
+            <Text value="Page 2" />
+          </Page>
+      </Pages>
+      <Footer>Powered by XMLUI</Footer>
+    </App>
+  `} />
 
 #### `condensed`
 
-<Playground name="Example: 'condensed' layout" height={350} app={condensed} />
+<Playground 
+  name="Example: 'condensed' layout" 
+  height={350} 
+  app={`
+    <App layout="condensed">
+      <property name="logoTemplate">
+        <Heading level="h3" value="Example App"/>
+      </property>
+      <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+          <NavLink label="Page 2" to="/page2"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+          <Page url="/">
+            <List data="https://api.spacexdata.com/v3/history">
+              <property name="itemTemplate">
+                <Card title="{$item.title}" subtitle="{$item.details}"/>
+              </property>
+            </List>
+          </Page>
+          <Page url="/page1">
+            <Text value="Page 1" />
+          </Page>
+          <Page url="/page2">
+            <Text value="Page 2" />
+          </Page>
+      </Pages>
+      <Footer>Powered by XMLUI</Footer>
+    </App>
+  `} />
 
 #### `condensed-sticky`
 
-<Playground name="Example: 'condensed-sticky' layout" height={350} app={condensedSticky} />
+<Playground 
+  name="Example: 'condensed-sticky' layout" 
+  height={350} 
+  app={`
+    <App layout="condensed-sticky">
+      <property name="logoTemplate">
+          <Heading level="h3" value="Example App"/>
+      </property>
+      <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+          <NavLink label="Page 2" to="/page2"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+          <Page url="/">
+            <List data="https://api.spacexdata.com/v3/history">
+              <property name="itemTemplate">
+                <Card title="{$item.title}" subtitle="{$item.details}"/>
+              </property>
+            </List>
+          </Page>
+          <Page url="/page1">
+            <Text value="Page 1" />
+          </Page>
+          <Page url="/page2">
+            <Text value="Page 2" />
+          </Page>
+      </Pages>
+      <Footer>Powered by XMLUI</Footer>
+    </App>
+  `} />
 
 #### `vertical`
 
-<Playground name="Example: 'vertical' layout" horizontal={true} height={300} app={vertical} />
+<Playground 
+  name="Example: 'vertical' layout" 
+  horizontal={true} 
+  height={300} 
+  app={`
+    <App layout="vertical">
+      <property name="logoTemplate">
+        <Heading level="h3" value="Example App"/>
+      </property>
+      <NavPanel>
+        <NavLink label="Home" to="/" icon="home"/>
+        <NavLink label="Page 1" to="/page1"/>
+        <NavLink label="Page 2" to="/page2"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+          <Page url="/">
+            <List data="https://api.spacexdata.com/v3/history">
+              <property name="itemTemplate">
+                <Card title="{$item.title}" subtitle="{$item.details}"/>
+              </property>
+            </List>
+          </Page>
+          <Page url="/page1">
+            <Text value="Page 1" />
+          </Page>
+          <Page url="/page2">
+            <Text value="Page 2" />
+          </Page>
+      </Pages>
+      <Footer>Powered by XMLUI</Footer>
+    </App>
+  `} />
 
 #### `vertical-sticky`
 
@@ -80,7 +223,34 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
   name="Example: 'vertical-sticky' layout"
   horizontal={true}
   height={300}
-  app={verticalSticky}
+  app={`
+    <App layout="vertical-sticky">
+      <property name="logoTemplate">
+        <Heading level="h3" value="Example App"/>
+      </property>
+      <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+          <NavLink label="Page 2" to="/page2"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+          <Page url="/">
+            <List data="https://api.spacexdata.com/v3/history">
+              <property name="itemTemplate">
+                <Card title="{$item.title}" subtitle="{$item.details}"/>
+              </property>
+            </List>
+          </Page>
+          <Page url="/page1">
+            <Text value="Page 1" />
+          </Page>
+          <Page url="/page2">
+            <Text value="Page 2" />
+          </Page>
+      </Pages>
+      <Footer>Powered by XMLUI</Footer>
+    </App>
+  `}
 />
 
 #### `vertical-full-header`
@@ -89,7 +259,36 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
   name="Example: 'vertical-full-header' layout"
   horizontal={true}
   height={300}
-  app={verticalFullHeader}
+  app={`
+    <App layout="vertical-full-header">
+      <AppHeader>
+        <property name="logoTemplate">
+            <Heading level="h3" value="Example App"/>
+        </property>
+      </AppHeader>
+      <NavPanel>
+          <NavLink label="Home" to="/" icon="home"/>
+          <NavLink label="Page 1" to="/page1"/>
+          <NavLink label="Page 2" to="/page2"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+          <Page url="/">
+            <List data="https://api.spacexdata.com/v3/history">
+              <property name="itemTemplate">
+                <Card title="{$item.title}" subtitle="{$item.details}"/>
+              </property>
+            </List>
+          </Page>
+          <Page url="/page1">
+            <Text value="Page 1" />
+          </Page>
+          <Page url="/page2">
+            <Text value="Page 2" />
+          </Page>
+      </Pages>
+      <Footer>Powered by XMLUI</Footer>
+    </App>
+  `}
 />
 
 For a detailed list on the different kinds of layouts available see [this short guide](../learning/using-components/app-component.mdx).

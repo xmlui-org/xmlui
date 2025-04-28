@@ -9,7 +9,9 @@ import { CSSProperties, ReactNode } from "react";
 const COMP = "InspectButton";
 export const InspectButtonMd = createMetadata({
   status: "experimental",
-  description: `The \`${COMP}\` component is a component that allows the user to change the tone of the app.`,
+  description:
+    "This component displays a button that can turn the inspection " +
+    "mode of a running XMLUI app on or off.",
   props: {},
   themeVars: parseScssVar(styles.themeVars),
 });

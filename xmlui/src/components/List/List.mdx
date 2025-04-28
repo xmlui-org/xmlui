@@ -1,9 +1,3 @@
-%-IMPORT-START
-
-import data from "./doc-resources/list-component-data.js";
-
-%-IMPORT-END
-
 %-DESC-START
 
 In the following examples all use the same list of data which looks like so:
@@ -37,7 +31,56 @@ To tweak what data and how it is displayed, see the [`itemTemplate` section](#it
   height={400}
   app={`
     <App>
-      <List data='{${JSON.stringify(data, null, 2)}}' />
+      <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' />
     </App>
   `}
 />
@@ -109,7 +152,56 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
   app={`
     <App>
       <List
-        data='{${JSON.stringify(data, null, 2)}}'
+        data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
         defaultGroups="{['dairy', 'meat', 'vegetables']}"
         groupBy="category">
         <property name="groupHeaderTemplate">
@@ -169,7 +261,56 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
   height={400}
   app={`
     <App>
-      <List idKey="key" data='{${JSON.stringify(data, null, 2)}}' />
+      <List idKey="key" data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' />
     </App>
   `}
 />
@@ -204,7 +345,56 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
   height={400}
   app={`
     <App>
-      <List data='{${JSON.stringify(data, null, 2)}}'>
+      <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'>
         <property name="itemTemplate">
           <Card>
             <HStack verticalAlignment="center">
@@ -237,7 +427,56 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
   height={400}
   app={`
     <App>
-      <List limit="4" data='{${JSON.stringify(data, null, 2)}}' />
+      <List limit="4" data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' />
     </App>
   `}
 />
@@ -279,7 +518,56 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
     <App>
       <List 
         orderBy="{{ field: 'quantity', direction: 'desc' }}" 
-        data='{${JSON.stringify(data, null, 2)}}' />
+        data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' />
     </App>
   `}
 />
@@ -326,7 +614,56 @@ or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
   app={`
     <App>
       <List
-        data='{${JSON.stringify(data, null, 2)}}'
+        data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
         groupBy="category">
         <property name="groupHeaderTemplate">
           <VStack>
@@ -354,7 +691,7 @@ This example displays a separator line in the groups' footer:
 
 ```xmlui copy {8-12}
 <App>
-  <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
+  <List data='{[...]}' groupBy="category">
     <property name="groupHeaderTemplate">
       <VStack>
         <Text variant="subtitle" value="{$group.key}" />
@@ -374,7 +711,57 @@ This example displays a separator line in the groups' footer:
   height={400}
   app={`
     <App>
-      <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
+      <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
+    groupBy="category">
         <property name="groupHeaderTemplate">
           <VStack>
             <Text variant="subtitle" value="{$group.key}" />
@@ -419,7 +806,57 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
   height={400}
   app={`
     <App>
-      <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
+      <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
+      groupBy="category">
         <property name="groupHeaderTemplate">
           <Stack padding="$space-2">
             <Text variant="subtitle" value="{$group.key}" />
@@ -445,7 +882,56 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
   height={400}
   app={`
     <App>
-      <List selectedIndex="5" data='{${JSON.stringify(data, null, 2)}}' />
+      <List selectedIndex="5" data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' />
     </App>
   `}
 />
@@ -456,7 +942,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 
 ```xmlui /scrollAnchor="bottom"/
 <App>
-  <List scrollAnchor="bottom" data='{${JSON.stringify(data, null, 2)}}' />
+  <List scrollAnchor="bottom" data='{[...]}' />
 </App>
 ```
 
@@ -465,7 +951,56 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
   height={400}
   app={`
     <App>
-      <List scrollAnchor="bottom" data='{${JSON.stringify(data, null, 2)}}' />
+      <List scrollAnchor="bottom" data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' />
     </App>
   `}
 />
@@ -494,7 +1029,57 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
   height={400}
   app={`
     <App>
-      <List availableGroups="{['fruits', 'vegetables']}" groupBy="category" data='{${JSON.stringify(data, null, 2)}}'>
+      <List availableGroups="{['fruits', 'vegetables']}" groupBy="category" 
+      data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'>
         <property name="groupHeaderTemplate">
           <Stack>
             <Text variant="subtitle" value="{$group.key}" />
@@ -538,14 +1123,114 @@ Note how the `List` on the right has different borders:
   app={`
     <App>
       <HStack>
-        <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category" borderCollapse="false" width="$space-48">
+        <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
+      groupBy="category" borderCollapse="false" width="$space-48">
         <property name="groupHeaderTemplate">
             <Stack>
               <Text variant="subtitle" value="{$group.key}" />
             </Stack>
           </property>
         </List>
-        <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category" borderCollapse="true" width="$space-48">
+        <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
+          groupBy="category" borderCollapse="true" width="$space-48">
           <property name="groupHeaderTemplate">
             <Stack>
               <Text variant="subtitle" value="{$group.key}" />
@@ -590,14 +1275,114 @@ Note how the groups in the right `List` are expanded by default:
   app={`
     <App>
       <HStack gap="$space-2"> 
-        <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category" groupsInitiallyExpanded="false" width="$space-48">
+        <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        groupBy="category" groupsInitiallyExpanded="false" width="$space-48">
           <property name="groupHeaderTemplate">
             <Stack>
               <Text variant="subtitle" value="{$group.key}" />
             </Stack>
           </property>
         </List>
-        <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category" groupsInitiallyExpanded="true" width="$space-48">
+        <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+          groupBy="category" groupsInitiallyExpanded="true" width="$space-48">
           <property name="groupHeaderTemplate">
             <Stack>
               <Text variant="subtitle" value="{$group.key}" />
@@ -652,14 +1437,114 @@ Note how the `meats` category is not displayed in the right `List`:
   app={`
     <App>
       <HStack gap="$space-2">
-        <List data='{${JSON.stringify(data, null, 2)}}' defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="false" width="$space-48">
+        <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="false" width="$space-48">
           <property name="groupHeaderTemplate">
             <Stack>
               <Text variant="subtitle" value="{$group.key}" />
             </Stack>
           </property>
         </List>
-        <List data='{${JSON.stringify(data, null, 2)}}' defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="true" width="$space-48">
+        <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+          defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="true" width="$space-48">
           <property name="groupHeaderTemplate">
             <Stack>
               <Text variant="subtitle" value="{$group.key}" />
