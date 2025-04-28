@@ -7,20 +7,38 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$themeVars: t.composeBorderVars($themeVars, "H1");
+$themeVars: t.composePaddingVars($themeVars, "H1");
+$themeVars: t.composeBorderVars($themeVars, "H2");
+$themeVars: t.composePaddingVars($themeVars, "H2");
+$themeVars: t.composeBorderVars($themeVars, "H3");
+$themeVars: t.composePaddingVars($themeVars, "H3");
+$themeVars: t.composeBorderVars($themeVars, "H4");
+$themeVars: t.composePaddingVars($themeVars, "H4");
+$themeVars: t.composeBorderVars($themeVars, "H5");
+$themeVars: t.composePaddingVars($themeVars, "H5");
+$themeVars: t.composeBorderVars($themeVars, "H6");
+
 @mixin heading($level) {
-  color: createThemeVar('Heading:textColor-#{$level}');
-  letter-spacing: createThemeVar('Heading:letterSpacing-#{$level}');
-  font-family: createThemeVar('Heading:fontFamily-#{$level}');
-  font-weight: createThemeVar('Heading:fontWeight-#{$level}');
-  font-size: createThemeVar('fontSize-#{$level}'); // Intentionally omitting "Heading" inheritance
-  line-height: createThemeVar('lineHeight-#{$level}'); // Intentionally omitting "Heading" inheritance
-  margin-top: createThemeVar('marginTop-#{$level}'); // Intentionally omitting "Heading" inheritance
-  margin-bottom: createThemeVar('marginBottom-#{$level}'); // Intentionally omitting "Heading" inheritance
-  text-decoration-line: createThemeVar('Heading:textDecorationLine-#{$level}');
-  text-decoration-color: createThemeVar('Heading:textDecorationColor-#{$level}');
-  text-decoration-style: createThemeVar('Heading:textDecorationStyle-#{$level}');
-  text-decoration-thickness: createThemeVar('Heading:textDecorationThickness-#{$level}');
-  text-underline-offset: createThemeVar('Heading:textUnderlineOffset-#{$level}');
+  @include t.paddingVars($themeVars, $level);
+  @include t.borderVars($themeVars, $level);
+  color: createThemeVar("Heading:textColor-#{$level}");
+  letter-spacing: createThemeVar("Heading:letterSpacing-#{$level}");
+  font-family: createThemeVar("Heading:fontFamily-#{$level}");
+  font-weight: createThemeVar("Heading:fontWeight-#{$level}");
+  font-size: createThemeVar("fontSize-#{$level}"); // Intentionally omitting "Heading" inheritance
+  line-height: createThemeVar(
+    "lineHeight-#{$level}"
+  ); // Intentionally omitting "Heading" inheritance
+  margin-top: createThemeVar("marginTop-#{$level}"); // Intentionally omitting "Heading" inheritance
+  margin-bottom: createThemeVar(
+    "marginBottom-#{$level}"
+  ); // Intentionally omitting "Heading" inheritance
+  text-decoration-line: createThemeVar("Heading:textDecorationLine-#{$level}");
+  text-decoration-color: createThemeVar("Heading:textDecorationColor-#{$level}");
+  text-decoration-style: createThemeVar("Heading:textDecorationStyle-#{$level}");
+  text-decoration-thickness: createThemeVar("Heading:textDecorationThickness-#{$level}");
+  text-underline-offset: createThemeVar("Heading:textUnderlineOffset-#{$level}");
 }
 
 .heading {
@@ -63,6 +81,6 @@ See this source for details: https://css-tricks.com/line-clampin/
 }
 
 // --- We export the theme variables to add them to the component renderer
-:export{
-  themeVars: t.json-stringify($themeVars)
+:export {
+  themeVars: t.json-stringify($themeVars);
 }
