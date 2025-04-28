@@ -2,8 +2,7 @@
 
 // --- table
 
-$themeVarsTable: (
-);
+$themeVarsTable: ();
 
 @function createThemeVarTable($componentVariable) {
   $themeVarsTable: t.appendThemeVar($themeVarsTable, $componentVariable) !global;
@@ -36,8 +35,7 @@ $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
 
 // --- thead
 
-$themeVarsThead: (
-);
+$themeVarsThead: ();
 
 @function createThemeVarThead($componentVariable) {
   $themeVarsThead: t.appendThemeVar($themeVarsThead, $componentVariable) !global;
@@ -64,8 +62,7 @@ $themeVarsThead: t.composePaddingVars($themeVarsThead, "HtmlThead");
 
 // --- tbody
 
-$themeVarsTbody: (
-);
+$themeVarsTbody: ();
 
 @function createThemeVarTbody($componentVariable) {
   $themeVarsTbody: t.appendThemeVar($themeVarsTbody, $componentVariable) !global;
@@ -88,8 +85,7 @@ $textTransform-HtmlTbody: createThemeVarTbody("textTransform-HtmlTbody");
 
 // --- tfoot
 
-$themeVarsTfoot: (
-);
+$themeVarsTfoot: ();
 
 @function createThemeVarTfoot($componentVariable) {
   $themeVarsTfoot: t.appendThemeVar($themeVarsTfoot, $componentVariable) !global;
@@ -106,8 +102,7 @@ $textColor-HtmlTfoot: createThemeVarTfoot("textColor-HtmlTfoot");
 
 // --- th
 
-$themeVarsTh: (
-);
+$themeVarsTh: ();
 
 @function createThemeVarTh($componentVariable) {
   $themeVarsTh: t.appendThemeVar($themeVarsTh, $componentVariable) !global;
@@ -137,8 +132,7 @@ $themeVarsTh: t.composePaddingVars($themeVarsTh, "HtmlTh");
 
 // --- tr
 
-$themeVarsTr: (
-);
+$themeVarsTr: ();
 
 @function createThemeVarTr($componentVariable) {
   $themeVarsTr: t.appendThemeVar($themeVarsTr, $componentVariable) !global;
@@ -179,8 +173,7 @@ $themeVarsTr: t.composeBorderVars($themeVarsTr, "HtmlTr");
 
 // --- td
 
-$themeVarsTd: (
-);
+$themeVarsTd: ();
 
 @function createThemeVarTd($componentVariable) {
   $themeVarsTd: t.appendThemeVar($themeVarsTd, $componentVariable) !global;
@@ -207,38 +200,50 @@ $themeVarsTd: t.composePaddingVars($themeVarsTd, "HtmlTd");
 
 // --- List styling (for both ul and ol)
 
-$themeVarsList: (
-);
+$themeVarsList: ();
 
 @function createThemeVarList($componentVariable) {
   $themeVarsList: t.appendThemeVar($themeVarsList, $componentVariable) !global;
   @return t.getThemeVar($themeVarsList, $componentVariable);
 }
 
+$themeVarsList: t.composeBorderVars($themeVarsList, "HtmlOl");
+$themeVarsList: t.composePaddingVars($themeVarsList, "HtmlOl");
 $marginTop-HtmlOl: createThemeVarList("marginTop-HtmlOl");
 $marginBottom-HtmlOl: createThemeVarList("marginBottom-HtmlOl");
 
+$themeVarsList: t.composeBorderVars($themeVarsList, "HtmlUl");
+$themeVarsList: t.composePaddingVars($themeVarsList, "HtmlUl");
 $marginTop-HtmlUl: createThemeVarList("marginTop-HtmlUl");
 $marginBottom-HtmlUl: createThemeVarList("marginBottom-HtmlUl");
 
+$themeVarsList: t.composeBorderVars($themeVarsList, "HtmlLi");
+$themeVarsList: t.composePaddingVars($themeVarsList, "HtmlLi");
 $marginTop-HtmlLi: createThemeVarList("marginTop-HtmlLi");
 $marginBottom-HtmlLi: createThemeVarList("marginBottom-HtmlLi");
-
+$listStyleType-HtmlLi: createThemeVarList("listStyleType-HtmlLi");
 
 // Apply to both ul and ol elements
 .htmlUl {
   margin-top: $marginTop-HtmlUl;
   margin-bottom: $marginBottom-HtmlUl;
+  @include t.borderVars($themeVarsList, "HtmlUl");
+  @include t.paddingVars($themeVarsList, "HtmlUl");
 }
 
 .htmlOl {
   margin-top: $marginTop-HtmlOl;
   margin-bottom: $marginBottom-HtmlOl;
+  @include t.borderVars($themeVarsList, "HtmlOl");
+  @include t.paddingVars($themeVarsList, "HtmlOl");
 }
 
 .htmlLi {
   margin-top: $marginTop-HtmlLi;
   margin-bottom: $marginBottom-HtmlLi;
+  list-style-type: $listStyleType-HtmlLi;
+  @include t.borderVars($themeVarsList, "HtmlLi");
+  @include t.paddingVars($themeVarsList, "HtmlLi");
 }
 
 /*
@@ -251,8 +256,7 @@ li .htmlOl {
 */
 
 // --- Heading styling
-$themeVarsHeading: (
-);
+$themeVarsHeading: ();
 
 @function createThemeVarHeading($componentVariable) {
   $themeVarsHeading: t.appendThemeVar($themeVarsHeading, $componentVariable) !global;
@@ -262,15 +266,19 @@ $themeVarsHeading: (
 $marginTop-HtmlHeading: createThemeVarHeading("marginTop-HtmlHeading");
 $marginBottom-HtmlHeading: createThemeVarHeading("marginBottom-HtmlHeading");
 
-.htmlH1, .htmlH2, .htmlH3, .htmlH4, .htmlH5, .htmlH6 {
+.htmlH1,
+.htmlH2,
+.htmlH3,
+.htmlH4,
+.htmlH5,
+.htmlH6 {
   margin-top: $marginTop-HtmlHeading;
   margin-bottom: $marginBottom-HtmlHeading;
 }
 
 // --- Video
 
-$themeVarsVideo: (
-);
+$themeVarsVideo: ();
 
 @function createThemeVarVideo($componentVariable) {
   $themeVarsVideo: t.appendThemeVar($themeVarsVideo, $componentVariable) !global;
@@ -287,26 +295,28 @@ $marginBottom-HtmlVideo: createThemeVarVideo("marginBottom-HtmlVideo");
 
 // --- Details
 
-$themeVarsDetails: (
-);
+$themeVarsDetails: ();
 
 @function createThemeVarDetails($componentVariable) {
   $themeVarsDetails: t.appendThemeVar($themeVarsDetails, $componentVariable) !global;
   @return t.getThemeVar($themeVarsDetails, $componentVariable);
 }
 
+$themeVarsDetails: t.composeBorderVars($themeVarsDetails, "HtmlDetails");
+$themeVarsDetails: t.composePaddingVars($themeVarsDetails, "HtmlDetails");
 $marginTop-HtmlDetails: createThemeVarDetails("marginTop-HtmlDetails");
 $marginBottom-HtmlDetails: createThemeVarDetails("marginBottom-HtmlDetails");
 
 .htmlDetails {
   margin-top: $marginTop-HtmlDetails;
   margin-bottom: $marginBottom-HtmlDetails;
+  @include t.borderVars($themeVarsDetails, "HtmlDetails");
+  @include t.paddingVars($themeVarsDetails, "HtmlDetails");
 }
 
 // --- Details
 
-$themeVarsDetails: (
-);
+$themeVarsDetails: ();
 
 @function createThemeVarDetails($componentVariable) {
   $themeVarsDetails: t.appendThemeVar($themeVarsDetails, $componentVariable) !global;
@@ -323,22 +333,24 @@ $marginBottom-HtmlDetails: createThemeVarDetails("marginBottom-HtmlDetails");
 
 // --- Image
 
-$themeVarsImage: (
-);
+$themeVarsImage: ();
 
 @function createThemeVarImage($componentVariable) {
   $themeVarsImage: t.appendThemeVar($themeVarsImage, $componentVariable) !global;
   @return t.getThemeVar($themeVarsImage, $componentVariable);
 }
 
+$themeVarsImage: t.composeBorderVars($themeVarsImage, "HtmlImage");
+$themeVarsImage: t.composePaddingVars($themeVarsImage, "HtmlImage");
 $width-htmlImage: createThemeVarImage("width-HtmlImage");
+$height-htmlImage: createThemeVarImage("height-HtmlImage");
 
 .htmlImage {
-  width:$width-htmlImage;
+  width: $width-htmlImage;
+  height: $height-htmlImage;
+  @include t.borderVars($themeVarsImage, "HtmlImage");
+  @include t.paddingVars($themeVarsImage, "HtmlImage");
 }
-
-
-
 
 // --- We export the theme variables to add them to the component renderer
 :export {
@@ -353,5 +365,4 @@ $width-htmlImage: createThemeVarImage("width-HtmlImage");
   themeVarsHeading: t.json-stringify($themeVarsHeading);
   themeVarsVideo: t.json-stringify($themeVarsVideo);
   themeVarsDetails: t.json-stringify($themeVarsDetails);
-
 }
