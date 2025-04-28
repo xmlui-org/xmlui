@@ -83,7 +83,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
   }
   switch (action.type) {
     case FormActionKind.FIELD_INITIALIZED: {
-      if (!state.interactionFlags[uid].isDirty) {
+      if (!state.interactionFlags[uid].isDirty || action.payload.force) {
         setByPath(state.subject, uid, action.payload.value);
       }
       break;
@@ -195,8 +195,8 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       return {
         ...initialState,
         subject: originalSubject,
+        resetVersion: (state.resetVersion ?? 0) + 1,
       };
-      break;
     }
     default:
   }
@@ -208,6 +208,7 @@ interface FormState {
   generalValidationResults: Array<SingleValidationResult>;
   interactionFlags: Record<string, InteractionFlags>;
   submitInProgress?: boolean;
+  resetVersion?: number;
 }
 
 const initialState: FormState = {
@@ -216,6 +217,7 @@ const initialState: FormState = {
   generalValidationResults: [],
   interactionFlags: {},
   submitInProgress: false,
+  resetVersion: 0,
 };
 
 type Props = {
@@ -303,6 +305,7 @@ const Form = forwardRef(function (
       originalSubject: initialValue,
       validationResults: formState.validationResults,
       interactionFlags: formState.interactionFlags,
+      resetVersion: formState.resetVersion,
       dispatch,
       enabled: isEnabled,
     };
@@ -311,6 +314,7 @@ const Form = forwardRef(function (
     formState.interactionFlags,
     formState.subject,
     formState.validationResults,
+    formState.resetVersion,
     initialValue,
     isEnabled,
     itemLabelBreak,
