@@ -321,6 +321,23 @@ $marginBottom-HtmlDetails: createThemeVarDetails("marginBottom-HtmlDetails");
   margin-bottom: $marginBottom-HtmlDetails;
 }
 
+// --- Image
+
+$themeVarsImage: (
+);
+
+@function createThemeVarImage($componentVariable) {
+  $themeVarsImage: t.appendThemeVar($themeVarsImage, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsImage, $componentVariable);
+}
+
+$width-htmlImage: createThemeVarImage("width-HtmlImage");
+
+.htmlImage {
+  width:$width-htmlImage;
+}
+
+
 
 
 // --- We export the theme variables to add them to the component renderer
