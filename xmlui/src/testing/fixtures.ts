@@ -18,6 +18,7 @@ import {
   FormItemDriver,
   HeadingDriver,
   HStackDriver,
+  HtmlTagDriver,
   IconDriver,
   ItemsDriver,
   LinkDriver,
@@ -158,9 +159,12 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
 
       const themedDescription = mapThemeRelatedVars(description);
       await initComponent(page, { ...themedDescription, entryPoint });
+      const { width, height } = page.viewportSize();
       return {
         testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
         clipboard: new Clipboard(page),
+        width: width ?? 0,
+        height: height ?? 0,
       };
     });
   },
@@ -354,6 +358,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(OptionDriver, testIdOrLocator);
     });
   },
+  createHtmlTagDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(OptionDriver, testIdOrLocator);
+    });
+  },
 });
 
 // --- Types
@@ -368,7 +377,12 @@ type TestDriverExtenderProps = {
   initTestBed: (
     source: string,
     description?: TestBedDescription,
-  ) => Promise<{ testStateDriver: TestStateDriver; clipboard: Clipboard }>;
+  ) => Promise<{
+    testStateDriver: TestStateDriver;
+    clipboard: Clipboard;
+    width: number;
+    height: number;
+  }>;
   createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
     driverClass: T,
     testIdOrLocator?: string | Locator,
@@ -407,4 +421,5 @@ type TestDriverExtenderProps = {
   createBadgeDriver: ComponentDriverMethod<BadgeDriver>;
   createNoResultDriver: ComponentDriverMethod<NoResultDriver>;
   createOptionDriver: ComponentDriverMethod<OptionDriver>;
+  createHtmlTagDriver: ComponentDriverMethod<HtmlTagDriver>;
 };

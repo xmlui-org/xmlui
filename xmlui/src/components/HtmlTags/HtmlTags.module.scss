@@ -17,6 +17,7 @@ $fontWeight-HtmlTable: createThemeVarTable("fontWeight-HtmlTable");
 $textTransform-HtmlTable: createThemeVarTable("textTransform-HtmlTable");
 $marginTop-HtmlTable: createThemeVarTable("marginTop-HtmlTable");
 $marginBottom-HtmlTable: createThemeVarTable("marginBottom-HtmlTable");
+$width-HtmlTable: createThemeVarTable("width-HtmlTable");
 $themeVarsTable: t.composeBorderVars($themeVarsTable, "HtmlTable");
 $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
 
@@ -29,6 +30,7 @@ $themeVarsTable: t.composePaddingVars($themeVarsTable, "HtmlTable");
   text-transform: $textTransform-HtmlTable;
   margin-top: $marginTop-HtmlTable;
   margin-bottom: $marginBottom-HtmlTable;
+  width: $width-HtmlTable;
   @include t.borderVars($themeVarsTable, "HtmlTable");
   @include t.paddingVars($themeVarsTable, "HtmlTable");
 }

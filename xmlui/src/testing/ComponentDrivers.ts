@@ -531,3 +531,7 @@ export class FormItemDriver extends ComponentDriver {
     return this.component.locator(`[${this.validationStatusTag}]`);
   }
 }
+
+// --- htmlTags
+
+export class HtmlTagDriver extends ComponentDriver {}
