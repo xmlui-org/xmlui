@@ -106,6 +106,7 @@ import { SortDescendingIcon } from "./Icon/SortDescendingIcon";
 import { NoSortIcon } from "./Icon/NoSortIcon";
 import { TrendingLevelIcon } from "./Icon/TrendingLevelIcon";
 import { InspectIcon } from "./Icon/Inspect";
+import { MoonIcon } from "./Icon/MoonIcon";
 
 type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
 
@@ -249,7 +250,7 @@ registerIconRenderer("duplicate", (props: IconBaseProps) => <HiOutlineDuplicate 
 registerIconRenderer("connect", (props: IconBaseProps) => <RxLightningBolt {...props} />);
 registerIconRenderer("cog", (props: IconBaseProps) => <HiOutlineCog {...props} />);
 registerIconRenderer("sun", (props: IconBaseProps) => <HiSun {...props} />);
-registerIconRenderer("moon", (props: IconBaseProps) => <FiMoon {...props} />);
+registerIconRenderer("moon", (props: IconBaseProps) => <MoonIcon {...props} />);
 registerIconRenderer("share", (props: IconBaseProps) => <ShareIcon {...props} />);
 registerIconRenderer("new-window", (props: IconBaseProps) => <RxOpenInNewWindow {...props} />);
 registerIconRenderer("paint", (props: IconBaseProps) => <HiOutlinePaintBrush {...props} />);
