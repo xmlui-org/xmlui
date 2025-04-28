@@ -1,7 +1,5 @@
 import { Callout } from "nextra/components";
 
-import data from  "../../component-samples/Table/list-component-data.js";
-
 # Table [#component-table]
 
 `Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells.
@@ -60,7 +58,56 @@ The component receives data via this property. The `data` property is a list of 
   name="Example: data"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}'>
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'>
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
@@ -126,7 +173,56 @@ By default, the value of this property is `true`.
   name="Example: enableMultiRowSelection"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' 
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
         rowsSelectable="true" 
         enableMultiRowSelection="false">
         <Column bindTo="name"/>
@@ -157,7 +253,57 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
   name="Example: headerHeight"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' headerHeight="60px">
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        headerHeight="60px">
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
@@ -188,7 +334,57 @@ The default value is `false`.
   height={300}
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' hideHeader="true">
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        hideHeader="true">
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
@@ -218,7 +414,57 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
   name="Example: iconNoSort"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' sortBy="quantity" iconNoSort="close">
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        sortBy="quantity" iconNoSort="close">
         <Column bindTo="name" canSort="true" />
         <Column bindTo="quantity" canSort="true" />
         <Column bindTo="unit" canSort="true" />
@@ -248,7 +494,57 @@ sorting is done according to the column, and the column is sorted in ascending o
   name="Example: iconSortAsc"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' sortBy="quantity" iconSortAsc="chevronup">
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        sortBy="quantity" iconSortAsc="chevronup">
         <Column bindTo="name" canSort="true" />
         <Column bindTo="quantity" canSort="true" />
         <Column bindTo="unit" canSort="true" />
@@ -280,7 +576,57 @@ Select a column header and set it to descending ordering.
   name="Example: iconSortDesc"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' sortBy="quantity" iconSortDesc="chevrondown">
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        sortBy="quantity" iconSortDesc="chevrondown">
         <Column bindTo="name" canSort="true" />
         <Column bindTo="quantity" canSort="true" />
         <Column bindTo="unit" canSort="true" />
@@ -307,7 +653,57 @@ This property adds pagination controls to the `Table`.
   name="Example: isPaginated"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        isPaginated="true" pageSizes="{[3, 6, 12]}">
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
@@ -401,7 +797,57 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
   name="Example: pageSizes"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        isPaginated="true" pageSizes="{[3, 6, 12]}">
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
@@ -435,7 +881,56 @@ Disabled items are rendered with a different color.
   name="Example: rowDisabledPredicate"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}'
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
         rowDisabledPredicate="{(item) => item.quantity > 6}">
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
@@ -465,7 +960,57 @@ The default value is `false`.
   name="Example: rowsSelectable"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' rowsSelectable="true">
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        rowsSelectable="true">
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
@@ -492,7 +1037,57 @@ This property is used to determine which data attributes to sort by.
   name="Example: sortBy"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' sortBy="quantity">
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        sortBy="quantity">
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
@@ -519,7 +1114,57 @@ This property determines the sort order to be `ascending` or `descending`. This 
   name="Example: sortDirection"
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}' sortBy="quantity" sortDirection="descending">
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' 
+        sortBy="quantity" sortDirection="descending">
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
@@ -557,7 +1202,56 @@ Click on any of the column headers to trigger a new sorting:
   app={`
     <App var.selection="">
       <Text>Current selection (row IDs): [{selection}]</Text>
-      <Table data='{${JSON.stringify(data, null, 2)}}'
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
         rowsSelectable="true"
         enableMultiRowSelection="true"
         onSelectionDidChange="(newSel) => selection = newSel.map(item => item.id).join()" >
@@ -594,7 +1288,56 @@ Click on any of the column headers to trigger a new sorting:
   app={`
     <App var.sortedBy="">
       <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
-      <Table data='{${JSON.stringify(data, null, 2)}}'
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
         onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
         <Column bindTo="name" canSort="true"/>
         <Column bindTo="quantity" canSort="true"/>
@@ -632,7 +1375,56 @@ clicking that column header still does not sort because `willSort` prevents it:
   app={`
     <App var.sortedBy="">
       <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
-      <Table data='{${JSON.stringify(data, null, 2)}}'
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
         onWillSort="(by, dir) => by !== 'name'"
         onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
         <Column bindTo="name" canSort="true"/>
@@ -657,7 +1449,7 @@ This method clears the list of currently selected table rows.
     <Button label="Select 1" onClick="table.selectId(1)" />
     <Button label="Select 2, 4" onClick="table.selectId([2, 4])" />
   </HStack>
-  <Table id="table" data='{${JSON.stringify(data, null, 2)}}'
+  <Table id="table" data='{[...]}'
     rowsSelectable="true"
     enableMultiRowSelection="true">
     <Column bindTo="name" canSort="true"/>
@@ -677,7 +1469,56 @@ This method clears the list of currently selected table rows.
         <Button label="Select 1" onClick="table.selectId(1)" />
         <Button label="Select 2, 4" onClick="table.selectId([2, 4])" />
       </HStack>
-      <Table id="table" data='{${JSON.stringify(data, null, 2)}}'
+      <Table id="table" data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
         rowsSelectable="true"
         enableMultiRowSelection="true">
         <Column bindTo="name" canSort="true"/>
@@ -794,7 +1635,56 @@ Heading theme variables:
   ]}
   app={`
     <App>
-      <Table data='{${JSON.stringify(data, null, 2)}}'>
+      <Table data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'>
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
