@@ -41,7 +41,6 @@ import { NavLinkMd } from "./NavLink/NavLink";
 import { NavPanelMd } from "./NavPanel/NavPanel";
 import { NoResultMd } from "./NoResult/NoResult";
 import { NumberBoxMd } from "./NumberBox/NumberBox";
-import { OffCanvasMd } from "./OffCanvas/OffCanvas";
 import { PageMetaTitleMd } from "./PageMetaTitle/PageMetaTitle";
 import { PageMd, PagesMd } from "./Pages/Pages";
 import { PositionedContainerMd } from "./PositionedContainer/PositionedContainer";
@@ -63,16 +62,13 @@ import { TableOfContentsMd } from "./TableOfContents/TableOfContents";
 import { TabsMd } from "./Tabs/Tabs";
 import { TextMd } from "./Text/Text";
 import { TextAreaMd } from "./TextArea/TextArea";
-import type { ComponentMetadata } from "../abstractions/ComponentDefs";
 import { AccordionMd } from "./Accordion/Accordion";
-import { AlertMd } from "./Alert/Alert";
 import { TabItemMd } from "./Tabs/TabItem";
 import { FragmentMd } from "../components-core/Fragment";
 import { TreeMd } from "./Tree/TreeComponent";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
-import { ButtonGroupMd } from "./ButtonGroup/ButtonGroup";
 import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
@@ -290,7 +286,6 @@ export const collectedComponentMetadata = {
   wbr: HtmlWbrMd,
   // --- Heavy xmlui components
   Accordion: AccordionMd,
-  Alert: AlertMd,
   APICall: APICallMd,
   App: AppMd,
   AppHeader: AppHeaderMd,
@@ -302,7 +297,6 @@ export const collectedComponentMetadata = {
   Bookmark: BookmarkMd,
   Breakout: BreakoutMd,
   Button: ButtonMd,
-  ButtonGroup: ButtonGroupMd,
   Card: CardMd,
   Carousel: CarouselMd,
   ChangeListener: ChangeListenerMd,
@@ -348,7 +342,6 @@ export const collectedComponentMetadata = {
   NavPanel: NavPanelMd,
   NoResult: NoResultMd,
   NumberBox: NumberBoxMd,
-  OffCanvas: OffCanvasMd,
   Option: OptionMd,
   PageMetaTitle: PageMetaTitleMd,
   Page: PageMd,
