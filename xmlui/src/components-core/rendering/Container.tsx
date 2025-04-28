@@ -52,7 +52,6 @@ import { extractParam, shouldKeep } from "../utils/extractParam";
 import { useIsomorphicLayoutEffect } from "../utils/hooks";
 import { capitalizeFirstLetter, delay, generatedId, useEvent } from "../utils/misc";
 import { parseHandlerCode, prepareHandlerStatements } from "../utils/statementUtils";
-import { StateViewer } from "../../components/StateViewer/StateViewerNative";
 import { renderChild } from "./renderChild";
 import { useTheme } from "../theming/ThemeContext";
 import { LoaderComponent } from "../LoaderComponent";
@@ -635,9 +634,6 @@ export const Container = memo(
 
     const thisUidInfoRef = useRef({});
     const uidInfoRef = node.uses === undefined ? parentUidInfoRef : thisUidInfoRef;
-    const debugContext = useDebugView();
-    const stateViewProps = debugContext?.stateViewOptions;
-    const showContainer = stateViewProps && debugContext.displayStateView;
 
     const renderedChildren = stableRenderChild(
       node.children,
@@ -680,16 +676,7 @@ export const Container = memo(
             : undefined
         }
       >
-        {showContainer && (
-          <StateViewer
-            state={componentState}
-            showBoundary={stateViewProps?.showBoundary}
-            blink={stateViewProps?.blink}
-          >
-            {containerContent}
-          </StateViewer>
-        )}
-        {!showContainer && containerContent}
+        {containerContent}
       </Fragment>
     );
   }),
