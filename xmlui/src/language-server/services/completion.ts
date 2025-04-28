@@ -6,7 +6,7 @@ import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import * as docGen from "./common/docs-generation";
 import { compNameForTagNameNode, findTagNameNodeInStack, insideClosingTag, pathToNodeInAscendands } from "./common/syntax-node-utilities";
-import type { ComponentMetadataCollection } from "./common/types";
+import type { ComponentMetadataCollection, MetadataProvider } from "./common/types";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
   Type,
@@ -62,7 +62,7 @@ export function handleCompletionResolve({
 type CompletionContext = {
   parseResult: ParseResult;
   getText: GetText;
-  metaByComp: ComponentMetadataCollection;
+  metaByComp: MetadataProvider;
 };
 
 export function handleCompletion(
@@ -111,13 +111,13 @@ export function handleCompletion(
   if (completeForProp) {
     const tagNameNode = findTagNameNodeInStack(chainAtPos);
     const compName = compNameForTagNameNode(tagNameNode, getText);
-    return completionForNewProp(compName, metaByComp);
+    return completionForNewAttr(compName, metaByComp);
   }
   return null;
 }
 
-function allComponentNames(md: ComponentMetadataCollection): CompletionItem[] {
-  return Object.keys(md).map((compName) => CompletionItemBuilder.withComponent(compName).componentResolveData().build());
+function allComponentNames(md: MetadataProvider): CompletionItem[] {
+  return md.componentNames().map((compName) => CompletionItemBuilder.withComponent(compName).componentResolveData().build());
 }
 
 /**
@@ -127,7 +127,7 @@ function allComponentNames(md: ComponentMetadataCollection): CompletionItem[] {
 */
 function matchingTagName(
   elementNode: Node,
-  metaByComp: ComponentMetadataCollection,
+  metaByComp: MetadataProvider,
   getText: GetText,
 ): CompletionItem[] | null {
   const nameNode = elementNode.children!.find((c) => c.kind === SyntaxKind.TagNameNode);
@@ -157,7 +157,7 @@ function matchingTagName(
 function handleCompletionInsideToken(
   chainAtPos: Node[],
   position: number,
-  metaByComp: ComponentMetadataCollection,
+  metaByComp: MetadataProvider,
   getText: (n: Node) => string,
 ): CompletionItem[] | null {
   const parent = chainAtPos.at(-2);
@@ -180,20 +180,21 @@ function handleCompletionInsideToken(
     case SyntaxKind.AttributeKeyNode: {
       const tagNameNode = findTagNameNodeInStack(chainAtPos);
       const compName = compNameForTagNameNode(tagNameNode, getText);
-      return completionForNewProp(compName, metaByComp);
+      return completionForNewAttr(compName, metaByComp);
     }
   }
   return null;
 }
 
-function completionForNewProp(
+function completionForNewAttr(
   compName: string,
-  metaByComp: ComponentMetadataCollection,
+  metaByComp: MetadataProvider,
 ): CompletionItem[] | null {
-  const metadata = metaByComp[compName];
-  if (!metadata || !metadata.props) {
+  const metadata = metaByComp.getComponent(compName);
+  if (!metadata) {
     return null;
   }
+  return metadata.getAllAttributes();
   return Object.keys(metadata.props).map((propName) =>
     CompletionItemBuilder.withProp(propName).propResolveData(compName).build()
   );

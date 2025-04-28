@@ -13,15 +13,15 @@ import {
   ProposedFeatures,
 } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-
 import collectedComponentMetadata from "./xmlui-metadata-generated.mjs";
 import type {XmluiCompletionItem} from "./services/completion";
 import { handleCompletion, handleCompletionResolve} from "./services/completion";
 import {handleHover} from "./services/hover";
 import { createXmlUiParser, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
-import type { ComponentMetadataCollection } from './services/common/types';
+import { MetadataProvider, type ComponentMetadataCollection } from './services/common/types';
 
 const metaByComp = collectedComponentMetadata as ComponentMetadataCollection;
+const metadataProvider = new MetadataProvider(metaByComp);
 
 export function start(connection: Connection){
   // Also include all preview / proposed LSP features.
@@ -91,11 +91,11 @@ export function start(connection: Connection){
       return [];
     }
     const parseResult = parseDocument(document);
-    return handleCompletion({ parseResult: parseResult.parseResult, getText: parseResult.getText, metaByComp }, document.offsetAt(position));
+    return handleCompletion({ parseResult: parseResult.parseResult, getText: parseResult.getText, metaByComp: metadataProvider }, document.offsetAt(position));
   });
 
   connection.onCompletionResolve((completionItem: XmluiCompletionItem) => {
-    return handleCompletionResolve({metaByComp, item: completionItem})
+    return handleCompletionResolve({metaByComp: metadataProvider, item: completionItem})
   });
 
   connection.onHover(({ position, textDocument }: HoverParams) => {
@@ -109,7 +109,7 @@ export function start(connection: Connection){
     const ctx = {
       parseResult,
       getText,
-      metaByComp
+      metaByComp: metadataProvider
     }
     const hoverRes = handleHover(ctx, document.offsetAt(position));
     if (hoverRes === null){

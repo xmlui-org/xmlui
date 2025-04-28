@@ -27,7 +27,6 @@ export function handleHover(
   position: number,
 ): SimpleHover {
   const findRes = findTokenAtPos(node, position);
-  console.log("findres: ", findRes);
 
   if (findRes === undefined) {
     return null;
