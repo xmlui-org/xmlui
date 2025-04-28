@@ -45,16 +45,15 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
 
     .listItem {
       list-style-type: none;
-      border-left: createThemeVar("border-width-TableOfContentsItem") createThemeVar("border-style-TableOfContentsItem") createThemeVar("border-color-TableOfContentsItem");
+      border-left: createThemeVar("border-width-#{$component}Item") createThemeVar("border-style-#{$component}Item") createThemeVar("border-color-#{$component}Item");
 
       .link {
-        color: createThemeVar("textColor-TableOfContentsItem");
-        font-size: createThemeVar("fontSize-TableOfContentsItem");
-        font-weight: createThemeVar("fontWeight-TableOfContentsItem");
-        font-family: createThemeVar("fontFamily-TableOfContentsItem");
-        text-transform: createThemeVar("textTransform-TableOfContentsItem");
-        vertical-align: createThemeVar("verticalAlign-TableOfContentsItem");
-        letter-spacing: createThemeVar("letterSpacing-TableOfContentsItem");
+        color: createThemeVar("textColor-#{$component}Item");
+        font-size: createThemeVar("fontSize-#{$component}Item");
+        font-weight: createThemeVar("fontWeight-#{$component}Item");
+        font-family: createThemeVar("fontFamily-#{$component}Item");
+        text-transform: createThemeVar("textTransform-#{$component}Item");
+        letter-spacing: createThemeVar("letterSpacing-#{$component}Item");
         overflow-wrap: break-word;
         display: block;
         @include t.paddingVars($themeVars, "#{$component}Item");
@@ -85,11 +84,11 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
       }
 
       &.active {
-        border-left: 2px solid createThemeVar("borderColor-TableOfContentsItem--active");
+        border-left: 2px solid createThemeVar("borderColor-#{$component}Item--active");
 
         .link {
-          color: createThemeVar("color-TableOfContentsItem--active");
-          font-weight: createThemeVar("fontWeight-TableOfContentsItem--active");
+          color: createThemeVar("color-#{$component}Item--active");
+          font-weight: createThemeVar("fontWeight-#{$component}Item--active");
         }
       }
     }
