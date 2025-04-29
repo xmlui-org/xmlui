@@ -9,27 +9,31 @@ $themeVars: ();
 
 $themeVars: t.composeBorderVars($themeVars, "H1");
 $themeVars: t.composePaddingVars($themeVars, "H1");
+$themeVars: t.composeTextVars($themeVars, "H1");
 $themeVars: t.composeBorderVars($themeVars, "H2");
 $themeVars: t.composePaddingVars($themeVars, "H2");
+$themeVars: t.composeTextVars($themeVars, "H2");
 $themeVars: t.composeBorderVars($themeVars, "H3");
 $themeVars: t.composePaddingVars($themeVars, "H3");
+$themeVars: t.composeTextVars($themeVars, "H3");
 $themeVars: t.composeBorderVars($themeVars, "H4");
 $themeVars: t.composePaddingVars($themeVars, "H4");
+$themeVars: t.composeTextVars($themeVars, "H4");
 $themeVars: t.composeBorderVars($themeVars, "H5");
 $themeVars: t.composePaddingVars($themeVars, "H5");
+$themeVars: t.composeTextVars($themeVars, "H5");
 $themeVars: t.composeBorderVars($themeVars, "H6");
+$themeVars: t.composePaddingVars($themeVars, "H6");
+$themeVars: t.composeTextVars($themeVars, "H6");
 
 @mixin heading($level) {
   @include t.paddingVars($themeVars, $level);
   @include t.borderVars($themeVars, $level);
+  @include t.textVars($themeVars, $level);
   color: createThemeVar("Heading:textColor-#{$level}");
   letter-spacing: createThemeVar("Heading:letterSpacing-#{$level}");
   font-family: createThemeVar("Heading:fontFamily-#{$level}");
   font-weight: createThemeVar("Heading:fontWeight-#{$level}");
-  font-size: createThemeVar("fontSize-#{$level}"); // Intentionally omitting "Heading" inheritance
-  line-height: createThemeVar(
-    "lineHeight-#{$level}"
-  ); // Intentionally omitting "Heading" inheritance
   margin-top: createThemeVar("marginTop-#{$level}"); // Intentionally omitting "Heading" inheritance
   margin-bottom: createThemeVar(
     "marginBottom-#{$level}"

@@ -10,18 +10,15 @@ $themeVars: ();
 $component: "Badge";
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeTextVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, "#{$component}-pill");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}-pill");
-$backgroundColor-Badge: createThemeVar("backgroundColor-#{$component}");
-$textColor-Badge: createThemeVar("textColor-#{$component}");
-$fontSize-Badge: createThemeVar("fontSize-#{$component}");
-$fontSize-Badge-pill: createThemeVar("fontSize-#{$component}-pill");
-$fontWeight-Badge: createThemeVar("fontWeight-#{$component}");
-$fontWeight-Badge-pill: createThemeVar("fontWeight-#{$component}-pill");
+$themeVars: t.composeTextVars($themeVars, "#{$component}-pill");
 
 .badge {
   @include t.paddingVars($themeVars, $component);
   @include t.borderVars($themeVars, $component);
+  @include t.textVars($themeVars, $component);
   display: inline-block;
   width: fit-content;
   vertical-align: top;
@@ -29,28 +26,19 @@ $fontWeight-Badge-pill: createThemeVar("fontWeight-#{$component}-pill");
   overflow: hidden;
   text-overflow: ellipsis;
   text-transform: uppercase;
-  font-weight: $fontWeight-Badge;
-
-  background-color: $backgroundColor-Badge;
-  color: $textColor-Badge;
-  font-size: $fontSize-Badge;
 }
 
 .pill {
   @include t.paddingVars($themeVars, "#{$component}-pill");
   @include t.borderVars($themeVars, "#{$component}-pill");
+  @include t.textVars($themeVars, "#{$component}-pill");
   display: inline-block;
   width: fit-content;
   vertical-align: top;
   min-width: fit-content;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-weight: $fontWeight-Badge-pill;
-
-  background-color: $backgroundColor-Badge;
-  color: $textColor-Badge;
   border-radius: 9999px;
-  font-size: $fontSize-Badge-pill;
 }
 
 // --- We export the theme variables to add them to the component renderer

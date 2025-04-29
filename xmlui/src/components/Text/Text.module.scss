@@ -11,30 +11,13 @@ $component: "Text";
 @mixin textVariant($variant) {
   $themeVars: t.composePaddingVars($themeVars, "#{$component}-#{$variant}");
   $themeVars: t.composeBorderVars($themeVars, "#{$component}-#{$variant}");
-  font-family: createThemeVar("fontFamily-#{$component}-#{$variant}");
-  font-size: createThemeVar("fontSize-#{$component}-#{$variant}");
-  font-weight: createThemeVar("fontWeight-#{$component}-#{$variant}");
-  font-style: createThemeVar("fontStyle-#{$component}-#{$variant}");
-  font-stretch: createThemeVar("fontStretch-#{$component}-#{$variant}");
-  text-decoration-line: createThemeVar('textDecorationLine-#{$component}-#{$variant}');
-  text-decoration-color: createThemeVar('textDecorationColor-#{$component}-#{$variant}');
-  text-decoration-style: createThemeVar('textDecorationStyle-#{$component}-#{$variant}');
-  text-decoration-thickness: createThemeVar('textDecorationThickness-#{$component}-#{$variant}');
-  text-underline-offset: createThemeVar('textUnderlineOffset-#{$component}-#{$variant}');
-  line-height: createThemeVar("lineHeight-#{$component}-#{$variant}");
-  color: createThemeVar("textColor-Text-#{$variant}");
-  background-color: createThemeVar("backgroundColor-#{$component}-#{$variant}");
-  // border-radius: createThemeVar("borderRadius-#{$component}-#{$variant}");
-  // border-color: createThemeVar("borderColor-#{$component}-#{$variant}");
-  // border-width: createThemeVar("borderWidth-#{$component}-#{$variant}");
-  // border-style: createThemeVar("borderStyle-#{$component}-#{$variant}");
+  $themeVars: t.composeTextVars($themeVars, "#{$component}-#{$variant}");
   @include t.paddingVars($themeVars, "#{$component}-#{$variant}");
   @include t.borderVars($themeVars, "#{$component}-#{$variant}");
+  @include t.textVars($themeVars, "#{$component}-#{$variant}");
   margin-top: createThemeVar("marginTop-#{$component}-#{$variant}");
   margin-bottom: createThemeVar("marginBottom-#{$component}-#{$variant}");
-  text-transform: createThemeVar("textTransform-#{$component}-#{$variant}");
   vertical-align: createThemeVar("verticalAlign-#{$component}-#{$variant}");
-  letter-spacing: createThemeVar("letterSpacing-#{$component}-#{$variant}");
 }
 
 .text {
@@ -43,6 +26,7 @@ $component: "Text";
   margin: 0;
   padding: 0;
   min-height: fit-content;
+  @include textVariant("default");
 
   &.markdown {
     @include textVariant("markdown");
