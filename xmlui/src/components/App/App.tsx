@@ -79,6 +79,7 @@ export const AppMd = createMetadata({
     "maxWidth‑content‑App":
       "This theme variable defines the maximum width of the main content. If the main " +
       "content is broader, the engine adds margins to keep the expected maximum size.",
+    "maxWidth-App-vertical": "This theme variable defines the app's full width in vertical layouts.",
     "boxShadow‑header‑App": "This theme variable sets the shadow of the app's header section.",
     "boxShadow‑navPanel‑App":
       "This theme variable sets the shadow of the app's navigation panel section " +
@@ -90,6 +91,7 @@ export const AppMd = createMetadata({
   defaultThemeVars: {
     [`width-navPanel-${COMP}`]: "$space-64",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",
+    [`maxWidth-${COMP}-vertical`]: "100%",
     [`boxShadow-header-${COMP}`]: "$boxShadow-spread",
     [`boxShadow-navPanel-${COMP}`]: "$boxShadow-spread",
     [`scroll-padding-block-Pages`]: "$space-4",
