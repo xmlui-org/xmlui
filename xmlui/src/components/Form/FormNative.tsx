@@ -43,30 +43,11 @@ import { type FormAction, formReset } from "../Form/formActions";
 import type { FormMd } from "./Form";
 import type { InteractionFlags, SingleValidationResult, ValidationResult } from "./FormContext";
 import { FormContext } from "./FormContext";
+import { get, set } from "lodash-es";
 
-const setByPath = (obj: any, path: string, val: any) => {
-  const keys = path.split(".");
-  for (let i = 0; i < keys.length; i++) {
-    const currentKey = keys[i];
-    const nextKey = keys[i + 1];
-
-    if (typeof nextKey !== "undefined") {
-      obj[currentKey] = obj[currentKey] ? obj[currentKey] : {};
-    } else {
-      obj[currentKey] = val;
-    }
-
-    obj = obj[currentKey];
-  }
-};
 
 export const getByPath = (obj: any, path: string) => {
-  const keys = path.split(".");
-  let ret = obj;
-  for (let i = 0; i < keys.length; i++) {
-    ret = ret?.[keys[i]];
-  }
-  return ret;
+  return get(obj, path);
 };
 
 const formReducer = produce((state: FormState, action: ContainerAction | FormAction) => {
@@ -84,7 +65,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
   switch (action.type) {
     case FormActionKind.FIELD_INITIALIZED: {
       if (!state.interactionFlags[uid].isDirty || action.payload.force) {
-        setByPath(state.subject, uid, action.payload.value);
+        set(state.subject, uid, action.payload.value);
       }
       break;
     }
@@ -93,7 +74,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.FIELD_VALUE_CHANGED: {
-      setByPath(state.subject, uid, action.payload.value);
+      set(state.subject, uid, action.payload.value);
       state.interactionFlags[uid].isDirty = true;
       state.interactionFlags[uid].forceShowValidationResult = false;
       break;
@@ -199,6 +180,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       };
     }
     default:
+      break;
   }
 });
 
@@ -305,7 +287,6 @@ const Form = forwardRef(function (
       originalSubject: initialValue,
       validationResults: formState.validationResults,
       interactionFlags: formState.interactionFlags,
-      resetVersion: formState.resetVersion,
       dispatch,
       enabled: isEnabled,
     };
@@ -314,7 +295,6 @@ const Form = forwardRef(function (
     formState.interactionFlags,
     formState.subject,
     formState.validationResults,
-    formState.resetVersion,
     initialValue,
     isEnabled,
     itemLabelBreak,
@@ -469,6 +449,7 @@ const Form = forwardRef(function (
         onSubmit={doSubmit}
         onReset={doReset}
         id={id}
+        key={formState.resetVersion}
         ref={formRef}
       >
         <ValidationSummary generalValidationResults={formState.generalValidationResults} />

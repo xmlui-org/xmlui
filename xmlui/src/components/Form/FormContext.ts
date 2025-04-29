@@ -20,7 +20,6 @@ interface IFormContext {
   originalSubject: Record<string, any>;
   validationResults: Record<string, ValidationResult>;
   interactionFlags: Record<string, InteractionFlags>;
-  resetVersion?: number;
   dispatch: Dispatch<ContainerAction | FormAction>;
   enabled?: boolean;
   itemLabelWidth?: string;
@@ -98,10 +97,6 @@ export const validationModeMd: PropertyValueDescription[] = [
 
 export const FormContext = createContext<IFormContext>(undefined as unknown as IFormContext);
 
-export function useFormContext (): IFormContext {
-  return useContext(FormContext);
-}
-
 export function useFormContextPart<T = unknown>(selector: (value: IFormContext) => T) {
   return useContextSelector(FormContext, selector);
 }
@@ -124,6 +119,7 @@ export const formControlTypes = [
   "switch",
   "slider",
   "colorpicker",
+  "items",
 ] as const;
 
 export const formControlTypesMd: PropertyValueDescription[] = [
@@ -182,6 +178,10 @@ export const formControlTypesMd: PropertyValueDescription[] = [
   {
     value: "colorpicker",
     description: "Renders ColorPicker",
+  },
+  {
+    value: "items",
+    description: "Renders Items",
   },
   {
     value: "custom",

@@ -1,24 +1,33 @@
-import type { CSSProperties, ReactNode } from "react";
-import { Fragment, memo, useCallback, useEffect, useId, useMemo, useState } from "react";
+import {
+  createContext,
+  CSSProperties,
+  Fragment,
+  memo,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+} from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
-import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { asOptionalBoolean } from "../../components-core/rendering/valueExtractor";
-import type {
+import {
   FormControlType,
   FormItemValidations,
+  useFormContextPart,
   ValidateEventHandler,
   ValidationMode,
 } from "../Form/FormContext";
-import { useFormContext, useFormContextPart } from "../Form/FormContext";
 import { TextBox } from "../TextBox/TextBoxNative";
 import { Toggle } from "../Toggle/Toggle";
 import { FileInput } from "../FileInput/FileInputNative";
 import { NumberBox } from "../NumberBox/NumberBoxNative";
 import { Select } from "../Select/SelectNative";
 import { RadioGroup } from "../RadioGroup/RadioGroupNative";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
 
 import {
   fieldChanged,
@@ -41,6 +50,8 @@ import { Slider } from "../Slider/SliderNative";
 import { ColorPicker } from "../ColorPicker/ColorPickerNative";
 import { HelperText } from "./HelperText";
 import { NumberBox2 } from "../NumberBox/NumberBox2Native";
+import { Items } from "../Items/ItemsNative";
+import { EMPTY_ARRAY } from "../../components-core/constants";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
   checkbox: "end",
@@ -66,6 +77,7 @@ type Props = {
   registerComponentApi?: RegisterComponentApiFn;
   maxTextLength?: number;
   inputRenderer?: any;
+  itemIndex?: number;
 };
 
 export const defaultProps: Pick<
@@ -77,6 +89,38 @@ export const defaultProps: Pick<
   enabled: true,
   customValidationsDebounce: 0,
 };
+
+const FormItemContext = createContext<any>({ parentFormItemId: null });
+
+function ArrayLikeFormItem({
+  children,
+  formItemId,
+  registerComponentApi,
+  value = EMPTY_ARRAY,
+  updateState,
+}) {
+  const formContextValue = useMemo(() => {
+    return {
+      parentFormItemId: formItemId,
+    };
+  }, [formItemId]);
+
+  const addItem = useEvent((item = {}) => {
+    updateState({ value: [...value, item] });
+  });
+  const removeItem = useEvent((index) => {
+    updateState({ value: value.filter((item, i) => i !== index) });
+  });
+
+  useEffect(() => {
+    registerComponentApi?.({
+      addItem: addItem,
+      removeItem: removeItem,
+    });
+  }, [addItem, registerComponentApi, removeItem]);
+
+  return <FormItemContext.Provider value={formContextValue}>{children}</FormItemContext.Provider>;
+}
 
 export const FormItem = memo(function FormItem({
   style,
@@ -95,10 +139,20 @@ export const FormItem = memo(function FormItem({
   registerComponentApi,
   maxTextLength,
   inputRenderer,
+  itemIndex,
   ...rest
 }: Props) {
   const defaultId = useId();
-  const [formItemId, setFormItemId] = useState(bindTo);
+  const { parentFormItemId } = useContext(FormItemContext);
+  const formItemId = useMemo(() => {
+    let formItemId = "";
+    if (parentFormItemId) {
+      if (itemIndex !== undefined) {
+        formItemId = `${parentFormItemId}[${itemIndex}].`;
+      }
+    }
+    return formItemId + (bindTo || `${defaultId}${UNBOUND_FIELD_SUFFIX}`);
+  }, [bindTo, defaultId, itemIndex, parentFormItemId]);
   const labelWidthValue = useFormContextPart((value) => labelWidth || value.itemLabelWidth);
   const labelBreakValue = useFormContextPart((value) =>
     labelBreak !== undefined ? labelBreak : value.itemLabelBreak,
@@ -106,13 +160,14 @@ export const FormItem = memo(function FormItem({
   const labelPositionValue = useFormContextPart<any>(
     (value) => labelPosition || value.itemLabelPosition || DEFAULT_LABEL_POSITIONS[type],
   );
-  const resetVersion = useFormContext()?.resetVersion;
   const initialValueFromSubject = useFormContextPart<any>((value) =>
     getByPath(value.originalSubject, formItemId),
   );
   const initialValue =
     initialValueFromSubject === undefined ? rest.initialValue : initialValueFromSubject;
+
   const value = useFormContextPart<any>((value) => getByPath(value.subject, formItemId));
+
   const validationResult = useFormContextPart((value) => value.validationResults[formItemId]);
   const dispatch = useFormContextPart((value) => value.dispatch);
   const formEnabled = useFormContextPart((value) => value.enabled);
@@ -120,16 +175,8 @@ export const FormItem = memo(function FormItem({
   const isEnabled = enabled && formEnabled;
 
   useEffect(() => {
-    const newId = bindTo || `${defaultId}${UNBOUND_FIELD_SUFFIX}` ;
-    setFormItemId(newId);
-    dispatch(fieldInitialized(newId, initialValue));
-  }, [bindTo, dispatch, initialValue]);
-
-  useEffect(() => {
-    if (resetVersion) {
-      dispatch(fieldInitialized(formItemId, initialValue, true));
-    }
-  }, [resetVersion, formItemId, initialValue, dispatch]);
+    dispatch(fieldInitialized(formItemId, initialValue));
+  }, [dispatch, formItemId, initialValue]);
 
   useValidation(validations, onValidate, value, dispatch, formItemId, customValidationsDebounce);
 
@@ -354,6 +401,19 @@ export const FormItem = memo(function FormItem({
       );
       break;
     }
+    case "items": {
+      formControl = (
+        <ArrayLikeFormItem
+          formItemId={formItemId}
+          registerComponentApi={registerComponentApi}
+          updateState={onStateChange}
+          value={value}
+        >
+          <Items items={value} renderItem={inputRenderer} />
+        </ArrayLikeFormItem>
+      );
+      break;
+    }
     case "custom": {
       formControl = children;
       break;
@@ -426,6 +486,9 @@ export function CustomFormItem({
   node: FormItemComponentDef;
   bindTo: string;
 }) {
+  // IMPORTANT NOTE:
+  //  why we use useFormContextPart, and not useFormContext?
+  //  because we want to avoid re-rendering the whole form when the form state changes.
   const value = useFormContextPart<any>((value) => getByPath(value.subject, bindTo));
   const validationResult = useFormContextPart((value) => value.validationResults[bindTo]);
   const dispatch = useFormContextPart((value) => value.dispatch);

@@ -284,6 +284,8 @@ export const formItemComponentRenderer = createComponentRenderer(
         validationMode={extractValue.asOptionalString(validationMode)}
         registerComponentApi={registerComponentApi}
         maxTextLength={extractValue(maxTextLength)}
+        itemIndex={extractValue("{$itemIndex}")}
+        initialValue={extractValue(node.props.initialValue)}
         inputRenderer={
           inputTemplate
             ? (contextVars) => (

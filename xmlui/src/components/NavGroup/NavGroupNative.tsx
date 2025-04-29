@@ -108,7 +108,7 @@ export const NavGroup = forwardRef(function NavGroup(
       iconVerticalCollapsed: iconVerticalCollapsed ?? defaultProps.iconVerticalCollapsed,
       iconVerticalExpanded: iconVerticalExpanded ?? defaultProps.iconVerticalExpanded,
     };
-  }, [level]);
+  }, [iconHorizontalCollapsed, iconHorizontalExpanded, iconVerticalCollapsed, iconVerticalExpanded, level]);
 
   return (
     <NavGroupContext.Provider value={navGroupContextValue}>

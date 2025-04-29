@@ -173,7 +173,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
         <SelectPortal container={root}>
           <SelectContent
             className={styles.selectContent}
-            position="popper"
+            position="item-aligned"
             style={{ height: height }}
           >
             <ScrollUpButton className={styles.selectScrollUpButton}>

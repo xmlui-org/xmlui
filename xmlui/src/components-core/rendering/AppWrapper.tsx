@@ -144,7 +144,7 @@ export const AppWrapper = ({
             <InspectorProvider
               sources={sources}
               projectCompilation={projectCompilation}
-              mockApi={globalProps.demoMockApi}
+              mockApi={globalProps?.demoMockApi}
             >
               <ConfirmationModalContextProvider>
                 <AppContent

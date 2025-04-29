@@ -10,5 +10,8 @@
     "./tools/create-app",
     "./tools/vscode",
     "./packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.15.0"
+  }
 }
