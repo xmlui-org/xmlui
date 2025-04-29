@@ -8,7 +8,12 @@ import styles from "./DropdownMenu.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { noop } from "../../components-core/constants";
-import type { IconPosition, ButtonVariant, ButtonThemeColor, AlignmentOptions } from "../abstractions";
+import type {
+  IconPosition,
+  ButtonVariant,
+  ButtonThemeColor,
+  AlignmentOptions,
+} from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { Icon } from "../Icon/IconNative";
 
@@ -119,6 +124,7 @@ type MenuItemProps = {
   style?: CSSProperties;
   to?: string;
   active?: boolean;
+  enabled?: boolean;
 };
 
 export const defaultMenuItemProps: Pick<MenuItemProps, "iconPosition" | "active"> = {
@@ -126,15 +132,19 @@ export const defaultMenuItemProps: Pick<MenuItemProps, "iconPosition" | "active"
   active: false,
 };
 
-export const MenuItem = forwardRef(function MenuItem({
-  children,
-  onClick = noop,
-  label,
-  style,
-  icon,
-  iconPosition = defaultMenuItemProps.iconPosition,
-  active = defaultMenuItemProps.active,
-}: MenuItemProps, ref) {
+export const MenuItem = forwardRef(function MenuItem(
+  {
+    children,
+    onClick = noop,
+    label,
+    style,
+    icon,
+    iconPosition = defaultMenuItemProps.iconPosition,
+    active = defaultMenuItemProps.active,
+    enabled = true,
+  }: MenuItemProps,
+  ref,
+) {
   const iconToStart = iconPosition === "start";
 
   return (
@@ -142,10 +152,18 @@ export const MenuItem = forwardRef(function MenuItem({
       style={style}
       className={classnames(styles.DropdownMenuItem, {
         [styles.active]: active,
+        [styles.disabled]: !enabled,
       })}
       onClick={(event) => {
+        if (!enabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
         event.stopPropagation();
-        onClick(event);
+        if (enabled) {
+          onClick(event);
+        }
       }}
       ref={ref as any}
     >
@@ -154,7 +172,7 @@ export const MenuItem = forwardRef(function MenuItem({
       {!iconToStart && icon}
     </ReactDropdownMenu.Item>
   );
-})
+});
 
 type SubMenuItemProps = {
   label?: string;
