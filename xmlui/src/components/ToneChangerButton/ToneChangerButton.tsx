@@ -17,7 +17,7 @@ function ToneChangerButton() {
   return (
     <Button
       variant="ghost"
-      icon={<Icon name={activeThemeTone === "light" ? "moon" : "sun"} />}
+      icon={<Icon name={activeThemeTone === "light" ? "stars" : "sun"} />}
       onClick={() => {
         activeThemeTone === "light" ? setActiveThemeTone("dark") : setActiveThemeTone("light");
       }}
