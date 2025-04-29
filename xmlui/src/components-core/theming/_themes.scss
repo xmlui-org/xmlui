@@ -440,6 +440,67 @@ $THEME-VAR-PREFIX: xmlui;
   border-end-end-radius: getThemeVar($themeVars, "borderEndEndRadius-#{$subject}");
 }
 
+// This function composes style variables for setting styles of text elements
+@function composeTextVars($themeVars, $subject) {
+  $tmp: appendThemeVar($themeVars, "textColor-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "fontFamily-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "fontSize-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "fontStyle-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "fontVariant-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "fontWeight-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "fontStretch-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "textDecorationLine-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "textDecorationColor-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "textDecorationStyle-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "textDecorationThickness-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "textUnderlineOffset-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "lineHeight-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "backgroundColor-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "textTransform-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "letterSpacing-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "wordSpacing-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "textShadow-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "textIndent-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "textAlign-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "textAlignLast-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "wordBreak-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "wordWrap-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "direction-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "writingMode-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "lineBreak-#{$subject}") !global;
+  @return $tmp;
+}
+
+@mixin textVars($themeVars, $subject) {
+  color: getThemeVar($themeVars, "textColor-#{$subject}");
+  font-family: getThemeVar($themeVars, "fontFamily-#{$subject}");
+  font-size: getThemeVar($themeVars, "fontSize-#{$subject}");
+  font-style: getThemeVar($themeVars, "fontStyle-#{$subject}");
+  font-weight: getThemeVar($themeVars, "fontWeight-#{$subject}");
+  font-stretch: getThemeVar($themeVars, "fontStretch-#{$subject}");
+  text-decoration-line: getThemeVar($themeVars, "textDecorationLine-#{$subject}");
+  text-decoration-color: getThemeVar($themeVars, "textDecorationColor-#{$subject}");
+  text-decoration-style: getThemeVar($themeVars, "textDecorationStyle-#{$subject}");
+  text-decoration-thickness: getThemeVar($themeVars, "textDecorationThickness-#{$subject}");
+  text-underline-offset: getThemeVar($themeVars, "textUnderlineOffset-#{$subject}");
+  line-height: getThemeVar($themeVars, "lineHeight-#{$subject}");
+  background-color: getThemeVar($themeVars, "backgroundColor-#{$subject}");
+  text-transform: getThemeVar($themeVars, "textTransform-#{$subject}");
+  letter-spacing: getThemeVar($themeVars, "letterSpacing-#{$subject}");
+  word-spacing: getThemeVar($themeVars, "wordSpacing-#{$subject}");
+  text-shadow: getThemeVar($themeVars, "textShadow-#{$subject}");
+  text-indent: getThemeVar($themeVars, "textIndent-#{$subject}"); 
+  text-align: getThemeVar($themeVars, "textAlign-#{$subject}");
+  text-align-last: getThemeVar($themeVars, "textAlignLast-#{$subject}");
+  word-break: getThemeVar($themeVars, "wordBreak-#{$subject}");
+  word-wrap: getThemeVar($themeVars, "wordWrap-#{$subject}");
+  direction: getThemeVar($themeVars, "direction-#{$subject}");
+  writing-mode: getThemeVar($themeVars, "writingMode-#{$subject}");
+  line-break: getThemeVar($themeVars, "lineBreak-#{$subject}");
+}
+
+
+
 // =====================================================================================================================
 // CSS variables for miscellaneous shadows
 $boxShadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
