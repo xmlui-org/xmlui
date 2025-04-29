@@ -8,12 +8,19 @@ $themeVars: ();
 
 $component: "TableOfContents";
 $themeVars: t.composePaddingVars($themeVars, "#{$component}Item");
+$themeVars: t.composeTextVars($themeVars, "#{$component}Item");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-1");
+$themeVars: t.composeTextVars($themeVars, "#{$component}Item-level-1");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-2");
+$themeVars: t.composeTextVars($themeVars, "#{$component}Item-level-2");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-3");
+$themeVars: t.composeTextVars($themeVars, "#{$component}Item-level-3");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-4");
+$themeVars: t.composeTextVars($themeVars, "#{$component}Item-level-4");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-5");
+$themeVars: t.composeTextVars($themeVars, "#{$component}Item-level-5");
 $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
+$themeVars: t.composeTextVars($themeVars, "#{$component}Item-level-6");
 
 .nav {
   background-color: createThemeVar("backgroundColor-TableOfContents");
@@ -49,37 +56,39 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}Item-level-6");
 
       .link {
         color: createThemeVar("textColor-#{$component}Item");
-        font-size: createThemeVar("fontSize-#{$component}Item");
-        font-weight: createThemeVar("fontWeight-#{$component}Item");
-        font-family: createThemeVar("fontFamily-#{$component}Item");
-        text-transform: createThemeVar("textTransform-#{$component}Item");
-        letter-spacing: createThemeVar("letterSpacing-#{$component}Item");
         overflow-wrap: break-word;
         display: block;
         @include t.paddingVars($themeVars, "#{$component}Item");
+        @include t.textVars($themeVars, "#{$component}Item");
 
         &.head_1 {
           @include t.paddingVars($themeVars, "#{$component}Item-level-1");
+          @include t.textVars($themeVars, "#{$component}Item-level-1");
         }
 
         &.head_2 {
           @include t.paddingVars($themeVars, "#{$component}Item-level-2");
+          @include t.textVars($themeVars, "#{$component}Item-level-2");
         }
 
         &.head_3 {
           @include t.paddingVars($themeVars, "#{$component}Item-level-3");
+          @include t.textVars($themeVars, "#{$component}Item-level-3");
         }
 
         &.head_4 {
           @include t.paddingVars($themeVars, "#{$component}Item-level-4");
+          @include t.textVars($themeVars, "#{$component}Item-level-4");
         }
 
         &.head_5 {
           @include t.paddingVars($themeVars, "#{$component}Item-level-5");
+          @include t.textVars($themeVars, "#{$component}Item-level-5");
         }
 
         &.head_6 {
           @include t.paddingVars($themeVars, "#{$component}Item-level-6");
+          @include t.textVars($themeVars, "#{$component}Item-level-6");
         }
       }
 
