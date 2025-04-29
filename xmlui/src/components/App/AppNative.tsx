@@ -332,39 +332,6 @@ export function App({
         </div>
       );
       break;
-    case "vertical-constrained-width":
-      content = (
-        <div
-          className={classnames(wrapperBaseClasses, styles.verticalConstrained)}
-          style={styleWithHelpers}
-          ref={scrollPageContainerRef}
-        >
-          <header
-            className={classnames(styles.headerWrapper, styles.sticky)}
-            ref={headerRefCallback}
-          >
-            <div className={styles.header} style={{ paddingInline: 0 }}>
-              {header}
-            </div>
-          </header>
-          <div className={classnames(styles.content, styles.verticalConstrained)}>
-            {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
-            <main className={styles.contentWrapper}>
-              <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-                <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
-                    {children}
-                  </div>
-                </ScrollContext.Provider>
-              </div>
-            </main>
-          </div>
-          <div className={styles.footerWrapper} ref={footerRefCallback}>
-            {footer}
-          </div>
-        </div>
-      );
-      break;
     case "condensed":
     case "condensed-sticky":
       content = (
@@ -473,7 +440,6 @@ export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
     case "vertical":
     case "vertical-sticky":
     case "vertical-full-header":
-    case "vertical-constrained-width":
       return "vertical";
     default:
       return "horizontal";
