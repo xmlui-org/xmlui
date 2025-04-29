@@ -5,6 +5,7 @@ import { useInspectMode } from "../../components-core/InspectorContext";
 import styles from "./InspectButton.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { CSSProperties, ReactNode } from "react";
+import { PiFileCode } from "react-icons/pi";
 
 const COMP = "InspectButton";
 export const InspectButtonMd = createMetadata({
@@ -22,12 +23,14 @@ function InspectButton({ children, style }: { children: ReactNode; style: CSSPro
   return (
     <Button
       style={style}
+      className={styles.inspectButton}
       themeColor={inspectMode ? "primary" : "secondary"}
       variant={inspectMode ? "solid" : "outlined"}
       onClick={() => {
         setInspectMode((prev: any) => !prev);
       }}
     >
+      <PiFileCode className={styles.icon}/>
       {children}
     </Button>
   );
