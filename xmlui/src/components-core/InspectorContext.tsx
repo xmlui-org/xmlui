@@ -172,7 +172,7 @@ function InspectButton({
       {
         name: "offset",
         options: {
-          offset: [0, -18],
+          offset: [-4, -18],
         },
       },
       {
@@ -271,7 +271,7 @@ function InspectButton({
       htmlElement.removeEventListener("mouseenter", mouseenter);
       htmlElement.removeEventListener("mouseleave", mouseleave);
     };
-  }, [inspectId, node, inspectMode, setInspectedNode, setShowCode]);
+  }, [inspectId, node, inspectMode, setShowCode]);
 
   return (
     <>
@@ -281,7 +281,7 @@ function InspectButton({
           !!root &&
           createPortal(
               <Button
-                variant={"solid"}
+                variant={"ghost"}
                 className={classnames(styles.wrapper, "_debug-inspect-button")}
                 ref={(el) => setPopperElement(el)}
                 style={{ ...popperStyles.popper, padding: 0 }}

@@ -1,22 +1,23 @@
 @use "./theming/themes" as themes;
 
 .wrapper {
-  opacity: 0.6;
   position: relative;
+  opacity: .5;
 
   &:hover {
     opacity: 1;
   }
+
+  button[data-popper-reference-hidden='true'] {
+    opacity: 0;
+    pointer-events: none;
+    display: none;
+  }
 }
 
-button[data-popper-reference-hidden='true'] {
-  opacity: 0;
-  pointer-events: none;
-  display: none;
-}
 
 .inspectIcon {
-  font-size: 1rem;
+  font-size: 1.4rem;
 }
 
 .inspectableNode {
