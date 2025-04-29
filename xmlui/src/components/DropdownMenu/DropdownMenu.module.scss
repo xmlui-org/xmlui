@@ -33,6 +33,7 @@ $backgroundColor-MenuItem--active--hover: createThemeVar("backgroundColor-MenuIt
 $color-MenuItem--hover: createThemeVar("color-MenuItem--hover");
 $color-MenuItem--active: createThemeVar("color-MenuItem--active");
 $color-MenuItem--active--hover: createThemeVar("color-MenuItem--active--hover");
+$color-MenuItem--disabled: createThemeVar("color-MenuItem--disabled");
 $marginTop-MenuSeparator: createThemeVar("marginTop-MenuSeparator");
 $marginBottom-MenuSeparator: createThemeVar("marginBottom-MenuSeparator");
 $width-MenuSeparator: createThemeVar("width-MenuSeparator");
@@ -84,6 +85,17 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
     &:hover {
       background-color: $backgroundColor-MenuItem--active--hover;
       color: $color-MenuItem--active--hover;
+    }
+  }
+
+  &.disabled {
+    background-color: $backgroundColor-MenuItem;
+    color: $color-MenuItem--disabled;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: $backgroundColor-MenuItem;
+      color: $color-MenuItem--disabled;
     }
   }
 

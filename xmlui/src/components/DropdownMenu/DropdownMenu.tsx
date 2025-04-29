@@ -129,6 +129,7 @@ export const MenuItemMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultMenuItemProps.active,
     },
+    enabled: dEnabled(),
   },
   events: {
     click: dClick(MICOMP),
@@ -137,6 +138,7 @@ export const MenuItemMd = createMetadata({
   defaultThemeVars: {
     [`backgroundColor-${MICOMP}`]: "$backgroundColor-dropdown-item",
     [`color-${MICOMP}`]: "$textColor-primary",
+    [`color-${MICOMP}--disabled`]: "$textColor--disabled",
     [`fontFamily-${MICOMP}`]: "$fontFamily",
     [`fontSize-${MICOMP}`]: "$fontSize-small",
     [`paddingVertical-${MICOMP}`]: "$space-2",
@@ -173,6 +175,7 @@ export const menuItemRenderer = createComponentRenderer(
         iconPosition={extractValue(node.props.iconPosition)}
         icon={node.props?.icon && <Icon name={extractValue(node.props.icon)} />}
         active={extractValue.asOptionalBoolean(node.props.active, false)}
+        enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
       >
         {renderChild(node.children)}
       </MenuItem>
