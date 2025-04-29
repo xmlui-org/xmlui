@@ -108,13 +108,14 @@ export function LineChart({
       <ResponsiveContainer style={style}>
         <RLineChart accessibilityLayer data={data}>
           <XAxis
-            interval="preserveStartEnd"
+            interval="preserveEnd"
             dataKey={nameKey}
             tickLine={false}
             hide={hideX}
             axisLine={false}
             tick={{ fill: "currentColor" }}
             tickFormatter={tickFormatter}
+            minTickGap={5}
           />
           {!hideTooltip && <Tooltip content={<TooltipContent />} />}
           {Object.keys(config).map((key, index) => (
