@@ -14,10 +14,10 @@ import { createPortal } from "react-dom";
 import { useTheme } from "./theming/ThemeContext";
 import classnames from "classnames";
 import { Button } from "../components/Button/ButtonNative";
-import Icon from "../components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
 import { useComponentRegistry } from "../components/ComponentRegistryContext";
 import { ProjectCompilation } from "../abstractions/scripting/Compilation";
+import { PiFileCode } from "react-icons/pi";
 
 // --- The context object that is used to store the inspector information.
 interface IInspectorContext {
@@ -60,7 +60,6 @@ export function InspectorProvider({
   const [devToolsSize, setDevToolsSize] = useState(0);
   const [devToolsSide, setDevToolsSide] = useState<"bottom" | "left" | "right">("bottom");
   const [inspectMode, setInspectMode] = useState(false);
-  const [lastInspectedElement, setLastInspectedElement] = useState<HTMLElement | null>(null);
 
   const componentRegistry = useComponentRegistry();
 
@@ -281,30 +280,30 @@ function InspectButton({
         : visible &&
           !!root &&
           createPortal(
-            <Button
-              variant={"ghost"}
-              className={classnames(styles.wrapper, "_debug-inspect-button")}
-              ref={(el) => setPopperElement(el)}
-              style={{ ...popperStyles.popper, padding: 0 }}
-              {...attributes.popper}
-              onMouseEnter={() => {
-                hoverRef.current = true;
-                if (timeoutRef.current) {
-                  clearTimeout(timeoutRef.current);
-                  timeoutRef.current = null;
-                }
-              }}
-              onMouseLeave={() => {
-                hoverRef.current = false;
-                setVisible(false);
-              }}
-              onClick={() => {
-                setInspectedNode(node);
-                setShowCode(true);
-              }}
-            >
-              <Icon name={"inspect"} size={"md"} />
-            </Button>,
+              <Button
+                variant={"solid"}
+                className={classnames(styles.wrapper, "_debug-inspect-button")}
+                ref={(el) => setPopperElement(el)}
+                style={{ ...popperStyles.popper, padding: 0 }}
+                {...attributes.popper}
+                onMouseEnter={() => {
+                  hoverRef.current = true;
+                  if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                    timeoutRef.current = null;
+                  }
+                }}
+                onMouseLeave={() => {
+                  hoverRef.current = false;
+                  setVisible(false);
+                }}
+                onClick={() => {
+                  setInspectedNode(node);
+                  setShowCode(true);
+                }}
+              >
+                <PiFileCode className={styles.inspectIcon}/>
+              </Button>,
             root,
           )}
     </>

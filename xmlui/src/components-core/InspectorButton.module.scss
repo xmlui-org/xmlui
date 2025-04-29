@@ -1,17 +1,22 @@
 @use "./theming/themes" as themes;
 
 .wrapper {
-  opacity: 0.5;
+  opacity: 0.6;
+  position: relative;
 
   &:hover {
     opacity: 1;
   }
+}
 
-  &[data-popper-reference-hidden='true'] {
-    opacity: 0;
-    pointer-events: none;
-    display: none;
-  }
+button[data-popper-reference-hidden='true'] {
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+}
+
+.inspectIcon {
+  font-size: 1rem;
 }
 
 .inspectableNode {
@@ -27,7 +32,8 @@
 .inspectOverlay {
   cursor: pointer;
   position: absolute;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background: transparent;
@@ -45,10 +51,4 @@
   .inspectOverlay {
     background: rgba(32, 107, 196, 0.1);
   }
-}
-
-.inspectIcon {
-  position: absolute;
-  right: 0;
-  top: -10px;
 }
