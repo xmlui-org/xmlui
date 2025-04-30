@@ -39,6 +39,14 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   padding-bottom: $paddingBottom-MarkDown;
   background-color: $backgroundColor-MarkDown;
 
+  img {
+      display: block;
+      max-width: 20%;
+      max-height: 400px;
+      width: auto;
+      height: auto;
+    }
+
   // --- Blockquote
 
   .blockquote {
