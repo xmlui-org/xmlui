@@ -1,9 +1,10 @@
+import type {
+  CSSProperties,
+  ReactNode} from "react";
 import {
   createContext,
-  CSSProperties,
   Fragment,
   memo,
-  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -15,12 +16,13 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { asOptionalBoolean } from "../../components-core/rendering/valueExtractor";
-import {
+import type {
   FormControlType,
   FormItemValidations,
-  useFormContextPart,
   ValidateEventHandler,
-  ValidationMode,
+  ValidationMode} from "../Form/FormContext";
+import {
+  useFormContextPart
 } from "../Form/FormContext";
 import { TextBox } from "../TextBox/TextBoxNative";
 import { Toggle } from "../Toggle/Toggle";
@@ -105,9 +107,10 @@ function ArrayLikeFormItem({
     };
   }, [formItemId]);
 
-  const addItem = useEvent((item = {}) => {
+  const addItem = useEvent((item) => {
     updateState({ value: [...value, item] });
   });
+
   const removeItem = useEvent((index) => {
     updateState({ value: value.filter((item, i) => i !== index) });
   });
@@ -140,19 +143,27 @@ export const FormItem = memo(function FormItem({
   maxTextLength,
   inputRenderer,
   itemIndex,
+  initialValue: initialValueFromProps,
   ...rest
 }: Props) {
   const defaultId = useId();
   const { parentFormItemId } = useContext(FormItemContext);
   const formItemId = useMemo(() => {
-    let formItemId = "";
+    const safeBindTo = bindTo || `${defaultId}${UNBOUND_FIELD_SUFFIX}`;
     if (parentFormItemId) {
       if (itemIndex !== undefined) {
-        formItemId = `${parentFormItemId}[${itemIndex}].`;
+        let parentFieldReference = `${parentFormItemId}[${itemIndex}]`;
+        if (bindTo !== undefined && bindTo.trim() === "") {
+          return parentFieldReference;
+        } else {
+          return `${parentFieldReference}.${safeBindTo}`;
+        }
       }
+    } else {
+      return safeBindTo;
     }
-    return formItemId + (bindTo || `${defaultId}${UNBOUND_FIELD_SUFFIX}`);
   }, [bindTo, defaultId, itemIndex, parentFormItemId]);
+
   const labelWidthValue = useFormContextPart((value) => labelWidth || value.itemLabelWidth);
   const labelBreakValue = useFormContextPart((value) =>
     labelBreak !== undefined ? labelBreak : value.itemLabelBreak,
@@ -164,7 +175,7 @@ export const FormItem = memo(function FormItem({
     getByPath(value.originalSubject, formItemId),
   );
   const initialValue =
-    initialValueFromSubject === undefined ? rest.initialValue : initialValueFromSubject;
+    initialValueFromSubject === undefined ? initialValueFromProps : initialValueFromSubject;
 
   const value = useFormContextPart<any>((value) => getByPath(value.subject, formItemId));
 
@@ -175,7 +186,9 @@ export const FormItem = memo(function FormItem({
   const isEnabled = enabled && formEnabled;
 
   useEffect(() => {
-    dispatch(fieldInitialized(formItemId, initialValue));
+    if(initialValue !== undefined){
+      dispatch(fieldInitialized(formItemId, initialValue));
+    }
   }, [dispatch, formItemId, initialValue]);
 
   useValidation(validations, onValidate, value, dispatch, formItemId, customValidationsDebounce);

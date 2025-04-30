@@ -136,13 +136,41 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 
     await (await createButtonDriver("addButton")).click();
     await (await createFormItemDriver("text0")).textBox.fill("John");
+    await (await createButtonDriver("addButton")).click();
+    await (await createFormItemDriver("text1")).textBox.fill("Peter");
     const driver = await createFormDriver("form");
     await driver.submitForm();
     await expect.poll(testStateDriver.testState).toStrictEqual({
-      arrayItems: [{name: "John"}],
+      arrayItems: [{name: "John"}, {name: "Peter"}],
     });
   });
+
+  test(`submit with type 'items', empty bindTo`, async ({
+                                            initTestBed,
+                                            createFormDriver,
+                                            createButtonDriver,
+                                            createFormItemDriver
+                                          }) => {
+    const {testStateDriver} = await initTestBed(`
+      <Form onSubmit="data => testState = data" testId="form">
+        <FormItem testId="formItem" type="items" bindTo="arrayItems" id="arrayItems">
+            <FormItem testId="text{$itemIndex}" bindTo=""/>
+        </FormItem>
+        <Button testId="addButton" onClick="arrayItems.addItem()"/>
+      </Form>`);
+
+    await (await createButtonDriver("addButton")).click();
+    await (await createFormItemDriver("text0")).textBox.fill("John");
+    await (await createButtonDriver("addButton")).click();
+    await (await createFormItemDriver("text1")).textBox.fill("Peter");
+    const driver = await createFormDriver("form");
+    await driver.submitForm();
+    await expect.poll(testStateDriver.testState).toStrictEqual({
+      arrayItems: ["John", "Peter"],
+    });
+  })
 });
+
 
 // --- Testing
 

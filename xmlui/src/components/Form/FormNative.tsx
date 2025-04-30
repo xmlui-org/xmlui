@@ -71,6 +71,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
     }
     case FormActionKind.FIELD_REMOVED: {
       delete state.validationResults[uid];
+      delete state.interactionFlags[uid];
       break;
     }
     case FormActionKind.FIELD_VALUE_CHANGED: {

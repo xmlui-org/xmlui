@@ -30,7 +30,7 @@ export function Items({ items, renderItem, reverse = false }: Props) {
     <>
       {itemsToRender.map((item, index) => {
         return <Fragment key={index}>
-          {renderItem(
+          {renderItem?.(
             {
               $item: item,
               $itemIndex: index,
