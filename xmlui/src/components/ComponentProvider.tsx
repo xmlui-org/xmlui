@@ -238,6 +238,7 @@ import {
 import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
 import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
 import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
+import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -621,6 +622,9 @@ export class ComponentRegistry {
     this.registerCoreComponent(htmlVarTagRenderer);
     this.registerCoreComponent(htmlVideoTagRenderer);
     this.registerCoreComponent(htmlWbrTagRenderer);
+
+    // --- Nested app and related components
+    this.registerCoreComponent(nestedAppComponentRenderer);
 
     this.registerActionFn(apiAction);
     this.registerActionFn(downloadAction);

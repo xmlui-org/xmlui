@@ -195,6 +195,7 @@ export class ApiInterceptor {
           status: successStatusCode,
         });
       }
+      console.log(operationId, ret)
       return HttpResponse.json(ret, {
         headers: headers,
         status: successStatusCode,

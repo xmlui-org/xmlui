@@ -73,6 +73,9 @@ export function Preview() {
       apiUrl: apiUrl,
     };
 
+    console.log("mock", mock);
+    console.log("apiWorker", apiWorker);
+
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
         <ApiInterceptorProvider interceptor={mock} apiWorker={apiWorker}>

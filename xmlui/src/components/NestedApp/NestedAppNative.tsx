@@ -1,0 +1,144 @@
+import { useRef, useEffect, useMemo, useId } from "react";
+import type { Root } from "react-dom/client";
+import ReactDOM from "react-dom/client";
+import { CompoundComponentDef } from "xmlui";
+import { AppRoot } from "../../components-core/rendering/AppRoot";
+import type { ThemeTone } from "../../abstractions/ThemingDefs";
+import styles from "./NestedApp.module.scss";
+import { errReportComponent, xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
+import { ApiInterceptorProvider } from "../../components-core/interception/ApiInterceptorProvider";
+import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
+import { setupWorker } from "msw/browser";
+
+type NestedAppProps = {
+  api?: any;
+  app: string;
+  components?: any[];
+  config?: any;
+  activeTone?: ThemeTone;
+  activeTheme?: string;
+};
+
+export function NestedApp({
+  api,
+  app,
+  components = [],
+  config,
+  activeTheme,
+  activeTone,
+}: NestedAppProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const contentRootRef = useRef<Root | null>(null);
+  const nestedAppId = useId();
+
+  const apiWorker = useMemo(() => {
+    console.log("HERE");
+    if (typeof document !== "undefined") {
+      return setupWorker();
+    }
+  }, [nestedAppId]);
+
+  useEffect(() => {
+    apiWorker?.start({
+      onUnhandledRequest: "bypass",
+      quiet: true,
+    });
+    return () => apiWorker?.stop();
+  }, [apiWorker]);
+
+  console.log("apiWorker", apiWorker);
+
+  const mock = useMemo(() => {
+    return api
+      ? {
+          type: "in-memory",
+          ...api,
+          apiUrl: "/api",
+        }
+      : undefined;
+  }, [api]);
+
+  console.log("mock", mock);
+
+  useEffect(() => {
+    if (!contentRootRef.current && rootRef.current) {
+      contentRootRef.current = ReactDOM.createRoot(rootRef.current);
+    }
+    let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
+      `<Fragment xmlns:XMLUIExtensions="component-ns">${app}</Fragment>`,
+    );
+    if (errors.length > 0) {
+      component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
+    }
+    const compoundComponents: CompoundComponentDef[] = components.map((src) => {
+      const isErrorReportComponent = typeof src !== "string";
+      if (isErrorReportComponent) {
+        return src;
+      }
+      let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
+        src as string,
+      );
+      if (errors.length > 0) {
+        return errReportComponent(errors, `nested xmlui`, erroneousCompoundComponentName);
+      }
+      return component;
+    });
+
+    let globalProps = {
+      name: config?.name,
+      ...(config?.appGlobals || {}),
+      apiUrl: "",
+    };
+
+    contentRootRef.current?.render(
+      <ErrorBoundary node={component}>
+        <ApiInterceptorProvider interceptor={mock} apiWorker={apiWorker}>
+          <AppRoot
+            key={`app-${nestedAppId}`}
+            previewMode={true}
+            standalone={true}
+            trackContainerHeight={true}
+            node={component}
+            globalProps={globalProps}
+            defaultTheme={activeTheme || config?.defaultTheme}
+            defaultTone={(activeTone || config?.defaultTone) as ThemeTone}
+            contributes={{
+              compoundComponents,
+              themes: config?.themes,
+            }}
+            resources={config?.resources}
+          />
+        </ApiInterceptorProvider>
+      </ErrorBoundary>,
+    );
+  }, [
+    nestedAppId,
+    activeTone,
+    activeTheme,
+    app,
+    config,
+    config?.themes,
+    config?.name,
+    config?.appGlobals,
+    config?.resources,
+    config?.defaultTheme,
+    config?.defaultTone,
+    components,
+    mock,
+    apiWorker,
+  ]);
+  return (
+    <div className={styles.nestedApp}>
+      <div
+        ref={rootRef}
+        style={{
+          width: "100%",
+          height: "100%",
+          overflow: "auto",
+          position: "relative",
+          isolation: "isolate",
+        }}
+      />
+    </div>
+  );
+}
