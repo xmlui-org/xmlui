@@ -10,7 +10,6 @@ import {
   TextDocumentSyncKind,
   DidChangeConfigurationNotification,
   TextDocuments,
-  ProposedFeatures,
 } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import collectedComponentMetadata from "./xmlui-metadata-generated.mjs";

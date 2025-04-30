@@ -4,7 +4,7 @@ import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./common/syntax-node-utilities";
 import * as docGen from "./common/docs-generation";
-import type { ComponentMetadataCollection } from "./common/types";
+import type { ComponentMetadataCollection, MetadataProvider } from "./common/types";
 
 type SimpleHover = null | {
   value: string;
@@ -17,7 +17,7 @@ type SimpleHover = null | {
 type HoverContex = {
   parseResult: ParseResult;
   getText: GetText;
-  metaByComp: ComponentMetadataCollection;
+  metaByComp: MetadataProvider;
 };
 /**
  * @returns The hover content string
@@ -41,7 +41,7 @@ export function handleHover(
       switch (parentNode?.kind) {
         case SyntaxKind.TagNameNode: {
           return hoverName({
-            collectedComponentMetadata: metaByComp,
+            metaByComp: metaByComp,
             tagNameNode: parentNode,
             identNode: atNode,
             getText,
@@ -67,7 +67,7 @@ function hoverAttr({
   parentStack,
   getText,
 }: {
-  metaByComp: ComponentMetadataCollection;
+  metaByComp: MetadataProvider;
   attrKeyNode: Node;
   parentStack: Node[];
   getText: GetText;
@@ -124,7 +124,7 @@ function hoverAttr({
   if (!propMetadata) {
     return null;
   }
-  const value = docGen.generatePropDescription(propName, propMetadata);
+  const value = docGen.generateAttrDescription(propName, propMetadata);
   return {
     value,
     range: {
@@ -135,12 +135,12 @@ function hoverAttr({
 }
 
 function hoverName({
-  collectedComponentMetadata,
+  metaByComp,
   tagNameNode,
   identNode,
   getText,
 }: {
-  collectedComponentMetadata: ComponentMetadataCollection;
+  metaByComp: MetadataProvider;
   tagNameNode: Node;
   identNode: Node;
   getText: GetText;
@@ -149,7 +149,7 @@ function hoverName({
   if (!compName) {
     return null;
   }
-  const compMetadata = collectedComponentMetadata[compName];
+  const compMetadata = metaByComp.getComponent(compName)?.getMetadata();
   if (!compMetadata) {
     return null;
   }

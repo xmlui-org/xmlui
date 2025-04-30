@@ -1,69 +1,110 @@
-import type { ComponentMetadata } from "../../../abstractions/ComponentDefs"
+import type { ComponentMetadata, ComponentPropertyMetadata } from "../../../abstractions/ComponentDefs"
+import { layoutOptionKeys } from "../../../components-core/descriptorHelper";
 
 type RestrictedComponentMetadata = Pick<ComponentMetadata, "description" | "status" | "props" | "events" | "apis" | "contextVars" | "allowArbitraryProps" | "shortDescription">
 
 export type ComponentMetadataCollection = Record<string, RestrictedComponentMetadata>
 
 export class MetadataProvider {
-    constructor(private readonly metadataCollection: ComponentMetadataCollection) {}
+  constructor(private readonly metadataCollection: ComponentMetadataCollection) {}
 
-    componentNames(): string[] {
-        return Object.keys(this.metadataCollection);
+  componentNames(): string[] {
+    return Object.keys(this.metadataCollection);
+  }
+
+  getComponent(componentName: string): ComponentMetadataProvider | null {
+    const providerData = this.metadataCollection[componentName];
+    if (!providerData) {
+      return null;
     }
 
-    getComponent(componentName: string): ComponentMetadataProvider | null {
-      const providerData = this.metadataCollection[componentName];
-      if (!providerData) {
-        return null;
-      }
-
-      return new ComponentMetadataProvider(providerData);
-    }
+    return new ComponentMetadataProvider(providerData);
+  }
 }
+
+export type AttributeKind = "prop" | "event" | "api" | "implicit" | "layout"
+export type TaggedAttribute = { name: string, kind: AttributeKind };
 
 class ComponentMetadataProvider {
-    constructor(private readonly metadata: RestrictedComponentMetadata) {}
+  constructor(private readonly metadata: RestrictedComponentMetadata) {}
 
-    getProp(name: string) {
+  getProp(name: string) {
+    return this.metadata.props[name];
+  }
+
+  getAttrMd({ name, kind}: TaggedAttribute){
+    switch (kind){
+      case "api":
+        return this.metadata.apis[name];
+      case "event":
+        return this.metadata.events[name];
+      case "prop":
         return this.metadata.props[name];
+
+      case "implicit":
+        return implicitPropsMetadata[name];
+      case "layout":
+        return layoutMdForKey(name)
+    }
+  }
+
+  getAllAttributes() {
+    const attrNames: TaggedAttribute[] = [];
+    for (const key of Object.keys(this.metadata.props ?? {})) {
+      attrNames.push({ name: key, kind: "prop" });
+    }
+    for (const key of Object.keys(this.metadata.events ?? {})) {
+      attrNames.push({ name: key, kind: "event" });
+    }
+    for (const key of Object.keys(this.metadata.apis ?? {})) {
+      attrNames.push({ name: key, kind: "api" });
+    }
+    for (const layoutKey of layoutOptionKeys){
+      attrNames.push({name: layoutKey, kind: "layout"})
+    }
+    for (const implicitPropKey of Object.keys(implicitPropsMetadata)){
+      attrNames.push({name: implicitPropKey, kind: "layout"})
     }
 
-    getAllAttributes(): string[] {
-      const attrNames = [];
-      for (const key of Object.keys(this.metadata.props)){
-        attrNames.push({name: key, kind: "prop"});
-      }
-      for (const key of Object.keys(this.metadata.events)){
-        attrNames.push({name: key, kind: "event"});
-      }
-      for (const key of Object.keys(this.metadata.apis)){
-        attrNames.push({name: key, kind: "api"});
-      }
-      add other props here
-      return attrNames;
-    }
+    return attrNames;
+  }
 
-    get events(): Record<string, string> {
-        return this.metadata.events;
-    }
+  get events(): Record<string, string> {
+    return this.metadata.events;
+  }
 
-    get apis(): Record<string, string> {
-        return this.metadata.apis;
-    }
+  get apis(): Record<string, string> {
+    return this.metadata.apis;
+  }
 
-    get contextVars(): Record<string, string> {
-        return this.metadata.contextVars;
-    }
+  get contextVars(): Record<string, string> {
+    return this.metadata.contextVars;
+  }
 
-    get allowArbitraryProps(): boolean {
-        return this.metadata.allowArbitraryProps;
-    }
+  get allowArbitraryProps(): boolean {
+    return this.metadata.allowArbitraryProps;
+  }
 
-    get shortDescription(): string {
-        return this.metadata.shortDescription;
-    }
+  get shortDescription(): string {
+    return this.metadata.shortDescription;
+  }
 
-    getMetadata(): RestrictedComponentMetadata {
-        return this.metadata;
-    }
+  getMetadata(): RestrictedComponentMetadata {
+    return this.metadata;
+  }
 }
+
+function layoutMdForKey(name: string): ComponentPropertyMetadata {
+  throw new Error("layout properties do not have a documentation yet.");
+}
+
+const implicitPropsMetadata: Record<string, ComponentPropertyMetadata> = {
+  inspect: {
+    description: "Determines whether the component can be inspected or not",
+    defaultValue: false,
+    valueType: "boolean",
+  },
+  data: {
+    description: "Specifies the data source for a component. Can be a URL string (fetched automatically), a DataSource or an expression to evaluate. Changes to this property trigger UI updates once data is loaded.",
+  },
+};
