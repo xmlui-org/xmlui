@@ -1,5 +1,14 @@
 import type { CSSProperties, ForwardedRef, ReactNode } from "react";
-import React, { forwardRef, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import {
   Content as SelectContent,
@@ -101,6 +110,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
       | "min-content"
       | string
       | number;
+    children: React.ReactNode;
     options: Set<Option>;
   },
   forwardedRef,
@@ -112,6 +122,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
     autoFocus,
     onValueChange,
     validationStatus,
+    children,
     value,
     height,
     style,
@@ -135,86 +146,49 @@ const SimpleSelect = forwardRef(function SimpleSelect(
     [onValueChange, options],
   );
 
-  const { optionRenderer, optionLabelRenderer, value: selectedValue } = useSelect();
-
   return (
-    <SelectRoot value={stringValue} onValueChange={onValChange}>
-      <SelectTrigger
-        id={id}
-        style={style}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        disabled={!enabled}
-        className={classnames(styles.selectTrigger, {
-          [styles.error]: validationStatus === "error",
-          [styles.warning]: validationStatus === "warning",
-          [styles.valid]: validationStatus === "valid",
-        })}
-        ref={ref}
-        autoFocus={autoFocus}
-      >
-        <div className={styles.selectValue}>
-          <SelectValue placeholder={placeholder} />
-        </div>
-        <SelectIcon asChild>
-          <Icon name="chevrondown" />
-        </SelectIcon>
-      </SelectTrigger>
-      <SelectPortal container={root}>
-        <SelectContent
-          className={styles.selectContent}
-          position="popper"
-          style={{ height: height }}
+    <OptionTypeProvider Component={SelectOption}>
+      <SelectRoot value={stringValue} onValueChange={onValChange}>
+        <SelectTrigger
+          id={id}
+          style={style}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          disabled={!enabled}
+          className={classnames(styles.selectTrigger, {
+            [styles.error]: validationStatus === "error",
+            [styles.warning]: validationStatus === "warning",
+            [styles.valid]: validationStatus === "valid",
+          })}
+          ref={ref}
+          autoFocus={autoFocus}
         >
-          <ScrollUpButton className={styles.selectScrollUpButton}>
-            <Icon name="chevronup" />
-          </ScrollUpButton>
-          <SelectViewport className={classnames(styles.selectViewport)}>
-            {Array.from(options)?.map((option) => (
-              <SelectItem
-                ref={ref}
-                className={styles.selectItem}
-                value={option.value + ""}
-                disabled={!enabled}
-              >
-                <div className={styles.selectItemContent}>
-                  {optionRenderer ? (
-                    optionRenderer(
-                      {
-                        label: option.label,
-                        value: option.value,
-                        enabled: option.enabled,
-                      },
-                      selectedValue as any,
-                      false,
-                    )
-                  ) : (
-                    <>
-                      <SelectItemText>
-                        {optionLabelRenderer
-                          ? optionLabelRenderer({
-                              value: option.value,
-                              label: option.value,
-                            })
-                          : option.label}
-                      </SelectItemText>
-                      <span className={styles.selectItemIndicator}>
-                        <SelectItemIndicator>
-                          <Icon name="checkmark" />
-                        </SelectItemIndicator>
-                      </span>
-                    </>
-                  )}
-                </div>
-              </SelectItem>
-            ))}
-          </SelectViewport>
-          <ScrollDownButton className={styles.selectScrollDownButton}>
+          <div className={styles.selectValue}>
+            <SelectValue placeholder={placeholder} />
+          </div>
+          <SelectIcon asChild>
             <Icon name="chevrondown" />
-          </ScrollDownButton>
-        </SelectContent>
-      </SelectPortal>
-    </SelectRoot>
+          </SelectIcon>
+        </SelectTrigger>
+        <SelectPortal container={root}>
+          <SelectContent
+            className={styles.selectContent}
+            position="popper"
+            style={{ height: height }}
+          >
+            <ScrollUpButton className={styles.selectScrollUpButton}>
+              <Icon name="chevronup" />
+            </ScrollUpButton>
+            <SelectViewport className={classnames(styles.selectViewport)}>
+              {children}
+            </SelectViewport>
+            <ScrollDownButton className={styles.selectScrollDownButton}>
+              <Icon name="chevrondown" />
+            </ScrollDownButton>
+          </SelectContent>
+        </SelectPortal>
+      </SelectRoot>
+    </OptionTypeProvider>
   );
 });
 
@@ -378,9 +352,9 @@ export const Select = forwardRef(function Select(
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        <OptionTypeProvider Component={HiddenOption}>
-          {children}
-          {searchable || multiSelect ? (
+        {searchable || multiSelect ? (
+          <OptionTypeProvider Component={HiddenOption}>
+            {children}
             <ItemWithLabel
               ref={ref}
               labelPosition={labelPosition as any}
@@ -511,25 +485,27 @@ export const Select = forwardRef(function Select(
                 )}
               </Popover>
             </ItemWithLabel>
-          ) : (
-            <SimpleSelect
-              ref={ref}
-              value={value as SingleValueType}
-              options={options}
-              onValueChange={toggleOption}
-              id={id}
-              style={style}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              enabled={enabled}
-              validationStatus={validationStatus}
-              triggerRef={setReferenceElement}
-              autoFocus={autoFocus}
-              placeholder={placeholder}
-              height={dropdownHeight}
-            />
-          )}
-        </OptionTypeProvider>
+          </OptionTypeProvider>
+        ) : (
+          <SimpleSelect
+            ref={ref}
+            value={value as SingleValueType}
+            options={options}
+            onValueChange={toggleOption}
+            id={id}
+            style={style}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            enabled={enabled}
+            validationStatus={validationStatus}
+            triggerRef={setReferenceElement}
+            autoFocus={autoFocus}
+            placeholder={placeholder}
+            height={dropdownHeight}
+          >
+            {children || emptyListNode}
+          </SimpleSelect>
+        )}
       </OptionContext.Provider>
     </SelectContext.Provider>
   );
@@ -583,14 +559,12 @@ export const ComboboxOption = forwardRef(function Combobox(
 });
 
 export function HiddenOption(option: Option) {
-  const { optionRenderer, label } = option;
   const { onOptionRemove, onOptionAdd } = useOption();
   const [node, setNode] = useState(null);
-
   const opt: Option = useMemo(() => {
     return {
       ...option,
-      label: label ?? node?.textContent ?? "",
+      labelText: node?.textContent ?? "",
       keywords: [node?.textContent ?? ""],
     };
   }, [option, node]);
@@ -602,7 +576,47 @@ export function HiddenOption(option: Option) {
 
   return (
     <div ref={(el) => setNode(el)} style={{ display: "none" }}>
-      {optionRenderer?.({})}
+      {option.label}
     </div>
   );
 }
+
+const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
+  (option, ref) => {
+    const { value, label, enabled = true } = option;
+    const { onOptionRemove, onOptionAdd } = useOption();
+    const { optionLabelRenderer, optionRenderer, value: selectedValue, multiSelect } = useSelect();
+
+    useLayoutEffect(() => {
+      onOptionAdd(option);
+      return () => onOptionRemove(option);
+    }, [option, onOptionAdd, onOptionRemove]);
+
+    return (
+      <SelectItem ref={ref} className={styles.selectItem} value={value + ""} disabled={!enabled}>
+        <div className={styles.selectItemContent}>
+          {optionRenderer ? (
+            optionRenderer({
+              label,
+              value,
+              enabled,
+            }, selectedValue as any, false)
+          ) : (
+            <>
+              <SelectItemText className={styles.selectItemContent}>
+                {optionLabelRenderer ? optionLabelRenderer({ value, label }) : label}
+              </SelectItemText>
+              <span className={styles.selectItemIndicator}>
+                <SelectItemIndicator>
+                  <Icon name="checkmark" />
+                </SelectItemIndicator>
+              </span>
+            </>
+          )}
+        </div>
+      </SelectItem>
+    );
+  },
+);
+
+SelectOption.displayName = "SelectOption";
