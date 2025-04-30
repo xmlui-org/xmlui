@@ -119,8 +119,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
   &.scrollWholePage {
     scrollbar-gutter: stable both-edges;
-    width: $maxWidth-App-vertical;
-    margin: auto;
 
     .headerWrapper {
       & > div {

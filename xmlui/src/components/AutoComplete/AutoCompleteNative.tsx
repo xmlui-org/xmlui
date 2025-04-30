@@ -156,8 +156,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
 
   useEffect(() => {
     if (!multi) {
-      const label = Array.from(options).find((o) => o.value === value)?.label;
-      setInputValue(label ? label + "" : "");
+      setInputValue(Array.from(options).find((o) => o.value === value)?.labelText || "");
     }
   }, [multi, options, value]);
 
@@ -284,7 +283,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                   return 0;
                 }}
               >
-                <PopoverTrigger style={{ width: "100%" }} >
+                <PopoverTrigger style={{ width: "100%" }}>
                   <div
                     ref={setReferenceElement}
                     onClick={() => {
