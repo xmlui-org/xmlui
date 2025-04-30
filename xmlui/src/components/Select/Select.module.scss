@@ -2,6 +2,7 @@
 
 // --- This code snippet is required to collect the theme variables used in this module
 $themeVars: ();
+$animDuration: 0.1s;
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -243,11 +244,11 @@ button.selectTrigger {
   border: createThemeVar("Input:borderWidth-menu-#{$componentName}") solid createThemeVar("Input:borderColor-menu-#{$componentName}");
 
   &[data-state='open'] {
-    animation: fadeIn 0.3s ease-in-out, zoomIn 0.3s ease-in-out;
+    animation: fadeIn $animDuration ease-in-out, zoomIn $animDuration ease-in-out;
   }
 
   &[data-state='closed'] {
-    animation: fadeOut 0.3s ease-in-out, zoomOut 0.3s ease-in-out;
+    animation: fadeOut $animDuration ease-in-out, zoomOut $animDuration ease-in-out;
   }
 
   &[data-side='bottom'] {
@@ -255,31 +256,31 @@ button.selectTrigger {
   }
 
   &[data-side='left'] {
-    animation: slideInFromRight 0.3s ease-in-out;
+    animation: slideInFromRight $animDuration ease-in-out;
   }
 
   &[data-side='right'] {
-    animation: slideInFromLeft 0.3s ease-in-out;
+    animation: slideInFromLeft $animDuration ease-in-out;
   }
 
   &[data-side='top'] {
-    animation: slideInFromBottom 0.3s ease-in-out;
+    animation: slideInFromBottom $animDuration ease-in-out;
   }
 
   &[data-side='bottom'] {
-    transform: translateY(0.25rem);
+    transform: translateY(0.15rem);
   }
 
   &[data-side='left'] {
-    transform: translateX(-0.25rem);
+    transform: translateX(-0.15rem);
   }
 
   &[data-side='right'] {
-    transform: translateX(0.25rem);
+    transform: translateX(0.15rem);
   }
 
   &[data-side='top'] {
-    transform: translateY(-0.25rem);
+    transform: translateY(-0.15rem);
   }
 }
 

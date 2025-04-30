@@ -519,6 +519,10 @@ export class FormItemDriver extends ComponentDriver {
     return (this.component.locator(">input").or(this.component)).first();
   }
 
+  get textBox() {
+    return this.input.getByRole("textbox");
+  }
+
   get label() {
     return this.component.locator("label");
   }
