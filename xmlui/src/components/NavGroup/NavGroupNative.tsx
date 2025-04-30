@@ -93,8 +93,7 @@ export const NavGroup = forwardRef(function NavGroup(
   let inline =
     appLayoutContext?.layout === "vertical" ||
     appLayoutContext?.layout === "vertical-sticky" ||
-    appLayoutContext?.layout === "vertical-full-header" ||
-    appLayoutContext?.layout === "vertical-constrained-width";
+    appLayoutContext?.layout === "vertical-full-header";
 
   if (navPanelContext !== null) {
     inline = navPanelContext.inDrawer;

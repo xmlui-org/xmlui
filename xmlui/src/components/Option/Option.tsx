@@ -4,7 +4,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import type { Option } from "../abstractions";
 import { dEnabled } from "../metadata-helpers";
-import { useOptionType } from "../Option/OptionTypeProvider";
+import { useOptionType } from "./OptionTypeProvider";
 import { MemoizedItem } from "../container-helpers";
 
 const COMP = "Option";
@@ -26,6 +26,7 @@ export const OptionMd = createMetadata({
     enabled: dEnabled(),
     optionTemplate: d("This property is used to define a custom option template"),
   },
+  childrenAsTemplate: "optionTemplate",
 });
 
 const OptionNative = memo((props: Option) => {
@@ -47,14 +48,16 @@ export const optionComponentRenderer = createComponentRenderer(
       <OptionNative
         optionRenderer={
           optionTemplate
-            ? (contextVars) => (
-                <MemoizedItem
-                  node={optionTemplate}
-                  renderChild={renderChild}
-                  contextVars={contextVars}
-                  layoutContext={layoutContext}
-                />
-              )
+            ? (contextVars) => {
+                return (
+                  <MemoizedItem
+                    node={optionTemplate}
+                    renderChild={renderChild}
+                    contextVars={contextVars}
+                    layoutContext={layoutContext}
+                  />
+                );
+              }
             : undefined
         }
         value={extractValue(node.props.value)}
