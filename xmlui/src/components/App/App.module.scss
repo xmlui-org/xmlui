@@ -265,9 +265,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
 .footerWrapper {
   flex-shrink: 0;
-  //position: sticky;
-  //bottom:  calc(-1 * var(--footer-height));
-  //margin-bottom: calc(-1 * var(--footer-height));
 }
 
 // --- We export the theme variables to add them to the component renderer
