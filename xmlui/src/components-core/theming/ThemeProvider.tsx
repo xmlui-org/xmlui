@@ -41,6 +41,7 @@ export function useCompiledTheme(
   themes: ThemeDefinition[] = EMPTY_ARRAY,
   resources: Record<string, string> = EMPTY_OBJECT,
   resourceMap: Record<string, string> = EMPTY_OBJECT,
+  localThemeVars: Record<string, string> = EMPTY_OBJECT,
 ) {
   const componentRegistry = useComponentRegistry();
   const { componentThemeVars, componentDefaultThemeVars } = componentRegistry;
@@ -145,6 +146,7 @@ export function useCompiledTheme(
     return resultedTheme;
   }, [activeTone, themeDefChain]);
 
+
   const allThemeVarsWithResolvedHierarchicalVars = useMemo(() => {
     let mergedThemeVars: Record<string, string> = {};
 
@@ -171,8 +173,9 @@ export function useCompiledTheme(
     return resolveThemeVarsWithCssVars({
       ...mergedThemeVars,
       ...resolvedThemeVarsFromChains,
+      ...localThemeVars,
     });
-  }, [componentThemeVars, themeDefChainVars]);
+  }, [componentThemeVars, themeDefChainVars, localThemeVars]);
 
   const themeCssVars = useMemo(() => {
     const ret: Record<string, string> = {};
@@ -214,6 +217,7 @@ export function useCompiledTheme(
       }
     });
   }, [themeDefChain, getResourceUrl, allFonts]);
+
   return {
     getResourceUrl,
     fontLinks,
@@ -234,6 +238,16 @@ export const builtInThemes: Array<ThemeDefinition> = [
   SolidThemeDefinition,
 ];
 
+type ThemeProviderProps = {
+  children?: React.ReactNode;
+  themes?: Array<ThemeDefinition>;
+  defaultTheme?: string;
+  defaultTone?: ThemeTone;
+  resources?: Record<string, string>;
+  resourceMap?: Record<string, string>;
+  localThemes?: Record<string, string>;
+};
+
 // theme-overriding properties change.
 function ThemeProvider({
   children,
@@ -242,14 +256,8 @@ function ThemeProvider({
   defaultTone = "light",
   resources = EMPTY_OBJECT,
   resourceMap = EMPTY_OBJECT,
-}: {
-  children?: React.ReactNode;
-  themes?: Array<ThemeDefinition>;
-  defaultTheme?: string;
-  defaultTone?: ThemeTone;
-  resources?: Record<string, string>;
-  resourceMap?: Record<string, string>;
-}) {
+  localThemes = EMPTY_OBJECT,
+}: ThemeProviderProps) {
   const [activeThemeTone, setActiveThemeTone] = useState<ThemeTone>(() => {
     if (!defaultTone) {
       return ThemeToneKeys[0];
@@ -299,7 +307,7 @@ function ThemeProvider({
   }, [activeThemeId, availableThemeIds, themes]);
 
   const { allThemeVarsWithResolvedHierarchicalVars, themeCssVars, getResourceUrl, getThemeVar } =
-    useCompiledTheme(activeTheme, activeThemeTone, themes, resources, resourceMap);
+    useCompiledTheme(activeTheme, activeThemeTone, themes, resources, resourceMap, localThemes);
   const [root, setRoot] = useState(typeof document === "undefined" ? undefined : document.body);
 
   const themeValue = useMemo(() => {
@@ -327,6 +335,7 @@ function ThemeProvider({
     resources,
     root,
     themes,
+    localThemes
   ]);
 
   const currentThemeContextValue = useMemo(() => {
@@ -392,13 +401,6 @@ function resolveThemeVarsWithCssVars(theme?: Record<string, string>) {
       }
       return ret;
     }
-
-    // for (let i = 1; i < (result?.length || 0); i++) {
-    //   const varName = result?.[i];
-    //   if(varName){
-    //     return input.replace(regex, `var(${getVarKey(varName)})`);
-    //   }
-    // }
 
     return input;
   }

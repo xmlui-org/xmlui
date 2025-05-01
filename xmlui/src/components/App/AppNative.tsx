@@ -78,6 +78,7 @@ export function App({
   const mounted = useRef(false);
 
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
+  console.log("var", getThemeVar("maxWidth-App-vertical"));
   const safeLayout = layoutWithDefaultValue
     ?.trim()
     .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
@@ -308,23 +309,34 @@ export function App({
           style={styleWithHelpers}
           ref={scrollPageContainerRef}
         >
-          <header
-            className={classnames(styles.headerWrapper, styles.sticky)}
-            ref={headerRefCallback}
+          <div className={classnames(styles.headerWrapper, styles.sticky)}>
+            <header ref={headerRefCallback}>{header}</header>
+          </div>
+          <div
+            style={{
+              boxSizing: "content-box",
+              width: "100%",
+              height: scrollWholePage ? "" : "100%",
+              display: "flex",
+              flexDirection: "row",
+              flexGrow: 0,
+              flexShrink: 0,
+              justifyContent: "center",
+              marginInline: scrollWholePage ? "calc(-1 * var(--scrollbar-width))" : "",
+            }}
           >
-            {header}
-          </header>
-          <div className={styles.content}>
-            {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
-            <main className={styles.contentWrapper}>
-              <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-                <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
-                    {children}
-                  </div>
-                </ScrollContext.Provider>
-              </div>
-            </main>
+            <div className={styles.content}>
+              {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
+              <main className={styles.contentWrapper}>
+                <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+                  <ScrollContext.Provider value={scrollContainerRef}>
+                    <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                      {children}
+                    </div>
+                  </ScrollContext.Provider>
+                </div>
+              </main>
+            </div>
           </div>
           <div className={styles.footerWrapper} ref={footerRefCallback}>
             {footer}

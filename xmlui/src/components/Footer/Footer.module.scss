@@ -18,11 +18,17 @@ $height-Footer: createThemeVar("height-#{$component}");
 $verticalAlign-Footer: createThemeVar("verticalAlign-#{$component}");
 $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
 $backgroundColor-Footer: createThemeVar("backgroundColor-#{$component}");
+$maxWidth-App-vertical: createThemeVar("maxWidth-App-vertical");
 
-.outerWrapper{
+.outerWrapper {
   @include t.borderVars($themeVars, $component);
   background-color: $backgroundColor-Footer;
   height: $height-Footer;
+
+  .verticalFullHeader {
+    max-width: $maxWidth-App-vertical;
+    margin: 0 auto;
+  }
 }
 
 .wrapper {
@@ -37,12 +43,12 @@ $backgroundColor-Footer: createThemeVar("backgroundColor-#{$component}");
   max-width: $maxWidth-content-Footer;
   margin: 0 auto;
 
-  &.full{
+  &.full {
     max-width: 100%;
   }
 }
 
 // --- We export the theme variables to add them to the component renderer
-:export{
-  themeVars: t.json-stringify($themeVars)
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

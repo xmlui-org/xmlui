@@ -23,6 +23,10 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   box-sizing: content-box;
   background-color: createThemeVar("backgroundColor-#{$component}");
   @include t.borderVars($themeVars, $component);
+
+  &.noBorder {
+    border: none;
+  }
 }
 
 .headerInner {

@@ -26,7 +26,7 @@ export const Footer = forwardRef(function Footer(
     <div className={styles.outerWrapper} ref={forwardedRef} style={style}>
       <div
         className={classnames(styles.wrapper, className, {
-          [styles.full]: !canRestrictContentWidth,
+          [styles.verticalFullHeader]: !canRestrictContentWidth,
         })}
       >
         {children}

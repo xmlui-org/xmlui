@@ -109,6 +109,14 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       }
     }
 
+    .headerWrapper {
+      box-sizing: content-box;
+      & > header {
+        max-width: $maxWidth-App-vertical;
+        margin: 0 auto;
+      }
+    }
+
     .footerWrapper {
       position: sticky;
       left: 0;
@@ -119,8 +127,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
   &.scrollWholePage {
     scrollbar-gutter: stable both-edges;
-    width: $maxWidth-App-vertical;
-    margin: auto;
 
     .headerWrapper {
       & > div {
@@ -139,7 +145,8 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     &.verticalFullHeader {
       scroll-padding-top: var(--header-height);
       .content {
-        margin-inline: calc(-1 * var(--scrollbar-width));
+        width: calc(100% + 2* var(--scrollbar-width));
+        max-width: $maxWidth-App-vertical;
       }
       .contentWrapper {
         padding-inline: var(--scrollbar-width);
@@ -148,9 +155,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   }
 
   &:not(.scrollWholePage) {
-    width: $maxWidth-App-vertical;
-    margin: auto;
-
     overflow: hidden;
     .content {
       min-height: 0;
@@ -172,6 +176,20 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       min-height: 100%;
       height: 0;
     }
+
+    &.verticalFullHeader {
+      scroll-padding-top: var(--header-height);
+      .content {
+        justify-content: flex-end;
+        width: calc(100% + var(--scrollbar-width));
+        max-width: $maxWidth-App-vertical;
+      }
+      .contentWrapper {
+        padding-inline: var(--scrollbar-width);
+        //max-width: $maxWidth-content-App;
+      }
+    }
+
   }
 
   &.noScrollbarGutters {
