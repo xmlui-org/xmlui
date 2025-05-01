@@ -78,6 +78,8 @@ export function App({
   const mounted = useRef(false);
 
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
+  const isFullVerticalWidth = getThemeVar("maxWidth-App-vertical") === "100%";
+  console.log("isVerticalMaxWidth", isFullVerticalWidth);
   const safeLayout = layoutWithDefaultValue
     ?.trim()
     .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
@@ -209,6 +211,8 @@ export function App({
       logoContentDef,
       registerSubNavPanelSlot,
       subNavPanelSlot,
+      isFullVerticalWidth,
+      scrollWholePage,
     };
   }, [
     hasRegisteredNavPanel,
@@ -224,6 +228,8 @@ export function App({
     logoContentDef,
     registerSubNavPanelSlot,
     subNavPanelSlot,
+    isFullVerticalWidth,
+    scrollWholePage,
   ]);
 
   useEffect(() => {

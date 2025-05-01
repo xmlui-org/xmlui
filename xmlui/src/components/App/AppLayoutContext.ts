@@ -67,6 +67,8 @@ export interface IAppLayoutContext {
   logoLight?: string;
   registerSubNavPanelSlot?: (slot: HTMLElement) => void;
   subNavPanelSlot?: HTMLElement;
+  scrollWholePage?: boolean;
+  isFullVerticalWidth?: boolean;
 }
 
 export const AppLayoutContext = createContext<IAppLayoutContext | null>(null);

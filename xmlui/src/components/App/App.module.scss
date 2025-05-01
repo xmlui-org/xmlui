@@ -146,8 +146,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   }
 
   &:not(.scrollWholePage) {
-    width: $maxWidth-App-vertical;
-    margin: auto;
 
     overflow: hidden;
     .content {
