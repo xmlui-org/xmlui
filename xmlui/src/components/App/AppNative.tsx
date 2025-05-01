@@ -320,17 +320,21 @@ export function App({
           >
             {header}
           </header>
-          <div className={styles.content}>
-            {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
-            <main className={styles.contentWrapper}>
-              <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-                <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
-                    {children}
+          <div className={styles.contentScroller}>
+            <div className={styles.contentAligner}>
+              <div className={styles.content}>
+                {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
+                <main className={styles.contentWrapper}>
+                  <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+                    <ScrollContext.Provider value={scrollContainerRef}>
+                      <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                        {children}
+                      </div>
+                    </ScrollContext.Provider>
                   </div>
-                </ScrollContext.Provider>
+                </main>
               </div>
-            </main>
+            </div>
           </div>
           <div className={styles.footerWrapper} ref={footerRefCallback}>
             {footer}
