@@ -90,12 +90,25 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     height: 100%;
     overflow: auto;
     scroll-padding-block: $scrollPaddingBlockPage;
+
     .navPanelWrapper {
       width: $width-navPanel-App;
       position: sticky;
       height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
       top: var(--header-height);
     }
+
+    .contentScroller {
+      width: 100%;
+      margin: 0 auto;
+
+      .contentAligner {
+        max-width: $maxWidth-App-vertical;
+        margin: 0 auto;
+      }
+
+    }
+
     .PagesWrapper {
       overflow: initial;
       min-height: calc(var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height));
@@ -146,8 +159,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   }
 
   &:not(.scrollWholePage) {
-    width: $maxWidth-App-vertical;
-    margin: auto;
 
     overflow: hidden;
     .content {
@@ -156,6 +167,14 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
     .contentWrapper {
       overflow: initial;
+    }
+
+    .contentScroller {
+      height: 100%;
+
+      .contentAligner {
+        height: 100%;
+      }
     }
 
     .PagesWrapper {
@@ -267,9 +286,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
 .footerWrapper {
   flex-shrink: 0;
-  //position: sticky;
-  //bottom:  calc(-1 * var(--footer-height));
-  //margin-bottom: calc(-1 * var(--footer-height));
 }
 
 // --- We export the theme variables to add them to the component renderer
