@@ -90,7 +90,7 @@ export function Theme({
     fontLinks,
     allThemeVarsWithResolvedHierarchicalVars,
     getThemeVar,
-  } = useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap, {});
+  } = useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
 
   const { css, className, rangeClassName, fromClass, toClass } = useMemo(() => {
     const vars = { ...themeCssVars, "color-scheme": themeTone };
@@ -174,8 +174,6 @@ export function Theme({
         }
       : {};
   }, [devToolsEnabled, devToolsSide, devToolsSize]);
-
-  console.log("ThemeContext", currentThemeContextValue);
 
   if (isRoot) {
     const faviconUrl = getResourceUrl("resource:favicon") || "/resources/favicon.ico";

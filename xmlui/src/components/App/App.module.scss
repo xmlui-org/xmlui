@@ -185,8 +185,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
         max-width: $maxWidth-App-vertical;
       }
       .contentWrapper {
-        padding-inline: var(--scrollbar-width);
-        //max-width: $maxWidth-content-App;
+        padding-left: var(--scrollbar-width);
       }
     }
 

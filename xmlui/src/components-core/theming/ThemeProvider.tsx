@@ -41,7 +41,6 @@ export function useCompiledTheme(
   themes: ThemeDefinition[] = EMPTY_ARRAY,
   resources: Record<string, string> = EMPTY_OBJECT,
   resourceMap: Record<string, string> = EMPTY_OBJECT,
-  localThemeVars: Record<string, string> = EMPTY_OBJECT,
 ) {
   const componentRegistry = useComponentRegistry();
   const { componentThemeVars, componentDefaultThemeVars } = componentRegistry;
@@ -146,7 +145,6 @@ export function useCompiledTheme(
     return resultedTheme;
   }, [activeTone, themeDefChain]);
 
-
   const allThemeVarsWithResolvedHierarchicalVars = useMemo(() => {
     let mergedThemeVars: Record<string, string> = {};
 
@@ -173,9 +171,8 @@ export function useCompiledTheme(
     return resolveThemeVarsWithCssVars({
       ...mergedThemeVars,
       ...resolvedThemeVarsFromChains,
-      ...localThemeVars,
     });
-  }, [componentThemeVars, themeDefChainVars, localThemeVars]);
+  }, [componentThemeVars, themeDefChainVars]);
 
   const themeCssVars = useMemo(() => {
     const ret: Record<string, string> = {};
@@ -307,7 +304,7 @@ function ThemeProvider({
   }, [activeThemeId, availableThemeIds, themes]);
 
   const { allThemeVarsWithResolvedHierarchicalVars, themeCssVars, getResourceUrl, getThemeVar } =
-    useCompiledTheme(activeTheme, activeThemeTone, themes, resources, resourceMap, localThemes);
+    useCompiledTheme(activeTheme, activeThemeTone, themes, resources, resourceMap);
   const [root, setRoot] = useState(typeof document === "undefined" ? undefined : document.body);
 
   const themeValue = useMemo(() => {
@@ -335,7 +332,7 @@ function ThemeProvider({
     resources,
     root,
     themes,
-    localThemes
+    localThemes,
   ]);
 
   const currentThemeContextValue = useMemo(() => {

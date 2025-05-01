@@ -432,13 +432,11 @@ export default class RestApiProxy {
         }
       }
     } else {
-      console.log("url", this.generateFullApiUrl(relativePath, queryParams))
       const response = await fetch(this.generateFullApiUrl(relativePath, queryParams), options);
       if (!response.clone().ok) {
         throw await this.raiseError(response);
       }
       const parsedResponse = await parseResponse(response.clone());
-      console.log("Parsed response", parsedResponse);
       return parsedResponse;
     }
   };

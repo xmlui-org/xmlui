@@ -78,7 +78,7 @@ export function App({
   const mounted = useRef(false);
 
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
-  console.log("var", getThemeVar("maxWidth-App-vertical"));
+  const isMaxWidth = getThemeVar("maxWidth-App-vertical");
   const safeLayout = layoutWithDefaultValue
     ?.trim()
     .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
@@ -314,7 +314,6 @@ export function App({
           </div>
           <div
             style={{
-              boxSizing: "content-box",
               width: "100%",
               height: scrollWholePage ? "" : "100%",
               display: "flex",
