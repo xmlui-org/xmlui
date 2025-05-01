@@ -52,7 +52,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 ) {
   const generatedId = useId();
   const inputId = id || generatedId;
-  if (label === undefined) {
+  if (label === undefined && !validationResult) {
     return (
       <Slot style={style} id={inputId} ref={ref}>
         {children}

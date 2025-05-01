@@ -45,7 +45,7 @@ export function fieldChanged(uid: string, value: any) {
     type: FormActionKind.FIELD_VALUE_CHANGED,
     payload: {
       uid,
-      value,
+      value
     },
   };
 }

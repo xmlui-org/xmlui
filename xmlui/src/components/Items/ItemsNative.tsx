@@ -1,4 +1,4 @@
-import { type ReactNode, useMemo } from "react";
+import { Fragment, type ReactNode, useMemo } from "react";
 import { isPlainObject } from "lodash-es";
 
 // =====================================================================================================================
@@ -28,17 +28,19 @@ export function Items({ items, renderItem, reverse = false }: Props) {
 
   return (
     <>
-      {itemsToRender.map((item, index) =>
-        renderItem(
-          {
-            $item: item,
-            $itemIndex: index,
-            $isFirst: index === 0,
-            $isLast: index === itemsToRender.length - 1,
-          },
-          index,
-        ),
-      )}
+      {itemsToRender.map((item, index) => {
+        return <Fragment key={index}>
+          {renderItem?.(
+            {
+              $item: item,
+              $itemIndex: index,
+              $isFirst: index === 0,
+              $isLast: index === itemsToRender.length - 1,
+            },
+            index,
+          )}
+        </Fragment>;
+      })}
     </>
   );
 }

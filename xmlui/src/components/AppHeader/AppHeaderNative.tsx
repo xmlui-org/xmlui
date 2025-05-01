@@ -81,7 +81,7 @@ export const AppHeader = ({
     ) : (
       titleContent
     );
-  const isVerticalFullHeader = layout?.layout === "vertical-full-header";
+  const layoutContext = useAppLayoutContext();
 
   useIsomorphicLayoutEffect(() => {
     registerSubNavPanelSlot?.(subNavPanelSlot.current);
@@ -91,7 +91,8 @@ export const AppHeader = ({
     <div className={classnames(styles.header, className)} style={style}>
       <div
         className={classnames(styles.headerInner, {
-          [styles.full]: isVerticalFullHeader,
+          [styles.verticalFullHeader]: layoutContext?.layout === "vertical-full-header",
+          [styles.scrollWholePage]: layoutContext?.scrollWholePage,
         })}
       >
         {!navPanelVisible && hasRegisteredNavPanel && (
@@ -167,7 +168,6 @@ export function AppContextAwareAppHeader({
 
   // console.log("APP LAYOUT CONTEXT", appLayoutContext);
   const displayLogo = layout !== "vertical" && layout !== "vertical-sticky" && showLogo;
-  const canRestrictContentWidth = layout !== "vertical-full-header";
 
   return (
     <AppHeader

@@ -43,8 +43,8 @@ $maxWidth-App-vertical: createThemeVar("maxWidth-App-vertical");
   max-width: $maxWidth-content-Footer;
   margin: 0 auto;
 
-  &.full {
-    max-width: 100%;
+  &.verticalFullHeader{
+    max-width: $maxWidth-App-vertical;
   }
 }
 

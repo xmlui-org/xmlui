@@ -59,22 +59,6 @@ export function AppRoot({
   // --- the root node must be wrapped in a `Container` component managing
   // --- the app's top-level state.
   const rootNode = useMemo(() => {
-    // const themedRoot =
-    //   (node as ComponentDef).type === "Theme"
-    //     ? {
-    //         ...node,
-    //         props: {
-    //           ...(node as ComponentDef).props,
-    //           root: true,
-    //         },
-    //       }
-    //     : {
-    //         type: "Theme",
-    //         props: {
-    //           root: true,
-    //         },
-    //         children: [node],
-    //       };
     const themedRoot = {
       type: "Theme",
       props: {
