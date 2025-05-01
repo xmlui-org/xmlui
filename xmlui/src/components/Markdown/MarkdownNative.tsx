@@ -14,6 +14,7 @@ import { LocalLink } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
+import { NestedApp } from "../NestedApp/NestedAppNative";
 
 type MarkdownProps = {
   extractValue: ValueExtractor;
@@ -162,9 +163,8 @@ export const Markdown = memo(function Markdown({
           },
 
           a({ children, href, ...props }) {
-            const allowedProps = ["style", "disabled", "active", "icon", "onClick"];
             return (
-              <LocalLink to={href} {...allowedProps}>
+              <LocalLink to={href} {...(props as any)}>
                 {children}
               </LocalLink>
             );
@@ -202,6 +202,19 @@ export const Markdown = memo(function Markdown({
           tfoot({ children }) {
             return <tfoot className={htmlTagStyles.htmlTfoot}>{children}</tfoot>;
           },
+          samp({ ...props }) {
+            const nestedProps = props as any;
+            console.log("nestedProps", nestedProps.config, typeof nestedProps.config);
+            return (
+              <NestedApp 
+                app={nestedProps.app}
+                config={extractValue(nestedProps.config)}
+                components={extractValue(nestedProps.components)}
+                api={extractValue(nestedProps.api)}
+              />
+            );
+          },
+
         }}
       >
         {children as any}

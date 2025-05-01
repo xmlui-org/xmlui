@@ -1,14 +1,18 @@
-import { useRef, useEffect, useMemo, useId } from "react";
+import { useRef, useEffect, useMemo, useId, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
-import { CompoundComponentDef } from "xmlui";
+import styles from "./NestedApp.module.scss";
+
 import { AppRoot } from "../../components-core/rendering/AppRoot";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
-import styles from "./NestedApp.module.scss";
+import { LiaUndoAltSolid } from "react-icons/lia";
+import { RxOpenInNewWindow } from "react-icons/rx";
 import { errReportComponent, xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "../../components-core/interception/ApiInterceptorProvider";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { setupWorker } from "msw/browser";
+import { CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import { Tooltip } from "./Tooltip";
 
 type NestedAppProps = {
   api?: any;
@@ -30,9 +34,10 @@ export function NestedApp({
   const rootRef = useRef<HTMLDivElement>(null);
   const contentRootRef = useRef<Root | null>(null);
   const nestedAppId = useId();
+  const [refreshVersion, setRefreshVersion] = useState(0);
 
   const apiWorker = useMemo(() => {
-    console.log("HERE");
+    // console.log("HERE");
     if (typeof document !== "undefined") {
       return setupWorker();
     }
@@ -46,7 +51,7 @@ export function NestedApp({
     return () => apiWorker?.stop();
   }, [apiWorker]);
 
-  console.log("apiWorker", apiWorker);
+  // console.log("apiWorker", apiWorker);
 
   const mock = useMemo(() => {
     return api
@@ -58,7 +63,7 @@ export function NestedApp({
       : undefined;
   }, [api]);
 
-  console.log("mock", mock);
+  //console.log("mock", mock);
 
   useEffect(() => {
     if (!contentRootRef.current && rootRef.current) {
@@ -93,21 +98,52 @@ export function NestedApp({
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
         <ApiInterceptorProvider interceptor={mock} apiWorker={apiWorker}>
-          <AppRoot
-            key={`app-${nestedAppId}`}
-            previewMode={true}
-            standalone={true}
-            trackContainerHeight={true}
-            node={component}
-            globalProps={globalProps}
-            defaultTheme={activeTheme || config?.defaultTheme}
-            defaultTone={(activeTone || config?.defaultTone) as ThemeTone}
-            contributes={{
-              compoundComponents,
-              themes: config?.themes,
-            }}
-            resources={config?.resources}
-          />
+          <div className={styles.nestedAppContainer}>
+            <div className={styles.header}>
+              <span className={styles.headerText}>Header</span>
+              <div className={styles.spacer} />
+              <Tooltip
+                trigger={
+                  <button className={styles.headerButton} onClick={() => {
+                    // TODO: Open the app in a new window
+                  }}>
+                    <RxOpenInNewWindow />
+                  </button>
+                }
+                label="Edit code in new window"
+              />
+              <Tooltip
+              trigger={
+                <button
+                  className={styles.headerButton}
+                  onClick={() => {
+                    setRefreshVersion(refreshVersion + 1);
+                  }}
+                >
+                  <LiaUndoAltSolid />
+                </button>
+              }
+              label="Reset the app"
+            />
+
+            </div>
+
+            <AppRoot
+              key={`app-${nestedAppId}-${refreshVersion}`}
+              previewMode={true}
+              standalone={true}
+              trackContainerHeight={true}
+              node={component}
+              globalProps={globalProps}
+              defaultTheme={activeTheme || config?.defaultTheme}
+              defaultTone={(activeTone || config?.defaultTone) as ThemeTone}
+              contributes={{
+                compoundComponents,
+                themes: config?.themes,
+              }}
+              resources={config?.resources}
+            />
+          </div>
         </ApiInterceptorProvider>
       </ErrorBoundary>,
     );
@@ -126,6 +162,7 @@ export function NestedApp({
     components,
     mock,
     apiWorker,
+    refreshVersion
   ]);
   return (
     <div className={styles.nestedApp}>

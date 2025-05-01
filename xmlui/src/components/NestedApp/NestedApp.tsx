@@ -36,12 +36,12 @@ export const NestedAppMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`borderRadius-${COMP}`]: "4px",
-    [`boxShadow-${COMP}`]: "inset 0 0 0 1px rgba(4,32,69,0.1)",
-    [`textColor-${COMP}`]: "$textColor-secondary",
-    [`fontWeight-${COMP}`]: "$fontWeight-bold",
-    [`border-${COMP}`]: "0px solid $color-surface-400A80",
-    [`backgroundColor-${COMP}`]: "$color-surface-100",
+    [`padding-${COMP}`]: "$space-4",
+    [`paddingTop-${COMP}`]: "$space-3",
+    [`borderRadius-${COMP}`]: "$space-4",
+    [`backgroundColor-frame-${COMP}`]: "$color-primary-100",
+    [`gap-frame-${COMP}`]: "$space-4",
+    [`fontWeight-header-${COMP}`]: "$fontWeight-bold",
   },
 });
 
