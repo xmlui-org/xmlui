@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { handleCompletion } from "../../src/language-server/services/completion";
+import { handleCompletion, handleCompletionResolve } from "../../src/language-server/services/completion";
 import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
 import { mockMetadata, mockMetadataProvider } from "./mockData";
-import { CompletionItemKind } from "vscode-languageserver";
+import { CompletionItem, CompletionItemKind, MarkupContent } from "vscode-languageserver";
 import { layoutOptionKeys } from "../../src/components-core/descriptorHelper";
 import { capitalizeFirstLetter } from "../../src/components-core/utils/misc";
 
@@ -10,7 +10,8 @@ describe('Completion', () => {
   it("lists all component names after '<'", () => {
     const suggestions = completeAtPoundSign("<#").map(({label}) => label);
     const expected = Object.keys(mockMetadata);
-    expect(new Set(suggestions)).toEqual(new Set(expected));
+
+    expectToContainExactly(suggestions, expected);
   });
 
   it("lists all attribute names inside attribute key", () => {
@@ -20,7 +21,66 @@ describe('Completion', () => {
     expected.push("inspect")
     expected.push("data")
     expected.push(...layoutOptionKeys)
-    expect(new Set(attrNames)).toEqual(new Set(expected));
+    expectToContainExactly(attrNames, expected);
+  });
+
+  it("resolves component name", () => {
+    const item = completeAtPoundSign("<Butto# />").find(({label}) => label === "Button");
+    const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
+    const docs = (resolvedItem.documentation as MarkupContent).value;
+
+    const expected: CompletionItem = { label: "Button", kind: CompletionItemKind.Constructor };
+
+    expect(resolvedItem).toMatchObject(expected);
+    expect(docs).toContain(mockMetadata.Button.description)
+    expect(docs).toContain(mockMetadata.Button.events.click.description)
+    expect(docs).toContain(mockMetadata.Button.props.label.description)
+  });
+
+  it("resolves prop", () => {
+    const item = completeAtPoundSign("<Button labe#l />").find(({label}) => label === "label");
+    const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
+    const docs = (resolvedItem.documentation as MarkupContent).value;
+
+    const expected: CompletionItem = { label: "label", kind: CompletionItemKind.Property };
+
+    expect(resolvedItem).toMatchObject(expected);
+    expect(docs).toContain(mockMetadata.Button.props.label.description)
+  });
+
+  it("resolves event", () => {
+    const item = completeAtPoundSign("<Button onClic#k />").find(({label}) => label === "onClick");
+    const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
+    const docs = (resolvedItem.documentation as MarkupContent).value;
+
+    const expected: CompletionItem = { label: "onClick", kind: CompletionItemKind.Event };
+
+    expect(resolvedItem).toMatchObject(expected);
+    expect(docs).toContain(mockMetadata.Button.events.click.description)
+  });
+
+  it("resolves implicit prop", () => {
+    const item = completeAtPoundSign("<Button dat#a />").find(({label}) => label === "data");
+    const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
+    const docs = (resolvedItem.documentation as MarkupContent).value;
+    const dataDescription = mockMetadataProvider.getComponent("Button").getProp("data").description;
+
+    const expected: CompletionItem = { label: "data", kind: CompletionItemKind.Property };
+
+    expect(resolvedItem).toMatchObject(expected);
+    expect(docs).toContain(dataDescription)
+  });
+
+  it("resolves layout prop", () => {
+    const item = completeAtPoundSign("<Button widt#h />").find(({label}) => label === "width");
+    const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
+    const docs = (resolvedItem.documentation as MarkupContent).value;
+    const dataDescription = mockMetadataProvider.getComponent("Button").getProp("width").description;
+
+    const expected: CompletionItem = { label: "width", kind: CompletionItemKind.Property };
+
+    expect(resolvedItem).toMatchObject(expected);
+    expect(docs).toContain(dataDescription)
   });
 });
 
@@ -37,4 +97,9 @@ function completeAtPoundSign(source: string) {
   const parseResult = parser.parse()
 
   return handleCompletion({getText: parser.getText, parseResult, metaByComp: mockMetadataProvider}, position)
+}
+
+function expectToContainExactly<T>(actual: T[], expected: T[]) {
+  expect(actual.length).toEqual(expected.length);
+  expect(new Set(actual)).toEqual(new Set(expected));
 }

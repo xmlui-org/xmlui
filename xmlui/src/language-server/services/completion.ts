@@ -6,7 +6,7 @@ import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import * as docGen from "./common/docs-generation";
 import { compNameForTagNameNode, findTagNameNodeInStack, insideClosingTag, pathToNodeInAscendands } from "./common/syntax-node-utilities";
-import type { AttributeKind, ComponentMetadataCollection, MetadataProvider, TaggedAttribute } from "./common/types";
+import type { AttributeKind, ComponentMetadataCollection, MetadataProvider, TaggedAttribute } from "./common/metadata-utils";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
   Type,
