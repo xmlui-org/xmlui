@@ -7,7 +7,6 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$maxWidth-MarkDown: createThemeVar("maxWidth-Markdown");
 $paddingTop-MarkDown: createThemeVar("paddingTop-Markdown");
 $paddingBottom-MarkDown: createThemeVar("paddingBottom-Markdown");
 $backgroundColor-MarkDown: createThemeVar("backgroundColor-Markdown");
@@ -22,8 +21,9 @@ $borderRadius-Blockquote: createThemeVar("borderRadius-Blockquote");
 $marginTop-Blockquote: createThemeVar("marginTop-Blockquote");
 $marginBottom-Blockquote: createThemeVar("marginBottom-Blockquote");
 
+$themeVars: t.composePaddingVars($themeVars, "Admonition");
+$themeVars: t.composeBorderVars($themeVars, "Admonition");
 $backgroundColor-Admonition: createThemeVar("backgroundColor-Admonition");
-$paddingLeft-Admonition: createThemeVar("paddingLeft-Admonition");
 $borderRadius-Admonition: createThemeVar("borderRadius-Admonition");
 $iconSize-Admonition: createThemeVar("iconSize-Admonition");
 $marginTop-Admonition: createThemeVar("marginTop-Admonition");
@@ -34,10 +34,10 @@ $marginTop-HtmlVideo: createThemeVar("marginTop-HtmlVideo");
 $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
 
 .markdownContent {
-  max-width: $maxWidth-MarkDown;
   padding-top: $paddingTop-MarkDown;
   padding-bottom: $paddingBottom-MarkDown;
   background-color: $backgroundColor-MarkDown;
+  width: 100%;
 
   // --- Blockquote
 
@@ -46,9 +46,6 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     margin-top: $marginTop-Blockquote;
     margin-bottom: $marginBottom-Blockquote;
     background-color: $backgroundColor-Blockquote;
-    padding-left: $paddingLeft-Blockquote;
-    @include t.borderVars($themeVars, "Blockquote");
-    @include t.paddingVars($themeVars, "Blockquote");
 
     &::before {
       background-color: $accentColor-Blockquote;
@@ -63,7 +60,8 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   }
 
   .blockquoteContainer {
-    padding: 0.5rem 0.5rem 0.1rem 0.5rem;
+    @include t.borderVars($themeVars, "Blockquote");
+    @include t.paddingVars($themeVars, "Blockquote");
   }
 
   .admonitionBlockquote {
@@ -71,6 +69,8 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     margin-bottom: $marginBottom-Admonition;
     background-color: $backgroundColor-Admonition;
     border-radius: $borderRadius-Admonition;
+    @include t.borderVars($themeVars, "Admonition");
+    @include t.paddingVars($themeVars, "Admonition");
   }
 
   .admonitionContainer {

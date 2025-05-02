@@ -13,10 +13,14 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composeTextVars($themeVars, "header-#{$component}");
 $backgroundColor-frame-NestedApp: createThemeVar("backgroundColor-frame-#{$component}");
 $gap-frame-NestedApp: createThemeVar("gap-frame-#{$component}");
+$marginTop-NestedApp: createThemeVar("marginTop-#{$component}");
+$marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
 
 .nestedAppContainer {
   @include t.borderVars($themeVars, $component);
   @include t.paddingVars($themeVars, $component);
+  margin-top: $marginTop-NestedApp;
+  margin-bottom: $marginBottom-NestedApp;
   width: 100%;
   height: fit-content;
   display: flex;

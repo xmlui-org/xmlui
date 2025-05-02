@@ -93,6 +93,12 @@ export const TextMd = createMetadata({
     [`paddingHorizontal-${COMP}-tableheading`]: "$space-1",
     [`fontWeight-${COMP}-tableheading`]: "$fontWeight-bold",
 
+    [`marginTop-${COMP}-markdown`]: "$space-3",
+    [`marginBottom-${COMP}-markdown`]: "$space-3",
+    [`fontSize-${COMP}-markdown`]: "$fontSize-normal",
+    [`marginTop-${COMP}-codefence`]: "$space-4",
+    [`marginBottom-${COMP}-codefence`]: "$space-4",
+
     [`backgroundColor-${COMP}-code`]: "$color-surface-100",
     [`borderColor-${COMP}-code`]: "$color-surface-200",
     [`backgroundColor-${COMP}-keyboard`]: "$color-surface-200",
