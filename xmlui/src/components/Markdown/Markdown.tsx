@@ -4,6 +4,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown } from "./MarkdownNative";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 const COMP = "Markdown";
 
@@ -24,21 +25,24 @@ export const MarkdownMd = createMetadata({
   },
 
   defaultThemeVars: {
-    "backgroundColor-Admonition": "$color-warn-300",
-    "borderRadius-Admonition": "$space-4",
+    "borderRadius-Admonition": "$space-2",
     "iconSize-Admonition": "$space-6",
-    "padding-Admonition": "$space-4",
-    "marginBottom-Admonition": "$space-4",
-    "marginLeft-Admonition-content":"$space-2",
+    "paddingLeft-Admonition": "$space-2",
+    "paddingRight-Admonition": "$space-6",
+    "paddingVertical-Admonition": "$space-2",
+    "marginLeft-Admonition-content": "$space-2",
+    "marginTop-Admonition": "$space-6",
+    "marginBottom-Admonition": "$space-6",
+    "backgroundColor-Admonition": "$color-warn-200",
 
+    "marginTop-Blockquote": "$space-6",
+    "marginBottom-Blockquote": "$space-6",
+    "paddingHorizontal-Blockquote": "$space-6",
+    "paddingTop-Blockquote": "$space-4",
+    "paddingBottom-Blockquote": "$space-2_5",
     "backgroundColor-Blockquote": "$color-warn-200",
     "accentWidth-Blockquote": "3px",
     "accentColor-Blockquote": "$color-surface-500",
-    "padding-Blockquote": "$space-2",
-    "marginBottom-Blockquote": "$space-4",
-
-    "marginBottom-Text-codefence": "$space-2",
-    "marginBottom-Text-markdown": "$space-2",
 
     "marginTop-HtmlLi": "$space-2",
     "marginBottom-HtmlLi": "$space-2",
@@ -90,4 +94,4 @@ export const markdownComponentRenderer = createComponentRenderer(
   },
 );
 
-export { Markdown } from './MarkdownNative';
+export { Markdown } from "./MarkdownNative";

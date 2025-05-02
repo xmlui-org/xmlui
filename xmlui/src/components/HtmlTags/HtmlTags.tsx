@@ -1299,6 +1299,10 @@ export const HtmlLiMd = createMetadata({
   props: {
     value: d("Specifies the value of the list item (if the parent is an ordered list)"),
   },
+  defaultThemeVars: {
+    "marginLeft-HtmlLi": "$space-8",
+    "paddingLeft-HtmlLi": "$space-2",
+  }
 });
 
 export const htmlLiTagRenderer = createComponentRenderer(

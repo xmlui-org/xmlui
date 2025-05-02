@@ -44,6 +44,8 @@ export const NestedAppMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    [`marginTop-${COMP}`]: "$space-3",
+    [`marginBottom-${COMP}`]: "$space-3",
     [`padding-${COMP}`]: "$space-4",
     [`paddingTop-${COMP}`]: "$space-3",
     [`borderRadius-${COMP}`]: "$space-4",
