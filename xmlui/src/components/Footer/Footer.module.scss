@@ -39,8 +39,8 @@ $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
   color: $textColor-Footer;
   margin: 0 auto;
 
-  &.full{
-    max-width: 100%;
+  &.verticalFullHeader{
+    max-width: $maxWidth-App-vertical;
   }
 }
 
