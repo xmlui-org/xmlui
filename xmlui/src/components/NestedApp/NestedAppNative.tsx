@@ -13,6 +13,7 @@ import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { setupWorker } from "msw/browser";
 import { CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { Tooltip } from "./Tooltip";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 type NestedAppProps = {
   api?: any;
@@ -21,6 +22,9 @@ type NestedAppProps = {
   config?: any;
   activeTone?: ThemeTone;
   activeTheme?: string;
+  title?: string;
+  height?: string | number;
+  allowPlaygroundPopup?: boolean;
 };
 
 export function NestedApp({
@@ -30,11 +34,16 @@ export function NestedApp({
   config,
   activeTheme,
   activeTone,
+  title,
+  height,
+  allowPlaygroundPopup = true,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const contentRootRef = useRef<Root | null>(null);
   const nestedAppId = useId();
   const [refreshVersion, setRefreshVersion] = useState(0);
+  const theme = useTheme();
+  const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
 
   const apiWorker = useMemo(() => {
     // console.log("HERE");
@@ -100,56 +109,61 @@ export function NestedApp({
         <ApiInterceptorProvider interceptor={mock} apiWorker={apiWorker}>
           <div className={styles.nestedAppContainer}>
             <div className={styles.header}>
-              <span className={styles.headerText}>Header</span>
+              <span className={styles.headerText}>{title}</span>
               <div className={styles.spacer} />
+              {allowPlaygroundPopup && (
+                <Tooltip
+                  trigger={
+                    <button
+                      className={styles.headerButton}
+                      onClick={() => {
+                        // TODO: Open the app in a new window
+                      }}
+                    >
+                      <RxOpenInNewWindow />
+                    </button>
+                  }
+                  label="Edit code in new window"
+                />
+              )}
               <Tooltip
                 trigger={
-                  <button className={styles.headerButton} onClick={() => {
-                    // TODO: Open the app in a new window
-                  }}>
-                    <RxOpenInNewWindow />
+                  <button
+                    className={styles.headerButton}
+                    onClick={() => {
+                      setRefreshVersion(refreshVersion + 1);
+                    }}
+                  >
+                    <LiaUndoAltSolid />
                   </button>
                 }
-                label="Edit code in new window"
+                label="Reset the app"
               />
-              <Tooltip
-              trigger={
-                <button
-                  className={styles.headerButton}
-                  onClick={() => {
-                    setRefreshVersion(refreshVersion + 1);
-                  }}
-                >
-                  <LiaUndoAltSolid />
-                </button>
-              }
-              label="Reset the app"
-            />
-
             </div>
-
-            <AppRoot
-              key={`app-${nestedAppId}-${refreshVersion}`}
-              previewMode={true}
-              standalone={true}
-              trackContainerHeight={true}
-              node={component}
-              globalProps={globalProps}
-              defaultTheme={activeTheme || config?.defaultTheme}
-              defaultTone={(activeTone || config?.defaultTone) as ThemeTone}
-              contributes={{
-                compoundComponents,
-                themes: config?.themes,
-              }}
-              resources={config?.resources}
-            />
+            <div style={{ height }}>
+              <AppRoot
+                key={`app-${nestedAppId}-${refreshVersion}`}
+                previewMode={true}
+                standalone={true}
+                trackContainerHeight={true}
+                node={component}
+                globalProps={globalProps}
+                defaultTheme={activeTheme || config?.defaultTheme}
+                defaultTone={toneToApply as ThemeTone}
+                contributes={{
+                  compoundComponents,
+                  themes: config?.themes,
+                }}
+                resources={config?.resources}
+              />
+            </div>
           </div>
         </ApiInterceptorProvider>
       </ErrorBoundary>,
     );
   }, [
     nestedAppId,
-    activeTone,
+    toneToApply,
     activeTheme,
     app,
     config,
@@ -162,7 +176,7 @@ export function NestedApp({
     components,
     mock,
     apiWorker,
-    refreshVersion
+    refreshVersion,
   ]);
   return (
     <div className={styles.nestedApp}>

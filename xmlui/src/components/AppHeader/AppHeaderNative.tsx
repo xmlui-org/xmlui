@@ -1,4 +1,4 @@
-import { ReactNode, useRef } from "react";
+import { ReactNode, useLayoutEffect, useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./AppHeader.module.scss";
@@ -19,6 +19,7 @@ type Props = {
   profileMenu?: ReactNode;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
+  canRestrictContentWidth?: boolean;
   className?: string;
   title?: string;
   navPanelVisible?: boolean;
@@ -26,7 +27,7 @@ type Props = {
   toggleDrawer?: () => void;
   hasRegisteredNavPanel?: boolean;
   titleContent?: ReactNode;
-  registerSubNavPanelSlot?: (node: HTMLElement) => void;
+  registerSubNavPanelSlot?: (node: HTMLElement)=>void;
 };
 
 function tryLoadImage(url: string, onLoaded: () => void, onError: () => void) {
@@ -41,7 +42,7 @@ function tryLoadImage(url: string, onLoaded: () => void, onError: () => void) {
 }
 
 export function useLogoUrl() {
-  const { logo, logoLight, logoDark } = useAppLayoutContext() || {};
+  const {logo, logoLight, logoDark} = useAppLayoutContext() || {};
   const logoUrlByTone = {
     light: logoLight,
     dark: logoDark,
@@ -49,8 +50,7 @@ export function useLogoUrl() {
   const { activeThemeTone } = useTheme();
 
   const baseLogoUrl = useResourceUrl("resource:logo") || logo;
-  const toneLogoUrl =
-    useResourceUrl(`resource:logo-${activeThemeTone}`) || logoUrlByTone[activeThemeTone];
+  const toneLogoUrl = useResourceUrl(`resource:logo-${activeThemeTone}`) || logoUrlByTone[activeThemeTone];
 
   return toneLogoUrl || baseLogoUrl;
 }
@@ -61,6 +61,7 @@ export const AppHeader = ({
   style = EMPTY_OBJECT,
   logoContent,
   className,
+  canRestrictContentWidth,
   navPanelVisible = true,
   toggleDrawer,
   showLogo,
@@ -70,7 +71,6 @@ export const AppHeader = ({
   registerSubNavPanelSlot,
 }: Props) => {
   const { mediaSize } = useAppContext();
-  const layout = useAppLayoutContext();
   const logoUrl = useLogoUrl();
   const subNavPanelSlot = useRef(null);
   const safeLogoTitle =
@@ -81,9 +81,8 @@ export const AppHeader = ({
     ) : (
       titleContent
     );
-  const layoutContext = useAppLayoutContext();
 
-  useIsomorphicLayoutEffect(() => {
+  useIsomorphicLayoutEffect(()=>{
     registerSubNavPanelSlot?.(subNavPanelSlot.current);
   }, []);
 
@@ -91,8 +90,7 @@ export const AppHeader = ({
     <div className={classnames(styles.header, className)} style={style}>
       <div
         className={classnames(styles.headerInner, {
-          [styles.verticalFullHeader]: layoutContext?.layout === "vertical-full-header",
-          [styles.scrollWholePage]: layoutContext?.scrollWholePage,
+          [styles.full]: !canRestrictContentWidth,
         })}
       >
         {!navPanelVisible && hasRegisteredNavPanel && (
@@ -123,7 +121,7 @@ export const AppHeader = ({
               </>
             ))}
         </div>
-        <div ref={subNavPanelSlot} className={styles.subNavPanelSlot} />
+        <div ref={subNavPanelSlot} className={styles.subNavPanelSlot}/>
         <div className={styles.childrenWrapper}>{children}</div>
         {profileMenu && <div className={styles.rightItems}>{profileMenu}</div>}
       </div>
@@ -168,12 +166,14 @@ export function AppContextAwareAppHeader({
 
   // console.log("APP LAYOUT CONTEXT", appLayoutContext);
   const displayLogo = layout !== "vertical" && layout !== "vertical-sticky" && showLogo;
+  const canRestrictContentWidth = layout !== "vertical-full-header";
 
   return (
     <AppHeader
       hasRegisteredNavPanel={hasRegisteredNavPanel}
       navPanelVisible={navPanelVisible}
       toggleDrawer={toggleDrawer}
+      canRestrictContentWidth={canRestrictContentWidth}
       showLogo={displayLogo}
       logoContent={logoContent || renderChild(logoContentDef)}
       profileMenu={profileMenu}

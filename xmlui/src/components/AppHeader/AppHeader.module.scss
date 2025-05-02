@@ -12,7 +12,6 @@ $themeVars: ();
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
 $themeVars: t.composeBorderVars($themeVars, $component);
-$maxWidth-App-vertical: createThemeVar("maxWidth-App-vertical");
 
 // --- Other
 $width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
@@ -24,10 +23,6 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   box-sizing: content-box;
   background-color: createThemeVar("backgroundColor-#{$component}");
   @include t.borderVars($themeVars, $component);
-
-  &.noBorder {
-    border: none;
-  }
 }
 
 .headerInner {
@@ -42,12 +37,8 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   padding-inline: t.getThemeVar($themeVars, "paddingHorizontal-#{$component}");
   @include t.paddingVars($themeVars, $component);
 
-  &.verticalFullHeader {
-    max-width: $maxWidth-App-vertical;
-    
-    &.scrollWholePage {
-      padding-left: calc(t.getThemeVar($themeVars, "paddingHorizontal-#{$component}") - var(--scrollbar-width));
-    }
+  &.full {
+    max-width: 100%;
   }
   width: 100%;
   margin: 0 auto;

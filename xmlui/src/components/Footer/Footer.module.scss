@@ -9,26 +9,21 @@ $themeVars: ();
 
 // --- Theme vars for paddings
 $component: "Footer";
-$themeVars: t.composePaddingVars($themeVars, $component) !global;
+$themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component) !global;
-$themeVars: t.composeTextVars($themeVars, $component) !global;
 
 // --- Other theme vars
+$backgroundColor-Footer: createThemeVar("backgroundColor-#{$component}");
+$textColor-Footer: createThemeVar("textColor-#{$component}");
 $height-Footer: createThemeVar("height-#{$component}");
+$fontSize-Footer: createThemeVar("fontSize-#{$component}");
 $verticalAlign-Footer: createThemeVar("verticalAlign-#{$component}");
 $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
-$backgroundColor-Footer: createThemeVar("backgroundColor-#{$component}");
-$maxWidth-App-vertical: createThemeVar("maxWidth-App-vertical");
 
-.outerWrapper {
+.outerWrapper{
   @include t.borderVars($themeVars, $component);
   background-color: $backgroundColor-Footer;
   height: $height-Footer;
-
-  .verticalFullHeader {
-    max-width: $maxWidth-App-vertical;
-    margin: 0 auto;
-  }
 }
 
 .wrapper {
@@ -38,17 +33,18 @@ $maxWidth-App-vertical: createThemeVar("maxWidth-App-vertical");
   height: 100%;
   flex-direction: row;
   @include t.paddingVars($themeVars, $component);
-  @include t.textVars($themeVars, $component);
+  font-size: $fontSize-Footer;
   align-items: $verticalAlign-Footer;
   max-width: $maxWidth-content-Footer;
+  color: $textColor-Footer;
   margin: 0 auto;
 
-  &.verticalFullHeader{
-    max-width: $maxWidth-App-vertical;
+  &.full{
+    max-width: 100%;
   }
 }
 
 // --- We export the theme variables to add them to the component renderer
-:export {
-  themeVars: t.json-stringify($themeVars);
+:export{
+  themeVars: t.json-stringify($themeVars)
 }

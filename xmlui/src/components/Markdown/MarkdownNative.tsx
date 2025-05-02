@@ -204,13 +204,17 @@ export const Markdown = memo(function Markdown({
           },
           samp({ ...props }) {
             const nestedProps = props as any;
-            console.log("nestedProps", nestedProps.config, typeof nestedProps.config);
             return (
               <NestedApp 
                 app={nestedProps.app}
                 config={extractValue(nestedProps.config)}
                 components={extractValue(nestedProps.components)}
                 api={extractValue(nestedProps.api)}
+                activeTheme={extractValue(nestedProps.activeTheme)}
+                activeTone={extractValue(nestedProps.activeTone)}
+                title={extractValue(nestedProps.title)}
+                height={extractValue(nestedProps.height)}
+                allowPlaygroundPopup={extractValue.asOptionalBoolean(nestedProps.allowPlaygroundPopup)}
               />
             );
           },
