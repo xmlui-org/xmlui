@@ -436,7 +436,8 @@ export default class RestApiProxy {
       if (!response.clone().ok) {
         throw await this.raiseError(response);
       }
-      return await parseResponse(response.clone());
+      const parsedResponse = await parseResponse(response.clone());
+      return parsedResponse;
     }
   };
 

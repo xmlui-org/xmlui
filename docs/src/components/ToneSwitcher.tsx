@@ -1,7 +1,7 @@
 import { usePlayground } from "../hooks/usePlayground";
 import { toneChanged } from "../state/store";
 import styles from "../components/Header.module.scss";
-import { LuMoon, LuSun } from "react-icons/lu";
+import { LuMoon, LuStar, LuSun } from "react-icons/lu";
 import { forwardRef } from "react";
 
 export const ToneSwitcher = forwardRef<HTMLButtonElement>((props, ref) => {
@@ -17,7 +17,7 @@ export const ToneSwitcher = forwardRef<HTMLButtonElement>((props, ref) => {
         tone === "light" ? dispatch(toneChanged("dark")) : dispatch(toneChanged("light"));
       }}
     >
-      {tone === "light" ? <LuMoon /> : <LuSun />}
+      {tone === "light" ? <LuStar /> : <LuSun />}
     </button>
   );
 });

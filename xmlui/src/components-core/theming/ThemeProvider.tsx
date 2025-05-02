@@ -214,6 +214,7 @@ export function useCompiledTheme(
       }
     });
   }, [themeDefChain, getResourceUrl, allFonts]);
+
   return {
     getResourceUrl,
     fontLinks,
@@ -234,6 +235,16 @@ export const builtInThemes: Array<ThemeDefinition> = [
   SolidThemeDefinition,
 ];
 
+type ThemeProviderProps = {
+  children?: React.ReactNode;
+  themes?: Array<ThemeDefinition>;
+  defaultTheme?: string;
+  defaultTone?: ThemeTone;
+  resources?: Record<string, string>;
+  resourceMap?: Record<string, string>;
+  localThemes?: Record<string, string>;
+};
+
 // theme-overriding properties change.
 function ThemeProvider({
   children,
@@ -242,14 +253,8 @@ function ThemeProvider({
   defaultTone = "light",
   resources = EMPTY_OBJECT,
   resourceMap = EMPTY_OBJECT,
-}: {
-  children?: React.ReactNode;
-  themes?: Array<ThemeDefinition>;
-  defaultTheme?: string;
-  defaultTone?: ThemeTone;
-  resources?: Record<string, string>;
-  resourceMap?: Record<string, string>;
-}) {
+  localThemes = EMPTY_OBJECT,
+}: ThemeProviderProps) {
   const [activeThemeTone, setActiveThemeTone] = useState<ThemeTone>(() => {
     if (!defaultTone) {
       return ThemeToneKeys[0];
@@ -327,6 +332,7 @@ function ThemeProvider({
     resources,
     root,
     themes,
+    localThemes,
   ]);
 
   const currentThemeContextValue = useMemo(() => {
@@ -392,13 +398,6 @@ function resolveThemeVarsWithCssVars(theme?: Record<string, string>) {
       }
       return ret;
     }
-
-    // for (let i = 1; i < (result?.length || 0); i++) {
-    //   const varName = result?.[i];
-    //   if(varName){
-    //     return input.replace(regex, `var(${getVarKey(varName)})`);
-    //   }
-    // }
 
     return input;
   }

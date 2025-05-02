@@ -1,0 +1,63 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "NestedApp";
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composeTextVars($themeVars, "header-#{$component}");
+$backgroundColor-frame-NestedApp: createThemeVar("backgroundColor-frame-#{$component}");
+$gap-frame-NestedApp: createThemeVar("gap-frame-#{$component}");
+
+.nestedAppContainer {
+  @include t.borderVars($themeVars, $component);
+  @include t.paddingVars($themeVars, $component);
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: $gap-frame-NestedApp;
+  background-color: $backgroundColor-frame-NestedApp;
+  align-content: center;
+
+  .header {
+    width: 100%;
+    height: 20px;
+    display: flex;
+    align-content: center;
+
+    .headerText {
+      @include t.textVars($themeVars, "header-#{$component}");
+    }
+
+    .headerButton {
+      padding: 0.5rem 1rem;
+    }
+
+    .spacer {
+      flex: 1 1 0 !important;
+      place-self: stretch;
+    }
+  }
+}
+
+.nestedApp {
+  width: 100%;
+  background-color: transparent;
+}
+
+:is(html[class~=dark]) {
+  .preview {
+    border: 1px solid #33404F;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
