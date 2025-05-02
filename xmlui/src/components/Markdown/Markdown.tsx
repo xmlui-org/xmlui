@@ -13,6 +13,10 @@ export const MarkdownMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   props: {
     content: d("This property sets the markdown content to display."),
+    codeHighlighter: {
+      description: "This property sets the code highlighter to use.",
+      isInternal: true,
+    },
     removeIndents: {
       description:
         "This boolean property specifies whether leading indents should be " +
@@ -86,6 +90,7 @@ export const markdownComponentRenderer = createComponentRenderer(
       <Markdown
         style={layoutCss}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
+        codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
       >
         {renderedChildren}

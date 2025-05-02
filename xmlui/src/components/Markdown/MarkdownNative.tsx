@@ -1,9 +1,10 @@
-import { type CSSProperties, memo, type ReactNode } from "react";
+import { type CSSProperties, memo, type ReactNode, useEffect, useState } from "react";
 import React from "react";
-import ReactMarkdown from "react-markdown";
+import { MarkdownHooks } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { visit } from "unist-util-visit";
+import type { Node, Parent } from "unist";
 
 import styles from "./Markdown.module.scss";
 import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
@@ -21,6 +22,7 @@ type MarkdownProps = {
   removeIndents?: boolean;
   children: ReactNode;
   style?: CSSProperties;
+  codeHighlighter?: CodeHighlighter;
 };
 
 export const Markdown = memo(function Markdown({
@@ -28,7 +30,18 @@ export const Markdown = memo(function Markdown({
   removeIndents = true,
   children,
   style,
+  codeHighlighter,
 }: MarkdownProps) {
+  /* const [test, setTest] = useState("red");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setTest("green"), 2000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []); */
+
   if (typeof children !== "string") {
     return null;
   }
@@ -37,8 +50,8 @@ export const Markdown = memo(function Markdown({
 
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }]]}
+      <MarkdownHooks
+        remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }], codeBlockParser]}
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
@@ -60,7 +73,7 @@ export const Markdown = memo(function Markdown({
             const popOut = props?.["data-popout"];
             if (popOut) {
               return (
-                <a href={src} target="_blank">
+                <a href={src} target="_blank" rel="noreferrer">
                   <img className={htmlTagStyles.htmlImage} {...props}>
                     {children}
                   </img>
@@ -99,14 +112,27 @@ export const Markdown = memo(function Markdown({
               </Text>
             );
           },
-          code({ id, children }) {
+          code({ id, children, node }) {
             return (
-              <Text uid={id} variant="code">
+              <Text uid={id} variant="code" /* style={{ color: test }} */>
                 {children}
               </Text>
             );
           },
-          pre({ id, children }) {
+          pre({ id, children, node }) {
+            const meta = extractMetaFromChildren(children);
+            // TEMP
+            const metaLanguage = meta.language === "xmlui" ? "xml" : meta.language;
+            // !TEMP
+            if (codeHighlighter && meta.language && codeHighlighter.availableLangs.includes(metaLanguage)) {
+              return (
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: codeHighlighter.highlight(extractTextContent(children), metaLanguage),
+                  }}
+                />
+              );
+            }
             return (
               <Text uid={id} variant="codefence">
                 {children}
@@ -222,7 +248,7 @@ export const Markdown = memo(function Markdown({
         }}
       >
         {children as any}
-      </ReactMarkdown>
+      </MarkdownHooks>
     </div>
   );
 });
@@ -383,14 +409,105 @@ const ListItem = ({ children, style }: ListItemProps) => {
   );
 };
 
+interface CodeNode extends Node {
+  lang: string | null;
+  meta: string | null;
+}
+
+function codeBlockParser() {
+  return function transformer(tree: Node) {
+    visit(tree, "code", visitor);
+  };
+
+  function visitor(node: CodeNode, index: number, parent: Parent | undefined) {
+    const { lang, meta } = node;
+    const nodeData = { hProperties: {} };
+    if (lang !== null) {
+      nodeData.hProperties["dataLanguage"] = lang;
+    }
+    if (!parent) return;
+    if (!meta) return;
+
+    const params = splitter(meta)
+      ?.filter((s) => s !== "")
+      .map((s) => s.trim());
+    if (!params) return;
+    if (params.length === 0) return;
+
+    nodeData.hProperties["dataMeta"] = params;
+    node.data = nodeData;
+
+    /* .reduce((acc, item) => {
+        const index = item.indexOf("=");
+        acc[item.substring(0, index)] = item
+          .substring(index + 1)
+          .replace(/"(.+)"/, "$1")
+          .replace(/'(.+)'/, "$1");
+        console.log(item.substring(0, index))
+        return acc;
+      }, {}); */
+
+    // console.log(params)
+
+    /* if (params["filename"]) {
+      let open: { open?: boolean };
+      if (useDetails) {
+        open = { open: true };
+      } else {
+        open = {};
+      }
+      if (params["open"] && params["open"] === "false") {
+        open = {
+          open: false,
+        };
+      }
+      // wrap node in a div
+      parent.children.splice(index, 1, {
+        type: "paragraph",
+        data: {
+          hName: useDetails ? "details" : "div",
+          hProperties: {
+            className: className,
+            ...open,
+          },
+        },
+        children: [
+          {
+            type: "paragraph",
+            data: {
+              hName: useDetails ? "summary" : "div",
+              hProperties: {
+                className: `${className}__filename`,
+              },
+            },
+            children: [
+              {
+                type: "text",
+                value: params["filename"],
+              },
+            ],
+          },
+          parent.children[index],
+        ],
+      });
+    } */
+    // nullify meta
+    //node.meta = null;
+  }
+
+  function splitter(str: string): string[] | null {
+    return str.match(/(?:[^\s"']+|("|')[^"']*("|'))+/g);
+  }
+}
+
 /**
  * Finds and evaluates given binding expressions in markdown text.
- * The binding expressions are of the form `${...}$`.
+ * The binding expressions are of the form `${...}`.
  * @param extractValue The function to resolve binding expressions
  * @returns visitor function that processes the binding expressions
  */
 function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
-  return (tree: any) => {
+  return (tree: Node) => {
     visit(tree, "text", (node) => {
       return detectBindingExpression(node);
     });
@@ -452,3 +569,64 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
     return "";
   }
 }
+
+function extractTextContent(node: React.ReactNode): string {
+  if (typeof node === "string") {
+    return node;
+  }
+
+  if (React.isValidElement(node) && node.props && node.props.children) {
+    if (Array.isArray(node.props.children)) {
+      return node.props.children.map(extractTextContent).join("");
+    }
+    return extractTextContent(node.props.children);
+  }
+
+  return "";
+}
+
+// Return html in string!
+type CodeHighlighter = {
+  highlight: (code: string, language: string, meta?: Record<string, any>) => string;
+  availableLangs: string[];
+};
+type CodeHighlighterMeta = {
+  language?: string;
+  copy?: boolean;
+  filename?: string;
+  rowHighlights?: number[];
+  columnHighlights?: number[];
+} 
+
+function extractMetaFromChildren(
+  node: React.ReactNode,
+  keys: string[] = ["data-language", "data-meta"],
+): CodeHighlighterMeta {
+  if (!node) return {};
+  if (typeof node === "string") return {};
+  if (typeof node === "number") return {};
+  if (typeof node === "boolean") return {};
+  if (Array.isArray(node)) return {};
+
+  if (
+    React.isValidElement(node) &&
+    node.props &&
+    node.props.children &&
+    typeof node.props.children === "string"
+  ) {
+    return Object.entries<Record<string, any>>(node.props)
+      .filter(([key, _]) => keys.includes(key))
+      .reduce((acc, [key, value]) => {
+        acc[key.replace("data-", "")] = value;
+        return acc;
+      }, {});
+  }
+  return {};
+}
+
+//console.log(node.properties)
+//console.log(typeof codeHighlighter, codeHighlighter)
+//if (codeHighlighter && typeof children === "string") {
+// shiki adds pre and code tags as well, not ideal
+//return codeHighlighter(children);
+//}
