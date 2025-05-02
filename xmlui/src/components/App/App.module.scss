@@ -13,6 +13,7 @@ $boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
 $backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
 $borderLeft-content-App: createThemeVar("borderLeft-content-App");
 $maxWidth-content-App: createThemeVar("maxWidth-content-App");
+$maxWidth-App: createThemeVar("maxWidth-App");
 $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
@@ -193,6 +194,9 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   display: flex;
   flex-direction: row;
   isolation: isolate;
+  align-self: center;
+  width: 100%;
+  max-width: createThemeVar("maxWidth-App");
 }
 
 .contentWrapper {

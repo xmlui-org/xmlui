@@ -4,7 +4,6 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown } from "./MarkdownNative";
-import { useTheme } from "../../components-core/theming/ThemeContext";
 
 const COMP = "Markdown";
 
@@ -86,7 +85,7 @@ export const markdownComponentRenderer = createComponentRenderer(
       <Markdown
         style={layoutCss}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
-        extractValue={extractValue}
+        // extractValue={extractValue}
       >
         {renderedChildren}
       </Markdown>

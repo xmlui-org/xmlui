@@ -178,6 +178,7 @@ export function Theme({
   if (isRoot) {
     const faviconUrl = getResourceUrl("resource:favicon") || "/resources/favicon.ico";
     return (
+      // <ThemeContext.Provider value={currentThemeContextValue}>
       <>
         <Helmet>
           {!!faviconUrl && <link rel="icon" type="image/svg+xml" href={faviconUrl} />}
@@ -201,6 +202,7 @@ export function Theme({
           <NotificationToast toastDuration={toastDuration} />
         </div>
       </>
+      // </ThemeContext.Provider>
     );
   }
 

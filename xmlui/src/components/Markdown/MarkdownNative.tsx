@@ -1,4 +1,4 @@
-import { type CSSProperties, memo, type ReactNode } from "react";
+import { type CSSProperties, memo, type ReactNode, useEffect } from "react";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -17,14 +17,14 @@ import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSource
 import { NestedApp } from "../NestedApp/NestedAppNative";
 
 type MarkdownProps = {
-  extractValue: ValueExtractor;
+  // extractValue: ValueExtractor;
   removeIndents?: boolean;
   children: ReactNode;
   style?: CSSProperties;
 };
 
 export const Markdown = memo(function Markdown({
-  extractValue,
+  // extractValue,
   removeIndents = true,
   children,
   style,
@@ -33,12 +33,10 @@ export const Markdown = memo(function Markdown({
     return null;
   }
 
-  children = removeIndents ? removeTextIndents(children) : children;
-
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }]]}
+        remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
@@ -207,21 +205,21 @@ export const Markdown = memo(function Markdown({
             return (
               <NestedApp 
                 app={nestedProps.app}
-                config={extractValue(nestedProps.config)}
-                components={extractValue(nestedProps.components)}
-                api={extractValue(nestedProps.api)}
-                activeTheme={extractValue(nestedProps.activeTheme)}
-                activeTone={extractValue(nestedProps.activeTone)}
-                title={extractValue(nestedProps.title)}
-                height={extractValue(nestedProps.height)}
-                allowPlaygroundPopup={extractValue.asOptionalBoolean(nestedProps.allowPlaygroundPopup)}
+                config={nestedProps.config}
+                components={nestedProps.components}
+                api={nestedProps.api}
+                activeTheme={nestedProps.activeTheme}
+                activeTone={nestedProps.activeTone}
+                title={nestedProps.title}
+                height={nestedProps.height}
+                allowPlaygroundPopup={nestedProps.allowPlaygroundPopup}
               />
             );
           },
 
         }}
       >
-        {children as any}
+        {removeIndents ? removeTextIndents(children) : children}
       </ReactMarkdown>
     </div>
   );
