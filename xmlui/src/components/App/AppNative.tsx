@@ -78,8 +78,6 @@ export function App({
   const mounted = useRef(false);
 
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
-  const isFullVerticalWidth = getThemeVar("maxWidth-App-vertical") === "100%";
-  console.log("isVerticalMaxWidth", isFullVerticalWidth);
   const safeLayout = layoutWithDefaultValue
     ?.trim()
     .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
@@ -211,8 +209,6 @@ export function App({
       logoContentDef,
       registerSubNavPanelSlot,
       subNavPanelSlot,
-      isFullVerticalWidth,
-      scrollWholePage,
     };
   }, [
     hasRegisteredNavPanel,
@@ -228,8 +224,6 @@ export function App({
     logoContentDef,
     registerSubNavPanelSlot,
     subNavPanelSlot,
-    isFullVerticalWidth,
-    scrollWholePage,
   ]);
 
   useEffect(() => {
@@ -320,21 +314,17 @@ export function App({
           >
             {header}
           </header>
-          <div className={styles.contentScroller}>
-            <div className={styles.contentAligner}>
-              <div className={styles.content}>
-                {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
-                <main className={styles.contentWrapper}>
-                  <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-                    <ScrollContext.Provider value={scrollContainerRef}>
-                      <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
-                        {children}
-                      </div>
-                    </ScrollContext.Provider>
+          <div className={styles.content}>
+            {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
+            <main className={styles.contentWrapper}>
+              <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+                <ScrollContext.Provider value={scrollContainerRef}>
+                  <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                    {children}
                   </div>
-                </main>
+                </ScrollContext.Provider>
               </div>
-            </div>
+            </main>
           </div>
           <div className={styles.footerWrapper} ref={footerRefCallback}>
             {footer}
