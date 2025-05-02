@@ -21,11 +21,12 @@ export const Footer = forwardRef(function Footer(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const { layout } = useAppLayoutContext() || {};
+  const canRestrictContentWidth = layout !== "vertical-full-header";
   return (
     <div className={styles.outerWrapper} ref={forwardedRef} style={style}>
       <div
         className={classnames(styles.wrapper, className, {
-          [styles.verticalFullHeader]: layout === "vertical-full-header",
+          [styles.full]: !canRestrictContentWidth,
         })}
       >
         {children}
