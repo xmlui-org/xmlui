@@ -3,18 +3,18 @@ import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSource
 
 /**
  * Finds and evaluates given binding expressions in markdown text.
- * The binding expressions are of the form `${...}`.
+ * The binding expressions are of the form `@{...}`.
  * @param text The markdown text
  * @param extractValue The function to resolve binding expressions
  * @returns the parsed text with resolved binding expressions
  */
 export function parseBindingExpression(text: string, extractValue: ValueExtractor) {
-  // Remove empty ${} expressions first
-  text = text.replaceAll(/\$\{\s*\}/g, "");
+  // Remove empty @{} expressions first
+  text = text.replaceAll(/(?<!\\)\@\{\s*\}/g, "");
 
   // The (?<!\\) is a "negative lookbehind" in regex that ensures that
-  // if escaping the ${...} expression like this: \${...}, we don't match it
-  const regex = /(?<!\\)\$\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
+  // if escaping the @{...} expression like this: \@{...}, we don't match it
+  const regex = /(?<!\\)\@\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
   const result = text.replace(regex, (_, expr) => {
     const extracted = extractValue(`{${expr}}`);
     const resultExpr = mapByType(extracted);
