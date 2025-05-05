@@ -1,4 +1,4 @@
-import { type CSSProperties, memo, type ReactNode, useEffect, useState } from "react";
+import { type CSSProperties, memo, type ReactNode } from "react";
 import React from "react";
 import { MarkdownHooks } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -14,8 +14,8 @@ import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
 import { NestedApp } from "../NestedApp/NestedAppNative";
+import { type CodeHighlighter, parseMetaAndHighlightCode } from "./highlight-code";
 
 type MarkdownProps = {
   extractValue: ValueExtractor;
@@ -41,7 +41,7 @@ export const Markdown = memo(function Markdown({
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
       <MarkdownHooks
-        remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }], codeBlockParser]}
+        remarkPlugins={[remarkGfm, codeBlockParser]}
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
@@ -441,154 +441,3 @@ function codeBlockParser() {
     return str.match(/(?:[^\s"']+|("|')[^"']*("|'))+/g);
   }
 }
-
-/**
- * Finds and evaluates given binding expressions in markdown text.
- * The binding expressions are of the form `${...}`.
- * @param extractValue The function to resolve binding expressions
- * @returns visitor function that processes the binding expressions
- */
-function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
-  return (tree: Node) => {
-    visit(tree, "text", (node) => {
-      return detectBindingExpression(node);
-    });
-  };
-
-  function detectBindingExpression(node: any) {
-    // Remove empty ${} expressions first
-    node.value = node.value.replace(/\$\{\s*\}/g, "");
-
-    const regex = /\$\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
-    const parts: string[] = node.value.split(regex);
-    if (parts.length > 1) {
-      node.type = "html";
-      node.value = parts
-        .map((part, index) => {
-          const extracted = index % 2 === 0 ? part : extractValue(`{${part}}`);
-          const resultExpr = mapByType(extracted);
-          // The result expression might be an object, in that case we stringify it here,
-          // at the last step, so that there are no unnecessary apostrophes
-          return typeof resultExpr === "object" && resultExpr !== null
-            ? JSON.stringify(resultExpr)
-            : resultExpr;
-        })
-        .join("");
-    }
-  }
-
-  function mapByType(extracted: any) {
-    if (extracted === null) {
-      return null;
-    } else if (extracted === undefined || typeof extracted === "undefined") {
-      return undefined;
-    } else if (typeof extracted === "object") {
-      const arrowFuncResult = parseArrowFunc(extracted);
-      if (arrowFuncResult) {
-        return arrowFuncResult;
-      }
-      if (Array.isArray(extracted)) {
-        return extracted;
-      }
-      return Object.fromEntries(
-        Object.entries(extracted).map(([key, value]) => {
-          return [key, mapByType(value)];
-        }),
-      );
-    } else {
-      return extracted;
-    }
-  }
-
-  function parseArrowFunc(extracted: Record<string, any>): string {
-    if (
-      extracted.hasOwnProperty("type") &&
-      extracted.type === T_ARROW_EXPRESSION &&
-      extracted?._ARROW_EXPR_
-    ) {
-      return "[xmlui function]";
-    }
-    return "";
-  }
-}
-
-// --- Codefence Syntax Highlighting & Meta Extraction
-
-function parseMetaAndHighlightCode(
-  node: React.ReactNode,
-  codeHighlighter: CodeHighlighter,
-): { classNames: string | null; cleanedHtmlStr: string } | null {
-  const meta = extractMetaFromChildren(node);
-  // TEMP
-  const metaLanguage =
-    meta.language === "xmlui" || meta.language === "xmlui-pg" ? "xml" : meta.language;
-  // !TEMP
-  if (metaLanguage && codeHighlighter.availableLangs.includes(metaLanguage)) {
-    const htmlCodeStr = codeHighlighter.highlight(
-      // TODO: for xmlui-pg languages, we need to map that to a Playground component
-      // Thus, there are other special lines that need to be detected and parsed
-      extractTextContent(node),
-      metaLanguage,
-    );
-    const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
-    const classNames = match ? match[1] : null;
-    const cleanedHtmlStr = htmlCodeStr.replace(/<pre\b[^>]*>|<\/pre>/gi, "");
-
-    return { classNames, cleanedHtmlStr };
-  }
-  return null;
-}
-
-function extractTextContent(node: React.ReactNode): string {
-  if (typeof node === "string") {
-    return node;
-  }
-
-  if (React.isValidElement(node) && node.props && node.props.children) {
-    if (Array.isArray(node.props.children)) {
-      return node.props.children.map(extractTextContent).join("");
-    }
-    return extractTextContent(node.props.children);
-  }
-
-  return "";
-}
-
-function extractMetaFromChildren(
-  node: React.ReactNode,
-  keys: string[] = ["data-language", "data-meta"],
-): CodeHighlighterMeta {
-  if (!node) return {};
-  if (typeof node === "string") return {};
-  if (typeof node === "number") return {};
-  if (typeof node === "boolean") return {};
-  if (Array.isArray(node)) return {};
-
-  if (
-    React.isValidElement(node) &&
-    node.props &&
-    node.props.children &&
-    typeof node.props.children === "string"
-  ) {
-    return Object.entries<Record<string, any>>(node.props)
-      .filter(([key, _]) => keys.includes(key))
-      .reduce((acc, [key, value]) => {
-        acc[key.replace("data-", "")] = value;
-        return acc;
-      }, {});
-  }
-  return {};
-}
-
-type CodeHighlighter = {
-  // Returns html in string!
-  highlight: (code: string, language: string, meta?: Record<string, any>) => string;
-  availableLangs: string[];
-};
-type CodeHighlighterMeta = {
-  language?: string;
-  copy?: boolean;
-  filename?: string;
-  rowHighlights?: number[];
-  columnHighlights?: number[];
-};
