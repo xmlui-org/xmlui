@@ -154,6 +154,7 @@ export const AppWrapper = ({
                   standalone={standalone}
                   decorateComponentsWithTestId={decorateComponentsWithTestId}
                   debugEnabled={debugEnabled}
+                  trackContainerHeight={trackContainerHeight}
                 >
                   {children}
                 </AppContent>

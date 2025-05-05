@@ -84,7 +84,7 @@ export function NestedApp({
     if (errors.length > 0) {
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
     }
-    const compoundComponents: CompoundComponentDef[] = components.map((src) => {
+    const compoundComponents: CompoundComponentDef[] = components ?? [].map((src) => {
       const isErrorReportComponent = typeof src !== "string";
       if (isErrorReportComponent) {
         return src;

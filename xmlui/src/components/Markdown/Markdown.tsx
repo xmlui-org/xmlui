@@ -82,15 +82,32 @@ export const markdownComponentRenderer = createComponentRenderer(
     }
 
     return (
-      <Markdown
+      <TransformedMarkdown
         style={layoutCss}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         // extractValue={extractValue}
       >
         {renderedChildren}
-      </Markdown>
+      </TransformedMarkdown>
     );
   },
 );
+
+type TransformedMarkdownProps = {
+  children: React.ReactNode;
+  removeIndents?: boolean;
+  style: React.CSSProperties;
+};
+
+const TransformedMarkdown = ({ children, removeIndents, style }: TransformedMarkdownProps) => {
+  if (typeof children !== "string") {
+    return null;
+  }
+  return (
+    <Markdown removeIndents={removeIndents} style={style}>
+      {children}
+    </Markdown>
+  );
+};
 
 export { Markdown } from "./MarkdownNative";

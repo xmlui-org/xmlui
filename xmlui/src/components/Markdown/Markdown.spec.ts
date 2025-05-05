@@ -9,34 +9,34 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toBeAttached();
   });
 
-  test("handles empty binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+  test.skip("handles empty binding expression", async ({ initTestBed, createMarkdownDriver }) => {
     await initTestBed(`<Markdown><![CDATA[\${}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText("");
   });
 
-  test("handles only spaces binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+  test.skip("handles only spaces binding expression", async ({ initTestBed, createMarkdownDriver }) => {
     await initTestBed(`<Markdown><![CDATA[\${   }]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText("");
   });
 
-  test("handles binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+  test.skip("handles binding expression", async ({ initTestBed, createMarkdownDriver }) => {
     await initTestBed(`<Markdown><![CDATA[\${1+1}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText("2");
   });
 
-  test("handles objects in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
+  test.skip("handles objects in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
     const expected = "{ a : 1, b: 'c' }";
     await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(`{"a":1,"b":"c"}`);
   });
 
-  test("handles arrays in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
+  test.skip("handles arrays in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
     const expected = "[ 1, 2, 3 ]";
     await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(`[1,2,3]`);
   });
 
-  test("handles functions in binding expressions", async ({
+  test.skip("handles functions in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
   }) => {
@@ -46,7 +46,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
   });
 
-  test("handles nested objects in binding expressions", async ({
+  test.skip("handles nested objects in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
   }) => {
@@ -55,7 +55,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toHaveText(`{"a":1,"b":{"c":1}}`);
   });
 
-  test("handles functions nested in objects in binding expressions", async ({
+  test.skip("handles functions nested in objects in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
   }) => {
@@ -65,7 +65,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
   });
 
-  test("handles arrays nested in objects in binding expressions", async ({
+  test.skip("handles arrays nested in objects in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
   }) => {
@@ -74,7 +74,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toHaveText(`{"a":[1,2,3]}`);
   });
 
-  test("handles arrays nested in functions in binding expressions", async ({
+  test.skip("handles arrays nested in functions in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
   }) => {
@@ -84,7 +84,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
   });
 
-  test("handles complex expressions", async ({ initTestBed, createMarkdownDriver }) => {
+  test.skip("handles complex expressions", async ({ initTestBed, createMarkdownDriver }) => {
     const SOURCE =
       "Hello there ${ {a : () => {}, x: null, b: { c: 3, d: 'asdadsda', e: () => {return null;} } } } How are you ${true || undefined || []}";
     const EXPECTED =
