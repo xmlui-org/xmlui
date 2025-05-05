@@ -32,16 +32,6 @@ export const Markdown = memo(function Markdown({
   style,
   codeHighlighter,
 }: MarkdownProps) {
-  /* const [test, setTest] = useState("red");
-
-  useEffect(() => {
-    const timer = setTimeout(() => setTest("green"), 2000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []); */
-
   if (typeof children !== "string") {
     return null;
   }
@@ -112,31 +102,38 @@ export const Markdown = memo(function Markdown({
               </Text>
             );
           },
-          code({ id, children, node }) {
+          code({ id, children }) {
             return (
-              <Text uid={id} variant="code" /* style={{ color: test }} */>
+              <Text uid={id} variant="code">
                 {children}
               </Text>
             );
           },
-          pre({ id, children, node }) {
-            const meta = extractMetaFromChildren(children);
-            // TEMP
-            const metaLanguage = meta.language === "xmlui" ? "xml" : meta.language;
-            // !TEMP
-            if (codeHighlighter && meta.language && codeHighlighter.availableLangs.includes(metaLanguage)) {
-              return (
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: codeHighlighter.highlight(extractTextContent(children), metaLanguage),
-                  }}
-                />
-              );
-            }
-            return (
+          pre({ id, children }) {
+            const defaultCodefence = (
               <Text uid={id} variant="codefence">
                 {children}
               </Text>
+            );
+
+            if (!codeHighlighter) {
+              return defaultCodefence;
+            }
+
+            const parsedData = parseMetaAndHighlightCode(children, codeHighlighter);
+            if (!parsedData) {
+              return defaultCodefence;
+            }
+
+            return (
+              <div className={styles.codeWrapper}>
+                <Text
+                  uid={id}
+                  variant="codefence"
+                  syntaxHighlightClasses={parsedData.classNames}
+                  dangerouslySetInnerHTML={{ __html: parsedData.cleanedHtmlStr }}
+                />
+              </div>
             );
           },
           strong({ id, children }) {
@@ -231,7 +228,7 @@ export const Markdown = memo(function Markdown({
           samp({ ...props }) {
             const nestedProps = props as any;
             return (
-              <NestedApp 
+              <NestedApp
                 app={nestedProps.app}
                 config={extractValue(nestedProps.config)}
                 components={extractValue(nestedProps.components)}
@@ -240,11 +237,12 @@ export const Markdown = memo(function Markdown({
                 activeTone={extractValue(nestedProps.activeTone)}
                 title={extractValue(nestedProps.title)}
                 height={extractValue(nestedProps.height)}
-                allowPlaygroundPopup={extractValue.asOptionalBoolean(nestedProps.allowPlaygroundPopup)}
+                allowPlaygroundPopup={extractValue.asOptionalBoolean(
+                  nestedProps.allowPlaygroundPopup,
+                )}
               />
             );
           },
-
         }}
       >
         {children as any}
@@ -419,7 +417,7 @@ function codeBlockParser() {
     visit(tree, "code", visitor);
   };
 
-  function visitor(node: CodeNode, index: number, parent: Parent | undefined) {
+  function visitor(node: CodeNode, _: number, parent: Parent | undefined) {
     const { lang, meta } = node;
     const nodeData = { hProperties: {} };
     if (lang !== null) {
@@ -434,65 +432,9 @@ function codeBlockParser() {
     if (!params) return;
     if (params.length === 0) return;
 
+    // TEMP: just appending everything else as a string to a different property
     nodeData.hProperties["dataMeta"] = params;
     node.data = nodeData;
-
-    /* .reduce((acc, item) => {
-        const index = item.indexOf("=");
-        acc[item.substring(0, index)] = item
-          .substring(index + 1)
-          .replace(/"(.+)"/, "$1")
-          .replace(/'(.+)'/, "$1");
-        console.log(item.substring(0, index))
-        return acc;
-      }, {}); */
-
-    // console.log(params)
-
-    /* if (params["filename"]) {
-      let open: { open?: boolean };
-      if (useDetails) {
-        open = { open: true };
-      } else {
-        open = {};
-      }
-      if (params["open"] && params["open"] === "false") {
-        open = {
-          open: false,
-        };
-      }
-      // wrap node in a div
-      parent.children.splice(index, 1, {
-        type: "paragraph",
-        data: {
-          hName: useDetails ? "details" : "div",
-          hProperties: {
-            className: className,
-            ...open,
-          },
-        },
-        children: [
-          {
-            type: "paragraph",
-            data: {
-              hName: useDetails ? "summary" : "div",
-              hProperties: {
-                className: `${className}__filename`,
-              },
-            },
-            children: [
-              {
-                type: "text",
-                value: params["filename"],
-              },
-            ],
-          },
-          parent.children[index],
-        ],
-      });
-    } */
-    // nullify meta
-    //node.meta = null;
   }
 
   function splitter(str: string): string[] | null {
@@ -570,6 +512,33 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
   }
 }
 
+// --- Codefence Syntax Highlighting & Meta Extraction
+
+function parseMetaAndHighlightCode(
+  node: React.ReactNode,
+  codeHighlighter: CodeHighlighter,
+): { classNames: string | null; cleanedHtmlStr: string } | null {
+  const meta = extractMetaFromChildren(node);
+  // TEMP
+  const metaLanguage =
+    meta.language === "xmlui" || meta.language === "xmlui-pg" ? "xml" : meta.language;
+  // !TEMP
+  if (metaLanguage && codeHighlighter.availableLangs.includes(metaLanguage)) {
+    const htmlCodeStr = codeHighlighter.highlight(
+      // TODO: for xmlui-pg languages, we need to map that to a Playground component
+      // Thus, there are other special lines that need to be detected and parsed
+      extractTextContent(node),
+      metaLanguage,
+    );
+    const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
+    const classNames = match ? match[1] : null;
+    const cleanedHtmlStr = htmlCodeStr.replace(/<pre\b[^>]*>|<\/pre>/gi, "");
+
+    return { classNames, cleanedHtmlStr };
+  }
+  return null;
+}
+
 function extractTextContent(node: React.ReactNode): string {
   if (typeof node === "string") {
     return node;
@@ -584,19 +553,6 @@ function extractTextContent(node: React.ReactNode): string {
 
   return "";
 }
-
-// Return html in string!
-type CodeHighlighter = {
-  highlight: (code: string, language: string, meta?: Record<string, any>) => string;
-  availableLangs: string[];
-};
-type CodeHighlighterMeta = {
-  language?: string;
-  copy?: boolean;
-  filename?: string;
-  rowHighlights?: number[];
-  columnHighlights?: number[];
-} 
 
 function extractMetaFromChildren(
   node: React.ReactNode,
@@ -624,9 +580,15 @@ function extractMetaFromChildren(
   return {};
 }
 
-//console.log(node.properties)
-//console.log(typeof codeHighlighter, codeHighlighter)
-//if (codeHighlighter && typeof children === "string") {
-// shiki adds pre and code tags as well, not ideal
-//return codeHighlighter(children);
-//}
+type CodeHighlighter = {
+  // Returns html in string!
+  highlight: (code: string, language: string, meta?: Record<string, any>) => string;
+  availableLangs: string[];
+};
+type CodeHighlighterMeta = {
+  language?: string;
+  copy?: boolean;
+  filename?: string;
+  rowHighlights?: number[];
+  columnHighlights?: number[];
+};
