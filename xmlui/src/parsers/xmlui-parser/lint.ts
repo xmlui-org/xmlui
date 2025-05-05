@@ -191,11 +191,12 @@ const implicitPropNames = layoutOptionKeys
 
 function lintAttrs(component: ComponentDef, metadataForCurrentComponent: ComponentMetadataProvider, diags: LintDiagnostic[]){
 
-  const attrNames = Object.keys(component.props ?? {});
-  attrNames.push(...Object.keys(component.api ?? {}));
-  attrNames.push(...Object.keys(component.events ?? {}));
+  const invalidAttrNames = Object.keys(component.props ?? {}).filter((name) => !metadataForCurrentComponent.getAttr(name))
+  const invalidEvents = Object.keys(component.events ?? {}).filter((event) => !metadataForCurrentComponent.getEvent(event))
+  const invalidApis = Object.keys(component.api ?? {}).filter((api) => !metadataForCurrentComponent.getApi(api))
 
-  const invalidAttrNames = attrNames.filter((name) => !metadataForCurrentComponent.getAttr(name))
+  invalidAttrNames.push(...invalidEvents);
+  invalidAttrNames.push(...invalidApis);
 
   for(const invalidAttrName of invalidAttrNames){
     diags.push(toUnrecognisedAttrDiag(component, invalidAttrName))

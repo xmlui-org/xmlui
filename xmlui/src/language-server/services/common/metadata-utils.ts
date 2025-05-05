@@ -100,6 +100,14 @@ export class ComponentMetadataProvider {
     return attrNames;
   }
 
+  getEvent(name: string){
+    return this.metadata.events?.[name];
+  }
+
+  getApi(name: string){
+    return this.metadata.apis?.[name];
+  }
+
   get events(): Record<string, string> {
     return this.metadata.events;
   }

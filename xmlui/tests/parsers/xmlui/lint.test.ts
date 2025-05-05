@@ -10,6 +10,11 @@ describe("lint", ()=>{
       Button: {
         props: {
           x: null
+        },
+        events: {
+          click: {
+            description: "event on click"
+          }
         }
       }
     });
@@ -60,6 +65,14 @@ describe("lint", ()=>{
     it("recognises layout prop with sm viewport size", () => {
       const component = transformSource(
         `<Button width-sm="anything" />`
+      ) as ComponentDef;
+      const diags = lint({ component, metadataProvider: buttonWithPropX });
+      expect(diags).toHaveLength(0);
+    });
+
+    it("recognises click event", () => {
+      const component = transformSource(
+        `<Button onClick="anything" />`
       ) as ComponentDef;
       const diags = lint({ component, metadataProvider: buttonWithPropX });
       expect(diags).toHaveLength(0);
