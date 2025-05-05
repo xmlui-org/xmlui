@@ -356,7 +356,8 @@ button.selectTrigger {
 }
 
 .selectViewport {
-  height: var(--radix-select-trigger-height);
+  height: fit-content;
+  max-height: 300px;
   width: 100%;
   min-width: var(--radix-select-trigger-width);
 }
