@@ -17,14 +17,12 @@ import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSource
 import { NestedApp } from "../NestedApp/NestedAppNative";
 
 type MarkdownProps = {
-  // extractValue: ValueExtractor;
   removeIndents?: boolean;
   children: ReactNode;
   style?: CSSProperties;
 };
 
 export const Markdown = memo(function Markdown({
-  // extractValue,
   removeIndents = true,
   children,
   style,
@@ -34,7 +32,7 @@ export const Markdown = memo(function Markdown({
   }
 
   return (
-    <div className={styles.markdownContent} style={{ ...style }}>
+    <div className={styles.markdownContent} style={style}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}

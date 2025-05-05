@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo, useId, useState } from "react";
+import { useRef, useEffect, useMemo, useId, useState, useLayoutEffect } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import styles from "./NestedApp.module.scss";
@@ -11,9 +11,10 @@ import { errReportComponent, xmlUiMarkupToComponent } from "../../components-cor
 import { ApiInterceptorProvider } from "../../components-core/interception/ApiInterceptorProvider";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { setupWorker } from "msw/browser";
-import { CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { Tooltip } from "./Tooltip";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { EMPTY_ARRAY } from "../../components-core/constants";
 
 type NestedAppProps = {
   api?: any;
@@ -30,7 +31,7 @@ type NestedAppProps = {
 export function NestedApp({
   api,
   app,
-  components = [],
+  components = EMPTY_ARRAY,
   config,
   activeTheme,
   activeTone,
@@ -50,7 +51,7 @@ export function NestedApp({
     if (typeof document !== "undefined") {
       return setupWorker();
     }
-  }, [nestedAppId]);
+  }, []);
 
   useEffect(() => {
     apiWorker?.start({
@@ -74,7 +75,7 @@ export function NestedApp({
 
   //console.log("mock", mock);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!contentRootRef.current && rootRef.current) {
       contentRootRef.current = ReactDOM.createRoot(rootRef.current);
     }
@@ -84,19 +85,21 @@ export function NestedApp({
     if (errors.length > 0) {
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
     }
-    const compoundComponents: CompoundComponentDef[] = components ?? [].map((src) => {
-      const isErrorReportComponent = typeof src !== "string";
-      if (isErrorReportComponent) {
-        return src;
-      }
-      let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
-        src as string,
-      );
-      if (errors.length > 0) {
-        return errReportComponent(errors, `nested xmlui`, erroneousCompoundComponentName);
-      }
-      return component;
-    });
+    const compoundComponents: CompoundComponentDef[] =
+      components ??
+      [].map((src) => {
+        const isErrorReportComponent = typeof src !== "string";
+        if (isErrorReportComponent) {
+          return src;
+        }
+        let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
+          src as string,
+        );
+        if (errors.length > 0) {
+          return errReportComponent(errors, `nested xmlui`, erroneousCompoundComponentName);
+        }
+        return component;
+      });
 
     let globalProps = {
       name: config?.name,
@@ -145,7 +148,7 @@ export function NestedApp({
                 key={`app-${nestedAppId}-${refreshVersion}`}
                 previewMode={true}
                 standalone={true}
-                trackContainerHeight={true}
+                trackContainerHeight={height ? "fixed" : "auto"}
                 node={component}
                 globalProps={globalProps}
                 defaultTheme={activeTheme || config?.defaultTheme}
@@ -161,22 +164,25 @@ export function NestedApp({
         </ApiInterceptorProvider>
       </ErrorBoundary>,
     );
+
+    return () => contentRootRef.current?.unmount();
   }, [
-    nestedAppId,
-    toneToApply,
     activeTheme,
-    app,
-    config,
-    config?.themes,
-    config?.name,
-    config?.appGlobals,
-    config?.resources,
-    config?.defaultTheme,
-    config?.defaultTone,
-    components,
-    mock,
+    allowPlaygroundPopup,
     apiWorker,
+    app,
+    components,
+    config?.appGlobals,
+    config?.defaultTheme,
+    config?.name,
+    config?.resources,
+    config?.themes,
+    height,
+    mock,
+    nestedAppId,
     refreshVersion,
+    title,
+    toneToApply,
   ]);
   return (
     <div className={styles.nestedApp}>

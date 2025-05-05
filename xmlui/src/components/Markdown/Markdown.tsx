@@ -4,6 +4,8 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown } from "./MarkdownNative";
+import { useMemo } from "react";
+import type { ValueExtractor } from "../../abstractions/RendererDefs";
 
 const COMP = "Markdown";
 
@@ -85,7 +87,7 @@ export const markdownComponentRenderer = createComponentRenderer(
       <TransformedMarkdown
         style={layoutCss}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
-        // extractValue={extractValue}
+        extractValue={extractValue}
       >
         {renderedChildren}
       </TransformedMarkdown>
@@ -97,15 +99,26 @@ type TransformedMarkdownProps = {
   children: React.ReactNode;
   removeIndents?: boolean;
   style: React.CSSProperties;
+  extractValue: ValueExtractor;
 };
 
-const TransformedMarkdown = ({ children, removeIndents, style }: TransformedMarkdownProps) => {
-  if (typeof children !== "string") {
-    return null;
-  }
+
+function resolveBindingExpressionsInChildren(children: string, extractValue: ValueExtractor){
+  //TODO resolve binding expressions in markdown text
+  return children;
+}
+
+const TransformedMarkdown = ({ children, removeIndents, style, extractValue }: TransformedMarkdownProps) => {
+  const markdownContent = useMemo(()=>{
+    if (typeof children !== "string") {
+      return null;
+    }
+    return resolveBindingExpressionsInChildren(children, extractValue)
+  }, [children, extractValue]);
+
   return (
     <Markdown removeIndents={removeIndents} style={style}>
-      {children}
+      {markdownContent}
     </Markdown>
   );
 };
