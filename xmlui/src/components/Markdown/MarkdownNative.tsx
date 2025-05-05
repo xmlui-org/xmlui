@@ -1,9 +1,10 @@
-import { type CSSProperties, memo, type ReactNode } from "react";
+import { type CSSProperties, memo, type ReactNode, useEffect, useState } from "react";
 import React from "react";
-import ReactMarkdown from "react-markdown";
+import { MarkdownHooks } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { visit } from "unist-util-visit";
+import type { Node, Parent } from "unist";
 
 import styles from "./Markdown.module.scss";
 import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
@@ -21,6 +22,7 @@ type MarkdownProps = {
   removeIndents?: boolean;
   children: ReactNode;
   style?: CSSProperties;
+  codeHighlighter?: CodeHighlighter;
 };
 
 export const Markdown = memo(function Markdown({
@@ -28,6 +30,7 @@ export const Markdown = memo(function Markdown({
   removeIndents = true,
   children,
   style,
+  codeHighlighter,
 }: MarkdownProps) {
   if (typeof children !== "string") {
     return null;
@@ -37,8 +40,8 @@ export const Markdown = memo(function Markdown({
 
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }]]}
+      <MarkdownHooks
+        remarkPlugins={[remarkGfm, [bindingExpression, { extractValue }], codeBlockParser]}
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
@@ -60,7 +63,7 @@ export const Markdown = memo(function Markdown({
             const popOut = props?.["data-popout"];
             if (popOut) {
               return (
-                <a href={src} target="_blank">
+                <a href={src} target="_blank" rel="noreferrer">
                   <img className={htmlTagStyles.htmlImage} {...props}>
                     {children}
                   </img>
@@ -107,10 +110,30 @@ export const Markdown = memo(function Markdown({
             );
           },
           pre({ id, children }) {
-            return (
+            const defaultCodefence = (
               <Text uid={id} variant="codefence">
                 {children}
               </Text>
+            );
+
+            if (!codeHighlighter) {
+              return defaultCodefence;
+            }
+
+            const parsedData = parseMetaAndHighlightCode(children, codeHighlighter);
+            if (!parsedData) {
+              return defaultCodefence;
+            }
+
+            return (
+              <div className={styles.codeWrapper}>
+                <Text
+                  uid={id}
+                  variant="codefence"
+                  syntaxHighlightClasses={parsedData.classNames}
+                  dangerouslySetInnerHTML={{ __html: parsedData.cleanedHtmlStr }}
+                />
+              </div>
             );
           },
           strong({ id, children }) {
@@ -205,7 +228,7 @@ export const Markdown = memo(function Markdown({
           samp({ ...props }) {
             const nestedProps = props as any;
             return (
-              <NestedApp 
+              <NestedApp
                 app={nestedProps.app}
                 config={extractValue(nestedProps.config)}
                 components={extractValue(nestedProps.components)}
@@ -214,15 +237,16 @@ export const Markdown = memo(function Markdown({
                 activeTone={extractValue(nestedProps.activeTone)}
                 title={extractValue(nestedProps.title)}
                 height={extractValue(nestedProps.height)}
-                allowPlaygroundPopup={extractValue.asOptionalBoolean(nestedProps.allowPlaygroundPopup)}
+                allowPlaygroundPopup={extractValue.asOptionalBoolean(
+                  nestedProps.allowPlaygroundPopup,
+                )}
               />
             );
           },
-
         }}
       >
         {children as any}
-      </ReactMarkdown>
+      </MarkdownHooks>
     </div>
   );
 });
@@ -383,14 +407,49 @@ const ListItem = ({ children, style }: ListItemProps) => {
   );
 };
 
+interface CodeNode extends Node {
+  lang: string | null;
+  meta: string | null;
+}
+
+function codeBlockParser() {
+  return function transformer(tree: Node) {
+    visit(tree, "code", visitor);
+  };
+
+  function visitor(node: CodeNode, _: number, parent: Parent | undefined) {
+    const { lang, meta } = node;
+    const nodeData = { hProperties: {} };
+    if (lang !== null) {
+      nodeData.hProperties["dataLanguage"] = lang;
+    }
+    if (!parent) return;
+    if (!meta) return;
+
+    const params = splitter(meta)
+      ?.filter((s) => s !== "")
+      .map((s) => s.trim());
+    if (!params) return;
+    if (params.length === 0) return;
+
+    // TEMP: just appending everything else as a string to a different property
+    nodeData.hProperties["dataMeta"] = params;
+    node.data = nodeData;
+  }
+
+  function splitter(str: string): string[] | null {
+    return str.match(/(?:[^\s"']+|("|')[^"']*("|'))+/g);
+  }
+}
+
 /**
  * Finds and evaluates given binding expressions in markdown text.
- * The binding expressions are of the form `${...}$`.
+ * The binding expressions are of the form `${...}`.
  * @param extractValue The function to resolve binding expressions
  * @returns visitor function that processes the binding expressions
  */
 function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
-  return (tree: any) => {
+  return (tree: Node) => {
     visit(tree, "text", (node) => {
       return detectBindingExpression(node);
     });
@@ -452,3 +511,84 @@ function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
     return "";
   }
 }
+
+// --- Codefence Syntax Highlighting & Meta Extraction
+
+function parseMetaAndHighlightCode(
+  node: React.ReactNode,
+  codeHighlighter: CodeHighlighter,
+): { classNames: string | null; cleanedHtmlStr: string } | null {
+  const meta = extractMetaFromChildren(node);
+  // TEMP
+  const metaLanguage =
+    meta.language === "xmlui" || meta.language === "xmlui-pg" ? "xml" : meta.language;
+  // !TEMP
+  if (metaLanguage && codeHighlighter.availableLangs.includes(metaLanguage)) {
+    const htmlCodeStr = codeHighlighter.highlight(
+      // TODO: for xmlui-pg languages, we need to map that to a Playground component
+      // Thus, there are other special lines that need to be detected and parsed
+      extractTextContent(node),
+      metaLanguage,
+    );
+    const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
+    const classNames = match ? match[1] : null;
+    const cleanedHtmlStr = htmlCodeStr.replace(/<pre\b[^>]*>|<\/pre>/gi, "");
+
+    return { classNames, cleanedHtmlStr };
+  }
+  return null;
+}
+
+function extractTextContent(node: React.ReactNode): string {
+  if (typeof node === "string") {
+    return node;
+  }
+
+  if (React.isValidElement(node) && node.props && node.props.children) {
+    if (Array.isArray(node.props.children)) {
+      return node.props.children.map(extractTextContent).join("");
+    }
+    return extractTextContent(node.props.children);
+  }
+
+  return "";
+}
+
+function extractMetaFromChildren(
+  node: React.ReactNode,
+  keys: string[] = ["data-language", "data-meta"],
+): CodeHighlighterMeta {
+  if (!node) return {};
+  if (typeof node === "string") return {};
+  if (typeof node === "number") return {};
+  if (typeof node === "boolean") return {};
+  if (Array.isArray(node)) return {};
+
+  if (
+    React.isValidElement(node) &&
+    node.props &&
+    node.props.children &&
+    typeof node.props.children === "string"
+  ) {
+    return Object.entries<Record<string, any>>(node.props)
+      .filter(([key, _]) => keys.includes(key))
+      .reduce((acc, [key, value]) => {
+        acc[key.replace("data-", "")] = value;
+        return acc;
+      }, {});
+  }
+  return {};
+}
+
+type CodeHighlighter = {
+  // Returns html in string!
+  highlight: (code: string, language: string, meta?: Record<string, any>) => string;
+  availableLangs: string[];
+};
+type CodeHighlighterMeta = {
+  language?: string;
+  copy?: boolean;
+  filename?: string;
+  rowHighlights?: number[];
+  columnHighlights?: number[];
+};
