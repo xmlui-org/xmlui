@@ -139,6 +139,11 @@ const implicitPropsMetadata: Record<string, ComponentPropertyMetadata> = {
   data: {
     description: "Specifies the data source for a component. Can be a URL string (fetched automatically), a DataSource or an expression to evaluate. Changes to this property trigger UI updates once data is loaded.",
   },
+  when: {
+    description: "Specifies a condition that must be met for the component to be displayed",
+    defaultValue: true,
+    valueType: "boolean",
+  }
 };
 
 export function addOnPrefix(name: string) {

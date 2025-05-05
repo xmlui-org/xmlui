@@ -18,6 +18,7 @@ import { handleCompletion, handleCompletionResolve} from "./services/completion"
 import {handleHover} from "./services/hover";
 import { createXmlUiParser, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
 import { MetadataProvider, type ComponentMetadataCollection } from './services/common/metadata-utils';
+import { N } from 'vitest/dist/chunks/reporters.d.CfRkRKN2';
 
 const metaByComp = collectedComponentMetadata as ComponentMetadataCollection;
 const metadataProvider = new MetadataProvider(metaByComp);
@@ -106,25 +107,12 @@ export function start(connection: Connection){
 
     const { parseResult, getText } = parseDocument(document);
     const ctx = {
-      parseResult,
+      node: parseResult.node,
       getText,
-      metaByComp: metadataProvider
+      metaByComp: metadataProvider,
+      offsetToPosition: document.positionAt
     }
-    const hoverRes = handleHover(ctx, document.offsetAt(position));
-    if (hoverRes === null){
-      return null;
-    }
-    const { value, range } = hoverRes;
-    return {
-      contents: {
-        kind: MarkupKind.Markdown,
-        value,
-      },
-      range: {
-        start: document.positionAt(range.pos),
-        end: document.positionAt(range.end),
-      },
-    };
+    return handleHover(ctx, document.offsetAt(position));
   });
 
   const parsedDocuments = new Map();

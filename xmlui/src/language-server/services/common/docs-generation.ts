@@ -76,7 +76,7 @@ export function generateAttrDescription(attrName: string, attrMd: ComponentPrope
   }
 
   if (attrMd.defaultValue !== undefined) {
-    propText += `\nDefault: \`${attrMd.defaultValue}\``;
+    propText += `\n\nDefault: \`${attrMd.defaultValue}\``;
   }
 
   if (attrMd.availableValues && attrMd.availableValues.length > 0) {
@@ -85,7 +85,7 @@ export function generateAttrDescription(attrName: string, attrMd: ComponentPrope
       `- \`${v.value}\`: ${v.description}` :
       `- \`${v}\``
     ).join('\n');
-    propText += `\n**Allowed values**:\n${values}`;
+    propText += `\n\n**Allowed values**:\n${values}`;
   }
 
   return propText;

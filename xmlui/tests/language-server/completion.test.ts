@@ -20,6 +20,7 @@ describe('Completion', () => {
     expected.push(...Object.keys(mockMetadata.Button.events).map(key => "on" + capitalizeFirstLetter(key)));
     expected.push("inspect")
     expected.push("data")
+    expected.push("when")
     expected.push(...layoutOptionKeys)
     expectToContainExactly(attrNames, expected);
   });
@@ -100,6 +101,6 @@ function completeAtPoundSign(source: string) {
 }
 
 function expectToContainExactly<T>(actual: T[], expected: T[]) {
-  expect(actual.length).toEqual(expected.length);
+  expect(actual).toHaveLength(expected.length);
   expect(new Set(actual)).toEqual(new Set(expected));
 }
