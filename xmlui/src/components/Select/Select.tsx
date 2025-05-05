@@ -129,9 +129,11 @@ export const selectComponentRenderer = createComponentRenderer(
     layoutCss,
     registerComponentApi,
   }) => {
+    const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
+
     return (
       <Select
-        multiSelect={extractValue.asOptionalBoolean(node.props.multiSelect)}
+        multiSelect={multiSelect}
         style={layoutCss}
         inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
         inProgressNotificationMessage={extractValue.asOptionalString(
@@ -178,11 +180,15 @@ export const selectComponentRenderer = createComponentRenderer(
                     item={item}
                     contextVars={{
                       $selectedValue: val,
-                      $inTrigger: inTrigger
+                      $inTrigger: inTrigger,
                     }}
-                    renderChild={(...args) => (
-                      <SelectItemText>{renderChild(...args)}</SelectItemText>
-                    )}
+                    renderChild={(...args) =>
+                      multiSelect ? (
+                        renderChild(...args)
+                      ) : (
+                        <SelectItemText>{renderChild(...args)}</SelectItemText>
+                      )
+                    }
                   />
                 );
               }
