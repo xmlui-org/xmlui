@@ -45,12 +45,18 @@ import {
   printComponentLints,
 } from "../parsers/xmlui-parser/lint";
 import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
-import { ThemeDefinition, ThemeTone } from "../abstractions/ThemingDefs";
-import { ComponentCompilation, ProjectCompilation } from "../abstractions/scripting/Compilation";
+import type { ThemeDefinition, ThemeTone } from "../abstractions/ThemingDefs";
+import type {
+  ComponentCompilation,
+  ProjectCompilation,
+} from "../abstractions/scripting/Compilation";
+import { MetadataProvider } from "../language-server/services/common/metadata-utils";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
 const CONFIG_FILE = "config.json";
+
+const metadataProvider = new MetadataProvider(collectedComponentMetadata);
 
 // --- The properties of the standalone app
 type StandaloneAppProps = {
@@ -526,7 +532,7 @@ function useStandalone(
         if (!appDef) {
           throw new Error("couldn't find the application metadata");
         }
-        const lintErrorComponent = processAppLinting(appDef, collectedComponentMetadata);
+        const lintErrorComponent = processAppLinting(appDef, metadataProvider);
         if (lintErrorComponent) {
           appDef.entryPoint = lintErrorComponent;
         }
@@ -566,7 +572,7 @@ function useStandalone(
           themes,
         };
 
-        const lintErrorComponent = processAppLinting(newAppDef, collectedComponentMetadata);
+        const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
         if (lintErrorComponent) {
           newAppDef.entryPoint = lintErrorComponent;
         }
@@ -851,7 +857,7 @@ function useStandalone(
         entryPoint: entryPointWithCodeBehind,
       };
 
-      const lintErrorComponent = processAppLinting(newAppDef, collectedComponentMetadata);
+      const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
 
       const errorComponent: ComponentDef | null =
         errorComponents.length > 0
@@ -982,14 +988,14 @@ export default StandaloneApp;
 
 function processAppLinting(
   appDef: StandaloneAppDescription,
-  metadataByComponent: any,
+  metadataProvider: MetadataProvider,
 ): null | ComponentDef {
   const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
 
   if (lintSeverity !== LintSeverity.Skip) {
     const allComponentLints = lintApp({
       appDef,
-      metadataByComponent,
+      metadataProvider,
     });
 
     if (allComponentLints.length > 0) {

@@ -1,4 +1,4 @@
-import type { MarkupContent, CompletionItem } from "vscode-languageserver";
+import { MarkupContent, CompletionItem } from "vscode-languageserver";
 import { CompletionItemKind, MarkupKind } from "vscode-languageserver";
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { FindTokenSuccess, findTokenAtPos } from "../../parsers/xmlui-parser/utils";
@@ -6,7 +6,7 @@ import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import * as docGen from "./common/docs-generation";
 import { compNameForTagNameNode, findTagNameNodeInStack, insideClosingTag, pathToNodeInAscendands } from "./common/syntax-node-utilities";
-import type { ComponentMetadataCollection } from "./common/types";
+import { addOnPrefix, type AttributeKind, type ComponentMetadataCollection, type MetadataProvider, type TaggedAttribute } from "./common/metadata-utils";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
   Type,
@@ -18,16 +18,12 @@ type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Om
  * Additional data that a completion item contains.
  * with that, a completion item can be resolved, thus
  * the sever can query the documentation of a component,
- * prop, etc...
+ * prop, event etc...
  */
 type XmluiCompletionData = {
-  metadataAccessInfo:
-  | {
+  metadataAccessInfo: {
     componentName: string;
-  }
-  | {
-    componentName: string;
-    prop: string;
+    attribute?: TaggedAttribute
   };
 };
 
@@ -35,7 +31,7 @@ export type XmluiCompletionItem = Override<CompletionItem, { data?: XmluiComplet
 
 type CompletionResolveContext = {
   item: XmluiCompletionItem;
-  metaByComp: ComponentMetadataCollection;
+  metaByComp: MetadataProvider;
 };
 
 export function handleCompletionResolve({
@@ -44,17 +40,20 @@ export function handleCompletionResolve({
 }: CompletionResolveContext): CompletionItem {
   const metadataAccessInfo = item?.data?.metadataAccessInfo;
   if (metadataAccessInfo) {
-    const { componentName } = metadataAccessInfo;
-    const componentMeta = metaByComp[componentName];
-    if ("prop" in metadataAccessInfo) {
-      const propName = metadataAccessInfo.prop;
-      const propMeta = componentMeta.props[propName];
-      item.documentation = markupContent(docGen.generatePropDescription(propName, propMeta));
+    const { componentName, attribute } = metadataAccessInfo;
+    const componentMeta = metaByComp.getComponent(componentName);
+    if (!componentMeta) {
+      return null;
+    }
+    if (attribute){
+      const attributeMetadata = componentMeta.getAttrForKind(attribute);
+      item.documentation = markupContent(docGen.generateAttrDescription(attribute.name, attributeMetadata));
     } else {
       item.documentation = markupContent(
-        docGen.generateCompNameDescription(componentName, componentMeta),
+        docGen.generateCompNameDescription(componentName, componentMeta.getMetadata()),
       );
     }
+
   }
   return item;
 }
@@ -62,7 +61,7 @@ export function handleCompletionResolve({
 type CompletionContext = {
   parseResult: ParseResult;
   getText: GetText;
-  metaByComp: ComponentMetadataCollection;
+  metaByComp: MetadataProvider;
 };
 
 export function handleCompletion(
@@ -111,13 +110,13 @@ export function handleCompletion(
   if (completeForProp) {
     const tagNameNode = findTagNameNodeInStack(chainAtPos);
     const compName = compNameForTagNameNode(tagNameNode, getText);
-    return completionForNewProp(compName, metaByComp);
+    return completionForNewAttr(compName, metaByComp);
   }
   return null;
 }
 
-function allComponentNames(md: ComponentMetadataCollection): CompletionItem[] {
-  return Object.keys(md).map((compName) => CompletionItemBuilder.withComponent(compName).componentResolveData().build());
+function allComponentNames(md: MetadataProvider): XmluiCompletionItem[] {
+  return md.componentNames().map(componentCompletionItem);
 }
 
 /**
@@ -127,7 +126,7 @@ function allComponentNames(md: ComponentMetadataCollection): CompletionItem[] {
 */
 function matchingTagName(
   elementNode: Node,
-  metaByComp: ComponentMetadataCollection,
+  metaByComp: MetadataProvider,
   getText: GetText,
 ): CompletionItem[] | null {
   const nameNode = elementNode.children!.find((c) => c.kind === SyntaxKind.TagNameNode);
@@ -151,13 +150,13 @@ function matchingTagName(
   }
   name = getText(nameIdent);
   const value = nameSpace !== undefined ? nameSpace + ":" + name : name;
-  return [CompletionItemBuilder.withComponent(value).build()];
+  return [componentCompletionItem(value)];
 }
 
 function handleCompletionInsideToken(
   chainAtPos: Node[],
   position: number,
-  metaByComp: ComponentMetadataCollection,
+  metaByComp: MetadataProvider,
   getText: (n: Node) => string,
 ): CompletionItem[] | null {
   const parent = chainAtPos.at(-2);
@@ -180,23 +179,62 @@ function handleCompletionInsideToken(
     case SyntaxKind.AttributeKeyNode: {
       const tagNameNode = findTagNameNodeInStack(chainAtPos);
       const compName = compNameForTagNameNode(tagNameNode, getText);
-      return completionForNewProp(compName, metaByComp);
+      return completionForNewAttr(compName, metaByComp);
     }
   }
   return null;
 }
 
-function completionForNewProp(
+function completionForNewAttr(
   compName: string,
-  metaByComp: ComponentMetadataCollection,
+  metaByComp: MetadataProvider,
 ): CompletionItem[] | null {
-  const metadata = metaByComp[compName];
-  if (!metadata || !metadata.props) {
+  const metadata = metaByComp.getComponent(compName);
+  if (!metadata) {
     return null;
   }
-  return Object.keys(metadata.props).map((propName) =>
-    CompletionItemBuilder.withProp(propName).propResolveData(compName).build()
-  );
+
+  const completionItemFromAttr = attributeCompletionItem.bind({}, compName);
+  return metadata.getAllAttributes().map(completionItemFromAttr);
+}
+
+function attrKindToCompletionItemKind(attrKind: AttributeKind){
+  switch (attrKind){
+    case "api":
+      return CompletionItemKind.Function
+    case "event":
+      return CompletionItemKind.Event
+    case "implicit":
+    case "layout":
+    case "prop":
+      return CompletionItemKind.Property
+  }
+}
+
+function attributeCompletionItem(componentName: string, attribute: TaggedAttribute): XmluiCompletionItem {
+  const label = attribute.kind === "event" ? addOnPrefix(attribute.name): attribute.name;
+  return {
+    label,
+    kind: attrKindToCompletionItemKind(attribute.kind),
+    data: {
+      metadataAccessInfo: {
+        componentName,
+        attribute
+      }
+    }
+  }
+}
+
+function componentCompletionItem(componentName: string): XmluiCompletionItem {
+  return {
+    label: componentName,
+    kind: CompletionItemKind.Constructor,
+    data: {
+      metadataAccessInfo: {
+        componentName,
+      }
+    }
+  }
 }
 
 function markupContent(content: string): MarkupContent {
@@ -204,51 +242,4 @@ function markupContent(content: string): MarkupContent {
     kind: MarkupKind.Markdown,
     value: content,
   };
-}
-
-class CompletionItemBuilder {
-  static withComponent(name: string){
-    const item: CompletionItem = {
-      label: name,
-      kind: CompletionItemKind.Constructor
-    };
-    return new CompletionItemBuilder(item);
-  }
-
-  static withProp(propName: string){
-    const item: CompletionItem = {
-      label: propName,
-      kind: CompletionItemKind.Property
-    };
-    return new CompletionItemBuilder(item);
-  }
-
-  private item: CompletionItem;
-
-  private constructor(item: CompletionItem) {
-    this.item = item;
-  }
-
-  componentResolveData(): this {
-    const data: XmluiCompletionData = {
-      metadataAccessInfo: { componentName: this.item.label }
-    }
-    this.item.data = data;
-    return this;
-  }
-
-  propResolveData(componentName: string): this {
-    const data: XmluiCompletionData = {
-      metadataAccessInfo: {
-        componentName,
-        prop: this.item.label
-      }
-    }
-    this.item.data = data;
-    return this;
-  }
-
-  build(): CompletionItem {
-    return this.item;
-  }
 }
