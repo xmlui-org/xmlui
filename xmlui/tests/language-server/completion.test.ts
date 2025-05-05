@@ -75,12 +75,12 @@ describe('Completion', () => {
     const item = completeAtPoundSign("<Button widt#h />").find(({label}) => label === "width");
     const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
     const docs = (resolvedItem.documentation as MarkupContent).value;
-    const dataDescription = mockMetadataProvider.getComponent("Button").getProp("width").description;
+    const widthDescription = mockMetadataProvider.getComponent("Button").getProp("width").description;
 
     const expected: CompletionItem = { label: "width", kind: CompletionItemKind.Property };
 
     expect(resolvedItem).toMatchObject(expected);
-    expect(docs).toContain(dataDescription)
+    expect(docs).toContain(widthDescription)
   });
 });
 

@@ -50,7 +50,7 @@ export function handleCompletionResolve({
       item.documentation = markupContent(docGen.generateAttrDescription(attribute.name, attributeMetadata));
     } else {
       item.documentation = markupContent(
-        docGen.generateCompNameDescription(componentName, componentMeta),
+        docGen.generateCompNameDescription(componentName, componentMeta.getMetadata()),
       );
     }
 
