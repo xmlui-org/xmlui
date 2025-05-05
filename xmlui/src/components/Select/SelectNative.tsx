@@ -125,58 +125,56 @@ const SimpleSelect = forwardRef(function SimpleSelect(
   } = props;
 
   const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
-  const stringValue = value != undefined ? value + "" : null;
+  const stringValue = useMemo(() => {
+    return value != undefined ? value + "" : null;
+  }, [value]);
+
   const onValChange = useCallback(
     (val: string) => {
-      const valueWithMatchingType = Array.from(options.values()).find(
-        (o) => o.value + "" === val,
-      )?.value;
-      onValueChange(valueWithMatchingType);
+      const match = Array.from(options).find((o) => `${o.value}` === val);
+      onValueChange(match?.value ?? val);
     },
     [onValueChange, options],
   );
 
   return (
-    <OptionTypeProvider Component={SelectOption}>
-      <SelectRoot value={stringValue} onValueChange={onValChange}>
-        <SelectTrigger
-          id={id}
-          style={style}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          disabled={!enabled}
-          className={classnames(styles.selectTrigger, {
-            [styles.error]: validationStatus === "error",
-            [styles.warning]: validationStatus === "warning",
-            [styles.valid]: validationStatus === "valid",
-          })}
-          ref={ref}
-          autoFocus={autoFocus}
+    <SelectRoot value={stringValue} onValueChange={onValChange}>
+      <SelectTrigger
+        style={style}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        disabled={!enabled}
+        className={classnames(styles.selectTrigger, {
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
+        })}
+        ref={ref}
+        autoFocus={autoFocus}
+      >
+        <div className={styles.selectValue}>
+          <SelectValue placeholder={placeholder} />
+        </div>
+        <SelectIcon asChild>
+          <Icon name="chevrondown" />
+        </SelectIcon>
+      </SelectTrigger>
+      <SelectPortal container={root}>
+        <SelectContent
+          className={styles.selectContent}
+          position="popper"
+          style={{ height: height }}
         >
-          <div className={styles.selectValue}>
-            <SelectValue placeholder={placeholder} />
-          </div>
-          <SelectIcon asChild>
+          <ScrollUpButton className={styles.selectScrollUpButton}>
+            <Icon name="chevronup" />
+          </ScrollUpButton>
+          <SelectViewport className={styles.selectViewport}>{children}</SelectViewport>
+          <ScrollDownButton className={styles.selectScrollDownButton}>
             <Icon name="chevrondown" />
-          </SelectIcon>
-        </SelectTrigger>
-        <SelectPortal container={root}>
-          <SelectContent
-            className={styles.selectContent}
-            position="popper"
-            style={{ height: height }}
-          >
-            <ScrollUpButton className={styles.selectScrollUpButton}>
-              <Icon name="chevronup" />
-            </ScrollUpButton>
-            <SelectViewport className={styles.selectViewport}>{children}</SelectViewport>
-            <ScrollDownButton className={styles.selectScrollDownButton}>
-              <Icon name="chevrondown" />
-            </ScrollDownButton>
-          </SelectContent>
-        </SelectPortal>
-      </SelectRoot>
-    </OptionTypeProvider>
+          </ScrollDownButton>
+        </SelectContent>
+      </SelectPortal>
+    </SelectRoot>
   );
 });
 
@@ -533,7 +531,7 @@ export const ComboboxOption = forwardRef(function Combobox(
       ref={forwardedRef}
       key={id}
       disabled={!enabled}
-      value={`${value}`}
+      value={value}
       className={styles.multiComboboxOption}
       onSelect={() => {
         onChange(value);
@@ -582,10 +580,10 @@ export function HiddenOption(option: Option) {
 const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
   (option, ref) => {
     const { value, label, enabled = true } = option;
-    const { optionLabelRenderer, optionRenderer, value: selectedValue, multiSelect } = useSelect();
+    const { optionLabelRenderer, optionRenderer, value: selectedValue } = useSelect();
 
     return (
-      <SelectItem ref={ref} className={styles.selectItem} value={value} disabled={!enabled}>
+      <SelectItem ref={ref} className={styles.selectItem} value={value + ""} disabled={!enabled}>
         <div className={styles.selectItemContent}>
           {optionRenderer ? (
             optionRenderer(
