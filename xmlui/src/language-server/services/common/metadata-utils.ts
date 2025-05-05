@@ -1,3 +1,4 @@
+import { RiEmpathizeFill } from "react-icons/ri";
 import type { ComponentMetadata, ComponentPropertyMetadata } from "../../../abstractions/ComponentDefs"
 import { layoutOptionKeys } from "../../../components-core/descriptorHelper";
 import { onPrefixRegex, stripOnPrefix } from "../../../parsers/xmlui-parser";
@@ -38,19 +39,19 @@ class ComponentMetadataProvider {
     return this.metadata.props[name] ?? implicitPropsMetadata[name];
   }
 
-  getAttrMd(name: string) {
+  getAttr(name: string) {
     if (onPrefixRegex.test(name)){
       const eventName = stripOnPrefix(name)
-      const event = this.metadata.events[eventName];
+      const event = this.metadata.events?.[eventName];
       if (event) {
         return event;
       }
     }
-    const explicitProp = this.metadata.props[name];
+    const explicitProp = this.metadata.props?.[name];
     if (explicitProp) {
       return explicitProp;
     }
-    const api = this.metadata.apis[name];
+    const api = this.metadata.apis?.[name];
     if (api) {
       return api;
     }
@@ -62,7 +63,7 @@ class ComponentMetadataProvider {
     return implicitPropsMetadata[name];
   }
 
-  getAttrMdForKind({ name, kind}: TaggedAttribute){
+  getAttrForKind({ name, kind}: TaggedAttribute){
     switch (kind){
       case "api":
         return this.metadata.apis[name];
@@ -92,7 +93,7 @@ class ComponentMetadataProvider {
       attrNames.push({name: layoutKey, kind: "layout"})
     }
     for (const implicitPropKey of Object.keys(implicitPropsMetadata)){
-      attrNames.push({name: implicitPropKey, kind: "layout"})
+      attrNames.push({name: implicitPropKey, kind: "implicit"})
     }
 
     return attrNames;
@@ -124,7 +125,9 @@ class ComponentMetadataProvider {
 }
 
 function layoutMdForKey(name: string): ComponentPropertyMetadata {
-  throw new Error("layout properties do not have a documentation yet.");
+  return layoutOptionKeys.includes(name)? {
+    description: "Layout property. Not yet documented",
+  }: undefined;
 }
 
 const implicitPropsMetadata: Record<string, ComponentPropertyMetadata> = {

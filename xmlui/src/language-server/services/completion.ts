@@ -46,7 +46,7 @@ export function handleCompletionResolve({
       return null;
     }
     if (attribute){
-      const attributeMetadata = componentMeta.getAttrMdForKind(attribute);
+      const attributeMetadata = componentMeta.getAttrForKind(attribute);
       item.documentation = markupContent(docGen.generateAttrDescription(attribute.name, attributeMetadata));
     } else {
       item.documentation = markupContent(

@@ -63,7 +63,7 @@ describe('Completion', () => {
     const item = completeAtPoundSign("<Button dat#a />").find(({label}) => label === "data");
     const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
     const docs = (resolvedItem.documentation as MarkupContent).value;
-    const dataDescription = mockMetadataProvider.getComponent("Button").getProp("data").description;
+    const dataDescription = mockMetadataProvider.getComponent("Button").getAttr("data").description;
 
     const expected: CompletionItem = { label: "data", kind: CompletionItemKind.Property };
 
@@ -75,7 +75,7 @@ describe('Completion', () => {
     const item = completeAtPoundSign("<Button widt#h />").find(({label}) => label === "width");
     const resolvedItem = handleCompletionResolve({ item, metaByComp: mockMetadataProvider });
     const docs = (resolvedItem.documentation as MarkupContent).value;
-    const widthDescription = mockMetadataProvider.getComponent("Button").getProp("width").description;
+    const widthDescription = mockMetadataProvider.getComponent("Button").getAttr("width").description;
 
     const expected: CompletionItem = { label: "width", kind: CompletionItemKind.Property };
 
