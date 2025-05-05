@@ -556,12 +556,13 @@ export const ComboboxOption = forwardRef(function Combobox(
 });
 
 export function HiddenOption(option: Option) {
+  const { optionRenderer, label } = option;
   const { onOptionRemove, onOptionAdd } = useOption();
   const [node, setNode] = useState(null);
   const opt: Option = useMemo(() => {
     return {
       ...option,
-      labelText: node?.textContent ?? "",
+      label: label ?? node?.textContent ?? "",
       keywords: [node?.textContent ?? ""],
     };
   }, [option, node]);
@@ -573,7 +574,7 @@ export function HiddenOption(option: Option) {
 
   return (
     <div ref={(el) => setNode(el)} style={{ display: "none" }}>
-      {option.label}
+      {optionRenderer?.({})}
     </div>
   );
 }
