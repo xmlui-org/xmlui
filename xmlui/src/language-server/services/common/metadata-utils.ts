@@ -1,5 +1,6 @@
 import type { ComponentMetadata, ComponentPropertyMetadata } from "../../../abstractions/ComponentDefs"
 import { layoutOptionKeys } from "../../../components-core/descriptorHelper";
+import { onPrefixRegex, stripOnPrefix } from "../../../parsers/xmlui-parser";
 
 type RestrictedComponentMetadata = Pick<ComponentMetadata, "description" | "status" | "props" | "events" | "apis" | "contextVars" | "allowArbitraryProps" | "shortDescription">
 
@@ -28,11 +29,40 @@ export type TaggedAttribute = { name: string, kind: AttributeKind };
 class ComponentMetadataProvider {
   constructor(private readonly metadata: RestrictedComponentMetadata) {}
 
+  /**
+   * Retrieves the metadata for a given property, explicit or implicit.
+   * @param name The name of the property.
+   * @returns The metadata for the property, or `undefined` if not found.
+   */
   getProp(name: string) {
-    return this.metadata.props[name];
+    return this.metadata.props[name] ?? implicitPropsMetadata[name];
   }
 
-  getAttrMd({ name, kind}: TaggedAttribute){
+  getAttrMd(name: string) {
+    if (onPrefixRegex.test(name)){
+      const eventName = stripOnPrefix(name)
+      const event = this.metadata.events[eventName];
+      if (event) {
+        return event;
+      }
+    }
+    const explicitProp = this.metadata.props[name];
+    if (explicitProp) {
+      return explicitProp;
+    }
+    const api = this.metadata.apis[name];
+    if (api) {
+      return api;
+    }
+
+    const layout = layoutMdForKey(name);
+    if (layout) {
+      return layout;
+    }
+    return implicitPropsMetadata[name];
+  }
+
+  getAttrMdForKind({ name, kind}: TaggedAttribute){
     switch (kind){
       case "api":
         return this.metadata.apis[name];
@@ -40,7 +70,6 @@ class ComponentMetadataProvider {
         return this.metadata.events[name];
       case "prop":
         return this.metadata.props[name];
-
       case "implicit":
         return implicitPropsMetadata[name];
       case "layout":
@@ -108,3 +137,7 @@ const implicitPropsMetadata: Record<string, ComponentPropertyMetadata> = {
     description: "Specifies the data source for a component. Can be a URL string (fetched automatically), a DataSource or an expression to evaluate. Changes to this property trigger UI updates once data is loaded.",
   },
 };
+
+export function addOnPrefix(name: string) {
+  return "on" + name[0].toUpperCase() + name.substring(1);
+}

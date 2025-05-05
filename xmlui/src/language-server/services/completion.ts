@@ -6,7 +6,7 @@ import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import * as docGen from "./common/docs-generation";
 import { compNameForTagNameNode, findTagNameNodeInStack, insideClosingTag, pathToNodeInAscendands } from "./common/syntax-node-utilities";
-import type { AttributeKind, ComponentMetadataCollection, MetadataProvider, TaggedAttribute } from "./common/metadata-utils";
+import { addOnPrefix, type AttributeKind, type ComponentMetadataCollection, type MetadataProvider, type TaggedAttribute } from "./common/metadata-utils";
 
 type Override<Type, NewType extends { [key in keyof Type]?: NewType[key] }> = Omit<
   Type,
@@ -46,7 +46,7 @@ export function handleCompletionResolve({
       return null;
     }
     if (attribute){
-      const attributeMetadata = componentMeta.getAttrMd(attribute);
+      const attributeMetadata = componentMeta.getAttrMdForKind(attribute);
       item.documentation = markupContent(docGen.generateAttrDescription(attribute.name, attributeMetadata));
     } else {
       item.documentation = markupContent(
@@ -212,8 +212,9 @@ function attrKindToCompletionItemKind(attrKind: AttributeKind){
 }
 
 function attributeCompletionItem(componentName: string, attribute: TaggedAttribute): XmluiCompletionItem {
+  const label = attribute.kind === "event" ? addOnPrefix(attribute.name): attribute.name;
   return {
-    label: attribute.name,
+    label,
     kind: attrKindToCompletionItemKind(attribute.kind),
     data: {
       metadataAccessInfo: {
