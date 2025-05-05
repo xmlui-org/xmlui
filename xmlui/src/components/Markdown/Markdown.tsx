@@ -4,7 +4,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown } from "./MarkdownNative";
-import { useTheme } from "../../components-core/theming/ThemeContext";
+import { parseBindingExpression } from "./parse-binding-expr";
 
 const COMP = "Markdown";
 
@@ -13,6 +13,10 @@ export const MarkdownMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   props: {
     content: d("This property sets the markdown content to display."),
+    codeHighlighter: {
+      description: "This property sets the code highlighter to use.",
+      isInternal: true,
+    },
     removeIndents: {
       description:
         "This boolean property specifies whether leading indents should be " +
@@ -67,7 +71,7 @@ export const markdownComponentRenderer = createComponentRenderer(
       renderedChildren = extractValue.asString(node.props.content);
     }
 
-    // 2. "data" property fallback)
+    // 2. "data" property fallback
     if (!renderedChildren) {
       renderedChildren = extractValue.asString((node.props as any).data);
     }
@@ -82,13 +86,15 @@ export const markdownComponentRenderer = createComponentRenderer(
       });
     }
 
+    const resolvedChildren = parseBindingExpression(renderedChildren, extractValue);
     return (
       <Markdown
         style={layoutCss}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
+        codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
       >
-        {renderedChildren}
+        {resolvedChildren}
       </Markdown>
     );
   },
