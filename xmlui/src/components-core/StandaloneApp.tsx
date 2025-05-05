@@ -47,6 +47,7 @@ import {
 import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
 import { ThemeDefinition, ThemeTone } from "../abstractions/ThemingDefs";
 import { ComponentCompilation, ProjectCompilation } from "../abstractions/scripting/Compilation";
+import { MetadataProvider } from "../language-server/services/common/metadata-utils";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -526,7 +527,10 @@ function useStandalone(
         if (!appDef) {
           throw new Error("couldn't find the application metadata");
         }
-        const lintErrorComponent = processAppLinting(appDef, collectedComponentMetadata);
+        const lintErrorComponent = processAppLinting(
+          appDef,
+          new MetadataProvider(collectedComponentMetadata),
+        );
         if (lintErrorComponent) {
           appDef.entryPoint = lintErrorComponent;
         }
@@ -982,14 +986,14 @@ export default StandaloneApp;
 
 function processAppLinting(
   appDef: StandaloneAppDescription,
-  metadataByComponent: any,
+  metadataProvider: MetadataProvider,
 ): null | ComponentDef {
   const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
 
   if (lintSeverity !== LintSeverity.Skip) {
     const allComponentLints = lintApp({
       appDef,
-      metadataByComponent,
+      metadataProvider,
     });
 
     if (allComponentLints.length > 0) {

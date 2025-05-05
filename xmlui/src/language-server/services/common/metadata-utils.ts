@@ -2,6 +2,7 @@ import { RiEmpathizeFill } from "react-icons/ri";
 import type { ComponentMetadata, ComponentPropertyMetadata } from "../../../abstractions/ComponentDefs"
 import { layoutOptionKeys } from "../../../components-core/descriptorHelper";
 import { onPrefixRegex, stripOnPrefix } from "../../../parsers/xmlui-parser";
+import { viewportSizeMd } from "../../../components/abstractions";
 
 type RestrictedComponentMetadata = Pick<ComponentMetadata, "description" | "status" | "props" | "events" | "apis" | "contextVars" | "allowArbitraryProps" | "shortDescription">
 
@@ -27,7 +28,7 @@ export class MetadataProvider {
 export type AttributeKind = "prop" | "event" | "api" | "implicit" | "layout"
 export type TaggedAttribute = { name: string, kind: AttributeKind };
 
-class ComponentMetadataProvider {
+export class ComponentMetadataProvider {
   constructor(private readonly metadata: RestrictedComponentMetadata) {}
 
   /**
@@ -125,9 +126,26 @@ class ComponentMetadataProvider {
 }
 
 function layoutMdForKey(name: string): ComponentPropertyMetadata {
-  return layoutOptionKeys.includes(name)? {
+  const metadata = {
     description: "Layout property. Not yet documented",
-  }: undefined;
+  };
+  if (layoutOptionKeys.includes(name)){
+    return metadata;
+  }
+  for(const size of viewportSizeMd){
+    const suffix = "-" + ((size as {
+      value: string | number;
+      description: string;
+    }).value);
+
+    if(name.endsWith(suffix)){
+      const nameWithoutSize = name.slice(0, -suffix.length);
+      if(layoutOptionKeys.includes(nameWithoutSize)){
+        return metadata;
+      }
+    }
+  }
+  return null;
 }
 
 const implicitPropsMetadata: Record<string, ComponentPropertyMetadata> = {

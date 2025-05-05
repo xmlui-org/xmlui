@@ -2,6 +2,7 @@ import type { ComponentDef, CompoundComponentDef, ComponentMetadata } from "../.
 import type { StandaloneAppDescription } from "../../components-core/abstractions/standalone";
 import { layoutOptionKeys } from "../../components-core/descriptorHelper";
 import { viewportSizeMd } from "../../components/abstractions";
+import { ComponentMetadataProvider, MetadataProvider } from "../../language-server/services/common/metadata-utils";
 import { CORE_NAMESPACE_VALUE } from "./transform";
 
 export enum LintSeverity{
@@ -56,17 +57,17 @@ export type ComponentLints = {
 
 export function lintApp({
   appDef,
-  metadataByComponent,
+  metadataProvider,
 }: {
   appDef: StandaloneAppDescription,
-  metadataByComponent: Record<string, ComponentMetadata>
+  metadataProvider: MetadataProvider
 }): ComponentLints[] {
 
   const entryPointLints: ComponentLints = {
     componentName: "Main",
     lints:  lint({
       component: appDef.entryPoint,
-      metadataByComponent: metadataByComponent,
+      metadataProvider,
     })
   };
 
@@ -74,11 +75,10 @@ export function lintApp({
     .map((c) => {
       const lints = lint({
         component: c,
-        metadataByComponent: metadataByComponent,
+        metadataProvider,
       });
       return { lints, componentName: c.name };
     })
-
 
   return [entryPointLints, ...compoundCompLints].filter((diags) => diags.lints.length > 0);
 }
@@ -155,26 +155,25 @@ export function lintErrorsComponent(lints: ComponentLints[]){
 
 export function lint({
   component,
-  metadataByComponent,
+  metadataProvider,
 }: {
   component: CompoundComponentDef | ComponentDef,
-  metadataByComponent: Record<string, ComponentMetadata>
+  metadataProvider: MetadataProvider,
 }
  ): LintDiagnostic[] {
   if ("component" in component){
-      return lintHelp(component.component, metadataByComponent, [])
+      return lintHelp(component.component, metadataProvider, [])
   }
-  return lintHelp(component, metadataByComponent, []);
+  return lintHelp(component, metadataProvider, []);
 }
 
-function lintHelp(component: ComponentDef, metadataByComponent: Record<string, ComponentMetadata>, acc: LintDiagnostic[] ){
+function lintHelp(component: ComponentDef, metadataProvider: MetadataProvider, acc: LintDiagnostic[] ){
 
-  const componentType = component.type.startsWith(CORE_NAMESPACE_VALUE) ? component.type.slice(CORE_NAMESPACE_VALUE.length + 1) : component.type
-  const metadataForCurrentComponent = metadataByComponent[componentType];
+  const componentName = component.type.startsWith(CORE_NAMESPACE_VALUE) ? component.type.slice(CORE_NAMESPACE_VALUE.length + 1) : component.type
+  const componentMdProvider = metadataProvider.getComponent(componentName);
 
-  const skipPropLints = !component.props || !metadataForCurrentComponent || !metadataForCurrentComponent.props || metadataForCurrentComponent.allowArbitraryProps
-  if(!skipPropLints){
-    lintProps(component, metadataForCurrentComponent, acc);
+  if(componentMdProvider !== null && !componentMdProvider.allowArbitraryProps){
+    lintAttrs(component, componentMdProvider, acc);
   }
 
   if (!component.children){
@@ -182,42 +181,30 @@ function lintHelp(component: ComponentDef, metadataByComponent: Record<string, C
   }
 
   for(const child of component.children){
-    lintHelp(child, metadataByComponent, acc)
+    lintHelp(child, metadataProvider, acc)
   }
   return acc
 
 }
 
 const implicitPropNames = layoutOptionKeys
-function lintProps(component: ComponentDef, metadataForCurrentComponent: ComponentMetadata, diags: LintDiagnostic[]){
-  const propNames = Object.keys(component.props);
-  const unrecognisedProps = propNames.filter((name) => !implicitProp(name) && !(name in metadataForCurrentComponent.props))
 
-  for(const prop of unrecognisedProps){
-    diags.push(toUnrecognisedPropDiag(component, prop))
+function lintAttrs(component: ComponentDef, metadataForCurrentComponent: ComponentMetadataProvider, diags: LintDiagnostic[]){
+
+  const attrNames = Object.keys(component.props ?? {});
+  attrNames.push(...Object.keys(component.api ?? {}));
+  attrNames.push(...Object.keys(component.events ?? {}));
+
+  const invalidAttrNames = attrNames.filter((name) => !metadataForCurrentComponent.getAttr(name))
+
+  for(const invalidAttrName of invalidAttrNames){
+    diags.push(toUnrecognisedAttrDiag(component, invalidAttrName))
   }
 }
 
-function toUnrecognisedPropDiag(component: ComponentDef, prop: string): LintDiagnostic{
+function toUnrecognisedAttrDiag(component: ComponentDef, attr: string): LintDiagnostic{
   return {
-    message: `Unrecognised property '${prop}' on component '${component.type}'.`,
+    message: `Unrecognised property '${attr}' on component '${component.type}'.`,
     kind: LintDiagKind.UnrecognisedProp,
   }
-}
-
-function implicitProp(name: string): boolean {
-  for(const size of viewportSizeMd){
-    const suffix = "-" + ((size as {
-              value: string | number;
-              description: string;
-            }).value);
-
-    if(name.endsWith(suffix)){
-      const nameWithoutSize = name.slice(0, -suffix.length);
-      if(implicitPropNames.includes(nameWithoutSize)){
-        return true
-      }
-    }
-  }
-  return implicitPropNames.includes(name);
 }
