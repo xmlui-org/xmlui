@@ -1,6 +1,5 @@
 import type { ComponentMetadata, ComponentPropertyMetadata } from "../../../abstractions/ComponentDefs";
 
-
 export function generateCompNameDescription(componentName: string, metadata: ComponentMetadata): string {
   const sections: string[] = [];
 
@@ -23,7 +22,7 @@ export function generateCompNameDescription(componentName: string, metadata: Com
     Object.entries(metadata.props)
       .filter(([_, prop]) => !(prop as any).isInternal)
       .forEach(([propName, prop]) => {
-        sections.push(generatePropDescription(propName, prop));
+        sections.push(generateAttrDescription(propName, prop));
       });
   }
 
@@ -63,20 +62,30 @@ export function generateCompNameDescription(componentName: string, metadata: Com
   return sections.join('\n\n');
 }
 
-export function generatePropDescription(propName: string, prop: ComponentPropertyMetadata){
-  let propText = `### \`${propName}\`\n${(prop as any).description}`;
+export function generateAttrDescription(attrName: string, attrMd: ComponentPropertyMetadata) {
+  let propText = `\`${attrName}\``;
 
-  if ((prop as any).defaultValue !== undefined) {
-    propText += `\n\nDefault: \`${(prop as any).defaultValue}\``;
+  if (attrMd.isRequired) {
+    propText += " (required)";
   }
 
-  if ((prop as any).availableValues) {
-    const values = (prop as any).availableValues.map(v =>
+  propText += ": ";
+
+  if (attrMd.description) {
+    propText += attrMd.description;
+  }
+
+  if (attrMd.defaultValue !== undefined) {
+    propText += `\n\nDefault: \`${attrMd.defaultValue}\``;
+  }
+
+  if (attrMd.availableValues && attrMd.availableValues.length > 0) {
+    const values = attrMd.availableValues.map(v =>
       typeof v === 'object' ?
       `- \`${v.value}\`: ${v.description}` :
       `- \`${v}\``
     ).join('\n');
-    propText += `\n\nAllowed values:\n${values}`;
+    propText += `\n\n**Allowed values**:\n${values}`;
   }
 
   return propText;

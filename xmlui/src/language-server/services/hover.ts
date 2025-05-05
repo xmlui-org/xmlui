@@ -4,7 +4,8 @@ import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./common/syntax-node-utilities";
 import * as docGen from "./common/docs-generation";
-import type { ComponentMetadataCollection } from "./common/types";
+import type { ComponentMetadataCollection, MetadataProvider } from "./common/metadata-utils";
+import { Hover, MarkupKind, Position } from "vscode-languageserver";
 
 type SimpleHover = null | {
   value: string;
@@ -15,19 +16,20 @@ type SimpleHover = null | {
 };
 
 type HoverContex = {
-  parseResult: ParseResult;
+  node: Node;
   getText: GetText;
-  metaByComp: ComponentMetadataCollection;
+  metaByComp: MetadataProvider;
+  offsetToPosition: (pos: number) => Position;
 };
+
 /**
  * @returns The hover content string
  */
-export function handleHover(
-  { parseResult: { node }, getText, metaByComp }: HoverContex,
+export function handleHoverCore(
+  { node , getText, metaByComp }: Omit<HoverContex, 'offsetToPosition'>,
   position: number,
 ): SimpleHover {
   const findRes = findTokenAtPos(node, position);
-  console.log("findres: ", findRes);
 
   if (findRes === undefined) {
     return null;
@@ -36,13 +38,12 @@ export function handleHover(
 
   const atNode = chainAtPos.at(-1)!;
   const parentNode = chainAtPos.at(-2);
-  console.log("hovering: ", atNode, parentNode);
   switch (atNode.kind) {
     case SyntaxKind.Identifier:
       switch (parentNode?.kind) {
         case SyntaxKind.TagNameNode: {
           return hoverName({
-            collectedComponentMetadata: metaByComp,
+            metaByComp: metaByComp,
             tagNameNode: parentNode,
             identNode: atNode,
             getText,
@@ -62,13 +63,31 @@ export function handleHover(
   return null;
 }
 
+export function handleHover(ctx: HoverContex, position: number,): Hover {
+  const hoverRes = handleHoverCore(ctx, position);
+  if (hoverRes === null){
+    return null;
+  }
+  const { value, range } = hoverRes;
+  return {
+    contents: {
+      kind: MarkupKind.Markdown,
+      value,
+    },
+    range: {
+      start: ctx.offsetToPosition(range.pos),
+      end: ctx.offsetToPosition(range.end),
+    },
+  };
+}
+
 function hoverAttr({
   metaByComp,
   attrKeyNode,
   parentStack,
   getText,
 }: {
-  metaByComp: ComponentMetadataCollection;
+  metaByComp: MetadataProvider;
   attrKeyNode: Node;
   parentStack: Node[];
   getText: GetText;
@@ -79,7 +98,6 @@ function hoverAttr({
   if (parentStack.at(-2).kind !== SyntaxKind.AttributeListNode) {
     return null;
   }
-  // console.log(parentStack.map(n => toDbgString(n, getText)));
   const tag = parentStack.at(-3);
   if (tag?.kind !== SyntaxKind.ElementNode) {
     return null;
@@ -91,7 +109,7 @@ function hoverAttr({
   }
   const compName = compNameForTagNameNode(tagNameNode, getText);
 
-  const component = metaByComp[compName];
+  const component = metaByComp.getComponent(compName);
   if (!component) {
     return null;
   }
@@ -102,7 +120,6 @@ function hoverAttr({
     return null;
   }
 
-  console.log("here");
   const attrIdent = attrKeyChildren[identIdx];
   const propIsNamespaceDefinition =
     attrKeyChildren[identIdx + 1]?.kind === SyntaxKind.Colon &&
@@ -119,13 +136,13 @@ function hoverAttr({
     };
   }
 
-  const propName = getText(attrIdent);
+  const attrName = getText(attrIdent);
 
-  const propMetadata = component.props?.[propName];
-  if (!propMetadata) {
+  const attrMd = component.getAttr(attrName);
+  if (!attrMd) {
     return null;
   }
-  const value = docGen.generatePropDescription(propName, propMetadata);
+  const value = docGen.generateAttrDescription(attrName, attrMd);
   return {
     value,
     range: {
@@ -136,12 +153,12 @@ function hoverAttr({
 }
 
 function hoverName({
-  collectedComponentMetadata,
+  metaByComp,
   tagNameNode,
   identNode,
   getText,
 }: {
-  collectedComponentMetadata: ComponentMetadataCollection;
+  metaByComp: MetadataProvider;
   tagNameNode: Node;
   identNode: Node;
   getText: GetText;
@@ -150,7 +167,7 @@ function hoverName({
   if (!compName) {
     return null;
   }
-  const compMetadata = collectedComponentMetadata[compName];
+  const compMetadata = metaByComp.getComponent(compName)?.getMetadata();
   if (!compMetadata) {
     return null;
   }
