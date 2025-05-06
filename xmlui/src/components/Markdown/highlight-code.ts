@@ -14,14 +14,9 @@ export function parseMetaAndHighlightCode(
   codeHighlighter: CodeHighlighter,
 ): { classNames: string | null; cleanedHtmlStr: string } | null {
   const meta = extractMetaFromChildren(node);
-  
-  // TEMP
-  const metaLanguage =
-    meta.language === "xmlui" || meta.language === "xmlui-pg" ? "xml" : meta.language;
-  // !TEMP
+  const metaLanguage = meta.language;
 
-  if (metaLanguage && codeHighlighter.availableLangs.includes(metaLanguage)) {
-    
+  if (metaLanguage && codeHighlighter.availableLangs.includes(metaLanguage)) {    
     // NOTE: Keep in mind, at this point, we are working with the markdown text
     const htmlCodeStr = codeHighlighter.highlight(mapTextContent(node), metaLanguage);
     const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
