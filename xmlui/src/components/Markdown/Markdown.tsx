@@ -117,6 +117,7 @@ const TransformedMarkdown = ({
   removeIndents,
   style,
   extractValue,
+  codeHighlighter,
 }: TransformedMarkdownProps) => {
   const markdownContent = useMemo(() => {
     if (typeof children !== "string") {
@@ -135,12 +136,11 @@ const TransformedMarkdown = ({
         convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
         resolvedMd.slice(nextPlayground[1]);
     }
-    console.log(resolvedMd)
     return resolvedMd;
   }, [children, extractValue]);
 
   return (
-    <Markdown removeIndents={removeIndents} style={style}>
+    <Markdown removeIndents={removeIndents} codeHighlighter={codeHighlighter} style={style}>
       {markdownContent}
     </Markdown>
   );
