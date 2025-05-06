@@ -160,11 +160,11 @@ export function App({
 
   const styleWithHelpers = useMemo(() => {
     return {
-      "--header-height": !scrollWholePage ? 0 : headerHeight + "px",
-      "--footer-height": !scrollWholePage ? 0 : footerHeight + "px",
+      "--header-height": !scrollWholePage ? "0px" : headerHeight + "px",
+      "--footer-height": !scrollWholePage ? "0px" : footerHeight + "px",
       "--header-abs-height": headerHeight + "px",
       "--footer-abs-height": footerHeight + "px",
-      "--scrollbar-width": noScrollbarGutters ? 0 : scrollbarWidth + "px",
+      "--scrollbar-width": noScrollbarGutters ? "0px" : scrollbarWidth + "px",
     } as CSSProperties;
   }, [footerHeight, headerHeight, noScrollbarGutters, scrollWholePage, scrollbarWidth]);
 
