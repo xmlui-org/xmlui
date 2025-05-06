@@ -168,7 +168,7 @@ describe("Playground pattern parsing", () => {
   it("Extracts the 'default' PlaygroundPattern property", () => {
     // --- Act
     const content =
-      '```xmlui-pg display copy {1,2,4-6} filename="Main.xmlui" name="MyApp example"\n```';
+      '```xmlui-pg display copy {1,2,4-6} height="300px" filename="Main.xmlui" name="MyApp example"\n```';
 
     const result = parsePlaygroundPattern(content);
 
@@ -177,6 +177,7 @@ describe("Playground pattern parsing", () => {
     expect(result.default?.display).toBe(true);
     expect(result.default?.copy).toBe(true);
     expect(result.default?.highlights).toEqual([1, 2, [4, 6]]);
+    expect(result.default.height).toEqual("300px");
     expect(result.default?.filename).toBe("Main.xmlui");
     expect(result.default?.name).toBe("MyApp example");
   });
@@ -195,6 +196,23 @@ describe("Playground pattern parsing", () => {
     expect(result.default?.highlights).toBeUndefined();
     expect(result.default?.filename).toBeUndefined();
     expect(result.default?.name).toBeUndefined();
+  });
+
+  it("Extracts PlaygroundPattern with noPopup flags", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg noPopup
+     \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.default).toBeDefined();
+    expect(result.default?.display).toBeUndefined();
+    expect(result.default?.copy).toBeUndefined();
+    expect(result.default?.highlights).toBeUndefined();
+    expect(result.default?.filename).toBeUndefined();
+    expect(result.default?.name).toBeUndefined();
+    expect(result.default?.noPopup).toBe(true);
   });
 
   it("Extracts PlaygroundPattern with filename only", () => {
@@ -260,7 +278,7 @@ describe("Playground pattern parsing", () => {
   it("Extracts default app #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    <Button>Click me</Button>
+<Button>Click me</Button>
   \`\`\``;
 
     const result = parsePlaygroundPattern(content);
@@ -278,7 +296,7 @@ describe("Playground pattern parsing", () => {
   it("Extracts default app #2", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg copy
-    <Button>Click me</Button>
+<Button>Click me</Button>
   \`\`\``;
 
     const result = parsePlaygroundPattern(content);
@@ -296,7 +314,7 @@ describe("Playground pattern parsing", () => {
   it("Extracts default app #3", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg display
-    <Button>Click me</Button>
+<Button>Click me</Button>
   \`\`\``;
 
     const result = parsePlaygroundPattern(content);
@@ -314,7 +332,7 @@ describe("Playground pattern parsing", () => {
   it("Extracts default app #4", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg {1,2,4-6}
-    <Button>Click me</Button>
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
 
@@ -331,7 +349,7 @@ describe("Playground pattern parsing", () => {
   it("Extracts default app #5", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg filename="Main.xmlui"
-    <Button>Click me</Button>
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -347,7 +365,7 @@ describe("Playground pattern parsing", () => {
   it("Extracts default app #6", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg name="MyApp example"
-    <Button>Click me</Button>
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -363,8 +381,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts explicit app #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---app
-    <Button>Click me</Button>
+---app
+<Button>Click me</Button>
   \`\`\``;
 
     const result = parsePlaygroundPattern(content);
@@ -382,8 +400,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts explicit app #2", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---app copy
-    <Button>Click me</Button>
+---app copy
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
 
@@ -400,8 +418,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts explicit app #3", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---app display
-    <Button>Click me</Button>
+---app display
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -417,8 +435,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts explicit app #4", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---app {1,2,4-6}
-    <Button>Click me</Button>
+---app {1,2,4-6}
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
 
@@ -435,8 +453,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts explicit app #5", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---app filename="Main.xmlui"
-    <Button>Click me</Button>
+---app filename="Main.xmlui"
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -452,8 +470,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts explicit app #6", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---app name="MyApp example"
-    <Button>Click me</Button>
+---app name="MyApp example"
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -469,12 +487,12 @@ describe("Playground pattern parsing", () => {
   it("Extracts app with empty lines", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---app
+---app
 
-    <Button>Click me</Button>
-    <Text>Hello</Text>
+<Button>Click me</Button>
+<Text>Hello</Text>
 
-    <Text>World</Text>
+<Text>World</Text>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -492,9 +510,9 @@ describe("Playground pattern parsing", () => {
   it("Explicit app overrides app #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    <Something />
-    ---app
-    <Button>Click me</Button>
+<Something />
+---app
+<Button>Click me</Button>
   \`\`\``;
 
     const result = parsePlaygroundPattern(content);
@@ -512,11 +530,11 @@ describe("Playground pattern parsing", () => {
   it("Next explicit app overrides the previous #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    <Something />
-    ---app
-    <Text>Hello</Text>
-    ---app
-    <Button>Click me</Button>
+<Something />
+---app
+<Text>Hello</Text>
+---app
+<Button>Click me</Button>
   \`\`\``;
 
     const result = parsePlaygroundPattern(content);
@@ -534,8 +552,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts components #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---comp
-    <Button>Click me</Button>
+---comp
+<Button>Click me</Button>
   \`\`\``;
 
     const result = parsePlaygroundPattern(content);
@@ -554,8 +572,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts components #2", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---comp copy
-    <Button>Click me</Button>
+---comp copy
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
 
@@ -573,8 +591,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts components #3", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---comp display
-    <Button>Click me</Button>
+---comp display
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -591,8 +609,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts components #4", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---comp {1,2,4-6}
-    <Button>Click me</Button>
+---comp {1,2,4-6}
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -609,8 +627,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts components #5", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---comp filename="Main.xmlui"
-    <Button>Click me</Button>
+---comp filename="Main.xmlui"
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
 
@@ -628,8 +646,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts components #6", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---comp name="MyApp example"
-    <Button>Click me</Button>
+---comp name="MyApp example"
+<Button>Click me</Button>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -646,10 +664,10 @@ describe("Playground pattern parsing", () => {
   it("Extracts multiple components #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---comp
-    <Button>Click me</Button>
-    ---comp
-    <Text>Hello</Text>
+---comp
+<Button>Click me</Button>
+---comp
+<Text>Hello</Text>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -672,12 +690,12 @@ describe("Playground pattern parsing", () => {
   it("Extracts multiple components #2", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---comp
-    <Button>Click me</Button>
-    ---comp
-    <Text>Hello</Text>
-    ---comp
-    <Text>World</Text>
+---comp
+<Button>Click me</Button>
+---comp
+<Text>Hello</Text>
+---comp
+<Text>World</Text>
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -706,8 +724,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts config #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---config
-    { apiUrl: "/api"}
+---config
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
 
@@ -724,8 +742,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts config #2", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---config copy
-    { apiUrl: "/api"}
+---config copy
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -741,8 +759,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts config #3", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---config display
-    { apiUrl: "/api"}
+---config display
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -758,8 +776,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts config #4", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---config {1,2,4-6}
-    { apiUrl: "/api"}
+---config {1,2,4-6}
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
 
@@ -776,8 +794,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts config #5", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---config filename="Main.xmlui"
-    { apiUrl: "/api"}
+---config filename="Main.xmlui"
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -793,8 +811,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts config #6", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---config name="MyApp example"
-    { apiUrl: "/api"}
+---config name="MyApp example"
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -810,8 +828,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts api #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---api
-    { apiUrl: "/api"}
+---api
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -827,8 +845,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts api #2", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---api copy
-    { apiUrl: "/api"}
+---api copy
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -844,8 +862,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts api #3", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---api display
-    { apiUrl: "/api"}
+---api display
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -861,8 +879,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts api #4", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---api {1,2,4-6}
-    { apiUrl: "/api"}
+---api {1,2,4-6}
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -878,8 +896,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts api #5", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---api filename="Main.xmlui"
-    { apiUrl: "/api"}
+---api filename="Main.xmlui"
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -895,8 +913,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts api #6", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---api name="MyApp example"
-    { apiUrl: "/api"}
+---api name="MyApp example"
+{ apiUrl: "/api"}
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -912,8 +930,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts descriptions #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---desc
-    **This is a description**.
+---desc
+**This is a description**.
   \`\`\``;
 
     const result = parsePlaygroundPattern(content);
@@ -932,8 +950,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts descriptions #2", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---desc copy
-    **This is a description**.
+---desc copy
+**This is a description**.
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -950,8 +968,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts descriptions #3", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---desc display
-    **This is a description**.
+---desc display
+**This is a description**.
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -968,8 +986,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts descriptions #4", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---desc {1,2,4-6}
-    **This is a description**.
+---desc {1,2,4-6}
+**This is a description**.
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -986,8 +1004,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts descriptions #5", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---desc filename="Main.xmlui"
-    **This is a description**.
+---desc filename="Main.xmlui"
+**This is a description**.
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -1004,8 +1022,8 @@ describe("Playground pattern parsing", () => {
   it("Extracts descriptions #6", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---desc name="MyApp example"
-    **This is a description**.
+---desc name="MyApp example"
+**This is a description**.
   \`\`\``;
     const result = parsePlaygroundPattern(content);
     // --- Assert
@@ -1022,7 +1040,7 @@ describe("Playground pattern parsing", () => {
   it("Convert default app #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    <Button>Click me</Button>
+<Button>Click me</Button>
   \`\`\``;
 
     const base64 = "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==";
@@ -1036,7 +1054,7 @@ describe("Playground pattern parsing", () => {
     // --- Act
     const base64 = "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==";
     const content = `\`\`\`xmlui-pg display
-    <Button>Click me</Button>
+<Button>Click me</Button>
   \`\`\``;
 
     const result = convertPlaygroundPatternToMarkdown(content);
@@ -1060,7 +1078,7 @@ describe("Playground pattern parsing", () => {
     // --- Act
     const base64 = "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==";
     const content = `\`\`\`xmlui-pg display copy
-    <Button>Click me</Button>
+<Button>Click me</Button>
   \`\`\``;
     const result = convertPlaygroundPatternToMarkdown(content);
     // --- Assert
@@ -1081,8 +1099,8 @@ describe("Playground pattern parsing", () => {
   it("Convert explicit app #1", () => {
     // --- Act
     const content = `\`\`\`xmlui-pg
-    ---app
-    <Button>Click me</Button>
+---app
+<Button>Click me</Button>
   \`\`\``;
 
     const base64 = "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==";
@@ -1096,8 +1114,8 @@ describe("Playground pattern parsing", () => {
     // --- Act
     const base64 = "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==";
     const content = `\`\`\`xmlui-pg
-    ---app display
-    <Button>Click me</Button>
+---app display
+<Button>Click me</Button>
   \`\`\``;
 
     const result = convertPlaygroundPatternToMarkdown(content);
@@ -1121,8 +1139,8 @@ describe("Playground pattern parsing", () => {
     // --- Act
     const base64 = "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4ifQ==";
     const content = `\`\`\`xmlui-pg
-    ---app display copy
-    <Button>Click me</Button>
+---app display copy
+<Button>Click me</Button>
   \`\`\``;
     const result = convertPlaygroundPatternToMarkdown(content);
     // --- Assert
@@ -1145,10 +1163,10 @@ describe("Playground pattern parsing", () => {
     const base64 =
       "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdfQ==";
     const content = `\`\`\`xmlui-pg
-    ---app display
-    <Button>Click me</Button>
-    ---comp
-    <Component name="MyComponent" />
+---app display
+<Button>Click me</Button>
+---comp
+<Component name="MyComponent" />
   \`\`\``;
 
     const result = convertPlaygroundPatternToMarkdown(content);
@@ -1174,10 +1192,10 @@ describe("Playground pattern parsing", () => {
     const base64 =
       "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdfQ==";
     const content = `\`\`\`xmlui-pg
-    ---app display
-    <Button>Click me</Button>
-    ---comp display
-    <Component name="MyComponent" />
+---app display
+<Button>Click me</Button>
+---comp display
+<Component name="MyComponent" />
   \`\`\``;
 
     const result = convertPlaygroundPatternToMarkdown(content);
@@ -1207,12 +1225,12 @@ describe("Playground pattern parsing", () => {
     const base64 =
       "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiIsIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdfQ==";
     const content = `\`\`\`xmlui-pg
-    ---app display
-    <Button>Click me</Button>
-    ---comp display
-    <Component name="MyComponent" />
-    ---comp display
-    <Component name="MyComponent" />
+---app display
+<Button>Click me</Button>
+---comp display
+<Component name="MyComponent" />
+---comp display
+<Component name="MyComponent" />
   \`\`\``;
 
     const result = convertPlaygroundPatternToMarkdown(content);
@@ -1400,12 +1418,12 @@ describe("Playground pattern parsing", () => {
     const base64 =
       "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdfQ==";
     const content = `\`\`\`xmlui-pg
-    ---app display
-    <Button>Click me</Button>
-    ---desc
-    **This is a description #1**.
-    ---comp display
-    <Component name="MyComponent" />
+---app display
+<Button>Click me</Button>
+---desc
+**This is a description #1**.
+---comp display
+<Component name="MyComponent" />
   \`\`\``;
 
     const result = convertPlaygroundPatternToMarkdown(content);
@@ -1437,14 +1455,14 @@ describe("Playground pattern parsing", () => {
     const base64 =
       "eyJhcHAiOiI8QnV0dG9uPkNsaWNrIG1lPC9CdXR0b24+XG4iLCJjb21wb25lbnRzIjpbIjxDb21wb25lbnQgbmFtZT1cIk15Q29tcG9uZW50XCIgLz5cbiJdfQ==";
     const content = `\`\`\`xmlui-pg
-    ---app display
-    <Button>Click me</Button>
-    ---desc
-    **This is a description #1**.
-    ---comp display
-    <Component name="MyComponent" />
-    ---desc
-    **This is a description #2**.
+---app display
+<Button>Click me</Button>
+---desc
+**This is a description #1**.
+---comp display
+<Component name="MyComponent" />
+---desc
+**This is a description #2**.
   \`\`\``;
 
     const result = convertPlaygroundPatternToMarkdown(content);
@@ -1470,6 +1488,31 @@ describe("Playground pattern parsing", () => {
     expect(base64ToJson(base64)).toStrictEqual({
       app: "<Button>Click me</Button>\n",
       components: ['<Component name="MyComponent" />\n'],
+    });
+  });
+
+  it("Convert wight height", () => {
+    // --- Act
+    const base64 = "eyJoZWlnaHQiOiIzMDBweCIsImFwcCI6IjxCdXR0b24+Q2xpY2sgbWU8L0J1dHRvbj5cbiJ9";
+    const content = `\`\`\`xmlui-pg display height="300px"
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = convertPlaygroundPatternToMarkdown(content);
+
+    // --- Assert
+    expect(result).toBe(
+      `\`\`\`xmlui 
+<Button>Click me</Button>
+\`\`\`
+
+<samp data-pg-content="${base64}"></samp>
+
+`,
+    );
+    expect(base64ToJson(base64)).toStrictEqual({
+      app: "<Button>Click me</Button>\n",
+      height: "300px",
     });
   });
 });
