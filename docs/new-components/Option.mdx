@@ -62,6 +62,26 @@ import { Callout } from "nextra/components";
   `}
 />
 
+## Use children as Content Template
+
+The [optionTemplate](#optiontemplate) property can be replaced by setting the item template component directly as the Option's child.
+In the following example, the two Option are functionally the same:
+
+```xmlui copy
+<App>
+  <!-- This is the same -->
+  <Option>
+    <property name="optionTemplate">
+      <Text>Template</Text>
+    </property>
+  </Option>
+  <!-- As this -->
+  <Option>
+    <Text>Template</Text>
+  </Option>
+</App>
+```
+
 ## Properties
 
 ### `enabled (default: true)`
