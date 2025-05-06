@@ -1,9 +1,10 @@
-import { type CSSProperties, memo, type ReactNode, useEffect } from "react";
+import { type CSSProperties, memo, type ReactNode } from "react";
 import React from "react";
-import ReactMarkdown from "react-markdown";
+import { MarkdownHooks } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { visit } from "unist-util-visit";
+import type { Node, Parent } from "unist";
 
 import styles from "./Markdown.module.scss";
 import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
@@ -12,29 +13,32 @@ import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
-import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
 import { NestedApp } from "../NestedApp/NestedAppNative";
+import { type CodeHighlighter, parseMetaAndHighlightCode } from "./highlight-code";
 
 type MarkdownProps = {
   removeIndents?: boolean;
   children: ReactNode;
   style?: CSSProperties;
+  codeHighlighter?: CodeHighlighter;
 };
 
 export const Markdown = memo(function Markdown({
   removeIndents = true,
   children,
   style,
+  codeHighlighter,
 }: MarkdownProps) {
   if (typeof children !== "string") {
     return null;
   }
 
+  children = removeIndents ? removeTextIndents(children) : children;
+
   return (
-    <div className={styles.markdownContent} style={style}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+    <div className={styles.markdownContent} style={{ ...style }}>
+      <MarkdownHooks
+        remarkPlugins={[remarkGfm, codeBlockParser]}
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
@@ -56,7 +60,7 @@ export const Markdown = memo(function Markdown({
             const popOut = props?.["data-popout"];
             if (popOut) {
               return (
-                <a href={src} target="_blank">
+                <a href={src} target="_blank" rel="noreferrer">
                   <img className={htmlTagStyles.htmlImage} {...props}>
                     {children}
                   </img>
@@ -103,10 +107,30 @@ export const Markdown = memo(function Markdown({
             );
           },
           pre({ id, children }) {
-            return (
+            const defaultCodefence = (
               <Text uid={id} variant="codefence">
                 {children}
               </Text>
+            );
+
+            if (!codeHighlighter) {
+              return defaultCodefence;
+            }
+
+            const parsedData = parseMetaAndHighlightCode(children, codeHighlighter);
+            if (!parsedData) {
+              return defaultCodefence;
+            }
+
+            return (
+              <div className={styles.codeWrapper}>
+                <Text
+                  uid={id}
+                  variant="codefence"
+                  syntaxHighlightClasses={parsedData.classNames}
+                  dangerouslySetInnerHTML={{ __html: parsedData.cleanedHtmlStr }}
+                />
+              </div>
             );
           },
           strong({ id, children }) {
@@ -200,8 +224,25 @@ export const Markdown = memo(function Markdown({
           },
           samp({ ...props }) {
             const nestedProps = props as any;
+            const dataContentBase64 = props?.["data-pg-content"];
+            if (dataContentBase64 !== undefined) {
+              const jsonContent = atob(dataContentBase64);
+              const appProps = JSON.parse(jsonContent);
+              // console.log(appProps);
+              return <NestedApp
+                app={appProps.app}
+                config={appProps.config}
+                components={appProps.components}
+                api={appProps.api}
+                activeTheme={appProps.activeTheme}
+                activeTone={appProps.activeTone}
+                title={appProps.name}
+                height={appProps.height}
+                allowPlaygroundPopup={!appProps.noPopup}
+              />
+            }
             return (
-              <NestedApp 
+              <NestedApp
                 app={nestedProps.app}
                 config={nestedProps.config}
                 components={nestedProps.components}
@@ -210,15 +251,14 @@ export const Markdown = memo(function Markdown({
                 activeTone={nestedProps.activeTone}
                 title={nestedProps.title}
                 height={nestedProps.height}
-                allowPlaygroundPopup={nestedProps.allowPlaygroundPopup}
+                allowPlaygroundPopup={true}
               />
             );
           },
-
         }}
       >
-        {removeIndents ? removeTextIndents(children) : children}
-      </ReactMarkdown>
+        {children as any}
+      </MarkdownHooks>
     </div>
   );
 });
@@ -379,72 +419,37 @@ const ListItem = ({ children, style }: ListItemProps) => {
   );
 };
 
-/**
- * Finds and evaluates given binding expressions in markdown text.
- * The binding expressions are of the form `${...}$`.
- * @param extractValue The function to resolve binding expressions
- * @returns visitor function that processes the binding expressions
- */
-function bindingExpression({ extractValue }: { extractValue: ValueExtractor }) {
-  return (tree: any) => {
-    visit(tree, "text", (node) => {
-      return detectBindingExpression(node);
-    });
+interface CodeNode extends Node {
+  lang: string | null;
+  meta: string | null;
+}
+
+function codeBlockParser() {
+  return function transformer(tree: Node) {
+    visit(tree, "code", visitor);
   };
 
-  function detectBindingExpression(node: any) {
-    // Remove empty ${} expressions first
-    node.value = node.value.replace(/\$\{\s*\}/g, "");
-
-    const regex = /\$\{((?:[^{}]|\{(?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*\})*)\}/g;
-    const parts: string[] = node.value.split(regex);
-    if (parts.length > 1) {
-      node.type = "html";
-      node.value = parts
-        .map((part, index) => {
-          const extracted = index % 2 === 0 ? part : extractValue(`{${part}}`);
-          const resultExpr = mapByType(extracted);
-          // The result expression might be an object, in that case we stringify it here,
-          // at the last step, so that there are no unnecessary apostrophes
-          return typeof resultExpr === "object" && resultExpr !== null
-            ? JSON.stringify(resultExpr)
-            : resultExpr;
-        })
-        .join("");
+  function visitor(node: CodeNode, _: number, parent: Parent | undefined) {
+    const { lang, meta } = node;
+    const nodeData = { hProperties: {} };
+    if (lang !== null) {
+      nodeData.hProperties["dataLanguage"] = lang;
     }
+    if (!parent) return;
+    if (!meta) return;
+
+    const params = splitter(meta)
+      ?.filter((s) => s !== "")
+      .map((s) => s.trim());
+    if (!params) return;
+    if (params.length === 0) return;
+
+    // TEMP: just appending everything else as a string to a different property
+    nodeData.hProperties["dataMeta"] = params;
+    node.data = nodeData;
   }
 
-  function mapByType(extracted: any) {
-    if (extracted === null) {
-      return null;
-    } else if (extracted === undefined || typeof extracted === "undefined") {
-      return undefined;
-    } else if (typeof extracted === "object") {
-      const arrowFuncResult = parseArrowFunc(extracted);
-      if (arrowFuncResult) {
-        return arrowFuncResult;
-      }
-      if (Array.isArray(extracted)) {
-        return extracted;
-      }
-      return Object.fromEntries(
-        Object.entries(extracted).map(([key, value]) => {
-          return [key, mapByType(value)];
-        }),
-      );
-    } else {
-      return extracted;
-    }
-  }
-
-  function parseArrowFunc(extracted: Record<string, any>): string {
-    if (
-      extracted.hasOwnProperty("type") &&
-      extracted.type === T_ARROW_EXPRESSION &&
-      extracted?._ARROW_EXPR_
-    ) {
-      return "[xmlui function]";
-    }
-    return "";
+  function splitter(str: string): string[] | null {
+    return str.match(/(?:[^\s"']+|("|')[^"']*("|'))+/g);
   }
 }

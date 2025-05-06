@@ -9,84 +9,110 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect((await createMarkdownDriver()).component).toBeAttached();
   });
 
-  test.skip("handles empty binding expression", async ({ initTestBed, createMarkdownDriver }) => {
-    await initTestBed(`<Markdown><![CDATA[\${}]]></Markdown>`);
+  test("handles empty binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\@{}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText("");
   });
 
-  test.skip("handles only spaces binding expression", async ({ initTestBed, createMarkdownDriver }) => {
-    await initTestBed(`<Markdown><![CDATA[\${   }]]></Markdown>`);
+  test("does not detect escaped empty expression #1", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[\\@{}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("@{}");
+  });
+
+  test("does not detect escaped empty expression #2", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    await initTestBed(`<Markdown><![CDATA[\@\\{}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("@{}");
+  });
+
+  test("does not detect escaped expression #1", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\\@{1}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("@{1}");
+  });
+
+  test("does not detect escaped expression #2", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\@\\{1}]]></Markdown>`);
+    await expect((await createMarkdownDriver()).component).toHaveText("@{1}");
+  });
+
+  test("handles only spaces binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\@{   }]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText("");
   });
 
-  test.skip("handles binding expression", async ({ initTestBed, createMarkdownDriver }) => {
-    await initTestBed(`<Markdown><![CDATA[\${1+1}]]></Markdown>`);
+  test("handles binding expression", async ({ initTestBed, createMarkdownDriver }) => {
+    await initTestBed(`<Markdown><![CDATA[\@{1+1}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText("2");
   });
 
-  test.skip("handles objects in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
+  test("handles objects in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
     const expected = "{ a : 1, b: 'c' }";
-    await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
+    await initTestBed(`<Markdown><![CDATA[\@{${expected}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(`{"a":1,"b":"c"}`);
   });
 
-  test.skip("handles arrays in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
+  test("handles arrays in binding expressions", async ({ initTestBed, createMarkdownDriver }) => {
     const expected = "[ 1, 2, 3 ]";
-    await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
+    await initTestBed(`<Markdown><![CDATA[\@{${expected}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(`[1,2,3]`);
   });
 
-  test.skip("handles functions in binding expressions", async ({
+  test("handles functions in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
   }) => {
     const SOURCE = "() => { const x = 1; console.log(x); return null; }";
     const EXPECTED = "[xmlui function]";
-    await initTestBed(`<Markdown><![CDATA[\${${SOURCE}}]]></Markdown>`);
+    await initTestBed(`<Markdown><![CDATA[\@{${SOURCE}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
   });
 
-  test.skip("handles nested objects in binding expressions", async ({
+  test("handles nested objects in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
   }) => {
     const expected = "{ a : 1, b: { c: 1 } }";
-    await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
+    await initTestBed(`<Markdown><![CDATA[\@{${expected}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(`{"a":1,"b":{"c":1}}`);
   });
 
-  test.skip("handles functions nested in objects in binding expressions", async ({
+  test("handles functions nested in objects in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
   }) => {
     const SOURCE = "{ a: () => { const x = 1; console.log(x); return null; } }";
     const EXPECTED = '{"a":"[xmlui function]"}';
-    await initTestBed(`<Markdown><![CDATA[\${${SOURCE}}]]></Markdown>`);
+    await initTestBed(`<Markdown><![CDATA[\@{${SOURCE}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
   });
 
-  test.skip("handles arrays nested in objects in binding expressions", async ({
+  test("handles arrays nested in objects in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
   }) => {
     const expected = "{ a: [1, 2, 3] }";
-    await initTestBed(`<Markdown><![CDATA[\${${expected}}]]></Markdown>`);
+    await initTestBed(`<Markdown><![CDATA[\@{${expected}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(`{"a":[1,2,3]}`);
   });
 
-  test.skip("handles arrays nested in functions in binding expressions", async ({
+  test("handles arrays nested in functions in binding expressions", async ({
     initTestBed,
     createMarkdownDriver,
   }) => {
     const SOURCE = "() => { return [1, 2, 3]; }";
     const EXPECTED = "[xmlui function]";
-    await initTestBed(`<Markdown><![CDATA[\${${SOURCE}}]]></Markdown>`);
+    await initTestBed(`<Markdown><![CDATA[\@{${SOURCE}}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
   });
 
-  test.skip("handles complex expressions", async ({ initTestBed, createMarkdownDriver }) => {
+  test("handles complex expressions", async ({ initTestBed, createMarkdownDriver }) => {
     const SOURCE =
-      "Hello there ${ {a : () => {}, x: null, b: { c: 3, d: 'asdadsda', e: () => {return null;} } } } How are you ${true || undefined || []}";
+      "Hello there @{ {a : () => {}, x: null, b: { c: 3, d: 'asdadsda', e: () => {return null;} } } } How are you @{true || undefined || []}";
     const EXPECTED =
       'Hello there {"a":"[xmlui function]","x":null,"b":{"c":3,"d":"asdadsda","e":"[xmlui function]"}} How are you true';
     await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);

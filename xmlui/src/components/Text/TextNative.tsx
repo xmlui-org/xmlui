@@ -35,6 +35,9 @@ export const Text = forwardRef(function Text(
 ) {
   const innerRef = useRef<HTMLElement>(null);
   const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
+  // NOTE: This is to accept syntax highlight classes coming from shiki
+  // classes need not to be added to the rendered html element, so we remove them from props
+  const { syntaxHighlightClasses, ...restVariantSpecificProps } = variantSpecificProps;
 
   const Element = useMemo(() => {
     if (!variant || !TextVariantElement[variant]) return "div"; //todo illesg, could be a span?
@@ -44,9 +47,10 @@ export const Text = forwardRef(function Text(
   return (
     <>
       <Element
-        {...variantSpecificProps}
+        {...restVariantSpecificProps}
         ref={ref as any}
         className={classnames([
+          syntaxHighlightClasses,
           styles.text,
           styles[variant || "default"],
           {

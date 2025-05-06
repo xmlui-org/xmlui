@@ -1295,3 +1295,10 @@ function getNamespaceResolvedComponentName(
 
   return resolvedNamespace + "." + name;
 }
+
+/**
+* @param name - The name of the event in camelCase, with "on" prefix.
+*/
+export function stripOnPrefix(name: string) {
+  return name[2].toLowerCase() + name.substring(3);
+}

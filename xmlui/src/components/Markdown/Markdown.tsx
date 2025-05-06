@@ -6,6 +6,9 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown } from "./MarkdownNative";
 import { useMemo } from "react";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { parseBindingExpression } from "./parse-binding-expr";
+import { CodeHighlighter } from "./highlight-code";
+import { convertPlaygroundPatternToMarkdown, observePlaygroundPattern } from "./utils";
 
 const COMP = "Markdown";
 
@@ -14,6 +17,10 @@ export const MarkdownMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   props: {
     content: d("This property sets the markdown content to display."),
+    codeHighlighter: {
+      description: "This property sets the code highlighter to use.",
+      isInternal: true,
+    },
     removeIndents: {
       description:
         "This boolean property specifies whether leading indents should be " +
@@ -68,7 +75,7 @@ export const markdownComponentRenderer = createComponentRenderer(
       renderedChildren = extractValue.asString(node.props.content);
     }
 
-    // 2. "data" property fallback)
+    // 2. "data" property fallback
     if (!renderedChildren) {
       renderedChildren = extractValue.asString((node.props as any).data);
     }
@@ -87,6 +94,7 @@ export const markdownComponentRenderer = createComponentRenderer(
       <TransformedMarkdown
         style={layoutCss}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
+        codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
       >
         {renderedChildren}
@@ -100,20 +108,31 @@ type TransformedMarkdownProps = {
   removeIndents?: boolean;
   style: React.CSSProperties;
   extractValue: ValueExtractor;
+  codeHighlighter?: CodeHighlighter;
 };
-
-
-function resolveBindingExpressionsInChildren(children: string, extractValue: ValueExtractor){
-  //TODO resolve binding expressions in markdown text
-  return children;
-}
 
 const TransformedMarkdown = ({ children, removeIndents, style, extractValue }: TransformedMarkdownProps) => {
   const markdownContent = useMemo(()=>{
     if (typeof children !== "string") {
       return null;
     }
-    return resolveBindingExpressionsInChildren(children, extractValue)
+
+    // --- Resolve bindig expression values
+    const withBindinxExprs = parseBindingExpression(children, extractValue);
+
+    // --- Resolve xmlui playground definitions
+    let resolvedMd = withBindinxExprs;
+    while (true) {
+      const nextPlayground = observePlaygroundPattern(resolvedMd);
+      if (!nextPlayground) break;
+
+      resolvedMd = resolvedMd.slice(0, nextPlayground[0]) +
+        convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
+        resolvedMd.slice(nextPlayground[1]);
+    }
+    // console.log(resolvedMd)
+    return resolvedMd;
+
   }, [children, extractValue]);
 
   return (
