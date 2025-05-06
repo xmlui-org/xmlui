@@ -160,13 +160,13 @@ export function App({
 
   const styleWithHelpers = useMemo(() => {
     return {
-      "--header-height": !scrollWholePage ? "0px" : headerHeight + "px",
-      "--footer-height": !scrollWholePage ? "0px" : footerHeight + "px",
+      "--header-height": (!scrollWholePage || safeLayout === "vertical" || safeLayout === "horizontal" || safeLayout === "condensed") ? "0px" : headerHeight + "px",
+      "--footer-height": (!scrollWholePage || safeLayout === "vertical" || safeLayout === "horizontal" || safeLayout === "condensed") ? "0px" : footerHeight + "px",
       "--header-abs-height": headerHeight + "px",
       "--footer-abs-height": footerHeight + "px",
       "--scrollbar-width": noScrollbarGutters ? "0px" : scrollbarWidth + "px",
     } as CSSProperties;
-  }, [footerHeight, headerHeight, noScrollbarGutters, scrollWholePage, scrollbarWidth]);
+  }, [footerHeight, headerHeight, noScrollbarGutters, safeLayout, scrollWholePage, scrollbarWidth]);
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const location = useLocation();
