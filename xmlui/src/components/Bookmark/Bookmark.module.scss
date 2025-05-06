@@ -1,0 +1,4 @@
+.anchorRef{
+  --my-scroll-margin-top: var(--header-height);
+  scroll-margin-top: var(--my-scroll-margin-top);
+}

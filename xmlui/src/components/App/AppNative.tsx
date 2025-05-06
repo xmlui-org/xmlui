@@ -81,7 +81,7 @@ export function App({
   const safeLayout = layoutWithDefaultValue
     ?.trim()
     .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
-  const { setLoggedInUser, mediaSize } = useAppContext();
+  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll } = useAppContext();
   const hasRegisteredHeader = header !== undefined;
   const hasRegisteredNavPanel = navPanelDef !== undefined;
 
@@ -160,11 +160,11 @@ export function App({
 
   const styleWithHelpers = useMemo(() => {
     return {
-      "--header-height": !scrollWholePage ? 0 : headerHeight + "px",
-      "--footer-height": !scrollWholePage ? 0 : footerHeight + "px",
+      "--header-height": !scrollWholePage ? "0px" : headerHeight + "px",
+      "--footer-height": !scrollWholePage ? "0px" : footerHeight + "px",
       "--header-abs-height": headerHeight + "px",
       "--footer-abs-height": footerHeight + "px",
-      "--scrollbar-width": noScrollbarGutters ? 0 : scrollbarWidth + "px",
+      "--scrollbar-width": noScrollbarGutters ? "0px" : scrollbarWidth + "px",
     } as CSSProperties;
   }, [footerHeight, headerHeight, noScrollbarGutters, scrollWholePage, scrollbarWidth]);
 
@@ -182,6 +182,13 @@ export function App({
       behavior: "instant", // Optional if you want to skip the scrolling animation
     });
   }, [location.pathname]);
+
+  useIsomorphicLayoutEffect(()=>{
+    requestAnimationFrame(()=>{
+      // we have to force refresh the anchor scroll to pos, because it depends on the header height (scroll-margin-top on anchors)
+      forceRefreshAnchorScroll();
+    })
+  }, []);
 
   const [subNavPanelSlot, setSubNavPanelSlot] = useState(null);
   const registerSubNavPanelSlot = useCallback((element) => {

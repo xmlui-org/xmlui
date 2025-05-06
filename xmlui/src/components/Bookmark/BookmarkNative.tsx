@@ -1,6 +1,7 @@
 import type { ReactNode} from "react";
 import { useContext, useLayoutEffect, useRef } from "react";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
+import styles from './Bookmark.module.scss';
 
 type Props = {
   uid?: string;
@@ -39,7 +40,7 @@ export const Bookmark = ({
   }, [uid, observeIntersection, registerHeading, level, title, omitFromToc]);
 
   return (
-    <span ref={elementRef} id={uid} data-anchor={true}>
+    <span ref={elementRef} id={uid} data-anchor={true} className={styles.anchorRef}>
       {children}
     </span>
   );

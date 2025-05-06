@@ -37,6 +37,7 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   padding-top: $paddingTop-MarkDown;
   padding-bottom: $paddingBottom-MarkDown;
   background-color: $backgroundColor-MarkDown;
+  min-width: 0;
   width: 100%;
 
   // --- Blockquote
