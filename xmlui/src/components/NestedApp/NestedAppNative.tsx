@@ -47,7 +47,6 @@ export function NestedApp({
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
 
   const apiWorker = useMemo(() => {
-    // console.log("HERE");
     if (typeof document !== "undefined") {
       return setupWorker();
     }
@@ -97,7 +96,6 @@ export function NestedApp({
         if (errors.length > 0) {
           return errReportComponent(errors, `nested xmlui`, erroneousCompoundComponentName);
         }
-        console.log("component", component);
         return component;
       });
 
