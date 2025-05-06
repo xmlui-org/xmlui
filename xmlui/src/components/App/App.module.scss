@@ -13,6 +13,7 @@ $boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
 $backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
 $borderLeft-content-App: createThemeVar("borderLeft-content-App");
 $maxWidth-content-App: createThemeVar("maxWidth-content-App");
+$maxWidth-App: createThemeVar("maxWidth-App");
 $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
@@ -51,9 +52,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       position: static;
     }
     &.sticky {
-      .contentWrapper{
-        scroll-padding-top: var(--header-height);
-      }
       .footerWrapper {
         position: sticky;
         bottom: 0;
@@ -71,7 +69,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       position: static;
     }
     &.sticky {
-      scroll-padding-top: var(--header-height);
       min-height: 100%;
       .footerWrapper {
         position: sticky;
@@ -134,7 +131,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
 
     &.verticalFullHeader {
-      scroll-padding-top: var(--header-height);
       .content {
         margin-inline: calc(-1 * var(--scrollbar-width));
       }
@@ -155,7 +151,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
     .PagesWrapper {
       overflow: auto;
-      //scroll-padding-top: var(--header-height);
       scroll-padding-block: $scrollPaddingBlockPage;
       min-height: 0;
       height: 100%;
@@ -193,6 +188,9 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
   display: flex;
   flex-direction: row;
   isolation: isolate;
+  align-self: center;
+  width: 100%;
+  max-width: createThemeVar("maxWidth-App");
 }
 
 .contentWrapper {

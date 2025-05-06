@@ -116,12 +116,14 @@ export default class RestApiProxy {
     const { apiUrl, errorResponseTransform } = conf;
     this.appContext = appContext;
 
-    const xsrfToken = readCookie("XSRF-TOKEN");
-    const xsrfHeaders = xsrfToken
-      ? {
-          "X-XSRF-TOKEN": readCookie("XSRF-TOKEN"),
-        }
-      : {};
+    // const xsrfToken = readCookie("XSRF-TOKEN");
+    const xsrfHeaders =
+      // xsrfToken
+      // ? {
+      //     "X-XSRF-TOKEN": readCookie("XSRF-TOKEN"),
+      //   }
+      // :
+        {};
     this.config = {
       apiUrl,
       errorResponseTransform,

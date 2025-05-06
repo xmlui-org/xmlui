@@ -66,6 +66,13 @@ $themeVars: t.composeTextVars($themeVars, "H6");
   }
 }
 
+.anchorRef{
+  --my-scroll-margin-top: var(--header-height);
+  width: 0;
+  height: 0;
+  scroll-margin-top: var(--my-scroll-margin-top);
+}
+
 /*
 This is a Chromium based solution that is supported by most modern browsers.
 See this source for details: https://css-tricks.com/line-clampin/

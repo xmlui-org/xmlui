@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 
 import { version } from "../../../package.json";
 
-import { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
+import type { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
 import { useThemes } from "../theming/ThemeContext";
@@ -27,8 +27,9 @@ import {
 import { getVarKey } from "../theming/themeVars";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { EMPTY_OBJECT, noop } from "../constants";
-import { AppStateContext, IAppStateContext } from "../../components/App/AppStateContext";
-import { MemoedVars } from "../abstractions/ComponentRenderer";
+import type { IAppStateContext } from "../../components/App/AppStateContext";
+import { AppStateContext } from "../../components/App/AppStateContext";
+import type { MemoedVars } from "../abstractions/ComponentRenderer";
 import { delay, formatFileSizeInBytes, getFileExtension } from "../utils/misc";
 import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
@@ -36,10 +37,12 @@ import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
 import { AppContext } from "../AppContext";
 import { renderChild } from "./renderChild";
-import { GlobalProps, queryClient } from "./AppRoot";
-import { ContainerWrapperDef } from "./ContainerWrapper";
+import type { GlobalProps} from "./AppRoot";
+import { queryClient } from "./AppRoot";
+import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { useLocation, useNavigate } from "@remix-run/react";
 import { ThemeToneKeys } from "../../abstractions/ThemingDefs";
+import type { TrackContainerHeight } from "./AppWrapper";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -47,7 +50,7 @@ type AppContentProps = {
   routerBaseName: string;
   globalProps?: GlobalProps;
   standalone?: boolean;
-  trackContainerHeight?: boolean;
+  trackContainerHeight?: TrackContainerHeight;
   decorateComponentsWithTestId?: boolean;
   debugEnabled?: boolean;
   children?: ReactNode;
@@ -142,9 +145,13 @@ export function AppContent({
         if (observer?.current) {
           observer.current.unobserve(root);
         }
-        observer.current = new ResizeObserver((entries) => {
-          root.style.setProperty("--containerHeight", entries[0].contentRect.height + "px");
-        });
+        if(trackContainerHeight === "auto"){
+          root.style.setProperty("--containerHeight", 'auto');
+        } else {
+          observer.current = new ResizeObserver((entries) => {
+            root.style.setProperty("--containerHeight", entries[0].contentRect.height + "px");
+          });
+        }
         if (observer.current) {
           observer.current.observe(root);
         }
