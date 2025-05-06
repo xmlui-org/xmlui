@@ -228,6 +228,7 @@ export const Markdown = memo(function Markdown({
             if (dataContentBase64 !== undefined) {
               const jsonContent = atob(dataContentBase64);
               const appProps = JSON.parse(jsonContent);
+              // console.log(appProps);
               return <NestedApp
                 app={appProps.app}
                 config={appProps.config}
@@ -235,9 +236,9 @@ export const Markdown = memo(function Markdown({
                 api={appProps.api}
                 activeTheme={appProps.activeTheme}
                 activeTone={appProps.activeTone}
-                title={appProps.title}
+                title={appProps.name}
                 height={appProps.height}
-                allowPlaygroundPopup={true}
+                allowPlaygroundPopup={!appProps.noPopup}
               />
             }
             return (

@@ -131,7 +131,7 @@ const TransformedMarkdown = ({ children, removeIndents, style, extractValue }: T
         convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
         resolvedMd.slice(nextPlayground[1]);
     }
-    console.log("resolved", resolvedMd);
+    // console.log(resolvedMd)
     return resolvedMd;
 
   }, [children, extractValue]);
