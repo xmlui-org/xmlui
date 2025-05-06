@@ -1,9 +1,11 @@
 export type SegmentProps = {
   display?: boolean;
   copy?: boolean;
+  noPopup?: boolean;
   highlights?: (number | [number, number])[];
   filename?: string;
   name?: string;
+  height?: string;
   content?: string;
   order?: number;
 };
@@ -55,14 +57,19 @@ export function observePlaygroundPattern(content: string): [number, number, stri
 export function parseSegmentProps(input: string): SegmentProps {
   const segment: SegmentProps = {};
 
-  // Match the "display" flag
+  // --- Match the "display" flag
   if (/\bdisplay\b/.test(input)) {
     segment.display = true;
   }
 
-  // Match the "copy" flag
+  // --- Match the "copy" flag
   if (/\bcopy\b/.test(input)) {
     segment.copy = true;
+  }
+
+  // --- Match the "noPopup" flag
+  if (/\bnoPopup\b/.test(input)) {
+    segment.noPopup = true;
   }
 
   // Match the "highlights" pattern
@@ -90,6 +97,12 @@ export function parseSegmentProps(input: string): SegmentProps {
     segment.name = nameMatch[1];
   }
 
+  // Match the "height" property
+  const heightMatch = input.match(/\bheight="([^"]+)"/);
+  if (heightMatch) {
+    segment.height = heightMatch[1];
+  }
+
   return segment;
 }
 
@@ -112,7 +125,7 @@ export function parsePlaygroundPattern(content: string): PlaygroundPattern {
   let order = 0;
 
   for (let i = 1; i < lines.length - 1; i++) {
-    const line = lines[i].trimStart();
+    const line = lines[i];
     if (line.startsWith("---app")) {
       const appSegment = parseSegmentProps(line);
       pattern.app = { ...appSegment };
@@ -212,9 +225,19 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
     });
   }
 
-  // --- Iterate through segments
+  // --- Assemble the final markdown content
   let markdownContent = "";
-  const pgContent: any = {};
+  const pgContent: any = { noPopup: pattern.default?.noPopup };
+
+  // --- Extract optional playground attributes
+  if (pattern.default.height) {
+    pgContent.height = pattern.default.height;
+  }
+  if (pattern.default.name) {
+    pgContent.name = pattern.default.name;
+  }
+
+  // --- Iterate through segments
   for (let i = 0; i <= maxOrder; i++) {
     let segment: SegmentProps | undefined;
     let type = "";
@@ -234,7 +257,7 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
         segment = descSegment;
         type = "desc";
       }
-    } 
+    }
     if (!segment && pattern.components) {
       const compSegment = pattern.components.find((comp) => comp.order === i);
       if (compSegment) {
@@ -294,7 +317,7 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
 
   // --- Convert the JSON representation of pgContent to a base64 string
   const jsonString = JSON.stringify(pgContent);
-  const base64String = Buffer.from(jsonString, "utf-8").toString("base64");
+  const base64String = btoa(jsonString);
   markdownContent += '<samp data-pg-content="' + base64String + '"></samp>\n\n';
 
   return markdownContent;
