@@ -90,7 +90,6 @@ export const markdownComponentRenderer = createComponentRenderer(
       });
     }
 
-    const resolvedChildren = parseBindingExpression(renderedChildren, extractValue);
     return (
       <TransformedMarkdown
         style={layoutCss}
@@ -98,7 +97,7 @@ export const markdownComponentRenderer = createComponentRenderer(
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
       >
-        {resolvedChildren}
+        {renderedChildren}
       </TransformedMarkdown>
     );
   },
@@ -131,7 +130,7 @@ const TransformedMarkdown = ({ children, removeIndents, style, extractValue }: T
         convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
         resolvedMd.slice(nextPlayground[1]);
     }
-    // console.log(resolvedMd)
+    console.log(resolvedMd)
     return resolvedMd;
 
   }, [children, extractValue]);
