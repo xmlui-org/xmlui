@@ -39,7 +39,7 @@ export const Bookmark = ({
   }, [uid, observeIntersection, registerHeading, level, title, omitFromToc]);
 
   return (
-    <span ref={elementRef} id={uid} data-anchor={true}>
+    <span ref={elementRef} id={uid} data-anchor={true} style={{scrollMarginTop: "var(--header-height)"}}>
       {children}
     </span>
   );

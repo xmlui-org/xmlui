@@ -164,8 +164,6 @@ export function NestedApp({
         </ApiInterceptorProvider>
       </ErrorBoundary>,
     );
-
-    return () => contentRootRef.current?.unmount();
   }, [
     activeTheme,
     allowPlaygroundPopup,
@@ -184,6 +182,14 @@ export function NestedApp({
     title,
     toneToApply,
   ]);
+
+  useEffect(() => {
+    return () => {
+      contentRootRef.current?.unmount();
+      contentRootRef.current = null;
+    };
+  }, []);
+
   return (
     <div className={styles.nestedApp}>
       <div

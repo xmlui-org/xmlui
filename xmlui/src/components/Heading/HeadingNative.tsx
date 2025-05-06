@@ -102,7 +102,7 @@ export const Heading = forwardRef(function Heading(
       {...furtherProps}
     >
       {anchorId && (
-        <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0 }} data-anchor={true} />
+        <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0, scrollMarginTop: "var(--header-height)" }} data-anchor={true} />
       )}
       {children}
     </Element>

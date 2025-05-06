@@ -81,7 +81,7 @@ export function App({
   const safeLayout = layoutWithDefaultValue
     ?.trim()
     .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
-  const { setLoggedInUser, mediaSize } = useAppContext();
+  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll } = useAppContext();
   const hasRegisteredHeader = header !== undefined;
   const hasRegisteredNavPanel = navPanelDef !== undefined;
 
@@ -182,6 +182,13 @@ export function App({
       behavior: "instant", // Optional if you want to skip the scrolling animation
     });
   }, [location.pathname]);
+
+  useIsomorphicLayoutEffect(()=>{
+    requestAnimationFrame(()=>{
+      // we have to force refresh the anchor scroll to pos, because it depends on the header height (scroll-margin-top on anchors)
+      forceRefreshAnchorScroll();
+    })
+  }, []);
 
   const [subNavPanelSlot, setSubNavPanelSlot] = useState(null);
   const registerSubNavPanelSlot = useCallback((element) => {

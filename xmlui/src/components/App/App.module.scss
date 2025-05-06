@@ -52,9 +52,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       position: static;
     }
     &.sticky {
-      .contentWrapper{
-        scroll-padding-top: var(--header-height);
-      }
       .footerWrapper {
         position: sticky;
         bottom: 0;
@@ -72,7 +69,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       position: static;
     }
     &.sticky {
-      scroll-padding-top: var(--header-height);
       min-height: 100%;
       .footerWrapper {
         position: sticky;
@@ -135,7 +131,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
 
     &.verticalFullHeader {
-      scroll-padding-top: var(--header-height);
       .content {
         margin-inline: calc(-1 * var(--scrollbar-width));
       }
@@ -156,7 +151,6 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
     .PagesWrapper {
       overflow: auto;
-      //scroll-padding-top: var(--header-height);
       scroll-padding-block: $scrollPaddingBlockPage;
       min-height: 0;
       height: 100%;
