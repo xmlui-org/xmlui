@@ -140,6 +140,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
   return (
     <SelectRoot value={stringValue} onValueChange={onValChange}>
       <SelectTrigger
+        id={id}
         style={style}
         onFocus={onFocus}
         onBlur={onBlur}
@@ -339,7 +340,6 @@ export const Select = forwardRef(function Select(
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
         <OptionTypeProvider Component={HiddenOption}>
-          {children}
           <ItemWithLabel
             ref={ref}
             labelPosition={labelPosition as any}
@@ -500,6 +500,7 @@ export const Select = forwardRef(function Select(
               </SimpleSelect>
             )}
           </ItemWithLabel>
+          {children}
         </OptionTypeProvider>
       </OptionContext.Provider>
     </SelectContext.Provider>
