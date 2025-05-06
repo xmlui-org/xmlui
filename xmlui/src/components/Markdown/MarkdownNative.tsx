@@ -13,12 +13,10 @@ import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
-import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { NestedApp } from "../NestedApp/NestedAppNative";
 import { type CodeHighlighter, parseMetaAndHighlightCode } from "./highlight-code";
 
 type MarkdownProps = {
-  extractValue: ValueExtractor;
   removeIndents?: boolean;
   children: ReactNode;
   style?: CSSProperties;
@@ -26,7 +24,6 @@ type MarkdownProps = {
 };
 
 export const Markdown = memo(function Markdown({
-  extractValue,
   removeIndents = true,
   children,
   style,
@@ -227,19 +224,33 @@ export const Markdown = memo(function Markdown({
           },
           samp({ ...props }) {
             const nestedProps = props as any;
+            const dataContentBase64 = props?.["data-pg-content"];
+            if (dataContentBase64 !== undefined) {
+              const jsonContent = atob(dataContentBase64);
+              const appProps = JSON.parse(jsonContent);
+              return <NestedApp
+                app={appProps.app}
+                config={appProps.config}
+                components={appProps.components}
+                api={appProps.api}
+                activeTheme={appProps.activeTheme}
+                activeTone={appProps.activeTone}
+                title={appProps.title}
+                height={appProps.height}
+                allowPlaygroundPopup={true}
+              />
+            }
             return (
               <NestedApp
                 app={nestedProps.app}
-                config={extractValue(nestedProps.config)}
-                components={extractValue(nestedProps.components)}
-                api={extractValue(nestedProps.api)}
-                activeTheme={extractValue(nestedProps.activeTheme)}
-                activeTone={extractValue(nestedProps.activeTone)}
-                title={extractValue(nestedProps.title)}
-                height={extractValue(nestedProps.height)}
-                allowPlaygroundPopup={extractValue.asOptionalBoolean(
-                  nestedProps.allowPlaygroundPopup,
-                )}
+                config={nestedProps.config}
+                components={nestedProps.components}
+                api={nestedProps.api}
+                activeTheme={nestedProps.activeTheme}
+                activeTone={nestedProps.activeTone}
+                title={nestedProps.title}
+                height={nestedProps.height}
+                allowPlaygroundPopup={true}
               />
             );
           },

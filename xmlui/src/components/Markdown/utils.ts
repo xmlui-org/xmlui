@@ -4,6 +4,7 @@ export type SegmentProps = {
   highlights?: (number | [number, number])[];
   filename?: string;
   name?: string;
+  height?: string;
   content?: string;
   order?: number;
 };
@@ -294,7 +295,7 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
 
   // --- Convert the JSON representation of pgContent to a base64 string
   const jsonString = JSON.stringify(pgContent);
-  const base64String = Buffer.from(jsonString, "utf-8").toString("base64");
+  const base64String = btoa(jsonString);
   markdownContent += '<samp data-pg-content="' + base64String + '"></samp>\n\n';
 
   return markdownContent;
