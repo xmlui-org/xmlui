@@ -126,14 +126,12 @@ export const Markdown = memo(function Markdown({
             }
 
             return (
-              <div className={styles.codeWrapper}>
-                <Text
-                  uid={id}
-                  variant="codefence"
-                  syntaxHighlightClasses={parsedData.classNames}
-                  dangerouslySetInnerHTML={{ __html: parsedData.cleanedHtmlStr }}
-                />
-              </div>
+              <Text
+                uid={id}
+                variant="codefence"
+                syntaxHighlightClasses={parsedData.classNames}
+                dangerouslySetInnerHTML={{ __html: parsedData.cleanedHtmlStr }}
+              />
             );
           },
           strong({ id, children }) {
@@ -231,7 +229,6 @@ export const Markdown = memo(function Markdown({
             if (dataContentBase64 !== undefined) {
               const jsonContent = atob(dataContentBase64);
               const appProps = JSON.parse(jsonContent);
-              // console.log(appProps);
               return <NestedApp
                 app={appProps.app}
                 config={appProps.config}
@@ -437,6 +434,7 @@ function codeBlockParser() {
     const nodeData = { hProperties: {} };
     if (lang !== null) {
       nodeData.hProperties["dataLanguage"] = lang;
+      node.data = nodeData;
     }
     if (!parent) return;
     if (!meta) return;
