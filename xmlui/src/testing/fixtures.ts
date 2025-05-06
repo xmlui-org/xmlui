@@ -1,3 +1,6 @@
+/* eslint react-hooks/rules-of-hooks: 0 */
+// The above exception is needed since it fires a false-positive
+// for the "use" function of the playwright test framework
 import { test as baseTest } from "@playwright/test";
 import type { Locator, Page } from "playwright-core";
 
@@ -7,6 +10,7 @@ import type { StandaloneAppDescription } from "../components-core/abstractions/s
 import {
   type ComponentDriver,
   type ComponentDriverParams,
+  type HtmlTagDriver,
   AccordionDriver,
   AppFooterDriver,
   AppHeaderDriver,
@@ -18,7 +22,6 @@ import {
   FormItemDriver,
   HeadingDriver,
   HStackDriver,
-  HtmlTagDriver,
   IconDriver,
   ItemsDriver,
   LinkDriver,
