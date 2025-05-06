@@ -1,0 +1,38 @@
+import { Callout } from "nextra/components";
+
+# HSplitter [#component-hsplitter]
+
+This component is inherited from <SmartLink href="/components/Splitter">Splitter</SmartLink>
+
+See also: <SmartLink href="/components/VSplitter">VSplitter</SmartLink>
+
+`HSplitter` is a specialized, shorthand version for the regular `Splitter` component with a vertical orientation.
+
+```xmlui copy
+<App >
+  <HSplitter height="200px">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </HSplitter>
+</App>
+```
+
+## Examples
+
+<Playground
+  name="Example: HSplitter"
+  app={`
+    <App >
+      <HSplitter height="200px">
+        <Stack backgroundColor="lightblue" height="100%" />
+        <Stack backgroundColor="darksalmon" height="100%" />
+      </HSplitter>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="📔">
+You cannot change the orientation of `HSplitter` from vertical to horizontal by setting the `orientation` prop, as the engine ignores that setting.
+</Callout>
+
+

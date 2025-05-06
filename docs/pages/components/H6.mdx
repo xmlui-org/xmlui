@@ -1,0 +1,32 @@
+import { Callout } from "nextra/components";
+
+# H6 [#component-h6]
+
+This component is inherited from <SmartLink href="/components/Heading">Heading</SmartLink>
+
+See also: <SmartLink href="/components/H1">H1</SmartLink>, <SmartLink href="/components/H2">H2</SmartLink>, <SmartLink href="/components/H3">H3</SmartLink>, <SmartLink href="/components/H4">H4</SmartLink>, <SmartLink href="/components/H5">H5</SmartLink>
+
+The `H6` component is a shorthand version of the `Heading` element with its `level` property set to "h6".
+
+```xmlui copy
+<App>
+  <H6 value="This is a H6 text" />
+</App>
+```
+
+<Playground
+  name="H6 example"
+  app={`
+  <App>
+    <H6 value="This is a H6 text" />
+  </App>
+  `}
+/>
+
+## Styling
+
+The `H6` component inherits its visual style from the `Heading` component.
+Using the `H6` component specifier, you can override the inherited theme variable values.
+For example, the `textColor-H6` theme variable sets the text color of `H6` while keeping the color of all other headings.
+
+

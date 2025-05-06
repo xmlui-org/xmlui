@@ -102,8 +102,8 @@ async function generateComponents(metadata) {
     {
       sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
       // --- CHANGE: Now documents are generated in the a new folder, outside of pages
-      outFolder: join(FOLDERS.docsRoot, "new-components"),
-      // outFolder: join(FOLDERS.docsRoot, "pages", "components"),
+      // outFolder: join(FOLDERS.docsRoot, "new-components"),
+      outFolder: join(FOLDERS.docsRoot, "pages", "components"),
       examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },

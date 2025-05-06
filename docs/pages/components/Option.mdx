@@ -1,0 +1,177 @@
+import { Callout } from "nextra/components";
+
+# Option [#component-option]
+
+`Option` is a non-visual component describing a selection option. Other components (such as `Select`, `AutoComplete`, and others) may use nested `Option` instances from which the user can select.
+
+## Using `Option`
+
+### With `AutoComplete`
+
+```xmlui copy {4-6}
+<App>
+  <Text value="Selected ID: {myComp.value}"/>
+  <AutoComplete id="myComp">
+    <Option label="John, Smith" value="john" />
+    <Option label="Jane, Clint" value="jane" disabled="true" />
+    <Option label="Herbert, Frank" value="herbert" />
+  </AutoComplete>
+</App>
+```
+
+<Playground
+    name="Example: Option in a AutoComplete"
+    height={260}
+    app={`
+    <App>
+      <Text value="Selected ID: {myComp.value}"/>
+      <AutoComplete id="myComp">
+        <Option label="John, Smith" value="john" />
+        <Option label="Jane, Clint" value="jane" disabled="true" />
+        <Option label="Herbert, Frank" value="herbert" />
+      </AutoComplete>
+    </App>
+  `}
+/>
+
+### With `Select`
+
+```xmlui copy {4-6}
+<App>
+  <Text value="Selected ID: {mySelect.value}"/>
+  <Select id="mySelect">
+    <Option label="John, Smith" value="john" />
+    <Option label="Jane, Clint" value="jane" />
+    <Option label="Herbert, Frank" value="herbert" />
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: Option in a Select"
+    height={260}
+    app={`
+    <App>
+      <Text value="Selected ID: {mySelect.value}"/>
+      <Select id="mySelect">
+        <Option label="John, Smith" value="john" />
+        <Option label="Jane, Clint" value="jane" />
+        <Option label="Herbert, Frank" value="herbert" />
+      </Select>
+    </App>
+  `}
+/>
+
+## Use children as Content Template
+
+The [optionTemplate](#optiontemplate) property can be replaced by setting the item template component directly as the Option's child.
+In the following example, the two Option are functionally the same:
+
+```xmlui copy
+<App>
+  <!-- This is the same -->
+  <Option>
+    <property name="optionTemplate">
+      <Text>Template</Text>
+    </property>
+  </Option>
+  <!-- As this -->
+  <Option>
+    <Text>Template</Text>
+  </Option>
+</App>
+```
+
+## Properties
+
+### `enabled (default: true)`
+
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+### `label`
+
+This property defines the text to display for the option. If `label` is not defined, `Option` will use the `value` as the label.
+
+<Callout type="info" emoji="📔">
+    If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
+</Callout>
+
+```xmlui copy
+<App>
+  <Text value="Selected ID: {mySelect.value}"/>
+  <Select id="mySelect">
+    <Option />
+    <Option label="Vanilla" value="van"/>
+    <Option label="Chocolate" value="choc" />
+    <Option value="pist" />
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: Using label"
+    height={260}
+    app={`
+    <App>
+      <Text value="Selected ID: {mySelect.value}"/>
+      <Select id="mySelect">
+        <Option />
+        <Option label="Vanilla" value="van"/>
+        <Option label="Chocolate" value="choc" />
+        <Option value="pist" />
+      </Select>
+    </App>
+  `}
+/>
+
+### `optionTemplate`
+
+This property is used to define a custom option template
+
+### `value`
+
+This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value.
+
+<Callout type="info" emoji="📔">
+    If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
+</Callout>
+
+```xmlui copy
+<App>
+  <Text value="Selected ID: {mySelect.value}"/>
+  <Select id="mySelect">
+    <Option />
+    <Option label="Vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: Option in a Select"
+    height={260}
+    app={`
+    <App>
+      <Text value="Selected ID: {mySelect.value}"/>
+      <Select id="mySelect">
+        <Option />
+        <Option label="Vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
+      </Select>
+    </App>
+  `}
+/>
+
+## Events
+
+This component does not have any events.
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+This component does not have any styles.

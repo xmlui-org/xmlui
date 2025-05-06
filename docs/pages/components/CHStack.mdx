@@ -1,0 +1,38 @@
+import { Callout } from "nextra/components";
+
+# CHStack [#component-chstack]
+
+This component is inherited from <SmartLink href="/components/Stack">Stack</SmartLink>
+
+See also: <SmartLink href="/components/CVStack">CVStack</SmartLink>, <SmartLink href="/components/HStack">HStack</SmartLink>, <SmartLink href="/components/VStack">VStack</SmartLink>
+
+`CHStack` is a specialized, shorthand version for the regular `Stack` component that has a horizontal orientation with its contents centered.
+
+```xmlui copy
+<App>
+  <CHStack backgroundColor="cyan">
+    <Stack height="32px" width="32px" backgroundColor="red" />
+    <Stack height="32px" width="32px" backgroundColor="blue" />
+    <Stack height="32px" width="32px" backgroundColor="green" />
+  </CHStack>
+</App>
+```
+
+<Playground
+  name="Example: CHStack"
+  app={`
+    <App>
+      <CHStack backgroundColor="cyan">
+        <Stack height="32px" width="32px" backgroundColor="red" />
+        <Stack height="32px" width="32px" backgroundColor="blue" />
+        <Stack height="32px" width="32px" backgroundColor="green" />
+      </CHStack>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="📔">
+You cannot change the orientation of `CHStack` from horizontal to vertical by setting the `orientation` prop, as the engine ignores that setting.
+</Callout>
+
+

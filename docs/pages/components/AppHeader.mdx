@@ -1,0 +1,202 @@
+import { Callout } from "nextra/components";
+
+# AppHeader [#component-appheader]
+
+<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
+
+`AppHeader` is a placeholder within `App` to define a custom application header.
+
+<Callout type="info" emoji="📔">
+You can learn more details about using this component [here](../learning/using-components/app-component).
+</Callout>
+
+## Properties
+
+### `logoTemplate`
+
+This property defines the template to use for the logo. With this property, you can construct your custom logo instead of using a single image.
+
+This property defines the template to use for the logo.
+With this property, you can construct your custom logo instead of using a single image.
+
+```xmlui copy {2-8}
+<App>
+  <AppHeader>
+    <property name="logoTemplate">
+      <H3>
+        <Icon name="drive" />
+        DriveDiag
+      </H3>
+    </property>
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Page 1" to="/page1"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <Text value="Home" />
+    </Page>
+    <Page url="/page1">
+      <Text value="Page 1" />
+    </Page>
+  </Pages>
+</App>
+```
+
+<Playground
+  name="Example: logoTemplate"
+  horizontal
+  height={150}
+  app={`
+  <App>
+    <AppHeader>
+    <property name="logoTemplate">
+        <H3>
+          <Icon name="drive" />
+          DriveDiag
+        </H3>
+    </property>
+    </AppHeader>
+    <NavPanel>
+      <NavLink label="Home" to="/" icon="home"/>
+      <NavLink label="Page 1" to="/page1"/>
+    </NavPanel>
+    <Pages defaultRoute="/">
+      <Page url="/">
+        <Text value="Home" />
+      </Page>
+      <Page url="/page1">
+        <Text value="Page 1" />
+      </Page>
+    </Pages>
+  </App>
+  `}
+/>
+
+### `profileMenuTemplate`
+
+This property makes the profile menu slot of the `AppHeader` component customizable.
+
+This property makes the profile menu slot of the `AppHeader` component customizable.
+It accepts component definitions.
+
+```xmlui copy {3-9}
+<App>
+  <AppHeader>
+    <property name="profileMenuTemplate">
+      <DropdownMenu>
+        <property name="triggerTemplate">
+          <Avatar name="Joe" size="xs" borderRadius="50%"/>
+        </property>
+      </DropdownMenu>
+    </property>
+  </AppHeader>
+</App>
+```
+
+<Playground
+  name="Example: profileMenuTemplate"
+  horizontal
+  height={150}
+  app={`
+  <App>
+    <AppHeader>
+      <property name="profileMenuTemplate">
+        <DropdownMenu>
+          <property name="triggerTemplate">
+            <Avatar name="Joe" size="xs" borderRadius="50%"/>
+          </property>
+        </DropdownMenu>
+      </property>
+    </AppHeader>
+  </App>
+  `}
+/>
+
+### `showLogo (default: true)`
+
+Show the logo in the header
+
+### `title`
+
+Title for the application logo
+
+### `titleTemplate`
+
+This property defines the template to use for the title. With this property, you can construct your custom title instead of using a single image.
+
+## Events
+
+This component does not have any events.
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| align-content-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-AppHeader | $color-surface-raised | $color-surface-raised |
+| [border](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | 1px solid $borderColor | 1px solid $borderColor |
+| [borderBottomColor](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderBottomStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderBottomWidth](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)EndEndRadius-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)EndStartRadius-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontalColor](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontalWidth](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeft](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeftStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeftWidth](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | 0px | 0px |
+| [borderRight](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRightStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRightWidth](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)StartEndRadius-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)StartStartRadius-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTop](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopColor](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopWidth](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderVerticalColor](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderVerticalWidth](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [height](../styles-and-themes/common-units/#size)-AppHeader | $space-14 | $space-14 |
+| [maxWidth](../styles-and-themes/common-units/#size)-AppHeader | $maxWidth-App | $maxWidth-App |
+| [maxWidth-content](../styles-and-themes/common-units/#size)-AppHeader | $maxWidth-content-App | $maxWidth-content-App |
+| [padding](../styles-and-themes/common-units/#size)-AppHeader | $paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader | $paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader |
+| [padding](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader | $paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader |
+| [paddingBottom](../styles-and-themes/common-units/#size)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
+| [paddingBottom](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-AppHeader | $space-4 | $space-4 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-logo-AppHeader | $space-0 | $space-0 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-AppHeader | $paddingHorizontal-AppHeader | $paddingHorizontal-AppHeader |
+| [paddingLeft](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingHorizontal-logo-AppHeader | $paddingHorizontal-logo-AppHeader |
+| [paddingRight](../styles-and-themes/common-units/#size)-AppHeader | $paddingHorizontal-AppHeader | $paddingHorizontal-AppHeader |
+| [paddingRight](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingHorizontal-logo-AppHeader | $paddingHorizontal-logo-AppHeader |
+| [paddingTop](../styles-and-themes/common-units/#size)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
+| [paddingTop](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
+| [paddingVertical](../styles-and-themes/common-units/#size)-AppHeader | $space-0 | $space-0 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-logo-AppHeader | $space-4 | $space-4 |
+| [width](../styles-and-themes/common-units/#size)-logo-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+
+### Variable Explanations
+
+| Theme Variable | Description |
+| --- | --- |
+| **`padding‑logo‑AppHeader`** | This theme variable sets the padding of the logo in the app header (including all `padding` variants, such as `paddingLeft-logo-AppHeader` and others). |
+| **`width‑logo‑AppHeader`** | Sets the width of the displayed logo |

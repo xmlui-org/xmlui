@@ -1,0 +1,136 @@
+import { Callout } from "nextra/components";
+
+# NavPanel [#component-navpanel]
+
+`NavPanel` is a placeholder within `App` to define the app's navigation (menu) structure.
+
+## Properties
+
+### `logoTemplate`
+
+This property defines the logo template to display in the navigation panel with the `vertical` and `vertical-sticky` layout.
+
+```xmlui copy {3-8}
+<App layout="vertical">
+  <NavPanel>
+    <property name="logoTemplate">
+       <H3>
+         <Icon name="drive" />
+         DriveDiag (Nav)
+       </H3>
+    </property>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Page 1" to="/page1"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <Text value="Home" />
+    </Page>
+    <Page url="/page1">
+      <Text value="Page 1" />
+    </Page>
+  </Pages>
+</App>
+```
+
+<Playground
+  name="Example: logoTemplate"
+  horizontal={true}
+  height={200}
+  app={`
+    <App layout="vertical">
+      <NavPanel>
+        <property name="logoTemplate">
+           <H3>
+             <Icon name="drive" />
+             DriveDiag (Nav)
+           </H3>
+        </property>
+        <NavLink label="Home" to="/" icon="home"/>
+        <NavLink label="Page 1" to="/page1"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+        <Page url="/">
+          <Text value="Home" />
+        </Page>
+        <Page url="/page1">
+          <Text value="Page 1" />
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+## Events
+
+This component does not have any events.
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+The `NavPanel` component uses these theme variables to customize its appearance:
+
+- `backgroundColor`
+- `boxShadow`
+- `paddingHorizontal`
+- `paddingHorizontal-logo-NavPanel`
+- `paddingVertical-logo-NavPanel`
+- `marginBottom-logo-NavPanel`
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavPanel | $backgroundColor | $backgroundColor |
+| [border](../styles-and-themes/common-units/#border)-NavPanel | 0px solid $borderColor | 0px solid $borderColor |
+| [borderBottom](../styles-and-themes/common-units/#border)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderBottomColor](../styles-and-themes/common-units/#color)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderBottomStyle](../styles-and-themes/common-units/#border-style)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderBottomWidth](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)EndEndRadius-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)EndStartRadius-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontalColor](../styles-and-themes/common-units/#color)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontalWidth](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeft](../styles-and-themes/common-units/#border)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeftStyle](../styles-and-themes/common-units/#border-style)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeftWidth](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRight](../styles-and-themes/common-units/#border)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRightStyle](../styles-and-themes/common-units/#border-style)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRightWidth](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)StartEndRadius-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)StartStartRadius-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTop](../styles-and-themes/common-units/#border)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopColor](../styles-and-themes/common-units/#color)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopStyle](../styles-and-themes/common-units/#border-style)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopWidth](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderVerticalColor](../styles-and-themes/common-units/#color)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderVerticalWidth](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel-vertical | 4px 0 4px 0 rgb(0 0 0 / 10%) | 4px 0 4px 0 rgb(0 0 0 / 10%) |
+| [marginBottom](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
+| [padding](../styles-and-themes/common-units/#size)-logo-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingBottom](../styles-and-themes/common-units/#size)-logo-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingBottom](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-NavPanel | 0 | 0 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-logo-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingLeft](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingRight](../styles-and-themes/common-units/#size)-logo-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingRight](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingTop](../styles-and-themes/common-units/#size)-logo-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingTop](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingVertical](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-NavPanel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
