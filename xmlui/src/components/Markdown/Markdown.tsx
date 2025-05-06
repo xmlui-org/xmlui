@@ -135,7 +135,7 @@ const TransformedMarkdown = ({
         convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
         resolvedMd.slice(nextPlayground[1]);
     }
-    // console.log(resolvedMd)
+    console.log(resolvedMd)
     return resolvedMd;
   }, [children, extractValue]);
 
