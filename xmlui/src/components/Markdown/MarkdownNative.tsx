@@ -120,7 +120,11 @@ export const Markdown = memo(function Markdown({
               return defaultCodefence;
             }
 
-            const parsedData = parseMetaAndHighlightCode(children, codeHighlighter, activeThemeTone);
+            const parsedData = parseMetaAndHighlightCode(
+              children,
+              codeHighlighter,
+              activeThemeTone,
+            );
             if (!parsedData) {
               return defaultCodefence;
             }
@@ -229,17 +233,19 @@ export const Markdown = memo(function Markdown({
             if (dataContentBase64 !== undefined) {
               const jsonContent = atob(dataContentBase64);
               const appProps = JSON.parse(jsonContent);
-              return <NestedApp
-                app={appProps.app}
-                config={appProps.config}
-                components={appProps.components}
-                api={appProps.api}
-                activeTheme={appProps.activeTheme}
-                activeTone={appProps.activeTone}
-                title={appProps.name}
-                height={appProps.height}
-                allowPlaygroundPopup={!appProps.noPopup}
-              />
+              return (
+                <NestedApp
+                  app={appProps.app}
+                  config={appProps.config}
+                  components={appProps.components}
+                  api={appProps.api}
+                  activeTheme={appProps.activeTheme}
+                  activeTone={appProps.activeTone}
+                  title={appProps.name}
+                  height={appProps.height}
+                  allowPlaygroundPopup={!appProps.noPopup}
+                />
+              );
             }
             return (
               <NestedApp
@@ -445,8 +451,33 @@ function codeBlockParser() {
     if (!params) return;
     if (params.length === 0) return;
 
-    // TEMP: just appending everything else as a string to a different property
-    nodeData.hProperties["dataMeta"] = params;
+    const parsedMeta = params.reduce((acc, item) => {
+      item = item.trim();
+      if (item === "") return acc;
+      if (item.indexOf("=") === -1) {
+        if (item.startsWith("/") && item.endsWith("/")) {
+          acc["dataHighlightSubstrings"] = item.substring(1, item.length - 1);
+        }
+        if (item.startsWith("{") && !item.endsWith("}")) {
+          acc["dataHighlightRows"] = item.substring(1, item.length - 1);
+        }
+        if (item === "copy") {
+          acc["dataCopy"] = "true";
+        }
+        if (item === "rowNumbers") {
+          acc["dataRowNumbers"] = "true";
+        }
+        return acc;
+      };
+      const index = item.indexOf("=");
+      if (item.substring(0, index) !== "filename") return acc;      
+      acc["dataFilename"] = item
+        .substring(index + 1)
+        .replace(/"(.+)"/, "$1")
+        .replace(/'(.+)'/, "$1");
+      return acc;
+    }, {} as Record<string, string>);
+    nodeData.hProperties = { ...nodeData.hProperties, ...parsedMeta };
     node.data = nodeData;
   }
 

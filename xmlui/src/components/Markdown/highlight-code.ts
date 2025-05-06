@@ -1,12 +1,11 @@
 import { type ReactNode, isValidElement } from "react";
 
-
 /**
  * This function handles two things:
  * 1. The extraction of meta information from code blocks and exposing them as data-meta attributes
  * 2. The highlighting of code blocks providing the highlighter function with meta information
  * @param node The React node containing the code block
- * @param codeHighlighter The highlighter object containing the highlight function and the available languages 
+ * @param codeHighlighter The highlighter object containing the highlight function and the available languages
  * @returns CSS class names for the codefence and the HTML string with highlighted code tokens
  */
 export function parseMetaAndHighlightCode(
@@ -15,11 +14,17 @@ export function parseMetaAndHighlightCode(
   themeTone?: string,
 ): { classNames: string | null; cleanedHtmlStr: string } | null {
   const meta = extractMetaFromChildren(node);
+  console.log(meta);
   const metaLanguage = meta.language;
 
-  if (metaLanguage && codeHighlighter.availableLangs.includes(metaLanguage)) {    
+  if (metaLanguage && codeHighlighter.availableLangs.includes(metaLanguage)) {
     // NOTE: Keep in mind, at this point, we are working with the markdown text
-    const htmlCodeStr = codeHighlighter.highlight(mapTextContent(node), metaLanguage, undefined, themeTone);
+    const htmlCodeStr = codeHighlighter.highlight(
+      mapTextContent(node),
+      metaLanguage,
+      undefined,
+      themeTone,
+    );
     const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
     const classNames = match ? match[1] : null;
 
@@ -63,7 +68,7 @@ function mapTextContent(node: ReactNode): string {
 
 function extractMetaFromChildren(
   node: ReactNode,
-  keys: string[] = ["data-language", "data-meta"],
+  keys: string[] = CodeHighlighterMetaKeys,
 ): CodeHighlighterMeta {
   if (!node) return {};
   if (typeof node === "string") return {};
@@ -77,6 +82,7 @@ function extractMetaFromChildren(
     node.props.children &&
     typeof node.props.children === "string"
   ) {
+    console.log(node.props, keys)
     return Object.entries<Record<string, any>>(node.props)
       .filter(([key, _]) => keys.includes(key))
       .reduce((acc, [key, value]) => {
@@ -89,7 +95,12 @@ function extractMetaFromChildren(
 
 export type CodeHighlighter = {
   // Returns html in string!
-  highlight: (code: string, language: string, meta?: Record<string, any>, themeTone?: string) => string;
+  highlight: (
+    code: string,
+    language: string,
+    meta?: Record<string, any>,
+    themeTone?: string,
+  ) => string;
   availableLangs: string[];
 };
 
@@ -97,6 +108,15 @@ type CodeHighlighterMeta = {
   language?: string;
   copy?: boolean;
   filename?: string;
+  rowNumbers?: boolean;
   rowHighlights?: number[];
-  columnHighlights?: number[];
+  substringHighlights?: number[];
 };
+const CodeHighlighterMetaKeys = [
+  "data-language",
+  "data-copy",
+  "data-filename",
+  "data-row-numbers",
+  "data-row-highlights",
+  "data-substring-highlights",
+];
