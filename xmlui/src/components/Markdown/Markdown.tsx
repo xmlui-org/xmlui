@@ -4,10 +4,11 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown } from "./MarkdownNative";
-import { parseBindingExpression } from "./parse-binding-expr";
-import { ValueExtractor } from "../../abstractions/RendererDefs";
+import type React from "react";
 import { useMemo } from "react";
-import { CodeHighlighter } from "./highlight-code";
+import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { parseBindingExpression } from "./parse-binding-expr";
+import type { CodeHighlighter } from "./highlight-code";
 import { convertPlaygroundPatternToMarkdown, observePlaygroundPattern } from "./utils";
 
 const COMP = "Markdown";
@@ -90,7 +91,6 @@ export const markdownComponentRenderer = createComponentRenderer(
       });
     }
 
-    const resolvedChildren = parseBindingExpression(renderedChildren, extractValue);
     return (
       <TransformedMarkdown
         style={layoutCss}
@@ -98,7 +98,7 @@ export const markdownComponentRenderer = createComponentRenderer(
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
       >
-        {resolvedChildren}
+        {renderedChildren}
       </TransformedMarkdown>
     );
   },
@@ -112,28 +112,31 @@ type TransformedMarkdownProps = {
   codeHighlighter?: CodeHighlighter;
 };
 
-const TransformedMarkdown = ({ children, removeIndents, style, extractValue }: TransformedMarkdownProps) => {
-  const markdownContent = useMemo(()=>{
+const TransformedMarkdown = ({
+  children,
+  removeIndents,
+  style,
+  extractValue,
+}: TransformedMarkdownProps) => {
+  const markdownContent = useMemo(() => {
     if (typeof children !== "string") {
       return null;
     }
 
-    // --- Resolve bindig expression values
-    const withBindinxExprs = parseBindingExpression(children, extractValue);
-
+    // --- Resolve binding expression values
     // --- Resolve xmlui playground definitions
-    let resolvedMd = withBindinxExprs;
+    let resolvedMd = parseBindingExpression(children, extractValue);
     while (true) {
       const nextPlayground = observePlaygroundPattern(resolvedMd);
       if (!nextPlayground) break;
 
-      resolvedMd = resolvedMd.slice(0, nextPlayground[0]) + 
+      resolvedMd =
+        resolvedMd.slice(0, nextPlayground[0]) +
         convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
         resolvedMd.slice(nextPlayground[1]);
     }
-    // console.log(resolvedMd)
+    console.log(resolvedMd)
     return resolvedMd;
-
   }, [children, extractValue]);
 
   return (

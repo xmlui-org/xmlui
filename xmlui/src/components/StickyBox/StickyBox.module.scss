@@ -13,7 +13,8 @@ $themeVars: ();
 
 .sentinel ~ *:has([data-anchor="true"]){
   [data-anchor="true"]{
-    scroll-margin-top: var(--xmlui-scroll-margin-top);
+    //my-scroll-margin-top is set by the heading component, we have to take that into account, too
+    scroll-margin-top: calc(var(--my-scroll-margin-top, 0px) + var(--xmlui-scroll-margin-top, 0px));
   }
 }
 

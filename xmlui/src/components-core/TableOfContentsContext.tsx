@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useScrollEventHandler, useScrollParent } from "./utils/hooks";
+import { useIsomorphicLayoutEffect, useScrollEventHandler, useScrollParent } from "./utils/hooks";
 import { useNavigate } from "@remix-run/react";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "./constants";
 import { useAppContext } from "./AppContext";
@@ -176,7 +176,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
 
   //the content could take time to load, this way we try to force the scroll to anchor mechanism to kick in
   const hasHeadings = sortedHeadings.length > 0;
-  useEffect(()=>{
+  useIsomorphicLayoutEffect(()=>{
     if(hasHeadings){
       forceRefreshAnchorScroll();
     }

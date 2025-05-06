@@ -1,4 +1,5 @@
-import React, { ReactNode } from "react";
+import type { ReactNode } from "react";
+import React from "react";
 import { BrowserRouter, HashRouter, MemoryRouter } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Helmet, HelmetProvider } from "react-helmet-async";
@@ -16,11 +17,12 @@ import { queryClient } from "./AppRoot";
 import { AppContent } from "./AppContent";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { ErrorBoundary } from "./ErrorBoundary";
-import { ThemeTone } from "../../abstractions/ThemingDefs";
+import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { LoggerProvider } from "../../logging/LoggerContext";
 import { LoggerInitializer } from "../../logging/LoggerInitializer";
-import { ProjectCompilation } from "../../abstractions/scripting/Compilation";
+import type { ProjectCompilation } from "../../abstractions/scripting/Compilation";
 
+export type TrackContainerHeight = "auto" | "fixed";
 export type AppWrapperProps = {
   // --- The root node of the application definition; the internal
   // --- representation of the entire app to run
@@ -55,7 +57,7 @@ export type AppWrapperProps = {
   // --- This property indicates whether the app should track the height of
   // --- the app container. We created this property for the preview component
   // --- used in the documentation platform. It has no other use.
-  trackContainerHeight?: boolean;
+  trackContainerHeight?: TrackContainerHeight;
 
   // --- This property signs that we use the app in the end-to-end test
   // --- environment. Components should use their IDs as test IDs added to the
@@ -154,6 +156,7 @@ export const AppWrapper = ({
                   standalone={standalone}
                   decorateComponentsWithTestId={decorateComponentsWithTestId}
                   debugEnabled={debugEnabled}
+                  trackContainerHeight={trackContainerHeight}
                 >
                   {children}
                 </AppContent>

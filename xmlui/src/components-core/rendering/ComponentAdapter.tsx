@@ -161,23 +161,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   );
   const isApiBound = apiBoundProps.length > 0 || apiBoundEvents.length > 0;
 
-  // --- API-bound components provide helpful behavior out of the box, such as transforming API-bound
-  // --- events and properties. This extra functionality is implemented in `ApiBoundComponent`.
-  if (isApiBound) {
-    return (
-      <ApiBoundComponent
-        uid={uid}
-        renderChild={memoedRenderChild}
-        node={safeNode}
-        key={safeNode.uid}
-        apiBoundEvents={apiBoundEvents}
-        apiBoundProps={apiBoundProps}
-        layoutContextRef={layoutContextRef}
-        parentRendererContext={parentRenderContext}
-      />
-    );
-  }
-
   // --- Obtain the component renderer and descriptor from the component registry
   const componentRegistry = useComponentRegistry();
   const { renderer, descriptor, isCompoundComponent } =
@@ -308,9 +291,26 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
                 { ...(renderedNode as ReactElement).props, ...mouseEventHandlers },
                 rest,
               ),
-            } as any
+            } as any,
           )}
         </ComponentDecorator>
+      );
+    }
+
+    // --- API-bound components provide helpful behavior out of the box, such as transforming API-bound
+    // --- events and properties. This extra functionality is implemented in `ApiBoundComponent`.
+    if (isApiBound) {
+      return (
+        <ApiBoundComponent
+          uid={uid}
+          renderChild={memoedRenderChild}
+          node={safeNode}
+          key={safeNode.uid}
+          apiBoundEvents={apiBoundEvents}
+          apiBoundProps={apiBoundProps}
+          layoutContextRef={layoutContextRef}
+          parentRendererContext={parentRenderContext}
+        />
       );
     }
 
@@ -340,15 +340,32 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     // --- https://www.radix-ui.com/primitives/docs/guides/composition
 
     const childrenArray = !children ? [] : Array.isArray(children) ? children : [children];
-    return cloneElement(renderedNode, {
-      // ref: ref ? composeRefs(ref, (renderedNode as any).ref) : (renderedNode as any).ref,
-      // ...mergeProps({ ...renderedNode.props, ...mouseEventHandlers }, rest),
-      ref: renderedNode.type === React.Fragment ? undefined : (ref ? composeRefs(ref, (renderedNode as any).ref) : (renderedNode as any).ref),
-      ...mergeProps({ ...renderedNode.props, ...(renderedNode.type !== React.Fragment ? mouseEventHandlers : {}) }, rest),
-    } as any, ...(childrenArray));
+    return cloneElement(
+      renderedNode,
+      {
+        // ref: ref ? composeRefs(ref, (renderedNode as any).ref) : (renderedNode as any).ref,
+        // ...mergeProps({ ...renderedNode.props, ...mouseEventHandlers }, rest),
+        ref:
+          renderedNode.type === React.Fragment
+            ? undefined
+            : ref
+              ? composeRefs(ref, (renderedNode as any).ref)
+              : (renderedNode as any).ref,
+        ...mergeProps(
+          {
+            ...renderedNode.props,
+            ...(renderedNode.type !== React.Fragment ? mouseEventHandlers : {}),
+          },
+          rest,
+        ),
+      } as any,
+      ...childrenArray,
+    );
   }
   // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.
-  return (React.isValidElement(renderedNode) && !!children) ? cloneElement(renderedNode, null, children) : renderedNode;
+  return React.isValidElement(renderedNode) && !!children
+    ? cloneElement(renderedNode, null, children)
+    : renderedNode;
 });
 
 /**
