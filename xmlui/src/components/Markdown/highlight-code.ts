@@ -12,13 +12,14 @@ import { type ReactNode, isValidElement } from "react";
 export function parseMetaAndHighlightCode(
   node: ReactNode,
   codeHighlighter: CodeHighlighter,
+  themeTone?: string,
 ): { classNames: string | null; cleanedHtmlStr: string } | null {
   const meta = extractMetaFromChildren(node);
   const metaLanguage = meta.language;
 
   if (metaLanguage && codeHighlighter.availableLangs.includes(metaLanguage)) {    
     // NOTE: Keep in mind, at this point, we are working with the markdown text
-    const htmlCodeStr = codeHighlighter.highlight(mapTextContent(node), metaLanguage);
+    const htmlCodeStr = codeHighlighter.highlight(mapTextContent(node), metaLanguage, undefined, themeTone);
     const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
     const classNames = match ? match[1] : null;
 
@@ -88,7 +89,7 @@ function extractMetaFromChildren(
 
 export type CodeHighlighter = {
   // Returns html in string!
-  highlight: (code: string, language: string, meta?: Record<string, any>) => string;
+  highlight: (code: string, language: string, meta?: Record<string, any>, themeTone?: string) => string;
   availableLangs: string[];
 };
 

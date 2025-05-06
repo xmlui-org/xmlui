@@ -4,7 +4,7 @@ import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "../components-core/abstractions/standalone";
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
-import chroma, { Color } from "chroma-js";
+import chroma, { type Color } from "chroma-js";
 
 type EntryPoint = string | ComponentDef;
 type UnparsedAppDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
@@ -28,6 +28,10 @@ export function mapObject<K extends (val: any) => any, V extends (val: string) =
     newObject[keyFn(key)] = valFn(value);
   });
   return newObject;
+}
+
+export async function getComponentTagName(locator: Locator) {
+  return locator.evaluate((el) => el.tagName.toLowerCase());
 }
 
 function parseComponentIfNecessary(entryPoint: ComponentDef<any> | CompoundComponentDef | string) {
