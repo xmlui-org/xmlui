@@ -231,7 +231,7 @@ export const Markdown = memo(function Markdown({
             if (dataContentBase64 !== undefined) {
               const jsonContent = atob(dataContentBase64);
               const appProps = JSON.parse(jsonContent);
-              // console.log(appProps);
+              console.log(appProps);
               return <NestedApp
                 app={appProps.app}
                 config={appProps.config}
