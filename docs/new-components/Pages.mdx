@@ -15,7 +15,7 @@ You can provide a link to this route to display a particular `Page`.
 Currently, all navigation is done on the clientside.
 No page is fetched from the server, thus the application operates as a [Single Page Application](https://developer.mozilla.org/en-US/docs/Glossary/SPA).
 
-```xmlui copy {3-4, 7, 10}
+```xmlui-pg copy {3-4, 7, 10} display name="Example: using Pages and Page" height="150px"
 <App>
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -32,35 +32,13 @@ No page is fetched from the server, thus the application operates as a [Single P
 </App>
 ```
 
-<Playground
-  height={150}
-  name="Example: using Pages and Page"
-  horizontal
-  app={`
-  <App>
-    <NavPanel>
-      <NavLink label="Home" to="/" icon="home"/>
-      <NavLink label="Account" to="/account" icon="user"/>
-    </NavPanel>
-    <Pages>
-      <Page url="/">
-        <Text>Hello App!</Text>
-      </Page>
-      <Page url="/account">
-        <Text>This is the account page.</Text>
-      </Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 ## Properties
 
 ### `defaultRoute`
 
 The default route when displaying the app
 
-```xmlui copy {6-13}
+```xmlui-pg copy {6-13} display name="Example: defaultRoute" height="150px"
 <App>
   <NavPanel>
     <NavLink label="Not Home" to="/not-home" icon="trash"/>
@@ -76,28 +54,6 @@ The default route when displaying the app
   </Pages>
 </App>
 ```
-
-<Playground
-  height={150}
-  name="Example: defaultRoute"
-  horizontal
-  app={`
-  <App>
-    <NavPanel>
-      <NavLink label="Not Home" to="/not-home" icon="trash"/>
-      <NavLink label="Home" to="/home" icon="home"/>
-    </NavPanel>
-    <Pages defaultRoute="/home">
-      <Page url="/not-home">
-        <Text>This is not home...</Text>
-      </Page>
-      <Page url="/home">
-        <Text>Hello App!</Text>
-      </Page>
-    </Pages>
-  </App>
-  `}
-/>
 
 ## Events
 

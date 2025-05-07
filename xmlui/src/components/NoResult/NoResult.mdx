@@ -1,6 +1,6 @@
 %-PROP-START hideIcon
 
-```xmlui copy
+```xmlui-pg copy display name="Example: hideIcon"
 <App>
   <FlowLayout>
     <NoResult hideIcon="true" width="50%" />
@@ -9,38 +9,17 @@
 </App>
 ```
 
-<Playground
-  name="Example: hideIcon"
-  app={`
-    <App>
-      <FlowLayout>
-        <NoResult hideIcon="true" width="50%" />
-        <NoResult hideIcon="false" width="50%" />
-      </FlowLayout>
-    </App>
-`}
-/>
-
 %-PROP-END
 
 %-PROP-START icon
 
 This property defines the icon to display with the component. For a list of of available icons consult [`Icon` documentation](./Icon.mdx).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: icon"
 <App>
   <NoResult icon="error" height="100%" />
 </App>
 ```
-
-<Playground
-  name="Example: icon"
-  app={`
-    <App>
-      <NoResult icon="error" height="100%" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -48,29 +27,10 @@ This property defines the icon to display with the component. For a list of of a
 
 Customize the displayed text using this property. Leave empty to omit it.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: label"
 <App>
   <NoResult label="Sorry, found nothing!" height="100%" />
 </App>
 ```
 
-<Playground
-  name="Example: label"
-  app={`
-    <App>
-      <NoResult label="Sorry, found nothing!" height="100%" />
-    </App>
-  `}
-/>
-
 %-PROP-END
-
-%-STYLE-START
-
-The `NoResult` component uses these theme variables to customize its appearance:
-
-- `paddingVertical-NoResult`
-- `gap-icon-NoResult`
-- `size-icon-NoResult`
-
-%-STYLE-END

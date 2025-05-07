@@ -8,7 +8,7 @@ import { Callout } from "nextra/components";
 
 ### With `AutoComplete`
 
-```xmlui copy {4-6}
+```xmlui-pg copy {4-6} display name="Example: Option in a AutoComplete"
 <App>
   <Text value="Selected ID: {myComp.value}"/>
   <AutoComplete id="myComp">
@@ -19,24 +19,9 @@ import { Callout } from "nextra/components";
 </App>
 ```
 
-<Playground
-    name="Example: Option in a AutoComplete"
-    height={260}
-    app={`
-    <App>
-      <Text value="Selected ID: {myComp.value}"/>
-      <AutoComplete id="myComp">
-        <Option label="John, Smith" value="john" />
-        <Option label="Jane, Clint" value="jane" disabled="true" />
-        <Option label="Herbert, Frank" value="herbert" />
-      </AutoComplete>
-    </App>
-  `}
-/>
-
 ### With `Select`
 
-```xmlui copy {4-6}
+```xmlui-pg copy {4-6} display name="Example: Option in a Select"
 <App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
@@ -46,21 +31,6 @@ import { Callout } from "nextra/components";
   </Select>
 </App>
 ```
-
-<Playground
-    name="Example: Option in a Select"
-    height={260}
-    app={`
-    <App>
-      <Text value="Selected ID: {mySelect.value}"/>
-      <Select id="mySelect">
-        <Option label="John, Smith" value="john" />
-        <Option label="Jane, Clint" value="jane" />
-        <Option label="Herbert, Frank" value="herbert" />
-      </Select>
-    </App>
-  `}
-/>
 
 ## Use children as Content Template
 
@@ -96,7 +66,7 @@ This property defines the text to display for the option. If `label` is not defi
     If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
 </Callout>
 
-```xmlui copy
+```xmlui-pg copy display name="Example: Using label" height="260px"
 <App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
@@ -107,22 +77,6 @@ This property defines the text to display for the option. If `label` is not defi
   </Select>
 </App>
 ```
-
-<Playground
-    name="Example: Using label"
-    height={260}
-    app={`
-    <App>
-      <Text value="Selected ID: {mySelect.value}"/>
-      <Select id="mySelect">
-        <Option />
-        <Option label="Vanilla" value="van"/>
-        <Option label="Chocolate" value="choc" />
-        <Option value="pist" />
-      </Select>
-    </App>
-  `}
-/>
 
 ### `optionTemplate`
 
@@ -136,7 +90,7 @@ This property defines the value of the option. If `value` is not defined, `Optio
     If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
 </Callout>
 
-```xmlui copy
+```xmlui-pg copy display name="Example: Using value" height="260px"
 <App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
@@ -147,22 +101,6 @@ This property defines the value of the option. If `value` is not defined, `Optio
   </Select>
 </App>
 ```
-
-<Playground
-    name="Example: Option in a Select"
-    height={260}
-    app={`
-    <App>
-      <Text value="Selected ID: {mySelect.value}"/>
-      <Select id="mySelect">
-        <Option />
-        <Option label="Vanilla" />
-        <Option label="Chocolate" value="chocolate" />
-        <Option label="Pistachio" value="pistachio" />
-      </Select>
-    </App>
-  `}
-/>
 
 ## Events
 

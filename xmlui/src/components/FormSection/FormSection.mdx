@@ -6,7 +6,7 @@ See the \`FlowLayout\` reference documentation for details on sizing children.
 
 %-PROP-START columnGap
 
-```xmlui copy /columnGap="1rem"/
+```xmlui-pg copy display name="Example: columnGap"
 <Form padding="1rem">
   <FormSection columnGap="1rem">
     <FormItem width="50%" label="Name" bindTo="" />
@@ -14,22 +14,12 @@ See the \`FlowLayout\` reference documentation for details on sizing children.
   </FormSection>
 </Form>
 ```
-
-<Playground
-  name="Example: columnGap"
-  app={`<Form padding="1rem">
-  <FormSection columnGap="1rem">
-    <FormItem width="50%" label="Name" bindTo="" />
-    <FormItem width="50%" label="Occupation" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
 
 %-PROP-END
 
 %-PROP-STARt rowGap
 
-```xmlui copy /rowGap="2rem"/
+```xmlui-pg copy display name="Example: rowGap"
 <Form padding="1rem">
   <FormSection rowGap="2rem">
     <FormItem label="Name" bindTo="" />
@@ -37,44 +27,24 @@ See the \`FlowLayout\` reference documentation for details on sizing children.
   </FormSection>
 </Form>
 ```
-
-<Playground
-  name="Example: rowGap"
-  app={`<Form padding="1rem">
-  <FormSection rowGap="2rem">
-    <FormItem label="Name" bindTo="" />
-    <FormItem label="Occupation" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
 
 %-PROP-END
 
 %-PROP-START info
 
-```xmlui copy /info="This is some information about a particular section."/
+```xmlui-pg copy display name="Example: info"
 <Form padding="1rem">
   <FormSection info="This is some information about a particular section.">
     <FormItem label="Input Field" bindTo="" />
   </FormSection>
 </Form>
 ```
-
-<Playground
-  name="Example: info"
-  app={`<Form padding="1rem">
-  <FormSection info="This is some information about a particular section.">
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
 
 %-PROP-END
 
-
 %-PROP-START infoFontSize
 
-```xmlui copy {4}
+```xmlui-pg copy {4} display name="Example: infoFontSize"
 <Form padding="1rem">
   <FormSection
     info="This is some information about a particular section."
@@ -84,60 +54,30 @@ See the \`FlowLayout\` reference documentation for details on sizing children.
   </FormSection>
 </Form>
 ```
-
-<Playground
-  name="Example: infoFontSize"
-  app={`<Form padding="1rem">
-  <FormSection
-    info="This is some information about a particular section."
-    infoFontSize="18px"
-  >
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
 
 %-PROP-END
 
 %-PROP-START heading
 
-```xmlui copy /heading="Basic Heading"/
+```xmlui-pg copy display name="Example: heading"
 <Form padding="1rem">
   <FormSection heading="Basic Heading">
     <FormItem label="Input Field" bindTo="" />
   </FormSection>
 </Form>
 ```
-
-<Playground
-  name="Example: heading"
-  app={`<Form padding="1rem">
-  <FormSection heading="Basic Heading">
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
 
 %-PROP-END
 
 %-PROP-START headingLevel
 
-```xmlui copy /headingLevel="h1"/
+```xmlui-pg copy display name="Example: headingLevel"
 <Form padding="1rem">
   <FormSection heading="Basic Heading" headingLevel="h1">
     <FormItem label="Input Field" bindTo="" />
   </FormSection>
 </Form>
 ```
-
-<Playground
-  name="Example: headingLevel"
-  app={`<Form padding="1rem">
-  <FormSection heading="Basic Heading" headingLevel="h1">
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
 
 %-PROP-END
 
@@ -145,28 +85,19 @@ See the \`FlowLayout\` reference documentation for details on sizing children.
 
 The default weight is `bold`.
 
-```xmlui copy /headingWeight="normal"/
+```xmlui-pg copy display name="Example: headingWeight"
 <Form padding="1rem">
   <FormSection heading="Basic Heading" headingWeight="normal">
     <FormItem label="Input Field" bindTo="" />
   </FormSection>
 </Form>
 ```
-
-<Playground
-  name="Example: headingWeight"
-  app={`<Form padding="1rem">
-  <FormSection heading="Basic Heading" headingWeight="normal">
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
 
 %-PROP-END
 
 %-PROP-START paddingBottom
 
-```xmlui copy /paddingBottom/
+```xmlui-pg copy display name="Example: paddingBottom"
 <Form padding="1rem">
   <FormSection paddingBottom="3rem" heading="Basic Info">
     <FormItem width="50%" label="First Name" bindTo="" />
@@ -178,19 +109,5 @@ The default weight is `bold`.
   </FormSection>
 </Form>
 ```
-
-<Playground
-  name="Example: paddingBottom"
-  app={`<Form padding="1rem">
-  <FormSection paddingBottom="3rem" heading="Basic Info">
-    <FormItem width="50%" label="First Name" bindTo="" />
-    <FormItem width="50%" label="Last Name" bindTo="" />
-  </FormSection>
-  <FormSection paddingBottom="0" heading="Job Related">
-    <FormItem width="50%" label="Occupation" bindTo="" />
-    <FormItem width="50%" label="Job Description" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
 
 %-PROP-END

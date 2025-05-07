@@ -101,7 +101,7 @@ export function useListData({
     if (!limit) {
       return sortedItems;
     }
-    return sortedItems.slice(0, limit - 1);
+    return sortedItems.slice(0, limit);
   }, [sortedItems, limit]);
 
   const sectionedItems: Record<string, any> = useMemo(() => {

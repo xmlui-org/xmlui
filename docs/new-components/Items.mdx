@@ -25,7 +25,7 @@ You can set the list of data to be rendered via the `data` property, as the foll
 The nested child component describes a template to display each data entry in `Items`.
 In the template, you can refer to a particular entry with the [`$item`](#&item) identifier:
 
-```xmlui copy {8}
+```xmlui-pg copy {8} display name="Example: inline data"
 <App>
   <VStack>
     <Items data="{[
@@ -39,28 +39,11 @@ In the template, you can refer to a particular entry with the [`$item`](#&item) 
 </App>
 ```
 
-<Playground
-  name="Example: inline data"
-  app={`
-    <App>
-      <VStack>
-        <Items data="{[
-          { idx: 1, value: 'One lion' },
-          { idx: 2, value: 'Two monkeys' },
-          { idx: 3, value: 'Three rabbits' },
-        ]}">
-          <Text>{$item.idx} - {$item.value}</Text>
-        </Items>
-      </VStack>
-    </App>
-  `}
-/>
-
 ### Data Binding
 
 You can use also API bindings to display data:
 
-```xmlui copy {4-6}
+```xmlui-pg copy {4-6} display name="Example: data binding"
 <App>
   <VStack>
     <Items>
@@ -72,22 +55,6 @@ You can use also API bindings to display data:
   </VStack>
 </App>
 ```
-
-<Playground
-  name="Example: data binding"
-  app={`
-    <App>
-      <VStack>
-        <Items>
-          <property name="data">
-            <DataSource url="https://api.spacexdata.com/v3/rockets"/>
-          </property>
-          <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
-        </Items>
-      </VStack>
-    </App>
-  `}
-/>
 
 ## Use children as Content Template
 
@@ -123,7 +90,7 @@ The component template to display a single item
 
 This property reverses the order in which data is mapped to template components.
 
-```xmlui copy {4}
+```xmlui-pg copy {4} display name="Example: reverse"
 <App>
   <VStack>
     <Items
@@ -138,25 +105,6 @@ This property reverses the order in which data is mapped to template components.
   </VStack>
 </App>
 ```
-
-<Playground
-  name="Example: reverse"
-  app={`
-    <App>
-      <VStack>
-        <Items
-          reverse="true"
-          data="{[
-            { idx: 1, value: 'One lion' },
-            { idx: 2, value: 'Two monkeys' },
-            { idx: 3, value: 'Three rabbits' },
-          ]}">
-          <Text>{$item.idx} - {$item.value}</Text>
-        </Items>
-      </VStack>
-    </App>
-  `}
-/>
 
 ## Events
 
