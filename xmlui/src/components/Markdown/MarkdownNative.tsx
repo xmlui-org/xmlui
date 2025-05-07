@@ -3,8 +3,6 @@ import React from "react";
 import { MarkdownHooks } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import { visit } from "unist-util-visit";
-import type { Node, Parent } from "unist";
 
 import styles from "./Markdown.module.scss";
 import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
@@ -16,13 +14,10 @@ import { Toggle } from "../Toggle/Toggle";
 import { NestedApp } from "../NestedApp/NestedAppNative";
 import {
   type CodeHighlighter,
-  type CodeHighlighterMeta,
   parseMetaAndHighlightCode,
 } from "./highlight-code";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { Button } from "../Button/ButtonNative";
-import Icon from "../Icon/IconNative";
-import toast from "react-hot-toast";
+import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlock";
 
 type MarkdownProps = {
   removeIndents?: boolean;
@@ -48,7 +43,7 @@ export const Markdown = memo(function Markdown({
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
       <MarkdownHooks
-        remarkPlugins={[remarkGfm, codeBlockParser]}
+        remarkPlugins={[remarkGfm, markdownCodeBlockParser]}
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
@@ -434,106 +429,3 @@ const ListItem = ({ children, style }: ListItemProps) => {
     </li>
   );
 };
-
-type CodeBlockProps = {
-  children?: React.ReactNode;
-  textToCopy?: string;
-  meta?: CodeHighlighterMeta;
-};
-
-function CodeBlock({ children, meta, textToCopy }: CodeBlockProps) {
-  if (!meta) {
-    return <div className={styles.codeBlock}>{children}</div>;
-  }
-  return (
-    <div className={styles.codeBlock}>
-      {meta.filename && (
-        <div className={styles.codeBlockHeader}>
-          <Text variant="em">
-            <Text variant="strong">Filename:</Text> {meta.filename}
-          </Text>
-        </div>
-      )}
-      <div className={styles.codeBlockCopyWrapper}>
-        {children}
-        <div className={styles.codeBlockCopyButton}>
-          <Button
-            variant="ghost"
-            themeColor="secondary"
-            size="sm"
-            icon={<Icon name={"copy"} aria-hidden />}
-            onClick={() => {
-              if (!textToCopy) return;
-              navigator.clipboard.writeText(textToCopy);
-              toast.success("Code copied!");
-            }}
-          ></Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface CodeNode extends Node {
-  lang: string | null;
-  meta: string | null;
-}
-
-function codeBlockParser() {
-  return function transformer(tree: Node) {
-    visit(tree, "code", visitor);
-  };
-
-  function visitor(node: CodeNode, _: number, parent: Parent | undefined) {
-    const { lang, meta } = node;
-    const nodeData = { hProperties: {} };
-    if (lang !== null) {
-      nodeData.hProperties["dataLanguage"] = lang;
-      node.data = nodeData;
-    }
-    if (!parent) return;
-    if (!meta) return;
-
-    const params = splitter(meta)
-      ?.filter((s) => s !== "")
-      .map((s) => s.trim());
-    if (!params) return;
-    if (params.length === 0) return;
-
-    const parsedMeta = params.reduce(
-      (acc, item) => {
-        item = item.trim();
-        if (item === "") return acc;
-        if (item.indexOf("=") === -1) {
-          if (item.startsWith("/") && item.endsWith("/")) {
-            acc["dataHighlightSubstrings"] = item.substring(1, item.length - 1);
-          }
-          if (item.startsWith("{") && !item.endsWith("}")) {
-            acc["dataHighlightRows"] = item.substring(1, item.length - 1);
-          }
-          if (item === "copy") {
-            acc["dataCopy"] = "true";
-          }
-          if (item === "rowNumbers") {
-            acc["dataRowNumbers"] = "true";
-          }
-          return acc;
-        }
-        const index = item.indexOf("=");
-        if (item.substring(0, index) !== "filename") return acc;
-        acc["dataFilename"] = item
-          .substring(index + 1)
-          .replace(/"(.+)"/, "$1")
-          .replace(/'(.+)'/, "$1");
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
-    nodeData.hProperties = { ...nodeData.hProperties, ...parsedMeta };
-    node.data = nodeData;
-  }
-
-  function splitter(str: string): string[] | null {
-    return str.match(/(?:[^\s"']+|("|')[^"']*("|'))+/g);
-  }
-}

@@ -1,0 +1,56 @@
+@use "../../components-core/theming/themes" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$themeVars: t.composePaddingVars($themeVars, "CodeBlock");
+$themeVars: t.composeBorderVars($themeVars, "CodeBlock");
+$backgroundColor-CodeBlock: createThemeVar("backgroundColor-CodeBlock");
+$backgroundColor-CodeBlock-header: createThemeVar("backgroundColor-CodeBlock-header");
+$borderRadius-CodeBlock: createThemeVar("borderRadius-CodeBlock");
+$color-CodeBlock-headerSeparator: createThemeVar("color-CodeBlock-headerSeparator");
+$marginTop-CodeBlock: createThemeVar("marginTop-CodeBlock");
+$marginBottom-CodeBlock: createThemeVar("marginBottom-CodeBlock");
+$backgroundColor-CodeBlock-highlight: createThemeVar("backgroundColor-CodeBlock-highlight");
+
+.codeBlock {
+  @include t.borderVars($themeVars, "CodeBlock");
+  @include t.paddingVars($themeVars, "CodeBlock");
+  border-radius: $borderRadius-CodeBlock;
+  margin-top: $marginTop-CodeBlock;
+  margin-bottom: $marginBottom-CodeBlock;
+  background-color: $backgroundColor-CodeBlock;
+}
+
+.codeBlockHeader {
+  padding: t.$space-1;
+  padding-left: t.$space-3;
+  background-color: $backgroundColor-CodeBlock-header;
+  border-bottom: $color-CodeBlock-headerSeparator solid 2px;
+}
+
+.codeBlockCopyWrapper {
+  position: relative;
+
+  .codeBlockCopyButton {
+    position: absolute;
+    top: t.$space-1;
+    right: t.$space-1;
+    z-index: 1;
+    display: none;
+    background-color: $backgroundColor-CodeBlock;
+  }
+
+  &:hover {
+    .codeBlockCopyButton {
+      display: block;
+    }
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

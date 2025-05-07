@@ -73,7 +73,46 @@ $component: "Text";
     overflow-x: auto;
     text-overflow: initial;
     font-size: t.$fontSize-small;
+    line-height: 1.3;
   }
+
+  // TEMP: experimental - may be removed
+  &.codefence:has(> code > span) {
+    padding-inline: 0;
+  }
+  &.codefence > code > span:not([class*="numbered"]) {
+    padding-inline: t.$space-3;
+  }
+
+  &.codefence > code {
+    white-space: pre-wrap;
+    display: inline-block;
+    width: 100%;
+  }
+
+  &.codefence > code::before {
+    counter-reset: listing;
+  }
+
+  &.codefence > code > span {
+    display: inline-block;
+    width: 100%;
+  }
+  &.codefence > code > span[class*="numbered"] {
+    counter-increment: listing;
+  }
+
+  &.codefence > code > span[class*="numbered"]::before {
+    content: counter(listing);
+    display: inline-block;
+    width: t.$space-12;
+    padding-left: auto;
+    padding-right: t.$space-5;
+    margin-left: auto;
+    text-align: right;
+    color: t.$textColor-secondary;
+  }
+  // END TEMP
 
   // ---
 
