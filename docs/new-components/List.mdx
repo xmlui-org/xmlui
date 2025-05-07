@@ -292,13 +292,13 @@ The component receives data via this property. The `data` property is a list of 
 Note how the `List` infers the given data and provides a simple layout for it.
 To tweak what data and how it is displayed, see the [`itemTemplate` section](#itemtemplate).
 
-```xmlui
+```xmlui copy
 <App>
-  <List data="{[...]}">
+  <List data='{[...]}' />
 </App>
 ```
 
-```xmlui-pg copy name="Example: data" height="400px"
+```xmlui-pg name="Example: data" height="400px"
 <App>
   <List data='{[
   {
@@ -358,18 +358,18 @@ You can also provide the `List` with data directly from an API via this property
 In the example below, the `List` also uses the `itemTemplate` property to access the data attributes as well.
 See the [itemTemplate section](#itemtemplate).
 
-```xmlui-pg copy display name="Example: data API Call" height="400px"
-  <App>
-    <List data='https://api.spacexdata.com/v3/rockets'>
-      <property name="itemTemplate">
-        <Card>
-          <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-          <Text value="{$item.country}" />
-          <Text value="{$item.company}" variant="strong" />
-        </Card>
-      </property>
-    </List>
-  </App>
+```xmlui-pg copy name="Example: data API Call" height="400px"
+<App>
+  <List data='https://api.spacexdata.com/v3/rockets'>
+    <property name="itemTemplate">
+      <Card>
+        <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
+        <Text value="{$item.country}" />
+        <Text value="{$item.company}" variant="strong" />
+      </Card>
+    </property>
+  </List>
+</App>
 ```
 
 ### `defaultGroups`
@@ -1240,9 +1240,12 @@ This property limits the number of items displayed in the `List`.
 </App>
 ```
 
-```xmlui-pg name="Example: limit" height="400px"
-<App>
-  <List limit="4" data='{[
+<Playground
+  name="Example: limit"
+  height={400}
+  app={`
+    <App>
+      <List limit="4" data='{${JSON.stringify([
   {
     id: 0,
     name: "Apples",
@@ -1291,9 +1294,10 @@ This property limits the number of items displayed in the `List`.
     category: "dairy",
     key: 0,
   },
-]}' />
-</App>
-```
+])}}' />
+    </App>
+  `}
+/>
 
 ### `loading`
 
