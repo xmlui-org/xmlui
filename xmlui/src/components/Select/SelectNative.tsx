@@ -354,72 +354,70 @@ export const Select = forwardRef(function Select(
           >
             {searchable || multiSelect ? (
               <Popover open={open} onOpenChange={setOpen} modal={false}>
-                <PopoverTrigger asChild>
-                  <button
-                    id={id}
-                    style={style}
-                    ref={setReferenceElement}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                    disabled={!enabled}
-                    aria-expanded={open}
-                    onClick={() => setOpen((prev) => !prev)}
-                    className={classnames(styles.selectTrigger, styles[validationStatus], {
-                      [styles.disabled]: !enabled,
-                      [styles.multi]: multiSelect,
-                    })}
-                    placeholder={placeholder}
-                    autoFocus={autoFocus}
-                  >
-                    {multiSelect ? (
-                      Array.isArray(value) && value.length > 0 ? (
-                        <div className={styles.badgeListContainer}>
-                          <div className={styles.badgeList}>
-                            {value.map((v) =>
-                              valueRenderer ? (
-                                valueRenderer(
-                                  Array.from(options).find((o) => o.value === v),
-                                  () => {
+                <PopoverTrigger
+                  id={id}
+                  style={style}
+                  ref={setReferenceElement}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                  disabled={!enabled}
+                  aria-expanded={open}
+                  onClick={() => setOpen((prev) => !prev)}
+                  className={classnames(styles.selectTrigger, styles[validationStatus], {
+                    [styles.disabled]: !enabled,
+                    [styles.multi]: multiSelect,
+                  })}
+                  placeholder={placeholder}
+                  autoFocus={autoFocus}
+                >
+                  {multiSelect ? (
+                    Array.isArray(value) && value.length > 0 ? (
+                      <div className={styles.badgeListContainer}>
+                        <div className={styles.badgeList}>
+                          {value.map((v) =>
+                            valueRenderer ? (
+                              valueRenderer(
+                                Array.from(options).find((o) => o.value === v),
+                                () => {
+                                  toggleOption(v);
+                                },
+                              )
+                            ) : (
+                              <span key={v} className={styles.badge}>
+                                {Array.from(options).find((o) => o.value === v)?.label}
+                                <Icon
+                                  name="close"
+                                  size="sm"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
                                     toggleOption(v);
-                                  },
-                                )
-                              ) : (
-                                <span key={v} className={styles.badge}>
-                                  {Array.from(options).find((o) => o.value === v)?.label}
-                                  <Icon
-                                    name="close"
-                                    size="sm"
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      toggleOption(v);
-                                    }}
-                                  />
-                                </span>
-                              ),
-                            )}
-                          </div>
+                                  }}
+                                />
+                              </span>
+                            ),
+                          )}
                         </div>
-                      ) : (
-                        <span className={styles.placeholder}>{placeholder || ""}</span>
-                      )
-                    ) : value !== undefined && value !== null ? (
-                      <div>{Array.from(options).find((o) => o.value === value)?.label}</div>
+                      </div>
                     ) : (
                       <span className={styles.placeholder}>{placeholder || ""}</span>
+                    )
+                  ) : value !== undefined && value !== null ? (
+                    <div>{Array.from(options).find((o) => o.value === value)?.label}</div>
+                  ) : (
+                    <span className={styles.placeholder}>{placeholder || ""}</span>
+                  )}
+                  <div className={styles.actions}>
+                    {multiSelect && Array.isArray(value) && value.length > 0 && (
+                      <Icon
+                        name="close"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          clearValue();
+                        }}
+                      />
                     )}
-                    <div className={styles.actions}>
-                      {multiSelect && Array.isArray(value) && value.length > 0 && (
-                        <Icon
-                          name="close"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            clearValue();
-                          }}
-                        />
-                      )}
-                      <Icon name="chevrondown" />
-                    </div>
-                  </button>
+                    <Icon name="chevrondown" />
+                  </div>
                 </PopoverTrigger>
                 {open && (
                   <SelectPortal container={root}>

@@ -236,7 +236,9 @@ button.selectTrigger {
 
 .selectContent {
   position: relative;
+  max-height: 280px;
   z-index: 50;
+  width: var(--radix-select-trigger-width);
   overflow: auto;
   background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
   border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
@@ -357,7 +359,6 @@ button.selectTrigger {
 
 .selectViewport {
   height: fit-content;
-  max-height: 280px;
   width: 100%;
   min-width: var(--radix-select-trigger-width);
 }
