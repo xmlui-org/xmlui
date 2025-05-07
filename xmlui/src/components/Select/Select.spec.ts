@@ -207,7 +207,7 @@ test("disabled Option cannot be selected", async ({ initTestBed, createSelectDri
   await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
 });
 
-test.fixme(
+test(
   "clicking label brings up the options",
   async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`
