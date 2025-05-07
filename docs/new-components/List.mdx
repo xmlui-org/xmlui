@@ -67,13 +67,10 @@ This property is an array of group names that the `List` will display.
 </App>
 ```
 
-<Playground
-  name="Example: availableGroups"
-  height={400}
-  app={`
-    <App>
-      <List availableGroups="{['fruits', 'vegetables']}" groupBy="category" 
-      data='{${JSON.stringify([
+```xmlui-pg name="Example: availableGroups" height="400px"
+<App>
+  <List availableGroups="{['fruits', 'vegetables']}" groupBy="category" 
+  data='{[
   {
     id: 0,
     name: "Apples",
@@ -122,16 +119,15 @@ This property is an array of group names that the `List` will display.
     category: "dairy",
     key: 0,
   },
-])}}'>
-        <property name="groupHeaderTemplate">
-          <Stack>
-            <Text variant="subtitle" value="{$group.key}" />
-          </Stack>
-        </property>  
-      </List>
-    </App>
-  `}
-/>
+]}'>
+    <property name="groupHeaderTemplate">
+      <Stack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </Stack>
+    </property>  
+  </List>
+</App>
+```
 
 ### `borderCollapse (default: true)`
 
@@ -160,13 +156,10 @@ Note how the `List` on the right has different borders:
 </App>
 ```
 
-<Playground
-  name="Example: borderCollapse"
-  height={400}
-  app={`
-    <App>
-      <HStack>
-        <List data='{${JSON.stringify([
+```xmlui-pg name="Example: borderCollapse" height="400px"
+<App>
+  <HStack>
+    <List data='{[
   {
     id: 0,
     name: "Apples",
@@ -215,15 +208,15 @@ Note how the `List` on the right has different borders:
     category: "dairy",
     key: 0,
   },
-])}}'
-      groupBy="category" borderCollapse="false" width="$space-48">
-        <property name="groupHeaderTemplate">
-            <Stack>
-              <Text variant="subtitle" value="{$group.key}" />
-            </Stack>
-          </property>
-        </List>
-        <List data='{${JSON.stringify([
+]}'
+  groupBy="category" borderCollapse="false" width="$space-48">
+    <property name="groupHeaderTemplate">
+        <Stack>
+          <Text variant="subtitle" value="{$group.key}" />
+        </Stack>
+      </property>
+    </List>
+    <List data='{[
   {
     id: 0,
     name: "Apples",
@@ -272,18 +265,17 @@ Note how the `List` on the right has different borders:
     category: "dairy",
     key: 0,
   },
-])}}'
-          groupBy="category" borderCollapse="true" width="$space-48">
-          <property name="groupHeaderTemplate">
-            <Stack>
-              <Text variant="subtitle" value="{$group.key}" />
-            </Stack>
-          </property>
-        </List>
-      </HStack>
-    </App>
-  `}
-/>
+]}'
+      groupBy="category" borderCollapse="true" width="$space-48">
+      <property name="groupHeaderTemplate">
+        <Stack>
+          <Text variant="subtitle" value="{$group.key}" />
+        </Stack>
+      </property>
+    </List>
+  </HStack>
+</App>
+```
 
 ### `data`
 
@@ -499,13 +491,10 @@ or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 </App>
 ```
 
-<Playground
-  name="Example: groupBy"
-  height={400}
-  app={`
-    <App>
-      <List
-        data='{${JSON.stringify([
+```xmlui-pg name="Example: groupBy" height="400px"
+<App>
+  <List
+    data='{[
   {
     id: 0,
     name: "Apples",
@@ -554,17 +543,16 @@ or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
     category: "dairy",
     key: 0,
   },
-])}}'
-        groupBy="category">
-        <property name="groupHeaderTemplate">
-          <VStack>
-            <Text variant="subtitle" value="{$group.key}" />
-          </VStack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
+]}'
+    groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+  </List>
+</App>
+```
 
 ### `groupFooterTemplate`
 
@@ -597,12 +585,9 @@ This example displays a separator line in the groups' footer:
 </App>
 ```
 
-<Playground
-  name="Example: groupFooterTemplate"
-  height={400}
-  app={`
-    <App>
-      <List data='{${JSON.stringify([
+```xmlui-pg name="Example: groupFooterTemplate" height="400px"
+<App>
+  <List data='{[
   {
     id: 0,
     name: "Apples",
@@ -651,22 +636,21 @@ This example displays a separator line in the groups' footer:
     category: "dairy",
     key: 0,
   },
-])}}'
-    groupBy="category">
-        <property name="groupHeaderTemplate">
-          <VStack>
-            <Text variant="subtitle" value="{$group.key}" />
-          </VStack>
-        </property>
-        <property name="groupFooterTemplate">
-          <VStack paddingVertical="$space-normal">
-            <ContentSeparator/>
-          </VStack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
+]}'
+groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+    <property name="groupFooterTemplate">
+      <VStack paddingVertical="$space-normal">
+        <ContentSeparator/>
+      </VStack>
+    </property>
+  </List>
+</App>
+```
 
 ### `groupHeaderTemplate`
 
@@ -692,12 +676,9 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 </App>
 ```
 
-<Playground
-  name="Example: groupHeaderTemplate"
-  height={400}
-  app={`
-    <App>
-      <List data='{${JSON.stringify([
+```xmlui-pg copy name="Example: groupHeaderTemplate" height="400px"
+<App>
+  <List data='{[
   {
     id: 0,
     name: "Apples",
@@ -746,17 +727,16 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
     category: "dairy",
     key: 0,
   },
-])}}'
-      groupBy="category">
-        <property name="groupHeaderTemplate">
-          <Stack padding="$space-2">
-            <Text variant="subtitle" value="{$group.key}" />
-          </Stack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
+]}'
+  groupBy="category">
+    <property name="groupHeaderTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$group.key}" />
+      </Stack>
+    </property>
+  </List>
+</App>
+```
 
 ### `groupsInitiallyExpanded`
 
@@ -767,14 +747,20 @@ Note how the groups in the right `List` are expanded by default:
 ```xmlui {3, 10}
 <App>
   <HStack gap="$space-2">
-    <List data="{[...]}" groupBy="category" groupsInitiallyExpanded="false" width="$space-48">
+    <List data="{[...]}" 
+      groupBy="category" 
+      groupsInitiallyExpanded="false" 
+      width="$space-48">
       <property name="groupHeaderTemplate">
         <Stack>
           <Text variant="subtitle" value="{$group.key}" />
         </Stack>
       </property>
     </List>
-    <List data="{[...]}" groupBy="category" groupsInitiallyExpanded="true" width="$space-48">
+    <List data="{[...]}" 
+      groupBy="category" 
+      groupsInitiallyExpanded="true" 
+      width="$space-48">
       <property name="groupHeaderTemplate">
         <Stack>
           <Text variant="subtitle" value="{$group.key}" />
@@ -785,13 +771,10 @@ Note how the groups in the right `List` are expanded by default:
 </App>
 ```
 
-<Playground
-  name="Example: groupsInitiallyExpanded"
-  height={400}
-  app={`
-    <App>
-      <HStack gap="$space-2"> 
-        <List data='{${JSON.stringify([
+```xmlui-pg name="Example: groupsInitiallyExpanded" height="400px"
+<App>
+  <HStack gap="$space-2"> 
+    <List data='{[
   {
     id: 0,
     name: "Apples",
@@ -840,15 +823,15 @@ Note how the groups in the right `List` are expanded by default:
     category: "dairy",
     key: 0,
   },
-])}}' 
-        groupBy="category" groupsInitiallyExpanded="false" width="$space-48">
-          <property name="groupHeaderTemplate">
-            <Stack>
-              <Text variant="subtitle" value="{$group.key}" />
-            </Stack>
-          </property>
-        </List>
-        <List data='{${JSON.stringify([
+]}' 
+  groupBy="category" groupsInitiallyExpanded="false" width="$space-48">
+    <property name="groupHeaderTemplate">
+      <Stack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </Stack>
+    </property>
+  </List>
+  <List data='{[
   {
     id: 0,
     name: "Apples",
@@ -897,18 +880,17 @@ Note how the groups in the right `List` are expanded by default:
     category: "dairy",
     key: 0,
   },
-])}}' 
-          groupBy="category" groupsInitiallyExpanded="true" width="$space-48">
-          <property name="groupHeaderTemplate">
-            <Stack>
-              <Text variant="subtitle" value="{$group.key}" />
-            </Stack>
-          </property>
-        </List>
-      </HStack>
-    </App>
-  `}
-/>
+]}' 
+      groupBy="category" groupsInitiallyExpanded="true" width="$space-48">
+      <property name="groupHeaderTemplate">
+        <Stack>
+          <Text variant="subtitle" value="{$group.key}" />
+        </Stack>
+      </property>
+    </List>
+  </HStack>
+</App>
+```
 
 ### `hideEmptyGroups (default: true)`
 
@@ -947,13 +929,10 @@ Note how the `meats` category is not displayed in the right `List`:
 </App>
 ```
 
-<Playground
-  name="Example: hideEmptyGroups"
-  height={400}
-  app={`
-    <App>
-      <HStack gap="$space-2">
-        <List data='{${JSON.stringify([
+```xmlui-pg name="Example: hideEmptyGroups" height="400px"
+<App>
+  <HStack gap="$space-2">
+    <List data='{[
   {
     id: 0,
     name: "Apples",
@@ -1002,15 +981,15 @@ Note how the `meats` category is not displayed in the right `List`:
     category: "dairy",
     key: 0,
   },
-])}}' 
-        defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="false" width="$space-48">
-          <property name="groupHeaderTemplate">
-            <Stack>
-              <Text variant="subtitle" value="{$group.key}" />
-            </Stack>
-          </property>
-        </List>
-        <List data='{${JSON.stringify([
+]}' 
+  defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="false" width="$space-48">
+    <property name="groupHeaderTemplate">
+      <Stack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </Stack>
+    </property>
+  </List>
+  <List data='{[
   {
     id: 0,
     name: "Apples",
@@ -1059,18 +1038,17 @@ Note how the `meats` category is not displayed in the right `List`:
     category: "dairy",
     key: 0,
   },
-])}}' 
-          defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="true" width="$space-48">
-          <property name="groupHeaderTemplate">
-            <Stack>
-              <Text variant="subtitle" value="{$group.key}" />
-            </Stack>
-          </property>
-        </List>
-      </HStack>
-    </App>
-  `}
-/>
+]}' 
+      defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="true" width="$space-48">
+      <property name="groupHeaderTemplate">
+        <Stack>
+          <Text variant="subtitle" value="{$group.key}" />
+        </Stack>
+      </property>
+    </List>
+  </HStack>
+</App>
+```
 
 ### `idKey (default: "id")`
 
@@ -1236,16 +1214,13 @@ This property limits the number of items displayed in the `List`.
 
 ```xmlui /limit="4"/
 <App>
-  <List limit="4" data='{[...]}' />
+  <List limit="3" data='{[...]}' />
 </App>
 ```
 
-<Playground
-  name="Example: limit"
-  height={400}
-  app={`
-    <App>
-      <List limit="4" data='{${JSON.stringify([
+```xmlui-pg name="Example: limit" height="400px"
+<App>
+  <List limit="3" data='{[
   {
     id: 0,
     name: "Apples",
@@ -1294,30 +1269,19 @@ This property limits the number of items displayed in the `List`.
     category: "dairy",
     key: 0,
   },
-])}}' />
-    </App>
-  `}
-/>
+]}' />
+</App>
+```
 
 ### `loading`
 
 This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: loading" height="120px"
 <App>
   <List loading="true" />
 </App>
 ```
-
-<Playground
-  name="Example: loading"
-  height={120}
-  app={`
-    <App>
-      <List loading="true" />
-    </App>
-  `}
-/>
 
 ### `orderBy`
 
@@ -1329,14 +1293,11 @@ This property enables the ordering of list items by specifying an attribute in t
 </App>
 ```
 
-<Playground
-  name="Example: orderBy"
-  height={400}
-  app={`
-    <App>
-      <List 
-        orderBy="{{ field: 'quantity', direction: 'desc' }}" 
-        data='{${JSON.stringify([
+```xmlui-pg name="Example: orderBy" height="400px"
+<App>
+  <List 
+    orderBy="{{ field: 'quantity', direction: 'desc' }}" 
+    data='{[
   {
     id: 0,
     name: "Apples",
@@ -1385,10 +1346,9 @@ This property enables the ordering of list items by specifying an attribute in t
     category: "dairy",
     key: 0,
   },
-])}}' />
-    </App>
-  `}
-/>
+]}' />
+</App>
+```
 
 ### `pageInfo`
 
@@ -1415,12 +1375,9 @@ Available values: `top` **(default)**, `bottom`
 </App>
 ```
 
-<Playground
-  name="Example: scrollAnchor"
-  height={400}
-  app={`
-    <App>
-      <List scrollAnchor="bottom" data='{${JSON.stringify([
+```xmlui-pg name="Example: scrollAnchor" height="400px"
+<App>
+  <List scrollAnchor="bottom" data='{[
   {
     id: 0,
     name: "Apples",
@@ -1469,10 +1426,9 @@ Available values: `top` **(default)**, `bottom`
     category: "dairy",
     key: 0,
   },
-])}}' />
-    </App>
-  `}
-/>
+]}' />
+</App>
+```
 
 ## Events
 
@@ -1486,7 +1442,7 @@ This method scrolls the list to the bottom.
 
 The following example demonstrates `scrollToBottom` and all the other scroll methods:
 
-```xmlui copy /scrollToBottom/ /scrollToTop/ /scrollToIndex/ /scrollToId/
+```xmlui-pg copy display name="Example: data API Call" height="400px"
 <App layout="condensed-sticky">
   <AppHeader>
     <HStack>
@@ -1498,7 +1454,10 @@ The following example demonstrates `scrollToBottom` and all the other scroll met
   </AppHeader>
   <List 
     id="myList" 
-    data="{Array.from({ length: 100 }).map((_, i) => ({id: 'item-' + i, value: 'Item #' + i}))}">
+    data="{
+      Array.from({ length: 100 })
+      .map((_, i) => ({id: 'item-' + i, value: 'Item #' + i}))
+    }">
     <property name="itemTemplate">
       <Card>
         <Text value="{$item.value}" />
@@ -1507,32 +1466,6 @@ The following example demonstrates `scrollToBottom` and all the other scroll met
   </List>
 </App>
 ```
-
-<Playground
-  name="Example: data API Call"
-  height={400}
-  app={`
-  <App layout="condensed-sticky">
-    <AppHeader>
-      <HStack>
-        <Button onClick="myList.scrollToBottom()">Scroll to Bottom</Button>
-        <Button onClick="myList.scrollToTop()">Scroll to Top</Button>
-        <Button onClick="myList.scrollToIndex(25)">Scroll to #25</Button>
-        <Button onClick="myList.scrollToId('item-40')">Scroll to ID 'item-40'</Button>
-      </HStack>
-    </AppHeader>
-    <List 
-      id="myList" 
-      data="{Array.from({ length: 100 }).map((_, i) => ({id: 'item-' + i, value: 'Item #' + i}))}">
-      <property name="itemTemplate">
-        <Card>
-          <Text value="{$item.value}" />
-        </Card>
-      </property>
-    </List>
-  </App>
-  `}
-/>
 
 ### `scrollToId`
 
