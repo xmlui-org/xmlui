@@ -1,4 +1,6 @@
+import { initComponent } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
+import { initApp } from "../../testing/themed-app-test-helpers";
 
 test("options with number type keeps number type - outside of forms", async ({
   initTestBed,
@@ -49,6 +51,7 @@ test("initialValue='{0}' works", async ({ page, initTestBed }) => {
   await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
 });
 
+<<<<<<< HEAD
 test("multi-select initialValue='{[0]}' works", async ({ page, initTestBed }) => {
   await initTestBed(`
     <Fragment>
@@ -85,6 +88,41 @@ test("reset works with initialValue", async ({
   createSelectDriver,
   createButtonDriver,
 }) => {
+||||||| parent of d2472cd1 (add more test cases)
+test("multi-select initialValue='{[0]}' works", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <Fragment>
+      <Select id="mySelect" initialValue="{[0]}" multiSelect>
+        <Option value="{0}" label="Zero"/>
+        <Option value="{1}" label="One"/>
+        <Option value="{2}" label="Two"/>
+      </Select>
+      <Text testId="text">Selected value: {mySelect.value}</Text>
+    </Fragment>
+  `);
+
+  await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
+});
+
+test("multi-select initialValue='{[0,1]}' works", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <Fragment>
+      <Select id="mySelect" initialValue="{[0,1]}" multiSelect>
+        <Option value="{0}" label="Zero"/>
+        <Option value="{1}" label="One"/>
+        <Option value="{2}" label="Two"/>
+      </Select>
+      <Text testId="text">Selected value: {mySelect.value}</Text>
+    </Fragment>
+  `);
+
+  await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
+});
+
+test("reset works with initialValue", async ({ page, initTestBed, createSelectDriver, createButtonDriver }) => {
+=======
+test("reset works with initialValue", async ({ page, initTestBed, createSelectDriver, createButtonDriver }) => {
+>>>>>>> d2472cd1 (add more test cases)
   const { testStateDriver } = await initTestBed(`
     <Fragment>
       <Select id="mySelect" initialValue="{0}">
@@ -131,30 +169,7 @@ test("reset works with no intialValue", async ({
   await expect(page.getByTestId("text")).not.toContainText("1");
 });
 
-test("select multiple items without closing listbox", async ({
-  page,
-  initTestBed,
-  createSelectDriver,
-  createButtonDriver,
-}) => {
-  const { testStateDriver } = await initTestBed(`
-    <Fragment>
-      <Select id="mySelect" multiSelect>
-        <Option value="{0}" label="Zero"/>
-        <Option value="{1}" label="One"/>
-        <Option value="{2}" label="Two"/>
-      </Select>
-      <Text testId="text">Selected value: {mySelect.value}</Text>
-    </Fragment>
-  `);
-  const selectDrv = await createSelectDriver("mySelect");
-  await selectDrv.selectMultipleLabels(["Zero", "One"]);
-
-  /* problem is that the listbox closes after the 1st selection is made */
-  await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
-});
-
-test("disabled Select cannot be opened", async ({ page, createSelectDriver, initTestBed }) => {
+test("disabled Select cannot be opened", async ({page, createSelectDriver, initTestBed}) => {
   await initTestBed(`
     <Select enabled="{false}">
       <Option value="1" label="One"/>
@@ -236,4 +251,189 @@ test("clicking label brings up the options", async ({ initTestBed, page, createS
   await page.getByLabel("Choose an option").click();
   await expect(page.getByRole("option", { name: "One" })).toBeVisible();
   await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
+});
+
+test.fixme("clicking label brings up the options", async ({ initTestBed, page, createSelectDriver }) => {
+  await initTestBed(`
+    <Select label="Choose an option">
+      <Option value="1" label="One"/>
+      <Option value="2" label="Two"/>
+    </Select>
+  `);
+  await page.getByLabel("Choose an option").click();
+  await expect(page.getByRole("option", {name: "One"})).toBeVisible();
+  await expect(page.getByRole("option", {name: "Two"})).toBeVisible();
+});
+
+test("autoFocus brings the focus to component", async ({ initTestBed, page, createSelectDriver }) => {
+  await initTestBed(`
+    <Select>
+      <Option value="1" label="One"/>
+      <Option value="2" label="Two"/>
+    </Select>
+    <Select testId="focused-select" autoFocus>
+      <Option value="1" label="One"/>
+      <Option value="2" label="Two"/>
+    </Select>
+  `);
+  const driver = await createSelectDriver("focused-select");
+
+  await expect(driver.component).toBeFocused();
+});
+
+test("emptyListTemplate shown when wrapped inside an App component", async ({ initTestBed, page, createSelectDriver }) => {
+  await initTestBed(`
+    <App>
+      <Select>
+        <property name="emptyListTemplate">
+          <Text value="Nothing to see here!" />
+        </property>
+      </Select>
+    </App>
+  `);
+  const driver = await createSelectDriver();
+  driver.click();
+
+  await expect(page.getByText("Nothing to see here!", {exact: true})).toBeVisible();
+});
+
+test.fixme("prop inProgressNotificationMessage ... what is this and why do we need it?", async ({ initTestBed, page, createSelectDriver }) => {
+  const propMakesSenseAndDoesSomethingDetectable = false;
+  expect(propMakesSenseAndDoesSomethingDetectable).toBeTruthy();
+});
+
+test.fixme("prop inProgress ... what is this and why do we need it?", async ({ initTestBed, page, createSelectDriver }) => {
+  const propMakesSenseAndDoesSomethingDetectable = false;
+  expect(propMakesSenseAndDoesSomethingDetectable).toBeTruthy();
+});
+
+test.describe("multiSelect", () => {
+  test("initialValue='{[0]}' works", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select id="mySelect" initialValue="{[0]}" multiSelect>
+          <Option value="{0}" label="Zero"/>
+          <Option value="{1}" label="One"/>
+          <Option value="{2}" label="Two"/>
+        </Select>
+        <Text testId="text">Selected value: {mySelect.value}</Text>
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
+  });
+
+  test("initialValue='{[0,1]}' works", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select id="mySelect" initialValue="{[0,1]}" multiSelect>
+          <Option value="{0}" label="Zero"/>
+          <Option value="{1}" label="One"/>
+          <Option value="{2}" label="Two"/>
+        </Select>
+        <Text testId="text">Selected value: {mySelect.value}</Text>
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
+  });
+
+  test("select multiple items without closing listbox", async ({ page, initTestBed, createSelectDriver, createButtonDriver }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Select id="mySelect" multiSelect>
+          <Option value="{0}" label="Zero"/>
+          <Option value="{1}" label="One"/>
+          <Option value="{2}" label="Two"/>
+        </Select>
+        <Text testId="text">Selected value: {mySelect.value}</Text>
+      </Fragment>
+    `);
+    const selectDrv = await createSelectDriver("mySelect");
+    await selectDrv.selectMultipleLabels(["Zero", "One"]);
+
+    /* problem is that the listbox closes after the 1st selection is made */
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
+  });
+
+  test("clicking label brings up the options", async ({ initTestBed, page, createSelectDriver }) => {
+    await initTestBed(`
+      <Select label="Choose an option" multiSelect>
+        <Option value="1" label="One"/>
+        <Option value="2" label="Two"/>
+      </Select>
+    `);
+    await page.getByLabel("Choose an option").click();
+    await expect(page.getByRole("option", {name: "One"})).toBeVisible();
+    await expect(page.getByRole("option", {name: "Two"})).toBeVisible();
+  });
+
+  test('labelBreak prop defaults to false', async ({ initTestBed, page, createSelectDriver }) => {
+    await page.setViewportSize({ width: 300, height: 720 });
+
+    await initTestBed(`
+      <Select
+        label="Dignissimos esse quasi esse cupiditate qui qui. Ut provident ad voluptatem tenetur sit consequuntur. Aliquam nisi fugit ut temporibus itaque ducimus rerum. Dolorem reprehenderit qui adipisci. Ullam harum atque ipsa."
+
+        multiSelect>
+        <Option value="1" label="One"/>
+        <Option value="2" label="Two"/>
+      </Select>
+    `);
+    const labelWidth = (await page.getByText("Dignissimos esse quasi").boundingBox()).width;
+    const select = page.getByRole("button").or(page.getByRole("combobox")).first();
+    const { width: selectWidth } = await select.boundingBox();
+    expect(labelWidth).toBeGreaterThan(selectWidth);
+  });
+
+  test('labelPosition="start" is left in ltr language', async ({ initTestBed, browser, createSelectDriver, page}) => {
+    await initTestBed(`
+      <Select multiSelect label="hi there" labelPosition="start" labelBreak="false">
+        <Option value="1" label="One"/>
+        <Option value="2" label="Two"/>
+      </Select>
+      `)
+    const { x: labelX } = await page.getByText("hi there").boundingBox()
+    const select = page.getByRole("button").or(page.getByRole("combobox")).first();
+    const { x: selectX } = await select.boundingBox();
+    expect(labelX).toBeLessThan(selectX);
+  });
+
+  test('labelPosition="start" is right to select in rtl language', async ({ browser }) => {
+
+    const rightToLeftLanguage = 'ar';
+    const context = await browser.newContext({
+      locale: rightToLeftLanguage
+    });
+    const page = await context.newPage();
+    await initComponent(page, {
+      entryPoint: `
+          <Select multiSelect label="hi there" labelPosition="start" labelBreak="false">
+            <Option value="1" label="One"/>
+            <Option value="2" label="Two"/>
+          </Select>
+        `})
+    const { x: labelX } = await page.getByText("hi there").boundingBox()
+    const select = page.getByRole("button").or(page.getByRole("combobox")).first();
+    const { x: selectX } = await select.boundingBox();
+    expect(labelX).toBeGreaterThan(selectX);
+    const checkedBrowserIsActuallyRTL_inThisTestCase = false;
+    expect(checkedBrowserIsActuallyRTL_inThisTestCase).toBeTruthy();
+  });
+
+  test("autoFocus brings the focus to component", async ({ initTestBed, page, createSelectDriver }) => {
+    await initTestBed(`
+      <Select multiSelect>
+        <Option value="1" label="One"/>
+        <Option value="2" label="Two"/>
+      </Select>
+      <Select testId="focused-select" multmultiSelect autoFocus>
+        <Option value="1" label="One"/>
+        <Option value="2" label="Two"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver("focused-select");
+
+    await expect(driver.component).toBeFocused();
+  });
 });
