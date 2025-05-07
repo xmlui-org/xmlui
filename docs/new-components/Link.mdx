@@ -10,10 +10,10 @@ A `Link` component represents a navigation target within the app or a reference 
 
 You can use the `label` and `icon` properties of a `Link` to set its text and icon to display. If you want a custom appearance, you can nest your visual representation into `Link`:
 
-```xmlui copy {1,6}
+```xmlui-pg copy {1,6} display name="Example: custom Link content"
 <App>
-  <Link to="https://ncrm.azurewebsites.net/" target="_blank">
-    <HStackverticalAlignment="center">
+  <Link to="https://docs.xmlui.com/" target="_blank">
+    <HStack verticalAlignment="center">
       <Stack width="16px" height="16px" backgroundColor="purple" />
       XMLUI introduction
     </HStack>
@@ -21,27 +21,13 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 </App>
 ```
 
-<Playground
-  name="Example: custom Link content"
-  app={`
-    <App>
-      <Link to="https://ncrm.azurewebsites.net/" target="_blank">
-        <HStack verticalAlignment="center">
-          <Stack width="16px" height="16px" backgroundColor="purple" />
-          XMLUI introduction
-        </HStack>
-      </Link>
-    </App>
-  `}
-/>
-
 ## Properties
 
 ### `active (default: false)`
 
 Indicates whether this link is active or not. If so, it will have a distinct visual appearance.
 
-```xmlui copy /active="true"/ /active="false"/
+```xmlui-pg copy display name="Example: active"
 <App>
   <Link>I'm an inactive link (by default)</Link>
   <Link active="true">I'm an active link</Link>
@@ -49,22 +35,11 @@ Indicates whether this link is active or not. If so, it will have a distinct vis
 </App>
 ```
 
-<Playground
-  name="Example: active"
-  app={`
-    <App>
-      <Link>I'm an inactive link (by default)</Link>
-      <Link active="true">I'm an active link</Link>
-      <Link active="false">I'm an inactive link (explicit setting)</Link>
-    </App>
-  `}
-/>
-
 ### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```xmlui copy /enabled="true"/ /enabled="false"/
+```xmlui-pg copy display name="Example: enabled"
 <App>
   <Link>I'm an enabled link (by default)</Link>
   <Link enabled="false">I'm a disabled link</Link>
@@ -72,37 +47,16 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-<Playground
-  name="Example: active"
-  app={`
-    <App>
-      <Link>I'm an enabled link (by default)</Link>
-      <Link enabled="false">I'm a disabled link</Link>
-      <Link enabled="true">I'm an enabled link (explicit setting)</Link>
-    </App>
-  `}
-/>
-
 ### `icon`
 
 This property allows you to add an icon (specify the icon's name) to the link.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: icon"
 <App>
   <Link icon="home" label="Home" />
   <Link icon="drive">Drives</Link>
 </App>
 ```
-
-<Playground
-  name="Example: icon"
-  app={`
-    <App>
-      <Link icon="home" label="Home" />
-      <Link icon="drive">Drives</Link>
-    </App>
-  `}
-/>
 
 <Callout type="info" emoji="💡">
 If you want to specify paddings and gaps or put the icon to the right of the link text, use your custom link template (nest it into `Link`).
@@ -128,24 +82,13 @@ Available values:
 
 The following sample opens its link in a new tab:
 
-```xmlui copy
+```xmlui-pg copy display name="Example: target"
 <App>
   <Link to="https://docs.xmlui.com/" target="_blank">
     Open XMLUI overview in a new tab
   </Link>
 </App>
 ```
-
-<Playground
-  name="Example: target"
-  app={`
-    <App>
-      <Link to="https://docs.xmlui.com/" target="_blank">
-        Open XMLUI overview in a new tab
-      </Link>
-    </App>
-  `}
-/>
 
 ### `to`
 
@@ -160,53 +103,6 @@ This component does not have any events.
 This component does not expose any methods.
 
 ## Styling
-
-The `Link` component uses these theme variables to customize its appearance:
-
-- `textDecorationColor`
-- `color`
-- `fontWeight`
-- `textDecorationLine`
-- `textUnderlineOffset`
-- `textDecorationStyle`
-- `textDecorationThickness`
-
-The following sample theme sets a few visual properties of `Link`:
-
-```json
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "textColor-Link--hover": "orangered",
-    "textDecorationColor-Link": "purple",
-    "textDecorationThickness-Link": "4px",
-    "textDecorationStyle-Link": "dotted"
-  }
-}
-```
-
-<Playground
-  name="Example: styling"
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "textColor-Link--hover": "orangered",
-        "textDecorationColor-Link": "purple",
-        "textDecorationThickness-Link": "4px",
-        "textDecorationStyle-Link": "dotted",
-      },
-    },
-  ]}
-  app={`
-    <App>
-      <Link>I have a fancy style when you hover me!</Link>
-    </App>
-  `}
-/>
 
 ### Theme Variables
 
