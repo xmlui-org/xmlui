@@ -139,6 +139,7 @@ export const selectComponentRenderer = createComponentRenderer(
         inProgressNotificationMessage={extractValue.asOptionalString(
           node.props.inProgressNotificationMessage,
         )}
+        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         updateState={updateState}
         searchable={extractValue.asOptionalBoolean(node.props.searchable)}
         initialValue={extractValue(node.props.initialValue)}

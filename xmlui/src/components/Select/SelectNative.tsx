@@ -70,6 +70,7 @@ type SelectProps = {
   labelBreak?: boolean;
   inProgress?: boolean;
   inProgressNotificationMessage?: string;
+  readOnly?: boolean;
 };
 
 const SimpleSelect = forwardRef(function SimpleSelect(
@@ -103,6 +104,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
       | number;
     options: Set<Option>;
     children: ReactNode;
+    readOnly: boolean;
   },
   forwardedRef,
 ) {
@@ -122,6 +124,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
     onFocus,
     options,
     children,
+    readOnly,
   } = props;
 
   const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
@@ -131,6 +134,9 @@ const SimpleSelect = forwardRef(function SimpleSelect(
 
   const onValChange = useCallback(
     (val: string) => {
+      if (readOnly) {
+        return;
+      }
       const match = Array.from(options).find((o) => `${o.value}` === val);
       onValueChange(match?.value ?? val);
     },
@@ -155,7 +161,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
         autoFocus={autoFocus}
       >
         <div className={styles.selectValue}>
-          <SelectValue placeholder={placeholder} />
+          {readOnly ? stringValue || placeholder : <SelectValue placeholder={placeholder} />}
         </div>
         <SelectIcon asChild>
           <Icon name="chevrondown" />
@@ -212,6 +218,7 @@ export const Select = forwardRef(function Select(
     required = false,
     inProgress = false,
     inProgressNotificationMessage = "Loading...",
+    readOnly = false,
   }: SelectProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
@@ -477,6 +484,7 @@ export const Select = forwardRef(function Select(
               </Popover>
             ) : (
               <SimpleSelect
+                readOnly={!!readOnly}
                 ref={ref}
                 value={value as SingleValueType}
                 options={options}
@@ -589,7 +597,13 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
     const { optionLabelRenderer, optionRenderer, value: selectedValue } = useSelect();
 
     return (
-      <SelectItem ref={ref} className={styles.selectItem} value={value + ""} disabled={!enabled}>
+      <SelectItem
+        ref={ref}
+        className={styles.selectItem}
+        value={value + ""}
+        disabled={!enabled}
+        data-state={selectedValue === value && "checked"}
+      >
         <div className={styles.selectItemContent}>
           {optionRenderer ? (
             optionRenderer(
@@ -606,11 +620,13 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
               <SelectItemText className={styles.selectItemContent}>
                 {optionLabelRenderer ? optionLabelRenderer({ value, label }) : label}
               </SelectItemText>
-              <span className={styles.selectItemIndicator}>
-                <SelectItemIndicator>
-                  <Icon name="checkmark" />
-                </SelectItemIndicator>
-              </span>
+              {selectedValue === value && (
+                <span className={styles.selectItemIndicator}>
+                  <SelectItemIndicator>
+                    <Icon name="checkmark" />
+                  </SelectItemIndicator>
+                </span>
+              )}
             </>
           )}
         </div>

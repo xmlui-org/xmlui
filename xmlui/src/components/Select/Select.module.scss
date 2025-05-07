@@ -320,7 +320,7 @@ button.selectTrigger {
   outline: none;
   font-size: createThemeVar("fontSize-#{$componentName}");
 
-  &[data-highlighted] {
+  &:hover {
     background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
   }
 

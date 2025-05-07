@@ -1,9 +1,9 @@
 import { expect, test } from "../../testing/fixtures";
 
 test("options with number type keeps number type - outside of forms", async ({
-  initTestBed,
-  createSelectDriver,
-}) => {
+                                                                               initTestBed,
+                                                                               createSelectDriver,
+                                                                             }) => {
   const { testStateDriver } = await initTestBed(
     `<Select onDidChange="(value) => { testState = value; }">
       <Option value="{1}" label="One"/>
@@ -19,9 +19,9 @@ test("options with number type keeps number type - outside of forms", async ({
 });
 
 test("changing selected option in form", async ({
-  initTestBed,
-  createSelectDriver,
-}) => {
+                                                  initTestBed,
+                                                  createSelectDriver,
+                                                }) => {
   const { testStateDriver } = await initTestBed(`
     <Form data="{{sel: 'opt1'}}">
       <FormItem testId="mySelect" type="select" bindTo="sel">
@@ -155,7 +155,7 @@ test("disabled Select cannot be opened", async ({page, createSelectDriver, initT
   await expect(page.getByText("One")).not.toBeVisible();
 });
 
-test.fixme("readOnly Select shows options, but value cannot be changed", async ({ page, initTestBed, createSelectDriver }) => {
+test("readOnly Select shows options, but value cannot be changed", async ({ page, initTestBed, createSelectDriver }) => {
   await initTestBed(`
     <Select readOnly initialValue="1">
       <Option value="1" label="One"/>
@@ -187,14 +187,17 @@ test("disabled Option cannot be selected", async ({ initTestBed, createSelectDri
   await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
 });
 
-test.fixme("clicking label brings up the options", async ({ initTestBed, page, createSelectDriver }) => {
-  await initTestBed(`
+test.fixme(
+  "clicking label brings up the options",
+  async ({ initTestBed, page, createSelectDriver }) => {
+    await initTestBed(`
     <Select label="Choose an option">
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
     </Select>
   `);
-  await page.getByLabel("Choose an option").click();
-  await expect(page.getByRole("option", {name: "One"})).toBeVisible();
-  await expect(page.getByRole("option", {name: "Two"})).toBeVisible();
-});
+    await page.getByLabel("Choose an option").click();
+    await expect(page.getByRole("option", { name: "One" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
+  },
+);
