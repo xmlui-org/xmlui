@@ -18,20 +18,11 @@ If this boolean prop is set to true, the `NumberBox` input will be focused when 
 
 Controls whether the input field is enabled (`true`) or disabled (`false`).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: enabled"
 <App>
   <NumberBox enabled="false" />
 </App>
 ```
-
-<Playground
-  name="Example: enabled"
-  app={`
-    <App>
-      <NumberBox enabled="false" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -39,37 +30,19 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
 
 This string prop enables the display of an icon on the right side (left-to-right display) of the input field by providing a valid [icon name]().
 
-```xmlui copy
+```xmlui-pg copy display name="Example: endIcon"
 <App>
   <NumberBox endIcon="email" />
 </App>
 ```
 
-<Playground
-  name="Example: endIcon"
-  app={`
-    <App>
-      <NumberBox endIcon="email" />
-    </App>
-  `}
-/>
-
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: all adornments"
 <App>
   <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
 ```
-
-<Playground
-  name="Example: all adornments"
-  app={`
-    <App>
-      <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -77,59 +50,30 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 This string prop enables the display of a custom string on the right side (left-to-right display) of the input field.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: endText"
 <App>
   <NumberBox endText=".com" />
 </App>
 ```
 
-<Playground
-  name="Example: endText"
-  app={`
-    <App>
-      <NumberBox endText=".com" />
-    </App>
-  `}
-/>
-
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: all adornments"
 <App>
   <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
 ```
 
-<Playground
-  name="Example: all adornments"
-  app={`
-    <App>
-      <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START hasSpinBox
 
-
-```xmlui copy
+```xmlui-pg copy display name="Example: hasSpinBox"
 <App>
   <NumberBox hasSpinBox="true" initialValue="3" />
   <NumberBox hasSpinBox="false" initialValue="34" />
 </App>
 ```
-
-<Playground
-  name="Example: hasSpinBox"
-  app={`
-    <App>
-      <NumberBox hasSpinBox="true" initialValue="3" />
-      <NumberBox hasSpinBox="false" initialValue="34" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -137,41 +81,22 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 The initial value displayed in the input field.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: initialValue"
 <App>
   <NumberBox initialValue="123" />
 </App>
 ```
 
-<Playground
-  name="Example: initialValue"
-  app={`
-    <App>
-      <NumberBox initialValue="123" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START integersOnly
 
-```xmlui copy
+```xmlui-pg copy display name="Example: integersOnly"
 <App>
   <NumberBox integersOnly="true" initialValue="42" />
   <NumberBox integersOnly="false" initialValue="{Math.PI}" />
 </App>
 ```
-
-<Playground
-  name="Example: integersOnly"
-  app={`
-    <App>
-      <NumberBox integersOnly="true" initialValue="42" />
-      <NumberBox integersOnly="false" initialValue="{Math.PI}" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -183,20 +108,11 @@ otherwise it can only be an integer.
 
 Try to enter a bigger value into the input field below than the maximum allowed.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: maxValue"
 <App>
   <NumberBox maxValue="100" initialValue="99" />
 </App>
 ```
-
-<Playground
-  name="Example: maxValue"
-  app={`
-    <App>
-      <NumberBox maxValue="100" initialValue="99" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -204,20 +120,11 @@ Try to enter a bigger value into the input field below than the maximum allowed.
 
 Try to enter a bigger value into the input field below than the minimum allowed.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: minValue"
 <App>
   <NumberBox minValue="-100" initialValue="-99" />
 </App>
 ```
-
-<Playground
-  name="Example: minValue"
-  app={`
-    <App>
-      <NumberBox minValue="-100" initialValue="-99" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -225,20 +132,11 @@ Try to enter a bigger value into the input field below than the minimum allowed.
 
 A placeholder text that is visible in the input field when its empty.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: placeholder"
 <App>
   <NumberBox placeholder="This is a placeholder" />
 </App>
 ```
-
-<Playground
-  name="Example: placeholder"
-  app={`
-    <App>
-      <NumberBox placeholder="This is a placeholder" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -248,20 +146,11 @@ The default stepping value is **1**.
 
 Note that only integers are allowed to be entered.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: step"
 <App>
   <NumberBox initialValue="10" step="10" />
 </App>
 ```
-
-<Playground
-  name="Example: step"
-  app={`
-    <App>
-      <NumberBox initialValue="10" step="10" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -269,20 +158,11 @@ Note that only integers are allowed to be entered.
 
 If true, the component's value cannot be modified with user interactions.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: readOnly"
 <App>
   <NumberBox initialValue="123" readOnly="true" />
 </App>
 ```
-
-<Playground
-  name="Example: readOnly"
-  app={`
-    <App>
-      <NumberBox initialValue="123" readOnly="true" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -290,37 +170,19 @@ If true, the component's value cannot be modified with user interactions.
 
 This string prop enables the display of an icon on the left side (left-to-right display) of the input field by providing a valid [icon name]().
 
-```xmlui copy
+```xmlui-pg copy display name="Example: startIcon"
 <App>
   <NumberBox startIcon="hyperlink" />
 </App>
 ```
 
-<Playground
-  name="Example: startIcon"
-  app={`
-    <App>
-      <NumberBox startIcon="hyperlink" />
-    </App>
-  `}
-/>
-
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: all adornments"
 <App>
   <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
 ```
-
-<Playground
-  name="Example: all adornments"
-  app={`
-    <App>
-      <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -328,37 +190,19 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 This string prop enables the display of a custom string on the left side (left-to-right display) of the input field.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: startText"
 <App>
   <NumberBox startText="www." />
 </App>
 ```
 
-<Playground
-  name="Example: startText"
-  app={`
-    <App>
-      <NumberBox startText="www." />
-    </App>
-  `}
-/>
-
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`endText`](#endtext).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: all adornments"
 <App>
   <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
 ```
-
-<Playground
-  name="Example: all adornments"
-  app={`
-    <App>
-      <NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -372,7 +216,7 @@ This prop is used to visually indicate status changes reacting to form field val
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```xmlui copy
+```xmlui-pg copy display name="Example: validationStatus"
 <App>
   <NumberBox />
   <NumberBox validationStatus="valid" />
@@ -381,18 +225,6 @@ This prop is used to visually indicate status changes reacting to form field val
 </App>
 ```
 
-<Playground
-  name="Example: validationStatus"
-  app={`
-    <App>
-      <NumberBox />
-      <NumberBox validationStatus="valid" />
-      <NumberBox validationStatus="warning" />
-      <NumberBox validationStatus="error" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START zeroOrPositive
@@ -400,20 +232,11 @@ This prop is used to visually indicate status changes reacting to form field val
 This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
 By default, this property is set to `false`.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: zeroOrPositive"
 <App>
   <NumberBox initialValue="123" zeroOrPositive="true" />
 </App>
 ```
-
-<Playground
-  name="Example: zeroOrPositive"
-  app={`
-    <App>
-      <NumberBox initialValue="123" zeroOrPositive="true" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -429,7 +252,7 @@ See an example in the `setValue` API method.
 
 You can use this method to set the component's current value programmatically.
 
-```xmlui copy {3, 9, 12}
+```xmlui-pg copy {3, 9, 12} display name="Example: value and setValue"
 <App>
   <NumberBox
     id="numberbox"
@@ -446,26 +269,6 @@ You can use this method to set the component's current value programmatically.
 </App>
 ```
 
-<Playground
-  name="Example: value and setValue"
-  app={`
-    <App>
-      <NumberBox
-        id="numberbox"
-        readOnly="true"
-      />
-      <HStack>
-        <Button
-          label="Set to 100"
-          onClick="numberbox.setValue(100)" />
-        <Button
-          label="Set to 0"
-          onClick="numberbox.setValue(0)" />
-      </HStack>
-    </App>
-  `}
-/>
-
 %-API-END
 
 %-EVENT-START didChange
@@ -474,22 +277,12 @@ This event is triggered after the user has changed the field value.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```xmlui copy {2}
+```xmlui-pg copy {2} display name="Example: didChange"
 <App var.field="0">
   <NumberBox initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
 </App>
 ```
-
-<Playground
-  name="Example: didChange"
-  app={`
-    <App var.field="0">
-      <NumberBox initialValue="{field}" onDidChange="(val) => field = val" />
-      <Text value="{field}" />
-    </App>
-  `}
-/>
 
 %-EVENT-END
 
@@ -497,28 +290,17 @@ Write in the input field and see how the `Text` underneath it is updated in para
 
 This event is triggered when the `NumberBox` receives focus. The following sample demonstrates this event.
 
-```xmlui copy {3-4}
+```xmlui-pg
+---app copy {3-4} display name="Example: gotFocus"
 <App var.focused="{false}">
   <NumberBox
     onGotFocus="focused = true"
     onLostFocus="focused = false" />
   <Text>The NumberBox is {focused ? '' : 'not'} focused</Text>
 </App>
-```
-
+---desc
 Click into the `NumberBox` (and then click the text below):
-
-<Playground
-  name="Example: gotFocus/lostFocus"
-  app={`
-    <App var.focused="{false}">
-      <NumberBox
-        onGotFocus="focused = true"
-        onLostFocus="focused = false" />
-      <Text>The NumberBox is {focused ? '' : 'not'} focused</Text>
-    </App>
-  `}
-/>
+```
 
 %-EVENT-END
 
@@ -529,73 +311,3 @@ This event is triggered when the `NumberBox` loses focus.
 (See the example above)
 
 %-EVENT-END
-
-%-STYLE-START
-
-The `NumberBox` component uses these theme variables to customize its appearance:
-
-- `borderRadius-NumberBox`
-- `textColor-NumberBox`
-- `backgroundColor-NumberBox--disabled`
-- `borderWidth-NumberBox`
-- `borderStyle-NumberBox`
-- `borderColor-NumberBox--disabled`
-- `backgroundColor-NumberBox--disabled`
-- `textColor-NumberBox--disabled`
-- `borderColor-NumberBox-default`
-- `borderColor-NumberBox-error`
-- `borderColor-NumberBox-warning`
-- `borderColor-NumberBox-success`
-- `textColor-placeholder-NumberBox`
-
-```json
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "borderRadius-NumberBox": "30px",
-    "color-adornment-NumberBox": "red",
-    "borderWidth-NumberBox": "4px"
-  }
-}
-```
-
-<Playground
-  name="Example: styling"
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "borderRadius-NumberBox": "30px",
-        "color-adornment-NumberBox": "red",
-        "borderWidth-NumberBox": "4px",
-      },
-    },
-  ]}
-  app={`
-    <App>
-      <NumberBox startIcon="hyperlink" />
-    </App>
-  `}
-/>
-
-To style all input controls not just this component, use `Input` instead of the `NumberBox` segment:
-
-```
-borderColor-Input: "#0033FF"
-```
-
-`Input` affects the following controls:
-
-- [`Checkbox`](./Checkbox.mdx)
-- [`RadioGroupOption`](./RadioGroupOption.mdx)
-- [`Select`](./Select.mdx)
-- [`Switch`](./Switch.mdx)
-- [`TextArea`](./TextArea.mdx)
-- [`TextBox`](./TextBox.mdx)
-
-See [custom themes](../learning/themes/overview.mdx) for styling details.
-
-%-STYLE-END

@@ -702,11 +702,11 @@ function listThemeVars(component) {
       const defaultLightVar =
         component.defaultThemeVars?.["light"]?.[themeVar] ||
         component.defaultThemeVars?.[themeVar] ||
-        "<GrayText>none</GrayText>";
+        "*none*";
       const defaultDarkVar =
         component.defaultThemeVars?.["dark"]?.[themeVar] ||
         component.defaultThemeVars?.[themeVar] ||
-        "<GrayText>none</GrayText>";
+        "*none*";
 
       return [provideLinkForThemeVar(themeVar), defaultLightVar, defaultDarkVar];
     });

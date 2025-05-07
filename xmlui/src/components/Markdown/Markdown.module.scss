@@ -103,6 +103,12 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     }
   }
 
+  .horizontalRule {
+    border-top-color: createThemeVar("borderColor-HorizontalRule");
+    border-top-style: createThemeVar("borderStyle-HorizontalRule");
+    border-top-width: createThemeVar("borderWidth-HorizontalRule");
+  }
+
   li:has(> input[type="checkbox"]),
   li:has(> input[type="checkbox"]) {
     display: flex;

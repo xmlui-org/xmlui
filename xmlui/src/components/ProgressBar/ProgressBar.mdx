@@ -2,7 +2,7 @@
 
 The following example demonstrates using it:
 
-```xmlui copy {2-6}
+```xmlui-pg copy {2-6} display name="Example: value" height="200px"
 <App>
   <ProgressBar />
   <ProgressBar value="0.2"/>
@@ -12,68 +12,4 @@ The following example demonstrates using it:
 </App>
 ```
 
-<Playground
-  name="Example: value"
-  app={`
-    <App>
-      <ProgressBar />
-      <ProgressBar value="0.2"/>
-      <ProgressBar value="0.6"/>
-      <ProgressBar value="1"/>
-      <ProgressBar value="1.2"/>
-    </App>
-  `}
-/>
-
 %-PROP-END
-
-%-STYLE-START
-
-The `ProgressBar` component uses these theme variables to customize its appearance:
-
-- `backgroundColor-ProgressBar`
-- `color-indicator-ProgressBar`
-- `borderRadius-ProgressBar`
-- `borderRadius-indicator-ProgressBar`
-- `thicness-ProgressBar`
-
-This sample shows how you can style `ProgressBar`:
-
-```xmlui copy
-<Theme
-  backgroundColor-ProgressBar="cyan"
-  color-indicator-ProgressBar="purple"
-  thickness-ProgressBar="12px"
-  borderRadius-indicator-ProgressBar="12px"
-  borderRadius-Progressbar="4px">
-  <App>
-    <ProgressBar value="0"/>
-    <ProgressBar value="0.2"/>
-    <ProgressBar value="0.6"/>
-    <ProgressBar value="1"/>
-    <ProgressBar value="1.2"/>
-  </App>
-</Theme>
-```
-
-<Playground
-  name="Example: styling ProgressBar"
-  app={`
-    <Theme
-      backgroundColor-ProgressBar="cyan"
-      color-indicator-ProgressBar="purple"
-      thickness-ProgressBar="12px"
-      borderRadius-indicator-ProgressBar="12px"
-      borderRadius-Progressbar="4px">
-      <App>
-        <ProgressBar value="0"/>
-        <ProgressBar value="0.2"/>
-        <ProgressBar value="0.6"/>
-        <ProgressBar value="1"/>
-        <ProgressBar value="1.2"/>
-      </App>
-    </Theme>
-  `}
-/>
-
-%-STYLE-END

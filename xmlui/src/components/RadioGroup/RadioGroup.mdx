@@ -8,7 +8,7 @@
 
 This property defines the initial value of the selected option within the group.
 
-```xmlui copy /initialValue="first"/
+```xmlui-pg copy display name="Example: initialValue"
 <App>
   <RadioGroup initialValue="first">
     <HStack padding="$space-normal">
@@ -20,28 +20,13 @@ This property defines the initial value of the selected option within the group.
 </App>
 ```
 
-<Playground
-  name="Example: initialValue"
-  app={`
-    <App>
-      <RadioGroup initialValue="first">
-        <HStack padding="$space-normal">
-          <Option label="First Item" value="first"/>
-          <Option label="Second Item" value="second"/>
-          <Option label="Third Item" value="third"/>
-        </HStack>
-      </RadioGroup>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START enabled
 
 This property indicates whether the input accepts user actions (`true`) or not (`false`). The default value is `true`.
 
-```xmlui copy /enabled="false"/
+```xmlui-pg copy display name="Example: enabled"
 <App>
   <RadioGroup initialValue="first" enabled="false">
     <HStack padding="$space-normal">
@@ -52,21 +37,6 @@ This property indicates whether the input accepts user actions (`true`) or not (
   </RadioGroup>
 </App>
 ```
-
-<Playground
-  name="Example: enabled"
-  app={`
-    <App>
-      <RadioGroup initialValue="first" enabled="false">
-        <HStack padding="$space-normal">
-          <Option label="First Item" value="first"/>
-          <Option label="Second Item" value="second"/>
-          <Option label="Third Item" value="third"/>
-        </HStack>
-      </RadioGroup>
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -80,7 +50,7 @@ This prop is used to visually indicate status changes reacting to form field val
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```xmlui copy
+```xmlui-pg copy display name="Example: validationStatus"
 <App>
   <HStack>
     <RadioGroup initialValue="first" validationStatus="error">
@@ -99,35 +69,13 @@ This prop is used to visually indicate status changes reacting to form field val
 </App>
 ```
 
-<Playground
-  name="Example: validationStatus"
-  app={`
-    <App>
-      <HStack>
-        <RadioGroup initialValue="first" validationStatus="error">
-          <Option label="First Item" value="first"/>
-          <Option label="Second Item" value="second"/>
-        </RadioGroup>
-        <RadioGroup initialValue="first" validationStatus="warning">
-          <Option label="First Item" value="first"/>
-          <Option label="Second Item" value="second"/>
-        </RadioGroup>
-        <RadioGroup initialValue="first" validationStatus="valid">
-          <Option label="First Item" value="first"/>
-          <Option label="Second Item" value="second"/>
-        </RadioGroup>
-      </HStack>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-API-START setValue
 
 You can use this method to set the component's current value programmatically.
 
-```xmlui copy {2, 7-8}
+```xmlui-pg copy {2, 7-8} display name="Example: value and setValue"
 <App>
   <RadioGroup id="radio">
     <Option label="First Item" value="first"/>
@@ -140,29 +88,14 @@ You can use this method to set the component's current value programmatically.
 </App>
 ```
 
-<Playground
-  name="Example: value and setValue"
-  app={`
-    <App>
-      <RadioGroup id="radio">
-        <Option label="First Item" value="first"/>
-        <Option label="Second Item" value="second"/>
-      </RadioGroup>
-      <HStack>
-        <Button label="Set First" onClick="radio.setValue('first')" />
-        <Button label="Set Second" onClick="radio.setValue('second')" />
-      </HStack>
-    </App>
-  `}
-/>
-
 %-API-END
 
 %-EVENT-START didChange
 
 This event is triggered after the user has changed the field value. The following example uses this event to display the selected option's value:
 
-```xmlui copy /onDidChange="(val) => field = val"/
+```xmlui-pg
+---app copy display name="Example: didChange"
 <App var.field="">
   <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
     <Option label="First Item" value="first"/>
@@ -170,22 +103,9 @@ This event is triggered after the user has changed the field value. The followin
   </RadioGroup>
   <Text value="{field}" />
 </App>
-```
-
+---desc
 Select one of the available options and see how the `Text` underneath it is updated in parallel:
-
-<Playground
-  name="Example: didChange"
-  app={`
-    <App var.field="">
-      <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
-        <Option label="First Item" value="first"/>
-        <Option label="Second Item" value="second"/>
-      </RadioGroup>
-      <Text value="{field}" />
-    </App>
-  `}
-/>
+```
 
 %-EVENT-END
 

@@ -11,7 +11,7 @@ The `NavLink` component defines a navigation target (app navigation menu item) w
 You can use the `label` and `icon` properties of a `NavLink` to set its text and icon to display.
 If you want a custom appearance, you can nest define custom visuals for the `NavLink` by nesting:
 
-```xmlui copy {6-14}
+```xmlui-pg copy {6-14} display name="Example: NavLink appearance" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -33,38 +33,12 @@ If you want a custom appearance, you can nest define custom visuals for the `Nav
 </App>
 ```
 
-<Playground
-  name="Example: custom NavLink content"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <AppHeader>
-      <H1>MyApp</H1>
-    </AppHeader>
-    <NavPanel>
-      <NavLink to="/">
-        <Stack width="16px" height="16px" backgroundColor="purple" />
-        Home
-      </NavLink>
-      <NavLink to="/about">
-        <Stack width="16px" height="16px" backgroundColor="green" />
-        About
-      </NavLink>
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-      <Page url="/about">About</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 ### Actions
 
 By default, activating (clicking) a link navigates to the target URL.
 However, you can create a link that executes an explicit action responding to the `click` event instead of the default navigation:
 
-```xmlui copy {7}
+```xmluipg copy {7} display name="Example: custom NavLink action" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -79,25 +53,6 @@ However, you can create a link that executes an explicit action responding to th
 </App>
 ```
 
-<Playground
-  name="Example: custom NavLink action"
-  height={250}
-  app={`
-    <App layout="horizontal">
-      <AppHeader>
-        <H1>MyApp</H1>
-      </AppHeader>
-      <NavPanel>
-        <NavLink to="/" label="Home" />
-        <NavLink label="Danger!" onClick="toast('Be careful with this action!')" />
-      </NavPanel>
-      <Pages>
-        <Page url="/">Home</Page>
-      </Pages>
-    </App>
-  `}
-/>
-
 ## Properties
 
 ### `active (default: false)`
@@ -108,7 +63,7 @@ This property indicates if the particular navigation is an active link. An activ
 
 This Boolean property indicates if the active state of a link should have a visual indication. Setting it to `false` removes the visual indication of an active link.
 
-```xmlui copy /displayActive="false"/
+```xmlui-pg copy display name="Example: displayActive" height="250px"
 <App layout="horizontal">
   <NavPanel>
     <NavLink to="/" label="Home" displayActive="false" />
@@ -119,28 +74,13 @@ This Boolean property indicates if the active state of a link should have a visu
 </App>
 ```
 
-<Playground
-  name="Example: displayActive"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <NavPanel>
-      <NavLink to="/" label="Home" displayActive="false" />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 ### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
 In the following app, the "Hotels" link is disabled:
 
-```xmlui copy {8}
+```xmlui-pg copy {8} display name="Example: enabled" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyTravel App</H1>
@@ -158,33 +98,11 @@ In the following app, the "Hotels" link is disabled:
 </App>
 ```
 
-<Playground
-  name="Example: enabled"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <AppHeader>
-      <H1>MyTravel App</H1>
-    </AppHeader>
-    <NavPanel>
-      <NavLink label="Home" to="/" />
-      <NavLink label="Flights" to="/flights" />
-      <NavLink label="Hotels" to="/hotels" enabled="false" />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-      <Page url="/flights">Flights Page</Page>
-      <Page url="/hotels">Hotels Page</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 ### `icon`
 
 This property allows you to add an icon (specify the icon's name) to the navigation link.
 
-```xmlui copy {6-7}
+```xmlui-pg copy {6-7} display name="Example: icon" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -200,31 +118,11 @@ This property allows you to add an icon (specify the icon's name) to the navigat
 </App>
 ```
 
-<Playground
-  name="Example: icon"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <AppHeader>
-      <H1>MyApp</H1>
-    </AppHeader>
-    <NavPanel>
-      <NavLink label="Home" to="/" icon="home" />
-      <NavLink label="Drives" to="/drives" icon="drive" />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-      <Page url="/drives">Drives Page</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 ### `label`
 
 This property sets the label of the component.
 
-```xmlui copy /label="Home"/
+```xmlui-pg copy display name="Example: label" height="250px"
 <App layout="horizontal">
   <NavPanel>
     <NavLink to="/" label="Home" />
@@ -234,21 +132,6 @@ This property sets the label of the component.
   </Pages>
 </App>
 ```
-
-<Playground
-  name="Example: label"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <NavPanel>
-      <NavLink to="/" label="Home" />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-    </Pages>
-  </App>
-  `}
-/>
 
 ### `target (default: "_self")`
 
@@ -266,7 +149,7 @@ Available values:
 
 The following example opens the "About XMLUI" link in a new tab:
 
-```xmlui copy {7}
+```xmlui-pg copy {7} display name="Example: target" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -282,26 +165,6 @@ The following example opens the "About XMLUI" link in a new tab:
 </App>
 ```
 
-<Playground
-  name="Example: target"
-  height={250}
-  app={`
-    <App layout="horizontal">
-      <AppHeader>
-        <H1>MyApp</H1>
-      </AppHeader>
-      <NavPanel>
-        <NavLink label="Home" to="/" />
-        <NavLink label="About XMLUI" to="https://docs.xmlui.com/" target="_blank" />
-      </NavPanel>
-      <Pages>
-        <Page url="/">Home</Page>
-        <Page url="/drives">Drives Page</Page>
-      </Pages>
-    </App>
-  `}
-/>
-
 ### `to`
 
 This property defines the URL of the link.
@@ -316,7 +179,7 @@ you need to manually set this property for the active state to be displayed prop
 
 The default value for this property is `false`.
 
-```xmlui copy /vertical="true"/
+```xmlui-pg copy display name="Example: vertical" height="250px"
 <App layout="horizontal">
   <NavPanel>
     <NavLink to="/" label="Home" vertical="true" />
@@ -327,21 +190,6 @@ The default value for this property is `false`.
 </App>
 ```
 
-<Playground
-  name="Example: vertical"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <NavPanel>
-      <NavLink to="/" label="Home" vertical="true" />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 ## Events
 
 ### `click`
@@ -350,28 +198,24 @@ This event is triggered when the NavLink is clicked.
 
 The following example shows a message and navigates to the "/status" link after closing the message window:
 
-<Playground
-  name="Example: click"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <AppHeader>
-      <H1>MyApp</H1>
-    </AppHeader>
-    <NavPanel>
-      <NavLink to="/" label="Home" />
-      <NavLink label="Check my status" onClick="
-          toast('You will be redirected');
-          Actions.navigate('/status');
-      " />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-      <Page url="/status">My Status</Page>
-    </Pages>
-  </App>
-  `}
-/>
+```xmlui-pg copy {7} display name="Example: click" height="250px"
+<App layout="horizontal">
+  <AppHeader>
+    <H1>MyApp</H1>
+  </AppHeader>
+  <NavPanel>
+    <NavLink to="/" label="Home" />
+    <NavLink label="Check my status" onClick="
+        toast('You will be redirected');
+        Actions.navigate('/status');
+    " />
+  </NavPanel>
+  <Pages>
+    <Page url="/">Home</Page>
+    <Page url="/status">My Status</Page>
+  </Pages>
+</App>
+```
 
 ## Exposed Methods
 
@@ -379,147 +223,77 @@ This component does not expose any methods.
 
 ## Styling
 
-The `Navlink` component uses these theme variables to customize its appearance:
-
-- `backgroundColor`: (with these states: `--hover`, `--hover--active`, `--active`, `--pressed`, `--pressed-active`)
-- `color-indicator`: (with these states: `--hover`, `--active`, `--pressed`)
-- `textColor`: (with these states: `--hover`, `--hover--active`, `--active`, `--pressed`, `--pressed-active`)
-- `color-icon`
-- `fontSize`
-- `fontWeight`: (with these states: `--active`, `--pressed`)
-- `paddingHorizontal`
-- `paddingVertical`
-- `borderRadius`
-- `borderRadius-indicator`
-- `thickness-indicator`
-
-The theme variables ending with `indicator` set the indicator's visual properties that sign the link's active state.
-
-The following sample theme sets a few visual properties of `NavLink`. It changes the background color to show the hovered state and modifies the indicator's visual appearance. The theme displays the link with an extra bold font:
-
-```json
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "backgroundColor-NavLink--hover": "deepskyblue",
-    "backgroundColor-NavLink--pressed": "steelblue",
-    "backgroundColor-NavLink--active": "lightblue",
-    "backgroundColor-NavLink--hover--active": "deepskyblue",
-    "color-indicator-NavLink--active": "purple",
-    "thickness-indicator-NavLink": "4px",
-    "fontWeight-NavLink": "900"
-  }
-}
-```
-
-<Playground
-  name="Example: styling"
-  height={250}
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "backgroundColor-NavLink--hover": "deepskyblue",
-        "backgroundColor-NavLink--pressed": "steelblue",
-        "backgroundColor-NavLink--active": "lightblue",
-        "backgroundColor-NavLink--hover--active": "deepskyblue",
-        "color-indicator-NavLink--active": "purple",
-        "thickness-indicator-NavLink": "4px",
-        "fontWeight-NavLink": "900",
-      },
-    },
-  ]}
-  app={`
-    <App  layout="horizontal">
-      <AppHeader>
-        <H1>SuperDrive App</H1>
-      </AppHeader>
-      <NavPanel>
-        <NavLink label="Home" to="/" icon="home" />
-        <NavLink label="Drives" to="/drives" icon="drive" />
-      </NavPanel>
-      <Pages>
-        <Page url="/">Home</Page>
-        <Page url="/drives">Drives Page</Page>
-      </Pages>
-    </App>
-  `}
-/>
-
 ### Theme Variables
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-NavLink | transparent | transparent |
-| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--hover--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--pressed | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--pressed--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--active | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--hover | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--hover--active | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--pressed | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavLink--pressed--active | *none* | *none* |
 | [border](../styles-and-themes/common-units/#border)-NavLink | 0px solid $borderColor | 0px solid $borderColor |
-| [borderBottom](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderBottomColor](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderBottomStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderBottomWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderColor](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderHorizontal](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderHorizontalColor](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderHorizontalWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderLeft](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderLeftStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderLeftWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderBottom](../styles-and-themes/common-units/#border)-NavLink | *none* | *none* |
+| [borderBottomColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
+| [borderBottomStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
+| [borderBottomWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
+| [border](../styles-and-themes/common-units/#border)EndEndRadius-NavLink | *none* | *none* |
+| [border](../styles-and-themes/common-units/#border)EndStartRadius-NavLink | *none* | *none* |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-NavLink | *none* | *none* |
+| [borderHorizontalColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
+| [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
+| [borderHorizontalWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [borderLeft](../styles-and-themes/common-units/#border)-NavLink | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
+| [borderLeftStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
+| [borderLeftWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-indicator-NavLink | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | $borderRadius | $borderRadius |
-| [borderRight](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderRightStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderRightWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderTop](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderTopColor](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderTopStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderTopWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderHorizontal](../styles-and-themes/common-units/#border)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderVerticalColor](../styles-and-themes/common-units/#color)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderVerticalWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderWidth](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRight](../styles-and-themes/common-units/#border)-NavLink | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
+| [borderRightStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
+| [borderRightWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [border](../styles-and-themes/common-units/#border)StartEndRadius-NavLink | *none* | *none* |
+| [border](../styles-and-themes/common-units/#border)StartStartRadius-NavLink | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
+| [borderTop](../styles-and-themes/common-units/#border)-NavLink | *none* | *none* |
+| [borderTopColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
+| [borderTopStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
+| [borderTopWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-NavLink | *none* | *none* |
+| [borderVerticalColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
+| [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
+| [borderVerticalWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-icon-NavLink | $color-surface-500 | $color-surface-500 |
-| [color](../styles-and-themes/common-units/#color)-indicator-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-indicator-NavLink | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink--active | $color-primary-500 | $color-primary-500 |
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink--hover | $color-primary-600 | $color-primary-600 |
 | [color](../styles-and-themes/common-units/#color)-indicator-NavLink--pressed | $color-primary-500 | $color-primary-500 |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-NavLink | $fontFamily | $fontFamily |
 | [fontSize](../styles-and-themes/common-units/#size)-NavLink | $fontSize-small | $fontSize-small |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink | $fontWeight-normal | $fontWeight-normal |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-NavLink--pressed | $fontWeight-normal | $fontWeight-normal |
 | [outlineColor](../styles-and-themes/common-units/#color)-NavLink--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineOffset](../styles-and-themes/common-units/#size)-NavLink--focus | -1px | -1px |
 | [outlineStyle](../styles-and-themes/common-units/#border)-NavLink--focus | $outlineStyle--focus | $outlineStyle--focus |
 | [outlineWidth](../styles-and-themes/common-units/#size)-NavLink--focus | $outlineWidth--focus | $outlineWidth--focus |
-| [padding](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [paddingBottom](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-NavLink | $space-4 | $space-4 |
-| [paddingLeft](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [paddingRight](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [paddingTop](../styles-and-themes/common-units/#size)-NavLink | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingLeft](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
+| [paddingTop](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-NavLink | $space-2 | $space-2 |
 | [textColor](../styles-and-themes/common-units/#color)-NavLink | $textColor-primary | $textColor-primary |
-| [textColor](../styles-and-themes/common-units/#color)-NavLink--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [textColor](../styles-and-themes/common-units/#color)-NavLink--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [textColor](../styles-and-themes/common-units/#color)-NavLink--hover--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [textColor](../styles-and-themes/common-units/#color)-NavLink--pressed | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [textColor](../styles-and-themes/common-units/#color)-NavLink--pressed--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-NavLink--active | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-NavLink--hover | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-NavLink--hover--active | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-NavLink--pressed | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-NavLink--pressed--active | *none* | *none* |
 | [thickness](../styles-and-themes/common-units/#size)-indicator-NavLink | $space-0_5 | $space-0_5 |
 
 ### Variable Explanations
