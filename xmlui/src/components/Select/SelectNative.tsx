@@ -357,6 +357,7 @@ export const Select = forwardRef(function Select(
                 <PopoverTrigger asChild>
                   <button
                     id={id}
+                    style={style}
                     ref={setReferenceElement}
                     onFocus={onFocus}
                     onBlur={onBlur}
