@@ -56,6 +56,7 @@ export const MarkdownMd = createMetadata({
     "marginTop-HtmlLi": "$space-2",
     "marginBottom-HtmlLi": "$space-2",
 
+    "backgroundColor-CodeBlock": "$color-surface-100",
     "backgroundColor-CodeBlock-header": "$color-surface-100",
     "color-CodeBlock-headerSeparator": "$color-surface-300",
     "borderLeft-CodeBlock": "$color-surface-300 2px solid",

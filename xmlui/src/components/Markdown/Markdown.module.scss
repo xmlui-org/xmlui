@@ -128,6 +128,7 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
 
 $themeVars: t.composePaddingVars($themeVars, "CodeBlock");
 $themeVars: t.composeBorderVars($themeVars, "CodeBlock");
+$backgroundColor-CodeBlock: createThemeVar("backgroundColor-CodeBlock");
 $backgroundColor-CodeBlock-header: createThemeVar("backgroundColor-CodeBlock-header");
 $borderRadius-CodeBlock: createThemeVar("borderRadius-CodeBlock");
 $color-CodeBlock-headerSeparator: createThemeVar("color-CodeBlock-headerSeparator");
@@ -140,6 +141,7 @@ $marginBottom-CodeBlock: createThemeVar("marginBottom-CodeBlock");
   border-radius: $borderRadius-CodeBlock;
   margin-top: $marginTop-CodeBlock;
   margin-bottom: $marginBottom-CodeBlock;
+  background-color: $backgroundColor-CodeBlock;
 }
 
 .codeBlockHeader {
