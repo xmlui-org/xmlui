@@ -1,4 +1,4 @@
-import { type CSSProperties, Fragment, memo, type ReactNode, useLayoutEffect, useRef } from "react";
+import { type CSSProperties, memo, type ReactNode } from "react";
 import React from "react";
 import { MarkdownHooks } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -37,7 +37,6 @@ export const Markdown = memo(function Markdown({
   style,
   codeHighlighter,
 }: MarkdownProps) {
-  const codeBlockTextRef = useRef<HTMLPreElement>(null);
   // TEMP: After ironing out theming for syntax highlighting, this should be removed
   const { activeThemeTone } = useTheme();
   if (typeof children !== "string") {
@@ -119,9 +118,11 @@ export const Markdown = memo(function Markdown({
           },
           pre({ id, children }) {
             const defaultCodefence = (
-              <Text uid={id} variant="codefence">
-                {children}
-              </Text>
+              <CodeBlock>
+                <Text uid={id} variant="codefence">
+                  {children}
+                </Text>
+              </CodeBlock>
             );
 
             if (!codeHighlighter) {
@@ -137,29 +138,14 @@ export const Markdown = memo(function Markdown({
               return defaultCodefence;
             }
             return (
-              <CodeBlockWithMeta meta={highlighterResult.meta}>
-                <div className={styles.codeBlockCopyWrapper}>
-                  <Text
-                    uid={id}
-                    ref={codeBlockTextRef}
-                    variant="codefence"
-                    syntaxHighlightClasses={highlighterResult.classNames}
-                    dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
-                  />
-                  <div className={styles.codeBlockCopyButton}>
-                    <Button
-                      variant="ghost"
-                      themeColor="secondary"
-                      size="sm"
-                      icon={<Icon name={"copy"} aria-hidden />}
-                      onClick={() => {
-                        navigator.clipboard.writeText(highlighterResult.codeStr);
-                        toast.success("Code copied!");
-                      }}
-                    ></Button>
-                  </div>
-                </div>
-              </CodeBlockWithMeta>
+              <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
+                <Text
+                  uid={id}
+                  variant="codefence"
+                  syntaxHighlightClasses={highlighterResult.classNames}
+                  dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
+                />
+              </CodeBlock>
             );
           },
           strong({ id, children }) {
@@ -450,13 +436,14 @@ const ListItem = ({ children, style }: ListItemProps) => {
 };
 
 type CodeBlockProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  textToCopy?: string;
   meta?: CodeHighlighterMeta;
 };
 
-function CodeBlockWithMeta({ children, meta }: CodeBlockProps) {
+function CodeBlock({ children, meta, textToCopy }: CodeBlockProps) {
   if (!meta) {
-    return <>{children}</>;
+    return <div className={styles.codeBlock}>{children}</div>;
   }
   return (
     <div className={styles.codeBlock}>
@@ -467,7 +454,22 @@ function CodeBlockWithMeta({ children, meta }: CodeBlockProps) {
           </Text>
         </div>
       )}
-      {children}
+      <div className={styles.codeBlockCopyWrapper}>
+        {children}
+        <div className={styles.codeBlockCopyButton}>
+          <Button
+            variant="ghost"
+            themeColor="secondary"
+            size="sm"
+            icon={<Icon name={"copy"} aria-hidden />}
+            onClick={() => {
+              if (!textToCopy) return;
+              navigator.clipboard.writeText(textToCopy);
+              toast.success("Code copied!");
+            }}
+          ></Button>
+        </div>
+      </div>
     </div>
   );
 }
