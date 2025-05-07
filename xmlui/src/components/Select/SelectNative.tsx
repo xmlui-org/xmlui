@@ -161,7 +161,11 @@ const SimpleSelect = forwardRef(function SimpleSelect(
         autoFocus={autoFocus}
       >
         <div className={styles.selectValue}>
-          {readOnly ? stringValue || placeholder : <SelectValue placeholder={placeholder} />}
+          {readOnly ? (
+            Array.from(options).find((o) => `${o.value}` === stringValue)?.label || placeholder
+          ) : (
+            <SelectValue placeholder={placeholder} />
+          )}
         </div>
         <SelectIcon asChild>
           <Icon name="chevrondown" />
