@@ -8,7 +8,7 @@ The following sample demonstrates these concepts. When the user clicks the butto
 
 A `ChangeListener` instance observes queue length changes and stores the actual length to display that in the UI.
 
-```xmlui copy {9-24}
+```xmlui-pg copy {9-24} display name="Example: using Queue"
 <App
   var.queued="{0}"
   var.queueLength="{0}"
@@ -42,43 +42,6 @@ A `ChangeListener` instance observes queue length changes and stores the actual 
 </App>
 ```
 
-<Playground
-  name="Example: using Queue"
-  app={`
-    <App
-      var.queued="{0}"
-      var.queueLength="{0}"
-      var.processed="{0}"
-      var.result="{0}">
-      <Button
-        label="Add a new item to the queue"
-        onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
-      <Queue id="myQueue"
-        onProcess="processing =>
-          {
-             result += processing.item;
-             delay(1000);
-             processed++;
-             processing.onProgress(processed)
-          }
-        ">
-        <property name="progressFeedback">
-          <Text value="{processed} / {queued}" />
-        </property>
-        <property name="resultFeedback">
-          <Text value="{result.toFixed(4)}" />
-        </property>
-      </Queue>
-      <ChangeListener
-        listenTo="{myQueue.getQueueLength()}"
-        onDidChange="l => queueLength = l.newValue;"/>
-      <Text>Items queued: {queued}</Text>
-      <Text>Current queue length: {queueLength}</Text>
-      <Text>Current result: {result.toFixed(4)}</Text>
-    </App>
-  `}
-/>
-
 Try the app by clicking the button several times. Check how the queue processes the items and displays feedback.
 
 %-DESC-END
@@ -87,7 +50,7 @@ Try the app by clicking the button several times. Check how the queue processes 
 
 The following example stores and displays this item when a new item is put into the queue:
 
-```xmlui copy {5} /enqueueItem/
+```xmlui-pg copy {5} display name="Example: enqueueItem"
 <App var.queued="{0}" var.itemIds="">
   <Button
     label="Add a new item to the queue"
@@ -100,23 +63,6 @@ The following example stores and displays this item when a new item is put into 
   <Text>Item IDs: {itemIds}</Text>
 </App>
 ```
-
-<Playground
-  name="Example: enqueueItem"
-  app={`
-    <App var.queued="{0}" var.itemIds="">
-      <Button
-        label="Add a new item to the queue"
-        onClick="{
-          const itemId = myQueue.enqueueItem(Math.random()); 
-          itemIds += itemId + ', '; queued++;
-        }" />
-      <Queue id="myQueue" onProcess="processing => {}" />
-      <Text>Items queued: {queued}</Text>
-      <Text>Item IDs: {itemIds}</Text>
-    </App>
-  `}
-/>
 
 %-API-END
 
@@ -140,7 +86,7 @@ This method removes an item from the queue. The parameter of this method is the 
 
 The following example emulates a file-processing application. When a file is about to save (in the `process` event), the processing fails with files that deny overwrite. In such a case, the `processError` event handler asks the user to confirm the overwrite action. In case of confirmation, the queue uses the `remove` action to discard the faulty queue item and enqueues the file again with the `accept` behavior so that it won't fail next time.
 
-```xmlui copy {21}
+```xmlui-pg copy {21} display name="Example: remove"
 <App var.queued="{0}" var.processed="" var.skipped="{0}">
   <Button
     label="Add a new file to the queue"
@@ -177,53 +123,13 @@ The following example emulates a file-processing application. When a file is abo
 </App>
 ```
 
-<Playground
-  name="Example: remove"
-  app={`
-    <App var.queued="{0}" var.processed="" var.skipped="{0}">
-      <Button
-        label="Add a new file to the queue"
-        onClick="{myQueue.enqueueItem({file: ++queued, conflict: 'deny'})}" />
-      <Queue id="myQueue"
-        onProcess="processing =>
-          {
-             delay(1000);
-             if (processing.item.conflict === 'deny') {
-               throw 'Conflict';
-             }
-             processed += processing.item.file + ', ';
-          }
-        "
-        onProcessError="(error, processing) => {
-          if (error.message === 'Conflict') {
-            console.log(error);
-            const result = confirm('Do you want to overwrite?', 
-              'File ' + processing.item.file + ' already exists', 
-              'Overwrite');
-            $this.remove(processing.actionItemId);
-            if (result) {
-              $this.enqueueItems([{...processing.item, conflict: 'accept'}]);
-            }
-            return false;
-          }
-        }">
-        <property name="resultFeedback">
-          <Text value="All items processed" />
-        </property>
-      </Queue>
-      <Text>Items queued: {queued}</Text>
-      <Text>Processed: {processed}</Text>
-    </App>
-  `}
-/>
-
 %-API-END
 
 %-EVENT-START complete
 
 The following sample displays a tick mark every time the queue is emptied:
 
-```xmlui copy {13}
+```xmlui-pg copy {13} display name="Example: complete"
 <App
   var.queued="{0}"
   var.queueEmptied=""
@@ -236,7 +142,7 @@ The following sample displays a tick mark every time the queue is emptied:
       result += processing.item;
       delay(1000);
     }"
-    onComplete="queueEmptied += '✅'" >
+    onComplete="queueEmptied += ' ok!'" >
     <property name="progressFeedback">
       <Text value="Completed: {$completedItems.length} of {$queuedItems.length}"/>
     </property>
@@ -250,36 +156,6 @@ The following sample displays a tick mark every time the queue is emptied:
 </App>
 ```
 
-<Playground
-  name="Example: complete"
-  app={`
-    <App
-      var.queued="{0}"
-      var.queueEmptied=""
-      var.result="{0}">
-      <Button
-        label="Add a new item to the queue"
-        onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
-      <Queue id="myQueue"
-        onProcess="processing => {
-          result += processing.item;
-          delay(1000);
-        }"
-        onComplete="queueEmptied += '✅'" >
-        <property name="resultFeedback">
-          <Text value="{result.toFixed(4)}" />
-        </property>
-        <property name="progressFeedback">
-          <Text value="Completed: {$completedItems.length} of {$queuedItems.length}"/>
-        </property>
-      </Queue>
-      <Text>Items queued: {queued}</Text>
-      <Text>Current result: {result.toFixed(4)}</Text>
-      <Text>Queue emptied: {queueEmptied}</Text>
-    </App>
-  `}
-/>
-
 %-EVENT-END
 
 %-EVENT-START didProcess
@@ -291,7 +167,7 @@ The parameter of the event handler is an object with these properties:
 
 The following sample uses the `didProcess` event handler to add a tick symbol to the progress whenever an item has been processed:
 
-```xmlui copy {13}
+```xmlui-pg copy {13} display name="Example: didProcess"
 <App
   var.queued="{0}"
   var.progressLine=""
@@ -304,7 +180,7 @@ The following sample uses the `didProcess` event handler to add a tick symbol to
       result += processing.item;
       delay(1000);
     }"
-    onDidProcess="progressLine += '✅'" >
+    onDidProcess="progressLine += ' ok!'" >
     <property name="resultFeedback">
       <Text value="{result.toFixed(4)}" />
     </property>
@@ -314,33 +190,6 @@ The following sample uses the `didProcess` event handler to add a tick symbol to
   <Text>Progress: {progressLine}</Text>
 </App>
 ```
-
-<Playground
-  name="Example: didProcess"
-  app={`
-    <App
-      var.queued="{0}"
-      var.progressLine=""
-      var.result="{0}">
-      <Button
-        label="Add a new item to the queue"
-        onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
-      <Queue id="myQueue"
-        onProcess="processing => {
-          result += processing.item;
-          delay(1000);
-        }"
-        onDidProcess="progressLine += '✅'" >
-        <property name="resultFeedback">
-          <Text value="{result.toFixed(4)}" />
-        </property>
-      </Queue>
-      <Text>Items queued: {queued}</Text>
-      <Text>Current result: {result.toFixed(4)}</Text>
-      <Text>Progress: {progressLine}</Text>
-    </App>
-  `}
-/>
 
 %-EVENT-END
 
@@ -366,7 +215,8 @@ If the event handler returns false, the queue does not sign the error in the UI.
 
 The following sample generates an error for every fourth item, and gives an error feedback with the `processError` event handler:
 
-```xmlui copy {10-12, 17}
+```xmlui-pg
+---app copy {10-12, 17} display name="Example: processError"
 <App
   var.queued="{0}"
   var.progressLine=""
@@ -382,8 +232,8 @@ The following sample generates an error for every fourth item, and gives an erro
       result += processing.item;
       delay(1000);
     }"
-    onDidProcess="progressLine += '✅'"
-    onProcessError="progressLine += '❌'" >
+    onDidProcess="progressLine += ' ok!'"
+    onProcessError="progressLine += ' canceled'" >
     <property name="resultFeedback">
       <Text value="{result.toFixed(4)}" />
     </property>
@@ -392,40 +242,9 @@ The following sample generates an error for every fourth item, and gives an erro
   <Text>Current result: {result.toFixed(4)}</Text>
   <Text>Progress: {progressLine}</Text>
 </App>
-```
-
+---desc
 Click the button several times to see how processing errors are handled in the UI.
-
-<Playground
-  name="Example: processError"
-  app={`
-    <App
-      var.queued="{0}"
-      var.progressLine=""
-      var.result="{0}">
-      <Button
-        label="Add a new item to the queue"
-        onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
-      <Queue id="myQueue"
-        onProcess="processing => {
-          if (progressLine.length % 4 === 3) {
-            throw 'Item cannot be processed';
-          }
-          result += processing.item;
-          delay(1000);
-        }"
-        onDidProcess="progressLine += '✅'"
-        onProcessError="progressLine += '❌'" >
-        <property name="resultFeedback">
-          <Text value="{result.toFixed(4)}" />
-        </property>
-      </Queue>
-      <Text>Items queued: {queued}</Text>
-      <Text>Current result: {result.toFixed(4)}</Text>
-      <Text>Progress: {progressLine}</Text>
-    </App>
-  `}
-/>
+```
 
 %-EVENT-END
 
@@ -440,7 +259,8 @@ The parameter of the event handler is an object with these properties:
 
 The following sample declares a `willProcess` event handler that will skip processing (summing) items less than 0.5; the handler counts the number of skipped items.
 
-```xmlui copy {9}
+```xmlui-pg
+---app copy {9} display name="Example: willProcess"
 <App
   var.queued="{0}"
   var.skipped="{0}"
@@ -462,35 +282,8 @@ The following sample declares a `willProcess` event handler that will skip proce
   <Text>Items skipped: {skipped}</Text>
   <Text>Current result: {result.toFixed(4)}</Text>
 </App>
-```
-
+---desc
 Click the button several times and see how the number of skipped items increments.
-
-<Playground
-  name="Example: willProcess"
-  app={`
-    <App
-      var.queued="{0}"
-      var.skipped="{0}"
-      var.result="{0}">
-      <Button
-        label="Add a new item to the queue"
-        onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
-      <Queue id="myQueue"
-        onWillProcess="toProcess => toProcess.item < 0.5 ? (skipped++, false) : true"
-        onProcess="processing => {
-          result += processing.item;
-          delay(1000);
-        }">
-        <property name="resultFeedback">
-          <Text value="{result.toFixed(4)}" />
-        </property>
-      </Queue>
-      <Text>Items queued: {queued}</Text>
-      <Text>Items skipped: {skipped}</Text>
-      <Text>Current result: {result.toFixed(4)}</Text>
-    </App>
-  `}
-/>
+```
 
 %-EVENT-END

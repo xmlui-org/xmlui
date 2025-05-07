@@ -27,7 +27,7 @@ It also lends to itself that these events can be triggered programmatically from
 Note the `id` property of the `ModalDialog` in the example below and how it is used to call the [`open`](#open-api) and [`close`](#close-api)
 operations of the component in the `onClick` event handlers.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: imperative API" height="120px"
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog">
@@ -35,19 +35,6 @@ operations of the component in the `onClick` event handlers.
   </ModalDialog>
 </App>
 ```
-
-<Playground
-  name="Example: imperative API"
-  height={120}
-  app={`
-  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
-    <Button label="Open Dialog" onClick="dialog.open()" />
-    <ModalDialog id="dialog" title="Example Dialog">
-      <Button label="Close Dialog" onClick="dialog.close()" />
-    </ModalDialog>
-  </App>
-  `}
-/>
 
 <Callout type="info" emoji="📔">
 The imperative approach is perhaps the most intuitive way to display and hide modal dialogs.
@@ -60,7 +47,8 @@ The `when` property accepts a primitive boolean or a binding expression resolvin
 Using the `when` property in a `ModalDialog` dialog component is commonly used with deep linking:
 showing the modal in conjunction with an updated URL so that the opened state of the modal dialog is referable.
 
-```xmlui copy /when="{isDialogShown}"/
+```xmlui-pg
+---app copy display name="Example: when" height="120px"
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <variable name="isDialogShown" value="{false}"/>
   <Button label="Open Dialog" onClick="isDialogShown = true" />
@@ -69,21 +57,9 @@ showing the modal in conjunction with an updated URL so that the opened state of
     title="Example Dialog" 
     onClose="isDialogShown = false" />
 </App>
-```
-
+---desc
 Click on the button in the demo below to open the modal dialog. Click anywhere outside the opened dialog or the close button to close it.
-
-<Playground
-  name="Example: when"
-  height={120}
-  app={`
-  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
-    <variable name="isDialogShown" value="{false}"/>
-    <Button label="Open Dialog" onClick="isDialogShown = true" />
-    <ModalDialog when="{isDialogShown}" title="Example Dialog" onClose="isDialogShown = false" />
-  </App>
-  `}
-/>
+```
 
 Setting the `when` property is the most straightforward way for deep-linked modals. If you use deep links with query parameters to show a particular dialog, you can set the `when` property to show or hide the dialog according to parameter values.
 
@@ -91,7 +67,7 @@ Setting the `when` property is the most straightforward way for deep-linked moda
 
 The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx), that it also accepts child components.
 
-```xmlui copy {3-8}
+```xmlui-pg copy {3-8} display name="Example: children" height="120px"
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog">
@@ -103,22 +79,6 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
 </App>
 ```
 
-<Playground
-  name="Example: children"
-  height={120}
-  app={`
-  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
-    <Button label="Open Dialog" onClick="dialog.open()" />
-    <ModalDialog id="dialog" title="Example Dialog">
-      <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}">
-        <FormItem bindTo="firstName" required="true" />
-        <FormItem bindTo="lastName" required="true" />
-      </Form>
-    </ModalDialog>
-  </App>
-  `}
-/>
-
 <Callout type="info" emoji="📔">
 When a form is nested into a modal dialog, closing the form (canceling it or completing its submit action) automatically closes the dialog.
 </Callout>
@@ -129,71 +89,40 @@ When a form is nested into a modal dialog, closing the form (canceling it or com
 
 Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.
 
-```xmlui copy /closeButtonVisible="false"/
+```xmlui-pg
+---app copy display name="Example: closeButtonVisible" height="120px"
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" closeButtonVisible="false" title="Example Dialog" />
 </App>
-```
-
+---desc
 Click outside the dialog to close it.
-
-<Playground
-  name="Example: closeButtonVisible"
-  height={120}
-  app={`
-  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
-    <Button label="Open Dialog" onClick="dialog.open()" />
-    <ModalDialog id="dialog" closeButtonVisible="false" title="Example Dialog" />
-  </App>
-  `}
-/>
+```
 
 ### `fullScreen (default: false)`
 
 Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).
 
-```xmlui copy /fullScreen="true"/
+```xmlui-pg
+---app copy display name="Example: fullScreen" height="120px"
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" fullScreen="true" title="Example Dialog" />
 </App>
-```
-
+---desc
 Click the button to display a full-screen dialog. The icon at the top-right corner of the dialog allows you to close it.
-
-<Playground
-  name="Example: fullScreen"
-  height={120}
-  app={`
-  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
-    <Button label="Open Dialog" onClick="dialog.open()" />
-    <ModalDialog id="dialog" fullScreen="true" title="Example Dialog" />
-  </App>
-  `}
-/>
+```
 
 ### `title`
 
 Provides a prestyled heading to display the intent of the dialog.
 
-```xmlui copy {3}
+```xmlui-pg copy {3} display name="Example: title" height="120px"
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Title" />
 </App>
 ```
-
-<Playground
-  name="Example: title"
-  height={120}
-  app={`
-  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
-    <Button label="Open Dialog" onClick="dialog.open()" />
-    <ModalDialog id="dialog" title="Example Title" />
-  </App>
-  `}
-/>
 
 ## Events
 
@@ -203,7 +132,8 @@ This event is fired when the close button is pressed or the user clicks outside 
 
 In this example, the `close` event counts how many times you closed the dialog:
 
-```xmlui copy {6-8}
+```xmlui-pg
+---app copy {6-8} display name="Example: open/close events" height="120px"
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="myDialog.open()" />
   <ModalDialog
@@ -214,26 +144,9 @@ In this example, the `close` event counts how many times you closed the dialog:
     <Text value="Dialog closed {counter} number of times." />
   </ModalDialog>
 </App>
-```
-
+---desc
 Open and close the dialog several times to test that it changes the counter.
-
-<Playground
-  name="Example: open/close events"
-  height={120}
-  app={`
-  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
-    <Button label="Open Dialog" onClick="myDialog.open()" />
-    <ModalDialog
-      id="myDialog"
-      title="Example Dialog"
-      var.counter="{0}"
-      onClose="counter++">
-      <Text value="Dialog closed {counter} number of times." />
-    </ModalDialog>
-  </App>
-  `}
-/>
+```
 
 ### `open`
 
@@ -241,7 +154,8 @@ This event is fired when the `ModalDialog` is opened either via a `when` or an i
 
 In this example, the `open` event counts how many times you opened the dialog:
 
-```xmlui copy {6-8}
+```xmlui
+---app copy {6-8} display name="Example: open/close events" height="120px"
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="myDialog.open()" />
   <ModalDialog
@@ -252,26 +166,9 @@ In this example, the `open` event counts how many times you opened the dialog:
     <Text value="Dialog opened {counter} number of times." />
   </ModalDialog>
 </App>
-```
-
+---desc
 Open and close the dialog several times to test that it changes the counter.
-
-<Playground
-  name="Example: open/close events"
-  height={120}
-  app={`
-  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
-    <Button label="Open Dialog" onClick="myDialog.open()" />
-    <ModalDialog
-      id="myDialog"
-      title="Example Dialog"
-      var.counter="{0}"
-      onOpen="counter++">
-      <Text value="Dialog opened {counter} number of times." />
-    </ModalDialog>
-  </App>
-  `}
-/>
+```
 
 ## Exposed Methods
 
@@ -289,21 +186,6 @@ See the [\`With Imperative API\`](#with-imperative-api) subsection for an exampl
 
 ## Styling
 
-The `ModalDialog` component uses these theme variables to customize its appearance:
-
-- `backgroundColor`
-- `backgroundColor-overlay`
-- `color`
-- `fontFamily`
-- `height`
-- `marginBottom-title`
-- `marginTop`,
-- `maxWidth`
-- `minWidth`
-- `padding` (including all `padding` variants, such as `paddingLeft` and others)
-- `padding-overlay` (including all `padding` variants, such as `paddingLeft` and others)
-- `borderRadius`
-
 ### Theme Variables
 
 | Variable | Default Value (Light) | Default Value (Dark) |
@@ -320,20 +202,20 @@ The `ModalDialog` component uses these theme variables to customize its appearan
 | [marginBottom](../styles-and-themes/common-units/#size)-title-ModalDialog | 0 | 0 |
 | [maxWidth](../styles-and-themes/common-units/#size)-ModalDialog | 450px | 450px |
 | [maxWidth](../styles-and-themes/common-units/#size)-ModalDialog | 450px | 450px |
-| [minWidth](../styles-and-themes/common-units/#size)-ModalDialog | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [minWidth](../styles-and-themes/common-units/#size)-ModalDialog | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-ModalDialog | $space-7 | $space-7 |
-| [padding](../styles-and-themes/common-units/#size)-overlay-ModalDialog | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-overlay-ModalDialog | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-ModalDialog | $paddingVertical-ModalDialog | $paddingVertical-ModalDialog |
-| [paddingBottom](../styles-and-themes/common-units/#size)-overlay-ModalDialog | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-ModalDialog | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-overlay-ModalDialog | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingBottom](../styles-and-themes/common-units/#size)-overlay-ModalDialog | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-ModalDialog | *none* | *none* |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-overlay-ModalDialog | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-ModalDialog | $paddingHorizontal-ModalDialog | $paddingHorizontal-ModalDialog |
-| [paddingLeft](../styles-and-themes/common-units/#size)-overlay-ModalDialog | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingLeft](../styles-and-themes/common-units/#size)-overlay-ModalDialog | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-ModalDialog | $paddingHorizontal-ModalDialog | $paddingHorizontal-ModalDialog |
-| [paddingRight](../styles-and-themes/common-units/#size)-overlay-ModalDialog | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingRight](../styles-and-themes/common-units/#size)-overlay-ModalDialog | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-ModalDialog | $paddingVertical-ModalDialog | $paddingVertical-ModalDialog |
-| [paddingTop](../styles-and-themes/common-units/#size)-overlay-ModalDialog | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [paddingVertical](../styles-and-themes/common-units/#size)-ModalDialog | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [paddingVertical](../styles-and-themes/common-units/#size)-overlay-ModalDialog | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingTop](../styles-and-themes/common-units/#size)-overlay-ModalDialog | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-ModalDialog | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-overlay-ModalDialog | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-ModalDialog | $textColor-primary | $textColor-primary |
 | [textColor](../styles-and-themes/common-units/#color)-ModalDialog | $textColor-primary | $textColor-primary |

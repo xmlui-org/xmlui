@@ -18,7 +18,7 @@ This boolean property value indicates whether the component responds to user eve
 
 This property indicates whether the input accepts user actions (`true`) or not (`false`). The default value is `true`.
 
-```xmlui copy /enabled="false"/
+```xmlui-pg copy display name="Example: enabled"
 <App>
   <RadioGroup initialValue="first" enabled="false">
     <HStack padding="$space-normal">
@@ -30,28 +30,13 @@ This property indicates whether the input accepts user actions (`true`) or not (
 </App>
 ```
 
-<Playground
-  name="Example: enabled"
-  app={`
-    <App>
-      <RadioGroup initialValue="first" enabled="false">
-        <HStack padding="$space-normal">
-          <Option label="First Item" value="first"/>
-          <Option label="Second Item" value="second"/>
-          <Option label="Third Item" value="third"/>
-        </HStack>
-      </RadioGroup>
-    </App>
-  `}
-/>
-
 ### `initialValue`
 
 This property sets the component's initial value.
 
 This property defines the initial value of the selected option within the group.
 
-```xmlui copy /initialValue="first"/
+```xmlui-pg copy display name="Example: initialValue"
 <App>
   <RadioGroup initialValue="first">
     <HStack padding="$space-normal">
@@ -62,21 +47,6 @@ This property defines the initial value of the selected option within the group.
   </RadioGroup>
 </App>
 ```
-
-<Playground
-  name="Example: initialValue"
-  app={`
-    <App>
-      <RadioGroup initialValue="first">
-        <HStack padding="$space-normal">
-          <Option label="First Item" value="first"/>
-          <Option label="Second Item" value="second"/>
-          <Option label="Third Item" value="third"/>
-        </HStack>
-      </RadioGroup>
-    </App>
-  `}
-/>
 
 ### `label`
 
@@ -135,7 +105,7 @@ This prop is used to visually indicate status changes reacting to form field val
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```xmlui copy
+```xmlui-pg copy display name="Example: validationStatus"
 <App>
   <HStack>
     <RadioGroup initialValue="first" validationStatus="error">
@@ -154,28 +124,6 @@ This prop is used to visually indicate status changes reacting to form field val
 </App>
 ```
 
-<Playground
-  name="Example: validationStatus"
-  app={`
-    <App>
-      <HStack>
-        <RadioGroup initialValue="first" validationStatus="error">
-          <Option label="First Item" value="first"/>
-          <Option label="Second Item" value="second"/>
-        </RadioGroup>
-        <RadioGroup initialValue="first" validationStatus="warning">
-          <Option label="First Item" value="first"/>
-          <Option label="Second Item" value="second"/>
-        </RadioGroup>
-        <RadioGroup initialValue="first" validationStatus="valid">
-          <Option label="First Item" value="first"/>
-          <Option label="Second Item" value="second"/>
-        </RadioGroup>
-      </HStack>
-    </App>
-  `}
-/>
-
 ## Events
 
 ### `didChange`
@@ -184,7 +132,8 @@ This event is triggered when value of RadioGroup has changed.
 
 This event is triggered after the user has changed the field value. The following example uses this event to display the selected option's value:
 
-```xmlui copy /onDidChange="(val) => field = val"/
+```xmlui-pg
+---app copy display name="Example: didChange"
 <App var.field="">
   <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
     <Option label="First Item" value="first"/>
@@ -192,22 +141,9 @@ This event is triggered after the user has changed the field value. The followin
   </RadioGroup>
   <Text value="{field}" />
 </App>
-```
-
+---desc
 Select one of the available options and see how the `Text` underneath it is updated in parallel:
-
-<Playground
-  name="Example: didChange"
-  app={`
-    <App var.field="">
-      <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
-        <Option label="First Item" value="first"/>
-        <Option label="Second Item" value="second"/>
-      </RadioGroup>
-      <Text value="{field}" />
-    </App>
-  `}
-/>
+```
 
 ### `gotFocus`
 
@@ -229,38 +165,38 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled] | $borderColor-RadioGroupOption--disabled | $borderColor-RadioGroupOption--disabled |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-default | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-error | $borderColor-RadioGroupOption-error | $borderColor-RadioGroupOption-error |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-success | $borderColor-RadioGroupOption-success | $borderColor-RadioGroupOption-success |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning |
-| [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | $color-surface-500 | $color-surface-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | $color-surface-500 | $color-surface-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default--active | $color-primary-500 | $color-primary-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default--active | $color-primary-500 | $color-primary-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default--hover | $color-surface-700 | $color-surface-700 |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default--hover | $color-surface-700 | $color-surface-700 |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-error | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-success | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption | 2px | 2px |
-| [color](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-default | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-error | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-success | *none* | *none* |
+| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-small | $fontSize-small |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [gap](../styles-and-themes/common-units/#size)-RadioGroupOption | $space-1_5 | $space-1_5 |
-| [outlineColor](../styles-and-themes/common-units/#color)-RadioGroupOption--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [outlineOffset](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [outlineStyle](../styles-and-themes/common-units/#border)-RadioGroupOption--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [outlineWidth](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-RadioGroupOption--focus | *none* | *none* |
+| [outlineOffset](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | *none* | *none* |
+| [outlineStyle](../styles-and-themes/common-units/#border)-RadioGroupOption--focus | *none* | *none* |
+| [outlineWidth](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-error | $borderColor-RadioGroupOption-error | $borderColor-RadioGroupOption-error |
 | [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-success | $borderColor-RadioGroupOption-success | $borderColor-RadioGroupOption-success |
 | [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning |

@@ -34,9 +34,9 @@ $component: "Text";
     @include textVariant("markdown");
   }
   //text inside text should be inline
-  .text {
-    display: inline;
-  }
+  // .text {
+  //   display: inline;
+  // }
 
   &.abbr {
     @include textVariant("abbr");
