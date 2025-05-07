@@ -1,26 +1,16 @@
 %-PROP-START autoFocus
 
-```xmlui copy
+```xmlui-pg copy display name="Example: autoFocus" height="420px"
 <App>
   <EmojiSelector autoFocus="true" />
 </App>
 ```
 
-<Playground
-  name="Example: autoFocus"
-  height={420}
-  app={`
-  <App>
-    <EmojiSelector autoFocus="true" />
-  </App>
-  `}
-/>
-
 %-PROP-END
 
 %-EVENT-START select
 
-```xmlui copy /onSelect="(emoji) => { selected = emoji }"/
+```xmlui-pg copy display name="Example: select" height="420px"
 <App>
   <HStack var.selected="">
     <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
@@ -28,19 +18,6 @@
   </HStack>
 </App>
 ```
-
-<Playground
-  name="Example: select"
-  height={420}
-  app={`
-    <App>
-      <HStack var.selected="">
-        <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
-        <Text value="Selected emoji: {selected}" />
-      </HStack>
-    </App>
-  `}
-/>
 
 %-EVENT-END
 

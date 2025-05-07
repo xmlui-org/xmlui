@@ -6,7 +6,8 @@ This component represents a dropdown menu with a trigger. When the user clicks t
 
 You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
 
-```xmlui copy
+```xmlui-pg copy display name="Example: Using DropdownMenu" height="240px"
+---app copy display
 <App>
   <DropdownMenu label="DropdownMenu">
     <MenuItem>Item 1</MenuItem>
@@ -18,27 +19,9 @@ You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `Dro
     </SubMenuItem>
   </DropdownMenu>
 </App>
-```
-
+---desc
 Try this dropdown menu:
-
-<Playground
-  name="Example: Using DropdownMenu"
-  height={240}
-  app={`
-    <App>
-      <DropdownMenu label="DropdownMenu">
-        <MenuItem>Item 1</MenuItem>
-        <MenuItem>Item 2</MenuItem>
-        <MenuSeparator />
-        <SubMenuItem label="Submenu">
-          <MenuItem>Submenu Item 1</MenuItem>
-          <MenuItem>Submenu Item 2</MenuItem>
-        </SubMenuItem>
-      </DropdownMenu>
-    </App>
-  `}
-/>
+```
 
 ## Properties
 
@@ -58,7 +41,7 @@ Available values are:
 - `start`: Menu items are aligned to the start of the trigger component (default).
 - `end`: Menu items are aligned to the end of the trigger component.
 
-```xmlui copy {8}
+```xmlui-pg copy display name="Example: alignment" height="240px"
 <App>
   <HStack>
     <DropdownMenu label="Start-aligned menu (open it!)">
@@ -75,32 +58,11 @@ Available values are:
 </App>
 ```
 
-<Playground
-  name="Example: alignment"
-  height={240}
-  app={`
-    <App>
-      <HStack>
-        <DropdownMenu label="Start-aligned menu (open it!)">
-          <MenuItem>Item 1</MenuItem>
-          <MenuItem>Item 2</MenuItem>
-          <MenuItem>Item 3</MenuItem>
-        </DropdownMenu>
-        <DropdownMenu label="End-aligned menu (open it!)" alignment="end">
-          <MenuItem>Item 1</MenuItem>
-          <MenuItem>Item 2</MenuItem>
-          <MenuItem>Item 3</MenuItem>
-        </DropdownMenu>
-      </HStack>
-    </App>
-  `}
-/>
-
 ### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```xmlui copy {4, 11}
+```xmlui-pg copy {4, 11} display name="Example: enabled" height="240px"
 <App>
   <HStack>
     <DropdownMenu
@@ -120,31 +82,6 @@ This boolean property value indicates whether the component responds to user eve
   </HStack>
 </App>
 ```
-
-<Playground
-  name="Example: enabled"
-  height={240}
-  app={`
-    <App>
-      <HStack>
-        <DropdownMenu
-          enabled="true"
-          label="Enabled Dropdown">
-          <MenuItem>Item 1</MenuItem>
-          <MenuItem>Item 2</MenuItem>
-          <MenuItem>Item 3</MenuItem>
-        </DropdownMenu>
-        <DropdownMenu
-          enabled="false"
-          label="Disabled Dropdown">
-          <MenuItem>Item 1</MenuItem>
-          <MenuItem>Item 2</MenuItem>
-          <MenuItem>Item 3</MenuItem>
-        </DropdownMenu>
-      </HStack>
-    </App>
-  `}
-/>
 
 ### `label`
 
@@ -193,7 +130,7 @@ Available values:
 
 This property allows you to define a custom trigger instead of the default one provided by `DropdownMenu`.
 
-```xmlui copy {3-5}
+```xmlui-pg copy {3-5} display name="Example: triggerTemplate" height="240px"
 <App>
   <DropdownMenu label="(ignored)">
     <property name="triggerTemplate">
@@ -206,30 +143,13 @@ This property allows you to define a custom trigger instead of the default one p
 </App>
 ```
 
-<Playground
-  name="Example: triggerTemplate"
-  height={240}
-  app={`
-    <App>
-      <DropdownMenu label="(ignored)">
-        <property name="triggerTemplate">
-          <Button label="Custom trigger" icon="chevrondown" iconPosition="end"/>
-        </property>
-        <MenuItem>Item 1</MenuItem>
-        <MenuItem>Item 2</MenuItem>
-        <MenuItem>Item 3</MenuItem>
-      </DropdownMenu>
-    </App>
-  `}
-/>
-
 ## Events
 
 ### `willOpen`
 
 This event fires when the `DropdownMenu` component is opened.
 
-```xmlui copy {6}
+```xmlui-pg copy {6} display name="Example: willOpen" height="240px"
 <App>
   <variable name="counter" value="{0}" />
   <Text value="Number of times the dropdown was opened: {counter}" />
@@ -243,31 +163,13 @@ This event fires when the `DropdownMenu` component is opened.
 </App>
 ```
 
-<Playground
-  name="Example: willOpen"
-  height={240}
-  app={`
-    <App>
-      <variable name="counter" value="{0}" />
-      <Text value="Number of times the dropdown was opened: {counter}" />
-      <DropdownMenu
-        label="Dropdown"
-        onWillOpen="counter += 1">
-        <MenuItem>Item 1</MenuItem>
-        <MenuItem>Item 2</MenuItem>
-        <MenuItem>Item 3</MenuItem>
-      </DropdownMenu>
-    </App>
-  `}
-/>
-
 ## Exposed Methods
 
 ### `close`
 
 This method command closes the dropdown.
 
-```xmlui copy {4}
+```xmlui-pg copy {4} display name="Example: close" height="240px"
 <App>
   <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
     <EmojiSelector
@@ -278,32 +180,7 @@ This method command closes the dropdown.
 </App>
 ```
 
-<Playground
-  name="Example: close"
-  height={240}
-  app={`
-    <App>
-      <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
-        <EmojiSelector
-          onSelect="(reaction) => { emojiDropDown.close(); }"
-          autoFocus="true"
-        />
-      </DropdownMenu>
-    </App>
-  `}
-/>
-
 ## Styling
-
-The `DropdownMenu` component uses these theme variables to customize its appearance:
-
-- `backgroundColor-DropdownMenu`
-- `borderColor-DropdownMenu-content`
-- `minWidth-DropdownMenu`
-- `borderRadius-DropdownMenu`
-- `boxShadow-DropdownMenu`
-- `borderStyle-DropdownMenu-content`
-- `borderWidth-DropdownMenu-content`
 
 ### Theme Variables
 
