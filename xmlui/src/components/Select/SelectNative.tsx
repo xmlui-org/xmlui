@@ -255,7 +255,9 @@ export const Select = forwardRef(function Select(
           : selectedValue;
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
-      setOpen(false);
+      if (!multiSelect) {
+        setOpen(false);
+      }
     },
     [multiSelect, value, updateState, onDidChange],
   );
