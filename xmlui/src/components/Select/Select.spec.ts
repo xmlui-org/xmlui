@@ -1,9 +1,9 @@
 import { expect, test } from "../../testing/fixtures";
 
 test("options with number type keeps number type - outside of forms", async ({
-                                                                               initTestBed,
-                                                                               createSelectDriver,
-                                                                             }) => {
+  initTestBed,
+  createSelectDriver,
+}) => {
   const { testStateDriver } = await initTestBed(
     `<Select onDidChange="(value) => { testState = value; }">
       <Option value="{1}" label="One"/>
@@ -18,10 +18,7 @@ test("options with number type keeps number type - outside of forms", async ({
   await expect.poll(testStateDriver.testState).toStrictEqual(1);
 });
 
-test("changing selected option in form", async ({
-                                                  initTestBed,
-                                                  createSelectDriver,
-                                                }) => {
+test("changing selected option in form", async ({ initTestBed, createSelectDriver }) => {
   const { testStateDriver } = await initTestBed(`
     <Form data="{{sel: 'opt1'}}">
       <FormItem testId="mySelect" type="select" bindTo="sel">
@@ -82,7 +79,12 @@ test("multi-select initialValue='{[0,1]}' works", async ({ page, initTestBed }) 
   await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
 });
 
-test("reset works with initialValue", async ({ page, initTestBed, createSelectDriver, createButtonDriver }) => {
+test("reset works with initialValue", async ({
+  page,
+  initTestBed,
+  createSelectDriver,
+  createButtonDriver,
+}) => {
   const { testStateDriver } = await initTestBed(`
     <Fragment>
       <Select id="mySelect" initialValue="{0}">
@@ -103,7 +105,12 @@ test("reset works with initialValue", async ({ page, initTestBed, createSelectDr
   await expect(page.getByTestId("text")).toHaveText("Selected value: 0");
 });
 
-test("reset works with no intialValue", async ({ page, initTestBed, createSelectDriver, createButtonDriver }) => {
+test("reset works with no intialValue", async ({
+  page,
+  initTestBed,
+  createSelectDriver,
+  createButtonDriver,
+}) => {
   const { testStateDriver } = await initTestBed(`
     <Fragment>
       <Select id="mySelect">
@@ -122,10 +129,14 @@ test("reset works with no intialValue", async ({ page, initTestBed, createSelect
   await btnDriver.click();
 
   await expect(page.getByTestId("text")).not.toContainText("1");
-
 });
 
-test("select multiple items without closing listbox", async ({ page, initTestBed, createSelectDriver, createButtonDriver }) => {
+test("select multiple items without closing listbox", async ({
+  page,
+  initTestBed,
+  createSelectDriver,
+  createButtonDriver,
+}) => {
   const { testStateDriver } = await initTestBed(`
     <Fragment>
       <Select id="mySelect" multiSelect>
@@ -143,7 +154,7 @@ test("select multiple items without closing listbox", async ({ page, initTestBed
   await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
 });
 
-test("disabled Select cannot be opened", async ({page, createSelectDriver, initTestBed}) => {
+test("disabled Select cannot be opened", async ({ page, createSelectDriver, initTestBed }) => {
   await initTestBed(`
     <Select enabled="{false}">
       <Option value="1" label="One"/>
@@ -151,11 +162,15 @@ test("disabled Select cannot be opened", async ({page, createSelectDriver, initT
     </Select>
   `);
   const driver = await createSelectDriver();
-  await driver.click({force: true});
+  await driver.click({ force: true });
   await expect(page.getByText("One")).not.toBeVisible();
 });
 
-test("readOnly Select shows options, but value cannot be changed", async ({ page, initTestBed, createSelectDriver }) => {
+test("readOnly Select shows options, but value cannot be changed", async ({
+  page,
+  initTestBed,
+  createSelectDriver,
+}) => {
   await initTestBed(`
     <Select readOnly initialValue="1">
       <Option value="1" label="One"/>
@@ -172,7 +187,11 @@ test("readOnly Select shows options, but value cannot be changed", async ({ page
   // verify dropdown is not visible but value is shown
 });
 
-test("readOnly multi-Select shows options, but value cannot be changed", async ({ page, initTestBed, createSelectDriver }) => {
+test("readOnly multi-Select shows options, but value cannot be changed", async ({
+  page,
+  initTestBed,
+  createSelectDriver,
+}) => {
   await initTestBed(`
     <Select readOnly initialValue="{[1, 2]}" multiSelect>
       <Option value="1" label="One"/>
@@ -207,17 +226,14 @@ test("disabled Option cannot be selected", async ({ initTestBed, createSelectDri
   await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
 });
 
-test(
-  "clicking label brings up the options",
-  async ({ initTestBed, page, createSelectDriver }) => {
-    await initTestBed(`
+test("clicking label brings up the options", async ({ initTestBed, page, createSelectDriver }) => {
+  await initTestBed(`
     <Select label="Choose an option">
       <Option value="1" label="One"/>
       <Option value="2" label="Two"/>
     </Select>
   `);
-    await page.getByLabel("Choose an option").click();
-    await expect(page.getByRole("option", { name: "One" })).toBeVisible();
-    await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
-  },
-);
+  await page.getByLabel("Choose an option").click();
+  await expect(page.getByRole("option", { name: "One" })).toBeVisible();
+  await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
+});
