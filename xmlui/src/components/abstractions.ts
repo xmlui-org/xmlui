@@ -10,6 +10,7 @@ export type Option = {
   value: string;
   enabled?: boolean;
   style?: CSSProperties;
+  readOnly?: boolean;
   keywords?: string[];
   renderer?: (item: any) => ReactNode;
   optionRenderer?: (contextVars: any) => ReactNode;

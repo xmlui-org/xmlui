@@ -172,6 +172,26 @@ test("readOnly Select shows options, but value cannot be changed", async ({ page
   // verify dropdown is not visible but value is shown
 });
 
+test("readOnly multi-Select shows options, but value cannot be changed", async ({ page, initTestBed, createSelectDriver }) => {
+  await initTestBed(`
+    <Select readOnly initialValue="{[1, 2]}" multiSelect>
+      <Option value="1" label="One"/>
+      <Option value="2" label="Two"/>
+      <Option value="3" label="Three"/>
+    </Select>
+  `);
+  const driver = await createSelectDriver();
+  await expect(page.getByText("Three")).not.toBeVisible();
+  await expect(page.getByText("One")).toBeVisible();
+  await expect(page.getByText("Two")).toBeVisible();
+  await driver.selectLabel("Three");
+  await expect(page.getByText("Three")).not.toBeVisible();
+  await expect(page.getByText("One")).toBeVisible();
+  await expect(page.getByText("Two")).toBeVisible();
+
+  // verify dropdown is not visible but value is shown
+});
+
 test("disabled Option cannot be selected", async ({ initTestBed, createSelectDriver, page }) => {
   await initTestBed(`
     <Select>

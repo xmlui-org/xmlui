@@ -348,6 +348,7 @@ export const Select = forwardRef(function Select(
       optionLabelRenderer,
       optionRenderer,
       onChange: toggleOption,
+      setOpen,
     }),
     [multiSelect, toggleOption, value, optionLabelRenderer, optionRenderer],
   );
@@ -394,14 +395,14 @@ export const Select = forwardRef(function Select(
                           {value.map((v) =>
                             valueRenderer ? (
                               valueRenderer(
-                                Array.from(options).find((o) => o.value === v),
+                                Array.from(options).find((o) => o.value === `${v}`),
                                 () => {
                                   toggleOption(v);
                                 },
                               )
                             ) : (
                               <span key={v} className={styles.badge}>
-                                {Array.from(options).find((o) => o.value === v)?.label}
+                                {Array.from(options).find((o) => o.value === `${v}`)?.label}
                                 <Icon
                                   name="close"
                                   size="sm"
@@ -472,6 +473,7 @@ export const Select = forwardRef(function Select(
                             {Array.from(options).map(({ value, label, enabled, keywords }) => (
                               <ComboboxOption
                                 key={value}
+                                readOnly={readOnly}
                                 value={value}
                                 label={label}
                                 enabled={enabled}
@@ -529,13 +531,14 @@ export const ComboboxOption = forwardRef(function Combobox(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const id = useId();
-  const { label, value, enabled = true, keywords } = option;
+  const { label, value, enabled = true, keywords, readOnly } = option;
   const {
     value: selectedValue,
     onChange,
     multiSelect,
     optionLabelRenderer,
     optionRenderer,
+    setOpen,
   } = useSelect();
   const selected = useMemo(() => {
     return Array.isArray(selectedValue) && multiSelect
@@ -552,6 +555,10 @@ export const ComboboxOption = forwardRef(function Combobox(
       value={value}
       className={styles.multiComboboxOption}
       onSelect={() => {
+        if (readOnly) {
+          setOpen(false);
+          return;
+        }
         onChange(value);
       }}
       data-state={selected ? "checked" : undefined}
