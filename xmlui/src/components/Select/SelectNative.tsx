@@ -232,6 +232,8 @@ export const Select = forwardRef(function Select(
   const observer = useRef<ResizeObserver>();
   const { root } = useTheme();
   const [options, setOptions] = useState(new Set<Option>());
+  const generatedId = useId();
+  const inputId = id || generatedId;
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -359,6 +361,7 @@ export const Select = forwardRef(function Select(
         <OptionTypeProvider Component={HiddenOption}>
           <ItemWithLabel
             ref={ref}
+            id={inputId}
             labelPosition={labelPosition as any}
             label={label}
             labelWidth={labelWidth}
@@ -372,7 +375,7 @@ export const Select = forwardRef(function Select(
             {searchable || multiSelect ? (
               <Popover open={open} onOpenChange={setOpen} modal={false}>
                 <PopoverTrigger
-                  id={id}
+                  id={inputId}
                   aria-haspopup="listbox"
                   style={style}
                   ref={setReferenceElement}
@@ -495,7 +498,7 @@ export const Select = forwardRef(function Select(
                 value={value as SingleValueType}
                 options={options}
                 onValueChange={toggleOption}
-                id={id}
+                id={inputId}
                 style={style}
                 onFocus={onFocus}
                 onBlur={onBlur}

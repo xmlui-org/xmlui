@@ -1,4 +1,4 @@
-import type { CSSProperties, ForwardedRef, ReactNode} from "react";
+import type { CSSProperties, ForwardedRef, ReactNode } from "react";
 import { forwardRef, useId } from "react";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";

@@ -107,6 +107,8 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const { root } = useTheme();
   const [width, setWidth] = useState(0);
   const observer = useRef<ResizeObserver>();
+  const generatedId = useId();
+  const inputId = id || generatedId;
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -263,6 +265,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
         <OptionContext.Provider value={optionContextValue}>
           {children}
           <ItemWithLabel
+            id={inputId}
             ref={forwardedRef}
             labelPosition={labelPosition as any}
             label={label}
@@ -284,13 +287,16 @@ export const AutoComplete = forwardRef(function AutoComplete(
                   return 0;
                 }}
               >
-                <PopoverTrigger style={{ width: "100%" }}>
+                <PopoverTrigger
+                  style={{ width: "100%" }}
+                  id={inputId}
+                  onClick={() => {
+                    if (!enabled) return;
+                    inputRef?.current?.focus();
+                  }}
+                >
                   <div
                     ref={setReferenceElement}
-                    onClick={() => {
-                      if (!enabled) return;
-                      inputRef?.current?.focus();
-                    }}
                     style={style}
                     className={classnames(styles.badgeListWrapper, styles[validationStatus], {
                       [styles.disabled]: !enabled,
@@ -360,18 +366,18 @@ export const AutoComplete = forwardRef(function AutoComplete(
                     )}
                     <div className={styles.actions}>
                       {value?.length > 0 && enabled && (
-                        <button
+                        <span
                           onClick={(event) => {
                             event.stopPropagation();
                             clearValue();
                           }}
                         >
                           <Icon name="close" />
-                        </button>
+                        </span>
                       )}
-                      <button onClick={() => setOpen(true)}>
+                      <span onClick={() => setOpen(true)}>
                         <Icon name="chevrondown" />
-                      </button>
+                      </span>
                     </div>
                   </div>
                 </PopoverTrigger>
