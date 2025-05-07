@@ -101,8 +101,6 @@ export const TextMd = createMetadata({
     [`marginTop-${COMP}-markdown`]: "$space-3",
     [`marginBottom-${COMP}-markdown`]: "$space-3",
     [`fontSize-${COMP}-markdown`]: "$fontSize-normal",
-    [`marginTop-${COMP}-codefence`]: "$space-4",
-    [`marginBottom-${COMP}-codefence`]: "$space-4",
 
     [`backgroundColor-${COMP}-code`]: "$color-surface-100",
     [`borderColor-${COMP}-code`]: "$color-surface-200",

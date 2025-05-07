@@ -56,6 +56,12 @@ export const MarkdownMd = createMetadata({
     "marginTop-HtmlLi": "$space-2",
     "marginBottom-HtmlLi": "$space-2",
 
+    "backgroundColor-CodeBlock-header": "$color-surface-100",
+    "color-CodeBlock-headerSeparator": "$color-surface-300",
+    "borderLeft-CodeBlock": "$color-surface-300 2px solid",
+    "marginTop-CodeBlock": "$space-4",
+    "marginBottom-CodeBlock": "$space-4",
+
     light: {
       // --- No light-specific theme vars
     },
