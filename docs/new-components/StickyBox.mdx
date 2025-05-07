@@ -1,0 +1,61 @@
+import { Callout } from "nextra/components";
+
+# StickyBox [#component-stickybox]
+
+<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
+
+The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls.
+
+## Properties
+
+### `to (default: "top")`
+
+This property determines whether the StickyBox should be anchored to the `top` or `bottom`.
+
+Available values: `top` **(default)**, `bottom`
+
+```xmlui copy
+<App>
+  <StickyBox to="top">
+    This part of the UI sticks to the top
+  </StickyBox>
+  <Stack backgroundColor="red" height="80px" width="100%" />
+  <Stack backgroundColor="green" height="80px" width="100%" />
+  <Stack backgroundColor="blue" height="80px" width="100%" />
+</App>
+```
+
+<Playground
+  name="Example: to"
+  height={200}
+  app={`
+  <App>
+    <StickyBox to="top">
+      This part of the UI sticks to the top
+    </StickyBox>
+    <Stack backgroundColor="red" height="80px" width="100%" />
+    <Stack backgroundColor="green" height="80px" width="100%" />
+    <Stack backgroundColor="blue" height="80px" width="100%" />
+  </App>
+  `}
+/>
+
+## Events
+
+This component does not have any events.
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+The component uses the following theme variables:
+
+- `backgroundColor-StickyBox`
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-StickyBox | $backgroundColor | $backgroundColor |

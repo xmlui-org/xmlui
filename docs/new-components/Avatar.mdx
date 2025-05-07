@@ -1,0 +1,171 @@
+import { Callout } from "nextra/components";
+
+# Avatar [#component-avatar]
+
+The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials.
+
+## Properties
+
+### `name`
+
+This property sets the name value the Avatar uses to display initials.
+
+```xmlui copy
+<App>
+  <Avatar name="John, Doe" />
+</App>
+```
+
+<Playground
+  name="Example: name"
+  app={`
+    <App>
+      <Avatar name="John, Doe" />
+    </App>
+  `}
+/>
+
+### `size (default: "sm")`
+
+This property defines the display size of the Avatar.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `xs` | Extra small button |
+| `sm` | Small button **(default)** |
+| `md` | Medium button |
+| `lg` | Large button |
+
+```xmlui copy
+<App>
+  <HStack>
+    <Avatar name="Dorothy Ellen Fuller" />
+    <Avatar name="Xavier Schiller" size="xs" />
+    <Avatar name="Sebastien Moore" size="sm" />
+    <Avatar name="Molly Dough" size="md" />
+    <Avatar name="Lynn Gilbert" size="lg" />
+  </HStack>
+</App>
+```
+
+<Playground
+  name="Example: size"
+  app={`
+    <App>
+      <HStack>
+        <Avatar name="Dorothy Ellen Fuller" />
+        <Avatar name="Xavier Schiller" size="xs" />
+        <Avatar name="Sebastien Moore" size="sm" />
+        <Avatar name="Molly Dough" size="md" />
+        <Avatar name="Lynn Gilbert" size="lg" />
+      </HStack>
+    </App>
+  `}
+/>
+
+### `url`
+
+This property specifies the URL of the image to display in the Avatar.
+
+```xmlui copy
+<App>
+  <Avatar url="https://i.pravatar.cc/100" size="md" />
+</App>
+```
+
+<Playground
+  name="Example: url"
+  app={`
+    <App>
+      <Avatar url="https://i.pravatar.cc/100" size="md" />
+    </App>
+  `}
+/>
+
+## Events
+
+### `click`
+
+This event is triggered when the avatar is clicked.
+
+```xmlui copy
+<App>
+  <HStack verticalAlignment="center">
+    <Avatar name="Molly Dough" size="md" onClick="toast('Avatar clicked')" />
+    Click the avatar!
+  </HStack>
+</App>
+```
+
+<Playground
+  name="Example: click"
+  app={`
+    <App>
+      <HStack verticalAlignment="center">
+        <Avatar name="Molly Dough" size="md" onClick="toast('Avatar clicked')" />
+        Click the avatar!
+      </HStack>
+    </App>
+  `}
+/>
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+The `Avatar` component uses these theme variables to customize its appearance:
+
+- `backgroundColor`
+- `borderColor`
+- `color`
+- `fontWeight`
+- `borderRadius`
+- `boxShadow`
+- `borderStyle`
+- `borderWidth`
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Avatar | $color-surface-100 | $color-surface-100 |
+| [border](../styles-and-themes/common-units/#border)-Avatar | 0px solid $color-surface-400A80 | 0px solid $color-surface-400A80 |
+| [borderBottom](../styles-and-themes/common-units/#border)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderBottomColor](../styles-and-themes/common-units/#color)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderBottomStyle](../styles-and-themes/common-units/#border-style)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderBottomWidth](../styles-and-themes/common-units/#size)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)EndEndRadius-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)EndStartRadius-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontalColor](../styles-and-themes/common-units/#color)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontalWidth](../styles-and-themes/common-units/#size)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeft](../styles-and-themes/common-units/#border)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeftStyle](../styles-and-themes/common-units/#border-style)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeftWidth](../styles-and-themes/common-units/#size)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Avatar | 4px | 4px |
+| [borderRight](../styles-and-themes/common-units/#border)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRightStyle](../styles-and-themes/common-units/#border-style)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRightWidth](../styles-and-themes/common-units/#size)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)StartEndRadius-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border](../styles-and-themes/common-units/#border)StartStartRadius-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTop](../styles-and-themes/common-units/#border)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopColor](../styles-and-themes/common-units/#color)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopStyle](../styles-and-themes/common-units/#border-style)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderTopWidth](../styles-and-themes/common-units/#size)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderHorizontal](../styles-and-themes/common-units/#border)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderVerticalColor](../styles-and-themes/common-units/#color)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderVerticalWidth](../styles-and-themes/common-units/#size)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-Avatar | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Avatar | inset 0 0 0 1px rgba(4,32,69,0.1) | inset 0 0 0 1px rgba(4,32,69,0.1) |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Avatar | $fontWeight-bold | $fontWeight-bold |
+| [textColor](../styles-and-themes/common-units/#color)-Avatar | $textColor-secondary | $textColor-secondary |

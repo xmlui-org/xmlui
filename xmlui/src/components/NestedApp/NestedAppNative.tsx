@@ -47,7 +47,6 @@ export function NestedApp({
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
 
   const apiWorker = useMemo(() => {
-    // console.log("HERE");
     if (typeof document !== "undefined") {
       return setupWorker();
     }
@@ -86,8 +85,7 @@ export function NestedApp({
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
     }
     const compoundComponents: CompoundComponentDef[] =
-      components ??
-      [].map((src) => {
+      (components ?? []).map((src) => {
         const isErrorReportComponent = typeof src !== "string";
         if (isErrorReportComponent) {
           return src;

@@ -1,0 +1,346 @@
+import { Callout } from "nextra/components";
+
+# Switch [#component-switch]
+
+The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state.
+
+## Properties
+
+### `autoFocus (default: false)`
+
+If this property is set to `true`, the component gets the focus automatically when displayed.
+
+### `enabled (default: true)`
+
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+This boolean property indicates whether the checkbox responds to user events (i.e. clicks);
+it is `true` by default.
+
+```xmlui copy {4-5, 9-10}
+<App>
+  Enabled switches:
+  <HStack>
+    <Switch initialValue="true" enabled="true" />
+    <Switch initialValue="false" enabled="true" />
+  </HStack>
+  Disabled switches:
+  <HStack>
+    <Switch initialValue="true" enabled="false" />
+    <Switch initilaValue="false" enabled="false" />
+  </HStack>
+</App>
+```
+
+<Playground
+  name="Example: enabled"
+  app={`
+    <App>
+      Enabled switches:
+      <HStack>
+        <Switch initialValue="true" enabled="true" />
+        <Switch initialValue="false" enabled="true" />
+      </HStack>
+      Disabled switches:
+      <HStack>
+        <Switch initialValue="true" enabled="false" />
+        <Switch initilaValue="false" enabled="false" />
+      </HStack>
+    </App>
+  `}
+/>
+
+### `indeterminate (default: false)`
+
+The `true` value of this property signals that the component is in an _intedeterminate state_.
+
+### `initialValue (default: false)`
+
+This property sets the component's initial value.
+
+### `label`
+
+This property sets the label of the component.
+
+This property sets the label of the component.
+
+```xmlui copy
+<App>
+  <Switch label="Example label" initialValue="true" />
+  <Switch label="Another label" intialValue="false" />
+</App>
+```
+
+<Playground
+  name="Example: label"
+  app={`
+    <App>
+      <Switch label="Example label" initialValue="true" />
+      <Switch label="Another label" intialValue="false" />
+    </App>
+  `}
+/>
+
+### `labelBreak (default: false)`
+
+This boolean value indicates if the `Switch` labels can be split into multiple lines if it would overflow the available label width.
+
+### `labelPosition (default: "end")`
+
+Places the label at the given position of the component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
+| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) **(default)** |
+| `top` | The top of the input |
+| `bottom` | The bottom of the input |
+
+```xmlui copy
+<App>
+  <Switch label="Top label" labelPosition="top" initialValue="true" />
+  <Switch label="End label" labelPosition="end" initialValue="true" />
+  <Switch label="Bottom label" labelPosition="bottom" initialValue="true" />
+  <Switch label="Start label" labelPosition="start" initialValue="true" />
+</App>
+```
+
+<Playground
+  name="Example: labelPosition"
+  app={`
+    <App>
+      <Switch label="Top label" labelPosition="top" initialValue="true" />
+      <Switch label="End label" labelPosition="end" initialValue="true" />
+      <Switch label="Bottom label" labelPosition="bottom" initialValue="true" />
+      <Switch label="Start label" labelPosition="start" initialValue="true" />
+    </App>
+  `}
+/>
+
+### `labelWidth`
+
+This property sets the width of the `Switch`.
+
+### `readOnly (default: false)`
+
+Set this property to `true` to disallow changing the component value.
+
+If true, the value of the component cannot be modified.
+
+```xmlui copy
+<App>
+  <Switch readOnly="true" label="Checked" initialValue="true" />
+  <Switch readOnly="true" label="Unchecked" intialValue="false" />
+</App>
+```
+
+<Playground
+  name="Example: readOnly"
+  app={`
+    <App>
+      <Switch readOnly="true" label="Checked" initialValue="true" />
+      <Switch readOnly="true" label="Unchecked" intialValue="false" />
+    </App>
+  `}
+/>
+
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `validationStatus (default: "none")`
+
+This property allows you to set the validation status of the input component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `valid` | Visual indicator for an input that is accepted |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error` | Visual indicator for an input that produced an error |
+
+## Events
+
+### `didChange`
+
+This event is triggered when value of Switch has changed.
+
+This event is triggered when the `Switch` is toggled due to user interaction.
+A read-only switch never fires this event, and it won't fire if the switch's value is set programmatically.
+
+```xmlui copy
+<App verticalAlignment="center" var.changes="">
+  <Switch label="Changeable" onDidChange="changes += '+'" />
+  <Switch label="Readonly" readOnly="true" onDidChange="changes += '-'" />
+  <Text value="Changes: {changes}" />
+</App>
+```
+
+<Playground
+  name="Example: didChange"
+  app={`
+    <App verticalAlignment="center" var.changes="">
+      <Switch label="Changeable" onDidChange="changes += '+'" />
+      <Switch label="Readonly" readOnly="true" onDidChange="changes += '-'" />
+      <Text value="Changes: {changes}" />
+    </App>
+  `}
+/>
+
+### `gotFocus`
+
+This event is triggered when the Switch has received the focus.
+
+This event is triggered when the `Switch` receives focus.
+
+Click the `Switch` in the example demo to change the label text. Note how clicking elsewhere resets the text to the original.
+
+```xmlui copy {4,5}
+<App var.focused="{false}" verticalAlignment="center">
+  <Switch
+    value="true"
+    onGotFocus="focused = true"
+    onLostFocus="focused = false"
+  />
+  <Text value="{focused === true ? 'I am focused!' : 'I have lost the focus!'}" />
+</App>
+```
+
+<Playground
+  name="Example: gotFocus/lostFocus"
+  app={`
+    <App var.focused="{false}" verticalAlignment="center">
+      <Switch
+        value="true"
+        onGotFocus="focused = true"
+        onLostFocus="focused = false"
+      />
+      <Text value="{focused === true ? 'I am focused!' : 'I have lost the focus!'}" />
+    </App>
+  `}
+/>
+
+### `lostFocus`
+
+This event is triggered when the Switch has lost the focus.
+
+## Exposed Methods
+
+### `setValue`
+
+You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+
+```xmlui copy {9,12,14}
+<App var.changes="">
+  <Switch
+    id="mySwitch"
+    readOnly="true"
+    label="This switch can be set only programmatically"
+    onDidChange="changes += '+'" />
+  <HStack>
+    <Button
+      label="Check"
+      onClick="mySwitch.setValue(true)" />
+    <Button
+      label="Uncheck"
+      onClick="mySwitch.setValue(false)" />
+  </HStack>
+  <Text>The switch is {checkbox.value ? "checked" : "unchecked"}</Text>
+  <Text value="Changes: {changes}" />
+</App>
+```
+
+<Playground
+  name="Example: value and setValue"
+  app={`
+    <App var.changes="">
+      <Switch
+        id="mySwitch"
+        readOnly="true"
+        label="This switch can be set only programmatically"
+        onDidChange="changes += '+'" />
+      <HStack>
+        <Button
+          label="Check"
+          onClick="mySwitch.setValue(true)" />
+        <Button
+          label="Uncheck"
+          onClick="mySwitch.setValue(false)" />
+      </HStack>
+      <Text>The switch is {checkbox.value ? "checked" : "unchecked"}</Text>
+      <Text value="Changes: {changes}" />
+    </App>
+  `}
+/>
+
+### `value`
+
+You can query this read-only API property to query the component's current value (`true`: checked, `false`: unchecked).
+
+## Styling
+
+The `Switch` component uses these theme variables to customize its appearance:
+
+- `backgroundColor-Switch`
+- `borderColor-Switch`
+- `backgroundColor-Switch--disabled`
+- `backgroundColor-indicator-Switch`
+- `backgroundColor-checked-Switch`
+- `backgroundColor-checked-Switch-warning`
+- `backgroundColor-checked-Switch-success`
+- `backgroundColor-checked-Switch-error`
+- `borderColor-checked-Switch`
+- `borderColor-checked-Switch-warning`
+- `borderColor-checked-Switch-success`
+- `borderColor-checked-Switch-error`
+
+<Callout type="info" emoji="📔">
+some generic styling options are not available for this component.
+Namely using any `padding` features like the following:
+
+```
+<Switch padding="1rem" />
+```
+
+If you need to add space around the component, use `margins` instead of `paddings`.
+</Callout>
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch-error | $borderColor-Switch-error | $borderColor-Switch-error |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch-error | $borderColor-Switch-error | $borderColor-Switch-error |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch-success | $borderColor-Switch-success | $borderColor-Switch-success |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch-success | $borderColor-Switch-success | $borderColor-Switch-success |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch-warning | $borderColor-Switch-warning | $borderColor-Switch-warning |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-Switch-warning | $borderColor-Switch-warning | $borderColor-Switch-warning |
+| [backgroundColor](../styles-and-themes/common-units/#color)-indicator-Switch | $backgroundColor-primary | $backgroundColor-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Switch | $color-surface-400 | $color-surface-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Switch | $color-surface-400 | $color-surface-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Switch--disabled | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Switch--disabled | $color-surface-200 | $color-surface-200 |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Switch | $color-primary-500 | $color-primary-500 |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Switch | $color-primary-500 | $color-primary-500 |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Switch-error | $borderColor-Switch-error | $borderColor-Switch-error |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Switch-error | $borderColor-Switch-error | $borderColor-Switch-error |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Switch-success | $borderColor-Switch-success | $borderColor-Switch-success |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Switch-success | $borderColor-Switch-success | $borderColor-Switch-success |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Switch-warning | $borderColor-Switch-warning | $borderColor-Switch-warning |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-Switch-warning | $borderColor-Switch-warning | $borderColor-Switch-warning |
+| [borderColor](../styles-and-themes/common-units/#color)-Switch | $color-surface-400 | $color-surface-400 |
+| [borderColor](../styles-and-themes/common-units/#color)-Switch | $color-surface-400 | $color-surface-400 |
+| [borderColor](../styles-and-themes/common-units/#color)-Switch--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Switch-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Switch-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Switch-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Switch-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-Switch--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Switch--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Switch--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Switch--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

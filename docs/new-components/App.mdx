@@ -1,12 +1,40 @@
-%-DESC-START
+import { Callout } from "nextra/components";
+
+# App [#component-app]
+
+The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.
 
 <Callout type="info" emoji="📔">
 You can learn more details about using this component [here](../learning/using-components/app-component).
 </Callout>
 
-%-DESC-END
+## Properties
 
-%-PROP-START layout
+### `defaultTheme (default: "xmlui")`
+
+This property sets the app's default theme.
+
+### `defaultTone (default: "light")`
+
+This property sets the app's default tone ("light" or "dark").
+
+Available values: `light` **(default)**, `dark`
+
+### `layout`
+
+This property sets the layout template of the app. This setting determines the position and size of the app parts (such as header, navigation bar, footer, etc.) and the app's scroll behavior.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `vertical` | This layout puts the navigation bar on the left side and displays its items vertically. The main content is aligned to the right (including the header and the footer), and its content is a single scroll container; every part of it moves as you scroll the page. This layout does not display the logo in the app header. |
+| `vertical-sticky` | Similar to `vertical`, the header and the navigation bar dock to the top of the main content's viewport, while the footer sticks to the bottom. This layout does not display the logo in the app header. |
+| `vertical-full-header` | Similar to `vertical-sticky`. However, the header and the navigation bar dock to the top of the app's window, while the footer sticks to the bottom. |
+| `condensed` | Similar to `horizontal`. However, the header and the navigation bar are in a single header block. (default) |
+| `condensed-sticky` | However, the header and the navigation bar are in a single header block. |
+| `horizontal` | This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page. |
+| `horizontal-sticky` | Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom. |
 
 Here are a few samples demonstrating the usage of the `layout` property. All samples use this markup, except the value of `App`'s layout and a few marked code snippets:
 
@@ -267,9 +295,54 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 For a detailed list on the different kinds of layouts available see [this short guide](../learning/using-components/app-component.mdx).
 
-%-PROP-END
+### `loggedInUser`
 
-%-PROP-START scrollWholePage
+Stores information about the currently logged in user.
+
+Stores information about the currently logged in user.
+Currently, there is no restriction on what the user data must look like.
+
+```xmlui-pg copy display name="Example: loggedInUser" height="180px"
+<App loggedInUser="{{ name: 'Joe', token: '1234' }}">
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <Text value="User name: {loggedInUser.name}" />
+      <Text value="User token: {loggedInUser.token}" />
+    </Page>
+  </Pages>
+</App>
+```
+
+### `logo`
+
+Optional logo path
+
+### `logo-dark`
+
+Optional logo path in dark tone
+
+### `logo-light`
+
+Optional logo path in light tone
+
+### `logoTemplate`
+
+Optional template of the app logo
+
+### `name`
+
+Optional application name (visible in the browser tab)
+
+### `noScrollbarGutters (default: false)`
+
+This boolean property specifies whether the scrollbar gutters should be hidden.
+
+### `scrollWholePage (default: true)`
+
+This boolean property specifies whether the whole page should scroll (`true`) or just the content area (`false`). The default value is `true`.
 
 This boolean property specifies whether the whole page should scroll (true) or just the content area (false).
 The default value is `true`.
@@ -292,30 +365,11 @@ The default value is `true`.
 </App>
 ```
 
-%-PROP-END
+## Events
 
-%-PROP-START loggedInUser
+### `ready`
 
-Stores information about the currently logged in user.
-Currently, there is no restriction on what the user data must look like.
-
-```xmlui-pg copy display name="Example: loggedInUser" height="180px"
-<App loggedInUser="{{ name: 'Joe', token: '1234' }}">
-  <NavPanel>
-    <NavLink label="Home" to="/" icon="home"/>
-  </NavPanel>
-  <Pages defaultRoute="/">
-    <Page url="/">
-      <Text value="User name: {loggedInUser.name}" />
-      <Text value="User token: {loggedInUser.token}" />
-    </Page>
-  </Pages>
-</App>
-```
-
-%-PROP-END
-
-%-EVENT-START ready
+This event fires when the `App` component finishes rendering on the page.
 
 This event fires when the `App` component finishes rendering on the page.
 Use it as `onReady` when inlining it on the component.
@@ -327,4 +381,31 @@ Use it as `onReady` when inlining it on the component.
   </App>
 ```
 
-%-EVENT-END
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-content-App | $backgroundColor | $backgroundColor |
+| [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderLeft](../styles-and-themes/common-units/#border)-content-App | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | $boxShadow-spread | $boxShadow-spread |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | $boxShadow-spread | $boxShadow-spread |
+| [maxWidth](../styles-and-themes/common-units/#size)-App | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
+| [width](../styles-and-themes/common-units/#size)-navPanel-App | $space-64 | $space-64 |
+
+### Variable Explanations
+
+| Theme Variable | Description |
+| --- | --- |
+| **`maxWidth‑content‑App`** | This theme variable defines the maximum width of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size. |
+| **`boxShadow‑header‑App`** | This theme variable sets the shadow of the app's header section. |
+| **`boxShadow‑navPanel‑App`** | This theme variable sets the shadow of the app's navigation panel section (visible only in vertical layouts). |
+| **`width‑navPanel‑App`** | This theme variable sets the width of the navigation panel when the app is displayed with one of the vertical layouts. |

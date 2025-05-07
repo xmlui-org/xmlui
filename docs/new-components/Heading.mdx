@@ -1,0 +1,273 @@
+import { Callout } from "nextra/components";
+
+# Heading [#component-heading]
+
+Represents a heading text
+
+<Callout type="info" emoji="📔">
+`Heading` follows the basic rules of the HTML heading elements (`<h1>`, ..., `<h6>`).
+</Callout>
+
+For the shorthand versions see their reference page: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
+
+<Playground
+  name="Example: Headings with levels"
+  app={`
+    <App>
+      <Heading level="h1" value="Heading Level 1" />
+      <Text>Text following H1</Text>
+      <Heading level="h2" value="Heading Level 2" />
+      <Text>Text following H2</Text>
+      <Heading level="h3" value="Heading Level 3" />
+      <Text>Text following H3</Text>
+      <Heading level="h4" value="Heading Level 4" />
+      <Text>Text following H4</Text>
+      <Heading level="h5" value="Heading Level 5" />
+      <Text>Text following H5</Text>
+      <Heading level="h6" value="Heading Level 6" />
+      <Text>Text following H6</Text>
+    </App>
+  `}
+/>
+
+## Properties
+
+### `ellipses (default: true)`
+
+This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).
+
+```xmlui copy {4}
+<App>
+  <VStack width="200px">
+    <H3
+      backgroundColor="cyan"
+      maxLines="1"
+      ellipses="false">
+      Though this long text does is about to crop!
+    </H3>
+    <H3
+      backgroundColor="cyan"
+      maxLines="1">
+      Though this long text does is about to crop!
+    </H3>
+  </VStack>
+</App>
+```
+
+<Playground
+  name="Example: ellipses"
+  horizontal
+  app={`
+    <App>
+      <VStack width="200px">
+        <H3
+          backgroundColor="cyan"
+          maxLines="1"
+          ellipses="false">
+          Though this long text does is about to crop!
+        </H3>
+        <H3
+          backgroundColor="cyan"
+          maxLines="1">
+          Though this long text does is about to crop!
+        </H3>
+      </VStack>
+    </App>
+  `}
+/>
+
+### `level (default: "h1")`
+
+This property sets the visual significance (level) of the heading.
+
+Available values: `h1` **(default)**, `h2`, `h3`, `h4`, `h5`, `h6`
+
+| Value | Description                                           |
+| :---- | :---------------------------------------------------- |
+| `h1`  | **(default)** Equivalent to the `<h1 />` HTML element |
+| `h2`  | Equivalent to the `<h2 />` HTML element               |
+| `h3`  | Equivalent to the `<h3 />` HTML element               |
+| `h4`  | Equivalent to the `<h4 />` HTML element               |
+| `h5`  | Equivalent to the `<h5 />` HTML element               |
+| `h6`  | Equivalent to the `<h6 />` HTML element               |
+
+For a visual example, see the component description.
+
+### `maxLines`
+
+This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified.
+
+```xmlui copy
+<App>
+  <H2
+    maxWidth="160px"
+    backgroundColor="cyan"
+    value="A long heading text that will likely overflow" maxLines="2" />
+</App>
+```
+
+<Playground
+  name="Example: maxLines"
+  app={`
+    <App>
+      <H2
+        maxWidth="160px"
+        backgroundColor="cyan"
+        value="A long heading text that will likely overflow" maxLines="2" />
+    </App>
+  `}
+/>
+
+### `omitFromToc (default: false)`
+
+If true, this heading will be excluded from the table of contents.
+
+### `preserveLinebreaks`
+
+This property indicates whether linebreaks should be preserved when displaying text.
+
+```xmlui copy {5}
+<App>
+  <HStack>
+    <H3
+      width="200px"
+      backgroundColor="cyan"
+      preserveLinebreaks="true"
+      value="(preserve) This long text
+  with several line breaks
+          does not fit into a viewport with a 200-pixel width." />
+    <H3
+      width="200px"
+      backgroundColor="cyan"
+      value="(do not preserve) This long text
+  with several line breaks
+          does not fit into a viewport with a 200-pixel width." />
+  </HStack>
+</App>
+```
+You can observe the effect of using `preserveLinebreaks`:
+
+<Playground
+  name="Example: preserveLinebreaks"
+  horizontal
+  app={`
+    <App>
+      <HStack>
+        <H3
+          width="200px"
+          backgroundColor="cyan"
+          preserveLinebreaks="true"
+          value="(preserve) This long text
+      with several line breaks
+              does not fit into a viewport with a 200-pixel width." />
+        <H3
+          width="200px"
+          backgroundColor="cyan"
+          value="(do not preserve) This long text
+      with several line breaks
+              does not fit into a viewport with a 200-pixel width." />
+      </HStack>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="📔">
+Remember to use the `value` property of `Heading`.
+Linebreaks are converted to spaces when nesting the text in the `Heading` component.
+</Callout>
+
+### `value`
+
+This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.
+
+```xmlui copy
+<App>
+  <Heading value="This is level 3 (value)" level="h3" />
+  <Heading level="h3">This is level 3 (child)</Heading>
+  <Heading value="Value" level="h3"><Icon name="trash" /></Heading>
+</App>
+```
+
+<Playground
+  name="Example: value"
+  app={`
+    <App>
+      <Heading value="This is level 3 (value)" level="h3" />
+      <Heading level="h3">This is level 3 (child)</Heading>
+      <Heading value="Value" level="h3"><Icon name="trash" /></Heading>
+    </App>
+  `}
+/>
+
+## Events
+
+This component does not have any events.
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-H1 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-H2 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-H3 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-H4 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-H5 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-H6 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-Heading | $fontFamily | $fontFamily |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-H1 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-H2 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-H3 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-H4 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-H5 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-H6 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Heading | $fontWeight-bold | $fontWeight-bold |
+| [letterSpacing](../styles-and-themes/common-units/#size)-H1 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letterSpacing](../styles-and-themes/common-units/#size)-H2 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letterSpacing](../styles-and-themes/common-units/#size)-H3 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letterSpacing](../styles-and-themes/common-units/#size)-H4 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letterSpacing](../styles-and-themes/common-units/#size)-H5 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letterSpacing](../styles-and-themes/common-units/#size)-H6 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letterSpacing](../styles-and-themes/common-units/#size)-Heading  | 0 | 0 |
+| [textColor](../styles-and-themes/common-units/#color)-H1 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-H2 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-H3 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-H4 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-H5 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-H6 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Heading | inherit | inherit |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-H1 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-H2 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-H3 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-H4 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-H5 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-H6 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-H1 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-H2 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-H3 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-H4 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-H5 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-H6 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-H1 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-H2 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-H3 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-H4 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-H5 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-H6 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-H1 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-H2 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-H3 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-H4 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-H5 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-H6 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textUnderlineOffset](../styles-and-themes/common-units/#size)-H1 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textUnderlineOffset](../styles-and-themes/common-units/#size)-H2 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textUnderlineOffset](../styles-and-themes/common-units/#size)-H3 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textUnderlineOffset](../styles-and-themes/common-units/#size)-H4 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textUnderlineOffset](../styles-and-themes/common-units/#size)-H5 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textUnderlineOffset](../styles-and-themes/common-units/#size)-H6 | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

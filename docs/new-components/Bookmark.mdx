@@ -1,0 +1,153 @@
+import { Callout } from "nextra/components";
+
+# Bookmark [#component-bookmark]
+
+As its name suggests, this component places a bookmark into its parent component's view. The component has an `id` that you can use in links to navigate (scroll to) the bookmark's location.
+
+<Callout type="info" emoji="💡">
+Pop out the examples in this article to view them on full screen.
+</Callout>
+
+## Using Bookmark
+
+Use `Bookmark` as a standalone tag or wrap children with it.
+
+<Callout type="info" emoji="💡">
+We suggest using a standalone bookmark, which does not increase the nesting depth.
+</Callout>
+
+### Standalone
+
+Add an `id` property to `Bookmark` instances and use the same identifiers in links with hash tags, as the following example shows:
+
+```xmlui copy /#red/ /#green/ /#blue/ /id="red"/ /id="green"/ /id="blue"/
+<App layout="vertical-full-header" scrollWholePage="false">
+  <NavPanel>
+    <Link to="/#red">Jump to red</Link>
+    <Link to="/#green">Jump to green</Link>
+    <Link to="/#blue">Jump to blue</Link>
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Bookmark id="red" />
+      <VStack height="200px" backgroundColor="red" />
+      <Bookmark id="green" />
+      <VStack height="200px" backgroundColor="green" />
+      <Bookmark id="blue" />
+      <VStack height="200px" backgroundColor="blue" />
+    </Page>
+  </Pages>
+</App>
+```
+
+Clicking a link scrolls the bookmarked component adjacent to the corresponding `Bookmark` tag into the view:
+
+<Playground
+  height={300}
+  name="Example: standalone Bookmark"
+  app={`
+    <App layout="vertical-full-header" scrollWholePage="false">
+      <NavPanel>
+        <Link to="/#red">Jump to red</Link>
+        <Link to="/#green">Jump to green</Link>
+        <Link to="/#blue">Jump to blue</Link>
+      </NavPanel>
+      <Pages>
+        <Page url="/">
+          <Bookmark id="red" />
+          <VStack height="200px" backgroundColor="red" />
+          <Bookmark id="green" />
+          <VStack height="200px" backgroundColor="green" />
+          <Bookmark id="blue" />
+          <VStack height="200px" backgroundColor="blue" />
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+### With nested children
+
+Alternatively, you can nest components into `Bookmark`:
+
+```xmlui copy /#red/ /#green/ /#blue/ /id="red"/ /id="green"/ /id="blue"/
+<App layout="vertical-full-header" scrollWholePage="false">
+  <NavPanel>
+    <Link to="/#red">Jump to red</Link>
+    <Link to="/#green">Jump to green</Link>
+    <Link to="/#blue">Jump to blue</Link>
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Bookmark id="red">
+        <VStack height="200px" backgroundColor="red" />
+      </Bookmark>
+      <Bookmark id="green">
+        <VStack height="200px" backgroundColor="green" />
+      </Bookmark>
+      <Bookmark id="blue">
+        <VStack height="200px" backgroundColor="blue" />
+      </Bookmark>
+    </Page>
+  </Pages>
+</App>
+```
+
+You can try; this example works like the previous one:
+
+<Playground
+  height={300}
+  name="Example: Bookmark with nested children"
+  app={`
+    <App layout="vertical-full-header" scrollWholePage="false">
+      <NavPanel>
+        <Link to="/#red1">Jump to red</Link>
+        <Link to="/#green1">Jump to green</Link>
+        <Link to="/#blue1">Jump to blue</Link>
+      </NavPanel>
+      <Pages>
+        <Page url="/">
+          <Bookmark id="red1">
+            <VStack height="200px" backgroundColor="red" />
+          </Bookmark>
+          <Bookmark id="green1">
+            <VStack height="200px" backgroundColor="green" />
+          </Bookmark>
+          <Bookmark id="blue1">
+            <VStack height="200px" backgroundColor="blue" />
+          </Bookmark>
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+## Properties
+
+### `level (default: 1)`
+
+The level of the bookmark. The level is used to determine the bookmark's position in the table of contents.
+
+### `omitFromToc (default: false)`
+
+If true, this bookmark will be excluded from the table of contents.
+
+### `title`
+
+Defines the text to display the bookmark in the table of contents. If this property is empty, the text falls back to the value of `id`.
+
+### `uid`
+
+The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location.
+
+## Events
+
+This component does not have any events.
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+This component does not have any styles.
