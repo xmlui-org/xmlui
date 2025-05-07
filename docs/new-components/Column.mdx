@@ -29,67 +29,63 @@ Indicates what part of the data to lay out in the column.
 </App>
 ```
 
-<Playground
-  name="Example: bindTo"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify(
-  [
-    {
-      id: 0,
-      name: "Apples",
-      quantity: 5,
-      unit: "pieces",
-      category: "fruits",
-      key: 5,
-    },
-    {
-      id: 1,
-      name: "Bananas",
-      quantity: 6,
-      unit: "pieces",
-      category: "fruits",
-      key: 4,
-    },
-    {
-      id: 2,
-      name: "Carrots",
-      quantity: 100,
-      unit: "grams",
-      category: "vegetables",
-      key: 3,
-    },
-    {
-      id: 3,
-      name: "Spinach",
-      quantity: 1,
-      unit: "bunch",
-      category: "vegetables",
-      key: 2,
-    },
-    {
-      id: 4,
-      name: "Milk",
-      quantity: 10,
-      unit: "liter",
-      category: "dairy",
-      key: 1,
-    },
-    {
-      id: 5,
-      name: "Cheese",
-      quantity: 200,
-      unit: "grams",
-      category: "dairy",
-      key: 0,
-    },
-  ])   
-      }}'>
-        <Column bindTo="name" />
-      </Table>
-    </App>
-  `}
-/>
+```xmlui-pg name="Example: bindTo"
+<App>
+  <Table data='{
+    [
+      {
+        id: 0,
+        name: "Apples",
+        quantity: 5,
+        unit: "pieces",
+        category: "fruits",
+        key: 5,
+      },
+      {
+        id: 1,
+        name: "Bananas",
+        quantity: 6,
+        unit: "pieces",
+        category: "fruits",
+        key: 4,
+      },
+      {
+        id: 2,
+        name: "Carrots",
+        quantity: 100,
+        unit: "grams",
+        category: "vegetables",
+        key: 3,
+      },
+      {
+        id: 3,
+        name: "Spinach",
+        quantity: 1,
+        unit: "bunch",
+        category: "vegetables",
+        key: 2,
+      },
+      {
+        id: 4,
+        name: "Milk",
+        quantity: 10,
+        unit: "liter",
+        category: "dairy",
+        key: 1,
+      },
+      {
+        id: 5,
+        name: "Cheese",
+        quantity: 200,
+        unit: "grams",
+        category: "dairy",
+        key: 0,
+      },
+    ]}'>
+    <Column bindTo="name" />
+  </Table>
+</App>
+```
 
 ### `canResize`
 
@@ -111,11 +107,9 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
 </App>
 ```
 
-<Playground
-  name="Example: canSort"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify(
+```xmlui-pg name="Example: canSort"
+<App>
+  <Table data='{
   [
     {
       id: 0,
@@ -165,15 +159,13 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
       category: "dairy",
       key: 0,
     },
-  ])   
-      }}'>
-        <Column canSort="true" bindTo="name" />
-        <Column canSort="true" bindTo="quantity" />
-        <Column canSort="false" bindTo="unit" />
-      </Table>
-    </App>
-  `}
-/>
+  ]}'>
+    <Column canSort="true" bindTo="name" />
+    <Column canSort="true" bindTo="quantity" />
+    <Column canSort="false" bindTo="unit" />
+  </Table>
+</App>
+```
 
 ### `header`
 
@@ -189,11 +181,9 @@ Adds a label for a particular column.
 </App>
 ```
 
-<Playground
-  name="Example: header"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify(
+```xmlui-pg name="Example: header"
+<App>
+  <Table data='{
   [
     {
       id: 0,
@@ -243,15 +233,13 @@ Adds a label for a particular column.
       category: "dairy",
       key: 0,
     },
-  ])   
-      }}'>
-        <Column header="Food Name" bindTo="name" />
-        <Column header="Food Quantity" bindTo="quantity" />
-        <Column bindTo="unit" />
-      </Table>
-    </App>
-  `}
-/>
+  ]}'>
+    <Column header="Food Name" bindTo="name" />
+    <Column header="Food Quantity" bindTo="quantity" />
+    <Column bindTo="unit" />
+  </Table>
+</App>
+```
 
 ### `maxWidth`
 
@@ -280,11 +268,9 @@ Available values: `left`, `right`
 ```
 Scroll the table contents horizontally to see how the pinned columns are displayed.
 
-<Playground
-  name="Example: pinTo"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify(
+```xmlui-pg name="Example: pinTo"
+<App>
+  <Table data='{
   [
     {
       id: 0,
@@ -334,18 +320,16 @@ Scroll the table contents horizontally to see how the pinned columns are display
       category: "dairy",
       key: 0,
     },
-  ])   
-      }}'
+  ]}'
       height="100%">
-        <Column bindTo="id" width="50px" pinTo="start" />
-        <Column bindTo="name" width="500px" />
-        <Column bindTo="quantity" width="300px" />
-        <Column bindTo="unit" width="300px"/>
-        <Column bindTo="category" width="100px" pinTo="end"/>
-      </Table>
-    </App>
-  `}
-/>
+    <Column bindTo="id" width="50px" pinTo="start" />
+    <Column bindTo="name" width="500px" />
+    <Column bindTo="quantity" width="300px" />
+    <Column bindTo="unit" width="300px"/>
+    <Column bindTo="category" width="100px" pinTo="end"/>
+  </Table>
+</App>
+```
 
 ### `width`
 
@@ -365,11 +349,9 @@ The following example sets the second column to an absolute size (size pixels), 
 
 Check what happens when you resize table columns:
 
-<Playground
-  name="Example: width"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify(
+```xmlui-pg name="Example: width"
+<App>
+  <Table data='{
   [
     {
       id: 0,
@@ -419,15 +401,13 @@ Check what happens when you resize table columns:
       category: "dairy",
       key: 0,
     },
-  ])   
-      }}'>
-        <Column bindTo="name" canResize="true" width="3*" />
-        <Column bindTo="quantity" width="100px" minWidth="50px" maxWidth="500px" />
-        <Column bindTo="unit" width="*" />
-      </Table>
-    </App>
-  `}
-/>
+  ]}'>
+    <Column bindTo="name" canResize="true" width="3*" />
+    <Column bindTo="quantity" width="100px" minWidth="50px" maxWidth="500px" />
+    <Column bindTo="unit" width="*" />
+  </Table>
+</App>
+```
 
 ## Events
 

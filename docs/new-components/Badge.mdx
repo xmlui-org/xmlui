@@ -12,24 +12,15 @@ The `Badge` component supports the mapping of a list of colors using the `value`
 
 1. Only change the background color
 
-```xmlui copy {2}
+```xmlui-pg copy display {2} name="Example: only background color"
 <App var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
   <Badge value="important" colorMap="{simpleColorMap}" />
 </App>
 ```
 
-<Playground
-  name="Example: only background color"
-  app={`
-    <App var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
-      <Badge value="important" colorMap="{simpleColorMap}" />
-    </App>
-`}
-/>
-
 2. Change the background and label color
 
-```xmlui copy {2-5}
+```xmlui-pg copy display {2-5} name="Example: background and label color"
 <App 
   var.simpleColorMap="{{ 
     important: { label: 'red', background: 'pink' }, 
@@ -41,38 +32,15 @@ The `Badge` component supports the mapping of a list of colors using the `value`
 </App>
 ```
 
-<Playground
-  name="Example: background and label color"
-  app={`
-  <App 
-    var.simpleColorMap="{{ 
-      important: { label: 'red', background: 'pink' }, 
-      unimportant: { label: 'black', background: 'gray' }
-    }}">
-    <Badge value="important" colorMap="{simpleColorMap}" />
-    <Badge value="unimportant" colorMap="{simpleColorMap}" />
-    <Badge value="other" colorMap="{simpleColorMap}" />
-  </App>
-  `}
-/>
-
 ### `value (required)`
 
 The text that the component displays
 
-```xmlui copy
+```xmlui-pg copy display name="Example: value" 
 <App>
   <Badge value="Example badge" />
 </App>  
 ```
-
-<Playground 
-  name="Example: value" 
-  app={`
-    <App>
-      <Badge value="Example badge" />
-    </App>  
-  `} />
 
 ### `variant (default: "badge")`
 
@@ -80,22 +48,12 @@ Modifies the shape of the component. Comes in the regular `badge` variant or the
 
 Available values: `badge` **(default)**, `pill`
 
-```xmlui copy
+```xmlui-pg copy display name="Example: variant"
 <App>
   <Badge value="Example badge" variant="badge" />
   <Badge value="Example pill" variant="pill" />
 </App>
 ```
-
-<Playground
-  name="Example: variant"
-  app={`
-  <App>
-    <Badge value="Example badge" variant="badge" />
-    <Badge value="Example pill" variant="pill" />
-  </App>
-  `}
-/>
 
 ## Events
 
@@ -106,30 +64,6 @@ This component does not have any events.
 This component does not expose any methods.
 
 ## Styling
-
-The `Badge` component uses these theme variables to customize its appearance:
-
-- `backgroundColor-Badge`
-- `textColor-Badge`
-
-There are also variant specific styling options:
-
-### `badge`
-
-- `borderRadius-Badge`
-- `fontSize-Badge`
-- `fontWeight-Badge`
-- `padding-Badge`
-- `paddingHorizontal-Badge`
-- `paddingVertical-Badge`
-
-### `pill`
-
-- `fontSize-Badge-pill`
-- `fontWeight-Badge-pill`
-- `padding-Badge-pill`
-- `paddingHorizontal-Badge-pill`
-- `paddingVertical-Badge-pill`
 
 ### Theme Variables
 

@@ -10,20 +10,11 @@ The `Avatar` component represents a user, group (or other entity's) avatar with 
 
 This property sets the name value the Avatar uses to display initials.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: name"
 <App>
   <Avatar name="John, Doe" />
 </App>
 ```
-
-<Playground
-  name="Example: name"
-  app={`
-    <App>
-      <Avatar name="John, Doe" />
-    </App>
-  `}
-/>
 
 ### `size (default: "sm")`
 
@@ -38,7 +29,7 @@ Available values:
 | `md` | Medium button |
 | `lg` | Large button |
 
-```xmlui copy
+```xmlui-pg copy display name="Example: size"
 <App>
   <HStack>
     <Avatar name="Dorothy Ellen Fuller" />
@@ -50,39 +41,15 @@ Available values:
 </App>
 ```
 
-<Playground
-  name="Example: size"
-  app={`
-    <App>
-      <HStack>
-        <Avatar name="Dorothy Ellen Fuller" />
-        <Avatar name="Xavier Schiller" size="xs" />
-        <Avatar name="Sebastien Moore" size="sm" />
-        <Avatar name="Molly Dough" size="md" />
-        <Avatar name="Lynn Gilbert" size="lg" />
-      </HStack>
-    </App>
-  `}
-/>
-
 ### `url`
 
 This property specifies the URL of the image to display in the Avatar.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: url"
 <App>
   <Avatar url="https://i.pravatar.cc/100" size="md" />
 </App>
 ```
-
-<Playground
-  name="Example: url"
-  app={`
-    <App>
-      <Avatar url="https://i.pravatar.cc/100" size="md" />
-    </App>
-  `}
-/>
 
 ## Events
 
@@ -90,7 +57,7 @@ This property specifies the URL of the image to display in the Avatar.
 
 This event is triggered when the avatar is clicked.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: click"
 <App>
   <HStack verticalAlignment="center">
     <Avatar name="Molly Dough" size="md" onClick="toast('Avatar clicked')" />
@@ -99,34 +66,11 @@ This event is triggered when the avatar is clicked.
 </App>
 ```
 
-<Playground
-  name="Example: click"
-  app={`
-    <App>
-      <HStack verticalAlignment="center">
-        <Avatar name="Molly Dough" size="md" onClick="toast('Avatar clicked')" />
-        Click the avatar!
-      </HStack>
-    </App>
-  `}
-/>
-
 ## Exposed Methods
 
 This component does not expose any methods.
 
 ## Styling
-
-The `Avatar` component uses these theme variables to customize its appearance:
-
-- `backgroundColor`
-- `borderColor`
-- `color`
-- `fontWeight`
-- `borderRadius`
-- `boxShadow`
-- `borderStyle`
-- `borderWidth`
 
 ### Theme Variables
 

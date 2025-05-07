@@ -4,7 +4,7 @@ import { Callout } from "nextra/components";
 
 The `Backdrop` component is a semi-transparent overlay that appears on top of its child component to obscure or highlight the content behind it.
 
-```xmlui
+```xmlui-pg copy display name="Example: using Backdrop"
 <App>
   <Backdrop opacity="0.2">
     <Image 
@@ -18,22 +18,6 @@ The `Backdrop` component is a semi-transparent overlay that appears on top of it
   </Backdrop>
 </App>
 ```
-
-<Playground
-  name="Example: using Backdrop"
-  app={`
-    <App>
-      <Backdrop opacity="0.2">
-        <Image src="/resources/images/components/image/breakfast.jpg" fit="cover" width="400px" />
-        <property name="overlayTemplate">
-          <VStack verticalAlignment="center" height="100px">
-            <H1 color="white" textAlign="center">Great breakfast!</H1>
-          </VStack>
-        </property>
-      </Backdrop>
-    </App>
-  `}
-/>
 
 ## Properties
 

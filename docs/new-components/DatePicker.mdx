@@ -34,61 +34,31 @@ The table below shows the available date formats:
 | yyyyMMdd   | 20240525   |
 | MMddyyyy   | 05252024   |
 
-```xmlui copy /dateFormat="dd-MM-yyyy"/
+```xmlui-pg copy display name="Example: dateFormat" height="120px"
 <App>
   <DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
 </App>
 ```
 
-<Playground
-  height={120}
-  name="Example: dateFormat"
-  app={`
-    <App>
-      <DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
-    </App>
-  `}
-/>
-
 ### `disabledDates`
 
 An array of dates that are disabled
 
-```xmlui copy
+```xmlui-pg copy display name="Example: disabledDates" height="120px"
 <App>
   <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
 </App>  
 ```
 
-<Playground
-  height={120}
-  name="Example: disabledDates"
-  app={`
-    <App>
-      <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
-    </App>  
-  `}
-/>
-
 ### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: enabled" height="120px"
 <App>
   <DatePicker enabled="false" />
 </App>  
 ```
-
-<Playground
-  height={120}
-  name="Example: enabled"
-  app={`
-    <App>
-      <DatePicker enabled="false" />
-    </App>  
-  `}
-/>
 
 ### `endIcon`
 
@@ -102,41 +72,21 @@ This property sets a text to appear on the end (right side when the left-to-righ
 
 The start date of the range of selectable dates
 
-```xmlui copy
+```xmlui-pg copy display name="Example: fromDate" height="120px"
 <App>
   <DatePicker fromDate="05/24/2024" />
 </App>
 ```
 
-<Playground
-  height={120}
-  name="Example: fromDate"
-  app={`
-    <App>
-      <DatePicker fromDate="05/24/2024" />
-    </App>
-  `}
-/>
-
 ### `initialValue`
 
 This property sets the component's initial value.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: initialValue" height="120px"
 <App>
   <DatePicker initialValue="05/25/2024" />
 </App>  
 ```
-
-<Playground
-  height={120}
-  name="Example: initialValue"
-  app={`
-    <App>
-      <DatePicker initialValue="05/25/2024" />
-    </App>  
-  `}
-/>
 
 ### `inline (default: false)`
 
@@ -148,43 +98,22 @@ The mode of the datepicker (single or range)
 
 Available values: `single` **(default)**, `range`
 
-```xmlui copy {2-3}
+```xmlui-pg copy {2-3} display name="Example: mode" height="240px"
 <App>
   <DatePicker mode="single" />
   <DatePicker mode="range" />
 </App>
 ```
 
-<Playground
-  height={240}
-  name="Example: mode"
-  app={`
-  <App>
-    <DatePicker mode="single" />
-    <DatePicker mode="range" />
-  </App>
-  `}
-/>
-
 ### `placeholder`
 
 A placeholder text that is visible in the input field when its empty.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: placeholder" height="120px"
 <App>
   <DatePicker placeholder="This is a placeholder" />
 </App>  
 ```
-
-<Playground
-  height={120}
-  name="Example: placeholder"
-  app={`
-    <App>
-      <DatePicker placeholder="This is a placeholder" />
-    </App>  
-  `}
-/>
 
 ### `readOnly (default: false)`
 
@@ -194,21 +123,11 @@ Set this property to `true` to disallow changing the component value.
 
 Whether to show the week number in the calendar
 
-```xmlui copy
+```xmlui-pg copy display name="Example: showWeekNumber" height="120px"
 <App>
   <DatePicker showWeekNumber="true" />
 </App>
 ```
-
-<Playground
-  height={120}
-  name="Example: showWeekNumber"
-  app={`
-    <App>
-      <DatePicker showWeekNumber="true" />
-    </App>
-  `}
-/>
 
 ### `startIcon`
 
@@ -222,21 +141,11 @@ This property sets a text to appear at the start (left side when the left-to-rig
 
 The end date of the range of selectable dates
 
-```xmlui copy
+```xmlui-pg copy display name="Example: toDate" height="120px"
 <App>
   <DatePicker toDate="05/26/2024" />
 </App>
 ```
-
-<Playground
-  height={120}
-  name="Example: toDate"
-  app={`
-    <App>
-      <DatePicker toDate="05/26/2024" />
-    </App>
-  `}
-/>
 
 ### `validationStatus (default: "none")`
 
@@ -256,7 +165,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```xmlui copy
+```xmlui-pg copy display name="Example: validationStatus" height="300px"
 <App>
   <DatePicker />
   <DatePicker validationStatus="valid" />
@@ -264,19 +173,6 @@ Available values:
   <DatePicker validationStatus="error" />
 </App>
 ```
-
-<Playground
-  name="Example: validationStatus"
-  height={300}
-  app={`
-    <App>
-      <DatePicker />
-      <DatePicker validationStatus="valid" />
-      <DatePicker validationStatus="warning" />
-      <DatePicker validationStatus="error" />
-    </App>
-  `}
-/>
 
 ### `weekStartsOn (default: 0)`
 
@@ -304,21 +200,11 @@ Available values:
 | Friday    | 5      |
 | Saturday  | 6      |
 
-```xmlui copy
+```xmlui-pg copy display name="Example: weekStartsOn" height="120px"
 <App>
   <DatePicker weekStartsOn="1" />
 </App>
 ```
-
-<Playground
-  name="Example: weekStartsOn"
-  height={120}
-  app={`
-    <App>
-      <DatePicker weekStartsOn="1" />
-    </App>
-  `}
-/>
 
 ## Events
 
@@ -328,23 +214,12 @@ This event is triggered when value of DatePicker has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```xmlui copy {2}
+```xmlui-pg copy {2} display name="Example: didChange" height="120px"
 <App var.field="">
   <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
 </App>
 ```
-
-<Playground
-  height={120}
-  name="Example: didChange"
-  app={`
-    <App var.field="">
-      <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
-      <Text value="{field}" />
-    </App>
-  `}
-/>
 
 ### `gotFocus`
 
@@ -353,7 +228,7 @@ This event is triggered when the DatePicker has received the focus.
 Clicking on the `DatePicker` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```xmlui copy {4-5}
+```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus" height="120px"
 <App var.isFocused="false">
   <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
   <DatePicker
@@ -362,20 +237,6 @@ Note how clicking elsewhere resets the text to the original.
   />
 </App>
 ```
-
-<Playground
-  height={160}
-  name="Example: gotFocus/lostFocus"
-  app={`
-    <App var.isFocused="false">
-      <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
-      <DatePicker
-        onGotFocus="isFocused = true"
-        onLostFocus="isFocused = false"
-      />
-    </App>
-  `}
-/>
 
 ### `lostFocus`
 
@@ -391,7 +252,7 @@ This method sets the focus on the DatePicker.
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-```xmlui copy {3, 9, 12}
+```xmlui-pg copy {3, 9, 12} display name="Example: value and setValue"
 <App>
   <DatePicker
     id="picker"
@@ -408,104 +269,11 @@ You can use this method to set the component's current value programmatically (`
 </App>
 ```
 
-<Playground
-  name="Example: value and setValue"
-  app={`
-    <App>
-      <DatePicker
-        id="picker"
-        readOnly="true"
-      />
-      <HStack>
-        <Button
-          label="Add Text"
-          onClick="picker.setValue('05/25/2024')" />
-        <Button
-          label="Remove Text"
-          onClick="picker.setValue('')" />
-      </HStack>
-    </App>
-  `}
-/>
-
 ### `value`
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
 ## Styling
-
-The `DatePicker` component provides these theme variables to customize its appearance:
-
-- `borderRadius-DatePicker`
-- `textColor-DatePicker`
-- `backgroundColor-DatePicker--disabled`
-- `borderWidth-DatePicker`
-- `borderStyle-DatePicker`
-- `borderColor-DatePicker--disabled`
-- `backgroundColor-DatePicker--disabled`
-- `textColor-DatePicker--disabled`
-- `textColor-value-DatePicker`
-- `borderColor-DatePicker-default`
-- `borderColor-DatePicker-error`
-- `borderColor-DatePicker-warning`
-- `borderColor-DatePicker-success`
-- `color-placeholder-DatePicker`
-- `backgroundColor-menu-DatePicker`
-- `boxShadow-menu-DatePicker`
-- `borderRadius-menu-DatePicker`
-- `backgroundColor-item-DatePicker--hover`
-- `backgroundColor-item-DatePicker--active`
-
-```json
-{
-  "borderRadius-DatePicker": "30px",
-  "borderWidth-DatePicker": "4px",
-  "borderRadius-menu-DatePicker": "30px",
-  "textColor-DatePicker": "black",
-  "backgroundColor-menu-DatePicker": "#f5f5dc"
-}
-```
-
-<Playground
-  name="Example: styling"
-  height={120}
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "borderRadius-DatePicker": "30px",
-        "borderWidth-DatePicker": "4px",
-        "borderRadius-menu-DatePicker": "30px",
-        "textColor-DatePicker": "black",
-        "backgroundColor-menu-DatePicker": "#f5f5dc"
-      },
-    },
-  ]}
-  app={`
-    <App>
-      <DatePicker />
-    </App>  
-  `}
-/>
-
-To style all input controls not just this component, use `Input` instead of the `DatePicker` segment:
-
-```
-textColor-Input: "#0033FF"
-```
-
-`Input` affects the following controls:
-
-- [`Checkbox`](./Checkbox.mdx)
-- [`NumberBox`](./NumberBox.mdx)
-- [`RadioGroupOption`](./RadioGroupOption.mdx)
-- [`Select`](./Select.mdx)
-- [`Switch`](./Switch.mdx)
-- [`TextArea`](./TextArea.mdx)
-
-See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 ### Theme Variables
 

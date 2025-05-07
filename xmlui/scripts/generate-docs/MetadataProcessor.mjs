@@ -428,7 +428,7 @@ function addChildrenTemplateSection(component) {
   buffer += `  </${compName}>\n`;
   buffer += "</App>\n";
   buffer += "```\n\n";
-  return buffer;  
+  return buffer;
 }
 
 function getSection(data, sectionRef, sectionId, transformer = (contents) => contents) {
@@ -766,7 +766,7 @@ function listThemeVars(component) {
  * @returns Buffer with a table of theme variable keys and their descriptions
  */
 function addThemeVarDescriptions(component) {
-  if (!component.themeVarDescriptions) {
+  if (!component.themeVarDescriptions || Object.keys(component.themeVarDescriptions).length === 0) {
     return "";
   }
   let buffer = "\n\n### Variable Explanations\n\n";

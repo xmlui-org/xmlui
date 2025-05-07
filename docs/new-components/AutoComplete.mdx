@@ -12,19 +12,15 @@ The component provides context values with which you can access some internal pr
 
 ## Using AutoComplete
 
-<Playground
-  height={200}
-  name="Example: Using AutoComplete"
-  app={`
-    <App>
-      <AutoComplete>
-        <Option value="1" label="Bruce Wayne" />
-        <Option value="2" label="Clark Kent" enabled="false" />
-        <Option value="3" label="Diana Prince" />
-      </AutoComplete>
-    </App>
-  `}
-/>
+```xmlui-pg copy display height="200px" name="Example: Using AutoComplete"
+<App>
+  <AutoComplete>
+    <Option value="1" label="Bruce Wayne" />
+    <Option value="2" label="Clark Kent" enabled="false" />
+    <Option value="3" label="Diana Prince" />
+  </AutoComplete>
+</App>
+```
 
 ## Properties
 
@@ -40,19 +36,15 @@ This property sets the height of the dropdown list.
 
 This property defines the template to display when the list of options is empty.
 
-<Playground
-  height={200}
-  name="Example: emptyListTemplate"
-  app={`
-    <App>
-      <AutoComplete>
-        <property name="emptyListTemplate">
-          <Text>No options found</Text>
-        </property>
-      </AutoComplete>
-    </App>
-  `}
-/>
+```xmlui-pg copy display height="200px" name="Example: emptyListTemplate"
+<App>
+  <AutoComplete>
+    <property name="emptyListTemplate">
+      <Text>No options found</Text>
+    </property>
+  </AutoComplete>
+</App>
+```
 
 ### `enabled (default: true)`
 
@@ -70,10 +62,7 @@ This property sets the maximum length of the input it accepts.
 
 The `true` value of the property indicates if the user can select multiple items.
 
-<Playground
-  height={300}
-  name="Example: multi"
-  app={`
+```xmlui-pg copy display height="300px" name="Example: multi"
     <App>
       <AutoComplete multi="true">
         <Option value="1" label="Bruce Wayne" />
@@ -83,29 +72,24 @@ The `true` value of the property indicates if the user can select multiple items
         <Option value="5" label="Hal Jordan" />
       </AutoComplete>
     </App>
-  `}
-/>
+```
 
 ### `optionTemplate`
 
 This property enables the customization of list items. To access the attributes of a list item use the `$item` context variable.
 
-<Playground
-  height={300}
-  name="Example: optionTemplate"
-  app={`
-    <App>
-      <AutoComplete multi="true">
-        <property name="optionTemplate">
-          <Text textAlign="center" color="purple">{console.log($item), $item.label}</Text>
-        </property>
-        <Option value="1" label="Bruce Wayne" />
-        <Option value="2" label="Clark Kent" />
-        <Option value="3" label="Diana Prince" />
-      </AutoComplete>
-    </App>
-  `}
-/>
+```xmlui-pg copy display height="300px" name="Example: optionTemplate"
+<App>
+  <AutoComplete multi="true">
+    <property name="optionTemplate">
+      <Text textAlign="center" color="purple">{console.log($item), $item.label}</Text>
+    </property>
+    <Option value="1" label="Bruce Wayne" />
+    <Option value="2" label="Clark Kent" />
+    <Option value="3" label="Diana Prince" />
+  </AutoComplete>
+</App>
+```
 
 ### `placeholder`
 
@@ -283,8 +267,3 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-AutoComplete-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-AutoComplete-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [textColor](../styles-and-themes/common-units/#color)-placeholder-AutoComplete-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-
-### Variable Explanations
-
-| Theme Variable | Description |
-| --- | --- |

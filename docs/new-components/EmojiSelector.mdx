@@ -12,21 +12,11 @@ The `EmojiSelector` component provides users with a graphical interface to brows
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: autoFocus" height="420px"
 <App>
   <EmojiSelector autoFocus="true" />
 </App>
 ```
-
-<Playground
-  name="Example: autoFocus"
-  height={420}
-  app={`
-  <App>
-    <EmojiSelector autoFocus="true" />
-  </App>
-  `}
-/>
 
 ## Events
 
@@ -34,7 +24,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 This event is fired when the user selects an emoticon from this component.
 
-```xmlui copy /onSelect="(emoji) => { selected = emoji }"/
+```xmlui-pg copy display name="Example: select" height="420px"
 <App>
   <HStack var.selected="">
     <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
@@ -42,19 +32,6 @@ This event is fired when the user selects an emoticon from this component.
   </HStack>
 </App>
 ```
-
-<Playground
-  name="Example: select"
-  height={420}
-  app={`
-    <App>
-      <HStack var.selected="">
-        <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
-        <Text value="Selected emoji: {selected}" />
-      </HStack>
-    </App>
-  `}
-/>
 
 ## Exposed Methods
 

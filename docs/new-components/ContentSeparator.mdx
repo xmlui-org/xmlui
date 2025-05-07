@@ -26,7 +26,7 @@ The demo below illustrates this.
 Notice how the first `ContentSeparator` does not show up while the second does:
 </Callout>
 
-```xmlui copy /height="48px"/
+```xmlui-pg copy display name="Example: no vertical space"
 <App>
   <HStack horizontalAlignment="center">
     <ContentSeparator orientation="vertical" size="8px" backgroundColor="blue" />
@@ -37,25 +37,11 @@ Notice how the first `ContentSeparator` does not show up while the second does:
 </App>
 ```
 
-<Playground
-  name="Example: no vertical space"
-  app={`
-  <App>
-    <HStack horizontalAlignment="center">
-      <ContentSeparator orientation="vertical" size="8px" backgroundColor="blue" />
-    </HStack>
-    <HStack horizontalAlignment="center" height="48px">
-      <ContentSeparator orientation="vertical" size="8px" backgroundColor="red" />
-    </HStack>
-  </App>
-  `}
-/>
-
 ### `size`
 
 This property defines the component's height (if the `orientation` is horizontal) or the width (if the `orientation` is vertical).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: size"
 <App>
   <Heading level="h2">
     Lorem Ipsum
@@ -79,33 +65,6 @@ This property defines the component's height (if the `orientation` is horizontal
 </App>
 ```
 
-<Playground
-  name="Example: size & orientation"
-  app={`
-    <App>
-      <Heading level="h2">
-        Lorem Ipsum
-      </Heading>
-      <ContentSeparator />
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-      Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
-      ut aliquip ex ea commodo consequat.
-      <ContentSeparator size="4px" />
-      <HStack height="120px">
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-        dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat
-        non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-        <ContentSeparator orientation="vertical" size="10px" />
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-        accusantium doloremque laudantium, totam rem aperiam,
-        eaque ipsa quae ab illo inventore veritatis et quasi architecto
-        beatae vitae dicta sunt explicabo.
-      </HStack>
-    </App>
-  `}
-/>
-
 <Callout type="info" emoji="📔">
 You can use the `width` and `height` layout properties to set the `ContentSeparator` dimensions.
 For the horizontal separator, you can set the `height` property; the vertical separator offers the `width` property instead of `size`.
@@ -121,41 +80,6 @@ This component does not have any events.
 This component does not expose any methods.
 
 ## Styling
-
-The `ContentSeparator` component uses these theme variables to customize its appearance:
-
-- `backgroundColor-ContentSeparator`
-- `size-ContentSeparator`
-
-```json
-"backgroundColor-ContentSeparator": "$color-primary-200",
-"size-ContentSeparator": "6px"
-```
-
-<Playground
-  name="Example: styling"
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "backgroundColor-ContentSeparator": "$color-primary-200",
-        "size-ContentSeparator": "6px",
-      },
-    },
-  ]}
-  app={`
-  <App>
-    <HStack>
-      <ContentSeparator size="8px" borderRadius="5px"/>
-    </HStack>
-    <HStack height="48px" horizontalAlignment="center">
-      <ContentSeparator orientation="vertical" size="8px"/>
-    </HStack>
-  </App>
-  `}
-/>
 
 ### Theme Variables
 

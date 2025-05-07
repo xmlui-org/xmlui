@@ -6,7 +6,7 @@ To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](../learning
 
 %-PROP-START enabled
 
-```xmlui copy {4-5, 9-10}
+```xmlui-pg copy display {4-5, 9-10} name="Example: enabled"
 <App>
   Enabled checkboxes:
   <HStack>
@@ -21,24 +21,6 @@ To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](../learning
 </App>
 ```
 
-<Playground
-  name="Example: enabled"
-  app={`
-    <App>
-      Enabled checkboxes:
-      <HStack>
-        <Checkbox initialValue="true" enabled="true" />
-        <Checkbox initialValue="false" enabled="true" />
-      </HStack>
-      Disabled checkboxes:
-      <HStack>
-        <Checkbox initialValue="true" enabled="false" />
-        <Checkbox initilaValue="false" enabled="false" />
-      </HStack>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START indeterminate
@@ -47,7 +29,8 @@ This prop is commonly used if there are several other checkboxes linked to one c
 
 The following sample binds the state of two checkboxes to one and updates the state of the top checkbox accordingly. When the states of the bound checkboxes are different, the top checkbox is set to indeterminate:
 
-```xmlui copy {4}
+```xmlui-pg copy display {4} name="Example: indeterminate"
+---app copy display
 <App var.indeterminate="{false}">
   <Checkbox
     label="Indeterminate Checkbox"
@@ -63,57 +46,26 @@ The following sample binds the state of two checkboxes to one and updates the st
     <Checkbox label="Checkbox #2" id="cb2" initialValue="false" />
   </HStack>
 </App>
-```
-
+---desc
 Try this sample by clicking the bottom group of checkboxes.
-
-<Playground
-  name="Example: indeterminate"
-  app={`
-    <App var.indeterminate="{false}">
-      <Checkbox
-        label="Indeterminate Checkbox"
-        indeterminate="{indeterminate}"
-        initialValue="{cb1.value}"
-        readOnly="true" />
-      <ChangeListener
-        listenTo="{ { v1: cb1.value, v2: cb2.value } }"
-        onDidChange="indeterminate = cb1.value !== cb2.value" />
-      Group of checkboxes:
-      <HStack>
-        <Checkbox label="Checkbox #1" id="cb1" initialValue="true" />
-        <Checkbox label="Checkbox #2" id="cb2" initialValue="false" />
-      </HStack>
-    </App>
-  `}
-/>
+```
 
 %-PROP-END
 
 %-PROP-START label
 
-```xmlui copy
+```xmlui-pg copy display name="Example: label"
 <App>
   <Checkbox label="Example label" initialValue="true" />
   <Checkbox label="Another label" intialValue="false" />
 </App>
 ```
 
-<Playground
-  name="Example: label"
-  app={`
-    <App>
-      <Checkbox label="Example label" initialValue="true" />
-      <Checkbox label="Another label" intialValue="false" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START labelPosition
 
-```xmlui copy
+```xmlui-pg copy display name="Example: labelPosition"
 <App>
   <Checkbox label="Top label" labelPosition="top" initialValue="true" />
   <Checkbox label="End label" labelPosition="end" initialValue="true" />
@@ -122,38 +74,16 @@ Try this sample by clicking the bottom group of checkboxes.
 </App>
 ```
 
-<Playground
-  name="Example: labelPosition"
-  app={`
-    <App>
-      <Checkbox label="Top label" labelPosition="top" initialValue="true" />
-      <Checkbox label="End label" labelPosition="end" initialValue="true" />
-      <Checkbox label="Bottom label" labelPosition="bottom" initialValue="true" />
-      <Checkbox label="Start label" labelPosition="start" initialValue="true" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START readOnly
 
-```xmlui copy {3}
+```xmlui-pg copy {3} display name="Example: readOnly"
 <App>
   <Checkbox readOnly="true" label="Checked" initialValue="true" />
   <Checkbox readOnly="true" label="Unchecked" intialValue="false" />
 </App>
 ```
-
-<Playground
-  name="Example: readOnly"
-  app={`
-    <App>
-      <Checkbox readOnly="true" label="Checked" initialValue="true" />
-      <Checkbox readOnly="true" label="Unchecked" intialValue="false" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -169,7 +99,7 @@ See an example in the `setValue` API method.
 
 You can use this method to set the checkbox's current value programmatically (`true`: checked, `false`: unchecked).
 
-```xmlui copy {10,13,15}
+```xmlui-pg copy {10,13,15} display name="Example: value and setValue"
 <App var.changes="">
   <Checkbox
     id="checkbox"
@@ -189,51 +119,20 @@ You can use this method to set the checkbox's current value programmatically (`t
 </App>
 ```
 
-<Playground
-  name="Example: value and setValue"
-  app={`
-    <App var.changes="">
-      <Checkbox
-        id="checkbox"
-        readOnly="true"
-        label="This checkbox can be set only programmatically"
-        onDidChange="changes += '+'" />
-      <HStack>
-        <Button
-          label="Check"
-          onClick="checkbox.setValue(true)" />
-        <Button
-          label="Uncheck"
-          onClick="checkbox.setValue(false)" />
-      </HStack>
-      <Text>The checkbox is {checkbox.value ? "checked" : "unchecked"}</Text>
-      <Text value="Changes: {changes}" />
-    </App>
-  `}
-/>
-
 %-API-END
 
 %-EVENT-START didChange
 
-```xmlui copy
+```xmlui-pg copy display name="Example: didChange"
 <App verticalAlignment="center" var.changes="">
   <Checkbox label="Changeable" onDidChange="changes += '+'" />
-  <Checkbox label="Readonly" readOnly="true" onDidChange="changes += '-'" />
+  <Checkbox 
+    label="Readonly" 
+    readOnly="true" 
+    onDidChange="changes += '-'" />
   <Text value="Changes: {changes}" />
 </App>
 ```
-
-<Playground
-  name="Example: didChange"
-  app={`
-    <App verticalAlignment="center" var.changes="">
-      <Checkbox label="Changeable" onDidChange="changes += '+'" />
-      <Checkbox label="Readonly" readOnly="true" onDidChange="changes += '-'" />
-      <Text value="Changes: {changes}" />
-    </App>
-  `}
-/>
 
 %-EVENT-END
 
@@ -241,7 +140,7 @@ You can use this method to set the checkbox's current value programmatically (`t
 
 Click the `Checkbox` in the example demo to change the label text. Note how clicking elsewhere resets the text to the original.
 
-```xmlui copy {4,5}
+```xmlui-pg copy display name="Example: gotFocus/lostFocus"
 <App var.focused="{false}" verticalAlignment="center">
   <Checkbox
     value="true"
@@ -252,20 +151,6 @@ Click the `Checkbox` in the example demo to change the label text. Note how clic
 </App>
 ```
 
-<Playground
-  name="Example: gotFocus/lostFocus"
-  app={`
-    <App var.focused="{false}" verticalAlignment="center">
-      <Checkbox
-        value="true"
-        onGotFocus="focused = true"
-        onLostFocus="focused = false"
-      />
-      <Text value="{focused === true ? 'I am focused!' : 'I have lost the focus!'}" />
-    </App>
-  `}
-/>
-
 %-EVENT-END
 
 %-EVENT-START lostFocus
@@ -273,22 +158,3 @@ Click the `Checkbox` in the example demo to change the label text. Note how clic
 (See the example above)
 
 %-EVENT-END
-
-%-STYLE-START
-
-The `Checkbox` component uses these theme variables to customize its appearance:
-
-- `backgroundColor-Checkbox-default`
-- `borderColor-Checkbox-default`
-- `borderRadius-Checkbox-default`
-- `backgroundColor-Checkbox--disabled`
-- `backgroundColor-indicator-Checkbox`
-- `backgroundColor-checked-Checkbox`
-- `backgroundColor-checked-Checkbox-warning`
-- `backgroundColor-checked-Checkbox-success`
-- `backgroundColor-checked-Checkbox-error`
-- `borderColor-checked-Checkbox`
-- `borderColor-checked-Checkbox-warning`
-- `borderColor-checked-Checkbox-error`
-
-%-STYLE-END

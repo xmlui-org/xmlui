@@ -8,22 +8,12 @@ This component allows the user to select a color with the browser's default colo
 
 This component allows you to edit or select a color using RGB, HSL, or CSS HEX notation. It displays a popup over the UI and lets you use the mouse or keyboard to edit or select a color.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: using ColorPicker"
 <App>
   <ColorPicker id="colorPicker" label="Select your favorite color" />
   <Text>Selected color: {colorPicker.value}</Text>
 </App>
 ```
-
-<Playground
-  name="Example: using ColorPicker"
-  app={`
-  <App>
-    <ColorPicker id="colorPicker" label="Select your favorite color" />
-    <Text>Selected color: {colorPicker.value}</Text>
-  </App>
-  `}
-/>
 
 ## Properties
 
@@ -39,7 +29,7 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the component's initial value.
 
-```xmlui copy /initialValue="#ff0080"/
+```xmlui-pg copy display name="Example: using ColorPicker"
 <App>
   <ColorPicker 
     id="colorPicker" 
@@ -49,20 +39,6 @@ This property sets the component's initial value.
   <Text>Selected color: {colorPicker.value}</Text>
 </App>
 ```
-
-<Playground
-  name="Example: using ColorPicker"
-  app={`
-  <App>
-    <ColorPicker 
-      id="colorPicker" 
-      label="Select your favorite color" 
-      initialValue="#ff0080"
-      />
-    <Text>Selected color: {colorPicker.value}</Text>
-  </App>
-  `}
-/>
 
 ### `label`
 
@@ -93,20 +69,11 @@ This property sets the width of the `ColorPicker`.
 
 Set this property to `true` to disallow changing the component value.
 
-```xmlui copy /initialValue="#ff0080"/
+```xmlui-pg copy display name="Example: readOnly"
 <App>
   <ColorPicker initialValue="#ffff00" label="Cannot be edited" readOnly />
 </App>
 ```
-
-<Playground
-  name="Example: readOnly"
-  app={`
-  <App>
-    <ColorPicker initialValue="#ffff00" label="Cannot be edited" readOnly />
-  </App>
-  `}
-/>
 
 ### `required`
 
@@ -124,24 +91,13 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-```xmlui copy /initialValue="#ff0080"/
+```xmlui-pg copy display name="Example: validationStatus"
 <App>
   <ColorPicker initialValue="#c0c0ff" label="Valid" validationStatus="valid" />
   <ColorPicker initialValue="#c0c0ff" label="Warning" validationStatus="warning" />
   <ColorPicker initialValue="#c0c0ff" label="Error" validationStatus="error" />
 </App>
 ```
-
-<Playground
-  name="Example: validationStatus"
-  app={`
-  <App>
-    <ColorPicker initialValue="#c0c0ff" label="Valid" validationStatus="valid" />
-    <ColorPicker initialValue="#c0c0ff" label="Warning" validationStatus="warning" />
-    <ColorPicker initialValue="#c0c0ff" label="Error" validationStatus="error" />
-  </App>
-  `}
-/>
 
 ## Events
 
@@ -167,10 +123,13 @@ This method sets the focus on the ColorPicker.
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-```xmlui copy /setValue/
+```xmlui-pg copy display name="Example: setValue"
 <App>
   <App>
-    <ColorPicker id="colorPicker" label="Select your favorite color" initialValue="#808080" />
+    <ColorPicker 
+      id="colorPicker" 
+      label="Select your favorite color" 
+      initialValue="#808080" />
     <HStack>
       <Button
         label="Set to red"
@@ -185,26 +144,6 @@ You can use this method to set the component's current value programmatically (`
   </App>
 </App>
 ```
-
-<Playground
-    name="Example: setValue()"
-    app={`
-    <App>
-      <ColorPicker id="colorPicker" label="Select your favorite color" initialValue="#808080" />
-      <HStack>
-        <Button
-          label="Set to red"
-          onClick="colorPicker.setValue('#ff0000')" />
-        <Button
-          label="Set to green"
-          onClick="colorPicker.setValue('#00c000')" />
-        <Button
-          label="Set to blue"
-          onClick="colorPicker.setValue('#0000ff')" />
-      </HStack>
-    </App>
-  `}
-/>
 
 ### `value`
 

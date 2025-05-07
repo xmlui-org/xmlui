@@ -9,7 +9,7 @@ The `Card` component is a container for cohesive elements, often rendered visual
 `Card` is a container; it does not have any explicit properties.
 You can nest the card's content into the `<Card>` tag:
 
-```xmlui copy
+```xmlui-pg copy display name="Example: using Card"
 <App>
   <Card maxWidth="200px">
     <HStack verticalAlignment="center">
@@ -21,26 +21,10 @@ You can nest the card's content into the `<Card>` tag:
 </App>
 ```
 
-<Playground
-  name="Example: using Card"
-  height="160"
-  app={`
-    <App>
-      <Card maxWidth="200px">
-        <HStack verticalAlignment="center">
-          <Icon name="info" />
-          <Text value="Information" variant="strong" />
-        </HStack>
-        <Text value="This is an example text" />
-      </Card>
-    </App>
-  `}
-/>
-
 There are also prestyled properties one can make use of, detailed in the [Properties section](#properties).
 Prestyled elements always appear above other children.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: using Card with prestyled elements"
 <App>
   <Card
     avatarUrl="https://i.pravatar.cc/100"
@@ -54,24 +38,6 @@ Prestyled elements always appear above other children.
   </Card>
 </App>
 ```
-
-<Playground
-  name="Example: using Card with prestyled elements"
-  app={`
-    <App>
-      <Card
-        avatarUrl="https://i.pravatar.cc/100"
-        title="Example Title"
-        subtitle="Predefined subtitle"
-        maxWidth="300px">
-        <HStack verticalAlignment="center">
-          <Icon name="info"/>
-          This is a card
-        </HStack>
-      </Card>
-    </App>
-  `}
-/>
 
 ## Properties
 
@@ -100,7 +66,7 @@ Available values:
 | `horizontal` | The component will fill the available space horizontally |
 | `vertical` | The component will fill the available space vertically **(default)** |
 
-```xmlui copy /orientation="horizontal"/
+```xmlui-pg copy display name="Example: orientation"
 <App>
   <Card title="Example Title" subtitle="Example Subtitle" orientation="horizontal">
     <SpaceFiller />
@@ -111,27 +77,13 @@ Available values:
 </App>
 ```
 
-<Playground
-  name="Example: orientation"
-  app={`
-  <App>
-    <Card title="Example Title" subtitle="Example Subtitle" orientation="horizontal">
-      <SpaceFiller />
-      <Text>Text child #1</Text>
-      <Text>Text child #2</Text>
-      <Button label="Button Child" />
-    </Card>
-  </App>
-  `}
-/>
-
 ### `showAvatar (default: false)`
 
 Indicates whether the Card should be displayed
 
 Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is automatically set to true but can still be hidden.
 
-```xmlui copy /showAvatar="true"/
+```xmlui-pg copy display name="Example: showAvatar"
 <App>
   <Card maxWidth="300px" avatarUrl="https://i.pravatar.cc/100" />
   <Card maxWidth="300px" showAvatar="true" title="Example Card" />
@@ -139,38 +91,17 @@ Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is aut
 </App>
 ```
 
-<Playground
-  name="Example: showAvatar"
-  height="200"
-  app={`
-    <App>
-      <Card maxWidth="300px" avatarUrl="https://i.pravatar.cc/100" />
-      <Card maxWidth="300px" showAvatar="true" title="Example Card" />
-      <Card maxWidth="300px" showAvatar="true" />
-    </App>
-  `}
-/>
-
 ### `subtitle`
 
 This prop sets the prestyled subtitle.
 
 This prop sets the prestyled subtitle.
 
-```xmlui copy /subtitle="Example Subtitle"/
+```xmlui-pg copy display name="Example: subtitle"
 <App>
   <Card maxWidth="300px" subtitle="Example Subtitle" />
 </App>
 ```
-
-<Playground
-  name="Example: subtitle"
-  app={`
-    <App>
-      <Card maxWidth="300px" subtitle="Example Subtitle" />
-    </App>
-  `}
-/>
 
 ### `title`
 
@@ -178,20 +109,11 @@ This prop sets the prestyled title.
 
 This prop sets the prestyled title.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: title"
 <App>
   <Card maxWidth="300px" title="Example Title" />
 </App>
 ```
-
-<Playground
-  name="Example: title"
-  app={`
-    <App>
-      <Card maxWidth="300px" title="Example Title" />
-    </App>
-  `}
-/>
 
 ## Events
 
@@ -201,7 +123,7 @@ This event is triggered when the Card is clicked.
 
 This event is triggered when the `Card` is clicked.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: click"
 <App>
   <Card maxWidth="300px" onClick="toast('Clicked!')">
     <HStack verticalAlignment="center">
@@ -213,84 +135,11 @@ This event is triggered when the `Card` is clicked.
 </App>
 ```
 
-<Playground
-  name="Example: click"
-  app={`
-    <App>
-      <Card maxWidth="300px" onClick="toast('Clicked!')">
-        <HStack verticalAlignment="center">
-          <Icon name="info" />
-          <Text value="Information" variant="strong" />
-        </HStack>
-        <Text value="This is an example text" />
-      </Card>
-    </App>
-  `}
-/>
-
 ## Exposed Methods
 
 This component does not expose any methods.
 
 ## Styling
-
-The `Card` component uses these theme variables to customize its appearance:
-
-- `border-Card`
-- `backgroundColor-Card`
-- `borderColor-Card`
-- `padding-Card`
-- `paddingHorizontal-Card`
-- `paddingVertical-Card`
-- `borderRadius-Card`
-- `boxShadow-Card`
-- `borderStyle-Card`
-- `borderWidth-Card`
-
-The following theme definition changes the visual appearance of the card:
-
-```json
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "backgroundColor-Card": "$color-surface-200",
-    "borderRadius-Card": "4px",
-    "borderColor-Card": "$color-surface-600",
-    "borderWidth-Card": "2px",
-    "paddingHorizontal-Card": "2rem",
-    "color": "black"
-  }
-}
-```
-
-<Playground
-  name="Example: styling"
-  defaultTheme="custom"
-  themes={[{
-    id: "custom",
-    name: "Custom Theme",
-    themeVars: {
-      "backgroundColor-Card": "$color-surface-200",
-      "borderRadius-Card": "4px",
-      "borderColor-Card": "$color-surface-600",
-      "borderWidth-Card": "2px",
-      "paddingHorizontal-Card": "2rem",
-      "color": "black"
-    }
-  }]}
-  app={`
-    <App>
-      <Card maxWidth="240px">
-        <HStack verticalAlignment="center">
-          <Icon name="info" />
-          <Text value="Information" variant="strong" />
-        </HStack>
-        <Text value="This is an example text" />
-      </Card>
-    </App>
-  `}
-/>
 
 ### Theme Variables
 
