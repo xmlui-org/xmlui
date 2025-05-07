@@ -1,25 +1,30 @@
 import { type ReactNode, isValidElement } from "react";
 
-
 /**
  * This function handles two things:
  * 1. The extraction of meta information from code blocks and exposing them as data-meta attributes
  * 2. The highlighting of code blocks providing the highlighter function with meta information
  * @param node The React node containing the code block
- * @param codeHighlighter The highlighter object containing the highlight function and the available languages 
+ * @param codeHighlighter The highlighter object containing the highlight function and the available languages
  * @returns CSS class names for the codefence and the HTML string with highlighted code tokens
  */
 export function parseMetaAndHighlightCode(
   node: ReactNode,
   codeHighlighter: CodeHighlighter,
   themeTone?: string,
-): { classNames: string | null; cleanedHtmlStr: string } | null {
+): HighlighterResults | null {
   const meta = extractMetaFromChildren(node);
-  const metaLanguage = meta.language;
+  const { language, ...restMeta } = meta;
 
-  if (metaLanguage && codeHighlighter.availableLangs.includes(metaLanguage)) {    
+  if (language && codeHighlighter.availableLangs.includes(language)) {
+    const codeStr = mapTextContent(node);
     // NOTE: Keep in mind, at this point, we are working with the markdown text
-    const htmlCodeStr = codeHighlighter.highlight(mapTextContent(node), metaLanguage, undefined, themeTone);
+    const htmlCodeStr = codeHighlighter.highlight(
+      codeStr,
+      language,
+      restMeta,
+      themeTone,
+    );
     const match = htmlCodeStr.match(/<pre\b[^>]*\bclass\s*=\s*["']([^"']*)["'][^>]*>/i);
     const classNames = match ? match[1] : null;
 
@@ -28,7 +33,7 @@ export function parseMetaAndHighlightCode(
     // so we would get <pre><pre><code>...</code></pre></pre>
     const cleanedHtmlStr = htmlCodeStr.replace(/<pre\b[^>]*>|<\/pre>/gi, "");
 
-    return { classNames, cleanedHtmlStr };
+    return { classNames, cleanedHtmlStr, codeStr, meta };
   }
   return null;
 }
@@ -63,7 +68,7 @@ function mapTextContent(node: ReactNode): string {
 
 function extractMetaFromChildren(
   node: ReactNode,
-  keys: string[] = ["data-language", "data-meta"],
+  keys: string[] = CodeHighlighterMetaKeys,
 ): CodeHighlighterMeta {
   if (!node) return {};
   if (typeof node === "string") return {};
@@ -89,14 +94,36 @@ function extractMetaFromChildren(
 
 export type CodeHighlighter = {
   // Returns html in string!
-  highlight: (code: string, language: string, meta?: Record<string, any>, themeTone?: string) => string;
+  highlight: (
+    code: string,
+    language: string,
+    meta?: Record<string, any>,
+    themeTone?: string,
+  ) => string;
   availableLangs: string[];
 };
 
-type CodeHighlighterMeta = {
+type HighlighterResults = {
+  classNames: string | null;
+  cleanedHtmlStr: string;
+  codeStr: string;
+  meta: CodeHighlighterMeta;
+};
+
+export type CodeHighlighterMeta = {
   language?: string;
   copy?: boolean;
   filename?: string;
-  rowHighlights?: number[];
-  columnHighlights?: number[];
+  rowNumbers?: boolean;
+  rowHighlights?: number[][];
+  substringHighlights?: number[];
 };
+
+const CodeHighlighterMetaKeys = [
+  "data-language",
+  "data-copy",
+  "data-filename",
+  "data-row-numbers",
+  "data-row-highlights",
+  "data-substring-highlights",
+];

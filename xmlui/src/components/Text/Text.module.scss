@@ -17,6 +17,8 @@ $component: "Text";
   @include t.textVars($themeVars, "#{$component}-#{$variant}");
   margin-top: createThemeVar("marginTop-#{$component}-#{$variant}");
   margin-bottom: createThemeVar("marginBottom-#{$component}-#{$variant}");
+  margin-left: createThemeVar("marginLeft-#{$component}-#{$variant}");
+  margin-right: createThemeVar("marginRight-#{$component}-#{$variant}");
   vertical-align: createThemeVar("verticalAlign-#{$component}-#{$variant}");
 }
 
