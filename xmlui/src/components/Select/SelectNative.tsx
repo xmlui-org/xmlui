@@ -126,7 +126,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
 
   const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
   const stringValue = useMemo(() => {
-    return value != undefined ? value + "" : null;
+    return value != undefined ? value + "" : undefined;
   }, [value]);
 
   const onValChange = useCallback(
