@@ -9,7 +9,7 @@ It is a small visual element, which is used to graphically represent functions, 
 The engine looks up the icon in its [registry]() and determines which icon is associated with the name that the component will show.
 Nothing is displayed if the icon name is not found in the registry.
 
-```xmlui copy /name/
+```xmlui-pg copy display name="Example: name"
 <App>
   <HStack>
     <Icon name="message" />
@@ -22,46 +22,21 @@ Nothing is displayed if the icon name is not found in the registry.
 </App>
 ```
 
-<Playground
-  name="Example: name"
-  app={`
-    <App>
-      <HStack>
-        <Icon name="message" />
-        <Icon name="note" />
-        <Icon name="cog" />
-        <Icon name="start" />
-        <Icon name="some-non-existing-icon" />
-        <Icon name="some-non-existing-icon-with fallback" fallback="trash" />
-      </HStack>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START fallback
 
-```xmlui copy /fallback="trash"/
+```xmlui-pg copy display name="Example: fallback"
 <App>
   <Icon name="noicon" fallback="trash" />
 </App>
 ```
 
-<Playground
-  name="Example: fallback"
-  app={`
-    <App>
-      <Icon name="noicon" fallback="trash" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START size
 
-```xmlui copy /size/
+```xmlui-pg copy display name="Example: size"
 <App>
   <HStack>
     <Icon name="like" />
@@ -73,51 +48,4 @@ Nothing is displayed if the icon name is not found in the registry.
 </App>
 ```
 
-<Playground
-  name="Example: size"
-  app={`
-    <App>
-      <HStack>
-        <Icon name="like" />
-        <Icon name="like" size="xs" />
-        <Icon name="like" size="sm" />
-        <Icon name="like" size="md" />
-        <Icon name="like" size="lg" />
-      </HStack>
-    </App>
-  `}
-/>
-
 %-PROP-END
-
-%-STYLE-START
-
-The `Icon` component uses these theme variables:
-
-- `size-Icon`
-- `thickness-stroke-Icon`:
-
-```json
-"size-Icon": "4rem",
-"thickness-stroke-Icon": "10px"
-```
-
-<Playground
-  name="Example: styling"
-  defaultTheme="custom"
-  themes={[{
-    id: "custom",
-    name: "Custom Theme",
-    themeVars: {
-      "size-Icon": "4rem",
-      "thickness-stroke-Icon": "5px",
-    },
-  }]}
-  app={`
-    <App>
-      <Icon name="like" />
-    </App>
-  `}
-/>
-
-%-STYLE-END

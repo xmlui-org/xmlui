@@ -6,48 +6,34 @@
 
 For the shorthand versions see their reference page: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
 
-<Playground
-  name="Example: Headings with levels"
-  app={`
-    <App>
-      <Heading level="h1" value="Heading Level 1" />
-      <Text>Text following H1</Text>
-      <Heading level="h2" value="Heading Level 2" />
-      <Text>Text following H2</Text>
-      <Heading level="h3" value="Heading Level 3" />
-      <Text>Text following H3</Text>
-      <Heading level="h4" value="Heading Level 4" />
-      <Text>Text following H4</Text>
-      <Heading level="h5" value="Heading Level 5" />
-      <Text>Text following H5</Text>
-      <Heading level="h6" value="Heading Level 6" />
-      <Text>Text following H6</Text>
-    </App>
-  `}
-/>
+```xmlui-pg copy display name="Example: Headings with levels"
+<App>
+  <Heading level="h1" value="Heading Level 1" />
+  <Text>Text following H1</Text>
+  <Heading level="h2" value="Heading Level 2" />
+  <Text>Text following H2</Text>
+  <Heading level="h3" value="Heading Level 3" />
+  <Text>Text following H3</Text>
+  <Heading level="h4" value="Heading Level 4" />
+  <Text>Text following H4</Text>
+  <Heading level="h5" value="Heading Level 5" />
+  <Text>Text following H5</Text>
+  <Heading level="h6" value="Heading Level 6" />
+  <Text>Text following H6</Text>
+</App>
+```
 
 %-DESC-END
 
 %-PROP-START value
 
-```xmlui copy
+```xmlui-pg copy display name="Example: value"
 <App>
   <Heading value="This is level 3 (value)" level="h3" />
   <Heading level="h3">This is level 3 (child)</Heading>
   <Heading value="Value" level="h3"><Icon name="trash" /></Heading>
 </App>
 ```
-
-<Playground
-  name="Example: value"
-  app={`
-    <App>
-      <Heading value="This is level 3 (value)" level="h3" />
-      <Heading level="h3">This is level 3 (child)</Heading>
-      <Heading value="Value" level="h3"><Icon name="trash" /></Heading>
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -68,7 +54,7 @@ For a visual example, see the component description.
 
 %-PROP-START maxLines
 
-```xmlui copy
+```xmlui-pg copy display name="Example: maxLines"
 <App>
   <H2
     maxWidth="160px"
@@ -77,23 +63,12 @@ For a visual example, see the component description.
 </App>
 ```
 
-<Playground
-  name="Example: maxLines"
-  app={`
-    <App>
-      <H2
-        maxWidth="160px"
-        backgroundColor="cyan"
-        value="A long heading text that will likely overflow" maxLines="2" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START preserveLinebreaks
 
-```xmlui copy {5}
+```xmlui-pg copy {5} display name="Example: preserveLinebreaks"
+---app copy display
 <App>
   <HStack>
     <H3
@@ -111,32 +86,9 @@ For a visual example, see the component description.
           does not fit into a viewport with a 200-pixel width." />
   </HStack>
 </App>
-```
+---desc
 You can observe the effect of using `preserveLinebreaks`:
-
-<Playground
-  name="Example: preserveLinebreaks"
-  horizontal
-  app={`
-    <App>
-      <HStack>
-        <H3
-          width="200px"
-          backgroundColor="cyan"
-          preserveLinebreaks="true"
-          value="(preserve) This long text
-      with several line breaks
-              does not fit into a viewport with a 200-pixel width." />
-        <H3
-          width="200px"
-          backgroundColor="cyan"
-          value="(do not preserve) This long text
-      with several line breaks
-              does not fit into a viewport with a 200-pixel width." />
-      </HStack>
-    </App>
-  `}
-/>
+```
 
 <Callout type="info" emoji="📔">
 Remember to use the `value` property of `Heading`.
@@ -147,7 +99,7 @@ Linebreaks are converted to spaces when nesting the text in the `Heading` compon
 
 %-PROP-START ellipses
 
-```xmlui copy {4}
+```xmlui-pg copy {4} display name="Example: ellipses"
 <App>
   <VStack width="200px">
     <H3
@@ -164,27 +116,5 @@ Linebreaks are converted to spaces when nesting the text in the `Heading` compon
   </VStack>
 </App>
 ```
-
-<Playground
-  name="Example: ellipses"
-  horizontal
-  app={`
-    <App>
-      <VStack width="200px">
-        <H3
-          backgroundColor="cyan"
-          maxLines="1"
-          ellipses="false">
-          Though this long text does is about to crop!
-        </H3>
-        <H3
-          backgroundColor="cyan"
-          maxLines="1">
-          Though this long text does is about to crop!
-        </H3>
-      </VStack>
-    </App>
-  `}
-/>
 
 %-PROP-END

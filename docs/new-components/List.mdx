@@ -292,18 +292,15 @@ The component receives data via this property. The `data` property is a list of 
 Note how the `List` infers the given data and provides a simple layout for it.
 To tweak what data and how it is displayed, see the [`itemTemplate` section](#itemtemplate).
 
-```xmlui copy
+```xmlui
 <App>
-  <List data='{[...]}' />
+  <List data="{[...]}">
 </App>
 ```
 
-<Playground
-  name="Example: data"
-  height={400}
-  app={`
-    <App>
-      <List data='{${JSON.stringify([
+```xmlui-pg copy name="Example: data" height="400px"
+<App>
+  <List data='{[
   {
     id: 0,
     name: "Apples",
@@ -352,34 +349,16 @@ To tweak what data and how it is displayed, see the [`itemTemplate` section](#it
     category: "dairy",
     key: 0,
   },
-])}}' />
-    </App>
-  `}
-/>
+]}' />
+</App>
+```
 
 You can also provide the `List` with data directly from an API via this property.
 
 In the example below, the `List` also uses the `itemTemplate` property to access the data attributes as well.
 See the [itemTemplate section](#itemtemplate).
 
-```xmlui copy {2}
-<App>
-  <List data='https://api.spacexdata.com/v3/rockets'>
-    <property name="itemTemplate">
-      <Card>
-        <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-        <Text value="{$item.country}" />
-        <Text value="{$item.company}" variant="strong" />
-      </Card>
-    </property>
-  </List>
-</App>
-```
-
-<Playground
-  name="Example: data API Call"
-  height={400}
-  app={`
+```xmlui-pg copy display name="Example: data API Call" height="400px"
   <App>
     <List data='https://api.spacexdata.com/v3/rockets'>
       <property name="itemTemplate">
@@ -391,8 +370,7 @@ See the [itemTemplate section](#itemtemplate).
       </property>
     </List>
   </App>
-  `}
-/>
+```
 
 ### `defaultGroups`
 
@@ -418,13 +396,10 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
 </App>
 ```
 
-<Playground
-  name="Example: defaultGroups"
-  height={400}
-  app={`
-    <App>
-      <List
-        data='{${JSON.stringify([
+```xmlui-pg name="Example: defaultGroups" height="400px"
+<App>
+  <List
+    data='{[
   {
     id: 0,
     name: "Apples",
@@ -473,24 +448,23 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
     category: "dairy",
     key: 0,
   },
-])}}'
-        defaultGroups="{['dairy', 'meat', 'vegetables']}"
-        groupBy="category">
-        <property name="groupHeaderTemplate">
-          <VStack>
-            <Text variant="subtitle" value="{$group.key}" />
-          </VStack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
+]}'
+    defaultGroups="{['dairy', 'meat', 'vegetables']}"
+    groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+  </List>
+</App>
+```
 
 ### `emptyListTemplate`
 
 This property defines the template to display when the list is empty.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: emptyListTemplate" height="140px"
 <App>
   <List>
     <property name="emptyListTemplate">
@@ -501,22 +475,6 @@ This property defines the template to display when the list is empty.
   </List>
 </App>
 ```
-
-<Playground
-  name="Example: emptyListTemplate"
-  height={140}
-  app={`
-    <App>
-      <List>
-        <property name="emptyListTemplate">
-          <VStack horizontalAlignment="center">
-            <Text variant="strong" value="Empty..." />
-          </VStack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
 
 ### `groupBy`
 
@@ -1124,12 +1082,9 @@ Denotes which attribute of an item acts as the ID or key of the item
 </App>
 ```
 
-<Playground
-  name="Example: idKey"
-  height={400}
-  app={`
-    <App>
-      <List idKey="key" data='{${JSON.stringify([
+```xmlui-pg name="Example: idKey" height="400px"
+<App>
+  <List idKey="key" data='{[
   {
     id: 0,
     name: "Apples",
@@ -1178,10 +1133,9 @@ Denotes which attribute of an item acts as the ID or key of the item
     category: "dairy",
     key: 0,
   },
-])}}' />
-    </App>
-  `}
-/>
+]}' />
+</App>
+```
 
 ### `itemTemplate`
 
@@ -1208,12 +1162,9 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 </App>
 ```
 
-<Playground
-  name="Example: itemTemplate"
-  height={400}
-  app={`
-    <App>
-      <List data='{${JSON.stringify([
+```xmlui-pg name="Example: itemTemplate" height="400px"
+<App>
+  <List data='{[
   {
     id: 0,
     name: "Apples",
@@ -1262,23 +1213,22 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
     category: "dairy",
     key: 0,
   },
-])}}'>
-        <property name="itemTemplate">
-          <Card>
-            <HStack verticalAlignment="center">
-              <Icon name="info" />
-              <Text value="{$item.name}" variant="strong" />
-            </HStack>
-            <HStack>
-              <Text value="{$item.quantity}" />
-              <Text value="{$item.unit}" variant="em" />
-            </HStack>
-          </Card>
-        </property>
-      </List>
-    </App>
-  `}
-/>
+]}'>
+    <property name="itemTemplate">
+      <Card>
+        <HStack verticalAlignment="center">
+          <Icon name="info" />
+          <Text value="{$item.name}" variant="strong" />
+        </HStack>
+        <HStack>
+          <Text value="{$item.quantity}" />
+          <Text value="{$item.unit}" variant="em" />
+        </HStack>
+      </Card>
+    </property>
+  </List>
+</App>
+```
 
 ### `limit`
 
@@ -1290,12 +1240,9 @@ This property limits the number of items displayed in the `List`.
 </App>
 ```
 
-<Playground
-  name="Example: limit"
-  height={400}
-  app={`
-    <App>
-      <List limit="4" data='{${JSON.stringify([
+```xmlui-pg name="Example: limit" height="400px"
+<App>
+  <List limit="4" data='{[
   {
     id: 0,
     name: "Apples",
@@ -1344,10 +1291,9 @@ This property limits the number of items displayed in the `List`.
     category: "dairy",
     key: 0,
   },
-])}}' />
-    </App>
-  `}
-/>
+]}' />
+</App>
+```
 
 ### `loading`
 

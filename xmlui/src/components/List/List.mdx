@@ -1,4 +1,17 @@
-%-DESC-START
+import { Callout } from "nextra/components";
+
+# List [#component-list]
+
+<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
+
+The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport.
+
+The component provides context values with which you can access some internal properties:
+
+- `$isFirst`: This boolean value indicates if the component renders its first item.
+- `$isLast`: This boolean value indicates if the component renders its last item.
+- `$item`: This property represents the value of an item in the data list.
+- `$itemIndex`: This integer value represents the current row index (zero-based) while rendering children.
 
 In the following examples all use the same list of data which looks like so:
 
@@ -13,1001 +26,31 @@ In the following examples all use the same list of data which looks like so:
 
 The data is provided as JSON.
 
-%-DESC-END
+## Use children as Content Template
 
-%-PROP-START data
-
-Note how the `List` infers the given data and provides a simple layout for it.
-To tweak what data and how it is displayed, see the [`itemTemplate` section](#itemtemplate).
+The [itemTemplate](#itemtemplate) property can be replaced by setting the item template component directly as the List's child.
+In the following example, the two List are functionally the same:
 
 ```xmlui copy
 <App>
-  <List data='{[...]}' />
-</App>
-```
-
-<Playground
-  name="Example: data"
-  height={400}
-  app={`
-    <App>
-      <List data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}' />
-    </App>
-  `}
-/>
-
-You can also provide the `List` with data directly from an API via this property.
-
-In the example below, the `List` also uses the `itemTemplate` property to access the data attributes as well.
-See the [itemTemplate section](#itemtemplate).
-
-```xmlui copy {2}
-<App>
-  <List data='https://api.spacexdata.com/v3/rockets'>
-    <property name="itemTemplate">
-      <Card>
-        <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-        <Text value="{$item.country}" />
-        <Text value="{$item.company}" variant="strong" />
-      </Card>
-    </property>
-  </List>
-</App>
-```
-
-<Playground
-  name="Example: data API Call"
-  height={400}
-  app={`
-  <App>
-    <List data='https://api.spacexdata.com/v3/rockets'>
-      <property name="itemTemplate">
-        <Card>
-          <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-          <Text value="{$item.country}" />
-          <Text value="{$item.company}" variant="strong" />
-        </Card>
-      </property>
-    </List>
-  </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START defaultGroups
-
-<Callout type="info" emoji="📔">
-For the `defaultGroups` property to work, the data must be sectioned using the [`groupBy`](#groupBy) property,
-and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
-</Callout>
-
-```xmlui copy {4}
-<App>
-  <List
-    data='{[...]}'
-    defaultGroups="{['dairy', 'meat', 'vegetables']}"
-    groupBy="category" >
-    <property name="groupHeaderTemplate">
-      <VStack>
-        <Text variant="subtitle" value="{$group.key}" />
-      </VStack>
-    </property>
-  </List>
-</App>
-```
-
-<Playground
-  name="Example: defaultGroups"
-  height={400}
-  app={`
-    <App>
-      <List
-        data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}'
-        defaultGroups="{['dairy', 'meat', 'vegetables']}"
-        groupBy="category">
-        <property name="groupHeaderTemplate">
-          <VStack>
-            <Text variant="subtitle" value="{$group.key}" />
-          </VStack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START emptyListTemplate
-
-```xmlui copy
-<App>
+  <!-- This is the same -->
   <List>
-    <property name="emptyListTemplate">
-      <VStack horizontalAlignment="center">
-        <Text variant="strong" value="Empty..." />
-      </VStack>
-    </property>
-  </List>
-</App>
-```
-
-<Playground
-  name="Example: emptyListTemplate"
-  height={140}
-  app={`
-    <App>
-      <List>
-        <property name="emptyListTemplate">
-          <VStack horizontalAlignment="center">
-            <Text variant="strong" value="Empty..." />
-          </VStack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START idKey
-
-```xmlui /idKey="key"/
-<App>
-  <List idKey="key" data='{[...]}' />
-</App>
-```
-
-<Playground
-  name="Example: idKey"
-  height={400}
-  app={`
-    <App>
-      <List idKey="key" data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}' />
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START itemTemplate
-
-Note how in the example below the `$item` is used to access the `name`, `quantity` and `unit` attributes.
-
-```xmlui copy {3-14}
-<App>
-  <List data='{[...]}'>
     <property name="itemTemplate">
-      <Card>
-        <HStack verticalAlignment="center">
-          <Icon name="info" />
-          <Text value="{$item.name}" variant="strong" />
-        </HStack>
-        <HStack>
-          <Text value="{$item.quantity}" />
-          <Text value="{$item.unit}" variant="em" />
-        </HStack>
-      </Card>
+      <Text>Template</Text>
     </property>
+  </List>
+  <!-- As this -->
+  <List>
+    <Text>Template</Text>
   </List>
 </App>
 ```
 
-<Playground
-  name="Example: itemTemplate"
-  height={400}
-  app={`
-    <App>
-      <List data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}'>
-        <property name="itemTemplate">
-          <Card>
-            <HStack verticalAlignment="center">
-              <Icon name="info" />
-              <Text value="{$item.name}" variant="strong" />
-            </HStack>
-            <HStack>
-              <Text value="{$item.quantity}" />
-              <Text value="{$item.unit}" variant="em" />
-            </HStack>
-          </Card>
-        </property>
-      </List>
-    </App>
-  `}
-/>
+## Properties
 
-%-PROP-END
+### `availableGroups`
 
-%-PROP-START limit
-
-```xmlui /limit="4"/
-<App>
-  <List limit="4" data='{[...]}' />
-</App>
-```
-
-<Playground
-  name="Example: limit"
-  height={400}
-  app={`
-    <App>
-      <List limit="4" data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}' />
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START loading
-
-```xmlui copy
-<App>
-  <List loading="true" />
-</App>
-```
-
-<Playground
-  name="Example: loading"
-  height={120}
-  app={`
-    <App>
-      <List loading="true" />
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START orderBy
-
-```xmlui /orderBy="{{ field: 'quantity', direction: 'desc' }}"/
-<App>
-  <List orderBy="{{ field: 'quantity', direction: 'desc' }}" data='{[...]}' />
-</App>
-```
-
-<Playground
-  name="Example: orderBy"
-  height={400}
-  app={`
-    <App>
-      <List 
-        orderBy="{{ field: 'quantity', direction: 'desc' }}" 
-        data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}' />
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START pageInfo
-
-It contains the following boolean attributes:
-
-| Attribute            | Description                          |
-| :------------------- | :------------------------------------|
-| `hasPrevPage`        | Does the list have a previous page   |
-| `hasNextPage`        | Does the list have a next page       |
-| `isFetchingPrevPage` | _TBD_                                |
-| `isFetchingNextPage` | _TBD_                                |
-
-%-PROP-END
-
-%-PROP-START groupBy
-
-<Callout type="info" emoji="📔">
-For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeaderTemplate)
-or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
-</Callout>
-
-```xmlui copy {3}
-<App>
-  <List
-    data='{[...]}'
-    groupBy="category">
-    <property name="groupHeaderTemplate">
-      <VStack>
-        <Text variant="subtitle" value="{$group.key}" />
-      </VStack>
-    </property>
-  </List>
-</App>
-```
-
-<Playground
-  name="Example: groupBy"
-  height={400}
-  app={`
-    <App>
-      <List
-        data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}'
-        groupBy="category">
-        <property name="groupHeaderTemplate">
-          <VStack>
-            <Text variant="subtitle" value="{$group.key}" />
-          </VStack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START groupFooterTemplate
-
-The structure of `$group` in a `groupFooterTemplate` is the following:
-
-| Attribute | Description                                                                                                   |
-| --------- | ------------------------------------------------------------------------------------------------------------- |
-| id        | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`.   |
-| items     | The items filtered from the original data list that fall into this section.                                   |
-| key       | The attribute name to section by provided via `groupBy`                                                       |
-
-This example displays a separator line in the groups' footer:
-
-```xmlui copy {8-12}
-<App>
-  <List data='{[...]}' groupBy="category">
-    <property name="groupHeaderTemplate">
-      <VStack>
-        <Text variant="subtitle" value="{$group.key}" />
-      </VStack>
-    </property>
-    <property name="groupFooterTemplate">
-      <VStack paddingVertical="$space-normal">
-        <ContentSeparator/>
-      </VStack>
-    </property>
-  </List>
-</App>
-```
-
-<Playground
-  name="Example: groupFooterTemplate"
-  height={400}
-  app={`
-    <App>
-      <List data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}'
-    groupBy="category">
-        <property name="groupHeaderTemplate">
-          <VStack>
-            <Text variant="subtitle" value="{$group.key}" />
-          </VStack>
-        </property>
-        <property name="groupFooterTemplate">
-          <VStack paddingVertical="$space-normal">
-            <ContentSeparator/>
-          </VStack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START groupHeaderTemplate
-
-The structure of `$group` in a `groupHeaderTemplate` is the following:
-
-| Attribute | Description                                                                                                   |
-| --------- | ------------------------------------------------------------------------------------------------------------- |
-| id        | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`.   |
-| items     | The items filtered from the original data list that fall into this section.                                   |
-| key       | The attribute name to section by provided via `groupBy`                                                       |
-
-```xmlui copy {3-7}
-<App>
-  <List data='{[...]}' groupBy="category">
-    <property name="groupHeaderTemplate">
-      <Stack padding="$space-2">
-        <Text variant="subtitle" value="{$group.key}" />
-      </Stack>
-    </property>
-  </List>
-</App>
-```
-
-<Playground
-  name="Example: groupHeaderTemplate"
-  height={400}
-  app={`
-    <App>
-      <List data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}'
-      groupBy="category">
-        <property name="groupHeaderTemplate">
-          <Stack padding="$space-2">
-            <Text variant="subtitle" value="{$group.key}" />
-          </Stack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START selectedIndex
-
-```xmlui /selectedIndex="5"/
-<App>
-  <List selectedIndex="5" data='{[...]}' />
-</App>
-```
-
-<Playground
-  name="Example: selectedIndex"
-  height={400}
-  app={`
-    <App>
-      <List selectedIndex="5" data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}' />
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START scrollAnchor
-
-```xmlui /scrollAnchor="bottom"/
-<App>
-  <List scrollAnchor="bottom" data='{[...]}' />
-</App>
-```
-
-<Playground
-  name="Example: scrollAnchor"
-  height={400}
-  app={`
-    <App>
-      <List scrollAnchor="bottom" data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}' />
-    </App>
-  `}
-/>
-
-%-PROP-END
-
-%-PROP-START availableGroups
+This property is an array of group names that the `List` will display.
 
 ```xmlui {5}
 <App>
@@ -1090,9 +133,9 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
   `}
 />
 
-%-PROP-END
+### `borderCollapse (default: true)`
 
-%-PROP-START borderCollapse
+Collapse items borders
 
 Note how the `List` on the right has different borders:
 
@@ -1242,9 +285,482 @@ Note how the `List` on the right has different borders:
   `}
 />
 
-%-PROP-END
+### `data`
 
-%-PROP-START groupsInitiallyExpanded
+The component receives data via this property. The `data` property is a list of items that the `List` can display.
+
+Note how the `List` infers the given data and provides a simple layout for it.
+To tweak what data and how it is displayed, see the [`itemTemplate` section](#itemtemplate).
+
+```xmlui
+<App>
+  <List data="{[...]}">
+</App>
+```
+
+```xmlui-pg copy name="Example: data" height="400px"
+<App>
+  <List data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}' />
+</App>
+```
+
+You can also provide the `List` with data directly from an API via this property.
+
+In the example below, the `List` also uses the `itemTemplate` property to access the data attributes as well.
+See the [itemTemplate section](#itemtemplate).
+
+```xmlui-pg copy display name="Example: data API Call" height="400px"
+  <App>
+    <List data='https://api.spacexdata.com/v3/rockets'>
+      <property name="itemTemplate">
+        <Card>
+          <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
+          <Text value="{$item.country}" />
+          <Text value="{$item.company}" variant="strong" />
+        </Card>
+      </property>
+    </List>
+  </App>
+```
+
+### `defaultGroups`
+
+This property adds a list of default groups for the `List` and displays the group headers in the specified order. If the data contains group headers not in this list, those headers are also displayed (after the ones in this list); however, their order is not deterministic.
+
+<Callout type="info" emoji="📔">
+For the `defaultGroups` property to work, the data must be sectioned using the [`groupBy`](#groupBy) property,
+and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
+</Callout>
+
+```xmlui copy {4}
+<App>
+  <List
+    data='{[...]}'
+    defaultGroups="{['dairy', 'meat', 'vegetables']}"
+    groupBy="category" >
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: defaultGroups" height="400px"
+<App>
+  <List
+    data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}'
+    defaultGroups="{['dairy', 'meat', 'vegetables']}"
+    groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+  </List>
+</App>
+```
+
+### `emptyListTemplate`
+
+This property defines the template to display when the list is empty.
+
+```xmlui-pg copy display name="Example: emptyListTemplate" height="140px"
+<App>
+  <List>
+    <property name="emptyListTemplate">
+      <VStack horizontalAlignment="center">
+        <Text variant="strong" value="Empty..." />
+      </VStack>
+    </property>
+  </List>
+</App>
+```
+
+### `groupBy`
+
+This property sets which attribute of the data is used to group the list items. If the attribute does not appear in the data, it will be ignored.
+
+<Callout type="info" emoji="📔">
+For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeaderTemplate)
+or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
+</Callout>
+
+```xmlui copy {3}
+<App>
+  <List
+    data='{[...]}'
+    groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+  </List>
+</App>
+```
+
+<Playground
+  name="Example: groupBy"
+  height={400}
+  app={`
+    <App>
+      <List
+        data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
+        groupBy="category">
+        <property name="groupHeaderTemplate">
+          <VStack>
+            <Text variant="subtitle" value="{$group.key}" />
+          </VStack>
+        </property>
+      </List>
+    </App>
+  `}
+/>
+
+### `groupFooterTemplate`
+
+Enables the customization of how the the footer of each group is displayed. Combine with [`groupHeaderTemplate`](#groupHeaderTemplate) to customize sections. You can use the `$item` context variable to access an item group and map its individual attributes.
+
+The structure of `$group` in a `groupFooterTemplate` is the following:
+
+| Attribute | Description                                                                                                   |
+| --------- | ------------------------------------------------------------------------------------------------------------- |
+| id        | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`.   |
+| items     | The items filtered from the original data list that fall into this section.                                   |
+| key       | The attribute name to section by provided via `groupBy`                                                       |
+
+This example displays a separator line in the groups' footer:
+
+```xmlui copy {8-12}
+<App>
+  <List data='{[...]}' groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+    <property name="groupFooterTemplate">
+      <VStack paddingVertical="$space-normal">
+        <ContentSeparator/>
+      </VStack>
+    </property>
+  </List>
+</App>
+```
+
+<Playground
+  name="Example: groupFooterTemplate"
+  height={400}
+  app={`
+    <App>
+      <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
+    groupBy="category">
+        <property name="groupHeaderTemplate">
+          <VStack>
+            <Text variant="subtitle" value="{$group.key}" />
+          </VStack>
+        </property>
+        <property name="groupFooterTemplate">
+          <VStack paddingVertical="$space-normal">
+            <ContentSeparator/>
+          </VStack>
+        </property>
+      </List>
+    </App>
+  `}
+/>
+
+### `groupHeaderTemplate`
+
+Enables the customization of how the groups are displayed, similarly to the [`itemTemplate`](#itemtemplate). You can use the `$item` context variable to access an item group and map its individual attributes.
+
+The structure of `$group` in a `groupHeaderTemplate` is the following:
+
+| Attribute | Description                                                                                                   |
+| --------- | ------------------------------------------------------------------------------------------------------------- |
+| id        | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`.   |
+| items     | The items filtered from the original data list that fall into this section.                                   |
+| key       | The attribute name to section by provided via `groupBy`                                                       |
+
+```xmlui copy {3-7}
+<App>
+  <List data='{[...]}' groupBy="category">
+    <property name="groupHeaderTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$group.key}" />
+      </Stack>
+    </property>
+  </List>
+</App>
+```
+
+<Playground
+  name="Example: groupHeaderTemplate"
+  height={400}
+  app={`
+    <App>
+      <List data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}'
+      groupBy="category">
+        <property name="groupHeaderTemplate">
+          <Stack padding="$space-2">
+            <Text variant="subtitle" value="{$group.key}" />
+          </Stack>
+        </property>
+      </List>
+    </App>
+  `}
+/>
+
+### `groupsInitiallyExpanded`
+
+This Boolean property defines whether the list groups are initially expanded.
 
 Note how the groups in the right `List` are expanded by default:
 
@@ -1394,9 +910,9 @@ Note how the groups in the right `List` are expanded by default:
   `}
 />
 
-%-PROP-END
+### `hideEmptyGroups (default: true)`
 
-%-PROP-START hideEmptyGroups
+This boolean property indicates if empty groups should be hidden (no header and footer are displayed).
 
 Note how the `meats` category is not displayed in the right `List`:
 
@@ -1556,16 +1072,413 @@ Note how the `meats` category is not displayed in the right `List`:
   `}
 />
 
-%-PROP-END
+### `idKey (default: "id")`
 
-%-STYLE-START
+Denotes which attribute of an item acts as the ID or key of the item
 
-`List` is a layout container; its purpose is to render nested child components.
-`List` has no theme variables to change its visual appearance.
+```xmlui /idKey="key"/
+<App>
+  <List idKey="key" data='{[...]}' />
+</App>
+```
 
-%-STYLE-END
+```xmlui-pg name="Example: idKey" height="400px"
+<App>
+  <List idKey="key" data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}' />
+</App>
+```
 
-%-API-START scrollToBottom
+### `itemTemplate`
+
+This property allows the customization of mapping data items to components. You can use the `$item` context variable to access an item and map its individual attributes.
+
+Note how in the example below the `$item` is used to access the `name`, `quantity` and `unit` attributes.
+
+```xmlui copy {3-14}
+<App>
+  <List data='{[...]}'>
+    <property name="itemTemplate">
+      <Card>
+        <HStack verticalAlignment="center">
+          <Icon name="info" />
+          <Text value="{$item.name}" variant="strong" />
+        </HStack>
+        <HStack>
+          <Text value="{$item.quantity}" />
+          <Text value="{$item.unit}" variant="em" />
+        </HStack>
+      </Card>
+    </property>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: itemTemplate" height="400px"
+<App>
+  <List data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}'>
+    <property name="itemTemplate">
+      <Card>
+        <HStack verticalAlignment="center">
+          <Icon name="info" />
+          <Text value="{$item.name}" variant="strong" />
+        </HStack>
+        <HStack>
+          <Text value="{$item.quantity}" />
+          <Text value="{$item.unit}" variant="em" />
+        </HStack>
+      </Card>
+    </property>
+  </List>
+</App>
+```
+
+### `limit`
+
+This property limits the number of items displayed in the `List`.
+
+```xmlui /limit="4"/
+<App>
+  <List limit="4" data='{[...]}' />
+</App>
+```
+
+```xmlui-pg name="Example: limit" height="400px"
+<App>
+  <List limit="4" data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}' />
+</App>
+```
+
+### `loading`
+
+This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property.
+
+```xmlui copy
+<App>
+  <List loading="true" />
+</App>
+```
+
+<Playground
+  name="Example: loading"
+  height={120}
+  app={`
+    <App>
+      <List loading="true" />
+    </App>
+  `}
+/>
+
+### `orderBy`
+
+This property enables the ordering of list items by specifying an attribute in the data.
+
+```xmlui /orderBy="{{ field: 'quantity', direction: 'desc' }}"/
+<App>
+  <List orderBy="{{ field: 'quantity', direction: 'desc' }}" data='{[...]}' />
+</App>
+```
+
+<Playground
+  name="Example: orderBy"
+  height={400}
+  app={`
+    <App>
+      <List 
+        orderBy="{{ field: 'quantity', direction: 'desc' }}" 
+        data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' />
+    </App>
+  `}
+/>
+
+### `pageInfo`
+
+This property contains the current page information. Setting this property also enures the `List` uses pagination.
+
+It contains the following boolean attributes:
+
+| Attribute            | Description                          |
+| :------------------- | :------------------------------------|
+| `hasPrevPage`        | Does the list have a previous page   |
+| `hasNextPage`        | Does the list have a next page       |
+| `isFetchingPrevPage` | _TBD_                                |
+| `isFetchingNextPage` | _TBD_                                |
+
+### `scrollAnchor (default: "top")`
+
+This property pins the scroll position to a specified location of the list. Available values are shown below.
+
+Available values: `top` **(default)**, `bottom`
+
+```xmlui /scrollAnchor="bottom"/
+<App>
+  <List scrollAnchor="bottom" data='{[...]}' />
+</App>
+```
+
+<Playground
+  name="Example: scrollAnchor"
+  height={400}
+  app={`
+    <App>
+      <List scrollAnchor="bottom" data='{${JSON.stringify([
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+])}}' />
+    </App>
+  `}
+/>
+
+## Events
+
+This component does not have any events.
+
+## Exposed Methods
+
+### `scrollToBottom`
+
+This method scrolls the list to the bottom.
 
 The following example demonstrates `scrollToBottom` and all the other scroll methods:
 
@@ -1617,22 +1530,25 @@ The following example demonstrates `scrollToBottom` and all the other scroll met
   `}
 />
 
-%-API-END
+### `scrollToId`
 
-%-API-START scrollToTop
-
-See the [`scrollToBottom`](#scrolltobottom) example.
-
-%-API-END
-
-%-API-START scrollToIndex
+This method scrolls the list to a specific item. The method accepts an item ID as a parameter.
 
 See the [`scrollToBottom`](#scrolltobottom) example.
 
-%-API-END
+### `scrollToIndex`
 
-%-API-START scrollToId
+This method scrolls the list to a specific index. The method accepts an index as a parameter.
 
 See the [`scrollToBottom`](#scrolltobottom) example.
 
-%-API-END
+### `scrollToTop`
+
+This method scrolls the list to the top.
+
+See the [`scrollToBottom`](#scrolltobottom) example.
+
+## Styling
+
+`List` is a layout container; its purpose is to render nested child components.
+`List` has no theme variables to change its visual appearance.
