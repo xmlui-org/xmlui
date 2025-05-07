@@ -125,7 +125,7 @@ test("reset works with no intialValue", async ({ page, initTestBed, createSelect
 
 });
 
-test.fixme("select multiple items without closing listbox", async ({ page, initTestBed, createSelectDriver, createButtonDriver }) => {
+test("select multiple items without closing listbox", async ({ page, initTestBed, createSelectDriver, createButtonDriver }) => {
   const { testStateDriver } = await initTestBed(`
     <Fragment>
       <Select id="mySelect" multiSelect>
@@ -140,7 +140,7 @@ test.fixme("select multiple items without closing listbox", async ({ page, initT
   await selectDrv.selectMultipleLabels(["Zero", "One"]);
 
   /* problem is that the listbox closes after the 1st selection is made */
-  await expect(page.getByTestId("text")).toHaveText("Selected value: 0, 1");
+  await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
 });
 
 test("disabled Select cannot be opened", async ({page, createSelectDriver, initTestBed}) => {
