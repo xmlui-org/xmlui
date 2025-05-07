@@ -55,16 +55,19 @@ $component: "Text";
   }
 
   // For inline code
-  :not(.text.codefence) > &.code {
+  :not(.text.codefence) > &.code,
+  :not(.text.codefence) > &code {
     @include textVariant("code");
   }
 
   // For code blocks using <![CDATA[ + <code> tags
-  &.codefence:has(> .text.code) {
+  &.codefence:has(> .text.code),
+  &.codefence:has(> code) {
     @include textVariant("codefence");
     // TEMP: solution for a demo - need to re-evaluate how to truncate/wrap code blocks
     overflow-x: auto;
     text-overflow: initial;
+    font-size: t.$fontSize-small;
   }
 
   // ---
