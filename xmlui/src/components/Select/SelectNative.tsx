@@ -141,6 +141,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
     <SelectRoot value={stringValue} onValueChange={onValChange}>
       <SelectTrigger
         id={id}
+        aria-haspopup="listbox"
         style={style}
         onFocus={onFocus}
         onBlur={onBlur}
@@ -169,7 +170,9 @@ const SimpleSelect = forwardRef(function SimpleSelect(
           <ScrollUpButton className={styles.selectScrollUpButton}>
             <Icon name="chevronup" />
           </ScrollUpButton>
-          <SelectViewport className={styles.selectViewport}>{children}</SelectViewport>
+          <SelectViewport className={styles.selectViewport} role="listbox">
+            {children}
+          </SelectViewport>
           <ScrollDownButton className={styles.selectScrollDownButton}>
             <Icon name="chevrondown" />
           </ScrollDownButton>
@@ -358,6 +361,7 @@ export const Select = forwardRef(function Select(
               <Popover open={open} onOpenChange={setOpen} modal={false}>
                 <PopoverTrigger
                   id={id}
+                  aria-haspopup="listbox"
                   style={style}
                   ref={setReferenceElement}
                   onFocus={onFocus}
