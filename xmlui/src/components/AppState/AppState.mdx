@@ -8,7 +8,8 @@ Variables in xmlui are a straightforward tool for managing states. However, a va
 
 In the following example, the main file of the app declares a variable, `enhancedMode`, which is toggled with a checkbox:
 
-```xmlui copy filename="Main.xmlui" /enhancedMode/
+```xmlui-pg name="Example: AppState" height="200px"
+---app display copy filename="Main.xmlui"
 <App var.enhancedMode="{false}">
   <VStack gap="$space-4" padding="$space-4">
     <Checkbox
@@ -19,56 +20,22 @@ In the following example, the main file of the app declares a variable, `enhance
     <Component2 enhancedMode="{enhancedMode}" />
   </VStack>
 </App>
-```
-
+---desc
 Two components, `Component1` and `Component2`, use the value of `enhancedMode`. Because of the aforementioned scoping issue, the app must explicitly pass the variable's value to those components so that they can use it. These components utilize the value to render their UI:
-
-
-```xmlui copy filename="Component1.xmlui" /enhancedMode/
+---comp display copy filename="Component1.xmlui"
 <Component name="Component1">
   <H3 when="{$props.enhancedMode}">I am in enhanced mode!</H3>
   <Text when="{!$props.enhancedMode}">Enhanced mode turned off.</Text>
 </Component>
-```
-
+---desc
 When you define an `AppState`, you can set its `initialValue` property to initialize the state value.
-
-```xmlui copy filename="Component2.xmlui" /enhancedMode/
+---comp display copy filename="Component2.xmlui"
 <Component name="Component2">
   <Button enabled="{$props.enhancedMode}">Set enhanced options</Button>
 </Component>
-```
-
+---desc
 You can try how this app works:
-
-<Playground
-  height={200}
-  name="Example: AppState"
-  components={[`
-    <Component name="Component1">
-      <H3 when="{$props.enhancedMode}">I am in enhanced mode!</H3>
-      <Text when="{!$props.enhancedMode}">Enhanced mode turned off.</Text>
-    </Component>
-  `,
-  `
-    <Component name="Component2">
-      <Button enabled="{$props.enhancedMode}">Set enhanced options</Button>
-    </Component>
-  `
-  ]}
-  app={`
-    <App var.enhancedMode="{false}">
-      <VStack gap="$space-4" padding="$space-4">
-        <Checkbox
-          label="Enhanced mode"
-          initialValue="{enhancedMode}"
-          onDidChange="v => enhancedMode = v" />
-        <Component1 enhancedMode="{enhancedMode}" />
-        <Component2 enhancedMode="{enhancedMode}" />
-      </VStack>
-    </App>
-  `}
-/>
+```
 
 ### Storing State in AppState
 

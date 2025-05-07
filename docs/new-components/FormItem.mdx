@@ -1,0 +1,880 @@
+import { Callout } from "nextra/components";
+
+# FormItem [#component-formitem]
+
+<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
+
+A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data.
+
+The component provides context values with which you can access some internal properties:
+
+- `$setValue`: This function can be invoked to set the `FormItem` instance's value. The function has a single argument, the new value to set.
+- `$validationResult`: This variable represents the result of the latest validation of the `FormItem` instance.
+- `$value`: The context variable represents the current value of the `FormItem`. It can be used in expressions and code snippets within the `FormItem` instance.
+
+You can learn more about this component in the [Forms](../../create-apps/forms.mdx) article.
+
+## Properties
+
+### `autoFocus (default: false)`
+
+If this property is set to `true`, the component gets the focus automatically when displayed.
+
+### `bindTo`
+
+This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name.
+
+Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data looks like compared to the one set in `data`.
+
+```xmlui copy /bindTo="firstname"/
+<App>
+  <Form
+    data="{{ firstname: 'James', lastname: 'Clewell' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem label="Firstname" bindTo="firstname" />
+    <FormItem label="Lastname" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: bindTo"
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: 'James', lastname: 'Clewell' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem label="Firstname" bindTo="firstname" />
+        <FormItem label="Lastname" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `customValidationsDebounce (default: 0)`
+
+This optional number prop determines the time interval between two runs of a custom validation.
+
+Note how changing the input in the demo below will result in a slight delay of input checks noted by the appearance of a new "I" character.
+
+```xmlui copy /customValidationsDebounce="3000"/
+<App>
+  <Form
+    var.validations="Validations: "
+    data="{{ name: 'Joe' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem
+      customValidationsDebounce="3000"
+      onValidate="(value) => { validations += '| '; return value === value.toUpperCase(); }"
+      bindTo="name" />
+    <Text value="{validations}" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: customValidationsDebounce"
+  app={`
+    <App>
+      <Form
+        var.validations="Validations: "
+        data="{{ name: 'Joe' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem
+          customValidationsDebounce="3000"
+          onValidate="(value) => { validations += '| '; return value === value.toUpperCase(); }"
+          bindTo="name" />
+        <Text value="{validations}" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `enabled (default: true)`
+
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+```xmlui copy {3-4}
+<App>
+  <Form>
+    <FormItem label="Firstname" enabled="true" />
+    <FormItem label="Lastname" enabled="false" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: enabled"
+  app={`
+    <App>
+      <Form>
+        <FormItem label="Firstname" enabled="true" />
+        <FormItem label="Lastname" enabled="false" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `initialValue`
+
+This property sets the component's initial value.
+
+```xmlui copy {3} /initialValue/
+<App>
+  <Form data="{{ firstname: 'Michael', lastname: undefined }}">
+    <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
+    <FormItem label="Lastname" bindTo="lastname" initialValue="Jordan" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: initialValue"
+  app={`
+    <App>
+      <Form data="{{ firstname: 'Michael', lastname: undefined }}">
+        <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
+        <FormItem label="Lastname" bindTo="lastname" initialValue="Jordan" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `inputTemplate`
+
+This property is used to define a custom input template.
+
+### `label`
+
+This property sets the label of the component.
+
+```xmlui copy /label="Firstname"/
+<App>
+  <Form>
+    <FormItem label="Firstname" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: label"
+  app={`
+    <App>
+      <Form>
+        <FormItem label="Firstname" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `labelBreak (default: true)`
+
+This boolean value indicates if the label can be split into multiple lines if it would overflow the available label width.
+
+### `labelPosition (default: "top")`
+
+Places the label at the given position of the component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
+| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
+| `top` | The top of the input **(default)** |
+| `bottom` | The bottom of the input |
+
+Different input components have different layout methods
+(i.e. `TextBox` labels are positioned at the top, `Checkbox` labels are on the right side).
+
+```xmlui copy /label="Firstname"/
+<App>
+  <Form>
+    <FormItem label="Start Label" labelPosition="start" />
+    <FormItem label="Top Label" labelPosition="top" />
+    <FormItem label="End Label" labelPosition="end" />
+    <FormItem label="Bottom Label" labelPosition="bottom" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: labelPosition"
+  app={`
+    <App>
+      <Form>
+        <FormItem label="Start Label" labelPosition="start" />
+        <FormItem label="Top Label" labelPosition="top" />
+        <FormItem label="End Label" labelPosition="end" />
+        <FormItem label="Bottom Label" labelPosition="bottom" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `labelWidth`
+
+This property sets the width of the item label.
+
+### `lengthInvalidMessage`
+
+This optional string property is used to customize the message that is displayed on a failed length check: [minLength](#minlength) or [maxLength](#maxlength).
+
+In the app, type a name longer than four characters in both fields, then leave the edited field. The two fields will display different error messages; the second uses the customized one.
+
+```xmlui copy /lengthInvalidMessage="Name is too long!"/
+<App>
+  <Form
+    data="{{ firstname: 'James', lastname: 'Clewell' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem maxLength="4" bindTo="firstname" />
+    <FormItem lengthInvalidMessage="Name is too long!" maxLength="4" bindTo="lastname" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: lengthInvalidMessage"
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: 'James', lastname: 'Clewell' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem maxLength="4" bindTo="firstname" />
+        <FormItem lengthInvalidMessage="Name is too long!" maxLength="4" bindTo="lastname" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `lengthInvalidSeverity (default: "error")`
+
+This property sets the severity level of the length validation.
+
+Available values: `error` **(default)**, `warning`, `valid`
+
+In the app, type a name longer than four characters in both fields, then leave the edited field. The two fields will display different error messages; the second uses a warning instead of an error.
+
+```xmlui copy /lengthInvalidSeverity="warning"/
+<App>
+  <Form
+    data="{{ firstname: 'James', lastname: 'Clewell' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem maxLength="4" bindTo="firstname" />
+    <FormItem lengthInvalidSeverity="warning" maxLength="4" bindTo="lastname" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: lengthInvalidSeverity"
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: 'James', lastname: 'Clewell' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem maxLength="4" bindTo="firstname" />
+        <FormItem lengthInvalidSeverity="warning" maxLength="4" bindTo="lastname" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `maxLength`
+
+Checks whether the input has a maximum length of a specified value.
+
+Note that it is not possible for the user to enter a string larger than the value of the `maxLength`,
+but setting such a value programmatically still results in a validation check.
+
+In the demo below, try to enter an input longer than 4 characters or submit the form as is.
+
+```xmlui copy /maxLength="4"/
+<App>
+  <Form
+    data="{{ firstname: 'James' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem maxLength="4" bindTo="firstname" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: maxLength"
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: 'James' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem maxLength="4" bindTo="firstname" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `maxTextLength`
+
+The maximum length of the text in the input field
+
+### `maxValue`
+
+Checks whether the input has the maximum specified value.
+
+Note that it is not possible for the user to enter a number larger than the value of the `maxValue`,
+but setting such a value programmatically still results in a validation check.
+
+In the demo below, enter an input greater than 99 or just submit the form as is.
+
+```xmlui copy /maxValue="99"/
+<App>
+  <Form
+    data="{{ age: 100 }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem maxValue="99" bindTo="age" type="integer" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: maxValue"
+  app={`
+    <App>
+      <Form
+        data="{{ age: 100 }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem maxValue="99" bindTo="age" type="integer" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `minLength`
+
+Checks whether the input has a minimum length of a specified value.
+
+In the demo below, enter an input shorter than 4 characters or just submit the form as is.
+
+```xmlui copy /minLength="4"/
+<App>
+  <Form
+    data="{{ firstname: '' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem minLength="4" bindTo="firstname" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: minLength"
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: '' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem minLength="4" bindTo="firstname" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `minValue`
+
+Checks whether the input has the minimum specified value.
+
+Note that it is not possible for the user to enter a number smaller than the value of the `minValue`,
+but setting such a value programmatically still results in a validation check.
+
+In the demo below, enter an input smaller than 18 or just submit the form as is.
+
+```xmlui copy /minValue="18"/
+<App>
+  <Form
+    data="{{ age: 0 }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem minValue="18" bindTo="age" type="integer" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: minValue"
+  app={`
+    <App>
+      <Form
+        data="{{ age: 0 }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem minValue="18" bindTo="age" type="integer" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `pattern`
+
+Checks whether the input fits a predefined regular expression.
+
+| Value   | Description                                                                                                                                                |
+| :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `email` | Accepts the `[username]@[second level domain].[top level domain]` format                                                                                     |
+| `phone` | Accepts a wide range of characters: numbers, upper- and lowercase letters and the following symbols: `#`, `*`, `)`, `(`, `+`, `.`, `\`, `-`, `_`, `&`, `'` |
+| `url`   | Accepts URLs and URIs starting with either `http` or `https`                                                                                               |
+
+> **Note:** To define custom patterns and regular expressions, see the [regex section](#regex).
+
+In the demo below, enter an input that is not solely one lowercase string or just submit the form as is.
+
+```xmlui copy /pattern="email"/
+<App>
+  <Form
+    data="{{ userEmail: 'mailto' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem pattern="email" bindTo="userEmail" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: regex"
+  app={`
+    <App>
+      <Form
+        data="{{ userEmail: 'mailto' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem pattern="email" bindTo="userEmail" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `patternInvalidMessage`
+
+This optional string property is used to customize the message that is displayed on a failed pattern test.
+
+In the demo below, enter anything that does not look like an email and click outside to see the regular and custom message.
+
+```xmlui copy /patternInvalidMessage="This does not look like an email"/
+<App>
+  <Form
+    data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem pattern="email" bindTo="oldEmail" />
+    <FormItem
+      patternInvalidMessage="This does not look like an email"
+      pattern="email" bindTo="newEmail" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: patternInvalidMessage"
+  app={`
+    <App>
+      <Form
+        data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem pattern="email" bindTo="oldEmail" />
+        <FormItem
+          patternInvalidMessage="This does not look like an email"
+          pattern="email" bindTo="newEmail" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `patternInvalidSeverity (default: "error")`
+
+This property sets the severity level of the pattern validation.
+
+Available values: `error` **(default)**, `warning`, `valid`
+
+In the demo below, enter a string of characters that does not look like an email to see the difference in feedback.
+
+```xmlui copy /patternInvalidSeverity="warning"/
+<App>
+  <Form
+    data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem pattern="email" bindTo="oldEmail" />
+    <FormItem patternInvalidSeverity="warning" pattern="email" bindTo="newEmail" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: patternInvalidSeverity"
+  app={`
+    <App>
+      <Form
+        data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem pattern="email" bindTo="oldEmail" />
+        <FormItem patternInvalidSeverity="warning" pattern="email" bindTo="newEmail" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `rangeInvalidMessage`
+
+This optional string property is used to customize the message that is displayed when a value is out of range.
+
+In the demo below, enter any value that is out of range in the input fields and click outside to see the regular and custom message.
+Just submitting the form as is also produces the same error.
+
+```xmlui copy /rangeInvalidMessage="Out of range!"/
+<App>
+  <Form
+    data="{{ age: 100, customAge: 100 }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
+    <FormItem
+      minValue="0"
+      maxValue="99"
+      rangeInvalidMessage="Out of range!"
+      bindTo="customAge"
+      type="integer" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: rangeInvalidMessage"
+  app={`
+    <App>
+      <Form
+        data="{{ age: 100, customAge: 100 }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
+        <FormItem
+          minValue="0"
+          maxValue="99"
+          rangeInvalidMessage="Out of range!"
+          bindTo="customAge"
+          type="integer" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `rangeInvalidSeverity (default: "error")`
+
+This property sets the severity level of the value range validation.
+
+Available values: `error` **(default)**, `warning`, `valid`
+
+In the demo below, enter any value that is out of range in the input fields and click outside to see the regular and custom message.
+Just submitting the form as is also produces the same error.
+
+```xmlui copy /rangeInvalidSeverity="warning"/
+<App>
+  <Form
+    data="{{ age: 100, customAge: 100 }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
+    <FormItem
+      minValue="0" maxValue="99"
+      rangeInvalidSeverity="warning"
+      bindTo="customAge"
+      type="integer" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: rangeInvalidSeverity"
+  app={`
+    <App>
+      <Form
+        data="{{ age: 100, customAge: 100 }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
+        <FormItem
+          minValue="0"
+          maxValue="99"
+          rangeInvalidSeverity="warning"
+          bindTo="customAge"
+          type="integer" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `regex`
+
+Checks whether the input fits the provided regular expression.
+
+In the demo below, enter an input that is not solely one lowercase string or just submit the form as is.
+
+```xmlui copy /regex="^[a-z]+$"/
+<App>
+  <Form
+    data="{{ password: 'PASSWORD123' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem regex="^[a-z]+$" bindTo="password" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: regex"
+  app={`
+    <App>
+      <Form
+        data="{{ password: 'PASSWORD123' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem regex="^[a-z]+$" bindTo="password" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `regexInvalidMessage`
+
+This optional string property is used to customize the message that is displayed on a failed regular expression test.
+
+In the demo below, enter a password that is not a lowercase string and click outside to see the regular and custom message.
+
+```xmlui copy /regexInvalidMessage="Password must be all lowercase"/
+<App>
+  <Form
+    data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
+    <FormItem
+      regexInvalidMessage="Password must be all lowercase"
+      regex="^[a-z]+$" bindTo="newPassword" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: regexInvalidMessage"
+  app={`
+    <App>
+      <Form
+        data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
+        <FormItem
+          regexInvalidMessage="Password must be all lowercase"
+          regex="^[a-z]+$" bindTo="newPassword" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `regexInvalidSeverity (default: "error")`
+
+This property sets the severity level of regular expression validation.
+
+Available values: `error` **(default)**, `warning`, `valid`
+
+In the demo below, enter a password that is not a lowercase string and click outside to see the regular and custom message.
+Just submitting the form as is also produces the same error.
+
+```xmlui copy /regexInvalidSeverity="warning"/
+<App>
+  <Form
+    data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
+    <FormItem regexInvalidSeverity="warning" regex="^[a-z]+$" bindTo="newPassword" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: regexInvalidSeverity"
+  app={`
+    <App>
+      <Form
+        data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
+        <FormItem regexInvalidSeverity="warning" regex="^[a-z]+$" bindTo="newPassword" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+```xmlui copy /required="true"/
+<App>
+  <Form
+    data="{{ name: undefined }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem required="true" label="Name" bindTo="name" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: required"
+  app={`
+    <App>
+      <Form
+        data="{{ name: undefined }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem required="true" label="Name" bindTo="name" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `requiredInvalidMessage`
+
+This optional string property is used to customize the message that is displayed if the field is not filled in.
+
+In the demo below, leave the field empty and click outside to see the regular and custom message.
+
+```xmlui copy /requiredInvalidMessage="Lastname is required!"/
+<App>
+  <Form
+    data="{{ firstname: undefined, lastname: undefined }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem required="true" label="First Name" bindTo="firstname" />
+    <FormItem
+      requiredInvalidMessage="Last Name is required!"
+      required="true"
+      label="Last Name"
+      bindTo="lastname" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: requiredInvalidMessage"
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: undefined, lastname: undefined }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem required="true" label="First Name" bindTo="firstname" />
+        <FormItem
+          requiredInvalidMessage="Last Name is required!"
+          required="true"
+          label="Last Name"
+          bindTo="lastname" />
+      </Form>
+    </App>
+  `}
+/>
+
+### `type (default: "text")`
+
+This property is used to determine the specific input control the FormItem will wrap around. Note that the control names start with a lowercase letter and map to input components found in XMLUI.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `text` | Renders TextBox **(default)** |
+| `password` | Renders TextBox with `password` type |
+| `textarea` | Renders Textarea |
+| `checkbox` | Renders Checkbox |
+| `number` | Renders NumberBox |
+| `integer` | Renders NumberBox with `integersOnly` set to true |
+| `file` | Renders FileInput |
+| `datePicker` | Renders DatePicker |
+| `radioGroup` | Renders RadioGroup |
+| `switch` | Renders Switch |
+| `select` | Renders Select |
+| `autocomplete` | Renders AutoComplete |
+| `slider` | Renders Slider |
+| `colorpicker` | Renders ColorPicker |
+| `items` | Renders Items |
+| `custom` | Custom control specified in children |
+
+<Callout type="info" emoji="📔">
+For custom controls, there is no need to explicitly set the `type` to `custom`.
+Omitting the type and providing child components implicitly sets it to custom.
+</Callout>
+
+### `validationMode (default: "errorLate")`
+
+This property sets what kind of validation mode or strategy to employ for a particular input field.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `errorLate` | Display the error when the field loses focus.If an error is already displayed, continue for every keystroke until input is accepted. **(default)** |
+| `onChanged` | Display error (if present) for every keystroke. |
+| `onLostFocus` | Show/hide error (if present) only if the field loses focus. |
+
+## Events
+
+### `validate`
+
+This event is used to define a custom validation function.
+
+In the demo below, leave the field as is and submit the form or enter an input that is not all capital letters.
+
+```xmlui copy {7}
+<App>
+  <Form
+    data="{{ name: 'James' }}"
+    onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+    <FormItem
+      bindTo="name"
+      onValidate="(value) => value === value.toUpperCase()" />
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: validate"
+  app={`
+    <App>
+      <Form
+        data="{{ name: 'James' }}"
+        onSubmit="(toSave) => toast(JSON.stringify(toSave))">
+        <FormItem
+          bindTo="name"
+          onValidate="(value) => value === value.toUpperCase()" />
+      </Form>
+    </App>
+  `}
+/>
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+`FormItem` supports the styling of labels through these theme variables:
+
+- `textColor-FormItemLabel`
+- `fontSize-FormItemLabel`
+- `fontWeight-FormItemLabel`
+- `fontStyle-FormItemLabel`
+- `textTransform-FormItemLabel`
+- `textColor-FormItemLabel-required`
+- `fontSize-FormItemLabel-required`
+- `fontWeight-FormItemLabel-required`
+- `fontStyle-FormItemLabel-required`
+- `textTransform-FormItemLabel-required`
+- `textColor-FormItemLabel-requiredMark`
+
+This component displays other input components and binds them with the form's logic. You can style the individual form components; see the [`type` property](#type) to check what components are used beyond a particular form item.
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [fontFamily](../styles-and-themes/common-units/#fontFamily)-FormItemLabel | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontSize](../styles-and-themes/common-units/#size)-FormItemLabel | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-FormItemLabel | normal | normal |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-FormItemLabel | $fontWeight-medium | $fontWeight-medium |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-FormItemLabel | $textColor-primary | $textColor-primary |
+| [textColor](../styles-and-themes/common-units/#color)-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-FormItemLabel-requiredMark | $color-danger-400 | $color-danger-400 |
+| [textTransform](../styles-and-themes/common-units/#textTransform)-FormItemLabel | none | none |
+| [textTransform](../styles-and-themes/common-units/#textTransform)-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

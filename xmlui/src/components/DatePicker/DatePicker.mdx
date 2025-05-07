@@ -1,6 +1,6 @@
 %-API-START setValue
 
-```xmlui copy {3, 9, 12}
+```xmlui-pg copy {3, 9, 12} display name="Example: value and setValue"
 <App>
   <DatePicker
     id="picker"
@@ -17,85 +17,35 @@
 </App>
 ```
 
-<Playground
-  name="Example: value and setValue"
-  app={`
-    <App>
-      <DatePicker
-        id="picker"
-        readOnly="true"
-      />
-      <HStack>
-        <Button
-          label="Add Text"
-          onClick="picker.setValue('05/25/2024')" />
-        <Button
-          label="Remove Text"
-          onClick="picker.setValue('')" />
-      </HStack>
-    </App>
-  `}
-/>
-
 %-API-END
 
 %-PROP-START initialValue
 
-```xmlui copy
+```xmlui-pg copy display name="Example: initialValue" height="120px"
 <App>
   <DatePicker initialValue="05/25/2024" />
 </App>  
 ```
 
-<Playground
-  height={120}
-  name="Example: initialValue"
-  app={`
-    <App>
-      <DatePicker initialValue="05/25/2024" />
-    </App>  
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START placeholder
 
-```xmlui copy
+```xmlui-pg copy display name="Example: placeholder" height="120px"
 <App>
   <DatePicker placeholder="This is a placeholder" />
 </App>  
 ```
 
-<Playground
-  height={120}
-  name="Example: placeholder"
-  app={`
-    <App>
-      <DatePicker placeholder="This is a placeholder" />
-    </App>  
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START enabled
 
-```xmlui copy
+```xmlui-pg copy display name="Example: enabled" height="120px"
 <App>
   <DatePicker enabled="false" />
 </App>  
 ```
-
-<Playground
-  height={120}
-  name="Example: enabled"
-  app={`
-    <App>
-      <DatePicker enabled="false" />
-    </App>  
-  `}
-/>
 
 %-PROP-END
 
@@ -107,7 +57,7 @@
 | `warning` | Visual indicator for an input that produced a warning |
 | `error`   | Visual indicator for an input that produced an error  |
 
-```xmlui copy
+```xmlui-pg copy display name="Example: validationStatus" height="300px"
 <App>
   <DatePicker />
   <DatePicker validationStatus="valid" />
@@ -116,40 +66,16 @@
 </App>
 ```
 
-<Playground
-  name="Example: validationStatus"
-  height={300}
-  app={`
-    <App>
-      <DatePicker />
-      <DatePicker validationStatus="valid" />
-      <DatePicker validationStatus="warning" />
-      <DatePicker validationStatus="error" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START mode
 
-```xmlui copy {2-3}
+```xmlui-pg copy {2-3} display name="Example: mode" height="240px"
 <App>
   <DatePicker mode="single" />
   <DatePicker mode="range" />
 </App>
 ```
-
-<Playground
-  height={240}
-  name="Example: mode"
-  app={`
-  <App>
-    <DatePicker mode="single" />
-    <DatePicker mode="range" />
-  </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -171,41 +97,21 @@ The table below shows the available date formats:
 | yyyyMMdd   | 20240525   |
 | MMddyyyy   | 05252024   |
 
-```xmlui copy /dateFormat="dd-MM-yyyy"/
+```xmlui-pg copy display name="Example: dateFormat" height="120px"
 <App>
   <DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
 </App>
 ```
 
-<Playground
-  height={120}
-  name="Example: dateFormat"
-  app={`
-    <App>
-      <DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START showWeekNumber
 
-```xmlui copy
+```xmlui-pg copy display name="Example: showWeekNumber" height="120px"
 <App>
   <DatePicker showWeekNumber="true" />
 </App>
 ```
-
-<Playground
-  height={120}
-  name="Example: showWeekNumber"
-  app={`
-    <App>
-      <DatePicker showWeekNumber="true" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -221,81 +127,41 @@ The table below shows the available date formats:
 | Friday    | 5      |
 | Saturday  | 6      |
 
-```xmlui copy
+```xmlui-pg copy display name="Example: weekStartsOn" height="120px"
 <App>
   <DatePicker weekStartsOn="1" />
 </App>
 ```
 
-<Playground
-  name="Example: weekStartsOn"
-  height={120}
-  app={`
-    <App>
-      <DatePicker weekStartsOn="1" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START fromDate
 
-```xmlui copy
+```xmlui-pg copy display name="Example: fromDate" height="120px"
 <App>
   <DatePicker fromDate="05/24/2024" />
 </App>
 ```
 
-<Playground
-  height={120}
-  name="Example: fromDate"
-  app={`
-    <App>
-      <DatePicker fromDate="05/24/2024" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START toDate
 
-```xmlui copy
+```xmlui-pg copy display name="Example: toDate" height="120px"
 <App>
   <DatePicker toDate="05/26/2024" />
 </App>
 ```
 
-<Playground
-  height={120}
-  name="Example: toDate"
-  app={`
-    <App>
-      <DatePicker toDate="05/26/2024" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START disabledDates
 
-```xmlui copy
+```xmlui-pg copy display name="Example: disabledDates" height="120px"
 <App>
   <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
 </App>  
 ```
-
-<Playground
-  height={120}
-  name="Example: disabledDates"
-  app={`
-    <App>
-      <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
-    </App>  
-  `}
-/>
 
 %-PROP-END
 
@@ -303,23 +169,12 @@ The table below shows the available date formats:
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```xmlui copy {2}
+```xmlui-pg copy {2} display name="Example: didChange" height="120px"
 <App var.field="">
   <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
 </App>
 ```
-
-<Playground
-  height={120}
-  name="Example: didChange"
-  app={`
-    <App var.field="">
-      <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
-      <Text value="{field}" />
-    </App>
-  `}
-/>
 
 %-EVENT-END
 
@@ -328,7 +183,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 Clicking on the `DatePicker` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```xmlui copy {4-5}
+```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus" height="120px"
 <App var.isFocused="false">
   <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
   <DatePicker
@@ -338,95 +193,5 @@ Note how clicking elsewhere resets the text to the original.
 </App>
 ```
 
-<Playground
-  height={160}
-  name="Example: gotFocus/lostFocus"
-  app={`
-    <App var.isFocused="false">
-      <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
-      <DatePicker
-        onGotFocus="isFocused = true"
-        onLostFocus="isFocused = false"
-      />
-    </App>
-  `}
-/>
-
 %-EVENT-END
 
-%-STYLE-START
-
-The `DatePicker` component provides these theme variables to customize its appearance:
-
-- `borderRadius-DatePicker`
-- `textColor-DatePicker`
-- `backgroundColor-DatePicker--disabled`
-- `borderWidth-DatePicker`
-- `borderStyle-DatePicker`
-- `borderColor-DatePicker--disabled`
-- `backgroundColor-DatePicker--disabled`
-- `textColor-DatePicker--disabled`
-- `textColor-value-DatePicker`
-- `borderColor-DatePicker-default`
-- `borderColor-DatePicker-error`
-- `borderColor-DatePicker-warning`
-- `borderColor-DatePicker-success`
-- `color-placeholder-DatePicker`
-- `backgroundColor-menu-DatePicker`
-- `boxShadow-menu-DatePicker`
-- `borderRadius-menu-DatePicker`
-- `backgroundColor-item-DatePicker--hover`
-- `backgroundColor-item-DatePicker--active`
-
-```json
-{
-  "borderRadius-DatePicker": "30px",
-  "borderWidth-DatePicker": "4px",
-  "borderRadius-menu-DatePicker": "30px",
-  "textColor-DatePicker": "black",
-  "backgroundColor-menu-DatePicker": "#f5f5dc"
-}
-```
-
-<Playground
-  name="Example: styling"
-  height={120}
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "borderRadius-DatePicker": "30px",
-        "borderWidth-DatePicker": "4px",
-        "borderRadius-menu-DatePicker": "30px",
-        "textColor-DatePicker": "black",
-        "backgroundColor-menu-DatePicker": "#f5f5dc"
-      },
-    },
-  ]}
-  app={`
-    <App>
-      <DatePicker />
-    </App>  
-  `}
-/>
-
-To style all input controls not just this component, use `Input` instead of the `DatePicker` segment:
-
-```
-textColor-Input: "#0033FF"
-```
-
-`Input` affects the following controls:
-
-- [`Checkbox`](./Checkbox.mdx)
-- [`NumberBox`](./NumberBox.mdx)
-- [`RadioGroupOption`](./RadioGroupOption.mdx)
-- [`Select`](./Select.mdx)
-- [`Switch`](./Switch.mdx)
-- [`TextArea`](./TextArea.mdx)
-
-See [custom themes](../learning/themes/overview.mdx) for styling details.
-
-%-STYLE-END

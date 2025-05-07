@@ -1,0 +1,882 @@
+import { Callout } from "nextra/components";
+
+# Select [#component-select]
+
+<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
+
+Provides a dropdown with a list of options to choose from.
+
+The component provides context values with which you can access some internal properties:
+
+- `$item`: This property represents the value of an item in the dropdown list.
+- `$itemContext`: This property provides a `removeItem` method to delete the particular value from the selection.
+
+## Using `Select`
+
+The component accepts `Option` components as children defining a particular option's label-value pair.
+`Option` requires a `value` property and while also having a `label` that is displayed in the list.
+If the `label` is not specified `value` is shown.
+
+```xmlui copy
+<App>
+  <Select>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: using Select"
+    height={200}
+    app={`
+    <App>
+      <Select>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second" enabled="false" />
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
+  `}
+/>
+
+You can use `Select` with dynamic options:
+
+```xmlui copy
+<App>
+  <Select>
+    <Items data="{['one', 'two', 'three']}" >
+      <Option value="{$itemIndex}" label="{$item}" />
+    </Items> 
+  </Select>
+</App>  
+```
+
+<Playground
+  name="Example: using Select with dynamic options"
+  height={200}
+  app={`
+    <App>
+      <Select>
+        <Items data="{['one', 'two', 'three']}" >
+          <Option value="{$itemIndex}" label="{$item}" />
+        </Items> 
+      </Select>
+    </App>  
+  `}
+/>
+
+## Properties
+
+### `autoFocus (default: false)`
+
+If this property is set to `true`, the component gets the focus automatically when displayed.
+
+### `dropdownHeight`
+
+This property sets the height of the dropdown list.
+
+```xmlui copy /dropdownHeight="180px"/
+<App>
+  <Select dropdownHeight="180px">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+    <!-- Omitted -->
+    <Option value="opt11" label="eleventh"/>
+    <Option value="opt12" label="twelfth"/>
+  </Select>
+</App>
+```
+
+<Playground
+  name="Example: dropdownHeight"
+  height={300}
+  app={`
+    <App>
+      <Select dropdownHeight="180px">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+        <Option value="opt4" label="fourth"/>
+        <Option value="opt5" label="fifth"/>
+        <Option value="opt6" label="sixth"/>
+        <Option value="opt7" label="seventh"/>
+        <Option value="opt8" label="eighth"/>
+        <Option value="opt9" label="ninth"/>
+        <Option value="opt10" label="tenth"/>
+        <Option value="opt11" label="eleventh"/>
+        <Option value="opt12" label="twelfth"/>
+      </Select>
+    </App>
+  `}
+/>
+
+### `emptyListTemplate`
+
+This optional property provides the ability to customize what is displayed when the list of options is empty.
+
+Click on the second field to see the custom empty list indicator.
+
+```xmlui copy {9-11}
+<App>
+  <VStack>
+    <Text value="Default:" />
+    <Select />
+  </VStack>
+  <VStack>
+    <Text value="Custom:" />
+    <Select>
+      <property name="emptyListTemplate">
+        <Text variant="strong" value="Nothing to see here!" />
+      </property>
+    </Select>
+  </VStack>
+</App>
+```
+
+<Playground
+    name="Example: emptyListTemplate"
+    height={260}
+    app={`
+    <App>
+      <VStack>
+        <Text value="Default:" />
+        <Select />
+      </VStack>
+      <VStack>
+        <Text value="Custom:" />
+        <Select>
+          <property name="emptyListTemplate">
+            <Text variant="strong" value="Nothing to see here!" />
+          </property>
+        </Select>
+      </VStack>
+    </App>
+  `}
+/>
+
+### `enabled (default: true)`
+
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+```xmlui copy
+<App>
+  <Select enabled="false" />
+</App>
+```
+
+<Playground
+    name="Example: enabled"
+    app={`
+    <App>
+      <Select enabled="false" />
+    </App>
+  `}
+/>
+
+### `inProgress`
+
+This property indicates whether the component is in progress. It can be used to show a loading message.
+
+### `inProgressNotificationMessage`
+
+This property indicates the message to display when the component is in progress.
+
+### `initialValue`
+
+This property sets the component's initial value.
+
+```xmlui copy
+<App>
+  <Select initialValue="opt3">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: initialValue"
+    height={200}
+    app={`
+    <App>
+      <Select initialValue="opt3">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
+  `}
+/>
+
+### `label`
+
+This property sets the label of the component.
+
+### `labelBreak (default: false)`
+
+This boolean value indicates if the `Select` labels can be split into multiple lines if it would overflow the available label width.
+
+### `labelPosition (default: "top")`
+
+Places the label at the given position of the component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
+| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
+| `top` | The top of the input **(default)** |
+| `bottom` | The bottom of the input |
+
+### `labelWidth`
+
+This property sets the width of the `Select`.
+
+### `maxLength`
+
+This property sets the maximum length of the input it accepts.
+
+### `multiSelect (default: false)`
+
+The `true` value of the property indicates if the user can select multiple items.
+
+```xmlui copy /multiSelect="true"/
+<App>
+  <Select multiSelect="true" dropdownHeight="180px" >
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+    <!-- Omitted -->
+    <Option value="opt11" label="eleventh"/>
+    <Option value="opt12" label="twelfth"/>
+  </Select>
+</App>
+```
+
+<Playground
+  name="Example: multiSelect"
+  height={300}
+  app={`
+    <App>
+      <Select multiSelect="true" dropdownHeight="180px" >
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+        <Option value="opt4" label="fourth"/>
+        <Option value="opt5" label="fifth"/>
+        <Option value="opt6" label="sixth"/>
+        <Option value="opt7" label="seventh"/>
+        <Option value="opt8" label="eighth"/>
+        <Option value="opt9" label="ninth"/>
+        <Option value="opt10" label="tenth"/>
+        <Option value="opt11" label="eleventh"/>
+        <Option value="opt12" label="twelfth"/>
+      </Select>
+    </App>
+  `}
+/>
+
+### `optionLabelTemplate`
+
+This property allows replacing the default template to display an option in the dropdown list.
+
+In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`. 
+
+```xmlui copy {3-9} /optionLabelTemplate/
+<App>
+  <Select initialValue="{0}" placeholder="Select..." searchable>
+    <property name="optionLabelTemplate">
+      <HStack 
+        paddingHorizontal="$padding-tight" 
+        border="2px dotted $color-primary-500">
+        <Text>{$item.label}</Text>
+      </HStack>
+    </property>
+    <Option value="{0}" label="zero"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
+```
+
+<Playground
+  name="Example: optionLabelTemplate"
+  height={300}
+  app={`
+    <App>
+      <Select initialValue="{0}" placeholder="Select..." searchable>
+        <property name="optionLabelTemplate">
+          <HStack 
+            paddingHorizontal="$padding-tight" 
+            border="2px dotted $color-primary-500">
+            <Text>{$item.label}</Text>
+          </HStack>
+        </property>
+        <Option value="{0}" label="zero"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
+  `}
+/>
+
+### `optionTemplate`
+
+This property allows replacing the default template to display an option in the dropdown list.
+
+```xmlui copy
+<App>
+  <Select>
+    <property name="optionTemplate">
+      <HStack verticalAlignment="center" gap="$space-0_5">
+        <Icon name="info" />
+        <Text value="{$item.label}" variant="strong" />
+      </HStack>
+    </property>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: optionTemplate"
+    height={200}
+    app={`
+    <App>
+      <Select>
+        <property name="optionTemplate">
+          <HStack verticalAlignment="center" gap="$space-0_5">
+            <Icon name="info" />
+            <Text value="{$item.label}" variant="strong" />
+          </HStack>
+        </property>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
+  `}
+/>
+
+### `placeholder`
+
+A placeholder text that is visible in the input field when its empty.
+
+```xmlui copy
+<App>
+  <Select placeholder="Please select an item">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: placeholder"
+    height={200}
+    app={`
+    <App>
+      <Select placeholder="Please select an item">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
+  `}
+/>
+
+### `readOnly (default: false)`
+
+Set this property to `true` to disallow changing the component value.
+
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `searchable`
+
+This property enables the search functionality in the dropdown list.
+
+### `validationStatus (default: "none")`
+
+This property allows you to set the validation status of the input component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `valid` | Visual indicator for an input that is accepted |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error` | Visual indicator for an input that produced an error |
+
+```xmlui copy
+<App>
+  <Select />
+  <Select validationStatus="valid" />
+  <Select validationStatus="warning" />
+  <Select validationStatus="error" />
+</App>
+```
+
+<Playground
+    name="Example: validationStatus"
+    app={`
+    <App>
+      <Select />
+      <Select validationStatus="valid" />
+      <Select validationStatus="warning" />
+      <Select validationStatus="error" />
+    </App>
+  `}
+/>
+
+### `valueTemplate`
+
+This property allows replacing the default template to display a selected value when multiple selections (`multiSelect` is `true`) are enabled.
+
+In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`.  The `$itemContext` property provides a `removeItem` method to delete a value from the current selection.
+
+```xmlui copy {3-15} /valueTemplate/
+<App>
+  <Select initialValue="{0}" placeholder="Select..." multiSelect>
+    <property name="valueTemplate">
+      <HStack 
+        paddingLeft="$padding-tight" 
+        border="2px dotted $color-primary-500"              
+        verticalAlignment="center">
+        <Text>{$item.label}</Text>
+        <Button 
+          variant="ghost"
+          icon="close" 
+          size="xs" 
+          onClick="$itemContext.removeItem()"/>
+      </HStack>
+    </property>
+    <Option value="{0}" label="zero"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>  
+```
+
+<Playground
+  name="Example: valueTemplate"
+  height={300}
+  app={`
+    <App>
+      <Select initialValue="{0}" placeholder="Select..." multiSelect>
+        <property name="valueTemplate">
+          <HStack 
+            paddingLeft="$padding-tight" 
+            border="2px dotted $color-primary-500"              
+            verticalAlignment="center">
+            <Text>{$item.label}</Text>
+            <Button 
+              variant="ghost"
+              icon="close" 
+              size="xs" 
+              onClick="$itemContext.removeItem()"/>
+          </HStack>
+        </property>
+        <Option value="{0}" label="zero"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>  
+  `}
+/>
+
+## Events
+
+### `didChange`
+
+This event is triggered when value of Select has changed.
+
+```xmlui copy /onDidChange="(newItem) => newValue = newItem"/
+<App>
+  <variable name="newValue" value="" />
+  <Text value="{newValue}" />
+  <Select onDidChange="(newItem) => newValue = newItem">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: didChange"
+    height={200}
+    app={`
+    <App>
+      <variable name="newValue" value="" />
+      <Text value="{newValue}" />
+      <Select onDidChange="(newItem) => newValue = newItem">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
+  `}
+/>
+
+### `gotFocus`
+
+This event is triggered when the Select has received the focus.
+
+```xmlui copy {5-6}
+<App>
+  <variable name="isFocused" value="{false}" />
+  <Text value="Input control is focused: {isFocused}" />
+  <Select
+    onGotFocus="isFocused = true"
+    onLostFocus="isFocused = false">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: gotFocus/lostFocus"
+    height={200}
+    app={`
+    <App>
+      <variable name="isFocused" value="{false}" />
+      <Text value="Input control is focused: {isFocused}" />
+      <Select
+        onGotFocus="isFocused = true"
+        onLostFocus="isFocused = false">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
+  `}
+/>
+
+### `lostFocus`
+
+This event is triggered when the Select has lost the focus.
+
+## Exposed Methods
+
+### `focus`
+
+This method sets the focus on the Select.
+
+```xmlui copy /onClick="inputControl.focus()"/
+<App>
+  <Button label="Focus Input" onClick="inputControl.focus()" />
+  <Select id="inputControl">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: focus()"
+    height={240}
+    app={`
+    <App>
+      <Button label="Focus Input" onClick="inputControl.focus()" />
+      <Select id="inputControl">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
+  `}
+/>
+
+### `reset`
+
+This method resets the component to its initial value, or clears the selection if no initial value was provided.
+
+### `setValue`
+
+You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+
+```xmlui copy
+<App>
+  <Select id="inputControl">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+  <HStack>
+    <Button
+      label="Select 2nd Item"
+      onClick="inputControl.setValue('opt2')" />
+    <Button
+      label="Remove Selection"
+      onClick="inputControl.setValue('')" />
+  </HStack>
+</App>
+```
+
+<Playground
+    name="Example: value() and setValue()"
+    app={`
+    <App>
+      <Select id="inputControl">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+      <HStack>
+        <Button
+          label="Select 2nd Item"
+          onClick="inputControl.setValue('opt2')" />
+        <Button
+          label="Remove Selection"
+          onClick="inputControl.setValue('')" />
+      </HStack>
+    </App>
+  `}
+/>
+
+### `value`
+
+You can query the component's value. If no value is set, it will retrieve `undefined`.
+
+## Styling
+
+The `Select` component uses these theme variables:
+
+- `minHeight-Select`
+
+These variables have 4 variants depending on the [validationStatus](#validationstatus) denoted by `|status|`.
+If the status segment is omitted, the style will be applied to all statuses.
+
+- `borderRadius-Select-|status|`
+- `fontSize-Select-|status|`
+- `textColor-placeholder-Select-|status|`
+- `borderWidth-Select-|status|`
+
+- `outlineWidth-Select-|status|--focus`
+- `outlineColor-Select-|status|--focus`
+- `outlineStyle-Select-|status|--focus`
+- `outlineOffset-Select-|status|--focus`
+
+```json copy
+"borderRadius-Select-default": "10px",
+"textColor-placeholder-Select-error": "crimson"
+```
+
+In addition to the validation statuses,
+the variables below are associated with styles for `hover` and `disabled` interaction states denoted by `|interact|` in their signature:
+
+- `borderColor-Select-|status|--|interact|`
+- `backgroundColor-Select-|status|--|interact|`
+- `boxShadow-Select-|status|--|interact|`
+- `textColor-Select-|status|--|interact|`
+
+```json copy
+"backgroundColor-Select-default--disabled": "gray",
+"textColor-Select-error--active": "lightcoral"
+```
+
+Theme variables to set the dropdown menu styles:
+
+- `backgroundColor-menu-Select`
+- `boxShadow-menu-Select`
+- `borderRadius-menu-Select`
+- `textColor-indicator-Select`
+
+Theme variables to set the selection styles in a dropdown menu:
+
+- `textColor-value-Select`
+- `backgroundColor-value-Select`
+
+Theme variables to set the styles of an unselected item:
+
+- `backgroundColor-item-Select--hover`
+- `backgroundColor-item-Select--active`
+- `textColor-item-Select--disabled`
+
+### Example
+
+```json copy
+{
+  "id": "custom",
+  "name": "Custom Theme",
+  "themeVars": {
+    "borderRadius-Select": "30px",
+    "textColor-placeholder-Select": "red",
+    "borderWidth-Select": "4px"
+  }
+}
+```
+
+<Playground
+    name="Example: styling"
+    height={260}
+    defaultTheme="custom"
+    themes={[
+        {
+            id: "custom",
+            name: "Custom Theme",
+            themeVars: {
+                "borderRadius-Select": "30px",
+                "textColor-placeholder-Select": "red",
+                "borderWidth-Select": "4px",
+            },
+        },
+    ]}
+    app={`
+    <App>
+      <Select placeholder="Please select an option" />
+    </App>
+  `}
+/>
+
+To style all input controls not just this component, use `Input` instead of the `Select` segment:
+
+```
+borderColor-Input: "#0033FF"
+```
+
+`Input` affects the following controls:
+
+- [`Checkbox`](./Checkbox.mdx)
+- [`NumberBox`](./NumberBox.mdx)
+- [`RadioGroupOption`](./RadioGroupOption.mdx)
+- [`Switch`](./Switch.mdx)
+- [`TextArea`](./TextArea.mdx)
+- [`TextBox`](./TextBox.mdx)
+- [`MultiSelect`](./MultiSelect.mdx)
+- [`MultiCombobox`](./MultiCombobox.mdx)
+
+See [custom themes](../learning/themes/overview.mdx) for styling details.
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-Select | $backgroundColor-dropdown-item | $backgroundColor-dropdown-item |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-Select--active | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-Select--hover | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
+| [backgroundColor](../styles-and-themes/common-units/#color)-menu-Select | $color-surface-raised | $color-surface-raised |
+| [backgroundColor](../styles-and-themes/common-units/#color)-menu-Select | $color-surface-raised | $color-surface-raised |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-400 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
+| [borderColor](../styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
+| [borderColor](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderColor](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
+| [borderWidth](../styles-and-themes/common-units/#size)-menu-Select | 1px | 1px |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [borderWidth](../styles-and-themes/common-units/#size)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-Select | $boxShadow-md | $boxShadow-md |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-menu-Select | $boxShadow-md | $boxShadow-md |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontSize](../styles-and-themes/common-units/#size)-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Select-badge | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontSize](../styles-and-themes/common-units/#size)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontSize](../styles-and-themes/common-units/#size)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [fontSize](../styles-and-themes/common-units/#size)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [opacity](../styles-and-themes/common-units/#opacity)-Select--disabled | 0.5 | 0.5 |
+| [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | 0.5 | 0.5 |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineColor](../styles-and-themes/common-units/#color)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineOffset](../styles-and-themes/common-units/#size)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineStyle](../styles-and-themes/common-units/#border)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [outlineWidth](../styles-and-themes/common-units/#size)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding](../styles-and-themes/common-units/#size)-item-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingBottom](../styles-and-themes/common-units/#size)-item-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-item-Select | $space-2 | $space-2 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-item-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingRight](../styles-and-themes/common-units/#size)-item-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingTop](../styles-and-themes/common-units/#size)-item-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [paddingVertical](../styles-and-themes/common-units/#size)-item-Select | $space-2 | $space-2 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
+| [textColor](../styles-and-themes/common-units/#color)-indicator-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-200 | $color-surface-200 |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-placeholder-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select-badge | $color-surface-50 | $color-surface-50 |
+| [textColor](../styles-and-themes/common-units/#color)-Select-badge | $color-surface-50 | $color-surface-50 |
+| [textColor](../styles-and-themes/common-units/#color)-Select-badge--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select-badge--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [textColor](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

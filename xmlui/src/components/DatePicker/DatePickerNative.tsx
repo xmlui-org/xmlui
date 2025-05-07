@@ -14,6 +14,7 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
+import "react-day-picker/dist/style.css";
 
 export const DatePickerModeValues = ["single", "range"] as const;
 type DatePickerMode = (typeof DatePickerModeValues)[number];

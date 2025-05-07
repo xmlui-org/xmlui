@@ -1,0 +1,25 @@
+import { Callout } from "nextra/components";
+
+# CVStack [#component-cvstack]
+
+This component is inherited from <SmartLink href="/new-components/Stack">Stack</SmartLink>
+
+See also: <SmartLink href="/new-components/CHStack">CHStack</SmartLink>, <SmartLink href="/new-components/HStack">HStack</SmartLink>, <SmartLink href="/new-components/VStack">VStack</SmartLink>
+
+`CVStack` is a specialized, shorthand version for the regular `Stack` component with a vertical orientation centered on its contents.
+
+```xmlui-pg copy display name="Example: CVStack"
+<App>
+  <CVStack width="33%" backgroundColor="cyan">
+    <Stack height="32px" width="32px" backgroundColor="red" />
+    <Stack height="32px" width="32px" backgroundColor="blue" />
+    <Stack height="32px" width="32px" backgroundColor="green" />
+  </CVStack>
+</App>
+```
+
+<Callout type="info" emoji="📔">
+You cannot change the orientation of `CVStack` from vertical to horizontal by setting the `orientation` prop, as the engine ignores that setting.
+</Callout>
+
+

@@ -15,6 +15,7 @@ import { LocalLink } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
 import { NestedApp } from "../NestedApp/NestedAppNative";
 import { type CodeHighlighter, parseMetaAndHighlightCode } from "./highlight-code";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 type MarkdownProps = {
   removeIndents?: boolean;
@@ -29,6 +30,8 @@ export const Markdown = memo(function Markdown({
   style,
   codeHighlighter,
 }: MarkdownProps) {
+  // TEMP: After ironing out theming for syntax highlighting, this should be removed
+  const { activeThemeTone } = useTheme();
   if (typeof children !== "string") {
     return null;
   }
@@ -117,20 +120,18 @@ export const Markdown = memo(function Markdown({
               return defaultCodefence;
             }
 
-            const parsedData = parseMetaAndHighlightCode(children, codeHighlighter);
+            const parsedData = parseMetaAndHighlightCode(children, codeHighlighter, activeThemeTone);
             if (!parsedData) {
               return defaultCodefence;
             }
 
             return (
-              <div className={styles.codeWrapper}>
-                <Text
-                  uid={id}
-                  variant="codefence"
-                  syntaxHighlightClasses={parsedData.classNames}
-                  dangerouslySetInnerHTML={{ __html: parsedData.cleanedHtmlStr }}
-                />
-              </div>
+              <Text
+                uid={id}
+                variant="codefence"
+                syntaxHighlightClasses={parsedData.classNames}
+                dangerouslySetInnerHTML={{ __html: parsedData.cleanedHtmlStr }}
+              />
             );
           },
           strong({ id, children }) {
@@ -228,7 +229,6 @@ export const Markdown = memo(function Markdown({
             if (dataContentBase64 !== undefined) {
               const jsonContent = atob(dataContentBase64);
               const appProps = JSON.parse(jsonContent);
-              // console.log(appProps);
               return <NestedApp
                 app={appProps.app}
                 config={appProps.config}
@@ -434,6 +434,7 @@ function codeBlockParser() {
     const nodeData = { hProperties: {} };
     if (lang !== null) {
       nodeData.hProperties["dataLanguage"] = lang;
+      node.data = nodeData;
     }
     if (!parent) return;
     if (!meta) return;

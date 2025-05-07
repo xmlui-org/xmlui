@@ -3,11 +3,7 @@ import { lstatSync } from "fs";
 import { writeFileSync } from "fs";
 import { unlink, readdir, readFile, mkdir } from "fs/promises";
 import { ErrorWithSeverity, logger, LOGGER_LEVELS, processError } from "./logger.mjs";
-import {
-  convertPath,
-  deleteFileIfExists,
-  fromKebabtoReadable,
-} from "./utils.mjs";
+import { convertPath, deleteFileIfExists, fromKebabtoReadable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { FOLDERS } from "./folders.mjs";
@@ -101,14 +97,18 @@ async function generateComponents(metadata) {
     metadata,
     {
       sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
-      outFolder: join(FOLDERS.docsRoot, "pages", "components"),
+      // --- CHANGE: Now documents are generated in the a new folder, outside of pages
+      outFolder: join(FOLDERS.docsRoot, "new-components"),
+      // outFolder: join(FOLDERS.docsRoot, "pages", "components"),
       examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
 
   if (componentsConfig?.cleanFolder) {
-    await cleanFolder(join(FOLDERS.pages, "components"));
+    // --- CHANGE: Now documents are generated in the a new folder, outside of pages
+    // await cleanFolder(join(FOLDERS.pages, "components"));
+    await cleanFolder(join(FOLDERS.docsRoot, "new-components"));
   }
   metadataGenerator.generateDocs();
 

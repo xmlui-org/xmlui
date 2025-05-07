@@ -84,7 +84,7 @@ export function Preview() {
             key={`app-${options.id}`}
             previewMode={true}
             standalone={true}
-            trackContainerHeight={true}
+            trackContainerHeight="auto"
             node={component}
             globalProps={globalProps}
             defaultTheme={options.activeTheme || appDescription.config?.defaultTheme}
