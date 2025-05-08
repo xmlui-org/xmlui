@@ -14,7 +14,15 @@ import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
 import { NestedApp } from "../NestedApp/NestedAppNative";
-import { type CodeHighlighter, parseMetaAndHighlightCode } from "./highlight-code";
+import {
+  type CodeHighlighter,
+  type CodeHighlighterMeta,
+  parseMetaAndHighlightCode,
+} from "./highlight-code";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { Button } from "../Button/ButtonNative";
+import Icon from "../Icon/IconNative";
+import toast from "react-hot-toast";
 
 type MarkdownProps = {
   removeIndents?: boolean;
@@ -29,6 +37,8 @@ export const Markdown = memo(function Markdown({
   style,
   codeHighlighter,
 }: MarkdownProps) {
+  // TEMP: After ironing out theming for syntax highlighting, this should be removed
+  const { activeThemeTone } = useTheme();
   if (typeof children !== "string") {
     return null;
   }
@@ -108,29 +118,34 @@ export const Markdown = memo(function Markdown({
           },
           pre({ id, children }) {
             const defaultCodefence = (
-              <Text uid={id} variant="codefence">
-                {children}
-              </Text>
+              <CodeBlock>
+                <Text uid={id} variant="codefence">
+                  {children}
+                </Text>
+              </CodeBlock>
             );
 
             if (!codeHighlighter) {
               return defaultCodefence;
             }
 
-            const parsedData = parseMetaAndHighlightCode(children, codeHighlighter);
-            if (!parsedData) {
+            const highlighterResult = parseMetaAndHighlightCode(
+              children,
+              codeHighlighter,
+              activeThemeTone,
+            );
+            if (!highlighterResult) {
               return defaultCodefence;
             }
-
             return (
-              <div className={styles.codeWrapper}>
+              <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
                 <Text
                   uid={id}
                   variant="codefence"
-                  syntaxHighlightClasses={parsedData.classNames}
-                  dangerouslySetInnerHTML={{ __html: parsedData.cleanedHtmlStr }}
+                  syntaxHighlightClasses={highlighterResult.classNames}
+                  dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
                 />
-              </div>
+              </CodeBlock>
             );
           },
           strong({ id, children }) {
@@ -228,18 +243,19 @@ export const Markdown = memo(function Markdown({
             if (dataContentBase64 !== undefined) {
               const jsonContent = atob(dataContentBase64);
               const appProps = JSON.parse(jsonContent);
-              // console.log(appProps);
-              return <NestedApp
-                app={appProps.app}
-                config={appProps.config}
-                components={appProps.components}
-                api={appProps.api}
-                activeTheme={appProps.activeTheme}
-                activeTone={appProps.activeTone}
-                title={appProps.name}
-                height={appProps.height}
-                allowPlaygroundPopup={!appProps.noPopup}
-              />
+              return (
+                <NestedApp
+                  app={appProps.app}
+                  config={appProps.config}
+                  components={appProps.components}
+                  api={appProps.api}
+                  activeTheme={appProps.activeTheme}
+                  activeTone={appProps.activeTone}
+                  title={appProps.name}
+                  height={appProps.height}
+                  allowPlaygroundPopup={!appProps.noPopup}
+                />
+              );
             }
             return (
               <NestedApp
@@ -419,6 +435,45 @@ const ListItem = ({ children, style }: ListItemProps) => {
   );
 };
 
+type CodeBlockProps = {
+  children?: React.ReactNode;
+  textToCopy?: string;
+  meta?: CodeHighlighterMeta;
+};
+
+function CodeBlock({ children, meta, textToCopy }: CodeBlockProps) {
+  if (!meta) {
+    return <div className={styles.codeBlock}>{children}</div>;
+  }
+  return (
+    <div className={styles.codeBlock}>
+      {meta.filename && (
+        <div className={styles.codeBlockHeader}>
+          <Text variant="em">
+            <Text variant="strong">Filename:</Text> {meta.filename}
+          </Text>
+        </div>
+      )}
+      <div className={styles.codeBlockCopyWrapper}>
+        {children}
+        <div className={styles.codeBlockCopyButton}>
+          <Button
+            variant="ghost"
+            themeColor="secondary"
+            size="sm"
+            icon={<Icon name={"copy"} aria-hidden />}
+            onClick={() => {
+              if (!textToCopy) return;
+              navigator.clipboard.writeText(textToCopy);
+              toast.success("Code copied!");
+            }}
+          ></Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface CodeNode extends Node {
   lang: string | null;
   meta: string | null;
@@ -434,6 +489,7 @@ function codeBlockParser() {
     const nodeData = { hProperties: {} };
     if (lang !== null) {
       nodeData.hProperties["dataLanguage"] = lang;
+      node.data = nodeData;
     }
     if (!parent) return;
     if (!meta) return;
@@ -444,8 +500,36 @@ function codeBlockParser() {
     if (!params) return;
     if (params.length === 0) return;
 
-    // TEMP: just appending everything else as a string to a different property
-    nodeData.hProperties["dataMeta"] = params;
+    const parsedMeta = params.reduce(
+      (acc, item) => {
+        item = item.trim();
+        if (item === "") return acc;
+        if (item.indexOf("=") === -1) {
+          if (item.startsWith("/") && item.endsWith("/")) {
+            acc["dataHighlightSubstrings"] = item.substring(1, item.length - 1);
+          }
+          if (item.startsWith("{") && !item.endsWith("}")) {
+            acc["dataHighlightRows"] = item.substring(1, item.length - 1);
+          }
+          if (item === "copy") {
+            acc["dataCopy"] = "true";
+          }
+          if (item === "rowNumbers") {
+            acc["dataRowNumbers"] = "true";
+          }
+          return acc;
+        }
+        const index = item.indexOf("=");
+        if (item.substring(0, index) !== "filename") return acc;
+        acc["dataFilename"] = item
+          .substring(index + 1)
+          .replace(/"(.+)"/, "$1")
+          .replace(/'(.+)'/, "$1");
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+    nodeData.hProperties = { ...nodeData.hProperties, ...parsedMeta };
     node.data = nodeData;
   }
 

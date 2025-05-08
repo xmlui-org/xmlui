@@ -6,7 +6,7 @@
 
 %-PROP-START logoTemplate
 
-```xmlui copy {3-8}
+```xmlui-pg copy {3-8} display name="Example: logoTemplate" height={250}
 <App layout="vertical">
   <NavPanel>
     <property name="logoTemplate">
@@ -29,45 +29,4 @@
 </App>
 ```
 
-<Playground
-  name="Example: logoTemplate"
-  horizontal={true}
-  height={200}
-  app={`
-    <App layout="vertical">
-      <NavPanel>
-        <property name="logoTemplate">
-           <H3>
-             <Icon name="drive" />
-             DriveDiag (Nav)
-           </H3>
-        </property>
-        <NavLink label="Home" to="/" icon="home"/>
-        <NavLink label="Page 1" to="/page1"/>
-      </NavPanel>
-      <Pages defaultRoute="/">
-        <Page url="/">
-          <Text value="Home" />
-        </Page>
-        <Page url="/page1">
-          <Text value="Page 1" />
-        </Page>
-      </Pages>
-    </App>
-  `}
-/>
-
 %-PROP-END
-
-%-STYLE-START
-
-The `NavPanel` component uses these theme variables to customize its appearance:
-
-- `backgroundColor`
-- `boxShadow`
-- `paddingHorizontal`
-- `paddingHorizontal-logo-NavPanel`
-- `paddingVertical-logo-NavPanel`
-- `marginBottom-logo-NavPanel`
-
-%-STYLE-END

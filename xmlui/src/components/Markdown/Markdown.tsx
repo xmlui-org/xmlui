@@ -56,6 +56,13 @@ export const MarkdownMd = createMetadata({
     "marginTop-HtmlLi": "$space-2",
     "marginBottom-HtmlLi": "$space-2",
 
+    "backgroundColor-CodeBlock": "$color-surface-100",
+    "backgroundColor-CodeBlock-header": "$color-surface-100",
+    "color-CodeBlock-headerSeparator": "$color-surface-300",
+    "borderLeft-CodeBlock": "$color-surface-300 2px solid",
+    "marginTop-CodeBlock": "$space-4",
+    "marginBottom-CodeBlock": "$space-4",
+
     light: {
       // --- No light-specific theme vars
     },
@@ -117,6 +124,7 @@ const TransformedMarkdown = ({
   removeIndents,
   style,
   extractValue,
+  codeHighlighter,
 }: TransformedMarkdownProps) => {
   const markdownContent = useMemo(() => {
     if (typeof children !== "string") {
@@ -125,7 +133,8 @@ const TransformedMarkdown = ({
 
     // --- Resolve binding expression values
     // --- Resolve xmlui playground definitions
-    let resolvedMd = parseBindingExpression(children, extractValue);
+
+    let resolvedMd = children;
     while (true) {
       const nextPlayground = observePlaygroundPattern(resolvedMd);
       if (!nextPlayground) break;
@@ -135,12 +144,12 @@ const TransformedMarkdown = ({
         convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
         resolvedMd.slice(nextPlayground[1]);
     }
-    console.log(resolvedMd)
+    resolvedMd = parseBindingExpression(resolvedMd, extractValue)
     return resolvedMd;
   }, [children, extractValue]);
 
   return (
-    <Markdown removeIndents={removeIndents} style={style}>
+    <Markdown removeIndents={removeIndents} codeHighlighter={codeHighlighter} style={style}>
       {markdownContent}
     </Markdown>
   );

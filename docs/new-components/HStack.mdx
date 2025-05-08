@@ -1,0 +1,25 @@
+import { Callout } from "nextra/components";
+
+# HStack [#component-hstack]
+
+This component is inherited from <SmartLink href="/new-components/Stack">Stack</SmartLink>
+
+See also: <SmartLink href="/new-components/CHStack">CHStack</SmartLink>, <SmartLink href="/new-components/CVStack">CVStack</SmartLink>, <SmartLink href="/new-components/VStack">VStack</SmartLink>
+
+`HStack` is a specialized, shorthand version for the regular `Stack` component with a horizontal orientation.
+
+```xmlui-pg copy display name="Example: HStack"
+<App>
+  <HStack>
+    <Stack height="32px" width="32px" backgroundColor="red" />
+    <Stack height="32px" width="32px" backgroundColor="blue" />
+    <Stack height="32px" width="32px" backgroundColor="green" />
+  </HStack>
+</App>
+```
+
+<Callout type="info" emoji="📔">
+You cannot change the orientation of `HStack` from horizontal to vertical by setting the `orientation` prop, as the engine ignores that setting.
+</Callout>
+
+

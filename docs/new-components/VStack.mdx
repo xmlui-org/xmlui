@@ -1,0 +1,26 @@
+import { Callout } from "nextra/components";
+
+# VStack [#component-vstack]
+
+This component is inherited from <SmartLink href="/new-components/Stack">Stack</SmartLink>
+
+See also: <SmartLink href="/new-components/CHStack">CHStack</SmartLink>, <SmartLink href="/new-components/CVStack">CVStack</SmartLink>, <SmartLink href="/new-components/HStack">HStack</SmartLink>
+
+`VStack` is a specialized, shorthand version for the regular [Stack](./Stack) component with a vertical orientation.
+See also: [HStack](./HStack.mdx), [CHStack](./CHStack.mdx), [CVStack](./CVStack.mdx).
+
+```xmlui-pg copy display name="Example: VStack"
+<App>
+  <VStack>
+    <Stack height="32px" width="32px" backgroundColor="red" />
+    <Stack height="32px" width="32px" backgroundColor="blue" />
+    <Stack height="32px" width="32px" backgroundColor="green" />
+  </VStack>
+</App>
+```
+
+<Callout type="info" emoji="📔">
+You cannot change the orientation of `VStack` from vertical to horizontal by setting the `orientation` prop, as the engine ignores that setting.
+</Callout>
+
+

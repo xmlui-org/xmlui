@@ -7,7 +7,7 @@
 You can use the `label` and `icon` properties of a `NavLink` to set its text and icon to display.
 If you want a custom appearance, you can nest define custom visuals for the `NavLink` by nesting:
 
-```xmlui copy {6-14}
+```xmlui-pg copy {6-14} display name="Example: NavLink appearance" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -29,38 +29,12 @@ If you want a custom appearance, you can nest define custom visuals for the `Nav
 </App>
 ```
 
-<Playground
-  name="Example: custom NavLink content"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <AppHeader>
-      <H1>MyApp</H1>
-    </AppHeader>
-    <NavPanel>
-      <NavLink to="/">
-        <Stack width="16px" height="16px" backgroundColor="purple" />
-        Home
-      </NavLink>
-      <NavLink to="/about">
-        <Stack width="16px" height="16px" backgroundColor="green" />
-        About
-      </NavLink>
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-      <Page url="/about">About</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 ### Actions
 
 By default, activating (clicking) a link navigates to the target URL.
 However, you can create a link that executes an explicit action responding to the `click` event instead of the default navigation:
 
-```xmlui copy {7}
+```xmluipg copy {7} display name="Example: custom NavLink action" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -75,30 +49,11 @@ However, you can create a link that executes an explicit action responding to th
 </App>
 ```
 
-<Playground
-  name="Example: custom NavLink action"
-  height={250}
-  app={`
-    <App layout="horizontal">
-      <AppHeader>
-        <H1>MyApp</H1>
-      </AppHeader>
-      <NavPanel>
-        <NavLink to="/" label="Home" />
-        <NavLink label="Danger!" onClick="toast('Be careful with this action!')" />
-      </NavPanel>
-      <Pages>
-        <Page url="/">Home</Page>
-      </Pages>
-    </App>
-  `}
-/>
-
 %-DESC-END
 
 %-PROP-START label
 
-```xmlui copy /label="Home"/
+```xmlui-pg copy display name="Example: label" height="250px"
 <App layout="horizontal">
   <NavPanel>
     <NavLink to="/" label="Home" />
@@ -108,21 +63,6 @@ However, you can create a link that executes an explicit action responding to th
   </Pages>
 </App>
 ```
-
-<Playground
-  name="Example: label"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <NavPanel>
-      <NavLink to="/" label="Home" />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-    </Pages>
-  </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -134,7 +74,7 @@ you need to manually set this property for the active state to be displayed prop
 
 The default value for this property is `false`.
 
-```xmlui copy /vertical="true"/
+```xmlui-pg copy display name="Example: vertical" height="250px"
 <App layout="horizontal">
   <NavPanel>
     <NavLink to="/" label="Home" vertical="true" />
@@ -145,26 +85,11 @@ The default value for this property is `false`.
 </App>
 ```
 
-<Playground
-  name="Example: vertical"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <NavPanel>
-      <NavLink to="/" label="Home" vertical="true" />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START icon
 
-```xmlui copy {6-7}
+```xmlui-pg copy {6-7} display name="Example: icon" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -180,31 +105,11 @@ The default value for this property is `false`.
 </App>
 ```
 
-<Playground
-  name="Example: icon"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <AppHeader>
-      <H1>MyApp</H1>
-    </AppHeader>
-    <NavPanel>
-      <NavLink label="Home" to="/" icon="home" />
-      <NavLink label="Drives" to="/drives" icon="drive" />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-      <Page url="/drives">Drives Page</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START displayActive
 
-```xmlui copy /displayActive="false"/
+```xmlui-pg copy display name="Example: displayActive" height="250px"
 <App layout="horizontal">
   <NavPanel>
     <NavLink to="/" label="Home" displayActive="false" />
@@ -215,28 +120,13 @@ The default value for this property is `false`.
 </App>
 ```
 
-<Playground
-  name="Example: displayActive"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <NavPanel>
-      <NavLink to="/" label="Home" displayActive="false" />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START enabled
 
 In the following app, the "Hotels" link is disabled:
 
-```xmlui copy {8}
+```xmlui-pg copy {8} display name="Example: enabled" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyTravel App</H1>
@@ -254,35 +144,13 @@ In the following app, the "Hotels" link is disabled:
 </App>
 ```
 
-<Playground
-  name="Example: enabled"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <AppHeader>
-      <H1>MyTravel App</H1>
-    </AppHeader>
-    <NavPanel>
-      <NavLink label="Home" to="/" />
-      <NavLink label="Flights" to="/flights" />
-      <NavLink label="Hotels" to="/hotels" enabled="false" />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-      <Page url="/flights">Flights Page</Page>
-      <Page url="/hotels">Hotels Page</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START target
 
 The following example opens the "About XMLUI" link in a new tab:
 
-```xmlui copy {7}
+```xmlui-pg copy {7} display name="Example: target" height="250px"
 <App layout="horizontal">
   <AppHeader>
     <H1>MyApp</H1>
@@ -298,127 +166,29 @@ The following example opens the "About XMLUI" link in a new tab:
 </App>
 ```
 
-<Playground
-  name="Example: target"
-  height={250}
-  app={`
-    <App layout="horizontal">
-      <AppHeader>
-        <H1>MyApp</H1>
-      </AppHeader>
-      <NavPanel>
-        <NavLink label="Home" to="/" />
-        <NavLink label="About XMLUI" to="https://docs.xmlui.com/" target="_blank" />
-      </NavPanel>
-      <Pages>
-        <Page url="/">Home</Page>
-        <Page url="/drives">Drives Page</Page>
-      </Pages>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-EVENT-START click
 
 The following example shows a message and navigates to the "/status" link after closing the message window:
 
-<Playground
-  name="Example: click"
-  height={250}
-  app={`
-  <App layout="horizontal">
-    <AppHeader>
-      <H1>MyApp</H1>
-    </AppHeader>
-    <NavPanel>
-      <NavLink to="/" label="Home" />
-      <NavLink label="Check my status" onClick="
-          toast('You will be redirected');
-          Actions.navigate('/status');
-      " />
-    </NavPanel>
-    <Pages>
-      <Page url="/">Home</Page>
-      <Page url="/status">My Status</Page>
-    </Pages>
-  </App>
-  `}
-/>
-
-%-EVENT-END
-
-%-STYLE-START
-
-The `Navlink` component uses these theme variables to customize its appearance:
-
-- `backgroundColor`: (with these states: `--hover`, `--hover--active`, `--active`, `--pressed`, `--pressed-active`)
-- `color-indicator`: (with these states: `--hover`, `--active`, `--pressed`)
-- `textColor`: (with these states: `--hover`, `--hover--active`, `--active`, `--pressed`, `--pressed-active`)
-- `color-icon`
-- `fontSize`
-- `fontWeight`: (with these states: `--active`, `--pressed`)
-- `paddingHorizontal`
-- `paddingVertical`
-- `borderRadius`
-- `borderRadius-indicator`
-- `thickness-indicator`
-
-The theme variables ending with `indicator` set the indicator's visual properties that sign the link's active state.
-
-The following sample theme sets a few visual properties of `NavLink`. It changes the background color to show the hovered state and modifies the indicator's visual appearance. The theme displays the link with an extra bold font:
-
-```json
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "backgroundColor-NavLink--hover": "deepskyblue",
-    "backgroundColor-NavLink--pressed": "steelblue",
-    "backgroundColor-NavLink--active": "lightblue",
-    "backgroundColor-NavLink--hover--active": "deepskyblue",
-    "color-indicator-NavLink--active": "purple",
-    "thickness-indicator-NavLink": "4px",
-    "fontWeight-NavLink": "900"
-  }
-}
+```xmlui-pg copy {7} display name="Example: click" height="250px"
+<App layout="horizontal">
+  <AppHeader>
+    <H1>MyApp</H1>
+  </AppHeader>
+  <NavPanel>
+    <NavLink to="/" label="Home" />
+    <NavLink label="Check my status" onClick="
+        toast('You will be redirected');
+        Actions.navigate('/status');
+    " />
+  </NavPanel>
+  <Pages>
+    <Page url="/">Home</Page>
+    <Page url="/status">My Status</Page>
+  </Pages>
+</App>
 ```
 
-<Playground
-  name="Example: styling"
-  height={250}
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "backgroundColor-NavLink--hover": "deepskyblue",
-        "backgroundColor-NavLink--pressed": "steelblue",
-        "backgroundColor-NavLink--active": "lightblue",
-        "backgroundColor-NavLink--hover--active": "deepskyblue",
-        "color-indicator-NavLink--active": "purple",
-        "thickness-indicator-NavLink": "4px",
-        "fontWeight-NavLink": "900",
-      },
-    },
-  ]}
-  app={`
-    <App  layout="horizontal">
-      <AppHeader>
-        <H1>SuperDrive App</H1>
-      </AppHeader>
-      <NavPanel>
-        <NavLink label="Home" to="/" icon="home" />
-        <NavLink label="Drives" to="/drives" icon="drive" />
-      </NavPanel>
-      <Pages>
-        <Page url="/">Home</Page>
-        <Page url="/drives">Drives Page</Page>
-      </Pages>
-    </App>
-  `}
-/>
-
-%-STYLE-END
+%-EVENT-END

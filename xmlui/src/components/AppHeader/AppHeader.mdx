@@ -11,15 +11,15 @@ You can learn more details about using this component [here](../learning/using-c
 This property defines the template to use for the logo.
 With this property, you can construct your custom logo instead of using a single image.
 
-```xmlui copy {2-8}
+```xmlui-pg copy display {2-8} name="Example: logoTemplate" height="150px"
 <App>
   <AppHeader>
-    <property name="logoTemplate">
+  <property name="logoTemplate">
       <H3>
         <Icon name="drive" />
         DriveDiag
       </H3>
-    </property>
+  </property>
   </AppHeader>
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -36,36 +36,6 @@ With this property, you can construct your custom logo instead of using a single
 </App>
 ```
 
-<Playground
-  name="Example: logoTemplate"
-  horizontal
-  height={150}
-  app={`
-  <App>
-    <AppHeader>
-    <property name="logoTemplate">
-        <H3>
-          <Icon name="drive" />
-          DriveDiag
-        </H3>
-    </property>
-    </AppHeader>
-    <NavPanel>
-      <NavLink label="Home" to="/" icon="home"/>
-      <NavLink label="Page 1" to="/page1"/>
-    </NavPanel>
-    <Pages defaultRoute="/">
-      <Page url="/">
-        <Text value="Home" />
-      </Page>
-      <Page url="/page1">
-        <Text value="Page 1" />
-      </Page>
-    </Pages>
-  </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START profileMenuTemplate
@@ -73,7 +43,7 @@ With this property, you can construct your custom logo instead of using a single
 This property makes the profile menu slot of the `AppHeader` component customizable.
 It accepts component definitions.
 
-```xmlui copy {3-9}
+```xmlui-pg copy display {3-9} name="Example: profileMenuTemplate" height="150px"
 <App>
   <AppHeader>
     <property name="profileMenuTemplate">
@@ -86,24 +56,5 @@ It accepts component definitions.
   </AppHeader>
 </App>
 ```
-
-<Playground
-  name="Example: profileMenuTemplate"
-  horizontal
-  height={150}
-  app={`
-  <App>
-    <AppHeader>
-      <property name="profileMenuTemplate">
-        <DropdownMenu>
-          <property name="triggerTemplate">
-            <Avatar name="Joe" size="xs" borderRadius="50%"/>
-          </property>
-        </DropdownMenu>
-      </property>
-    </AppHeader>
-  </App>
-  `}
-/>
 
 %-PROP-END

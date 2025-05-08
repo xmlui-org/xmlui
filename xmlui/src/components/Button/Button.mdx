@@ -10,7 +10,7 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START contentPosition
 
-```xmlui copy
+```xmlui-pg copy display name="Example: content position"
 <App>
   <Button width="200px" icon="drive" label="Button" contentPosition="center" />
   <Button width="200px" icon="drive" label="Button" contentPosition="start" />
@@ -21,53 +21,24 @@ Use the `Button` component to trigger various actions.
 </App>
 ```
 
-<Playground
-  height={270}
-  name="Example: content position"
-  app={`
-    <App>
-      <Button width="200px" icon="drive" label="Button" contentPosition="center" />
-      <Button width="200px" icon="drive" label="Button" contentPosition="start" />
-      <Button width="200px" icon="drive" label="Button" contentPosition="end" />
-      <Button width="200px" contentPosition="end">
-        This is a nested text
-      </Button>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START icon
 
-```xmlui
-  <App>
-    <HStack>
-      <Button icon="drive" label="Let there be drive" />
-      <Button icon="drive" />
-    </HStack>
-  </App>
+```xmlui-pg copy display name="Example: icon"
+<App>
+  <HStack>
+    <Button icon="drive" label="Let there be drive" />
+    <Button icon="drive" />
+  </HStack>
+</App>
 ```
-
-<Playground
-  name="Example: icon"
-  app={`
-    <App>
-      <HStack>
-        <Button icon="drive" label="Let there be drive" />
-        <Button icon="drive" />
-      </HStack>
-    </App>
-  `}
-  horizontal={true}
-  height={100}
-/>
 
 %-PROP-END
 
 %-PROP-START iconPosition
 
-```xmlui
+```xmlui-pg copy display name="Example: icon position"
 <App>
   <HStack>
     <Button icon="drive" label="Left" />
@@ -78,39 +49,25 @@ Use the `Button` component to trigger various actions.
     <Button icon="drive" label="End" iconPosition="end" />
   </HStack>
   <HStack>
-    <Button icon="drive" label="Start (right-to-left)" iconPosition="start" direction="rtl" />
-    <Button icon="drive" label="End (right-to-left)" iconPosition="end" direction="rtl" />
+    <Button 
+      icon="drive" 
+      label="Start (right-to-left)" 
+      iconPosition="start" 
+      direction="rtl" />
+    <Button 
+      icon="drive" 
+      label="End (right-to-left)" 
+      iconPosition="end" 
+      direction="rtl" />
   </HStack>
 </App>
 ```
-
-<Playground
-  name="Example: iconPosition"
-  app={`
-    <App>
-      <HStack>
-        <Button icon="drive" label="Left" />
-        <Button icon="drive" label="Right" iconPosition="right" />
-      </HStack>
-      <HStack>
-        <Button icon="drive" label="Start" iconPosition="start" />
-        <Button icon="drive" label="End" iconPosition="end" />
-      </HStack>
-      <HStack>
-        <Button icon="drive" label="Start (right-to-left)" iconPosition="start" direction="rtl" />
-        <Button icon="drive" label="End (right-to-left)" iconPosition="end" direction="rtl" />
-      </HStack>
-    </App>
-  `}
-  horizontal={true}
-  height={220}
-/>
 
 %-PROP-END
 
 %-PROP-START label
 
-```xmlui copy
+```xmlui-pg copy display name="Example: label"
 <App>
   <Button label="I am the button label" />
   <Button />
@@ -121,27 +78,11 @@ Use the `Button` component to trigger various actions.
 </App>
 ```
 
-<Playground
-  name="Button label"
-  app={`
-    <App>
-      <Button label="I am the button label" />
-      <Button />
-      <Button label="I am the button label">
-        <Icon name="trash" />
-        I am a text nested into Button
-      </Button>
-    </App>
-  `}
-  horizontal={true}
-  height={200}
-/>
-
 %-PROP-END
 
 %-PROP-START variant
 
-```xmlui copy
+```xmlui-pg copy display name="Example: variant"
 <App>
   <HStack>
     <Button label="default (solid)" />
@@ -152,26 +93,11 @@ Use the `Button` component to trigger various actions.
 </App>
 ```
 
-<Playground
-  height={100}
-  name="Example: variant"
-  app={`
-  <App>
-    <HStack>
-      <Button label="default (solid)" />
-      <Button label="solid" variant="solid" />
-      <Button label="outlined" variant="outlined" />
-      <Button label="ghost" variant="ghost" />
-    </HStack>
-  </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START themeColor
 
-```xmlui copy
+```xmlui-pg copy display name="Example: theme colors"
 <App>
   <HStack>
     <Button label="Button" themeColor="primary" />
@@ -181,25 +107,11 @@ Use the `Button` component to trigger various actions.
 </App>  
 ```
 
-<Playground
-  name="Example: theme colors"
-  app={`
-    <App>
-      <HStack>
-        <Button label="Button" themeColor="primary" />
-        <Button label="Button" themeColor="secondary" />
-        <Button label="Button" themeColor="attention" />
-      </HStack>
-    </App>  
-  `}
-  height={100}
-/>
-
 %-PROP-END
 
 %-PROP-START enabled
 
-```xmlui copy
+```xmlui-pg copy display name="Example: enabled"
 <App>
   <HStack>
     <Button label="I am enabled (by default)" />
@@ -209,26 +121,11 @@ Use the `Button` component to trigger various actions.
 </App>
 ```
 
-<Playground
-  name="Example: enabled"
-  app={`
-    <App>
-      <HStack>
-        <Button label="I am enabled (by default)" />
-        <Button label="I am enabled explicitly" enabled="true" />
-        <Button label="I am not enabled" enabled="false" />
-      </HStack>
-    </App>
-  `}
-  horizontal={true}
-  height={100}
-/>
-
 %-PROP-END
 
 %-PROP-START size
 
-```xmlui copy
+```xmlui-pg copy display name="Example: size"
 <App>
   <HStack>
     <Button icon="drive" label="default" />
@@ -247,54 +144,21 @@ Use the `Button` component to trigger various actions.
 </App>
 ```
 
-<Playground
-  height={200}
-  name="Example: size"
-  app={`
-    <App>
-      <HStack>
-        <Button icon="drive" label="default" />
-        <Button icon="drive" label="extra-small" size="xs" />
-        <Button icon="drive" label="small" size="sm" />
-        <Button icon="drive" label="medium" size="md" />
-        <Button icon="drive" label="large" size="lg" />
-      </HStack>
-      <HStack>
-        <Button label="default" />
-        <Button label="extra-small" size="xs" />
-        <Button label="small" size="sm" />
-        <Button label="medium" size="md" />
-        <Button label="large" size="lg" />
-      </HStack>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-EVENT-START click
 
-```xmlui copy
+```xmlui-pg copy display name="Example: click"
 <App>
   <Button label="Click me!" onClick="toast('Button clicked')" />
 </App>
 ```
 
-<Playground
-  name="Example: click"
-  app={`
-    <App>
-      <Button label="Click me!" onClick="toast('Button clicked')" />
-    </App>
-  `}
-  height={160}
-/>
-
 %-EVENT-END
 
 %-EVENT-START gotFocus
 
-```xmlui copy
+```xmlui-pg copy display name="Example: gotFocus"
 <App var.text="No event" >
   <HStack verticalAlignment="center" >
     <Button label="First, click me!" 
@@ -306,20 +170,6 @@ Use the `Button` component to trigger various actions.
 </App>
 ```
 
-<Playground
-    name="Example: gotFocus/lostFocus"
-    app={`
-    <App var.text="No event" >
-      <HStack verticalAlignment="center" >
-        <Button label="First, click me!" onGotFocus="text = 'Focus received'" onLostFocus="text = 'Focus lost'" />
-        <Text value="Then, me!"/>
-      </HStack>
-      <Text value="{text}" />
-    </App>
-  `}
-    height={140}
-/>
-
 %-EVENT-END
 
 %-EVENT-START lostFocus
@@ -330,76 +180,6 @@ Use the `Button` component to trigger various actions.
 
 %-STYLE-START
 
-The `Button` component uses these theme variables to customize its appearance:
-
-- `backgroundColor`
-- `borderColor`
-- `color`
-- `fontSize`
-- `fontWeight`
-- `borderRadius`
-- `borderStyle`
-- `borderWidth`
-- `boxShadow`
-
-`Button` provides are some unique behavior with styling:
-
-Outlined and ghost buttons have no background color unless active or hovered. As ghost buttons do not have a border, setting border-related theme variables does not affect ghost buttons.
-
-When you set a value for background-related variables, the `Button` component recalculates its background color tones toward the theme variable chain. Thus, using these variables may render different background colors than you expect with outlined and ghost buttons, as by default, they use background when they are active or hovered:
-
-```text
-backgroundColor-Button-solid
-backgroundColor-Button-outlined
-backgroundColor-Button-ghost
-backgroundColor-Button-primary-outlined
-backgroundColor-Button-primary-ghost
-backgroundColor-Button-secondary-outlined
-backgroundColor-Button-secondary-ghost
-backgroundColor-Button-attention-outlined
-backgroundColor-Button-attention-ghost
-```
-
-The `themeColor` and `variant` properties of `Button` are used within theme variables as traits; first the `themeColor`, and then the `variant` value. So, when setting theme variables, you can use these traits with `Button`:
-
-- `Button-solid`
-- `Button-outlined`,
-- `Button-ghost`,
-- `Button-primary`
-- `Button-secondary`,
-- `Button-attention`,
-- `Button-primary-solid`,
-- `Button-primary-outlined`,
-- `Button-primary-ghost`,
-- `Button-secondary-solid`,
-- `Button-secondary-outlined`,
-- `Button-secondary-ghost`,
-- `Button-attention-solid`,
-- `Button-attention-outlined`,
-- `Button-attention-ghost`,
-
-The paddings of buttons can be themed through these theme variables according to the specified size (no separate theme variables for `themeColor` and `variant`):
-
-- `paddingHorizontal-xs-Button`
-- `paddingHorizontal-sm-Button`
-- `paddingHorizontal-md-Button`
-- `paddingHorizontal-lg-Button`
-- `paddingVertical-xs-Button`
-- `paddingVertical-sm-Button`
-- `paddingVertical-md-Button`
-- `paddingVertical-lg-Button`
-
-The `Button` component handles these visual states:
-
-- `--active`
-- `--disabled`
-- `--focus`
-- `--hover`
-
-<Callout type="info" emoji="📔">
-Using these states is restricted to color properties.
-</Callout>
-
 ### Fixed width and height
 
 Using a set of buttons with a fixed width or height is often helpful. So `Button` supports these theme variables:
@@ -408,7 +188,7 @@ Using a set of buttons with a fixed width or height is often helpful. So `Button
 
 Avoid setting the `width-Button` and `height-Button` styles in the theme definition. Instead, wrap the affected button group into a `Theme` component as in the following example:
 
-```xmlui copy
+```xmlui-pg copy display name="Example: Buttons with fixed width"
 <App>
   <HStack>
     <Theme width-Button="120px">
@@ -421,23 +201,5 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
   </HStack>
 </App>
 ```
-
-<Playground
-  name="Example: Buttons with fixed width"
-  app={`
-    <App>
-      <HStack>
-        <Theme width-Button="120px">
-          <Button label="Short" />
-          <Button label="Longer" />
-          <Button label="Longest" />
-          <Button label="Disabled" enabled="false" />
-          <Button label="Outlined" variant="outlined" />
-        </Theme>
-      </HStack>
-    </App>
-  `}
-  height={100}
-/>
 
 %-STYLE-END

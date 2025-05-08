@@ -30,7 +30,8 @@ In the following example, you can see a custom logo definition in the `AppHeader
 There is a `Heading` with the title text "MyApp" before the logo.
 It also uses the `Logo` component within the template definition:
 
-```xmlui copy {6}
+```xmlui-pg
+---app copy display name="Example: using Logo" {6} height="200px"
 <App layout="horizontal">
   <AppHeader>
     <property name="logoTemplate">
@@ -51,36 +52,8 @@ It also uses the `Logo` component within the template definition:
     </Page>
   </Pages>
 </App>
-```
-
+---desc
 The markup displays the app's logo:
-
-<Playground
-  name="Example: using Logo"
-  height={200}
-  resources={{ logo: xmluiLogo }}
-  app={`
-    <App layout="horizontal">
-      <AppHeader>
-        <property name="logoTemplate">
-           <Fragment>
-             <Heading level="h2" value="MyApp"/>
-             <Logo/>
-           </Fragment>
-        </property>
-      </AppHeader>
-      <NavPanel>
-          <NavLink label="Home" to="/" icon="home"/>
-      </NavPanel>
-      <Pages defaultRoute="/">
-          <Page url="/">
-            <CHStack>
-              (Sample content)
-            </CHStack>
-          </Page>
-      </Pages>
-    </App>
-  `}
-/>
+```
 
 %-DESC-END

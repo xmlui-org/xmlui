@@ -165,6 +165,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const componentRegistry = useComponentRegistry();
   const { renderer, descriptor, isCompoundComponent } =
     componentRegistry.lookupComponentRenderer(safeNode.type) || {};
+  // if (safeNode.type.startsWith("Component")) {
+  //   console.log("renderer", renderer, safeNode.type);
+  //   console.log("registry", componentRegistry.getRegisteredComponentKeys().length);
+  // }
 
   // --- Obtain a function that can lookup an event handler, which is bound to a
   // --- particular event of this component instance

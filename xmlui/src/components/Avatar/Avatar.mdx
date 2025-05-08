@@ -1,25 +1,15 @@
 %-PROP-START name
 
-```xmlui copy
+```xmlui-pg copy display name="Example: name"
 <App>
   <Avatar name="John, Doe" />
 </App>
 ```
-
-<Playground
-  name="Example: name"
-  app={`
-    <App>
-      <Avatar name="John, Doe" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START size
 
-```xmlui copy
+```xmlui-pg copy display name="Example: size"
 <App>
   <HStack>
     <Avatar name="Dorothy Ellen Fuller" />
@@ -31,45 +21,21 @@
 </App>
 ```
 
-<Playground
-  name="Example: size"
-  app={`
-    <App>
-      <HStack>
-        <Avatar name="Dorothy Ellen Fuller" />
-        <Avatar name="Xavier Schiller" size="xs" />
-        <Avatar name="Sebastien Moore" size="sm" />
-        <Avatar name="Molly Dough" size="md" />
-        <Avatar name="Lynn Gilbert" size="lg" />
-      </HStack>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START url
 
-```xmlui copy
+```xmlui-pg copy display name="Example: url"
 <App>
   <Avatar url="https://i.pravatar.cc/100" size="md" />
 </App>
 ```
 
-<Playground
-  name="Example: url"
-  app={`
-    <App>
-      <Avatar url="https://i.pravatar.cc/100" size="md" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-EVENT-START click
 
-```xmlui copy
+```xmlui-pg copy display name="Example: click"
 <App>
   <HStack verticalAlignment="center">
     <Avatar name="Molly Dough" size="md" onClick="toast('Avatar clicked')" />
@@ -78,31 +44,4 @@
 </App>
 ```
 
-<Playground
-  name="Example: click"
-  app={`
-    <App>
-      <HStack verticalAlignment="center">
-        <Avatar name="Molly Dough" size="md" onClick="toast('Avatar clicked')" />
-        Click the avatar!
-      </HStack>
-    </App>
-  `}
-/>
-
 %-EVENT-END
-
-%-STYLE-START
-
-The `Avatar` component uses these theme variables to customize its appearance:
-
-- `backgroundColor`
-- `borderColor`
-- `color`
-- `fontWeight`
-- `borderRadius`
-- `boxShadow`
-- `borderStyle`
-- `borderWidth`
-
-%-STYLE-END
