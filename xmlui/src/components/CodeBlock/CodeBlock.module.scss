@@ -30,6 +30,7 @@ $backgroundColor-CodeBlock-highlight: createThemeVar("backgroundColor-CodeBlock-
   padding-left: t.$space-3;
   background-color: $backgroundColor-CodeBlock-header;
   border-bottom: $color-CodeBlock-headerSeparator solid 2px;
+  font-size: t.$fontSize-small;
 }
 
 .codeBlockCopyWrapper {

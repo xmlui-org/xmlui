@@ -19,12 +19,11 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import classnames from "classnames";
 
 import styles from "./NavGroup.module.scss";
 
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
-import { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { mergeProps } from "../../components-core/utils/mergeProps";
 import { useTheme } from "../../components-core/theming/ThemeContext";
@@ -32,7 +31,7 @@ import { Icon } from "../Icon/IconNative";
 import { NavLink } from "../NavLink/NavLinkNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
-import { NavGroupMd } from "./NavGroup";
+import type { NavGroupMd } from "./NavGroup";
 
 type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;
 
@@ -59,8 +58,8 @@ export const defaultProps: Pick<
 > = {
   iconHorizontalExpanded: "chevronleft",
   iconHorizontalCollapsed: "chevronright",
-  iconVerticalExpanded: "chevronup",
-  iconVerticalCollapsed: "chevrondown",
+  iconVerticalExpanded: "chevrondown",
+  iconVerticalCollapsed: "chevronright",
 };
 
 const NavGroupContext = createContext({

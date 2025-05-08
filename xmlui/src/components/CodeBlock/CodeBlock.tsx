@@ -25,25 +25,23 @@ export function CodeBlock({ children, meta, textToCopy }: CodeBlockProps) {
     <div className={styles.codeBlock}>
       {meta.filename && (
         <div className={styles.codeBlockHeader}>
-          <Text variant="em">
-            <Text variant="strong">Filename:</Text> {meta.filename}
-          </Text>
+          <Text variant="em">{meta.filename}</Text>
         </div>
       )}
       <div className={styles.codeBlockCopyWrapper}>
         {children}
         <div className={styles.codeBlockCopyButton}>
           <Button
-            variant="ghost"
-            themeColor="secondary"
-            size="sm"
+            variant="outlined"
+            themeColor="primary"
+            size="xs"
             icon={<Icon name={"copy"} aria-hidden />}
             onClick={() => {
               if (!textToCopy) return;
               navigator.clipboard.writeText(textToCopy);
               toast.success("Code copied!");
             }}
-          ></Button>
+          >Copy</Button>
         </div>
       </div>
     </div>

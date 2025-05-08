@@ -59,7 +59,7 @@ function mapTextContent(node: ReactNode): string {
   // ---
 
   function transformCodeLines(node: string) {
-    const splitNode = node.split("\n");
+    const splitNode = node.split(/\r?\n/);
     for (let i = 0; i < splitNode.length; i++) {
       // Backslash before a codefence indicates an escaped codefence
       // -> don't render the backslash
@@ -67,6 +67,25 @@ function mapTextContent(node: ReactNode): string {
         splitNode[i] = splitNode[i].replace("\\```", "```");
       }
     }
+
+    // Remove empty lines from start and end
+    let startTrimIdx = 0;
+    let endTrimIdx = splitNode.length - 1;
+    for(let i = 0; i < splitNode.length; i++) {
+      if (splitNode[i].trim() !== "") {
+        startTrimIdx = i;
+        break;
+      }
+    }
+    for(let i = splitNode.length - 1; i >= 0; i--) {
+      if (splitNode[i].trim() !== "") {
+        endTrimIdx = i;
+        break;
+      }
+    }
+
+    splitNode.splice(0, startTrimIdx);
+    splitNode.splice(endTrimIdx + 1);
     return splitNode.join("\n");
   }
 }
