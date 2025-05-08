@@ -19,6 +19,14 @@ $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
 .nestedAppContainer {
   @include t.borderVars($themeVars, $component);
   @include t.paddingVars($themeVars, $component);
+
+  //https://stackoverflow.com/a/70422489
+  //https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Containing_block#identifying_the_containing_block
+  //" ...If the position property is absolute or fixed, the containing block may also be formed by the edge of the padding box of the nearest ancestor element that has any of the following:
+  // A filter, backdrop-filter, transform, or perspective value other than none. ..."
+
+  // so we do this to make the position 'fixed' elements to be positioned relative to the nestedAppContainer
+  transform: scale(1);
   margin-top: $marginTop-NestedApp;
   margin-bottom: $marginBottom-NestedApp;
   width: 100%;

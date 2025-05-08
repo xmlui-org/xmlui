@@ -3,7 +3,7 @@
 This boolean property indicates whether the checkbox responds to user events (i.e. clicks);
 it is `true` by default.
 
-```xmlui copy {4-5, 9-10}
+```xmlui-pg copy {4-5, 9-10} display name="Example: enabled"
 <App>
   Enabled switches:
   <HStack>
@@ -18,52 +18,24 @@ it is `true` by default.
 </App>
 ```
 
-<Playground
-  name="Example: enabled"
-  app={`
-    <App>
-      Enabled switches:
-      <HStack>
-        <Switch initialValue="true" enabled="true" />
-        <Switch initialValue="false" enabled="true" />
-      </HStack>
-      Disabled switches:
-      <HStack>
-        <Switch initialValue="true" enabled="false" />
-        <Switch initilaValue="false" enabled="false" />
-      </HStack>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START label
 
 This property sets the label of the component.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: label"
 <App>
   <Switch label="Example label" initialValue="true" />
   <Switch label="Another label" intialValue="false" />
 </App>
 ```
 
-<Playground
-  name="Example: label"
-  app={`
-    <App>
-      <Switch label="Example label" initialValue="true" />
-      <Switch label="Another label" intialValue="false" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START labelPosition
 
-```xmlui copy
+```xmlui-pg copy display name="Example: labelPosition"
 <App>
   <Switch label="Top label" labelPosition="top" initialValue="true" />
   <Switch label="End label" labelPosition="end" initialValue="true" />
@@ -72,46 +44,24 @@ This property sets the label of the component.
 </App>
 ```
 
-<Playground
-  name="Example: labelPosition"
-  app={`
-    <App>
-      <Switch label="Top label" labelPosition="top" initialValue="true" />
-      <Switch label="End label" labelPosition="end" initialValue="true" />
-      <Switch label="Bottom label" labelPosition="bottom" initialValue="true" />
-      <Switch label="Start label" labelPosition="start" initialValue="true" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START readOnly
 
 If true, the value of the component cannot be modified.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: readOnly"
 <App>
   <Switch readOnly="true" label="Checked" initialValue="true" />
   <Switch readOnly="true" label="Unchecked" intialValue="false" />
 </App>
 ```
 
-<Playground
-  name="Example: readOnly"
-  app={`
-    <App>
-      <Switch readOnly="true" label="Checked" initialValue="true" />
-      <Switch readOnly="true" label="Unchecked" intialValue="false" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-API-START setValue
 
-```xmlui copy {9,12,14}
+```xmlui-pg copy {9,12,14} display name="Example: value and setValue"
 <App var.changes="">
   <Switch
     id="mySwitch"
@@ -131,29 +81,6 @@ If true, the value of the component cannot be modified.
 </App>
 ```
 
-<Playground
-  name="Example: value and setValue"
-  app={`
-    <App var.changes="">
-      <Switch
-        id="mySwitch"
-        readOnly="true"
-        label="This switch can be set only programmatically"
-        onDidChange="changes += '+'" />
-      <HStack>
-        <Button
-          label="Check"
-          onClick="mySwitch.setValue(true)" />
-        <Button
-          label="Uncheck"
-          onClick="mySwitch.setValue(false)" />
-      </HStack>
-      <Text>The switch is {checkbox.value ? "checked" : "unchecked"}</Text>
-      <Text value="Changes: {changes}" />
-    </App>
-  `}
-/>
-
 %-API-END
 
 %-EVENT-START didChange
@@ -161,24 +88,13 @@ If true, the value of the component cannot be modified.
 This event is triggered when the `Switch` is toggled due to user interaction.
 A read-only switch never fires this event, and it won't fire if the switch's value is set programmatically.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: didChange"
 <App verticalAlignment="center" var.changes="">
   <Switch label="Changeable" onDidChange="changes += '+'" />
   <Switch label="Readonly" readOnly="true" onDidChange="changes += '-'" />
   <Text value="Changes: {changes}" />
 </App>
 ```
-
-<Playground
-  name="Example: didChange"
-  app={`
-    <App verticalAlignment="center" var.changes="">
-      <Switch label="Changeable" onDidChange="changes += '+'" />
-      <Switch label="Readonly" readOnly="true" onDidChange="changes += '-'" />
-      <Text value="Changes: {changes}" />
-    </App>
-  `}
-/>
 
 %-EVENT-END
 
@@ -188,7 +104,7 @@ This event is triggered when the `Switch` receives focus.
 
 Click the `Switch` in the example demo to change the label text. Note how clicking elsewhere resets the text to the original.
 
-```xmlui copy {4,5}
+```xmlui-pg copy {4,5} display name="Example: gotFocus"
 <App var.focused="{false}" verticalAlignment="center">
   <Switch
     value="true"
@@ -199,52 +115,9 @@ Click the `Switch` in the example demo to change the label text. Note how clicki
 </App>
 ```
 
-<Playground
-  name="Example: gotFocus/lostFocus"
-  app={`
-    <App var.focused="{false}" verticalAlignment="center">
-      <Switch
-        value="true"
-        onGotFocus="focused = true"
-        onLostFocus="focused = false"
-      />
-      <Text value="{focused === true ? 'I am focused!' : 'I have lost the focus!'}" />
-    </App>
-  `}
-/>
-
 %-EVENT-END
 
 This event is triggered when the `Switch` loses focus.
 
 (See the example above)
 
-%-STYLE-START
-
-The `Switch` component uses these theme variables to customize its appearance:
-
-- `backgroundColor-Switch`
-- `borderColor-Switch`
-- `backgroundColor-Switch--disabled`
-- `backgroundColor-indicator-Switch`
-- `backgroundColor-checked-Switch`
-- `backgroundColor-checked-Switch-warning`
-- `backgroundColor-checked-Switch-success`
-- `backgroundColor-checked-Switch-error`
-- `borderColor-checked-Switch`
-- `borderColor-checked-Switch-warning`
-- `borderColor-checked-Switch-success`
-- `borderColor-checked-Switch-error`
-
-<Callout type="info" emoji="📔">
-some generic styling options are not available for this component.
-Namely using any `padding` features like the following:
-
-```
-<Switch padding="1rem" />
-```
-
-If you need to add space around the component, use `margins` instead of `paddings`.
-</Callout>
-
-%-STYLE-END

@@ -18,7 +18,7 @@ You can define specific styles for components nested in `Theme` using these them
 The following example specifies a dark tone for the current theme
 and sets several theme variables to style the `ProgressBar` component:
 
-```xmlui copy {3-8}
+```xmlui-pg copy {3-8} display name="Example: using Theme"
 <App>
   <Theme
     tone="dark"
@@ -38,29 +38,6 @@ and sets several theme variables to style the `ProgressBar` component:
 </App>
 ```
 
-<Playground
-  name="Example: using Theme"
-  app={`
-  <App>
-    <Theme
-      tone="dark"
-      backgroundColor-ProgressBar="cyan"
-      color-indicator-ProgressBar="purple"
-      thickness-ProgressBar="12px"
-      borderRadius-indicator-ProgressBar="12px"
-      borderRadius-Progressbar="4px"
-    >
-      <VStack backgroundColor="$backgroundColor-primary">
-        <ProgressBar value="0"/>
-        <ProgressBar value="0.2"/>
-        <ProgressBar value="0.6"/>
-        <ProgressBar value="1.0"/>
-      </VStack>
-    </Theme>
-  </App>
-  `}
-/>
-
 ## Properties
 
 ### `root`
@@ -79,7 +56,7 @@ Otherwise, the `Theme` component will just provide the theme context to its chil
 
 This property specifies which theme to use by setting the theme's id.
 
-```xmlui copy {2, 9, 16}
+```xmlui-pg copy {2, 9, 16} display name="Example: themeId"
 <App>
   <Theme themeId="xmlui">
     <VStack backgroundColor="$backgroundColor-primary">
@@ -105,42 +82,13 @@ This property specifies which theme to use by setting the theme's id.
 </App>
 ```
 
-<Playground
-  name="Example: themeId"
-  app={`
-  <App>
-    <Theme themeId="xmlui">
-      <VStack backgroundColor="$backgroundColor-primary">
-        <H3>Use 'xmlui' theme:</H3>
-        <ProgressBar value="0"/>
-        <ProgressBar value="0.6"/>
-      </VStack>
-    </Theme>
-    <Theme themeId="xmlui-green">
-      <VStack backgroundColor="$backgroundColor-primary">
-        <H3>Use 'xmlui-green' theme:</H3>
-        <ProgressBar value="0"/>
-        <ProgressBar value="0.6"/>
-      </VStack>
-    </Theme>
-    <Theme themeId="solid">
-      <VStack backgroundColor="$backgroundColor-primary">
-        <H3>Use the 'solid' theme:</H3>
-        <ProgressBar value="0"/>
-        <ProgressBar value="0.6"/>
-      </VStack>
-    </Theme>
-  </App>
-  `}
-/>
-
 ### `tone (default: "light")`
 
 This property allows the setting of the current theme's tone.
 
 Available values: `light` **(default)**, `dark`
 
-```xmlui copy {2,9}
+```xmlui-pg copy {2,9} display name="Example: tone"
 <App>
   <Theme tone="light">
     <VStack backgroundColor="$backgroundColor-primary" >
@@ -158,28 +106,6 @@ Available values: `light` **(default)**, `dark`
   </Theme>
 </App>
 ```
-
-<Playground
-  name="Example: tone"
-  app={`
-  <App>
-    <Theme tone="light">
-      <VStack backgroundColor="$backgroundColor-primary" >
-        <H3>Use the light tone of the base theme:</H3>
-        <ProgressBar value="0"/>
-        <ProgressBar value="0.6"/>
-      </VStack>
-    </Theme>
-    <Theme tone="dark">
-      <VStack backgroundColor="$backgroundColor-primary">
-        <H3>Use the dark tone of the base theme:</H3>
-        <ProgressBar value="0"/>
-        <ProgressBar value="0.6"/>
-      </VStack>
-    </Theme>
-  </App>
-  `}
-/>
 
 ## Events
 

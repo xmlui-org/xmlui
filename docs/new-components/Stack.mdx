@@ -20,17 +20,17 @@ Optional size value indicating the gap between child elements.
 
 In the following example we use pixels, characters (shorthand `ch`), and the `em` CSS unit size which is a relative size to the font size of the element (See size values).
 
-```xmlui copy {3, 10}
+```xmlui-pg copy {3, 10} display name="Example: gap"
 <App>
   <Stack orientation="horizontal" backgroundColor="cyan"
-      gap="80px">
+    gap="80px">
     <Stack height="40px" width="40px" backgroundColor="red" />
     <Stack height="40px" width="40px" backgroundColor="green" />
     <Stack height="40px" width="40px" backgroundColor="blue" />
     <Stack height="40px" width="40px" backgroundColor="yellow" />
   </Stack>
   <Stack orientation="horizontal" backgroundColor="cyan"
-          gap="12ch">
+    gap="12ch">
     <Stack height="40px" width="40px" backgroundColor="red" />
     <Stack height="40px" width="40px" backgroundColor="green" />
     <Stack height="40px" width="40px" backgroundColor="blue" />
@@ -38,28 +38,6 @@ In the following example we use pixels, characters (shorthand `ch`), and the `em
   </Stack>
 </App>
 ```
-
-<Playground
-  name="Example: gap"
-  app={`
-    <App>
-      <Stack orientation="horizontal" backgroundColor="cyan"
-         gap="80px">
-        <Stack height="40px" width="40px" backgroundColor="red" />
-        <Stack height="40px" width="40px" backgroundColor="green" />
-        <Stack height="40px" width="40px" backgroundColor="blue" />
-        <Stack height="40px" width="40px" backgroundColor="yellow" />
-      </Stack>
-      <Stack orientation="horizontal" backgroundColor="cyan"
-             gap="12ch">
-        <Stack height="40px" width="40px" backgroundColor="red" />
-        <Stack height="40px" width="40px" backgroundColor="green" />
-        <Stack height="40px" width="40px" backgroundColor="blue" />
-        <Stack height="40px" width="40px" backgroundColor="yellow" />
-      </Stack>
-    </App>
-  `}
-/>
 
 ### `horizontalAlignment (default: "start")`
 
@@ -71,24 +49,13 @@ Available values: `start` **(default)**, `center`, `end`
 The `start` and `end` values can be affected by i18n if the layout is in a right-to-left writing style.
 </Callout>
 
-```xmlui copy {3}
+```xmlui-pg copy {3} display name="Example: horizontalAlignment"
 <App>
   <Stack width="100%" horizontalAlignment="center" backgroundColor="cyan">
     <Stack width="36px" height="36px" backgroundColor="red" />
   </Stack>
 </App>
 ```
-
-<Playground
-  name="Example: horizontalAlignment"
-  app={`
-    <App>
-      <Stack width="100%" horizontalAlignment="center" backgroundColor="cyan">
-        <Stack width="36px" height="36px" backgroundColor="red" />
-      </Stack>
-    </App>
-  `}
-/>
 
 ### `orientation (default: "vertical")`
 
@@ -102,7 +69,7 @@ Optional boolean property to reverse the order of child elements.
 
 Default is **false**, which indicates a left-to-right layout.
 
-```xmlui copy /reverse="true"/
+```xmlui-pg copy display name="Example: reverse"
 <App>
   <Stack backgroundColor="cyan">
     <Stack gap="10px" orientation="horizontal">
@@ -119,33 +86,13 @@ Default is **false**, which indicates a left-to-right layout.
 </App>
 ```
 
-<Playground
-  name="Example: reverse"
-  app={`
-    <App>
-      <Stack backgroundColor="cyan">
-        <Stack gap="10px" orientation="horizontal">
-          <Stack height="40px" width="40px" backgroundColor="red" />
-          <Stack height="40px" width="40px" backgroundColor="green" />
-          <Stack height="40px" width="40px" backgroundColor="blue" />
-        </Stack>
-        <Stack reverse="true" orientation="horizontal">
-          <Stack height="40px" width="40px" backgroundColor="red" />
-          <Stack height="40px" width="40px" backgroundColor="green" />
-          <Stack height="40px" width="40px" backgroundColor="blue" />
-        </Stack>
-      </Stack>
-    </App>
-  `}
-/>
-
 ### `verticalAlignment (default: "start")`
 
 Manages the vertical content alignment for each child element in the Stack.
 
 Available values: `start` **(default)**, `center`, `end`
 
-```xmlui copy {2}
+```xmlui-pg copy {2} display name="Example: verticalAlignment"
 <App>
   <Stack height="100px" verticalAlignment="end" backgroundColor="cyan">
     <Stack width="36px" height="36px" backgroundColor="red" />
@@ -153,24 +100,13 @@ Available values: `start` **(default)**, `center`, `end`
 </App>
 ```
 
-<Playground
-  name="Example: verticalAlignment"
-  app={`
-    <App>
-      <Stack height="100px" verticalAlignment="end" backgroundColor="cyan">
-        <Stack width="36px" height="36px" backgroundColor="red" />
-      </Stack>
-    </App>
-  `}
-/>
-
 ### `wrapContent (default: false)`
 
 Optional boolean which wraps the content if set to true and the available space is not big enough. Works only with horizontal orientations.
 
 Optional boolean which wraps the content if set to true and the available space is not big enough. Works in all orientations.
 
-```xmlui copy /wrapContent="true"/
+```xmlui-pg copy display name="Example: wrapContent"
 <App>
   <Stack wrapContent="true" width="140px" orientation="horizontal" backgroundColor="cyan">
     <Stack height="40px" width="40px" backgroundColor="blue" />
@@ -181,20 +117,6 @@ Optional boolean which wraps the content if set to true and the available space 
 </App>
 ```
 
-<Playground
-  name="Example: wrapContent"
-  app={`
-    <App>
-      <Stack wrapContent="true" width="140px" orientation="horizontal" backgroundColor="cyan">
-        <Stack height="40px" width="40px" backgroundColor="blue" />
-        <Stack height="40px" width="40px" backgroundColor="blue" />
-        <Stack height="40px" width="40px" backgroundColor="blue" />
-        <Stack height="40px" width="40px" backgroundColor="blue" />
-      </Stack>
-    </App>
-  `}
-/>
-
 ## Events
 
 ### `click`
@@ -203,7 +125,7 @@ This event is triggered when the Stack is clicked.
 
 Describes the logic that fires when the component is clicked.
 
-```xmlui copy {4}
+```xmlui-pg copy display name="Example: click"
 <App>
   <HStack var.shown="{false}">
     <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />
@@ -211,18 +133,6 @@ Describes the logic that fires when the component is clicked.
   </HStack>
 </App>
 ```
-
-<Playground
-  name="Example: click"
-  app={`
-    <App>
-      <HStack var.shown="{false}">
-        <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />
-        <Stack when="{shown}" height="40px" width="40px" backgroundColor="blue" />
-      </HStack>
-    </App>
-  `}
-/>
 
 ## Exposed Methods
 

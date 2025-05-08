@@ -8,20 +8,11 @@ While it is visible, the action is yet to be completed; on completion, the UI lo
 
 ## Using the `Spinner`
 
-```xmlui copy
+```xmlui-pg copy display name="Example: using Spinner"
 <App>
   <Spinner />
 </App>
 ```
-
-<Playground
-  name="Example: using Spinner"
-  app={`
-    <App>
-      <Spinner />
-    </App>
-  `}
-/>
 
 <Callout type="info" emoji="📔">
 `Spinner` ignores the `width`, `minWidth`, `maxWidth`, `height`, `minHeight`, and `maxHeight` properties. If you want to change its size, use the `size-Spinner` theme variable (see details is the [Styling](#styling) section).
@@ -35,7 +26,7 @@ The delay in milliseconds before the spinner is displayed.
 
 Use the buttons to toggle between the two `Spinners`.
 
-```xmlui copy {8-9}
+```xmlui-pg copy {8-9} display name="Example: delay"
 <App>
   <variable name="noDelay" value="{true}" />
   <variable name="yesDelay" value="{false}" />
@@ -48,46 +39,15 @@ Use the buttons to toggle between the two `Spinners`.
 </App>
 ```
 
-<Playground
-  name="Example: delay"
-  height={180}
-  app={`
-    <App>
-      <variable name="noDelay" value="{true}" />
-      <variable name="yesDelay" value="{false}" />
-      <HStack gap="$space-0_5">
-        <Button label="No delay" onClick="noDelay = true; yesDelay = false;" />
-        <Button label="1000 ms delay" onClick="noDelay = false; yesDelay = true;" />
-      </HStack>
-      <Spinner when="{noDelay}" delay="0" />
-      <Spinner when="{yesDelay}" delay="1000" />
-    </App>
-  `}
-/>
-
 ### `fullScreen (default: false)`
 
 If set to `true`, the component will be rendered in a full screen container.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: fullScreen" height="200px"
 <App>
   <Spinner fullScreen="true" />
 </App>
 ```
-
-<Playground
-  name="Example: fullScreen"
-  height={200}
-  app={`
-  <App>
-    <Spinner fullScreen="true" />
-  </App>
-  `}
-/>
-
-### `themeColor`
-
-(**NOT IMPLEMENTED YET**) The theme color of the component.
 
 ## Events
 
@@ -98,45 +58,6 @@ This component does not have any events.
 This component does not expose any methods.
 
 ## Styling
-
-The `Spinner` has the following theme variables:
-
-- `borderColor-Spinner`
-- `size-Spinner`
-- `thickness-Spinner`
-
-```json copy
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "size-Spinner": "3rem",
-    "thickness-Spinner": "8px",
-    "borderColor-Spinner": "red"
-  }
-}
-```
-
-<Playground
-  name="Example: styling"
-  app={`
-  <App>
-    <Spinner />
-  </App>
-  `}
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "size-Spinner": "3rem",
-        "thickness-Spinner": "8px",
-        "borderColor-Spinner": "red",
-      }
-    }
-  ]}
-/>
 
 ### Theme Variables
 
