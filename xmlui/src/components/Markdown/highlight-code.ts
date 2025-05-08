@@ -71,13 +71,13 @@ function mapTextContent(node: ReactNode): string {
     // Remove empty lines from start and end
     let startTrimIdx = 0;
     let endTrimIdx = splitNode.length - 1;
-    for(let i = 0; i < splitNode.length; i++) {
+    for (let i = 0; i < splitNode.length; i++) {
       if (splitNode[i].trim() !== "") {
         startTrimIdx = i;
         break;
       }
     }
-    for(let i = splitNode.length - 1; i >= 0; i--) {
+    for (let i = splitNode.length - 1; i >= 0; i--) {
       if (splitNode[i].trim() !== "") {
         endTrimIdx = i;
         break;
@@ -118,12 +118,14 @@ function extractMetaFromChildren(
       );
 
     return {
-      [CodeHighlighterMetaKeys.language.prop]: meta["data-language"],
-      [CodeHighlighterMetaKeys.copy.prop]: parseBoolean(meta["data-copy"]),
-      [CodeHighlighterMetaKeys.filename.prop]: meta["data-filename"],
-      [CodeHighlighterMetaKeys.rowNumbers.prop]: parseBoolean(meta["data-row-numbers"]),
-      [CodeHighlighterMetaKeys.highlightRows.prop]: meta["data-highlight-rows"]
-        ? parseRowHighlights(meta["data-highlight-rows"], codeLength)
+      [CodeHighlighterMetaKeys.language.prop]: meta[CodeHighlighterMetaKeys.language.data],
+      [CodeHighlighterMetaKeys.copy.prop]: parseBoolean(meta[CodeHighlighterMetaKeys.copy.data]),
+      [CodeHighlighterMetaKeys.filename.prop]: meta[CodeHighlighterMetaKeys.filename.data],
+      [CodeHighlighterMetaKeys.rowNumbers.prop]: parseBoolean(
+        meta[CodeHighlighterMetaKeys.rowNumbers.data],
+      ),
+      [CodeHighlighterMetaKeys.highlightRows.prop]: meta[CodeHighlighterMetaKeys.highlightRows.data]
+        ? parseRowHighlights(meta[CodeHighlighterMetaKeys.highlightRows.data], codeLength)
         : [],
       [CodeHighlighterMetaKeys.highlightSubstrings.prop]: [], // TODO
     };
@@ -155,13 +157,11 @@ function parseRowHighlights(str: string, codeLines: number): ItemDecoration[] {
 
       return { start, end };
     })
-    .filter(
-      (item) => {
-        if (item.start === -1 || item.end === -1) return false;
-        if (item.start > codeLines || item.end > codeLines) return false;
-        return true;
-      }
-    );
+    .filter((item) => {
+      if (item.start === -1 || item.end === -1) return false;
+      if (item.start > codeLines || item.end > codeLines) return false;
+      return true;
+    });
 }
 
 export type CodeHighlighter = {
@@ -191,7 +191,7 @@ export type CodeHighlighterMeta = {
   highlightSubstrings?: number[];
 };
 
-type ItemDecoration = { start: number; end: number, className?: string };
+type ItemDecoration = { start: number; end: number; className?: string };
 
 export const CodeHighlighterMetaKeys = {
   language: { data: "data-language", prop: "language" },

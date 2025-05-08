@@ -17,7 +17,7 @@ import {
   parseMetaAndHighlightCode,
 } from "./highlight-code";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlock";
+import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
 
 type MarkdownProps = {
   removeIndents?: boolean;
