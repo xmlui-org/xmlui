@@ -324,3 +324,31 @@ export const useRealBackground = (element: HTMLElement)=>{
   }, [activeThemeTone, activeThemeId]);
   return useMemo(()=> element ? realBackgroundColor(element) : 'transparent', [element, counter]);
 }
+
+
+// export const useIsInViewport = (ref, observerOptions) => {
+//   const [entered, setEntered] = useState(false);
+//   const observer = useRef(
+//     new IntersectionObserver(
+//       ([entry]) => setEntered(entry.isIntersecting),
+//       observerOptions
+//     )
+//   );
+//
+//   useEffect(() => {
+//     const element = ref.current;
+//     const ob = observer.current;
+//
+//     // stop observing once the element has entered the viewport for the first time.
+//     // if (entered) {
+//     //   ob.disconnect();
+//     //   return;
+//     // }
+//
+//     if (element) ob.observe(element);
+//
+//     return () => ob.disconnect();
+//   }, [entered, ref]);
+//
+//   return entered;
+// };

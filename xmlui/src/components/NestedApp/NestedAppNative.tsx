@@ -40,6 +40,7 @@ export function NestedApp({
   allowPlaygroundPopup = true,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const shadowRef = useRef(null);
   const contentRootRef = useRef<Root | null>(null);
   const nestedAppId = useId();
   const [refreshVersion, setRefreshVersion] = useState(0);
@@ -75,8 +76,16 @@ export function NestedApp({
   //console.log("mock", mock);
 
   useLayoutEffect(() => {
-    if (!contentRootRef.current && rootRef.current) {
-      contentRootRef.current = ReactDOM.createRoot(rootRef.current);
+    if(!shadowRef.current && rootRef.current){
+      // Clone existing style and link tags
+      shadowRef.current = rootRef.current.attachShadow({ mode: "open" });
+      const styleSheets = document.querySelectorAll('style, link[rel="stylesheet"]');
+      styleSheets.forEach((el) => {
+        shadowRef.current.appendChild(el.cloneNode(true));
+      });
+    }
+    if (!contentRootRef.current && shadowRef.current) {
+      contentRootRef.current = ReactDOM.createRoot(shadowRef.current);
     }
     let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
       `<Fragment xmlns:XMLUIExtensions="component-ns">${app}</Fragment>`,
