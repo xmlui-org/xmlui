@@ -40,6 +40,37 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   min-width: 0;
   width: 100%;
 
+  // --- Additional Heading styles
+  h1 {
+    margin-top: createThemeVar("marginTop-H1-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H1-markdown") !important;
+  }
+
+  h2 {
+    margin-top: createThemeVar("marginTop-H2-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H2-markdown") !important;
+  }
+
+  h3 {
+    margin-top: createThemeVar("marginTop-H3-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H3-markdown") !important;
+  }
+
+  h4 {
+    margin-top: createThemeVar("marginTop-H4-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H4-markdown") !important;
+  }
+
+  h5 {
+    margin-top: createThemeVar("marginTop-H5-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H5-markdown") !important;
+  }
+
+  h6 {
+    margin-top: createThemeVar("marginTop-H6-markdown") !important;
+    margin-bottom: createThemeVar("marginBottom-H6-markdown") !important;
+  }
+
   // --- Blockquote
 
   .blockquote {

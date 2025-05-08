@@ -33,6 +33,7 @@ $component: "Text";
   &.markdown {
     @include textVariant("markdown");
   }
+  
   //text inside text should be inline
   // .text {
   //   display: inline;
@@ -60,6 +61,8 @@ $component: "Text";
   :not(.text.codefence) > &.code,
   :not(.text.codefence) > &code {
     @include textVariant("code");
+    // --- We may add some opacity to the code element
+    // opacity: 0.75;
   }
 
   // For code blocks using <![CDATA[ + <code> tags

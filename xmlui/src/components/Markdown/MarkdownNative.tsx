@@ -355,7 +355,7 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
       if (React.isValidElement(node)) {
         // Handle React elements with children
         if (node.props && node.props.children) {
-          let newChildren;
+          let newChildren: any;
 
           if (Array.isArray(node.props.children)) {
             newChildren = node.props.children.map(processNode);
