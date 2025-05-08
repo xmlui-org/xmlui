@@ -22,7 +22,6 @@ export const SpinnerMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
-    themeColor: d(`(**NOT IMPLEMENTED YET**) The theme color of the component.`),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

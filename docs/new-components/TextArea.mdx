@@ -24,40 +24,21 @@ If set to `true`, this boolean property enables the `TextArea` to resize automat
 
 Write multiple lines in the `TextArea` in the demo below to see how it resizes automatically.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: autoSize" height="240px"
 <App>
   <TextArea autoSize="true" />
 </App>
 ```
 
-<Playground
-  name="Example: autoSize"
-  app={`
-  <App>
-    <TextArea autoSize="true" />
-  </App>
-  `}
-  height={240}
-/>
-
 ### `enabled (default: true)`
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: enabled"
 <App>
   <TextArea enabled="false" />
 </App>
 ```
-
-<Playground
-  name="Example: enabled"
-  app={`
-  <App>
-    <TextArea enabled="false" />
-  </App>
-  `}
-/>
 
 ### `enterSubmits (default: true)`
 
@@ -66,7 +47,7 @@ This optional boolean property indicates whether pressing the `Enter` key on the
 Press `Enter` after writing something in the `TextArea` in the demo below.
 See [Using Forms](../learning/forms.mdx) for details.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: enterSubmits"
 <App>
   <Form onSubmit="toast.success(JSON.stringify(address.value))">
     <TextArea
@@ -76,20 +57,6 @@ See [Using Forms](../learning/forms.mdx) for details.
   </Form>
 </App>
 ```
-
-<Playground
-  name="Example: enterSubmits"
-  app={`
-  <App>
-    <Form onSubmit="toast.success(JSON.stringify(address.value))">
-      <TextArea
-        id="address"
-        enterSubmits="true"
-        initialValue="Suzy Queue, 4455 Landing Lange, APT 4, Louisville, KY 40018-1234" />
-    </Form>
-  </App>
-  `}
-/>
 
 ### `escResets (default: false)`
 
@@ -101,20 +68,11 @@ This property sets the component's initial value.
 
 The initial value displayed in the input field.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: initialValue"
 <App>
   <TextArea initialValue="Example text" />
 </App>
 ```
-
-<Playground
-  name="Example: initialValue"
-  app={`
-  <App>
-    <TextArea initialValue="Example text" />
-  </App>
-  `}
-/>
 
 ### `label`
 
@@ -151,7 +109,7 @@ This optional property sets the maximum number of text rows the `TextArea` can g
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
-```xmlui copy {3}
+```xmlui-pg copy {3} display name="Example: maxRows" height="160px"
 <App>
   <TextArea
     maxRows="3"
@@ -163,81 +121,37 @@ This optional property sets the maximum number of text rows the `TextArea` can g
 </App>
 ```
 
-<Playground
-  name="Example: maxRows"
-  height={160}
-  app={`
-  <App>
-    <TextArea
-      maxRows="3"
-      initialValue="Lorem ipsum dolor sit amet,
-      consectetur adipiscing elit,
-      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-      Ut enim ad minim veniam,
-      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." />
-  </App>
-  `}
-/>
-
 ### `minRows`
 
 This optional property sets the minimum number of text rows the `TextArea` can shrink.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
-```xmlui copy /minRows="3"/
+```xmlui-pg copy display name="Example: minRows" height="200px"
 <App>
   <TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />
 </App>
 ```
 
-<Playground
-  name="Example: minRows"
-  height={200}
-  app={`
-  <App>
-    <TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />
-  </App>
-  `}
-/>
-
 ### `placeholder`
 
 A placeholder text that is visible in the input field when its empty.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: placeholder"
 <App>
   <TextArea placeholder="This is a placeholder" />
 </App>
 ```
 
-<Playground
-  name="Example: placeholder"
-  app={`
-  <App>
-    <TextArea placeholder="This is a placeholder" />
-  </App>
-  `}
-/>
-
 ### `readOnly (default: false)`
 
 Set this property to `true` to disallow changing the component value.
 
-```xmlui copy /readOnly="{true}"/
+```xmlui-pg copy display name="Example: readOnly"
 <App>
   <TextArea initialValue="Example text" readOnly="{true}" />
 </App>
 ```
-
-<Playground
-  name="Example: readOnly"
-  app={`
-  <App>
-    <TextArea initialValue="Example text" readOnly="{true}" />
-  </App>
-  `}
-/>
 
 ### `required`
 
@@ -262,23 +176,12 @@ When you allow vertical resizing, you can limit the sizable range according to `
 
 Drag the small resize indicators at the bottom right on each of the controls in the demo.
 
-```xmlui copy /resize/
+```xmlui-pg copy display name="Example: resize" height="300px"
 <App>
   <TextArea resize="vertical" minRows="1" maxRows="8" />
   <TextArea resize="both" />
 </App>
 ```
-
-<Playground
-  name="Example: resize"
-  height={300}
-  app={`
-  <App>
-    <TextArea resize="vertical" minRows="1" maxRows="8" />
-    <TextArea resize="both" />
-  </App>
-  `}
-/>
 
 ### `rows (default: 2)`
 
@@ -286,20 +189,11 @@ Specifies the number of rows the component initially has.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: rows"
 <App>
   <TextArea rows="10" />
 </App>
 ```
-
-<Playground
-  name="Example: rows"
-  app={`
-  <App>
-    <TextArea rows="10" />
-  </App>
-  `}
-/>
 
 ### `validationStatus (default: "none")`
 
@@ -315,7 +209,7 @@ Available values:
 
 This prop is used to visually indicate status changes reacting to form field validation.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: validationStatus"
 <App>
   <TextArea />
   <TextArea validationStatus="valid" />
@@ -323,18 +217,6 @@ This prop is used to visually indicate status changes reacting to form field val
   <TextArea validationStatus="error" />
 </App>
 ```
-
-<Playground
-  name="Example: validationStatus"
-  app={`
-  <App>
-    <TextArea />
-    <TextArea validationStatus="valid" />
-    <TextArea validationStatus="warning" />
-    <TextArea validationStatus="error" />
-  </App>
-  `}
-/>
 
 ## Events
 
@@ -344,23 +226,12 @@ This event is triggered when value of TextArea has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```xmlui copy {3}
+```xmlui-pg copy display name="Example: didChange"
 <App var.field="">
   <TextArea autoFocus="true" initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
 </App>
 ```
-
-<Playground
-  name="Example: didChange"
-  height={160}
-  app={`
-  <App var.field="">
-    <TextArea autoFocus="true" initialValue="{field}" onDidChange="(val) => field = val" />
-    <Text value="{field}" />
-  </App>
-  `}
-/>
 
 ### `gotFocus`
 
@@ -369,7 +240,7 @@ This event is triggered when the TextArea has received the focus.
 Clicking on the `TextArea` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```xmlui copy {4-5}
+```xmlui-pg copy display name="Example: gotFocus/lostFocus"
 <App>
   <TextArea
     initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
@@ -378,19 +249,6 @@ Note how clicking elsewhere resets the text to the original.
     var.focused="{false}" />
 </App>
 ```
-
-<Playground
-  name="Example: gotFocus/lostFocus"
-  app={`
-  <App>
-    <TextArea
-      initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
-      onGotFocus="focused = true"
-      onLostFocus="focused = false"
-      var.focused="{false}" />
-  </App>
-  `}
-/>
 
 ### `lostFocus`
 
@@ -402,28 +260,18 @@ This event is triggered when the TextArea has lost the focus.
 
 This method sets the focus on the TextArea.
 
-```xmlui copy {2-3}
+```xmlui-pg copy display name="Example: focus"
 <App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
   <TextArea id="inputComponent" />
 </App>
 ```
 
-<Playground
-  name="Example: focus"
-  app={`
-  <App>
-    <Button label="Trigger Focus" onClick="inputComponent.focus()" />
-    <TextArea id="inputComponent" />
-  </App>
-  `}
-/>
-
 ### `setValue`
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-```xmlui copy {9}
+```xmlui-pg copy display name="Example: setValue"
 <App var.changes="">
   <TextArea
     id="inputField"
@@ -438,133 +286,19 @@ You can use this method to set the component's current value programmatically (`
 </App>
 ```
 
-<Playground
-  name="Example: setValue"
-  app={`
-  <App var.changes="">
-    <TextArea
-      id="inputField"
-      readOnly="true"
-      onDidChange="changes++" />
-    <HStack>
-      <Button
-        label="Check"
-        onClick="inputField.setValue('example ')" />
-      <Text value="Number of changes: {changes}" />
-    </HStack>
-  </App>
-  `}
-/>
-
 ### `value`
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
 In the example below, typing in the `TextArea` will also display the length of the text typed into it above the field:
 
-```xmlui copy {2-3}
+```xmlui-pg copy display name="Example: value"
 <App>
   <Text value="TextArea content length: {inputComponent.value.length}" />
   <TextArea id="inputComponent" />
 </App>
 ```
 
-<Playground
-  name="Example: value"
-  app={`
-  <App>
-    <Text value="TextArea content length: {inputComponent.value.length}" />
-    <TextArea id="inputComponent" />
-  </App>
-  `}
-/>
-
 ## Styling
 
-The `TextArea` component uses these theme variables.
-
-These variables have 4 variants depending on the [validationStatus](#validationstatus) denoted by `|status|`.
-If the status segment is omitted, the style will be applied to all validation statuses.
-
-- `borderRadius-TextArea-|status|`
-- `borderWidth-TextArea-|status|`
-- `borderStyle-TextArea-|status|`
-- `fontSize-TextArea-|status|`
-- `color-placeholder-TextArea-|status|`
-
-```json copy
-"borderRadius-TextArea-default": "10px",
-"color-placeholder-TextArea-error": "crimson"
-```
-
-In addition to the validation statuses,
-the variables below are associated with styles for `hover` and `focus` interaction states denoted by `|interact|` in their signature:
-
-- `borderColor-TextArea-|status|--|interact|`
-- `backgroundColor-TextArea-|status|--|interact|`
-- `boxShadow-TextArea-|status|--|interact|`
-- `textColor-TextArea-|status|--|interact|`
-
-```json copy
-"backgroundColor-TextArea-default--hover": "gray",
-"textColor-TextArea-error--focus": "lightcoral"
-```
-
-The following variables are only used in the `focus` state:
-
-- `outlineWidth-TextArea-|status|--focus`
-- `outlineColor-TextArea-|status|--focus`
-- `outlineStyle-TextArea-|status|--focus`
-- `outlineOffset-TextArea-|status|--focus`
-
-These variables set the `disabled` state:
-
-- `backgroundColor-TextArea--disabled`
-- `textColor-TextArea--disabled`
-- `borderColor-TextArea--disabled`
-
-### Example
-
-```json copy
-"borderRadius-TextArea": "30px",
-"color-placeholder-TextArea-default": "blue"
-```
-
-<Playground
-  name="Example: styling"
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "borderRadius-TextArea": "30px",
-        "color-placeholder-TextArea-default": "blue"
-      },
-    },
-  ]}
-  app={`
-  <App>
-    <TextArea placeholder="I am a placeholder" />
-  </App>
-  `}
-/>
-
-To style all input controls not just this component, replace the `TextArea` segment with `Input`:
-
-```
-borderColor-Input: "#0033FF"
-```
-
-`Input` affects the following controls:
-
-- [`Checkbox`](./Checkbox.mdx)
-- [`NumberBox`](./NumberBox.mdx)
-- [`RadioGroupOption`](./RadioGroupOption.mdx)
-- [`Select`](./Select.mdx)
-- [`Switch`](./Switch.mdx)
-- [`TextBox`](./TextBox.mdx)
-- [`MultiSelect`](./MultiSelect.mdx)
-- [`MultiCombobox`](./MultiCombobox.mdx)
-
-See [custom themes](../learning/themes/overview.mdx) for styling details.
+This component does not have any styles.
