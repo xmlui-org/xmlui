@@ -61,13 +61,7 @@ export class DocsGenerator {
 
   generateDocs(writeMetaFile) {
     logger.info("Processing MDX files");
-
-    //const pagesMapFile = join(FOLDERS.pages, "pages.js");
-    // const pagesMapFileName = basename(pagesMapFile);
-    const importsToInject = `import { Callout } from "nextra/components";\n\n`;
-    // join(FOLDERS.pages, "components")
-    // + `import ${pagesMapFileName.replace(extname(pagesMapFile), "")} from "${convertPath(relative(join(FOLDERS.pages, "components"), pagesMapFile))}";\n\n`;
-    const metaProcessor = new MetadataProcessor(this.metadata, importsToInject, this.folders);
+    const metaProcessor = new MetadataProcessor(this.metadata, "", this.folders);
     metaProcessor.processDocfiles(writeMetaFile);
   }
 
