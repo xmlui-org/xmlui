@@ -34,7 +34,7 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}Item-level-6");
   z-index: 99;
   top: var(--header-height);
   position: sticky;
-  scrollbar-color: lab(48.438% 0 0 / .4) transparent;
+  scrollbar-color: lab(48.438% 0 0 / 0.4) transparent;
   scrollbar-width: thin;
   border-radius: createThemeVar("borderRadius-TableOfContents");
   border-color: createThemeVar("borderColor-TableOfContents");
@@ -52,7 +52,7 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}Item-level-6");
 
     .listItem {
       list-style-type: none;
-      border-left: createThemeVar("border-width-#{$component}Item") createThemeVar("border-style-#{$component}Item") createThemeVar("border-color-#{$component}Item");
+      border-left: createThemeVar("borderWidth-#{$component}Item") createThemeVar("borderStyle-#{$component}Item") createThemeVar("borderColor-#{$component}Item");
 
       .link {
         color: createThemeVar("textColor-#{$component}Item");
@@ -92,8 +92,14 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}Item-level-6");
         }
       }
 
+      &:hover {
+        .link {
+          color: createThemeVar("textColor-#{$component}Item--hover");
+        }
+      }
+
       &.active {
-        border-left: 2px solid createThemeVar("borderColor-#{$component}Item--active");
+        border-left: createThemeVar("borderWidth-#{$component}Item--active") solid createThemeVar("borderColor-#{$component}Item--active");
 
         .link {
           color: createThemeVar("color-#{$component}Item--active");

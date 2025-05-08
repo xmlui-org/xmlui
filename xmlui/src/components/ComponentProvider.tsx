@@ -239,6 +239,7 @@ import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
 import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
 import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
+import { codeBlockComponentRenderer } from "./CodeBlock/CodeBlock";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -511,6 +512,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(bookmarkComponentRenderer);
       this.registerCoreComponent(tableOfContentsRenderer);
       this.registerCoreComponent(breakoutComponentRenderer);
+      this.registerCoreComponent(codeBlockComponentRenderer);
     }
     this.registerCoreComponent(themeComponentRenderer);
     this.registerCoreComponent(appStateComponentRenderer);
