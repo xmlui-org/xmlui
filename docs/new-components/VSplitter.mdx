@@ -8,7 +8,7 @@ See also: <SmartLink href="/new-components/HSplitter">HSplitter</SmartLink>
 
 `VSplitter` is a specialized, shorthand version for the regular `Splitter` component with a vertical orientation.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: VSplitter"
 <App>
   <VSplitter height="200px">
     <Stack backgroundColor="lightblue" height="100%" />
@@ -16,20 +16,6 @@ See also: <SmartLink href="/new-components/HSplitter">HSplitter</SmartLink>
   </VSplitter>
 </App>
 ```
-
-## Examples
-
-<Playground
-  name="Example: VSplitter"
-  app={`
-    <App>
-      <VSplitter height="200px">
-        <Stack backgroundColor="lightblue" height="100%" />
-        <Stack backgroundColor="darksalmon" height="100%" />
-      </VSplitter>
-    </App>
-  `}
-/>
 
 <Callout type="info" emoji="📔">
 You cannot change the orientation of `VSplitter` from vertical to horizontal by setting the `orientation` prop, as the engine ignores that setting.

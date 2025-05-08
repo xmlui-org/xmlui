@@ -16,111 +16,57 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: enabled"
 <App>
   <TextBox enabled="false" />
 </App>
 ```
 
-<Playground
-  name="Example: enabled"
-  app={`
-  <App>
-    <TextBox enabled="false" />
-  </App>
-  `}
-/>
-
 ### `endIcon`
 
 This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: endIcon"
 <App>
   <TextBox endIcon="email" />
 </App>
 ```
 
-<Playground
-  name="Example: endIcon"
-  app={`
-  <App>
-    <TextBox endIcon="email" />
-  </App>
-  `}
-/>
-
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: all adornments"
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
 ```
-
-<Playground
-  name="Example: all adornments"
-  app={`
-  <App>
-    <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
-  </App>
-  `}
-/>
 
 ### `endText`
 
 This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: endText"
 <App>
   <TextBox endText=".com" />
 </App>
 ```
 
-<Playground
-  name="Example: endText"
-  app={`
-  <App>
-    <TextBox endText=".com" />
-  </App>
-  `}
-/>
-
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: all adornments"
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
 ```
 
-<Playground
-  name="Example: all adornments"
-  app={`
-  <App>
-    <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
-  </App>
-  `}
-/>
-
 ### `initialValue`
 
 This property sets the component's initial value.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: initialValue"
 <App>
   <TextBox initialValue="Example text" />
 </App>
 ```
-
-<Playground
-  name="Example: initialValue"
-  app={`
-  <App>
-    <TextBox initialValue="Example text" />
-  </App>
-  `}
-/>
 
 ### `label`
 
@@ -153,58 +99,31 @@ This property sets the maximum length of the input it accepts.
 
 Try to enter a longer value into the input field below.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: maxLength"
 <App>
   <TextBox maxLength="16" />
 </App>
 ```
 
-<Playground
-  name="Example: maxLength"
-  app={`
-  <App>
-    <TextBox maxLength="16" />
-  </App>
-  `}
-/>
-
 ### `placeholder`
 
 A placeholder text that is visible in the input field when its empty.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: placeholder"
 <App>
   <TextBox placeholder="This is a placeholder" />
 </App>
 ```
 
-<Playground
-  name="Example: placeholder"
-  app={`
-  <App>
-    <TextBox placeholder="This is a placeholder" />
-  </App>
-  `}
-/>
-
 ### `readOnly (default: false)`
 
 Set this property to `true` to disallow changing the component value.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: readOnly"
 <App>
   <TextBox initialValue="Example text" readOnly="true" />
 </App>
 ```
-
-<Playground
-  name="Example: readOnly"
-  app={`
-  <App>
-    <TextBox initialValue="Example text" readOnly="true" />
-  </App>
-  `}
-/>
 
 ### `required`
 
@@ -214,73 +133,37 @@ Set this property to `true` to indicate it must have a value before submitting t
 
 This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: startIcon"
 <App>
   <TextBox startIcon="hyperlink" />
 </App>
 ```
 
-<Playground
-  name="Example: startIcon"
-  app={`
-  <App>
-    <TextBox startIcon="hyperlink" />
-  </App>
-  `}
-/>
-
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: all adornments"
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
 ```
-
-<Playground
-  name="Example: all adornments"
-  app={`
-  <App>
-    <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
-  </App>
-  `}
-/>
 
 ### `startText`
 
 This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: startText"
 <App>
   <TextBox startText="www." />
 </App>
 ```
 
-<Playground
-  name="Example: startText"
-  app={`
-  <App>
-    <TextBox startText="www." />
-  </App>
-  `}
-/>
-
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`endText`](#endtext).
 
-```xmlui copy
+```xmlui-pg copy display name="Example: all adornments"
 <App>
   <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
 </App>
 ```
-
-<Playground
-  name="Example: all adornments"
-  app={`
-  <App>
-    <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
-  </App>
-  `}
-/>
 
 ### `validationStatus (default: "none")`
 
@@ -294,7 +177,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-```xmlui copy
+```xmlui-pg copy display name="Example: validationStatus"
 <App>
   <TextBox />
   <TextBox validationStatus="valid" />
@@ -302,18 +185,6 @@ Available values:
   <TextBox validationStatus="error" />
 </App>
 ```
-
-<Playground
-  name="Example: validationStatus"
-  app={`
-  <App>
-    <TextBox />
-    <TextBox validationStatus="valid" />
-    <TextBox validationStatus="warning" />
-    <TextBox validationStatus="error" />
-  </App>
-  `}
-/>
 
 ## Events
 
@@ -323,23 +194,12 @@ This event is triggered when value of TextBox has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```xmlui copy {3}
+```xmlui-pg copy {3} display name="Example: didChange"
 <App var.field="">
   <TextBox initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
 </App>
 ```
-
-<Playground
-  name="Example: didChange"
-  height={160}
-  app={`
-  <App var.field="">
-    <TextBox initialValue="{field}" onDidChange="(val) => field = val" />
-    <Text value="{field}" />
-  </App>
-  `}
-/>
 
 ### `gotFocus`
 
@@ -348,7 +208,7 @@ This event is triggered when the TextBox has received the focus.
 Clicking on the `TextBox` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to its original.
 
-```xmlui copy {4-5}
+```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus"
 <App>
   <TextBox
     initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
@@ -358,20 +218,6 @@ Note how clicking elsewhere resets the text to its original.
   />
 </App>
 ```
-
-<Playground
-  name="Example: gotFocus/lostFocus"
-  app={`
-  <App>
-    <TextBox
-      initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
-      onGotFocus="focused = true"
-      onLostFocus="focused = false"
-      var.focused="{false}"
-    />
-  </App>
-  `}
-/>
 
 ### `lostFocus`
 
@@ -383,28 +229,18 @@ This event is triggered when the TextBox has lost the focus.
 
 This method sets the focus on the TextBox.
 
-```xmlui copy {2-3}
+```xmlui-pg copy {2-3} display name="Example: focus"
 <App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
   <TextBox id="inputComponent" />
 </App>
 ```
 
-<Playground
-  name="Example: focus"
-  app={`
-  <App>
-    <Button label="Trigger Focus" onClick="inputComponent.focus()" />
-    <TextBox id="inputComponent" />
-  </App>
-  `}
-/>
-
 ### `setValue`
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-```xmlui copy {10}
+```xmlui-pg copy {10} display name="Example: setValue"
 <App var.changes="">
   <TextBox
     id="inputField"
@@ -421,138 +257,20 @@ You can use this method to set the component's current value programmatically (`
 </App>
 ```
 
-<Playground
-  name="Example: setValue"
-  app={`
-  <App var.changes="">
-    <TextBox
-      id="inputField"
-      readOnly="true"
-      onDidChange="changes++"
-    />
-    <HStack>
-      <Button
-        label="Check"
-        onClick="inputField.setValue('example ')"
-      />
-      <Text value="Number of changes: {changes}" />
-    </HStack>
-  </App>
-  `}
-/>
-
 ### `value`
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
 In the example below, typing in the `TextBox` will also display the length of the text typed into it above the field:
 
-```xmlui copy {2-3}
+```xmlui-pg copy {2-3} display name="Example: value"
 <App>
   <Text value="TextBox content length: {inputComponent.value.length}" />
   <TextBox id="inputComponent" />
 </App>
 ```
 
-<Playground
-  name="Example: value"
-  app={`
-  <App>
-    <Text value="TextBox content length: {inputComponent.value.length}" />
-    <TextBox id="inputComponent" />
-  </App>
-  `}
-/>
-
 ## Styling
-
-The `TextBox` component uses these theme variables:
-
-These variables have 4 variants depending on the [validationStatus](#validationstatus) denoted by `|status|`.
-If the status segment is omitted, the style will be applied to all validation statuses.
-
-- `borderRadius-TextBox-|status|`
-- `borderWidth-TextBox-|status|`
-- `borderStyle-TextBox-|status|`
-- `fontSize-TextBox-|status|`
-- `color-placeholder-TextBox-|status|`
-
-```json copy
-"borderRadius-TextBox-default": "10px",
-"color-placeholder-TextBox-error": "crimson"
-```
-
-In addition to the validation statuses,
-the variables below are associated with styles for `hover` and `focus` interaction states denoted by `|interact|` in their signature:
-
-- `borderColor-TextBox-|status|--|interact|`
-- `backgroundColor-TextBox-|status|--|interact|`
-- `boxShadow-TextBox-|status|--|interact|`
-- `textColor-TextBox-|status|--|interact|`
-
-```json copy
-"backgroundColor-TextBox-default--hover": "gray",
-"textColor-TextBox-error--focus": "lightcoral"
-```
-
-The following variables are only used in the `focus` state:
-
-- `outlineWidth-TextBox-|status|--focus`
-- `outlineColor-TextBox-|status|--focus`
-- `outlineStyle-TextBox-|status|--focus`
-- `outlineOffset-TextBox-|status|--focus`
-
-These variables set the `disabled` state:
-
-- `backgroundColor-TextBox--disabled`
-- `textColor-TextBox--disabled`
-- `borderColor-TextBox--disabled`
-
-### Example
-
-```json copy
-"borderRadius-TextBox": "30px",
-"color-placeholder-TextBox-default": "blue"
-```
-
-<Playground
-  name="Example: styling"
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "borderRadius-TextBox": "30px",
-        "color-placeholder-TextBox-default": "blue"
-      },
-    },
-  ]}
-  app={`
-  <App>
-    <TextBox placeholder="I am a placeholder" />
-  </App>
-  `}
-/>
-
-To style all input controls not just this component, replace the `TextBox` segment with `Input`:
-
-```
-borderColor-Input: "#0033FF"
-```
-
-`Input` affects the following controls:
-
-- [`Checkbox`](./Checkbox.mdx)
-- [`NumberBox`](./NumberBox.mdx)
-- [`RadioGroupOption`](./RadioGroupOption.mdx)
-- [`Select`](./Select.mdx)
-- [`Switch`](./Switch.mdx)
-- [`TextArea`](./TextArea.mdx)
-- [`MultiSelect`](./MultiSelect.mdx)
-- [`MultiCombobox`](./MultiCombobox.mdx)
-
-See [custom themes](../learning/themes/overview.mdx) for styling details.
 
 ### Theme Variables
 

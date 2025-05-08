@@ -6,7 +6,7 @@ Other child components will not be displayed.
 The `TabItem` component has a `label` prop to define the tab button label text.
 Content is provided to a tab via placing child components under the `TabItem`.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: using Tabs" height="200px"
 <App>
   <Tabs>
     <TabItem label="Account">
@@ -22,31 +22,11 @@ Content is provided to a tab via placing child components under the `TabItem`.
 </App>
 ```
 
-<Playground
-  name="Example: using Tabs"
-  app={`
-    <App>
-      <Tabs>
-        <TabItem label="Account">
-          <Text>Account</Text>
-        </TabItem>
-        <TabItem label="Stream">
-          <Text>Stream</Text>
-        </TabItem>
-        <TabItem label="Support">
-          <Text>Support</Text>
-        </TabItem>
-      </Tabs>
-    </App>
-  `}
-  height={200}
-/>
-
 %-DESC-END
 
 %-PROP-START activeTab
 
-```xmlui copy /activeTab="2"/
+```xmlui-pg copy display name="Example: activeTab" height="200px"
 <App>
   <Tabs activeTab="2">
     <TabItem label="Account">
@@ -62,31 +42,11 @@ Content is provided to a tab via placing child components under the `TabItem`.
 </App>
 ```
 
-<Playground
-  name="Example: activeTab"
-  app={`
-    <App>
-      <Tabs activeTab="2">
-        <TabItem label="Account">
-          <Text>Account</Text>
-        </TabItem>
-        <TabItem label="Stream">
-          <Text>Stream</Text>
-        </TabItem>
-        <TabItem label="Support">
-          <Text>Support</Text>
-        </TabItem>
-      </Tabs>
-    </App>
-  `}
-  height={200}
-/>
-
 %-PROP-END
 
 %-PROP-START orientation
 
-```xmlui copy /orientation="horizontal"/
+```xmlui-pg copy display name="Example: orientation" height="200px"
 <App>
   <Tabs orientation="horizontal">
     <TabItem label="Account">
@@ -102,35 +62,15 @@ Content is provided to a tab via placing child components under the `TabItem`.
 </App>
 ```
 
-<Playground
-  name="Example: orientation"
-  app={`
-    <App>
-      <Tabs orientation="horizontal">
-        <TabItem label="Account">
-          <Text>Account</Text>
-        </TabItem>
-        <TabItem label="Stream">
-          <Text>Stream</Text>
-        </TabItem>
-        <TabItem label="Support">
-          <Text>Support</Text>
-        </TabItem>
-      </Tabs>
-    </App>
-  `}
-  height={200}
-/>
-
 %-PROP-END
 
 %-PROP-START tabTemplate
 
-```xmlui copy {2-4}
+```xmlui-pg copy {2-4} display name="Example: tabTemplate" height="200px"
 <App>
   <Tabs>
     <property name="tabTemplate">
-      <Button variant="outlined" label="{$item.label}" />
+      <Card title="{$item.label}" />
     </property>
     <TabItem label="Account">
       <Text>Account</Text>
@@ -145,84 +85,4 @@ Content is provided to a tab via placing child components under the `TabItem`.
 </App>
 ```
 
-<Playground
-  name="Example: tabTemplate"
-  app={`
-    <App>
-      <Tabs>
-        <property name="tabTemplate">
-          <Button variant="outlined" label="{$item.label}" />
-        </property>
-        <TabItem label="Account">
-          <Text>Account</Text>
-        </TabItem>
-        <TabItem label="Stream">
-          <Text>Stream</Text>
-        </TabItem>
-        <TabItem label="Support">
-          <Text>Support</Text>
-        </TabItem>
-      </Tabs>
-    </App>
-  `}
-  height={200}
-/>
-
 %-PROP-END
-
-%-STYLE-START
-
-The `Tabs` component uses these theme variables to customize its appearance:
-
-- `backgroundColor-Tabs`
-- `borderColor-Tabs`
-- `borderWidth-Tabs`
-- `borderColor-active-Tabs`
-- `backgroundColor-trigger-Tabs`
-- `backgroundColor-trigger-Tabs--hover`
-
-```json copy
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "backgroundColor-Tabs": "green",
-    "borderWidth-Tabs": "6px",
-    "borderColor-Tabs": "gold"
-  }
-}
-```
-
-<Playground
-  name="Example: styling"
-  height={200}
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "backgroundColor-Tabs": "green",
-        "borderWidth-Tabs": "6px",
-        "borderColor-Tabs": "gold"
-      },
-    },
-  ]}
-  app={`
-    <App>
-      <Tabs>
-        <TabItem label="Account">
-          <Text>Account</Text>
-        </TabItem>
-        <TabItem label="Stream">
-          <Text>Stream</Text>
-        </TabItem>
-        <TabItem label="Support">
-          <Text>Support</Text>
-        </TabItem>
-      </Tabs>
-    </App>
-  `}
-/>
-
-%-STYLE-END

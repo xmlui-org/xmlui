@@ -1,6 +1,6 @@
 %-PROP-START to
 
-```xmlui copy
+```xmlui-pg copy display name="Example: to" height="200px"
 <App>
   <StickyBox to="top">
     This part of the UI sticks to the top
@@ -11,27 +11,4 @@
 </App>
 ```
 
-<Playground
-  name="Example: to"
-  height={200}
-  app={`
-  <App>
-    <StickyBox to="top">
-      This part of the UI sticks to the top
-    </StickyBox>
-    <Stack backgroundColor="red" height="80px" width="100%" />
-    <Stack backgroundColor="green" height="80px" width="100%" />
-    <Stack backgroundColor="blue" height="80px" width="100%" />
-  </App>
-  `}
-/>
-
 %-PROP-END
-
-%-STYLE-START
-
-The component uses the following theme variables:
-
-- `backgroundColor-StickyBox`
-
-%-STYLE-END

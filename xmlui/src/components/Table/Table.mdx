@@ -16,7 +16,7 @@ The data is provided as JSON. In the source code samples, the `data={[...]}` dec
 All samples use table columns with the following definition unless noted otherwise
 (The `...` declaration nested into `<Table>` represents this column definition):
 
-```xmlui copy
+```xmlui copy 
 <Table data='{[...]}'>
   <Column bindTo="name"/>
   <Column bindTo="quantity"/>
@@ -40,11 +40,9 @@ All samples use table columns with the following definition unless noted otherwi
 </App>
 ```
 
-<Playground
-  name="Example: data"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: data"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -93,19 +91,18 @@ All samples use table columns with the following definition unless noted otherwi
     category: "dairy",
     key: 0,
   },
-])}}'>
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
+]}'>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 You can also provide the `Table` with data directly from an API via this property.
 Here, the component displays rocket information coming from the official SpaceX API.
 
-```xmlui copy /data='https://api.spacexdata.com/v3/rockets'/
+```xmlui-pg copy display name="Example: data API Call"
 <App>
   <Table data='https://api.spacexdata.com/v3/rockets'>
     <Column header="Image" size="140px">
@@ -116,22 +113,6 @@ Here, the component displays rocket information coming from the official SpaceX 
   </Table>
 </App>
 ```
-
-<Playground
-  name="Example: data API Call"
-  height={400}
-  app={`
-    <App>
-      <Table data='https://api.spacexdata.com/v3/rockets'>
-        <Column header="Image" size="140px">
-          <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-        </Column>
-        <Column canSort="true" bindTo="country"/>
-        <Column canSort="true" bindTo="company"/>
-      </Table>
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -155,11 +136,9 @@ By default, the value of this property is `true`.
 </App>
 ```
 
-<Playground
-  name="Example: enableMultiRowSelection"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: enableMultiRowSelection"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -208,16 +187,15 @@ By default, the value of this property is `true`.
     category: "dairy",
     key: 0,
   },
-])}}' 
-        rowsSelectable="true" 
-        enableMultiRowSelection="false">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    rowsSelectable="true" 
+    enableMultiRowSelection="false">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -235,11 +213,9 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
 </App>
 ```
 
-<Playground
-  name="Example: headerHeight"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: headerHeight"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -288,15 +264,14 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
     category: "dairy",
     key: 0,
   },
-])}}' 
-        headerHeight="60px">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    headerHeight="60px">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -315,12 +290,9 @@ The default value is `false`.
 </App>
 ```
 
-<Playground
-  name="Example: hideHeader"
-  height={300}
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: hideHeader" height="300px"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -369,15 +341,14 @@ The default value is `false`.
     category: "dairy",
     key: 0,
   },
-])}}' 
-        hideHeader="true">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    hideHeader="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -393,11 +364,9 @@ The default value is `false`.
 </App>
 ```
 
-<Playground
-  name="Example: isPaginated"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: isPaginated"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -446,15 +415,14 @@ The default value is `false`.
     category: "dairy",
     key: 0,
   },
-])}}' 
-        isPaginated="true" pageSizes="{[3, 6, 12]}">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    isPaginated="true" pageSizes="{[3, 6, 12]}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -463,7 +431,7 @@ The default value is `false`.
 This boolean property indicates if the component is fetching (or processing) data.
 This property is useful when data is loaded conditionally or receiving it takes some time.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: loading"
 <App>
   <Table loading="true">
     <Column bindTo="name"/>
@@ -472,23 +440,11 @@ This property is useful when data is loaded conditionally or receiving it takes 
 </App>
 ```
 
-<Playground
-  name="Example: loading"
-  app={`
-    <App>
-      <Table loading="true">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-      </Table>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START noDataTemplate
 
-```xmlui copy {3-5}
+```xmlui-pg copy {3-5} display name="Example: noDataTemplate"
 <App>
   <Table>
     <property name="noDataTemplate">
@@ -499,21 +455,6 @@ This property is useful when data is loaded conditionally or receiving it takes 
   </Table>
 </App>
 ```
-
-<Playground
-  name="Example: noDataTemplate"
-  app={`
-    <App>
-      <Table>
-        <property name="noDataTemplate">
-          <Text value="No data loaded" variant="strong" />
-        </property>
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-      </Table>
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -533,11 +474,9 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
 </App>
 ```
 
-<Playground
-  name="Example: pageSizes"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: pageSizes"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -586,15 +525,14 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
     category: "dairy",
     key: 0,
   },
-])}}' 
-        isPaginated="true" pageSizes="{[3, 6, 12]}">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    isPaginated="true" pageSizes="{[3, 6, 12]}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -617,11 +555,9 @@ The following example disables all table rows where the item's quantity exceeds 
 Disabled items are rendered with a different color.
 </Callout>
 
-<Playground
-  name="Example: rowDisabledPredicate"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: rowDisabledPredicate"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -670,15 +606,14 @@ Disabled items are rendered with a different color.
     category: "dairy",
     key: 0,
   },
-])}}'
-        rowDisabledPredicate="{(item) => item.quantity > 6}">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
+]}'
+    rowDisabledPredicate="{(item) => item.quantity > 6}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -696,11 +631,9 @@ The default value is `false`.
 </App>
 ```
 
-<Playground
-  name="Example: rowsSelectable"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: rowsSelectable"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -749,15 +682,14 @@ The default value is `false`.
     category: "dairy",
     key: 0,
   },
-])}}' 
-        rowsSelectable="true">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    rowsSelectable="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -778,13 +710,11 @@ The following sample turns on this property. Try how it works when you click on 
 </App>
 ```
 
-<Playground
-  name="Example: singleSelectOnRowClick"
-  app={`
-    <App>
-      <SelectionStore>
-      <Table 
-        data='{${JSON.stringify([
+```xmlui-pg name="Example: singleSelectOnRowClick"
+<App>
+  <SelectionStore>
+  <Table 
+    data='{[
   {
     id: 0,
     name: "Apples",
@@ -833,17 +763,16 @@ The following sample turns on this property. Try how it works when you click on 
     category: "dairy",
     key: 0,
   },
-])}}' 
-        rowsSelectable="true"
-        singleSelectOnRowClick="true">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-      </SelectionStore>
-    </App>
-  `}
-/>
+]}' 
+    rowsSelectable="true"
+    singleSelectOnRowClick="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+  </SelectionStore>
+</App>
+```
 
 %-PROP-END
 
@@ -860,11 +789,9 @@ The following sample turns on this property. Try how it works when you click on 
 </App>
 ```
 
-<Playground
-  name="Example: sortBy"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: sortBy"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -913,15 +840,14 @@ The following sample turns on this property. Try how it works when you click on 
     category: "dairy",
     key: 0,
   },
-])}}' 
-        sortBy="quantity">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    sortBy="quantity">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -937,11 +863,9 @@ The following sample turns on this property. Try how it works when you click on 
 </App>
 ```
 
-<Playground
-  name="Example: sortDirection"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: sortDirection"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -990,15 +914,14 @@ The following sample turns on this property. Try how it works when you click on 
     category: "dairy",
     key: 0,
   },
-])}}' 
-        sortBy="quantity" sortDirection="descending">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    sortBy="quantity" sortDirection="descending">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -1017,11 +940,9 @@ sorting is done according to the column, and the column is sorted in ascending o
 </App>
 ```
 
-<Playground
-  name="Example: iconSortAsc"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg copy name="Example: iconSortAsc"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -1070,15 +991,14 @@ sorting is done according to the column, and the column is sorted in ascending o
     category: "dairy",
     key: 0,
   },
-])}}' 
-        sortBy="quantity" iconSortAsc="chevronup">
-        <Column bindTo="name" canSort="true" />
-        <Column bindTo="quantity" canSort="true" />
-        <Column bindTo="unit" canSort="true" />
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    sortBy="quantity" iconSortAsc="chevronup">
+    <Column bindTo="name" canSort="true" />
+    <Column bindTo="quantity" canSort="true" />
+    <Column bindTo="unit" canSort="true" />
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -1099,11 +1019,9 @@ sorting is done according to the column, and the column is sorted in descending 
 
 Select a column header and set it to descending ordering.
 
-<Playground
-  name="Example: iconSortDesc"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: iconSortDesc"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -1152,15 +1070,14 @@ Select a column header and set it to descending ordering.
     category: "dairy",
     key: 0,
   },
-])}}' 
-        sortBy="quantity" iconSortDesc="chevrondown">
-        <Column bindTo="name" canSort="true" />
-        <Column bindTo="quantity" canSort="true" />
-        <Column bindTo="unit" canSort="true" />
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    sortBy="quantity" iconSortDesc="chevrondown">
+    <Column bindTo="name" canSort="true" />
+    <Column bindTo="quantity" canSort="true" />
+    <Column bindTo="unit" canSort="true" />
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -1179,11 +1096,9 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
 </App>
 ```
 
-<Playground
-  name="Example: iconNoSort"
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: iconNoSort"
+<App>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -1232,15 +1147,14 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
     category: "dairy",
     key: 0,
   },
-])}}' 
-        sortBy="quantity" iconNoSort="close">
-        <Column bindTo="name" canSort="true" />
-        <Column bindTo="quantity" canSort="true" />
-        <Column bindTo="unit" canSort="true" />
-      </Table>
-    </App>
-  `}
-/>
+]}' 
+    sortBy="quantity" iconNoSort="close">
+    <Column bindTo="name" canSort="true" />
+    <Column bindTo="quantity" canSort="true" />
+    <Column bindTo="unit" canSort="true" />
+  </Table>
+</App>
+```
 
 %-PROP-END
 
@@ -1262,12 +1176,10 @@ Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColum
 
 Click on any of the column headers to trigger a new sorting:
 
-<Playground
-  name="Example: sortingDidChange"
-  app={`
-    <App var.sortedBy="">
-      <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: sortingDidChange"
+<App var.sortedBy="">
+  <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -1316,15 +1228,14 @@ Click on any of the column headers to trigger a new sorting:
     category: "dairy",
     key: 0,
   },
-])}}'
-        onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
-        <Column bindTo="name" canSort="true"/>
-        <Column bindTo="quantity" canSort="true"/>
-        <Column bindTo="unit" canSort="true"/>
-      </Table>
-    </App>
-  `}
-/>
+]}'
+    onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
+    <Column bindTo="name" canSort="true"/>
+    <Column bindTo="quantity" canSort="true"/>
+    <Column bindTo="unit" canSort="true"/>
+  </Table>
+</App>
+```
 
 %-EVENT-END
 
@@ -1349,12 +1260,10 @@ Click on any of the column headers to trigger the event.
 Though sorting is enabled in the `TableColumnnDef` component of the "name" column via `canSort`,
 clicking that column header still does not sort because `willSort` prevents it:
 
-<Playground
-  name="Example: willSort"
-  app={`
-    <App var.sortedBy="">
-      <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: willSort"
+<App var.sortedBy="">
+  <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -1403,16 +1312,15 @@ clicking that column header still does not sort because `willSort` prevents it:
     category: "dairy",
     key: 0,
   },
-])}}'
-        onWillSort="(by, dir) => by !== 'name'"
-        onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
-        <Column bindTo="name" canSort="true"/>
-        <Column bindTo="quantity" canSort="true"/>
-        <Column bindTo="unit" canSort="true"/>
-      </Table>
-    </App>
-  `}
-/>
+]}'
+    onWillSort="(by, dir) => by !== 'name'"
+    onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
+    <Column bindTo="name" canSort="true"/>
+    <Column bindTo="quantity" canSort="true"/>
+    <Column bindTo="unit" canSort="true"/>
+  </Table>
+</App>
+```
 
 %-EVENT-END
 
@@ -1436,12 +1344,10 @@ Of course, if multiple-row selection is not allowed (`enableMultipleRowSelection
 
 Click on any of the column headers to trigger a new sorting:
 
-<Playground
-  name="Example: selectionDidChange"
-  app={`
-    <App var.selection="">
-      <Text>Current selection (row IDs): [{selection}]</Text>
-      <Table data='{${JSON.stringify([
+```xmlui-pg name="Example: selectionDidChange"
+<App var.selection="">
+  <Text>Current selection (row IDs): [{selection}]</Text>
+  <Table data='{[
   {
     id: 0,
     name: "Apples",
@@ -1490,17 +1396,16 @@ Click on any of the column headers to trigger a new sorting:
     category: "dairy",
     key: 0,
   },
-])}}'
-        rowsSelectable="true"
-        enableMultiRowSelection="true"
-        onSelectionDidChange="(newSel) => selection = newSel.map(item => item.id).join()" >
-        <Column bindTo="name" canSort="true"/>
-        <Column bindTo="quantity" canSort="true"/>
-        <Column bindTo="unit" canSort="true"/>
-      </Table>
-    </App>
-  `}
-/>
+]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    onSelectionDidChange="(newSel) => selection = newSel.map(item => item.id).join()" >
+    <Column bindTo="name" canSort="true"/>
+    <Column bindTo="quantity" canSort="true"/>
+    <Column bindTo="unit" canSort="true"/>
+  </Table>
+</App>
+```
 
 %-EVENT-END
 
@@ -1524,17 +1429,15 @@ Click on any of the column headers to trigger a new sorting:
 </App>
 ```
 
-<Playground
-  name="Example: selection methods"
-  app={`
-    <App>
-      <HStack>
-        <Button label="Select all" onClick="table.selectAll()" />
-        <Button label="Clear all" onClick="table.clearSelection()" />
-        <Button label="Select 1" onClick="table.selectId(1)" />
-        <Button label="Select 2, 4" onClick="table.selectId([2, 4])" />
-      </HStack>
-      <Table id="table" data='{${JSON.stringify([
+```xmlui-pg name="Example: clearSelection"
+<App>
+  <HStack>
+    <Button label="Select all" onClick="table.selectAll()" />
+    <Button label="Clear all" onClick="table.clearSelection()" />
+    <Button label="Select 1" onClick="table.selectId(1)" />
+    <Button label="Select 2, 4" onClick="table.selectId([2, 4])" />
+  </HStack>
+  <Table id="table" data='{[
   {
     id: 0,
     name: "Apples",
@@ -1583,16 +1486,15 @@ Click on any of the column headers to trigger a new sorting:
     category: "dairy",
     key: 0,
   },
-])}}'
-        rowsSelectable="true"
-        enableMultiRowSelection="true">
-        <Column bindTo="name" canSort="true"/>
-        <Column bindTo="quantity" canSort="true"/>
-        <Column bindTo="unit" canSort="true"/>
-      </Table>
-    </App>
-  `}
-/>
+]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true">
+    <Column bindTo="name" canSort="true"/>
+    <Column bindTo="quantity" canSort="true"/>
+    <Column bindTo="unit" canSort="true"/>
+  </Table>
+</App>
+```
 
 %-API-END
 
@@ -1619,145 +1521,3 @@ Click on any of the column headers to trigger a new sorting:
 (See the [example](#clearselection) at the `clearSelection` method)
 
 %-API-END
-
-%-STYLE-START
-
-The `Table` component uses the following theme variables.
-
-Overall Table theme variables:
-
-- `backgroundColor-Table`
-- `borderStyle-cell-Table`
-- `backgroundColor-pagination-Table`
-- `textColor-Table`
-- `textColor-pagination-Table`
-
-Row theme variables:
-
-- `backgroundColor-row-Table`
-- `backgroundColor-row-Table--hover`
-- `fontSize-row-Table`
-- `fontWeight-row-Table`
-
-Selected row theme variables:
-
-- `backgroundColor-selected-Table`
-- `backgroundColor-selected-Table--hover`
-
-Cell theme variables:
-
-- `border-cell-Table`
-- `borderColor-cell-Table`
-- `borderWidth-cell-Table`
-- `padding-cell-Table`
-- `paddingHorizontal-cell-Table`
-- `paddingVertical-cell-Table`
-- `paddingHorizontal-cell-first-Table`
-- `paddingHorizontal-cell-last-Table`
-
-Heading theme variables:
-
-- `backgroundColor-heading-Table`
-- `backgroundColor-heading-Table--hover`
-- `backgroundColor-heading-Table--active`
-- `textColor-heading-Table`
-- `fontSize-heading-Table`
-- `fontWeight-heading-Table`
-- `padding-heading-Table`
-- `paddingHorizontal-heading-Table`
-- `paddingVertical-heading-Table`
-- `textTransform-heading-Table`
-
-### Example
-
-```json copy
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "backgroundColor-heading-Table": "#c4c4c4",
-    "backgroundColor-Table": "#ededed",
-    "paddingVertical-heading-Table": "1rem",
-    "textColor-Table": "black",
-    "textColor-heading-Table": "black"
-  }
-}
-```
-
-<Playground
-  name="Example: styling"
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "backgroundColor-heading-Table": "#c4c4c4",
-        "backgroundColor-Table": "#ededed",
-        "paddingVertical-heading-Table": "1rem",
-        "textColor-Table": "black",
-        "textColor-heading-Table": "black"
-      },
-    },
-  ]}
-  app={`
-    <App>
-      <Table data='{${JSON.stringify([
-  {
-    id: 0,
-    name: "Apples",
-    quantity: 5,
-    unit: "pieces",
-    category: "fruits",
-    key: 5,
-  },
-  {
-    id: 1,
-    name: "Bananas",
-    quantity: 6,
-    unit: "pieces",
-    category: "fruits",
-    key: 4,
-  },
-  {
-    id: 2,
-    name: "Carrots",
-    quantity: 100,
-    unit: "grams",
-    category: "vegetables",
-    key: 3,
-  },
-  {
-    id: 3,
-    name: "Spinach",
-    quantity: 1,
-    unit: "bunch",
-    category: "vegetables",
-    key: 2,
-  },
-  {
-    id: 4,
-    name: "Milk",
-    quantity: 10,
-    unit: "liter",
-    category: "dairy",
-    key: 1,
-  },
-  {
-    id: 5,
-    name: "Cheese",
-    quantity: 200,
-    unit: "grams",
-    category: "dairy",
-    key: 0,
-  },
-])}}'>
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-    </App>
-  `}
-/>
-
-%-STYLE-END

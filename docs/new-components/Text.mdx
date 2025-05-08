@@ -15,7 +15,7 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
 
 This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
 
-```xmlui copy /ellipses="false"/
+```xmlui-pg copy display name="Example: ellipses"
 <App>
   <VStack width="120px">
     <Text
@@ -35,34 +35,11 @@ This property indicates whether ellipses should be displayed when the text is cr
 </App>
 ```
 
-<Playground
-  name="Example: ellipses"
-  app={`
-  <App>
-    <VStack width="120px">
-      <Text
-        backgroundColor="cyan"
-        color="black"
-        maxLines="1"
-        ellipses="false">
-        Though this long text does is about to crop!
-      </Text>
-      <Text
-        backgroundColor="cyan"
-        color="black"
-        maxLines="1">
-        Though this long text does is about to crop!
-      </Text>
-    </VStack>
-  </App>
-  `}
-/>
-
 ### `maxLines`
 
 This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: maxLines"
 <App>
   <Text
     maxWidth="120px"
@@ -73,25 +50,11 @@ This property determines the maximum number of lines the component can wrap to. 
 </App>
 ```
 
-<Playground
-  name="Example: maxLines"
-  app={`
-  <App>
-    <Text
-      maxWidth="120px"
-      backgroundColor="cyan"
-      color="black"
-      value="A long text that will likely overflow"
-      maxLines="1" />
-  </App>
-  `}
-/>
-
 ### `preserveLinebreaks (default: "false")`
 
 This property indicates if linebreaks should be preserved when displaying text.
 
-```xmlui copy {7}
+```xmlui-pg copy {7} display name="Example: preserveLinebreaks"
 <App>
   <HStack>
     <Text
@@ -113,31 +76,6 @@ This property indicates if linebreaks should be preserved when displaying text.
 </App>
 ```
 
-<Playground
-  name="Example: preserveLinebreaks"
-  app={`
-  <App>
-    <HStack>
-      <Text
-        width="250px"
-        backgroundColor="cyan"
-        color="black"
-        preserveLinebreaks="true"
-        value="(preserve) This long text
-        with several line breaks
-                does not fit into a viewport with a 200-pixel width." />
-      <Text
-        width="250px"
-        backgroundColor="cyan"
-        color="black"
-        value="(don't preserve) This long text
-        with several line breaks
-                does not fit into a viewport with a 200-pixel width." />
-    </HStack>
-  </App>
-  `}
-/>
-
 > **Note**: Remember to use the `value` property of the `Text`.
 > Linebreaks are converted to spaces when nesting the text inside the `Text` component.
 
@@ -145,22 +83,12 @@ This property indicates if linebreaks should be preserved when displaying text.
 
 The text to be displayed. This value can also be set via nesting the text into the `Text` component.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: value"
 <App>
   <Text value="An example text" />
   <Text>An example text</Text>
 </App>
 ```
-
-<Playground
-  name="Example: value"
-  app={`
-  <App>
-    <Text value="An example text" />
-    <Text>An example text</Text>
-  </App>
-  `}
-/>
 
 ### `variant`
 
@@ -195,169 +123,166 @@ Available values:
 | `title` | Indicates that the text is the title of some other content |
 | `var` | Represents the name of a variable in a mathematical expression |
 
-<Playground
-  name="Example: variant"
-  app={`
-    <App>
-      <HStack>
-        <Text width="150px">default:</Text>
-        <Text>This is an example text</Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">paragraph:</Text>
-        <Text variant="paragraph">This is an example paragraph</Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">abbr:</Text>
-        <Text variant="abbr">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">cite:</Text>
-        <Text variant="cite">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">code:</Text>
-        <Text variant="code">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">codefence:</Text>
-        <Text variant="codefence">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">codefence + code:</Text>
-        <Text variant="codefence">
-          <Text variant="code">
-            This is an example text
-          </Text>
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">deleted:</Text>
-        <Text variant="deleted">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">inserted:</Text>
-        <Text variant="inserted">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">keyboard:</Text>
-        <Text variant="keyboard">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">marked:</Text>
-        <Text variant="marked">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">sample:</Text>
-        <Text variant="sample">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">sup:</Text>
-        <Text>
-          This is an example text
-          <Text variant="sup">(with some additional text)</Text>
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">sub:</Text>
-        <Text>
-          This is an example text
-          <Text variant="sub">(with some additional text)</Text>
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">var:</Text>
-        <Text variant="var">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">mono:</Text>
-        <Text variant="mono">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">strong:</Text>
-        <Text variant="strong">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">em:</Text>
-        <Text variant="em">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">title:</Text>
-        <Text variant="title">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">subtitle:</Text>
-        <Text variant="subtitle">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">small:</Text>
-        <Text variant="small">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">caption:</Text>
-        <Text variant="caption">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">placeholder:</Text>
-        <Text variant="placeholder">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">subheading:</Text>
-        <Text variant="subheading">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">tableheading:</Text>
-        <Text variant="tableheading">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">secondary:</Text>
-        <Text variant="secondary">
-          This is an example text
-        </Text>
-      </HStack>
-    </App>
-  `}
-/>
+```xmlui-pg name="Example: variant"
+<App>
+  <HStack>
+    <Text width="150px">default:</Text>
+    <Text>This is an example text</Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">paragraph:</Text>
+    <Text variant="paragraph">This is an example paragraph</Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">abbr:</Text>
+    <Text variant="abbr">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">cite:</Text>
+    <Text variant="cite">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">code:</Text>
+    <Text variant="code">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">codefence:</Text>
+    <Text variant="codefence">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">codefence + code:</Text>
+    <Text variant="codefence">
+      <Text variant="code">
+        This is an example text
+      </Text>
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">deleted:</Text>
+    <Text variant="deleted">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">inserted:</Text>
+    <Text variant="inserted">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">keyboard:</Text>
+    <Text variant="keyboard">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">marked:</Text>
+    <Text variant="marked">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">sample:</Text>
+    <Text variant="sample">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">sup:</Text>
+    <Text>
+      This is an example text
+      <Text variant="sup">(with some additional text)</Text>
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">sub:</Text>
+    <Text>
+      This is an example text
+      <Text variant="sub">(with some additional text)</Text>
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">var:</Text>
+    <Text variant="var">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">mono:</Text>
+    <Text variant="mono">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">strong:</Text>
+    <Text variant="strong">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">em:</Text>
+    <Text variant="em">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">title:</Text>
+    <Text variant="title">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">subtitle:</Text>
+    <Text variant="subtitle">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">small:</Text>
+    <Text variant="small">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">caption:</Text>
+    <Text variant="caption">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">placeholder:</Text>
+    <Text variant="placeholder">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">subheading:</Text>
+    <Text variant="subheading">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">tableheading:</Text>
+    <Text variant="tableheading">
+      This is an example text
+    </Text>
+  </HStack>
+  <HStack>
+    <Text width="150px">secondary:</Text>
+    <Text variant="secondary">
+      This is an example text
+    </Text>
+  </HStack>
+</App>
+```
 
 **HtmlTag Mappings**
 
@@ -391,75 +316,6 @@ This component does not expose any methods.
 
 ## Styling
 
-The `Text` component uses these theme variables:
-
-- `verticalAlign`
-- `borderRadius`
-- `color`
-- `backgroundColor`
-- `borderColor`
-- `textDecorationColor`
-- `fontFamily`
-- `fontSize`
-- `fontWeight`
-- `fontStyle`
-- `fontStretch`
-- `letterSpacing`
-- `textDecorationLine`
-- `lineHeight`
-- `textUnderlineOffset`
-- `paddingHorizontal`
-- `paddingVertical`
-- `borderStyle`
-- `textDecorationStyle`
-- `borderWidth`
-- `textDecorationThickness`
-- `transform`
-
-You must combine these property names with `Text` and the variant's name.
-For example, you can set a light green background for the `abbr` variant and add some horizontal padding
-with the following theme variables:
-
-```json copy
-"backgroundColor-Text-abbr": "lightgreen",
-"paddingHorizontal-Text-abbr": "8px"
-```
-
-<Playground
-  name="Example: styling the 'abbr' variant"
-  app={`
-    <App>
-      <HStack>
-        <Text width="150px">default:</Text>
-        <Text>This is an example text</Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">abbr:</Text>
-        <Text variant="abbr">
-          This is an example text
-        </Text>
-      </HStack>
-      <HStack>
-        <Text width="150px">cite:</Text>
-        <Text variant="cite">
-          This is an example text
-        </Text>
-      </HStack>
-    </App>
-  `}
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "backgroundColor-Text-abbr": "lightgreen",
-        "paddingHorizontal-Text-abbr": "8px",
-      },
-    },
-  ]}
-/>
-
 ### Theme Variables
 
 | Variable | Default Value (Light) | Default Value (Dark) |
@@ -471,7 +327,9 @@ with the following theme variables:
 | [borderColor](../styles-and-themes/common-units/#color)-Text-code | $color-surface-200 | $color-surface-200 |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-300 | $color-surface-300 |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Text | $borderRadius | $borderRadius |
+| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Text-code | 4px | 4px |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Text | solid | solid |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-Text-code | solid | solid |
 | [borderWidth](../styles-and-themes/common-units/#size)-Text | $space-0 | $space-0 |
 | [borderWidth](../styles-and-themes/common-units/#size)-Text-code | 1px | 1px |
 | [borderWidth](../styles-and-themes/common-units/#size)-Text-keyboard | 1px | 1px |
@@ -512,7 +370,7 @@ with the following theme variables:
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-caption | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-cite | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-codefence | $space-4 | $space-4 |
+| [marginBottom](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-default | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-deleted | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-inserted | *none* | *none* |
@@ -532,11 +390,59 @@ with the following theme variables:
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-tableheading | $space-4 | $space-4 |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-title | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-var | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-abbr | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-caption | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-cite | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-code | $space-0_5 | $space-0_5 |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-default | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-deleted | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-inserted | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-keyboard | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-mono | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-placeholder | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-sample | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-secondary | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-sub | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-subheading | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-subtitle | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-sup | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-tableheading | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-title | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-var | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-abbr | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-caption | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-cite | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-code | $space-0_5 | $space-0_5 |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-default | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-deleted | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-inserted | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-keyboard | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-mono | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-placeholder | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-sample | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-secondary | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-sub | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-subheading | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-subtitle | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-sup | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-tableheading | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-title | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-var | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-abbr | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-caption | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-cite | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-codefence | $space-4 | $space-4 |
+| [marginTop](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-default | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-deleted | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-inserted | *none* | *none* |
@@ -556,6 +462,7 @@ with the following theme variables:
 | [marginTop](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-title | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-var | *none* | *none* |
+| [paddingBottom](../styles-and-themes/common-units/#size)-Text-code | 2px | 2px |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-code | $space-1 | $space-1 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-codefence | $space-3 | $space-3 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-keyboard | $space-1 | $space-1 |
