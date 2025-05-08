@@ -130,6 +130,7 @@ export const selectComponentRenderer = createComponentRenderer(
     registerComponentApi,
   }) => {
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
+    const searchable = extractValue.asOptionalBoolean(node.props.searchable);
 
     return (
       <Select
@@ -141,7 +142,7 @@ export const selectComponentRenderer = createComponentRenderer(
         )}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         updateState={updateState}
-        searchable={extractValue.asOptionalBoolean(node.props.searchable)}
+        searchable={searchable}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
@@ -184,7 +185,7 @@ export const selectComponentRenderer = createComponentRenderer(
                       $inTrigger: inTrigger,
                     }}
                     renderChild={(...args) =>
-                      multiSelect ? (
+                      multiSelect || searchable ? (
                         renderChild(...args)
                       ) : (
                         <SelectItemText>{renderChild(...args)}</SelectItemText>

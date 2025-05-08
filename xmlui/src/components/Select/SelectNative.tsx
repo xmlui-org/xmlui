@@ -162,7 +162,7 @@ const SimpleSelect = forwardRef(function SimpleSelect(
       >
         <div className={styles.selectValue}>
           {readOnly ? (
-            Array.from(options).find((o) => `${o.value}` === stringValue)?.label || placeholder
+            Array.from(options).find((o) => `${o.value}` === stringValue)?.label || <span>{placeholder}</span>
           ) : (
             <SelectValue placeholder={placeholder} />
           )}
@@ -218,7 +218,7 @@ export const Select = forwardRef(function Select(
     label,
     labelPosition,
     labelWidth,
-    labelBreak,
+    labelBreak = false,
     required = false,
     inProgress = false,
     inProgressNotificationMessage = "Loading...",
@@ -420,7 +420,7 @@ export const Select = forwardRef(function Select(
                         </div>
                       </div>
                     ) : (
-                      <span className={styles.placeholder}>{placeholder || ""}</span>
+                      <span className={styles.placeholder}>{placeholder}</span>
                     )
                   ) : value !== undefined && value !== null ? (
                     <div>{Array.from(options).find((o) => o.value === value)?.label}</div>
