@@ -236,7 +236,9 @@ button.selectTrigger {
 
 .selectContent {
   position: relative;
+  max-height: 280px;
   z-index: 50;
+  width: var(--radix-select-trigger-width);
   overflow: auto;
   background-color: createThemeVar("Input:backgroundColor-menu-#{$componentName}");
   border-radius: createThemeVar("Input:borderRadius-menu-#{$componentName}");
@@ -318,7 +320,7 @@ button.selectTrigger {
   outline: none;
   font-size: createThemeVar("fontSize-#{$componentName}");
 
-  &[data-highlighted] {
+  &:hover {
     background-color: createThemeVar("backgroundColor-item-#{$componentName}--hover");
   }
 
@@ -356,7 +358,7 @@ button.selectTrigger {
 }
 
 .selectViewport {
-  height: var(--radix-select-trigger-height);
+  height: fit-content;
   width: 100%;
   min-width: var(--radix-select-trigger-width);
 }
