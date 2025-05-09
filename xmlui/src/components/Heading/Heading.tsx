@@ -83,8 +83,9 @@ export const H1Md = createMetadata({
     [`fontSize-${H1}`]: "$fontSize-large",
     [`marginTop-${H1}`]: "0",
     [`marginBottom-${H1}`]: "0",
+    [`fontSize-${H1}-markdown`]: "$fontSize-larger",
     [`marginTop-${H1}-markdown`]: "0",
-    [`marginBottom-${H1}-markdown`]: "$space-8",
+    [`marginBottom-${H1}-markdown`]: "$space-6",
     light: {
       // --- No light-specific theme vars
     },
@@ -108,8 +109,8 @@ export const H2Md = createMetadata({
     [`fontSize-${H2}`]: "$fontSize-medium",
     [`marginTop-${H2}`]: "0",
     [`marginBottom-${H2}`]: "0",
-    [`marginTop-${H2}-markdown`]: "0",
-    [`marginBottom-${H2}-markdown`]: "$space-0",
+    [`marginTop-${H2}-markdown`]: "$space-9",
+    [`marginBottom-${H2}-markdown`]: "$space-3",
     light: {
       // --- No light-specific theme vars
     },
@@ -133,8 +134,8 @@ export const H3Md = createMetadata({
     [`fontSize-${H3}`]: "$fontSize-normal",
     [`marginTop-${H3}`]: "0",
     [`marginBottom-${H3}`]: "0",
-    [`marginTop-${H3}-markdown`]: "0",
-    [`marginBottom-${H3}-markdown`]: "$space-0",
+    [`marginTop-${H3}-markdown`]: "$space-6",
+    [`marginBottom-${H3}-markdown`]: "$space-2",
     light: {
       // --- No light-specific theme vars
     },
@@ -158,8 +159,8 @@ export const H4Md = createMetadata({
     [`fontSize-${H4}`]: "$fontSize-small",
     [`marginTop-${H4}`]: "0",
     [`marginBottom-${H4}`]: "0",
-    [`marginTop-${H4}-markdown`]: "0",
-    [`marginBottom-${H4}-markdown`]: "$space-0",
+    [`marginTop-${H4}-markdown`]: "$space-5",
+    [`marginBottom-${H4}-markdown`]: "$space-1",
     light: {
       // --- No light-specific theme vars
     },

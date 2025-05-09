@@ -108,6 +108,8 @@ import { TrendingLevelIcon } from "./Icon/TrendingLevelIcon";
 import { InspectIcon } from "./Icon/Inspect";
 import { MoonIcon } from "./Icon/MoonIcon";
 import { StarsIcon } from "./Icon/StarsIcon";
+import { LightToDarkIcon } from "./Icon/LightToDark";
+import { DarkToLightIcon } from "./Icon/DarkToLightIcon";
 
 type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
 
@@ -193,6 +195,8 @@ registerIconRenderer("plus", (props: IconBaseProps) => <PlusIcon {...props} />);
 registerIconRenderer("inspect", (props: IconBaseProps) => <InspectIcon {...props} />);
 registerIconRenderer("plus-circle", (props: IconBaseProps) => <AiOutlinePlusCircle {...props} />);
 registerIconRenderer("filledplus", (props: IconBaseProps) => <FillPlusCircleIcon {...props} />);
+registerIconRenderer("darkToLight", (props: IconBaseProps) => <DarkToLightIcon {...props} />);
+registerIconRenderer("lightToDark", (props: IconBaseProps) => <LightToDarkIcon {...props} />);
 registerIconRenderer("checkmark", (props: IconBaseProps) => <CheckIcon {...props} />);
 registerIconRenderer("valid", (props: IconBaseProps) => <FiCheckCircle {...props} />);
 registerIconRenderer("info", (props: IconBaseProps) => <FiAlertOctagon {...props} />);

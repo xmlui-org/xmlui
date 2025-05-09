@@ -1300,7 +1300,7 @@ export const HtmlLiMd = createMetadata({
     value: d("Specifies the value of the list item (if the parent is an ordered list)"),
   },
   defaultThemeVars: {
-    "marginLeft-HtmlLi": "$space-8",
+    "marginLeft-HtmlLi": "$space-6",
     "paddingLeft-HtmlLi": "$space-2",
   }
 });
@@ -2387,8 +2387,8 @@ export const HtmlUlMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
   defaultThemeVars: {
-    "marginTop-HtmlUl": "$space-4",
-    "marginBottom-HtmlUl": "$space-4",
+    "marginTop-HtmlUl": "$space-2",
+    "marginBottom-HtmlUl": "$space-2",
   },
 });
 

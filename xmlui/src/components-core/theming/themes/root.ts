@@ -205,6 +205,7 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- Various font sizes (relative to the current context)
     "fontSize-gigantic": "3rem",
+    "fontSize-larger": "2.15rem",
     "fontSize-large": "1.5rem",
     "fontSize-medium": "1.25rem",
     "fontSize-normal": "1rem",
