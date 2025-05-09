@@ -1,7 +1,11 @@
+import { Callout } from 'nextra/components'
+import { HELLO_XMLUI } from '../meta/downloads'
+
 # Understanding the XMLUI Architecture
 
->[!INFO]
-> XMLUI has a straightforward architecture based on the reactive principle.
+<Callout type="info" emoji="📔">
+XMLUI has a straightforward architecture based on the reactive principle.
+</Callout>
 
 XMLUI takes your app's source files and precompiles them into an internal definition of the app. The framework's rendering engine uses this representation to render your app following this loop:
 
@@ -22,8 +26,9 @@ As the input, you can feed this black box with these items:
 
 ## XMLUI Apps
 
->[!INFO]
-> XMLUI does not require a build. A web server can immediately serve your app from the framework's core files and your app's source code.
+<Callout type="info" emoji="📔">
+XMLUI does not require a build. A web server can immediately serve your app from the framework's core files and your app's source code.
+</Callout>
 
 An XMLUI app uses **markup files** (with the `.xmlui` extension) and optional accompanying **code-behind files** (with the `.xmlui.xs` extension). 
 
@@ -81,8 +86,9 @@ If the referenced component cannot be found, the app stops with an error message
 
 XMLUI applies the same strategy recursively (as app-specific components may utilize other app-specific components) to obtain the entire app. The engine loads resources, themes, data files, etc., with a similar strategy.
 
->[!INFO]
-> This behavior may cause your browser's console to display "Failed to load resource 404 (Not Found)" messages. Most messages refer to `.xmlui.xs` files, as the engine does not know whether a code-behind file exists. 
+<Callout type="info" emoji="📔">
+This behavior may cause your browser's console to display "Failed to load resource 404 (Not Found)" messages. Most messages refer to `.xmlui.xs` files, as the engine does not know whether a code-behind file exists. 
+</Callout>
 
 ### The Configuration File
 
@@ -118,15 +124,17 @@ This approach works quickly in a company intranet's production environment but m
 
 The framework supports using XMLUI apps with optimization after a quick build process. This activity removes unused components (either components part of XMLUI or a third-party component library not leveraged in your app) and adds some code optimizations to improve startup.
 
->[!WARNING]
-> We are still working on the build tools that optimize the application structure. When these tools are ready, we update this part of the documentation.
+<Callout type="warning">
+We are still working on the build tools that optimize the application structure. When these tools are ready, we update this part of the documentation.
+</Callout>
 
 ## Developing Apps with HMR
 
 XMLUI supports using a development environment (with a similar structure to the "no-build" mode, which has some extra files), which supports hot module reloading (HMR). Optionally, use this mode and its build process to create optimized files.
 
->[!WARNING]
-> We are still working on the HMR environment and building tools that optimize the application structure. When these tools are ready, we update this part of the documentation.
+<Callout type="warning">
+We are still working on the HMR environment and building tools that optimize the application structure. When these tools are ready, we update this part of the documentation.
+</Callout>
 
 ## Extensibility
 
@@ -142,5 +150,6 @@ Extending XMLUI is as simple as one of these methods:
 - Modifying the app's configuration (refer to a particular custom resource or changing a default resource, for example, the "email" icon with your own)
 - Loading extra script files in the `index.html` file.
 
->[!INFO]
-> Our team is working on extensibility tools to support the community in contributing to XMLUI with custom extensions.
+<Callout type="info" emoji="💡">
+Our team is working on extensibility tools to support the community in contributing to XMLUI with custom extensions.
+</Callout>
