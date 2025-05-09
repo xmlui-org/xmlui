@@ -1,77 +1,42 @@
-import { Callout } from 'nextra/components'
-import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui";
-
 # Introduction
 
 **XMLUI is a framework for building UIs declaratively with XML/XHTML markup, optional lightweight scripting, and flexible theming.**
 
 ## No Build Required
 
-<Callout type="info" emoji="💡">
-  XMLUI applications can be served directly as static files. Simply host them on a standard web server and load them in
+>[!INFO]
+> XMLUI applications can be served directly as static files. Simply host them on a standard web server and load them in
   a browser—no bundling, compiling, or build pipeline needed.
-</Callout>
 
 ## Declarative Markup
 
-<Callout type="info" emoji="💡">
-  With an XML-based approach, your UI’s structure and appearance are clearly defined in markup, making it easy to
+>[!INFO]
+> With an XML-based approach, your UI’s structure and appearance are clearly defined in markup, making it easy to
   understand, modify, and maintain without digging through complex scripts.
-</Callout>
 
-```xmlui copy
+```xmlui-pg copy display name="Example: Hello, World!"
 <App>
   Hello, World from XMLUI!
 </App>
 ```
 
-<Playground
-  name="Example: Hello, World!"
-  app={`
-    <App>
-      Hello, World from XMLUI!
-    </App>
-  `}
-/>
-
 You can **bind components to work together**.
 
-```xmlui copy /myTextBox/ /myTextBox.value/
+```xmlui-pg copy display name="Example: Bind components"
 <App>
   <TextBox id="myTextBox" placeholder="Type something" />
   <Text>You typed: {myTextBox.value}</Text>
 </App>
 ```
 
-<Playground
-  name="Example: Bind components"
-  app={`
-    <App>
-      <TextBox id="myTextBox" placeholder="Type something" />
-      <Text>You typed: {myTextBox.value}</Text>
-    </App>
-  `}
-/>
-
-## Minimal Scripting Needs
-
-<Callout type="info" emoji="💡">
-  While XMLUI supports a lightweight scripting layer, most of your app’s behavior can be handled through markup, themes,
-  and properties. This reduces dependency on heavy JavaScript frameworks and lowers the learning curve.
-</Callout>
-
-```xmlui copy
-<!-- Add a concise sample here -->
-```
-
 ## Reactive Data Handling
 
-<Callout type="info" emoji="💡">
-  The UI automatically updates whenever underlying data changes. This built-in reactivity means you don’t have to
+>[!INFO]
+> The UI automatically updates whenever underlying data changes. This built-in reactivity means you don’t have to
   manually trigger refreshes or write additional logic, streamlining the development process.
-</Callout>
 
-```xmlui copy /countTimes3="{3 * count}"/ /countTimes3/
+```xmlui-pg
+---app copy display name="Example: Reactive variables"
 <App
   var.count="{0}"
   var.countTimes3="{3 * count}" >
@@ -79,37 +44,17 @@ You can **bind components to work together**.
   <Text>Click count = {count}</Text>
   <Text>Click count * 3 = {countTimes3}</Text>
 </App>
-```
-
+---desc
 Each time the button is clicked, `count` is incremented, causing `countTimes3` to automatically recalculate and the UI to update accordingly.
-
-<Playground
-  name="Example: Reactive variables"
-  app={`
-    <App
-      var.count="{0}"
-      var.countTimes3="{3 * count}" >
-      <Button
-        label="Click to increment!"
-        onClick="count++" />
-      <Text>Click count = {count}</Text>
-      <Text>Click count * 3 = {countTimes3}</Text>
-    </App>
-  `}
-/>
-
-```xmlui copy
-<!-- Add a concise sample here that uses backend data with the reactive nature -->
 ```
 
 ## Flexible Theming and Styling
 
-<Callout type="info" emoji="💡">
-  XMLUI themes and theme variables let you adjust colors, fonts, spacing, and more from a central location. Change a
-  single theme variable, and the updated look cascades throughout the entire interface automatically.
-</Callout>
+>[!INFO]
+>  XMLUI themes and theme variables let you adjust colors, fonts, spacing, and more from a central location. Change a single theme variable, and the updated look cascades throughout the entire interface automatically.
 
-```xmlui copy {5, 9}
+```xmlui-pg
+---app copy {5, 9} display name="Example: Flexible themes"
 <App>
   <HStack verticalAlignment="center">
     <Button label="First" />
@@ -124,40 +69,19 @@ Each time the button is clicked, `count` is incremented, causing `countTimes3` t
     </Theme>
   </HStack>
 </App>
-```
-
+---desc
 The `color-primary` theme variable affects all components using the primary color; `textColor-Button` affects only the `Button` component's appearance.
-
-<Playground
-  name="Example: Flexible themes"
-  app={`
-    <App>
-      <HStack verticalAlignment="center">
-        <Button label="First" />
-        <ProgressBar width="80px" value="0.6" />
-        <Theme color-primary="purple">
-          <Button label="Second" />
-          <ProgressBar width="80px" value="0.6" />
-        </Theme>
-        <Theme textColor-Button="orange">
-          <Button label="Third" />
-          <ProgressBar width="80px" value="0.6" />
-        </Theme>
-      </HStack>
-    </App>
-  `}
-/>
+```
 
 ## Reusable Components
 
-<Callout type="info" emoji="💡">
-  Define a component once and reuse it across different parts of your app or even share it as a third-party component.
-  This modular approach saves development time, ensures consistency, and simplifies maintenance.
-</Callout>
+>[!INFO]
+> Define a component once and reuse it across different parts of your app or even share it as a third-party component. This modular approach saves development time, ensures consistency, and simplifies maintenance.
 
 Reusable components are in a separate markup file:
 
-```xmlui copy filename="components/MySquare.xmlui" /MySquare/
+```xmlui-pg 
+---comp copy filename="components/MySquare.xmlui" /MySquare/
 <Component name="MySquare">
   <Stack
     width="{$props.size}"
@@ -165,11 +89,9 @@ Reusable components are in a separate markup file:
     backgroundColor="{$props.color}"
     onClick="emitEvent('click')"/>
 </Component>
-```
-
+---desc
 The app can immediately leverage the reusable component:
-
-```xmlui copy filename="Main.xmlui" /MySquare/
+---app copy filename="Main.xmlui" name="Example: Hello, World!"
 <App var.lastClicked="none">
   <HStack>
     <MySquare size="24px" color="red" onClick="lastClicked = 'red'" />
@@ -180,54 +102,16 @@ The app can immediately leverage the reusable component:
 </App>
 ```
 
-<Playground
-  name="Example: Hello, World!"
-  components={[
-    `
-      <Component name="MySquare">
-        <Stack
-          width="{$props.size}"
-          height="{$props.size}"
-          backgroundColor="{$props.color}"
-          onClick="emitEvent('click')"/>
-      </Component>
-    `
-  ]}
-  app={`
-    <App var.lastClicked="none">
-      <HStack>
-        <MySquare size="24px" color="red" onClick="lastClicked = 'red'" />
-        <MySquare size="36px" color="green" onClick="lastClicked = 'green'" />
-        <MySquare size="48px" color="blue" onClick="lastClicked = 'blue'" />
-      </HStack>
-      <Text>Last clicked: {lastClicked}</Text>
-    </App>
-  `}
-/>
-
 ## Seamless Data Integration
 
-<Callout type="info" emoji="💡">
-  Connecting your UI to backend APIs is as simple as providing a URL. The framework fetches and presents the data
+>[!INFO]
+> Connecting your UI to backend APIs is as simple as providing a URL. The framework fetches and presents the data
   without extra tooling, ensuring that dynamic content is readily available and easy to incorporate.
-</Callout>
 
-```xmlui copy /data=/
+```xmlui-pg copy display name="Example: Fetch and display data" height="300px"
 <App>
   <List data="https://api.spacexdata.com/v4/history">
     <Card title="{$item.title}" subtitle="{$item.details}"/>
   </List>
 </App>
 ```
-
-<Playground
-  name="Example: Fetch and display data"
-  app={`
-    <App>
-      <List data="https://api.spacexdata.com/v4/history">
-        <Card title="{$item.title}" subtitle="{$item.details}"/>
-      </List>
-    </App>
-  `}
-  height={300}
-/>

@@ -1,18 +1,13 @@
-import { Callout } from 'nextra/components'
-import { GETTING_STARTED } from "../meta/downloads";
-import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui";
-
 # Getting Started with XMLUI
 
 XMLUI is a declarative UI framework with a simple markup allowing you to create web apps directly bound to web APIs on the backend.
 
-<Callout type="info" emoji="💡">
-  - XMLUI applications have a **simple structure**. You can copy the app files into your web server's static files folder, and they are ready to be hosted instantly.
-  - In contrast to other UI frameworks, XMLUI offers **simple concepts** to create apps quickly **without coping with the cumbersome peculiarities of web development**.
-  - It integrates with **web APIs** out of the box.
-  - You can create **reusable app components** to avoid markup repetition and improve maintainability.
-  - You can change an app's visual appearance by selecting a **built-in theme or creating or deriving a new one**.
-</Callout>
+>[!INFO]
+> - XMLUI applications have a **simple structure**. You can copy the app files into your web server's static files folder, and they are ready to be hosted instantly.
+> - In contrast to other UI frameworks, XMLUI offers **simple concepts** to create apps quickly **without coping with the cumbersome peculiarities of web development**.
+> - It integrates with **web APIs** out of the box.
+> - You can create **reusable app components** to avoid markup repetition and improve maintainability.
+> - You can change an app's visual appearance by selecting a **built-in theme or creating or deriving a new one**.
 
 After trying our Starter App, visit the [Dive Deeper](#dive-deeper) section of this article for suggestions on further steps to get acquainted with XMLUI.
 
@@ -34,14 +29,12 @@ npx -y http-server -o
 
 When your app starts, it displays this page:
 
-<br/>
 <Image alt="App start" src="/resources/images/get-started/app-start.png" />
 
-<Callout type="info" emoji="📔">
-Later, when you modify the code, refresh the browser page to reload the page with the changes. In some cases, depending on your settings, the browser caches the page, so the refresh will not respond to your markup changes. If you experience this, the browser caching may be turned on; turn it off.
+>[!INFO]
+> Later, when you modify the code, refresh the browser page to reload the page with the changes. In some cases, depending on your settings, the browser caches the page, so the refresh will not respond to your markup changes. If you experience this, the browser caching may be turned on; turn it off.
 
-Check your browser's documentation for details. If you use Chrome, turn on Developer Tools (F12), go to the Network tab, and set the "Disable cache" checkbox.
-</Callout>
+> Check your browser's documentation for details. If you use Chrome, turn on Developer Tools (F12), go to the Network tab, and set the "Disable cache" checkbox.
 
 You can try some simple and cool XMLUI features with the menu items.
 
@@ -73,12 +66,10 @@ The sample's root folder contains a `Main.xmlui` file, which is the app's entry 
 
 Save the `Main.xmlui` file and refresh the app's page in the browser. The app now displays the modified footer.
 
-<br/>
 <Image alt="App modified" src="/resources/images/get-started/app-modified.png" />
 
-<Callout type="info" emoji="💡">
-  Each tag (`<App>`, `<AppHeader>`, `<NavPanel>`, `<Pages>`, `<Footer>`, and the others) in the markup represents a **component**. Components are the basic building blocks of XMLUI apps. You can **nest them** to represent the hierarchy of UI elements.
-</Callout>
+>[!INFO]
+> Each tag (`<App>`, `<AppHeader>`, `<NavPanel>`, `<Pages>`, `<Footer>`, and the others) in the markup represents a **component**. Components are the basic building blocks of XMLUI apps. You can **nest them** to represent the hierarchy of UI elements.
 
 (Later, when we refer to a component, we omit the wrapping angle brackets and use only the name.)
 
@@ -86,7 +77,6 @@ Save the `Main.xmlui` file and refresh the app's page in the browser. The app no
 
 When you click the "SpaceX List" menu item, the app displays a list with data fetched from the SpaceX API.
 
-<br/>
 <Image alt="App modified" src="/resources/images/get-started/spacex-list.png" />
 
 The SpaceX API endpoint in this sample retrieves other data fields, including links. After observing the markup, you will modify the UI to display those links and allow navigating to their targets.
@@ -114,9 +104,8 @@ This functionality is a cooperation of a couple of components within `App`: `Nav
 </App>
 ```
 
-<Callout type="info" emoji="💡">
-  Components have **properties** that determine their appearance and behavior. Properties are declared as XML attributes when they can be represented with strings.
-</Callout>
+>[!INFO]
+> Components have **properties** that determine their appearance and behavior. Properties are declared as XML attributes when they can be represented with strings.
 
 Components work together declaratively. `App` connects the `to` property of `NavLink` with the `url` property of `Page`. As a result, the particular page is displayed when you click the "SpaceX List" menu item.
 
@@ -130,15 +119,13 @@ Components work together declaratively. `App` connects the `to` property of `Nav
 </List>
 ```
 
-<Callout type="info" emoji="💡">
-  You can use **expressions** in property values. Expressions are wrapped in curly braces.
-</Callout>
+>[!INFO]
+> You can use **expressions** in property values. Expressions are wrapped in curly braces.
 
 The `title` and `subtitle` property values of `Card` are expressions, `{$item.title}` and `{$item.details}`, respectively.
 
-<Callout type="info" emoji="💡">
-  The component definitions within the template properties can access information in the hosting component (the one using the template's content) through identifiers starting with `$`. We call them **context values**.
-</Callout>
+>[!INFO]
+> The component definitions within the template properties can access information in the hosting component (the one using the template's content) through identifiers starting with `$`. We call them **context values**.
 
 The list uses a `Card` component to display a particular item. `Card` has a `title` and a `subtitle` property to display two data entries. The `$item` context value represents the current item of the list to be displayed. So, `$item.title` and `$item.details` represent the current item's `title` and `details` fields in the fetched data list.
 
@@ -161,10 +148,9 @@ The specific endpoint of the SpaceX API (given in the `data` property of `List`)
 }
 ```
 
-<Callout type="info" emoji="💡">
-  Components working with data **can be bound to API endpoints** as well.
+>[!INFO]
+> Components working with data **can be bound to API endpoints** as well.
   Many XMLUI components handle data fetching from an API (using GET) in the `data` property.
-</Callout>
 
 ### Updating the Item Template
 
@@ -179,14 +165,12 @@ Change the `Card` component to display the SpaceX and Wikipedia links and allow 
 
 When you refresh the app in the browser, it will display the links. Click a link to open it in a new browser tab.
 
-<br/>
 <Image alt="App modified" src="/resources/images/get-started/spacex-list-with-links.png" />
 
 ## Extend the App
 
-<Callout type="info" emoji="💡">
-  You can **easily extend** an XMLUI working app.
-</Callout>
+>[!INFO]
+> You can **easily extend** an XMLUI working app.
 
 In this section, you will add a new component to your app's page to display three boxes. Their markup is similar; however, each has its particular color and text.
 
@@ -239,14 +223,12 @@ This code declares a reusable component named `MyBox` with two properties, `colo
 
 Return to the browser and refresh the current page. Click the "My Boxes" item in the menu. You will see the newly added component works:
 
-<br/>
 <Image alt="App modified" src="/resources/images/get-started/app-with-boxes.png" />
 
 ### Respond to an Event
 
-<Callout type="info" emoji="💡">
-  Components handle **user and system events**. You can declare **event handlers** to change how components respond to particular events. Handling events may change some components' properties. XMLUI observes these changes and refreshes the UI accordingly.
-</Callout>
+>[!INFO]
+> Components handle **user and system events**. You can declare **event handlers** to change how components respond to particular events. Handling events may change some components' properties. XMLUI observes these changes and refreshes the UI accordingly.
 
 Extend the `MyBox` component to display a toast when the box is clicked.
 
@@ -270,7 +252,6 @@ The code above executes the `toast('You clicked' + $props.label)` event handler,
 
 When you refresh the app in the browser and click a box, a toast will appear:
 
-<br/>
 <Image alt="App modified" src="/resources/images/get-started/app-with-toast.png" />
 
 ## Diving Deeper into XMLUI [#dive-deeper]

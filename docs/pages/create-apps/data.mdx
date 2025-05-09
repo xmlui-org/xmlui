@@ -1,6 +1,3 @@
-import { Callout } from 'nextra/components';
-import { COMPONENT_ITEMS, COMPONENT_LIST, COMPONENT_TABLE, THE_APP_COMPONENT } from "../../meta/pages.js";
-
 # Working with data
 
 Real apps consume data. XMLUI provides a straightforward way to reach data from the backend and display them in the UI. It also lets you execute actions that change backend data.
@@ -23,115 +20,66 @@ When you pass an explicit (non-string) value to the `data` property, the framewo
 
 Here is a sample demonstrating this case:
 
-```xmlui copy
+```xmlui-pg
+---app copy display name="Example: Explicit data" height="240px"
 <App>
   <List data="{['one', 'two', 'three']}">
     <Card title="{$item}" />
   </List>
-</App>  
-```
-
+</App>
+---desc
 This code passes an array of strings to `data`. A `List` component displays each item in `data` according to the template described by its children. The `$item` context value in the template represents the current item to display.
-
-<Playground
-  name="Example: Explicit data"
-  app={`
-    <App>
-      <List data="{['one', 'two', 'three']}">
-        <Card title="{$item}" />
-      </List>
-    </App>  
-  `}
-  height={240}
-/>
-
-
+```
 
 ### Using `data` with a valid URL
 
 When you pass a string value to `data`, XMLUI considers it a URL and fetches the data from it. When the fetch is complete, the UI is refreshed accordingly.
 
-```xmlui copy
+```xmlui-pg
+---app copy display name="Example: Data with a URL" height="240px"
 <App>
   <List data="https://api.spacexdata.com/v4/launchpads">
     <Card title="{$item.name}" />
   </List>
-</App>  
-```
-
+</App>
+---desc  
 This markup uses the endpoint in `data` to fetch launchpad information from the SpaceX API.
-
-<Playground
-  name="Example: Data with a URL"
-  app={`
-    <App>
-      <List data="https://api.spacexdata.com/v4/launchpads">
-        <Card title="{$item.name}" />
-      </List>
-    </App>  
-  `}
-  height={240}
-/>
+```
 
 ### Using `data` with a non-functional URL
 
 When you use a string value in `data` but not a valid URL or the data fetch results in an error, the `data` is set to an empty value. The following example demonstrates this case:
 
-```xmlui copy
+```xmlui-pg
+---app copy display name="Example: Data with a non-functional URL" height="180px"
 <App var.myData="{[]}">
   <Button label="Fetch Data" onClick="myData = 'bla-bla-bla'" />
   <List data="{myData}">
     <Card title="{$item}" />
   </List>
 </App>  
+---desc
+By default, the value passed to `data` is an empty list (the UI displays "No data available"); however, when you click the button that sets the `data` property to an invalid URL ("bla-bla-bla"), an error is raised while the framework fetches the data from that URL.
 ```
 
-By default, the value passed to `data` is an empty list (the UI displays "No data available"); however, when you click the button that sets the `data` property to an invalid URL ("bla-bla-bla"), an error is raised while the framework fetches the data from that URL.
-
-<Playground
-  name="Example: Data with a non-functional URL"
-  app={`
-    <App var.myData="{[]}">
-      <Button label="Fetch Data" onClick="myData = 'bla-bla-bla'" />
-      <List data="{myData}">
-        <Card title="{$item}" />
-      </List>
-    </App>  
-  `}
-  height={180}
-/>
-
-<Callout type="info" emoji="📔">
-When you click the button again, the value of `data` does not change (it remains "bla-bla-bla"), so the framework does not trigger the fetch again.
-</Callout>
+>[!INFO]
+> When you click the button again, the value of `data` does not change (it remains "bla-bla-bla"), so the framework does not trigger the fetch again.
 
 ### Using `data` with a `DataSource`
 
 You can bind the `data` property to a `DataSource` instance. Similarly to a single URL, `DataSource` fetches the data from that URL. 
 
-```xmlui copy /rocketsData/
+```xmlui-pg copy
+---app copy display name="Example: Using DataSource in Data" height="260px"
 <App>
   <DataSource id="rocketsData" url="https://api.spacexdata.com/v4/rockets" />
   <List data="{rocketsData}">
     <Card title="{$item.rocket_name}" subtitle="{$item.success_rate_pct}%" />
   </List>
-</App>  
-```
-
+</App>
+---desc
 You can refer to the `DataSource` instance with its identifier, `rocketsData`.
-
-<Playground
-  name="Example: Using DataSource in Data"
-  app={`
-    <App>
-      <DataSource id="rocketsData" url="https://api.spacexdata.com/v4/rockets" />
-      <List data="{rocketsData}">
-        <Card title="{$item.name}" subtitle="{$item.success_rate_pct}%" />
-      </List>
-    </App>  
-  `}
-  height={260}
-/>
+```
 
 This sample has the same effect as using a URL in the `data` property. However, when you need additional configuration to issue a fetch request (for example, changing the `GET` method or adding some custom headers), `DataSource` provides that flexibility over a single string URL.
 
@@ -165,13 +113,11 @@ Though using the `data` property is extremely easy, there are situations when yo
 - You want to know that the data is being fetched to indicate that the fetch operation is in progress.
 - Initiating the fetch request is more complex than issuing a GET request with the specified URL; for example, you must pass some information in the request header.  
 
-<Callout type="info" emoji="💡">
-  The `DataSource` component provides **more control of the fetch operation** with its methods and state information.
-</Callout>
+>[!INFO]
+> The `DataSource` component provides **more control of the fetch operation** with its methods and state information.
 
-<Callout type="info" emoji="📔">
-This samples in this section use XMLUI's emulated API feature.
-</Callout>
+>[!INFO]
+> This samples in this section use XMLUI's emulated API feature.
 
 ### Accessing the Data
 
@@ -566,9 +512,8 @@ The following example orders a list of friends' data by descending age:
   `}
 />
 
-<Callout type="info" emoji="📔">
-  Though this technique is seducing, you must apply the transform in every component that intends to display the data. Should you change that transform (let's say from descending to ascending order), you should maintain each occurrence.
-</Callout>
+>[!INFO]
+> Though this technique is seducing, you must apply the transform in every component that intends to display the data. Should you change that transform (let's say from descending to ascending order), you should maintain each occurrence.
 
 ### Transforming the Result with `transformResult` [#transform-data-2]
 
@@ -654,9 +599,8 @@ var sortedReviews = reviews.value
   .toSorted((a, b) => b.avg - a.avg);
 ```
 
-<Callout type="info" emoji="📔">
-  XMLUI does not allow you to invoke a JavaScript array's `sort()` function, as that sorts the data in place. Use the `toSorted()` function with the same signature, which creates a new array with sorted data.
-</Callout>
+>[!INFO]
+>  XMLUI does not allow you to invoke a JavaScript array's `sort()` function, as that sorts the data in place. Use the `toSorted()` function with the same signature, which creates a new array with sorted data.
 
 Due to XMLUI's reactive nature, `sortedReviews` is evaluated every time the data is fetched (as `reviews.value` changes). In the `Table` component's `data` property, you refer to the `sortedReviews` variable to ensure the transformed value is displayed.
 
@@ -721,9 +665,8 @@ Due to XMLUI's reactive nature, `sortedReviews` is evaluated every time the data
 
 In contrast to fetching data, where the framework can be smart about when to initiate the data fetch operation, persisting data requires an explicit user (or system) trigger to invoke a related API endpoint.
 
-<Callout type="info" emoji="💡">
-  XMLUI has an **`APICall` component** that manages API endpoint invocations that persist data (or cause other state changes at the backend).
-</Callout>
+>[!INFO]
+> XMLUI has an **`APICall` component** that manages API endpoint invocations that persist data (or cause other state changes at the backend).
 
 An `APICall` component requires a URL and an operation method (such as POST, PUT, DELETE, etc.) to do its job. It must also be configured with other details to convey the request information between the UI and the backend.
 
@@ -1068,9 +1011,8 @@ XMLUI comes with several data-aware components. In this section, you will learn 
 
 The `Items` component maps sequential data into component instances, representing each data item as a particular component.
 
-<Callout type="info" emoji="📔">
-Learn more about this component in the <SmartLink href={COMPONENT_ITEMS}>`Items`</SmartLink> reference documentation.
-</Callout>
+>[!INFO]
+> Learn more about this component in the <SmartLink href={COMPONENT_ITEMS}>`Items`</SmartLink> reference documentation.
 
 The following sample uses the `data` property to define the source of backend data displayed in the component:
 
@@ -1131,9 +1073,8 @@ Items also can be used when you provide a list of options for components such as
 
 The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items visible in the viewport.
 
-<Callout type="info" emoji="📔">
-Learn more about this component in the <SmartLink href={COMPONENT_LIST}>`List`</SmartLink> reference documentation.
-</Callout>
+>[!INFO]
+> Learn more about this component in the <SmartLink href={COMPONENT_LIST}>`List`</SmartLink> reference documentation.
 
 The following sample demonstrates using `List`:
 
@@ -1251,9 +1192,8 @@ As the following sample demonstrates, a `List` can group its items according to 
 
 `Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells.
 
-<Callout type="info" emoji="📔">
-Learn more about this component in the <SmartLink href={COMPONENT_TABLE}>`Table`</SmartLink> reference documentation.
-</Callout>
+>[!INFO]
+> Learn more about this component in the <SmartLink href={COMPONENT_TABLE}>`Table`</SmartLink> reference documentation.
 
 The following sample demonstrates using `Table`. You can use `Column` components to specify table column templates.
 

@@ -138,7 +138,6 @@ const TransformedMarkdown = ({
         resolvedMd.slice(nextPlayground[1]);
     }
     resolvedMd = parseBindingExpression(resolvedMd, extractValue)
-    console.log("Resolved Markdown:", resolvedMd);
     return resolvedMd;
   }, [children, extractValue]);
 

@@ -6,7 +6,7 @@ The component accepts `Option` components as children defining a particular opti
 `Option` requires a `value` property and while also having a `label` that is displayed in the list.
 If the `label` is not specified `value` is shown.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: using Select" height="200px"
 <App>
   <Select>
     <Option value="opt1" label="first"/>
@@ -16,23 +16,9 @@ If the `label` is not specified `value` is shown.
 </App>
 ```
 
-<Playground
-    name="Example: using Select"
-    height={200}
-    app={`
-    <App>
-      <Select>
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second" enabled="false" />
-        <Option value="opt3" label="third"/>
-      </Select>
-    </App>
-  `}
-/>
-
 You can use `Select` with dynamic options:
 
-```xmlui copy
+```xmlui-pg copy display name="Example: using Select with dynamic options" height="200px"
 <App>
   <Select>
     <Items data="{['one', 'two', 'three']}" >
@@ -42,25 +28,11 @@ You can use `Select` with dynamic options:
 </App>  
 ```
 
-<Playground
-  name="Example: using Select with dynamic options"
-  height={200}
-  app={`
-    <App>
-      <Select>
-        <Items data="{['one', 'two', 'three']}" >
-          <Option value="{$itemIndex}" label="{$item}" />
-        </Items> 
-      </Select>
-    </App>  
-  `}
-/>
-
 %-DESC-END
 
 %-PROP-START initialValue
 
-```xmlui copy
+```xmlui-pg copy display name="Example: initialValue" height="200px"
 <App>
   <Select initialValue="opt3">
     <Option value="opt1" label="first"/>
@@ -70,25 +42,11 @@ You can use `Select` with dynamic options:
 </App>
 ```
 
-<Playground
-    name="Example: initialValue"
-    height={200}
-    app={`
-    <App>
-      <Select initialValue="opt3">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-      </Select>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START optionTemplate
 
-```xmlui copy
+```xmlui-pg copy display name="Example: optionTemplate" height="200px"
 <App>
   <Select>
     <property name="optionTemplate">
@@ -104,31 +62,11 @@ You can use `Select` with dynamic options:
 </App>
 ```
 
-<Playground
-    name="Example: optionTemplate"
-    height={200}
-    app={`
-    <App>
-      <Select>
-        <property name="optionTemplate">
-          <HStack verticalAlignment="center" gap="$space-0_5">
-            <Icon name="info" />
-            <Text value="{$item.label}" variant="strong" />
-          </HStack>
-        </property>
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-      </Select>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START placeholder
 
-```xmlui copy
+```xmlui-pg copy display name="Example: placeholder" height="200px"
 <App>
   <Select placeholder="Please select an item">
     <Option value="opt1" label="first"/>
@@ -138,25 +76,11 @@ You can use `Select` with dynamic options:
 </App>
 ```
 
-<Playground
-    name="Example: placeholder"
-    height={200}
-    app={`
-    <App>
-      <Select placeholder="Please select an item">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-      </Select>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START validationStatus
 
-```xmlui copy
+```xmlui-pg copy display name="Example: validationStatus"
 <App>
   <Select />
   <Select validationStatus="valid" />
@@ -165,36 +89,15 @@ You can use `Select` with dynamic options:
 </App>
 ```
 
-<Playground
-    name="Example: validationStatus"
-    app={`
-    <App>
-      <Select />
-      <Select validationStatus="valid" />
-      <Select validationStatus="warning" />
-      <Select validationStatus="error" />
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START enabled
 
-```xmlui copy
+```xmlui-pg copy display name="Example: enabled"
 <App>
   <Select enabled="false" />
 </App>
 ```
-
-<Playground
-    name="Example: enabled"
-    app={`
-    <App>
-      <Select enabled="false" />
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -202,7 +105,7 @@ You can use `Select` with dynamic options:
 
 Click on the second field to see the custom empty list indicator.
 
-```xmlui copy {9-11}
+```xmlui-pg copy {9-11} display name="Example: emptyListTemplate" height="260px"
 <App>
   <VStack>
     <Text value="Default:" />
@@ -219,106 +122,51 @@ Click on the second field to see the custom empty list indicator.
 </App>
 ```
 
-<Playground
-    name="Example: emptyListTemplate"
-    height={260}
-    app={`
-    <App>
-      <VStack>
-        <Text value="Default:" />
-        <Select />
-      </VStack>
-      <VStack>
-        <Text value="Custom:" />
-        <Select>
-          <property name="emptyListTemplate">
-            <Text variant="strong" value="Nothing to see here!" />
-          </property>
-        </Select>
-      </VStack>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START dropdownHeight
 
-```xmlui copy /dropdownHeight="180px"/
+```xmlui-pg copy display name="Example: dropdownHeight" height="300px"
 <App>
   <Select dropdownHeight="180px">
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
-    <!-- Omitted -->
+    <Option value="opt4" label="fourth"/>
+    <Option value="opt5" label="fifth"/>
+    <Option value="opt6" label="sixth"/>
+    <Option value="opt7" label="seventh"/>
+    <Option value="opt8" label="eighth"/>
+    <Option value="opt9" label="ninth"/>
+    <Option value="opt10" label="tenth"/>
     <Option value="opt11" label="eleventh"/>
     <Option value="opt12" label="twelfth"/>
   </Select>
 </App>
 ```
-
-<Playground
-  name="Example: dropdownHeight"
-  height={300}
-  app={`
-    <App>
-      <Select dropdownHeight="180px">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-        <Option value="opt4" label="fourth"/>
-        <Option value="opt5" label="fifth"/>
-        <Option value="opt6" label="sixth"/>
-        <Option value="opt7" label="seventh"/>
-        <Option value="opt8" label="eighth"/>
-        <Option value="opt9" label="ninth"/>
-        <Option value="opt10" label="tenth"/>
-        <Option value="opt11" label="eleventh"/>
-        <Option value="opt12" label="twelfth"/>
-      </Select>
-    </App>
-  `}
-/>
 
 %-PROP-END
 
 %-PROP-START multiSelect
 
-```xmlui copy /multiSelect="true"/
+```xmlui-pg copy display name="Example: multiSelect" height="300px"
 <App>
   <Select multiSelect="true" dropdownHeight="180px" >
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
-    <!-- Omitted -->
+    <Option value="opt4" label="fourth"/>
+    <Option value="opt5" label="fifth"/>
+    <Option value="opt6" label="sixth"/>
+    <Option value="opt7" label="seventh"/>
+    <Option value="opt8" label="eighth"/>
+    <Option value="opt9" label="ninth"/>
+    <Option value="opt10" label="tenth"/>
     <Option value="opt11" label="eleventh"/>
     <Option value="opt12" label="twelfth"/>
   </Select>
 </App>
 ```
-
-<Playground
-  name="Example: multiSelect"
-  height={300}
-  app={`
-    <App>
-      <Select multiSelect="true" dropdownHeight="180px" >
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-        <Option value="opt4" label="fourth"/>
-        <Option value="opt5" label="fifth"/>
-        <Option value="opt6" label="sixth"/>
-        <Option value="opt7" label="seventh"/>
-        <Option value="opt8" label="eighth"/>
-        <Option value="opt9" label="ninth"/>
-        <Option value="opt10" label="tenth"/>
-        <Option value="opt11" label="eleventh"/>
-        <Option value="opt12" label="twelfth"/>
-      </Select>
-    </App>
-  `}
-/>
 
 %-PROP-END
 
@@ -326,7 +174,7 @@ Click on the second field to see the custom empty list indicator.
 
 In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`. 
 
-```xmlui copy {3-9} /optionLabelTemplate/
+```xmlui-pg copy {3-9} display name="Example: optionLabelTemplate" height="300px"
 <App>
   <Select initialValue="{0}" placeholder="Select..." searchable>
     <property name="optionLabelTemplate">
@@ -344,35 +192,13 @@ In the template definition, you can use the `$item` context property to access t
 </App>
 ```
 
-<Playground
-  name="Example: optionLabelTemplate"
-  height={300}
-  app={`
-    <App>
-      <Select initialValue="{0}" placeholder="Select..." searchable>
-        <property name="optionLabelTemplate">
-          <HStack 
-            paddingHorizontal="$padding-tight" 
-            border="2px dotted $color-primary-500">
-            <Text>{$item.label}</Text>
-          </HStack>
-        </property>
-        <Option value="{0}" label="zero"/>
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-      </Select>
-    </App>
-  `}
-/>
-
 %-PROP-END
 
 %-PROP-START valueTemplate
 
 In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`.  The `$itemContext` property provides a `removeItem` method to delete a value from the current selection.
 
-```xmlui copy {3-15} /valueTemplate/
+```xmlui-pg copy {3-15} display name="Example: valueTemplate" height="300px"
 <App>
   <Select initialValue="{0}" placeholder="Select..." multiSelect>
     <property name="valueTemplate">
@@ -396,42 +222,13 @@ In the template definition, you can use the `$item` context property to access t
 </App>  
 ```
 
-<Playground
-  name="Example: valueTemplate"
-  height={300}
-  app={`
-    <App>
-      <Select initialValue="{0}" placeholder="Select..." multiSelect>
-        <property name="valueTemplate">
-          <HStack 
-            paddingLeft="$padding-tight" 
-            border="2px dotted $color-primary-500"              
-            verticalAlignment="center">
-            <Text>{$item.label}</Text>
-            <Button 
-              variant="ghost"
-              icon="close" 
-              size="xs" 
-              onClick="$itemContext.removeItem()"/>
-          </HStack>
-        </property>
-        <Option value="{0}" label="zero"/>
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-      </Select>
-    </App>  
-  `}
-/>
-
 %-PROP-END
-
 
 %-EVENT-START didChange
 
-```xmlui copy /onDidChange="(newItem) => newValue = newItem"/
+```xmlui-pg copy display name="Example: didChange" height="260px"
 <App>
-  <variable name="newValue" value="" />
+  <variable name="newValue" value="(none)" />
   <Text value="{newValue}" />
   <Select onDidChange="(newItem) => newValue = newItem">
     <Option value="opt1" label="first"/>
@@ -441,27 +238,11 @@ In the template definition, you can use the `$item` context property to access t
 </App>
 ```
 
-<Playground
-    name="Example: didChange"
-    height={200}
-    app={`
-    <App>
-      <variable name="newValue" value="" />
-      <Text value="{newValue}" />
-      <Select onDidChange="(newItem) => newValue = newItem">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-      </Select>
-    </App>
-  `}
-/>
-
 %-EVENT-END
 
 %-EVENT-START gotFocus
 
-```xmlui copy {5-6}
+```xmlui-pg copy {5-6} display name="Example: gotFocus/lostFocus" height="260px"
 <App>
   <variable name="isFocused" value="{false}" />
   <Text value="Input control is focused: {isFocused}" />
@@ -475,29 +256,11 @@ In the template definition, you can use the `$item` context property to access t
 </App>
 ```
 
-<Playground
-    name="Example: gotFocus/lostFocus"
-    height={200}
-    app={`
-    <App>
-      <variable name="isFocused" value="{false}" />
-      <Text value="Input control is focused: {isFocused}" />
-      <Select
-        onGotFocus="isFocused = true"
-        onLostFocus="isFocused = false">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-      </Select>
-    </App>
-  `}
-/>
-
 %-EVENT-END
 
 %-API-START focus
 
-```xmlui copy /onClick="inputControl.focus()"/
+```xmlui-pg copy display name="Example: focus()" height="260px"
 <App>
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <Select id="inputControl">
@@ -508,26 +271,11 @@ In the template definition, you can use the `$item` context property to access t
 </App>
 ```
 
-<Playground
-    name="Example: focus()"
-    height={240}
-    app={`
-    <App>
-      <Button label="Focus Input" onClick="inputControl.focus()" />
-      <Select id="inputControl">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-      </Select>
-    </App>
-  `}
-/>
-
 %-API-END
 
 %-API-START setValue
 
-```xmlui copy
+```xmlui-pg copy display name="Example: setValue()" height="260px"
 <App>
   <Select id="inputControl">
     <Option value="opt1" label="first"/>
@@ -545,145 +293,4 @@ In the template definition, you can use the `$item` context property to access t
 </App>
 ```
 
-<Playground
-    name="Example: value() and setValue()"
-    app={`
-    <App>
-      <Select id="inputControl">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
-      </Select>
-      <HStack>
-        <Button
-          label="Select 2nd Item"
-          onClick="inputControl.setValue('opt2')" />
-        <Button
-          label="Remove Selection"
-          onClick="inputControl.setValue('')" />
-      </HStack>
-    </App>
-  `}
-/>
-
 %-API-END
-
-%-CONTEXT_VAR-START $item
-
-Access attributes of the item using the dot notation.
-
-For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\`didChange\`](#didchange) event.
-
-%-CONTEXT_VAR-END
-
-%-STYLE-START
-
-The `Select` component uses these theme variables:
-
-- `minHeight-Select`
-
-These variables have 4 variants depending on the [validationStatus](#validationstatus) denoted by `|status|`.
-If the status segment is omitted, the style will be applied to all statuses.
-
-- `borderRadius-Select-|status|`
-- `fontSize-Select-|status|`
-- `textColor-placeholder-Select-|status|`
-- `borderWidth-Select-|status|`
-
-- `outlineWidth-Select-|status|--focus`
-- `outlineColor-Select-|status|--focus`
-- `outlineStyle-Select-|status|--focus`
-- `outlineOffset-Select-|status|--focus`
-
-```json copy
-"borderRadius-Select-default": "10px",
-"textColor-placeholder-Select-error": "crimson"
-```
-
-In addition to the validation statuses,
-the variables below are associated with styles for `hover` and `disabled` interaction states denoted by `|interact|` in their signature:
-
-- `borderColor-Select-|status|--|interact|`
-- `backgroundColor-Select-|status|--|interact|`
-- `boxShadow-Select-|status|--|interact|`
-- `textColor-Select-|status|--|interact|`
-
-```json copy
-"backgroundColor-Select-default--disabled": "gray",
-"textColor-Select-error--active": "lightcoral"
-```
-
-Theme variables to set the dropdown menu styles:
-
-- `backgroundColor-menu-Select`
-- `boxShadow-menu-Select`
-- `borderRadius-menu-Select`
-- `textColor-indicator-Select`
-
-Theme variables to set the selection styles in a dropdown menu:
-
-- `textColor-value-Select`
-- `backgroundColor-value-Select`
-
-Theme variables to set the styles of an unselected item:
-
-- `backgroundColor-item-Select--hover`
-- `backgroundColor-item-Select--active`
-- `textColor-item-Select--disabled`
-
-### Example
-
-```json copy
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "borderRadius-Select": "30px",
-    "textColor-placeholder-Select": "red",
-    "borderWidth-Select": "4px"
-  }
-}
-```
-
-<Playground
-    name="Example: styling"
-    height={260}
-    defaultTheme="custom"
-    themes={[
-        {
-            id: "custom",
-            name: "Custom Theme",
-            themeVars: {
-                "borderRadius-Select": "30px",
-                "textColor-placeholder-Select": "red",
-                "borderWidth-Select": "4px",
-            },
-        },
-    ]}
-    app={`
-    <App>
-      <Select placeholder="Please select an option" />
-    </App>
-  `}
-/>
-
-To style all input controls not just this component, use `Input` instead of the `Select` segment:
-
-```
-borderColor-Input: "#0033FF"
-```
-
-`Input` affects the following controls:
-
-- [`Checkbox`](./Checkbox.mdx)
-- [`NumberBox`](./NumberBox.mdx)
-- [`RadioGroupOption`](./RadioGroupOption.mdx)
-- [`Switch`](./Switch.mdx)
-- [`TextArea`](./TextArea.mdx)
-- [`TextBox`](./TextBox.mdx)
-- [`MultiSelect`](./MultiSelect.mdx)
-- [`MultiCombobox`](./MultiCombobox.mdx)
-
-See [custom themes](../learning/themes/overview.mdx) for styling details.
-
-%-STYLE-END
