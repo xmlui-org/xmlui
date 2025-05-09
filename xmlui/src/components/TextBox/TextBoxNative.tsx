@@ -30,6 +30,7 @@ type Props = {
   startIcon?: string;
   endText?: string;
   endIcon?: string;
+  gap?: string;
   autoFocus?: boolean;
   readOnly?: boolean;
   tabIndex?: number;
@@ -60,6 +61,7 @@ export const TextBox = forwardRef(function TextBox(
     startIcon,
     endText,
     endIcon,
+    gap,
     autoFocus,
     readOnly,
     tabIndex,
@@ -157,6 +159,7 @@ export const TextBox = forwardRef(function TextBox(
         })}
         tabIndex={-1}
         onFocus={focus}
+        style={{gap}}
       >
         <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
         <input

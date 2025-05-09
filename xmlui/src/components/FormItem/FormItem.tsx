@@ -162,6 +162,9 @@ export const FormItemMd = createMetadata({
     inputTemplate: {
       description: "This property is used to define a custom input template.",
     },
+    gap: {
+      description: "This property defines the gap between the adornments and the input area.",
+    },
   },
   events: {
     validate: d(`This event is used to define a custom validation function.`),
@@ -231,6 +234,7 @@ export const formItemComponentRenderer = createComponentRenderer(
       customValidationsDebounce,
       validationMode,
       maxTextLength,
+      gap,
       ...rest
     } = node.props;
 
@@ -298,6 +302,7 @@ export const formItemComponentRenderer = createComponentRenderer(
               )
             : undefined
         }
+        gap={extractValue.asOptionalString(gap)}
         {...resolvedRestProps}
       >
         {isCustomFormItem ? (

@@ -23,23 +23,27 @@ $componentName: "NumberBox";
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar(
+      "Input:backgroundColor-#{$componentName}-#{$variantName}--hover"
+    );
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--hover");
     color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--hover");
   }
 
   &:focus-within {
     border-color: createThemeVar("Input:borderColor-#{$componentName}-#{$variantName}--focus");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}-#{$variantName}--focus");
+    background-color: createThemeVar(
+      "Input:backgroundColor-#{$componentName}-#{$variantName}--focus"
+    );
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}-#{$variantName}--focus");
     color: createThemeVar("Input:textColor-#{$componentName}-#{$variantName}--focus");
   }
 
-  &:has(.input:focus-visible){
-    outline-width: createThemeVar('Input:outlineWidth-#{$componentName}-#{$variantName}--focus');
-    outline-color: createThemeVar('Input:outlineColor-#{$componentName}-#{$variantName}--focus');
-    outline-style: createThemeVar('Input:outlineStyle-#{$componentName}-#{$variantName}--focus');
-    outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}-#{$variantName}--focus');
+  &:has(.input:focus-visible) {
+    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}-#{$variantName}--focus");
+    outline-color: createThemeVar("Input:outlineColor-#{$componentName}-#{$variantName}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}-#{$variantName}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}-#{$variantName}--focus");
   }
 
   .input {
@@ -55,7 +59,7 @@ $componentName: "NumberBox";
 .inputRoot {
   display: flex;
   align-items: center;
-  gap: t.$space-2;
+  gap: createThemeVar("Input:gap-adornment-#{$componentName}");
   padding: t.$space-2;
   width: 100%;
   border-style: solid;

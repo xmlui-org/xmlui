@@ -58,6 +58,7 @@ type Props = {
   startIcon?: string;
   endText?: string;
   endIcon?: string;
+  gap?: string;
   autoFocus?: boolean;
   readOnly?: boolean;
   required?: boolean;
@@ -92,6 +93,7 @@ export const NumberBox = forwardRef(function NumberBox(
     startIcon,
     endText,
     endIcon,
+    gap,
     autoFocus,
     readOnly,
     required,
@@ -395,6 +397,7 @@ export const NumberBox = forwardRef(function NumberBox(
         onFocus={() => {
           inputRef.current?.focus();
         }}
+        style={{gap}}
       >
         <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
         <input
