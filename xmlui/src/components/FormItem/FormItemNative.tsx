@@ -80,6 +80,7 @@ type Props = {
   maxTextLength?: number;
   inputRenderer?: any;
   itemIndex?: number;
+  gap?: string;
 };
 
 export const defaultProps: Pick<
@@ -144,6 +145,7 @@ export const FormItem = memo(function FormItem({
   inputRenderer,
   itemIndex,
   initialValue: initialValueFromProps,
+  gap,
   ...rest
 }: Props) {
   const defaultId = useId();
@@ -290,6 +292,7 @@ export const FormItem = memo(function FormItem({
           min={validations.minValue}
           max={validations.maxValue}
           maxLength={maxTextLength ?? validations?.maxLength}
+          gap={gap}
         ></NumberBox>
       );
       break;
@@ -344,6 +347,7 @@ export const FormItem = memo(function FormItem({
       break;
     }
     case "text": {
+      console.log("gap", gap);
       formControl = (
         <TextBox
           {...rest}
@@ -353,6 +357,7 @@ export const FormItem = memo(function FormItem({
           enabled={isEnabled}
           validationStatus={validationStatus}
           maxLength={maxTextLength ?? validations?.maxLength}
+          gap={gap}
         />
       );
       break;

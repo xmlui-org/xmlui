@@ -1,6 +1,6 @@
 import styles from "./TextBox.module.scss";
 
-import type {RegisterComponentApiFn, ValueExtractor} from "../../abstractions/RendererDefs";
+import type { RegisterComponentApiFn, ValueExtractor } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { LookupActionOptions } from "../../abstractions/ActionDefs";
 import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
@@ -53,6 +53,9 @@ export const TextBoxMd = createMetadata({
     startIcon: dStartIcon(),
     endText: dEndText(),
     endIcon: dEndIcon(),
+    gap: {
+      description: "This property defines the gap between the adornments and the input area.",
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -75,6 +78,7 @@ export const TextBoxMd = createMetadata({
     "borderWidth-Input": "1px",
     "minHeight-Input": "39px",
     "padding-Input": "$space-2",
+    "gap-adornment-Input": "$space-2",
     "borderStyle-Input": "solid",
     "borderColor-Input--disabled": "$borderColor--disabled",
     "textColor-Input--disabled": "$textColor--disabled",
@@ -113,6 +117,7 @@ function renderTextBox(
   registerComponentApi: RegisterComponentApiFn,
   type: "text" | "password" = "text",
 ) {
+  delete layoutCss.gap;
   return (
     <TextBox
       type={type}
@@ -132,6 +137,7 @@ function renderTextBox(
       startIcon={extractValue.asOptionalString(node.props.startIcon)}
       endText={extractValue.asOptionalString(node.props.endText)}
       endIcon={extractValue.asOptionalString(node.props.endIcon)}
+      gap={extractValue.asOptionalString(node.props.gap)}
       autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
       readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
       label={extractValue.asOptionalString(node.props.label)}
@@ -170,7 +176,7 @@ export const textBoxComponentRenderer = createComponentRenderer(
 export const PasswordMd = createMetadata({
   ...TextBoxMd,
   description:
-    "The \`Password\` component is a specialized version of the \`TextBox\` component that " + 
+    "The \`Password\` component is a specialized version of the \`TextBox\` component that " +
     "allows users to input and edit passwords.",
 });
 

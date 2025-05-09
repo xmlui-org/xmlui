@@ -53,6 +53,9 @@ export const NumberBoxMd = createMetadata({
     startIcon: dStartIcon(),
     endText: dEndText(),
     endIcon: dEndIcon(),
+    gap: {
+      description: "This property defines the gap between the adornments and the input area.",
+    },
     hasSpinBox: {
       description: `This boolean prop shows (\`true\`) or hides (\`false\`) the spinner buttons for the input field.`,
       valueType: "boolean",
@@ -133,6 +136,7 @@ export const numberBoxComponentRenderer = createComponentRenderer(
         startText={extractValue.asOptionalString(node.props.startText)}
         startIcon={extractValue.asOptionalString(node.props.startIcon)}
         endText={extractValue.asOptionalString(node.props.endText)}
+        gap={extractValue.asOptionalString(node.props.gap)}
         endIcon={extractValue.asOptionalString(node.props.endIcon)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
