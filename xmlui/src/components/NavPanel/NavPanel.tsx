@@ -18,7 +18,7 @@ export const NavPanelMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    // [`backgroundColor-${COMP}`]: "$backgroundColor", <- messes up horizontal nav styling
+    [`backgroundColor-${COMP}`]: "$backgroundColor",
     [`border-${COMP}`]: '0px solid $borderColor',
     [`paddingHorizontal-${COMP}`]: "0",
     [`paddingVertical-logo-${COMP}`]: "$space-4",
