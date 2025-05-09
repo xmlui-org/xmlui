@@ -83,6 +83,9 @@ $themeVars: ();
 .alignItemsEnd {
   align-items: flex-end;
 }
+.alignItemsBaseline {
+  align-items: baseline;
+}
 
 // --- We export the theme variables to add them to the component renderer
 :export {
