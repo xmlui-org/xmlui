@@ -1,10 +1,7 @@
-import { Callout } from "nextra/components";
-
 # TableOfContents [#component-tableofcontents]
 
-<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
-
-The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position.
+>[!WARNING]
+> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position.
 
 ## Properties
 
@@ -38,7 +35,6 @@ This component does not expose any methods.
 | [backgroundColor](../styles-and-themes/common-units/#color)-TableOfContentsItem-level-4 | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-TableOfContentsItem-level-5 | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-TableOfContentsItem-level-6 | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)-color-TableOfContentsItem | *none* | *none* |
 | [border](../styles-and-themes/common-units/#border)-style-TableOfContents | solid | solid |
 | [border](../styles-and-themes/common-units/#border)-style-TableOfContentsItem | solid | solid |
 | [border](../styles-and-themes/common-units/#border)-style-TableOfContentsItem--active | solid | solid |
@@ -52,7 +48,10 @@ This component does not expose any methods.
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem | 0 | 0 |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-TableOfContentsItem--active | 0 | 0 |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-TableOfContents | *none* | *none* |
+| [borderStyle](../styles-and-themes/common-units/#border-style)-TableOfContentsItem | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-TableOfContents | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem | *none* | *none* |
+| [borderWidth](../styles-and-themes/common-units/#size)-TableOfContentsItem--active | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-TableOfContentsItem | $textColor-primary | $textColor-primary |
 | [color](../styles-and-themes/common-units/#color)-TableOfContentsItem--active | $color-primary-500 | $color-primary-500 |
 | direction-TableOfContentsItem | *none* | *none* |
@@ -195,6 +194,7 @@ This component does not expose any methods.
 | textAlignLast-TableOfContentsItem-level-5 | *none* | *none* |
 | textAlignLast-TableOfContentsItem-level-6 | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem--hover | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem-level-1 | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem-level-2 | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-TableOfContentsItem-level-3 | *none* | *none* |

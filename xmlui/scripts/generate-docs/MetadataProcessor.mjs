@@ -604,7 +604,7 @@ function addComponentStatusDisclaimer(status) {
       disclaimer = "";
   }
 
-  return disclaimer !== "" ? `<Callout type="warning" emoji="📔">${disclaimer}</Callout>\n\n` : "";
+  return disclaimer !== "" ? `>[!WARNING]\n> ${disclaimer}` : "";
 }
 
 function appendArticleId(articleId) {
@@ -614,8 +614,8 @@ function appendArticleId(articleId) {
 
 function addNonVisualDisclaimer(isNonVisual) {
   return isNonVisual
-    ? "<Callout>**Note**: This component does not show up on the UI; " +
-        "it merely helps implement UI logic.</Callout>\n\n"
+    ? ">[!WARNING]\n> This component does not show up on the UI; " +
+        "it merely helps implement UI logic.\n\n"
     : "";
 }
 
