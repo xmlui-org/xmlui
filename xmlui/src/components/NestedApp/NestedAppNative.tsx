@@ -75,12 +75,15 @@ export function NestedApp({
 
   //console.log("mock", mock);
 
-  useLayoutEffect(() => {
-    if(!shadowRef.current && rootRef.current){
+  useEffect(() => {
+    if (!shadowRef.current && rootRef.current) {
       // Clone existing style and link tags
       shadowRef.current = rootRef.current.attachShadow({ mode: "open" });
       const styleSheets = document.querySelectorAll('style, link[rel="stylesheet"]');
       styleSheets.forEach((el) => {
+        if (el.hasAttribute("data-theme-root")) {
+          return;
+        }
         shadowRef.current.appendChild(el.cloneNode(true));
       });
     }
@@ -93,26 +96,31 @@ export function NestedApp({
     if (errors.length > 0) {
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
     }
-    const compoundComponents: CompoundComponentDef[] =
-      (components ?? []).map((src) => {
-        const isErrorReportComponent = typeof src !== "string";
-        if (isErrorReportComponent) {
-          return src;
-        }
-        let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
-          src as string,
-        );
-        if (errors.length > 0) {
-          return errReportComponent(errors, `nested xmlui`, erroneousCompoundComponentName);
-        }
-        return component;
-      });
+    const compoundComponents: CompoundComponentDef[] = (components ?? []).map((src) => {
+      const isErrorReportComponent = typeof src !== "string";
+      if (isErrorReportComponent) {
+        return src;
+      }
+      let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
+        src as string,
+      );
+      if (errors.length > 0) {
+        return errReportComponent(errors, `nested xmlui`, erroneousCompoundComponentName);
+      }
+      return component;
+    });
 
     let globalProps = {
       name: config?.name,
       ...(config?.appGlobals || {}),
       apiUrl: "",
     };
+
+    // css variables are leaking into to shadow dom, so we reset them here
+    const themeVarReset = {};
+    Object.keys(theme.themeStyles).forEach((key) => {
+      themeVarReset[key] = "initial";
+    });
 
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
@@ -150,7 +158,7 @@ export function NestedApp({
                 label="Reset the app"
               />
             </div>
-            <div style={{ height }}>
+            <div style={{ height, ...themeVarReset }}>
               <AppRoot
                 key={`app-${nestedAppId}-${refreshVersion}`}
                 previewMode={true}
@@ -186,6 +194,7 @@ export function NestedApp({
     mock,
     nestedAppId,
     refreshVersion,
+    theme.themeStyles,
     title,
     toneToApply,
   ]);
