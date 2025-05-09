@@ -6,7 +6,7 @@ class LoggerService {
   private isDev: boolean;
 
   private constructor() {
-    this.isDev = import.meta.env?.MODE === "development" || process.env.NODE_ENV === "development";
+    this.isDev = process.env.NODE_ENV === "development" || !!process.env.VITE_DEV_MODE;
   }
 
   public static getInstance(): LoggerService {
