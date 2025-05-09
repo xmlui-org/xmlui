@@ -850,15 +850,15 @@ test("can submit with invisible required field", async ({
   initTestBed,
   createFormDriver,
   createFormItemDriver,
-  createOptionDriver,
   createTextBoxDriver,
+  page
 }) => {
   const { testStateDriver } = await initTestBed(`
     <Form onSubmit="testState = true">
       <FormItem testId="select" bindTo="authenticationType"
         type="select" label="Authentication Type:" initialValue="{0}">
         <Option value="{0}" label="Password" />
-        <Option value="{1}" label="Public Key" testId="publicKey" />
+        <Option value="{1}" label="Public Key" />
       </FormItem>
       <FormItem label="name1" testId="name1" bindTo="name1"
         required="true" when="{$data.authenticationType === 0}"/>
@@ -868,12 +868,11 @@ test("can submit with invisible required field", async ({
   `);
   const formDriver = await createFormDriver();
   const selectDriver = await createFormItemDriver("select");
-  const optionDriver = await createOptionDriver("publicKey");
   const textfieldElement = (await createFormItemDriver("name2")).input;
   const textfieldDriver = await createTextBoxDriver(textfieldElement);
 
   await selectDriver.component.click();
-  await optionDriver.click();
+  await page.getByLabel("Public Key").click();
   await textfieldDriver.field.fill("John");
   await formDriver.submitForm();
 

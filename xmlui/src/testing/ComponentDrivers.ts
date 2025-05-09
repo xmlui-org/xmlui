@@ -104,7 +104,7 @@ export class ComponentDriver {
   // NOTE: methods must be created using the arrow function notation.
   // Otherwise, the "this" will not be correctly bound to the class instance when destructuring.
 
-  click = async (options?: { timeout?: number }) => {
+  click = async (options?: {timeout?: number, force?: boolean}) => {
     await this.locator.click(options);
   };
 
@@ -336,9 +336,16 @@ export class RangeDriver extends ComponentDriver {}
 // --- Select
 
 export class SelectDriver extends ComponentDriver {
-  async selectOption(value: string) {
+  async selectLabel(value: string) {
     await this.locator.click();
-    await this.page.getByLabel(value).click();
+    await this.component.getByRole("option", {name: value}).or(this.page.getByRole("option", {name: value})).first().click({force: true});
+  }
+
+  async selectMultipleLabels(values: string[]) {
+    await this.locator.click();
+    for (const value of values) {
+      await this.component.getByRole("option", {name: value}).or(this.page.getByRole("option", {name: value})).first().click();
+    }
   }
 }
 
@@ -494,8 +501,8 @@ export class OptionDriver extends ComponentDriver {}
   NumberBoxDriver: NumberBoxDriver;
 };
 
-const driverConstructors: { 
-  [K in keyof DriverMap]: new (obj: ComponentDriverParams) => DriverMap[K] 
+const driverConstructors: {
+  [K in keyof DriverMap]: new (obj: ComponentDriverParams) => DriverMap[K]
 } = {
   TextBoxDriver,
   NumberBoxDriver
@@ -530,7 +537,7 @@ export class FormItemDriver extends ComponentDriver {
   get validationStatusTag() {
     return "data-validation-status";
   }
-  
+
   async getValidationStatusIndicator() {
     return this.component.locator(`[${this.validationStatusTag}]`);
   }

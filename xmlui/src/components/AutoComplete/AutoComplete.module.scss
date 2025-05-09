@@ -42,6 +42,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 
 .badgeListWrapper {
   outline: none;
+  width: 100%;
   display: flex;
   padding: t.$space-1 t.$space-2;
   min-height: 2.5rem; /* h-12 */

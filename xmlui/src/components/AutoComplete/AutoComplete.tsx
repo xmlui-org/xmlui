@@ -20,6 +20,10 @@ import {
   dFocus,
   dSetValueApi,
   dMulti,
+  dLabel,
+  dLabelPosition,
+  dLabelWidth,
+  dLabelBreak,
 } from "../metadata-helpers";
 import { AutoComplete } from "./AutoCompleteNative";
 
@@ -39,6 +43,10 @@ export const AutoCompleteMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
+    label: dLabel(),
+    labelPosition: dLabelPosition("top"),
+    labelWidth: dLabelWidth(COMP),
+    labelBreak: dLabelBreak(COMP),
     dropdownHeight: d("This property sets the height of the dropdown list."),
     multi: dMulti(),
     optionTemplate: dComponent(
@@ -110,6 +118,10 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         updateState={updateState}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
+        label={extractValue(node.props.label)}
+        labelPosition={extractValue(node.props.labelPosition)}
+        labelWidth={extractValue(node.props.labelWidth)}
+        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         placeholder={extractValue.asOptionalString(node.props.placeholder)}
