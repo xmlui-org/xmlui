@@ -22,9 +22,9 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
 
   /*
-  Default Github job runners have 4 cores
+  Default Github job runners have 4 cores (on public repos, 2 on privates)
   https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories */
-  workers: process.env.CI ? 4 : undefined,
+  workers: undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI ? [["github"], ["html"]] : [["html"]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

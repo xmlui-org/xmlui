@@ -121,4 +121,31 @@ test("context vars in formItems", async ({ page }) => {
   await expect(page.getByTestId("textBox").getByRole('textbox')).toHaveValue("hello {1 + 2}");
 });
 
+test("$data context var in form event handlers", async ({ page }) => {
+  await initApp(page, {
+    entryPoint: `
+    <Fragment var.dataFromSubmit="" var.dataFromCancel="" var.dataFromReset="">
+      <Form testId="form">
+        <FormItem bindTo="customText" testId="textBox"/>
+        <event name="submit" value="dataFromSubmit = $data.customText"/>
+        <event name="cancel" value="dataFromCancel = $data.customText"/>
+        <event name="reset" value="dataFromReset = $data.customText"/>
+      </Form>
+      <Text testId="dataFromSubmit">{dataFromSubmit}</Text>
+      <Text testId="dataFromCancel">{dataFromCancel}</Text>
+      <Text testId="dataFromReset">{dataFromReset}</Text>
+    </Fragment>
+    `,
+  });
+
+  await page.getByTestId("textBox").getByRole('textbox').fill("hello {1 + 2}");
+  await page.getByTestId("form").locator("button[type=button]").click();
+  await expect(page.getByTestId("dataFromCancel")).toHaveText("hello {1 + 2}");
+  await page.getByTestId("form").locator("button[type=submit]").click();
+  await expect(page.getByTestId("dataFromSubmit")).toHaveText("hello {1 + 2}");
+  //reset is called after submit
+  await expect(page.getByTestId("dataFromReset")).toHaveText("hello {1 + 2}");
+});
+
+
 
