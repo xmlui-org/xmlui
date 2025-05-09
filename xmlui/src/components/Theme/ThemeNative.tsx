@@ -55,7 +55,7 @@ export function Theme({
   toastDuration = 5000,
   themeVars = EMPTY_OBJECT,
   layoutContext,
-  children
+  children,
 }: Props) {
   const generatedId = useId();
 
@@ -160,7 +160,6 @@ export function Theme({
     allThemeVarsWithResolvedHierarchicalVars,
     getResourceUrl,
     getThemeVar,
-    themeVars
   ]);
 
   const { devToolsSize, devToolsSide, devToolsEnabled } = useDevTools();
@@ -184,7 +183,7 @@ export function Theme({
           {!!faviconUrl && <link rel="icon" type="image/svg+xml" href={faviconUrl} />}
           {fontLinks?.map((fontLink) => <link href={fontLink} rel={"stylesheet"} key={fontLink} />)}
         </Helmet>
-        <style type="text/css">{`.${className}  {${css}}`}</style>
+        <style type="text/css" data-theme-root={true}>{`.${className}  {${css}}`}</style>
         <div
           style={inspectStyle}
           id={"_ui-engine-theme-root"}

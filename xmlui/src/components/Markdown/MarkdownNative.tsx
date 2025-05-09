@@ -26,14 +26,43 @@ type MarkdownProps = {
   codeHighlighter?: CodeHighlighter;
 };
 
+function PreTagComponent({ id, children, codeHighlighter }) {
+  // TEMP: After ironing out theming for syntax highlighting, this should be removed
+  const { activeThemeTone } = useTheme();
+    const defaultCodefence = (
+      <CodeBlock>
+        <Text uid={id} variant="codefence">
+          {children}
+        </Text>
+      </CodeBlock>
+    );
+
+    if (!codeHighlighter) {
+      return defaultCodefence;
+    }
+
+    const highlighterResult = parseMetaAndHighlightCode(children, codeHighlighter, activeThemeTone);
+    if (!highlighterResult) {
+      return defaultCodefence;
+    }
+    return (
+      <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
+        <Text
+          uid={id}
+          variant="codefence"
+          syntaxHighlightClasses={highlighterResult.classNames}
+          dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
+        />
+      </CodeBlock>
+    );
+}
+
 export const Markdown = memo(function Markdown({
   removeIndents = true,
   children,
   style,
   codeHighlighter,
 }: MarkdownProps) {
-  // TEMP: After ironing out theming for syntax highlighting, this should be removed
-  const { activeThemeTone } = useTheme();
   if (typeof children !== "string") {
     return null;
   }
@@ -111,38 +140,9 @@ export const Markdown = memo(function Markdown({
               </Text>
             );
           },
-          pre({ id, children }) {
-            const defaultCodefence = (
-              <CodeBlock>
-                <Text uid={id} variant="codefence">
-                  {children}
-                </Text>
-              </CodeBlock>
-            );
-
-            if (!codeHighlighter) {
-              return defaultCodefence;
-            }
-
-            const highlighterResult = parseMetaAndHighlightCode(
-              children,
-              codeHighlighter,
-              activeThemeTone,
-            );
-            if (!highlighterResult) {
-              return defaultCodefence;
-            }
-            return (
-              <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
-                <Text
-                  uid={id}
-                  variant="codefence"
-                  syntaxHighlightClasses={highlighterResult.classNames}
-                  dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
-                />
-              </CodeBlock>
-            );
-          },
+          pre({ id, children }){
+            return <PreTagComponent id={id} codeHighlighter={codeHighlighter}>{children}</PreTagComponent>;
+        },
           strong({ id, children }) {
             return (
               <Text uid={id} variant="strong">
