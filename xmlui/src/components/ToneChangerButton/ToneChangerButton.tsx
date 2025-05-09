@@ -17,11 +17,11 @@ function ToneChangerButton() {
   return (
     <Button
       variant="ghost"
-      style={{flexShrink: 0}}
-      icon={<Icon name={activeThemeTone === "light" ? "stars" : "sun"} />}
-      onClick={() => {
-        activeThemeTone === "light" ? setActiveThemeTone("dark") : setActiveThemeTone("light");
-      }}
+      style={{ flexShrink: 0 }}
+      icon={<Icon name={activeThemeTone === "light" ? "lightToDark" : "darkToLight"} />}
+      onClick={() =>
+        activeThemeTone === "light" ? setActiveThemeTone("dark") : setActiveThemeTone("light")
+      }
     />
   );
 }

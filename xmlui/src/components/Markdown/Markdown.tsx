@@ -34,33 +34,36 @@ export const MarkdownMd = createMetadata({
   },
 
   defaultThemeVars: {
+    "backgroundColor-Admonition": "$color-primary-100",
     "borderRadius-Admonition": "$space-2",
-    "iconSize-Admonition": "$space-6",
+    "border-Admonition": "1px solid $color-primary-300",
+    "iconSize-Admonition": "$space-5",
     "paddingLeft-Admonition": "$space-2",
     "paddingRight-Admonition": "$space-6",
-    "paddingVertical-Admonition": "$space-2",
-    "marginLeft-Admonition-content": "$space-2",
-    "marginTop-Admonition": "$space-6",
-    "marginBottom-Admonition": "$space-6",
-    "backgroundColor-Admonition": "$color-warn-200",
+    "paddingTop-Admonition": "$space-3",
+    "paddingBottom-Admonition": "$space-2",
+    "marginLeft-Admonition-content": "$space-1_5",
+    "marginTop-Admonition": "$space-7",
+    "marginBottom-Admonition": "$space-7",
 
-    "marginTop-Blockquote": "$space-6",
-    "marginBottom-Blockquote": "$space-6",
+    "marginTop-Blockquote": "$space-7",
+    "marginBottom-Blockquote": "$space-7",
     "paddingHorizontal-Blockquote": "$space-6",
-    "paddingTop-Blockquote": "$space-4",
+    "paddingTop-Blockquote": "$space-3",
     "paddingBottom-Blockquote": "$space-2_5",
-    "backgroundColor-Blockquote": "$color-warn-200",
+    "backgroundColor-Blockquote": "$color-surface-100",
     "accentWidth-Blockquote": "3px",
     "accentColor-Blockquote": "$color-surface-500",
 
-    "marginTop-HtmlLi": "$space-2",
-    "marginBottom-HtmlLi": "$space-2",
+    "marginTop-HtmlLi": "$space-2_5",
+    "marginBottom-HtmlLi": "$space-2_5",
 
     light: {
       // --- No light-specific theme vars
     },
     dark: {
-      // --- No dark-specific theme vars
+      "backgroundColor-Blockquote": "$color-surface-50",
+      "backgroundColor-Admonition": "$color-primary-200",
     },
   },
 });

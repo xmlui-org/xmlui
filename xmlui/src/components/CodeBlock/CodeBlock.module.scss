@@ -19,7 +19,6 @@ $backgroundColor-CodeBlock-highlight: createThemeVar("backgroundColor-CodeBlock-
 .codeBlock {
   @include t.borderVars($themeVars, "CodeBlock");
   @include t.paddingVars($themeVars, "CodeBlock");
-  border-radius: $borderRadius-CodeBlock;
   margin-top: $marginTop-CodeBlock;
   margin-bottom: $marginBottom-CodeBlock;
   background-color: $backgroundColor-CodeBlock;
@@ -38,8 +37,8 @@ $backgroundColor-CodeBlock-highlight: createThemeVar("backgroundColor-CodeBlock-
 
   .codeBlockCopyButton {
     position: absolute;
-    top: t.$space-1;
-    right: t.$space-1;
+    top: t.$space-1_5;
+    right: t.$space-1_5;
     z-index: 1;
     display: none;
     background-color: $backgroundColor-CodeBlock;

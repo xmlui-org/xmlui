@@ -15,8 +15,12 @@ export const CodeBlockMd = createMetadata({
     "backgroundColor-CodeBlock": "$color-surface-100",
     "backgroundColor-CodeBlock-header": "$color-primary-100",
     //"borderLeft-CodeBlock": "$color-surface-300 2px solid",
-    "marginTop-CodeBlock": "$space-4",
-    "marginBottom-CodeBlock": "$space-4",
+    "marginTop-CodeBlock": "$space-5",
+    "marginBottom-CodeBlock": "$space-5",
+
+    dark: {
+      "backgroundColor-CodeBlock-header": "$color-primary-200",
+    }
   },
 });
 

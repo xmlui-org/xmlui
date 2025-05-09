@@ -1127,7 +1127,7 @@ export const HtmlImgMd = createMetadata({
     loading: d("Specifies the loading behavior of the image"),
     referrerPolicy: d("Specifies the referrer policy for the image"),
     sizes: d("Specifies image sizes for different page layouts"),
-  },
+  }
 });
 
 export const htmlImgTagRenderer = createComponentRenderer(
@@ -1300,8 +1300,8 @@ export const HtmlLiMd = createMetadata({
     value: d("Specifies the value of the list item (if the parent is an ordered list)"),
   },
   defaultThemeVars: {
-    "marginLeft-HtmlLi": "$space-8",
-    "paddingLeft-HtmlLi": "$space-2",
+    "marginLeft-HtmlLi": "$space-6",
+    "paddingLeft-HtmlLi": "$space-1",
   }
 });
 
@@ -2387,8 +2387,8 @@ export const HtmlUlMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
   defaultThemeVars: {
-    "marginTop-HtmlUl": "$space-4",
-    "marginBottom-HtmlUl": "$space-4",
+    "marginTop-HtmlUl": "$space-2",
+    "marginBottom-HtmlUl": "$space-2",
   },
 });
 

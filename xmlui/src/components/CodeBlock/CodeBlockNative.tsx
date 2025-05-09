@@ -36,14 +36,14 @@ export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps)
           <Button
             variant="outlined"
             themeColor="primary"
-            size="xs"
+            size="sm"
             icon={<Icon name={"copy"} aria-hidden />}
             onClick={() => {
               if (!textToCopy) return;
               navigator.clipboard.writeText(textToCopy);
               toast.success("Code copied!");
             }}
-          >Copy</Button>
+          ></Button>
         </div>
       </div>
     </div>
