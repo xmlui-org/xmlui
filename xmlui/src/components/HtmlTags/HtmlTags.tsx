@@ -1127,7 +1127,7 @@ export const HtmlImgMd = createMetadata({
     loading: d("Specifies the loading behavior of the image"),
     referrerPolicy: d("Specifies the referrer policy for the image"),
     sizes: d("Specifies image sizes for different page layouts"),
-  },
+  }
 });
 
 export const htmlImgTagRenderer = createComponentRenderer(
@@ -1301,7 +1301,7 @@ export const HtmlLiMd = createMetadata({
   },
   defaultThemeVars: {
     "marginLeft-HtmlLi": "$space-6",
-    "paddingLeft-HtmlLi": "$space-2",
+    "paddingLeft-HtmlLi": "$space-1",
   }
 });
 

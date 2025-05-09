@@ -109,7 +109,7 @@ export const H2Md = createMetadata({
     [`fontSize-${H2}`]: "$fontSize-medium",
     [`marginTop-${H2}`]: "0",
     [`marginBottom-${H2}`]: "0",
-    [`marginTop-${H2}-markdown`]: "$space-9",
+    [`marginTop-${H2}-markdown`]: "$space-10",
     [`marginBottom-${H2}-markdown`]: "$space-3",
     light: {
       // --- No light-specific theme vars

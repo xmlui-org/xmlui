@@ -99,7 +99,7 @@ export const TextMd = createMetadata({
     [`fontWeight-${COMP}-tableheading`]: "$fontWeight-bold",
 
     [`marginTop-${COMP}-markdown`]: "$space-3",
-    [`marginBottom-${COMP}-markdown`]: "$space-3",
+    [`marginBottom-${COMP}-markdown`]: "$space-6",
     [`fontSize-${COMP}-markdown`]: "$fontSize-normal",
 
     [`backgroundColor-${COMP}-code`]: "$color-surface-100",
@@ -108,13 +108,13 @@ export const TextMd = createMetadata({
     [`borderColor-${COMP}-keyboard`]: "$color-surface-300",
     [`backgroundColor-${COMP}-marked`]: "yellow",
     [`color-${COMP}-placeholder`]: "$color-surface-500",
-    [`backgroundColor-${COMP}-codefence`]: "$color-surface-100",
+    [`backgroundColor-${COMP}-codefence`]: "#f2f7fc",
     [`color-${COMP}-codefence`]: "$color-surface-900",
     [`color-${COMP}-subheading`]: "$textColor-secondary",
     [`color-${COMP}-secondary`]: "$textColor-secondary",
 
     dark: {
-      [`backgroundColor-${COMP}-codefence`]: "$color-surface-50",
+      [`backgroundColor-${COMP}-codefence`]: "#112033",
     }
   },
 });

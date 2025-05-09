@@ -44,6 +44,7 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   h1 {
     margin-top: createThemeVar("marginTop-H1-markdown") !important;
     margin-bottom: createThemeVar("marginBottom-H1-markdown") !important;
+    font-size: createThemeVar("fontSize-H1-markdown") !important;
   }
 
   h2 {
