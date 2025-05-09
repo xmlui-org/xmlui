@@ -3,21 +3,25 @@ import {
   type Dispatch,
   type FormEvent,
   type ForwardedRef,
+  forwardRef,
   type ReactNode,
+  useEffect,
   useImperativeHandle,
+  useMemo,
+  useReducer,
   useRef,
+  useState,
 } from "react";
-import { forwardRef, useEffect, useMemo, useReducer, useState } from "react";
 import { flushSync } from "react-dom";
 import produce from "immer";
 
 import styles from "./Form.module.scss";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type {
   LookupEventHandlerFn,
   RegisterComponentApiFn,
+  RenderChildFn,
   ValueExtractor,
 } from "../../abstractions/RendererDefs";
 import type { ContainerAction } from "../../components-core/abstractions/containers";
@@ -44,7 +48,6 @@ import type { FormMd } from "./Form";
 import type { InteractionFlags, SingleValidationResult, ValidationResult } from "./FormContext";
 import { FormContext } from "./FormContext";
 import { get, set } from "lodash-es";
-
 
 export const getByPath = (obj: any, path: string) => {
   return get(obj, path);
@@ -161,7 +164,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
               validatedValue: state.subject[field],
             };
           }
-          
+
           state.validationResults[field].validations = [
             ...(state.validationResults[field]?.validations || []),
             ...((singleValidationResults as Array<SingleValidationResult>) || []),
@@ -203,6 +206,12 @@ const initialState: FormState = {
   resetVersion: 0,
 };
 
+type OnSubmit = (
+  params: Record<string, any> | undefined,
+  options: { passAsDefaultBody: boolean },
+) => Promise<void>;
+type OnCancel = () => void;
+type OnReset = () => void;
 type Props = {
   formState: FormState;
   dispatch: Dispatch<ContainerAction | FormAction>;
@@ -216,12 +225,9 @@ type Props = {
   saveInProgressLabel?: string;
   saveIcon?: string;
   swapCancelAndSave?: boolean;
-  onSubmit?: (
-    params: Record<string, any> | undefined,
-    options: { passAsDefaultBody: boolean },
-  ) => Promise<void>;
-  onCancel?: () => void;
-  onReset?: () => void;
+  onSubmit?: OnSubmit;
+  onCancel?: OnCancel;
+  onReset?: OnReset;
   buttonRow?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   itemLabelBreak?: boolean;
@@ -246,6 +252,19 @@ export const defaultProps: Pick<
   itemLabelBreak: true,
   keepModalOpenOnSubmit: false,
 };
+
+// --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
+function cleanUpSubject(subject: any) {
+  return Object.entries(subject || {}).reduce(
+    (acc, [key, value]) => {
+      if (!key.endsWith(UNBOUND_FIELD_SUFFIX)) {
+        acc[key] = value;
+      }
+      return acc;
+    },
+    {} as Record<string, any>,
+  );
+}
 
 const Form = forwardRef(function (
   {
@@ -328,13 +347,7 @@ const Form = forwardRef(function (
     const prevFocused = document.activeElement;
     dispatch(formSubmitting());
     try {
-      // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
-      const filteredSubject = Object.entries(formState.subject).reduce((acc, [key, value]) => {
-        if (!key.endsWith(UNBOUND_FIELD_SUFFIX)) {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as Record<string, any>);
+      const filteredSubject = cleanUpSubject(formState.subject);
 
       await onSubmit?.(filteredSubject, {
         passAsDefaultBody: true,
@@ -516,7 +529,7 @@ export function FormWithContextVar({
 }) {
   const [formState, dispatch] = useReducer(formReducer, initialState);
 
-  const nodeWithItem = useMemo(() => {
+  const $data = useMemo(() => {
     const updateData = (change: any) => {
       if (typeof change !== "object" || change === null || change === undefined) {
         return;
@@ -532,14 +545,18 @@ export function FormWithContextVar({
       });
     };
 
+    return { ...cleanUpSubject(formState.subject), update: updateData };
+  }, [formState.subject]);
+
+  const nodeWithItem = useMemo(() => {
     return {
       type: "Fragment",
       vars: {
-        $data: { ...formState.subject, update: updateData },
+        $data: $data,
       },
       children: node.children,
     };
-  }, [formState.subject, node.children]);
+  }, [$data, node.children]);
 
   const initialValue = extractValue(node.props.data);
   const submitMethod =
@@ -566,9 +583,20 @@ export function FormWithContextVar({
         defaultHandler: submitUrl
           ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs })`
           : undefined,
+        context: {
+          $data,
+        },
       })}
-      onCancel={lookupEventHandler("cancel")}
-      onReset={lookupEventHandler("reset")}
+      onCancel={lookupEventHandler("cancel", {
+        context: {
+          $data,
+        },
+      })}
+      onReset={lookupEventHandler("reset", {
+        context: {
+          $data,
+        },
+      })}
       initialValue={initialValue}
       buttonRow={renderChild(node.props.buttonRowTemplate)}
       registerComponentApi={registerComponentApi}

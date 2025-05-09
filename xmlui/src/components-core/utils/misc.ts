@@ -115,7 +115,7 @@ export const useEvent: useEventOverload = (callback) => {
 
   return useCallback((...args: any) => {
     const latestFn = callbackRef.current
-    return latestFn(...args);
+    return latestFn?.(...args);
   }, [callbackRef]);
 };
 

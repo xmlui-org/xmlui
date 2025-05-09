@@ -405,7 +405,8 @@ export const Container = memo(
           throw new Error("Invalid event handler");
         }
 
-        if (options?.ephemeral) {
+        //if we have a context or ephemeral event handler, we don't cache it (otherwise we would have stale reference for the context)
+        if (options?.ephemeral || options?.context) {
           return handler;
         }
         if (!fnsRef.current[uid]?.[fnCacheKey]) {
