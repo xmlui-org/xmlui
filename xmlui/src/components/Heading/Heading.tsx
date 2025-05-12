@@ -60,6 +60,10 @@ export const HeadingMd = createMetadata({
     [`textColor-${COMP}`]: "inherit",
     [`fontWeight-${COMP}`]: "$fontWeight-bold",
     [`letterSpacing-${COMP} `]: "0",
+    [`color-anchor-${COMP} `]: "$color-surface-400",
+    [`gap-anchor-${COMP} `]: "$space-2",
+    [`textDecorationLine-anchor-${COMP} `]: "underline",
+
     light: {
       // --- No light-specific theme vars
     },

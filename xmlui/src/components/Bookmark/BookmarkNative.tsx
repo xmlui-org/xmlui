@@ -33,7 +33,7 @@ export const Bookmark = ({
       return registerHeading?.({
         id: uid,
         level,
-        text: title || elementRef.current?.textContent?.trim() || uid,
+        text: title || elementRef.current?.textContent?.trim()?.replace(/#$/, "") || uid,
         anchor: elementRef.current,
       });
     }

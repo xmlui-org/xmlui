@@ -25,6 +25,9 @@ $themeVars: t.composeTextVars($themeVars, "H5");
 $themeVars: t.composeBorderVars($themeVars, "H6");
 $themeVars: t.composePaddingVars($themeVars, "H6");
 $themeVars: t.composeTextVars($themeVars, "H6");
+$color-anchor-Heading: createThemeVar("color-anchor-Heading");
+$gap-anchor-Heading: createThemeVar("gap-anchor-Heading");
+$textDecorationLine-anchor-Heading: createThemeVar("textDecorationLine-anchor-Heading");
 
 @mixin heading($level) {
   @include t.paddingVars($themeVars, $level);
@@ -64,9 +67,23 @@ $themeVars: t.composeTextVars($themeVars, "H6");
   &.h6 {
     @include heading("H6");
   }
+
+  a {
+    opacity: 0; // Hide the <a> element by default
+    margin-left: $gap-anchor-Heading;
+    color: $color-anchor-Heading;
+    transition: opacity 0.2s ease-in-out; // Smooth transition for visibility
+  }
+
+  &:hover {
+    a {
+      opacity: 1;
+      text-decoration: $textDecorationLine-anchor-Heading;
+    }
+  }
 }
 
-.anchorRef{
+.anchorRef {
   --my-scroll-margin-top: var(--header-height);
   width: 0;
   height: 0;

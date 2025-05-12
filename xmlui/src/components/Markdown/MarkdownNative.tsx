@@ -12,10 +12,7 @@ import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
 import { NestedApp } from "../NestedApp/NestedAppNative";
-import {
-  type CodeHighlighter,
-  parseMetaAndHighlightCode,
-} from "./highlight-code";
+import { type CodeHighlighter, parseMetaAndHighlightCode } from "./highlight-code";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
 
@@ -29,32 +26,32 @@ type MarkdownProps = {
 function PreTagComponent({ id, children, codeHighlighter }) {
   // TEMP: After ironing out theming for syntax highlighting, this should be removed
   const { activeThemeTone } = useTheme();
-    const defaultCodefence = (
-      <CodeBlock>
-        <Text uid={id} variant="codefence">
-          {children}
-        </Text>
-      </CodeBlock>
-    );
+  const defaultCodefence = (
+    <CodeBlock>
+      <Text uid={id} variant="codefence">
+        {children}
+      </Text>
+    </CodeBlock>
+  );
 
-    if (!codeHighlighter) {
-      return defaultCodefence;
-    }
+  if (!codeHighlighter) {
+    return defaultCodefence;
+  }
 
-    const highlighterResult = parseMetaAndHighlightCode(children, codeHighlighter, activeThemeTone);
-    if (!highlighterResult) {
-      return defaultCodefence;
-    }
-    return (
-      <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
-        <Text
-          uid={id}
-          variant="codefence"
-          syntaxHighlightClasses={highlighterResult.classNames}
-          dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
-        />
-      </CodeBlock>
-    );
+  const highlighterResult = parseMetaAndHighlightCode(children, codeHighlighter, activeThemeTone);
+  if (!highlighterResult) {
+    return defaultCodefence;
+  }
+  return (
+    <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
+      <Text
+        uid={id}
+        variant="codefence"
+        syntaxHighlightClasses={highlighterResult.classNames}
+        dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
+      />
+    </CodeBlock>
+  );
 }
 
 export const Markdown = memo(function Markdown({
@@ -68,6 +65,25 @@ export const Markdown = memo(function Markdown({
   }
 
   children = removeIndents ? removeTextIndents(children) : children;
+
+  const renderHeading = (level: string, children: ReactNode) => {
+    if (typeof children === "string") {
+      const [headingLabel, anchorId] = getCustomAnchor(children);
+      if (anchorId) {
+        const currentPath = window.location.href.replace(/(?<!\/)#.*$/, "");
+        const href = `${currentPath}#${anchorId}`;
+        return (
+          <Heading level={level} id={anchorId}>
+            {headingLabel}
+            <a href={href} id={anchorId} aria-label="Permalink for this section">
+              #
+            </a>
+          </Heading>
+        );
+      }
+    }
+    return <Heading level={level}>{children}</Heading>;
+  };
 
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
@@ -109,22 +125,22 @@ export const Markdown = memo(function Markdown({
             }
           },
           h1({ children }) {
-            return <Heading level="h1">{children}</Heading>;
+            return renderHeading("h1", children);
           },
           h2({ children }) {
-            return <Heading level="h2">{children}</Heading>;
+            return renderHeading("h2", children);
           },
           h3({ children }) {
-            return <Heading level="h3">{children}</Heading>;
+            return renderHeading("h3", children);
           },
           h4({ children }) {
-            return <Heading level="h4">{children}</Heading>;
+            return renderHeading("h4", children);
           },
           h5({ children }) {
-            return <Heading level="h5">{children}</Heading>;
+            return renderHeading("h5", children);
           },
           h6({ children }) {
-            return <Heading level="h6">{children}</Heading>;
+            return renderHeading("h6", children);
           },
           p({ id, children }) {
             return (
@@ -140,9 +156,13 @@ export const Markdown = memo(function Markdown({
               </Text>
             );
           },
-          pre({ id, children }){
-            return <PreTagComponent id={id} codeHighlighter={codeHighlighter}>{children}</PreTagComponent>;
-        },
+          pre({ id, children }) {
+            return (
+              <PreTagComponent id={id} codeHighlighter={codeHighlighter}>
+                {children}
+              </PreTagComponent>
+            );
+          },
           strong({ id, children }) {
             return (
               <Text uid={id} variant="strong">
@@ -294,6 +314,24 @@ function removeTextIndents(input: string): string {
   );
 
   return trimmedLines.join("\n");
+}
+
+function getCustomAnchor(value: string): [string, string] {
+  if (!value) {
+    return ["", ""];
+  }
+
+  // --- Match the pattern: "Heading text [#anchor]"
+  const match = value.match(/^(.*?)\s*\[#([^\]]+)\]$/);
+
+  if (match) {
+    const headingLabel = match[1].trim(); // Extract the heading text
+    const anchorId = match[2].trim(); // Extract the anchor ID
+    return [headingLabel, anchorId];
+  }
+
+  // If no match, return the full value as the heading label and an empty anchor ID
+  return [value.trim(), ""];
 }
 
 const HorizontalRule = () => {

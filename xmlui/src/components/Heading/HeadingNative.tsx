@@ -82,7 +82,7 @@ export const Heading = forwardRef(function Heading(
       return registerHeading?.({
         id: anchorId,
         level: parseInt(level.replace("h", "")),
-        text: elementRef.current.textContent!.trim(),
+        text: elementRef.current.textContent!.trim().replace(/#$/, ""), // Remove trailing #
         anchor: anchorRef.current,
       });
     }
