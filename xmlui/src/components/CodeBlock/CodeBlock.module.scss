@@ -10,11 +10,11 @@ $themeVars: t.composePaddingVars($themeVars, "CodeBlock");
 $themeVars: t.composeBorderVars($themeVars, "CodeBlock");
 $backgroundColor-CodeBlock: createThemeVar("backgroundColor-CodeBlock");
 $backgroundColor-CodeBlock-header: createThemeVar("backgroundColor-CodeBlock-header");
-$borderRadius-CodeBlock: createThemeVar("borderRadius-CodeBlock");
 $color-CodeBlock-headerSeparator: createThemeVar("color-CodeBlock-headerSeparator");
 $marginTop-CodeBlock: createThemeVar("marginTop-CodeBlock");
 $marginBottom-CodeBlock: createThemeVar("marginBottom-CodeBlock");
-$backgroundColor-CodeBlock-highlight: createThemeVar("backgroundColor-CodeBlock-highlight");
+$backgroundColor-CodeBlock-highlightRow: createThemeVar("backgroundColor-CodeBlock-highlightRow");
+$backgroundColor-CodeBlock-highlightString: createThemeVar("backgroundColor-CodeBlock-highlightString");
 
 .codeBlock {
   @include t.borderVars($themeVars, "CodeBlock");
@@ -48,6 +48,15 @@ $backgroundColor-CodeBlock-highlight: createThemeVar("backgroundColor-CodeBlock-
     .codeBlockCopyButton {
       display: block;
     }
+  }
+}
+
+:global {
+  .codeBlockHighlightRow {
+    background-color: $backgroundColor-CodeBlock-highlightRow;
+  }
+  .codeBlockHighlightString {
+    background-color: $backgroundColor-CodeBlock-highlightString;
   }
 }
 

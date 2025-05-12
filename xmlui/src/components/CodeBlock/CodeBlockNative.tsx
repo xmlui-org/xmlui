@@ -1,10 +1,7 @@
 import type React from "react";
 import styles from "./CodeBlock.module.scss";
 import { Text } from "../Text/TextNative";
-import {
-  type CodeHighlighterMeta,
-  CodeHighlighterMetaKeys,
-} from "../Markdown/highlight-code";
+import { type CodeHighlighterMeta, CodeHighlighterMetaKeys } from "./highlight-code";
 import { Button } from "../Button/ButtonNative";
 import Icon from "../Icon/IconNative";
 import toast from "react-hot-toast";
@@ -21,7 +18,11 @@ type CodeBlockProps = {
 
 export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps) {
   if (!meta) {
-    return <div className={styles.codeBlock} style={style}>{children}</div>;
+    return (
+      <div className={styles.codeBlock} style={style}>
+        {children}
+      </div>
+    );
   }
   return (
     <div className={styles.codeBlock} style={style}>
@@ -60,6 +61,10 @@ export function markdownCodeBlockParser() {
     visit(tree, "code", visitor);
   };
 
+  /**
+   * This visitor visits each node in the mdast tree and adds all meta information to the code block html element
+   * that we use later in the Markdown component.
+   */
   function visitor(node: CodeNode, _: number, parent: Parent | undefined) {
     const { lang, meta } = node;
     const nodeData = { hProperties: {} };
@@ -82,13 +87,25 @@ export function markdownCodeBlockParser() {
         if (item === "") return acc;
         if (item.indexOf("=") === -1) {
           if (item.startsWith("/") && item.endsWith("/")) {
-            acc[CodeHighlighterMetaKeys.highlightSubstrings.data] = item.substring(
-              1,
-              item.length - 1,
-            );
+            const unparsedSubstrings = acc[CodeHighlighterMetaKeys.highlightSubstrings.data];
+            const newItemBase64 = window.btoa(item.substring(1, item.length - 1));
+
+            if (!unparsedSubstrings) {
+              acc[CodeHighlighterMetaKeys.highlightSubstrings.data] = newItemBase64;
+            } else {
+              acc[CodeHighlighterMetaKeys.highlightSubstrings.data] =
+                `${unparsedSubstrings} ${newItemBase64}`;
+            }
           }
           if (item.startsWith("{") && item.endsWith("}")) {
-            acc[CodeHighlighterMetaKeys.highlightRows.data] = item.substring(1, item.length - 1);
+            const unparsedRows = acc[CodeHighlighterMetaKeys.highlightRows.data];
+            const newItem = item.substring(1, item.length - 1);
+
+            if (!unparsedRows) {
+              acc[CodeHighlighterMetaKeys.highlightRows.data] = newItem;
+            } else {
+              acc[CodeHighlighterMetaKeys.highlightRows.data] = `${unparsedRows}, ${newItem}`;
+            }
           }
           if (item === "copy") {
             acc[CodeHighlighterMetaKeys.copy.data] = "true";

@@ -12,7 +12,7 @@ import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
 import { NestedApp } from "../NestedApp/NestedAppNative";
-import { type CodeHighlighter, parseMetaAndHighlightCode } from "./highlight-code";
+import { type CodeHighlighter, parseMetaAndHighlightCode } from "../CodeBlock/highlight-code";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
 

@@ -1,5 +1,8 @@
 import { type ReactNode, isValidElement } from "react";
 
+const highlightRowsClass = "codeBlockHighlightRow";
+const highlightSubstringsClass = "codeBlockHighlightString";
+
 /**
  * This function handles two things:
  * 1. The extraction of meta information from code blocks and exposing them as data-meta attributes
@@ -14,11 +17,7 @@ export function parseMetaAndHighlightCode(
   themeTone?: string,
 ): HighlighterResults | null {
   const codeStr = mapTextContent(node);
-  const meta = extractMetaFromChildren(
-    node,
-    CodeHighlighterMetaKeysData,
-    codeStr.split("\n").length,
-  );
+  const meta = extractMetaFromChildren(node, CodeHighlighterMetaKeysData, codeStr);
 
   const { language, ...restMeta } = meta;
   if (language && codeHighlighter.availableLangs.includes(language)) {
@@ -93,7 +92,7 @@ function mapTextContent(node: ReactNode): string {
 function extractMetaFromChildren(
   node: ReactNode,
   keys: string[],
-  codeLength: number = 0,
+  code: string = "",
 ): CodeHighlighterMeta {
   if (!node) return {};
   if (typeof node === "string") return {};
@@ -124,44 +123,89 @@ function extractMetaFromChildren(
       [CodeHighlighterMetaKeys.rowNumbers.prop]: parseBoolean(
         meta[CodeHighlighterMetaKeys.rowNumbers.data],
       ),
-      [CodeHighlighterMetaKeys.highlightRows.prop]: meta[CodeHighlighterMetaKeys.highlightRows.data]
-        ? parseRowHighlights(meta[CodeHighlighterMetaKeys.highlightRows.data], codeLength)
-        : [],
-      [CodeHighlighterMetaKeys.highlightSubstrings.prop]: [], // TODO
+      [CodeHighlighterMetaKeys.highlightRows.prop]: parseRowHighlights(
+        code.split("\n").length,
+        meta[CodeHighlighterMetaKeys.highlightRows.data],
+      ),
+      [CodeHighlighterMetaKeys.highlightSubstrings.prop]: parseSubstringHighlights(
+        code,
+        meta[CodeHighlighterMetaKeys.highlightSubstrings.data],
+      ),
     };
   }
   return {};
 }
 
-function parseBoolean(str: string) {
+function parseBoolean(str?: string) {
   if (str === "true") return true;
   if (str === "false") return false;
   return false;
 }
 
-function parseRowHighlights(str: string, codeLines: number): ItemDecoration[] {
+function parseRowHighlights(codeLines: number, str?: string): ItemRowDecoration[] {
+  if (!str) return [];
   if (str === "") return [];
   return str
     .split(",")
     .map((item) => {
       item = item.trim();
-      const splitted = item.split("-");
-
-      const start = Number.isNaN(parseInt(splitted[0], 10)) ? -1 : parseInt(splitted[0], 10);
+      const split = item.split("-");
+      let start = 0;
       let end = 0;
-      if (splitted.length === 1) {
-        end = Number.isNaN(start + 1) ? -1 : start + 1;
-      } else {
-        end = Number.isNaN(parseInt(splitted[1], 10)) ? -1 : parseInt(splitted[1], 10);
-      }
 
-      return { start, end };
+      if (split.length === 0) return { start, end, properties: { class: highlightRowsClass } };
+      const val = parseAndRemoveIfInvalid(split[0]);
+      start = val - 1;
+
+      if (split.length === 1) {
+        end = val;
+      } else {
+        end = parseAndRemoveIfInvalid(split[1]);
+      }
+      return { start, end, properties: { class: highlightRowsClass } };
     })
     .filter((item) => {
       if (item.start === -1 || item.end === -1) return false;
       if (item.start > codeLines || item.end > codeLines) return false;
       return true;
     });
+
+  function parseAndRemoveIfInvalid(value: string): number {
+    const parsed = parseInt(value, 10);
+    if (Number.isNaN(parsed)) return -1;
+    if (parsed < 0) return -1;
+    if (parsed > codeLines) return -1;
+    return parsed;
+  }
+}
+
+function parseSubstringHighlights(code: string, str?: string): ItemRowDecoration[] {
+  if (!str) return [];
+  if (!code) return [];
+  return str
+    .split(" ")
+    .map((item) => window.atob(item))
+    .reduce((acc, item) => acc.concat(findAllNonOverlappingSubstrings(code, item)), []);
+
+  function findAllNonOverlappingSubstrings(str: string, code: string) {
+    const result: ItemRowDecoration[] = [];
+    let startIndex = 0;
+    const searchLength = code.length;
+
+    while (startIndex <= str.length - searchLength) {
+      const index = str.indexOf(code, startIndex);
+      if (index === -1) break;
+
+      result.push({
+        start: index,
+        end: index + searchLength,
+        properties: { class: highlightSubstringsClass },
+      });
+      startIndex = index + searchLength; // Jump past this match
+    }
+
+    return result;
+  }
 }
 
 export type CodeHighlighter = {
@@ -187,11 +231,15 @@ export type CodeHighlighterMeta = {
   copy?: boolean;
   filename?: string;
   rowNumbers?: boolean;
-  highlightRows?: ItemDecoration[];
+  highlightRows?: ItemRowDecoration[];
   highlightSubstrings?: number[];
 };
 
-type ItemDecoration = { start: number; end: number; className?: string };
+type ItemRowDecoration = {
+  start: number;
+  end: number;
+  properties: { class?: string; style?: string };
+};
 
 export const CodeHighlighterMetaKeys = {
   language: { data: "data-language", prop: "language" },

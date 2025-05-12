@@ -12,14 +12,17 @@ export const CodeBlockMd = createMetadata({
   props: {},
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "backgroundColor-CodeBlock": "$color-surface-100",
+    "backgroundColor-CodeBlock": "#f2f7fc", // "$color-surface-100"
     "backgroundColor-CodeBlock-header": "$color-primary-100",
-    //"borderLeft-CodeBlock": "$color-surface-300 2px solid",
     "marginTop-CodeBlock": "$space-5",
     "marginBottom-CodeBlock": "$space-5",
+    "backgroundColor-CodeBlock-highlightRow": "$color-surface-200",
+    "backgroundColor-CodeBlock-highlightString": "$color-surface-300",
 
     dark: {
       "backgroundColor-CodeBlock-header": "$color-primary-200",
+      "backgroundColor-CodeBlock": "#112033",
+      "backgroundColor-CodeBlock-highlightRow": "$color-surface-100",
     }
   },
 });
@@ -27,7 +30,7 @@ export const CodeBlockMd = createMetadata({
 export const codeBlockComponentRenderer = createComponentRenderer(
   "CodeBlock",
   CodeBlockMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, renderChild, layoutCss }) => {
     return (
       <CodeBlock style={layoutCss}>
         {renderChild(node.children)}
