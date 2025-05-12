@@ -108,14 +108,9 @@ export const TextMd = createMetadata({
     [`borderColor-${COMP}-keyboard`]: "$color-surface-300",
     [`backgroundColor-${COMP}-marked`]: "yellow",
     [`color-${COMP}-placeholder`]: "$color-surface-500",
-    [`backgroundColor-${COMP}-codefence`]: "#f2f7fc",
     [`color-${COMP}-codefence`]: "$color-surface-900",
     [`color-${COMP}-subheading`]: "$textColor-secondary",
     [`color-${COMP}-secondary`]: "$textColor-secondary",
-
-    dark: {
-      [`backgroundColor-${COMP}-codefence`]: "#112033",
-    }
   },
 });
 

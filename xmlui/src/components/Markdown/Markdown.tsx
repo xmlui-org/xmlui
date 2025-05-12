@@ -8,7 +8,7 @@ import type React from "react";
 import { useMemo } from "react";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { parseBindingExpression } from "./parse-binding-expr";
-import type { CodeHighlighter } from "./highlight-code";
+import type { CodeHighlighter } from "../CodeBlock/highlight-code";
 import { convertPlaygroundPatternToMarkdown, observePlaygroundPattern } from "./utils";
 
 const COMP = "Markdown";
