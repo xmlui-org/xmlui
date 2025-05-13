@@ -2239,7 +2239,7 @@ export const HtmlThMd = createMetadata({
     "padding-HtmlTh": "$space-2",
     "fontSize-HtmlTh": "$fontSize-tiny",
     "fontWeight-HtmlTh": "$fontWeight-bold",
-    "backgroundColor-HtmlTh--hover": "$color-surface-200",
+    //"backgroundColor-HtmlTh--hover": "$color-surface-200",
   },
 });
 
@@ -2314,7 +2314,7 @@ export const HtmlTrMd = createMetadata({
   defaultThemeVars: {
     "fontSize-HtmlTr": "$fontSize-small",
     "backgroundColor-row-HtmlTr": "inherit",
-    "backgroundColor-HtmlTr--hover": "$color-primary-50",
+    //"backgroundColor-HtmlTr--hover": "$color-primary-50",
   },
 });
 

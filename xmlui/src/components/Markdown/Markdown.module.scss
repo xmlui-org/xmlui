@@ -104,6 +104,27 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     border-radius: $borderRadius-Admonition;
     @include t.borderVars($themeVars, "Admonition");
     @include t.paddingVars($themeVars, "Admonition");
+
+    &.info {
+      background-color: createThemeVar("backgroundColor-Admonition-info");
+      border-color: createThemeVar("borderColor-Admonition-info");
+    }
+    &.warning {
+      background-color: createThemeVar("backgroundColor-Admonition-warning");
+      border-color: createThemeVar("borderColor-Admonition-warning");
+    }
+    &.danger {
+      background-color: createThemeVar("backgroundColor-Admonition-danger");
+      border-color: createThemeVar("borderColor-Admonition-danger");
+    }
+    &.note {
+      background-color: createThemeVar("backgroundColor-Admonition-note");
+      border-color: createThemeVar("borderColor-Admonition-note");
+    }
+    &.tip {
+      background-color: createThemeVar("backgroundColor-Admonition-tip");
+      border-color: createThemeVar("borderColor-Admonition-tip");
+    }
   }
 
   .admonitionContainer {
@@ -112,16 +133,13 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     align-items: flex-start;
   }
 
-  .admonitionContent {
-    margin-left: $marginLeft-Admonition-content;
-  }
-
   .admonitionIcon {
     font-size: $iconSize-Admonition;
     line-height: 1;
   }
 
   .admonitionContent {
+    margin-left: $marginLeft-Admonition-content;
     flex: 1;
     min-width: 0;
   }

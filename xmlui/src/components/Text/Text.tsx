@@ -78,6 +78,7 @@ export const TextMd = createMetadata({
     [`fontSize-${COMP}-sub`]: "$fontSize-smaller",
     [`verticalAlign-${COMP}-sub`]: "sub",
     [`fontStyle-${COMP}-var`]: "italic",
+    [`fontStyle-${COMP}-em`]: "italic",
     [`fontFamily-${COMP}-mono`]: "$fontFamily-monospace",
     [`fontSize-${COMP}-title`]: "$fontSize-large",
     [`fontSize-${COMP}-subtitle`]: "$fontSize-medium",

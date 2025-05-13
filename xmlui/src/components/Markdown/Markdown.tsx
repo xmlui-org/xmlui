@@ -35,8 +35,12 @@ export const MarkdownMd = createMetadata({
 
   defaultThemeVars: {
     "backgroundColor-Admonition": "$color-primary-100",
-    "borderRadius-Admonition": "$space-2",
     "border-Admonition": "1px solid $color-primary-300",
+    "backgroundColor-Admonition-warning": "$color-warn-100",
+    "borderColor-Admonition-warning": "$color-warn-300",
+    "backgroundColor-Admonition-danger": "$color-danger-100",
+    "borderColor-Admonition-danger": "$color-danger-300",
+    "borderRadius-Admonition": "$space-2",
     "iconSize-Admonition": "$space-5",
     "paddingLeft-Admonition": "$space-2",
     "paddingRight-Admonition": "$space-6",

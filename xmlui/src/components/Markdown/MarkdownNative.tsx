@@ -15,6 +15,7 @@ import { NestedApp } from "../NestedApp/NestedAppNative";
 import { type CodeHighlighter, parseMetaAndHighlightCode } from "../CodeBlock/highlight-code";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
+import classnames from "classnames";
 
 type MarkdownProps = {
   removeIndents?: boolean;
@@ -361,7 +362,7 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
   };
 
   // Extract all text content
-  const allText = React.Children.toArray(children).map(extractTextContent).join("");
+  const allText: string = React.Children.toArray(children).map(extractTextContent).join("");
 
   // Check for admonition pattern
   const match = allText.match(/\[!([A-Z]+)\]/);
@@ -411,7 +412,16 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
 
     // Render admonition blockquote with the updated structure
     return (
-      <blockquote className={styles.admonitionBlockquote} style={style}>
+      <blockquote
+        className={classnames(styles.admonitionBlockquote, {
+          [styles.info]: type === "info",
+          [styles.warning]: type === "warning",
+          [styles.danger]: type === "danger",
+          [styles.note]: type === "note",
+          [styles.tip]: type === "tip",
+        })}
+        style={style}
+      >
         <div className={styles.admonitionContainer}>
           <div className={`${styles.admonitionIcon} ${styles[type] || ""}`}>
             {emojiMap[type] || "💡"}
