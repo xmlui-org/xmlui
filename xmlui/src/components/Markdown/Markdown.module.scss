@@ -146,7 +146,8 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
 
   .admonitionBlockquote {
     .admonitionContent {
-      [class*="text_"][class*="markdown_"] {
+      [class*="text_"][class*="markdown_"],
+      ul, ol {
         margin-top: 0;
         margin-bottom: 0;
       }

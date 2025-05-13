@@ -1489,8 +1489,8 @@ export const HtmlOlMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
   defaultThemeVars: {
-    "marginTop-HtmlOl": "$space-4",
-    "marginBottom-HtmlOl": "$space-4",
+    "marginTop-HtmlOl": "$space-5",
+    "marginBottom-HtmlOl": "$space-5",
   },
 });
 
@@ -2387,8 +2387,8 @@ export const HtmlUlMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
   defaultThemeVars: {
-    "marginTop-HtmlUl": "$space-2",
-    "marginBottom-HtmlUl": "$space-2",
+    "marginTop-HtmlUl": "$space-5",
+    "marginBottom-HtmlUl": "$space-5",
   },
 });
 
