@@ -12,6 +12,14 @@
     "./packages/*"
   ],
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.15.0"
+    "@changesets/cli": "^2.29.4",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "turbo": "^2.5.3"
+  },
+  "packageManager": "npm@10.9.2",
+  "scripts": {
+    "build-xmlui": "turbo run build:xmlui-all --filter=xmlui",
+    "test-xmlui": "turbo run build:xmlui-all test:xmlui-all --filter=xmlui --filter=xmlui-e2e",
+    "test-xmlui-smoke": "turbo run build:xmlui-all test:xmlui-smoke --filter=xmlui --filter=xmlui-e2e"
   }
 }

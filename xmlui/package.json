@@ -4,7 +4,7 @@
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
-    "build:test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
+    "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
     "build:bin": "tsc -p tsconfig.bin.json",
     "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
@@ -12,9 +12,8 @@
     "build:ext-meta": "node scripts/build-extension-packages/build-extension-packages.mjs",
     "build": "rimraf dist && tsc && npm run build:bin && npm run build:xmlui-metadata && npm run build:xmlui && npm run build:xmlui-standalone",
     "build:extensions": "cd ../packages/xmlui-animations && npm run build && cd ../xmlui-charts && npm run build && cd ../xmlui-pdf && npm run build && cd ../xmlui-spreadsheet && cd ../xmlui-devtools && npm run build && npm run build",
-    "test": "npm run test:unit",
     "test:unit": "vitest run",
-    "test:e2e": "playwright test",
+    "test:2e2-non-smoke": "playwright test --project non-smoke",
     "test:e2e-smoke": "playwright test --project smoke",
     "test:e2e-ui": "npm run test:e2e -- --ui",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
@@ -163,29 +162,29 @@
       "bin": {
         "xmlui": "dist/scripts/bin/bootstrap.js"
       },
-      "main": "./dist/xmlui.umd.js",
-      "module": "./dist/xmlui.mjs",
-      "types": "./dist/xmlui.d.ts",
+      "main": "./dist/standalone/xmlui-standalone.umd.js",
+      "module": "./dist/lib/xmlui.mjs",
+      "types": "./dist/lib/xmlui.d.ts",
       "exports": {
         ".": {
-          "import": "./dist/xmlui.mjs",
-          "require": "./dist/xmlui.umd.js"
+          "import": "./dist/lib/xmlui.mjs",
+          "require": "./dist/standalone/xmlui-standalone.umd.js"
         },
         "./language-server": {
-          "import": "./dist/language-server.mjs",
-          "require": "./dist/language-server.mjs"
+          "import": "./dist/lib/language-server.mjs",
+          "require": "./dist/lib/language-server.mjs"
         },
         "./language-server-web-worker": {
-          "import": "./dist/language-server-web-worker.mjs",
-          "require": "./dist/language-server-web-worker.mjs"
+          "import": "./dist/lib/language-server-web-worker.mjs",
+          "require": "./dist/lib/language-server-web-worker.mjs"
         },
         "./parser": {
-          "import": "./dist/xmlui-parser.mjs",
-          "require": "./dist/xmlui-parser.mjs"
+          "import": "./dist/lib/xmlui-parser.mjs",
+          "require": "./dist/lib/xmlui-parser.mjs"
         },
         "./*.css": {
-          "import": "./dist/*.css",
-          "require": "./dist/*.css"
+          "import": "./dist/lib/*.css",
+          "require": "./dist/lib/*.css"
         },
         "./index.scss": {
           "import": "./src/index.scss",

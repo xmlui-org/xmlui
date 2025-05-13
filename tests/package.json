@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "start": "xmlui start",
-    "build": "xmlui build --build-mode=INLINE_ALL --withMock --withHostingMetaFiles",
-    "test": "playwright test",
+    "build:test-bed": "xmlui build --build-mode=INLINE_ALL --withMock --withHostingMetaFiles",
+    "test:e2e-smoke": "playwright test",
     "test-ui": "npm run test -- --ui"
   },
   "dependencies": {

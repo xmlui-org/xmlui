@@ -12,7 +12,7 @@ import { defineConfig, devices } from "@playwright/test";
  * See https://playwright.dev/docs/test-configuration.
  */
 
-const port = 3210;
+const port = 3211;
 export default defineConfig({
   testDir: "./src/components",
   /* Run tests in files in parallel */
