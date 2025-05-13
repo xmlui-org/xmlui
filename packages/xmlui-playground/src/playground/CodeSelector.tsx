@@ -4,7 +4,7 @@ import selectStyles from "./Select.module.scss";
 import { usePlayground } from "../hooks/usePlayground";
 import { contentChanged } from "../state/store";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
-import { CompoundComponentDef, ThemeDefinition } from "xmlui";
+import { CompoundComponentDef, ThemeDefinition, useTheme } from "xmlui";
 
 export const SelectItem = React.forwardRef(
   ({ children, className, ...props }: any, forwardedRef) => {
@@ -19,6 +19,8 @@ export const SelectItem = React.forwardRef(
 export const CodeSelector = () => {
   const { appDescription, options, dispatch } = usePlayground();
   const [open, setOpen] = React.useState(false);
+  const {root} = useTheme();
+
   const selectedValue = useMemo(() => {
     let content = "";
     if (options.content === "app") {
@@ -53,7 +55,7 @@ export const CodeSelector = () => {
           {open ? <HiChevronUp /> : <HiChevronDown />}
         </RadixSelect.Icon>
       </RadixSelect.Trigger>
-      <RadixSelect.Portal>
+      <RadixSelect.Portal container={root}>
         <RadixSelect.Content
           className={selectStyles.RadixMenuContent}
           side="bottom"

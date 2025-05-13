@@ -7,19 +7,19 @@ import * as RadixMenu from "@radix-ui/react-dropdown-menu";
 import { FiCheck } from "react-icons/fi";
 import { activeThemeChanged } from "../state/store";
 import { forwardRef } from "react";
+import { useTheme } from "xmlui";
 
 export const ThemeSwitcher = forwardRef<HTMLButtonElement>((props, ref) => {
   const { appDescription, options, dispatch } = usePlayground();
+  const { root } = useTheme();
 
   return (
     <RadixMenu.Root modal={false}>
       <RadixMenu.Trigger className={styles.button} ref={ref} {...props}>
         <MdOutlinePalette />
       </RadixMenu.Trigger>
-      <RadixMenu.Portal>
-        <RadixMenu.Content
-          className={classnames(styles.RadixMenuContent)}
-        >
+      <RadixMenu.Portal container={root}>
+        <RadixMenu.Content className={classnames(styles.RadixMenuContent)}>
           <RadixMenu.Label className={styles.RadixMenuLabel}>Theme</RadixMenu.Label>
           <RadixMenu.RadioGroup
             className={styles.RadixMenuRadioGroup}

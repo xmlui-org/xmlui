@@ -1,3 +1,5 @@
+@use "xmlui/themes.scss" as themes;
+
 .button {
   padding: .5rem 1rem;
 }
@@ -7,7 +9,7 @@
   flex-direction: column;
   min-width: 100px;
   width: fit-content;
-  background-color: hsl(var(--nextra-primary-hue), var(--nextra-primary-saturation), 100%, 1);
+  background-color: themes.$backgroundColor;
   border-radius: 6px;
   padding: 5px;
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
@@ -73,7 +75,6 @@
 :is(html[class~=dark] .RadixMenuRadioItem[data-highlighted], .RadixMenuItem[data-highlighted]) {
   background-color: hsl(var(--nextra-primary-hue) var(--nextra-primary-saturation) 94%/.05);
   --tw-text-opacity: 1;
-  color: hsl(var(--nextra-primary-hue) var(--nextra-primary-saturation) 45%/var(--tw-text-opacity));
 }
 
 .RadixMenuLabel {
@@ -86,7 +87,6 @@
 .RadixMenuSeparator {
   height: 1px;
   --tw-text-opacity: 1;
-  background-color: hsl(var(--nextra-primary-hue) var(--nextra-primary-saturation) 45%/var(--tw-text-opacity));
   margin: 5px;
 }
 

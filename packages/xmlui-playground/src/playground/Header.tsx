@@ -38,7 +38,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
         },
       };
       const appQueryString = await createQueryString(JSON.stringify(data));
-      window.open(`/playground#${appQueryString}`, "_blank");
+      window.open(`/#/playground#${appQueryString}`, "_blank");
     },
     [
       appDescription,

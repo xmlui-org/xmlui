@@ -1,3 +1,5 @@
+@use "xmlui/themes.scss" as themes;
+
 .SelectTrigger {
   display: inline-flex;
   align-items: center;
@@ -45,7 +47,7 @@
   flex-direction: column;
   min-width: 140px;
   width: fit-content;
-  background-color: hsl(var(--nextra-primary-hue), var(--nextra-primary-saturation), 100%, 1);
+  background-color: themes.$backgroundColor;
   border-radius: 6px;
   padding: 6px;
   gap: 5rem;
