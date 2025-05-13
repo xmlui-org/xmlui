@@ -1489,8 +1489,8 @@ export const HtmlOlMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
   defaultThemeVars: {
-    "marginTop-HtmlOl": "$space-4",
-    "marginBottom-HtmlOl": "$space-4",
+    "marginTop-HtmlOl": "$space-5",
+    "marginBottom-HtmlOl": "$space-5",
   },
 });
 
@@ -2239,7 +2239,7 @@ export const HtmlThMd = createMetadata({
     "padding-HtmlTh": "$space-2",
     "fontSize-HtmlTh": "$fontSize-tiny",
     "fontWeight-HtmlTh": "$fontWeight-bold",
-    "backgroundColor-HtmlTh--hover": "$color-surface-200",
+    //"backgroundColor-HtmlTh--hover": "$color-surface-200",
   },
 });
 
@@ -2314,7 +2314,7 @@ export const HtmlTrMd = createMetadata({
   defaultThemeVars: {
     "fontSize-HtmlTr": "$fontSize-small",
     "backgroundColor-row-HtmlTr": "inherit",
-    "backgroundColor-HtmlTr--hover": "$color-primary-50",
+    //"backgroundColor-HtmlTr--hover": "$color-primary-50",
   },
 });
 
@@ -2387,8 +2387,8 @@ export const HtmlUlMd = createMetadata({
   isHtmlTag: true,
   themeVars: parseScssVar(styles.themeVarsList), // Use only themeVarsList
   defaultThemeVars: {
-    "marginTop-HtmlUl": "$space-2",
-    "marginBottom-HtmlUl": "$space-2",
+    "marginTop-HtmlUl": "$space-5",
+    "marginBottom-HtmlUl": "$space-5",
   },
 });
 

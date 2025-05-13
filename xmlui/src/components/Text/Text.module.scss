@@ -47,6 +47,10 @@ $component: "Text";
     @include textVariant("cite");
   }
 
+  &.em {
+    @include textVariant("em");
+  }
+
   // --- Styling <pre><code> elements
 
   // codefence/<pre> elements are block level by default, even in another text element
