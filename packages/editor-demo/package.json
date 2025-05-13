@@ -96,10 +96,10 @@
     "react": "~19.0.0",
     "react-dom": "~19.0.0",
     "vscode": "npm:@codingame/monaco-vscode-extension-api@~15.0.2",
-    "vscode-languageclient": "~9.0.1",
-    "xmlui": "*"
+    "vscode-languageclient": "~9.0.1"
   },
   "devDependencies": {
+    "xmlui": "*",
     "vscode-languageserver-types": "~3.17.5"
   },
   "scripts": {
