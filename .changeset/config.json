@@ -7,5 +7,8 @@
   "access": "restricted",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["xmlui-e2e", "monaco-languageclient-examples"]
+  "ignore": ["xmlui-e2e", "monaco-languageclient-examples"],
+  "snapshot": {
+    "useCalculatedVersion": true
+  }
 }
