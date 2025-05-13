@@ -1,0 +1,26 @@
+.playgroundContent {
+  flex-grow: 1;
+  position: relative;
+  padding: 0 16px 16px 16px;
+  background-color: #E0EDF9;
+
+  &:focus-within{
+    z-index: 999;
+  }
+}
+
+.standaloneMode {
+  height: 100%;
+  padding: 0;
+  margin-top: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+:is(html[class~=dark]) {
+  .playgroundContent {
+    background-color: #020B1A;
+  }
+}
+
+
