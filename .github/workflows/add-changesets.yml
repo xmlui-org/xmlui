@@ -1,0 +1,39 @@
+name: Add Changeset from Conventional Commits (NPM)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  add_changeset:
+    if: github.event.pull_request.draft == false && github.actor != 'dependabot[bot]' && github.actor != 'renovate[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # No npm setup action needed like pnpm/action-setup
+      # actions/setup-node handles npm installation/caching
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22 # Or your Node.js version
+          cache: 'npm' # Use npm cache
+
+      - name: Install Dependencies
+        run: npm ci # Uses package-lock.json
+
+      - name: Create Changeset File
+        uses: TriPSs/conventional-changelog-action@v6.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          git-message: "chore: add generated changeset(s) [skip ci]"
+          skip-ci: "true"
+          # Configure type mappings if needed
