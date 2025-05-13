@@ -145,7 +145,7 @@ $themeVars: ();
 }
 
 .switch {
-  border: 2px solid createThemeVar("Input:borderColor-Switch");
+  border: 1px solid createThemeVar("Input:borderColor-Switch");
   width: 32px;
   height: 20px;
   border-radius: 1rem;
@@ -172,8 +172,9 @@ $themeVars: ();
   &::before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 1px;
     width: 16px;
     height: 16px;
     background: createThemeVar("backgroundColor-indicator-Switch");
@@ -191,7 +192,8 @@ $themeVars: ();
   }
 
   &:checked::before {
-    transform: translateX(calc(100% - 4px));
+    background: createThemeVar("backgroundColor-indicator-checked-Switch");
+    transform: translateX(calc(100% - 4px)) translateY(-50%);
   }
 }
 
