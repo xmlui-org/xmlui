@@ -1,0 +1,77 @@
+name: Component e2e nightly tests
+
+concurrency: # Concurrency ensures that only a single job or workflow using the same concurrency group will run at a time.
+  group: component-e2e-testing-nightly
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "39 1 * * *"
+jobs:
+  check-commit:
+    runs-on: ubuntu-latest
+    outputs:
+      should_test: ${{ steps.check.outputs.should_test }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        name: Determine if the commit has been tested already
+        run: |
+          current_time_epoch=$(date +%s)
+          last_commit_time_epoch=$(git log -1 --format=%ct)
+          one_day_epoch=$((60 * 60 * 24))
+          threshold_time=$((last_commit_time_epoch + one_day_epoch))
+
+          if [ $current_time_epoch -gt $threshold_time ]; then
+              echo "Last commit is older than 24 hours, skipping tests"
+              echo "should_test=false" >> $GITHUB_OUTPUT
+          else
+              echo "Last commit is within the last 24 hours, will not skip tests"
+              echo "should_test=true" >> $GITHUB_OUTPUT
+          fi
+  test:
+    needs: check-commit
+    if: needs.check-commit.outputs.should_test == 'true'
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+      - name: Install node dependencies
+        run: npm ci --prefer-offline
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+      - name: Store Playwright's Version
+        working-directory: xmlui
+        run: |
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: Cache Playwright Browsers for Playwright's Version
+        id: cache-playwright-browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Install Playwright Browsers
+        working-directory: xmlui
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+      - name: run some tests
+        run: npm run test-xmlui
+      - uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            xmlui/playwright-report/
+            tests/playwright-report/
+          retention-days: 30

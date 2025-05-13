@@ -13,8 +13,10 @@ export default ({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   let lib;
   let define;
+  let distSubDirName = "";
   switch (mode) {
     case "standalone": {
+      distSubDirName = "standalone";
       lib = {
         entry: [path.resolve("src", "index-standalone.ts")],
         name: "xmlui",
@@ -37,6 +39,7 @@ export default ({ mode }) => {
       break;
     }
     case "metadata": {
+      distSubDirName = "metadata";
       lib = {
         entry: [path.resolve("src", "components", "collectedComponentMetadata.ts")],
         name: "xmlui-metadata",
@@ -50,6 +53,7 @@ export default ({ mode }) => {
       break;
     }
     default: {
+      distSubDirName = "lib";
       lib = {
         entry: {
           xmlui: path.resolve("src", "index.ts"),
@@ -78,8 +82,8 @@ export default ({ mode }) => {
     },
     build: {
       minify:false,
-      emptyOutDir: false,
-      outDir: "dist",
+      emptyOutDir: true,
+      outDir: `dist/${distSubDirName}`,
       lib: lib,
       // minify: false,
       rollupOptions: {
