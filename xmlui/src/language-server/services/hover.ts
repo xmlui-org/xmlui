@@ -48,7 +48,7 @@ export function handleHoverCore(
             metaByComp: metaByComp,
             tagNameNode: parentNode,
             identNode: atNode,
-            getText,
+            getText
           });
         }
         case SyntaxKind.AttributeKeyNode: {

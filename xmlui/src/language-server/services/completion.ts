@@ -1,4 +1,4 @@
-import { MarkupContent, CompletionItem } from "vscode-languageserver";
+import type { MarkupContent, CompletionItem } from "vscode-languageserver";
 import { CompletionItemKind, MarkupKind } from "vscode-languageserver";
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
 import { FindTokenSuccess, findTokenAtPos } from "../../parsers/xmlui-parser/utils";
@@ -93,11 +93,15 @@ export function handleCompletion(
     case SyntaxKind.Identifier:
 
       const pathToElementNode = pathToNodeInAscendands(chainBeforePos, (n) => n.kind === SyntaxKind.ElementNode);
-      if (pathToElementNode && insideClosingTag(pathToElementNode)){
-        const elementNode = pathToElementNode.at(-1);
-        return matchingTagName(elementNode, metaByComp, getText);
+      const parentOfnodeBefore = chainBeforePos.at(-2);
+      const completeCompName = parentOfnodeBefore.kind === SyntaxKind.TagNameNode && position === nodeBefore.end
+      if (completeCompName){
+        if (pathToElementNode && insideClosingTag(pathToElementNode)){
+          const elementNode = pathToElementNode.at(-1);
+          return matchingTagName(elementNode, metaByComp, getText);
+        }
+        return allComponentNames(metaByComp);
       }
-      return allComponentNames(metaByComp);
   }
 
   const completeForProp = chainBeforePos.some(
