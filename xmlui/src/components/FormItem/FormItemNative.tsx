@@ -347,7 +347,6 @@ export const FormItem = memo(function FormItem({
       break;
     }
     case "text": {
-      console.log("gap", gap);
       formControl = (
         <TextBox
           {...rest}

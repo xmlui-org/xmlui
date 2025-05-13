@@ -155,6 +155,23 @@ export const RadioGroup = forwardRef(function RadioGroup(
   );
 });
 
+export function useRadioGroupValue() {
+  const context = useContext(RadioGroupValidationStatusContext);
+
+  if (!context) {
+    throw new Error("useRadioGroupValue must be used within a RadioGroup");
+  }
+
+  const { value } = context;
+
+  const isChecked = useCallback((optionValue: string) => value === optionValue, [value]);
+
+  return {
+    value,
+    isChecked,
+  };
+}
+
 export const RadioGroupOption = ({
   value,
   label,
@@ -164,6 +181,7 @@ export const RadioGroupOption = ({
 }: Option) => {
   const id = useId();
   const validationContext = useContext(RadioGroupValidationStatusContext);
+  const { isChecked } = useRadioGroupValue();
 
   const statusStyles = useMemo(
     () => ({
@@ -179,7 +197,9 @@ export const RadioGroupOption = ({
     () => (
       <>
         <InnerRadioGroup.Item
-          className={classnames(styles.radioOption, statusStyles)}
+          className={classnames(styles.radioOption, statusStyles, {
+            [styles.checked]: isChecked(value),
+          })}
           value={value}
           disabled={!enabled}
           id={id}
