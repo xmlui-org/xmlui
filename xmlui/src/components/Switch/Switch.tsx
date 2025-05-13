@@ -5,7 +5,6 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dAutoFocus,
-  dClick,
   dDidChange,
   dEnabled,
   dGotFocus,
@@ -66,9 +65,11 @@ export const SwitchMd = createMetadata({
     [`backgroundColor-checked-${COMP}-warning`]: `$borderColor-${COMP}-warning`,
     [`borderColor-checked-${COMP}-success`]: `$borderColor-${COMP}-success`,
     [`backgroundColor-checked-${COMP}-success`]: `$borderColor-${COMP}-success`,
-    [`backgroundColor-${COMP}`]: "$color-surface-400",
-    [`borderColor-${COMP}`]: "$color-surface-400",
-    [`backgroundColor-indicator-${COMP}`]: "$backgroundColor-primary",
+    [`backgroundColor-${COMP}`]: "$backgroundColor-primary",
+    [`borderColor-${COMP}`]: "$color-surface-200",
+    [`borderWidth-${COMP}`]: "1px",
+    [`backgroundColor-indicator-${COMP}`]: "$color-surface-200",
+    [`backgroundColor-indicator-checked-${COMP}`]: "$backgroundColor-primary",
     [`borderColor-checked-${COMP}`]: "$color-primary-500",
     [`backgroundColor-checked-${COMP}`]: "$color-primary-500",
     [`backgroundColor-${COMP}--disabled`]: "$color-surface-200",
