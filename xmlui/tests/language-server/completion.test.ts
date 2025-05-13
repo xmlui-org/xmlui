@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { handleCompletion, handleCompletionResolve } from "../../src/language-server/services/completion";
 import { createXmlUiParser } from "../../src/parsers/xmlui-parser";
 import { mockMetadata, mockMetadataProvider } from "./mockData";
-import { CompletionItem, CompletionItemKind, MarkupContent } from "vscode-languageserver";
+import type { CompletionItem, MarkupContent } from "vscode-languageserver";
+import { CompletionItemKind } from "vscode-languageserver";
 import { layoutOptionKeys } from "../../src/components-core/descriptorHelper";
 import { capitalizeFirstLetter } from "../../src/components-core/utils/misc";
 
@@ -16,13 +17,32 @@ describe('Completion', () => {
 
   it("lists all attribute names inside attribute key", () => {
     const attrNames = completeAtPoundSign("<Button a#b />").map(({label}) => label);
-    const expected = Object.keys(mockMetadata.Button.props);
-    expected.push(...Object.keys(mockMetadata.Button.events).map(key => "on" + capitalizeFirstLetter(key)));
-    expected.push("inspect")
-    expected.push("data")
-    expected.push("when")
-    expected.push(...layoutOptionKeys)
-    expectToContainExactly(attrNames, expected);
+    expectToContainExactly(attrNames, allButtonProps);
+  });
+
+  it("lists all attribute names after last attribute key", () => {
+    const attrNames = completeAtPoundSign("<Button ab# />").map(({label}) => label);
+    expectToContainExactly(attrNames, allButtonProps);
+  });
+
+  it("lists all attribute names after component name", () => {
+    const attrNames = completeAtPoundSign("<Button #/>").map(({label}) => label);
+    expectToContainExactly(attrNames, allButtonProps);
+  });
+
+  it("lists all attribute names after attribute", () => {
+    const attrNames = completeAtPoundSign('<Button label="hi" #/>').map(({label}) => label);
+    expectToContainExactly(attrNames, allButtonProps);
+  });
+
+  it("list only matching closing tag name", () => {
+    const completionLabels = completeAtPoundSign('<Button>ha</#>').map(({ label }) => label);
+    expectToContainExactly(completionLabels, ["Button"]);
+  });
+
+  it("don't list anything after matching closing tag name",{todo:true},() => {
+    const completionLabels = completeAtPoundSign('<Button>ha</Button #>').map(({label}) => label);
+    expect(completionLabels).toBeNull();
   });
 
   it("resolves component name", () => {
@@ -104,3 +124,10 @@ function expectToContainExactly<T>(actual: T[], expected: T[]) {
   expect(actual).toHaveLength(expected.length);
   expect(new Set(actual)).toEqual(new Set(expected));
 }
+
+const allButtonProps =  Object.keys(mockMetadata.Button.props);
+allButtonProps.push(...Object.keys(mockMetadata.Button.events).map(key => "on" + capitalizeFirstLetter(key)));
+allButtonProps.push("inspect")
+allButtonProps.push("data")
+allButtonProps.push("when")
+allButtonProps.push(...layoutOptionKeys)

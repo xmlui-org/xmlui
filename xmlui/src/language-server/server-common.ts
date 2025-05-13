@@ -110,7 +110,7 @@ export function start(connection: Connection){
       node: parseResult.node,
       getText,
       metaByComp: metadataProvider,
-      offsetToPosition: document.positionAt
+      offsetToPosition: (offset: number) => document.positionAt(offset)
     }
     return handleHover(ctx, document.offsetAt(position));
   });

@@ -5,7 +5,9 @@ import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./common/syntax-node-utilities";
 import * as docGen from "./common/docs-generation";
 import type { ComponentMetadataCollection, MetadataProvider } from "./common/metadata-utils";
-import { Hover, MarkupKind, Position } from "vscode-languageserver";
+import type { Hover,  Position } from "vscode-languageserver";
+import { MarkupKind } from "vscode-languageserver";
+
 
 type SimpleHover = null | {
   value: string;
@@ -46,7 +48,7 @@ export function handleHoverCore(
             metaByComp: metaByComp,
             tagNameNode: parentNode,
             identNode: atNode,
-            getText,
+            getText
           });
         }
         case SyntaxKind.AttributeKeyNode: {
