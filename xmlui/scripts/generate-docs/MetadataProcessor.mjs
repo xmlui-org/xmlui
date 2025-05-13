@@ -508,8 +508,9 @@ function findParent(metadata, component) {
 }
 
 function addParentLinkLine(parentName, componentDocsFolder) {
+  // TODO: Insert component link
   const result = parentName
-    ? `This component is inherited from <SmartLink href="/${componentDocsFolder}/${parentName}">${parentName}</SmartLink>`
+    ? `This component is inherited from \`${parentName}\``
     : "";
   return result ? `${result}\n\n` : "";
 }
@@ -523,15 +524,17 @@ function findSiblings(metadata, component) {
 }
 
 function addSiblingLinkLine(siblings = [], componentDocsFolder) {
-  const result =
-    siblings?.length > 0
-      ? `See also: ${siblings
-          .map((sibling) => {
-            return `<SmartLink href="/${componentDocsFolder}/${sibling.displayName}">${sibling.displayName}</SmartLink>`;
-          })
-          .join(", ")}`
-      : "";
-  return result ? `${result}\n\n` : "";
+  return "";
+  // TODO: Insert component link
+  // const result =
+  //   siblings?.length > 0
+  //     ? `See also: ${siblings
+  //         .map((sibling) => {
+  //           return `<SmartLink href="/${componentDocsFolder}/${sibling.displayName}">${sibling.displayName}</SmartLink>`;
+  //         })
+  //         .join(", ")}`
+  //     : "";
+  // return result ? `${result}\n\n` : "";
 }
 
 function copyImports(imports) {
