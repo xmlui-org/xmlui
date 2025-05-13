@@ -1,8 +1,9 @@
 // This file is auto-generated. Do not edit manually.
 export default {
   "a": {
-    "description": "This component renders an HTML `a` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `a` tag.",
+    "isHtmlTag": true,
     "props": {
       "href": {
         "description": "Specifies the URL of the page the link goes to"
@@ -31,17 +32,17 @@ export default {
       "disabled": {
         "description": "Specifies that the link should be disabled"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "address": {
-    "description": "This component renders an HTML `address` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `address` tag.",
     "isHtmlTag": true
   },
   "area": {
-    "description": "This component renders an HTML `area` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `area` tag.",
+    "isHtmlTag": true,
     "props": {
       "alt": {
         "description": "Specifies an alternate text for the area"
@@ -73,22 +74,22 @@ export default {
       "media": {
         "description": "Specifies a media query for the linked resource"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "article": {
-    "description": "This component renders an HTML `article` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `article` tag.",
     "isHtmlTag": true
   },
   "aside": {
-    "description": "This component renders an HTML `aside` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `aside` tag.",
     "isHtmlTag": true
   },
   "audio": {
-    "description": "This component renders an HTML `audio` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `audio` tag.",
+    "isHtmlTag": true,
     "props": {
       "autoPlay": {
         "description": "Specifies that the audio will start playing as soon as it is ready"
@@ -111,47 +112,47 @@ export default {
       "src": {
         "description": "Specifies the URL of the audio file"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "b": {
-    "description": "This component renders an HTML `b` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `b` tag.",
     "isHtmlTag": true
   },
   "bdi": {
-    "description": "This component renders an HTML `bdi` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `bdi` tag.",
     "isHtmlTag": true
   },
   "bdo": {
-    "description": "This component renders an HTML `bdo` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `bdo` tag.",
+    "isHtmlTag": true,
     "props": {
       "dir": {
         "description": "Specifies the text direction override"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "blockquote": {
-    "description": "This component renders an HTML `blockquote` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `blockquote` tag.",
+    "isHtmlTag": true,
     "props": {
       "cite": {
         "description": "Specifies the source of the quotation"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "br": {
-    "description": "This component renders an HTML `br` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `br` tag.",
     "isHtmlTag": true
   },
   "button": {
-    "description": "This component renders an HTML `button` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `button` tag.",
+    "isHtmlTag": true,
     "props": {
       "autoFocus": {
         "description": "Specifies that the button should automatically get focus when the page loads"
@@ -186,12 +187,12 @@ export default {
       "value": {
         "description": "Specifies the value associated with the button"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "canvas": {
-    "description": "This component renders an HTML `canvas` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `canvas` tag.",
+    "isHtmlTag": true,
     "props": {
       "width": {
         "description": "Specifies the width of the canvas"
@@ -199,67 +200,67 @@ export default {
       "height": {
         "description": "Specifies the height of the canvas"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "caption": {
-    "description": "This component renders an HTML `caption` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `caption` tag.",
     "isHtmlTag": true
   },
   "cite": {
-    "description": "This component renders an HTML `cite` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `cite` tag.",
     "isHtmlTag": true
   },
   "code": {
-    "description": "This component renders an HTML `code` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `code` tag.",
     "isHtmlTag": true
   },
   "col": {
-    "description": "This component renders an HTML `col` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `col` tag.",
+    "isHtmlTag": true,
     "props": {
       "span": {
         "description": "Specifies the number of columns a `col` element should span"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "colgroup": {
-    "description": "This component renders an HTML `colgroup` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `colgroup` tag.",
+    "isHtmlTag": true,
     "props": {
       "span": {
         "description": "Specifies the number of columns in a `colgroup`"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "data": {
-    "description": "This component renders an HTML `data` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `data` tag.",
+    "isHtmlTag": true,
     "props": {
       "value": {
         "description": "Specifies the machine-readable value of the element"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "datalist": {
-    "description": "This component renders an HTML `datalist` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `datalist` tag.",
     "isHtmlTag": true
   },
   "dd": {
-    "description": "This component renders an HTML `dd` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `dd` tag.",
     "isHtmlTag": true
   },
   "del": {
-    "description": "This component renders an HTML `del` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `del` tag.",
+    "isHtmlTag": true,
     "props": {
       "cite": {
         "description": "Specifies the source of the quotation"
@@ -267,57 +268,65 @@ export default {
       "dateTime": {
         "description": "Specifies the date and time of the edit"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "details": {
-    "description": "This component renders an HTML `details` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `details` tag.",
+    "isHtmlTag": true,
     "props": {
       "open": {
         "description": "Specifies that the details are visible (open)"
       }
     },
-    "isHtmlTag": true
+    "themeVars": {
+      "marginTop-HtmlDetails": "var(--xmlui-marginTop-HtmlDetails)",
+      "marginBottom-HtmlDetails": "var(--xmlui-marginBottom-HtmlDetails)"
+    },
+    "defaultThemeVars": {
+      "marginTop-HtmlDetails": "1rem",
+      "marginBottom-HtmlDetails": "1rem"
+    }
   },
   "dfn": {
-    "description": "This component renders an HTML `dfn` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `dfn` tag.",
     "isHtmlTag": true
   },
   "dialog": {
-    "description": "This component renders an HTML `dialog` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `dialog` tag.",
+    "isHtmlTag": true,
     "props": {
       "open": {
         "description": "Specifies that the dialog is open"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "div": {
-    "description": "This component renders an HTML `div` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `div` tag.",
     "isHtmlTag": true
   },
   "dl": {
-    "description": "This component renders an HTML `dl` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `dl` tag.",
     "isHtmlTag": true
   },
   "dt": {
-    "description": "This component renders an HTML `dt` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `dt` tag.",
     "isHtmlTag": true
   },
   "em": {
-    "description": "This component renders an HTML `em` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `em` tag.",
     "isHtmlTag": true
   },
   "embed": {
-    "description": "This component renders an HTML `embed` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `embed` tag.",
+    "isHtmlTag": true,
     "props": {
       "src": {
         "description": "Specifies the URL of the resource"
@@ -331,12 +340,12 @@ export default {
       "height": {
         "description": "Specifies the height of the embed"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "fieldset": {
-    "description": "This component renders an HTML `fieldset` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `fieldset` tag.",
+    "isHtmlTag": true,
     "props": {
       "disabled": {
         "description": "Specifies that the fieldset should be disabled"
@@ -347,27 +356,27 @@ export default {
       "name": {
         "description": "Specifies a name for the fieldset"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "figcaption": {
-    "description": "This component renders an HTML `figcaption` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `figcaption` tag.",
     "isHtmlTag": true
   },
   "figure": {
-    "description": "This component renders an HTML `figure` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `figure` tag.",
     "isHtmlTag": true
   },
   "footer": {
-    "description": "This component renders an HTML `footer` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `footer` tag.",
     "isHtmlTag": true
   },
   "form": {
-    "description": "This component renders an HTML `form` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `form` tag.",
+    "isHtmlTag": true,
     "props": {
       "acceptCharset": {
         "description": "Specifies the character encodings that are to be used for the form submission"
@@ -393,12 +402,12 @@ export default {
       "target": {
         "description": "Specifies where to display the response after submitting the form"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "h1": {
-    "description": "This component renders an HTML `h1` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `h1` tag.",
+    "isHtmlTag": true,
     "themeVars": {
       "marginTop-HtmlHeading": "var(--xmlui-marginTop-HtmlHeading)",
       "marginBottom-HtmlHeading": "var(--xmlui-marginBottom-HtmlHeading)"
@@ -406,12 +415,12 @@ export default {
     "defaultThemeVars": {
       "marginTop-HtmlHeading": "1rem",
       "marginBottom-HtmlHeading": ".5rem"
-    },
-    "isHtmlTag": true
+    }
   },
   "h2": {
-    "description": "This component renders an HTML `h2` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `h2` tag.",
+    "isHtmlTag": true,
     "themeVars": {
       "marginTop-HtmlHeading": "var(--xmlui-marginTop-HtmlHeading)",
       "marginBottom-HtmlHeading": "var(--xmlui-marginBottom-HtmlHeading)"
@@ -419,12 +428,12 @@ export default {
     "defaultThemeVars": {
       "marginTop-HtmlHeading": "1rem",
       "marginBottom-HtmlHeading": ".5rem"
-    },
-    "isHtmlTag": true
+    }
   },
   "h3": {
-    "description": "This component renders an HTML `h3` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `h3` tag.",
+    "isHtmlTag": true,
     "themeVars": {
       "marginTop-HtmlHeading": "var(--xmlui-marginTop-HtmlHeading)",
       "marginBottom-HtmlHeading": "var(--xmlui-marginBottom-HtmlHeading)"
@@ -432,12 +441,12 @@ export default {
     "defaultThemeVars": {
       "marginTop-HtmlHeading": "1rem",
       "marginBottom-HtmlHeading": ".5rem"
-    },
-    "isHtmlTag": true
+    }
   },
   "h4": {
-    "description": "This component renders an HTML `h4` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `h4` tag.",
+    "isHtmlTag": true,
     "themeVars": {
       "marginTop-HtmlHeading": "var(--xmlui-marginTop-HtmlHeading)",
       "marginBottom-HtmlHeading": "var(--xmlui-marginBottom-HtmlHeading)"
@@ -445,12 +454,12 @@ export default {
     "defaultThemeVars": {
       "marginTop-HtmlHeading": "1rem",
       "marginBottom-HtmlHeading": ".5rem"
-    },
-    "isHtmlTag": true
+    }
   },
   "h5": {
-    "description": "This component renders an HTML `h5` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `h5` tag.",
+    "isHtmlTag": true,
     "themeVars": {
       "marginTop-HtmlHeading": "var(--xmlui-marginTop-HtmlHeading)",
       "marginBottom-HtmlHeading": "var(--xmlui-marginBottom-HtmlHeading)"
@@ -458,12 +467,12 @@ export default {
     "defaultThemeVars": {
       "marginTop-HtmlHeading": "1rem",
       "marginBottom-HtmlHeading": ".5rem"
-    },
-    "isHtmlTag": true
+    }
   },
   "h6": {
-    "description": "This component renders an HTML `h6` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `h6` tag.",
+    "isHtmlTag": true,
     "themeVars": {
       "marginTop-HtmlHeading": "var(--xmlui-marginTop-HtmlHeading)",
       "marginBottom-HtmlHeading": "var(--xmlui-marginBottom-HtmlHeading)"
@@ -471,27 +480,27 @@ export default {
     "defaultThemeVars": {
       "marginTop-HtmlHeading": "1rem",
       "marginBottom-HtmlHeading": ".5rem"
-    },
-    "isHtmlTag": true
+    }
   },
   "header": {
-    "description": "This component renders an HTML `header` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `header` tag.",
     "isHtmlTag": true
   },
   "hr": {
-    "description": "This component renders an HTML `hr` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `hr` tag.",
     "isHtmlTag": true
   },
   "i": {
-    "description": "This component renders an HTML `i` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `i` tag.",
     "isHtmlTag": true
   },
   "iframe": {
-    "description": "This component renders an HTML `iframe` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `iframe` tag.",
+    "isHtmlTag": true,
     "props": {
       "src": {
         "description": "Specifies the URL of the page to embed"
@@ -523,12 +532,12 @@ export default {
       "referrerPolicy": {
         "description": "Specifies the referrer policy for the iframe"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "img": {
-    "description": "This component renders an HTML `img` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `img` tag.",
+    "isHtmlTag": true,
     "props": {
       "alt": {
         "description": "Specifies an alternate text for an image"
@@ -554,12 +563,12 @@ export default {
       "sizes": {
         "description": "Specifies image sizes for different page layouts"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "input": {
-    "description": "This component renders an HTML `input` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `input` tag.",
+    "isHtmlTag": true,
     "props": {
       "type": {
         "description": "Specifies the type of input"
@@ -618,12 +627,12 @@ export default {
       "step": {
         "description": "Specifies the legal number intervals for an input"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "ins": {
-    "description": "This component renders an HTML `ins` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `ins` tag.",
+    "isHtmlTag": true,
     "props": {
       "cite": {
         "description": "Specifies the source URL for the inserted text"
@@ -631,72 +640,76 @@ export default {
       "dateTime": {
         "description": "Specifies the date and time when the text was inserted"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "kbd": {
-    "description": "This component renders an HTML `kbd` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `kbd` tag.",
     "isHtmlTag": true
   },
   "label": {
-    "description": "This component renders an HTML `label` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `label` tag.",
+    "isHtmlTag": true,
     "props": {
       "htmlFor": {
         "description": "Specifies which form element a label is bound to"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "legend": {
-    "description": "This component renders an HTML `legend` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `legend` tag.",
     "isHtmlTag": true
   },
   "li": {
-    "description": "This component renders an HTML `li` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `li` tag.",
+    "isHtmlTag": true,
     "props": {
       "value": {
         "description": "Specifies the value of the list item (if the parent is an ordered list)"
       }
     },
-    "isHtmlTag": true
+    "defaultThemeVars": {
+      "marginLeft-HtmlLi": "$space-6",
+      "paddingLeft-HtmlLi": "$space-1"
+    }
   },
   "main": {
-    "description": "This component renders an HTML `main` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `main` tag.",
     "isHtmlTag": true
   },
   "map": {
-    "description": "This component renders an HTML `map` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `map` tag.",
+    "isHtmlTag": true,
     "props": {
       "name": {
         "description": "Specifies the name of the map"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "mark": {
-    "description": "This component renders an HTML `mark` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `mark` tag.",
     "isHtmlTag": true
   },
   "menu": {
-    "description": "This component renders an HTML `menu` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `menu` tag.",
+    "isHtmlTag": true,
     "props": {
       "type": {
         "description": "Specifies the type of the menu"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "meter": {
-    "description": "This component renders an HTML `meter` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `meter` tag.",
+    "isHtmlTag": true,
     "props": {
       "min": {
         "description": "Specifies the minimum value"
@@ -716,17 +729,17 @@ export default {
       "value": {
         "description": "Specifies the current value"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "nav": {
-    "description": "This component renders an HTML `nav` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `nav` tag.",
     "isHtmlTag": true
   },
   "object": {
-    "description": "This component renders an HTML `object` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `object` tag.",
+    "isHtmlTag": true,
     "props": {
       "data": {
         "description": "Specifies the URL of the resource"
@@ -746,27 +759,148 @@ export default {
       "height": {
         "description": "Specifies the height of the object"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "ol": {
-    "description": "This component renders an HTML `ol` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `ol` tag.",
+    "isHtmlTag": true,
     "themeVars": {
+      "border-HtmlOl": "var(--xmlui-border-HtmlOl)",
+      "borderHorizontal-HtmlOl": "var(--xmlui-borderHorizontal-HtmlOl, var(--xmlui-border-HtmlOl))",
+      "borderVertical-HtmlOl": "var(--xmlui-borderVertical-HtmlOl, var(--xmlui-border-HtmlOl))",
+      "borderLeft-HtmlOl": "var(--xmlui-borderLeft-HtmlOl, var(--xmlui-borderHorizontal-HtmlOl, var(--xmlui-border-HtmlOl)))",
+      "borderRight-HtmlOl": "var(--xmlui-borderRight-HtmlOl, var(--xmlui-borderHorizontal-HtmlOl, var(--xmlui-border-HtmlOl)))",
+      "borderTop-HtmlOl": "var(--xmlui-borderTop-HtmlOl, var(--xmlui-borderVertical-HtmlOl, var(--xmlui-border-HtmlOl)))",
+      "borderBottom-HtmlOl": "var(--xmlui-borderBottom-HtmlOl, var(--xmlui-borderVertical-HtmlOl, var(--xmlui-border-HtmlOl)))",
+      "borderWidth-HtmlOl": "var(--xmlui-borderWidth-HtmlOl)",
+      "borderHorizontalWidth-HtmlOl": "var(--xmlui-borderHorizontalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl))",
+      "borderLeftWidth-HtmlOl": "var(--xmlui-borderLeftWidth-HtmlOl, var(--xmlui-borderHorizontalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl)))",
+      "borderRightWidth-HtmlOl": "var(--xmlui-borderRightWidth-HtmlOl, var(--xmlui-borderHorizontalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl)))",
+      "borderVerticalWidth-HtmlOl": "var(--xmlui-borderVerticalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl))",
+      "borderTopWidth-HtmlOl": "var(--xmlui-borderTopWidth-HtmlOl, var(--xmlui-borderVerticalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl)))",
+      "borderBottomWidth-HtmlOl": "var(--xmlui-borderBottomWidth-HtmlOl, var(--xmlui-borderVerticalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl)))",
+      "borderStyle-HtmlOl": "var(--xmlui-borderStyle-HtmlOl)",
+      "borderHorizontalStyle-HtmlOl": "var(--xmlui-borderHorizontalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl))",
+      "borderLeftStyle-HtmlOl": "var(--xmlui-borderLeftStyle-HtmlOl, var(--xmlui-borderHorizontalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl)))",
+      "borderRightStyle-HtmlOl": "var(--xmlui-borderRightStyle-HtmlOl, var(--xmlui-borderHorizontalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl)))",
+      "borderVerticalStyle-HtmlOl": "var(--xmlui-borderVerticalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl))",
+      "borderTopStyle-HtmlOl": "var(--xmlui-borderTopStyle-HtmlOl, var(--xmlui-borderVerticalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl)))",
+      "borderBottomStyle-HtmlOl": "var(--xmlui-borderBottomStyle-HtmlOl, var(--xmlui-borderVerticalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl)))",
+      "borderColor-HtmlOl": "var(--xmlui-borderColor-HtmlOl)",
+      "borderHorizontalColor-HtmlOl": "var(--xmlui-borderHorizontalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl))",
+      "borderLeftColor-HtmlOl": "var(--xmlui-borderLeftColor-HtmlOl, var(--xmlui-borderHorizontalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl)))",
+      "borderRightColor-HtmlOl": "var(--xmlui-borderRightColor-HtmlOl, var(--xmlui-borderHorizontalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl)))",
+      "borderVerticalColor-HtmlOl": "var(--xmlui-borderVerticalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl))",
+      "borderTopColor-HtmlOl": "var(--xmlui-borderTopColor-HtmlOl, var(--xmlui-borderVerticalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl)))",
+      "borderBottomColor-HtmlOl": "var(--xmlui-borderBottomColor-HtmlOl, var(--xmlui-borderVerticalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl)))",
+      "borderStartStartRadius-HtmlOl": "var(--xmlui-borderStartStartRadius-HtmlOl, var(--xmlui-borderRadius-HtmlOl))",
+      "borderStartEndRadius-HtmlOl": "var(--xmlui-borderStartEndRadius-HtmlOl, var(--xmlui-borderRadius-HtmlOl))",
+      "borderEndStartRadius-HtmlOl": "var(--xmlui-borderEndStartRadius-HtmlOl, var(--xmlui-borderRadius-HtmlOl))",
+      "borderEndEndRadius-HtmlOl": "var(--xmlui-borderEndEndRadius-HtmlOl, var(--xmlui-borderRadius-HtmlOl))",
+      "padding-HtmlOl": "var(--xmlui-padding-HtmlOl)",
+      "paddingHorizontal-HtmlOl": "var(--xmlui-paddingHorizontal-HtmlOl, var(--xmlui-padding-HtmlOl))",
+      "paddingVertical-HtmlOl": "var(--xmlui-paddingVertical-HtmlOl, var(--xmlui-padding-HtmlOl))",
+      "paddingLeft-HtmlOl": "var(--xmlui-paddingLeft-HtmlOl, var(--xmlui-paddingHorizontal-HtmlOl, var(--xmlui-padding-HtmlOl)))",
+      "paddingRight-HtmlOl": "var(--xmlui-paddingRight-HtmlOl, var(--xmlui-paddingHorizontal-HtmlOl, var(--xmlui-padding-HtmlOl)))",
+      "paddingTop-HtmlOl": "var(--xmlui-paddingTop-HtmlOl, var(--xmlui-paddingVertical-HtmlOl, var(--xmlui-padding-HtmlOl)))",
+      "paddingBottom-HtmlOl": "var(--xmlui-paddingBottom-HtmlOl, var(--xmlui-paddingVertical-HtmlOl, var(--xmlui-padding-HtmlOl)))",
       "marginTop-HtmlOl": "var(--xmlui-marginTop-HtmlOl)",
       "marginBottom-HtmlOl": "var(--xmlui-marginBottom-HtmlOl)",
+      "border-HtmlUl": "var(--xmlui-border-HtmlUl)",
+      "borderHorizontal-HtmlUl": "var(--xmlui-borderHorizontal-HtmlUl, var(--xmlui-border-HtmlUl))",
+      "borderVertical-HtmlUl": "var(--xmlui-borderVertical-HtmlUl, var(--xmlui-border-HtmlUl))",
+      "borderLeft-HtmlUl": "var(--xmlui-borderLeft-HtmlUl, var(--xmlui-borderHorizontal-HtmlUl, var(--xmlui-border-HtmlUl)))",
+      "borderRight-HtmlUl": "var(--xmlui-borderRight-HtmlUl, var(--xmlui-borderHorizontal-HtmlUl, var(--xmlui-border-HtmlUl)))",
+      "borderTop-HtmlUl": "var(--xmlui-borderTop-HtmlUl, var(--xmlui-borderVertical-HtmlUl, var(--xmlui-border-HtmlUl)))",
+      "borderBottom-HtmlUl": "var(--xmlui-borderBottom-HtmlUl, var(--xmlui-borderVertical-HtmlUl, var(--xmlui-border-HtmlUl)))",
+      "borderWidth-HtmlUl": "var(--xmlui-borderWidth-HtmlUl)",
+      "borderHorizontalWidth-HtmlUl": "var(--xmlui-borderHorizontalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl))",
+      "borderLeftWidth-HtmlUl": "var(--xmlui-borderLeftWidth-HtmlUl, var(--xmlui-borderHorizontalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl)))",
+      "borderRightWidth-HtmlUl": "var(--xmlui-borderRightWidth-HtmlUl, var(--xmlui-borderHorizontalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl)))",
+      "borderVerticalWidth-HtmlUl": "var(--xmlui-borderVerticalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl))",
+      "borderTopWidth-HtmlUl": "var(--xmlui-borderTopWidth-HtmlUl, var(--xmlui-borderVerticalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl)))",
+      "borderBottomWidth-HtmlUl": "var(--xmlui-borderBottomWidth-HtmlUl, var(--xmlui-borderVerticalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl)))",
+      "borderStyle-HtmlUl": "var(--xmlui-borderStyle-HtmlUl)",
+      "borderHorizontalStyle-HtmlUl": "var(--xmlui-borderHorizontalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl))",
+      "borderLeftStyle-HtmlUl": "var(--xmlui-borderLeftStyle-HtmlUl, var(--xmlui-borderHorizontalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl)))",
+      "borderRightStyle-HtmlUl": "var(--xmlui-borderRightStyle-HtmlUl, var(--xmlui-borderHorizontalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl)))",
+      "borderVerticalStyle-HtmlUl": "var(--xmlui-borderVerticalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl))",
+      "borderTopStyle-HtmlUl": "var(--xmlui-borderTopStyle-HtmlUl, var(--xmlui-borderVerticalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl)))",
+      "borderBottomStyle-HtmlUl": "var(--xmlui-borderBottomStyle-HtmlUl, var(--xmlui-borderVerticalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl)))",
+      "borderColor-HtmlUl": "var(--xmlui-borderColor-HtmlUl)",
+      "borderHorizontalColor-HtmlUl": "var(--xmlui-borderHorizontalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl))",
+      "borderLeftColor-HtmlUl": "var(--xmlui-borderLeftColor-HtmlUl, var(--xmlui-borderHorizontalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl)))",
+      "borderRightColor-HtmlUl": "var(--xmlui-borderRightColor-HtmlUl, var(--xmlui-borderHorizontalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl)))",
+      "borderVerticalColor-HtmlUl": "var(--xmlui-borderVerticalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl))",
+      "borderTopColor-HtmlUl": "var(--xmlui-borderTopColor-HtmlUl, var(--xmlui-borderVerticalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl)))",
+      "borderBottomColor-HtmlUl": "var(--xmlui-borderBottomColor-HtmlUl, var(--xmlui-borderVerticalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl)))",
+      "borderStartStartRadius-HtmlUl": "var(--xmlui-borderStartStartRadius-HtmlUl, var(--xmlui-borderRadius-HtmlUl))",
+      "borderStartEndRadius-HtmlUl": "var(--xmlui-borderStartEndRadius-HtmlUl, var(--xmlui-borderRadius-HtmlUl))",
+      "borderEndStartRadius-HtmlUl": "var(--xmlui-borderEndStartRadius-HtmlUl, var(--xmlui-borderRadius-HtmlUl))",
+      "borderEndEndRadius-HtmlUl": "var(--xmlui-borderEndEndRadius-HtmlUl, var(--xmlui-borderRadius-HtmlUl))",
+      "padding-HtmlUl": "var(--xmlui-padding-HtmlUl)",
+      "paddingHorizontal-HtmlUl": "var(--xmlui-paddingHorizontal-HtmlUl, var(--xmlui-padding-HtmlUl))",
+      "paddingVertical-HtmlUl": "var(--xmlui-paddingVertical-HtmlUl, var(--xmlui-padding-HtmlUl))",
+      "paddingLeft-HtmlUl": "var(--xmlui-paddingLeft-HtmlUl, var(--xmlui-paddingHorizontal-HtmlUl, var(--xmlui-padding-HtmlUl)))",
+      "paddingRight-HtmlUl": "var(--xmlui-paddingRight-HtmlUl, var(--xmlui-paddingHorizontal-HtmlUl, var(--xmlui-padding-HtmlUl)))",
+      "paddingTop-HtmlUl": "var(--xmlui-paddingTop-HtmlUl, var(--xmlui-paddingVertical-HtmlUl, var(--xmlui-padding-HtmlUl)))",
+      "paddingBottom-HtmlUl": "var(--xmlui-paddingBottom-HtmlUl, var(--xmlui-paddingVertical-HtmlUl, var(--xmlui-padding-HtmlUl)))",
       "marginTop-HtmlUl": "var(--xmlui-marginTop-HtmlUl)",
-      "marginBottom-HtmlUl": "var(--xmlui-marginBottom-HtmlUl)"
+      "marginBottom-HtmlUl": "var(--xmlui-marginBottom-HtmlUl)",
+      "border-HtmlLi": "var(--xmlui-border-HtmlLi)",
+      "borderHorizontal-HtmlLi": "var(--xmlui-borderHorizontal-HtmlLi, var(--xmlui-border-HtmlLi))",
+      "borderVertical-HtmlLi": "var(--xmlui-borderVertical-HtmlLi, var(--xmlui-border-HtmlLi))",
+      "borderLeft-HtmlLi": "var(--xmlui-borderLeft-HtmlLi, var(--xmlui-borderHorizontal-HtmlLi, var(--xmlui-border-HtmlLi)))",
+      "borderRight-HtmlLi": "var(--xmlui-borderRight-HtmlLi, var(--xmlui-borderHorizontal-HtmlLi, var(--xmlui-border-HtmlLi)))",
+      "borderTop-HtmlLi": "var(--xmlui-borderTop-HtmlLi, var(--xmlui-borderVertical-HtmlLi, var(--xmlui-border-HtmlLi)))",
+      "borderBottom-HtmlLi": "var(--xmlui-borderBottom-HtmlLi, var(--xmlui-borderVertical-HtmlLi, var(--xmlui-border-HtmlLi)))",
+      "borderWidth-HtmlLi": "var(--xmlui-borderWidth-HtmlLi)",
+      "borderHorizontalWidth-HtmlLi": "var(--xmlui-borderHorizontalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi))",
+      "borderLeftWidth-HtmlLi": "var(--xmlui-borderLeftWidth-HtmlLi, var(--xmlui-borderHorizontalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi)))",
+      "borderRightWidth-HtmlLi": "var(--xmlui-borderRightWidth-HtmlLi, var(--xmlui-borderHorizontalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi)))",
+      "borderVerticalWidth-HtmlLi": "var(--xmlui-borderVerticalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi))",
+      "borderTopWidth-HtmlLi": "var(--xmlui-borderTopWidth-HtmlLi, var(--xmlui-borderVerticalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi)))",
+      "borderBottomWidth-HtmlLi": "var(--xmlui-borderBottomWidth-HtmlLi, var(--xmlui-borderVerticalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi)))",
+      "borderStyle-HtmlLi": "var(--xmlui-borderStyle-HtmlLi)",
+      "borderHorizontalStyle-HtmlLi": "var(--xmlui-borderHorizontalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi))",
+      "borderLeftStyle-HtmlLi": "var(--xmlui-borderLeftStyle-HtmlLi, var(--xmlui-borderHorizontalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi)))",
+      "borderRightStyle-HtmlLi": "var(--xmlui-borderRightStyle-HtmlLi, var(--xmlui-borderHorizontalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi)))",
+      "borderVerticalStyle-HtmlLi": "var(--xmlui-borderVerticalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi))",
+      "borderTopStyle-HtmlLi": "var(--xmlui-borderTopStyle-HtmlLi, var(--xmlui-borderVerticalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi)))",
+      "borderBottomStyle-HtmlLi": "var(--xmlui-borderBottomStyle-HtmlLi, var(--xmlui-borderVerticalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi)))",
+      "borderColor-HtmlLi": "var(--xmlui-borderColor-HtmlLi)",
+      "borderHorizontalColor-HtmlLi": "var(--xmlui-borderHorizontalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi))",
+      "borderLeftColor-HtmlLi": "var(--xmlui-borderLeftColor-HtmlLi, var(--xmlui-borderHorizontalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi)))",
+      "borderRightColor-HtmlLi": "var(--xmlui-borderRightColor-HtmlLi, var(--xmlui-borderHorizontalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi)))",
+      "borderVerticalColor-HtmlLi": "var(--xmlui-borderVerticalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi))",
+      "borderTopColor-HtmlLi": "var(--xmlui-borderTopColor-HtmlLi, var(--xmlui-borderVerticalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi)))",
+      "borderBottomColor-HtmlLi": "var(--xmlui-borderBottomColor-HtmlLi, var(--xmlui-borderVerticalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi)))",
+      "borderStartStartRadius-HtmlLi": "var(--xmlui-borderStartStartRadius-HtmlLi, var(--xmlui-borderRadius-HtmlLi))",
+      "borderStartEndRadius-HtmlLi": "var(--xmlui-borderStartEndRadius-HtmlLi, var(--xmlui-borderRadius-HtmlLi))",
+      "borderEndStartRadius-HtmlLi": "var(--xmlui-borderEndStartRadius-HtmlLi, var(--xmlui-borderRadius-HtmlLi))",
+      "borderEndEndRadius-HtmlLi": "var(--xmlui-borderEndEndRadius-HtmlLi, var(--xmlui-borderRadius-HtmlLi))",
+      "padding-HtmlLi": "var(--xmlui-padding-HtmlLi)",
+      "paddingHorizontal-HtmlLi": "var(--xmlui-paddingHorizontal-HtmlLi, var(--xmlui-padding-HtmlLi))",
+      "paddingVertical-HtmlLi": "var(--xmlui-paddingVertical-HtmlLi, var(--xmlui-padding-HtmlLi))",
+      "paddingLeft-HtmlLi": "var(--xmlui-paddingLeft-HtmlLi, var(--xmlui-paddingHorizontal-HtmlLi, var(--xmlui-padding-HtmlLi)))",
+      "paddingRight-HtmlLi": "var(--xmlui-paddingRight-HtmlLi, var(--xmlui-paddingHorizontal-HtmlLi, var(--xmlui-padding-HtmlLi)))",
+      "paddingTop-HtmlLi": "var(--xmlui-paddingTop-HtmlLi, var(--xmlui-paddingVertical-HtmlLi, var(--xmlui-padding-HtmlLi)))",
+      "paddingBottom-HtmlLi": "var(--xmlui-paddingBottom-HtmlLi, var(--xmlui-paddingVertical-HtmlLi, var(--xmlui-padding-HtmlLi)))",
+      "marginLeft-HtmlLi": "var(--xmlui-marginLeft-HtmlLi)",
+      "marginTop-HtmlLi": "var(--xmlui-marginTop-HtmlLi)",
+      "marginBottom-HtmlLi": "var(--xmlui-marginBottom-HtmlLi)",
+      "listStyleType-HtmlLi": "var(--xmlui-listStyleType-HtmlLi)"
     },
     "defaultThemeVars": {
-      "marginTop-HtmlOl": "$space-4",
-      "marginBottom-HtmlOl": "$space-4"
-    },
-    "isHtmlTag": true
+      "marginTop-HtmlOl": "$space-5",
+      "marginBottom-HtmlOl": "$space-5"
+    }
   },
   "optgroup": {
-    "description": "This component renders an HTML `optgroup` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `optgroup` tag.",
+    "isHtmlTag": true,
     "props": {
       "label": {
         "description": "Specifies the label for the option group"
@@ -774,12 +908,12 @@ export default {
       "disabled": {
         "description": "Specifies that the option group is disabled"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "option": {
-    "description": "This component renders an HTML `option` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `option` tag.",
+    "isHtmlTag": true,
     "props": {
       "disabled": {
         "description": "Specifies that the option should be disabled"
@@ -793,12 +927,12 @@ export default {
       "value": {
         "description": "Specifies the value of the option"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "output": {
-    "description": "This component renders an HTML `output` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `output` tag.",
+    "isHtmlTag": true,
     "props": {
       "form": {
         "description": "Specifies the form element that the output is associated with"
@@ -809,17 +943,17 @@ export default {
       "name": {
         "description": "Specifies the name of the output"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "p": {
-    "description": "This component renders an HTML `p` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `p` tag.",
     "isHtmlTag": true
   },
   "param": {
-    "description": "This component renders an HTML `param` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `param` tag.",
+    "isHtmlTag": true,
     "props": {
       "name": {
         "description": "Specifies the name of the parameter"
@@ -827,22 +961,22 @@ export default {
       "value": {
         "description": "Specifies the value of the parameter"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "picture": {
-    "description": "This component renders an HTML `picture` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `picture` tag.",
     "isHtmlTag": true
   },
   "pre": {
-    "description": "This component renders an HTML `pre` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `pre` tag.",
     "isHtmlTag": true
   },
   "progress": {
-    "description": "This component renders an HTML `progress` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `progress` tag.",
+    "isHtmlTag": true,
     "props": {
       "max": {
         "description": "Specifies the maximum value of the progress element"
@@ -850,52 +984,52 @@ export default {
       "value": {
         "description": "Specifies the current value of the progress element"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "q": {
-    "description": "This component renders an HTML `q` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `q` tag.",
+    "isHtmlTag": true,
     "props": {
       "cite": {
         "description": "Specifies the source URL of the quotation"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "rp": {
-    "description": "This component renders an HTML `rp` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `rp` tag.",
     "isHtmlTag": true
   },
   "rt": {
-    "description": "This component renders an HTML `rt` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `rt` tag.",
     "isHtmlTag": true
   },
   "ruby": {
-    "description": "This component renders an HTML `ruby` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `ruby` tag.",
     "isHtmlTag": true
   },
   "s": {
-    "description": "This component renders an HTML `s` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `s` tag.",
     "isHtmlTag": true
   },
   "samp": {
-    "description": "This component renders an HTML `samp` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `samp` tag.",
     "isHtmlTag": true
   },
   "section": {
-    "description": "This component renders an HTML `section` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `section` tag.",
     "isHtmlTag": true
   },
   "select": {
-    "description": "This component renders an HTML `select` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `select` tag.",
+    "isHtmlTag": true,
     "props": {
       "autoFocus": {
         "description": "Specifies that the select should automatically get focus when the page loads"
@@ -918,17 +1052,17 @@ export default {
       "size": {
         "description": "Specifies the number of visible options in the select"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "small": {
-    "description": "This component renders an HTML `small` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `small` tag.",
     "isHtmlTag": true
   },
   "source": {
-    "description": "This component renders an HTML `source` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `source` tag.",
+    "isHtmlTag": true,
     "props": {
       "src": {
         "description": "Specifies the URL of the media file"
@@ -945,37 +1079,37 @@ export default {
       "sizes": {
         "description": "Specifies the sizes attribute for responsive images"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "span": {
-    "description": "This component renders an HTML `span` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `span` tag.",
     "isHtmlTag": true
   },
   "strong": {
-    "description": "This component renders an HTML `strong` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `strong` tag.",
     "isHtmlTag": true
   },
   "sub": {
-    "description": "This component renders an HTML `sub` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `sub` tag.",
     "isHtmlTag": true
   },
   "summary": {
-    "description": "This component renders an HTML `summary` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `summary` tag.",
     "isHtmlTag": true
   },
   "sup": {
-    "description": "This component renders an HTML `sup` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `sup` tag.",
     "isHtmlTag": true
   },
   "table": {
-    "description": "This component renders an HTML `table` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `table` tag.",
+    "isHtmlTag": true,
     "props": {
       "border": {
         "description": "Specifies the width of the border around the table"
@@ -1011,6 +1145,7 @@ export default {
       "textTransform-HtmlTable": "var(--xmlui-textTransform-HtmlTable)",
       "marginTop-HtmlTable": "var(--xmlui-marginTop-HtmlTable)",
       "marginBottom-HtmlTable": "var(--xmlui-marginBottom-HtmlTable)",
+      "width-HtmlTable": "var(--xmlui-width-HtmlTable)",
       "border-HtmlTable": "var(--xmlui-border-HtmlTable)",
       "borderHorizontal-HtmlTable": "var(--xmlui-borderHorizontal-HtmlTable, var(--xmlui-border-HtmlTable))",
       "borderVertical-HtmlTable": "var(--xmlui-borderVertical-HtmlTable, var(--xmlui-border-HtmlTable))",
@@ -1056,24 +1191,24 @@ export default {
       "border-HtmlTable": "1px solid $borderColor",
       "marginBottom-HtmlTable": "$space-4",
       "marginTop-HtmlTable": "$space-4"
-    },
-    "isHtmlTag": true
+    }
   },
   "tbody": {
-    "description": "This component renders an HTML `tbody` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `tbody` tag.",
+    "isHtmlTag": true,
     "themeVars": {
       "backgroundColor-HtmlTbody": "var(--xmlui-backgroundColor-HtmlTbody)",
       "textColor-HtmlTbody": "var(--xmlui-textColor-HtmlTbody)",
       "textAlign-HtmlTbody": "var(--xmlui-textAlign-HtmlTbody)",
       "verticalAlign-HtmlTbody": "var(--xmlui-verticalAlign-HtmlTbody)",
       "textTransform-HtmlTbody": "var(--xmlui-textTransform-HtmlTbody)"
-    },
-    "isHtmlTag": true
+    }
   },
   "td": {
-    "description": "This component renders an HTML `td` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `td` tag.",
+    "isHtmlTag": true,
     "props": {
       "align": {
         "description": "Specifies the horizontal alignment of the content in the cell"
@@ -1152,17 +1287,17 @@ export default {
     "defaultThemeVars": {
       "padding-HtmlTd": "$space-2",
       "borderBottom-HtmlTd": "1px solid $borderColor"
-    },
-    "isHtmlTag": true
+    }
   },
   "template": {
-    "description": "This component renders an HTML `template` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `template` tag.",
     "isHtmlTag": true
   },
   "textarea": {
-    "description": "This component renders an HTML `textarea` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `textarea` tag.",
+    "isHtmlTag": true,
     "props": {
       "autoFocus": {
         "description": "Specifies that the textarea should automatically get focus when the page loads"
@@ -1206,21 +1341,21 @@ export default {
       "wrap": {
         "description": "Specifies how the text in a textarea is to be wrapped when submitted"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "tfoot": {
-    "description": "This component renders an HTML `tfoot` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `tfoot` tag.",
+    "isHtmlTag": true,
     "themeVars": {
       "backgroundColor-HtmlTfoot": "var(--xmlui-backgroundColor-HtmlTfoot)",
       "textColor-HtmlTfoot": "var(--xmlui-textColor-HtmlTfoot)"
-    },
-    "isHtmlTag": true
+    }
   },
   "th": {
-    "description": "This component renders an HTML `th` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `th` tag.",
+    "isHtmlTag": true,
     "props": {
       "abbr": {
         "description": "Specifies an abbreviated version of the content in the header cell"
@@ -1290,19 +1425,13 @@ export default {
     "defaultThemeVars": {
       "padding-HtmlTh": "$space-2",
       "fontSize-HtmlTh": "$fontSize-tiny",
-      "fontWeight-HtmlTh": "$fontWeight-bold",
-      "light": {
-        "backgroundColor-HtmlTh--hover": "$color-surface-200"
-      },
-      "dark": {
-        "backgroundColor-HtmlTh--hover": "$color-surface-800"
-      }
-    },
-    "isHtmlTag": true
+      "fontWeight-HtmlTh": "$fontWeight-bold"
+    }
   },
   "thead": {
-    "description": "This component renders an HTML `thead` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `thead` tag.",
+    "isHtmlTag": true,
     "themeVars": {
       "backgroundColor-HtmlThead": "var(--xmlui-backgroundColor-HtmlThead)",
       "textColor-HtmlThead": "var(--xmlui-textColor-HtmlThead)",
@@ -1351,29 +1480,24 @@ export default {
     },
     "defaultThemeVars": {
       "textTransform-HtmlThead": "uppercase",
-      "light": {
-        "backgroundColor-HtmlThead": "$color-surface-100",
-        "textColor-HtmlThead": "$color-surface-500"
-      },
-      "dark": {
-        "backgroundColor-HtmlThead": "$color-surface-950"
-      }
-    },
-    "isHtmlTag": true
+      "backgroundColor-HtmlThead": "$color-surface-100",
+      "textColor-HtmlThead": "$color-surface-500"
+    }
   },
   "time": {
-    "description": "This component renders an HTML `time` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `time` tag.",
+    "isHtmlTag": true,
     "props": {
       "dateTime": {
         "description": "Specifies the date and time in a machine-readable format"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "tr": {
-    "description": "This component renders an HTML `tr` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `tr` tag.",
+    "isHtmlTag": true,
     "themeVars": {
       "backgroundColor-HtmlTr": "var(--xmlui-backgroundColor-HtmlTr)",
       "backgroundColor-HtmlTr--hover": "var(--xmlui-backgroundColor-HtmlTr--hover)",
@@ -1417,19 +1541,13 @@ export default {
     },
     "defaultThemeVars": {
       "fontSize-HtmlTr": "$fontSize-small",
-      "backgroundColor-row-HtmlTr": "inherit",
-      "light": {
-        "backgroundColor-HtmlTr--hover": "$color-primary-50"
-      },
-      "dark": {
-        "backgroundColor-HtmlTr--hover": "$color-primary-900"
-      }
-    },
-    "isHtmlTag": true
+      "backgroundColor-row-HtmlTr": "inherit"
+    }
   },
   "track": {
-    "description": "This component renders an HTML `track` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `track` tag.",
+    "isHtmlTag": true,
     "props": {
       "default": {
         "description": "Specifies that the track is to be enabled if no other track is more suitable"
@@ -1446,37 +1564,158 @@ export default {
       "srcLang": {
         "description": "Specifies the language of the track text data"
       }
-    },
-    "isHtmlTag": true
+    }
   },
   "u": {
-    "description": "This component renders an HTML `u` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `u` tag.",
     "isHtmlTag": true
   },
   "ul": {
-    "description": "This component renders an HTML `ul` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `ul` tag.",
+    "isHtmlTag": true,
     "themeVars": {
+      "border-HtmlOl": "var(--xmlui-border-HtmlOl)",
+      "borderHorizontal-HtmlOl": "var(--xmlui-borderHorizontal-HtmlOl, var(--xmlui-border-HtmlOl))",
+      "borderVertical-HtmlOl": "var(--xmlui-borderVertical-HtmlOl, var(--xmlui-border-HtmlOl))",
+      "borderLeft-HtmlOl": "var(--xmlui-borderLeft-HtmlOl, var(--xmlui-borderHorizontal-HtmlOl, var(--xmlui-border-HtmlOl)))",
+      "borderRight-HtmlOl": "var(--xmlui-borderRight-HtmlOl, var(--xmlui-borderHorizontal-HtmlOl, var(--xmlui-border-HtmlOl)))",
+      "borderTop-HtmlOl": "var(--xmlui-borderTop-HtmlOl, var(--xmlui-borderVertical-HtmlOl, var(--xmlui-border-HtmlOl)))",
+      "borderBottom-HtmlOl": "var(--xmlui-borderBottom-HtmlOl, var(--xmlui-borderVertical-HtmlOl, var(--xmlui-border-HtmlOl)))",
+      "borderWidth-HtmlOl": "var(--xmlui-borderWidth-HtmlOl)",
+      "borderHorizontalWidth-HtmlOl": "var(--xmlui-borderHorizontalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl))",
+      "borderLeftWidth-HtmlOl": "var(--xmlui-borderLeftWidth-HtmlOl, var(--xmlui-borderHorizontalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl)))",
+      "borderRightWidth-HtmlOl": "var(--xmlui-borderRightWidth-HtmlOl, var(--xmlui-borderHorizontalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl)))",
+      "borderVerticalWidth-HtmlOl": "var(--xmlui-borderVerticalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl))",
+      "borderTopWidth-HtmlOl": "var(--xmlui-borderTopWidth-HtmlOl, var(--xmlui-borderVerticalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl)))",
+      "borderBottomWidth-HtmlOl": "var(--xmlui-borderBottomWidth-HtmlOl, var(--xmlui-borderVerticalWidth-HtmlOl, var(--xmlui-borderWidth-HtmlOl)))",
+      "borderStyle-HtmlOl": "var(--xmlui-borderStyle-HtmlOl)",
+      "borderHorizontalStyle-HtmlOl": "var(--xmlui-borderHorizontalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl))",
+      "borderLeftStyle-HtmlOl": "var(--xmlui-borderLeftStyle-HtmlOl, var(--xmlui-borderHorizontalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl)))",
+      "borderRightStyle-HtmlOl": "var(--xmlui-borderRightStyle-HtmlOl, var(--xmlui-borderHorizontalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl)))",
+      "borderVerticalStyle-HtmlOl": "var(--xmlui-borderVerticalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl))",
+      "borderTopStyle-HtmlOl": "var(--xmlui-borderTopStyle-HtmlOl, var(--xmlui-borderVerticalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl)))",
+      "borderBottomStyle-HtmlOl": "var(--xmlui-borderBottomStyle-HtmlOl, var(--xmlui-borderVerticalStyle-HtmlOl, var(--xmlui-borderStyle-HtmlOl)))",
+      "borderColor-HtmlOl": "var(--xmlui-borderColor-HtmlOl)",
+      "borderHorizontalColor-HtmlOl": "var(--xmlui-borderHorizontalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl))",
+      "borderLeftColor-HtmlOl": "var(--xmlui-borderLeftColor-HtmlOl, var(--xmlui-borderHorizontalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl)))",
+      "borderRightColor-HtmlOl": "var(--xmlui-borderRightColor-HtmlOl, var(--xmlui-borderHorizontalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl)))",
+      "borderVerticalColor-HtmlOl": "var(--xmlui-borderVerticalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl))",
+      "borderTopColor-HtmlOl": "var(--xmlui-borderTopColor-HtmlOl, var(--xmlui-borderVerticalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl)))",
+      "borderBottomColor-HtmlOl": "var(--xmlui-borderBottomColor-HtmlOl, var(--xmlui-borderVerticalColor-HtmlOl, var(--xmlui-borderColor-HtmlOl)))",
+      "borderStartStartRadius-HtmlOl": "var(--xmlui-borderStartStartRadius-HtmlOl, var(--xmlui-borderRadius-HtmlOl))",
+      "borderStartEndRadius-HtmlOl": "var(--xmlui-borderStartEndRadius-HtmlOl, var(--xmlui-borderRadius-HtmlOl))",
+      "borderEndStartRadius-HtmlOl": "var(--xmlui-borderEndStartRadius-HtmlOl, var(--xmlui-borderRadius-HtmlOl))",
+      "borderEndEndRadius-HtmlOl": "var(--xmlui-borderEndEndRadius-HtmlOl, var(--xmlui-borderRadius-HtmlOl))",
+      "padding-HtmlOl": "var(--xmlui-padding-HtmlOl)",
+      "paddingHorizontal-HtmlOl": "var(--xmlui-paddingHorizontal-HtmlOl, var(--xmlui-padding-HtmlOl))",
+      "paddingVertical-HtmlOl": "var(--xmlui-paddingVertical-HtmlOl, var(--xmlui-padding-HtmlOl))",
+      "paddingLeft-HtmlOl": "var(--xmlui-paddingLeft-HtmlOl, var(--xmlui-paddingHorizontal-HtmlOl, var(--xmlui-padding-HtmlOl)))",
+      "paddingRight-HtmlOl": "var(--xmlui-paddingRight-HtmlOl, var(--xmlui-paddingHorizontal-HtmlOl, var(--xmlui-padding-HtmlOl)))",
+      "paddingTop-HtmlOl": "var(--xmlui-paddingTop-HtmlOl, var(--xmlui-paddingVertical-HtmlOl, var(--xmlui-padding-HtmlOl)))",
+      "paddingBottom-HtmlOl": "var(--xmlui-paddingBottom-HtmlOl, var(--xmlui-paddingVertical-HtmlOl, var(--xmlui-padding-HtmlOl)))",
       "marginTop-HtmlOl": "var(--xmlui-marginTop-HtmlOl)",
       "marginBottom-HtmlOl": "var(--xmlui-marginBottom-HtmlOl)",
+      "border-HtmlUl": "var(--xmlui-border-HtmlUl)",
+      "borderHorizontal-HtmlUl": "var(--xmlui-borderHorizontal-HtmlUl, var(--xmlui-border-HtmlUl))",
+      "borderVertical-HtmlUl": "var(--xmlui-borderVertical-HtmlUl, var(--xmlui-border-HtmlUl))",
+      "borderLeft-HtmlUl": "var(--xmlui-borderLeft-HtmlUl, var(--xmlui-borderHorizontal-HtmlUl, var(--xmlui-border-HtmlUl)))",
+      "borderRight-HtmlUl": "var(--xmlui-borderRight-HtmlUl, var(--xmlui-borderHorizontal-HtmlUl, var(--xmlui-border-HtmlUl)))",
+      "borderTop-HtmlUl": "var(--xmlui-borderTop-HtmlUl, var(--xmlui-borderVertical-HtmlUl, var(--xmlui-border-HtmlUl)))",
+      "borderBottom-HtmlUl": "var(--xmlui-borderBottom-HtmlUl, var(--xmlui-borderVertical-HtmlUl, var(--xmlui-border-HtmlUl)))",
+      "borderWidth-HtmlUl": "var(--xmlui-borderWidth-HtmlUl)",
+      "borderHorizontalWidth-HtmlUl": "var(--xmlui-borderHorizontalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl))",
+      "borderLeftWidth-HtmlUl": "var(--xmlui-borderLeftWidth-HtmlUl, var(--xmlui-borderHorizontalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl)))",
+      "borderRightWidth-HtmlUl": "var(--xmlui-borderRightWidth-HtmlUl, var(--xmlui-borderHorizontalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl)))",
+      "borderVerticalWidth-HtmlUl": "var(--xmlui-borderVerticalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl))",
+      "borderTopWidth-HtmlUl": "var(--xmlui-borderTopWidth-HtmlUl, var(--xmlui-borderVerticalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl)))",
+      "borderBottomWidth-HtmlUl": "var(--xmlui-borderBottomWidth-HtmlUl, var(--xmlui-borderVerticalWidth-HtmlUl, var(--xmlui-borderWidth-HtmlUl)))",
+      "borderStyle-HtmlUl": "var(--xmlui-borderStyle-HtmlUl)",
+      "borderHorizontalStyle-HtmlUl": "var(--xmlui-borderHorizontalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl))",
+      "borderLeftStyle-HtmlUl": "var(--xmlui-borderLeftStyle-HtmlUl, var(--xmlui-borderHorizontalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl)))",
+      "borderRightStyle-HtmlUl": "var(--xmlui-borderRightStyle-HtmlUl, var(--xmlui-borderHorizontalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl)))",
+      "borderVerticalStyle-HtmlUl": "var(--xmlui-borderVerticalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl))",
+      "borderTopStyle-HtmlUl": "var(--xmlui-borderTopStyle-HtmlUl, var(--xmlui-borderVerticalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl)))",
+      "borderBottomStyle-HtmlUl": "var(--xmlui-borderBottomStyle-HtmlUl, var(--xmlui-borderVerticalStyle-HtmlUl, var(--xmlui-borderStyle-HtmlUl)))",
+      "borderColor-HtmlUl": "var(--xmlui-borderColor-HtmlUl)",
+      "borderHorizontalColor-HtmlUl": "var(--xmlui-borderHorizontalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl))",
+      "borderLeftColor-HtmlUl": "var(--xmlui-borderLeftColor-HtmlUl, var(--xmlui-borderHorizontalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl)))",
+      "borderRightColor-HtmlUl": "var(--xmlui-borderRightColor-HtmlUl, var(--xmlui-borderHorizontalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl)))",
+      "borderVerticalColor-HtmlUl": "var(--xmlui-borderVerticalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl))",
+      "borderTopColor-HtmlUl": "var(--xmlui-borderTopColor-HtmlUl, var(--xmlui-borderVerticalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl)))",
+      "borderBottomColor-HtmlUl": "var(--xmlui-borderBottomColor-HtmlUl, var(--xmlui-borderVerticalColor-HtmlUl, var(--xmlui-borderColor-HtmlUl)))",
+      "borderStartStartRadius-HtmlUl": "var(--xmlui-borderStartStartRadius-HtmlUl, var(--xmlui-borderRadius-HtmlUl))",
+      "borderStartEndRadius-HtmlUl": "var(--xmlui-borderStartEndRadius-HtmlUl, var(--xmlui-borderRadius-HtmlUl))",
+      "borderEndStartRadius-HtmlUl": "var(--xmlui-borderEndStartRadius-HtmlUl, var(--xmlui-borderRadius-HtmlUl))",
+      "borderEndEndRadius-HtmlUl": "var(--xmlui-borderEndEndRadius-HtmlUl, var(--xmlui-borderRadius-HtmlUl))",
+      "padding-HtmlUl": "var(--xmlui-padding-HtmlUl)",
+      "paddingHorizontal-HtmlUl": "var(--xmlui-paddingHorizontal-HtmlUl, var(--xmlui-padding-HtmlUl))",
+      "paddingVertical-HtmlUl": "var(--xmlui-paddingVertical-HtmlUl, var(--xmlui-padding-HtmlUl))",
+      "paddingLeft-HtmlUl": "var(--xmlui-paddingLeft-HtmlUl, var(--xmlui-paddingHorizontal-HtmlUl, var(--xmlui-padding-HtmlUl)))",
+      "paddingRight-HtmlUl": "var(--xmlui-paddingRight-HtmlUl, var(--xmlui-paddingHorizontal-HtmlUl, var(--xmlui-padding-HtmlUl)))",
+      "paddingTop-HtmlUl": "var(--xmlui-paddingTop-HtmlUl, var(--xmlui-paddingVertical-HtmlUl, var(--xmlui-padding-HtmlUl)))",
+      "paddingBottom-HtmlUl": "var(--xmlui-paddingBottom-HtmlUl, var(--xmlui-paddingVertical-HtmlUl, var(--xmlui-padding-HtmlUl)))",
       "marginTop-HtmlUl": "var(--xmlui-marginTop-HtmlUl)",
-      "marginBottom-HtmlUl": "var(--xmlui-marginBottom-HtmlUl)"
+      "marginBottom-HtmlUl": "var(--xmlui-marginBottom-HtmlUl)",
+      "border-HtmlLi": "var(--xmlui-border-HtmlLi)",
+      "borderHorizontal-HtmlLi": "var(--xmlui-borderHorizontal-HtmlLi, var(--xmlui-border-HtmlLi))",
+      "borderVertical-HtmlLi": "var(--xmlui-borderVertical-HtmlLi, var(--xmlui-border-HtmlLi))",
+      "borderLeft-HtmlLi": "var(--xmlui-borderLeft-HtmlLi, var(--xmlui-borderHorizontal-HtmlLi, var(--xmlui-border-HtmlLi)))",
+      "borderRight-HtmlLi": "var(--xmlui-borderRight-HtmlLi, var(--xmlui-borderHorizontal-HtmlLi, var(--xmlui-border-HtmlLi)))",
+      "borderTop-HtmlLi": "var(--xmlui-borderTop-HtmlLi, var(--xmlui-borderVertical-HtmlLi, var(--xmlui-border-HtmlLi)))",
+      "borderBottom-HtmlLi": "var(--xmlui-borderBottom-HtmlLi, var(--xmlui-borderVertical-HtmlLi, var(--xmlui-border-HtmlLi)))",
+      "borderWidth-HtmlLi": "var(--xmlui-borderWidth-HtmlLi)",
+      "borderHorizontalWidth-HtmlLi": "var(--xmlui-borderHorizontalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi))",
+      "borderLeftWidth-HtmlLi": "var(--xmlui-borderLeftWidth-HtmlLi, var(--xmlui-borderHorizontalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi)))",
+      "borderRightWidth-HtmlLi": "var(--xmlui-borderRightWidth-HtmlLi, var(--xmlui-borderHorizontalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi)))",
+      "borderVerticalWidth-HtmlLi": "var(--xmlui-borderVerticalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi))",
+      "borderTopWidth-HtmlLi": "var(--xmlui-borderTopWidth-HtmlLi, var(--xmlui-borderVerticalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi)))",
+      "borderBottomWidth-HtmlLi": "var(--xmlui-borderBottomWidth-HtmlLi, var(--xmlui-borderVerticalWidth-HtmlLi, var(--xmlui-borderWidth-HtmlLi)))",
+      "borderStyle-HtmlLi": "var(--xmlui-borderStyle-HtmlLi)",
+      "borderHorizontalStyle-HtmlLi": "var(--xmlui-borderHorizontalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi))",
+      "borderLeftStyle-HtmlLi": "var(--xmlui-borderLeftStyle-HtmlLi, var(--xmlui-borderHorizontalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi)))",
+      "borderRightStyle-HtmlLi": "var(--xmlui-borderRightStyle-HtmlLi, var(--xmlui-borderHorizontalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi)))",
+      "borderVerticalStyle-HtmlLi": "var(--xmlui-borderVerticalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi))",
+      "borderTopStyle-HtmlLi": "var(--xmlui-borderTopStyle-HtmlLi, var(--xmlui-borderVerticalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi)))",
+      "borderBottomStyle-HtmlLi": "var(--xmlui-borderBottomStyle-HtmlLi, var(--xmlui-borderVerticalStyle-HtmlLi, var(--xmlui-borderStyle-HtmlLi)))",
+      "borderColor-HtmlLi": "var(--xmlui-borderColor-HtmlLi)",
+      "borderHorizontalColor-HtmlLi": "var(--xmlui-borderHorizontalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi))",
+      "borderLeftColor-HtmlLi": "var(--xmlui-borderLeftColor-HtmlLi, var(--xmlui-borderHorizontalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi)))",
+      "borderRightColor-HtmlLi": "var(--xmlui-borderRightColor-HtmlLi, var(--xmlui-borderHorizontalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi)))",
+      "borderVerticalColor-HtmlLi": "var(--xmlui-borderVerticalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi))",
+      "borderTopColor-HtmlLi": "var(--xmlui-borderTopColor-HtmlLi, var(--xmlui-borderVerticalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi)))",
+      "borderBottomColor-HtmlLi": "var(--xmlui-borderBottomColor-HtmlLi, var(--xmlui-borderVerticalColor-HtmlLi, var(--xmlui-borderColor-HtmlLi)))",
+      "borderStartStartRadius-HtmlLi": "var(--xmlui-borderStartStartRadius-HtmlLi, var(--xmlui-borderRadius-HtmlLi))",
+      "borderStartEndRadius-HtmlLi": "var(--xmlui-borderStartEndRadius-HtmlLi, var(--xmlui-borderRadius-HtmlLi))",
+      "borderEndStartRadius-HtmlLi": "var(--xmlui-borderEndStartRadius-HtmlLi, var(--xmlui-borderRadius-HtmlLi))",
+      "borderEndEndRadius-HtmlLi": "var(--xmlui-borderEndEndRadius-HtmlLi, var(--xmlui-borderRadius-HtmlLi))",
+      "padding-HtmlLi": "var(--xmlui-padding-HtmlLi)",
+      "paddingHorizontal-HtmlLi": "var(--xmlui-paddingHorizontal-HtmlLi, var(--xmlui-padding-HtmlLi))",
+      "paddingVertical-HtmlLi": "var(--xmlui-paddingVertical-HtmlLi, var(--xmlui-padding-HtmlLi))",
+      "paddingLeft-HtmlLi": "var(--xmlui-paddingLeft-HtmlLi, var(--xmlui-paddingHorizontal-HtmlLi, var(--xmlui-padding-HtmlLi)))",
+      "paddingRight-HtmlLi": "var(--xmlui-paddingRight-HtmlLi, var(--xmlui-paddingHorizontal-HtmlLi, var(--xmlui-padding-HtmlLi)))",
+      "paddingTop-HtmlLi": "var(--xmlui-paddingTop-HtmlLi, var(--xmlui-paddingVertical-HtmlLi, var(--xmlui-padding-HtmlLi)))",
+      "paddingBottom-HtmlLi": "var(--xmlui-paddingBottom-HtmlLi, var(--xmlui-paddingVertical-HtmlLi, var(--xmlui-padding-HtmlLi)))",
+      "marginLeft-HtmlLi": "var(--xmlui-marginLeft-HtmlLi)",
+      "marginTop-HtmlLi": "var(--xmlui-marginTop-HtmlLi)",
+      "marginBottom-HtmlLi": "var(--xmlui-marginBottom-HtmlLi)",
+      "listStyleType-HtmlLi": "var(--xmlui-listStyleType-HtmlLi)"
     },
     "defaultThemeVars": {
-      "marginTop-HtmlUl": "$space-4",
-      "marginBottom-HtmlUl": "$space-4"
-    },
-    "isHtmlTag": true
+      "marginTop-HtmlUl": "$space-5",
+      "marginBottom-HtmlUl": "$space-5"
+    }
   },
   "var": {
-    "description": "This component renders an HTML `var` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `var` tag.",
     "isHtmlTag": true
   },
   "video": {
-    "description": "This component renders an HTML `video` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `video` tag.",
+    "isHtmlTag": true,
     "props": {
       "autoPlay": {
         "description": "Specifies that the video will start playing as soon as it is ready"
@@ -1506,16 +1745,23 @@ export default {
         "description": "Specifies the width of the video player"
       }
     },
-    "isHtmlTag": true
+    "themeVars": {
+      "marginTop-HtmlVideo": "var(--xmlui-marginTop-HtmlVideo)",
+      "marginBottom-HtmlVideo": "var(--xmlui-marginBottom-HtmlVideo)"
+    },
+    "defaultThemeVars": {
+      "marginTop-HtmlVideo": "1rem",
+      "marginBottom-HtmlVideo": "1rem"
+    }
   },
   "wbr": {
-    "description": "This component renders an HTML `wbr` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `wbr` tag.",
     "isHtmlTag": true
   },
   "Accordion": {
-    "description": "(**NOT IMPLEMENTED YET**) The `Accordion` component is a collapsible container that toggles the display of content sections. It helps organize information by expanding or collapsing it based on user interaction.",
     "status": "in progress",
+    "description": "(**NOT IMPLEMENTED YET**) The `Accordion` component is a collapsible container that toggles the display of content sections. It helps organize information by expanding or collapsing it based on user interaction.",
     "props": {
       "triggerPosition": {
         "description": "This property indicates the position where the trigger icon should be displayed. The `start` value signs the trigger is before the header text (template), and `end` indicates that it follows the header.",
@@ -1634,96 +1880,12 @@ export default {
       "border-Accordion": "0px solid $borderColor",
       "width-icon-Accordion": "",
       "height-icon-Accordion": "",
-      "light": {
-        "backgroundColor-header-Accordion": "$color-primary-500",
-        "backgroundColor-header-Accordion-hover": "$color-primary-400",
-        "color-header-Accordion": "$color-surface-50",
-        "color-content-Accordion": "$textColor-primary",
-        "backgroundColor-content-Accordion": "transparent",
-        "color-icon-Accordion": "$color-surface-50"
-      },
-      "dark": {
-        "backgroundColor-header-Accordion": "$color-primary-500",
-        "backgroundColor-header-Accordion-hover": "$color-primary-600",
-        "color-header-Accordion": "$color-surface-50",
-        "color-content-Accordion": "$textColor-primary",
-        "backgroundColor-content-Accordion": "transparent",
-        "color-icon-Accordion": "$color-surface-50"
-      }
-    }
-  },
-  "Alert": {
-    "description": "(**NOT IMPLEMENTED YET**) The `Alert` component is a panel used to display important notifications or feedback to users. It helps convey different statuses or levels of urgency, such as success, warning, error, and others.",
-    "status": "in progress",
-    "props": {
-      "statusColor": {
-        "description": "The value of this optional property sets the string to provide a color scheme for the Alert.",
-        "availableValues": [
-          {
-            "value": "primary",
-            "description": "Primary theme color, no default icon"
-          },
-          {
-            "value": "secondary",
-            "description": "Secondary theme color, no default icon"
-          },
-          {
-            "value": "success",
-            "description": "Success theme color, \"success\" icon"
-          },
-          {
-            "value": "danger",
-            "description": "Warning theme color, \"warning\" icon"
-          },
-          {
-            "value": "warning",
-            "description": "Danger theme color, \"danger\" icon"
-          },
-          {
-            "value": "info",
-            "description": "Info theme color, \"info\" icon"
-          },
-          {
-            "value": "light",
-            "description": "Light theme color, no default icon"
-          },
-          {
-            "value": "dark",
-            "description": "Dark theme color, no default icon"
-          }
-        ],
-        "valueType": "string",
-        "defaultValue": "primary"
-      },
-      "dismissable": {
-        "description": "This property's `true` value indicates if this alert is dismissable by the user. When the user closes the Alert, it gets hidden.",
-        "valueType": "boolean",
-        "defaultValue": true
-      },
-      "autoDismissInMs": {
-        "description": "Timeout for the alert to be dismissed",
-        "valueType": "number"
-      },
-      "showIcon": {
-        "description": "Indicates if the alert should display an icon",
-        "valueType": "boolean",
-        "defaultValue": true
-      },
-      "icon": {
-        "description": "Icon to be displayed in the alert",
-        "valueType": "string"
-      }
-    },
-    "events": {},
-    "apis": {
-      "dismiss": {
-        "description": "This method dismisses the Alert. It triggers the `didDismiss` event with the argument set to `false`."
-      }
-    },
-    "themeVars": [],
-    "defaultThemeVars": {
-      "light": {},
-      "dark": {}
+      "backgroundColor-header-Accordion": "$color-primary-500",
+      "backgroundColor-header-Accordion-hover": "$color-primary-400",
+      "color-header-Accordion": "$color-surface-50",
+      "color-content-Accordion": "$textColor-primary",
+      "backgroundColor-content-Accordion": "transparent",
+      "color-icon-Accordion": "$color-surface-50"
     }
   },
   "APICall": {
@@ -1839,8 +2001,8 @@ export default {
     }
   },
   "App": {
-    "description": "The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.",
     "status": "stable",
+    "description": "The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.",
     "props": {
       "layout": {
         "description": "This property sets the layout template of the app. This setting determines the position and size of the app parts (such as header, navigation bar, footer, etc.) and the app's scroll behavior.",
@@ -1933,10 +2095,19 @@ export default {
       "width-navPanel-App": "var(--xmlui-width-navPanel-App)",
       "boxShadow-header-App": "var(--xmlui-boxShadow-header-App)",
       "boxShadow-navPanel-App": "var(--xmlui-boxShadow-navPanel-App)",
+      "backgroundColor-content-App": "var(--xmlui-backgroundColor-content-App)",
+      "borderLeft-content-App": "var(--xmlui-borderLeft-content-App)",
       "maxWidth-content-App": "var(--xmlui-maxWidth-content-App)",
+      "maxWidth-App": "var(--xmlui-maxWidth-App)",
       "backgroundColor-AppHeader": "var(--xmlui-backgroundColor-AppHeader)",
       "borderBottom-AppHeader": "var(--xmlui-borderBottom-AppHeader)",
       "scroll-padding-block-Pages": "var(--xmlui-scroll-padding-block-Pages)"
+    },
+    "themeVarDescriptions": {
+      "maxWidth‑content‑App": "This theme variable defines the maximum width of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size.",
+      "boxShadow‑header‑App": "This theme variable sets the shadow of the app's header section.",
+      "boxShadow‑navPanel‑App": "This theme variable sets the shadow of the app's navigation panel section (visible only in vertical layouts).",
+      "width‑navPanel‑App": "This theme variable sets the width of the navigation panel when the app is displayed with one of the vertical layouts."
     },
     "defaultThemeVars": {
       "width-navPanel-App": "$space-64",
@@ -1944,19 +2115,14 @@ export default {
       "boxShadow-header-App": "$boxShadow-spread",
       "boxShadow-navPanel-App": "$boxShadow-spread",
       "scroll-padding-block-Pages": "$space-4",
+      "backgroundColor-content-App": "$backgroundColor",
       "light": {},
       "dark": {}
-    },
-    "themeVarDescriptions": {
-      "maxWidth‑content‑App": "This theme variable defines the maximum width of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size.",
-      "boxShadow‑header‑App": "This theme variable sets the shadow of the app's header section.",
-      "boxShadow‑navPanel‑App": "This theme variable sets the shadow of the app's navigation panel section (visible only in vertical layouts).",
-      "width‑navPanel‑App": "This theme variable sets the width of the navigation panel when the app is displayed with one of the vertical layouts."
     }
   },
   "AppHeader": {
-    "description": "`AppHeader` is a placeholder within `App` to define a custom application header.",
     "status": "experimental",
+    "description": "`AppHeader` is a placeholder within `App` to define a custom application header.",
     "props": {
       "profileMenuTemplate": {
         "description": "This property makes the profile menu slot of the `AppHeader` component customizable.",
@@ -2031,11 +2197,17 @@ export default {
       "align-content-AppHeader": "var(--xmlui-align-content-AppHeader)",
       "height-AppHeader": "var(--xmlui-height-AppHeader)",
       "backgroundColor-AppHeader": "var(--xmlui-backgroundColor-AppHeader)",
-      "maxWidth-content-AppHeader": "var(--xmlui-maxWidth-content-AppHeader)"
+      "maxWidth-content-AppHeader": "var(--xmlui-maxWidth-content-AppHeader)",
+      "maxWidth-AppHeader": "var(--xmlui-maxWidth-AppHeader)"
+    },
+    "themeVarDescriptions": {
+      "padding‑logo‑AppHeader": "This theme variable sets the padding of the logo in the app header (including all `padding` variants, such as `paddingLeft-logo-AppHeader` and others).",
+      "width‑logo‑AppHeader": "Sets the width of the displayed logo"
     },
     "defaultThemeVars": {
       "height-AppHeader": "$space-14",
       "maxWidth-content-AppHeader": "$maxWidth-content-App",
+      "maxWidth-AppHeader": "$maxWidth-App",
       "borderBottom-AppHeader": "1px solid $borderColor",
       "paddingLeft-logo-AppHeader": "$paddingHorizontal-logo-AppHeader",
       "paddingRight-logo-AppHeader": "$paddingHorizontal-logo-AppHeader",
@@ -2052,16 +2224,7 @@ export default {
       "paddingVertical-AppHeader": "$space-0",
       "padding-AppHeader": "$paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader",
       "borderRadius-AppHeader": "0px",
-      "light": {
-        "backgroundColor-AppHeader": "white"
-      },
-      "dark": {
-        "backgroundColor-AppHeader": "$color-surface-900"
-      }
-    },
-    "themeVarDescriptions": {
-      "padding‑logo‑AppHeader": "This theme variable sets the padding of the logo in the app header (including all `padding` variants, such as `paddingLeft-logo-AppHeader` and others).",
-      "width‑logo‑AppHeader": "Sets the width of the displayed logo"
+      "backgroundColor-AppHeader": "$color-surface-raised"
     }
   },
   "AppState": {
@@ -2135,6 +2298,40 @@ export default {
         ],
         "defaultValue": "none"
       },
+      "label": {
+        "description": "This property sets the label of the component.",
+        "valueType": "string"
+      },
+      "labelPosition": {
+        "description": "Places the label at the given position of the component.",
+        "availableValues": [
+          {
+            "value": "start",
+            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
+          },
+          {
+            "value": "end",
+            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
+          },
+          {
+            "value": "top",
+            "description": "The top of the input"
+          },
+          {
+            "value": "bottom",
+            "description": "The bottom of the input"
+          }
+        ],
+        "defaultValue": "top"
+      },
+      "labelWidth": {
+        "description": "This property sets the width of the `AutoComplete`."
+      },
+      "labelBreak": {
+        "description": "This boolean value indicates if the `AutoComplete` labels can be split into multiple lines if it would overflow the available label width.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "dropdownHeight": {
         "description": "This property sets the height of the dropdown list."
       },
@@ -2162,11 +2359,6 @@ export default {
         "description": "This event is triggered when value of AutoComplete has changed."
       }
     },
-    "contextVars": {
-      "$item": {
-        "description": "This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option."
-      }
-    },
     "apis": {
       "focus": {
         "description": "This method sets the focus on the AutoComplete."
@@ -2176,6 +2368,11 @@ export default {
       },
       "setValue": {
         "description": "You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked)."
+      }
+    },
+    "contextVars": {
+      "$item": {
+        "description": "This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option."
       }
     },
     "themeVars": {
@@ -2211,45 +2408,6 @@ export default {
       "borderStartEndRadius-AutoComplete": "var(--xmlui-borderStartEndRadius-AutoComplete, var(--xmlui-borderRadius-AutoComplete))",
       "borderEndStartRadius-AutoComplete": "var(--xmlui-borderEndStartRadius-AutoComplete, var(--xmlui-borderRadius-AutoComplete))",
       "borderEndEndRadius-AutoComplete": "var(--xmlui-borderEndEndRadius-AutoComplete, var(--xmlui-borderRadius-AutoComplete))",
-      "padding-badge-AutoComplete": "var(--xmlui-padding-badge-AutoComplete)",
-      "paddingHorizontal-badge-AutoComplete": "var(--xmlui-paddingHorizontal-badge-AutoComplete, var(--xmlui-padding-badge-AutoComplete))",
-      "paddingVertical-badge-AutoComplete": "var(--xmlui-paddingVertical-badge-AutoComplete, var(--xmlui-padding-badge-AutoComplete))",
-      "paddingLeft-badge-AutoComplete": "var(--xmlui-paddingLeft-badge-AutoComplete, var(--xmlui-paddingHorizontal-badge-AutoComplete, var(--xmlui-padding-badge-AutoComplete)))",
-      "paddingRight-badge-AutoComplete": "var(--xmlui-paddingRight-badge-AutoComplete, var(--xmlui-paddingHorizontal-badge-AutoComplete, var(--xmlui-padding-badge-AutoComplete)))",
-      "paddingTop-badge-AutoComplete": "var(--xmlui-paddingTop-badge-AutoComplete, var(--xmlui-paddingVertical-badge-AutoComplete, var(--xmlui-padding-badge-AutoComplete)))",
-      "paddingBottom-badge-AutoComplete": "var(--xmlui-paddingBottom-badge-AutoComplete, var(--xmlui-paddingVertical-badge-AutoComplete, var(--xmlui-padding-badge-AutoComplete)))",
-      "border-badge-AutoComplete": "var(--xmlui-border-badge-AutoComplete)",
-      "borderHorizontal-badge-AutoComplete": "var(--xmlui-borderHorizontal-badge-AutoComplete, var(--xmlui-border-badge-AutoComplete))",
-      "borderVertical-badge-AutoComplete": "var(--xmlui-borderVertical-badge-AutoComplete, var(--xmlui-border-badge-AutoComplete))",
-      "borderLeft-badge-AutoComplete": "var(--xmlui-borderLeft-badge-AutoComplete, var(--xmlui-borderHorizontal-badge-AutoComplete, var(--xmlui-border-badge-AutoComplete)))",
-      "borderRight-badge-AutoComplete": "var(--xmlui-borderRight-badge-AutoComplete, var(--xmlui-borderHorizontal-badge-AutoComplete, var(--xmlui-border-badge-AutoComplete)))",
-      "borderTop-badge-AutoComplete": "var(--xmlui-borderTop-badge-AutoComplete, var(--xmlui-borderVertical-badge-AutoComplete, var(--xmlui-border-badge-AutoComplete)))",
-      "borderBottom-badge-AutoComplete": "var(--xmlui-borderBottom-badge-AutoComplete, var(--xmlui-borderVertical-badge-AutoComplete, var(--xmlui-border-badge-AutoComplete)))",
-      "borderWidth-badge-AutoComplete": "var(--xmlui-borderWidth-badge-AutoComplete)",
-      "borderHorizontalWidth-badge-AutoComplete": "var(--xmlui-borderHorizontalWidth-badge-AutoComplete, var(--xmlui-borderWidth-badge-AutoComplete))",
-      "borderLeftWidth-badge-AutoComplete": "var(--xmlui-borderLeftWidth-badge-AutoComplete, var(--xmlui-borderHorizontalWidth-badge-AutoComplete, var(--xmlui-borderWidth-badge-AutoComplete)))",
-      "borderRightWidth-badge-AutoComplete": "var(--xmlui-borderRightWidth-badge-AutoComplete, var(--xmlui-borderHorizontalWidth-badge-AutoComplete, var(--xmlui-borderWidth-badge-AutoComplete)))",
-      "borderVerticalWidth-badge-AutoComplete": "var(--xmlui-borderVerticalWidth-badge-AutoComplete, var(--xmlui-borderWidth-badge-AutoComplete))",
-      "borderTopWidth-badge-AutoComplete": "var(--xmlui-borderTopWidth-badge-AutoComplete, var(--xmlui-borderVerticalWidth-badge-AutoComplete, var(--xmlui-borderWidth-badge-AutoComplete)))",
-      "borderBottomWidth-badge-AutoComplete": "var(--xmlui-borderBottomWidth-badge-AutoComplete, var(--xmlui-borderVerticalWidth-badge-AutoComplete, var(--xmlui-borderWidth-badge-AutoComplete)))",
-      "borderStyle-badge-AutoComplete": "var(--xmlui-borderStyle-badge-AutoComplete)",
-      "borderHorizontalStyle-badge-AutoComplete": "var(--xmlui-borderHorizontalStyle-badge-AutoComplete, var(--xmlui-borderStyle-badge-AutoComplete))",
-      "borderLeftStyle-badge-AutoComplete": "var(--xmlui-borderLeftStyle-badge-AutoComplete, var(--xmlui-borderHorizontalStyle-badge-AutoComplete, var(--xmlui-borderStyle-badge-AutoComplete)))",
-      "borderRightStyle-badge-AutoComplete": "var(--xmlui-borderRightStyle-badge-AutoComplete, var(--xmlui-borderHorizontalStyle-badge-AutoComplete, var(--xmlui-borderStyle-badge-AutoComplete)))",
-      "borderVerticalStyle-badge-AutoComplete": "var(--xmlui-borderVerticalStyle-badge-AutoComplete, var(--xmlui-borderStyle-badge-AutoComplete))",
-      "borderTopStyle-badge-AutoComplete": "var(--xmlui-borderTopStyle-badge-AutoComplete, var(--xmlui-borderVerticalStyle-badge-AutoComplete, var(--xmlui-borderStyle-badge-AutoComplete)))",
-      "borderBottomStyle-badge-AutoComplete": "var(--xmlui-borderBottomStyle-badge-AutoComplete, var(--xmlui-borderVerticalStyle-badge-AutoComplete, var(--xmlui-borderStyle-badge-AutoComplete)))",
-      "borderColor-badge-AutoComplete": "var(--xmlui-borderColor-badge-AutoComplete)",
-      "borderHorizontalColor-badge-AutoComplete": "var(--xmlui-borderHorizontalColor-badge-AutoComplete, var(--xmlui-borderColor-badge-AutoComplete))",
-      "borderLeftColor-badge-AutoComplete": "var(--xmlui-borderLeftColor-badge-AutoComplete, var(--xmlui-borderHorizontalColor-badge-AutoComplete, var(--xmlui-borderColor-badge-AutoComplete)))",
-      "borderRightColor-badge-AutoComplete": "var(--xmlui-borderRightColor-badge-AutoComplete, var(--xmlui-borderHorizontalColor-badge-AutoComplete, var(--xmlui-borderColor-badge-AutoComplete)))",
-      "borderVerticalColor-badge-AutoComplete": "var(--xmlui-borderVerticalColor-badge-AutoComplete, var(--xmlui-borderColor-badge-AutoComplete))",
-      "borderTopColor-badge-AutoComplete": "var(--xmlui-borderTopColor-badge-AutoComplete, var(--xmlui-borderVerticalColor-badge-AutoComplete, var(--xmlui-borderColor-badge-AutoComplete)))",
-      "borderBottomColor-badge-AutoComplete": "var(--xmlui-borderBottomColor-badge-AutoComplete, var(--xmlui-borderVerticalColor-badge-AutoComplete, var(--xmlui-borderColor-badge-AutoComplete)))",
-      "borderStartStartRadius-badge-AutoComplete": "var(--xmlui-borderStartStartRadius-badge-AutoComplete, var(--xmlui-borderRadius-badge-AutoComplete))",
-      "borderStartEndRadius-badge-AutoComplete": "var(--xmlui-borderStartEndRadius-badge-AutoComplete, var(--xmlui-borderRadius-badge-AutoComplete))",
-      "borderEndStartRadius-badge-AutoComplete": "var(--xmlui-borderEndStartRadius-badge-AutoComplete, var(--xmlui-borderRadius-badge-AutoComplete))",
-      "borderEndEndRadius-badge-AutoComplete": "var(--xmlui-borderEndEndRadius-badge-AutoComplete, var(--xmlui-borderRadius-badge-AutoComplete))",
       "Input:borderRadius-AutoComplete-default": "var(--xmlui-borderRadius-AutoComplete-default)",
       "Input:borderColor-AutoComplete-default": "var(--xmlui-borderColor-AutoComplete-default)",
       "Input:borderWidth-AutoComplete-default": "var(--xmlui-borderWidth-AutoComplete-default)",
@@ -2309,13 +2467,15 @@ export default {
       "Input:outlineColor-AutoComplete--focus": "var(--xmlui-outlineColor-AutoComplete--focus)",
       "Input:outlineStyle-AutoComplete--focus": "var(--xmlui-outlineStyle-AutoComplete--focus)",
       "Input:outlineOffset-AutoComplete--focus": "var(--xmlui-outlineOffset-AutoComplete--focus)",
-      "Input:fontSize-badge-AutoComplete": "var(--xmlui-fontSize-badge-AutoComplete)",
-      "Input:backgroundColor-badge-AutoComplete": "var(--xmlui-backgroundColor-badge-AutoComplete)",
-      "Input:textColor-badgeAutoComplete": "var(--xmlui-textColor-badgeAutoComplete)",
-      "Input:backgroundColor-badge-AutoComplete--hover": "var(--xmlui-backgroundColor-badge-AutoComplete--hover)",
-      "Input:textColor-badgeAutoComplete--hover": "var(--xmlui-textColor-badgeAutoComplete--hover)",
-      "Input:backgroundColor-badge-AutoComplete--active": "var(--xmlui-backgroundColor-badge-AutoComplete--active)",
-      "Input:textColor-badgeAutoComplete--active": "var(--xmlui-textColor-badgeAutoComplete--active)",
+      "paddingVertical-AutoComplete-badge": "var(--xmlui-paddingVertical-AutoComplete-badge)",
+      "paddingHorizontal-AutoComplete-badge": "var(--xmlui-paddingHorizontal-AutoComplete-badge)",
+      "Input:fontSize-AutoComplete-badge": "var(--xmlui-fontSize-AutoComplete-badge)",
+      "Input:backgroundColor-AutoComplete-badge": "var(--xmlui-backgroundColor-AutoComplete-badge)",
+      "Input:textColor-AutoComplete-badge": "var(--xmlui-textColor-AutoComplete-badge)",
+      "Input:backgroundColor-AutoComplete-badge--hover": "var(--xmlui-backgroundColor-AutoComplete-badge--hover)",
+      "Input:textColor-AutoComplete-badge--hover": "var(--xmlui-textColor-AutoComplete-badge--hover)",
+      "Input:backgroundColor-AutoComplete-badge--active": "var(--xmlui-backgroundColor-AutoComplete-badge--active)",
+      "Input:textColor-AutoComplete-badge--active": "var(--xmlui-textColor-AutoComplete-badge--active)",
       "Input:textColor-placeholder-AutoComplete": "var(--xmlui-textColor-placeholder-AutoComplete)",
       "Input:backgroundColor-menu-AutoComplete": "var(--xmlui-backgroundColor-menu-AutoComplete)",
       "Input:borderRadius-menu-AutoComplete": "var(--xmlui-borderRadius-menu-AutoComplete)",
@@ -2328,28 +2488,21 @@ export default {
       "backgroundColor-menu-AutoComplete": "$backgroundColor-primary",
       "boxShadow-menu-AutoComplete": "$boxShadow-md",
       "borderRadius-menu-AutoComplete": "$borderRadius",
+      "borderWidth-menu-AutoComplete": "1px",
+      "borderColor-menu-AutoComplete": "$borderColor",
       "backgroundColor-item-AutoComplete": "$backgroundColor-dropdown-item",
       "backgroundColor-item-AutoComplete--hover": "$backgroundColor-dropdown-item--active",
       "backgroundColor-item-AutoComplete--active": "$backgroundColor-dropdown-item--active",
       "minHeight-Input": "39px",
-      "backgroundColor-badge-AutoComplete": "$color-primary-500",
-      "fontSize-badge-AutoComplete": "$fontSize-small",
-      "paddingHorizontal-badge-AutoComplete": "$space-1",
-      "paddingVertical-badge-AutoComplete": "$space-1",
-      "light": {
-        "backgroundColor-badge-AutoComplete--hover": "$color-primary-400",
-        "backgroundColor-badge-AutoComplete--active": "$color-primary-500",
-        "textColor-item-AutoComplete--disabled": "$color-surface-200",
-        "textColor-badge-AutoComplete": "$color-surface-50"
-      },
-      "dark": {
-        "backgroundColor-badgeAutoComplete--hover": "$color-primary-600",
-        "backgroundColor-badgeAutoComplete--active": "$color-primary-500",
-        "textColor-badge-AutoComplete": "$color-surface-50",
-        "textColor-item-AutoComplete--disabled": "$color-surface-800"
-      }
-    },
-    "themeVarDescriptions": {}
+      "backgroundColor-AutoComplete-badge": "$color-primary-500",
+      "fontSize-AutoComplete-badge": "$fontSize-small",
+      "paddingHorizontal-AutoComplete-badge": "$space-1",
+      "paddingVertical-AutoComplete-badge": "$space-1",
+      "backgroundColor-AutoComplete-badge--hover": "$color-primary-400",
+      "backgroundColor-AutoComplete-badge--active": "$color-primary-500",
+      "textColor-item-AutoComplete--disabled": "$color-surface-200",
+      "textColor-AutoComplete-badge": "$const-color-surface-50"
+    }
   },
   "Avatar": {
     "description": "The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials.",
@@ -2434,20 +2587,13 @@ export default {
       "boxShadow-Avatar": "inset 0 0 0 1px rgba(4,32,69,0.1)",
       "textColor-Avatar": "$textColor-secondary",
       "fontWeight-Avatar": "$fontWeight-bold",
-      "light": {
-        "border-Avatar": "0px solid $color-surface-400A80",
-        "backgroundColor-Avatar": "$color-surface-100"
-      },
-      "dark": {
-        "border-Avatar": "0px solid $color-surface-700",
-        "backgroundColor-Avatar": "$color-surface-800",
-        "borderColor-Avatar": "$color-surface-700"
-      }
+      "border-Avatar": "0px solid $color-surface-400A80",
+      "backgroundColor-Avatar": "$color-surface-100"
     }
   },
   "Backdrop": {
-    "description": "The `Backdrop` component is a semi-transparent overlay that appears on top of its child component to obscure or highlight the content behind it.",
     "status": "stable",
+    "description": "The `Backdrop` component is a semi-transparent overlay that appears on top of its child component to obscure or highlight the content behind it.",
     "props": {
       "overlayTemplate": {
         "description": "This property defines the component template for an optional overlay to display over the component.",
@@ -2467,8 +2613,8 @@ export default {
     "themeVars": []
   },
   "Badge": {
-    "description": "The `Badge` is a text label that accepts a color map to define its background color and, optionally, its label color.",
     "status": "stable",
+    "description": "The `Badge` is a text label that accepts a color map to define its background color and, optionally, its label color.",
     "props": {
       "value": {
         "description": "The text that the component displays",
@@ -2549,6 +2695,32 @@ export default {
       "paddingRight-Badge": "var(--xmlui-paddingRight-Badge, var(--xmlui-paddingHorizontal-Badge, var(--xmlui-padding-Badge)))",
       "paddingTop-Badge": "var(--xmlui-paddingTop-Badge, var(--xmlui-paddingVertical-Badge, var(--xmlui-padding-Badge)))",
       "paddingBottom-Badge": "var(--xmlui-paddingBottom-Badge, var(--xmlui-paddingVertical-Badge, var(--xmlui-padding-Badge)))",
+      "textColor-Badge": "var(--xmlui-textColor-Badge)",
+      "fontFamily-Badge": "var(--xmlui-fontFamily-Badge)",
+      "fontSize-Badge": "var(--xmlui-fontSize-Badge)",
+      "fontStyle-Badge": "var(--xmlui-fontStyle-Badge)",
+      "fontVariant-Badge": "var(--xmlui-fontVariant-Badge)",
+      "fontWeight-Badge": "var(--xmlui-fontWeight-Badge)",
+      "fontStretch-Badge": "var(--xmlui-fontStretch-Badge)",
+      "textDecorationLine-Badge": "var(--xmlui-textDecorationLine-Badge)",
+      "textDecorationColor-Badge": "var(--xmlui-textDecorationColor-Badge)",
+      "textDecorationStyle-Badge": "var(--xmlui-textDecorationStyle-Badge)",
+      "textDecorationThickness-Badge": "var(--xmlui-textDecorationThickness-Badge)",
+      "textUnderlineOffset-Badge": "var(--xmlui-textUnderlineOffset-Badge)",
+      "lineHeight-Badge": "var(--xmlui-lineHeight-Badge)",
+      "backgroundColor-Badge": "var(--xmlui-backgroundColor-Badge)",
+      "textTransform-Badge": "var(--xmlui-textTransform-Badge)",
+      "letterSpacing-Badge": "var(--xmlui-letterSpacing-Badge)",
+      "wordSpacing-Badge": "var(--xmlui-wordSpacing-Badge)",
+      "textShadow-Badge": "var(--xmlui-textShadow-Badge)",
+      "textIndent-Badge": "var(--xmlui-textIndent-Badge)",
+      "textAlign-Badge": "var(--xmlui-textAlign-Badge)",
+      "textAlignLast-Badge": "var(--xmlui-textAlignLast-Badge)",
+      "wordBreak-Badge": "var(--xmlui-wordBreak-Badge)",
+      "wordWrap-Badge": "var(--xmlui-wordWrap-Badge)",
+      "direction-Badge": "var(--xmlui-direction-Badge)",
+      "writingMode-Badge": "var(--xmlui-writingMode-Badge)",
+      "lineBreak-Badge": "var(--xmlui-lineBreak-Badge)",
       "border-Badge-pill": "var(--xmlui-border-Badge-pill)",
       "borderHorizontal-Badge-pill": "var(--xmlui-borderHorizontal-Badge-pill, var(--xmlui-border-Badge-pill))",
       "borderVertical-Badge-pill": "var(--xmlui-borderVertical-Badge-pill, var(--xmlui-border-Badge-pill))",
@@ -2588,12 +2760,32 @@ export default {
       "paddingRight-Badge-pill": "var(--xmlui-paddingRight-Badge-pill, var(--xmlui-paddingHorizontal-Badge-pill, var(--xmlui-padding-Badge-pill)))",
       "paddingTop-Badge-pill": "var(--xmlui-paddingTop-Badge-pill, var(--xmlui-paddingVertical-Badge-pill, var(--xmlui-padding-Badge-pill)))",
       "paddingBottom-Badge-pill": "var(--xmlui-paddingBottom-Badge-pill, var(--xmlui-paddingVertical-Badge-pill, var(--xmlui-padding-Badge-pill)))",
-      "backgroundColor-Badge": "var(--xmlui-backgroundColor-Badge)",
-      "textColor-Badge": "var(--xmlui-textColor-Badge)",
-      "fontSize-Badge": "var(--xmlui-fontSize-Badge)",
+      "textColor-Badge-pill": "var(--xmlui-textColor-Badge-pill)",
+      "fontFamily-Badge-pill": "var(--xmlui-fontFamily-Badge-pill)",
       "fontSize-Badge-pill": "var(--xmlui-fontSize-Badge-pill)",
-      "fontWeight-Badge": "var(--xmlui-fontWeight-Badge)",
-      "fontWeight-Badge-pill": "var(--xmlui-fontWeight-Badge-pill)"
+      "fontStyle-Badge-pill": "var(--xmlui-fontStyle-Badge-pill)",
+      "fontVariant-Badge-pill": "var(--xmlui-fontVariant-Badge-pill)",
+      "fontWeight-Badge-pill": "var(--xmlui-fontWeight-Badge-pill)",
+      "fontStretch-Badge-pill": "var(--xmlui-fontStretch-Badge-pill)",
+      "textDecorationLine-Badge-pill": "var(--xmlui-textDecorationLine-Badge-pill)",
+      "textDecorationColor-Badge-pill": "var(--xmlui-textDecorationColor-Badge-pill)",
+      "textDecorationStyle-Badge-pill": "var(--xmlui-textDecorationStyle-Badge-pill)",
+      "textDecorationThickness-Badge-pill": "var(--xmlui-textDecorationThickness-Badge-pill)",
+      "textUnderlineOffset-Badge-pill": "var(--xmlui-textUnderlineOffset-Badge-pill)",
+      "lineHeight-Badge-pill": "var(--xmlui-lineHeight-Badge-pill)",
+      "backgroundColor-Badge-pill": "var(--xmlui-backgroundColor-Badge-pill)",
+      "textTransform-Badge-pill": "var(--xmlui-textTransform-Badge-pill)",
+      "letterSpacing-Badge-pill": "var(--xmlui-letterSpacing-Badge-pill)",
+      "wordSpacing-Badge-pill": "var(--xmlui-wordSpacing-Badge-pill)",
+      "textShadow-Badge-pill": "var(--xmlui-textShadow-Badge-pill)",
+      "textIndent-Badge-pill": "var(--xmlui-textIndent-Badge-pill)",
+      "textAlign-Badge-pill": "var(--xmlui-textAlign-Badge-pill)",
+      "textAlignLast-Badge-pill": "var(--xmlui-textAlignLast-Badge-pill)",
+      "wordBreak-Badge-pill": "var(--xmlui-wordBreak-Badge-pill)",
+      "wordWrap-Badge-pill": "var(--xmlui-wordWrap-Badge-pill)",
+      "direction-Badge-pill": "var(--xmlui-direction-Badge-pill)",
+      "writingMode-Badge-pill": "var(--xmlui-writingMode-Badge-pill)",
+      "lineBreak-Badge-pill": "var(--xmlui-lineBreak-Badge-pill)"
     },
     "defaultThemeVars": {
       "padding-Badge": "$space-0_5 $space-2",
@@ -2602,18 +2794,13 @@ export default {
       "borderRadius-Badge": "4px",
       "fontSize-Badge": "0.8em",
       "fontSize-Badge-pill": "0.8em",
-      "light": {
-        "backgroundColor-Badge": "rgba($color-secondary-500-rgb, .6)",
-        "textColor-Badge": "white"
-      },
-      "dark": {
-        "backgroundColor-Badge": "rgba($color-secondary-500-rgb, .6)",
-        "textColor-Badge": "$color-surface-50"
-      }
+      "backgroundColor-Badge": "rgba($color-secondary-500-rgb, .6)",
+      "textColor-Badge": "$const-color-surface-0"
     }
   },
   "Bookmark": {
     "description": "As its name suggests, this component places a bookmark into its parent component's view. The component has an `id` that you can use in links to navigate (scroll to) the bookmark's location.",
+    "opaque": true,
     "props": {
       "uid": {
         "description": "The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location.",
@@ -2633,8 +2820,7 @@ export default {
         "valueType": "boolean",
         "defaultValue": false
       }
-    },
-    "opaque": true
+    }
   },
   "Breakout": {
     "description": "The `Breakout` component creates a breakout section. It allows its child to occupy the entire width of the UI even if the app or the parent container constrains the maximum content width."
@@ -2794,6 +2980,10 @@ export default {
         ],
         "type": "string",
         "defaultValue": "center"
+      },
+      "contextualLabel": {
+        "description": "This optional value is used to provide an accessible name for the Button in the context of its usage.",
+        "type": "string"
       }
     },
     "events": {
@@ -3037,137 +3227,34 @@ export default {
       "paddingVertical-Button-md": "$space-3",
       "paddingHorizontal-Button-lg": "$space-5",
       "paddingVertical-Button-lg": "$space-4",
-      "light": {
-        "textColor-Button": "$color-surface-950",
-        "textColor-Button-solid": "$color-surface-50",
-        "borderColor-Button-primary": "$color-primary-500",
-        "backgroundColor-Button-primary--hover": "$color-primary-400",
-        "backgroundColor-Button-primary--active": "$color-primary-500",
-        "backgroundColor-Button-primary-outlined--hover": "$color-primary-50",
-        "backgroundColor-Button-primary-outlined--active": "$color-primary-100",
-        "borderColor-Button-primary-outlined": "$color-primary-600",
-        "borderColor-Button-primary-outlined--hover": "$color-primary-500",
-        "textColor-Button-primary-outlined": "$color-primary-900",
-        "textColor-Button-primary-outlined--hover": "$color-primary-950",
-        "textColor-Button-primary-outlined--active": "$color-primary-900",
-        "backgroundColor-Button-primary-ghost--hover": "$color-primary-50",
-        "backgroundColor-Button-primary-ghost--active": "$color-primary-100",
-        "borderColor-Button-secondary": "$color-secondary-100",
-        "backgroundColor-Button-secondary": "$color-secondary-500",
-        "backgroundColor-Button-secondary--hover": "$color-secondary-400",
-        "backgroundColor-Button-secondary--active": "$color-secondary-500",
-        "backgroundColor-Button-secondary-outlined--hover": "$color-secondary-50",
-        "backgroundColor-Button-secondary-outlined--active": "$color-secondary-100",
-        "backgroundColor-Button-secondary-ghost--hover": "$color-secondary-100",
-        "backgroundColor-Button-secondary-ghost--active": "$color-secondary-100",
-        "backgroundColor-Button-attention--hover": "$color-danger-400",
-        "backgroundColor-Button-attention--active": "$color-danger-500",
-        "backgroundColor-Button-attention-outlined--hover": "$color-danger-50",
-        "backgroundColor-Button-attention-outlined--active": "$color-danger-100",
-        "backgroundColor-Button-attention-ghost--hover": "$color-danger-50",
-        "backgroundColor-Button-attention-ghost--active": "$color-danger-100"
-      },
-      "dark": {
-        "textColor-Button": "$color-surface-50",
-        "textColor-Button-solid": "$color-surface-50",
-        "borderColor-Button-primary": "$color-primary-500",
-        "backgroundColor-Button-primary--hover": "$color-primary-600",
-        "backgroundColor-Button-primary--active": "$color-primary-500",
-        "backgroundColor-Button-primary-outlined--hover": "$color-primary-900",
-        "backgroundColor-Button-primary-outlined--active": "$color-primary-950",
-        "borderColor-Button-primary-outlined": "$color-primary-600",
-        "borderColor-Button-primary-outlined--hover": "$color-primary-500",
-        "textColor-Button-primary-outlined": "$color-primary-100",
-        "textColor-Button-primary-outlined--hover": "$color-primary-50",
-        "textColor-Button-primary-outlined--active": "$color-primary-100",
-        "backgroundColor-Button-primary-ghost--hover": "$color-primary-900",
-        "backgroundColor-Button-primary-ghost--active": "$color-primary-950",
-        "borderColor-Button-secondary": "$color-secondary-500",
-        "backgroundColor-Button-secondary": "$color-secondary-500",
-        "backgroundColor-Button-secondary--hover": "$color-secondary-400",
-        "backgroundColor-Button-secondary--active": "$color-secondary-500",
-        "backgroundColor-Button-secondary-outlined--hover": "$color-secondary-600",
-        "backgroundColor-Button-secondary-outlined--active": "$color-secondary-500",
-        "backgroundColor-Button-secondary-ghost--hover": "$color-secondary-900",
-        "backgroundColor-Button-secondary-ghost--active": "$color-secondary-950",
-        "backgroundColor-Button-attention--hover": "$color-danger-400",
-        "backgroundColor-Button-attention--active": "$color-danger-500",
-        "backgroundColor-Button-attention-outlined--hover": "$color-danger-900",
-        "backgroundColor-Button-attention-outlined--active": "$color-danger-950",
-        "backgroundColor-Button-attention-ghost--hover": "$color-danger-900",
-        "backgroundColor-Button-attention-ghost--active": "$color-danger-950"
-      }
-    }
-  },
-  "ButtonGroup": {
-    "description": "(**NOT IMPLEMENTED YET**) The `ButtonGroup` component is a container that embeds buttons used together for a particular reason. It provides a view that emphasizes this coherency.",
-    "status": "in progress",
-    "props": {
-      "themeColor": {
-        "description": "This optional property specifies the default theme color for the buttons in the group. Individual buttons may override this setting with their `themeColor` property.",
-        "availableValues": [
-          {
-            "value": "attention",
-            "description": "Attention state theme color"
-          },
-          {
-            "value": "primary",
-            "description": "Primary theme color"
-          },
-          {
-            "value": "secondary",
-            "description": "Secondary theme color"
-          }
-        ],
-        "valueType": "string",
-        "defaultValue": "primary"
-      },
-      "variant": {
-        "description": "This optional property specifies the default variant for the buttons in the group. Individual buttons may override this setting with their `variant` property.",
-        "availableValues": [
-          {
-            "value": "solid",
-            "description": "A button with a border and a filled background."
-          },
-          {
-            "value": "outlined",
-            "description": "The button is displayed with a border and a transparent background."
-          },
-          {
-            "value": "ghost",
-            "description": "A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked."
-          }
-        ],
-        "valueType": "string",
-        "defaultValue": "solid"
-      },
-      "orientation": {
-        "description": "This property sets the main axis along which the nested components are rendered.",
-        "availableValues": [
-          {
-            "value": "horizontal",
-            "description": "The component will fill the available space horizontally"
-          },
-          {
-            "value": "vertical",
-            "description": "The component will fill the available space vertically"
-          }
-        ],
-        "valueType": "string",
-        "defaultValue": "horizontal",
-        "isRequired": false
-      },
-      "buttonWidth": {
-        "description": "When this optional property is set, all buttons within the group will have the specified width. If it is empty, each button's width accommodates its content."
-      },
-      "gap": {
-        "description": "When this optional property is set, adjacent buttons will have the specified gap between them. If this property is not set, the buttons will be merged into one group."
-      }
-    },
-    "themeVars": [],
-    "defaultThemeVars": {
-      "light": {},
-      "dark": {}
+      "textColor-Button": "$color-surface-950",
+      "textColor-Button-solid": "$const-color-surface-50",
+      "borderColor-Button-primary": "$color-primary-500",
+      "backgroundColor-Button-primary--hover": "$color-primary-400",
+      "backgroundColor-Button-primary--active": "$color-primary-500",
+      "backgroundColor-Button-primary-outlined--hover": "$color-primary-50",
+      "backgroundColor-Button-primary-outlined--active": "$color-primary-100",
+      "borderColor-Button-primary-outlined": "$color-primary-600",
+      "borderColor-Button-primary-outlined--hover": "$color-primary-500",
+      "textColor-Button-primary-outlined": "$color-primary-900",
+      "textColor-Button-primary-outlined--hover": "$color-primary-950",
+      "textColor-Button-primary-outlined--active": "$color-primary-900",
+      "backgroundColor-Button-primary-ghost--hover": "$color-primary-50",
+      "backgroundColor-Button-primary-ghost--active": "$color-primary-100",
+      "borderColor-Button-secondary": "$color-secondary-100",
+      "backgroundColor-Button-secondary": "$color-secondary-500",
+      "backgroundColor-Button-secondary--hover": "$color-secondary-400",
+      "backgroundColor-Button-secondary--active": "$color-secondary-500",
+      "backgroundColor-Button-secondary-outlined--hover": "$color-secondary-50",
+      "backgroundColor-Button-secondary-outlined--active": "$color-secondary-100",
+      "backgroundColor-Button-secondary-ghost--hover": "$color-secondary-100",
+      "backgroundColor-Button-secondary-ghost--active": "$color-secondary-100",
+      "backgroundColor-Button-attention--hover": "$color-danger-400",
+      "backgroundColor-Button-attention--active": "$color-danger-500",
+      "backgroundColor-Button-attention-outlined--hover": "$color-danger-50",
+      "backgroundColor-Button-attention-outlined--active": "$color-danger-100",
+      "backgroundColor-Button-attention-ghost--hover": "$color-danger-50",
+      "backgroundColor-Button-attention-ghost--active": "$color-danger-100"
     }
   },
   "Card": {
@@ -3181,6 +3268,16 @@ export default {
         "description": "Indicates whether the Card should be displayed",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "avatarSize": {
+        "description": "This prop sets the size of the avatar. The default value is `sm`.",
+        "availableValues": [
+          "xs",
+          "sm",
+          "md",
+          "lg"
+        ],
+        "valueType": "string"
       },
       "title": {
         "description": "This prop sets the prestyled title.",
@@ -3257,24 +3354,35 @@ export default {
       "borderEndEndRadius-Card": "var(--xmlui-borderEndEndRadius-Card, var(--xmlui-borderRadius-Card))",
       "boxShadow-Card": "var(--xmlui-boxShadow-Card)",
       "backgroundColor-Card": "var(--xmlui-backgroundColor-Card)",
-      "borderRadius-Card": "var(--xmlui-borderRadius-Card)"
+      "borderRadius-Card": "var(--xmlui-borderRadius-Card)",
+      "gap-Card": "var(--xmlui-gap-Card)",
+      "gap-title-Card": "var(--xmlui-gap-title-Card)",
+      "gap-avatar-Card": "var(--xmlui-gap-avatar-Card)",
+      "horizontalAlignment-title-Card": "var(--xmlui-horizontalAlignment-title-Card)",
+      "verticalAlignment-title-Card": "var(--xmlui-verticalAlignment-title-Card)"
     },
     "defaultThemeVars": {
       "padding-Card": "$space-4",
       "border-Card": "1px solid $borderColor",
       "borderRadius-Card": "$borderRadius",
       "boxShadow-Card": "none",
-      "light": {
-        "backgroundColor-Card": "white"
-      },
-      "dark": {
-        "backgroundColor-Card": "$color-surface-900"
-      }
+      "backgroundColor-Card": "$color-surface-raised",
+      "gap-Card": "var(--stack-gap-default)",
+      "gap-title-Card": "$gap-normal",
+      "gap-avatar-Card": "$gap-normal",
+      "verticalAlignment-title-Card": "center"
+    },
+    "themeVarDescriptions": {
+      "gap-Card": "The gap between the component's children.",
+      "gap-title-Card": "The gap between the title and the subtitle",
+      "gap-avatar-Card": "The gap between the avatar and the title panel",
+      "horizontalAlignment-title-Card": "The horizontal alignment of panel with the title and subtitle",
+      "verticalAlignment-title-Card": "The vertical alignment of the title and subtitle to the avatar"
     }
   },
   "Carousel": {
-    "description": "This component displays a slideshow by cycling through elements (images, text, or custom slides) like a carousel.",
     "status": "in progress",
+    "description": "This component displays a slideshow by cycling through elements (images, text, or custom slides) like a carousel.",
     "props": {
       "orientation": {
         "description": "This property indicates the orientation of the carousel. The `horizontal` value indicates that the carousel moves horizontally, and the `vertical` value indicates that the carousel moves vertically.",
@@ -3389,6 +3497,9 @@ export default {
       "backgroundColor-indicator-active-Carousel": "var(--xmlui-backgroundColor-indicator-active-Carousel)",
       "textColor-indicator-active-Carousel": "var(--xmlui-textColor-indicator-active-Carousel)"
     },
+    "themeVarDescriptions": {
+      "width-indicator-Carousel": "Sets the width of the indicator."
+    },
     "defaultThemeVars": {
       "backgroundColor-control-Carousel": "$color-primary",
       "textColor-control-Carousel": "$textColor",
@@ -3411,9 +3522,6 @@ export default {
       "borderRadius-control-Carousel": "50%",
       "height-Carousel": "100%",
       "width-Carousel": "100%"
-    },
-    "themeVarDescriptions": {
-      "width-indicator-Carousel": "Sets the width of the indicator."
     }
   },
   "ChangeListener": {
@@ -3436,8 +3544,8 @@ export default {
     }
   },
   "Checkbox": {
-    "description": "The `Checkbox` component allows users to make binary choices, typically between checked or unchecked. It consists of a small box that can be toggled on or off by clicking on it.",
     "status": "stable",
+    "description": "The `Checkbox` component allows users to make binary choices, typically between checked or unchecked. It consists of a small box that can be toggled on or off by clicking on it.",
     "props": {
       "indeterminate": {
         "description": "The `true` value of this property signals that the component is in an _intedeterminate state_.",
@@ -3526,6 +3634,7 @@ export default {
         "description": "This property is used to define a custom checkbox input template"
       }
     },
+    "childrenAsTemplate": "inputTemplate",
     "events": {
       "gotFocus": {
         "description": "This event is triggered when the Checkbox has received the focus."
@@ -3615,23 +3724,15 @@ export default {
       "backgroundColor-checked-Checkbox-warning": "$borderColor-Checkbox-warning",
       "borderColor-checked-Checkbox-success": "$borderColor-Checkbox-success",
       "backgroundColor-checked-Checkbox-success": "$borderColor-Checkbox-success",
-      "light": {
-        "backgroundColor-indicator-Checkbox": "$backgroundColor-primary",
-        "borderColor-checked-Checkbox": "$color-primary-500",
-        "backgroundColor-checked-Checkbox": "$color-primary-500",
-        "backgroundColor-Checkbox--disabled": "$color-surface-200"
-      },
-      "dark": {
-        "backgroundColor-indicator-Checkbox": "$backgroundColor-primary",
-        "borderColor-checked-Checkbox": "$color-primary-400",
-        "backgroundColor-checked-Checkbox": "$color-primary-400",
-        "backgroundColor-Checkbox--disabled": "$color-surface-800"
-      }
+      "backgroundColor-indicator-Checkbox": "$backgroundColor-primary",
+      "borderColor-checked-Checkbox": "$color-primary-500",
+      "backgroundColor-checked-Checkbox": "$color-primary-500",
+      "backgroundColor-Checkbox--disabled": "$color-surface-200"
     }
   },
   "CODE": {
-    "description": "This component renders an HTML `code` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `code` tag.",
     "isHtmlTag": true
   },
   "ColorPicker": {
@@ -3870,11 +3971,11 @@ export default {
     }
   },
   "DataSource": {
-    "description": "The `DataSource` component manages fetching data from a web API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component.",
     "status": "stable",
+    "description": "The `DataSource` component manages fetching data from an API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component.",
     "props": {
       "method": {
-        "description": "The method by which the data fetching request is made.",
+        "description": "Set the HTTP method.",
         "defaultValue": "get",
         "availableValues": [
           "get",
@@ -3888,65 +3989,95 @@ export default {
           "connect"
         ]
       },
-      "url": {
-        "description": "This property represents the URL to fetch the data.",
+      "id": {
+        "description": "Set the ID used by other components to access the retrieved data in the `value`property of a `DataSource`, or status info in the `loaded` and `error` properties.",
         "isRequired": true,
         "valueType": "string"
       },
-      "rawBody": {
-        "description": "This property sets the request body to the value provided here without any conversion. Use the `body` property if you want the object sent in JSON. When you define `body` and `rawBody`, the latest one prevails.",
+      "url": {
+        "description": "Set the URL.",
+        "isRequired": true,
         "valueType": "string"
       },
       "body": {
-        "description": "This property sets the request body. The object you pass here will be serialized to JSON when sending the request. Use the `rawBody` property to send another request body using its native format. When you define `body` and `rawBody`, the latest one prevails."
+        "description": "Set the request body. The object you pass is serialized as a JSON string.",
+        "valueType": "any"
+      },
+      "rawBody": {
+        "description": "Set the request body with no serialization. Use it to send a payload  that has already been serialized to a JSON string.",
+        "valueType": "string"
       },
       "queryParams": {
-        "description": "This property sets the request body. The object you pass here will be serialized to JSON when sending the request. Use the `rawBody` property to send another request body using its native format. When you define `body` and `rawBody`, the latest one prevails."
+        "description": "Append key/value pairs to the URL.",
+        "valueType": "any"
       },
       "headers": {
-        "description": "You can define request header values as key and value pairs, where the key is the ID of the particular header and the value is that header's value."
+        "description": "Set request headers. Pass an object whose keys are header names and values are header values.",
+        "valueType": "any"
       },
       "pollIntervalInSeconds": {
-        "description": "By setting this property, you can define periodic data fetching. The `DataSource` component will refresh its data according to the time specified as seconds. When the data changes during the refresh, it will trigger the update mechanism of XMLUI and re-render the UI accordingly.",
+        "description": "Set the interval for periodic data fetching. If the data changes on refresh, XMLUI will re-render components that refer directly or indirectly to the `DataSource`. ",
         "valueType": "number"
       },
       "inProgressNotificationMessage": {
-        "description": "This property defines the message to display when the data fetch operation is in progress.",
+        "description": "Set the message to display when the data fetch is in progress.",
         "valueType": "string"
       },
       "completedNotificationMessage": {
-        "description": "This property defines the message to display when the data fetch operation has been completed.",
+        "description": "Set the message to display when the data fetch completes.",
         "valueType": "string"
       },
       "errorNotificationMessage": {
-        "description": "This property defines the message to display when the data fetch operation results in an error.",
+        "description": "Set the message to display when the there is an error.",
         "valueType": "string"
       },
       "resultSelector": {
-        "description": "The response of a data-fetching query may include additional information that the UI cannot (or does not intend) to process. With this property, you can define a selector that extracts the data from the response body."
+        "description": "Set an object key to extract a subset of the response data.",
+        "valueType": "string"
       },
       "transformResult": {
-        "description": "This property accepts a transformation function that receives the data coming from the backend after it has been through the evaluation of the optional `resultSelector` property. The function gets the entire result set and can transform it. The `DataSource` component `value` property will return the data from this function."
+        "description": "Set a function to perform a final transformation of the response data."
       },
       "prevPageSelector": {
         "description": "When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the previous page information from the response deserialized to an object."
       },
       "nextPageSelector": {
         "description": "When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the next page information from the response deserialized to an object."
+      },
+      "structuralSharing": {
+        "description": "This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.",
+        "defaultValue": "true"
       }
     },
     "events": {
       "loaded": {
-        "description": "The component triggers this event when the fetch operation has been completed and the data is loaded. The argument of the event is the data loaded."
+        "description": "The component triggers this event when the fetch operation has been completed and the data is loaded. The event has two arguments. The first is the data loaded; the second indicates if the event is a result of a refetch."
       },
       "error": {
         "description": "This event fires when a request results in an error."
       }
+    },
+    "apis": {
+      "value": {
+        "description": "This property retrieves the data queried from the source after optional transformations."
+      },
+      "inProgress": {
+        "description": "This property indicates if the data is being fetched."
+      },
+      "isRefetching": {
+        "description": "This property indicates if the data is being re-fetched."
+      },
+      "loaded": {
+        "description": "This property indicates if the data has been loaded."
+      },
+      "refetch": {
+        "description": "This method requests the re-fetch of the data."
+      }
     }
   },
   "DatePicker": {
-    "description": "A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.",
     "status": "experimental",
+    "description": "A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.",
     "props": {
       "placeholder": {
         "description": "A placeholder text that is visible in the input field when its empty.",
@@ -4109,6 +4240,9 @@ export default {
       }
     },
     "themeVars": {
+      "Input:backgroundColor-item-DatePicker--active": "var(--xmlui-backgroundColor-item-DatePicker--active)",
+      "Input:backgroundColor-item-DatePicker--hover": "var(--xmlui-backgroundColor-item-DatePicker--hover)",
+      "Input:textColor-value-DatePicker": "var(--xmlui-textColor-value-DatePicker)",
       "Input:minHeight-DatePicker": "var(--xmlui-minHeight-DatePicker)",
       "Input:fontSize-DatePicker": "var(--xmlui-fontSize-DatePicker)",
       "Input:borderRadius-DatePicker-default": "var(--xmlui-borderRadius-DatePicker-default)",
@@ -4188,25 +4322,15 @@ export default {
       "Input:borderColor-DatePicker--disabled": "var(--xmlui-borderColor-DatePicker--disabled)",
       "Input:boxShadow-menu-DatePicker": "var(--xmlui-boxShadow-menu-DatePicker)",
       "Input:backgroundColor-menu-DatePicker": "var(--xmlui-backgroundColor-menu-DatePicker)",
-      "Input:borderRadius-menu-DatePicker": "var(--xmlui-borderRadius-menu-DatePicker)",
-      "Input:backgroundColor-item-DatePicker--active": "var(--xmlui-backgroundColor-item-DatePicker--active)",
-      "Input:backgroundColor-item-DatePicker--hover": "var(--xmlui-backgroundColor-item-DatePicker--hover)",
-      "Input:textColor-value-DatePicker": "var(--xmlui-textColor-value-DatePicker)"
+      "Input:borderRadius-menu-DatePicker": "var(--xmlui-borderRadius-menu-DatePicker)"
     },
     "defaultThemeVars": {
       "boxShadow-menu-DatePicker": "$boxShadow-md",
       "borderRadius-menu-DatePicker": "$borderRadius",
       "textColor-value-DatePicker": "$textColor-primary",
-      "light": {
-        "backgroundColor-menu-DatePicker": "$color-surface-50",
-        "backgroundColor-item-DatePicker--hover": "$color-surface-100",
-        "backgroundColor-item-DatePicker--active": "$color-surface-200"
-      },
-      "dark": {
-        "backgroundColor-menu-DatePicker": "$color-surface-950",
-        "backgroundColor-item-DatePicker--hover": "$color-surface-600",
-        "backgroundColor-item-DatePicker--active": "$color-surface-700"
-      }
+      "backgroundColor-menu-DatePicker": "$color-surface-50",
+      "backgroundColor-item-DatePicker--hover": "$color-surface-100",
+      "backgroundColor-item-DatePicker--active": "$color-surface-200"
     }
   },
   "DropdownMenu": {
@@ -4334,6 +4458,7 @@ export default {
       "color-MenuItem--hover": "var(--xmlui-color-MenuItem--hover)",
       "color-MenuItem--active": "var(--xmlui-color-MenuItem--active)",
       "color-MenuItem--active--hover": "var(--xmlui-color-MenuItem--active--hover)",
+      "color-MenuItem--disabled": "var(--xmlui-color-MenuItem--disabled)",
       "marginTop-MenuSeparator": "var(--xmlui-marginTop-MenuSeparator)",
       "marginBottom-MenuSeparator": "var(--xmlui-marginBottom-MenuSeparator)",
       "width-MenuSeparator": "var(--xmlui-width-MenuSeparator)",
@@ -4341,7 +4466,7 @@ export default {
       "color-MenuSeparator": "var(--xmlui-color-MenuSeparator)"
     },
     "defaultThemeVars": {
-      "backgroundColor-DropdownMenu": "$backgroundColor-primary",
+      "backgroundColor-DropdownMenu": "$color-surface-raised",
       "minWidth-DropdownMenu": "160px",
       "boxShadow-DropdownMenu": "$boxShadow-xl",
       "borderStyle-DropdownMenu-content": "solid",
@@ -4349,8 +4474,8 @@ export default {
     }
   },
   "EM": {
-    "description": "This component renders an HTML `em` tag.",
     "status": "experimental",
+    "description": "This component renders an HTML `em` tag.",
     "isHtmlTag": true
   },
   "Fragment": {
@@ -4359,6 +4484,7 @@ export default {
   },
   "MenuItem": {
     "description": "This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action.",
+    "docFolder": "DropdownMenu",
     "props": {
       "iconPosition": {
         "description": "This property allows you to determine the position of the icon displayed in the menu item.",
@@ -4391,6 +4517,11 @@ export default {
         "description": "This property indicates if the specified menu item is active.",
         "valueType": "boolean",
         "defaultValue": false
+      },
+      "enabled": {
+        "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": true
       }
     },
     "events": {
@@ -4419,6 +4550,7 @@ export default {
       "color-MenuItem--hover": "var(--xmlui-color-MenuItem--hover)",
       "color-MenuItem--active": "var(--xmlui-color-MenuItem--active)",
       "color-MenuItem--active--hover": "var(--xmlui-color-MenuItem--active--hover)",
+      "color-MenuItem--disabled": "var(--xmlui-color-MenuItem--disabled)",
       "marginTop-MenuSeparator": "var(--xmlui-marginTop-MenuSeparator)",
       "marginBottom-MenuSeparator": "var(--xmlui-marginBottom-MenuSeparator)",
       "width-MenuSeparator": "var(--xmlui-width-MenuSeparator)",
@@ -4428,6 +4560,7 @@ export default {
     "defaultThemeVars": {
       "backgroundColor-MenuItem": "$backgroundColor-dropdown-item",
       "color-MenuItem": "$textColor-primary",
+      "color-MenuItem--disabled": "$textColor--disabled",
       "fontFamily-MenuItem": "$fontFamily",
       "fontSize-MenuItem": "$fontSize-small",
       "paddingVertical-MenuItem": "$space-2",
@@ -4439,11 +4572,11 @@ export default {
       "backgroundColor-MenuItem--active": "$backgroundColor-dropdown-item--active",
       "light": {},
       "dark": {}
-    },
-    "docFolder": "DropdownMenu"
+    }
   },
   "SubMenuItem": {
     "description": "This component represents a nested menu item within another menu or menu item.",
+    "docFolder": "DropdownMenu",
     "props": {
       "label": {
         "description": "This property sets the label of the component.",
@@ -4453,12 +4586,11 @@ export default {
         "description": "This property allows you to define a custom trigger instead of the default one provided by `SubMenuItem`.",
         "valueType": "ComponentDef"
       }
-    },
-    "docFolder": "DropdownMenu"
+    }
   },
   "EmojiSelector": {
-    "description": "The `EmojiSelector` component provides users with a graphical interface to browse, search and select emojis to insert into text fields, messages, or other forms of communication.",
     "status": "experimental",
+    "description": "The `EmojiSelector` component provides users with a graphical interface to browse, search and select emojis to insert into text fields, messages, or other forms of communication.",
     "props": {
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -4768,15 +4900,15 @@ export default {
       "fontSize-Footer": "$fontSize-small",
       "textColor-Footer": "$textColor-secondary",
       "maxWidth-content-Footer": "$maxWidth-content",
-      "border-Footer": "1px solid $borderColor",
+      "borderTop-Footer": "1px solid $borderColor",
       "padding-Footer": "$space-2 $space-4",
       "light": {},
       "dark": {}
     }
   },
   "Form": {
-    "description": "A `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing.",
     "status": "experimental",
+    "description": "A `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing.",
     "props": {
       "buttonRowTemplate": {
         "description": "This property allows defining a custom component to display the buttons at the bottom of the form.",
@@ -4886,39 +5018,23 @@ export default {
     "defaultThemeVars": {
       "gap-Form": "$space-4",
       "gap-buttonRow-Form": "$space-4",
-      "light": {
-        "backgroundColor-ValidationDisplay-error": "$color-danger-100",
-        "backgroundColor-ValidationDisplay-warning": "$color-warn-100",
-        "backgroundColor-ValidationDisplay-info": "$color-primary-100",
-        "backgroundColor-ValidationDisplay-valid": "$color-success-100",
-        "color-accent-ValidationDisplay-error": "$color-error",
-        "color-accent-ValidationDisplay-warning": "$color-warning",
-        "color-accent-ValidationDisplay-info": "$color-info",
-        "color-accent-ValidationDisplay-valid": "$color-valid",
-        "textColor-ValidationDisplay-error": "$color-error",
-        "textColor-ValidationDisplay-warning": "$color-warning",
-        "textColor-ValidationDisplay-info": "$color-info",
-        "textColor-ValidationDisplay-valid": "$color-valid"
-      },
-      "dark": {
-        "backgroundColor-ValidationDisplay-error": "$color-danger-900",
-        "backgroundColor-ValidationDisplay-warning": "$color-warn-900",
-        "backgroundColor-ValidationDisplay-info": "$color-secondary-800",
-        "backgroundColor-ValidationDisplay-valid": "$color-success-900",
-        "color-accent-ValidationDisplay-error": "$color-danger-500",
-        "color-accent-ValidationDisplay-warning": "$color-warn-700",
-        "color-accent-ValidationDisplay-info": "$color-surface-200",
-        "color-accent-ValidationDisplay-valid": "$color-success-600",
-        "textColor-ValidationDisplay-error": "$color-danger-500",
-        "textColor-ValidationDisplay-warning": "$color-warn-700",
-        "textColor-ValidationDisplay-info": "$color-secondary-200",
-        "textColor-ValidationDisplay-valid": "$color-success-600"
-      }
+      "backgroundColor-ValidationDisplay-error": "$color-danger-100",
+      "backgroundColor-ValidationDisplay-warning": "$color-warn-100",
+      "backgroundColor-ValidationDisplay-info": "$color-primary-100",
+      "backgroundColor-ValidationDisplay-valid": "$color-success-100",
+      "color-accent-ValidationDisplay-error": "$color-error",
+      "color-accent-ValidationDisplay-warning": "$color-warning",
+      "color-accent-ValidationDisplay-info": "$color-info",
+      "color-accent-ValidationDisplay-valid": "$color-valid",
+      "textColor-ValidationDisplay-error": "$color-error",
+      "textColor-ValidationDisplay-warning": "$color-warning",
+      "textColor-ValidationDisplay-info": "$color-info",
+      "textColor-ValidationDisplay-valid": "$color-valid"
     }
   },
   "FormItem": {
-    "description": "A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data.",
     "status": "experimental",
+    "description": "A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data.",
     "props": {
       "bindTo": {
         "description": "This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name."
@@ -5025,6 +5141,10 @@ export default {
           {
             "value": "colorpicker",
             "description": "Renders ColorPicker"
+          },
+          {
+            "value": "items",
+            "description": "Renders Items"
           },
           {
             "value": "custom",
@@ -5154,6 +5274,9 @@ export default {
       },
       "inputTemplate": {
         "description": "This property is used to define a custom input template."
+      },
+      "gap": {
+        "description": "This property defines the gap between the adornments and the input area."
       }
     },
     "events": {
@@ -5196,8 +5319,8 @@ export default {
     }
   },
   "FormSection": {
-    "description": "The `FormSection` is a component that groups cohesive elements together within a `Form`. This grouping is indicated visually: the child components of the `FormSection` are placed in a [`FlowLayout`](./FlowLayout.mdx) component.",
-    "status": "experimental"
+    "status": "experimental",
+    "description": "The `FormSection` is a component that groups cohesive elements together within a `Form`. This grouping is indicated visually: the child components of the `FormSection` are placed in a [`FlowLayout`](./FlowLayout.mdx) component."
   },
   "Heading": {
     "description": "Represents a heading text",
@@ -5235,12 +5358,403 @@ export default {
       }
     },
     "themeVars": {
+      "border-H1": "var(--xmlui-border-H1)",
+      "borderHorizontal-H1": "var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1))",
+      "borderVertical-H1": "var(--xmlui-borderVertical-H1, var(--xmlui-border-H1))",
+      "borderLeft-H1": "var(--xmlui-borderLeft-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderRight-H1": "var(--xmlui-borderRight-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderTop-H1": "var(--xmlui-borderTop-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderBottom-H1": "var(--xmlui-borderBottom-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderWidth-H1": "var(--xmlui-borderWidth-H1)",
+      "borderHorizontalWidth-H1": "var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderLeftWidth-H1": "var(--xmlui-borderLeftWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderRightWidth-H1": "var(--xmlui-borderRightWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderVerticalWidth-H1": "var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderTopWidth-H1": "var(--xmlui-borderTopWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderBottomWidth-H1": "var(--xmlui-borderBottomWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderStyle-H1": "var(--xmlui-borderStyle-H1)",
+      "borderHorizontalStyle-H1": "var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderLeftStyle-H1": "var(--xmlui-borderLeftStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderRightStyle-H1": "var(--xmlui-borderRightStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderVerticalStyle-H1": "var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderTopStyle-H1": "var(--xmlui-borderTopStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderBottomStyle-H1": "var(--xmlui-borderBottomStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderColor-H1": "var(--xmlui-borderColor-H1)",
+      "borderHorizontalColor-H1": "var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderLeftColor-H1": "var(--xmlui-borderLeftColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderRightColor-H1": "var(--xmlui-borderRightColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderVerticalColor-H1": "var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderTopColor-H1": "var(--xmlui-borderTopColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderBottomColor-H1": "var(--xmlui-borderBottomColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderStartStartRadius-H1": "var(--xmlui-borderStartStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderStartEndRadius-H1": "var(--xmlui-borderStartEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndStartRadius-H1": "var(--xmlui-borderEndStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndEndRadius-H1": "var(--xmlui-borderEndEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "padding-H1": "var(--xmlui-padding-H1)",
+      "paddingHorizontal-H1": "var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1))",
+      "paddingVertical-H1": "var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1))",
+      "paddingLeft-H1": "var(--xmlui-paddingLeft-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingRight-H1": "var(--xmlui-paddingRight-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingTop-H1": "var(--xmlui-paddingTop-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "paddingBottom-H1": "var(--xmlui-paddingBottom-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "textColor-H1": "var(--xmlui-textColor-H1)",
+      "fontFamily-H1": "var(--xmlui-fontFamily-H1)",
+      "fontSize-H1": "var(--xmlui-fontSize-H1)",
+      "fontStyle-H1": "var(--xmlui-fontStyle-H1)",
+      "fontVariant-H1": "var(--xmlui-fontVariant-H1)",
+      "fontWeight-H1": "var(--xmlui-fontWeight-H1)",
+      "fontStretch-H1": "var(--xmlui-fontStretch-H1)",
+      "textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
+      "textDecorationColor-H1": "var(--xmlui-textDecorationColor-H1)",
+      "textDecorationStyle-H1": "var(--xmlui-textDecorationStyle-H1)",
+      "textDecorationThickness-H1": "var(--xmlui-textDecorationThickness-H1)",
+      "textUnderlineOffset-H1": "var(--xmlui-textUnderlineOffset-H1)",
+      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
+      "backgroundColor-H1": "var(--xmlui-backgroundColor-H1)",
+      "textTransform-H1": "var(--xmlui-textTransform-H1)",
+      "letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
+      "wordSpacing-H1": "var(--xmlui-wordSpacing-H1)",
+      "textShadow-H1": "var(--xmlui-textShadow-H1)",
+      "textIndent-H1": "var(--xmlui-textIndent-H1)",
+      "textAlign-H1": "var(--xmlui-textAlign-H1)",
+      "textAlignLast-H1": "var(--xmlui-textAlignLast-H1)",
+      "wordBreak-H1": "var(--xmlui-wordBreak-H1)",
+      "wordWrap-H1": "var(--xmlui-wordWrap-H1)",
+      "direction-H1": "var(--xmlui-direction-H1)",
+      "writingMode-H1": "var(--xmlui-writingMode-H1)",
+      "lineBreak-H1": "var(--xmlui-lineBreak-H1)",
+      "border-H2": "var(--xmlui-border-H2)",
+      "borderHorizontal-H2": "var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2))",
+      "borderVertical-H2": "var(--xmlui-borderVertical-H2, var(--xmlui-border-H2))",
+      "borderLeft-H2": "var(--xmlui-borderLeft-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderRight-H2": "var(--xmlui-borderRight-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderTop-H2": "var(--xmlui-borderTop-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderBottom-H2": "var(--xmlui-borderBottom-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderWidth-H2": "var(--xmlui-borderWidth-H2)",
+      "borderHorizontalWidth-H2": "var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderLeftWidth-H2": "var(--xmlui-borderLeftWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderRightWidth-H2": "var(--xmlui-borderRightWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderVerticalWidth-H2": "var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderTopWidth-H2": "var(--xmlui-borderTopWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderBottomWidth-H2": "var(--xmlui-borderBottomWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderStyle-H2": "var(--xmlui-borderStyle-H2)",
+      "borderHorizontalStyle-H2": "var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderLeftStyle-H2": "var(--xmlui-borderLeftStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderRightStyle-H2": "var(--xmlui-borderRightStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderVerticalStyle-H2": "var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderTopStyle-H2": "var(--xmlui-borderTopStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderBottomStyle-H2": "var(--xmlui-borderBottomStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderColor-H2": "var(--xmlui-borderColor-H2)",
+      "borderHorizontalColor-H2": "var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderLeftColor-H2": "var(--xmlui-borderLeftColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderRightColor-H2": "var(--xmlui-borderRightColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderVerticalColor-H2": "var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderTopColor-H2": "var(--xmlui-borderTopColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderBottomColor-H2": "var(--xmlui-borderBottomColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderStartStartRadius-H2": "var(--xmlui-borderStartStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderStartEndRadius-H2": "var(--xmlui-borderStartEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndStartRadius-H2": "var(--xmlui-borderEndStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndEndRadius-H2": "var(--xmlui-borderEndEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "padding-H2": "var(--xmlui-padding-H2)",
+      "paddingHorizontal-H2": "var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2))",
+      "paddingVertical-H2": "var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2))",
+      "paddingLeft-H2": "var(--xmlui-paddingLeft-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingRight-H2": "var(--xmlui-paddingRight-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingTop-H2": "var(--xmlui-paddingTop-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "paddingBottom-H2": "var(--xmlui-paddingBottom-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "textColor-H2": "var(--xmlui-textColor-H2)",
+      "fontFamily-H2": "var(--xmlui-fontFamily-H2)",
+      "fontSize-H2": "var(--xmlui-fontSize-H2)",
+      "fontStyle-H2": "var(--xmlui-fontStyle-H2)",
+      "fontVariant-H2": "var(--xmlui-fontVariant-H2)",
+      "fontWeight-H2": "var(--xmlui-fontWeight-H2)",
+      "fontStretch-H2": "var(--xmlui-fontStretch-H2)",
+      "textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
+      "textDecorationColor-H2": "var(--xmlui-textDecorationColor-H2)",
+      "textDecorationStyle-H2": "var(--xmlui-textDecorationStyle-H2)",
+      "textDecorationThickness-H2": "var(--xmlui-textDecorationThickness-H2)",
+      "textUnderlineOffset-H2": "var(--xmlui-textUnderlineOffset-H2)",
+      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
+      "backgroundColor-H2": "var(--xmlui-backgroundColor-H2)",
+      "textTransform-H2": "var(--xmlui-textTransform-H2)",
+      "letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
+      "wordSpacing-H2": "var(--xmlui-wordSpacing-H2)",
+      "textShadow-H2": "var(--xmlui-textShadow-H2)",
+      "textIndent-H2": "var(--xmlui-textIndent-H2)",
+      "textAlign-H2": "var(--xmlui-textAlign-H2)",
+      "textAlignLast-H2": "var(--xmlui-textAlignLast-H2)",
+      "wordBreak-H2": "var(--xmlui-wordBreak-H2)",
+      "wordWrap-H2": "var(--xmlui-wordWrap-H2)",
+      "direction-H2": "var(--xmlui-direction-H2)",
+      "writingMode-H2": "var(--xmlui-writingMode-H2)",
+      "lineBreak-H2": "var(--xmlui-lineBreak-H2)",
+      "border-H3": "var(--xmlui-border-H3)",
+      "borderHorizontal-H3": "var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3))",
+      "borderVertical-H3": "var(--xmlui-borderVertical-H3, var(--xmlui-border-H3))",
+      "borderLeft-H3": "var(--xmlui-borderLeft-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderRight-H3": "var(--xmlui-borderRight-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderTop-H3": "var(--xmlui-borderTop-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderBottom-H3": "var(--xmlui-borderBottom-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderWidth-H3": "var(--xmlui-borderWidth-H3)",
+      "borderHorizontalWidth-H3": "var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderLeftWidth-H3": "var(--xmlui-borderLeftWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderRightWidth-H3": "var(--xmlui-borderRightWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderVerticalWidth-H3": "var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderTopWidth-H3": "var(--xmlui-borderTopWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderBottomWidth-H3": "var(--xmlui-borderBottomWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderStyle-H3": "var(--xmlui-borderStyle-H3)",
+      "borderHorizontalStyle-H3": "var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderLeftStyle-H3": "var(--xmlui-borderLeftStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderRightStyle-H3": "var(--xmlui-borderRightStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderVerticalStyle-H3": "var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderTopStyle-H3": "var(--xmlui-borderTopStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderBottomStyle-H3": "var(--xmlui-borderBottomStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderColor-H3": "var(--xmlui-borderColor-H3)",
+      "borderHorizontalColor-H3": "var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderLeftColor-H3": "var(--xmlui-borderLeftColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderRightColor-H3": "var(--xmlui-borderRightColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderVerticalColor-H3": "var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderTopColor-H3": "var(--xmlui-borderTopColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderBottomColor-H3": "var(--xmlui-borderBottomColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderStartStartRadius-H3": "var(--xmlui-borderStartStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderStartEndRadius-H3": "var(--xmlui-borderStartEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndStartRadius-H3": "var(--xmlui-borderEndStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndEndRadius-H3": "var(--xmlui-borderEndEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "padding-H3": "var(--xmlui-padding-H3)",
+      "paddingHorizontal-H3": "var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3))",
+      "paddingVertical-H3": "var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3))",
+      "paddingLeft-H3": "var(--xmlui-paddingLeft-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingRight-H3": "var(--xmlui-paddingRight-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingTop-H3": "var(--xmlui-paddingTop-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "paddingBottom-H3": "var(--xmlui-paddingBottom-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "textColor-H3": "var(--xmlui-textColor-H3)",
+      "fontFamily-H3": "var(--xmlui-fontFamily-H3)",
+      "fontSize-H3": "var(--xmlui-fontSize-H3)",
+      "fontStyle-H3": "var(--xmlui-fontStyle-H3)",
+      "fontVariant-H3": "var(--xmlui-fontVariant-H3)",
+      "fontWeight-H3": "var(--xmlui-fontWeight-H3)",
+      "fontStretch-H3": "var(--xmlui-fontStretch-H3)",
+      "textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
+      "textDecorationColor-H3": "var(--xmlui-textDecorationColor-H3)",
+      "textDecorationStyle-H3": "var(--xmlui-textDecorationStyle-H3)",
+      "textDecorationThickness-H3": "var(--xmlui-textDecorationThickness-H3)",
+      "textUnderlineOffset-H3": "var(--xmlui-textUnderlineOffset-H3)",
+      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
+      "backgroundColor-H3": "var(--xmlui-backgroundColor-H3)",
+      "textTransform-H3": "var(--xmlui-textTransform-H3)",
+      "letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
+      "wordSpacing-H3": "var(--xmlui-wordSpacing-H3)",
+      "textShadow-H3": "var(--xmlui-textShadow-H3)",
+      "textIndent-H3": "var(--xmlui-textIndent-H3)",
+      "textAlign-H3": "var(--xmlui-textAlign-H3)",
+      "textAlignLast-H3": "var(--xmlui-textAlignLast-H3)",
+      "wordBreak-H3": "var(--xmlui-wordBreak-H3)",
+      "wordWrap-H3": "var(--xmlui-wordWrap-H3)",
+      "direction-H3": "var(--xmlui-direction-H3)",
+      "writingMode-H3": "var(--xmlui-writingMode-H3)",
+      "lineBreak-H3": "var(--xmlui-lineBreak-H3)",
+      "border-H4": "var(--xmlui-border-H4)",
+      "borderHorizontal-H4": "var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4))",
+      "borderVertical-H4": "var(--xmlui-borderVertical-H4, var(--xmlui-border-H4))",
+      "borderLeft-H4": "var(--xmlui-borderLeft-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderRight-H4": "var(--xmlui-borderRight-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderTop-H4": "var(--xmlui-borderTop-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderBottom-H4": "var(--xmlui-borderBottom-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderWidth-H4": "var(--xmlui-borderWidth-H4)",
+      "borderHorizontalWidth-H4": "var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderLeftWidth-H4": "var(--xmlui-borderLeftWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderRightWidth-H4": "var(--xmlui-borderRightWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderVerticalWidth-H4": "var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderTopWidth-H4": "var(--xmlui-borderTopWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderBottomWidth-H4": "var(--xmlui-borderBottomWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderStyle-H4": "var(--xmlui-borderStyle-H4)",
+      "borderHorizontalStyle-H4": "var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderLeftStyle-H4": "var(--xmlui-borderLeftStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderRightStyle-H4": "var(--xmlui-borderRightStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderVerticalStyle-H4": "var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderTopStyle-H4": "var(--xmlui-borderTopStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderBottomStyle-H4": "var(--xmlui-borderBottomStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderColor-H4": "var(--xmlui-borderColor-H4)",
+      "borderHorizontalColor-H4": "var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderLeftColor-H4": "var(--xmlui-borderLeftColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderRightColor-H4": "var(--xmlui-borderRightColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderVerticalColor-H4": "var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderTopColor-H4": "var(--xmlui-borderTopColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderBottomColor-H4": "var(--xmlui-borderBottomColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderStartStartRadius-H4": "var(--xmlui-borderStartStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderStartEndRadius-H4": "var(--xmlui-borderStartEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndStartRadius-H4": "var(--xmlui-borderEndStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndEndRadius-H4": "var(--xmlui-borderEndEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "padding-H4": "var(--xmlui-padding-H4)",
+      "paddingHorizontal-H4": "var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4))",
+      "paddingVertical-H4": "var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4))",
+      "paddingLeft-H4": "var(--xmlui-paddingLeft-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingRight-H4": "var(--xmlui-paddingRight-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingTop-H4": "var(--xmlui-paddingTop-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "paddingBottom-H4": "var(--xmlui-paddingBottom-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "textColor-H4": "var(--xmlui-textColor-H4)",
+      "fontFamily-H4": "var(--xmlui-fontFamily-H4)",
+      "fontSize-H4": "var(--xmlui-fontSize-H4)",
+      "fontStyle-H4": "var(--xmlui-fontStyle-H4)",
+      "fontVariant-H4": "var(--xmlui-fontVariant-H4)",
+      "fontWeight-H4": "var(--xmlui-fontWeight-H4)",
+      "fontStretch-H4": "var(--xmlui-fontStretch-H4)",
+      "textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
+      "textDecorationColor-H4": "var(--xmlui-textDecorationColor-H4)",
+      "textDecorationStyle-H4": "var(--xmlui-textDecorationStyle-H4)",
+      "textDecorationThickness-H4": "var(--xmlui-textDecorationThickness-H4)",
+      "textUnderlineOffset-H4": "var(--xmlui-textUnderlineOffset-H4)",
+      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
+      "backgroundColor-H4": "var(--xmlui-backgroundColor-H4)",
+      "textTransform-H4": "var(--xmlui-textTransform-H4)",
+      "letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
+      "wordSpacing-H4": "var(--xmlui-wordSpacing-H4)",
+      "textShadow-H4": "var(--xmlui-textShadow-H4)",
+      "textIndent-H4": "var(--xmlui-textIndent-H4)",
+      "textAlign-H4": "var(--xmlui-textAlign-H4)",
+      "textAlignLast-H4": "var(--xmlui-textAlignLast-H4)",
+      "wordBreak-H4": "var(--xmlui-wordBreak-H4)",
+      "wordWrap-H4": "var(--xmlui-wordWrap-H4)",
+      "direction-H4": "var(--xmlui-direction-H4)",
+      "writingMode-H4": "var(--xmlui-writingMode-H4)",
+      "lineBreak-H4": "var(--xmlui-lineBreak-H4)",
+      "border-H5": "var(--xmlui-border-H5)",
+      "borderHorizontal-H5": "var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5))",
+      "borderVertical-H5": "var(--xmlui-borderVertical-H5, var(--xmlui-border-H5))",
+      "borderLeft-H5": "var(--xmlui-borderLeft-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderRight-H5": "var(--xmlui-borderRight-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderTop-H5": "var(--xmlui-borderTop-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderBottom-H5": "var(--xmlui-borderBottom-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderWidth-H5": "var(--xmlui-borderWidth-H5)",
+      "borderHorizontalWidth-H5": "var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderLeftWidth-H5": "var(--xmlui-borderLeftWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderRightWidth-H5": "var(--xmlui-borderRightWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderVerticalWidth-H5": "var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderTopWidth-H5": "var(--xmlui-borderTopWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderBottomWidth-H5": "var(--xmlui-borderBottomWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderStyle-H5": "var(--xmlui-borderStyle-H5)",
+      "borderHorizontalStyle-H5": "var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderLeftStyle-H5": "var(--xmlui-borderLeftStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderRightStyle-H5": "var(--xmlui-borderRightStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderVerticalStyle-H5": "var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderTopStyle-H5": "var(--xmlui-borderTopStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderBottomStyle-H5": "var(--xmlui-borderBottomStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderColor-H5": "var(--xmlui-borderColor-H5)",
+      "borderHorizontalColor-H5": "var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderLeftColor-H5": "var(--xmlui-borderLeftColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderRightColor-H5": "var(--xmlui-borderRightColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderVerticalColor-H5": "var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderTopColor-H5": "var(--xmlui-borderTopColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderBottomColor-H5": "var(--xmlui-borderBottomColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderStartStartRadius-H5": "var(--xmlui-borderStartStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderStartEndRadius-H5": "var(--xmlui-borderStartEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndStartRadius-H5": "var(--xmlui-borderEndStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndEndRadius-H5": "var(--xmlui-borderEndEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "padding-H5": "var(--xmlui-padding-H5)",
+      "paddingHorizontal-H5": "var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5))",
+      "paddingVertical-H5": "var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5))",
+      "paddingLeft-H5": "var(--xmlui-paddingLeft-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingRight-H5": "var(--xmlui-paddingRight-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingTop-H5": "var(--xmlui-paddingTop-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "paddingBottom-H5": "var(--xmlui-paddingBottom-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "textColor-H5": "var(--xmlui-textColor-H5)",
+      "fontFamily-H5": "var(--xmlui-fontFamily-H5)",
+      "fontSize-H5": "var(--xmlui-fontSize-H5)",
+      "fontStyle-H5": "var(--xmlui-fontStyle-H5)",
+      "fontVariant-H5": "var(--xmlui-fontVariant-H5)",
+      "fontWeight-H5": "var(--xmlui-fontWeight-H5)",
+      "fontStretch-H5": "var(--xmlui-fontStretch-H5)",
+      "textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
+      "textDecorationColor-H5": "var(--xmlui-textDecorationColor-H5)",
+      "textDecorationStyle-H5": "var(--xmlui-textDecorationStyle-H5)",
+      "textDecorationThickness-H5": "var(--xmlui-textDecorationThickness-H5)",
+      "textUnderlineOffset-H5": "var(--xmlui-textUnderlineOffset-H5)",
+      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
+      "backgroundColor-H5": "var(--xmlui-backgroundColor-H5)",
+      "textTransform-H5": "var(--xmlui-textTransform-H5)",
+      "letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
+      "wordSpacing-H5": "var(--xmlui-wordSpacing-H5)",
+      "textShadow-H5": "var(--xmlui-textShadow-H5)",
+      "textIndent-H5": "var(--xmlui-textIndent-H5)",
+      "textAlign-H5": "var(--xmlui-textAlign-H5)",
+      "textAlignLast-H5": "var(--xmlui-textAlignLast-H5)",
+      "wordBreak-H5": "var(--xmlui-wordBreak-H5)",
+      "wordWrap-H5": "var(--xmlui-wordWrap-H5)",
+      "direction-H5": "var(--xmlui-direction-H5)",
+      "writingMode-H5": "var(--xmlui-writingMode-H5)",
+      "lineBreak-H5": "var(--xmlui-lineBreak-H5)",
+      "border-H6": "var(--xmlui-border-H6)",
+      "borderHorizontal-H6": "var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6))",
+      "borderVertical-H6": "var(--xmlui-borderVertical-H6, var(--xmlui-border-H6))",
+      "borderLeft-H6": "var(--xmlui-borderLeft-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderRight-H6": "var(--xmlui-borderRight-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderTop-H6": "var(--xmlui-borderTop-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderBottom-H6": "var(--xmlui-borderBottom-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderWidth-H6": "var(--xmlui-borderWidth-H6)",
+      "borderHorizontalWidth-H6": "var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderLeftWidth-H6": "var(--xmlui-borderLeftWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderRightWidth-H6": "var(--xmlui-borderRightWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderVerticalWidth-H6": "var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderTopWidth-H6": "var(--xmlui-borderTopWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderBottomWidth-H6": "var(--xmlui-borderBottomWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderStyle-H6": "var(--xmlui-borderStyle-H6)",
+      "borderHorizontalStyle-H6": "var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderLeftStyle-H6": "var(--xmlui-borderLeftStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderRightStyle-H6": "var(--xmlui-borderRightStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderVerticalStyle-H6": "var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderTopStyle-H6": "var(--xmlui-borderTopStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderBottomStyle-H6": "var(--xmlui-borderBottomStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderColor-H6": "var(--xmlui-borderColor-H6)",
+      "borderHorizontalColor-H6": "var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderLeftColor-H6": "var(--xmlui-borderLeftColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderRightColor-H6": "var(--xmlui-borderRightColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderVerticalColor-H6": "var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderTopColor-H6": "var(--xmlui-borderTopColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderBottomColor-H6": "var(--xmlui-borderBottomColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderStartStartRadius-H6": "var(--xmlui-borderStartStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderStartEndRadius-H6": "var(--xmlui-borderStartEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndStartRadius-H6": "var(--xmlui-borderEndStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndEndRadius-H6": "var(--xmlui-borderEndEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "padding-H6": "var(--xmlui-padding-H6)",
+      "paddingHorizontal-H6": "var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6))",
+      "paddingVertical-H6": "var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6))",
+      "paddingLeft-H6": "var(--xmlui-paddingLeft-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingRight-H6": "var(--xmlui-paddingRight-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingTop-H6": "var(--xmlui-paddingTop-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "paddingBottom-H6": "var(--xmlui-paddingBottom-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "textColor-H6": "var(--xmlui-textColor-H6)",
+      "fontFamily-H6": "var(--xmlui-fontFamily-H6)",
+      "fontSize-H6": "var(--xmlui-fontSize-H6)",
+      "fontStyle-H6": "var(--xmlui-fontStyle-H6)",
+      "fontVariant-H6": "var(--xmlui-fontVariant-H6)",
+      "fontWeight-H6": "var(--xmlui-fontWeight-H6)",
+      "fontStretch-H6": "var(--xmlui-fontStretch-H6)",
+      "textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
+      "textDecorationColor-H6": "var(--xmlui-textDecorationColor-H6)",
+      "textDecorationStyle-H6": "var(--xmlui-textDecorationStyle-H6)",
+      "textDecorationThickness-H6": "var(--xmlui-textDecorationThickness-H6)",
+      "textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)",
+      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
+      "backgroundColor-H6": "var(--xmlui-backgroundColor-H6)",
+      "textTransform-H6": "var(--xmlui-textTransform-H6)",
+      "letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
+      "wordSpacing-H6": "var(--xmlui-wordSpacing-H6)",
+      "textShadow-H6": "var(--xmlui-textShadow-H6)",
+      "textIndent-H6": "var(--xmlui-textIndent-H6)",
+      "textAlign-H6": "var(--xmlui-textAlign-H6)",
+      "textAlignLast-H6": "var(--xmlui-textAlignLast-H6)",
+      "wordBreak-H6": "var(--xmlui-wordBreak-H6)",
+      "wordWrap-H6": "var(--xmlui-wordWrap-H6)",
+      "direction-H6": "var(--xmlui-direction-H6)",
+      "writingMode-H6": "var(--xmlui-writingMode-H6)",
+      "lineBreak-H6": "var(--xmlui-lineBreak-H6)",
+      "color-anchor-Heading": "var(--xmlui-color-anchor-Heading)",
+      "gap-anchor-Heading": "var(--xmlui-gap-anchor-Heading)",
+      "textDecorationLine-anchor-Heading": "var(--xmlui-textDecorationLine-anchor-Heading)",
       "Heading:textColor-H1": "var(--xmlui-textColor-H1)",
       "Heading:letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
       "Heading:fontFamily-H1": "var(--xmlui-fontFamily-H1)",
       "Heading:fontWeight-H1": "var(--xmlui-fontWeight-H1)",
-      "fontSize-H1": "var(--xmlui-fontSize-H1)",
-      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
       "marginTop-H1": "var(--xmlui-marginTop-H1)",
       "marginBottom-H1": "var(--xmlui-marginBottom-H1)",
       "Heading:textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
@@ -5252,8 +5766,6 @@ export default {
       "Heading:letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
       "Heading:fontFamily-H2": "var(--xmlui-fontFamily-H2)",
       "Heading:fontWeight-H2": "var(--xmlui-fontWeight-H2)",
-      "fontSize-H2": "var(--xmlui-fontSize-H2)",
-      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
       "marginTop-H2": "var(--xmlui-marginTop-H2)",
       "marginBottom-H2": "var(--xmlui-marginBottom-H2)",
       "Heading:textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
@@ -5265,8 +5777,6 @@ export default {
       "Heading:letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
       "Heading:fontFamily-H3": "var(--xmlui-fontFamily-H3)",
       "Heading:fontWeight-H3": "var(--xmlui-fontWeight-H3)",
-      "fontSize-H3": "var(--xmlui-fontSize-H3)",
-      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
       "marginTop-H3": "var(--xmlui-marginTop-H3)",
       "marginBottom-H3": "var(--xmlui-marginBottom-H3)",
       "Heading:textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
@@ -5278,8 +5788,6 @@ export default {
       "Heading:letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
       "Heading:fontFamily-H4": "var(--xmlui-fontFamily-H4)",
       "Heading:fontWeight-H4": "var(--xmlui-fontWeight-H4)",
-      "fontSize-H4": "var(--xmlui-fontSize-H4)",
-      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
       "marginTop-H4": "var(--xmlui-marginTop-H4)",
       "marginBottom-H4": "var(--xmlui-marginBottom-H4)",
       "Heading:textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
@@ -5291,8 +5799,6 @@ export default {
       "Heading:letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
       "Heading:fontFamily-H5": "var(--xmlui-fontFamily-H5)",
       "Heading:fontWeight-H5": "var(--xmlui-fontWeight-H5)",
-      "fontSize-H5": "var(--xmlui-fontSize-H5)",
-      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
       "marginTop-H5": "var(--xmlui-marginTop-H5)",
       "marginBottom-H5": "var(--xmlui-marginBottom-H5)",
       "Heading:textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
@@ -5304,8 +5810,6 @@ export default {
       "Heading:letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
       "Heading:fontFamily-H6": "var(--xmlui-fontFamily-H6)",
       "Heading:fontWeight-H6": "var(--xmlui-fontWeight-H6)",
-      "fontSize-H6": "var(--xmlui-fontSize-H6)",
-      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
       "marginTop-H6": "var(--xmlui-marginTop-H6)",
       "marginBottom-H6": "var(--xmlui-marginBottom-H6)",
       "Heading:textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
@@ -5319,6 +5823,9 @@ export default {
       "textColor-Heading": "inherit",
       "fontWeight-Heading": "$fontWeight-bold",
       "letterSpacing-Heading ": "0",
+      "color-anchor-Heading ": "$color-surface-400",
+      "gap-anchor-Heading ": "$space-2",
+      "textDecorationLine-anchor-Heading ": "underline",
       "light": {},
       "dark": {}
     }
@@ -5340,12 +5847,403 @@ export default {
       }
     },
     "themeVars": {
+      "border-H1": "var(--xmlui-border-H1)",
+      "borderHorizontal-H1": "var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1))",
+      "borderVertical-H1": "var(--xmlui-borderVertical-H1, var(--xmlui-border-H1))",
+      "borderLeft-H1": "var(--xmlui-borderLeft-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderRight-H1": "var(--xmlui-borderRight-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderTop-H1": "var(--xmlui-borderTop-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderBottom-H1": "var(--xmlui-borderBottom-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderWidth-H1": "var(--xmlui-borderWidth-H1)",
+      "borderHorizontalWidth-H1": "var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderLeftWidth-H1": "var(--xmlui-borderLeftWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderRightWidth-H1": "var(--xmlui-borderRightWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderVerticalWidth-H1": "var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderTopWidth-H1": "var(--xmlui-borderTopWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderBottomWidth-H1": "var(--xmlui-borderBottomWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderStyle-H1": "var(--xmlui-borderStyle-H1)",
+      "borderHorizontalStyle-H1": "var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderLeftStyle-H1": "var(--xmlui-borderLeftStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderRightStyle-H1": "var(--xmlui-borderRightStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderVerticalStyle-H1": "var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderTopStyle-H1": "var(--xmlui-borderTopStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderBottomStyle-H1": "var(--xmlui-borderBottomStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderColor-H1": "var(--xmlui-borderColor-H1)",
+      "borderHorizontalColor-H1": "var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderLeftColor-H1": "var(--xmlui-borderLeftColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderRightColor-H1": "var(--xmlui-borderRightColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderVerticalColor-H1": "var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderTopColor-H1": "var(--xmlui-borderTopColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderBottomColor-H1": "var(--xmlui-borderBottomColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderStartStartRadius-H1": "var(--xmlui-borderStartStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderStartEndRadius-H1": "var(--xmlui-borderStartEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndStartRadius-H1": "var(--xmlui-borderEndStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndEndRadius-H1": "var(--xmlui-borderEndEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "padding-H1": "var(--xmlui-padding-H1)",
+      "paddingHorizontal-H1": "var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1))",
+      "paddingVertical-H1": "var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1))",
+      "paddingLeft-H1": "var(--xmlui-paddingLeft-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingRight-H1": "var(--xmlui-paddingRight-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingTop-H1": "var(--xmlui-paddingTop-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "paddingBottom-H1": "var(--xmlui-paddingBottom-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "textColor-H1": "var(--xmlui-textColor-H1)",
+      "fontFamily-H1": "var(--xmlui-fontFamily-H1)",
+      "fontSize-H1": "var(--xmlui-fontSize-H1)",
+      "fontStyle-H1": "var(--xmlui-fontStyle-H1)",
+      "fontVariant-H1": "var(--xmlui-fontVariant-H1)",
+      "fontWeight-H1": "var(--xmlui-fontWeight-H1)",
+      "fontStretch-H1": "var(--xmlui-fontStretch-H1)",
+      "textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
+      "textDecorationColor-H1": "var(--xmlui-textDecorationColor-H1)",
+      "textDecorationStyle-H1": "var(--xmlui-textDecorationStyle-H1)",
+      "textDecorationThickness-H1": "var(--xmlui-textDecorationThickness-H1)",
+      "textUnderlineOffset-H1": "var(--xmlui-textUnderlineOffset-H1)",
+      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
+      "backgroundColor-H1": "var(--xmlui-backgroundColor-H1)",
+      "textTransform-H1": "var(--xmlui-textTransform-H1)",
+      "letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
+      "wordSpacing-H1": "var(--xmlui-wordSpacing-H1)",
+      "textShadow-H1": "var(--xmlui-textShadow-H1)",
+      "textIndent-H1": "var(--xmlui-textIndent-H1)",
+      "textAlign-H1": "var(--xmlui-textAlign-H1)",
+      "textAlignLast-H1": "var(--xmlui-textAlignLast-H1)",
+      "wordBreak-H1": "var(--xmlui-wordBreak-H1)",
+      "wordWrap-H1": "var(--xmlui-wordWrap-H1)",
+      "direction-H1": "var(--xmlui-direction-H1)",
+      "writingMode-H1": "var(--xmlui-writingMode-H1)",
+      "lineBreak-H1": "var(--xmlui-lineBreak-H1)",
+      "border-H2": "var(--xmlui-border-H2)",
+      "borderHorizontal-H2": "var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2))",
+      "borderVertical-H2": "var(--xmlui-borderVertical-H2, var(--xmlui-border-H2))",
+      "borderLeft-H2": "var(--xmlui-borderLeft-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderRight-H2": "var(--xmlui-borderRight-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderTop-H2": "var(--xmlui-borderTop-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderBottom-H2": "var(--xmlui-borderBottom-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderWidth-H2": "var(--xmlui-borderWidth-H2)",
+      "borderHorizontalWidth-H2": "var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderLeftWidth-H2": "var(--xmlui-borderLeftWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderRightWidth-H2": "var(--xmlui-borderRightWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderVerticalWidth-H2": "var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderTopWidth-H2": "var(--xmlui-borderTopWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderBottomWidth-H2": "var(--xmlui-borderBottomWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderStyle-H2": "var(--xmlui-borderStyle-H2)",
+      "borderHorizontalStyle-H2": "var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderLeftStyle-H2": "var(--xmlui-borderLeftStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderRightStyle-H2": "var(--xmlui-borderRightStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderVerticalStyle-H2": "var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderTopStyle-H2": "var(--xmlui-borderTopStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderBottomStyle-H2": "var(--xmlui-borderBottomStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderColor-H2": "var(--xmlui-borderColor-H2)",
+      "borderHorizontalColor-H2": "var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderLeftColor-H2": "var(--xmlui-borderLeftColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderRightColor-H2": "var(--xmlui-borderRightColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderVerticalColor-H2": "var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderTopColor-H2": "var(--xmlui-borderTopColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderBottomColor-H2": "var(--xmlui-borderBottomColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderStartStartRadius-H2": "var(--xmlui-borderStartStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderStartEndRadius-H2": "var(--xmlui-borderStartEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndStartRadius-H2": "var(--xmlui-borderEndStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndEndRadius-H2": "var(--xmlui-borderEndEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "padding-H2": "var(--xmlui-padding-H2)",
+      "paddingHorizontal-H2": "var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2))",
+      "paddingVertical-H2": "var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2))",
+      "paddingLeft-H2": "var(--xmlui-paddingLeft-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingRight-H2": "var(--xmlui-paddingRight-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingTop-H2": "var(--xmlui-paddingTop-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "paddingBottom-H2": "var(--xmlui-paddingBottom-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "textColor-H2": "var(--xmlui-textColor-H2)",
+      "fontFamily-H2": "var(--xmlui-fontFamily-H2)",
+      "fontSize-H2": "var(--xmlui-fontSize-H2)",
+      "fontStyle-H2": "var(--xmlui-fontStyle-H2)",
+      "fontVariant-H2": "var(--xmlui-fontVariant-H2)",
+      "fontWeight-H2": "var(--xmlui-fontWeight-H2)",
+      "fontStretch-H2": "var(--xmlui-fontStretch-H2)",
+      "textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
+      "textDecorationColor-H2": "var(--xmlui-textDecorationColor-H2)",
+      "textDecorationStyle-H2": "var(--xmlui-textDecorationStyle-H2)",
+      "textDecorationThickness-H2": "var(--xmlui-textDecorationThickness-H2)",
+      "textUnderlineOffset-H2": "var(--xmlui-textUnderlineOffset-H2)",
+      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
+      "backgroundColor-H2": "var(--xmlui-backgroundColor-H2)",
+      "textTransform-H2": "var(--xmlui-textTransform-H2)",
+      "letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
+      "wordSpacing-H2": "var(--xmlui-wordSpacing-H2)",
+      "textShadow-H2": "var(--xmlui-textShadow-H2)",
+      "textIndent-H2": "var(--xmlui-textIndent-H2)",
+      "textAlign-H2": "var(--xmlui-textAlign-H2)",
+      "textAlignLast-H2": "var(--xmlui-textAlignLast-H2)",
+      "wordBreak-H2": "var(--xmlui-wordBreak-H2)",
+      "wordWrap-H2": "var(--xmlui-wordWrap-H2)",
+      "direction-H2": "var(--xmlui-direction-H2)",
+      "writingMode-H2": "var(--xmlui-writingMode-H2)",
+      "lineBreak-H2": "var(--xmlui-lineBreak-H2)",
+      "border-H3": "var(--xmlui-border-H3)",
+      "borderHorizontal-H3": "var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3))",
+      "borderVertical-H3": "var(--xmlui-borderVertical-H3, var(--xmlui-border-H3))",
+      "borderLeft-H3": "var(--xmlui-borderLeft-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderRight-H3": "var(--xmlui-borderRight-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderTop-H3": "var(--xmlui-borderTop-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderBottom-H3": "var(--xmlui-borderBottom-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderWidth-H3": "var(--xmlui-borderWidth-H3)",
+      "borderHorizontalWidth-H3": "var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderLeftWidth-H3": "var(--xmlui-borderLeftWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderRightWidth-H3": "var(--xmlui-borderRightWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderVerticalWidth-H3": "var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderTopWidth-H3": "var(--xmlui-borderTopWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderBottomWidth-H3": "var(--xmlui-borderBottomWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderStyle-H3": "var(--xmlui-borderStyle-H3)",
+      "borderHorizontalStyle-H3": "var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderLeftStyle-H3": "var(--xmlui-borderLeftStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderRightStyle-H3": "var(--xmlui-borderRightStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderVerticalStyle-H3": "var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderTopStyle-H3": "var(--xmlui-borderTopStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderBottomStyle-H3": "var(--xmlui-borderBottomStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderColor-H3": "var(--xmlui-borderColor-H3)",
+      "borderHorizontalColor-H3": "var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderLeftColor-H3": "var(--xmlui-borderLeftColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderRightColor-H3": "var(--xmlui-borderRightColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderVerticalColor-H3": "var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderTopColor-H3": "var(--xmlui-borderTopColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderBottomColor-H3": "var(--xmlui-borderBottomColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderStartStartRadius-H3": "var(--xmlui-borderStartStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderStartEndRadius-H3": "var(--xmlui-borderStartEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndStartRadius-H3": "var(--xmlui-borderEndStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndEndRadius-H3": "var(--xmlui-borderEndEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "padding-H3": "var(--xmlui-padding-H3)",
+      "paddingHorizontal-H3": "var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3))",
+      "paddingVertical-H3": "var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3))",
+      "paddingLeft-H3": "var(--xmlui-paddingLeft-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingRight-H3": "var(--xmlui-paddingRight-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingTop-H3": "var(--xmlui-paddingTop-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "paddingBottom-H3": "var(--xmlui-paddingBottom-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "textColor-H3": "var(--xmlui-textColor-H3)",
+      "fontFamily-H3": "var(--xmlui-fontFamily-H3)",
+      "fontSize-H3": "var(--xmlui-fontSize-H3)",
+      "fontStyle-H3": "var(--xmlui-fontStyle-H3)",
+      "fontVariant-H3": "var(--xmlui-fontVariant-H3)",
+      "fontWeight-H3": "var(--xmlui-fontWeight-H3)",
+      "fontStretch-H3": "var(--xmlui-fontStretch-H3)",
+      "textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
+      "textDecorationColor-H3": "var(--xmlui-textDecorationColor-H3)",
+      "textDecorationStyle-H3": "var(--xmlui-textDecorationStyle-H3)",
+      "textDecorationThickness-H3": "var(--xmlui-textDecorationThickness-H3)",
+      "textUnderlineOffset-H3": "var(--xmlui-textUnderlineOffset-H3)",
+      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
+      "backgroundColor-H3": "var(--xmlui-backgroundColor-H3)",
+      "textTransform-H3": "var(--xmlui-textTransform-H3)",
+      "letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
+      "wordSpacing-H3": "var(--xmlui-wordSpacing-H3)",
+      "textShadow-H3": "var(--xmlui-textShadow-H3)",
+      "textIndent-H3": "var(--xmlui-textIndent-H3)",
+      "textAlign-H3": "var(--xmlui-textAlign-H3)",
+      "textAlignLast-H3": "var(--xmlui-textAlignLast-H3)",
+      "wordBreak-H3": "var(--xmlui-wordBreak-H3)",
+      "wordWrap-H3": "var(--xmlui-wordWrap-H3)",
+      "direction-H3": "var(--xmlui-direction-H3)",
+      "writingMode-H3": "var(--xmlui-writingMode-H3)",
+      "lineBreak-H3": "var(--xmlui-lineBreak-H3)",
+      "border-H4": "var(--xmlui-border-H4)",
+      "borderHorizontal-H4": "var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4))",
+      "borderVertical-H4": "var(--xmlui-borderVertical-H4, var(--xmlui-border-H4))",
+      "borderLeft-H4": "var(--xmlui-borderLeft-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderRight-H4": "var(--xmlui-borderRight-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderTop-H4": "var(--xmlui-borderTop-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderBottom-H4": "var(--xmlui-borderBottom-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderWidth-H4": "var(--xmlui-borderWidth-H4)",
+      "borderHorizontalWidth-H4": "var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderLeftWidth-H4": "var(--xmlui-borderLeftWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderRightWidth-H4": "var(--xmlui-borderRightWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderVerticalWidth-H4": "var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderTopWidth-H4": "var(--xmlui-borderTopWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderBottomWidth-H4": "var(--xmlui-borderBottomWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderStyle-H4": "var(--xmlui-borderStyle-H4)",
+      "borderHorizontalStyle-H4": "var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderLeftStyle-H4": "var(--xmlui-borderLeftStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderRightStyle-H4": "var(--xmlui-borderRightStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderVerticalStyle-H4": "var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderTopStyle-H4": "var(--xmlui-borderTopStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderBottomStyle-H4": "var(--xmlui-borderBottomStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderColor-H4": "var(--xmlui-borderColor-H4)",
+      "borderHorizontalColor-H4": "var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderLeftColor-H4": "var(--xmlui-borderLeftColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderRightColor-H4": "var(--xmlui-borderRightColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderVerticalColor-H4": "var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderTopColor-H4": "var(--xmlui-borderTopColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderBottomColor-H4": "var(--xmlui-borderBottomColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderStartStartRadius-H4": "var(--xmlui-borderStartStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderStartEndRadius-H4": "var(--xmlui-borderStartEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndStartRadius-H4": "var(--xmlui-borderEndStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndEndRadius-H4": "var(--xmlui-borderEndEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "padding-H4": "var(--xmlui-padding-H4)",
+      "paddingHorizontal-H4": "var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4))",
+      "paddingVertical-H4": "var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4))",
+      "paddingLeft-H4": "var(--xmlui-paddingLeft-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingRight-H4": "var(--xmlui-paddingRight-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingTop-H4": "var(--xmlui-paddingTop-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "paddingBottom-H4": "var(--xmlui-paddingBottom-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "textColor-H4": "var(--xmlui-textColor-H4)",
+      "fontFamily-H4": "var(--xmlui-fontFamily-H4)",
+      "fontSize-H4": "var(--xmlui-fontSize-H4)",
+      "fontStyle-H4": "var(--xmlui-fontStyle-H4)",
+      "fontVariant-H4": "var(--xmlui-fontVariant-H4)",
+      "fontWeight-H4": "var(--xmlui-fontWeight-H4)",
+      "fontStretch-H4": "var(--xmlui-fontStretch-H4)",
+      "textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
+      "textDecorationColor-H4": "var(--xmlui-textDecorationColor-H4)",
+      "textDecorationStyle-H4": "var(--xmlui-textDecorationStyle-H4)",
+      "textDecorationThickness-H4": "var(--xmlui-textDecorationThickness-H4)",
+      "textUnderlineOffset-H4": "var(--xmlui-textUnderlineOffset-H4)",
+      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
+      "backgroundColor-H4": "var(--xmlui-backgroundColor-H4)",
+      "textTransform-H4": "var(--xmlui-textTransform-H4)",
+      "letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
+      "wordSpacing-H4": "var(--xmlui-wordSpacing-H4)",
+      "textShadow-H4": "var(--xmlui-textShadow-H4)",
+      "textIndent-H4": "var(--xmlui-textIndent-H4)",
+      "textAlign-H4": "var(--xmlui-textAlign-H4)",
+      "textAlignLast-H4": "var(--xmlui-textAlignLast-H4)",
+      "wordBreak-H4": "var(--xmlui-wordBreak-H4)",
+      "wordWrap-H4": "var(--xmlui-wordWrap-H4)",
+      "direction-H4": "var(--xmlui-direction-H4)",
+      "writingMode-H4": "var(--xmlui-writingMode-H4)",
+      "lineBreak-H4": "var(--xmlui-lineBreak-H4)",
+      "border-H5": "var(--xmlui-border-H5)",
+      "borderHorizontal-H5": "var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5))",
+      "borderVertical-H5": "var(--xmlui-borderVertical-H5, var(--xmlui-border-H5))",
+      "borderLeft-H5": "var(--xmlui-borderLeft-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderRight-H5": "var(--xmlui-borderRight-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderTop-H5": "var(--xmlui-borderTop-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderBottom-H5": "var(--xmlui-borderBottom-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderWidth-H5": "var(--xmlui-borderWidth-H5)",
+      "borderHorizontalWidth-H5": "var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderLeftWidth-H5": "var(--xmlui-borderLeftWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderRightWidth-H5": "var(--xmlui-borderRightWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderVerticalWidth-H5": "var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderTopWidth-H5": "var(--xmlui-borderTopWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderBottomWidth-H5": "var(--xmlui-borderBottomWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderStyle-H5": "var(--xmlui-borderStyle-H5)",
+      "borderHorizontalStyle-H5": "var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderLeftStyle-H5": "var(--xmlui-borderLeftStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderRightStyle-H5": "var(--xmlui-borderRightStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderVerticalStyle-H5": "var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderTopStyle-H5": "var(--xmlui-borderTopStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderBottomStyle-H5": "var(--xmlui-borderBottomStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderColor-H5": "var(--xmlui-borderColor-H5)",
+      "borderHorizontalColor-H5": "var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderLeftColor-H5": "var(--xmlui-borderLeftColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderRightColor-H5": "var(--xmlui-borderRightColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderVerticalColor-H5": "var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderTopColor-H5": "var(--xmlui-borderTopColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderBottomColor-H5": "var(--xmlui-borderBottomColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderStartStartRadius-H5": "var(--xmlui-borderStartStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderStartEndRadius-H5": "var(--xmlui-borderStartEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndStartRadius-H5": "var(--xmlui-borderEndStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndEndRadius-H5": "var(--xmlui-borderEndEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "padding-H5": "var(--xmlui-padding-H5)",
+      "paddingHorizontal-H5": "var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5))",
+      "paddingVertical-H5": "var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5))",
+      "paddingLeft-H5": "var(--xmlui-paddingLeft-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingRight-H5": "var(--xmlui-paddingRight-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingTop-H5": "var(--xmlui-paddingTop-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "paddingBottom-H5": "var(--xmlui-paddingBottom-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "textColor-H5": "var(--xmlui-textColor-H5)",
+      "fontFamily-H5": "var(--xmlui-fontFamily-H5)",
+      "fontSize-H5": "var(--xmlui-fontSize-H5)",
+      "fontStyle-H5": "var(--xmlui-fontStyle-H5)",
+      "fontVariant-H5": "var(--xmlui-fontVariant-H5)",
+      "fontWeight-H5": "var(--xmlui-fontWeight-H5)",
+      "fontStretch-H5": "var(--xmlui-fontStretch-H5)",
+      "textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
+      "textDecorationColor-H5": "var(--xmlui-textDecorationColor-H5)",
+      "textDecorationStyle-H5": "var(--xmlui-textDecorationStyle-H5)",
+      "textDecorationThickness-H5": "var(--xmlui-textDecorationThickness-H5)",
+      "textUnderlineOffset-H5": "var(--xmlui-textUnderlineOffset-H5)",
+      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
+      "backgroundColor-H5": "var(--xmlui-backgroundColor-H5)",
+      "textTransform-H5": "var(--xmlui-textTransform-H5)",
+      "letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
+      "wordSpacing-H5": "var(--xmlui-wordSpacing-H5)",
+      "textShadow-H5": "var(--xmlui-textShadow-H5)",
+      "textIndent-H5": "var(--xmlui-textIndent-H5)",
+      "textAlign-H5": "var(--xmlui-textAlign-H5)",
+      "textAlignLast-H5": "var(--xmlui-textAlignLast-H5)",
+      "wordBreak-H5": "var(--xmlui-wordBreak-H5)",
+      "wordWrap-H5": "var(--xmlui-wordWrap-H5)",
+      "direction-H5": "var(--xmlui-direction-H5)",
+      "writingMode-H5": "var(--xmlui-writingMode-H5)",
+      "lineBreak-H5": "var(--xmlui-lineBreak-H5)",
+      "border-H6": "var(--xmlui-border-H6)",
+      "borderHorizontal-H6": "var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6))",
+      "borderVertical-H6": "var(--xmlui-borderVertical-H6, var(--xmlui-border-H6))",
+      "borderLeft-H6": "var(--xmlui-borderLeft-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderRight-H6": "var(--xmlui-borderRight-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderTop-H6": "var(--xmlui-borderTop-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderBottom-H6": "var(--xmlui-borderBottom-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderWidth-H6": "var(--xmlui-borderWidth-H6)",
+      "borderHorizontalWidth-H6": "var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderLeftWidth-H6": "var(--xmlui-borderLeftWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderRightWidth-H6": "var(--xmlui-borderRightWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderVerticalWidth-H6": "var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderTopWidth-H6": "var(--xmlui-borderTopWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderBottomWidth-H6": "var(--xmlui-borderBottomWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderStyle-H6": "var(--xmlui-borderStyle-H6)",
+      "borderHorizontalStyle-H6": "var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderLeftStyle-H6": "var(--xmlui-borderLeftStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderRightStyle-H6": "var(--xmlui-borderRightStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderVerticalStyle-H6": "var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderTopStyle-H6": "var(--xmlui-borderTopStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderBottomStyle-H6": "var(--xmlui-borderBottomStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderColor-H6": "var(--xmlui-borderColor-H6)",
+      "borderHorizontalColor-H6": "var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderLeftColor-H6": "var(--xmlui-borderLeftColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderRightColor-H6": "var(--xmlui-borderRightColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderVerticalColor-H6": "var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderTopColor-H6": "var(--xmlui-borderTopColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderBottomColor-H6": "var(--xmlui-borderBottomColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderStartStartRadius-H6": "var(--xmlui-borderStartStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderStartEndRadius-H6": "var(--xmlui-borderStartEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndStartRadius-H6": "var(--xmlui-borderEndStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndEndRadius-H6": "var(--xmlui-borderEndEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "padding-H6": "var(--xmlui-padding-H6)",
+      "paddingHorizontal-H6": "var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6))",
+      "paddingVertical-H6": "var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6))",
+      "paddingLeft-H6": "var(--xmlui-paddingLeft-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingRight-H6": "var(--xmlui-paddingRight-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingTop-H6": "var(--xmlui-paddingTop-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "paddingBottom-H6": "var(--xmlui-paddingBottom-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "textColor-H6": "var(--xmlui-textColor-H6)",
+      "fontFamily-H6": "var(--xmlui-fontFamily-H6)",
+      "fontSize-H6": "var(--xmlui-fontSize-H6)",
+      "fontStyle-H6": "var(--xmlui-fontStyle-H6)",
+      "fontVariant-H6": "var(--xmlui-fontVariant-H6)",
+      "fontWeight-H6": "var(--xmlui-fontWeight-H6)",
+      "fontStretch-H6": "var(--xmlui-fontStretch-H6)",
+      "textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
+      "textDecorationColor-H6": "var(--xmlui-textDecorationColor-H6)",
+      "textDecorationStyle-H6": "var(--xmlui-textDecorationStyle-H6)",
+      "textDecorationThickness-H6": "var(--xmlui-textDecorationThickness-H6)",
+      "textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)",
+      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
+      "backgroundColor-H6": "var(--xmlui-backgroundColor-H6)",
+      "textTransform-H6": "var(--xmlui-textTransform-H6)",
+      "letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
+      "wordSpacing-H6": "var(--xmlui-wordSpacing-H6)",
+      "textShadow-H6": "var(--xmlui-textShadow-H6)",
+      "textIndent-H6": "var(--xmlui-textIndent-H6)",
+      "textAlign-H6": "var(--xmlui-textAlign-H6)",
+      "textAlignLast-H6": "var(--xmlui-textAlignLast-H6)",
+      "wordBreak-H6": "var(--xmlui-wordBreak-H6)",
+      "wordWrap-H6": "var(--xmlui-wordWrap-H6)",
+      "direction-H6": "var(--xmlui-direction-H6)",
+      "writingMode-H6": "var(--xmlui-writingMode-H6)",
+      "lineBreak-H6": "var(--xmlui-lineBreak-H6)",
+      "color-anchor-Heading": "var(--xmlui-color-anchor-Heading)",
+      "gap-anchor-Heading": "var(--xmlui-gap-anchor-Heading)",
+      "textDecorationLine-anchor-Heading": "var(--xmlui-textDecorationLine-anchor-Heading)",
       "Heading:textColor-H1": "var(--xmlui-textColor-H1)",
       "Heading:letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
       "Heading:fontFamily-H1": "var(--xmlui-fontFamily-H1)",
       "Heading:fontWeight-H1": "var(--xmlui-fontWeight-H1)",
-      "fontSize-H1": "var(--xmlui-fontSize-H1)",
-      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
       "marginTop-H1": "var(--xmlui-marginTop-H1)",
       "marginBottom-H1": "var(--xmlui-marginBottom-H1)",
       "Heading:textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
@@ -5357,8 +6255,6 @@ export default {
       "Heading:letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
       "Heading:fontFamily-H2": "var(--xmlui-fontFamily-H2)",
       "Heading:fontWeight-H2": "var(--xmlui-fontWeight-H2)",
-      "fontSize-H2": "var(--xmlui-fontSize-H2)",
-      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
       "marginTop-H2": "var(--xmlui-marginTop-H2)",
       "marginBottom-H2": "var(--xmlui-marginBottom-H2)",
       "Heading:textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
@@ -5370,8 +6266,6 @@ export default {
       "Heading:letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
       "Heading:fontFamily-H3": "var(--xmlui-fontFamily-H3)",
       "Heading:fontWeight-H3": "var(--xmlui-fontWeight-H3)",
-      "fontSize-H3": "var(--xmlui-fontSize-H3)",
-      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
       "marginTop-H3": "var(--xmlui-marginTop-H3)",
       "marginBottom-H3": "var(--xmlui-marginBottom-H3)",
       "Heading:textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
@@ -5383,8 +6277,6 @@ export default {
       "Heading:letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
       "Heading:fontFamily-H4": "var(--xmlui-fontFamily-H4)",
       "Heading:fontWeight-H4": "var(--xmlui-fontWeight-H4)",
-      "fontSize-H4": "var(--xmlui-fontSize-H4)",
-      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
       "marginTop-H4": "var(--xmlui-marginTop-H4)",
       "marginBottom-H4": "var(--xmlui-marginBottom-H4)",
       "Heading:textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
@@ -5396,8 +6288,6 @@ export default {
       "Heading:letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
       "Heading:fontFamily-H5": "var(--xmlui-fontFamily-H5)",
       "Heading:fontWeight-H5": "var(--xmlui-fontWeight-H5)",
-      "fontSize-H5": "var(--xmlui-fontSize-H5)",
-      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
       "marginTop-H5": "var(--xmlui-marginTop-H5)",
       "marginBottom-H5": "var(--xmlui-marginBottom-H5)",
       "Heading:textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
@@ -5409,8 +6299,6 @@ export default {
       "Heading:letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
       "Heading:fontFamily-H6": "var(--xmlui-fontFamily-H6)",
       "Heading:fontWeight-H6": "var(--xmlui-fontWeight-H6)",
-      "fontSize-H6": "var(--xmlui-fontSize-H6)",
-      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
       "marginTop-H6": "var(--xmlui-marginTop-H6)",
       "marginBottom-H6": "var(--xmlui-marginBottom-H6)",
       "Heading:textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
@@ -5423,6 +6311,9 @@ export default {
       "fontSize-H1": "$fontSize-large",
       "marginTop-H1": "0",
       "marginBottom-H1": "0",
+      "fontSize-H1-markdown": "$fontSize-larger",
+      "marginTop-H1-markdown": "0",
+      "marginBottom-H1-markdown": "$space-6",
       "light": {},
       "dark": {}
     }
@@ -5444,12 +6335,403 @@ export default {
       }
     },
     "themeVars": {
+      "border-H1": "var(--xmlui-border-H1)",
+      "borderHorizontal-H1": "var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1))",
+      "borderVertical-H1": "var(--xmlui-borderVertical-H1, var(--xmlui-border-H1))",
+      "borderLeft-H1": "var(--xmlui-borderLeft-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderRight-H1": "var(--xmlui-borderRight-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderTop-H1": "var(--xmlui-borderTop-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderBottom-H1": "var(--xmlui-borderBottom-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderWidth-H1": "var(--xmlui-borderWidth-H1)",
+      "borderHorizontalWidth-H1": "var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderLeftWidth-H1": "var(--xmlui-borderLeftWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderRightWidth-H1": "var(--xmlui-borderRightWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderVerticalWidth-H1": "var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderTopWidth-H1": "var(--xmlui-borderTopWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderBottomWidth-H1": "var(--xmlui-borderBottomWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderStyle-H1": "var(--xmlui-borderStyle-H1)",
+      "borderHorizontalStyle-H1": "var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderLeftStyle-H1": "var(--xmlui-borderLeftStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderRightStyle-H1": "var(--xmlui-borderRightStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderVerticalStyle-H1": "var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderTopStyle-H1": "var(--xmlui-borderTopStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderBottomStyle-H1": "var(--xmlui-borderBottomStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderColor-H1": "var(--xmlui-borderColor-H1)",
+      "borderHorizontalColor-H1": "var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderLeftColor-H1": "var(--xmlui-borderLeftColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderRightColor-H1": "var(--xmlui-borderRightColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderVerticalColor-H1": "var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderTopColor-H1": "var(--xmlui-borderTopColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderBottomColor-H1": "var(--xmlui-borderBottomColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderStartStartRadius-H1": "var(--xmlui-borderStartStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderStartEndRadius-H1": "var(--xmlui-borderStartEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndStartRadius-H1": "var(--xmlui-borderEndStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndEndRadius-H1": "var(--xmlui-borderEndEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "padding-H1": "var(--xmlui-padding-H1)",
+      "paddingHorizontal-H1": "var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1))",
+      "paddingVertical-H1": "var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1))",
+      "paddingLeft-H1": "var(--xmlui-paddingLeft-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingRight-H1": "var(--xmlui-paddingRight-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingTop-H1": "var(--xmlui-paddingTop-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "paddingBottom-H1": "var(--xmlui-paddingBottom-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "textColor-H1": "var(--xmlui-textColor-H1)",
+      "fontFamily-H1": "var(--xmlui-fontFamily-H1)",
+      "fontSize-H1": "var(--xmlui-fontSize-H1)",
+      "fontStyle-H1": "var(--xmlui-fontStyle-H1)",
+      "fontVariant-H1": "var(--xmlui-fontVariant-H1)",
+      "fontWeight-H1": "var(--xmlui-fontWeight-H1)",
+      "fontStretch-H1": "var(--xmlui-fontStretch-H1)",
+      "textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
+      "textDecorationColor-H1": "var(--xmlui-textDecorationColor-H1)",
+      "textDecorationStyle-H1": "var(--xmlui-textDecorationStyle-H1)",
+      "textDecorationThickness-H1": "var(--xmlui-textDecorationThickness-H1)",
+      "textUnderlineOffset-H1": "var(--xmlui-textUnderlineOffset-H1)",
+      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
+      "backgroundColor-H1": "var(--xmlui-backgroundColor-H1)",
+      "textTransform-H1": "var(--xmlui-textTransform-H1)",
+      "letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
+      "wordSpacing-H1": "var(--xmlui-wordSpacing-H1)",
+      "textShadow-H1": "var(--xmlui-textShadow-H1)",
+      "textIndent-H1": "var(--xmlui-textIndent-H1)",
+      "textAlign-H1": "var(--xmlui-textAlign-H1)",
+      "textAlignLast-H1": "var(--xmlui-textAlignLast-H1)",
+      "wordBreak-H1": "var(--xmlui-wordBreak-H1)",
+      "wordWrap-H1": "var(--xmlui-wordWrap-H1)",
+      "direction-H1": "var(--xmlui-direction-H1)",
+      "writingMode-H1": "var(--xmlui-writingMode-H1)",
+      "lineBreak-H1": "var(--xmlui-lineBreak-H1)",
+      "border-H2": "var(--xmlui-border-H2)",
+      "borderHorizontal-H2": "var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2))",
+      "borderVertical-H2": "var(--xmlui-borderVertical-H2, var(--xmlui-border-H2))",
+      "borderLeft-H2": "var(--xmlui-borderLeft-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderRight-H2": "var(--xmlui-borderRight-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderTop-H2": "var(--xmlui-borderTop-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderBottom-H2": "var(--xmlui-borderBottom-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderWidth-H2": "var(--xmlui-borderWidth-H2)",
+      "borderHorizontalWidth-H2": "var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderLeftWidth-H2": "var(--xmlui-borderLeftWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderRightWidth-H2": "var(--xmlui-borderRightWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderVerticalWidth-H2": "var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderTopWidth-H2": "var(--xmlui-borderTopWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderBottomWidth-H2": "var(--xmlui-borderBottomWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderStyle-H2": "var(--xmlui-borderStyle-H2)",
+      "borderHorizontalStyle-H2": "var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderLeftStyle-H2": "var(--xmlui-borderLeftStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderRightStyle-H2": "var(--xmlui-borderRightStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderVerticalStyle-H2": "var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderTopStyle-H2": "var(--xmlui-borderTopStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderBottomStyle-H2": "var(--xmlui-borderBottomStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderColor-H2": "var(--xmlui-borderColor-H2)",
+      "borderHorizontalColor-H2": "var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderLeftColor-H2": "var(--xmlui-borderLeftColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderRightColor-H2": "var(--xmlui-borderRightColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderVerticalColor-H2": "var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderTopColor-H2": "var(--xmlui-borderTopColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderBottomColor-H2": "var(--xmlui-borderBottomColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderStartStartRadius-H2": "var(--xmlui-borderStartStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderStartEndRadius-H2": "var(--xmlui-borderStartEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndStartRadius-H2": "var(--xmlui-borderEndStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndEndRadius-H2": "var(--xmlui-borderEndEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "padding-H2": "var(--xmlui-padding-H2)",
+      "paddingHorizontal-H2": "var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2))",
+      "paddingVertical-H2": "var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2))",
+      "paddingLeft-H2": "var(--xmlui-paddingLeft-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingRight-H2": "var(--xmlui-paddingRight-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingTop-H2": "var(--xmlui-paddingTop-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "paddingBottom-H2": "var(--xmlui-paddingBottom-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "textColor-H2": "var(--xmlui-textColor-H2)",
+      "fontFamily-H2": "var(--xmlui-fontFamily-H2)",
+      "fontSize-H2": "var(--xmlui-fontSize-H2)",
+      "fontStyle-H2": "var(--xmlui-fontStyle-H2)",
+      "fontVariant-H2": "var(--xmlui-fontVariant-H2)",
+      "fontWeight-H2": "var(--xmlui-fontWeight-H2)",
+      "fontStretch-H2": "var(--xmlui-fontStretch-H2)",
+      "textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
+      "textDecorationColor-H2": "var(--xmlui-textDecorationColor-H2)",
+      "textDecorationStyle-H2": "var(--xmlui-textDecorationStyle-H2)",
+      "textDecorationThickness-H2": "var(--xmlui-textDecorationThickness-H2)",
+      "textUnderlineOffset-H2": "var(--xmlui-textUnderlineOffset-H2)",
+      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
+      "backgroundColor-H2": "var(--xmlui-backgroundColor-H2)",
+      "textTransform-H2": "var(--xmlui-textTransform-H2)",
+      "letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
+      "wordSpacing-H2": "var(--xmlui-wordSpacing-H2)",
+      "textShadow-H2": "var(--xmlui-textShadow-H2)",
+      "textIndent-H2": "var(--xmlui-textIndent-H2)",
+      "textAlign-H2": "var(--xmlui-textAlign-H2)",
+      "textAlignLast-H2": "var(--xmlui-textAlignLast-H2)",
+      "wordBreak-H2": "var(--xmlui-wordBreak-H2)",
+      "wordWrap-H2": "var(--xmlui-wordWrap-H2)",
+      "direction-H2": "var(--xmlui-direction-H2)",
+      "writingMode-H2": "var(--xmlui-writingMode-H2)",
+      "lineBreak-H2": "var(--xmlui-lineBreak-H2)",
+      "border-H3": "var(--xmlui-border-H3)",
+      "borderHorizontal-H3": "var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3))",
+      "borderVertical-H3": "var(--xmlui-borderVertical-H3, var(--xmlui-border-H3))",
+      "borderLeft-H3": "var(--xmlui-borderLeft-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderRight-H3": "var(--xmlui-borderRight-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderTop-H3": "var(--xmlui-borderTop-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderBottom-H3": "var(--xmlui-borderBottom-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderWidth-H3": "var(--xmlui-borderWidth-H3)",
+      "borderHorizontalWidth-H3": "var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderLeftWidth-H3": "var(--xmlui-borderLeftWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderRightWidth-H3": "var(--xmlui-borderRightWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderVerticalWidth-H3": "var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderTopWidth-H3": "var(--xmlui-borderTopWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderBottomWidth-H3": "var(--xmlui-borderBottomWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderStyle-H3": "var(--xmlui-borderStyle-H3)",
+      "borderHorizontalStyle-H3": "var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderLeftStyle-H3": "var(--xmlui-borderLeftStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderRightStyle-H3": "var(--xmlui-borderRightStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderVerticalStyle-H3": "var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderTopStyle-H3": "var(--xmlui-borderTopStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderBottomStyle-H3": "var(--xmlui-borderBottomStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderColor-H3": "var(--xmlui-borderColor-H3)",
+      "borderHorizontalColor-H3": "var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderLeftColor-H3": "var(--xmlui-borderLeftColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderRightColor-H3": "var(--xmlui-borderRightColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderVerticalColor-H3": "var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderTopColor-H3": "var(--xmlui-borderTopColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderBottomColor-H3": "var(--xmlui-borderBottomColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderStartStartRadius-H3": "var(--xmlui-borderStartStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderStartEndRadius-H3": "var(--xmlui-borderStartEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndStartRadius-H3": "var(--xmlui-borderEndStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndEndRadius-H3": "var(--xmlui-borderEndEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "padding-H3": "var(--xmlui-padding-H3)",
+      "paddingHorizontal-H3": "var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3))",
+      "paddingVertical-H3": "var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3))",
+      "paddingLeft-H3": "var(--xmlui-paddingLeft-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingRight-H3": "var(--xmlui-paddingRight-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingTop-H3": "var(--xmlui-paddingTop-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "paddingBottom-H3": "var(--xmlui-paddingBottom-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "textColor-H3": "var(--xmlui-textColor-H3)",
+      "fontFamily-H3": "var(--xmlui-fontFamily-H3)",
+      "fontSize-H3": "var(--xmlui-fontSize-H3)",
+      "fontStyle-H3": "var(--xmlui-fontStyle-H3)",
+      "fontVariant-H3": "var(--xmlui-fontVariant-H3)",
+      "fontWeight-H3": "var(--xmlui-fontWeight-H3)",
+      "fontStretch-H3": "var(--xmlui-fontStretch-H3)",
+      "textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
+      "textDecorationColor-H3": "var(--xmlui-textDecorationColor-H3)",
+      "textDecorationStyle-H3": "var(--xmlui-textDecorationStyle-H3)",
+      "textDecorationThickness-H3": "var(--xmlui-textDecorationThickness-H3)",
+      "textUnderlineOffset-H3": "var(--xmlui-textUnderlineOffset-H3)",
+      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
+      "backgroundColor-H3": "var(--xmlui-backgroundColor-H3)",
+      "textTransform-H3": "var(--xmlui-textTransform-H3)",
+      "letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
+      "wordSpacing-H3": "var(--xmlui-wordSpacing-H3)",
+      "textShadow-H3": "var(--xmlui-textShadow-H3)",
+      "textIndent-H3": "var(--xmlui-textIndent-H3)",
+      "textAlign-H3": "var(--xmlui-textAlign-H3)",
+      "textAlignLast-H3": "var(--xmlui-textAlignLast-H3)",
+      "wordBreak-H3": "var(--xmlui-wordBreak-H3)",
+      "wordWrap-H3": "var(--xmlui-wordWrap-H3)",
+      "direction-H3": "var(--xmlui-direction-H3)",
+      "writingMode-H3": "var(--xmlui-writingMode-H3)",
+      "lineBreak-H3": "var(--xmlui-lineBreak-H3)",
+      "border-H4": "var(--xmlui-border-H4)",
+      "borderHorizontal-H4": "var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4))",
+      "borderVertical-H4": "var(--xmlui-borderVertical-H4, var(--xmlui-border-H4))",
+      "borderLeft-H4": "var(--xmlui-borderLeft-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderRight-H4": "var(--xmlui-borderRight-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderTop-H4": "var(--xmlui-borderTop-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderBottom-H4": "var(--xmlui-borderBottom-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderWidth-H4": "var(--xmlui-borderWidth-H4)",
+      "borderHorizontalWidth-H4": "var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderLeftWidth-H4": "var(--xmlui-borderLeftWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderRightWidth-H4": "var(--xmlui-borderRightWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderVerticalWidth-H4": "var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderTopWidth-H4": "var(--xmlui-borderTopWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderBottomWidth-H4": "var(--xmlui-borderBottomWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderStyle-H4": "var(--xmlui-borderStyle-H4)",
+      "borderHorizontalStyle-H4": "var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderLeftStyle-H4": "var(--xmlui-borderLeftStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderRightStyle-H4": "var(--xmlui-borderRightStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderVerticalStyle-H4": "var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderTopStyle-H4": "var(--xmlui-borderTopStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderBottomStyle-H4": "var(--xmlui-borderBottomStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderColor-H4": "var(--xmlui-borderColor-H4)",
+      "borderHorizontalColor-H4": "var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderLeftColor-H4": "var(--xmlui-borderLeftColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderRightColor-H4": "var(--xmlui-borderRightColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderVerticalColor-H4": "var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderTopColor-H4": "var(--xmlui-borderTopColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderBottomColor-H4": "var(--xmlui-borderBottomColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderStartStartRadius-H4": "var(--xmlui-borderStartStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderStartEndRadius-H4": "var(--xmlui-borderStartEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndStartRadius-H4": "var(--xmlui-borderEndStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndEndRadius-H4": "var(--xmlui-borderEndEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "padding-H4": "var(--xmlui-padding-H4)",
+      "paddingHorizontal-H4": "var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4))",
+      "paddingVertical-H4": "var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4))",
+      "paddingLeft-H4": "var(--xmlui-paddingLeft-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingRight-H4": "var(--xmlui-paddingRight-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingTop-H4": "var(--xmlui-paddingTop-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "paddingBottom-H4": "var(--xmlui-paddingBottom-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "textColor-H4": "var(--xmlui-textColor-H4)",
+      "fontFamily-H4": "var(--xmlui-fontFamily-H4)",
+      "fontSize-H4": "var(--xmlui-fontSize-H4)",
+      "fontStyle-H4": "var(--xmlui-fontStyle-H4)",
+      "fontVariant-H4": "var(--xmlui-fontVariant-H4)",
+      "fontWeight-H4": "var(--xmlui-fontWeight-H4)",
+      "fontStretch-H4": "var(--xmlui-fontStretch-H4)",
+      "textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
+      "textDecorationColor-H4": "var(--xmlui-textDecorationColor-H4)",
+      "textDecorationStyle-H4": "var(--xmlui-textDecorationStyle-H4)",
+      "textDecorationThickness-H4": "var(--xmlui-textDecorationThickness-H4)",
+      "textUnderlineOffset-H4": "var(--xmlui-textUnderlineOffset-H4)",
+      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
+      "backgroundColor-H4": "var(--xmlui-backgroundColor-H4)",
+      "textTransform-H4": "var(--xmlui-textTransform-H4)",
+      "letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
+      "wordSpacing-H4": "var(--xmlui-wordSpacing-H4)",
+      "textShadow-H4": "var(--xmlui-textShadow-H4)",
+      "textIndent-H4": "var(--xmlui-textIndent-H4)",
+      "textAlign-H4": "var(--xmlui-textAlign-H4)",
+      "textAlignLast-H4": "var(--xmlui-textAlignLast-H4)",
+      "wordBreak-H4": "var(--xmlui-wordBreak-H4)",
+      "wordWrap-H4": "var(--xmlui-wordWrap-H4)",
+      "direction-H4": "var(--xmlui-direction-H4)",
+      "writingMode-H4": "var(--xmlui-writingMode-H4)",
+      "lineBreak-H4": "var(--xmlui-lineBreak-H4)",
+      "border-H5": "var(--xmlui-border-H5)",
+      "borderHorizontal-H5": "var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5))",
+      "borderVertical-H5": "var(--xmlui-borderVertical-H5, var(--xmlui-border-H5))",
+      "borderLeft-H5": "var(--xmlui-borderLeft-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderRight-H5": "var(--xmlui-borderRight-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderTop-H5": "var(--xmlui-borderTop-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderBottom-H5": "var(--xmlui-borderBottom-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderWidth-H5": "var(--xmlui-borderWidth-H5)",
+      "borderHorizontalWidth-H5": "var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderLeftWidth-H5": "var(--xmlui-borderLeftWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderRightWidth-H5": "var(--xmlui-borderRightWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderVerticalWidth-H5": "var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderTopWidth-H5": "var(--xmlui-borderTopWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderBottomWidth-H5": "var(--xmlui-borderBottomWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderStyle-H5": "var(--xmlui-borderStyle-H5)",
+      "borderHorizontalStyle-H5": "var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderLeftStyle-H5": "var(--xmlui-borderLeftStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderRightStyle-H5": "var(--xmlui-borderRightStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderVerticalStyle-H5": "var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderTopStyle-H5": "var(--xmlui-borderTopStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderBottomStyle-H5": "var(--xmlui-borderBottomStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderColor-H5": "var(--xmlui-borderColor-H5)",
+      "borderHorizontalColor-H5": "var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderLeftColor-H5": "var(--xmlui-borderLeftColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderRightColor-H5": "var(--xmlui-borderRightColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderVerticalColor-H5": "var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderTopColor-H5": "var(--xmlui-borderTopColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderBottomColor-H5": "var(--xmlui-borderBottomColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderStartStartRadius-H5": "var(--xmlui-borderStartStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderStartEndRadius-H5": "var(--xmlui-borderStartEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndStartRadius-H5": "var(--xmlui-borderEndStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndEndRadius-H5": "var(--xmlui-borderEndEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "padding-H5": "var(--xmlui-padding-H5)",
+      "paddingHorizontal-H5": "var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5))",
+      "paddingVertical-H5": "var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5))",
+      "paddingLeft-H5": "var(--xmlui-paddingLeft-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingRight-H5": "var(--xmlui-paddingRight-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingTop-H5": "var(--xmlui-paddingTop-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "paddingBottom-H5": "var(--xmlui-paddingBottom-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "textColor-H5": "var(--xmlui-textColor-H5)",
+      "fontFamily-H5": "var(--xmlui-fontFamily-H5)",
+      "fontSize-H5": "var(--xmlui-fontSize-H5)",
+      "fontStyle-H5": "var(--xmlui-fontStyle-H5)",
+      "fontVariant-H5": "var(--xmlui-fontVariant-H5)",
+      "fontWeight-H5": "var(--xmlui-fontWeight-H5)",
+      "fontStretch-H5": "var(--xmlui-fontStretch-H5)",
+      "textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
+      "textDecorationColor-H5": "var(--xmlui-textDecorationColor-H5)",
+      "textDecorationStyle-H5": "var(--xmlui-textDecorationStyle-H5)",
+      "textDecorationThickness-H5": "var(--xmlui-textDecorationThickness-H5)",
+      "textUnderlineOffset-H5": "var(--xmlui-textUnderlineOffset-H5)",
+      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
+      "backgroundColor-H5": "var(--xmlui-backgroundColor-H5)",
+      "textTransform-H5": "var(--xmlui-textTransform-H5)",
+      "letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
+      "wordSpacing-H5": "var(--xmlui-wordSpacing-H5)",
+      "textShadow-H5": "var(--xmlui-textShadow-H5)",
+      "textIndent-H5": "var(--xmlui-textIndent-H5)",
+      "textAlign-H5": "var(--xmlui-textAlign-H5)",
+      "textAlignLast-H5": "var(--xmlui-textAlignLast-H5)",
+      "wordBreak-H5": "var(--xmlui-wordBreak-H5)",
+      "wordWrap-H5": "var(--xmlui-wordWrap-H5)",
+      "direction-H5": "var(--xmlui-direction-H5)",
+      "writingMode-H5": "var(--xmlui-writingMode-H5)",
+      "lineBreak-H5": "var(--xmlui-lineBreak-H5)",
+      "border-H6": "var(--xmlui-border-H6)",
+      "borderHorizontal-H6": "var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6))",
+      "borderVertical-H6": "var(--xmlui-borderVertical-H6, var(--xmlui-border-H6))",
+      "borderLeft-H6": "var(--xmlui-borderLeft-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderRight-H6": "var(--xmlui-borderRight-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderTop-H6": "var(--xmlui-borderTop-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderBottom-H6": "var(--xmlui-borderBottom-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderWidth-H6": "var(--xmlui-borderWidth-H6)",
+      "borderHorizontalWidth-H6": "var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderLeftWidth-H6": "var(--xmlui-borderLeftWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderRightWidth-H6": "var(--xmlui-borderRightWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderVerticalWidth-H6": "var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderTopWidth-H6": "var(--xmlui-borderTopWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderBottomWidth-H6": "var(--xmlui-borderBottomWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderStyle-H6": "var(--xmlui-borderStyle-H6)",
+      "borderHorizontalStyle-H6": "var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderLeftStyle-H6": "var(--xmlui-borderLeftStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderRightStyle-H6": "var(--xmlui-borderRightStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderVerticalStyle-H6": "var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderTopStyle-H6": "var(--xmlui-borderTopStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderBottomStyle-H6": "var(--xmlui-borderBottomStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderColor-H6": "var(--xmlui-borderColor-H6)",
+      "borderHorizontalColor-H6": "var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderLeftColor-H6": "var(--xmlui-borderLeftColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderRightColor-H6": "var(--xmlui-borderRightColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderVerticalColor-H6": "var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderTopColor-H6": "var(--xmlui-borderTopColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderBottomColor-H6": "var(--xmlui-borderBottomColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderStartStartRadius-H6": "var(--xmlui-borderStartStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderStartEndRadius-H6": "var(--xmlui-borderStartEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndStartRadius-H6": "var(--xmlui-borderEndStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndEndRadius-H6": "var(--xmlui-borderEndEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "padding-H6": "var(--xmlui-padding-H6)",
+      "paddingHorizontal-H6": "var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6))",
+      "paddingVertical-H6": "var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6))",
+      "paddingLeft-H6": "var(--xmlui-paddingLeft-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingRight-H6": "var(--xmlui-paddingRight-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingTop-H6": "var(--xmlui-paddingTop-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "paddingBottom-H6": "var(--xmlui-paddingBottom-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "textColor-H6": "var(--xmlui-textColor-H6)",
+      "fontFamily-H6": "var(--xmlui-fontFamily-H6)",
+      "fontSize-H6": "var(--xmlui-fontSize-H6)",
+      "fontStyle-H6": "var(--xmlui-fontStyle-H6)",
+      "fontVariant-H6": "var(--xmlui-fontVariant-H6)",
+      "fontWeight-H6": "var(--xmlui-fontWeight-H6)",
+      "fontStretch-H6": "var(--xmlui-fontStretch-H6)",
+      "textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
+      "textDecorationColor-H6": "var(--xmlui-textDecorationColor-H6)",
+      "textDecorationStyle-H6": "var(--xmlui-textDecorationStyle-H6)",
+      "textDecorationThickness-H6": "var(--xmlui-textDecorationThickness-H6)",
+      "textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)",
+      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
+      "backgroundColor-H6": "var(--xmlui-backgroundColor-H6)",
+      "textTransform-H6": "var(--xmlui-textTransform-H6)",
+      "letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
+      "wordSpacing-H6": "var(--xmlui-wordSpacing-H6)",
+      "textShadow-H6": "var(--xmlui-textShadow-H6)",
+      "textIndent-H6": "var(--xmlui-textIndent-H6)",
+      "textAlign-H6": "var(--xmlui-textAlign-H6)",
+      "textAlignLast-H6": "var(--xmlui-textAlignLast-H6)",
+      "wordBreak-H6": "var(--xmlui-wordBreak-H6)",
+      "wordWrap-H6": "var(--xmlui-wordWrap-H6)",
+      "direction-H6": "var(--xmlui-direction-H6)",
+      "writingMode-H6": "var(--xmlui-writingMode-H6)",
+      "lineBreak-H6": "var(--xmlui-lineBreak-H6)",
+      "color-anchor-Heading": "var(--xmlui-color-anchor-Heading)",
+      "gap-anchor-Heading": "var(--xmlui-gap-anchor-Heading)",
+      "textDecorationLine-anchor-Heading": "var(--xmlui-textDecorationLine-anchor-Heading)",
       "Heading:textColor-H1": "var(--xmlui-textColor-H1)",
       "Heading:letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
       "Heading:fontFamily-H1": "var(--xmlui-fontFamily-H1)",
       "Heading:fontWeight-H1": "var(--xmlui-fontWeight-H1)",
-      "fontSize-H1": "var(--xmlui-fontSize-H1)",
-      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
       "marginTop-H1": "var(--xmlui-marginTop-H1)",
       "marginBottom-H1": "var(--xmlui-marginBottom-H1)",
       "Heading:textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
@@ -5461,8 +6743,6 @@ export default {
       "Heading:letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
       "Heading:fontFamily-H2": "var(--xmlui-fontFamily-H2)",
       "Heading:fontWeight-H2": "var(--xmlui-fontWeight-H2)",
-      "fontSize-H2": "var(--xmlui-fontSize-H2)",
-      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
       "marginTop-H2": "var(--xmlui-marginTop-H2)",
       "marginBottom-H2": "var(--xmlui-marginBottom-H2)",
       "Heading:textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
@@ -5474,8 +6754,6 @@ export default {
       "Heading:letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
       "Heading:fontFamily-H3": "var(--xmlui-fontFamily-H3)",
       "Heading:fontWeight-H3": "var(--xmlui-fontWeight-H3)",
-      "fontSize-H3": "var(--xmlui-fontSize-H3)",
-      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
       "marginTop-H3": "var(--xmlui-marginTop-H3)",
       "marginBottom-H3": "var(--xmlui-marginBottom-H3)",
       "Heading:textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
@@ -5487,8 +6765,6 @@ export default {
       "Heading:letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
       "Heading:fontFamily-H4": "var(--xmlui-fontFamily-H4)",
       "Heading:fontWeight-H4": "var(--xmlui-fontWeight-H4)",
-      "fontSize-H4": "var(--xmlui-fontSize-H4)",
-      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
       "marginTop-H4": "var(--xmlui-marginTop-H4)",
       "marginBottom-H4": "var(--xmlui-marginBottom-H4)",
       "Heading:textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
@@ -5500,8 +6776,6 @@ export default {
       "Heading:letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
       "Heading:fontFamily-H5": "var(--xmlui-fontFamily-H5)",
       "Heading:fontWeight-H5": "var(--xmlui-fontWeight-H5)",
-      "fontSize-H5": "var(--xmlui-fontSize-H5)",
-      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
       "marginTop-H5": "var(--xmlui-marginTop-H5)",
       "marginBottom-H5": "var(--xmlui-marginBottom-H5)",
       "Heading:textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
@@ -5513,8 +6787,6 @@ export default {
       "Heading:letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
       "Heading:fontFamily-H6": "var(--xmlui-fontFamily-H6)",
       "Heading:fontWeight-H6": "var(--xmlui-fontWeight-H6)",
-      "fontSize-H6": "var(--xmlui-fontSize-H6)",
-      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
       "marginTop-H6": "var(--xmlui-marginTop-H6)",
       "marginBottom-H6": "var(--xmlui-marginBottom-H6)",
       "Heading:textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
@@ -5527,6 +6799,8 @@ export default {
       "fontSize-H2": "$fontSize-medium",
       "marginTop-H2": "0",
       "marginBottom-H2": "0",
+      "marginTop-H2-markdown": "$space-10",
+      "marginBottom-H2-markdown": "$space-3",
       "light": {},
       "dark": {}
     }
@@ -5548,12 +6822,403 @@ export default {
       }
     },
     "themeVars": {
+      "border-H1": "var(--xmlui-border-H1)",
+      "borderHorizontal-H1": "var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1))",
+      "borderVertical-H1": "var(--xmlui-borderVertical-H1, var(--xmlui-border-H1))",
+      "borderLeft-H1": "var(--xmlui-borderLeft-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderRight-H1": "var(--xmlui-borderRight-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderTop-H1": "var(--xmlui-borderTop-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderBottom-H1": "var(--xmlui-borderBottom-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderWidth-H1": "var(--xmlui-borderWidth-H1)",
+      "borderHorizontalWidth-H1": "var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderLeftWidth-H1": "var(--xmlui-borderLeftWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderRightWidth-H1": "var(--xmlui-borderRightWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderVerticalWidth-H1": "var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderTopWidth-H1": "var(--xmlui-borderTopWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderBottomWidth-H1": "var(--xmlui-borderBottomWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderStyle-H1": "var(--xmlui-borderStyle-H1)",
+      "borderHorizontalStyle-H1": "var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderLeftStyle-H1": "var(--xmlui-borderLeftStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderRightStyle-H1": "var(--xmlui-borderRightStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderVerticalStyle-H1": "var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderTopStyle-H1": "var(--xmlui-borderTopStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderBottomStyle-H1": "var(--xmlui-borderBottomStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderColor-H1": "var(--xmlui-borderColor-H1)",
+      "borderHorizontalColor-H1": "var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderLeftColor-H1": "var(--xmlui-borderLeftColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderRightColor-H1": "var(--xmlui-borderRightColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderVerticalColor-H1": "var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderTopColor-H1": "var(--xmlui-borderTopColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderBottomColor-H1": "var(--xmlui-borderBottomColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderStartStartRadius-H1": "var(--xmlui-borderStartStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderStartEndRadius-H1": "var(--xmlui-borderStartEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndStartRadius-H1": "var(--xmlui-borderEndStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndEndRadius-H1": "var(--xmlui-borderEndEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "padding-H1": "var(--xmlui-padding-H1)",
+      "paddingHorizontal-H1": "var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1))",
+      "paddingVertical-H1": "var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1))",
+      "paddingLeft-H1": "var(--xmlui-paddingLeft-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingRight-H1": "var(--xmlui-paddingRight-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingTop-H1": "var(--xmlui-paddingTop-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "paddingBottom-H1": "var(--xmlui-paddingBottom-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "textColor-H1": "var(--xmlui-textColor-H1)",
+      "fontFamily-H1": "var(--xmlui-fontFamily-H1)",
+      "fontSize-H1": "var(--xmlui-fontSize-H1)",
+      "fontStyle-H1": "var(--xmlui-fontStyle-H1)",
+      "fontVariant-H1": "var(--xmlui-fontVariant-H1)",
+      "fontWeight-H1": "var(--xmlui-fontWeight-H1)",
+      "fontStretch-H1": "var(--xmlui-fontStretch-H1)",
+      "textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
+      "textDecorationColor-H1": "var(--xmlui-textDecorationColor-H1)",
+      "textDecorationStyle-H1": "var(--xmlui-textDecorationStyle-H1)",
+      "textDecorationThickness-H1": "var(--xmlui-textDecorationThickness-H1)",
+      "textUnderlineOffset-H1": "var(--xmlui-textUnderlineOffset-H1)",
+      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
+      "backgroundColor-H1": "var(--xmlui-backgroundColor-H1)",
+      "textTransform-H1": "var(--xmlui-textTransform-H1)",
+      "letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
+      "wordSpacing-H1": "var(--xmlui-wordSpacing-H1)",
+      "textShadow-H1": "var(--xmlui-textShadow-H1)",
+      "textIndent-H1": "var(--xmlui-textIndent-H1)",
+      "textAlign-H1": "var(--xmlui-textAlign-H1)",
+      "textAlignLast-H1": "var(--xmlui-textAlignLast-H1)",
+      "wordBreak-H1": "var(--xmlui-wordBreak-H1)",
+      "wordWrap-H1": "var(--xmlui-wordWrap-H1)",
+      "direction-H1": "var(--xmlui-direction-H1)",
+      "writingMode-H1": "var(--xmlui-writingMode-H1)",
+      "lineBreak-H1": "var(--xmlui-lineBreak-H1)",
+      "border-H2": "var(--xmlui-border-H2)",
+      "borderHorizontal-H2": "var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2))",
+      "borderVertical-H2": "var(--xmlui-borderVertical-H2, var(--xmlui-border-H2))",
+      "borderLeft-H2": "var(--xmlui-borderLeft-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderRight-H2": "var(--xmlui-borderRight-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderTop-H2": "var(--xmlui-borderTop-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderBottom-H2": "var(--xmlui-borderBottom-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderWidth-H2": "var(--xmlui-borderWidth-H2)",
+      "borderHorizontalWidth-H2": "var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderLeftWidth-H2": "var(--xmlui-borderLeftWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderRightWidth-H2": "var(--xmlui-borderRightWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderVerticalWidth-H2": "var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderTopWidth-H2": "var(--xmlui-borderTopWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderBottomWidth-H2": "var(--xmlui-borderBottomWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderStyle-H2": "var(--xmlui-borderStyle-H2)",
+      "borderHorizontalStyle-H2": "var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderLeftStyle-H2": "var(--xmlui-borderLeftStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderRightStyle-H2": "var(--xmlui-borderRightStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderVerticalStyle-H2": "var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderTopStyle-H2": "var(--xmlui-borderTopStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderBottomStyle-H2": "var(--xmlui-borderBottomStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderColor-H2": "var(--xmlui-borderColor-H2)",
+      "borderHorizontalColor-H2": "var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderLeftColor-H2": "var(--xmlui-borderLeftColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderRightColor-H2": "var(--xmlui-borderRightColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderVerticalColor-H2": "var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderTopColor-H2": "var(--xmlui-borderTopColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderBottomColor-H2": "var(--xmlui-borderBottomColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderStartStartRadius-H2": "var(--xmlui-borderStartStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderStartEndRadius-H2": "var(--xmlui-borderStartEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndStartRadius-H2": "var(--xmlui-borderEndStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndEndRadius-H2": "var(--xmlui-borderEndEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "padding-H2": "var(--xmlui-padding-H2)",
+      "paddingHorizontal-H2": "var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2))",
+      "paddingVertical-H2": "var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2))",
+      "paddingLeft-H2": "var(--xmlui-paddingLeft-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingRight-H2": "var(--xmlui-paddingRight-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingTop-H2": "var(--xmlui-paddingTop-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "paddingBottom-H2": "var(--xmlui-paddingBottom-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "textColor-H2": "var(--xmlui-textColor-H2)",
+      "fontFamily-H2": "var(--xmlui-fontFamily-H2)",
+      "fontSize-H2": "var(--xmlui-fontSize-H2)",
+      "fontStyle-H2": "var(--xmlui-fontStyle-H2)",
+      "fontVariant-H2": "var(--xmlui-fontVariant-H2)",
+      "fontWeight-H2": "var(--xmlui-fontWeight-H2)",
+      "fontStretch-H2": "var(--xmlui-fontStretch-H2)",
+      "textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
+      "textDecorationColor-H2": "var(--xmlui-textDecorationColor-H2)",
+      "textDecorationStyle-H2": "var(--xmlui-textDecorationStyle-H2)",
+      "textDecorationThickness-H2": "var(--xmlui-textDecorationThickness-H2)",
+      "textUnderlineOffset-H2": "var(--xmlui-textUnderlineOffset-H2)",
+      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
+      "backgroundColor-H2": "var(--xmlui-backgroundColor-H2)",
+      "textTransform-H2": "var(--xmlui-textTransform-H2)",
+      "letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
+      "wordSpacing-H2": "var(--xmlui-wordSpacing-H2)",
+      "textShadow-H2": "var(--xmlui-textShadow-H2)",
+      "textIndent-H2": "var(--xmlui-textIndent-H2)",
+      "textAlign-H2": "var(--xmlui-textAlign-H2)",
+      "textAlignLast-H2": "var(--xmlui-textAlignLast-H2)",
+      "wordBreak-H2": "var(--xmlui-wordBreak-H2)",
+      "wordWrap-H2": "var(--xmlui-wordWrap-H2)",
+      "direction-H2": "var(--xmlui-direction-H2)",
+      "writingMode-H2": "var(--xmlui-writingMode-H2)",
+      "lineBreak-H2": "var(--xmlui-lineBreak-H2)",
+      "border-H3": "var(--xmlui-border-H3)",
+      "borderHorizontal-H3": "var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3))",
+      "borderVertical-H3": "var(--xmlui-borderVertical-H3, var(--xmlui-border-H3))",
+      "borderLeft-H3": "var(--xmlui-borderLeft-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderRight-H3": "var(--xmlui-borderRight-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderTop-H3": "var(--xmlui-borderTop-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderBottom-H3": "var(--xmlui-borderBottom-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderWidth-H3": "var(--xmlui-borderWidth-H3)",
+      "borderHorizontalWidth-H3": "var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderLeftWidth-H3": "var(--xmlui-borderLeftWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderRightWidth-H3": "var(--xmlui-borderRightWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderVerticalWidth-H3": "var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderTopWidth-H3": "var(--xmlui-borderTopWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderBottomWidth-H3": "var(--xmlui-borderBottomWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderStyle-H3": "var(--xmlui-borderStyle-H3)",
+      "borderHorizontalStyle-H3": "var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderLeftStyle-H3": "var(--xmlui-borderLeftStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderRightStyle-H3": "var(--xmlui-borderRightStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderVerticalStyle-H3": "var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderTopStyle-H3": "var(--xmlui-borderTopStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderBottomStyle-H3": "var(--xmlui-borderBottomStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderColor-H3": "var(--xmlui-borderColor-H3)",
+      "borderHorizontalColor-H3": "var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderLeftColor-H3": "var(--xmlui-borderLeftColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderRightColor-H3": "var(--xmlui-borderRightColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderVerticalColor-H3": "var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderTopColor-H3": "var(--xmlui-borderTopColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderBottomColor-H3": "var(--xmlui-borderBottomColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderStartStartRadius-H3": "var(--xmlui-borderStartStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderStartEndRadius-H3": "var(--xmlui-borderStartEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndStartRadius-H3": "var(--xmlui-borderEndStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndEndRadius-H3": "var(--xmlui-borderEndEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "padding-H3": "var(--xmlui-padding-H3)",
+      "paddingHorizontal-H3": "var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3))",
+      "paddingVertical-H3": "var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3))",
+      "paddingLeft-H3": "var(--xmlui-paddingLeft-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingRight-H3": "var(--xmlui-paddingRight-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingTop-H3": "var(--xmlui-paddingTop-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "paddingBottom-H3": "var(--xmlui-paddingBottom-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "textColor-H3": "var(--xmlui-textColor-H3)",
+      "fontFamily-H3": "var(--xmlui-fontFamily-H3)",
+      "fontSize-H3": "var(--xmlui-fontSize-H3)",
+      "fontStyle-H3": "var(--xmlui-fontStyle-H3)",
+      "fontVariant-H3": "var(--xmlui-fontVariant-H3)",
+      "fontWeight-H3": "var(--xmlui-fontWeight-H3)",
+      "fontStretch-H3": "var(--xmlui-fontStretch-H3)",
+      "textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
+      "textDecorationColor-H3": "var(--xmlui-textDecorationColor-H3)",
+      "textDecorationStyle-H3": "var(--xmlui-textDecorationStyle-H3)",
+      "textDecorationThickness-H3": "var(--xmlui-textDecorationThickness-H3)",
+      "textUnderlineOffset-H3": "var(--xmlui-textUnderlineOffset-H3)",
+      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
+      "backgroundColor-H3": "var(--xmlui-backgroundColor-H3)",
+      "textTransform-H3": "var(--xmlui-textTransform-H3)",
+      "letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
+      "wordSpacing-H3": "var(--xmlui-wordSpacing-H3)",
+      "textShadow-H3": "var(--xmlui-textShadow-H3)",
+      "textIndent-H3": "var(--xmlui-textIndent-H3)",
+      "textAlign-H3": "var(--xmlui-textAlign-H3)",
+      "textAlignLast-H3": "var(--xmlui-textAlignLast-H3)",
+      "wordBreak-H3": "var(--xmlui-wordBreak-H3)",
+      "wordWrap-H3": "var(--xmlui-wordWrap-H3)",
+      "direction-H3": "var(--xmlui-direction-H3)",
+      "writingMode-H3": "var(--xmlui-writingMode-H3)",
+      "lineBreak-H3": "var(--xmlui-lineBreak-H3)",
+      "border-H4": "var(--xmlui-border-H4)",
+      "borderHorizontal-H4": "var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4))",
+      "borderVertical-H4": "var(--xmlui-borderVertical-H4, var(--xmlui-border-H4))",
+      "borderLeft-H4": "var(--xmlui-borderLeft-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderRight-H4": "var(--xmlui-borderRight-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderTop-H4": "var(--xmlui-borderTop-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderBottom-H4": "var(--xmlui-borderBottom-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderWidth-H4": "var(--xmlui-borderWidth-H4)",
+      "borderHorizontalWidth-H4": "var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderLeftWidth-H4": "var(--xmlui-borderLeftWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderRightWidth-H4": "var(--xmlui-borderRightWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderVerticalWidth-H4": "var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderTopWidth-H4": "var(--xmlui-borderTopWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderBottomWidth-H4": "var(--xmlui-borderBottomWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderStyle-H4": "var(--xmlui-borderStyle-H4)",
+      "borderHorizontalStyle-H4": "var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderLeftStyle-H4": "var(--xmlui-borderLeftStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderRightStyle-H4": "var(--xmlui-borderRightStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderVerticalStyle-H4": "var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderTopStyle-H4": "var(--xmlui-borderTopStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderBottomStyle-H4": "var(--xmlui-borderBottomStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderColor-H4": "var(--xmlui-borderColor-H4)",
+      "borderHorizontalColor-H4": "var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderLeftColor-H4": "var(--xmlui-borderLeftColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderRightColor-H4": "var(--xmlui-borderRightColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderVerticalColor-H4": "var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderTopColor-H4": "var(--xmlui-borderTopColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderBottomColor-H4": "var(--xmlui-borderBottomColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderStartStartRadius-H4": "var(--xmlui-borderStartStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderStartEndRadius-H4": "var(--xmlui-borderStartEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndStartRadius-H4": "var(--xmlui-borderEndStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndEndRadius-H4": "var(--xmlui-borderEndEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "padding-H4": "var(--xmlui-padding-H4)",
+      "paddingHorizontal-H4": "var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4))",
+      "paddingVertical-H4": "var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4))",
+      "paddingLeft-H4": "var(--xmlui-paddingLeft-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingRight-H4": "var(--xmlui-paddingRight-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingTop-H4": "var(--xmlui-paddingTop-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "paddingBottom-H4": "var(--xmlui-paddingBottom-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "textColor-H4": "var(--xmlui-textColor-H4)",
+      "fontFamily-H4": "var(--xmlui-fontFamily-H4)",
+      "fontSize-H4": "var(--xmlui-fontSize-H4)",
+      "fontStyle-H4": "var(--xmlui-fontStyle-H4)",
+      "fontVariant-H4": "var(--xmlui-fontVariant-H4)",
+      "fontWeight-H4": "var(--xmlui-fontWeight-H4)",
+      "fontStretch-H4": "var(--xmlui-fontStretch-H4)",
+      "textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
+      "textDecorationColor-H4": "var(--xmlui-textDecorationColor-H4)",
+      "textDecorationStyle-H4": "var(--xmlui-textDecorationStyle-H4)",
+      "textDecorationThickness-H4": "var(--xmlui-textDecorationThickness-H4)",
+      "textUnderlineOffset-H4": "var(--xmlui-textUnderlineOffset-H4)",
+      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
+      "backgroundColor-H4": "var(--xmlui-backgroundColor-H4)",
+      "textTransform-H4": "var(--xmlui-textTransform-H4)",
+      "letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
+      "wordSpacing-H4": "var(--xmlui-wordSpacing-H4)",
+      "textShadow-H4": "var(--xmlui-textShadow-H4)",
+      "textIndent-H4": "var(--xmlui-textIndent-H4)",
+      "textAlign-H4": "var(--xmlui-textAlign-H4)",
+      "textAlignLast-H4": "var(--xmlui-textAlignLast-H4)",
+      "wordBreak-H4": "var(--xmlui-wordBreak-H4)",
+      "wordWrap-H4": "var(--xmlui-wordWrap-H4)",
+      "direction-H4": "var(--xmlui-direction-H4)",
+      "writingMode-H4": "var(--xmlui-writingMode-H4)",
+      "lineBreak-H4": "var(--xmlui-lineBreak-H4)",
+      "border-H5": "var(--xmlui-border-H5)",
+      "borderHorizontal-H5": "var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5))",
+      "borderVertical-H5": "var(--xmlui-borderVertical-H5, var(--xmlui-border-H5))",
+      "borderLeft-H5": "var(--xmlui-borderLeft-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderRight-H5": "var(--xmlui-borderRight-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderTop-H5": "var(--xmlui-borderTop-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderBottom-H5": "var(--xmlui-borderBottom-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderWidth-H5": "var(--xmlui-borderWidth-H5)",
+      "borderHorizontalWidth-H5": "var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderLeftWidth-H5": "var(--xmlui-borderLeftWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderRightWidth-H5": "var(--xmlui-borderRightWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderVerticalWidth-H5": "var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderTopWidth-H5": "var(--xmlui-borderTopWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderBottomWidth-H5": "var(--xmlui-borderBottomWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderStyle-H5": "var(--xmlui-borderStyle-H5)",
+      "borderHorizontalStyle-H5": "var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderLeftStyle-H5": "var(--xmlui-borderLeftStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderRightStyle-H5": "var(--xmlui-borderRightStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderVerticalStyle-H5": "var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderTopStyle-H5": "var(--xmlui-borderTopStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderBottomStyle-H5": "var(--xmlui-borderBottomStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderColor-H5": "var(--xmlui-borderColor-H5)",
+      "borderHorizontalColor-H5": "var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderLeftColor-H5": "var(--xmlui-borderLeftColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderRightColor-H5": "var(--xmlui-borderRightColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderVerticalColor-H5": "var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderTopColor-H5": "var(--xmlui-borderTopColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderBottomColor-H5": "var(--xmlui-borderBottomColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderStartStartRadius-H5": "var(--xmlui-borderStartStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderStartEndRadius-H5": "var(--xmlui-borderStartEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndStartRadius-H5": "var(--xmlui-borderEndStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndEndRadius-H5": "var(--xmlui-borderEndEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "padding-H5": "var(--xmlui-padding-H5)",
+      "paddingHorizontal-H5": "var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5))",
+      "paddingVertical-H5": "var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5))",
+      "paddingLeft-H5": "var(--xmlui-paddingLeft-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingRight-H5": "var(--xmlui-paddingRight-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingTop-H5": "var(--xmlui-paddingTop-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "paddingBottom-H5": "var(--xmlui-paddingBottom-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "textColor-H5": "var(--xmlui-textColor-H5)",
+      "fontFamily-H5": "var(--xmlui-fontFamily-H5)",
+      "fontSize-H5": "var(--xmlui-fontSize-H5)",
+      "fontStyle-H5": "var(--xmlui-fontStyle-H5)",
+      "fontVariant-H5": "var(--xmlui-fontVariant-H5)",
+      "fontWeight-H5": "var(--xmlui-fontWeight-H5)",
+      "fontStretch-H5": "var(--xmlui-fontStretch-H5)",
+      "textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
+      "textDecorationColor-H5": "var(--xmlui-textDecorationColor-H5)",
+      "textDecorationStyle-H5": "var(--xmlui-textDecorationStyle-H5)",
+      "textDecorationThickness-H5": "var(--xmlui-textDecorationThickness-H5)",
+      "textUnderlineOffset-H5": "var(--xmlui-textUnderlineOffset-H5)",
+      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
+      "backgroundColor-H5": "var(--xmlui-backgroundColor-H5)",
+      "textTransform-H5": "var(--xmlui-textTransform-H5)",
+      "letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
+      "wordSpacing-H5": "var(--xmlui-wordSpacing-H5)",
+      "textShadow-H5": "var(--xmlui-textShadow-H5)",
+      "textIndent-H5": "var(--xmlui-textIndent-H5)",
+      "textAlign-H5": "var(--xmlui-textAlign-H5)",
+      "textAlignLast-H5": "var(--xmlui-textAlignLast-H5)",
+      "wordBreak-H5": "var(--xmlui-wordBreak-H5)",
+      "wordWrap-H5": "var(--xmlui-wordWrap-H5)",
+      "direction-H5": "var(--xmlui-direction-H5)",
+      "writingMode-H5": "var(--xmlui-writingMode-H5)",
+      "lineBreak-H5": "var(--xmlui-lineBreak-H5)",
+      "border-H6": "var(--xmlui-border-H6)",
+      "borderHorizontal-H6": "var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6))",
+      "borderVertical-H6": "var(--xmlui-borderVertical-H6, var(--xmlui-border-H6))",
+      "borderLeft-H6": "var(--xmlui-borderLeft-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderRight-H6": "var(--xmlui-borderRight-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderTop-H6": "var(--xmlui-borderTop-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderBottom-H6": "var(--xmlui-borderBottom-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderWidth-H6": "var(--xmlui-borderWidth-H6)",
+      "borderHorizontalWidth-H6": "var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderLeftWidth-H6": "var(--xmlui-borderLeftWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderRightWidth-H6": "var(--xmlui-borderRightWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderVerticalWidth-H6": "var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderTopWidth-H6": "var(--xmlui-borderTopWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderBottomWidth-H6": "var(--xmlui-borderBottomWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderStyle-H6": "var(--xmlui-borderStyle-H6)",
+      "borderHorizontalStyle-H6": "var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderLeftStyle-H6": "var(--xmlui-borderLeftStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderRightStyle-H6": "var(--xmlui-borderRightStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderVerticalStyle-H6": "var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderTopStyle-H6": "var(--xmlui-borderTopStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderBottomStyle-H6": "var(--xmlui-borderBottomStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderColor-H6": "var(--xmlui-borderColor-H6)",
+      "borderHorizontalColor-H6": "var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderLeftColor-H6": "var(--xmlui-borderLeftColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderRightColor-H6": "var(--xmlui-borderRightColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderVerticalColor-H6": "var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderTopColor-H6": "var(--xmlui-borderTopColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderBottomColor-H6": "var(--xmlui-borderBottomColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderStartStartRadius-H6": "var(--xmlui-borderStartStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderStartEndRadius-H6": "var(--xmlui-borderStartEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndStartRadius-H6": "var(--xmlui-borderEndStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndEndRadius-H6": "var(--xmlui-borderEndEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "padding-H6": "var(--xmlui-padding-H6)",
+      "paddingHorizontal-H6": "var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6))",
+      "paddingVertical-H6": "var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6))",
+      "paddingLeft-H6": "var(--xmlui-paddingLeft-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingRight-H6": "var(--xmlui-paddingRight-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingTop-H6": "var(--xmlui-paddingTop-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "paddingBottom-H6": "var(--xmlui-paddingBottom-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "textColor-H6": "var(--xmlui-textColor-H6)",
+      "fontFamily-H6": "var(--xmlui-fontFamily-H6)",
+      "fontSize-H6": "var(--xmlui-fontSize-H6)",
+      "fontStyle-H6": "var(--xmlui-fontStyle-H6)",
+      "fontVariant-H6": "var(--xmlui-fontVariant-H6)",
+      "fontWeight-H6": "var(--xmlui-fontWeight-H6)",
+      "fontStretch-H6": "var(--xmlui-fontStretch-H6)",
+      "textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
+      "textDecorationColor-H6": "var(--xmlui-textDecorationColor-H6)",
+      "textDecorationStyle-H6": "var(--xmlui-textDecorationStyle-H6)",
+      "textDecorationThickness-H6": "var(--xmlui-textDecorationThickness-H6)",
+      "textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)",
+      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
+      "backgroundColor-H6": "var(--xmlui-backgroundColor-H6)",
+      "textTransform-H6": "var(--xmlui-textTransform-H6)",
+      "letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
+      "wordSpacing-H6": "var(--xmlui-wordSpacing-H6)",
+      "textShadow-H6": "var(--xmlui-textShadow-H6)",
+      "textIndent-H6": "var(--xmlui-textIndent-H6)",
+      "textAlign-H6": "var(--xmlui-textAlign-H6)",
+      "textAlignLast-H6": "var(--xmlui-textAlignLast-H6)",
+      "wordBreak-H6": "var(--xmlui-wordBreak-H6)",
+      "wordWrap-H6": "var(--xmlui-wordWrap-H6)",
+      "direction-H6": "var(--xmlui-direction-H6)",
+      "writingMode-H6": "var(--xmlui-writingMode-H6)",
+      "lineBreak-H6": "var(--xmlui-lineBreak-H6)",
+      "color-anchor-Heading": "var(--xmlui-color-anchor-Heading)",
+      "gap-anchor-Heading": "var(--xmlui-gap-anchor-Heading)",
+      "textDecorationLine-anchor-Heading": "var(--xmlui-textDecorationLine-anchor-Heading)",
       "Heading:textColor-H1": "var(--xmlui-textColor-H1)",
       "Heading:letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
       "Heading:fontFamily-H1": "var(--xmlui-fontFamily-H1)",
       "Heading:fontWeight-H1": "var(--xmlui-fontWeight-H1)",
-      "fontSize-H1": "var(--xmlui-fontSize-H1)",
-      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
       "marginTop-H1": "var(--xmlui-marginTop-H1)",
       "marginBottom-H1": "var(--xmlui-marginBottom-H1)",
       "Heading:textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
@@ -5565,8 +7230,6 @@ export default {
       "Heading:letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
       "Heading:fontFamily-H2": "var(--xmlui-fontFamily-H2)",
       "Heading:fontWeight-H2": "var(--xmlui-fontWeight-H2)",
-      "fontSize-H2": "var(--xmlui-fontSize-H2)",
-      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
       "marginTop-H2": "var(--xmlui-marginTop-H2)",
       "marginBottom-H2": "var(--xmlui-marginBottom-H2)",
       "Heading:textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
@@ -5578,8 +7241,6 @@ export default {
       "Heading:letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
       "Heading:fontFamily-H3": "var(--xmlui-fontFamily-H3)",
       "Heading:fontWeight-H3": "var(--xmlui-fontWeight-H3)",
-      "fontSize-H3": "var(--xmlui-fontSize-H3)",
-      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
       "marginTop-H3": "var(--xmlui-marginTop-H3)",
       "marginBottom-H3": "var(--xmlui-marginBottom-H3)",
       "Heading:textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
@@ -5591,8 +7252,6 @@ export default {
       "Heading:letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
       "Heading:fontFamily-H4": "var(--xmlui-fontFamily-H4)",
       "Heading:fontWeight-H4": "var(--xmlui-fontWeight-H4)",
-      "fontSize-H4": "var(--xmlui-fontSize-H4)",
-      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
       "marginTop-H4": "var(--xmlui-marginTop-H4)",
       "marginBottom-H4": "var(--xmlui-marginBottom-H4)",
       "Heading:textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
@@ -5604,8 +7263,6 @@ export default {
       "Heading:letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
       "Heading:fontFamily-H5": "var(--xmlui-fontFamily-H5)",
       "Heading:fontWeight-H5": "var(--xmlui-fontWeight-H5)",
-      "fontSize-H5": "var(--xmlui-fontSize-H5)",
-      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
       "marginTop-H5": "var(--xmlui-marginTop-H5)",
       "marginBottom-H5": "var(--xmlui-marginBottom-H5)",
       "Heading:textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
@@ -5617,8 +7274,6 @@ export default {
       "Heading:letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
       "Heading:fontFamily-H6": "var(--xmlui-fontFamily-H6)",
       "Heading:fontWeight-H6": "var(--xmlui-fontWeight-H6)",
-      "fontSize-H6": "var(--xmlui-fontSize-H6)",
-      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
       "marginTop-H6": "var(--xmlui-marginTop-H6)",
       "marginBottom-H6": "var(--xmlui-marginBottom-H6)",
       "Heading:textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
@@ -5631,6 +7286,8 @@ export default {
       "fontSize-H3": "$fontSize-normal",
       "marginTop-H3": "0",
       "marginBottom-H3": "0",
+      "marginTop-H3-markdown": "$space-6",
+      "marginBottom-H3-markdown": "$space-2",
       "light": {},
       "dark": {}
     }
@@ -5652,12 +7309,403 @@ export default {
       }
     },
     "themeVars": {
+      "border-H1": "var(--xmlui-border-H1)",
+      "borderHorizontal-H1": "var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1))",
+      "borderVertical-H1": "var(--xmlui-borderVertical-H1, var(--xmlui-border-H1))",
+      "borderLeft-H1": "var(--xmlui-borderLeft-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderRight-H1": "var(--xmlui-borderRight-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderTop-H1": "var(--xmlui-borderTop-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderBottom-H1": "var(--xmlui-borderBottom-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderWidth-H1": "var(--xmlui-borderWidth-H1)",
+      "borderHorizontalWidth-H1": "var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderLeftWidth-H1": "var(--xmlui-borderLeftWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderRightWidth-H1": "var(--xmlui-borderRightWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderVerticalWidth-H1": "var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderTopWidth-H1": "var(--xmlui-borderTopWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderBottomWidth-H1": "var(--xmlui-borderBottomWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderStyle-H1": "var(--xmlui-borderStyle-H1)",
+      "borderHorizontalStyle-H1": "var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderLeftStyle-H1": "var(--xmlui-borderLeftStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderRightStyle-H1": "var(--xmlui-borderRightStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderVerticalStyle-H1": "var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderTopStyle-H1": "var(--xmlui-borderTopStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderBottomStyle-H1": "var(--xmlui-borderBottomStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderColor-H1": "var(--xmlui-borderColor-H1)",
+      "borderHorizontalColor-H1": "var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderLeftColor-H1": "var(--xmlui-borderLeftColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderRightColor-H1": "var(--xmlui-borderRightColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderVerticalColor-H1": "var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderTopColor-H1": "var(--xmlui-borderTopColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderBottomColor-H1": "var(--xmlui-borderBottomColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderStartStartRadius-H1": "var(--xmlui-borderStartStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderStartEndRadius-H1": "var(--xmlui-borderStartEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndStartRadius-H1": "var(--xmlui-borderEndStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndEndRadius-H1": "var(--xmlui-borderEndEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "padding-H1": "var(--xmlui-padding-H1)",
+      "paddingHorizontal-H1": "var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1))",
+      "paddingVertical-H1": "var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1))",
+      "paddingLeft-H1": "var(--xmlui-paddingLeft-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingRight-H1": "var(--xmlui-paddingRight-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingTop-H1": "var(--xmlui-paddingTop-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "paddingBottom-H1": "var(--xmlui-paddingBottom-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "textColor-H1": "var(--xmlui-textColor-H1)",
+      "fontFamily-H1": "var(--xmlui-fontFamily-H1)",
+      "fontSize-H1": "var(--xmlui-fontSize-H1)",
+      "fontStyle-H1": "var(--xmlui-fontStyle-H1)",
+      "fontVariant-H1": "var(--xmlui-fontVariant-H1)",
+      "fontWeight-H1": "var(--xmlui-fontWeight-H1)",
+      "fontStretch-H1": "var(--xmlui-fontStretch-H1)",
+      "textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
+      "textDecorationColor-H1": "var(--xmlui-textDecorationColor-H1)",
+      "textDecorationStyle-H1": "var(--xmlui-textDecorationStyle-H1)",
+      "textDecorationThickness-H1": "var(--xmlui-textDecorationThickness-H1)",
+      "textUnderlineOffset-H1": "var(--xmlui-textUnderlineOffset-H1)",
+      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
+      "backgroundColor-H1": "var(--xmlui-backgroundColor-H1)",
+      "textTransform-H1": "var(--xmlui-textTransform-H1)",
+      "letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
+      "wordSpacing-H1": "var(--xmlui-wordSpacing-H1)",
+      "textShadow-H1": "var(--xmlui-textShadow-H1)",
+      "textIndent-H1": "var(--xmlui-textIndent-H1)",
+      "textAlign-H1": "var(--xmlui-textAlign-H1)",
+      "textAlignLast-H1": "var(--xmlui-textAlignLast-H1)",
+      "wordBreak-H1": "var(--xmlui-wordBreak-H1)",
+      "wordWrap-H1": "var(--xmlui-wordWrap-H1)",
+      "direction-H1": "var(--xmlui-direction-H1)",
+      "writingMode-H1": "var(--xmlui-writingMode-H1)",
+      "lineBreak-H1": "var(--xmlui-lineBreak-H1)",
+      "border-H2": "var(--xmlui-border-H2)",
+      "borderHorizontal-H2": "var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2))",
+      "borderVertical-H2": "var(--xmlui-borderVertical-H2, var(--xmlui-border-H2))",
+      "borderLeft-H2": "var(--xmlui-borderLeft-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderRight-H2": "var(--xmlui-borderRight-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderTop-H2": "var(--xmlui-borderTop-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderBottom-H2": "var(--xmlui-borderBottom-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderWidth-H2": "var(--xmlui-borderWidth-H2)",
+      "borderHorizontalWidth-H2": "var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderLeftWidth-H2": "var(--xmlui-borderLeftWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderRightWidth-H2": "var(--xmlui-borderRightWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderVerticalWidth-H2": "var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderTopWidth-H2": "var(--xmlui-borderTopWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderBottomWidth-H2": "var(--xmlui-borderBottomWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderStyle-H2": "var(--xmlui-borderStyle-H2)",
+      "borderHorizontalStyle-H2": "var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderLeftStyle-H2": "var(--xmlui-borderLeftStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderRightStyle-H2": "var(--xmlui-borderRightStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderVerticalStyle-H2": "var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderTopStyle-H2": "var(--xmlui-borderTopStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderBottomStyle-H2": "var(--xmlui-borderBottomStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderColor-H2": "var(--xmlui-borderColor-H2)",
+      "borderHorizontalColor-H2": "var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderLeftColor-H2": "var(--xmlui-borderLeftColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderRightColor-H2": "var(--xmlui-borderRightColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderVerticalColor-H2": "var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderTopColor-H2": "var(--xmlui-borderTopColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderBottomColor-H2": "var(--xmlui-borderBottomColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderStartStartRadius-H2": "var(--xmlui-borderStartStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderStartEndRadius-H2": "var(--xmlui-borderStartEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndStartRadius-H2": "var(--xmlui-borderEndStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndEndRadius-H2": "var(--xmlui-borderEndEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "padding-H2": "var(--xmlui-padding-H2)",
+      "paddingHorizontal-H2": "var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2))",
+      "paddingVertical-H2": "var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2))",
+      "paddingLeft-H2": "var(--xmlui-paddingLeft-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingRight-H2": "var(--xmlui-paddingRight-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingTop-H2": "var(--xmlui-paddingTop-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "paddingBottom-H2": "var(--xmlui-paddingBottom-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "textColor-H2": "var(--xmlui-textColor-H2)",
+      "fontFamily-H2": "var(--xmlui-fontFamily-H2)",
+      "fontSize-H2": "var(--xmlui-fontSize-H2)",
+      "fontStyle-H2": "var(--xmlui-fontStyle-H2)",
+      "fontVariant-H2": "var(--xmlui-fontVariant-H2)",
+      "fontWeight-H2": "var(--xmlui-fontWeight-H2)",
+      "fontStretch-H2": "var(--xmlui-fontStretch-H2)",
+      "textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
+      "textDecorationColor-H2": "var(--xmlui-textDecorationColor-H2)",
+      "textDecorationStyle-H2": "var(--xmlui-textDecorationStyle-H2)",
+      "textDecorationThickness-H2": "var(--xmlui-textDecorationThickness-H2)",
+      "textUnderlineOffset-H2": "var(--xmlui-textUnderlineOffset-H2)",
+      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
+      "backgroundColor-H2": "var(--xmlui-backgroundColor-H2)",
+      "textTransform-H2": "var(--xmlui-textTransform-H2)",
+      "letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
+      "wordSpacing-H2": "var(--xmlui-wordSpacing-H2)",
+      "textShadow-H2": "var(--xmlui-textShadow-H2)",
+      "textIndent-H2": "var(--xmlui-textIndent-H2)",
+      "textAlign-H2": "var(--xmlui-textAlign-H2)",
+      "textAlignLast-H2": "var(--xmlui-textAlignLast-H2)",
+      "wordBreak-H2": "var(--xmlui-wordBreak-H2)",
+      "wordWrap-H2": "var(--xmlui-wordWrap-H2)",
+      "direction-H2": "var(--xmlui-direction-H2)",
+      "writingMode-H2": "var(--xmlui-writingMode-H2)",
+      "lineBreak-H2": "var(--xmlui-lineBreak-H2)",
+      "border-H3": "var(--xmlui-border-H3)",
+      "borderHorizontal-H3": "var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3))",
+      "borderVertical-H3": "var(--xmlui-borderVertical-H3, var(--xmlui-border-H3))",
+      "borderLeft-H3": "var(--xmlui-borderLeft-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderRight-H3": "var(--xmlui-borderRight-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderTop-H3": "var(--xmlui-borderTop-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderBottom-H3": "var(--xmlui-borderBottom-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderWidth-H3": "var(--xmlui-borderWidth-H3)",
+      "borderHorizontalWidth-H3": "var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderLeftWidth-H3": "var(--xmlui-borderLeftWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderRightWidth-H3": "var(--xmlui-borderRightWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderVerticalWidth-H3": "var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderTopWidth-H3": "var(--xmlui-borderTopWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderBottomWidth-H3": "var(--xmlui-borderBottomWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderStyle-H3": "var(--xmlui-borderStyle-H3)",
+      "borderHorizontalStyle-H3": "var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderLeftStyle-H3": "var(--xmlui-borderLeftStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderRightStyle-H3": "var(--xmlui-borderRightStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderVerticalStyle-H3": "var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderTopStyle-H3": "var(--xmlui-borderTopStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderBottomStyle-H3": "var(--xmlui-borderBottomStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderColor-H3": "var(--xmlui-borderColor-H3)",
+      "borderHorizontalColor-H3": "var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderLeftColor-H3": "var(--xmlui-borderLeftColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderRightColor-H3": "var(--xmlui-borderRightColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderVerticalColor-H3": "var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderTopColor-H3": "var(--xmlui-borderTopColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderBottomColor-H3": "var(--xmlui-borderBottomColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderStartStartRadius-H3": "var(--xmlui-borderStartStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderStartEndRadius-H3": "var(--xmlui-borderStartEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndStartRadius-H3": "var(--xmlui-borderEndStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndEndRadius-H3": "var(--xmlui-borderEndEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "padding-H3": "var(--xmlui-padding-H3)",
+      "paddingHorizontal-H3": "var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3))",
+      "paddingVertical-H3": "var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3))",
+      "paddingLeft-H3": "var(--xmlui-paddingLeft-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingRight-H3": "var(--xmlui-paddingRight-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingTop-H3": "var(--xmlui-paddingTop-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "paddingBottom-H3": "var(--xmlui-paddingBottom-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "textColor-H3": "var(--xmlui-textColor-H3)",
+      "fontFamily-H3": "var(--xmlui-fontFamily-H3)",
+      "fontSize-H3": "var(--xmlui-fontSize-H3)",
+      "fontStyle-H3": "var(--xmlui-fontStyle-H3)",
+      "fontVariant-H3": "var(--xmlui-fontVariant-H3)",
+      "fontWeight-H3": "var(--xmlui-fontWeight-H3)",
+      "fontStretch-H3": "var(--xmlui-fontStretch-H3)",
+      "textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
+      "textDecorationColor-H3": "var(--xmlui-textDecorationColor-H3)",
+      "textDecorationStyle-H3": "var(--xmlui-textDecorationStyle-H3)",
+      "textDecorationThickness-H3": "var(--xmlui-textDecorationThickness-H3)",
+      "textUnderlineOffset-H3": "var(--xmlui-textUnderlineOffset-H3)",
+      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
+      "backgroundColor-H3": "var(--xmlui-backgroundColor-H3)",
+      "textTransform-H3": "var(--xmlui-textTransform-H3)",
+      "letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
+      "wordSpacing-H3": "var(--xmlui-wordSpacing-H3)",
+      "textShadow-H3": "var(--xmlui-textShadow-H3)",
+      "textIndent-H3": "var(--xmlui-textIndent-H3)",
+      "textAlign-H3": "var(--xmlui-textAlign-H3)",
+      "textAlignLast-H3": "var(--xmlui-textAlignLast-H3)",
+      "wordBreak-H3": "var(--xmlui-wordBreak-H3)",
+      "wordWrap-H3": "var(--xmlui-wordWrap-H3)",
+      "direction-H3": "var(--xmlui-direction-H3)",
+      "writingMode-H3": "var(--xmlui-writingMode-H3)",
+      "lineBreak-H3": "var(--xmlui-lineBreak-H3)",
+      "border-H4": "var(--xmlui-border-H4)",
+      "borderHorizontal-H4": "var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4))",
+      "borderVertical-H4": "var(--xmlui-borderVertical-H4, var(--xmlui-border-H4))",
+      "borderLeft-H4": "var(--xmlui-borderLeft-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderRight-H4": "var(--xmlui-borderRight-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderTop-H4": "var(--xmlui-borderTop-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderBottom-H4": "var(--xmlui-borderBottom-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderWidth-H4": "var(--xmlui-borderWidth-H4)",
+      "borderHorizontalWidth-H4": "var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderLeftWidth-H4": "var(--xmlui-borderLeftWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderRightWidth-H4": "var(--xmlui-borderRightWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderVerticalWidth-H4": "var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderTopWidth-H4": "var(--xmlui-borderTopWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderBottomWidth-H4": "var(--xmlui-borderBottomWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderStyle-H4": "var(--xmlui-borderStyle-H4)",
+      "borderHorizontalStyle-H4": "var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderLeftStyle-H4": "var(--xmlui-borderLeftStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderRightStyle-H4": "var(--xmlui-borderRightStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderVerticalStyle-H4": "var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderTopStyle-H4": "var(--xmlui-borderTopStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderBottomStyle-H4": "var(--xmlui-borderBottomStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderColor-H4": "var(--xmlui-borderColor-H4)",
+      "borderHorizontalColor-H4": "var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderLeftColor-H4": "var(--xmlui-borderLeftColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderRightColor-H4": "var(--xmlui-borderRightColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderVerticalColor-H4": "var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderTopColor-H4": "var(--xmlui-borderTopColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderBottomColor-H4": "var(--xmlui-borderBottomColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderStartStartRadius-H4": "var(--xmlui-borderStartStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderStartEndRadius-H4": "var(--xmlui-borderStartEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndStartRadius-H4": "var(--xmlui-borderEndStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndEndRadius-H4": "var(--xmlui-borderEndEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "padding-H4": "var(--xmlui-padding-H4)",
+      "paddingHorizontal-H4": "var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4))",
+      "paddingVertical-H4": "var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4))",
+      "paddingLeft-H4": "var(--xmlui-paddingLeft-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingRight-H4": "var(--xmlui-paddingRight-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingTop-H4": "var(--xmlui-paddingTop-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "paddingBottom-H4": "var(--xmlui-paddingBottom-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "textColor-H4": "var(--xmlui-textColor-H4)",
+      "fontFamily-H4": "var(--xmlui-fontFamily-H4)",
+      "fontSize-H4": "var(--xmlui-fontSize-H4)",
+      "fontStyle-H4": "var(--xmlui-fontStyle-H4)",
+      "fontVariant-H4": "var(--xmlui-fontVariant-H4)",
+      "fontWeight-H4": "var(--xmlui-fontWeight-H4)",
+      "fontStretch-H4": "var(--xmlui-fontStretch-H4)",
+      "textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
+      "textDecorationColor-H4": "var(--xmlui-textDecorationColor-H4)",
+      "textDecorationStyle-H4": "var(--xmlui-textDecorationStyle-H4)",
+      "textDecorationThickness-H4": "var(--xmlui-textDecorationThickness-H4)",
+      "textUnderlineOffset-H4": "var(--xmlui-textUnderlineOffset-H4)",
+      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
+      "backgroundColor-H4": "var(--xmlui-backgroundColor-H4)",
+      "textTransform-H4": "var(--xmlui-textTransform-H4)",
+      "letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
+      "wordSpacing-H4": "var(--xmlui-wordSpacing-H4)",
+      "textShadow-H4": "var(--xmlui-textShadow-H4)",
+      "textIndent-H4": "var(--xmlui-textIndent-H4)",
+      "textAlign-H4": "var(--xmlui-textAlign-H4)",
+      "textAlignLast-H4": "var(--xmlui-textAlignLast-H4)",
+      "wordBreak-H4": "var(--xmlui-wordBreak-H4)",
+      "wordWrap-H4": "var(--xmlui-wordWrap-H4)",
+      "direction-H4": "var(--xmlui-direction-H4)",
+      "writingMode-H4": "var(--xmlui-writingMode-H4)",
+      "lineBreak-H4": "var(--xmlui-lineBreak-H4)",
+      "border-H5": "var(--xmlui-border-H5)",
+      "borderHorizontal-H5": "var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5))",
+      "borderVertical-H5": "var(--xmlui-borderVertical-H5, var(--xmlui-border-H5))",
+      "borderLeft-H5": "var(--xmlui-borderLeft-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderRight-H5": "var(--xmlui-borderRight-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderTop-H5": "var(--xmlui-borderTop-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderBottom-H5": "var(--xmlui-borderBottom-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderWidth-H5": "var(--xmlui-borderWidth-H5)",
+      "borderHorizontalWidth-H5": "var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderLeftWidth-H5": "var(--xmlui-borderLeftWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderRightWidth-H5": "var(--xmlui-borderRightWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderVerticalWidth-H5": "var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderTopWidth-H5": "var(--xmlui-borderTopWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderBottomWidth-H5": "var(--xmlui-borderBottomWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderStyle-H5": "var(--xmlui-borderStyle-H5)",
+      "borderHorizontalStyle-H5": "var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderLeftStyle-H5": "var(--xmlui-borderLeftStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderRightStyle-H5": "var(--xmlui-borderRightStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderVerticalStyle-H5": "var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderTopStyle-H5": "var(--xmlui-borderTopStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderBottomStyle-H5": "var(--xmlui-borderBottomStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderColor-H5": "var(--xmlui-borderColor-H5)",
+      "borderHorizontalColor-H5": "var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderLeftColor-H5": "var(--xmlui-borderLeftColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderRightColor-H5": "var(--xmlui-borderRightColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderVerticalColor-H5": "var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderTopColor-H5": "var(--xmlui-borderTopColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderBottomColor-H5": "var(--xmlui-borderBottomColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderStartStartRadius-H5": "var(--xmlui-borderStartStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderStartEndRadius-H5": "var(--xmlui-borderStartEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndStartRadius-H5": "var(--xmlui-borderEndStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndEndRadius-H5": "var(--xmlui-borderEndEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "padding-H5": "var(--xmlui-padding-H5)",
+      "paddingHorizontal-H5": "var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5))",
+      "paddingVertical-H5": "var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5))",
+      "paddingLeft-H5": "var(--xmlui-paddingLeft-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingRight-H5": "var(--xmlui-paddingRight-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingTop-H5": "var(--xmlui-paddingTop-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "paddingBottom-H5": "var(--xmlui-paddingBottom-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "textColor-H5": "var(--xmlui-textColor-H5)",
+      "fontFamily-H5": "var(--xmlui-fontFamily-H5)",
+      "fontSize-H5": "var(--xmlui-fontSize-H5)",
+      "fontStyle-H5": "var(--xmlui-fontStyle-H5)",
+      "fontVariant-H5": "var(--xmlui-fontVariant-H5)",
+      "fontWeight-H5": "var(--xmlui-fontWeight-H5)",
+      "fontStretch-H5": "var(--xmlui-fontStretch-H5)",
+      "textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
+      "textDecorationColor-H5": "var(--xmlui-textDecorationColor-H5)",
+      "textDecorationStyle-H5": "var(--xmlui-textDecorationStyle-H5)",
+      "textDecorationThickness-H5": "var(--xmlui-textDecorationThickness-H5)",
+      "textUnderlineOffset-H5": "var(--xmlui-textUnderlineOffset-H5)",
+      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
+      "backgroundColor-H5": "var(--xmlui-backgroundColor-H5)",
+      "textTransform-H5": "var(--xmlui-textTransform-H5)",
+      "letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
+      "wordSpacing-H5": "var(--xmlui-wordSpacing-H5)",
+      "textShadow-H5": "var(--xmlui-textShadow-H5)",
+      "textIndent-H5": "var(--xmlui-textIndent-H5)",
+      "textAlign-H5": "var(--xmlui-textAlign-H5)",
+      "textAlignLast-H5": "var(--xmlui-textAlignLast-H5)",
+      "wordBreak-H5": "var(--xmlui-wordBreak-H5)",
+      "wordWrap-H5": "var(--xmlui-wordWrap-H5)",
+      "direction-H5": "var(--xmlui-direction-H5)",
+      "writingMode-H5": "var(--xmlui-writingMode-H5)",
+      "lineBreak-H5": "var(--xmlui-lineBreak-H5)",
+      "border-H6": "var(--xmlui-border-H6)",
+      "borderHorizontal-H6": "var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6))",
+      "borderVertical-H6": "var(--xmlui-borderVertical-H6, var(--xmlui-border-H6))",
+      "borderLeft-H6": "var(--xmlui-borderLeft-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderRight-H6": "var(--xmlui-borderRight-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderTop-H6": "var(--xmlui-borderTop-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderBottom-H6": "var(--xmlui-borderBottom-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderWidth-H6": "var(--xmlui-borderWidth-H6)",
+      "borderHorizontalWidth-H6": "var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderLeftWidth-H6": "var(--xmlui-borderLeftWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderRightWidth-H6": "var(--xmlui-borderRightWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderVerticalWidth-H6": "var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderTopWidth-H6": "var(--xmlui-borderTopWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderBottomWidth-H6": "var(--xmlui-borderBottomWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderStyle-H6": "var(--xmlui-borderStyle-H6)",
+      "borderHorizontalStyle-H6": "var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderLeftStyle-H6": "var(--xmlui-borderLeftStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderRightStyle-H6": "var(--xmlui-borderRightStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderVerticalStyle-H6": "var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderTopStyle-H6": "var(--xmlui-borderTopStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderBottomStyle-H6": "var(--xmlui-borderBottomStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderColor-H6": "var(--xmlui-borderColor-H6)",
+      "borderHorizontalColor-H6": "var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderLeftColor-H6": "var(--xmlui-borderLeftColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderRightColor-H6": "var(--xmlui-borderRightColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderVerticalColor-H6": "var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderTopColor-H6": "var(--xmlui-borderTopColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderBottomColor-H6": "var(--xmlui-borderBottomColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderStartStartRadius-H6": "var(--xmlui-borderStartStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderStartEndRadius-H6": "var(--xmlui-borderStartEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndStartRadius-H6": "var(--xmlui-borderEndStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndEndRadius-H6": "var(--xmlui-borderEndEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "padding-H6": "var(--xmlui-padding-H6)",
+      "paddingHorizontal-H6": "var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6))",
+      "paddingVertical-H6": "var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6))",
+      "paddingLeft-H6": "var(--xmlui-paddingLeft-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingRight-H6": "var(--xmlui-paddingRight-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingTop-H6": "var(--xmlui-paddingTop-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "paddingBottom-H6": "var(--xmlui-paddingBottom-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "textColor-H6": "var(--xmlui-textColor-H6)",
+      "fontFamily-H6": "var(--xmlui-fontFamily-H6)",
+      "fontSize-H6": "var(--xmlui-fontSize-H6)",
+      "fontStyle-H6": "var(--xmlui-fontStyle-H6)",
+      "fontVariant-H6": "var(--xmlui-fontVariant-H6)",
+      "fontWeight-H6": "var(--xmlui-fontWeight-H6)",
+      "fontStretch-H6": "var(--xmlui-fontStretch-H6)",
+      "textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
+      "textDecorationColor-H6": "var(--xmlui-textDecorationColor-H6)",
+      "textDecorationStyle-H6": "var(--xmlui-textDecorationStyle-H6)",
+      "textDecorationThickness-H6": "var(--xmlui-textDecorationThickness-H6)",
+      "textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)",
+      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
+      "backgroundColor-H6": "var(--xmlui-backgroundColor-H6)",
+      "textTransform-H6": "var(--xmlui-textTransform-H6)",
+      "letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
+      "wordSpacing-H6": "var(--xmlui-wordSpacing-H6)",
+      "textShadow-H6": "var(--xmlui-textShadow-H6)",
+      "textIndent-H6": "var(--xmlui-textIndent-H6)",
+      "textAlign-H6": "var(--xmlui-textAlign-H6)",
+      "textAlignLast-H6": "var(--xmlui-textAlignLast-H6)",
+      "wordBreak-H6": "var(--xmlui-wordBreak-H6)",
+      "wordWrap-H6": "var(--xmlui-wordWrap-H6)",
+      "direction-H6": "var(--xmlui-direction-H6)",
+      "writingMode-H6": "var(--xmlui-writingMode-H6)",
+      "lineBreak-H6": "var(--xmlui-lineBreak-H6)",
+      "color-anchor-Heading": "var(--xmlui-color-anchor-Heading)",
+      "gap-anchor-Heading": "var(--xmlui-gap-anchor-Heading)",
+      "textDecorationLine-anchor-Heading": "var(--xmlui-textDecorationLine-anchor-Heading)",
       "Heading:textColor-H1": "var(--xmlui-textColor-H1)",
       "Heading:letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
       "Heading:fontFamily-H1": "var(--xmlui-fontFamily-H1)",
       "Heading:fontWeight-H1": "var(--xmlui-fontWeight-H1)",
-      "fontSize-H1": "var(--xmlui-fontSize-H1)",
-      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
       "marginTop-H1": "var(--xmlui-marginTop-H1)",
       "marginBottom-H1": "var(--xmlui-marginBottom-H1)",
       "Heading:textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
@@ -5669,8 +7717,6 @@ export default {
       "Heading:letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
       "Heading:fontFamily-H2": "var(--xmlui-fontFamily-H2)",
       "Heading:fontWeight-H2": "var(--xmlui-fontWeight-H2)",
-      "fontSize-H2": "var(--xmlui-fontSize-H2)",
-      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
       "marginTop-H2": "var(--xmlui-marginTop-H2)",
       "marginBottom-H2": "var(--xmlui-marginBottom-H2)",
       "Heading:textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
@@ -5682,8 +7728,6 @@ export default {
       "Heading:letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
       "Heading:fontFamily-H3": "var(--xmlui-fontFamily-H3)",
       "Heading:fontWeight-H3": "var(--xmlui-fontWeight-H3)",
-      "fontSize-H3": "var(--xmlui-fontSize-H3)",
-      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
       "marginTop-H3": "var(--xmlui-marginTop-H3)",
       "marginBottom-H3": "var(--xmlui-marginBottom-H3)",
       "Heading:textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
@@ -5695,8 +7739,6 @@ export default {
       "Heading:letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
       "Heading:fontFamily-H4": "var(--xmlui-fontFamily-H4)",
       "Heading:fontWeight-H4": "var(--xmlui-fontWeight-H4)",
-      "fontSize-H4": "var(--xmlui-fontSize-H4)",
-      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
       "marginTop-H4": "var(--xmlui-marginTop-H4)",
       "marginBottom-H4": "var(--xmlui-marginBottom-H4)",
       "Heading:textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
@@ -5708,8 +7750,6 @@ export default {
       "Heading:letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
       "Heading:fontFamily-H5": "var(--xmlui-fontFamily-H5)",
       "Heading:fontWeight-H5": "var(--xmlui-fontWeight-H5)",
-      "fontSize-H5": "var(--xmlui-fontSize-H5)",
-      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
       "marginTop-H5": "var(--xmlui-marginTop-H5)",
       "marginBottom-H5": "var(--xmlui-marginBottom-H5)",
       "Heading:textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
@@ -5721,8 +7761,6 @@ export default {
       "Heading:letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
       "Heading:fontFamily-H6": "var(--xmlui-fontFamily-H6)",
       "Heading:fontWeight-H6": "var(--xmlui-fontWeight-H6)",
-      "fontSize-H6": "var(--xmlui-fontSize-H6)",
-      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
       "marginTop-H6": "var(--xmlui-marginTop-H6)",
       "marginBottom-H6": "var(--xmlui-marginBottom-H6)",
       "Heading:textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
@@ -5735,6 +7773,8 @@ export default {
       "fontSize-H4": "$fontSize-small",
       "marginTop-H4": "0",
       "marginBottom-H4": "0",
+      "marginTop-H4-markdown": "$space-5",
+      "marginBottom-H4-markdown": "$space-1",
       "light": {},
       "dark": {}
     }
@@ -5756,12 +7796,403 @@ export default {
       }
     },
     "themeVars": {
+      "border-H1": "var(--xmlui-border-H1)",
+      "borderHorizontal-H1": "var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1))",
+      "borderVertical-H1": "var(--xmlui-borderVertical-H1, var(--xmlui-border-H1))",
+      "borderLeft-H1": "var(--xmlui-borderLeft-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderRight-H1": "var(--xmlui-borderRight-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderTop-H1": "var(--xmlui-borderTop-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderBottom-H1": "var(--xmlui-borderBottom-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderWidth-H1": "var(--xmlui-borderWidth-H1)",
+      "borderHorizontalWidth-H1": "var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderLeftWidth-H1": "var(--xmlui-borderLeftWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderRightWidth-H1": "var(--xmlui-borderRightWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderVerticalWidth-H1": "var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderTopWidth-H1": "var(--xmlui-borderTopWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderBottomWidth-H1": "var(--xmlui-borderBottomWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderStyle-H1": "var(--xmlui-borderStyle-H1)",
+      "borderHorizontalStyle-H1": "var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderLeftStyle-H1": "var(--xmlui-borderLeftStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderRightStyle-H1": "var(--xmlui-borderRightStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderVerticalStyle-H1": "var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderTopStyle-H1": "var(--xmlui-borderTopStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderBottomStyle-H1": "var(--xmlui-borderBottomStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderColor-H1": "var(--xmlui-borderColor-H1)",
+      "borderHorizontalColor-H1": "var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderLeftColor-H1": "var(--xmlui-borderLeftColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderRightColor-H1": "var(--xmlui-borderRightColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderVerticalColor-H1": "var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderTopColor-H1": "var(--xmlui-borderTopColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderBottomColor-H1": "var(--xmlui-borderBottomColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderStartStartRadius-H1": "var(--xmlui-borderStartStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderStartEndRadius-H1": "var(--xmlui-borderStartEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndStartRadius-H1": "var(--xmlui-borderEndStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndEndRadius-H1": "var(--xmlui-borderEndEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "padding-H1": "var(--xmlui-padding-H1)",
+      "paddingHorizontal-H1": "var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1))",
+      "paddingVertical-H1": "var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1))",
+      "paddingLeft-H1": "var(--xmlui-paddingLeft-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingRight-H1": "var(--xmlui-paddingRight-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingTop-H1": "var(--xmlui-paddingTop-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "paddingBottom-H1": "var(--xmlui-paddingBottom-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "textColor-H1": "var(--xmlui-textColor-H1)",
+      "fontFamily-H1": "var(--xmlui-fontFamily-H1)",
+      "fontSize-H1": "var(--xmlui-fontSize-H1)",
+      "fontStyle-H1": "var(--xmlui-fontStyle-H1)",
+      "fontVariant-H1": "var(--xmlui-fontVariant-H1)",
+      "fontWeight-H1": "var(--xmlui-fontWeight-H1)",
+      "fontStretch-H1": "var(--xmlui-fontStretch-H1)",
+      "textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
+      "textDecorationColor-H1": "var(--xmlui-textDecorationColor-H1)",
+      "textDecorationStyle-H1": "var(--xmlui-textDecorationStyle-H1)",
+      "textDecorationThickness-H1": "var(--xmlui-textDecorationThickness-H1)",
+      "textUnderlineOffset-H1": "var(--xmlui-textUnderlineOffset-H1)",
+      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
+      "backgroundColor-H1": "var(--xmlui-backgroundColor-H1)",
+      "textTransform-H1": "var(--xmlui-textTransform-H1)",
+      "letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
+      "wordSpacing-H1": "var(--xmlui-wordSpacing-H1)",
+      "textShadow-H1": "var(--xmlui-textShadow-H1)",
+      "textIndent-H1": "var(--xmlui-textIndent-H1)",
+      "textAlign-H1": "var(--xmlui-textAlign-H1)",
+      "textAlignLast-H1": "var(--xmlui-textAlignLast-H1)",
+      "wordBreak-H1": "var(--xmlui-wordBreak-H1)",
+      "wordWrap-H1": "var(--xmlui-wordWrap-H1)",
+      "direction-H1": "var(--xmlui-direction-H1)",
+      "writingMode-H1": "var(--xmlui-writingMode-H1)",
+      "lineBreak-H1": "var(--xmlui-lineBreak-H1)",
+      "border-H2": "var(--xmlui-border-H2)",
+      "borderHorizontal-H2": "var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2))",
+      "borderVertical-H2": "var(--xmlui-borderVertical-H2, var(--xmlui-border-H2))",
+      "borderLeft-H2": "var(--xmlui-borderLeft-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderRight-H2": "var(--xmlui-borderRight-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderTop-H2": "var(--xmlui-borderTop-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderBottom-H2": "var(--xmlui-borderBottom-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderWidth-H2": "var(--xmlui-borderWidth-H2)",
+      "borderHorizontalWidth-H2": "var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderLeftWidth-H2": "var(--xmlui-borderLeftWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderRightWidth-H2": "var(--xmlui-borderRightWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderVerticalWidth-H2": "var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderTopWidth-H2": "var(--xmlui-borderTopWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderBottomWidth-H2": "var(--xmlui-borderBottomWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderStyle-H2": "var(--xmlui-borderStyle-H2)",
+      "borderHorizontalStyle-H2": "var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderLeftStyle-H2": "var(--xmlui-borderLeftStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderRightStyle-H2": "var(--xmlui-borderRightStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderVerticalStyle-H2": "var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderTopStyle-H2": "var(--xmlui-borderTopStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderBottomStyle-H2": "var(--xmlui-borderBottomStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderColor-H2": "var(--xmlui-borderColor-H2)",
+      "borderHorizontalColor-H2": "var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderLeftColor-H2": "var(--xmlui-borderLeftColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderRightColor-H2": "var(--xmlui-borderRightColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderVerticalColor-H2": "var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderTopColor-H2": "var(--xmlui-borderTopColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderBottomColor-H2": "var(--xmlui-borderBottomColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderStartStartRadius-H2": "var(--xmlui-borderStartStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderStartEndRadius-H2": "var(--xmlui-borderStartEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndStartRadius-H2": "var(--xmlui-borderEndStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndEndRadius-H2": "var(--xmlui-borderEndEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "padding-H2": "var(--xmlui-padding-H2)",
+      "paddingHorizontal-H2": "var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2))",
+      "paddingVertical-H2": "var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2))",
+      "paddingLeft-H2": "var(--xmlui-paddingLeft-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingRight-H2": "var(--xmlui-paddingRight-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingTop-H2": "var(--xmlui-paddingTop-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "paddingBottom-H2": "var(--xmlui-paddingBottom-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "textColor-H2": "var(--xmlui-textColor-H2)",
+      "fontFamily-H2": "var(--xmlui-fontFamily-H2)",
+      "fontSize-H2": "var(--xmlui-fontSize-H2)",
+      "fontStyle-H2": "var(--xmlui-fontStyle-H2)",
+      "fontVariant-H2": "var(--xmlui-fontVariant-H2)",
+      "fontWeight-H2": "var(--xmlui-fontWeight-H2)",
+      "fontStretch-H2": "var(--xmlui-fontStretch-H2)",
+      "textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
+      "textDecorationColor-H2": "var(--xmlui-textDecorationColor-H2)",
+      "textDecorationStyle-H2": "var(--xmlui-textDecorationStyle-H2)",
+      "textDecorationThickness-H2": "var(--xmlui-textDecorationThickness-H2)",
+      "textUnderlineOffset-H2": "var(--xmlui-textUnderlineOffset-H2)",
+      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
+      "backgroundColor-H2": "var(--xmlui-backgroundColor-H2)",
+      "textTransform-H2": "var(--xmlui-textTransform-H2)",
+      "letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
+      "wordSpacing-H2": "var(--xmlui-wordSpacing-H2)",
+      "textShadow-H2": "var(--xmlui-textShadow-H2)",
+      "textIndent-H2": "var(--xmlui-textIndent-H2)",
+      "textAlign-H2": "var(--xmlui-textAlign-H2)",
+      "textAlignLast-H2": "var(--xmlui-textAlignLast-H2)",
+      "wordBreak-H2": "var(--xmlui-wordBreak-H2)",
+      "wordWrap-H2": "var(--xmlui-wordWrap-H2)",
+      "direction-H2": "var(--xmlui-direction-H2)",
+      "writingMode-H2": "var(--xmlui-writingMode-H2)",
+      "lineBreak-H2": "var(--xmlui-lineBreak-H2)",
+      "border-H3": "var(--xmlui-border-H3)",
+      "borderHorizontal-H3": "var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3))",
+      "borderVertical-H3": "var(--xmlui-borderVertical-H3, var(--xmlui-border-H3))",
+      "borderLeft-H3": "var(--xmlui-borderLeft-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderRight-H3": "var(--xmlui-borderRight-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderTop-H3": "var(--xmlui-borderTop-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderBottom-H3": "var(--xmlui-borderBottom-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderWidth-H3": "var(--xmlui-borderWidth-H3)",
+      "borderHorizontalWidth-H3": "var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderLeftWidth-H3": "var(--xmlui-borderLeftWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderRightWidth-H3": "var(--xmlui-borderRightWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderVerticalWidth-H3": "var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderTopWidth-H3": "var(--xmlui-borderTopWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderBottomWidth-H3": "var(--xmlui-borderBottomWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderStyle-H3": "var(--xmlui-borderStyle-H3)",
+      "borderHorizontalStyle-H3": "var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderLeftStyle-H3": "var(--xmlui-borderLeftStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderRightStyle-H3": "var(--xmlui-borderRightStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderVerticalStyle-H3": "var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderTopStyle-H3": "var(--xmlui-borderTopStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderBottomStyle-H3": "var(--xmlui-borderBottomStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderColor-H3": "var(--xmlui-borderColor-H3)",
+      "borderHorizontalColor-H3": "var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderLeftColor-H3": "var(--xmlui-borderLeftColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderRightColor-H3": "var(--xmlui-borderRightColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderVerticalColor-H3": "var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderTopColor-H3": "var(--xmlui-borderTopColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderBottomColor-H3": "var(--xmlui-borderBottomColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderStartStartRadius-H3": "var(--xmlui-borderStartStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderStartEndRadius-H3": "var(--xmlui-borderStartEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndStartRadius-H3": "var(--xmlui-borderEndStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndEndRadius-H3": "var(--xmlui-borderEndEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "padding-H3": "var(--xmlui-padding-H3)",
+      "paddingHorizontal-H3": "var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3))",
+      "paddingVertical-H3": "var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3))",
+      "paddingLeft-H3": "var(--xmlui-paddingLeft-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingRight-H3": "var(--xmlui-paddingRight-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingTop-H3": "var(--xmlui-paddingTop-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "paddingBottom-H3": "var(--xmlui-paddingBottom-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "textColor-H3": "var(--xmlui-textColor-H3)",
+      "fontFamily-H3": "var(--xmlui-fontFamily-H3)",
+      "fontSize-H3": "var(--xmlui-fontSize-H3)",
+      "fontStyle-H3": "var(--xmlui-fontStyle-H3)",
+      "fontVariant-H3": "var(--xmlui-fontVariant-H3)",
+      "fontWeight-H3": "var(--xmlui-fontWeight-H3)",
+      "fontStretch-H3": "var(--xmlui-fontStretch-H3)",
+      "textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
+      "textDecorationColor-H3": "var(--xmlui-textDecorationColor-H3)",
+      "textDecorationStyle-H3": "var(--xmlui-textDecorationStyle-H3)",
+      "textDecorationThickness-H3": "var(--xmlui-textDecorationThickness-H3)",
+      "textUnderlineOffset-H3": "var(--xmlui-textUnderlineOffset-H3)",
+      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
+      "backgroundColor-H3": "var(--xmlui-backgroundColor-H3)",
+      "textTransform-H3": "var(--xmlui-textTransform-H3)",
+      "letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
+      "wordSpacing-H3": "var(--xmlui-wordSpacing-H3)",
+      "textShadow-H3": "var(--xmlui-textShadow-H3)",
+      "textIndent-H3": "var(--xmlui-textIndent-H3)",
+      "textAlign-H3": "var(--xmlui-textAlign-H3)",
+      "textAlignLast-H3": "var(--xmlui-textAlignLast-H3)",
+      "wordBreak-H3": "var(--xmlui-wordBreak-H3)",
+      "wordWrap-H3": "var(--xmlui-wordWrap-H3)",
+      "direction-H3": "var(--xmlui-direction-H3)",
+      "writingMode-H3": "var(--xmlui-writingMode-H3)",
+      "lineBreak-H3": "var(--xmlui-lineBreak-H3)",
+      "border-H4": "var(--xmlui-border-H4)",
+      "borderHorizontal-H4": "var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4))",
+      "borderVertical-H4": "var(--xmlui-borderVertical-H4, var(--xmlui-border-H4))",
+      "borderLeft-H4": "var(--xmlui-borderLeft-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderRight-H4": "var(--xmlui-borderRight-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderTop-H4": "var(--xmlui-borderTop-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderBottom-H4": "var(--xmlui-borderBottom-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderWidth-H4": "var(--xmlui-borderWidth-H4)",
+      "borderHorizontalWidth-H4": "var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderLeftWidth-H4": "var(--xmlui-borderLeftWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderRightWidth-H4": "var(--xmlui-borderRightWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderVerticalWidth-H4": "var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderTopWidth-H4": "var(--xmlui-borderTopWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderBottomWidth-H4": "var(--xmlui-borderBottomWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderStyle-H4": "var(--xmlui-borderStyle-H4)",
+      "borderHorizontalStyle-H4": "var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderLeftStyle-H4": "var(--xmlui-borderLeftStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderRightStyle-H4": "var(--xmlui-borderRightStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderVerticalStyle-H4": "var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderTopStyle-H4": "var(--xmlui-borderTopStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderBottomStyle-H4": "var(--xmlui-borderBottomStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderColor-H4": "var(--xmlui-borderColor-H4)",
+      "borderHorizontalColor-H4": "var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderLeftColor-H4": "var(--xmlui-borderLeftColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderRightColor-H4": "var(--xmlui-borderRightColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderVerticalColor-H4": "var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderTopColor-H4": "var(--xmlui-borderTopColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderBottomColor-H4": "var(--xmlui-borderBottomColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderStartStartRadius-H4": "var(--xmlui-borderStartStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderStartEndRadius-H4": "var(--xmlui-borderStartEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndStartRadius-H4": "var(--xmlui-borderEndStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndEndRadius-H4": "var(--xmlui-borderEndEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "padding-H4": "var(--xmlui-padding-H4)",
+      "paddingHorizontal-H4": "var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4))",
+      "paddingVertical-H4": "var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4))",
+      "paddingLeft-H4": "var(--xmlui-paddingLeft-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingRight-H4": "var(--xmlui-paddingRight-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingTop-H4": "var(--xmlui-paddingTop-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "paddingBottom-H4": "var(--xmlui-paddingBottom-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "textColor-H4": "var(--xmlui-textColor-H4)",
+      "fontFamily-H4": "var(--xmlui-fontFamily-H4)",
+      "fontSize-H4": "var(--xmlui-fontSize-H4)",
+      "fontStyle-H4": "var(--xmlui-fontStyle-H4)",
+      "fontVariant-H4": "var(--xmlui-fontVariant-H4)",
+      "fontWeight-H4": "var(--xmlui-fontWeight-H4)",
+      "fontStretch-H4": "var(--xmlui-fontStretch-H4)",
+      "textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
+      "textDecorationColor-H4": "var(--xmlui-textDecorationColor-H4)",
+      "textDecorationStyle-H4": "var(--xmlui-textDecorationStyle-H4)",
+      "textDecorationThickness-H4": "var(--xmlui-textDecorationThickness-H4)",
+      "textUnderlineOffset-H4": "var(--xmlui-textUnderlineOffset-H4)",
+      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
+      "backgroundColor-H4": "var(--xmlui-backgroundColor-H4)",
+      "textTransform-H4": "var(--xmlui-textTransform-H4)",
+      "letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
+      "wordSpacing-H4": "var(--xmlui-wordSpacing-H4)",
+      "textShadow-H4": "var(--xmlui-textShadow-H4)",
+      "textIndent-H4": "var(--xmlui-textIndent-H4)",
+      "textAlign-H4": "var(--xmlui-textAlign-H4)",
+      "textAlignLast-H4": "var(--xmlui-textAlignLast-H4)",
+      "wordBreak-H4": "var(--xmlui-wordBreak-H4)",
+      "wordWrap-H4": "var(--xmlui-wordWrap-H4)",
+      "direction-H4": "var(--xmlui-direction-H4)",
+      "writingMode-H4": "var(--xmlui-writingMode-H4)",
+      "lineBreak-H4": "var(--xmlui-lineBreak-H4)",
+      "border-H5": "var(--xmlui-border-H5)",
+      "borderHorizontal-H5": "var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5))",
+      "borderVertical-H5": "var(--xmlui-borderVertical-H5, var(--xmlui-border-H5))",
+      "borderLeft-H5": "var(--xmlui-borderLeft-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderRight-H5": "var(--xmlui-borderRight-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderTop-H5": "var(--xmlui-borderTop-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderBottom-H5": "var(--xmlui-borderBottom-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderWidth-H5": "var(--xmlui-borderWidth-H5)",
+      "borderHorizontalWidth-H5": "var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderLeftWidth-H5": "var(--xmlui-borderLeftWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderRightWidth-H5": "var(--xmlui-borderRightWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderVerticalWidth-H5": "var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderTopWidth-H5": "var(--xmlui-borderTopWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderBottomWidth-H5": "var(--xmlui-borderBottomWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderStyle-H5": "var(--xmlui-borderStyle-H5)",
+      "borderHorizontalStyle-H5": "var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderLeftStyle-H5": "var(--xmlui-borderLeftStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderRightStyle-H5": "var(--xmlui-borderRightStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderVerticalStyle-H5": "var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderTopStyle-H5": "var(--xmlui-borderTopStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderBottomStyle-H5": "var(--xmlui-borderBottomStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderColor-H5": "var(--xmlui-borderColor-H5)",
+      "borderHorizontalColor-H5": "var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderLeftColor-H5": "var(--xmlui-borderLeftColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderRightColor-H5": "var(--xmlui-borderRightColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderVerticalColor-H5": "var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderTopColor-H5": "var(--xmlui-borderTopColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderBottomColor-H5": "var(--xmlui-borderBottomColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderStartStartRadius-H5": "var(--xmlui-borderStartStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderStartEndRadius-H5": "var(--xmlui-borderStartEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndStartRadius-H5": "var(--xmlui-borderEndStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndEndRadius-H5": "var(--xmlui-borderEndEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "padding-H5": "var(--xmlui-padding-H5)",
+      "paddingHorizontal-H5": "var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5))",
+      "paddingVertical-H5": "var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5))",
+      "paddingLeft-H5": "var(--xmlui-paddingLeft-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingRight-H5": "var(--xmlui-paddingRight-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingTop-H5": "var(--xmlui-paddingTop-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "paddingBottom-H5": "var(--xmlui-paddingBottom-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "textColor-H5": "var(--xmlui-textColor-H5)",
+      "fontFamily-H5": "var(--xmlui-fontFamily-H5)",
+      "fontSize-H5": "var(--xmlui-fontSize-H5)",
+      "fontStyle-H5": "var(--xmlui-fontStyle-H5)",
+      "fontVariant-H5": "var(--xmlui-fontVariant-H5)",
+      "fontWeight-H5": "var(--xmlui-fontWeight-H5)",
+      "fontStretch-H5": "var(--xmlui-fontStretch-H5)",
+      "textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
+      "textDecorationColor-H5": "var(--xmlui-textDecorationColor-H5)",
+      "textDecorationStyle-H5": "var(--xmlui-textDecorationStyle-H5)",
+      "textDecorationThickness-H5": "var(--xmlui-textDecorationThickness-H5)",
+      "textUnderlineOffset-H5": "var(--xmlui-textUnderlineOffset-H5)",
+      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
+      "backgroundColor-H5": "var(--xmlui-backgroundColor-H5)",
+      "textTransform-H5": "var(--xmlui-textTransform-H5)",
+      "letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
+      "wordSpacing-H5": "var(--xmlui-wordSpacing-H5)",
+      "textShadow-H5": "var(--xmlui-textShadow-H5)",
+      "textIndent-H5": "var(--xmlui-textIndent-H5)",
+      "textAlign-H5": "var(--xmlui-textAlign-H5)",
+      "textAlignLast-H5": "var(--xmlui-textAlignLast-H5)",
+      "wordBreak-H5": "var(--xmlui-wordBreak-H5)",
+      "wordWrap-H5": "var(--xmlui-wordWrap-H5)",
+      "direction-H5": "var(--xmlui-direction-H5)",
+      "writingMode-H5": "var(--xmlui-writingMode-H5)",
+      "lineBreak-H5": "var(--xmlui-lineBreak-H5)",
+      "border-H6": "var(--xmlui-border-H6)",
+      "borderHorizontal-H6": "var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6))",
+      "borderVertical-H6": "var(--xmlui-borderVertical-H6, var(--xmlui-border-H6))",
+      "borderLeft-H6": "var(--xmlui-borderLeft-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderRight-H6": "var(--xmlui-borderRight-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderTop-H6": "var(--xmlui-borderTop-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderBottom-H6": "var(--xmlui-borderBottom-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderWidth-H6": "var(--xmlui-borderWidth-H6)",
+      "borderHorizontalWidth-H6": "var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderLeftWidth-H6": "var(--xmlui-borderLeftWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderRightWidth-H6": "var(--xmlui-borderRightWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderVerticalWidth-H6": "var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderTopWidth-H6": "var(--xmlui-borderTopWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderBottomWidth-H6": "var(--xmlui-borderBottomWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderStyle-H6": "var(--xmlui-borderStyle-H6)",
+      "borderHorizontalStyle-H6": "var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderLeftStyle-H6": "var(--xmlui-borderLeftStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderRightStyle-H6": "var(--xmlui-borderRightStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderVerticalStyle-H6": "var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderTopStyle-H6": "var(--xmlui-borderTopStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderBottomStyle-H6": "var(--xmlui-borderBottomStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderColor-H6": "var(--xmlui-borderColor-H6)",
+      "borderHorizontalColor-H6": "var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderLeftColor-H6": "var(--xmlui-borderLeftColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderRightColor-H6": "var(--xmlui-borderRightColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderVerticalColor-H6": "var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderTopColor-H6": "var(--xmlui-borderTopColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderBottomColor-H6": "var(--xmlui-borderBottomColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderStartStartRadius-H6": "var(--xmlui-borderStartStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderStartEndRadius-H6": "var(--xmlui-borderStartEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndStartRadius-H6": "var(--xmlui-borderEndStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndEndRadius-H6": "var(--xmlui-borderEndEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "padding-H6": "var(--xmlui-padding-H6)",
+      "paddingHorizontal-H6": "var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6))",
+      "paddingVertical-H6": "var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6))",
+      "paddingLeft-H6": "var(--xmlui-paddingLeft-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingRight-H6": "var(--xmlui-paddingRight-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingTop-H6": "var(--xmlui-paddingTop-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "paddingBottom-H6": "var(--xmlui-paddingBottom-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "textColor-H6": "var(--xmlui-textColor-H6)",
+      "fontFamily-H6": "var(--xmlui-fontFamily-H6)",
+      "fontSize-H6": "var(--xmlui-fontSize-H6)",
+      "fontStyle-H6": "var(--xmlui-fontStyle-H6)",
+      "fontVariant-H6": "var(--xmlui-fontVariant-H6)",
+      "fontWeight-H6": "var(--xmlui-fontWeight-H6)",
+      "fontStretch-H6": "var(--xmlui-fontStretch-H6)",
+      "textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
+      "textDecorationColor-H6": "var(--xmlui-textDecorationColor-H6)",
+      "textDecorationStyle-H6": "var(--xmlui-textDecorationStyle-H6)",
+      "textDecorationThickness-H6": "var(--xmlui-textDecorationThickness-H6)",
+      "textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)",
+      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
+      "backgroundColor-H6": "var(--xmlui-backgroundColor-H6)",
+      "textTransform-H6": "var(--xmlui-textTransform-H6)",
+      "letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
+      "wordSpacing-H6": "var(--xmlui-wordSpacing-H6)",
+      "textShadow-H6": "var(--xmlui-textShadow-H6)",
+      "textIndent-H6": "var(--xmlui-textIndent-H6)",
+      "textAlign-H6": "var(--xmlui-textAlign-H6)",
+      "textAlignLast-H6": "var(--xmlui-textAlignLast-H6)",
+      "wordBreak-H6": "var(--xmlui-wordBreak-H6)",
+      "wordWrap-H6": "var(--xmlui-wordWrap-H6)",
+      "direction-H6": "var(--xmlui-direction-H6)",
+      "writingMode-H6": "var(--xmlui-writingMode-H6)",
+      "lineBreak-H6": "var(--xmlui-lineBreak-H6)",
+      "color-anchor-Heading": "var(--xmlui-color-anchor-Heading)",
+      "gap-anchor-Heading": "var(--xmlui-gap-anchor-Heading)",
+      "textDecorationLine-anchor-Heading": "var(--xmlui-textDecorationLine-anchor-Heading)",
       "Heading:textColor-H1": "var(--xmlui-textColor-H1)",
       "Heading:letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
       "Heading:fontFamily-H1": "var(--xmlui-fontFamily-H1)",
       "Heading:fontWeight-H1": "var(--xmlui-fontWeight-H1)",
-      "fontSize-H1": "var(--xmlui-fontSize-H1)",
-      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
       "marginTop-H1": "var(--xmlui-marginTop-H1)",
       "marginBottom-H1": "var(--xmlui-marginBottom-H1)",
       "Heading:textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
@@ -5773,8 +8204,6 @@ export default {
       "Heading:letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
       "Heading:fontFamily-H2": "var(--xmlui-fontFamily-H2)",
       "Heading:fontWeight-H2": "var(--xmlui-fontWeight-H2)",
-      "fontSize-H2": "var(--xmlui-fontSize-H2)",
-      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
       "marginTop-H2": "var(--xmlui-marginTop-H2)",
       "marginBottom-H2": "var(--xmlui-marginBottom-H2)",
       "Heading:textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
@@ -5786,8 +8215,6 @@ export default {
       "Heading:letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
       "Heading:fontFamily-H3": "var(--xmlui-fontFamily-H3)",
       "Heading:fontWeight-H3": "var(--xmlui-fontWeight-H3)",
-      "fontSize-H3": "var(--xmlui-fontSize-H3)",
-      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
       "marginTop-H3": "var(--xmlui-marginTop-H3)",
       "marginBottom-H3": "var(--xmlui-marginBottom-H3)",
       "Heading:textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
@@ -5799,8 +8226,6 @@ export default {
       "Heading:letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
       "Heading:fontFamily-H4": "var(--xmlui-fontFamily-H4)",
       "Heading:fontWeight-H4": "var(--xmlui-fontWeight-H4)",
-      "fontSize-H4": "var(--xmlui-fontSize-H4)",
-      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
       "marginTop-H4": "var(--xmlui-marginTop-H4)",
       "marginBottom-H4": "var(--xmlui-marginBottom-H4)",
       "Heading:textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
@@ -5812,8 +8237,6 @@ export default {
       "Heading:letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
       "Heading:fontFamily-H5": "var(--xmlui-fontFamily-H5)",
       "Heading:fontWeight-H5": "var(--xmlui-fontWeight-H5)",
-      "fontSize-H5": "var(--xmlui-fontSize-H5)",
-      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
       "marginTop-H5": "var(--xmlui-marginTop-H5)",
       "marginBottom-H5": "var(--xmlui-marginBottom-H5)",
       "Heading:textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
@@ -5825,8 +8248,6 @@ export default {
       "Heading:letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
       "Heading:fontFamily-H6": "var(--xmlui-fontFamily-H6)",
       "Heading:fontWeight-H6": "var(--xmlui-fontWeight-H6)",
-      "fontSize-H6": "var(--xmlui-fontSize-H6)",
-      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
       "marginTop-H6": "var(--xmlui-marginTop-H6)",
       "marginBottom-H6": "var(--xmlui-marginBottom-H6)",
       "Heading:textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
@@ -5839,6 +8260,8 @@ export default {
       "fontSize-H5": "$fontSize-smaller",
       "marginTop-H5": "0",
       "marginBottom-H5": "0",
+      "marginTop-H5-markdown": "0",
+      "marginBottom-H5-markdown": "$space-0",
       "light": {},
       "dark": {}
     }
@@ -5860,12 +8283,403 @@ export default {
       }
     },
     "themeVars": {
+      "border-H1": "var(--xmlui-border-H1)",
+      "borderHorizontal-H1": "var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1))",
+      "borderVertical-H1": "var(--xmlui-borderVertical-H1, var(--xmlui-border-H1))",
+      "borderLeft-H1": "var(--xmlui-borderLeft-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderRight-H1": "var(--xmlui-borderRight-H1, var(--xmlui-borderHorizontal-H1, var(--xmlui-border-H1)))",
+      "borderTop-H1": "var(--xmlui-borderTop-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderBottom-H1": "var(--xmlui-borderBottom-H1, var(--xmlui-borderVertical-H1, var(--xmlui-border-H1)))",
+      "borderWidth-H1": "var(--xmlui-borderWidth-H1)",
+      "borderHorizontalWidth-H1": "var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderLeftWidth-H1": "var(--xmlui-borderLeftWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderRightWidth-H1": "var(--xmlui-borderRightWidth-H1, var(--xmlui-borderHorizontalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderVerticalWidth-H1": "var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1))",
+      "borderTopWidth-H1": "var(--xmlui-borderTopWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderBottomWidth-H1": "var(--xmlui-borderBottomWidth-H1, var(--xmlui-borderVerticalWidth-H1, var(--xmlui-borderWidth-H1)))",
+      "borderStyle-H1": "var(--xmlui-borderStyle-H1)",
+      "borderHorizontalStyle-H1": "var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderLeftStyle-H1": "var(--xmlui-borderLeftStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderRightStyle-H1": "var(--xmlui-borderRightStyle-H1, var(--xmlui-borderHorizontalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderVerticalStyle-H1": "var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1))",
+      "borderTopStyle-H1": "var(--xmlui-borderTopStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderBottomStyle-H1": "var(--xmlui-borderBottomStyle-H1, var(--xmlui-borderVerticalStyle-H1, var(--xmlui-borderStyle-H1)))",
+      "borderColor-H1": "var(--xmlui-borderColor-H1)",
+      "borderHorizontalColor-H1": "var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderLeftColor-H1": "var(--xmlui-borderLeftColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderRightColor-H1": "var(--xmlui-borderRightColor-H1, var(--xmlui-borderHorizontalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderVerticalColor-H1": "var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1))",
+      "borderTopColor-H1": "var(--xmlui-borderTopColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderBottomColor-H1": "var(--xmlui-borderBottomColor-H1, var(--xmlui-borderVerticalColor-H1, var(--xmlui-borderColor-H1)))",
+      "borderStartStartRadius-H1": "var(--xmlui-borderStartStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderStartEndRadius-H1": "var(--xmlui-borderStartEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndStartRadius-H1": "var(--xmlui-borderEndStartRadius-H1, var(--xmlui-borderRadius-H1))",
+      "borderEndEndRadius-H1": "var(--xmlui-borderEndEndRadius-H1, var(--xmlui-borderRadius-H1))",
+      "padding-H1": "var(--xmlui-padding-H1)",
+      "paddingHorizontal-H1": "var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1))",
+      "paddingVertical-H1": "var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1))",
+      "paddingLeft-H1": "var(--xmlui-paddingLeft-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingRight-H1": "var(--xmlui-paddingRight-H1, var(--xmlui-paddingHorizontal-H1, var(--xmlui-padding-H1)))",
+      "paddingTop-H1": "var(--xmlui-paddingTop-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "paddingBottom-H1": "var(--xmlui-paddingBottom-H1, var(--xmlui-paddingVertical-H1, var(--xmlui-padding-H1)))",
+      "textColor-H1": "var(--xmlui-textColor-H1)",
+      "fontFamily-H1": "var(--xmlui-fontFamily-H1)",
+      "fontSize-H1": "var(--xmlui-fontSize-H1)",
+      "fontStyle-H1": "var(--xmlui-fontStyle-H1)",
+      "fontVariant-H1": "var(--xmlui-fontVariant-H1)",
+      "fontWeight-H1": "var(--xmlui-fontWeight-H1)",
+      "fontStretch-H1": "var(--xmlui-fontStretch-H1)",
+      "textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
+      "textDecorationColor-H1": "var(--xmlui-textDecorationColor-H1)",
+      "textDecorationStyle-H1": "var(--xmlui-textDecorationStyle-H1)",
+      "textDecorationThickness-H1": "var(--xmlui-textDecorationThickness-H1)",
+      "textUnderlineOffset-H1": "var(--xmlui-textUnderlineOffset-H1)",
+      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
+      "backgroundColor-H1": "var(--xmlui-backgroundColor-H1)",
+      "textTransform-H1": "var(--xmlui-textTransform-H1)",
+      "letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
+      "wordSpacing-H1": "var(--xmlui-wordSpacing-H1)",
+      "textShadow-H1": "var(--xmlui-textShadow-H1)",
+      "textIndent-H1": "var(--xmlui-textIndent-H1)",
+      "textAlign-H1": "var(--xmlui-textAlign-H1)",
+      "textAlignLast-H1": "var(--xmlui-textAlignLast-H1)",
+      "wordBreak-H1": "var(--xmlui-wordBreak-H1)",
+      "wordWrap-H1": "var(--xmlui-wordWrap-H1)",
+      "direction-H1": "var(--xmlui-direction-H1)",
+      "writingMode-H1": "var(--xmlui-writingMode-H1)",
+      "lineBreak-H1": "var(--xmlui-lineBreak-H1)",
+      "border-H2": "var(--xmlui-border-H2)",
+      "borderHorizontal-H2": "var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2))",
+      "borderVertical-H2": "var(--xmlui-borderVertical-H2, var(--xmlui-border-H2))",
+      "borderLeft-H2": "var(--xmlui-borderLeft-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderRight-H2": "var(--xmlui-borderRight-H2, var(--xmlui-borderHorizontal-H2, var(--xmlui-border-H2)))",
+      "borderTop-H2": "var(--xmlui-borderTop-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderBottom-H2": "var(--xmlui-borderBottom-H2, var(--xmlui-borderVertical-H2, var(--xmlui-border-H2)))",
+      "borderWidth-H2": "var(--xmlui-borderWidth-H2)",
+      "borderHorizontalWidth-H2": "var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderLeftWidth-H2": "var(--xmlui-borderLeftWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderRightWidth-H2": "var(--xmlui-borderRightWidth-H2, var(--xmlui-borderHorizontalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderVerticalWidth-H2": "var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2))",
+      "borderTopWidth-H2": "var(--xmlui-borderTopWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderBottomWidth-H2": "var(--xmlui-borderBottomWidth-H2, var(--xmlui-borderVerticalWidth-H2, var(--xmlui-borderWidth-H2)))",
+      "borderStyle-H2": "var(--xmlui-borderStyle-H2)",
+      "borderHorizontalStyle-H2": "var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderLeftStyle-H2": "var(--xmlui-borderLeftStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderRightStyle-H2": "var(--xmlui-borderRightStyle-H2, var(--xmlui-borderHorizontalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderVerticalStyle-H2": "var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2))",
+      "borderTopStyle-H2": "var(--xmlui-borderTopStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderBottomStyle-H2": "var(--xmlui-borderBottomStyle-H2, var(--xmlui-borderVerticalStyle-H2, var(--xmlui-borderStyle-H2)))",
+      "borderColor-H2": "var(--xmlui-borderColor-H2)",
+      "borderHorizontalColor-H2": "var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderLeftColor-H2": "var(--xmlui-borderLeftColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderRightColor-H2": "var(--xmlui-borderRightColor-H2, var(--xmlui-borderHorizontalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderVerticalColor-H2": "var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2))",
+      "borderTopColor-H2": "var(--xmlui-borderTopColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderBottomColor-H2": "var(--xmlui-borderBottomColor-H2, var(--xmlui-borderVerticalColor-H2, var(--xmlui-borderColor-H2)))",
+      "borderStartStartRadius-H2": "var(--xmlui-borderStartStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderStartEndRadius-H2": "var(--xmlui-borderStartEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndStartRadius-H2": "var(--xmlui-borderEndStartRadius-H2, var(--xmlui-borderRadius-H2))",
+      "borderEndEndRadius-H2": "var(--xmlui-borderEndEndRadius-H2, var(--xmlui-borderRadius-H2))",
+      "padding-H2": "var(--xmlui-padding-H2)",
+      "paddingHorizontal-H2": "var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2))",
+      "paddingVertical-H2": "var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2))",
+      "paddingLeft-H2": "var(--xmlui-paddingLeft-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingRight-H2": "var(--xmlui-paddingRight-H2, var(--xmlui-paddingHorizontal-H2, var(--xmlui-padding-H2)))",
+      "paddingTop-H2": "var(--xmlui-paddingTop-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "paddingBottom-H2": "var(--xmlui-paddingBottom-H2, var(--xmlui-paddingVertical-H2, var(--xmlui-padding-H2)))",
+      "textColor-H2": "var(--xmlui-textColor-H2)",
+      "fontFamily-H2": "var(--xmlui-fontFamily-H2)",
+      "fontSize-H2": "var(--xmlui-fontSize-H2)",
+      "fontStyle-H2": "var(--xmlui-fontStyle-H2)",
+      "fontVariant-H2": "var(--xmlui-fontVariant-H2)",
+      "fontWeight-H2": "var(--xmlui-fontWeight-H2)",
+      "fontStretch-H2": "var(--xmlui-fontStretch-H2)",
+      "textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
+      "textDecorationColor-H2": "var(--xmlui-textDecorationColor-H2)",
+      "textDecorationStyle-H2": "var(--xmlui-textDecorationStyle-H2)",
+      "textDecorationThickness-H2": "var(--xmlui-textDecorationThickness-H2)",
+      "textUnderlineOffset-H2": "var(--xmlui-textUnderlineOffset-H2)",
+      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
+      "backgroundColor-H2": "var(--xmlui-backgroundColor-H2)",
+      "textTransform-H2": "var(--xmlui-textTransform-H2)",
+      "letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
+      "wordSpacing-H2": "var(--xmlui-wordSpacing-H2)",
+      "textShadow-H2": "var(--xmlui-textShadow-H2)",
+      "textIndent-H2": "var(--xmlui-textIndent-H2)",
+      "textAlign-H2": "var(--xmlui-textAlign-H2)",
+      "textAlignLast-H2": "var(--xmlui-textAlignLast-H2)",
+      "wordBreak-H2": "var(--xmlui-wordBreak-H2)",
+      "wordWrap-H2": "var(--xmlui-wordWrap-H2)",
+      "direction-H2": "var(--xmlui-direction-H2)",
+      "writingMode-H2": "var(--xmlui-writingMode-H2)",
+      "lineBreak-H2": "var(--xmlui-lineBreak-H2)",
+      "border-H3": "var(--xmlui-border-H3)",
+      "borderHorizontal-H3": "var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3))",
+      "borderVertical-H3": "var(--xmlui-borderVertical-H3, var(--xmlui-border-H3))",
+      "borderLeft-H3": "var(--xmlui-borderLeft-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderRight-H3": "var(--xmlui-borderRight-H3, var(--xmlui-borderHorizontal-H3, var(--xmlui-border-H3)))",
+      "borderTop-H3": "var(--xmlui-borderTop-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderBottom-H3": "var(--xmlui-borderBottom-H3, var(--xmlui-borderVertical-H3, var(--xmlui-border-H3)))",
+      "borderWidth-H3": "var(--xmlui-borderWidth-H3)",
+      "borderHorizontalWidth-H3": "var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderLeftWidth-H3": "var(--xmlui-borderLeftWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderRightWidth-H3": "var(--xmlui-borderRightWidth-H3, var(--xmlui-borderHorizontalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderVerticalWidth-H3": "var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3))",
+      "borderTopWidth-H3": "var(--xmlui-borderTopWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderBottomWidth-H3": "var(--xmlui-borderBottomWidth-H3, var(--xmlui-borderVerticalWidth-H3, var(--xmlui-borderWidth-H3)))",
+      "borderStyle-H3": "var(--xmlui-borderStyle-H3)",
+      "borderHorizontalStyle-H3": "var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderLeftStyle-H3": "var(--xmlui-borderLeftStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderRightStyle-H3": "var(--xmlui-borderRightStyle-H3, var(--xmlui-borderHorizontalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderVerticalStyle-H3": "var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3))",
+      "borderTopStyle-H3": "var(--xmlui-borderTopStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderBottomStyle-H3": "var(--xmlui-borderBottomStyle-H3, var(--xmlui-borderVerticalStyle-H3, var(--xmlui-borderStyle-H3)))",
+      "borderColor-H3": "var(--xmlui-borderColor-H3)",
+      "borderHorizontalColor-H3": "var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderLeftColor-H3": "var(--xmlui-borderLeftColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderRightColor-H3": "var(--xmlui-borderRightColor-H3, var(--xmlui-borderHorizontalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderVerticalColor-H3": "var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3))",
+      "borderTopColor-H3": "var(--xmlui-borderTopColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderBottomColor-H3": "var(--xmlui-borderBottomColor-H3, var(--xmlui-borderVerticalColor-H3, var(--xmlui-borderColor-H3)))",
+      "borderStartStartRadius-H3": "var(--xmlui-borderStartStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderStartEndRadius-H3": "var(--xmlui-borderStartEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndStartRadius-H3": "var(--xmlui-borderEndStartRadius-H3, var(--xmlui-borderRadius-H3))",
+      "borderEndEndRadius-H3": "var(--xmlui-borderEndEndRadius-H3, var(--xmlui-borderRadius-H3))",
+      "padding-H3": "var(--xmlui-padding-H3)",
+      "paddingHorizontal-H3": "var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3))",
+      "paddingVertical-H3": "var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3))",
+      "paddingLeft-H3": "var(--xmlui-paddingLeft-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingRight-H3": "var(--xmlui-paddingRight-H3, var(--xmlui-paddingHorizontal-H3, var(--xmlui-padding-H3)))",
+      "paddingTop-H3": "var(--xmlui-paddingTop-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "paddingBottom-H3": "var(--xmlui-paddingBottom-H3, var(--xmlui-paddingVertical-H3, var(--xmlui-padding-H3)))",
+      "textColor-H3": "var(--xmlui-textColor-H3)",
+      "fontFamily-H3": "var(--xmlui-fontFamily-H3)",
+      "fontSize-H3": "var(--xmlui-fontSize-H3)",
+      "fontStyle-H3": "var(--xmlui-fontStyle-H3)",
+      "fontVariant-H3": "var(--xmlui-fontVariant-H3)",
+      "fontWeight-H3": "var(--xmlui-fontWeight-H3)",
+      "fontStretch-H3": "var(--xmlui-fontStretch-H3)",
+      "textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
+      "textDecorationColor-H3": "var(--xmlui-textDecorationColor-H3)",
+      "textDecorationStyle-H3": "var(--xmlui-textDecorationStyle-H3)",
+      "textDecorationThickness-H3": "var(--xmlui-textDecorationThickness-H3)",
+      "textUnderlineOffset-H3": "var(--xmlui-textUnderlineOffset-H3)",
+      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
+      "backgroundColor-H3": "var(--xmlui-backgroundColor-H3)",
+      "textTransform-H3": "var(--xmlui-textTransform-H3)",
+      "letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
+      "wordSpacing-H3": "var(--xmlui-wordSpacing-H3)",
+      "textShadow-H3": "var(--xmlui-textShadow-H3)",
+      "textIndent-H3": "var(--xmlui-textIndent-H3)",
+      "textAlign-H3": "var(--xmlui-textAlign-H3)",
+      "textAlignLast-H3": "var(--xmlui-textAlignLast-H3)",
+      "wordBreak-H3": "var(--xmlui-wordBreak-H3)",
+      "wordWrap-H3": "var(--xmlui-wordWrap-H3)",
+      "direction-H3": "var(--xmlui-direction-H3)",
+      "writingMode-H3": "var(--xmlui-writingMode-H3)",
+      "lineBreak-H3": "var(--xmlui-lineBreak-H3)",
+      "border-H4": "var(--xmlui-border-H4)",
+      "borderHorizontal-H4": "var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4))",
+      "borderVertical-H4": "var(--xmlui-borderVertical-H4, var(--xmlui-border-H4))",
+      "borderLeft-H4": "var(--xmlui-borderLeft-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderRight-H4": "var(--xmlui-borderRight-H4, var(--xmlui-borderHorizontal-H4, var(--xmlui-border-H4)))",
+      "borderTop-H4": "var(--xmlui-borderTop-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderBottom-H4": "var(--xmlui-borderBottom-H4, var(--xmlui-borderVertical-H4, var(--xmlui-border-H4)))",
+      "borderWidth-H4": "var(--xmlui-borderWidth-H4)",
+      "borderHorizontalWidth-H4": "var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderLeftWidth-H4": "var(--xmlui-borderLeftWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderRightWidth-H4": "var(--xmlui-borderRightWidth-H4, var(--xmlui-borderHorizontalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderVerticalWidth-H4": "var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4))",
+      "borderTopWidth-H4": "var(--xmlui-borderTopWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderBottomWidth-H4": "var(--xmlui-borderBottomWidth-H4, var(--xmlui-borderVerticalWidth-H4, var(--xmlui-borderWidth-H4)))",
+      "borderStyle-H4": "var(--xmlui-borderStyle-H4)",
+      "borderHorizontalStyle-H4": "var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderLeftStyle-H4": "var(--xmlui-borderLeftStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderRightStyle-H4": "var(--xmlui-borderRightStyle-H4, var(--xmlui-borderHorizontalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderVerticalStyle-H4": "var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4))",
+      "borderTopStyle-H4": "var(--xmlui-borderTopStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderBottomStyle-H4": "var(--xmlui-borderBottomStyle-H4, var(--xmlui-borderVerticalStyle-H4, var(--xmlui-borderStyle-H4)))",
+      "borderColor-H4": "var(--xmlui-borderColor-H4)",
+      "borderHorizontalColor-H4": "var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderLeftColor-H4": "var(--xmlui-borderLeftColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderRightColor-H4": "var(--xmlui-borderRightColor-H4, var(--xmlui-borderHorizontalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderVerticalColor-H4": "var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4))",
+      "borderTopColor-H4": "var(--xmlui-borderTopColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderBottomColor-H4": "var(--xmlui-borderBottomColor-H4, var(--xmlui-borderVerticalColor-H4, var(--xmlui-borderColor-H4)))",
+      "borderStartStartRadius-H4": "var(--xmlui-borderStartStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderStartEndRadius-H4": "var(--xmlui-borderStartEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndStartRadius-H4": "var(--xmlui-borderEndStartRadius-H4, var(--xmlui-borderRadius-H4))",
+      "borderEndEndRadius-H4": "var(--xmlui-borderEndEndRadius-H4, var(--xmlui-borderRadius-H4))",
+      "padding-H4": "var(--xmlui-padding-H4)",
+      "paddingHorizontal-H4": "var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4))",
+      "paddingVertical-H4": "var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4))",
+      "paddingLeft-H4": "var(--xmlui-paddingLeft-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingRight-H4": "var(--xmlui-paddingRight-H4, var(--xmlui-paddingHorizontal-H4, var(--xmlui-padding-H4)))",
+      "paddingTop-H4": "var(--xmlui-paddingTop-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "paddingBottom-H4": "var(--xmlui-paddingBottom-H4, var(--xmlui-paddingVertical-H4, var(--xmlui-padding-H4)))",
+      "textColor-H4": "var(--xmlui-textColor-H4)",
+      "fontFamily-H4": "var(--xmlui-fontFamily-H4)",
+      "fontSize-H4": "var(--xmlui-fontSize-H4)",
+      "fontStyle-H4": "var(--xmlui-fontStyle-H4)",
+      "fontVariant-H4": "var(--xmlui-fontVariant-H4)",
+      "fontWeight-H4": "var(--xmlui-fontWeight-H4)",
+      "fontStretch-H4": "var(--xmlui-fontStretch-H4)",
+      "textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
+      "textDecorationColor-H4": "var(--xmlui-textDecorationColor-H4)",
+      "textDecorationStyle-H4": "var(--xmlui-textDecorationStyle-H4)",
+      "textDecorationThickness-H4": "var(--xmlui-textDecorationThickness-H4)",
+      "textUnderlineOffset-H4": "var(--xmlui-textUnderlineOffset-H4)",
+      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
+      "backgroundColor-H4": "var(--xmlui-backgroundColor-H4)",
+      "textTransform-H4": "var(--xmlui-textTransform-H4)",
+      "letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
+      "wordSpacing-H4": "var(--xmlui-wordSpacing-H4)",
+      "textShadow-H4": "var(--xmlui-textShadow-H4)",
+      "textIndent-H4": "var(--xmlui-textIndent-H4)",
+      "textAlign-H4": "var(--xmlui-textAlign-H4)",
+      "textAlignLast-H4": "var(--xmlui-textAlignLast-H4)",
+      "wordBreak-H4": "var(--xmlui-wordBreak-H4)",
+      "wordWrap-H4": "var(--xmlui-wordWrap-H4)",
+      "direction-H4": "var(--xmlui-direction-H4)",
+      "writingMode-H4": "var(--xmlui-writingMode-H4)",
+      "lineBreak-H4": "var(--xmlui-lineBreak-H4)",
+      "border-H5": "var(--xmlui-border-H5)",
+      "borderHorizontal-H5": "var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5))",
+      "borderVertical-H5": "var(--xmlui-borderVertical-H5, var(--xmlui-border-H5))",
+      "borderLeft-H5": "var(--xmlui-borderLeft-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderRight-H5": "var(--xmlui-borderRight-H5, var(--xmlui-borderHorizontal-H5, var(--xmlui-border-H5)))",
+      "borderTop-H5": "var(--xmlui-borderTop-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderBottom-H5": "var(--xmlui-borderBottom-H5, var(--xmlui-borderVertical-H5, var(--xmlui-border-H5)))",
+      "borderWidth-H5": "var(--xmlui-borderWidth-H5)",
+      "borderHorizontalWidth-H5": "var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderLeftWidth-H5": "var(--xmlui-borderLeftWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderRightWidth-H5": "var(--xmlui-borderRightWidth-H5, var(--xmlui-borderHorizontalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderVerticalWidth-H5": "var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5))",
+      "borderTopWidth-H5": "var(--xmlui-borderTopWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderBottomWidth-H5": "var(--xmlui-borderBottomWidth-H5, var(--xmlui-borderVerticalWidth-H5, var(--xmlui-borderWidth-H5)))",
+      "borderStyle-H5": "var(--xmlui-borderStyle-H5)",
+      "borderHorizontalStyle-H5": "var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderLeftStyle-H5": "var(--xmlui-borderLeftStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderRightStyle-H5": "var(--xmlui-borderRightStyle-H5, var(--xmlui-borderHorizontalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderVerticalStyle-H5": "var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5))",
+      "borderTopStyle-H5": "var(--xmlui-borderTopStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderBottomStyle-H5": "var(--xmlui-borderBottomStyle-H5, var(--xmlui-borderVerticalStyle-H5, var(--xmlui-borderStyle-H5)))",
+      "borderColor-H5": "var(--xmlui-borderColor-H5)",
+      "borderHorizontalColor-H5": "var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderLeftColor-H5": "var(--xmlui-borderLeftColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderRightColor-H5": "var(--xmlui-borderRightColor-H5, var(--xmlui-borderHorizontalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderVerticalColor-H5": "var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5))",
+      "borderTopColor-H5": "var(--xmlui-borderTopColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderBottomColor-H5": "var(--xmlui-borderBottomColor-H5, var(--xmlui-borderVerticalColor-H5, var(--xmlui-borderColor-H5)))",
+      "borderStartStartRadius-H5": "var(--xmlui-borderStartStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderStartEndRadius-H5": "var(--xmlui-borderStartEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndStartRadius-H5": "var(--xmlui-borderEndStartRadius-H5, var(--xmlui-borderRadius-H5))",
+      "borderEndEndRadius-H5": "var(--xmlui-borderEndEndRadius-H5, var(--xmlui-borderRadius-H5))",
+      "padding-H5": "var(--xmlui-padding-H5)",
+      "paddingHorizontal-H5": "var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5))",
+      "paddingVertical-H5": "var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5))",
+      "paddingLeft-H5": "var(--xmlui-paddingLeft-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingRight-H5": "var(--xmlui-paddingRight-H5, var(--xmlui-paddingHorizontal-H5, var(--xmlui-padding-H5)))",
+      "paddingTop-H5": "var(--xmlui-paddingTop-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "paddingBottom-H5": "var(--xmlui-paddingBottom-H5, var(--xmlui-paddingVertical-H5, var(--xmlui-padding-H5)))",
+      "textColor-H5": "var(--xmlui-textColor-H5)",
+      "fontFamily-H5": "var(--xmlui-fontFamily-H5)",
+      "fontSize-H5": "var(--xmlui-fontSize-H5)",
+      "fontStyle-H5": "var(--xmlui-fontStyle-H5)",
+      "fontVariant-H5": "var(--xmlui-fontVariant-H5)",
+      "fontWeight-H5": "var(--xmlui-fontWeight-H5)",
+      "fontStretch-H5": "var(--xmlui-fontStretch-H5)",
+      "textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
+      "textDecorationColor-H5": "var(--xmlui-textDecorationColor-H5)",
+      "textDecorationStyle-H5": "var(--xmlui-textDecorationStyle-H5)",
+      "textDecorationThickness-H5": "var(--xmlui-textDecorationThickness-H5)",
+      "textUnderlineOffset-H5": "var(--xmlui-textUnderlineOffset-H5)",
+      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
+      "backgroundColor-H5": "var(--xmlui-backgroundColor-H5)",
+      "textTransform-H5": "var(--xmlui-textTransform-H5)",
+      "letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
+      "wordSpacing-H5": "var(--xmlui-wordSpacing-H5)",
+      "textShadow-H5": "var(--xmlui-textShadow-H5)",
+      "textIndent-H5": "var(--xmlui-textIndent-H5)",
+      "textAlign-H5": "var(--xmlui-textAlign-H5)",
+      "textAlignLast-H5": "var(--xmlui-textAlignLast-H5)",
+      "wordBreak-H5": "var(--xmlui-wordBreak-H5)",
+      "wordWrap-H5": "var(--xmlui-wordWrap-H5)",
+      "direction-H5": "var(--xmlui-direction-H5)",
+      "writingMode-H5": "var(--xmlui-writingMode-H5)",
+      "lineBreak-H5": "var(--xmlui-lineBreak-H5)",
+      "border-H6": "var(--xmlui-border-H6)",
+      "borderHorizontal-H6": "var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6))",
+      "borderVertical-H6": "var(--xmlui-borderVertical-H6, var(--xmlui-border-H6))",
+      "borderLeft-H6": "var(--xmlui-borderLeft-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderRight-H6": "var(--xmlui-borderRight-H6, var(--xmlui-borderHorizontal-H6, var(--xmlui-border-H6)))",
+      "borderTop-H6": "var(--xmlui-borderTop-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderBottom-H6": "var(--xmlui-borderBottom-H6, var(--xmlui-borderVertical-H6, var(--xmlui-border-H6)))",
+      "borderWidth-H6": "var(--xmlui-borderWidth-H6)",
+      "borderHorizontalWidth-H6": "var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderLeftWidth-H6": "var(--xmlui-borderLeftWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderRightWidth-H6": "var(--xmlui-borderRightWidth-H6, var(--xmlui-borderHorizontalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderVerticalWidth-H6": "var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6))",
+      "borderTopWidth-H6": "var(--xmlui-borderTopWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderBottomWidth-H6": "var(--xmlui-borderBottomWidth-H6, var(--xmlui-borderVerticalWidth-H6, var(--xmlui-borderWidth-H6)))",
+      "borderStyle-H6": "var(--xmlui-borderStyle-H6)",
+      "borderHorizontalStyle-H6": "var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderLeftStyle-H6": "var(--xmlui-borderLeftStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderRightStyle-H6": "var(--xmlui-borderRightStyle-H6, var(--xmlui-borderHorizontalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderVerticalStyle-H6": "var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6))",
+      "borderTopStyle-H6": "var(--xmlui-borderTopStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderBottomStyle-H6": "var(--xmlui-borderBottomStyle-H6, var(--xmlui-borderVerticalStyle-H6, var(--xmlui-borderStyle-H6)))",
+      "borderColor-H6": "var(--xmlui-borderColor-H6)",
+      "borderHorizontalColor-H6": "var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderLeftColor-H6": "var(--xmlui-borderLeftColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderRightColor-H6": "var(--xmlui-borderRightColor-H6, var(--xmlui-borderHorizontalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderVerticalColor-H6": "var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6))",
+      "borderTopColor-H6": "var(--xmlui-borderTopColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderBottomColor-H6": "var(--xmlui-borderBottomColor-H6, var(--xmlui-borderVerticalColor-H6, var(--xmlui-borderColor-H6)))",
+      "borderStartStartRadius-H6": "var(--xmlui-borderStartStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderStartEndRadius-H6": "var(--xmlui-borderStartEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndStartRadius-H6": "var(--xmlui-borderEndStartRadius-H6, var(--xmlui-borderRadius-H6))",
+      "borderEndEndRadius-H6": "var(--xmlui-borderEndEndRadius-H6, var(--xmlui-borderRadius-H6))",
+      "padding-H6": "var(--xmlui-padding-H6)",
+      "paddingHorizontal-H6": "var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6))",
+      "paddingVertical-H6": "var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6))",
+      "paddingLeft-H6": "var(--xmlui-paddingLeft-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingRight-H6": "var(--xmlui-paddingRight-H6, var(--xmlui-paddingHorizontal-H6, var(--xmlui-padding-H6)))",
+      "paddingTop-H6": "var(--xmlui-paddingTop-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "paddingBottom-H6": "var(--xmlui-paddingBottom-H6, var(--xmlui-paddingVertical-H6, var(--xmlui-padding-H6)))",
+      "textColor-H6": "var(--xmlui-textColor-H6)",
+      "fontFamily-H6": "var(--xmlui-fontFamily-H6)",
+      "fontSize-H6": "var(--xmlui-fontSize-H6)",
+      "fontStyle-H6": "var(--xmlui-fontStyle-H6)",
+      "fontVariant-H6": "var(--xmlui-fontVariant-H6)",
+      "fontWeight-H6": "var(--xmlui-fontWeight-H6)",
+      "fontStretch-H6": "var(--xmlui-fontStretch-H6)",
+      "textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
+      "textDecorationColor-H6": "var(--xmlui-textDecorationColor-H6)",
+      "textDecorationStyle-H6": "var(--xmlui-textDecorationStyle-H6)",
+      "textDecorationThickness-H6": "var(--xmlui-textDecorationThickness-H6)",
+      "textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)",
+      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
+      "backgroundColor-H6": "var(--xmlui-backgroundColor-H6)",
+      "textTransform-H6": "var(--xmlui-textTransform-H6)",
+      "letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
+      "wordSpacing-H6": "var(--xmlui-wordSpacing-H6)",
+      "textShadow-H6": "var(--xmlui-textShadow-H6)",
+      "textIndent-H6": "var(--xmlui-textIndent-H6)",
+      "textAlign-H6": "var(--xmlui-textAlign-H6)",
+      "textAlignLast-H6": "var(--xmlui-textAlignLast-H6)",
+      "wordBreak-H6": "var(--xmlui-wordBreak-H6)",
+      "wordWrap-H6": "var(--xmlui-wordWrap-H6)",
+      "direction-H6": "var(--xmlui-direction-H6)",
+      "writingMode-H6": "var(--xmlui-writingMode-H6)",
+      "lineBreak-H6": "var(--xmlui-lineBreak-H6)",
+      "color-anchor-Heading": "var(--xmlui-color-anchor-Heading)",
+      "gap-anchor-Heading": "var(--xmlui-gap-anchor-Heading)",
+      "textDecorationLine-anchor-Heading": "var(--xmlui-textDecorationLine-anchor-Heading)",
       "Heading:textColor-H1": "var(--xmlui-textColor-H1)",
       "Heading:letterSpacing-H1": "var(--xmlui-letterSpacing-H1)",
       "Heading:fontFamily-H1": "var(--xmlui-fontFamily-H1)",
       "Heading:fontWeight-H1": "var(--xmlui-fontWeight-H1)",
-      "fontSize-H1": "var(--xmlui-fontSize-H1)",
-      "lineHeight-H1": "var(--xmlui-lineHeight-H1)",
       "marginTop-H1": "var(--xmlui-marginTop-H1)",
       "marginBottom-H1": "var(--xmlui-marginBottom-H1)",
       "Heading:textDecorationLine-H1": "var(--xmlui-textDecorationLine-H1)",
@@ -5877,8 +8691,6 @@ export default {
       "Heading:letterSpacing-H2": "var(--xmlui-letterSpacing-H2)",
       "Heading:fontFamily-H2": "var(--xmlui-fontFamily-H2)",
       "Heading:fontWeight-H2": "var(--xmlui-fontWeight-H2)",
-      "fontSize-H2": "var(--xmlui-fontSize-H2)",
-      "lineHeight-H2": "var(--xmlui-lineHeight-H2)",
       "marginTop-H2": "var(--xmlui-marginTop-H2)",
       "marginBottom-H2": "var(--xmlui-marginBottom-H2)",
       "Heading:textDecorationLine-H2": "var(--xmlui-textDecorationLine-H2)",
@@ -5890,8 +8702,6 @@ export default {
       "Heading:letterSpacing-H3": "var(--xmlui-letterSpacing-H3)",
       "Heading:fontFamily-H3": "var(--xmlui-fontFamily-H3)",
       "Heading:fontWeight-H3": "var(--xmlui-fontWeight-H3)",
-      "fontSize-H3": "var(--xmlui-fontSize-H3)",
-      "lineHeight-H3": "var(--xmlui-lineHeight-H3)",
       "marginTop-H3": "var(--xmlui-marginTop-H3)",
       "marginBottom-H3": "var(--xmlui-marginBottom-H3)",
       "Heading:textDecorationLine-H3": "var(--xmlui-textDecorationLine-H3)",
@@ -5903,8 +8713,6 @@ export default {
       "Heading:letterSpacing-H4": "var(--xmlui-letterSpacing-H4)",
       "Heading:fontFamily-H4": "var(--xmlui-fontFamily-H4)",
       "Heading:fontWeight-H4": "var(--xmlui-fontWeight-H4)",
-      "fontSize-H4": "var(--xmlui-fontSize-H4)",
-      "lineHeight-H4": "var(--xmlui-lineHeight-H4)",
       "marginTop-H4": "var(--xmlui-marginTop-H4)",
       "marginBottom-H4": "var(--xmlui-marginBottom-H4)",
       "Heading:textDecorationLine-H4": "var(--xmlui-textDecorationLine-H4)",
@@ -5916,8 +8724,6 @@ export default {
       "Heading:letterSpacing-H5": "var(--xmlui-letterSpacing-H5)",
       "Heading:fontFamily-H5": "var(--xmlui-fontFamily-H5)",
       "Heading:fontWeight-H5": "var(--xmlui-fontWeight-H5)",
-      "fontSize-H5": "var(--xmlui-fontSize-H5)",
-      "lineHeight-H5": "var(--xmlui-lineHeight-H5)",
       "marginTop-H5": "var(--xmlui-marginTop-H5)",
       "marginBottom-H5": "var(--xmlui-marginBottom-H5)",
       "Heading:textDecorationLine-H5": "var(--xmlui-textDecorationLine-H5)",
@@ -5929,8 +8735,6 @@ export default {
       "Heading:letterSpacing-H6": "var(--xmlui-letterSpacing-H6)",
       "Heading:fontFamily-H6": "var(--xmlui-fontFamily-H6)",
       "Heading:fontWeight-H6": "var(--xmlui-fontWeight-H6)",
-      "fontSize-H6": "var(--xmlui-fontSize-H6)",
-      "lineHeight-H6": "var(--xmlui-lineHeight-H6)",
       "marginTop-H6": "var(--xmlui-marginTop-H6)",
       "marginBottom-H6": "var(--xmlui-marginBottom-H6)",
       "Heading:textDecorationLine-H6": "var(--xmlui-textDecorationLine-H6)",
@@ -5943,13 +8747,15 @@ export default {
       "fontSize-H6": "$fontSize-tiny",
       "marginTop-H6": "0",
       "marginBottom-H6": "0",
+      "marginTop-H6-markdown": "0",
+      "marginBottom-H6-markdown": "$space-0",
       "light": {},
       "dark": {}
     }
   },
   "HoverCard": {
-    "description": "(**OBSOLETE**) This component displays some content when its parent component is hovered.",
     "status": "deprecated",
+    "description": "(**OBSOLETE**) This component displays some content when its parent component is hovered.",
     "props": {
       "triggerTemplate": {
         "description": "The component that opens the hover card when hovered.",
@@ -5958,8 +8764,8 @@ export default {
     }
   },
   "Icon": {
-    "description": "This component is the representation of an icon.",
     "status": "experimental",
+    "description": "This component is the representation of an icon.",
     "props": {
       "name": {
         "description": "This string property specifies the name of the icon to display. All icons have unique names and identifying the name is case-sensitive."
@@ -6034,6 +8840,7 @@ export default {
         "valueType": "ComponentDef"
       }
     },
+    "childrenAsTemplate": "itemTemplate",
     "contextVars": {
       "$item": {
         "description": "This value represents the current iteration item while the component renders its children.",
@@ -6153,35 +8960,55 @@ export default {
       "borderEndStartRadius-Link": "var(--xmlui-borderEndStartRadius-Link, var(--xmlui-borderRadius-Link))",
       "borderEndEndRadius-Link": "var(--xmlui-borderEndEndRadius-Link, var(--xmlui-borderRadius-Link))",
       "textColor-Link": "var(--xmlui-textColor-Link)",
+      "fontFamily-Link": "var(--xmlui-fontFamily-Link)",
+      "fontSize-Link": "var(--xmlui-fontSize-Link)",
+      "fontStyle-Link": "var(--xmlui-fontStyle-Link)",
+      "fontVariant-Link": "var(--xmlui-fontVariant-Link)",
+      "fontWeight-Link": "var(--xmlui-fontWeight-Link)",
+      "fontStretch-Link": "var(--xmlui-fontStretch-Link)",
+      "textDecorationLine-Link": "var(--xmlui-textDecorationLine-Link)",
+      "textDecorationColor-Link": "var(--xmlui-textDecorationColor-Link)",
+      "textDecorationStyle-Link": "var(--xmlui-textDecorationStyle-Link)",
+      "textDecorationThickness-Link": "var(--xmlui-textDecorationThickness-Link)",
+      "textUnderlineOffset-Link": "var(--xmlui-textUnderlineOffset-Link)",
+      "lineHeight-Link": "var(--xmlui-lineHeight-Link)",
+      "backgroundColor-Link": "var(--xmlui-backgroundColor-Link)",
+      "textTransform-Link": "var(--xmlui-textTransform-Link)",
+      "letterSpacing-Link": "var(--xmlui-letterSpacing-Link)",
+      "wordSpacing-Link": "var(--xmlui-wordSpacing-Link)",
+      "textShadow-Link": "var(--xmlui-textShadow-Link)",
+      "textIndent-Link": "var(--xmlui-textIndent-Link)",
+      "textAlign-Link": "var(--xmlui-textAlign-Link)",
+      "textAlignLast-Link": "var(--xmlui-textAlignLast-Link)",
+      "wordBreak-Link": "var(--xmlui-wordBreak-Link)",
+      "wordWrap-Link": "var(--xmlui-wordWrap-Link)",
+      "direction-Link": "var(--xmlui-direction-Link)",
+      "writingMode-Link": "var(--xmlui-writingMode-Link)",
+      "lineBreak-Link": "var(--xmlui-lineBreak-Link)",
       "textColor-Link--active": "var(--xmlui-textColor-Link--active)",
       "textColor-Link--hover": "var(--xmlui-textColor-Link--hover)",
       "textColor-Link--hover--active": "var(--xmlui-textColor-Link--hover--active)",
-      "fontFamily-Link": "var(--xmlui-fontFamily-Link)",
-      "fontSize-Link": "var(--xmlui-fontSize-Link)",
-      "fontWeight-Link": "var(--xmlui-fontWeight-Link)",
       "fontWeight-Link--active": "var(--xmlui-fontWeight-Link--active)",
-      "textDecorationColor-Link": "var(--xmlui-textDecorationColor-Link)",
-      "textUnderlineOffset-Link": "var(--xmlui-textUnderlineOffset-Link)",
-      "textDecorationLine-Link": "var(--xmlui-textDecorationLine-Link)",
-      "textDecorationStyle-Link": "var(--xmlui-textDecorationStyle-Link)",
-      "textDecorationThickness-Link": "var(--xmlui-textDecorationThickness-Link)",
       "gap-icon-Link": "var(--xmlui-gap-icon-Link)",
       "outlineWidth-Link--focus": "var(--xmlui-outlineWidth-Link--focus)",
       "outlineColor-Link--focus": "var(--xmlui-outlineColor-Link--focus)",
       "outlineStyle-Link--focus": "var(--xmlui-outlineStyle-Link--focus)",
       "outlineOffset-Link--focus": "var(--xmlui-outlineOffset-Link--focus)"
     },
+    "themeVarDescriptions": {
+      "gap-icon-Link": "This property defines the size of the gap between the icon and the label."
+    },
     "defaultThemeVars": {
       "border-Link": "0px solid $borderColor",
       "textColor-Link--hover--active": "$textColor-Link--active",
-      "textDecorationColor-Link--hover": "$color-surface-400A80",
-      "textDecorationColor-Link--active": "$color-surface200",
+      "textDecorationColor-Link--hover": "$color-primary-400",
+      "textColor-Link--hover": "$color-primary-400",
+      "textDecorationColor-Link--active": "$color-primary-200",
       "fontWeight-Link--active": "$fontWeight-bold",
-      "textDecorationColor-Link": "$color-surface-400",
+      "textDecorationColor-Link": "$color-primary-400",
       "textUnderlineOffset-Link": "$space-1",
       "textDecorationLine-Link": "underline",
-      "textDecorationStyle-Link": "dashed",
-      "textDecorationThickness-Link": "$space-0_5",
+      "textDecorationStyle-Link": "solid",
       "outlineColor-Link--focus": "$outlineColor--focus",
       "outlineWidth-Link--focus": "$outlineWidth--focus",
       "outlineStyle-Link--focus": "$outlineStyle--focus",
@@ -6189,22 +9016,13 @@ export default {
       "fontSize-Link": "inherit",
       "gap-icon-Link": "$gap-tight",
       "padding-icon-Link": "$space-0_5",
-      "light": {
-        "textColor-Link": "$color-primary-500",
-        "textColor-Link--active": "$color-primary-500"
-      },
-      "dark": {
-        "textColor-Link": "$color-primary-500",
-        "textColor-Link--active": "$color-primary-500"
-      }
-    },
-    "themeVarDescriptions": {
-      "gap-icon-Link": "This property defines the size of the gap between the icon and the label."
+      "textColor-Link": "$color-primary-500",
+      "textColor-Link--active": "$color-primary-500"
     }
   },
   "List": {
-    "description": "The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport.",
     "status": "experimental",
+    "description": "The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport.",
     "props": {
       "data": {
         "description": "The component receives data via this property. The `data` property is a list of items that the `List` can display."
@@ -6278,11 +9096,7 @@ export default {
         "defaultValue": true
       }
     },
-    "contextVars": {
-      "$item": {
-        "description": "This property represents the value of an item in the data list."
-      }
-    },
+    "childrenAsTemplate": "itemTemplate",
     "apis": {
       "scrollToTop": {
         "description": "This method scrolls the list to the top."
@@ -6297,17 +9111,161 @@ export default {
         "description": "This method scrolls the list to a specific item. The method accepts an item ID as a parameter."
       }
     },
+    "contextVars": {
+      "$item": {
+        "description": "This property represents the value of an item in the data list."
+      },
+      "$itemIndex": {
+        "description": "This integer value represents the current row index (zero-based) while rendering children.",
+        "valueType": "ComponentDef"
+      },
+      "$isFirst": {
+        "description": "This boolean value indicates if the component renders its first item.",
+        "valueType": "ComponentDef"
+      },
+      "$isLast": {
+        "description": "This boolean value indicates if the component renders its last item.",
+        "valueType": "ComponentDef"
+      }
+    },
     "themeVars": []
   },
   "Logo": {
-    "description": "The `Logo` component represents a logo or a brand symbol. Usually, you use this component in the [`AppHeader`](./AppHeader.mdx#logotemplate).",
-    "status": "experimental"
+    "status": "experimental",
+    "description": "The `Logo` component represents a logo or a brand symbol. Usually, you use this component in the [`AppHeader`](./AppHeader.mdx#logotemplate)."
   },
   "Markdown": {
-    "description": "`Markdown` displays plain text styled with markdown syntax.",
+    "description": "`Markdown` displays plain text styled using markdown syntax.",
+    "themeVars": {
+      "paddingTop-Markdown": "var(--xmlui-paddingTop-Markdown)",
+      "paddingBottom-Markdown": "var(--xmlui-paddingBottom-Markdown)",
+      "backgroundColor-Markdown": "var(--xmlui-backgroundColor-Markdown)",
+      "padding-Blockquote": "var(--xmlui-padding-Blockquote)",
+      "paddingHorizontal-Blockquote": "var(--xmlui-paddingHorizontal-Blockquote, var(--xmlui-padding-Blockquote))",
+      "paddingVertical-Blockquote": "var(--xmlui-paddingVertical-Blockquote, var(--xmlui-padding-Blockquote))",
+      "paddingLeft-Blockquote": "var(--xmlui-paddingLeft-Blockquote)",
+      "paddingRight-Blockquote": "var(--xmlui-paddingRight-Blockquote, var(--xmlui-paddingHorizontal-Blockquote, var(--xmlui-padding-Blockquote)))",
+      "paddingTop-Blockquote": "var(--xmlui-paddingTop-Blockquote, var(--xmlui-paddingVertical-Blockquote, var(--xmlui-padding-Blockquote)))",
+      "paddingBottom-Blockquote": "var(--xmlui-paddingBottom-Blockquote, var(--xmlui-paddingVertical-Blockquote, var(--xmlui-padding-Blockquote)))",
+      "border-Blockquote": "var(--xmlui-border-Blockquote)",
+      "borderHorizontal-Blockquote": "var(--xmlui-borderHorizontal-Blockquote, var(--xmlui-border-Blockquote))",
+      "borderVertical-Blockquote": "var(--xmlui-borderVertical-Blockquote, var(--xmlui-border-Blockquote))",
+      "borderLeft-Blockquote": "var(--xmlui-borderLeft-Blockquote, var(--xmlui-borderHorizontal-Blockquote, var(--xmlui-border-Blockquote)))",
+      "borderRight-Blockquote": "var(--xmlui-borderRight-Blockquote, var(--xmlui-borderHorizontal-Blockquote, var(--xmlui-border-Blockquote)))",
+      "borderTop-Blockquote": "var(--xmlui-borderTop-Blockquote, var(--xmlui-borderVertical-Blockquote, var(--xmlui-border-Blockquote)))",
+      "borderBottom-Blockquote": "var(--xmlui-borderBottom-Blockquote, var(--xmlui-borderVertical-Blockquote, var(--xmlui-border-Blockquote)))",
+      "borderWidth-Blockquote": "var(--xmlui-borderWidth-Blockquote)",
+      "borderHorizontalWidth-Blockquote": "var(--xmlui-borderHorizontalWidth-Blockquote, var(--xmlui-borderWidth-Blockquote))",
+      "borderLeftWidth-Blockquote": "var(--xmlui-borderLeftWidth-Blockquote, var(--xmlui-borderHorizontalWidth-Blockquote, var(--xmlui-borderWidth-Blockquote)))",
+      "borderRightWidth-Blockquote": "var(--xmlui-borderRightWidth-Blockquote, var(--xmlui-borderHorizontalWidth-Blockquote, var(--xmlui-borderWidth-Blockquote)))",
+      "borderVerticalWidth-Blockquote": "var(--xmlui-borderVerticalWidth-Blockquote, var(--xmlui-borderWidth-Blockquote))",
+      "borderTopWidth-Blockquote": "var(--xmlui-borderTopWidth-Blockquote, var(--xmlui-borderVerticalWidth-Blockquote, var(--xmlui-borderWidth-Blockquote)))",
+      "borderBottomWidth-Blockquote": "var(--xmlui-borderBottomWidth-Blockquote, var(--xmlui-borderVerticalWidth-Blockquote, var(--xmlui-borderWidth-Blockquote)))",
+      "borderStyle-Blockquote": "var(--xmlui-borderStyle-Blockquote)",
+      "borderHorizontalStyle-Blockquote": "var(--xmlui-borderHorizontalStyle-Blockquote, var(--xmlui-borderStyle-Blockquote))",
+      "borderLeftStyle-Blockquote": "var(--xmlui-borderLeftStyle-Blockquote, var(--xmlui-borderHorizontalStyle-Blockquote, var(--xmlui-borderStyle-Blockquote)))",
+      "borderRightStyle-Blockquote": "var(--xmlui-borderRightStyle-Blockquote, var(--xmlui-borderHorizontalStyle-Blockquote, var(--xmlui-borderStyle-Blockquote)))",
+      "borderVerticalStyle-Blockquote": "var(--xmlui-borderVerticalStyle-Blockquote, var(--xmlui-borderStyle-Blockquote))",
+      "borderTopStyle-Blockquote": "var(--xmlui-borderTopStyle-Blockquote, var(--xmlui-borderVerticalStyle-Blockquote, var(--xmlui-borderStyle-Blockquote)))",
+      "borderBottomStyle-Blockquote": "var(--xmlui-borderBottomStyle-Blockquote, var(--xmlui-borderVerticalStyle-Blockquote, var(--xmlui-borderStyle-Blockquote)))",
+      "borderColor-Blockquote": "var(--xmlui-borderColor-Blockquote)",
+      "borderHorizontalColor-Blockquote": "var(--xmlui-borderHorizontalColor-Blockquote, var(--xmlui-borderColor-Blockquote))",
+      "borderLeftColor-Blockquote": "var(--xmlui-borderLeftColor-Blockquote, var(--xmlui-borderHorizontalColor-Blockquote, var(--xmlui-borderColor-Blockquote)))",
+      "borderRightColor-Blockquote": "var(--xmlui-borderRightColor-Blockquote, var(--xmlui-borderHorizontalColor-Blockquote, var(--xmlui-borderColor-Blockquote)))",
+      "borderVerticalColor-Blockquote": "var(--xmlui-borderVerticalColor-Blockquote, var(--xmlui-borderColor-Blockquote))",
+      "borderTopColor-Blockquote": "var(--xmlui-borderTopColor-Blockquote, var(--xmlui-borderVerticalColor-Blockquote, var(--xmlui-borderColor-Blockquote)))",
+      "borderBottomColor-Blockquote": "var(--xmlui-borderBottomColor-Blockquote, var(--xmlui-borderVerticalColor-Blockquote, var(--xmlui-borderColor-Blockquote)))",
+      "borderStartStartRadius-Blockquote": "var(--xmlui-borderStartStartRadius-Blockquote, var(--xmlui-borderRadius-Blockquote))",
+      "borderStartEndRadius-Blockquote": "var(--xmlui-borderStartEndRadius-Blockquote, var(--xmlui-borderRadius-Blockquote))",
+      "borderEndStartRadius-Blockquote": "var(--xmlui-borderEndStartRadius-Blockquote, var(--xmlui-borderRadius-Blockquote))",
+      "borderEndEndRadius-Blockquote": "var(--xmlui-borderEndEndRadius-Blockquote, var(--xmlui-borderRadius-Blockquote))",
+      "accentColor-Blockquote": "var(--xmlui-accentColor-Blockquote)",
+      "accentWidth-Blockquote": "var(--xmlui-accentWidth-Blockquote)",
+      "backgroundColor-Blockquote": "var(--xmlui-backgroundColor-Blockquote)",
+      "borderRadius-Blockquote": "var(--xmlui-borderRadius-Blockquote)",
+      "marginTop-Blockquote": "var(--xmlui-marginTop-Blockquote)",
+      "marginBottom-Blockquote": "var(--xmlui-marginBottom-Blockquote)",
+      "padding-Admonition": "var(--xmlui-padding-Admonition)",
+      "paddingHorizontal-Admonition": "var(--xmlui-paddingHorizontal-Admonition, var(--xmlui-padding-Admonition))",
+      "paddingVertical-Admonition": "var(--xmlui-paddingVertical-Admonition, var(--xmlui-padding-Admonition))",
+      "paddingLeft-Admonition": "var(--xmlui-paddingLeft-Admonition, var(--xmlui-paddingHorizontal-Admonition, var(--xmlui-padding-Admonition)))",
+      "paddingRight-Admonition": "var(--xmlui-paddingRight-Admonition, var(--xmlui-paddingHorizontal-Admonition, var(--xmlui-padding-Admonition)))",
+      "paddingTop-Admonition": "var(--xmlui-paddingTop-Admonition, var(--xmlui-paddingVertical-Admonition, var(--xmlui-padding-Admonition)))",
+      "paddingBottom-Admonition": "var(--xmlui-paddingBottom-Admonition, var(--xmlui-paddingVertical-Admonition, var(--xmlui-padding-Admonition)))",
+      "border-Admonition": "var(--xmlui-border-Admonition)",
+      "borderHorizontal-Admonition": "var(--xmlui-borderHorizontal-Admonition, var(--xmlui-border-Admonition))",
+      "borderVertical-Admonition": "var(--xmlui-borderVertical-Admonition, var(--xmlui-border-Admonition))",
+      "borderLeft-Admonition": "var(--xmlui-borderLeft-Admonition, var(--xmlui-borderHorizontal-Admonition, var(--xmlui-border-Admonition)))",
+      "borderRight-Admonition": "var(--xmlui-borderRight-Admonition, var(--xmlui-borderHorizontal-Admonition, var(--xmlui-border-Admonition)))",
+      "borderTop-Admonition": "var(--xmlui-borderTop-Admonition, var(--xmlui-borderVertical-Admonition, var(--xmlui-border-Admonition)))",
+      "borderBottom-Admonition": "var(--xmlui-borderBottom-Admonition, var(--xmlui-borderVertical-Admonition, var(--xmlui-border-Admonition)))",
+      "borderWidth-Admonition": "var(--xmlui-borderWidth-Admonition)",
+      "borderHorizontalWidth-Admonition": "var(--xmlui-borderHorizontalWidth-Admonition, var(--xmlui-borderWidth-Admonition))",
+      "borderLeftWidth-Admonition": "var(--xmlui-borderLeftWidth-Admonition, var(--xmlui-borderHorizontalWidth-Admonition, var(--xmlui-borderWidth-Admonition)))",
+      "borderRightWidth-Admonition": "var(--xmlui-borderRightWidth-Admonition, var(--xmlui-borderHorizontalWidth-Admonition, var(--xmlui-borderWidth-Admonition)))",
+      "borderVerticalWidth-Admonition": "var(--xmlui-borderVerticalWidth-Admonition, var(--xmlui-borderWidth-Admonition))",
+      "borderTopWidth-Admonition": "var(--xmlui-borderTopWidth-Admonition, var(--xmlui-borderVerticalWidth-Admonition, var(--xmlui-borderWidth-Admonition)))",
+      "borderBottomWidth-Admonition": "var(--xmlui-borderBottomWidth-Admonition, var(--xmlui-borderVerticalWidth-Admonition, var(--xmlui-borderWidth-Admonition)))",
+      "borderStyle-Admonition": "var(--xmlui-borderStyle-Admonition)",
+      "borderHorizontalStyle-Admonition": "var(--xmlui-borderHorizontalStyle-Admonition, var(--xmlui-borderStyle-Admonition))",
+      "borderLeftStyle-Admonition": "var(--xmlui-borderLeftStyle-Admonition, var(--xmlui-borderHorizontalStyle-Admonition, var(--xmlui-borderStyle-Admonition)))",
+      "borderRightStyle-Admonition": "var(--xmlui-borderRightStyle-Admonition, var(--xmlui-borderHorizontalStyle-Admonition, var(--xmlui-borderStyle-Admonition)))",
+      "borderVerticalStyle-Admonition": "var(--xmlui-borderVerticalStyle-Admonition, var(--xmlui-borderStyle-Admonition))",
+      "borderTopStyle-Admonition": "var(--xmlui-borderTopStyle-Admonition, var(--xmlui-borderVerticalStyle-Admonition, var(--xmlui-borderStyle-Admonition)))",
+      "borderBottomStyle-Admonition": "var(--xmlui-borderBottomStyle-Admonition, var(--xmlui-borderVerticalStyle-Admonition, var(--xmlui-borderStyle-Admonition)))",
+      "borderColor-Admonition": "var(--xmlui-borderColor-Admonition)",
+      "borderHorizontalColor-Admonition": "var(--xmlui-borderHorizontalColor-Admonition, var(--xmlui-borderColor-Admonition))",
+      "borderLeftColor-Admonition": "var(--xmlui-borderLeftColor-Admonition, var(--xmlui-borderHorizontalColor-Admonition, var(--xmlui-borderColor-Admonition)))",
+      "borderRightColor-Admonition": "var(--xmlui-borderRightColor-Admonition, var(--xmlui-borderHorizontalColor-Admonition, var(--xmlui-borderColor-Admonition)))",
+      "borderVerticalColor-Admonition": "var(--xmlui-borderVerticalColor-Admonition, var(--xmlui-borderColor-Admonition))",
+      "borderTopColor-Admonition": "var(--xmlui-borderTopColor-Admonition, var(--xmlui-borderVerticalColor-Admonition, var(--xmlui-borderColor-Admonition)))",
+      "borderBottomColor-Admonition": "var(--xmlui-borderBottomColor-Admonition, var(--xmlui-borderVerticalColor-Admonition, var(--xmlui-borderColor-Admonition)))",
+      "borderStartStartRadius-Admonition": "var(--xmlui-borderStartStartRadius-Admonition, var(--xmlui-borderRadius-Admonition))",
+      "borderStartEndRadius-Admonition": "var(--xmlui-borderStartEndRadius-Admonition, var(--xmlui-borderRadius-Admonition))",
+      "borderEndStartRadius-Admonition": "var(--xmlui-borderEndStartRadius-Admonition, var(--xmlui-borderRadius-Admonition))",
+      "borderEndEndRadius-Admonition": "var(--xmlui-borderEndEndRadius-Admonition, var(--xmlui-borderRadius-Admonition))",
+      "backgroundColor-Admonition": "var(--xmlui-backgroundColor-Admonition)",
+      "borderRadius-Admonition": "var(--xmlui-borderRadius-Admonition)",
+      "iconSize-Admonition": "var(--xmlui-iconSize-Admonition)",
+      "marginTop-Admonition": "var(--xmlui-marginTop-Admonition)",
+      "marginBottom-Admonition": "var(--xmlui-marginBottom-Admonition)",
+      "marginLeft-Admonition-content": "var(--xmlui-marginLeft-Admonition-content)",
+      "marginTop-HtmlVideo": "var(--xmlui-marginTop-HtmlVideo)",
+      "marginBottom-HtmlVideo": "var(--xmlui-marginBottom-HtmlVideo)",
+      "marginTop-H1-markdown": "var(--xmlui-marginTop-H1-markdown)",
+      "marginBottom-H1-markdown": "var(--xmlui-marginBottom-H1-markdown)",
+      "fontSize-H1-markdown": "var(--xmlui-fontSize-H1-markdown)",
+      "marginTop-H2-markdown": "var(--xmlui-marginTop-H2-markdown)",
+      "marginBottom-H2-markdown": "var(--xmlui-marginBottom-H2-markdown)",
+      "marginTop-H3-markdown": "var(--xmlui-marginTop-H3-markdown)",
+      "marginBottom-H3-markdown": "var(--xmlui-marginBottom-H3-markdown)",
+      "marginTop-H4-markdown": "var(--xmlui-marginTop-H4-markdown)",
+      "marginBottom-H4-markdown": "var(--xmlui-marginBottom-H4-markdown)",
+      "marginTop-H5-markdown": "var(--xmlui-marginTop-H5-markdown)",
+      "marginBottom-H5-markdown": "var(--xmlui-marginBottom-H5-markdown)",
+      "marginTop-H6-markdown": "var(--xmlui-marginTop-H6-markdown)",
+      "marginBottom-H6-markdown": "var(--xmlui-marginBottom-H6-markdown)",
+      "backgroundColor-Admonition-info": "var(--xmlui-backgroundColor-Admonition-info)",
+      "borderColor-Admonition-info": "var(--xmlui-borderColor-Admonition-info)",
+      "backgroundColor-Admonition-warning": "var(--xmlui-backgroundColor-Admonition-warning)",
+      "borderColor-Admonition-warning": "var(--xmlui-borderColor-Admonition-warning)",
+      "backgroundColor-Admonition-danger": "var(--xmlui-backgroundColor-Admonition-danger)",
+      "borderColor-Admonition-danger": "var(--xmlui-borderColor-Admonition-danger)",
+      "backgroundColor-Admonition-note": "var(--xmlui-backgroundColor-Admonition-note)",
+      "borderColor-Admonition-note": "var(--xmlui-borderColor-Admonition-note)",
+      "backgroundColor-Admonition-tip": "var(--xmlui-backgroundColor-Admonition-tip)",
+      "borderColor-Admonition-tip": "var(--xmlui-borderColor-Admonition-tip)",
+      "borderColor-HorizontalRule": "var(--xmlui-borderColor-HorizontalRule)",
+      "borderStyle-HorizontalRule": "var(--xmlui-borderStyle-HorizontalRule)",
+      "borderWidth-HorizontalRule": "var(--xmlui-borderWidth-HorizontalRule)"
+    },
     "props": {
       "content": {
         "description": "This property sets the markdown content to display."
+      },
+      "codeHighlighter": {
+        "description": "This property sets the code highlighter to use.",
+        "isInternal": true
       },
       "removeIndents": {
         "description": "This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.",
@@ -6315,42 +9273,42 @@ export default {
         "defaultValue": true
       }
     },
-    "themeVars": {
-      "borderColor-HorizontalRule": "var(--xmlui-borderColor-HorizontalRule)",
-      "borderWidth-HorizontalRule": "var(--xmlui-borderWidth-HorizontalRule)",
-      "borderStyle-HorizontalRule": "var(--xmlui-borderStyle-HorizontalRule)",
-      "backgroundColor-Blockquote": "var(--xmlui-backgroundColor-Blockquote)",
-      "accent-Blockquote": "var(--xmlui-accent-Blockquote)",
-      "borderRadius-Blockquote": "var(--xmlui-borderRadius-Blockquote)",
-      "boxShadow-Blockquote": "var(--xmlui-boxShadow-Blockquote)",
-      "padding-Blockquote": "var(--xmlui-padding-Blockquote)",
-      "margin-Blockquote": "var(--xmlui-margin-Blockquote)",
-      "backgroundColor-Admonition": "var(--xmlui-backgroundColor-Admonition)",
-      "textColor-Admonition": "var(--xmlui-textColor-Admonition)",
-      "size-icon-Admonition": "var(--xmlui-size-icon-Admonition)",
-      "paddingLeft-UnorderedList": "var(--xmlui-paddingLeft-UnorderedList)",
-      "paddingLeft-OrderedList": "var(--xmlui-paddingLeft-OrderedList)",
-      "paddingLeft-ListItem": "var(--xmlui-paddingLeft-ListItem)",
-      "color-marker-ListItem": "var(--xmlui-color-marker-ListItem)",
-      "marginTop-HtmlHeading": "var(--xmlui-marginTop-HtmlHeading)",
-      "marginBottom-HtmlHeading": "var(--xmlui-marginBottom-HtmlHeading)"
-    },
     "defaultThemeVars": {
-      "borderColor-HorizontalRule": "$borderColor",
-      "borderWidth-HorizontalRule": "1px",
-      "borderStyle-HorizontalRule": "solid",
-      "accent-Blockquote": "$color-primary",
-      "padding-Blockquote": "$space-2 $space-6",
-      "margin-Blockquote": "$space-2",
-      "paddingLeft-UnorderedList": "$space-6",
-      "paddingLeft-OrderedList": "$space-6",
-      "paddingLeft-ListItem": "$space-1",
+      "backgroundColor-Admonition": "$color-primary-100",
+      "border-Admonition": "1px solid $color-primary-300",
+      "backgroundColor-Admonition-warning": "$color-warn-100",
+      "borderColor-Admonition-warning": "$color-warn-300",
+      "backgroundColor-Admonition-danger": "$color-danger-100",
+      "borderColor-Admonition-danger": "$color-danger-300",
+      "borderRadius-Admonition": "$space-2",
+      "iconSize-Admonition": "$space-5",
+      "paddingLeft-Admonition": "$space-2",
+      "paddingRight-Admonition": "$space-6",
+      "paddingTop-Admonition": "$space-3",
+      "paddingBottom-Admonition": "$space-2",
+      "marginLeft-Admonition-content": "$space-1_5",
+      "marginTop-Admonition": "$space-7",
+      "marginBottom-Admonition": "$space-7",
+      "marginTop-Blockquote": "$space-7",
+      "marginBottom-Blockquote": "$space-7",
+      "paddingHorizontal-Blockquote": "$space-6",
+      "paddingTop-Blockquote": "$space-3",
+      "paddingBottom-Blockquote": "$space-2_5",
+      "backgroundColor-Blockquote": "$color-surface-100",
+      "accentWidth-Blockquote": "3px",
+      "accentColor-Blockquote": "$color-surface-500",
+      "marginTop-HtmlLi": "$space-2_5",
+      "marginBottom-HtmlLi": "$space-2_5",
       "light": {},
-      "dark": {}
+      "dark": {
+        "backgroundColor-Blockquote": "$color-surface-50",
+        "backgroundColor-Admonition": "$color-primary-200"
+      }
     }
   },
   "MenuSeparator": {
     "description": "This component displays a separator line between menu items.",
+    "docFolder": "DropdownMenu",
     "themeVars": {
       "backgroundColor-DropdownMenu": "var(--xmlui-backgroundColor-DropdownMenu)",
       "borderRadius-DropdownMenu": "var(--xmlui-borderRadius-DropdownMenu)",
@@ -6372,6 +9330,7 @@ export default {
       "color-MenuItem--hover": "var(--xmlui-color-MenuItem--hover)",
       "color-MenuItem--active": "var(--xmlui-color-MenuItem--active)",
       "color-MenuItem--active--hover": "var(--xmlui-color-MenuItem--active--hover)",
+      "color-MenuItem--disabled": "var(--xmlui-color-MenuItem--disabled)",
       "marginTop-MenuSeparator": "var(--xmlui-marginTop-MenuSeparator)",
       "marginBottom-MenuSeparator": "var(--xmlui-marginBottom-MenuSeparator)",
       "width-MenuSeparator": "var(--xmlui-width-MenuSeparator)",
@@ -6385,8 +9344,7 @@ export default {
       "height-MenuSeparator": "1px",
       "color-MenuSeparator": "$borderColor-dropdown-item",
       "marginHorizontal-MenuSeparator": "12px"
-    },
-    "docFolder": "DropdownMenu"
+    }
   },
   "ModalDialog": {
     "description": "The `ModalDialog` component defines a modal dialog UI element that can be displayed over the existing UI - triggered by some action.",
@@ -6413,20 +9371,20 @@ export default {
         "description": "This event is fired when the close button is pressed or the user clicks outside the `ModalDialog`."
       }
     },
-    "contextVars": {
-      "$param": {
-        "description": "This value represents the first parameters passed to the `open()` method to display the modal dialog."
-      },
-      "$params": {
-        "description": "This value represents the array of parameters passed to the `open()` method. You can use `$params[0]` to access the first and `$params[1]` to access the second (and so on) parameters. `$param` is the same as `$params[0]`."
-      }
-    },
     "apis": {
       "close": {
         "description": "This method is used to close the `ModalDialog`. Invoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component."
       },
       "open": {
         "description": "This method imperatively opens the modal dialog. You can pass an arbitrary number of parameters to the method. In the `ModalDialog` instance, you can access those with the `$paramq` and `$params` context values."
+      }
+    },
+    "contextVars": {
+      "$param": {
+        "description": "This value represents the first parameters passed to the `open()` method to display the modal dialog."
+      },
+      "$params": {
+        "description": "This value represents the array of parameters passed to the `open()` method. You can use `$params[0]` to access the first and `$params[1]` to access the second (and so on) parameters. `$param` is the same as `$params[0]`."
       }
     },
     "themeVars": {
@@ -6467,10 +9425,7 @@ export default {
       "borderRadius-ModalDialog": "$borderRadius",
       "fontFamily-ModalDialog": "$fontFamily",
       "maxWidth-ModalDialog": "450px",
-      "marginBottom-title-ModalDialog": "0",
-      "dark": {
-        "backgroundColor-ModalDialog": "$backgroundColor-primary"
-      }
+      "marginBottom-title-ModalDialog": "0"
     }
   },
   "NavGroup": {
@@ -6480,11 +9435,36 @@ export default {
         "description": "This property sets the label of the component.",
         "valueType": "string"
       },
-      "icon": {
-        "description": "This property defines an optional icon to display along with the `NavGroup` label."
+      "initiallyExpanded": {
+        "description": "This property defines whether the group is initially expanded or collapsed."
       },
       "to": {
-        "description": "This property defines an optional navigation link."
+        "description": "This property defines an optional navigation link.",
+        "valueType": "string"
+      },
+      "icon": {
+        "description": "This property defines an optional icon to display along with the `NavGroup` label.",
+        "valueType": "string"
+      },
+      "iconHorizontalExpanded": {
+        "description": "Set a custom icon to display when the navigation menu is expanded, is in a **horizontal** app layout, and is in a navigation submenu.",
+        "valueType": "string",
+        "defaultValue": "chevronleft"
+      },
+      "iconVerticalExpanded": {
+        "description": "Set a custom icon to display when the navigation menu is expanded, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
+        "valueType": "string",
+        "defaultValue": "chevrondown"
+      },
+      "iconHorizontalCollapsed": {
+        "description": "Set a custom icon to display when the navigation menu is collapsed, is in a **horizontal** app layout, and is in a navigation submenu.",
+        "valueType": "string",
+        "defaultValue": "chevronright"
+      },
+      "iconVerticalCollapsed": {
+        "description": "Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
+        "valueType": "string",
+        "defaultValue": "chevronright"
       }
     },
     "themeVars": {
@@ -6611,6 +9591,7 @@ export default {
       "backgroundColor-NavLink--pressed": "var(--xmlui-backgroundColor-NavLink--pressed)",
       "backgroundColor-NavLink--pressed--active": "var(--xmlui-backgroundColor-NavLink--pressed--active)",
       "fontSize-NavLink": "var(--xmlui-fontSize-NavLink)",
+      "wordWrap-NavLink": "var(--xmlui-wordWrap-NavLink)",
       "textColor-NavLink": "var(--xmlui-textColor-NavLink)",
       "textColor-NavLink--hover": "var(--xmlui-textColor-NavLink--hover)",
       "textColor-NavLink--active": "var(--xmlui-textColor-NavLink--active)",
@@ -6633,6 +9614,9 @@ export default {
       "outlineStyle-NavLink--focus": "var(--xmlui-outlineStyle-NavLink--focus)",
       "outlineOffset-NavLink--focus": "var(--xmlui-outlineOffset-NavLink--focus)"
     },
+    "themeVarDescriptions": {
+      "color-indicator-NavLink": "Provides the following states: `--hover`, `--active`, `--pressed`"
+    },
     "defaultThemeVars": {
       "border-NavLink": "0px solid $borderColor",
       "borderRadius-NavLink": "$borderRadius",
@@ -6650,20 +9634,10 @@ export default {
       "outlineStyle-NavLink--focus": "$outlineStyle--focus",
       "outlineOffset-NavLink--focus": "-1px",
       "borderRadius-indicator-NavLink": "$borderRadius",
-      "light": {
-        "color-icon-NavLink": "$color-surface-500",
-        "color-indicator-NavLink--active": "$color-primary-500",
-        "color-indicator-NavLink--pressed": "$color-primary-500",
-        "color-indicator-NavLink--hover": "$color-primary-600"
-      },
-      "dark": {
-        "color-indicator-NavLink--active": "$color-primary-500",
-        "color-indicator-NavLink--pressed": "$color-primary-500",
-        "color-indicator-NavLink--hover": "$color-primary-400"
-      }
-    },
-    "themeVarDescriptions": {
-      "color-indicator-NavLink": "Provides the following states: `--hover`, `--active`, `--pressed`"
+      "color-icon-NavLink": "$color-surface-500",
+      "color-indicator-NavLink--active": "$color-primary-500",
+      "color-indicator-NavLink--pressed": "$color-primary-500",
+      "color-indicator-NavLink--hover": "$color-primary-600"
     }
   },
   "NavPanel": {
@@ -6709,8 +9683,6 @@ export default {
       "borderEndEndRadius-NavPanel": "var(--xmlui-borderEndEndRadius-NavPanel, var(--xmlui-borderRadius-NavPanel))",
       "backgroundColor-NavPanel": "var(--xmlui-backgroundColor-NavPanel)",
       "boxShadow-NavPanel": "var(--xmlui-boxShadow-NavPanel)",
-      "height-AppHeader": "var(--xmlui-height-AppHeader)",
-      "maxWidth-content-App": "var(--xmlui-maxWidth-content-App)",
       "padding-NavPanel": "var(--xmlui-padding-NavPanel)",
       "paddingHorizontal-NavPanel": "var(--xmlui-paddingHorizontal-NavPanel)",
       "paddingVertical-NavPanel": "var(--xmlui-paddingVertical-NavPanel, var(--xmlui-padding-NavPanel))",
@@ -6726,22 +9698,21 @@ export default {
       "paddingTop-logo-NavPanel": "var(--xmlui-paddingTop-logo-NavPanel, var(--xmlui-paddingVertical-logo-NavPanel, var(--xmlui-padding-logo-NavPanel)))",
       "paddingBottom-logo-NavPanel": "var(--xmlui-paddingBottom-logo-NavPanel, var(--xmlui-paddingVertical-logo-NavPanel, var(--xmlui-padding-logo-NavPanel)))",
       "marginBottom-logo-NavPanel": "var(--xmlui-marginBottom-logo-NavPanel)",
+      "color-scrollbar-NavPanel": "var(--xmlui-color-scrollbar-NavPanel)",
+      "backgroundColor-scrollbar-NavPanel": "var(--xmlui-backgroundColor-scrollbar-NavPanel)",
+      "maxWidth-content-App": "var(--xmlui-maxWidth-content-App)",
+      "height-AppHeader": "var(--xmlui-height-AppHeader)",
       "paddingVertical-AppHeader": "var(--xmlui-paddingVertical-AppHeader)",
       "align-content-AppHeader": "var(--xmlui-align-content-AppHeader)"
     },
     "defaultThemeVars": {
-      "backgroundColor-NavPanel": "transparent",
+      "backgroundColor-NavPanel": "$backgroundColor",
       "border-NavPanel": "0px solid $borderColor",
-      "paddingHorizontal-NavPanel": "$space-4",
+      "paddingHorizontal-NavPanel": "0",
       "paddingVertical-logo-NavPanel": "$space-4",
       "paddingHorizontal-logo-NavPanel": "$space-4",
       "marginBottom-logo-NavPanel": "$space-4",
-      "light": {
-        "boxShadow-NavPanel-vertical": "4px 0 4px 0 rgb(0 0 0 / 10%)"
-      },
-      "dark": {
-        "boxShadow-NavPanel-vertical": "4px 0 6px 0 rgba(0, 0, 0, 0.2)"
-      }
+      "boxShadow-NavPanel-vertical": "4px 0 4px 0 rgb(0 0 0 / 10%)"
     }
   },
   "NoResult": {
@@ -6813,8 +9784,8 @@ export default {
     }
   },
   "NumberBox": {
-    "description": "A `NumberBox` component allows users to input numeric values: either integer or floating point numbers. It also accepts empty values, where the stored value will be of type `null`.",
     "status": "experimental",
+    "description": "A `NumberBox` component allows users to input numeric values: either integer or floating point numbers. It also accepts empty values, where the stored value will be of type `null`.",
     "props": {
       "placeholder": {
         "description": "A placeholder text that is visible in the input field when its empty.",
@@ -6914,6 +9885,9 @@ export default {
         "description": "This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
+      "gap": {
+        "description": "This property defines the gap between the adornments and the input area."
+      },
       "hasSpinBox": {
         "description": "This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.",
         "valueType": "boolean",
@@ -6964,6 +9938,7 @@ export default {
       }
     },
     "themeVars": {
+      "Input:gap-adornment-NumberBox": "var(--xmlui-gap-adornment-NumberBox)",
       "Input:borderRadius-NumberBox-default": "var(--xmlui-borderRadius-NumberBox-default)",
       "Input:borderColor-NumberBox-default": "var(--xmlui-borderColor-NumberBox-default)",
       "Input:borderWidth-NumberBox-default": "var(--xmlui-borderWidth-NumberBox-default)",
@@ -7057,138 +10032,6 @@ export default {
       "Input:borderColor-NumberBox--disabled": "var(--xmlui-borderColor-NumberBox--disabled)"
     }
   },
-  "OffCanvas": {
-    "description": "(**NOT IMPLEMENTED YET**) The `OffCanvas` component is a hidden panel that slides into view from the side of the screen. It helps display additional content or navigation without disrupting the main interface.",
-    "status": "in progress",
-    "props": {
-      "title": {
-        "description": "This property sets the title of the component.",
-        "availableValues": null,
-        "valueType": "string"
-      },
-      "isInitiallyOpen": {
-        "description": "This property indicates if the component is initially open.",
-        "availableValues": null,
-        "valueType": "boolean",
-        "defaultValue": false
-      },
-      "enableBackdrop": {
-        "description": "This property indicates if the backdrop is enabled when the component is displayed. When the backdrop is not enabled, clicking outside `OffCanvas` will not close it.",
-        "availableValues": null,
-        "valueType": "boolean",
-        "defaultValue": true
-      },
-      "enableBodyScroll": {
-        "description": "This property indicates if the body scroll is enabled when the component is displayed.",
-        "availableValues": null,
-        "valueType": "boolean",
-        "defaultValue": false
-      },
-      "noCloseOnBackdropClick": {
-        "description": "When this property is set to `true`, the OffCanvas does not close when the user clicks on its backdrop.",
-        "availableValues": null,
-        "valueType": "boolean",
-        "defaultValue": false
-      },
-      "placement": {
-        "description": "This property indicates the position where the OffCanvas should be docked to.",
-        "availableValues": [
-          {
-            "value": "start",
-            "description": "The left side of the window (left-to-right) or the right side of the window (right-to-left)"
-          },
-          {
-            "value": "end",
-            "description": "The right side of the window (left-to-right) or the left side of the window (right-to-left)"
-          },
-          {
-            "value": "top",
-            "description": "The top of the window"
-          },
-          {
-            "value": "bottom",
-            "description": "The bottom of the window"
-          }
-        ]
-      },
-      "autoCloseInMs": {
-        "description": "This property sets a timeout. When the timeout expires, the component gets hidden."
-      }
-    },
-    "events": {
-      "didOpen": {
-        "description": "This event is triggered when the OffCanvas has been displayed. The event handler has a single boolean argument set to `true`, indicating that the user opened the component."
-      },
-      "didClose": {
-        "description": "This event is triggered when the OffCanvas has been closed. The event handler has a single boolean argument set to `true`, indicating that the user closed the component."
-      }
-    },
-    "apis": {
-      "open": {
-        "description": "This method opens the component. It triggers the `didOpen` event  with the argument set to `false`."
-      },
-      "close": {
-        "description": "This method closes the component. It triggers the `didClose` event with the argument set to `false`."
-      }
-    },
-    "themeVars": {
-      "border-OffCanvas": "var(--xmlui-border-OffCanvas)",
-      "borderHorizontal-OffCanvas": "var(--xmlui-borderHorizontal-OffCanvas, var(--xmlui-border-OffCanvas))",
-      "borderVertical-OffCanvas": "var(--xmlui-borderVertical-OffCanvas, var(--xmlui-border-OffCanvas))",
-      "borderLeft-OffCanvas": "var(--xmlui-borderLeft-OffCanvas, var(--xmlui-borderHorizontal-OffCanvas, var(--xmlui-border-OffCanvas)))",
-      "borderRight-OffCanvas": "var(--xmlui-borderRight-OffCanvas, var(--xmlui-borderHorizontal-OffCanvas, var(--xmlui-border-OffCanvas)))",
-      "borderTop-OffCanvas": "var(--xmlui-borderTop-OffCanvas, var(--xmlui-borderVertical-OffCanvas, var(--xmlui-border-OffCanvas)))",
-      "borderBottom-OffCanvas": "var(--xmlui-borderBottom-OffCanvas, var(--xmlui-borderVertical-OffCanvas, var(--xmlui-border-OffCanvas)))",
-      "borderWidth-OffCanvas": "var(--xmlui-borderWidth-OffCanvas)",
-      "borderHorizontalWidth-OffCanvas": "var(--xmlui-borderHorizontalWidth-OffCanvas, var(--xmlui-borderWidth-OffCanvas))",
-      "borderLeftWidth-OffCanvas": "var(--xmlui-borderLeftWidth-OffCanvas, var(--xmlui-borderHorizontalWidth-OffCanvas, var(--xmlui-borderWidth-OffCanvas)))",
-      "borderRightWidth-OffCanvas": "var(--xmlui-borderRightWidth-OffCanvas, var(--xmlui-borderHorizontalWidth-OffCanvas, var(--xmlui-borderWidth-OffCanvas)))",
-      "borderVerticalWidth-OffCanvas": "var(--xmlui-borderVerticalWidth-OffCanvas, var(--xmlui-borderWidth-OffCanvas))",
-      "borderTopWidth-OffCanvas": "var(--xmlui-borderTopWidth-OffCanvas, var(--xmlui-borderVerticalWidth-OffCanvas, var(--xmlui-borderWidth-OffCanvas)))",
-      "borderBottomWidth-OffCanvas": "var(--xmlui-borderBottomWidth-OffCanvas, var(--xmlui-borderVerticalWidth-OffCanvas, var(--xmlui-borderWidth-OffCanvas)))",
-      "borderStyle-OffCanvas": "var(--xmlui-borderStyle-OffCanvas)",
-      "borderHorizontalStyle-OffCanvas": "var(--xmlui-borderHorizontalStyle-OffCanvas, var(--xmlui-borderStyle-OffCanvas))",
-      "borderLeftStyle-OffCanvas": "var(--xmlui-borderLeftStyle-OffCanvas, var(--xmlui-borderHorizontalStyle-OffCanvas, var(--xmlui-borderStyle-OffCanvas)))",
-      "borderRightStyle-OffCanvas": "var(--xmlui-borderRightStyle-OffCanvas, var(--xmlui-borderHorizontalStyle-OffCanvas, var(--xmlui-borderStyle-OffCanvas)))",
-      "borderVerticalStyle-OffCanvas": "var(--xmlui-borderVerticalStyle-OffCanvas, var(--xmlui-borderStyle-OffCanvas))",
-      "borderTopStyle-OffCanvas": "var(--xmlui-borderTopStyle-OffCanvas, var(--xmlui-borderVerticalStyle-OffCanvas, var(--xmlui-borderStyle-OffCanvas)))",
-      "borderBottomStyle-OffCanvas": "var(--xmlui-borderBottomStyle-OffCanvas, var(--xmlui-borderVerticalStyle-OffCanvas, var(--xmlui-borderStyle-OffCanvas)))",
-      "borderColor-OffCanvas": "var(--xmlui-borderColor-OffCanvas)",
-      "borderHorizontalColor-OffCanvas": "var(--xmlui-borderHorizontalColor-OffCanvas, var(--xmlui-borderColor-OffCanvas))",
-      "borderLeftColor-OffCanvas": "var(--xmlui-borderLeftColor-OffCanvas, var(--xmlui-borderHorizontalColor-OffCanvas, var(--xmlui-borderColor-OffCanvas)))",
-      "borderRightColor-OffCanvas": "var(--xmlui-borderRightColor-OffCanvas, var(--xmlui-borderHorizontalColor-OffCanvas, var(--xmlui-borderColor-OffCanvas)))",
-      "borderVerticalColor-OffCanvas": "var(--xmlui-borderVerticalColor-OffCanvas, var(--xmlui-borderColor-OffCanvas))",
-      "borderTopColor-OffCanvas": "var(--xmlui-borderTopColor-OffCanvas, var(--xmlui-borderVerticalColor-OffCanvas, var(--xmlui-borderColor-OffCanvas)))",
-      "borderBottomColor-OffCanvas": "var(--xmlui-borderBottomColor-OffCanvas, var(--xmlui-borderVerticalColor-OffCanvas, var(--xmlui-borderColor-OffCanvas)))",
-      "borderStartStartRadius-OffCanvas": "var(--xmlui-borderStartStartRadius-OffCanvas, var(--xmlui-borderRadius-OffCanvas))",
-      "borderStartEndRadius-OffCanvas": "var(--xmlui-borderStartEndRadius-OffCanvas, var(--xmlui-borderRadius-OffCanvas))",
-      "borderEndStartRadius-OffCanvas": "var(--xmlui-borderEndStartRadius-OffCanvas, var(--xmlui-borderRadius-OffCanvas))",
-      "borderEndEndRadius-OffCanvas": "var(--xmlui-borderEndEndRadius-OffCanvas, var(--xmlui-borderRadius-OffCanvas))",
-      "padding-OffCanvas": "var(--xmlui-padding-OffCanvas)",
-      "paddingHorizontal-OffCanvas": "var(--xmlui-paddingHorizontal-OffCanvas, var(--xmlui-padding-OffCanvas))",
-      "paddingVertical-OffCanvas": "var(--xmlui-paddingVertical-OffCanvas, var(--xmlui-padding-OffCanvas))",
-      "paddingLeft-OffCanvas": "var(--xmlui-paddingLeft-OffCanvas, var(--xmlui-paddingHorizontal-OffCanvas, var(--xmlui-padding-OffCanvas)))",
-      "paddingRight-OffCanvas": "var(--xmlui-paddingRight-OffCanvas, var(--xmlui-paddingHorizontal-OffCanvas, var(--xmlui-padding-OffCanvas)))",
-      "paddingTop-OffCanvas": "var(--xmlui-paddingTop-OffCanvas, var(--xmlui-paddingVertical-OffCanvas, var(--xmlui-padding-OffCanvas)))",
-      "paddingBottom-OffCanvas": "var(--xmlui-paddingBottom-OffCanvas, var(--xmlui-paddingVertical-OffCanvas, var(--xmlui-padding-OffCanvas)))",
-      "boxShadow-vertical-OffCanvas": "var(--xmlui-boxShadow-vertical-OffCanvas)",
-      "boxShadow-horizontal-OffCanvas": "var(--xmlui-boxShadow-horizontal-OffCanvas)",
-      "backgroundColor-OffCanvas": "var(--xmlui-backgroundColor-OffCanvas)",
-      "width-OffCanvas": "var(--xmlui-width-OffCanvas)",
-      "marginBottom-title-OffCanvas": "var(--xmlui-marginBottom-title-OffCanvas)"
-    },
-    "defaultThemeVars": {
-      "width-OffCanvas": "600px",
-      "padding-OffCanvas": "$padding-tight",
-      "paddingVertical-OffCanvas": "$padding-tight",
-      "paddingHorizontal-OffCanvas": "$padding-normal",
-      "backgroundColor-OffCanvas": "$backgroundColor",
-      "boxShadow-horizontal-OffCanvas": "0 2px 10px rgba(0, 0, 0, 0.2)",
-      "boxShadow-vertical-OffCanvas": "0 2px 10px rgba(0, 0, 0, 0.2)",
-      "light": {},
-      "dark": {}
-    }
-  },
   "Option": {
     "description": "`Option` is a non-visual component describing a selection option. Other components (such as `Select`, `AutoComplete`, and others) may use nested `Option` instances from which the user can select.",
     "props": {
@@ -7206,7 +10049,8 @@ export default {
       "optionTemplate": {
         "description": "This property is used to define a custom option template"
       }
-    }
+    },
+    "childrenAsTemplate": "optionTemplate"
   },
   "PageMetaTitle": {
     "description": "A PageMetaTitle component allows setting up (or changing) the app title to display with the current browser tab.",
@@ -7217,14 +10061,14 @@ export default {
     }
   },
   "Page": {
-    "description": "The `Page` component defines what content is displayed when the user navigates to a particular URL that is associated with the page.",
     "status": "stable",
+    "docFolder": "Page",
+    "description": "The `Page` component defines what content is displayed when the user navigates to a particular URL that is associated with the page.",
     "props": {
       "url": {
         "description": "The URL of the route associated with the content."
       }
-    },
-    "docFolder": "Page"
+    }
   },
   "Pages": {
     "description": "The `Pages` component is used as a container for [`Page`](./Page.mdx) components within an [`App`](./App.mdx).",
@@ -7235,8 +10079,8 @@ export default {
     }
   },
   "PositionedContainer": {
-    "description": "(**OBSOLETE**) This component was created for the ChatEngine app.",
     "status": "deprecated",
+    "description": "(**OBSOLETE**) This component was created for the ChatEngine app.",
     "props": {
       "visibleOnHover": {
         "description": "No description"
@@ -7264,14 +10108,8 @@ export default {
       "borderRadius-ProgressBar": "$borderRadius",
       "borderRadius-indicator-ProgressBar": "0px",
       "thickness-ProgressBar": "$space-2",
-      "light": {
-        "backgroundColor-ProgressBar": "$color-surface-200",
-        "color-indicator-ProgressBar": "$color-primary-500"
-      },
-      "dark": {
-        "backgroundColor-ProgressBar": "$color-surface-700",
-        "color-indicator-ProgressBar": "$color-primary-500"
-      }
+      "backgroundColor-ProgressBar": "$color-surface-200",
+      "color-indicator-ProgressBar": "$color-primary-500"
     }
   },
   "Queue": {
@@ -7287,6 +10125,7 @@ export default {
         "description": "This property indicates the completed items (successful or error) should be removed from the queue after completion."
       }
     },
+    "nonVisual": true,
     "events": {
       "willProcess": {
         "description": "This event is triggered to process a particular item."
@@ -7302,14 +10141,6 @@ export default {
       },
       "complete": {
         "description": "The queue fires this event when the queue gets empty after processing all items. The event handler has no arguments."
-      }
-    },
-    "contextVars": {
-      "$completedItems": {
-        "description": "A list containing the queue items that have been completed (fully processed)."
-      },
-      "$queuedItems": {
-        "description": "A list containing the items waiting in the queue, icluding the completed items."
       }
     },
     "apis": {
@@ -7329,7 +10160,14 @@ export default {
         "description": "This method retrieves the current queue length. The queue contains only those items that are not fully processed yet."
       }
     },
-    "nonVisual": true
+    "contextVars": {
+      "$completedItems": {
+        "description": "A list containing the queue items that have been completed (fully processed)."
+      },
+      "$queuedItems": {
+        "description": "A list containing the items waiting in the queue, icluding the completed items."
+      }
+    }
   },
   "RadioGroup": {
     "description": "The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](./RadioGroupOption.mdx) components) that allow users to select only one option from the group at a time.",
@@ -7463,23 +10301,15 @@ export default {
       "textColor-RadioGroupOption-error": "$borderColor-RadioGroupOption-error",
       "textColor-RadioGroupOption-warning": "$borderColor-RadioGroupOption-warning",
       "textColor-RadioGroupOption-success": "$borderColor-RadioGroupOption-success",
-      "light": {
-        "backgroundColor-checked-RadioGroupOption-default": "$color-primary-500",
-        "borderColor-RadioGroupOption-default": "$color-surface-500",
-        "borderColor-RadioGroupOption-default--hover": "$color-surface-700",
-        "borderColor-RadioGroupOption-default--active": "$color-primary-500"
-      },
-      "dark": {
-        "backgroundColor-checked-RadioGroupOption-default": "$color-primary-500",
-        "borderColor-RadioGroupOption-default": "$color-surface-500",
-        "borderColor-RadioGroupOption-default--hover": "$color-surface-300",
-        "borderColor-RadioGroupOption-default--active": "$color-primary-400"
-      }
+      "backgroundColor-checked-RadioGroupOption-default": "$color-primary-500",
+      "borderColor-RadioGroupOption-default": "$color-surface-500",
+      "borderColor-RadioGroupOption-default--hover": "$color-surface-700",
+      "borderColor-RadioGroupOption-default--active": "$color-primary-500"
     }
   },
   "RealTimeAdapter": {
-    "description": "`RealTimeAdapter` is a non-visual component that listens to real-time events through long-polling.",
     "status": "experimental",
+    "description": "`RealTimeAdapter` is a non-visual component that listens to real-time events through long-polling.",
     "props": {
       "url": {
         "description": "This property specifies the URL to use for long-polling."
@@ -7589,6 +10419,10 @@ export default {
         "description": "This property allows replacing the default template to display an option in the dropdown list.",
         "valueType": "ComponentDef"
       },
+      "optionTemplate": {
+        "description": "This property allows replacing the default template to display an option in the dropdown list.",
+        "valueType": "ComponentDef"
+      },
       "valueTemplate": {
         "description": "This property allows replacing the default template to display a selected value when multiple selections (`multiSelect` is `true`) are enabled.",
         "valueType": "ComponentDef"
@@ -7606,6 +10440,12 @@ export default {
       },
       "searchable": {
         "description": "This property enables the search functionality in the dropdown list."
+      },
+      "inProgress": {
+        "description": "This property indicates whether the component is in progress. It can be used to show a loading message."
+      },
+      "inProgressNotificationMessage": {
+        "description": "This property indicates the message to display when the component is in progress."
       }
     },
     "events": {
@@ -7619,14 +10459,6 @@ export default {
         "description": "This event is triggered when value of Select has changed."
       }
     },
-    "contextVars": {
-      "$item": {
-        "description": "This property represents the value of an item in the dropdown list."
-      },
-      "$itemContext": {
-        "description": "This property provides a `removeItem` method to delete the particular value from the selection."
-      }
-    },
     "apis": {
       "focus": {
         "description": "This method sets the focus on the Select."
@@ -7636,9 +10468,27 @@ export default {
       },
       "value": {
         "description": "You can query the component's value. If no value is set, it will retrieve `undefined`."
+      },
+      "reset": {
+        "description": "This method resets the component to its initial value, or clears the selection if no initial value was provided."
+      }
+    },
+    "contextVars": {
+      "$item": {
+        "description": "This property represents the value of an item in the dropdown list."
+      },
+      "$itemContext": {
+        "description": "This property provides a `removeItem` method to delete the particular value from the selection."
       }
     },
     "themeVars": {
+      "padding-item-Select": "var(--xmlui-padding-item-Select)",
+      "paddingHorizontal-item-Select": "var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-padding-item-Select))",
+      "paddingVertical-item-Select": "var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select))",
+      "paddingLeft-item-Select": "var(--xmlui-paddingLeft-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-padding-item-Select)))",
+      "paddingRight-item-Select": "var(--xmlui-paddingRight-item-Select, var(--xmlui-paddingHorizontal-item-Select, var(--xmlui-padding-item-Select)))",
+      "paddingTop-item-Select": "var(--xmlui-paddingTop-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select)))",
+      "paddingBottom-item-Select": "var(--xmlui-paddingBottom-item-Select, var(--xmlui-paddingVertical-item-Select, var(--xmlui-padding-item-Select)))",
       "Input:fontSize-Select-default": "var(--xmlui-fontSize-Select-default)",
       "Input:textColor-placeholder-Select-default": "var(--xmlui-textColor-placeholder-Select-default)",
       "Input:textColor-Select-default": "var(--xmlui-textColor-Select-default)",
@@ -7734,7 +10584,7 @@ export default {
       "textColor-indicator-Select": "var(--xmlui-textColor-indicator-Select)"
     },
     "defaultThemeVars": {
-      "backgroundColor-menu-Select": "$backgroundColor-primary",
+      "backgroundColor-menu-Select": "$color-surface-raised",
       "boxShadow-menu-Select": "$boxShadow-md",
       "borderRadius-menu-Select": "$borderRadius",
       "borderWidth-menu-Select": "1px",
@@ -7747,25 +10597,19 @@ export default {
       "fontSize-Select-badge": "$fontSize-small",
       "paddingHorizontal-Select-badge": "$space-1",
       "paddingVertical-Select-badge": "$space-1",
+      "paddingHorizontal-item-Select": "$space-2",
+      "paddingVertical-item-Select": "$space-2",
       "opacity-text-item-Select--disabled": "0.5",
       "opacity-Select--disabled": "0.5",
-      "light": {
-        "backgroundColor-Select-badge--hover": "$color-primary-400",
-        "backgroundColor-Select-badge--active": "$color-primary-500",
-        "textColor-item-Select--disabled": "$color-surface-200",
-        "textColor-Select-badge": "$color-surface-50"
-      },
-      "dark": {
-        "backgroundColor-Select-badge--hover": "$color-primary-600",
-        "backgroundColor-Select-badge--active": "$color-primary-500",
-        "textColor-Select-badge": "$color-surface-50",
-        "textColor-item-Select--disabled": "$color-surface-800"
-      }
+      "backgroundColor-Select-badge--hover": "$color-primary-400",
+      "backgroundColor-Select-badge--active": "$color-primary-500",
+      "textColor-item-Select--disabled": "$color-surface-200",
+      "textColor-Select-badge": "$color-surface-50"
     }
   },
   "SelectionStore": {
-    "description": "The `SelectionStore` is a non-visual component that may wrap components (items) and manage their selection state to accommodate the usage of other actions.",
     "status": "deprecated",
+    "description": "The `SelectionStore` is a non-visual component that may wrap components (items) and manage their selection state to accommodate the usage of other actions.",
     "props": {
       "idKey": {
         "description": "The selected items in the selection store needs to have a unique ID to use as an unambiguous key for that particular item. This property uniquely identifies the selected object item via a given property. By default, the key attribute is `\"id\"`."
@@ -7773,8 +10617,8 @@ export default {
     }
   },
   "Slider": {
-    "description": "The `Slider` component allows you to select a numeric value between a range specified by minimum and maximum values.",
     "status": "experimental",
+    "description": "The `Slider` component allows you to select a numeric value between a range specified by minimum and maximum values.",
     "props": {
       "initialValue": {
         "description": "This property sets the component's initial value."
@@ -7872,7 +10716,18 @@ export default {
         "description": "This property allows you to apply custom styles to the range element of the slider."
       },
       "thumbStyle": {
-        "description": "This property allows yout top apply custom styles to the thumb elements of the slider."
+        "description": "This property allows you to apply custom styles to the thumb elements of the slider."
+      },
+      "showValues": {
+        "description": "This property controls whether the slider shows the current values of the thumbs.",
+        "availableValues": null,
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "valueFormat": {
+        "description": "This property allows you to customize how the values are displayed.",
+        "availableValues": null,
+        "valueType": "any"
       }
     },
     "events": {
@@ -7952,13 +10807,24 @@ export default {
       "borderColor-thumb-Slider": "$color-surface-50",
       "backgroundColor-thumb-Slider": "$color-primary",
       "boxShadow-thumb-Slider": "$boxShadow-md",
+      "boxShadow-thumb-Slider--hover": "$boxShadow-lg",
+      "boxShadow-thumb-Slider--focus": "$boxShadow-xl",
+      "borderRadius-Slider-default": "$borderRadius",
+      "borderColor-Slider-default": "transparent",
+      "borderWidth-Slider-default": "0",
+      "borderStyle-Slider-default": "solid",
+      "boxShadow-Slider-default": "none",
       "light": {
         "backgroundColor-track-Slider--disabled": "$color-surface-300",
-        "backgroundColor-range-Slider--disabled": "$color-surface-400"
+        "backgroundColor-range-Slider--disabled": "$color-surface-400",
+        "backgroundColor-thumb-Slider": "$color-primary-500",
+        "borderColor-thumb-Slider": "$color-surface-50"
       },
       "dark": {
         "backgroundColor-track-Slider--disabled": "$color-surface-600",
-        "backgroundColor-range-Slider--disabled": "$color-surface-800"
+        "backgroundColor-range-Slider--disabled": "$color-surface-800",
+        "backgroundColor-thumb-Slider": "$color-primary-400",
+        "borderColor-thumb-Slider": "$color-surface-950"
       }
     }
   },
@@ -7978,9 +10844,6 @@ export default {
         "description": "If set to `true`, the component will be rendered in a full screen container.",
         "valueType": "boolean",
         "defaultValue": false
-      },
-      "themeColor": {
-        "description": "(**NOT IMPLEMENTED YET**) The theme color of the component."
       }
     },
     "themeVars": {
@@ -7991,12 +10854,7 @@ export default {
     "defaultThemeVars": {
       "size-Spinner": "$space-10",
       "thickness-Spinner": "$space-0_5",
-      "light": {
-        "borderColor-Spinner": "$color-surface-400"
-      },
-      "dark": {
-        "borderColor-Spinner": "$color-surface-600"
-      }
+      "borderColor-Spinner": "$color-surface-400"
     }
   },
   "Splitter": {
@@ -8068,7 +10926,6 @@ export default {
   },
   "HSplitter": {
     "description": "The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.",
-    "specializedFrom": "Splitter",
     "props": {
       "swapped": {
         "description": "This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.",
@@ -8132,11 +10989,11 @@ export default {
       "thickness-resizer-Splitter": "5px",
       "cursor-resizer-horizontal-Splitter": "ew-resize",
       "cursor-resizer-vertical-Splitter": "ns-resize"
-    }
+    },
+    "specializedFrom": "Splitter"
   },
   "VSplitter": {
     "description": "The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.",
-    "specializedFrom": "Splitter",
     "props": {
       "swapped": {
         "description": "This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.",
@@ -8200,7 +11057,8 @@ export default {
       "thickness-resizer-Splitter": "5px",
       "cursor-resizer-horizontal-Splitter": "ew-resize",
       "cursor-resizer-vertical-Splitter": "ns-resize"
-    }
+    },
+    "specializedFrom": "Splitter"
   },
   "Stack": {
     "description": "`Stack` is a layout container displaying children in a horizontal or vertical stack.",
@@ -8271,7 +11129,6 @@ export default {
   },
   "CHStack": {
     "description": "This component represents a stack that renders its contents horizontally and aligns that in the center along both axes.",
-    "specializedFrom": "Stack",
     "props": {
       "gap": {
         "description": "Optional size value indicating the gap between child elements.",
@@ -8335,11 +11192,11 @@ export default {
         "isInternal": true
       }
     },
-    "themeVars": []
+    "themeVars": [],
+    "specializedFrom": "Stack"
   },
   "CVStack": {
     "description": "This component represents a stack that renders its contents vertically and aligns that in the center along both axes.",
-    "specializedFrom": "Stack",
     "props": {
       "gap": {
         "description": "Optional size value indicating the gap between child elements.",
@@ -8403,11 +11260,11 @@ export default {
         "isInternal": true
       }
     },
-    "themeVars": []
+    "themeVars": [],
+    "specializedFrom": "Stack"
   },
   "HStack": {
     "description": "This component represents a stack rendering its contents horizontally.",
-    "specializedFrom": "Stack",
     "props": {
       "gap": {
         "description": "Optional size value indicating the gap between child elements.",
@@ -8471,11 +11328,11 @@ export default {
         "isInternal": true
       }
     },
-    "themeVars": []
+    "themeVars": [],
+    "specializedFrom": "Stack"
   },
   "VStack": {
     "description": "This component represents a stack rendering its contents vertically.",
-    "specializedFrom": "Stack",
     "props": {
       "gap": {
         "description": "Optional size value indicating the gap between child elements.",
@@ -8539,11 +11396,12 @@ export default {
         "isInternal": true
       }
     },
-    "themeVars": []
+    "themeVars": [],
+    "specializedFrom": "Stack"
   },
   "StickyBox": {
-    "description": "The `StickyBox` is a component that \"sticks\" or remains fixed at the top or bottom position on the screen as the user scrolls.",
     "status": "experimental",
+    "description": "The `StickyBox` is a component that \"sticks\" or remains fixed at the top or bottom position on the screen as the user scrolls.",
     "props": {
       "to": {
         "description": "This property determines whether the StickyBox should be anchored to the `top` or `bottom`.",
@@ -8736,22 +11594,12 @@ export default {
       "backgroundColor-checked-Switch-warning": "$borderColor-Switch-warning",
       "borderColor-checked-Switch-success": "$borderColor-Switch-success",
       "backgroundColor-checked-Switch-success": "$borderColor-Switch-success",
-      "light": {
-        "backgroundColor-Switch": "$color-surface-400",
-        "borderColor-Switch": "$color-surface-400",
-        "backgroundColor-indicator-Switch": "$backgroundColor-primary",
-        "borderColor-checked-Switch": "$color-primary-500",
-        "backgroundColor-checked-Switch": "$color-primary-500",
-        "backgroundColor-Switch--disabled": "$color-surface-200"
-      },
-      "dark": {
-        "backgroundColor-Switch": "$color-surface-500",
-        "borderColor-Switch": "$color-surface-500",
-        "backgroundColor-indicator-Switch": "$backgroundColor-primary",
-        "borderColor-checked-Switch": "$color-primary-400",
-        "backgroundColor-checked-Switch": "$color-primary-400",
-        "backgroundColor-Switch--disabled": "$color-surface-800"
-      }
+      "backgroundColor-Switch": "$color-surface-400",
+      "borderColor-Switch": "$color-surface-400",
+      "backgroundColor-indicator-Switch": "$backgroundColor-primary",
+      "borderColor-checked-Switch": "$color-primary-500",
+      "backgroundColor-checked-Switch": "$color-primary-500",
+      "backgroundColor-Switch--disabled": "$color-surface-200"
     }
   },
   "Table": {
@@ -8820,6 +11668,11 @@ export default {
       },
       "alwaysShowSelectionHeader": {
         "description": "This property indicates when the row selection header is displayed. When the value is `true,` the selection header is always visible. Otherwise, it is displayed only when hovered.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "noBottomBorder": {
+        "description": "This property indicates whether the table should have a bottom border. When set to `true`, the table does not have a bottom border. Otherwise, it has a bottom border.",
         "valueType": "boolean",
         "defaultValue": false
       }
@@ -8937,32 +11790,21 @@ export default {
       "fontWeight-heading-Table": "$fontWeight-bold",
       "textTransform-heading-Table": "uppercase",
       "fontSize-row-Table": "$fontSize-small",
-      "backgroundColor-Table": "$backgroundColor",
-      "backgroundColor-row-Table": "inherit",
       "backgroundColor-selected-Table--hover": "$backgroundColor-row-Table--hover",
       "backgroundColor-pagination-Table": "$backgroundColor-Table",
       "outlineColor-heading-Table--focus": "$outlineColor--focus",
       "textColor-pagination-Table": "$color-secondary",
-      "light": {
-        "backgroundColor-row-Table--hover": "$color-primary-50",
-        "backgroundColor-selected-Table": "$color-primary-100",
-        "backgroundColor-heading-Table--hover": "$color-surface-200",
-        "backgroundColor-heading-Table--active": "$color-surface-300",
-        "backgroundColor-heading-Table": "$color-surface-100",
-        "textColor-heading-Table": "$color-surface-500"
-      },
-      "dark": {
-        "backgroundColor-row-Table--hover": "$color-primary-900",
-        "backgroundColor-selected-Table": "$color-primary-800",
-        "backgroundColor-heading-Table--hover": "$color-surface-800",
-        "backgroundColor-heading-Table": "$color-surface-950",
-        "backgroundColor-heading-Table--active": "$color-surface-700"
-      }
+      "backgroundColor-row-Table--hover": "$color-primary-50",
+      "backgroundColor-selected-Table": "$color-primary-100",
+      "backgroundColor-heading-Table--hover": "$color-surface-200",
+      "backgroundColor-heading-Table--active": "$color-surface-300",
+      "backgroundColor-heading-Table": "$color-surface-100",
+      "textColor-heading-Table": "$color-surface-500"
     }
   },
   "TableOfContents": {
-    "description": "The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position.",
     "status": "experimental",
+    "description": "The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position.",
     "props": {
       "smoothScrolling": {
         "description": "This property indicates that smooth scrolling is used while scrolling the selected table of contents items into view.",
@@ -8983,6 +11825,32 @@ export default {
       "paddingRight-TableOfContentsItem": "var(--xmlui-paddingRight-TableOfContentsItem, var(--xmlui-paddingHorizontal-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
       "paddingTop-TableOfContentsItem": "var(--xmlui-paddingTop-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
       "paddingBottom-TableOfContentsItem": "var(--xmlui-paddingBottom-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
+      "textColor-TableOfContentsItem": "var(--xmlui-textColor-TableOfContentsItem)",
+      "fontFamily-TableOfContentsItem": "var(--xmlui-fontFamily-TableOfContentsItem)",
+      "fontSize-TableOfContentsItem": "var(--xmlui-fontSize-TableOfContentsItem)",
+      "fontStyle-TableOfContentsItem": "var(--xmlui-fontStyle-TableOfContentsItem)",
+      "fontVariant-TableOfContentsItem": "var(--xmlui-fontVariant-TableOfContentsItem)",
+      "fontWeight-TableOfContentsItem": "var(--xmlui-fontWeight-TableOfContentsItem)",
+      "fontStretch-TableOfContentsItem": "var(--xmlui-fontStretch-TableOfContentsItem)",
+      "textDecorationLine-TableOfContentsItem": "var(--xmlui-textDecorationLine-TableOfContentsItem)",
+      "textDecorationColor-TableOfContentsItem": "var(--xmlui-textDecorationColor-TableOfContentsItem)",
+      "textDecorationStyle-TableOfContentsItem": "var(--xmlui-textDecorationStyle-TableOfContentsItem)",
+      "textDecorationThickness-TableOfContentsItem": "var(--xmlui-textDecorationThickness-TableOfContentsItem)",
+      "textUnderlineOffset-TableOfContentsItem": "var(--xmlui-textUnderlineOffset-TableOfContentsItem)",
+      "lineHeight-TableOfContentsItem": "var(--xmlui-lineHeight-TableOfContentsItem)",
+      "backgroundColor-TableOfContentsItem": "var(--xmlui-backgroundColor-TableOfContentsItem)",
+      "textTransform-TableOfContentsItem": "var(--xmlui-textTransform-TableOfContentsItem)",
+      "letterSpacing-TableOfContentsItem": "var(--xmlui-letterSpacing-TableOfContentsItem)",
+      "wordSpacing-TableOfContentsItem": "var(--xmlui-wordSpacing-TableOfContentsItem)",
+      "textShadow-TableOfContentsItem": "var(--xmlui-textShadow-TableOfContentsItem)",
+      "textIndent-TableOfContentsItem": "var(--xmlui-textIndent-TableOfContentsItem)",
+      "textAlign-TableOfContentsItem": "var(--xmlui-textAlign-TableOfContentsItem)",
+      "textAlignLast-TableOfContentsItem": "var(--xmlui-textAlignLast-TableOfContentsItem)",
+      "wordBreak-TableOfContentsItem": "var(--xmlui-wordBreak-TableOfContentsItem)",
+      "wordWrap-TableOfContentsItem": "var(--xmlui-wordWrap-TableOfContentsItem)",
+      "direction-TableOfContentsItem": "var(--xmlui-direction-TableOfContentsItem)",
+      "writingMode-TableOfContentsItem": "var(--xmlui-writingMode-TableOfContentsItem)",
+      "lineBreak-TableOfContentsItem": "var(--xmlui-lineBreak-TableOfContentsItem)",
       "padding-TableOfContentsItem-level-1": "var(--xmlui-padding-TableOfContentsItem-level-1)",
       "paddingHorizontal-TableOfContentsItem-level-1": "var(--xmlui-paddingHorizontal-TableOfContentsItem-level-1, var(--xmlui-padding-TableOfContentsItem-level-1))",
       "paddingVertical-TableOfContentsItem-level-1": "var(--xmlui-paddingVertical-TableOfContentsItem-level-1, var(--xmlui-padding-TableOfContentsItem-level-1))",
@@ -8990,6 +11858,32 @@ export default {
       "paddingRight-TableOfContentsItem-level-1": "var(--xmlui-paddingRight-TableOfContentsItem-level-1, var(--xmlui-paddingHorizontal-TableOfContentsItem-level-1, var(--xmlui-padding-TableOfContentsItem-level-1)))",
       "paddingTop-TableOfContentsItem-level-1": "var(--xmlui-paddingTop-TableOfContentsItem-level-1, var(--xmlui-paddingVertical-TableOfContentsItem-level-1, var(--xmlui-padding-TableOfContentsItem-level-1)))",
       "paddingBottom-TableOfContentsItem-level-1": "var(--xmlui-paddingBottom-TableOfContentsItem-level-1, var(--xmlui-paddingVertical-TableOfContentsItem-level-1, var(--xmlui-padding-TableOfContentsItem-level-1)))",
+      "textColor-TableOfContentsItem-level-1": "var(--xmlui-textColor-TableOfContentsItem-level-1)",
+      "fontFamily-TableOfContentsItem-level-1": "var(--xmlui-fontFamily-TableOfContentsItem-level-1)",
+      "fontSize-TableOfContentsItem-level-1": "var(--xmlui-fontSize-TableOfContentsItem-level-1)",
+      "fontStyle-TableOfContentsItem-level-1": "var(--xmlui-fontStyle-TableOfContentsItem-level-1)",
+      "fontVariant-TableOfContentsItem-level-1": "var(--xmlui-fontVariant-TableOfContentsItem-level-1)",
+      "fontWeight-TableOfContentsItem-level-1": "var(--xmlui-fontWeight-TableOfContentsItem-level-1)",
+      "fontStretch-TableOfContentsItem-level-1": "var(--xmlui-fontStretch-TableOfContentsItem-level-1)",
+      "textDecorationLine-TableOfContentsItem-level-1": "var(--xmlui-textDecorationLine-TableOfContentsItem-level-1)",
+      "textDecorationColor-TableOfContentsItem-level-1": "var(--xmlui-textDecorationColor-TableOfContentsItem-level-1)",
+      "textDecorationStyle-TableOfContentsItem-level-1": "var(--xmlui-textDecorationStyle-TableOfContentsItem-level-1)",
+      "textDecorationThickness-TableOfContentsItem-level-1": "var(--xmlui-textDecorationThickness-TableOfContentsItem-level-1)",
+      "textUnderlineOffset-TableOfContentsItem-level-1": "var(--xmlui-textUnderlineOffset-TableOfContentsItem-level-1)",
+      "lineHeight-TableOfContentsItem-level-1": "var(--xmlui-lineHeight-TableOfContentsItem-level-1)",
+      "backgroundColor-TableOfContentsItem-level-1": "var(--xmlui-backgroundColor-TableOfContentsItem-level-1)",
+      "textTransform-TableOfContentsItem-level-1": "var(--xmlui-textTransform-TableOfContentsItem-level-1)",
+      "letterSpacing-TableOfContentsItem-level-1": "var(--xmlui-letterSpacing-TableOfContentsItem-level-1)",
+      "wordSpacing-TableOfContentsItem-level-1": "var(--xmlui-wordSpacing-TableOfContentsItem-level-1)",
+      "textShadow-TableOfContentsItem-level-1": "var(--xmlui-textShadow-TableOfContentsItem-level-1)",
+      "textIndent-TableOfContentsItem-level-1": "var(--xmlui-textIndent-TableOfContentsItem-level-1)",
+      "textAlign-TableOfContentsItem-level-1": "var(--xmlui-textAlign-TableOfContentsItem-level-1)",
+      "textAlignLast-TableOfContentsItem-level-1": "var(--xmlui-textAlignLast-TableOfContentsItem-level-1)",
+      "wordBreak-TableOfContentsItem-level-1": "var(--xmlui-wordBreak-TableOfContentsItem-level-1)",
+      "wordWrap-TableOfContentsItem-level-1": "var(--xmlui-wordWrap-TableOfContentsItem-level-1)",
+      "direction-TableOfContentsItem-level-1": "var(--xmlui-direction-TableOfContentsItem-level-1)",
+      "writingMode-TableOfContentsItem-level-1": "var(--xmlui-writingMode-TableOfContentsItem-level-1)",
+      "lineBreak-TableOfContentsItem-level-1": "var(--xmlui-lineBreak-TableOfContentsItem-level-1)",
       "padding-TableOfContentsItem-level-2": "var(--xmlui-padding-TableOfContentsItem-level-2)",
       "paddingHorizontal-TableOfContentsItem-level-2": "var(--xmlui-paddingHorizontal-TableOfContentsItem-level-2, var(--xmlui-padding-TableOfContentsItem-level-2))",
       "paddingVertical-TableOfContentsItem-level-2": "var(--xmlui-paddingVertical-TableOfContentsItem-level-2, var(--xmlui-padding-TableOfContentsItem-level-2))",
@@ -8997,6 +11891,32 @@ export default {
       "paddingRight-TableOfContentsItem-level-2": "var(--xmlui-paddingRight-TableOfContentsItem-level-2, var(--xmlui-paddingHorizontal-TableOfContentsItem-level-2, var(--xmlui-padding-TableOfContentsItem-level-2)))",
       "paddingTop-TableOfContentsItem-level-2": "var(--xmlui-paddingTop-TableOfContentsItem-level-2, var(--xmlui-paddingVertical-TableOfContentsItem-level-2, var(--xmlui-padding-TableOfContentsItem-level-2)))",
       "paddingBottom-TableOfContentsItem-level-2": "var(--xmlui-paddingBottom-TableOfContentsItem-level-2, var(--xmlui-paddingVertical-TableOfContentsItem-level-2, var(--xmlui-padding-TableOfContentsItem-level-2)))",
+      "textColor-TableOfContentsItem-level-2": "var(--xmlui-textColor-TableOfContentsItem-level-2)",
+      "fontFamily-TableOfContentsItem-level-2": "var(--xmlui-fontFamily-TableOfContentsItem-level-2)",
+      "fontSize-TableOfContentsItem-level-2": "var(--xmlui-fontSize-TableOfContentsItem-level-2)",
+      "fontStyle-TableOfContentsItem-level-2": "var(--xmlui-fontStyle-TableOfContentsItem-level-2)",
+      "fontVariant-TableOfContentsItem-level-2": "var(--xmlui-fontVariant-TableOfContentsItem-level-2)",
+      "fontWeight-TableOfContentsItem-level-2": "var(--xmlui-fontWeight-TableOfContentsItem-level-2)",
+      "fontStretch-TableOfContentsItem-level-2": "var(--xmlui-fontStretch-TableOfContentsItem-level-2)",
+      "textDecorationLine-TableOfContentsItem-level-2": "var(--xmlui-textDecorationLine-TableOfContentsItem-level-2)",
+      "textDecorationColor-TableOfContentsItem-level-2": "var(--xmlui-textDecorationColor-TableOfContentsItem-level-2)",
+      "textDecorationStyle-TableOfContentsItem-level-2": "var(--xmlui-textDecorationStyle-TableOfContentsItem-level-2)",
+      "textDecorationThickness-TableOfContentsItem-level-2": "var(--xmlui-textDecorationThickness-TableOfContentsItem-level-2)",
+      "textUnderlineOffset-TableOfContentsItem-level-2": "var(--xmlui-textUnderlineOffset-TableOfContentsItem-level-2)",
+      "lineHeight-TableOfContentsItem-level-2": "var(--xmlui-lineHeight-TableOfContentsItem-level-2)",
+      "backgroundColor-TableOfContentsItem-level-2": "var(--xmlui-backgroundColor-TableOfContentsItem-level-2)",
+      "textTransform-TableOfContentsItem-level-2": "var(--xmlui-textTransform-TableOfContentsItem-level-2)",
+      "letterSpacing-TableOfContentsItem-level-2": "var(--xmlui-letterSpacing-TableOfContentsItem-level-2)",
+      "wordSpacing-TableOfContentsItem-level-2": "var(--xmlui-wordSpacing-TableOfContentsItem-level-2)",
+      "textShadow-TableOfContentsItem-level-2": "var(--xmlui-textShadow-TableOfContentsItem-level-2)",
+      "textIndent-TableOfContentsItem-level-2": "var(--xmlui-textIndent-TableOfContentsItem-level-2)",
+      "textAlign-TableOfContentsItem-level-2": "var(--xmlui-textAlign-TableOfContentsItem-level-2)",
+      "textAlignLast-TableOfContentsItem-level-2": "var(--xmlui-textAlignLast-TableOfContentsItem-level-2)",
+      "wordBreak-TableOfContentsItem-level-2": "var(--xmlui-wordBreak-TableOfContentsItem-level-2)",
+      "wordWrap-TableOfContentsItem-level-2": "var(--xmlui-wordWrap-TableOfContentsItem-level-2)",
+      "direction-TableOfContentsItem-level-2": "var(--xmlui-direction-TableOfContentsItem-level-2)",
+      "writingMode-TableOfContentsItem-level-2": "var(--xmlui-writingMode-TableOfContentsItem-level-2)",
+      "lineBreak-TableOfContentsItem-level-2": "var(--xmlui-lineBreak-TableOfContentsItem-level-2)",
       "padding-TableOfContentsItem-level-3": "var(--xmlui-padding-TableOfContentsItem-level-3)",
       "paddingHorizontal-TableOfContentsItem-level-3": "var(--xmlui-paddingHorizontal-TableOfContentsItem-level-3, var(--xmlui-padding-TableOfContentsItem-level-3))",
       "paddingVertical-TableOfContentsItem-level-3": "var(--xmlui-paddingVertical-TableOfContentsItem-level-3, var(--xmlui-padding-TableOfContentsItem-level-3))",
@@ -9004,6 +11924,32 @@ export default {
       "paddingRight-TableOfContentsItem-level-3": "var(--xmlui-paddingRight-TableOfContentsItem-level-3, var(--xmlui-paddingHorizontal-TableOfContentsItem-level-3, var(--xmlui-padding-TableOfContentsItem-level-3)))",
       "paddingTop-TableOfContentsItem-level-3": "var(--xmlui-paddingTop-TableOfContentsItem-level-3, var(--xmlui-paddingVertical-TableOfContentsItem-level-3, var(--xmlui-padding-TableOfContentsItem-level-3)))",
       "paddingBottom-TableOfContentsItem-level-3": "var(--xmlui-paddingBottom-TableOfContentsItem-level-3, var(--xmlui-paddingVertical-TableOfContentsItem-level-3, var(--xmlui-padding-TableOfContentsItem-level-3)))",
+      "textColor-TableOfContentsItem-level-3": "var(--xmlui-textColor-TableOfContentsItem-level-3)",
+      "fontFamily-TableOfContentsItem-level-3": "var(--xmlui-fontFamily-TableOfContentsItem-level-3)",
+      "fontSize-TableOfContentsItem-level-3": "var(--xmlui-fontSize-TableOfContentsItem-level-3)",
+      "fontStyle-TableOfContentsItem-level-3": "var(--xmlui-fontStyle-TableOfContentsItem-level-3)",
+      "fontVariant-TableOfContentsItem-level-3": "var(--xmlui-fontVariant-TableOfContentsItem-level-3)",
+      "fontWeight-TableOfContentsItem-level-3": "var(--xmlui-fontWeight-TableOfContentsItem-level-3)",
+      "fontStretch-TableOfContentsItem-level-3": "var(--xmlui-fontStretch-TableOfContentsItem-level-3)",
+      "textDecorationLine-TableOfContentsItem-level-3": "var(--xmlui-textDecorationLine-TableOfContentsItem-level-3)",
+      "textDecorationColor-TableOfContentsItem-level-3": "var(--xmlui-textDecorationColor-TableOfContentsItem-level-3)",
+      "textDecorationStyle-TableOfContentsItem-level-3": "var(--xmlui-textDecorationStyle-TableOfContentsItem-level-3)",
+      "textDecorationThickness-TableOfContentsItem-level-3": "var(--xmlui-textDecorationThickness-TableOfContentsItem-level-3)",
+      "textUnderlineOffset-TableOfContentsItem-level-3": "var(--xmlui-textUnderlineOffset-TableOfContentsItem-level-3)",
+      "lineHeight-TableOfContentsItem-level-3": "var(--xmlui-lineHeight-TableOfContentsItem-level-3)",
+      "backgroundColor-TableOfContentsItem-level-3": "var(--xmlui-backgroundColor-TableOfContentsItem-level-3)",
+      "textTransform-TableOfContentsItem-level-3": "var(--xmlui-textTransform-TableOfContentsItem-level-3)",
+      "letterSpacing-TableOfContentsItem-level-3": "var(--xmlui-letterSpacing-TableOfContentsItem-level-3)",
+      "wordSpacing-TableOfContentsItem-level-3": "var(--xmlui-wordSpacing-TableOfContentsItem-level-3)",
+      "textShadow-TableOfContentsItem-level-3": "var(--xmlui-textShadow-TableOfContentsItem-level-3)",
+      "textIndent-TableOfContentsItem-level-3": "var(--xmlui-textIndent-TableOfContentsItem-level-3)",
+      "textAlign-TableOfContentsItem-level-3": "var(--xmlui-textAlign-TableOfContentsItem-level-3)",
+      "textAlignLast-TableOfContentsItem-level-3": "var(--xmlui-textAlignLast-TableOfContentsItem-level-3)",
+      "wordBreak-TableOfContentsItem-level-3": "var(--xmlui-wordBreak-TableOfContentsItem-level-3)",
+      "wordWrap-TableOfContentsItem-level-3": "var(--xmlui-wordWrap-TableOfContentsItem-level-3)",
+      "direction-TableOfContentsItem-level-3": "var(--xmlui-direction-TableOfContentsItem-level-3)",
+      "writingMode-TableOfContentsItem-level-3": "var(--xmlui-writingMode-TableOfContentsItem-level-3)",
+      "lineBreak-TableOfContentsItem-level-3": "var(--xmlui-lineBreak-TableOfContentsItem-level-3)",
       "padding-TableOfContentsItem-level-4": "var(--xmlui-padding-TableOfContentsItem-level-4)",
       "paddingHorizontal-TableOfContentsItem-level-4": "var(--xmlui-paddingHorizontal-TableOfContentsItem-level-4, var(--xmlui-padding-TableOfContentsItem-level-4))",
       "paddingVertical-TableOfContentsItem-level-4": "var(--xmlui-paddingVertical-TableOfContentsItem-level-4, var(--xmlui-padding-TableOfContentsItem-level-4))",
@@ -9011,6 +11957,32 @@ export default {
       "paddingRight-TableOfContentsItem-level-4": "var(--xmlui-paddingRight-TableOfContentsItem-level-4, var(--xmlui-paddingHorizontal-TableOfContentsItem-level-4, var(--xmlui-padding-TableOfContentsItem-level-4)))",
       "paddingTop-TableOfContentsItem-level-4": "var(--xmlui-paddingTop-TableOfContentsItem-level-4, var(--xmlui-paddingVertical-TableOfContentsItem-level-4, var(--xmlui-padding-TableOfContentsItem-level-4)))",
       "paddingBottom-TableOfContentsItem-level-4": "var(--xmlui-paddingBottom-TableOfContentsItem-level-4, var(--xmlui-paddingVertical-TableOfContentsItem-level-4, var(--xmlui-padding-TableOfContentsItem-level-4)))",
+      "textColor-TableOfContentsItem-level-4": "var(--xmlui-textColor-TableOfContentsItem-level-4)",
+      "fontFamily-TableOfContentsItem-level-4": "var(--xmlui-fontFamily-TableOfContentsItem-level-4)",
+      "fontSize-TableOfContentsItem-level-4": "var(--xmlui-fontSize-TableOfContentsItem-level-4)",
+      "fontStyle-TableOfContentsItem-level-4": "var(--xmlui-fontStyle-TableOfContentsItem-level-4)",
+      "fontVariant-TableOfContentsItem-level-4": "var(--xmlui-fontVariant-TableOfContentsItem-level-4)",
+      "fontWeight-TableOfContentsItem-level-4": "var(--xmlui-fontWeight-TableOfContentsItem-level-4)",
+      "fontStretch-TableOfContentsItem-level-4": "var(--xmlui-fontStretch-TableOfContentsItem-level-4)",
+      "textDecorationLine-TableOfContentsItem-level-4": "var(--xmlui-textDecorationLine-TableOfContentsItem-level-4)",
+      "textDecorationColor-TableOfContentsItem-level-4": "var(--xmlui-textDecorationColor-TableOfContentsItem-level-4)",
+      "textDecorationStyle-TableOfContentsItem-level-4": "var(--xmlui-textDecorationStyle-TableOfContentsItem-level-4)",
+      "textDecorationThickness-TableOfContentsItem-level-4": "var(--xmlui-textDecorationThickness-TableOfContentsItem-level-4)",
+      "textUnderlineOffset-TableOfContentsItem-level-4": "var(--xmlui-textUnderlineOffset-TableOfContentsItem-level-4)",
+      "lineHeight-TableOfContentsItem-level-4": "var(--xmlui-lineHeight-TableOfContentsItem-level-4)",
+      "backgroundColor-TableOfContentsItem-level-4": "var(--xmlui-backgroundColor-TableOfContentsItem-level-4)",
+      "textTransform-TableOfContentsItem-level-4": "var(--xmlui-textTransform-TableOfContentsItem-level-4)",
+      "letterSpacing-TableOfContentsItem-level-4": "var(--xmlui-letterSpacing-TableOfContentsItem-level-4)",
+      "wordSpacing-TableOfContentsItem-level-4": "var(--xmlui-wordSpacing-TableOfContentsItem-level-4)",
+      "textShadow-TableOfContentsItem-level-4": "var(--xmlui-textShadow-TableOfContentsItem-level-4)",
+      "textIndent-TableOfContentsItem-level-4": "var(--xmlui-textIndent-TableOfContentsItem-level-4)",
+      "textAlign-TableOfContentsItem-level-4": "var(--xmlui-textAlign-TableOfContentsItem-level-4)",
+      "textAlignLast-TableOfContentsItem-level-4": "var(--xmlui-textAlignLast-TableOfContentsItem-level-4)",
+      "wordBreak-TableOfContentsItem-level-4": "var(--xmlui-wordBreak-TableOfContentsItem-level-4)",
+      "wordWrap-TableOfContentsItem-level-4": "var(--xmlui-wordWrap-TableOfContentsItem-level-4)",
+      "direction-TableOfContentsItem-level-4": "var(--xmlui-direction-TableOfContentsItem-level-4)",
+      "writingMode-TableOfContentsItem-level-4": "var(--xmlui-writingMode-TableOfContentsItem-level-4)",
+      "lineBreak-TableOfContentsItem-level-4": "var(--xmlui-lineBreak-TableOfContentsItem-level-4)",
       "padding-TableOfContentsItem-level-5": "var(--xmlui-padding-TableOfContentsItem-level-5)",
       "paddingHorizontal-TableOfContentsItem-level-5": "var(--xmlui-paddingHorizontal-TableOfContentsItem-level-5, var(--xmlui-padding-TableOfContentsItem-level-5))",
       "paddingVertical-TableOfContentsItem-level-5": "var(--xmlui-paddingVertical-TableOfContentsItem-level-5, var(--xmlui-padding-TableOfContentsItem-level-5))",
@@ -9018,6 +11990,32 @@ export default {
       "paddingRight-TableOfContentsItem-level-5": "var(--xmlui-paddingRight-TableOfContentsItem-level-5, var(--xmlui-paddingHorizontal-TableOfContentsItem-level-5, var(--xmlui-padding-TableOfContentsItem-level-5)))",
       "paddingTop-TableOfContentsItem-level-5": "var(--xmlui-paddingTop-TableOfContentsItem-level-5, var(--xmlui-paddingVertical-TableOfContentsItem-level-5, var(--xmlui-padding-TableOfContentsItem-level-5)))",
       "paddingBottom-TableOfContentsItem-level-5": "var(--xmlui-paddingBottom-TableOfContentsItem-level-5, var(--xmlui-paddingVertical-TableOfContentsItem-level-5, var(--xmlui-padding-TableOfContentsItem-level-5)))",
+      "textColor-TableOfContentsItem-level-5": "var(--xmlui-textColor-TableOfContentsItem-level-5)",
+      "fontFamily-TableOfContentsItem-level-5": "var(--xmlui-fontFamily-TableOfContentsItem-level-5)",
+      "fontSize-TableOfContentsItem-level-5": "var(--xmlui-fontSize-TableOfContentsItem-level-5)",
+      "fontStyle-TableOfContentsItem-level-5": "var(--xmlui-fontStyle-TableOfContentsItem-level-5)",
+      "fontVariant-TableOfContentsItem-level-5": "var(--xmlui-fontVariant-TableOfContentsItem-level-5)",
+      "fontWeight-TableOfContentsItem-level-5": "var(--xmlui-fontWeight-TableOfContentsItem-level-5)",
+      "fontStretch-TableOfContentsItem-level-5": "var(--xmlui-fontStretch-TableOfContentsItem-level-5)",
+      "textDecorationLine-TableOfContentsItem-level-5": "var(--xmlui-textDecorationLine-TableOfContentsItem-level-5)",
+      "textDecorationColor-TableOfContentsItem-level-5": "var(--xmlui-textDecorationColor-TableOfContentsItem-level-5)",
+      "textDecorationStyle-TableOfContentsItem-level-5": "var(--xmlui-textDecorationStyle-TableOfContentsItem-level-5)",
+      "textDecorationThickness-TableOfContentsItem-level-5": "var(--xmlui-textDecorationThickness-TableOfContentsItem-level-5)",
+      "textUnderlineOffset-TableOfContentsItem-level-5": "var(--xmlui-textUnderlineOffset-TableOfContentsItem-level-5)",
+      "lineHeight-TableOfContentsItem-level-5": "var(--xmlui-lineHeight-TableOfContentsItem-level-5)",
+      "backgroundColor-TableOfContentsItem-level-5": "var(--xmlui-backgroundColor-TableOfContentsItem-level-5)",
+      "textTransform-TableOfContentsItem-level-5": "var(--xmlui-textTransform-TableOfContentsItem-level-5)",
+      "letterSpacing-TableOfContentsItem-level-5": "var(--xmlui-letterSpacing-TableOfContentsItem-level-5)",
+      "wordSpacing-TableOfContentsItem-level-5": "var(--xmlui-wordSpacing-TableOfContentsItem-level-5)",
+      "textShadow-TableOfContentsItem-level-5": "var(--xmlui-textShadow-TableOfContentsItem-level-5)",
+      "textIndent-TableOfContentsItem-level-5": "var(--xmlui-textIndent-TableOfContentsItem-level-5)",
+      "textAlign-TableOfContentsItem-level-5": "var(--xmlui-textAlign-TableOfContentsItem-level-5)",
+      "textAlignLast-TableOfContentsItem-level-5": "var(--xmlui-textAlignLast-TableOfContentsItem-level-5)",
+      "wordBreak-TableOfContentsItem-level-5": "var(--xmlui-wordBreak-TableOfContentsItem-level-5)",
+      "wordWrap-TableOfContentsItem-level-5": "var(--xmlui-wordWrap-TableOfContentsItem-level-5)",
+      "direction-TableOfContentsItem-level-5": "var(--xmlui-direction-TableOfContentsItem-level-5)",
+      "writingMode-TableOfContentsItem-level-5": "var(--xmlui-writingMode-TableOfContentsItem-level-5)",
+      "lineBreak-TableOfContentsItem-level-5": "var(--xmlui-lineBreak-TableOfContentsItem-level-5)",
       "padding-TableOfContentsItem-level-6": "var(--xmlui-padding-TableOfContentsItem-level-6)",
       "paddingHorizontal-TableOfContentsItem-level-6": "var(--xmlui-paddingHorizontal-TableOfContentsItem-level-6, var(--xmlui-padding-TableOfContentsItem-level-6))",
       "paddingVertical-TableOfContentsItem-level-6": "var(--xmlui-paddingVertical-TableOfContentsItem-level-6, var(--xmlui-padding-TableOfContentsItem-level-6))",
@@ -9025,6 +12023,32 @@ export default {
       "paddingRight-TableOfContentsItem-level-6": "var(--xmlui-paddingRight-TableOfContentsItem-level-6, var(--xmlui-paddingHorizontal-TableOfContentsItem-level-6, var(--xmlui-padding-TableOfContentsItem-level-6)))",
       "paddingTop-TableOfContentsItem-level-6": "var(--xmlui-paddingTop-TableOfContentsItem-level-6, var(--xmlui-paddingVertical-TableOfContentsItem-level-6, var(--xmlui-padding-TableOfContentsItem-level-6)))",
       "paddingBottom-TableOfContentsItem-level-6": "var(--xmlui-paddingBottom-TableOfContentsItem-level-6, var(--xmlui-paddingVertical-TableOfContentsItem-level-6, var(--xmlui-padding-TableOfContentsItem-level-6)))",
+      "textColor-TableOfContentsItem-level-6": "var(--xmlui-textColor-TableOfContentsItem-level-6)",
+      "fontFamily-TableOfContentsItem-level-6": "var(--xmlui-fontFamily-TableOfContentsItem-level-6)",
+      "fontSize-TableOfContentsItem-level-6": "var(--xmlui-fontSize-TableOfContentsItem-level-6)",
+      "fontStyle-TableOfContentsItem-level-6": "var(--xmlui-fontStyle-TableOfContentsItem-level-6)",
+      "fontVariant-TableOfContentsItem-level-6": "var(--xmlui-fontVariant-TableOfContentsItem-level-6)",
+      "fontWeight-TableOfContentsItem-level-6": "var(--xmlui-fontWeight-TableOfContentsItem-level-6)",
+      "fontStretch-TableOfContentsItem-level-6": "var(--xmlui-fontStretch-TableOfContentsItem-level-6)",
+      "textDecorationLine-TableOfContentsItem-level-6": "var(--xmlui-textDecorationLine-TableOfContentsItem-level-6)",
+      "textDecorationColor-TableOfContentsItem-level-6": "var(--xmlui-textDecorationColor-TableOfContentsItem-level-6)",
+      "textDecorationStyle-TableOfContentsItem-level-6": "var(--xmlui-textDecorationStyle-TableOfContentsItem-level-6)",
+      "textDecorationThickness-TableOfContentsItem-level-6": "var(--xmlui-textDecorationThickness-TableOfContentsItem-level-6)",
+      "textUnderlineOffset-TableOfContentsItem-level-6": "var(--xmlui-textUnderlineOffset-TableOfContentsItem-level-6)",
+      "lineHeight-TableOfContentsItem-level-6": "var(--xmlui-lineHeight-TableOfContentsItem-level-6)",
+      "backgroundColor-TableOfContentsItem-level-6": "var(--xmlui-backgroundColor-TableOfContentsItem-level-6)",
+      "textTransform-TableOfContentsItem-level-6": "var(--xmlui-textTransform-TableOfContentsItem-level-6)",
+      "letterSpacing-TableOfContentsItem-level-6": "var(--xmlui-letterSpacing-TableOfContentsItem-level-6)",
+      "wordSpacing-TableOfContentsItem-level-6": "var(--xmlui-wordSpacing-TableOfContentsItem-level-6)",
+      "textShadow-TableOfContentsItem-level-6": "var(--xmlui-textShadow-TableOfContentsItem-level-6)",
+      "textIndent-TableOfContentsItem-level-6": "var(--xmlui-textIndent-TableOfContentsItem-level-6)",
+      "textAlign-TableOfContentsItem-level-6": "var(--xmlui-textAlign-TableOfContentsItem-level-6)",
+      "textAlignLast-TableOfContentsItem-level-6": "var(--xmlui-textAlignLast-TableOfContentsItem-level-6)",
+      "wordBreak-TableOfContentsItem-level-6": "var(--xmlui-wordBreak-TableOfContentsItem-level-6)",
+      "wordWrap-TableOfContentsItem-level-6": "var(--xmlui-wordWrap-TableOfContentsItem-level-6)",
+      "direction-TableOfContentsItem-level-6": "var(--xmlui-direction-TableOfContentsItem-level-6)",
+      "writingMode-TableOfContentsItem-level-6": "var(--xmlui-writingMode-TableOfContentsItem-level-6)",
+      "lineBreak-TableOfContentsItem-level-6": "var(--xmlui-lineBreak-TableOfContentsItem-level-6)",
       "backgroundColor-TableOfContents": "var(--xmlui-backgroundColor-TableOfContents)",
       "width-TableOfContents": "var(--xmlui-width-TableOfContents)",
       "height-TableOfContents": "var(--xmlui-height-TableOfContents)",
@@ -9036,16 +12060,11 @@ export default {
       "marginBottom-TableOfContents": "var(--xmlui-marginBottom-TableOfContents)",
       "paddingVertical-TableOfContents": "var(--xmlui-paddingVertical-TableOfContents)",
       "paddingHorizontal-TableOfContents": "var(--xmlui-paddingHorizontal-TableOfContents)",
-      "border-width-TableOfContentsItem": "var(--xmlui-border-width-TableOfContentsItem)",
-      "border-style-TableOfContentsItem": "var(--xmlui-border-style-TableOfContentsItem)",
-      "border-color-TableOfContentsItem": "var(--xmlui-border-color-TableOfContentsItem)",
-      "textColor-TableOfContentsItem": "var(--xmlui-textColor-TableOfContentsItem)",
-      "fontSize-TableOfContentsItem": "var(--xmlui-fontSize-TableOfContentsItem)",
-      "fontWeight-TableOfContentsItem": "var(--xmlui-fontWeight-TableOfContentsItem)",
-      "fontFamily-TableOfContentsItem": "var(--xmlui-fontFamily-TableOfContentsItem)",
-      "textTransform-TableOfContentsItem": "var(--xmlui-textTransform-TableOfContentsItem)",
-      "verticalAlign-TableOfContentsItem": "var(--xmlui-verticalAlign-TableOfContentsItem)",
-      "letterSpacing-TableOfContentsItem": "var(--xmlui-letterSpacing-TableOfContentsItem)",
+      "borderWidth-TableOfContentsItem": "var(--xmlui-borderWidth-TableOfContentsItem)",
+      "borderStyle-TableOfContentsItem": "var(--xmlui-borderStyle-TableOfContentsItem)",
+      "borderColor-TableOfContentsItem": "var(--xmlui-borderColor-TableOfContentsItem)",
+      "textColor-TableOfContentsItem--hover": "var(--xmlui-textColor-TableOfContentsItem--hover)",
+      "borderWidth-TableOfContentsItem--active": "var(--xmlui-borderWidth-TableOfContentsItem--active)",
       "borderColor-TableOfContentsItem--active": "var(--xmlui-borderColor-TableOfContentsItem--active)",
       "color-TableOfContentsItem--active": "var(--xmlui-color-TableOfContentsItem--active)",
       "fontWeight-TableOfContentsItem--active": "var(--xmlui-fontWeight-TableOfContentsItem--active)"
@@ -9080,21 +12099,14 @@ export default {
       "border-width-TableOfContents": "0",
       "borderColor-TableOfContents": "transparent",
       "border-style-TableOfContents": "solid",
+      "paddingLeft-TableOfContentsItem": "$space-1",
       "textTransform-TableOfContentsItem": "none",
       "verticalAlign-TableOfContentsItem": "baseline",
       "letterSpacing-TableOfContentsItem": "0",
-      "light": {
-        "color-TableOfContentsItem": "$textColor-primary",
-        "borderColor-TableOfContentsItem": "$borderColor",
-        "borderColor-TableOfContentsItem--active": "$color-primary-500",
-        "color-TableOfContentsItem--active": "$color-primary-500"
-      },
-      "dark": {
-        "color-TableOfContentsItem": "$textColor-primary",
-        "borderColor-TableOfContentsItem": "$borderColor",
-        "borderColor-TableOfContentsItem--active": "$color-primary-500",
-        "color-TableOfContentsItem--active": "$textColor-secondary"
-      }
+      "color-TableOfContentsItem": "$textColor-primary",
+      "borderColor-TableOfContentsItem": "$borderColor",
+      "borderColor-TableOfContentsItem--active": "$color-primary-500",
+      "color-TableOfContentsItem--active": "$color-primary-500"
     }
   },
   "TabItem": {
@@ -9107,8 +12119,8 @@ export default {
     }
   },
   "Tabs": {
-    "description": "The `Tabs` component provides a tabbed layout where each tab has a clickable label and content.",
     "status": "experimental",
+    "description": "The `Tabs` component provides a tabbed layout where each tab has a clickable label and content.",
     "props": {
       "activeTab": {
         "description": "This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab."
@@ -9133,32 +12145,34 @@ export default {
       }
     },
     "themeVars": {
+      "padding-trigger-Tabs": "var(--xmlui-padding-trigger-Tabs)",
+      "paddingHorizontal-trigger-Tabs": "var(--xmlui-paddingHorizontal-trigger-Tabs, var(--xmlui-padding-trigger-Tabs))",
+      "paddingVertical-trigger-Tabs": "var(--xmlui-paddingVertical-trigger-Tabs, var(--xmlui-padding-trigger-Tabs))",
+      "paddingLeft-trigger-Tabs": "var(--xmlui-paddingLeft-trigger-Tabs, var(--xmlui-paddingHorizontal-trigger-Tabs, var(--xmlui-padding-trigger-Tabs)))",
+      "paddingRight-trigger-Tabs": "var(--xmlui-paddingRight-trigger-Tabs, var(--xmlui-paddingHorizontal-trigger-Tabs, var(--xmlui-padding-trigger-Tabs)))",
+      "paddingTop-trigger-Tabs": "var(--xmlui-paddingTop-trigger-Tabs, var(--xmlui-paddingVertical-trigger-Tabs, var(--xmlui-padding-trigger-Tabs)))",
+      "paddingBottom-trigger-Tabs": "var(--xmlui-paddingBottom-trigger-Tabs, var(--xmlui-paddingVertical-trigger-Tabs, var(--xmlui-padding-trigger-Tabs)))",
       "backgroundColor-Tabs": "var(--xmlui-backgroundColor-Tabs)",
       "borderColor-Tabs": "var(--xmlui-borderColor-Tabs)",
       "borderWidth-Tabs": "var(--xmlui-borderWidth-Tabs)",
       "borderColor-active-Tabs": "var(--xmlui-borderColor-active-Tabs)",
       "backgroundColor-trigger-Tabs": "var(--xmlui-backgroundColor-trigger-Tabs)",
+      "borderRadius-trigger-Tabs": "var(--xmlui-borderRadius-trigger-Tabs)",
+      "border-trigger-Tabs": "var(--xmlui-border-trigger-Tabs)",
       "textColor-trigger-Tabs": "var(--xmlui-textColor-trigger-Tabs)",
       "backgroundColor-trigger-Tabs--hover": "var(--xmlui-backgroundColor-trigger-Tabs--hover)",
-      "backgroundColor-list-Tabs": "var(--xmlui-backgroundColor-list-Tabs)"
+      "backgroundColor-trigger-Tabs--active": "var(--xmlui-backgroundColor-trigger-Tabs--active)",
+      "backgroundColor-list-Tabs": "var(--xmlui-backgroundColor-list-Tabs)",
+      "borderRadius-list-Tabs": "var(--xmlui-borderRadius-list-Tabs)",
+      "border-list-Tabs": "var(--xmlui-border-list-Tabs)"
     },
     "defaultThemeVars": {
-      "backgroundColor-Tabs": "$backgroundColor-primary",
       "borderStyle-Tabs": "solid",
       "borderColor-Tabs": "$borderColor",
       "borderColor-active-Tabs": "$color-primary",
       "borderWidth-Tabs": "2px",
-      "backgroundColor-trigger-Tabs": "$backgroundColor-primary",
-      "light": {
-        "backgroundColor-trigger-Tabs--hover": "$color-primary-50",
-        "backgroundColor-list-Tabs": "$color-primary-50",
-        "textColor-trigger-Tabs": "$color-primary-100"
-      },
-      "dark": {
-        "backgroundColor-trigger-Tabs--hover": "$color-primary-800",
-        "backgroundColor-list-Tabs": "$color-primary-800",
-        "textColor-trigger-Tabs": "$color-primary-100"
-      }
+      "backgroundColor-trigger-Tabs--hover": "$color-surface-100",
+      "padding-trigger-Tabs": "$space-4"
     }
   },
   "Text": {
@@ -9283,490 +12297,131 @@ export default {
       }
     },
     "themeVars": {
-      "fontFamily-Text-abbr": "var(--xmlui-fontFamily-Text-abbr)",
-      "fontSize-Text-abbr": "var(--xmlui-fontSize-Text-abbr)",
-      "fontWeight-Text-abbr": "var(--xmlui-fontWeight-Text-abbr)",
-      "font-style-Text-abbr": "var(--xmlui-font-style-Text-abbr)",
-      "fontStretch-Text-abbr": "var(--xmlui-fontStretch-Text-abbr)",
-      "textDecorationLine-Text-abbr": "var(--xmlui-textDecorationLine-Text-abbr)",
-      "textDecorationColor-Text-abbr": "var(--xmlui-textDecorationColor-Text-abbr)",
-      "textDecorationStyle-Text-abbr": "var(--xmlui-textDecorationStyle-Text-abbr)",
-      "textDecorationThickness-Text-abbr": "var(--xmlui-textDecorationThickness-Text-abbr)",
-      "textUnderlineOffset-Text-abbr": "var(--xmlui-textUnderlineOffset-Text-abbr)",
-      "lineHeight-Text-abbr": "var(--xmlui-lineHeight-Text-abbr)",
-      "textColor-Text-abbr": "var(--xmlui-textColor-Text-abbr)",
-      "backgroundColor-Text-abbr": "var(--xmlui-backgroundColor-Text-abbr)",
-      "borderRadius-Text-abbr": "var(--xmlui-borderRadius-Text-abbr)",
-      "borderColor-Text-abbr": "var(--xmlui-borderColor-Text-abbr)",
-      "borderWidth-Text-abbr": "var(--xmlui-borderWidth-Text-abbr)",
-      "borderStyle-Text-abbr": "var(--xmlui-borderStyle-Text-abbr)",
+      "marginTop-Text-default": "var(--xmlui-marginTop-Text-default)",
+      "marginBottom-Text-default": "var(--xmlui-marginBottom-Text-default)",
+      "marginLeft-Text-default": "var(--xmlui-marginLeft-Text-default)",
+      "marginRight-Text-default": "var(--xmlui-marginRight-Text-default)",
+      "verticalAlign-Text-default": "var(--xmlui-verticalAlign-Text-default)",
+      "marginTop-Text-markdown": "var(--xmlui-marginTop-Text-markdown)",
+      "marginBottom-Text-markdown": "var(--xmlui-marginBottom-Text-markdown)",
+      "marginLeft-Text-markdown": "var(--xmlui-marginLeft-Text-markdown)",
+      "marginRight-Text-markdown": "var(--xmlui-marginRight-Text-markdown)",
+      "verticalAlign-Text-markdown": "var(--xmlui-verticalAlign-Text-markdown)",
       "marginTop-Text-abbr": "var(--xmlui-marginTop-Text-abbr)",
       "marginBottom-Text-abbr": "var(--xmlui-marginBottom-Text-abbr)",
-      "textTransform-Text-abbr": "var(--xmlui-textTransform-Text-abbr)",
+      "marginLeft-Text-abbr": "var(--xmlui-marginLeft-Text-abbr)",
+      "marginRight-Text-abbr": "var(--xmlui-marginRight-Text-abbr)",
       "verticalAlign-Text-abbr": "var(--xmlui-verticalAlign-Text-abbr)",
-      "letterSpacing-Text-abbr": "var(--xmlui-letterSpacing-Text-abbr)",
-      "fontFamily-Text-cite": "var(--xmlui-fontFamily-Text-cite)",
-      "fontSize-Text-cite": "var(--xmlui-fontSize-Text-cite)",
-      "fontWeight-Text-cite": "var(--xmlui-fontWeight-Text-cite)",
-      "font-style-Text-cite": "var(--xmlui-font-style-Text-cite)",
-      "fontStretch-Text-cite": "var(--xmlui-fontStretch-Text-cite)",
-      "textDecorationLine-Text-cite": "var(--xmlui-textDecorationLine-Text-cite)",
-      "textDecorationColor-Text-cite": "var(--xmlui-textDecorationColor-Text-cite)",
-      "textDecorationStyle-Text-cite": "var(--xmlui-textDecorationStyle-Text-cite)",
-      "textDecorationThickness-Text-cite": "var(--xmlui-textDecorationThickness-Text-cite)",
-      "textUnderlineOffset-Text-cite": "var(--xmlui-textUnderlineOffset-Text-cite)",
-      "lineHeight-Text-cite": "var(--xmlui-lineHeight-Text-cite)",
-      "textColor-Text-cite": "var(--xmlui-textColor-Text-cite)",
-      "backgroundColor-Text-cite": "var(--xmlui-backgroundColor-Text-cite)",
-      "borderRadius-Text-cite": "var(--xmlui-borderRadius-Text-cite)",
-      "borderColor-Text-cite": "var(--xmlui-borderColor-Text-cite)",
-      "borderWidth-Text-cite": "var(--xmlui-borderWidth-Text-cite)",
-      "borderStyle-Text-cite": "var(--xmlui-borderStyle-Text-cite)",
       "marginTop-Text-cite": "var(--xmlui-marginTop-Text-cite)",
       "marginBottom-Text-cite": "var(--xmlui-marginBottom-Text-cite)",
-      "textTransform-Text-cite": "var(--xmlui-textTransform-Text-cite)",
+      "marginLeft-Text-cite": "var(--xmlui-marginLeft-Text-cite)",
+      "marginRight-Text-cite": "var(--xmlui-marginRight-Text-cite)",
       "verticalAlign-Text-cite": "var(--xmlui-verticalAlign-Text-cite)",
-      "letterSpacing-Text-cite": "var(--xmlui-letterSpacing-Text-cite)",
-      "fontFamily-Text-code": "var(--xmlui-fontFamily-Text-code)",
-      "fontSize-Text-code": "var(--xmlui-fontSize-Text-code)",
-      "fontWeight-Text-code": "var(--xmlui-fontWeight-Text-code)",
-      "font-style-Text-code": "var(--xmlui-font-style-Text-code)",
-      "fontStretch-Text-code": "var(--xmlui-fontStretch-Text-code)",
-      "textDecorationLine-Text-code": "var(--xmlui-textDecorationLine-Text-code)",
-      "textDecorationColor-Text-code": "var(--xmlui-textDecorationColor-Text-code)",
-      "textDecorationStyle-Text-code": "var(--xmlui-textDecorationStyle-Text-code)",
-      "textDecorationThickness-Text-code": "var(--xmlui-textDecorationThickness-Text-code)",
-      "textUnderlineOffset-Text-code": "var(--xmlui-textUnderlineOffset-Text-code)",
-      "lineHeight-Text-code": "var(--xmlui-lineHeight-Text-code)",
-      "textColor-Text-code": "var(--xmlui-textColor-Text-code)",
-      "backgroundColor-Text-code": "var(--xmlui-backgroundColor-Text-code)",
-      "borderRadius-Text-code": "var(--xmlui-borderRadius-Text-code)",
-      "borderColor-Text-code": "var(--xmlui-borderColor-Text-code)",
-      "borderWidth-Text-code": "var(--xmlui-borderWidth-Text-code)",
-      "borderStyle-Text-code": "var(--xmlui-borderStyle-Text-code)",
-      "marginTop-Text-code": "var(--xmlui-marginTop-Text-code)",
-      "marginBottom-Text-code": "var(--xmlui-marginBottom-Text-code)",
-      "textTransform-Text-code": "var(--xmlui-textTransform-Text-code)",
-      "verticalAlign-Text-code": "var(--xmlui-verticalAlign-Text-code)",
-      "letterSpacing-Text-code": "var(--xmlui-letterSpacing-Text-code)",
-      "fontFamily-Text-codefence": "var(--xmlui-fontFamily-Text-codefence)",
-      "fontSize-Text-codefence": "var(--xmlui-fontSize-Text-codefence)",
-      "fontWeight-Text-codefence": "var(--xmlui-fontWeight-Text-codefence)",
-      "font-style-Text-codefence": "var(--xmlui-font-style-Text-codefence)",
-      "fontStretch-Text-codefence": "var(--xmlui-fontStretch-Text-codefence)",
-      "textDecorationLine-Text-codefence": "var(--xmlui-textDecorationLine-Text-codefence)",
-      "textDecorationColor-Text-codefence": "var(--xmlui-textDecorationColor-Text-codefence)",
-      "textDecorationStyle-Text-codefence": "var(--xmlui-textDecorationStyle-Text-codefence)",
-      "textDecorationThickness-Text-codefence": "var(--xmlui-textDecorationThickness-Text-codefence)",
-      "textUnderlineOffset-Text-codefence": "var(--xmlui-textUnderlineOffset-Text-codefence)",
-      "lineHeight-Text-codefence": "var(--xmlui-lineHeight-Text-codefence)",
-      "textColor-Text-codefence": "var(--xmlui-textColor-Text-codefence)",
-      "backgroundColor-Text-codefence": "var(--xmlui-backgroundColor-Text-codefence)",
-      "borderRadius-Text-codefence": "var(--xmlui-borderRadius-Text-codefence)",
-      "borderColor-Text-codefence": "var(--xmlui-borderColor-Text-codefence)",
-      "borderWidth-Text-codefence": "var(--xmlui-borderWidth-Text-codefence)",
-      "borderStyle-Text-codefence": "var(--xmlui-borderStyle-Text-codefence)",
+      "marginTop-Text-em": "var(--xmlui-marginTop-Text-em)",
+      "marginBottom-Text-em": "var(--xmlui-marginBottom-Text-em)",
+      "marginLeft-Text-em": "var(--xmlui-marginLeft-Text-em)",
+      "marginRight-Text-em": "var(--xmlui-marginRight-Text-em)",
+      "verticalAlign-Text-em": "var(--xmlui-verticalAlign-Text-em)",
       "marginTop-Text-codefence": "var(--xmlui-marginTop-Text-codefence)",
       "marginBottom-Text-codefence": "var(--xmlui-marginBottom-Text-codefence)",
-      "textTransform-Text-codefence": "var(--xmlui-textTransform-Text-codefence)",
+      "marginTop-Text-code": "var(--xmlui-marginTop-Text-code)",
+      "marginBottom-Text-code": "var(--xmlui-marginBottom-Text-code)",
+      "marginLeft-Text-code": "var(--xmlui-marginLeft-Text-code)",
+      "marginRight-Text-code": "var(--xmlui-marginRight-Text-code)",
+      "verticalAlign-Text-code": "var(--xmlui-verticalAlign-Text-code)",
+      "marginLeft-Text-codefence": "var(--xmlui-marginLeft-Text-codefence)",
+      "marginRight-Text-codefence": "var(--xmlui-marginRight-Text-codefence)",
       "verticalAlign-Text-codefence": "var(--xmlui-verticalAlign-Text-codefence)",
-      "letterSpacing-Text-codefence": "var(--xmlui-letterSpacing-Text-codefence)",
-      "fontFamily-Text-deleted": "var(--xmlui-fontFamily-Text-deleted)",
-      "fontSize-Text-deleted": "var(--xmlui-fontSize-Text-deleted)",
-      "fontWeight-Text-deleted": "var(--xmlui-fontWeight-Text-deleted)",
-      "font-style-Text-deleted": "var(--xmlui-font-style-Text-deleted)",
-      "fontStretch-Text-deleted": "var(--xmlui-fontStretch-Text-deleted)",
-      "textDecorationLine-Text-deleted": "var(--xmlui-textDecorationLine-Text-deleted)",
-      "textDecorationColor-Text-deleted": "var(--xmlui-textDecorationColor-Text-deleted)",
-      "textDecorationStyle-Text-deleted": "var(--xmlui-textDecorationStyle-Text-deleted)",
-      "textDecorationThickness-Text-deleted": "var(--xmlui-textDecorationThickness-Text-deleted)",
-      "textUnderlineOffset-Text-deleted": "var(--xmlui-textUnderlineOffset-Text-deleted)",
-      "lineHeight-Text-deleted": "var(--xmlui-lineHeight-Text-deleted)",
-      "textColor-Text-deleted": "var(--xmlui-textColor-Text-deleted)",
-      "backgroundColor-Text-deleted": "var(--xmlui-backgroundColor-Text-deleted)",
-      "borderRadius-Text-deleted": "var(--xmlui-borderRadius-Text-deleted)",
-      "borderColor-Text-deleted": "var(--xmlui-borderColor-Text-deleted)",
-      "borderWidth-Text-deleted": "var(--xmlui-borderWidth-Text-deleted)",
-      "borderStyle-Text-deleted": "var(--xmlui-borderStyle-Text-deleted)",
       "marginTop-Text-deleted": "var(--xmlui-marginTop-Text-deleted)",
       "marginBottom-Text-deleted": "var(--xmlui-marginBottom-Text-deleted)",
-      "textTransform-Text-deleted": "var(--xmlui-textTransform-Text-deleted)",
+      "marginLeft-Text-deleted": "var(--xmlui-marginLeft-Text-deleted)",
+      "marginRight-Text-deleted": "var(--xmlui-marginRight-Text-deleted)",
       "verticalAlign-Text-deleted": "var(--xmlui-verticalAlign-Text-deleted)",
-      "letterSpacing-Text-deleted": "var(--xmlui-letterSpacing-Text-deleted)",
-      "fontFamily-Text-inserted": "var(--xmlui-fontFamily-Text-inserted)",
-      "fontSize-Text-inserted": "var(--xmlui-fontSize-Text-inserted)",
-      "fontWeight-Text-inserted": "var(--xmlui-fontWeight-Text-inserted)",
-      "font-style-Text-inserted": "var(--xmlui-font-style-Text-inserted)",
-      "fontStretch-Text-inserted": "var(--xmlui-fontStretch-Text-inserted)",
-      "textDecorationLine-Text-inserted": "var(--xmlui-textDecorationLine-Text-inserted)",
-      "textDecorationColor-Text-inserted": "var(--xmlui-textDecorationColor-Text-inserted)",
-      "textDecorationStyle-Text-inserted": "var(--xmlui-textDecorationStyle-Text-inserted)",
-      "textDecorationThickness-Text-inserted": "var(--xmlui-textDecorationThickness-Text-inserted)",
-      "textUnderlineOffset-Text-inserted": "var(--xmlui-textUnderlineOffset-Text-inserted)",
-      "lineHeight-Text-inserted": "var(--xmlui-lineHeight-Text-inserted)",
-      "textColor-Text-inserted": "var(--xmlui-textColor-Text-inserted)",
-      "backgroundColor-Text-inserted": "var(--xmlui-backgroundColor-Text-inserted)",
-      "borderRadius-Text-inserted": "var(--xmlui-borderRadius-Text-inserted)",
-      "borderColor-Text-inserted": "var(--xmlui-borderColor-Text-inserted)",
-      "borderWidth-Text-inserted": "var(--xmlui-borderWidth-Text-inserted)",
-      "borderStyle-Text-inserted": "var(--xmlui-borderStyle-Text-inserted)",
       "marginTop-Text-inserted": "var(--xmlui-marginTop-Text-inserted)",
       "marginBottom-Text-inserted": "var(--xmlui-marginBottom-Text-inserted)",
-      "textTransform-Text-inserted": "var(--xmlui-textTransform-Text-inserted)",
+      "marginLeft-Text-inserted": "var(--xmlui-marginLeft-Text-inserted)",
+      "marginRight-Text-inserted": "var(--xmlui-marginRight-Text-inserted)",
       "verticalAlign-Text-inserted": "var(--xmlui-verticalAlign-Text-inserted)",
-      "letterSpacing-Text-inserted": "var(--xmlui-letterSpacing-Text-inserted)",
-      "fontFamily-Text-keyboard": "var(--xmlui-fontFamily-Text-keyboard)",
-      "fontSize-Text-keyboard": "var(--xmlui-fontSize-Text-keyboard)",
-      "fontWeight-Text-keyboard": "var(--xmlui-fontWeight-Text-keyboard)",
-      "font-style-Text-keyboard": "var(--xmlui-font-style-Text-keyboard)",
-      "fontStretch-Text-keyboard": "var(--xmlui-fontStretch-Text-keyboard)",
-      "textDecorationLine-Text-keyboard": "var(--xmlui-textDecorationLine-Text-keyboard)",
-      "textDecorationColor-Text-keyboard": "var(--xmlui-textDecorationColor-Text-keyboard)",
-      "textDecorationStyle-Text-keyboard": "var(--xmlui-textDecorationStyle-Text-keyboard)",
-      "textDecorationThickness-Text-keyboard": "var(--xmlui-textDecorationThickness-Text-keyboard)",
-      "textUnderlineOffset-Text-keyboard": "var(--xmlui-textUnderlineOffset-Text-keyboard)",
-      "lineHeight-Text-keyboard": "var(--xmlui-lineHeight-Text-keyboard)",
-      "textColor-Text-keyboard": "var(--xmlui-textColor-Text-keyboard)",
-      "backgroundColor-Text-keyboard": "var(--xmlui-backgroundColor-Text-keyboard)",
-      "borderRadius-Text-keyboard": "var(--xmlui-borderRadius-Text-keyboard)",
-      "borderColor-Text-keyboard": "var(--xmlui-borderColor-Text-keyboard)",
-      "borderWidth-Text-keyboard": "var(--xmlui-borderWidth-Text-keyboard)",
-      "borderStyle-Text-keyboard": "var(--xmlui-borderStyle-Text-keyboard)",
       "marginTop-Text-keyboard": "var(--xmlui-marginTop-Text-keyboard)",
       "marginBottom-Text-keyboard": "var(--xmlui-marginBottom-Text-keyboard)",
-      "textTransform-Text-keyboard": "var(--xmlui-textTransform-Text-keyboard)",
+      "marginLeft-Text-keyboard": "var(--xmlui-marginLeft-Text-keyboard)",
+      "marginRight-Text-keyboard": "var(--xmlui-marginRight-Text-keyboard)",
       "verticalAlign-Text-keyboard": "var(--xmlui-verticalAlign-Text-keyboard)",
-      "letterSpacing-Text-keyboard": "var(--xmlui-letterSpacing-Text-keyboard)",
-      "fontFamily-Text-marked": "var(--xmlui-fontFamily-Text-marked)",
-      "fontSize-Text-marked": "var(--xmlui-fontSize-Text-marked)",
-      "fontWeight-Text-marked": "var(--xmlui-fontWeight-Text-marked)",
-      "font-style-Text-marked": "var(--xmlui-font-style-Text-marked)",
-      "fontStretch-Text-marked": "var(--xmlui-fontStretch-Text-marked)",
-      "textDecorationLine-Text-marked": "var(--xmlui-textDecorationLine-Text-marked)",
-      "textDecorationColor-Text-marked": "var(--xmlui-textDecorationColor-Text-marked)",
-      "textDecorationStyle-Text-marked": "var(--xmlui-textDecorationStyle-Text-marked)",
-      "textDecorationThickness-Text-marked": "var(--xmlui-textDecorationThickness-Text-marked)",
-      "textUnderlineOffset-Text-marked": "var(--xmlui-textUnderlineOffset-Text-marked)",
-      "lineHeight-Text-marked": "var(--xmlui-lineHeight-Text-marked)",
-      "textColor-Text-marked": "var(--xmlui-textColor-Text-marked)",
-      "backgroundColor-Text-marked": "var(--xmlui-backgroundColor-Text-marked)",
-      "borderRadius-Text-marked": "var(--xmlui-borderRadius-Text-marked)",
-      "borderColor-Text-marked": "var(--xmlui-borderColor-Text-marked)",
-      "borderWidth-Text-marked": "var(--xmlui-borderWidth-Text-marked)",
-      "borderStyle-Text-marked": "var(--xmlui-borderStyle-Text-marked)",
       "marginTop-Text-marked": "var(--xmlui-marginTop-Text-marked)",
       "marginBottom-Text-marked": "var(--xmlui-marginBottom-Text-marked)",
-      "textTransform-Text-marked": "var(--xmlui-textTransform-Text-marked)",
+      "marginLeft-Text-marked": "var(--xmlui-marginLeft-Text-marked)",
+      "marginRight-Text-marked": "var(--xmlui-marginRight-Text-marked)",
       "verticalAlign-Text-marked": "var(--xmlui-verticalAlign-Text-marked)",
-      "letterSpacing-Text-marked": "var(--xmlui-letterSpacing-Text-marked)",
-      "fontFamily-Text-mono": "var(--xmlui-fontFamily-Text-mono)",
-      "fontSize-Text-mono": "var(--xmlui-fontSize-Text-mono)",
-      "fontWeight-Text-mono": "var(--xmlui-fontWeight-Text-mono)",
-      "font-style-Text-mono": "var(--xmlui-font-style-Text-mono)",
-      "fontStretch-Text-mono": "var(--xmlui-fontStretch-Text-mono)",
-      "textDecorationLine-Text-mono": "var(--xmlui-textDecorationLine-Text-mono)",
-      "textDecorationColor-Text-mono": "var(--xmlui-textDecorationColor-Text-mono)",
-      "textDecorationStyle-Text-mono": "var(--xmlui-textDecorationStyle-Text-mono)",
-      "textDecorationThickness-Text-mono": "var(--xmlui-textDecorationThickness-Text-mono)",
-      "textUnderlineOffset-Text-mono": "var(--xmlui-textUnderlineOffset-Text-mono)",
-      "lineHeight-Text-mono": "var(--xmlui-lineHeight-Text-mono)",
-      "textColor-Text-mono": "var(--xmlui-textColor-Text-mono)",
-      "backgroundColor-Text-mono": "var(--xmlui-backgroundColor-Text-mono)",
-      "borderRadius-Text-mono": "var(--xmlui-borderRadius-Text-mono)",
-      "borderColor-Text-mono": "var(--xmlui-borderColor-Text-mono)",
-      "borderWidth-Text-mono": "var(--xmlui-borderWidth-Text-mono)",
-      "borderStyle-Text-mono": "var(--xmlui-borderStyle-Text-mono)",
       "marginTop-Text-mono": "var(--xmlui-marginTop-Text-mono)",
       "marginBottom-Text-mono": "var(--xmlui-marginBottom-Text-mono)",
-      "textTransform-Text-mono": "var(--xmlui-textTransform-Text-mono)",
+      "marginLeft-Text-mono": "var(--xmlui-marginLeft-Text-mono)",
+      "marginRight-Text-mono": "var(--xmlui-marginRight-Text-mono)",
       "verticalAlign-Text-mono": "var(--xmlui-verticalAlign-Text-mono)",
-      "letterSpacing-Text-mono": "var(--xmlui-letterSpacing-Text-mono)",
-      "fontFamily-Text-sample": "var(--xmlui-fontFamily-Text-sample)",
-      "fontSize-Text-sample": "var(--xmlui-fontSize-Text-sample)",
-      "fontWeight-Text-sample": "var(--xmlui-fontWeight-Text-sample)",
-      "font-style-Text-sample": "var(--xmlui-font-style-Text-sample)",
-      "fontStretch-Text-sample": "var(--xmlui-fontStretch-Text-sample)",
-      "textDecorationLine-Text-sample": "var(--xmlui-textDecorationLine-Text-sample)",
-      "textDecorationColor-Text-sample": "var(--xmlui-textDecorationColor-Text-sample)",
-      "textDecorationStyle-Text-sample": "var(--xmlui-textDecorationStyle-Text-sample)",
-      "textDecorationThickness-Text-sample": "var(--xmlui-textDecorationThickness-Text-sample)",
-      "textUnderlineOffset-Text-sample": "var(--xmlui-textUnderlineOffset-Text-sample)",
-      "lineHeight-Text-sample": "var(--xmlui-lineHeight-Text-sample)",
-      "textColor-Text-sample": "var(--xmlui-textColor-Text-sample)",
-      "backgroundColor-Text-sample": "var(--xmlui-backgroundColor-Text-sample)",
-      "borderRadius-Text-sample": "var(--xmlui-borderRadius-Text-sample)",
-      "borderColor-Text-sample": "var(--xmlui-borderColor-Text-sample)",
-      "borderWidth-Text-sample": "var(--xmlui-borderWidth-Text-sample)",
-      "borderStyle-Text-sample": "var(--xmlui-borderStyle-Text-sample)",
       "marginTop-Text-sample": "var(--xmlui-marginTop-Text-sample)",
       "marginBottom-Text-sample": "var(--xmlui-marginBottom-Text-sample)",
-      "textTransform-Text-sample": "var(--xmlui-textTransform-Text-sample)",
+      "marginLeft-Text-sample": "var(--xmlui-marginLeft-Text-sample)",
+      "marginRight-Text-sample": "var(--xmlui-marginRight-Text-sample)",
       "verticalAlign-Text-sample": "var(--xmlui-verticalAlign-Text-sample)",
-      "letterSpacing-Text-sample": "var(--xmlui-letterSpacing-Text-sample)",
-      "fontFamily-Text-sup": "var(--xmlui-fontFamily-Text-sup)",
-      "fontSize-Text-sup": "var(--xmlui-fontSize-Text-sup)",
-      "fontWeight-Text-sup": "var(--xmlui-fontWeight-Text-sup)",
-      "font-style-Text-sup": "var(--xmlui-font-style-Text-sup)",
-      "fontStretch-Text-sup": "var(--xmlui-fontStretch-Text-sup)",
-      "textDecorationLine-Text-sup": "var(--xmlui-textDecorationLine-Text-sup)",
-      "textDecorationColor-Text-sup": "var(--xmlui-textDecorationColor-Text-sup)",
-      "textDecorationStyle-Text-sup": "var(--xmlui-textDecorationStyle-Text-sup)",
-      "textDecorationThickness-Text-sup": "var(--xmlui-textDecorationThickness-Text-sup)",
-      "textUnderlineOffset-Text-sup": "var(--xmlui-textUnderlineOffset-Text-sup)",
-      "lineHeight-Text-sup": "var(--xmlui-lineHeight-Text-sup)",
-      "textColor-Text-sup": "var(--xmlui-textColor-Text-sup)",
-      "backgroundColor-Text-sup": "var(--xmlui-backgroundColor-Text-sup)",
-      "borderRadius-Text-sup": "var(--xmlui-borderRadius-Text-sup)",
-      "borderColor-Text-sup": "var(--xmlui-borderColor-Text-sup)",
-      "borderWidth-Text-sup": "var(--xmlui-borderWidth-Text-sup)",
-      "borderStyle-Text-sup": "var(--xmlui-borderStyle-Text-sup)",
       "marginTop-Text-sup": "var(--xmlui-marginTop-Text-sup)",
       "marginBottom-Text-sup": "var(--xmlui-marginBottom-Text-sup)",
-      "textTransform-Text-sup": "var(--xmlui-textTransform-Text-sup)",
+      "marginLeft-Text-sup": "var(--xmlui-marginLeft-Text-sup)",
+      "marginRight-Text-sup": "var(--xmlui-marginRight-Text-sup)",
       "verticalAlign-Text-sup": "var(--xmlui-verticalAlign-Text-sup)",
-      "letterSpacing-Text-sup": "var(--xmlui-letterSpacing-Text-sup)",
-      "fontFamily-Text-sub": "var(--xmlui-fontFamily-Text-sub)",
-      "fontSize-Text-sub": "var(--xmlui-fontSize-Text-sub)",
-      "fontWeight-Text-sub": "var(--xmlui-fontWeight-Text-sub)",
-      "font-style-Text-sub": "var(--xmlui-font-style-Text-sub)",
-      "fontStretch-Text-sub": "var(--xmlui-fontStretch-Text-sub)",
-      "textDecorationLine-Text-sub": "var(--xmlui-textDecorationLine-Text-sub)",
-      "textDecorationColor-Text-sub": "var(--xmlui-textDecorationColor-Text-sub)",
-      "textDecorationStyle-Text-sub": "var(--xmlui-textDecorationStyle-Text-sub)",
-      "textDecorationThickness-Text-sub": "var(--xmlui-textDecorationThickness-Text-sub)",
-      "textUnderlineOffset-Text-sub": "var(--xmlui-textUnderlineOffset-Text-sub)",
-      "lineHeight-Text-sub": "var(--xmlui-lineHeight-Text-sub)",
-      "textColor-Text-sub": "var(--xmlui-textColor-Text-sub)",
-      "backgroundColor-Text-sub": "var(--xmlui-backgroundColor-Text-sub)",
-      "borderRadius-Text-sub": "var(--xmlui-borderRadius-Text-sub)",
-      "borderColor-Text-sub": "var(--xmlui-borderColor-Text-sub)",
-      "borderWidth-Text-sub": "var(--xmlui-borderWidth-Text-sub)",
-      "borderStyle-Text-sub": "var(--xmlui-borderStyle-Text-sub)",
       "marginTop-Text-sub": "var(--xmlui-marginTop-Text-sub)",
       "marginBottom-Text-sub": "var(--xmlui-marginBottom-Text-sub)",
-      "textTransform-Text-sub": "var(--xmlui-textTransform-Text-sub)",
+      "marginLeft-Text-sub": "var(--xmlui-marginLeft-Text-sub)",
+      "marginRight-Text-sub": "var(--xmlui-marginRight-Text-sub)",
       "verticalAlign-Text-sub": "var(--xmlui-verticalAlign-Text-sub)",
-      "letterSpacing-Text-sub": "var(--xmlui-letterSpacing-Text-sub)",
-      "fontFamily-Text-var": "var(--xmlui-fontFamily-Text-var)",
-      "fontSize-Text-var": "var(--xmlui-fontSize-Text-var)",
-      "fontWeight-Text-var": "var(--xmlui-fontWeight-Text-var)",
-      "font-style-Text-var": "var(--xmlui-font-style-Text-var)",
-      "fontStretch-Text-var": "var(--xmlui-fontStretch-Text-var)",
-      "textDecorationLine-Text-var": "var(--xmlui-textDecorationLine-Text-var)",
-      "textDecorationColor-Text-var": "var(--xmlui-textDecorationColor-Text-var)",
-      "textDecorationStyle-Text-var": "var(--xmlui-textDecorationStyle-Text-var)",
-      "textDecorationThickness-Text-var": "var(--xmlui-textDecorationThickness-Text-var)",
-      "textUnderlineOffset-Text-var": "var(--xmlui-textUnderlineOffset-Text-var)",
-      "lineHeight-Text-var": "var(--xmlui-lineHeight-Text-var)",
-      "textColor-Text-var": "var(--xmlui-textColor-Text-var)",
-      "backgroundColor-Text-var": "var(--xmlui-backgroundColor-Text-var)",
-      "borderRadius-Text-var": "var(--xmlui-borderRadius-Text-var)",
-      "borderColor-Text-var": "var(--xmlui-borderColor-Text-var)",
-      "borderWidth-Text-var": "var(--xmlui-borderWidth-Text-var)",
-      "borderStyle-Text-var": "var(--xmlui-borderStyle-Text-var)",
       "marginTop-Text-var": "var(--xmlui-marginTop-Text-var)",
       "marginBottom-Text-var": "var(--xmlui-marginBottom-Text-var)",
-      "textTransform-Text-var": "var(--xmlui-textTransform-Text-var)",
+      "marginLeft-Text-var": "var(--xmlui-marginLeft-Text-var)",
+      "marginRight-Text-var": "var(--xmlui-marginRight-Text-var)",
       "verticalAlign-Text-var": "var(--xmlui-verticalAlign-Text-var)",
-      "letterSpacing-Text-var": "var(--xmlui-letterSpacing-Text-var)",
-      "fontFamily-Text-title": "var(--xmlui-fontFamily-Text-title)",
-      "fontSize-Text-title": "var(--xmlui-fontSize-Text-title)",
-      "fontWeight-Text-title": "var(--xmlui-fontWeight-Text-title)",
-      "font-style-Text-title": "var(--xmlui-font-style-Text-title)",
-      "fontStretch-Text-title": "var(--xmlui-fontStretch-Text-title)",
-      "textDecorationLine-Text-title": "var(--xmlui-textDecorationLine-Text-title)",
-      "textDecorationColor-Text-title": "var(--xmlui-textDecorationColor-Text-title)",
-      "textDecorationStyle-Text-title": "var(--xmlui-textDecorationStyle-Text-title)",
-      "textDecorationThickness-Text-title": "var(--xmlui-textDecorationThickness-Text-title)",
-      "textUnderlineOffset-Text-title": "var(--xmlui-textUnderlineOffset-Text-title)",
-      "lineHeight-Text-title": "var(--xmlui-lineHeight-Text-title)",
-      "textColor-Text-title": "var(--xmlui-textColor-Text-title)",
-      "backgroundColor-Text-title": "var(--xmlui-backgroundColor-Text-title)",
-      "borderRadius-Text-title": "var(--xmlui-borderRadius-Text-title)",
-      "borderColor-Text-title": "var(--xmlui-borderColor-Text-title)",
-      "borderWidth-Text-title": "var(--xmlui-borderWidth-Text-title)",
-      "borderStyle-Text-title": "var(--xmlui-borderStyle-Text-title)",
       "marginTop-Text-title": "var(--xmlui-marginTop-Text-title)",
       "marginBottom-Text-title": "var(--xmlui-marginBottom-Text-title)",
-      "textTransform-Text-title": "var(--xmlui-textTransform-Text-title)",
+      "marginLeft-Text-title": "var(--xmlui-marginLeft-Text-title)",
+      "marginRight-Text-title": "var(--xmlui-marginRight-Text-title)",
       "verticalAlign-Text-title": "var(--xmlui-verticalAlign-Text-title)",
-      "letterSpacing-Text-title": "var(--xmlui-letterSpacing-Text-title)",
-      "fontFamily-Text-subtitle": "var(--xmlui-fontFamily-Text-subtitle)",
-      "fontSize-Text-subtitle": "var(--xmlui-fontSize-Text-subtitle)",
-      "fontWeight-Text-subtitle": "var(--xmlui-fontWeight-Text-subtitle)",
-      "font-style-Text-subtitle": "var(--xmlui-font-style-Text-subtitle)",
-      "fontStretch-Text-subtitle": "var(--xmlui-fontStretch-Text-subtitle)",
-      "textDecorationLine-Text-subtitle": "var(--xmlui-textDecorationLine-Text-subtitle)",
-      "textDecorationColor-Text-subtitle": "var(--xmlui-textDecorationColor-Text-subtitle)",
-      "textDecorationStyle-Text-subtitle": "var(--xmlui-textDecorationStyle-Text-subtitle)",
-      "textDecorationThickness-Text-subtitle": "var(--xmlui-textDecorationThickness-Text-subtitle)",
-      "textUnderlineOffset-Text-subtitle": "var(--xmlui-textUnderlineOffset-Text-subtitle)",
-      "lineHeight-Text-subtitle": "var(--xmlui-lineHeight-Text-subtitle)",
-      "textColor-Text-subtitle": "var(--xmlui-textColor-Text-subtitle)",
-      "backgroundColor-Text-subtitle": "var(--xmlui-backgroundColor-Text-subtitle)",
-      "borderRadius-Text-subtitle": "var(--xmlui-borderRadius-Text-subtitle)",
-      "borderColor-Text-subtitle": "var(--xmlui-borderColor-Text-subtitle)",
-      "borderWidth-Text-subtitle": "var(--xmlui-borderWidth-Text-subtitle)",
-      "borderStyle-Text-subtitle": "var(--xmlui-borderStyle-Text-subtitle)",
       "marginTop-Text-subtitle": "var(--xmlui-marginTop-Text-subtitle)",
       "marginBottom-Text-subtitle": "var(--xmlui-marginBottom-Text-subtitle)",
-      "textTransform-Text-subtitle": "var(--xmlui-textTransform-Text-subtitle)",
+      "marginLeft-Text-subtitle": "var(--xmlui-marginLeft-Text-subtitle)",
+      "marginRight-Text-subtitle": "var(--xmlui-marginRight-Text-subtitle)",
       "verticalAlign-Text-subtitle": "var(--xmlui-verticalAlign-Text-subtitle)",
-      "letterSpacing-Text-subtitle": "var(--xmlui-letterSpacing-Text-subtitle)",
-      "fontFamily-Text-small": "var(--xmlui-fontFamily-Text-small)",
-      "fontSize-Text-small": "var(--xmlui-fontSize-Text-small)",
-      "fontWeight-Text-small": "var(--xmlui-fontWeight-Text-small)",
-      "font-style-Text-small": "var(--xmlui-font-style-Text-small)",
-      "fontStretch-Text-small": "var(--xmlui-fontStretch-Text-small)",
-      "textDecorationLine-Text-small": "var(--xmlui-textDecorationLine-Text-small)",
-      "textDecorationColor-Text-small": "var(--xmlui-textDecorationColor-Text-small)",
-      "textDecorationStyle-Text-small": "var(--xmlui-textDecorationStyle-Text-small)",
-      "textDecorationThickness-Text-small": "var(--xmlui-textDecorationThickness-Text-small)",
-      "textUnderlineOffset-Text-small": "var(--xmlui-textUnderlineOffset-Text-small)",
-      "lineHeight-Text-small": "var(--xmlui-lineHeight-Text-small)",
-      "textColor-Text-small": "var(--xmlui-textColor-Text-small)",
-      "backgroundColor-Text-small": "var(--xmlui-backgroundColor-Text-small)",
-      "borderRadius-Text-small": "var(--xmlui-borderRadius-Text-small)",
-      "borderColor-Text-small": "var(--xmlui-borderColor-Text-small)",
-      "borderWidth-Text-small": "var(--xmlui-borderWidth-Text-small)",
-      "borderStyle-Text-small": "var(--xmlui-borderStyle-Text-small)",
       "marginTop-Text-small": "var(--xmlui-marginTop-Text-small)",
       "marginBottom-Text-small": "var(--xmlui-marginBottom-Text-small)",
-      "textTransform-Text-small": "var(--xmlui-textTransform-Text-small)",
+      "marginLeft-Text-small": "var(--xmlui-marginLeft-Text-small)",
+      "marginRight-Text-small": "var(--xmlui-marginRight-Text-small)",
       "verticalAlign-Text-small": "var(--xmlui-verticalAlign-Text-small)",
-      "letterSpacing-Text-small": "var(--xmlui-letterSpacing-Text-small)",
-      "fontFamily-Text-caption": "var(--xmlui-fontFamily-Text-caption)",
-      "fontSize-Text-caption": "var(--xmlui-fontSize-Text-caption)",
-      "fontWeight-Text-caption": "var(--xmlui-fontWeight-Text-caption)",
-      "font-style-Text-caption": "var(--xmlui-font-style-Text-caption)",
-      "fontStretch-Text-caption": "var(--xmlui-fontStretch-Text-caption)",
-      "textDecorationLine-Text-caption": "var(--xmlui-textDecorationLine-Text-caption)",
-      "textDecorationColor-Text-caption": "var(--xmlui-textDecorationColor-Text-caption)",
-      "textDecorationStyle-Text-caption": "var(--xmlui-textDecorationStyle-Text-caption)",
-      "textDecorationThickness-Text-caption": "var(--xmlui-textDecorationThickness-Text-caption)",
-      "textUnderlineOffset-Text-caption": "var(--xmlui-textUnderlineOffset-Text-caption)",
-      "lineHeight-Text-caption": "var(--xmlui-lineHeight-Text-caption)",
-      "textColor-Text-caption": "var(--xmlui-textColor-Text-caption)",
-      "backgroundColor-Text-caption": "var(--xmlui-backgroundColor-Text-caption)",
-      "borderRadius-Text-caption": "var(--xmlui-borderRadius-Text-caption)",
-      "borderColor-Text-caption": "var(--xmlui-borderColor-Text-caption)",
-      "borderWidth-Text-caption": "var(--xmlui-borderWidth-Text-caption)",
-      "borderStyle-Text-caption": "var(--xmlui-borderStyle-Text-caption)",
       "marginTop-Text-caption": "var(--xmlui-marginTop-Text-caption)",
       "marginBottom-Text-caption": "var(--xmlui-marginBottom-Text-caption)",
-      "textTransform-Text-caption": "var(--xmlui-textTransform-Text-caption)",
+      "marginLeft-Text-caption": "var(--xmlui-marginLeft-Text-caption)",
+      "marginRight-Text-caption": "var(--xmlui-marginRight-Text-caption)",
       "verticalAlign-Text-caption": "var(--xmlui-verticalAlign-Text-caption)",
-      "letterSpacing-Text-caption": "var(--xmlui-letterSpacing-Text-caption)",
-      "fontFamily-Text-placeholder": "var(--xmlui-fontFamily-Text-placeholder)",
-      "fontSize-Text-placeholder": "var(--xmlui-fontSize-Text-placeholder)",
-      "fontWeight-Text-placeholder": "var(--xmlui-fontWeight-Text-placeholder)",
-      "font-style-Text-placeholder": "var(--xmlui-font-style-Text-placeholder)",
-      "fontStretch-Text-placeholder": "var(--xmlui-fontStretch-Text-placeholder)",
-      "textDecorationLine-Text-placeholder": "var(--xmlui-textDecorationLine-Text-placeholder)",
-      "textDecorationColor-Text-placeholder": "var(--xmlui-textDecorationColor-Text-placeholder)",
-      "textDecorationStyle-Text-placeholder": "var(--xmlui-textDecorationStyle-Text-placeholder)",
-      "textDecorationThickness-Text-placeholder": "var(--xmlui-textDecorationThickness-Text-placeholder)",
-      "textUnderlineOffset-Text-placeholder": "var(--xmlui-textUnderlineOffset-Text-placeholder)",
-      "lineHeight-Text-placeholder": "var(--xmlui-lineHeight-Text-placeholder)",
-      "textColor-Text-placeholder": "var(--xmlui-textColor-Text-placeholder)",
-      "backgroundColor-Text-placeholder": "var(--xmlui-backgroundColor-Text-placeholder)",
-      "borderRadius-Text-placeholder": "var(--xmlui-borderRadius-Text-placeholder)",
-      "borderColor-Text-placeholder": "var(--xmlui-borderColor-Text-placeholder)",
-      "borderWidth-Text-placeholder": "var(--xmlui-borderWidth-Text-placeholder)",
-      "borderStyle-Text-placeholder": "var(--xmlui-borderStyle-Text-placeholder)",
       "marginTop-Text-placeholder": "var(--xmlui-marginTop-Text-placeholder)",
       "marginBottom-Text-placeholder": "var(--xmlui-marginBottom-Text-placeholder)",
-      "textTransform-Text-placeholder": "var(--xmlui-textTransform-Text-placeholder)",
+      "marginLeft-Text-placeholder": "var(--xmlui-marginLeft-Text-placeholder)",
+      "marginRight-Text-placeholder": "var(--xmlui-marginRight-Text-placeholder)",
       "verticalAlign-Text-placeholder": "var(--xmlui-verticalAlign-Text-placeholder)",
-      "letterSpacing-Text-placeholder": "var(--xmlui-letterSpacing-Text-placeholder)",
-      "fontFamily-Text-paragraph": "var(--xmlui-fontFamily-Text-paragraph)",
-      "fontSize-Text-paragraph": "var(--xmlui-fontSize-Text-paragraph)",
-      "fontWeight-Text-paragraph": "var(--xmlui-fontWeight-Text-paragraph)",
-      "font-style-Text-paragraph": "var(--xmlui-font-style-Text-paragraph)",
-      "fontStretch-Text-paragraph": "var(--xmlui-fontStretch-Text-paragraph)",
-      "textDecorationLine-Text-paragraph": "var(--xmlui-textDecorationLine-Text-paragraph)",
-      "textDecorationColor-Text-paragraph": "var(--xmlui-textDecorationColor-Text-paragraph)",
-      "textDecorationStyle-Text-paragraph": "var(--xmlui-textDecorationStyle-Text-paragraph)",
-      "textDecorationThickness-Text-paragraph": "var(--xmlui-textDecorationThickness-Text-paragraph)",
-      "textUnderlineOffset-Text-paragraph": "var(--xmlui-textUnderlineOffset-Text-paragraph)",
-      "lineHeight-Text-paragraph": "var(--xmlui-lineHeight-Text-paragraph)",
-      "textColor-Text-paragraph": "var(--xmlui-textColor-Text-paragraph)",
-      "backgroundColor-Text-paragraph": "var(--xmlui-backgroundColor-Text-paragraph)",
-      "borderRadius-Text-paragraph": "var(--xmlui-borderRadius-Text-paragraph)",
-      "borderColor-Text-paragraph": "var(--xmlui-borderColor-Text-paragraph)",
-      "borderWidth-Text-paragraph": "var(--xmlui-borderWidth-Text-paragraph)",
-      "borderStyle-Text-paragraph": "var(--xmlui-borderStyle-Text-paragraph)",
       "marginTop-Text-paragraph": "var(--xmlui-marginTop-Text-paragraph)",
       "marginBottom-Text-paragraph": "var(--xmlui-marginBottom-Text-paragraph)",
-      "textTransform-Text-paragraph": "var(--xmlui-textTransform-Text-paragraph)",
+      "marginLeft-Text-paragraph": "var(--xmlui-marginLeft-Text-paragraph)",
+      "marginRight-Text-paragraph": "var(--xmlui-marginRight-Text-paragraph)",
       "verticalAlign-Text-paragraph": "var(--xmlui-verticalAlign-Text-paragraph)",
-      "letterSpacing-Text-paragraph": "var(--xmlui-letterSpacing-Text-paragraph)",
-      "fontFamily-Text-subheading": "var(--xmlui-fontFamily-Text-subheading)",
-      "fontSize-Text-subheading": "var(--xmlui-fontSize-Text-subheading)",
-      "fontWeight-Text-subheading": "var(--xmlui-fontWeight-Text-subheading)",
-      "font-style-Text-subheading": "var(--xmlui-font-style-Text-subheading)",
-      "fontStretch-Text-subheading": "var(--xmlui-fontStretch-Text-subheading)",
-      "textDecorationLine-Text-subheading": "var(--xmlui-textDecorationLine-Text-subheading)",
-      "textDecorationColor-Text-subheading": "var(--xmlui-textDecorationColor-Text-subheading)",
-      "textDecorationStyle-Text-subheading": "var(--xmlui-textDecorationStyle-Text-subheading)",
-      "textDecorationThickness-Text-subheading": "var(--xmlui-textDecorationThickness-Text-subheading)",
-      "textUnderlineOffset-Text-subheading": "var(--xmlui-textUnderlineOffset-Text-subheading)",
-      "lineHeight-Text-subheading": "var(--xmlui-lineHeight-Text-subheading)",
-      "textColor-Text-subheading": "var(--xmlui-textColor-Text-subheading)",
-      "backgroundColor-Text-subheading": "var(--xmlui-backgroundColor-Text-subheading)",
-      "borderRadius-Text-subheading": "var(--xmlui-borderRadius-Text-subheading)",
-      "borderColor-Text-subheading": "var(--xmlui-borderColor-Text-subheading)",
-      "borderWidth-Text-subheading": "var(--xmlui-borderWidth-Text-subheading)",
-      "borderStyle-Text-subheading": "var(--xmlui-borderStyle-Text-subheading)",
       "marginTop-Text-subheading": "var(--xmlui-marginTop-Text-subheading)",
       "marginBottom-Text-subheading": "var(--xmlui-marginBottom-Text-subheading)",
-      "textTransform-Text-subheading": "var(--xmlui-textTransform-Text-subheading)",
+      "marginLeft-Text-subheading": "var(--xmlui-marginLeft-Text-subheading)",
+      "marginRight-Text-subheading": "var(--xmlui-marginRight-Text-subheading)",
       "verticalAlign-Text-subheading": "var(--xmlui-verticalAlign-Text-subheading)",
-      "letterSpacing-Text-subheading": "var(--xmlui-letterSpacing-Text-subheading)",
-      "fontFamily-Text-tableheading": "var(--xmlui-fontFamily-Text-tableheading)",
-      "fontSize-Text-tableheading": "var(--xmlui-fontSize-Text-tableheading)",
-      "fontWeight-Text-tableheading": "var(--xmlui-fontWeight-Text-tableheading)",
-      "font-style-Text-tableheading": "var(--xmlui-font-style-Text-tableheading)",
-      "fontStretch-Text-tableheading": "var(--xmlui-fontStretch-Text-tableheading)",
-      "textDecorationLine-Text-tableheading": "var(--xmlui-textDecorationLine-Text-tableheading)",
-      "textDecorationColor-Text-tableheading": "var(--xmlui-textDecorationColor-Text-tableheading)",
-      "textDecorationStyle-Text-tableheading": "var(--xmlui-textDecorationStyle-Text-tableheading)",
-      "textDecorationThickness-Text-tableheading": "var(--xmlui-textDecorationThickness-Text-tableheading)",
-      "textUnderlineOffset-Text-tableheading": "var(--xmlui-textUnderlineOffset-Text-tableheading)",
-      "lineHeight-Text-tableheading": "var(--xmlui-lineHeight-Text-tableheading)",
-      "textColor-Text-tableheading": "var(--xmlui-textColor-Text-tableheading)",
-      "backgroundColor-Text-tableheading": "var(--xmlui-backgroundColor-Text-tableheading)",
-      "borderRadius-Text-tableheading": "var(--xmlui-borderRadius-Text-tableheading)",
-      "borderColor-Text-tableheading": "var(--xmlui-borderColor-Text-tableheading)",
-      "borderWidth-Text-tableheading": "var(--xmlui-borderWidth-Text-tableheading)",
-      "borderStyle-Text-tableheading": "var(--xmlui-borderStyle-Text-tableheading)",
       "marginTop-Text-tableheading": "var(--xmlui-marginTop-Text-tableheading)",
       "marginBottom-Text-tableheading": "var(--xmlui-marginBottom-Text-tableheading)",
-      "textTransform-Text-tableheading": "var(--xmlui-textTransform-Text-tableheading)",
+      "marginLeft-Text-tableheading": "var(--xmlui-marginLeft-Text-tableheading)",
+      "marginRight-Text-tableheading": "var(--xmlui-marginRight-Text-tableheading)",
       "verticalAlign-Text-tableheading": "var(--xmlui-verticalAlign-Text-tableheading)",
-      "letterSpacing-Text-tableheading": "var(--xmlui-letterSpacing-Text-tableheading)",
-      "fontFamily-Text-secondary": "var(--xmlui-fontFamily-Text-secondary)",
-      "fontSize-Text-secondary": "var(--xmlui-fontSize-Text-secondary)",
-      "fontWeight-Text-secondary": "var(--xmlui-fontWeight-Text-secondary)",
-      "font-style-Text-secondary": "var(--xmlui-font-style-Text-secondary)",
-      "fontStretch-Text-secondary": "var(--xmlui-fontStretch-Text-secondary)",
-      "textDecorationLine-Text-secondary": "var(--xmlui-textDecorationLine-Text-secondary)",
-      "textDecorationColor-Text-secondary": "var(--xmlui-textDecorationColor-Text-secondary)",
-      "textDecorationStyle-Text-secondary": "var(--xmlui-textDecorationStyle-Text-secondary)",
-      "textDecorationThickness-Text-secondary": "var(--xmlui-textDecorationThickness-Text-secondary)",
-      "textUnderlineOffset-Text-secondary": "var(--xmlui-textUnderlineOffset-Text-secondary)",
-      "lineHeight-Text-secondary": "var(--xmlui-lineHeight-Text-secondary)",
-      "textColor-Text-secondary": "var(--xmlui-textColor-Text-secondary)",
-      "backgroundColor-Text-secondary": "var(--xmlui-backgroundColor-Text-secondary)",
-      "borderRadius-Text-secondary": "var(--xmlui-borderRadius-Text-secondary)",
-      "borderColor-Text-secondary": "var(--xmlui-borderColor-Text-secondary)",
-      "borderWidth-Text-secondary": "var(--xmlui-borderWidth-Text-secondary)",
-      "borderStyle-Text-secondary": "var(--xmlui-borderStyle-Text-secondary)",
       "marginTop-Text-secondary": "var(--xmlui-marginTop-Text-secondary)",
       "marginBottom-Text-secondary": "var(--xmlui-marginBottom-Text-secondary)",
-      "textTransform-Text-secondary": "var(--xmlui-textTransform-Text-secondary)",
-      "verticalAlign-Text-secondary": "var(--xmlui-verticalAlign-Text-secondary)",
-      "letterSpacing-Text-secondary": "var(--xmlui-letterSpacing-Text-secondary)"
+      "marginLeft-Text-secondary": "var(--xmlui-marginLeft-Text-secondary)",
+      "marginRight-Text-secondary": "var(--xmlui-marginRight-Text-secondary)",
+      "verticalAlign-Text-secondary": "var(--xmlui-verticalAlign-Text-secondary)"
     },
     "defaultThemeVars": {
       "borderRadius-Text": "$borderRadius",
@@ -9783,7 +12438,10 @@ export default {
       "fontFamily-Text-code": "$fontFamily-monospace",
       "fontSize-Text-code": "$fontSize-small",
       "borderWidth-Text-code": "1px",
+      "borderStyle-Text-code": "solid",
+      "borderRadius-Text-code": "4px",
       "paddingHorizontal-Text-code": "$space-1",
+      "paddingBottom-Text-code": "2px",
       "textDecorationLine-Text-deleted": "line-through",
       "textDecorationLine-Text-inserted": "underline",
       "fontFamily-Text-keyboard": "$fontFamily-monospace",
@@ -9798,6 +12456,7 @@ export default {
       "fontSize-Text-sub": "$fontSize-smaller",
       "verticalAlign-Text-sub": "sub",
       "fontStyle-Text-var": "italic",
+      "fontStyle-Text-em": "italic",
       "fontFamily-Text-mono": "$fontFamily-monospace",
       "fontSize-Text-title": "$fontSize-large",
       "fontSize-Text-subtitle": "$fontSize-medium",
@@ -9817,35 +12476,23 @@ export default {
       "marginBottom-Text-tableheading": "$space-4",
       "paddingHorizontal-Text-tableheading": "$space-1",
       "fontWeight-Text-tableheading": "$fontWeight-bold",
-      "light": {
-        "backgroundColor-Text-code": "$color-surface-100",
-        "borderColor-Text-code": "$color-surface-200",
-        "backgroundColor-Text-keyboard": "$color-surface-200",
-        "borderColor-Text-keyboard": "$color-surface-300",
-        "backgroundColor-Text-marked": "yellow",
-        "color-Text-placeholder": "$color-surface-500",
-        "backgroundColor-Text-codefence": "$color-primary-100",
-        "color-Text-codefence": "$color-surface-900",
-        "color-Text-subheading": "$textColor-secondary",
-        "color-Text-secondary": "$textColor-secondary"
-      },
-      "dark": {
-        "backgroundColor-Text-code": "$color-surface-800",
-        "borderColor-Text-code": "$color-surface-700",
-        "backgroundColor-Text-keyboard": "$color-surface-800",
-        "borderColor-Text-keyboard": "$color-surface-700",
-        "backgroundColor-Text-marked": "orange",
-        "color-Text-placeholder": "$color-surface-500",
-        "backgroundColor-Text-codefence": "$color-primary-800",
-        "color-Text-codefence": "$color-surface-200",
-        "color-Text-subheading": "$textColor-secondary",
-        "color-Text-secondary": "$textColor-secondary"
-      }
+      "marginTop-Text-markdown": "$space-3",
+      "marginBottom-Text-markdown": "$space-6",
+      "fontSize-Text-markdown": "$fontSize-normal",
+      "backgroundColor-Text-code": "rgba($color-surface-100-rgb, .4)",
+      "borderColor-Text-code": "$color-surface-300",
+      "backgroundColor-Text-keyboard": "rgba($color-surface-100-rgb, .4)",
+      "borderColor-Text-keyboard": "$color-surface-300",
+      "backgroundColor-Text-marked": "yellow",
+      "color-Text-placeholder": "$color-surface-500",
+      "color-Text-codefence": "$color-surface-900",
+      "color-Text-subheading": "$textColor-secondary",
+      "color-Text-secondary": "$textColor-secondary"
     }
   },
   "TextArea": {
-    "description": "`TextArea` is a component that provides a multiline text input area.",
     "status": "experimental",
+    "description": "`TextArea` is a component that provides a multiline text input area.",
     "props": {
       "enterSubmits": {
         "description": "This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.",
@@ -10094,8 +12741,8 @@ export default {
     }
   },
   "TextBox": {
-    "description": "The `TextBox` is an input component that allows users to input and edit textual data.",
     "status": "experimental",
+    "description": "The `TextBox` is an input component that allows users to input and edit textual data.",
     "props": {
       "placeholder": {
         "description": "A placeholder text that is visible in the input field when its empty.",
@@ -10194,6 +12841,9 @@ export default {
       "endIcon": {
         "description": "This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
+      },
+      "gap": {
+        "description": "This property defines the gap between the adornments and the input area."
       }
     },
     "events": {
@@ -10219,6 +12869,7 @@ export default {
       }
     },
     "themeVars": {
+      "Input:gap-adornment-TextBox": "var(--xmlui-gap-adornment-TextBox)",
       "Input:borderRadius-TextBox-default": "var(--xmlui-borderRadius-TextBox-default)",
       "Input:borderColor-TextBox-default": "var(--xmlui-borderColor-TextBox-default)",
       "Input:borderWidth-TextBox-default": "var(--xmlui-borderWidth-TextBox-default)",
@@ -10322,6 +12973,7 @@ export default {
       "borderWidth-Input": "1px",
       "minHeight-Input": "39px",
       "padding-Input": "$space-2",
+      "gap-adornment-Input": "$space-2",
       "borderStyle-Input": "solid",
       "borderColor-Input--disabled": "$borderColor--disabled",
       "textColor-Input--disabled": "$textColor--disabled",
@@ -10339,8 +12991,8 @@ export default {
     }
   },
   "PasswordInput": {
-    "description": "The `Password` component is a specialized version of the `TextBox` component that allows users to input and edit passwords.",
     "status": "experimental",
+    "description": "The `Password` component is a specialized version of the `TextBox` component that allows users to input and edit passwords.",
     "props": {
       "placeholder": {
         "description": "A placeholder text that is visible in the input field when its empty.",
@@ -10439,6 +13091,9 @@ export default {
       "endIcon": {
         "description": "This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
+      },
+      "gap": {
+        "description": "This property defines the gap between the adornments and the input area."
       }
     },
     "events": {
@@ -10464,6 +13119,7 @@ export default {
       }
     },
     "themeVars": {
+      "Input:gap-adornment-TextBox": "var(--xmlui-gap-adornment-TextBox)",
       "Input:borderRadius-TextBox-default": "var(--xmlui-borderRadius-TextBox-default)",
       "Input:borderColor-TextBox-default": "var(--xmlui-borderColor-TextBox-default)",
       "Input:borderWidth-TextBox-default": "var(--xmlui-borderWidth-TextBox-default)",
@@ -10567,6 +13223,7 @@ export default {
       "borderWidth-Input": "1px",
       "minHeight-Input": "39px",
       "padding-Input": "$space-2",
+      "gap-adornment-Input": "$space-2",
       "borderStyle-Input": "solid",
       "borderColor-Input--disabled": "$borderColor--disabled",
       "textColor-Input--disabled": "$textColor--disabled",
@@ -10585,6 +13242,7 @@ export default {
   },
   "Theme": {
     "description": "The `Theme` component provides a way to define a particular theming context for its nested components. The XMLUI framework uses `Theme` to define the default theming context for all of its child components. Theme variables and theme settings only work in this context.",
+    "allowArbitraryProps": true,
     "props": {
       "themeId": {
         "description": "This property specifies which theme to use by setting the theme's id."
@@ -10602,17 +13260,16 @@ export default {
         "description": "This property indicates whether the component is at the root of the application."
       }
     },
-    "opaque": true,
-    "allowArbitraryProps": true
+    "opaque": true
   },
   "ToneChangerButton": {
-    "description": "The `ToneChangerButton` component is a component that allows the user to change the tone of the app.",
     "status": "experimental",
+    "description": "The `ToneChangerButton` component is a component that allows the user to change the tone of the app.",
     "props": {}
   },
   "Tree": {
-    "description": "The `Tree` component is a virtualized tree component that displays hierarchical data.",
     "status": "in progress",
+    "description": "The `Tree` component is a virtualized tree component that displays hierarchical data.",
     "props": {
       "data": {
         "description": "The data source of the tree.",
