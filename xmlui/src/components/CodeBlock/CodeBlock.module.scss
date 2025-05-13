@@ -30,6 +30,8 @@ $backgroundColor-CodeBlock-highlightString: createThemeVar("backgroundColor-Code
   background-color: $backgroundColor-CodeBlock-header;
   border-bottom: $color-CodeBlock-headerSeparator solid 2px;
   font-size: t.$fontSize-small;
+  border-start-start-radius: t.getThemeVar($themeVars, "borderStartStartRadius-CodeBlock");
+  border-start-end-radius: t.getThemeVar($themeVars, "borderStartEndRadius-CodeBlock");
 }
 
 .codeBlockCopyWrapper {
