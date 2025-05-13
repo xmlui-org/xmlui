@@ -11,6 +11,8 @@ on:
 jobs:
   check-commit:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
     outputs:
       should_test: ${{ steps.check.outputs.should_test }}
     steps:

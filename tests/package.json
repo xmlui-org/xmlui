@@ -8,8 +8,10 @@
     "test:e2e-smoke": "playwright test",
     "test-ui": "npm run test -- --ui"
   },
+  "dependencies": {
+    "xmlui": "*"
+  },
   "devDependencies": {
-    "xmlui": "*",
     "@playwright/test": "1.50.1",
     "cross-env": "7.0.3",
     "serve": "14.2.0"
