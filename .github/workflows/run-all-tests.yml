@@ -37,6 +37,8 @@ jobs:
     if: needs.check-commit.outputs.should_test == 'true'
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
