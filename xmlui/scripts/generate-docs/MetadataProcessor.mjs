@@ -64,16 +64,16 @@ export class MetadataProcessor {
    */
   processDocfiles() {
     // Check for docs already in the output folder
-    const docFiles = readdirSync(this.outFolder).filter((file) => extname(file) === ".md");
-    let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
+    const docFiles = existsSync(this.outFolder)
+      ? readdirSync(this.outFolder).filter((file) => extname(file) === ".md")
+      : [];
+    let componentNames = docFiles.map((file) => basename(file, extname(file)));
 
     this.metadata.forEach((component) => {
       componentNames = this._processMdx(component, componentNames);
     });
 
-    const metaFileContents = Object.fromEntries(
-      componentNames.sort().map((name) => [name, name]),
-    );
+    const metaFileContents = Object.fromEntries(componentNames.sort().map((name) => [name, name]));
     return metaFileContents;
   }
 
@@ -502,9 +502,7 @@ function findParent(metadata, component) {
 
 function addParentLinkLine(parentName, componentDocsFolder) {
   // TODO: Insert component link
-  const result = parentName
-    ? `This component is inherited from \`${parentName}\``
-    : "";
+  const result = parentName ? `This component is inherited from \`${parentName}\`` : "";
   return result ? `${result}\n\n` : "";
 }
 
