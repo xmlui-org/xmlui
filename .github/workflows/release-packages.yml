@@ -6,7 +6,7 @@ on:
       commit_message:
         description: 'Custom commit message for versioning PR (optional)'
         required: false
-        default: 'chore: version packages for stable release [skip ci]'
+        default: 'chore: version packages for stable release'
       pr_title:
         description: 'Custom title for versioning PR (optional)'
         required: false
@@ -60,7 +60,7 @@ jobs:
 
   publish_and_github_release:
     name: Publish Stable and Create GitHub Release
-    if: |
+    if: >
       github.event_name == 'pull_request' &&
       github.event.action == 'closed' &&
       github.event.pull_request.merged == true &&

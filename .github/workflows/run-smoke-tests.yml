@@ -12,11 +12,6 @@ jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    if: |
-      !(github.event_name == 'pull_request' &&
-      github.event.action == 'closed' &&
-      github.event.pull_request.merged == true &&
-      (startsWith(github.event.pull_request.title, 'Version Packages for Stable Release') || contains(github.event.pull_request.labels.*.name, 'changeset-release')))
     env:
       NODE_OPTIONS: "--max-old-space-size=8192"
     steps:
