@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.8
+
+### Patch Changes
+
+- b0ae113: testing
+
 ## 0.1.7
 
 ### Patch Changes

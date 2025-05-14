@@ -1,6 +1,6 @@
 {
   "name": "xmlui-charts",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "sideEffects": false,
   "type": "module",
   "scripts": {
