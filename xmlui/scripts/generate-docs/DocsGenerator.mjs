@@ -1,5 +1,5 @@
 import { basename, join } from "path";
-import { existsSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 import { unlink, readFile, writeFile } from "fs/promises";
 import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import { MetadataProcessor } from "./MetadataProcessor.mjs";
@@ -39,7 +39,7 @@ export class DocsGenerator {
       .map(([compName, compData]) => {
         const displayName = compName;
         const componentFolder = compData.specializedFrom || compData.docFolder || compName;
-        const descriptionRef = join(componentFolder, `${displayName}.mdx`);
+        const descriptionRef = join(componentFolder, `${displayName}.md`);
 
         const extendedComponentData = {
           ...compData,
@@ -59,10 +59,26 @@ export class DocsGenerator {
       });
   }
 
-  generateDocs(writeMetaFile) {
+  generateDocs() {
     logger.info("Processing MDX files");
     const metaProcessor = new MetadataProcessor(this.metadata, "", this.folders);
-    metaProcessor.processDocfiles(writeMetaFile);
+    return metaProcessor.processDocfiles();
+  }
+
+  /**
+   * Writes the meta file summary to the output folder
+   * @param {Record<string,string>} metaFileContents The meta file contents
+   * @param {string} outputFolder The output folder
+   */
+  writeMetaSummary(metaFileContents, outputFolder) {
+    try {
+      writeFileSync(
+        join(outputFolder, "_meta.json"),
+        JSON.stringify(metaFileContents, null, 2),
+      );
+    } catch (e) {
+      logger.error("Could not write _meta file: ", e?.message || "unknown error");
+    }
   }
 
   async exportMetadataToJson() {
@@ -86,7 +102,7 @@ export class DocsGenerator {
   async generatePackageDescription(packageDescription, sectionName, fileName) {
     logger.info("Creating package description section in specified file");
     try {
-      const outFile = fileName || join(FOLDERS.pages, `${basename(this.folders.sourceFolder)}.mdx`);
+      const outFile = fileName || join(FOLDERS.pages, `${basename(this.folders.sourceFolder)}.md`);
 
       if (!existsSync(outFile)) {
         await writeFile(outFile, "");
@@ -118,10 +134,9 @@ export class DocsGenerator {
     summaryFileName,
     tableRowNums,
   ) {
-    logger.info("Creating Component Summary");
+    logger.info("Creating components summary");
     try {
-      const outFile =
-        summaryFileName || join(FOLDERS.pages, `${basename(this.folders.sourceFolder)}.mdx`);
+      const outFile = summaryFileName || join(this.folders.outFolder, `_overview.md`);
 
       if (!existsSync(outFile)) {
         await writeFile(outFile, "");
@@ -205,8 +220,8 @@ async function createSummary(
       })
       .map((component) => {
         return [
-          existsSync(join(componentsOutFolder, `${component.displayName}.mdx`))
-            ? `[${component.displayName}](./${componentFolderName}/${component.displayName}.mdx)`
+          existsSync(join(componentsOutFolder, `${component.displayName}.md`))
+            ? `[${component.displayName}](./${componentFolderName}/${component.displayName}.md)`
             : component.displayName,
           component.description,
           component.status ?? defaultStatus,
@@ -249,7 +264,7 @@ function addDescriptionRef(component, entries = []) {
       if (component[entry]) {
         result[entry] = Object.fromEntries(
           Object.entries(component[entry]).map(([k, v]) => {
-            v.descriptionRef = `${component.componentFolder}/${component.displayName}.mdx?${k}`;
+            v.descriptionRef = `${component.componentFolder}/${component.displayName}.md?${k}`;
             return [k, v];
           }),
         );

@@ -139,8 +139,6 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [color](../styles-and-themes/common-units/#color)-anchor-Heading | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-anchor-Heading  | $color-surface-400 | $color-surface-400 |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-H1 | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-H2 | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-H3 | *none* | *none* |
@@ -155,8 +153,6 @@ This component does not expose any methods.
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-H5 | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-H6 | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Heading | $fontWeight-bold | $fontWeight-bold |
-| [gap](../styles-and-themes/common-units/#size)-anchor-Heading | *none* | *none* |
-| [gap](../styles-and-themes/common-units/#size)-anchor-Heading  | $space-2 | $space-2 |
 | [letterSpacing](../styles-and-themes/common-units/#size)-H1 | *none* | *none* |
 | [letterSpacing](../styles-and-themes/common-units/#size)-H2 | *none* | *none* |
 | [letterSpacing](../styles-and-themes/common-units/#size)-H3 | *none* | *none* |
@@ -177,8 +173,6 @@ This component does not expose any methods.
 | [textDecorationColor](../styles-and-themes/common-units/#color)-H4 | *none* | *none* |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-H5 | *none* | *none* |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-H6 | *none* | *none* |
-| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-anchor-Heading | *none* | *none* |
-| [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-anchor-Heading  | underline | underline |
 | [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-H1 | *none* | *none* |
 | [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-H2 | *none* | *none* |
 | [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-H3 | *none* | *none* |

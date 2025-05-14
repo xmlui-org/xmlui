@@ -38,7 +38,7 @@ const SECTION_DIRECTIVE_MAP = Object.freeze({
 });
 
 // These constants denote which attribute contains the inline component description
-// and which contains the reference to the source mdx file
+// and which contains the reference to the source markdown file
 const SECTION_DESCRIPTION = "description";
 const SECTION_DESCRIPTION_REF = "descriptionRef";
 
@@ -59,29 +59,22 @@ export class MetadataProcessor {
     this.examplesFolder = examplesFolder;
   }
 
-  processDocfiles(writeMetaFile = true) {
+  /**
+   * @returns object containing the component name and the associated filenames
+   */
+  processDocfiles() {
     // Check for docs already in the output folder
-    const docFiles = readdirSync(this.outFolder).filter((file) => extname(file) === ".mdx");
+    const docFiles = readdirSync(this.outFolder).filter((file) => extname(file) === ".md");
     let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
 
     this.metadata.forEach((component) => {
       componentNames = this._processMdx(component, componentNames);
     });
 
-    // Write the _meta.json file
-    if (writeMetaFile) {
-      try {
-        const metaFileContents = Object.fromEntries(
-          componentNames.sort().map((name) => [name, name]),
-        );
-        writeFileSync(
-          join(this.outFolder, "_meta.json"),
-          JSON.stringify(metaFileContents, null, 2),
-        );
-      } catch (e) {
-        logger.error("Could not write _meta file: ", e?.message || "unknown error");
-      }
-    }
+    const metaFileContents = Object.fromEntries(
+      componentNames.sort().map((name) => [name, name]),
+    );
+    return metaFileContents;
   }
 
   _processMdx(component, componentNames) {
@@ -168,10 +161,10 @@ export class MetadataProcessor {
     }
 
     try {
-      writeFileSync(join(this.outFolder, `${component.displayName}.mdx`), result);
+      writeFileSync(join(this.outFolder, `${component.displayName}.md`), result);
       componentNames.push(component.displayName);
     } catch (error) {
-      logger.error("Could not write mdx file: ", error?.message || "unknown error");
+      logger.error("Could not write markdown file: ", error?.message || "unknown error");
     }
     return componentNames;
   }

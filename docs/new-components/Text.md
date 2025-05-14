@@ -319,6 +319,7 @@ This component does not expose any methods.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Text-code | $color-surface-100 | $color-surface-100 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-codefence | #f2f7fc | #112033 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Text-marked | yellow | yellow |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-code | $color-surface-200 | $color-surface-200 |
