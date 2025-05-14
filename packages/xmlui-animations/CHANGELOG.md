@@ -1,5 +1,11 @@
 # xmlui-animations
 
+## 0.1.12
+
+### Patch Changes
+
+- 8e026fe: testing
+
 ## 0.1.11
 
 ### Patch Changes
