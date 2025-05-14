@@ -1,8 +1,10 @@
+@use "xmlui/themes.scss" as themes;
+
 .playgroundContent {
   flex-grow: 1;
   position: relative;
   padding: 0 16px 16px 16px;
-  background-color: #E0EDF9;
+  background-color: themes.$backgroundColor;
 
   &:focus-within{
     z-index: 999;
