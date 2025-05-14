@@ -60,7 +60,7 @@ jobs:
 
   publish_and_github_release:
     name: Publish Stable and Create GitHub Release
-    if: >
+    if: |
       github.event_name == 'pull_request' &&
       github.event.action == 'closed' &&
       github.event.pull_request.merged == true &&
