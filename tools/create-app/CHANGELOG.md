@@ -1,5 +1,11 @@
 # create-xmlui-app
 
+## 0.9.30
+
+### Patch Changes
+
+- b0ae113: testing
+
 ## 0.9.29
 
 ### Patch Changes

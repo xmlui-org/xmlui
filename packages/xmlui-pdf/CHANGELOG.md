@@ -1,5 +1,11 @@
 # xmlui-pdf
 
+## 0.1.9
+
+### Patch Changes
+
+- b0ae113: testing
+
 ## 0.1.8
 
 ### Patch Changes
