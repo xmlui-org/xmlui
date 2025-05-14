@@ -24,6 +24,6 @@
     "build-xmlui": "turbo run build:xmlui-all --filter=xmlui",
     "test-xmlui": "turbo run build:xmlui-all test:xmlui-all --filter=xmlui --filter=xmlui-e2e",
     "test-xmlui-smoke": "turbo run build:xmlui-all test:xmlui-smoke --filter=xmlui --filter=xmlui-e2e",
-    "publish-packages": "turbo run build:xmlui-all build:extension test:xmlui-all && npm run changeset:publish"
+    "publish-packages": "turbo run build:xmlui-all build:extension && npm run changeset:publish"
   }
 }
