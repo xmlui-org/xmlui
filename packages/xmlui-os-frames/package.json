@@ -12,8 +12,7 @@
     "build:demo": "xmlui build",
     "build:meta": "xmlui build-lib --mode=metadata"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "xmlui": "*"
   },
