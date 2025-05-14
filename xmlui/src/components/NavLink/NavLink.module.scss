@@ -127,13 +127,16 @@ $transition: color 0.1s, background-color 0.1s;
       color: $textColor-NavLink--active;
       background-color: $backgroundColor-NavLink--active;
       font-weight: $fontWeight-NavLink--active;
+
       * {
         font-weight: $fontWeight-NavLink--active;
         color: $textColor-NavLink--active;
       }
+
       & > * {
         z-index: 1;
       }
+
       &:hover {
         color: $textColor-NavLink--hover--active;
         background-color: $backgroundColor-NavLink--hover--active;
@@ -146,10 +149,10 @@ $transition: color 0.1s, background-color 0.1s;
         background-color: $color-indicator-NavLink--active;
       }
 
-      &:active {
+      &:active, &.active {
         color: $textColor-NavLink--pressed--active;
         background-color: $backgroundColor-NavLink--pressed--active;
-        font-weight: $fontWeight-NavLink--pressed;
+        //font-weight: $fontWeight-NavLink--pressed;
         * {
           font-weight: $fontWeight-NavLink--pressed;
           color: $textColor-NavLink--pressed--active;
