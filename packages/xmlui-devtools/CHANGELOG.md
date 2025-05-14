@@ -1,5 +1,12 @@
 # xmlui-devtools
 
+## 0.1.7
+
+### Patch Changes
+
+- f15c018: another testing
+- f15c018: testing
+
 ## 0.1.6
 
 ### Patch Changes

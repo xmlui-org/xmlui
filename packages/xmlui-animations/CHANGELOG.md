@@ -1,5 +1,12 @@
 # xmlui-animations
 
+## 0.1.10
+
+### Patch Changes
+
+- f15c018: another testing
+- f15c018: testing
+
 ## 0.1.9
 
 ### Patch Changes
