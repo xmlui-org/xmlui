@@ -82,6 +82,7 @@ jobs:
           node-version: 22
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
+          token:  ${{ secrets.PUBLISH_NPM_TOKEN }}
 
       - name: Install dependencies
         run: npm ci --prefer-offline
@@ -114,7 +115,6 @@ jobs:
           publish: npm run publish-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.PUBLISH_NPM_TOKEN }}
 
       - name: Output Published Packages Info
         if: steps.changesets_publish.outputs.published == 'true'
