@@ -1,0 +1,123 @@
+name: Release Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_message:
+        description: 'Custom commit message for versioning PR (optional)'
+        required: false
+        default: 'chore: version packages for stable release'
+      pr_title:
+        description: 'Custom title for versioning PR (optional)'
+        required: false
+        default: 'Version Packages for Stable Release'
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+jobs:
+  create_version_pr:
+    name: Create Stable Version PR
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci --prefer-offline
+
+      - name: Create Version PR
+        id: changesets_pr
+        uses: changesets/action@v1
+        with:
+          # Command to run for versioning.
+          version: npm run changeset:version
+          commit: ${{ github.event.inputs.commit_message }}
+          title: ${{ github.event.inputs.pr_title }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Output Changeset PR URL
+        if: steps.changesets_pr.outputs.pullRequestUrl
+        run: |
+          echo "Version PR created: ${{ steps.changesets_pr.outputs.pullRequestUrl }}"
+
+  publish_and_github_release:
+    name: Publish Stable and Create GitHub Release
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      (startsWith(github.event.pull_request.title, 'Version Packages for Stable Release') || contains(github.event.pull_request.labels.*.name, 'changeset-release'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
+    # needs: [create_version_pr] # This is implied by the trigger conditions
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+      - name: Store Playwright's Version
+        run: |
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: Cache Playwright Browsers for Playwright's Version
+        id: cache-playwright-browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Install Playwright Browsers
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+      - name: Publish to NPM and Create GitHub Releases
+        id: changesets_publish
+        uses: changesets/action@v1
+        with:
+          publish: npm run publish-packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.PUBLISH_NPM_TOKEN }}
+
+      - name: Output Published Packages Info
+        if: steps.changesets_publish.outputs.published == 'true'
+        run: |
+          echo "Packages published: ${{ steps.changesets_publish.outputs.publishedPackages }}"
+          echo "GitHub Releases have been created."

@@ -1,13 +1,12 @@
 {
   "name": "xmlui-animations",
-  "version": "0.1.6",
+  "version": "0.1.11",
   "sideEffects": false,
   "type": "module",
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
-    "prepublishOnly": "npm run build",
-    "build": "xmlui build-lib",
+    "build:extension": "xmlui build-lib",
     "build-watch": "xmlui build-lib --watch",
     "build:demo": "xmlui build",
     "build:meta": "xmlui build-lib --mode=metadata"

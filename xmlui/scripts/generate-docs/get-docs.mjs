@@ -18,8 +18,6 @@ const [components, htmlTagComponents] = partitionMetadata(
   filterByProps,
 );
 
-await generateHtmlTagComponents(htmlTagComponents);
-
 await generateComponents(components);
 
 const packagesMetadata = await dynamicallyLoadExtensionPackages();
@@ -28,9 +26,12 @@ await generateExtenionPackages(packagesMetadata);
 // --- Helpers
 
 async function generateExtenionPackages(metadata) {
-  const extensionsConfig = await loadConfig(join(FOLDERS.script, "extensions-config.json"));
+  logger.info(`Generating extension package docs`);
 
-  const extensionsFolder = join(FOLDERS.pages, "extension-components");
+  const extensionsConfig = await loadConfig(join(FOLDERS.script, "extensions-config.json"));
+  const outputFolder = join(FOLDERS.docsRoot, "content", "extensions");
+  const extensionsFolder = outputFolder;
+
   for (const packageName in metadata) {
     // Just to be sure we don't generate anything internal
     if (metadata[packageName].state === "internal") {
@@ -57,10 +58,11 @@ async function generateExtenionPackages(metadata) {
       await cleanFolder(packageFolder);
     }
 
-    extensionGenerator.generateDocs();
+    const componentsAndFileNames = extensionGenerator.generateDocs();
+    if (Object.keys(componentsAndFileNames).length === 0) return;
 
     // In both of these cases, we are writing to the same file
-    const indexFile = join(extensionsFolder, `${packageName}.mdx`);
+    const indexFile = join(packageFolder, `_overview.md`);
     deleteFileIfExists(indexFile);
 
     await extensionGenerator.generatePackageDescription(
@@ -75,7 +77,7 @@ async function generateExtenionPackages(metadata) {
 
   // generate a _meta.json for the folder names
   try {
-    const extensionPackagesMetafile = join(FOLDERS.pages, "extension-components", "_meta.json");
+    const extensionPackagesMetafile = join(extensionsFolder, "_meta.json");
 
     const folderNames = Object.fromEntries(
       Object.keys(metadata).map((name) => {
@@ -93,12 +95,14 @@ async function generateExtenionPackages(metadata) {
 
 async function generateComponents(metadata) {
   const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
+  const outputFolder = join(FOLDERS.docsRoot, "content", "components");
+  
   const metadataGenerator = new DocsGenerator(
     metadata,
     {
       sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
       // --- CHANGE: Now documents are generated in the a new folder, outside of pages
-      outFolder: join(FOLDERS.docsRoot, "new-components"),
+      outFolder: outputFolder,
       // outFolder: join(FOLDERS.docsRoot, "pages", "components"),
       examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
     },
@@ -108,18 +112,32 @@ async function generateComponents(metadata) {
   if (componentsConfig?.cleanFolder) {
     // --- CHANGE: Now documents are generated in the a new folder, outside of pages
     // await cleanFolder(join(FOLDERS.pages, "components"));
-    await cleanFolder(join(FOLDERS.docsRoot, "new-components"));
+    await cleanFolder(outputFolder);
   }
-  metadataGenerator.generateDocs();
+
+  let componentsAndFileNames = metadataGenerator.generateDocs();
 
   if (componentsConfig?.exportToJson) {
     await metadataGenerator.exportMetadataToJson();
   }
 
-  await metadataGenerator.generateComponentsSummary();
-  await metadataGenerator.generateArticleAndDownloadsLinks();
+  const summaryTitle = "Components Overview";
+  const summaryFileName = "_overview";
+  await metadataGenerator.generateComponentsSummary(
+    summaryTitle,
+    join(outputFolder, `${summaryFileName}.md`),
+  );
+  componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
+
+  metadataGenerator.writeMetaSummary(
+    componentsAndFileNames,
+    outputFolder,
+  );
+
+  //await metadataGenerator.generateArticleAndDownloadsLinks();
 }
 
+// NOTE: Unused - we are not generating Html component docs
 async function generateHtmlTagComponents(metadata) {
   const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
   const metadataGenerator = new DocsGenerator(
@@ -133,12 +151,14 @@ async function generateHtmlTagComponents(metadata) {
   );
   await metadataGenerator.generateComponentsSummary(
     "HtmlTag Components",
-    join(FOLDERS.pages, "html-tag-components.mdx"),
+    join(FOLDERS.pages, "html-tag-components.md"),
   );
 }
 
 async function cleanFolder(folderToClean) {
   logger.info(`Cleaning ${basename(folderToClean)} by removing previous doc files`);
+
+  if (!existsSync(folderToClean)) return;
 
   // NOTE: This is the important part: we only delete .mdx and .md files and the _meta.json
   const cleanCondition = (file) =>
@@ -193,6 +213,8 @@ async function loadConfig(configPath) {
  * >>} imported metadata
  */
 async function dynamicallyLoadExtensionPackages() {
+  logger.info(`Loading extension packages`);
+
   const defaultPackageState = "experimental";
 
   const extendedPackagesFolder = join(FOLDERS.projectRoot, "packages");
@@ -233,7 +255,7 @@ async function dynamicallyLoadExtensionPackages() {
         logger.info("Skipping internal extension package:", dir);
         continue;
       }
-      console.log("Loaded extension package:", basename(dir));
+      logger.info("Loaded extension package:", basename(dir));
       importedMetadata[basename(dir)] = extensionPackage;
     } catch (error) {
       processError(error);
@@ -280,4 +302,10 @@ function partitionObject(obj, discriminator) {
   );
 }
 
-function addPackageDescription() {}
+function insertKeyAt(key, value, obj, pos) {
+  return Object.keys(obj).reduce((ac, a, i) => {
+    if (i === pos) ac[key] = value;
+    ac[a] = obj[a];
+    return ac;
+  }, {});
+}

@@ -1,16 +1,15 @@
 {
   "name": "xmlui-charts",
-  "version": "0.1.15",
+  "version": "0.1.20",
   "sideEffects": false,
   "type": "module",
   "scripts": {
     "start": "xmlui start",
     "build:demo": "xmlui build",
     "preview": "xmlui preview",
-    "build": "xmlui build-lib",
+    "build:extension": "xmlui build-lib",
     "build-watch": "xmlui build-lib --watch",
-    "build:meta": "xmlui build-lib --mode=metadata",
-    "prepublishOnly": "npm run build"
+    "build:meta": "xmlui build-lib --mode=metadata"
   },
   "dependencies": {
     "recharts": "^2.15.1"

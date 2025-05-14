@@ -10,6 +10,13 @@ on:
     branches: [main]
 jobs:
   test:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'push' &&
+        !contains(github.event.head_commit.message, 'Version Packages for Stable Release') &&
+        !contains(github.event.head_commit.message, 'chore: version packages for stable release')
+      )
     timeout-minutes: 60
     runs-on: ubuntu-latest
     env:
@@ -30,7 +37,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
       - name: Store Playwright's Version
-        working-directory: xmlui
         run: |
           PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
           echo "Playwright's Version: $PLAYWRIGHT_VERSION"
@@ -42,7 +48,6 @@ jobs:
           path: ~/.cache/ms-playwright
           key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
       - name: Install Playwright Browsers
-        working-directory: xmlui
         if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
       - name: run some tests
