@@ -4,10 +4,11 @@
   "commit": false,
   "fixed": [["xmlui", "create-xmlui-app"]],
   "linked": [],
-  "access": "restricted",
+  "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["xmlui-e2e", "monaco-languageclient-examples"],
+  "ignore": [],
+  "privatePackages": false,
   "snapshot": {
     "useCalculatedVersion": true
   }
