@@ -1,0 +1,9 @@
+@use "xmlui/themes.scss" as themes;
+
+.playground {
+  overflow: hidden;
+  margin-top: 1.25rem;
+  border-radius: 16px;
+  border: 1px solid themes.$borderColor;
+  box-shadow: themes.$boxShadow-md;
+}
