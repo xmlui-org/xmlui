@@ -52,7 +52,8 @@ export const RadioGroupMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`gap-${RGOption}`]: "$space-1_5",
-    [`borderWidth-${RGOption}`]: "2px",
+    [`borderWidth-${RGOption}`]: "1px",
+    [`backgroundColor-checked-${RGOption}-indicator`]: `$backgroundColor-primary`,
     [`backgroundColor-checked-${RGOption}--disabled]`]: `$borderColor-${RGOption}--disabled`,
     [`backgroundColor-checked-${RGOption}-error`]: `$borderColor-${RGOption}-error`,
     [`backgroundColor-checked-${RGOption}-warning`]: `$borderColor-${RGOption}-warning`,
