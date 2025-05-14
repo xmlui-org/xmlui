@@ -21,6 +21,11 @@
         "dist/metadata/**"
       ]
     },
+    "build:extension": {
+      "outputs": [
+        "dist/**"
+      ]
+    },
     "build:xmlui-all": {
       "dependsOn": [
         "build:bin",
