@@ -58,10 +58,11 @@ async function generateExtenionPackages(metadata) {
       await cleanFolder(packageFolder);
     }
 
-    extensionGenerator.generateDocs();
+    const componentsAndFileNames = extensionGenerator.generateDocs();
+    if (Object.keys(componentsAndFileNames).length === 0) return;
 
     // In both of these cases, we are writing to the same file
-    const indexFile = join(extensionsFolder, `${packageName}.md`);
+    const indexFile = join(packageFolder, `_overview.md`);
     deleteFileIfExists(indexFile);
 
     await extensionGenerator.generatePackageDescription(
@@ -254,7 +255,7 @@ async function dynamicallyLoadExtensionPackages() {
         logger.info("Skipping internal extension package:", dir);
         continue;
       }
-      console.log("Loaded extension package:", basename(dir));
+      logger.info("Loaded extension package:", basename(dir));
       importedMetadata[basename(dir)] = extensionPackage;
     } catch (error) {
       processError(error);
