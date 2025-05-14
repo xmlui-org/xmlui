@@ -18,16 +18,17 @@ const [components, htmlTagComponents] = partitionMetadata(
   filterByProps,
 );
 
-await generateHtmlTagComponents(htmlTagComponents);
+// await generateHtmlTagComponents(htmlTagComponents);
 
 await generateComponents(components);
 
-const packagesMetadata = await dynamicallyLoadExtensionPackages();
-await generateExtenionPackages(packagesMetadata);
+//const packagesMetadata = await dynamicallyLoadExtensionPackages();
+//await generateExtenionPackages(packagesMetadata);
 
 // --- Helpers
 
 async function generateExtenionPackages(metadata) {
+  logger.info(`Generating extension package docs`);
   const extensionsConfig = await loadConfig(join(FOLDERS.script, "extensions-config.json"));
 
   const extensionsFolder = join(FOLDERS.pages, "extension-components");
@@ -60,7 +61,7 @@ async function generateExtenionPackages(metadata) {
     extensionGenerator.generateDocs();
 
     // In both of these cases, we are writing to the same file
-    const indexFile = join(extensionsFolder, `${packageName}.mdx`);
+    const indexFile = join(extensionsFolder, `${packageName}.md`);
     deleteFileIfExists(indexFile);
 
     await extensionGenerator.generatePackageDescription(
@@ -110,14 +111,27 @@ async function generateComponents(metadata) {
     // await cleanFolder(join(FOLDERS.pages, "components"));
     await cleanFolder(join(FOLDERS.docsRoot, "new-components"));
   }
-  metadataGenerator.generateDocs();
+
+  let componentsAndFileNames = metadataGenerator.generateDocs();
 
   if (componentsConfig?.exportToJson) {
     await metadataGenerator.exportMetadataToJson();
   }
 
-  await metadataGenerator.generateComponentsSummary();
-  await metadataGenerator.generateArticleAndDownloadsLinks();
+  const summaryTitle = "Components Overview";
+  const summaryFileName = "_overview";
+  await metadataGenerator.generateComponentsSummary(
+    summaryTitle,
+    join(FOLDERS.docsRoot, "new-components", `${summaryFileName}.md`),
+  );
+  componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
+
+  metadataGenerator.writeMetaSummary(
+    componentsAndFileNames,
+    join(FOLDERS.docsRoot, "new-components"),
+  );
+
+  //await metadataGenerator.generateArticleAndDownloadsLinks();
 }
 
 async function generateHtmlTagComponents(metadata) {
@@ -133,7 +147,7 @@ async function generateHtmlTagComponents(metadata) {
   );
   await metadataGenerator.generateComponentsSummary(
     "HtmlTag Components",
-    join(FOLDERS.pages, "html-tag-components.mdx"),
+    join(FOLDERS.pages, "html-tag-components.md"),
   );
 }
 
@@ -193,6 +207,8 @@ async function loadConfig(configPath) {
  * >>} imported metadata
  */
 async function dynamicallyLoadExtensionPackages() {
+  logger.info(`Loading extension packages`);
+
   const defaultPackageState = "experimental";
 
   const extendedPackagesFolder = join(FOLDERS.projectRoot, "packages");
@@ -280,4 +296,10 @@ function partitionObject(obj, discriminator) {
   );
 }
 
-function addPackageDescription() {}
+function insertKeyAt(key, value, obj, pos) {
+  return Object.keys(obj).reduce((ac, a, i) => {
+    if (i === pos) ac[key] = value;
+    ac[a] = obj[a];
+    return ac;
+  }, {});
+}
