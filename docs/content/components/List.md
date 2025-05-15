@@ -1,4 +1,4 @@
-# List [#component-list]
+# List [#list]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport.

@@ -1,4 +1,4 @@
-# StickyBox [#component-stickybox]
+# StickyBox [#stickybox]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls.

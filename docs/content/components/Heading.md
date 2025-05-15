@@ -1,4 +1,4 @@
-# Heading [#component-heading]
+# Heading [#heading]
 
 Represents a heading text
 

@@ -1,4 +1,4 @@
-# DropdownMenu [#component-dropdownmenu]
+# DropdownMenu [#dropdownmenu]
 
 This component represents a dropdown menu with a trigger. When the user clicks the trigger, the dropdown menu displays its items.
 

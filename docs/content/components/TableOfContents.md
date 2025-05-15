@@ -1,4 +1,4 @@
-# TableOfContents [#component-tableofcontents]
+# TableOfContents [#tableofcontents]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position.

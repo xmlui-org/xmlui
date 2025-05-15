@@ -1,4 +1,4 @@
-# ContentSeparator [#component-contentseparator]
+# ContentSeparator [#contentseparator]
 
 A `ContentSeparator` is a component that divides or separates content visually within a layout. It serves as a visual cue to distinguish between different sections or groups of content, helping to improve readability and organization.
 

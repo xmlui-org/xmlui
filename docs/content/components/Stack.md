@@ -1,4 +1,4 @@
-# Stack [#component-stack]
+# Stack [#stack]
 
 `Stack` is a layout container displaying children in a horizontal or vertical stack.
 

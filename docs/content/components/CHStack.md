@@ -1,6 +1,8 @@
-# CHStack [#component-chstack]
+# CHStack [#chstack]
 
-This component is inherited from `Stack`
+This component is inherited from [Stack](components/Stack)
+
+See also: [CVStack](components/CVStack), [HStack](components/HStack), [VStack](components/VStack)
 
 `CHStack` is a specialized, shorthand version for the regular `Stack` component that has a horizontal orientation with its contents centered.
 

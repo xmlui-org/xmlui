@@ -1,4 +1,4 @@
-# DonutChart [#component-donutchart]
+# DonutChart [#donutchart]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.Represents a derivative of the pie chart that is a donut chart.

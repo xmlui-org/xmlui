@@ -1,4 +1,4 @@
-# Link [#component-link]
+# Link [#link]
 
 A `Link` component represents a navigation target within the app or a reference to an external web URL.
 

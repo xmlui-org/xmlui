@@ -1,4 +1,4 @@
-# Button [#component-button]
+# Button [#button]
 
 Button is an interactive element that triggers an action when clicked.
 

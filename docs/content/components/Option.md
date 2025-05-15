@@ -1,4 +1,4 @@
-# Option [#component-option]
+# Option [#option]
 
 `Option` is a non-visual component describing a selection option. Other components (such as `Select`, `AutoComplete`, and others) may use nested `Option` instances from which the user can select.
 

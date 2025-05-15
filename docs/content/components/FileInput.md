@@ -1,4 +1,4 @@
-# FileInput [#component-fileinput]
+# FileInput [#fileinput]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise).

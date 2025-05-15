@@ -1,4 +1,4 @@
-# SpaceFiller [#component-spacefiller]
+# SpaceFiller [#spacefiller]
 
 The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. Its behavior depends on the layout container in which it is used.
 

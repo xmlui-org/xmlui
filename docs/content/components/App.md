@@ -1,4 +1,4 @@
-# App [#component-app]
+# App [#app]
 
 The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.
 

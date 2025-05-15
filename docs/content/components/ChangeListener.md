@@ -1,4 +1,4 @@
-# ChangeListener [#component-changelistener]
+# ChangeListener [#changelistener]
 
 `ChangeListener` is a functional component (it renders no UI) to trigger an action when a particular value (component property, state, etc.) changes.
 

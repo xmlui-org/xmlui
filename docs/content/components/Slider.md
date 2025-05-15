@@ -1,4 +1,4 @@
-# Slider [#component-slider]
+# Slider [#slider]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `Slider` component allows you to select a numeric value between a range specified by minimum and maximum values.

@@ -1,4 +1,4 @@
-# BarChart [#component-barchart]
+# BarChart [#barchart]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `BarChart` component represents a bar chart.Accepts a `LabelLst` component as a child to parametrize display labels.

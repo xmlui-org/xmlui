@@ -10071,7 +10071,7 @@ export default {
     }
   },
   "Pages": {
-    "description": "The `Pages` component is used as a container for [`Page`](./Page.mdx) components within an [`App`](./App.mdx).",
+    "description": "The `Pages` component is used as a container for [`Page`](/components/Page) components within an [`App`](/components/App).",
     "props": {
       "defaultRoute": {
         "description": "The default route when displaying the app"

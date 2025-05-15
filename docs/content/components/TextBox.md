@@ -1,4 +1,4 @@
-# TextBox [#component-textbox]
+# TextBox [#textbox]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `TextBox` is an input component that allows users to input and edit textual data.

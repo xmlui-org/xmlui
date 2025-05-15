@@ -1,4 +1,4 @@
-# DataSource [#component-datasource]
+# DataSource [#datasource]
 
 The `DataSource` component manages fetching data from an API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component.
 

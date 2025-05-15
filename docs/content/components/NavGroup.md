@@ -1,4 +1,4 @@
-# NavGroup [#component-navgroup]
+# NavGroup [#navgroup]
 
 The `NavGroup` component is a container for grouping related navigation targets (`NavLink` components). It can be displayed as a submenu in the App's UI.
 
