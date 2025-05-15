@@ -2,73 +2,49 @@
   "$schema": "https://turborepo.com/schema.json",
   "tasks": {
     "build:bin": {
-      "outputs": [
-        "dist/scripts/**"
-      ]
+      "outputs": ["dist/scripts/**"]
     },
     "build:xmlui": {
-      "outputs": [
-        "dist/lib/**"
-      ]
+      "outputs": ["dist/lib/**"]
     },
     "build:xmlui-standalone": {
-      "outputs": [
-        "dist/standalone/**"
-      ]
+      "outputs": ["dist/standalone/**"]
     },
     "build:xmlui-metadata": {
-      "outputs": [
-        "dist/metadata/**"
-      ]
+      "outputs": ["dist/metadata/**"]
     },
     "build:extension": {
-      "outputs": [
-        "dist/**"
-      ]
+      "outputs": ["dist/**"]
     },
     "build:xmlui-all": {
-      "dependsOn": [
-        "build:bin",
-        "build:xmlui-metadata",
-        "build:xmlui",
-        "build:xmlui-standalone"
-      ],
-      "outputs": [
-        "dist/**"
-      ]
+      "dependsOn": ["build:bin", "build:xmlui-metadata", "build:xmlui", "build:xmlui-standalone"],
+      "outputs": ["dist/**"]
     },
     "build:xmlui-test-bed": {
       "outputs": ["src/testing/infrastructure/dist/**"]
     },
     "build:test-bed": {
-      "outputs": [
-        "dist/**"
-      ]
+      "outputs": ["dist/**"]
     },
     "test:unit": {
       "outputs": []
     },
     "test:e2e-smoke": {
+      "env": ["CI"],
       "dependsOn": ["build:test-bed", "build:xmlui-test-bed"],
       "outputs": ["playwright-report/**"]
     },
     "test:e2e-non-smoke": {
+      "env": ["CI"],
       "dependsOn": ["test:e2e-smoke"],
       "outputs": ["playwright-report/**"]
     },
     "test:xmlui-all": {
-      "dependsOn": [
-        "test:unit",
-        "test:e2e-smoke",
-        "test:e2e-non-smoke"
-      ],
+      "dependsOn": ["test:unit", "test:e2e-smoke", "test:e2e-non-smoke"],
       "outputs": ["playwright-report/**"]
     },
     "test:xmlui-smoke": {
-      "dependsOn": [
-        "test:unit",
-        "test:e2e-smoke"
-      ],
+      "dependsOn": ["test:unit", "test:e2e-smoke"],
       "outputs": ["playwright-report/**"]
     }
   }
