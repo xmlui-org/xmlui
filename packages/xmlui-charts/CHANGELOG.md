@@ -1,5 +1,11 @@
 # xmlui-charts
 
+## 0.1.21
+
+### Patch Changes
+
+- ed53215: test release
+
 ## 0.1.20
 
 ### Patch Changes
