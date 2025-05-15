@@ -1,7 +1,6 @@
 import { basename, join, extname, relative } from "path";
 import { lstatSync } from "fs";
-import { writeFileSync } from "fs";
-import { unlink, readdir, readFile, mkdir } from "fs/promises";
+import { unlink, readdir, readFile, mkdir, writeFile, rm } from "fs/promises";
 import { ErrorWithSeverity, logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import { convertPath, deleteFileIfExists, fromKebabtoReadable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
@@ -32,6 +31,7 @@ async function generateExtenionPackages(metadata) {
   const outputFolder = join(FOLDERS.docsRoot, "content", "extensions");
   const extensionsFolder = outputFolder;
 
+  const unlistedFolders = [];
   for (const packageName in metadata) {
     // Just to be sure we don't generate anything internal
     if (metadata[packageName].state === "internal") {
@@ -59,7 +59,13 @@ async function generateExtenionPackages(metadata) {
     }
 
     const componentsAndFileNames = extensionGenerator.generateDocs();
-    if (Object.keys(componentsAndFileNames).length === 0) return;
+    if (Object.keys(componentsAndFileNames).length === 0) {
+      if (existsSync(packageFolder)) {
+        await rm(packageFolder, { recursive: true });
+      }
+      unlistedFolders.push(packageName);
+      continue;
+    }
 
     // In both of these cases, we are writing to the same file
     const indexFile = join(packageFolder, `_overview.md`);
@@ -80,14 +86,14 @@ async function generateExtenionPackages(metadata) {
     const extensionPackagesMetafile = join(extensionsFolder, "_meta.json");
 
     const folderNames = Object.fromEntries(
-      Object.keys(metadata).map((name) => {
+      Object.keys(metadata).filter(m => !unlistedFolders.includes(m)).map((name) => {
         return [name, fromKebabtoReadable(name)];
       }),
     );
 
     // Do not include the summary file
     deleteFileIfExists(extensionPackagesMetafile);
-    writeFileSync(extensionPackagesMetafile, JSON.stringify(folderNames, null, 2));
+    await writeFile(extensionPackagesMetafile, JSON.stringify(folderNames, null, 2));
   } catch (e) {
     logger.error("Could not write _meta file: ", e?.message || "unknown error");
   }
