@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.9.31
+
+### Patch Changes
+
+- ed53215: test release
+- ed53215: another testing
+
 ## 0.9.30
 
 ### Patch Changes
