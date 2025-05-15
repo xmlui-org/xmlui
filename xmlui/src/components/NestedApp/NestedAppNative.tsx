@@ -93,7 +93,8 @@ export function NestedApp({
         previewMode: false,
         orientation: "horizontal",
         activeTheme,
-        content: "Main",
+        activeTone,
+        content: "app",
       },
     };
     const appQueryString = await createQueryString(JSON.stringify(data));
