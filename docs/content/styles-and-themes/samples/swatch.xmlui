@@ -1,0 +1,12 @@
+<Component name="Swatch">
+  <VStack gap="0.25rem">
+    <Stack
+      height="50px"
+      border="1px solid black"
+      backgroundColor="{$props.color}"
+      horizontalAlignment="center"
+      verticalAlignment="center">
+      <Text value="{$props.color.substring(1) || 'color token'}" color="{$props.textColor}" />
+    </Stack>    
+  </VStack>
+</Component>
