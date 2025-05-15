@@ -134,7 +134,7 @@ async function generateComponents(metadata) {
     outputFolder,
   );
 
-  //await metadataGenerator.generateArticleAndDownloadsLinks();
+  await metadataGenerator.generatePermalinksForHeaders();
 }
 
 // NOTE: Unused - we are not generating Html component docs
