@@ -1,9 +1,9 @@
-import { basename, join } from "path";
+import { basename, extname, join, parse } from "path";
 import { existsSync, writeFileSync } from "fs";
-import { unlink, readFile, writeFile } from "fs/promises";
+import { unlink, readFile, writeFile, readdir } from "fs/promises";
 import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import { MetadataProcessor } from "./MetadataProcessor.mjs";
-import { createTable, strBufferToLines } from "./utils.mjs";
+import { createTable, strBufferToLines, toHeadingPath } from "./utils.mjs";
 import { buildPagesMap } from "./build-pages-map.mjs";
 import { buildDownloadsMap } from "./build-downloads-map.mjs";
 import { FOLDERS } from "./folders.mjs";
@@ -72,10 +72,7 @@ export class DocsGenerator {
    */
   writeMetaSummary(metaFileContents, outputFolder) {
     try {
-      writeFileSync(
-        join(outputFolder, "_meta.json"),
-        JSON.stringify(metaFileContents, null, 2),
-      );
+      writeFileSync(join(outputFolder, "_meta.json"), JSON.stringify(metaFileContents, null, 2));
     } catch (e) {
       logger.error("Could not write _meta file: ", e?.message || "unknown error");
     }
@@ -154,6 +151,22 @@ export class DocsGenerator {
       await writeFile(outFile, summary);
     } catch (error) {
       processError(error);
+    }
+  }
+
+  async generatePermalinksForHeaders() {
+    logger.info("Generating permalinks for file headings");
+
+    const docFiles = existsSync(this.folders.outFolder)
+      ? (await readdir(this.folders.outFolder)).filter((file) => extname(file) === ".md")
+      : [];
+
+    for (const file of docFiles) {
+      const filePath = join(this.folders.outFolder, file);
+      if (!existsSync(filePath)) {
+        throw new ErrorWithSeverity(`File ${file} does not exist.`, LOGGER_LEVELS.error);
+      }
+      await generatePermalinks(filePath);
     }
   }
 
@@ -273,4 +286,50 @@ function addDescriptionRef(component, entries = []) {
   }
 
   return result;
+}
+
+/**
+ * Get the ID and path of the article heading.
+ * @param {string} articlePath The path of the article.
+ */
+async function generatePermalinks(articlePath) {
+  try {
+    const content = await readFile(articlePath, { encoding: "utf8" });
+    const lines = strBufferToLines(content);
+    const newContent = appendHeadingIds(lines);
+    await writeFile(articlePath, newContent, { encoding: "utf8" });
+  } catch (error) {
+    processError(error);
+  }
+
+  // ---
+
+  function appendHeadingIds(lines) {
+    let newLines = [];
+    for (const line of lines) {
+      // Match Headings
+      const match = line.match(/^#{1,6}\s+.+?\s*(\[#[\w-]+\])?$/);
+      if (match && typeof match[1] === "undefined") {
+        newLines.push(
+          `${line} [#${toHeadingPath(stripApostrophies(stripParentheses(stripBackticks(match[0]))))}]`,
+        );
+        continue;
+      }
+      // Rest
+      newLines.push(line);
+    }
+    return newLines.join("\n");
+  }
+
+  function stripBackticks(str) {
+    return str.replace(/`/g, "");
+  }
+
+  function stripParentheses(str) {
+    return str.replace(/\(|\)/g, "");
+  }
+
+  function stripApostrophies(str) {
+    return str.replace(/"|'/g, "");
+  }
 }
