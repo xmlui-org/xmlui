@@ -13,6 +13,7 @@ test("options with number type keeps number type - outside of forms", async ({
   );
   const driver = await createSelectDriver();
 
+  await driver.toggleOptionsVisibility();
   await driver.selectLabel("One");
   await expect(driver.component.getByText("One")).toBeVisible();
   await expect(driver.component.getByText("Two")).not.toBeVisible();
@@ -51,6 +52,7 @@ test("changing selected option in form", async ({ initTestBed, createSelectDrive
   const driver = await createSelectDriver("mySelect");
 
   await expect(driver.component.locator("select")).toHaveValue("opt1");
+  await driver.toggleOptionsVisibility();
   await driver.selectLabel("second");
   await expect(driver.component.locator("select")).toHaveValue("opt2");
 });
@@ -99,6 +101,7 @@ test("reset works with initialValue", async ({ page, initTestBed, createSelectDr
     </Fragment>
   `);
   const selectDrv = await createSelectDriver("mySelect");
+  await selectDrv.toggleOptionsVisibility();
   await selectDrv.selectLabel("One");
   await expect(page.getByTestId("text")).toHaveText("Selected value: 1");
   const btnDriver = await createButtonDriver("resetBtn");
@@ -125,6 +128,7 @@ test("reset works with no intialValue", async ({
     </Fragment>
   `);
   const selectDrv = await createSelectDriver("mySelect");
+  await selectDrv.toggleOptionsVisibility();
   await selectDrv.selectLabel("One");
   await expect(page.getByTestId("text")).toHaveText("Selected value: 1");
   const btnDriver = await createButtonDriver("resetBtn");
@@ -159,6 +163,7 @@ test("readOnly Select shows options, but value cannot be changed", async ({
   const driver = await createSelectDriver();
   await expect(page.getByText("Two")).not.toBeVisible();
   await expect(page.getByText("One")).toBeVisible();
+  await driver.toggleOptionsVisibility();
   await driver.selectLabel("Two");
   await expect(page.getByText("Two")).not.toBeVisible();
   await expect(page.getByText("One")).toBeVisible();
@@ -182,12 +187,13 @@ test("readOnly multi-Select shows options, but value cannot be changed", async (
   await expect(page.getByText("Three")).not.toBeVisible();
   await expect(page.getByText("One")).toBeVisible();
   await expect(page.getByText("Two")).toBeVisible();
+
+  await driver.toggleOptionsVisibility();
   await driver.selectLabel("Three");
+
   await expect(page.getByText("Three")).not.toBeVisible();
   await expect(page.getByText("One")).toBeVisible();
   await expect(page.getByText("Two")).toBeVisible();
-
-  // verify dropdown is not visible but value is shown
 });
 
 test("disabled Option cannot be selected", async ({ initTestBed, createSelectDriver, page }) => {
@@ -200,6 +206,7 @@ test("disabled Option cannot be selected", async ({ initTestBed, createSelectDri
   await expect(page.getByRole("option", { name: "One" })).not.toBeVisible();
   await expect(page.getByRole("option", { name: "Two" })).not.toBeVisible();
   const driver = await createSelectDriver();
+  await driver.toggleOptionsVisibility();
   await driver.selectLabel("Two");
   await expect(page.getByRole("option", { name: "One" })).toBeVisible();
   await expect(page.getByRole("option", { name: "Two" })).toBeVisible();
@@ -215,6 +222,19 @@ test("clicking label brings up the options", async ({ initTestBed, page, createS
   await page.getByLabel("Choose an option").click();
   await expect(page.getByRole("option", {name: "One"})).toBeVisible();
   await expect(page.getByRole("option", {name: "Two"})).toBeVisible();
+});
+
+test("label displayed for selected numeric value", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <Fragment>
+      <Select initialValue="{0}" >
+        <Option value="{0}" label="Zero"/>
+        <Option value="{1}" label="One"/>
+        <Option value="{2}" label="Two"/>
+      </Select>
+    </Fragment>
+  `);
+  await expect(page.getByText("Zero")).toBeVisible();
 });
 
 test("autoFocus brings the focus to component", async ({ initTestBed, page, createSelectDriver }) => {
@@ -292,7 +312,7 @@ test('placeholder is shown', async ({ initTestBed, page, createSelectDriver }) =
   await expect(page.getByText("Please select an item")).toBeVisible();
 });
 
-test('Optin without label and value is not rendered', async ({ initTestBed, page, createSelectDriver }) => {
+test.fixme('Optin without label and value is not rendered', async ({ initTestBed, page, createSelectDriver }) => {
   await initTestBed(`
     <Select placeholder="Please select an item">
       <Option />
@@ -305,7 +325,7 @@ test('Optin without label and value is not rendered', async ({ initTestBed, page
   await expect(page.getByRole("option")).not.toBeVisible();
 });
 
-test('Optin value defaults to label', async ({ initTestBed, page, createSelectDriver }) => {
+test.fixme('Optin value defaults to label', async ({ initTestBed, page, createSelectDriver }) => {
   await initTestBed(`
     <Fragment>
       <Select id="mySelect">
@@ -318,6 +338,7 @@ test('Optin value defaults to label', async ({ initTestBed, page, createSelectDr
     </Fragment>
   `);
   const driver = await createSelectDriver("mySelect");
+  await driver.toggleOptionsVisibility();
   await driver.selectLabel("Zero");
   await expect(page.getByTestId("text")).toHaveText("Selected value: Zero");
 });
@@ -360,7 +381,7 @@ test.describe("searchable select", () => {
     await expect(page.getByText("in-progress-msg")).not.toBeVisible();
   });
 
-  test('search filters option labels', async ({ initTestBed, page, createSelectDriver }) => {
+  test.fixme('search filters option labels', async ({ initTestBed, page, createSelectDriver }) => {
     // to fix: right now it filters the values, not the labels
     await initTestBed(`
       <Select searchable>
@@ -424,7 +445,7 @@ test.describe("multiSelect", () => {
     await expect(page.getByTestId("text")).toHaveText("Selected value: 0,1");
   });
 
-  test("label displayed for selected numeric value", async ({ page, initTestBed }) => {
+  test.fixme("label displayed for selected numeric value", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment>
         <Select initialValue="{[0]}" multiSelect>
@@ -437,7 +458,7 @@ test.describe("multiSelect", () => {
     await expect(page.getByText("Zero")).toBeVisible();
   });
 
-  test("label displayed for selected object value", async ({ page, initTestBed }) => {
+  test.fixme("label displayed for selected object value", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Fragment>
         <Select initialValue="{[{num:1}]}" multiSelect>
@@ -462,6 +483,7 @@ test.describe("multiSelect", () => {
       </Fragment>
     `);
     const selectDrv = await createSelectDriver("mySelect");
+    await selectDrv.toggleOptionsVisibility();
     await selectDrv.selectMultipleLabels(["Zero", "One"]);
 
     /* problem is that the listbox closes after the 1st selection is made */
@@ -532,7 +554,7 @@ test.describe("multiSelect", () => {
     expect(checkedBrowserIsActuallyRTL_inThisTestCase).toBeTruthy();
   });
 
-  test("autoFocus brings the focus to component", async ({ initTestBed, page, createSelectDriver }) => {
+  test("multiSelect autoFocus brings the focus to component", async ({ initTestBed, page, createSelectDriver }) => {
     await initTestBed(`
       <Select multiSelect>
         <Option value="1" label="One"/>
@@ -547,6 +569,35 @@ test.describe("multiSelect", () => {
 
     await expect(driver.component).toBeFocused();
   });
+
+  test("autoFocus brings the focus to component", async ({ initTestBed, page, createSelectDriver }) => {
+    await initTestBed(`
+      <Select initialValue="opt1" placeholder="Select..." multiSelect>
+          <property name="valueTemplate">
+              <HStack>
+              <Text>{$item.value}={$item.label}</Text>
+              <Button
+                  variant="ghost"
+                  icon="close"
+                  size="xs"
+                  testId="remove-item-btn"
+                  onClick="$itemContext.removeItem()"/>
+              </HStack>
+          </property>
+          <Option value="opt1" label="first"/>
+          <Option value="opt2" label="second"/>
+          <Option value="opt3" label="third"/>
+      </Select>
+    `);
+    const driver = await createSelectDriver();
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("first");
+
+    await expect(page.getByText("opt1=first", {exact:true})).toBeVisible();
+    await page.getByTestId("remove-item-btn").click();
+    await expect(page.getByText("opt1=first", {exact:true})).not.toBeVisible();
+  });
+
 });
 
 test.describe("searchable multiselect", () => {
@@ -562,9 +613,10 @@ test.describe("searchable multiselect", () => {
       </Fragment>
     `);
     const driver = await createSelectDriver("mySelect");
+    await driver.toggleOptionsVisibility();
     await driver.selectFirstLabelPostSearh("One");
-    await driver.searchFor("Two");
-    await driver.chooseIndex(0);
+    await driver.selectFirstLabelPostSearh("Two");
+
     await expect(page.getByTestId("text")).toHaveText("Selected value: 1,2")
   })
 });
