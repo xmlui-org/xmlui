@@ -1,5 +1,11 @@
 # xmlui-pdf
 
+## 0.1.10
+
+### Patch Changes
+
+- ed53215: test release
+
 ## 0.1.9
 
 ### Patch Changes

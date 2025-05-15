@@ -72,6 +72,7 @@ export function convertPath(windowsPath) {
 
 /**
  * Simple but slow
+ * @param {string} buffer
  */
 export function strBufferToLines(buffer) {
   if (typeof buffer !== "string") {

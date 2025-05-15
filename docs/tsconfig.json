@@ -1,47 +1,32 @@
 {
   "compilerOptions": {
-    "target": "es2015",
+    "target": "es2017",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
-    "types": [
-      "vite/client",
-      "node"
-    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
+    "types": ["vite/client", "node"],
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "noEmit": true,
-    "jsx": "preserve",
-    "incremental": true
+    "jsx": "react-jsx",
+    "paths": {
+      "@components/*": ["../ui-engine/src/components/*"],
+    }
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
     "src",
-    "pages/_app.jsx",
-    "scripts/create-component-docs.js",
-  ],
-  "exclude": [
-    "node_modules"
+    "build",
+    "index.ts"
   ]
 }

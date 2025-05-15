@@ -13,7 +13,7 @@ import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
 import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
 import xmluiLight from "../syntax/monaco/xmlui-light";
 import xmluiDark from "../syntax/monaco/xmlui-dark";
-import { createQueryString } from "xmlui-docs/src/components/utils";
+import { createQueryString } from "./utils";
 
 function trySafeStringify(obj: any): string {
   try {

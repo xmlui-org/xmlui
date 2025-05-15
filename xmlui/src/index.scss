@@ -3,7 +3,7 @@
 
 @scope(#_ui-engine-theme-root){
   :scope{
-    line-height: 1.5;
+    line-height: 1.7;
     font-feature-settings: t.$font-feature-settings;
     font-variation-settings: normal;
     -webkit-font-smoothing: antialiased;
@@ -249,7 +249,7 @@
   html {
     -webkit-text-size-adjust: 100%;
     tab-size: 4;
-    line-height: 1.5
+    line-height: 1.7;
   }
 
   body {

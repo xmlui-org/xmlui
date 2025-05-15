@@ -114,7 +114,8 @@ jobs:
           publish: npm run publish-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.PUBLISH_NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{secrets.PUBLISH_NPM_TOKEN}}
+
 
       - name: Output Published Packages Info
         if: steps.changesets_publish.outputs.published == 'true'
