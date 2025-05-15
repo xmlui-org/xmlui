@@ -58,7 +58,7 @@ async function generateExtenionPackages(metadata) {
       await cleanFolder(packageFolder);
     }
 
-    const componentsAndFileNames = extensionGenerator.generateDocs();
+    let componentsAndFileNames = extensionGenerator.generateDocs();
     if (Object.keys(componentsAndFileNames).length === 0) {
       if (existsSync(packageFolder)) {
         await rm(packageFolder, { recursive: true });
@@ -67,10 +67,14 @@ async function generateExtenionPackages(metadata) {
       continue;
     }
 
+    const summaryTitle = "Extension Overview";
+    const summaryFileName = "_overview";
+
     // In both of these cases, we are writing to the same file
-    const indexFile = join(packageFolder, `_overview.md`);
+    const indexFile = join(packageFolder, `${summaryFileName}.md`);
     deleteFileIfExists(indexFile);
 
+    componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
     await extensionGenerator.generatePackageDescription(
       metadata[packageName].description,
       `${fromKebabtoReadable(packageName)} Package`,
@@ -79,6 +83,12 @@ async function generateExtenionPackages(metadata) {
 
     // Create summary and index file for extension package
     await extensionGenerator.generateComponentsSummary(`Package Components`, indexFile, false);
+
+    // Generate a _meta.json for the files in the extension
+    extensionGenerator.writeMetaSummary(
+      componentsAndFileNames,
+      packageFolder,
+    );
   }
 
   // generate a _meta.json for the folder names
