@@ -1,4 +1,4 @@
-# Bookmark [#component-bookmark]
+# Bookmark [#bookmark]
 
 As its name suggests, this component places a bookmark into its parent component's view. The component has an `id` that you can use in links to navigate (scroll to) the bookmark's location.
 

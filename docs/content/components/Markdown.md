@@ -1,4 +1,4 @@
-# Markdown [#component-markdown]
+# Markdown [#markdown]
 
 `Markdown` displays plain text styled using markdown syntax.
 

@@ -234,7 +234,7 @@ async function createSummary(
       .map((component) => {
         return [
           existsSync(join(componentsOutFolder, `${component.displayName}.md`))
-            ? `[${component.displayName}](./${componentFolderName}/${component.displayName}.md)`
+            ? `[${component.displayName}](./${componentFolderName}/${component.displayName})`
             : component.displayName,
           component.description,
           component.status ?? defaultStatus,

@@ -1,4 +1,4 @@
-# NavLink [#component-navlink]
+# NavLink [#navlink]
 
 The `NavLink` component defines a navigation target (app navigation menu item) within the app; it is associated with a particular in-app navigation target (or an external link).
 

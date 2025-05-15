@@ -1,4 +1,4 @@
-# Items [#component-items]
+# Items [#items]
 
 The `Items` component maps sequential data items into component instances, representing each data item as a particular component.
 

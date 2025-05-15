@@ -1,4 +1,4 @@
-# Splitter [#component-splitter]
+# Splitter [#splitter]
 
 The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.
 

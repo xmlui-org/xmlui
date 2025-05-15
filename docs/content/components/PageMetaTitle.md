@@ -1,4 +1,4 @@
-# PageMetaTitle [#component-pagemetatitle]
+# PageMetaTitle [#pagemetatitle]
 
 A PageMetaTitle component allows setting up (or changing) the app title to display with the current browser tab.
 

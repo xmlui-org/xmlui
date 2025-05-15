@@ -1,4 +1,4 @@
-# NoResult [#component-noresult]
+# NoResult [#noresult]
 
 `NoResult` is a component that displays a visual indication that some data query (search) resulted in no (zero) items.
 

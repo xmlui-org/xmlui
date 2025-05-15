@@ -1,4 +1,4 @@
-# Image [#component-image]
+# Image [#image]
 
 The `Image` component represents or depicts an object, scene, idea, or other concept with a picture.
 

@@ -1,6 +1,6 @@
 %-DESC-START
 
-See the [\`Page\` docs](./Page.mdx) for a short description.
+See the [\`Page\` docs](/components/Page) for a short description.
 
 Examples for both components can be found here.
 

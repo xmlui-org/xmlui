@@ -1,4 +1,4 @@
-# PasswordInput [#component-passwordinput]
+# PasswordInput [#passwordinput]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `Password` component is a specialized version of the `TextBox` component that allows users to input and edit passwords.

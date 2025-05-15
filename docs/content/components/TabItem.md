@@ -1,4 +1,4 @@
-# TabItem [#component-tabitem]
+# TabItem [#tabitem]
 
 `TabItem` is a non-visual component describing a tab. Tabs component may use nested TabItem instances from which the user can select.
 

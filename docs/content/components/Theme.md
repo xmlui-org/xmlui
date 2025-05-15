@@ -1,4 +1,4 @@
-# Theme [#component-theme]
+# Theme [#theme]
 
 The `Theme` component provides a way to define a particular theming context for its nested components. The XMLUI framework uses `Theme` to define the default theming context for all of its child components. Theme variables and theme settings only work in this context.
 

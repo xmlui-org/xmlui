@@ -1,4 +1,4 @@
-# MenuItem [#component-menuitem]
+# MenuItem [#menuitem]
 
 This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action.
 

@@ -1,4 +1,4 @@
-# Card [#component-card]
+# Card [#card]
 
 The `Card` component is a container for cohesive elements, often rendered visually as a card.
 

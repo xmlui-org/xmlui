@@ -1,4 +1,4 @@
-# Spinner [#component-spinner]
+# Spinner [#spinner]
 
 The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value.
 

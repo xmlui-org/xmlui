@@ -1,4 +1,4 @@
-# Table [#component-table]
+# Table [#table]
 
 `Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells.
 

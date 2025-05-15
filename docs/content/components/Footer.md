@@ -1,4 +1,4 @@
-# Footer [#component-footer]
+# Footer [#footer]
 
 The `Footer` is a component that acts as a placeholder within `App`.
 

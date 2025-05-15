@@ -1,4 +1,4 @@
-# NumberBox [#component-numberbox]
+# NumberBox [#numberbox]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.A `NumberBox` component allows users to input numeric values: either integer or floating point numbers. It also accepts empty values, where the stored value will be of type `null`.

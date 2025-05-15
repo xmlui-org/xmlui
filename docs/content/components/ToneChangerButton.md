@@ -1,4 +1,4 @@
-# ToneChangerButton [#component-tonechangerbutton]
+# ToneChangerButton [#tonechangerbutton]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `ToneChangerButton` component is a component that allows the user to change the tone of the app.

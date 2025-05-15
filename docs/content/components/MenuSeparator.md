@@ -1,4 +1,4 @@
-# MenuSeparator [#component-menuseparator]
+# MenuSeparator [#menuseparator]
 
 This component displays a separator line between menu items.
 

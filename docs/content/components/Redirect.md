@@ -1,4 +1,4 @@
-# Redirect [#component-redirect]
+# Redirect [#redirect]
 
 `Redirect` is a component that immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). The redirection works only within the app.
 
