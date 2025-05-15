@@ -1,0 +1,589 @@
+# Scripts in XMLUI
+
+>[!INFO]
+> XMLUI uses a scripting language, which is a **subset of JavaScript**. 
+
+When an application runs, the framework precompiles scripts into an intermediate representation and processes (interprets) that. It uses the same expression evaluation and statement executing semantics as JavaScript.
+
+>[!INFO]
+> When we designed scripting, we opted to create the scripting language as a subset of JavaScript because of these primary reasons:
+> - JavaScript is an easy language to learn at the level needed to productively use XMLUI; its language constructs are mature and proven.
+> - Using JavaScript semantics allows us to leverage the entire JS runtime and utilize them with the original semantics; we do not need to create a separate runtime library.
+
+## Sync and Async Evaluation
+
+>[!INFO]
+> The scripting engine is smart about using sync and async evaluation.
+
+When resolving property values, the engine uses sync evaluation; event handlers are asynchronous. You do not have to know how it happens; they just get the operation result.
+
+You do not need to use `async` or `await` keywords or do anything to manage asynchronous execution. More accurately, these keywords are not part of the scripting language.
+
+When evaluating the initial value of variables or setting and changing property values, the engine expects sync evaluation. It needs the initial values instantly to render the UI. Thus, the engine raises an error message if the initial variable evaluation contains async parts.
+
+The UI remains responsive even if you create an infinite loop with an event handler.
+
+## Language Constraints
+
+The scripting language is just a subset of JavaScript. This section describes what is not implemented in XMLUI.
+
+**No `import` and `export` statements**
+
+XMLUI does not support modules, so the language does not yet include the `import` and `export` keywords.
+
+>[!INFO]
+> We are already working on implementing simplified module handling within the framework. So, you will be able to separate some utility code into separate files and use them similarly to JavaScript modules. Nonetheless, this feature is not available yet.
+
+**No labels**
+
+You cannot use labels: no label declarations; the `break` and `continue` statements do not accept labels.
+
+**No class declarations**
+
+XMLUI does not allow declaring classes.
+
+**No `debugger` statement**
+
+XMLUI does not support using the `debugger` statement.
+
+>[!INFO]
+> When we have debugging tools for XMLUI, we may implement this statement.
+
+**No default value and rest syntax with destructuring constructs**
+
+You can use destructure operators with variable declarations and function arguments with a syntax matching JavaScript. However, the current implementation does not support extracting rest values and providing default values.
+
+So, these example constructs work in XMLUI:
+
+```js
+const {a, b} = someObject;
+
+val {a, b, other: { c, d }} = someObject;
+
+let {a, b:myB} = someObject;
+
+function example ({a, b, other: { c:myC }}) {
+  // ...
+}
+```
+
+However, these constructs are not supported:
+
+```js
+const {a, b, ...rest} = someObject;
+
+let {a, b = 0} = someObject;
+```
+
+**Destructuring with left-hand value is unavailable**
+
+While destructuring works with left-hand values in JavaScript, XMLUI does not support this construct. For example, swapping two variables with this construct is available in JavaScript but not in XMLUI:
+
+```js
+let a = 1, b = 2;
+[a, b] = [b, a];
+```
+
+**The `new`, `instanceof`, `void`, `yield`, and `await` operators are unavailable**
+
+You cannot instantiate objects with the `new` operator. This feature is missing for code security reasons.
+
+>[!INFO]
+> We plan to relax this constraint in a future release, at least allowing the new operator for the core, frequently used JavaScript object types.
+
+We opted to omit `the void` and `yield` operators as we guess they do not add value to the XMLUI scripting. Not only `yield` but generator functions are unavailable.
+
+As you learned earlier, XMLUI handles async execution, so there is no need for `async` or `await`. Async functions and loops are not available.
+
+**Restricted use of the optional chaining operator**
+
+XMLUI supports using the optional chaining operator(`?.`) only for member access but not for calculated member access (`?.[]`) and function invocation (`?.()`).
+
+>[!INFO]
+> We plan to add these operators in a future release.
+
+## Semantic differences
+
+There are a few semantic differences between JavaScript and XMLUI that you should consider when working with scripts.
+
+### Standard and optional member access operators
+
+In the current version, the member access operator `.` and its optional pair, `?.` both work with the semantics as the optional operator. 
+
+So, using the `myResult.customerName` expression, it is evaluated as if it were `myResult?.customerName`. In JavaScript, the first would give an error if `myResult` were `undefined`, while the second would result in undefined without raising an error.
+
+In XMLUI, both would retrieve `undefined`.
+
+>[!INFO]
+> We decided on this implementation because we have experienced that it relaxes the syntax and makes it easier to code with `null` and `undefined` values. In the future, we will include configurable switches for the scripting engine to turn this behavior on or off. 
+
+### Variable declarations
+
+Like JavaScript, XMLUI supports declaring variables with the keywords `var`, `let`, and `const`. However, XMLUI restricts their usage:
+
+`var` can be used only in the top code level behind files; it is not allowed within function declarations or event handlers.
+`let` and `const` can be used only within event handlers and function declarations.
+
+### Reactive Variables
+
+Variables declared with `var` are reactive. **They automatically update when their dependencies (in the expression the variable is initialized with) change, such as components or other variables they rely on**. 
+
+Look at these variable declarations:
+
+```js
+let count = 0;
+let countTimesThree = count * 3;
+```
+
+If you change the `count` variable, the `countTimesThree` variable will automatically update:
+
+```js
+count = 5;
+```
+
+This statement will update the `countTimesThree` variable to 15 even without explicitly assigning the value due to the reactive nature of XMLUI variables.
+
+However, the first time you assign a runtime-evaluated value to the `countTimesThree` variable, it will lose its dependency on `count`:
+
+```js
+countTimesThree = 12;
+```
+
+>[!INFO]
+> Observe that this statement is an assignment, not a variable declaration.
+
+After that assignment, changing the value of `counter` will never modify `counterTimesThree`; you cannot restore its reactive behavior. If you assign this value to `countTimesThree` somewhere in an event handler:
+
+```js
+countTimesThree = count * 3;
+```
+
+`countTimesThree` will have three times the current value of `count` but will no longer depend on `count`.  Any future updates to count will not update `countTimesThree` automatically.
+
+This article contains a [How Reactiveness Works](#reactiveness) section where you can learn more details about this topic.
+
+### No `Error` object
+
+XMLUI supports the `throw` statement and the `try..catch..finally` block. However, you cannot throw native JavaScript `Error` objects; you should provide your error objects (even strings, numbers, or other composite object values).
+
+Here are a few examples:
+
+```js copy {3}
+function sum(values) => {
+  if (values.some(function (v) {typeof v !== "number"})) {
+    throw "Can only add numbers";
+  }
+  let sum = 0;
+  for (let v of values) {
+    sum += v;
+  }  
+  return sum;
+}
+```
+
+```js copy {3}
+try {
+  readData(); // may throw three types of exceptions
+} catch (e) {
+  if (e === "DataReadError") {
+    // Statements to handle data read errors
+  } else if (typeof e === "number") {
+    // Statements to handle a particular numeric error code
+  } else if (e.errorType) {
+    // Statements to handle some other error
+  } else {
+    // Statements to handle any unspecified exceptions
+    console.log(e);
+  }
+}
+```
+
+## Expressions Syntax
+
+When you declare an inline expression within a component property (markup attribute) or in a markup text element, XMLUI parses that with the *expression syntax*.
+
+### Identifiers
+
+XMLUI identifiers may start with one of these characters: `$`, `_`, or any English alphabet letters (from `a` to `z` and from `A` to `Z`). The continuation characters can be of the same set as the start character, and you can also use decimal digits (from `0` to `9`). Other characters (such as Unicode letters, symbols, or emojis) are not allowed in identifiers.
+
+Here are a few examples of valid identifiers:
+
+```js
+saveButton
+$item
+$saveCommand
+_a123
+```
+
+Identifier resolution has the same semantics as in JavaScript. Identifier search starts from the innermost scope and traverses until the global scope is reached unless the id can be resolved in one of the previous scopes.
+
+XMLUI changes this by injecting a unique scope between the global JavaScript scope and the others. This scope contains global XMLUI functions (mostly helpers) and objects.
+
+### Literals
+
+You can use the same numbers (integers and floating-point numbers) as in JavaScript, and also the `NaN` value
+(not-a-number) and `Infinity` (the result coming from a divide by zero).
+
+Array and object literals also allow you the same syntax as in JavaScript. Here are a few samples:
+
+```js
+[1, 2, 3] // An array of three numbers
+["Hello", "World", 42, true] // An array of four values
+{a: 1, b: 2, c: 3} // An object with three properties
+{
+  hey: 123,
+  ho: false,
+  hi: 123.e-2,
+  what: NaN,
+  is: ["this", "object-like"],
+  thing: {
+      that: null,
+      seems: "completely",
+      stupid: "?"
+  }
+} // A compound object literal
+```
+
+Strings allow the same characters as JavaScript, including inline Unicode and the following escape characters:
+
+- `\b`: Backspace
+- `\f`: Form Feed
+- `\n`: New Line
+- `\r`: Carriage Return
+- `\t`: Horizontal Tabulator
+- `\v`: Vertical Tabulator
+- `\S`: Non-breaking Space
+- `\\`: Backslash
+- `\'`: Single quote
+- `\"`: Double quote
+- `\xhh`: Hexadecimal character (here, `hh` represents two hexadecimal digits).
+- `\uhhhh`: Unicode code point between `U+0000` and `U+FFFF` (here `hhhh` represents four hexadecimal digits).
+- `\u{hHHHHH}`: Unicode code point between `U+0000` and `U+10FFFF` (here `hHHHHH` represents one to six hexadecimal
+digits).
+
+XMLUI supports [template strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals); however, it does not allow using [tagged templates](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates).
+
+### Available operators
+
+The operators are grouped according to their precedence, starting with the highest one:
+
+| Operator | Notation | Examples | Group |
+| --- | --- | --- | --: |
+| **Grouping** | `( … )` | `(a + b) * c` | 1 |
+| **Member Access** | `… . …` | `object.property` | 2 |
+| **Optional Member Access** | `… ?. …` | `object?.property` | 2 |
+| **Calculated Member Access** | `… [ … ]` | `object[property]` | 2 |
+| **Function Invocation** | `… ( … )` | `function(arg1, arg2)` | 2 |
+| **Postfix Increment** | `… ++` | `a++` | 3 |
+| **Postfix Decrement** | `… --` | `a--` | 3 |
+| **Prefix Increment** | `++ …` | `++a` | 4 |
+| **Prefix Decrement** | `-- …` | `--a` | 4 |
+| **Logical NOT** | `! …` | `!a` | 4 |
+| **Bitwise NOT** | `~ …` | `~a` | 4 |
+| **Unary Plus** | `+ …` | `+a` | 4 |
+| **Unary Negation** | `- …` | `-a` | 4 |
+| **Typeof** | `typeof …` | `typeof a` | 4 |
+| **Delete** | `delete …` | `delete a` | 4 |
+| **Exponentiation** | `… ** …` | `a ** b` | 5 |
+| **Multiplication** | `… * …` | `a * b` | 6 |
+| **Division** | `… / …` | `a / b` | 6 |
+| **Remainder** | `… % …` | `a % b` | 6 |
+| **Addition** | `… + …` | `a + b` | 7 |
+| **Subtraction** | `… - …` | `a - b` | 7 |
+| **Bitwise Left Shift** | `… << …` | `a << b` | 8 |
+| **Bitwise Right Shift** | `… >> …` | `a >> b` | 8 |
+| **Bitwise Unsigned Right Shift** | `… >>> …` | `a >>> b` | 8 |
+| **Less Than** | `… < …` | `a < b` | 9 |
+| **Less Than or Equal** | `… <= …` | `a <= b` | 9 |
+| **Greater Than** | `… > …` | `a > b` | 9 |
+| **Greater Than or Equal** | `… >= …` | `a >= b` | 9 |
+| **Inclusion Test** | `… in …` | `a in b` | 9 |
+| **Equality** | `… == …` | `a == b` | 10 |
+| **Inequality** | `… != …` | `a != b` | 10 |
+| **Strict Equality** | `… === …` | `a === b` | 10 |
+| **Strict Inequality** | `… !== …` | `a !== b` | 10 |
+| **Bitwise AND** | `… & …` | `a & b` | 11 |
+| **Bitwise XOR** | `… ^ …` | `a ^ b` | 12 |
+| **Bitwise OR** | `… \| …` | `a \| b` | 13 |
+| **Logical AND** | `… && …` | `a && b` | 14 |
+| **Logical OR** | `… \|\| …` | `a \|\| b` | 15 |
+| **Nullish Coalescing** | `… ?? …` | `a ?? b` | 15 |
+| **Assignment** | `… = …` | `a = b` | 16 |
+| **Addition Assignment** | `… += …` | `a += b` | 16 |
+| **Subtraction Assignment** | `… -= …` | `a -= b` | 16 |
+| **Multiplication Assignment** | `… *= …` | `a *= b` | 16 |
+| **Division Assignment** | `… /= …` | `a /= b` | 16 |
+| **Remainder Assignment** | `… %= …` | `a %= b` | 16 |
+| **Exponentiation Assignment** | `… **= …` | `a **= b` | 16 |
+| **Bitwise Left Shift Assignment** | `… <<= …` | `a <<= b` | 16 |
+| **Bitwise Right Shift Assignment** | `… >>= …` | `a >>= b` | 16 |
+| **Bitwise Unsigned Right Shift Assignment** | `… >>>= …` | `a >>>= b` | 16 |
+| **Bitwise AND Assignment** | `… &= …` | `a &= b` | 16 |
+| **Bitwise XOR Assignment** | `… ^= …` | `a ^= b` | 16 |
+| **Bitwise OR Assignment** | `… \|= …` | `a \|= b` | 16 |
+| **Nullish Coalescing Assignment** | `… ??= …` | `a ??= b` | 16 |
+| **Conditional** | `… ? … : …` | `a ? b : c` | 17 |
+| **Arrow Function** | `() => …` | `() => a` | 18 |
+| **Comma** | `… , …` | `a, b` | 19 |
+
+### Function Declaration as Expressions
+
+You can use functions as variable values. XMLUI accepts both an arrow expression (arrow function) or a standard JavaScript function declaration as an expression. So, these variable declarations are valid in XMLUI:
+
+```xmlui copy /x => x*x/ /function(x) { return x * x; }/
+<App 
+  var.mySqr="{x => x*x}"
+  var.mySqrOther="{function(x) { return x * x; }}">
+  <Text>Square of 5 is {mySqr(5)}</Text> <!-- Displays 25 -->
+  <Text>Square of 8 is {mySqrOther(8)}</Text> <!-- Displays 64 -->
+</App>
+```
+
+Function declarations support the rest parameters:
+
+```xmlui copy {2, 3}
+<App 
+  var.myArgs="{(a, b, ...others) => { return others.length + 2; }}"
+  var.myArgsOther="{function(a, b, ...others) { return others.length + 2; }}">
+  <Text>Number of arguments is {myArgs(1, 2, 3, 4, 5)}</Text> <!-- Displays 5 -->
+  <Text>Number of arguments is {myArgsOther(1, 2, 3, 4)}</Text> <!-- Displays 4 -->
+</App>
+```
+
+You can use arrow expressions and function declarations with immediate invocations:
+
+```xmlui copy {2, 3}
+<App>
+  <Text>5**3 is {(n => n ** 3)(5)}</Text> <!-- Displays 125 -->
+  <Text> <!-- Displays 81 -->
+    3**4 is {(function(n){ return n ** 4})(3)}
+  </Text> 
+  <Text> <!-- Displays 120 -->
+    5! is{(function fact(n) { return n &lt; 2 ? 1 : n * fact(n - 1); })(5)}
+  </Text>
+</App>
+```
+
+>[!INFO]
+> The function name in the expression is optional. However, you must name the function if you want to refer to its name (for example, you use recursion, like above in the `fact` function).
+
+## Statements Syntax
+
+While expressions are parsed using only the expression syntax (they can contain statements only within function declaration or arrow function bodies), event handlers and code-behind files can use statements.
+
+XMLUI supports these statements:
+
+| Category | Statement | Description |
+| --- | --- | --- |
+| Declaration | `var`, `let`, `const` | Variable declarations |
+| Declaration | `function` | Function declarations |
+| Control Flow | `if`, `else`, `switch`, `case`, `default`, `break`, `continue`, `return` | Conditional and switch-case statements |
+| Loops | `for`, `while`, `do..while`, `for..in`, `for..of` | Looping statements |
+| Exception Handling | `throw` `try..catch..finally` | Exception raising and handling statements |
+| Expressions | `<expression>` | Expression statement |
+| Block | `{ ... }` | Block statement |
+| Other | `;` | Empty statement |
+
+## Event Handlers [#event-handlers]
+
+Event handlers are functions that can receive and process arguments. When the engine invokes an event handler, it passes the event's parameters to the function.
+
+The engine is smart enough to create a function from your script. Even if it is not a fully declared function, after parsing the script, the engine transforms it into an invokable function.
+
+**Empty code**
+
+The engine creates a no-op function:
+
+```js
+function () {}
+```
+
+**Identifier**
+
+The engine considers an identifier to be a function name. It transforms this id into arrow functions with as many arguments as the corresponding event. Provided you use the identifier `myFuncion` and the event has *N* arguments (*N* can be zero), the engine applies this transformation:
+
+```js
+function eventHandlerFunction(arg1, arg2, /* ... */, argN) {
+  myFunction(arg1, arg2, /* ... */, argN)
+}
+```
+
+**Member Access Chain**
+
+The engine considers the member access chains to refer to a function. It transforms the chain into a function declaration, similar to how it does with identifiers. 
+
+For example, if you have a member access chain, `myArr[3].method`, it is transformed the following way:
+
+```js
+function eventHandlerFunction(arg1, arg2, /* ... */, argN) {
+  myArr[3].method(arg1, arg2, /* ... */, argN)
+}
+```
+
+These member access chains can be arbitrarily long. Here are a few examples:
+
+```js
+action.execute
+operation[0].handler.fire
+operation["do-it"].handler.fire
+```
+
+With the calculated member access (`[` ... `]`) operator, you can use only literals (strings or numbers); otherwise, the engine wraps considers the expression an *expression statement* and wraps it accordingly.
+
+For example, all of the following member access chains are considered expression statements because the `[` ... `]` operators contain a non-literal:
+
+```js
+operation[index + 3].handler.fire
+operation["do" + "it"].handler.fire
+```
+
+**Expression statements**
+
+When the event handler script is an expression statement, the engine transforms it into a function returning the particular expression. For example, `count++` is transformed into this function:
+
+```js
+function () { return count++; }
+```
+
+***Code Blocks with Single Expression***
+
+Though inline expressions are wrapped into curly braces (e.g., `{doThis()}`), event handlers are not.Nonetheless, users often forget about this fact. The engine recognizes the braces as block statement delimiters and transforms code blocks into the appropriate arrow function:
+
+For example, if the event handler is `{count++;}`, the engine transforms it into this function:
+
+```js
+function () { return count++; }
+```
+***Code Blocks with Multiple Statement***
+
+If the block statement contains a single non-expression statement or multiple statements, the engine provides a different transformation. It wraps the block into a function and separates the statements with semicolons.
+
+Let's assume the event handler script is the following:
+
+
+```js
+{ if (x) counter++; return counter + 10; }
+```
+
+The engine replaces it with this function definition:
+
+```js
+function () { 
+  if (x) counter++; 
+  return counter + 10;
+}
+```
+
+**Multiple Statements**
+
+The engine recognizes multiple statements and transforms them similarly to the body of block statements:
+
+Original event handler:
+
+```js
+if (x) counter++; return counter + 10;
+```
+
+Transformed event handler:
+
+```js
+function () { 
+  if (x) counter++; 
+  return counter + 10;
+}
+```
+
+>[!INFO]
+> Be aware of using the `return` statement explicitly to retrieve a value from an event handler.
+
+## Runtime
+
+As described earlier in this article, XMLUI entirely conceals that it runs the code asynchronously without any explicit hint from the script. The script language does not contain the `async` and `await` keywords.
+
+To implement this "magic", the scripting engine provides two mechanisms:
+It prevents some JavaScript runtime functions from calling
+Provides asynchronous replacements for some JavaScript runtime functions that support only sync operations
+
+### Banned Functions
+
+A few functions in the JavaScript runtime manage the JavaScript event loop and animation frames at a low level or may derail script management. XMLUI does not allow their use:
+
+- [`cancelAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/cancelAnimationFrame)
+- [`cancelIdleCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Window/cancelIdleCallback)
+- [`clearInterval`](https://developer.mozilla.org/en-US/docs/Web/API/Window/clearInterval)
+- [`clearImmediate`](https://developer.mozilla.org/en-US/docs/Web/API/Window/clearImmediate)
+- [`clearTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/Window/clearTimeout)
+- [`eval`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval)
+- [`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/queueMicrotask)
+- [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame)
+- [`requestIdleCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback)
+- [`setImmediate`](https://developer.mozilla.org/en-US/docs/Web/API/Window/setImmediate)
+- [`setInterval`](https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval)
+- [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout)
+
+When you invoke these functions, XMLUI stops with an error.
+
+>[!INFO]
+> We may extend this list in the future.
+
+### Async Replacements
+
+XMLUI replaces several functions with its implementation that supports async execution:
+
+- [`Array.prototype.every`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every)
+- [`Array.prototype.filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
+- [`Array.prototype.find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
+- [`Array.prototype.findIndex`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)
+- [`Array.prototype.flatMap`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap)
+- [`Array.prototype.forEach`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach)
+- [`Array.prototype.map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
+- [`Array.prototype.some`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)
+
+>[!INFO]
+> We may extend this list in the future.
+
+## Appendix: How Reactiveness Works [#reactiveness]
+
+The reactive feature works with XMLUI-managed objects such as variables and components. However, it does not work with objects managed by other entities.
+
+For example, the following variable declaration assigns the current timestamp to the `thisIsNow` variable:
+
+```js
+let thisIsNow = getDate();
+```
+
+The timestamp continuously changes; nonetheless, `this is now` (though it is still a reactive variable) does not have any dependencies, as the execution of the body of the `getDate()` function is managed by the JavaScript runtime and not XMLUI. 
+
+The exact time at which this automatic update occurs is indeterministic. Updating a value and all reactive variables depending on it is far from atomic. If there are more dependencies of paticular value, the order of updating them is also indeterministic.
+
+Without the exact details, this is what happens when you modify a dependency of a reactive variable:
+- After completing the execution of an operation (for example, an assignment), the engine detects the update in a dependency (or even more dependencies).
+- The engine initiates a UI refresh.
+- This UI refresh evaluates all reactive variables that depend on the updated dependency (or dependencies). The UI is displayed accordingly.
+
+You can create circular dependencies among reactive variables that could cause an infinite loop. However, the mechanism above (based on UI refresh) will settle down the value of such variables and avoid infinite updates.
+
+Because the update mechanism triggers only after executing an entire XMLUI statement, after processing all statements in an event handler, there is no more trigger, so there is no chance for an infinite loop.
+
+Look at this example, where variables `b` and `c` form a circular reference and depend on variable `a`. Clicking the button increments `a` and triggers the update mechanism:
+
+```xmlui-pg copy display name="Example: No infinite updates"
+<App 
+  var.a="{0}" 
+  var.b="{a + (c ?? 0) * 2}" 
+  var.c="{a + (b ?? 0) * 2}">
+  <Button label="Increment 'a'" onClick="a++"/>
+  <Text>a = {a}</Text>
+  <Text>b = {b}</Text>
+  <Text>c = {c}</Text>
+</App>
+```
+
+The values you see are displayed after two UI updates:
+- The completion of `a++` statements in `onClick` event handler triggers a UI update.
+- The completion of the entire event handler triggers another UI update.
+
+Only the value of `a` is deterministic; it is one after a single click. The other variable values are indeterministic due to the circular reference between them and the unknown order of re-evaluating `b` and `c`. This order may be different for the two UI refreshes. 
+
+>[!INFO]
+> A future release of XMLUI may display different values for `b` and `c`. However, it will not change the fact that there are now infinite update loops.

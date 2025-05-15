@@ -1,0 +1,10 @@
+{
+  "references": {
+    "title": "References",
+    "type": "separator"
+  },
+  "components": "Components Library",
+  "extensions": "XMLUI Extensions",
+  "styles-and-themes": "Themes",
+  "scripting": "Scripting and APIs"
+}

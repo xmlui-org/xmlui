@@ -1,0 +1,13 @@
+<Component name="MarkdownPage">
+    <HStack>
+        <VStack width="*">
+            <Breadcrumb />
+            <Markdown
+                content="{$props.content}"
+                data="{$props.url}"
+                codeHighlighter="{appGlobals.highlighter}"
+            />
+        </VStack>
+        <TableOfContents maxHeadingLevel="3" width="$space-64" when="{mediaSize.sizeIndex > 3}"/>
+    </HStack>    
+</Component>

@@ -134,7 +134,8 @@ async function generateComponents(metadata) {
     outputFolder,
   );
 
-  await metadataGenerator.generatePermalinksForHeaders();
+  // TODO: Permalinks show up in regular markdown
+  //await metadataGenerator.generatePermalinksForHeaders();
 }
 
 // NOTE: Unused - we are not generating Html component docs

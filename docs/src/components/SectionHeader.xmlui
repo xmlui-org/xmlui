@@ -1,0 +1,5 @@
+<Component name="SectionHeader">
+  <H4 paddingHorizontal="$space-4" paddingTop="$space-5" paddingBottom="$space-2">
+    {$props.title}
+  </H4>
+</Component>
