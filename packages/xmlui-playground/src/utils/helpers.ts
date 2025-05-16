@@ -1,11 +1,16 @@
 import type { PlaygroundState } from "../state/store";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import { ComponentDef, CompoundComponentDef, ThemeDefinition } from "xmlui";
-import { XmlUiHelper, XmlUiNode } from "../../../../xmlui/src/parsers/xmlui-parser";
+import {
+  ComponentDef,
+  CompoundComponentDef,
+  ThemeDefinition,
+  XmlUiHelper,
+  XmlUiNode,
+  SolidThemeDefinition,
+  XmlUiThemeDefinition,
+} from "xmlui";
 import { decompress } from "../playground/utils";
-import { SolidThemeDefinition } from "../../../../xmlui/src/components-core/theming/themes/solid";
-import { XmlUiThemeDefinition } from "../../../../xmlui/src/components-core/theming/themes/xmlui";
 
 export function normalizePath(url?: string): string | undefined {
   if (!url) {
@@ -99,7 +104,7 @@ function removeWhitespace(obj: any) {
   if (typeof obj === "string") {
     return obj.replace(/\s+/g, " ").trim(); // Remove extra whitespaces and newlines
   } else if (typeof obj === "object" && obj !== null) {
-    const newObj = Array.isArray(obj) ? [] : {};
+    const newObj: any = Array.isArray(obj) ? [] : {};
     for (const key in obj) {
       newObj[key] = removeWhitespace(obj[key]);
     }
@@ -117,7 +122,7 @@ export const handleDownloadZip = async (appDescription: any) => {
   const xmluiStandalone = await fetchWithoutCache(
     "/resources/files/for-download/xmlui/xmlui-standalone.umd.js",
   ).then((res) => res.blob());
-  xmluiFolder.file("xmlui-standalone.umd.js", xmluiStandalone);
+  xmluiFolder?.file("xmlui-standalone.umd.js", xmluiStandalone);
 
   zip.file("Main.xmlui", appDescription.app);
   zip.file("config.json", JSON.stringify(appDescription.config, null, 2));
@@ -125,13 +130,13 @@ export const handleDownloadZip = async (appDescription: any) => {
   if (appDescription.components.length > 0) {
     const components = zip.folder("components");
     appDescription.components.forEach((component: { name: string; component: string }) => {
-      components.file(`${component.name}.xmlui`, component.component);
+      components?.file(`${component.name}.xmlui`, component.component);
     });
   }
   if (appDescription.config.themes.length > 0) {
     const themes = zip.folder("themes");
     appDescription.config.themes.forEach((theme: ThemeDefinition) => {
-      themes.file(`${theme.id}.json`, JSON.stringify(theme, null, 2));
+      themes?.file(`${theme.id}.json`, JSON.stringify(theme, null, 2));
     });
   }
 
@@ -141,7 +146,7 @@ export const handleDownloadZip = async (appDescription: any) => {
       "/resources/files/for-download/index-with-api.html",
     ).then((res) => res.blob());
     zip.file("index.html", indexWithApiHtml);
-    xmluiFolder.file(
+    xmluiFolder?.file(
       "mockApiDef.js",
       `window.XMLUI_MOCK_API = ${JSON.stringify(removeWhitespace(emulatedApi), null, 2)};`,
     );

@@ -4,7 +4,6 @@ import {
   optionsInitialized,
   PlaygroundContext,
   playgroundReducer,
-  toneChanged,
 } from "../state/store";
 import { INITIAL_PLAYGROUND_STATE, preprocessCode } from "../utils/helpers";
 import styles from "./PlaygroundNative.module.scss";

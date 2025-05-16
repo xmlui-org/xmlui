@@ -2,15 +2,24 @@ import React, { useRef, useEffect, useMemo } from "react";
 import { usePlayground } from "../hooks/usePlayground";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
-import { AppRoot, ComponentDef, CompoundComponentDef, ErrorBoundary, StandaloneExtensionManager } from "xmlui";
+import {
+  AppRoot,
+  ComponentDef,
+  CompoundComponentDef,
+  ErrorBoundary,
+  StandaloneExtensionManager,
+} from "xmlui";
 import styles from "./Preview.module.scss";
 import charts from "xmlui-charts";
 import animations from "xmlui-animations";
 import pdf from "xmlui-pdf";
-import { useApiWorkerContext } from "../../../../xmlui/src/components/NestedApp/ApiWorkerContext";
-import { errReportComponent, xmlUiMarkupToComponent } from "../../../../xmlui/src/components-core/xmlui-parser";
-import { ApiInterceptorProvider } from "../../../../xmlui/src/components-core/interception/ApiInterceptorProvider";
-import { ThemeTone } from "../../../../xmlui/src/abstractions/ThemingDefs";
+import {
+  useApiWorkerContext,
+  errReportComponent,
+  xmlUiMarkupToComponent,
+  ApiInterceptorProvider,
+  ThemeTone,
+} from "xmlui";
 
 export function Preview() {
   const rootRef = useRef<HTMLDivElement>(null);

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo, useId, useState, useLayoutEffect } from "react";
+import { useRef, useEffect, useMemo, useId, useState, useLayoutEffect, useCallback } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import styles from "./NestedApp.module.scss";
@@ -15,6 +15,7 @@ import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { Tooltip } from "./Tooltip";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { EMPTY_ARRAY } from "../../components-core/constants";
+import { createQueryString } from "./utils";
 
 type NestedAppProps = {
   api?: any;
@@ -74,6 +75,31 @@ export function NestedApp({
   }, [api]);
 
   //console.log("mock", mock);
+
+  const openPlayground = useCallback(async () => {
+    const data = {
+      standalone: {
+        app,
+        components,
+        config: {
+          name: title,
+          themes: [],
+          defaultTheme: activeTheme,
+        }
+      },
+      options: {
+        fixedTheme: false,
+        swapped: false,
+        previewMode: false,
+        orientation: "horizontal",
+        activeTheme,
+        activeTone,
+        content: "app",
+      },
+    };
+    const appQueryString = await createQueryString(JSON.stringify(data));
+    window.open(`/#/playground#${appQueryString}`, "_blank");
+  }, [app, activeTheme]);
 
   useEffect(() => {
     if (!shadowRef.current && rootRef.current) {
@@ -135,7 +161,7 @@ export function NestedApp({
                     <button
                       className={styles.headerButton}
                       onClick={() => {
-                        // TODO: Open the app in a new window
+                        openPlayground();
                       }}
                     >
                       <RxOpenInNewWindow />

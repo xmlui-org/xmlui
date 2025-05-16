@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "shiki": "^3.3.0",
-    "xmlui": "*"
+    "xmlui": "*",
+    "xmlui-playground": "*"
   }
 }

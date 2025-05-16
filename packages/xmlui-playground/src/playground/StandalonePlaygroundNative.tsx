@@ -10,8 +10,7 @@ import { decompressData, INITIAL_PLAYGROUND_STATE } from "../utils/helpers";
 import { ToastProvider } from "@radix-ui/react-toast";
 import styles from "./StandalonePlaygroundNative.module.scss";
 import { useToast } from "../hooks/useToast";
-import { ErrorBoundary } from "xmlui";
-import { Spinner } from "../../../../xmlui/src/components/Spinner/SpinnerNative";
+import { ErrorBoundary, Spinner } from "xmlui";
 import { Header } from "./Header";
 import { PlaygroundContent } from "./PlaygroundContent";
 
