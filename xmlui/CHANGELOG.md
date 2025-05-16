@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.9.32
+
+### Patch Changes
+
+- 4019d82: xmlui-playground, new exports from xmlui
+- 450e1ee: feat: add aria-placeholder to Select component
+
 ## 0.9.31
 
 ### Patch Changes
