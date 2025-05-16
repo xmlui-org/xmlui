@@ -2,15 +2,6 @@ name: Release Packages
 
 on:
   workflow_dispatch:
-    inputs:
-      commit_message:
-        description: 'Custom commit message for versioning PR (optional)'
-        required: false
-        default: 'chore: version packages for stable release'
-      pr_title:
-        description: 'Custom title for versioning PR (optional)'
-        required: false
-        default: 'Version Packages for Stable Release'
   pull_request:
     types:
       - closed
@@ -23,48 +14,14 @@ permissions:
   id-token: write
 
 jobs:
-  create_version_pr:
-    name: Create Stable Version PR
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci --prefer-offline
-
-      - name: Create Version PR
-        id: changesets_pr
-        uses: changesets/action@v1
-        with:
-          # Command to run for versioning.
-          version: npm run changeset:version
-          commit: ${{ github.event.inputs.commit_message }}
-          title: ${{ github.event.inputs.pr_title }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Output Changeset PR URL
-        if: steps.changesets_pr.outputs.pullRequestUrl
-        run: |
-          echo "Version PR created: ${{ steps.changesets_pr.outputs.pullRequestUrl }}"
-
   publish_and_github_release:
     name: Publish Stable and Create GitHub Release
     if: >
-      github.event_name == 'pull_request' &&
+      github.event_name == 'workflow_dispatch' || 
+      (github.event_name == 'pull_request' &&
       github.event.action == 'closed' &&
       github.event.pull_request.merged == true &&
-      (startsWith(github.event.pull_request.title, 'Version Packages for Stable Release') || contains(github.event.pull_request.labels.*.name, 'changeset-release'))
+      (startsWith(github.event.pull_request.title, 'Version Packages for Stable Release') || contains(github.event.pull_request.labels.*.name, 'changeset-release')))
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
