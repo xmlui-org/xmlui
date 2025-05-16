@@ -23,9 +23,9 @@ You can use `Select` with dynamic options:
   <Select>
     <Items data="{['one', 'two', 'three']}" >
       <Option value="{$itemIndex}" label="{$item}" />
-    </Items> 
+    </Items>
   </Select>
-</App>  
+</App>
 ```
 
 %-DESC-END
@@ -80,7 +80,7 @@ You can use `Select` with dynamic options:
 
 %-PROP-START validationStatus
 
-```xmlui-pg copy display name="Example: validationStatus"
+```xmlui-pg copy display name="Example: validationStatus" height="280px"
 <App>
   <Select />
   <Select validationStatus="valid" />
@@ -172,14 +172,14 @@ Click on the second field to see the custom empty list indicator.
 
 %-PROP-START optionLabelTemplate
 
-In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`. 
+In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`.
 
 ```xmlui-pg copy {3-9} display name="Example: optionLabelTemplate" height="300px"
 <App>
   <Select initialValue="{0}" placeholder="Select..." searchable>
     <property name="optionLabelTemplate">
-      <HStack 
-        paddingHorizontal="$padding-tight" 
+      <HStack
+        paddingHorizontal="$padding-tight"
         border="2px dotted $color-primary-500">
         <Text>{$item.label}</Text>
       </HStack>
@@ -202,15 +202,15 @@ In the template definition, you can use the `$item` context property to access t
 <App>
   <Select initialValue="{0}" placeholder="Select..." multiSelect>
     <property name="valueTemplate">
-      <HStack 
-        paddingLeft="$padding-tight" 
-        border="2px dotted $color-primary-500"              
+      <HStack
+        paddingLeft="$padding-tight"
+        border="2px dotted $color-primary-500"
         verticalAlignment="center">
         <Text>{$item.label}</Text>
-        <Button 
+        <Button
           variant="ghost"
-          icon="close" 
-          size="xs" 
+          icon="close"
+          size="xs"
           onClick="$itemContext.removeItem()"/>
       </HStack>
     </property>
@@ -219,7 +219,7 @@ In the template definition, you can use the `$item` context property to access t
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </Select>
-</App>  
+</App>
 ```
 
 %-PROP-END
