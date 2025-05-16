@@ -6,7 +6,7 @@
 
 ### With `AutoComplete`
 
-```xmlui-pg copy {4-6} display name="Example: Option in a AutoComplete"
+```xmlui-pg copy {4-6} display name="Example: Option in a AutoComplete" height="275px"
 <App>
   <Text value="Selected ID: {myComp.value}"/>
   <AutoComplete id="myComp">
@@ -19,7 +19,7 @@
 
 ### With `Select`
 
-```xmlui-pg copy {4-6} display name="Example: Option in a Select"
+```xmlui-pg copy {4-6} display name="Example: Option in a Select" height="275px"
 <App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
@@ -63,7 +63,7 @@ This property defines the text to display for the option. If `label` is not defi
 >[!INFO]
 > If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
 
-```xmlui-pg copy display name="Example: Using label" height="260px"
+```xmlui-pg copy display name="Example: Using label" height="275px"
 <App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
@@ -86,7 +86,7 @@ This property defines the value of the option. If `value` is not defined, `Optio
 >[!INFO]
 > If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
 
-```xmlui-pg copy display name="Example: Using value" height="260px"
+```xmlui-pg copy display name="Example: Using value" height="275px"
 <App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
