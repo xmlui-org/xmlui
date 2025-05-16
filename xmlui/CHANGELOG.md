@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.33
+
+### Patch Changes
+
+- dabeb53: Fixed NavPanel background color
+
 ## 0.9.32
 
 ### Patch Changes
