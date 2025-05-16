@@ -176,7 +176,7 @@ export const handleDownloadZip = async (appDescription: any) => {
       type: "blob",
       platform: operatingSystem === "Windows" ? "DOS" : "UNIX",
     });
-    saveAs(content, `${appDescription.config.name.trim()}.zip`);
+    saveAs(content, `${(appDescription.config.name || 'xmlui-playground-app').trim()}.zip`);
   } catch (error) {
     console.error("An error occurred while generating the ZIP:", error);
   }

@@ -17,6 +17,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { createQueryString } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
+import { useComponentRegistry } from "../ComponentRegistryContext";
 
 type NestedAppProps = {
   api?: any;
@@ -51,6 +52,7 @@ export function NestedApp({
   const theme = useTheme();
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
   const {appGlobals} = useAppContext();
+  const componentRegistry = useComponentRegistry();
 
   const apiWorker = useMemo(() => {
     if (typeof document !== "undefined") {
@@ -169,6 +171,7 @@ export function NestedApp({
             themes: config?.themes,
           }}
           resources={config?.resources}
+          extensionManager={componentRegistry.getExtensionManager()}
         />
       </div>
     );
