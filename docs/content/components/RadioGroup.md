@@ -167,6 +167,8 @@ This component does not expose any methods.
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled] | $borderColor-RadioGroupOption--disabled | $borderColor-RadioGroupOption--disabled |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-default | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-error | $borderColor-RadioGroupOption-error | $borderColor-RadioGroupOption-error |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-indicator | $backgroundColor-primary | $backgroundColor-primary |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-indicator | $backgroundColor-primary | $backgroundColor-primary |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-success | $borderColor-RadioGroupOption-success | $borderColor-RadioGroupOption-success |
 | [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning |
 | [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | *none* | *none* |
@@ -180,7 +182,7 @@ This component does not expose any methods.
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-error | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-success | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | *none* | *none* |
-| [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption | 2px | 2px |
+| [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption | 1px | 1px |
 | [color](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-RadioGroupOption-default | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-RadioGroupOption-error | *none* | *none* |

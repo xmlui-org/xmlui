@@ -4,7 +4,7 @@ import { unlink, readdir, readFile, mkdir, writeFile, rm } from "fs/promises";
 import { ErrorWithSeverity, logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import { convertPath, deleteFileIfExists, fromKebabtoReadable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
-import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
+import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.mjs";
 import { FOLDERS } from "./folders.mjs";
 import { existsSync } from "fs";
 
@@ -85,10 +85,7 @@ async function generateExtenionPackages(metadata) {
     await extensionGenerator.generateComponentsSummary(`Package Components`, indexFile, false);
 
     // Generate a _meta.json for the files in the extension
-    extensionGenerator.writeMetaSummary(
-      componentsAndFileNames,
-      packageFolder,
-    );
+    extensionGenerator.writeMetaSummary(componentsAndFileNames, packageFolder);
   }
 
   // generate a _meta.json for the folder names
@@ -96,9 +93,11 @@ async function generateExtenionPackages(metadata) {
     const extensionPackagesMetafile = join(extensionsFolder, "_meta.json");
 
     const folderNames = Object.fromEntries(
-      Object.keys(metadata).filter(m => !unlistedFolders.includes(m)).map((name) => {
-        return [name, fromKebabtoReadable(name)];
-      }),
+      Object.keys(metadata)
+        .filter((m) => !unlistedFolders.includes(m))
+        .map((name) => {
+          return [name, fromKebabtoReadable(name)];
+        }),
     );
 
     // Do not include the summary file
@@ -112,7 +111,7 @@ async function generateExtenionPackages(metadata) {
 async function generateComponents(metadata) {
   const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
   const outputFolder = join(FOLDERS.docsRoot, "content", "components");
-  
+
   const metadataGenerator = new DocsGenerator(
     metadata,
     {
@@ -145,10 +144,7 @@ async function generateComponents(metadata) {
   );
   componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
 
-  metadataGenerator.writeMetaSummary(
-    componentsAndFileNames,
-    outputFolder,
-  );
+  metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
 
   // TODO: Permalinks show up in regular markdown
   //await metadataGenerator.generatePermalinksForHeaders();

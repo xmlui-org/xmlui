@@ -318,11 +318,10 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Text-code | $color-surface-100 | $color-surface-100 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Text-codefence | #f2f7fc | #112033 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-code | rgba($color-surface-100-rgb, .4) | rgba($color-surface-100-rgb, .4) |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-keyboard | rgba($color-surface-100-rgb, .4) | rgba($color-surface-100-rgb, .4) |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Text-marked | yellow | yellow |
-| [borderColor](../styles-and-themes/common-units/#color)-Text-code | $color-surface-200 | $color-surface-200 |
+| [borderColor](../styles-and-themes/common-units/#color)-Text-code | $color-surface-300 | $color-surface-300 |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-300 | $color-surface-300 |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Text | $borderRadius | $borderRadius |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Text-code | 4px | 4px |
@@ -355,6 +354,7 @@ This component does not expose any methods.
 | [fontSize](../styles-and-themes/common-units/#size)-Text-sup | $fontSize-smaller | $fontSize-smaller |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-title | $fontSize-large | $fontSize-large |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-cite | italic | italic |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-em | italic | italic |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-var | italic | italic |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-abbr | $fontWeight-bold | $fontWeight-bold |
@@ -371,6 +371,7 @@ This component does not expose any methods.
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-default | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-deleted | *none* | *none* |
+| [marginBottom](../styles-and-themes/common-units/#size)-Text-em | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-inserted | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-keyboard | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-markdown | $space-6 | $space-6 |
@@ -391,10 +392,11 @@ This component does not expose any methods.
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-abbr | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-caption | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-cite | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-code | $space-1 | $space-1 |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-default | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-deleted | *none* | *none* |
+| [marginLeft](../styles-and-themes/common-units/#size)-Text-em | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-inserted | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-keyboard | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
@@ -415,10 +417,11 @@ This component does not expose any methods.
 | [marginRight](../styles-and-themes/common-units/#size)-Text-abbr | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-caption | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-cite | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-code | $space-1 | $space-1 |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-default | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-deleted | *none* | *none* |
+| [marginRight](../styles-and-themes/common-units/#size)-Text-em | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-inserted | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-keyboard | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
@@ -443,6 +446,7 @@ This component does not expose any methods.
 | [marginTop](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-default | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-deleted | *none* | *none* |
+| [marginTop](../styles-and-themes/common-units/#size)-Text-em | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-inserted | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-keyboard | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-markdown | $space-3 | $space-3 |
@@ -479,6 +483,7 @@ This component does not expose any methods.
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-codefence | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-default | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-deleted | *none* | *none* |
+| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-em | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-inserted | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-keyboard | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-markdown | *none* | *none* |

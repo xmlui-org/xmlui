@@ -1,6 +1,6 @@
 # Pages [#pages]
 
-The `Pages` component is used as a container for [`Page`](./Page.mdx) components within an [`App`](./App.mdx).
+The `Pages` component is used as a container for [`Page`](/components/Page) components within an [`App`](/components/App).
 
 See the [\`Page\` docs](/components/Page) for a short description.
 
