@@ -89,6 +89,7 @@ export const AppMd = createMetadata({
   },
   defaultThemeVars: {
     [`width-navPanel-${COMP}`]: "$space-64",
+    [`backgroundColor-navPanel-${COMP}`]: "$backgroundColor",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",
     [`boxShadow-header-${COMP}`]: "$boxShadow-spread",
     [`boxShadow-navPanel-${COMP}`]: "$boxShadow-spread",
