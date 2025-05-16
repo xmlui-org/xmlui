@@ -59,7 +59,7 @@ export const defaultProps: Pick<
   iconHorizontalExpanded: "chevronleft",
   iconHorizontalCollapsed: "chevronright",
   iconVerticalExpanded: "chevrondown",
-  iconVerticalCollapsed: "chevronright",
+  iconVerticalCollapsed: "chevronup",
 };
 
 const NavGroupContext = createContext({

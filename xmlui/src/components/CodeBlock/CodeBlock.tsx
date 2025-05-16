@@ -13,18 +13,19 @@ export const CodeBlockMd = createMetadata({
   props: {},
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "backgroundColor-CodeBlock": "#f2f7fc", // "$color-surface-100"
+    "backgroundColor-CodeBlock": "$color-primary-50",
     "backgroundColor-CodeBlock-header": "$color-primary-100",
     "marginTop-CodeBlock": "$space-5",
     "marginBottom-CodeBlock": "$space-5",
-    "backgroundColor-CodeBlock-highlightRow": "$color-surface-200",
-    "backgroundColor-CodeBlock-highlightString": "$color-surface-300",
+    "backgroundColor-CodeBlock-highlightRow": "rgba($color-primary-200-rgb, .25)",
+    "backgroundColor-CodeBlock-highlightString": "rgba($color-primary-200-rgb, .5)",
     "borderRadius-CodeBlock": "$space-2",
 
     dark: {
-      "backgroundColor-CodeBlock-header": "$color-primary-200",
-      "backgroundColor-CodeBlock": "#112033",
-      "backgroundColor-CodeBlock-highlightRow": "$color-surface-100",
+      "backgroundColor-CodeBlock-header": "$color-surface-200",
+      "backgroundColor-CodeBlock": "$color-surface-50",
+      "backgroundColor-CodeBlock-highlightRow": "rgba($color-primary-300-rgb, .15)",
+      "backgroundColor-CodeBlock-highlightString": "rgba($color-primary-300-rgb, .5)",
     }
   },
 });

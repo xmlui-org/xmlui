@@ -1,9 +1,6 @@
 <Fragment>
     <App layout="vertical-full-header" noScrollbarGutters="false" when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
-            <property name="logoTemplate">
-                <Logo paddingVertical="$space-3_5" paddingHorizontal="0" />
-            </property>
             <SpaceFiller/>
             <ToneChangerButton />
         </AppHeader>

@@ -15,9 +15,6 @@ $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
 $marginBottom-logo-NavPanel: createThemeVar("marginBottom-logo-#{$component}");
 
-$color-scrollbar-NavPanel: createThemeVar("color-scrollbar-#{$component}");
-$backgroundColor-scrollbar-NavPanel: createThemeVar("backgroundColor-scrollbar-#{$component}");
-
 $maxWidth-content-NavPanel: createThemeVar("maxWidth-content-App");
 
 $height-NavPanel: createThemeVar("height-AppHeader");
@@ -37,12 +34,14 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
   position: relative;
   display: flex;
   flex-direction: column;
-  // This is not implemented in Safari
-  scrollbar-color: $color-scrollbar-NavPanel $backgroundColor-scrollbar-NavPanel;
   scrollbar-width: thin;
 
   &:not(.condensed){
     background-color: $backgroundColor-NavPanel;
+  }
+
+  &.vertical {
+    scrollbar-gutter: stable;
   }
 
   &.horizontal{

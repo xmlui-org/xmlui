@@ -73,6 +73,7 @@ export const NavPanel = forwardRef(function NavPanel(
   const showLogo =
     appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
   const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
+  const vertical = appLayoutContext?.layout?.startsWith("vertical");
   const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
 
   // console.log(appLayoutContext);
@@ -90,6 +91,7 @@ export const NavPanel = forwardRef(function NavPanel(
       ref={ref}
       className={classnames(styles.wrapper, className, {
         [styles.horizontal]: horizontal,
+        [styles.vertical]: vertical,
         [styles.condensed]: isCondensed,
       })}
     >
