@@ -13,7 +13,7 @@ import ConfirmationDialog from "./ConfirmationDialog";
 import { ToneSwitcher } from "./ToneSwitcher";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { CodeSelector } from "./CodeSelector";
-import { Text } from "../../../../xmlui/src/components/Text/TextNative";
+import { Text } from "xmlui";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { appDescription, options, dispatch } = usePlayground();

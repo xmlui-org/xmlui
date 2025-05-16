@@ -1,8 +1,13 @@
 import type { Dispatch } from "react";
 import { createContext } from "react";
 import produce from "immer";
-import { ApiInterceptorDefinition, CompoundComponentDef, ThemeDefinition } from "xmlui";
-import { errReportComponent, xmlUiMarkupToComponent } from "../../../../xmlui/src/components-core/xmlui-parser";
+import {
+  ApiInterceptorDefinition,
+  CompoundComponentDef,
+  ThemeDefinition,
+  errReportComponent,
+  xmlUiMarkupToComponent,
+} from "xmlui";
 import { builtInThemes } from "../utils/helpers";
 
 type Orientation = "horizontal" | "vertical";

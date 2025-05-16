@@ -32,6 +32,15 @@ import { useDevTools } from "./components-core/InspectorContext";
 import { useLogger } from "./logging/LoggerContext";
 import { TabItemComponent } from "./components/Tabs/TabItemNative";
 import { Tabs } from "./components/Tabs/TabsNative";
+import { useApiWorkerContext } from "./components/NestedApp/ApiWorkerContext";
+import { errReportComponent, xmlUiMarkupToComponent } from "./components-core/xmlui-parser";
+import { ApiInterceptorProvider } from "./components-core/interception/ApiInterceptorProvider";
+import { ThemeTone } from "./abstractions/ThemingDefs";
+import { Spinner } from "./components/Spinner/SpinnerNative";
+import { SolidThemeDefinition } from "./components-core/theming/themes/solid";
+import { XmlUiThemeDefinition } from "./components-core/theming/themes/xmlui";
+import { XmlUiHelper, XmlUiNode } from "./parsers/xmlui-parser";
+import { Text } from "./components/Text/TextNative";
 
 export type {
   ThemeDefinition,
@@ -47,6 +56,8 @@ export type {
   TreeNode, //TODO REMOVE
   RendererContext,
   ComponentMetadata,
+  ThemeTone,
+  XmlUiNode,
 };
 export {
   StandaloneApp,
@@ -69,5 +80,14 @@ export {
   useColors,
   toCssVar,
   useDevTools,
-  useLogger
+  useLogger,
+  useApiWorkerContext,
+  errReportComponent,
+  xmlUiMarkupToComponent,
+  ApiInterceptorProvider,
+  Spinner,
+  SolidThemeDefinition,
+  XmlUiThemeDefinition,
+  XmlUiHelper,
+  Text
 };
