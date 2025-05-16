@@ -336,17 +336,33 @@ export class RangeDriver extends ComponentDriver {}
 // --- Select
 
 export class SelectDriver extends ComponentDriver {
+  async toggleOptionsVisibility(){
+    await this.component.click();
+  }
+
   async selectLabel(value: string) {
-    await this.locator.click();
-    await this.component.getByRole("option", {name: value}).or(this.page.getByRole("option", {name: value})).first().click({force: true});
+    await this.component.getByRole("option", { name: value }).or(this.page.getByRole("option", { name: value })).first().click({ force: true });
+  }
+
+  async selectFirstLabelPostSearh(label: string){
+    await this.searchFor(label);
+    await this.chooseIndex(0);
+  }
+
+  async searchFor(value: string) {
+    await this.page.getByRole("combobox").fill(value);
+  }
+
+  async chooseIndex(index: number) {
+    await this.locator.getByRole("option").nth(index).or(this.page.getByRole("option").nth(index)).first().click();
   }
 
   async selectMultipleLabels(values: string[]) {
-    await this.locator.click();
     for (const value of values) {
       await this.component.getByRole("option", {name: value}).or(this.page.getByRole("option", {name: value})).first().click();
     }
   }
+
 }
 
 // --- RadioGroup

@@ -1,4 +1,4 @@
-# RadioGroup [#component-radiogroup]
+# RadioGroup [#radiogroup]
 
 The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](./RadioGroupOption.mdx) components) that allow users to select only one option from the group at a time.
 

@@ -1,4 +1,4 @@
-# ModalDialog [#component-modaldialog]
+# ModalDialog [#modaldialog]
 
 The `ModalDialog` component defines a modal dialog UI element that can be displayed over the existing UI - triggered by some action.
 

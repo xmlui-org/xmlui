@@ -1,4 +1,4 @@
-# LabelList [#component-labellist]
+# LabelList [#labellist]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.Label list component for a chart component.

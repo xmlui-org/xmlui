@@ -502,7 +502,9 @@ function findParent(metadata, component) {
 
 function addParentLinkLine(parentName, componentDocsFolder) {
   // TODO: Insert component link
-  const result = parentName ? `This component is inherited from \`${parentName}\`` : "";
+  const result = parentName
+    ? `This component is inherited from [${parentName}](${componentDocsFolder}/${parentName})`
+    : "";
   return result ? `${result}\n\n` : "";
 }
 
@@ -515,17 +517,15 @@ function findSiblings(metadata, component) {
 }
 
 function addSiblingLinkLine(siblings = [], componentDocsFolder) {
-  return "";
-  // TODO: Insert component link
-  // const result =
-  //   siblings?.length > 0
-  //     ? `See also: ${siblings
-  //         .map((sibling) => {
-  //           return `<SmartLink href="/${componentDocsFolder}/${sibling.displayName}">${sibling.displayName}</SmartLink>`;
-  //         })
-  //         .join(", ")}`
-  //     : "";
-  // return result ? `${result}\n\n` : "";
+  const result =
+    siblings?.length > 0
+      ? `See also: ${siblings
+          .map((sibling) => {
+            return `[${sibling.displayName}](${componentDocsFolder}/${sibling.displayName})`;
+          })
+          .join(", ")}`
+      : "";
+  return result ? `${result}\n\n` : "";
 }
 
 function copyImports(imports) {
@@ -603,7 +603,7 @@ function addComponentStatusDisclaimer(status) {
 
 function appendArticleId(articleId) {
   if (!articleId) return "";
-  return ` [#component-${articleId.toLocaleLowerCase().replace(" ", "-")}]`;
+  return ` [#${articleId.toLocaleLowerCase().replace(" ", "-")}]`;
 }
 
 function addNonVisualDisclaimer(isNonVisual) {

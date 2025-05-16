@@ -1,4 +1,4 @@
-# FormSection [#component-formsection]
+# FormSection [#formsection]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `FormSection` is a component that groups cohesive elements together within a `Form`. This grouping is indicated visually: the child components of the `FormSection` are placed in a [`FlowLayout`](./FlowLayout.mdx) component.

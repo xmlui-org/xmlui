@@ -1,4 +1,4 @@
-# Avatar [#component-avatar]
+# Avatar [#avatar]
 
 The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials.
 

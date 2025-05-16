@@ -1,4 +1,4 @@
-# Column [#component-column]
+# Column [#column]
 
 The `Column` component can be used within a `Table` to define a particular table column's visual properties and data bindings.
 

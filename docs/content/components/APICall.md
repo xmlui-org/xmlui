@@ -1,4 +1,4 @@
-# APICall [#component-apicall]
+# APICall [#apicall]
 
 `APICall` is used to mutate (create, update or delete) some data on the backend. It is similar in nature to the `DataSource` component which retrieves data from the backend.
 

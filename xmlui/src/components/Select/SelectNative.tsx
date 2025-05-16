@@ -162,9 +162,11 @@ const SimpleSelect = forwardRef(function SimpleSelect(
       >
         <div className={styles.selectValue}>
           {readOnly ? (
-            Array.from(options).find((o) => `${o.value}` === stringValue)?.label || <span>{placeholder}</span>
+            Array.from(options).find((o) => `${o.value}` === stringValue)?.label || (
+              <span aria-placeholder={placeholder}>{placeholder}</span>
+            )
           ) : (
-            <SelectValue placeholder={placeholder} />
+            <SelectValue aria-placeholder={placeholder} placeholder={placeholder} />
           )}
         </div>
         <SelectIcon asChild>
@@ -420,12 +422,16 @@ export const Select = forwardRef(function Select(
                         </div>
                       </div>
                     ) : (
-                      <span className={styles.placeholder}>{placeholder}</span>
+                      <span aria-placeholder={placeholder} className={styles.placeholder}>
+                        {placeholder}
+                      </span>
                     )
                   ) : value !== undefined && value !== null ? (
                     <div>{Array.from(options).find((o) => o.value === value)?.label}</div>
                   ) : (
-                    <span className={styles.placeholder}>{placeholder || ""}</span>
+                    <span aria-placeholder={placeholder} className={styles.placeholder}>
+                      {placeholder || ""}
+                    </span>
                   )}
                   <div className={styles.actions}>
                     {multiSelect && Array.isArray(value) && value.length > 0 && (

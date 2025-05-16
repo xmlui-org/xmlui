@@ -1,4 +1,4 @@
-# ProgressBar [#component-progressbar]
+# ProgressBar [#progressbar]
 
 A `ProgressBar` component visually represents the progress of a task or process.
 

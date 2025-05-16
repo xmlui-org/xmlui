@@ -1,4 +1,4 @@
-# Text [#component-text]
+# Text [#text]
 
 The `Text` component displays textual information in a number of optional styles and variants.
 

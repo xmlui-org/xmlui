@@ -1,4 +1,4 @@
-# Page [#component-page]
+# Page [#page]
 
 The `Page` component defines what content is displayed when the user navigates to a particular URL that is associated with the page.
 

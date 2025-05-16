@@ -1,4 +1,4 @@
-# Backdrop [#component-backdrop]
+# Backdrop [#backdrop]
 
 The `Backdrop` component is a semi-transparent overlay that appears on top of its child component to obscure or highlight the content behind it.
 

@@ -39,8 +39,8 @@ const COMP = "Pages";
 
 export const PagesMd = createMetadata({
   description:
-    `The \`${COMP}\` component is used as a container for [\`Page\`](./Page.mdx) components ` +
-    `within an [\`App\`](./App.mdx).`,
+    `The \`${COMP}\` component is used as a container for [\`Page\`](/components/Page) components ` +
+    `within an [\`App\`](/components/App).`,
   props: {
     defaultRoute: d(`The default route when displaying the app`),
   },

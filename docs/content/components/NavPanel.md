@@ -1,4 +1,4 @@
-# NavPanel [#component-navpanel]
+# NavPanel [#navpanel]
 
 `NavPanel` is a placeholder within `App` to define the app's navigation (menu) structure.
 

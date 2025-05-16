@@ -1,4 +1,4 @@
-# Badge [#component-badge]
+# Badge [#badge]
 
 The `Badge` is a text label that accepts a color map to define its background color and, optionally, its label color.
 

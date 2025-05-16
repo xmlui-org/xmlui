@@ -1,4 +1,4 @@
-# FileUploadDropZone [#component-fileuploaddropzone]
+# FileUploadDropZone [#fileuploaddropzone]
 
 The `FileUploadDropZone` component allows users to upload files to a web application by dragging and dropping files from their local file system onto a designated area within the UI.
 

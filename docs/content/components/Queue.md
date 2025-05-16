@@ -1,4 +1,4 @@
-# Queue [#component-queue]
+# Queue [#queue]
 
 >[!WARNING]
 > This component does not show up on the UI; it merely helps implement UI logic.

@@ -1,4 +1,4 @@
-# SubMenuItem [#component-submenuitem]
+# SubMenuItem [#submenuitem]
 
 This component represents a nested menu item within another menu or menu item.
 

@@ -1,4 +1,4 @@
-# Fragment [#component-fragment]
+# Fragment [#fragment]
 
 The `Fragment` component encloses multiple child components into a single root component, so it can be used where only a single component definition is allowed.
 

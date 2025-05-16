@@ -1,4 +1,4 @@
-# EmojiSelector [#component-emojiselector]
+# EmojiSelector [#emojiselector]
 
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `EmojiSelector` component provides users with a graphical interface to browse, search and select emojis to insert into text fields, messages, or other forms of communication.
