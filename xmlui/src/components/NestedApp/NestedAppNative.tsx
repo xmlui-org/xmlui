@@ -16,6 +16,7 @@ import { Tooltip } from "./Tooltip";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { createQueryString } from "./utils";
+import { useAppContext } from "../../components-core/AppContext";
 
 type NestedAppProps = {
   api?: any;
@@ -27,6 +28,7 @@ type NestedAppProps = {
   title?: string;
   height?: string | number;
   allowPlaygroundPopup?: boolean;
+  withFrame?: boolean;
 };
 
 export function NestedApp({
@@ -39,6 +41,7 @@ export function NestedApp({
   title,
   height,
   allowPlaygroundPopup = true,
+  withFrame = true
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
@@ -47,6 +50,7 @@ export function NestedApp({
   const [refreshVersion, setRefreshVersion] = useState(0);
   const theme = useTheme();
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
+  const {appGlobals} = useAppContext();
 
   const apiWorker = useMemo(() => {
     if (typeof document !== "undefined") {
@@ -76,6 +80,7 @@ export function NestedApp({
 
   //console.log("mock", mock);
 
+  const useHashBasedRouting = appGlobals?.useHashBasedRouting || true;
   const openPlayground = useCallback(async () => {
     const data = {
       standalone: {
@@ -85,7 +90,7 @@ export function NestedApp({
           name: title,
           themes: [],
           defaultTheme: activeTheme,
-        }
+        },
       },
       options: {
         fixedTheme: false,
@@ -98,8 +103,8 @@ export function NestedApp({
       },
     };
     const appQueryString = await createQueryString(JSON.stringify(data));
-    window.open(`/#/playground#${appQueryString}`, "_blank");
-  }, [app, activeTheme]);
+    window.open(useHashBasedRouting ? `/#/playground#${appQueryString}` : `/playground#${appQueryString}`, "_blank");
+  }, [app, components, title, activeTheme, activeTone, useHashBasedRouting]);
 
   useEffect(() => {
     if (!shadowRef.current && rootRef.current) {
@@ -148,60 +153,68 @@ export function NestedApp({
       themeVarReset[key] = "initial";
     });
 
+    let nestedAppRoot = (
+      <div style={{ height, ...themeVarReset }}>
+        <AppRoot
+          key={`app-${nestedAppId}-${refreshVersion}`}
+          previewMode={true}
+          standalone={true}
+          trackContainerHeight={height ? "fixed" : "auto"}
+          node={component}
+          globalProps={globalProps}
+          defaultTheme={activeTheme || config?.defaultTheme}
+          defaultTone={toneToApply as ThemeTone}
+          contributes={{
+            compoundComponents,
+            themes: config?.themes,
+          }}
+          resources={config?.resources}
+        />
+      </div>
+    );
+
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
         <ApiInterceptorProvider interceptor={mock} apiWorker={apiWorker}>
-          <div className={styles.nestedAppContainer}>
-            <div className={styles.header}>
-              <span className={styles.headerText}>{title}</span>
-              <div className={styles.spacer} />
-              {allowPlaygroundPopup && (
+          {withFrame ? (
+            <div className={styles.nestedAppContainer}>
+              <div className={styles.header}>
+                <span className={styles.headerText}>{title}</span>
+                <div className={styles.spacer} />
+                {allowPlaygroundPopup && (
+                  <Tooltip
+                    trigger={
+                      <button
+                        className={styles.headerButton}
+                        onClick={() => {
+                          openPlayground();
+                        }}
+                      >
+                        <RxOpenInNewWindow />
+                      </button>
+                    }
+                    label="Edit code in new window"
+                  />
+                )}
                 <Tooltip
                   trigger={
                     <button
                       className={styles.headerButton}
                       onClick={() => {
-                        openPlayground();
+                        setRefreshVersion(refreshVersion + 1);
                       }}
                     >
-                      <RxOpenInNewWindow />
+                      <LiaUndoAltSolid />
                     </button>
                   }
-                  label="Edit code in new window"
+                  label="Reset the app"
                 />
-              )}
-              <Tooltip
-                trigger={
-                  <button
-                    className={styles.headerButton}
-                    onClick={() => {
-                      setRefreshVersion(refreshVersion + 1);
-                    }}
-                  >
-                    <LiaUndoAltSolid />
-                  </button>
-                }
-                label="Reset the app"
-              />
+              </div>
+              {nestedAppRoot}
             </div>
-            <div style={{ height, ...themeVarReset }}>
-              <AppRoot
-                key={`app-${nestedAppId}-${refreshVersion}`}
-                previewMode={true}
-                standalone={true}
-                trackContainerHeight={height ? "fixed" : "auto"}
-                node={component}
-                globalProps={globalProps}
-                defaultTheme={activeTheme || config?.defaultTheme}
-                defaultTone={toneToApply as ThemeTone}
-                contributes={{
-                  compoundComponents,
-                  themes: config?.themes,
-                }}
-                resources={config?.resources}
-              />
-            </div>
-          </div>
+          ) : (
+            nestedAppRoot
+          )}
         </ApiInterceptorProvider>
       </ErrorBoundary>,
     );
@@ -219,6 +232,7 @@ export function NestedApp({
     height,
     mock,
     nestedAppId,
+    openPlayground,
     refreshVersion,
     theme.themeStyles,
     title,
@@ -233,17 +247,15 @@ export function NestedApp({
   }, []);
 
   return (
-    <div className={styles.nestedApp}>
-      <div
-        ref={rootRef}
-        style={{
-          width: "100%",
-          height: "100%",
-          overflow: "auto",
-          position: "relative",
-          isolation: "isolate",
-        }}
-      />
-    </div>
+    <div
+      ref={rootRef}
+      style={{
+        width: "100%",
+        height: "100%",
+        overflow: "auto",
+        position: "relative",
+        isolation: "isolate",
+      }}
+    />
   );
 }

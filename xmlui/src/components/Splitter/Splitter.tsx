@@ -73,7 +73,7 @@ const baseSplitterMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-resizer-${COMP}`]: "$backgroundColor-Card",
+    [`backgroundColor-resizer-${COMP}`]: "$color-surface-100",
     [`thickness-resizer-${COMP}`]: "5px",
     [`cursor-resizer-horizontal-${COMP}`]: "ew-resize",
     [`cursor-resizer-vertical-${COMP}`]: "ns-resize",
