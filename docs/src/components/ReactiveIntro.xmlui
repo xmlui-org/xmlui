@@ -1,0 +1,184 @@
+<Component name="ReactiveIntro">
+
+<Markdown><![CDATA[
+# Reactive data binding
+
+Let's load that same London tube data into a [Select](/components/Select) component.
+]]></Markdown>
+
+    <HStack>
+        <Markdown width="60%">
+    <![CDATA[
+
+### Markup
+
+ ```
+<Select id="lines" initialValue="bakerloo" width="30%">
+    <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
+        <Option value="{$item.id}" label="{$item.name}" />
+    </Items>
+</Select>
+```
+    ]]>
+        </Markdown>
+
+        <ContentSeparator size="2x" orientation="vertical" />
+
+        <VStack>
+            <Text variant="strong">Live rendering</Text>
+
+            <Stack verticalAlignment="center">
+                <Stack horizontalAlignment="start">
+                    <Select width="15rem" id="lines" initialValue="bakerloo">
+                        <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
+                            <Option value="{$item.id}" label="{$item.name}" />
+                        </Items>
+                    </Select>
+                </Stack>
+            </Stack>
+        </VStack>
+    </HStack>
+
+
+    <Markdown>
+    <![CDATA[
+
+The `Select` uses the same API as the `List`. It contains an <a href="/components/Items" target="blank">Items</a> component which is another way to loop through a sequence and embed a component that receives each item. In this case what's embedded is a selectable <a href="/components/Option" target="blank">Option</a> which again receives the `$item` variable.
+
+Nothing happens yet when you select a tube line. Let's wire up the selection to display details for the selected line in a <a href="/components/Table" target="blank">Table</a>.
+    ]]></Markdown>
+
+    <HStack>
+
+        <Markdown width="60%"><![CDATA[
+
+### Markup
+```
+<DataSource
+  id="stations"
+  url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
+  resultSelector="stations"/>
+
+<Text>Line: {lines.value}</Text>
+<Table data="{stations}">
+    <Column bindTo="name" />
+    <Column bindTo="modes" />
+</Table>
+```
+The <a href="/components/DataSource" target="blank">DataSource</a> component works like the `data` attribute we used with `List` and `Items`: it fetches from a REST endpoint. Unlike `List`,`Select`, and `Table`, `DataSource` isn't a visible component. It works behind the scenes to capture data for use by visible components.
+
+In this case the returned data object is big and complex, and we only want to display data from the `stations` object nested within it.
+
+<details>
+<summary>Click to see a sample object</summary>
+<pre>
+{
+    "$type": "Tfl.Api.Presentation.Entities.RouteSequence, Tfl.Api.Presentation.Entities",
+    "lineId": "bakerloo",
+    "lineName": "Bakerloo",
+    "direction": "inbound",
+    "isOutboundOnly": false,
+    "mode": "tube",
+    "lineStrings": [
+        "[[[-0.335217,51.592268],[-0.31691,51.581756],[-0.308433,51.570232],[-0.304,51.562551],[-0.296852,51.552304],[-0.275892,51.543959],[-0.257883,51.53631],[-0.244283,51.532259],[-0.225016,51.530539],[-0.204574,51.534158],[-0.194232,51.534979],[-0.185758,51.529777],[-0.183783,51.523263],[-0.175689,51.516581],[-0.17015,51.520299],[-0.163207,51.522322],[-0.15713,51.522883],[-0.146444,51.523344],[-0.141903,51.515224],[-0.133798,51.51005],[-0.127277,51.50741],[-0.122666,51.507058],[-0.11478,51.503299],[-0.112315,51.498808],[-0.100606,51.494536]]]"
+    ],
+    <b>"stations": [
+        {
+            "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+            "stationId": "940GZZLUBST",
+            "icsId": "1000011",
+            "topMostParentId": "940GZZLUBST",
+            "modes": [
+                "tube"
+            ],
+            "stopType": "NaptanMetroStation",
+            "zone": "1",
+            "lines": [
+                {
+                    "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+                    "id": "bakerloo",
+                    "name": "Bakerloo",
+                    "uri": "/Line/bakerloo",
+                    "type": "Line",
+                    "crowding": {
+                        "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+                    },
+                    "routeType": "Unknown",
+                    "status": "Unknown"
+                },
+                {
+                    ... more lines ...
+                }
+            ],
+            "status": true,
+            "id": "940GZZLUBST",
+            "name": "Baker Street Underground Station",
+            "lat": 51.522883,
+            "lon": -0.15713
+        },
+        {
+            ...
+        }
+    ],</b>
+"stopPointSequences": [
+      ...
+    ],
+    "orderedLineRoutes": [
+      ...
+    ]
+}
+</pre>
+</details>
+
+The `resultSelector` property on the `DataSource` targets the nested `stations` object so we can feed just that data into the table.
+
+## Reactive magic
+
+The `Select` is wired to the `Table`. When you make a new selection, the table fills with details for the selected line. Try it!
+
+How does this work? Note above how the `Select` declares the property `id="lines"`. That makes `lines` a variable accessible other XMLUI components, and `lines.value` holds the value of the current selection.
+
+Now look at the `url` property of the `DataSource`: it embeds a reference to `lines.value`. When you loaded this page, that URL fetched details for the initial value of the `Select`. Changing the selection changes `lines.value` which causes the `DataSource` to fetch a new batch of details. Likewise the `Table`'s `data` property refers to `stations`, the id of the `DataSource`. So when the `DataSource` fetches fresh data, the `Table` notices the change and refills with that fresh data.
+
+There's a name for this pattern: reactive data binding. It's what spreadsheets do when a change in one cell propagates to others that refer to it. It's what the popular framework React enables for web apps. React, as you may know, is a complex beast that only expert programmers can tame. Fortunately the expert programmers who build XMLUI have done that for you. When you build apps declaratively with XMLUI you enjoy the benefit of reactive data binding without the burden of React's complexity. You don't need to write code to make this magic happen, it's automatic!
+    ]]></Markdown>
+
+        <ContentSeparator marginTop="2rem" height="20rem" orientation="vertical" size="2px" />
+
+        <VStack width="40%">
+
+            <Text variant="strong">Live rendering</Text>
+
+            <Stack verticalAlignment="center">
+                <Stack horizontalAlignment="start">
+                    <Select width="15rem" id="lines" initialValue="bakerloo">
+                        <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
+                            <Option value="{$item.id}" label="{$item.name}" />
+                        </Items>
+                    </Select>
+                </Stack>
+            </Stack>
+
+
+            <Stack>
+                <Text variant="em">Line: {lines.value || '(not specified)'}</Text>
+                <Fragment when="{lines.value}">
+                    <DataSource
+                        id="stations"
+                        url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
+                        resultSelector="stations" />
+
+                    <Table data="{stations}" height="600px">
+                        <Column bindTo="name" />
+                        <Column bindTo="modes" />
+                    </Table>
+                </Fragment>
+            </Stack>
+
+        </VStack>
+
+    </HStack>
+
+<Link icon="arrowright" label="Components" to="/components-intro"/>
+
+</Component>

@@ -1,0 +1,30 @@
+<Component
+    name="Icons"
+    var.names = "{[
+        'assign', 'arrowup', 'arrowleft', 'arrowright', 'pause', 'play', 'date', 'hamburger',
+        'send', 'users', 'refresh', 'chevrondown', 'chevronup', 'chevronright', 'chevronleft',
+        'dotmenu', 'dotmenuhorizontal', 'noresult', 'crm', 'chat', 'pencil', 'cube', 'apps',
+        'permissions', 'close', 'star', 'help', 'compactlist', 'copy', 'move', 'rename',
+        'hyperlink', 'globe', 'link', 'looseList', 'options', 'search', 'filter', 'trash',
+        'pen', 'email', 'phone', 'home', 'user', 'exit', 'adduser', 'userminus', 'plus',
+        'inspect', 'plus-circle', 'filledplus', 'checkmark', 'valid', 'info', 'error',
+        'warning', 'board', 'list', 'folder', 'folder-outline', 'emptyfolder', 'pdf', 'txt',
+        'doc', 'docx', 'doc-outline', 'conf', 'code', 'codesandbox', 'box', 'xls', 'jpg',
+        'unknownfile', 'photo', 'previous', 'next', 'like', 'reply', 'attach', 'attach2',
+        'emoji', 'message', 'upload', 'split-vertical', 'split-horizontal', 'swap', 'download',
+        'note', 'binding', 'database', 'unlink', 'api', 'expression', 'hash', 'drive', 'lock',
+        'start', 'stop', 'restart', 'duplicate', 'connect', 'cog', 'sun', 'moon', 'share',
+        'new-window', 'paint', 'palette', 'trending-up', 'trending-down', 'trending-level',
+        'sortasc', 'sortdesc', 'nosort', 'arrowdown', 'square', 'squarehalf', 'squarefill'
+    ].toSorted()}"
+>
+<FlowLayout gap="$space-2" padding="$space-2">
+    <Items data="{names}">
+        <VStack width="8rem" marginBottom="2rem">
+            <Icon name="{$item}" />
+            <Text fontSize="$text-xs">{$item}</Text>
+        </VStack>
+    </Items>
+</FlowLayout>
+
+</Component>
