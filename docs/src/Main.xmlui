@@ -5,20 +5,134 @@
             <ToneChangerButton />
         </AppHeader>
 
+    <NavPanel>
+
+        <NavGroup label="Learn XMLUI" initiallyExpanded="true">
+            <NavLink label="Introduction" to="/" />
+            <NavLink label="Reactive Data" to="/reactive-intro" />
+            <NavLink label="Components" to="/components-intro" />
+            <NavLink label="Themes" to="/themes-intro" />
+        </NavGroup>
+
+        <NavGroup label="Create XMLUI Apps" initiallyExpanded="false">
+            <NavLink label="Markup" to="/markup" />
+            <NavLink label="Code" to="/code" />
+            <NavLink label="The App Component" to="/appComponent" />
+            <NavLink label="Working with Text" to="/workingWithText" />
+            <NavLink label="Routing and Links" to="/routingAndLinks" />
+            <NavLink label="Forms" to="/forms" />
+            <NavLink label="Modal Dialogs" to="/modalDialogs" />
+        </NavGroup>
+
+
+        <NavGroup label="Code" >
+            <NavLink label="Code Behind" to="/tbd" />
+            <NavLink label="Properties" to="/tbd" />
+            <NavLink label="Expressions" to="/tbd" />
+            <NavLink label="Context Variable" to="/tbd" />
+        </NavGroup>
+
+        <NavGroup label="Themes" >
+            <NavLink label="Layout Values" to="/tbd" />
+            <NavLink label="Variables" to="/tbd" />
+        </NavGroup>
+
+        <NavLink label="Glossary" to="/tbd" />
+        <NavLink label="Palettes" to="/palettes" />
+        <NavLink label="Icons" to="/icons" />
+
+        <RecursiveNavTree items="{appGlobals.navPanelContent}"/>
+
+        </NavPanel>
+
+
+    <Pages>
+
+        <Page url="/">
+            <Markdown data="/pages/intro.md" />
+        </Page>
+
+        <Page url="/reactive-intro">
+            <ReactiveIntro />
+        </Page>
+
+        <Page url="/components-intro">
+            <ComponentsIntro />
+        </Page>
+
+        <Page url="/themes-intro">
+            <ThemesIntro />
+        </Page>
+
+        <Page url="/icons">
+            <Icons />
+        </Page>
+
+        <Page url="/palettes">
+            <Palettes />
+        </Page>
+
+        <Page url="/xmlui-theme">
+            <Markdown data="pages/xmlui-theme.md" />
+        </Page>
+
+        <Page url="/markup">
+            <TBD />
+        </Page>
+
+        <Page url="/code">
+            <TBD />
+        </Page>
+
+        <Page url="/appComponent">
+            <TBD />
+        </Page>
+
+        <Page url="/workingWithText">
+            <TBD />
+        </Page>
+
+        <Page url="/routingAndLinks">
+            <TBD />
+        </Page>
+
+        <Page url="/forms">
+            <TBD />
+        </Page>
+
+        <Page url="/modalDialogs">
+            <TBD />
+        </Page>
+
+        <Page url="/tbd">
+            <TBD />
+        </Page>
+
+
+        <Page url="/themes">
+            <Markdown data="pages/themes.md" />
+        </Page>
+
+        <Page url="/*">
+            <MarkdownPage content="{appGlobals.content[$routeParams['*']]}" />
+         </Page>
+
+    </Pages>
+
+        <!--
+
         <NavPanel>
-            <!-- Custom documentation pages navigation -->
             <NavLink to="/" label="Introduction" />
 
             <SectionHeader title="Quick Reference" />
             <NavLink to="/cheat-sheet" label="XMLUI Cheat Sheet" />
             <NavLink to="/glossary" label="Glossary" />
 
-            <!-- Generated component reference navigation tree -->
-            <RecursiveNavTree items="{appGlobals.navPanelContent}"/>
+
         </NavPanel>
 
+
         <Pages defaultRoute="/">
-            <!-- Custom documentation pages -->
             <Page url="/">
                 <MarkdownPage url="/pages/introduction.md" />
             </Page>
@@ -29,14 +143,15 @@
                 <MarkdownPage url="/pages/glossary.md" />
             </Page>
 
-            <!-- Generated component reference pages -->
-            <Page url="/*">
-                <MarkdownPage content="{appGlobals.content[$routeParams['*']]}" />
-            </Page>
         </Pages>
+        -->
+
+
         <Footer>
             <Text>Created with <Text variant="strong"> XMLUI</Text></Text>
         </Footer>
+
+
     </App>
     <XMLUIExtensions:StandalonePlayground  when="{window.location.hash.includes('/playground')}"/>
 </Fragment>
