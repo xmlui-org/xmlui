@@ -4,7 +4,7 @@ import classnames from "classnames";
 
 import styles from "./NavPanel.module.scss";
 
-import { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { ScrollContext } from "../../components-core/ScrollContext";
 import { Logo } from "../Logo/LogoNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";

@@ -8,6 +8,7 @@ $themeVars: ();
 }
 
 $width-navPanel-App: createThemeVar("width-navPanel-App");
+$backgroundColor-navPanel-App: createThemeVar("backgroundColor-navPanel-App");
 $boxShadow-header-App: createThemeVar("boxShadow-header-App");
 $boxShadow-navPanel-App: createThemeVar("boxShadow-navPanel-App");
 $backgroundColor-content-App: createThemeVar("backgroundColor-content-App");
@@ -78,6 +79,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     .navPanelWrapper {
       border-bottom: $borderBottom-NavPanel;
       justify-content: end;
+      background-color: $backgroundColor-navPanel-App;
     }
   }
 
@@ -91,6 +93,17 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       position: sticky;
       height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
       top: var(--header-height);
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 50vw;
+        z-index: -1;
+        background-color: $backgroundColor-navPanel-App;
+      }
     }
     .PagesWrapper {
       overflow: initial;

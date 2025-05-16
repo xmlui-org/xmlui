@@ -7,6 +7,8 @@ export const DefaultDocsTheme: ThemeDefinition = {
   themeVars: {
     // NOTE: All of these theme vars should be assessed whether to have them in the default theme
     
+    "color-surface": "#f8fafc",
+    
     "fontFamily": "Inter, -apple-system, 'system-ui', 'San Francisco', 'Segoe UI', sans-serif",
     "font-feature-settings": "'cv03', 'cv04', 'cv11'",
     "maxWidth-App": "1430px",
@@ -22,6 +24,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
 
     // --- NavPanel
     "backgroundColor-NavPanel": "$color-surface-50",
+    "backgroundColor-navPanel-App": "$color-surface-50",
     "paddingVertical-NavPanel": "$space-5",
     "borderRightWidth-NavPanel": "1px",
     "backgroundColor-scrollbar-NavPanel": "$color-surface-50",
