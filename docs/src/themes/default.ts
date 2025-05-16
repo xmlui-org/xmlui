@@ -7,7 +7,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
   themeVars: {
     // NOTE: All of these theme vars should be assessed whether to have them in the default theme
     
-    "color-surface": "#f8fafc",
+    "color-surface": "#1e2734",
     
     "fontFamily": "Inter, -apple-system, 'system-ui', 'San Francisco', 'Segoe UI', sans-serif",
     "font-feature-settings": "'cv03', 'cv04', 'cv11'",
@@ -21,14 +21,14 @@ export const DefaultDocsTheme: ThemeDefinition = {
     // --- AppHeader
     "height-AppHeader": "64px",
     "paddingInline-AppHeader": "$space-4",
+    "paddingTop-logo-AppHeader": "$space-3_5",
+    "paddingBottom-logo-AppHeader": "$space-3_5",
 
     // --- NavPanel
     "backgroundColor-NavPanel": "$color-surface-50",
     "backgroundColor-navPanel-App": "$color-surface-50",
     "paddingVertical-NavPanel": "$space-5",
     "borderRightWidth-NavPanel": "1px",
-    "backgroundColor-scrollbar-NavPanel": "$color-surface-50",
-    "color-scrollbar-NavPanel": "$color-secondary-200",
 
     // --- NavLink
     "textColor-NavLink": "$color-secondary-600",
@@ -39,8 +39,8 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "backgroundColor-NavLink--pressed": "$color-surface-100",
     "fontWeight-NavLink--active": "bold",
     "textColor-NavLink--hover": "$color-surface-900",
-    "textColor-NavLink--active": "$color-primary-500", //"#3366cc",
-    "textColor-NavLink--hover--active": "$color-primary-500", //"#3366cc",
+    "textColor-NavLink--active": "$color-primary-500",
+    "textColor-NavLink--hover--active": "$color-primary-500",
   
     // --- TOC
     "paddingTop-TableOfContents": "0",
@@ -71,11 +71,23 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "fontSize-Text-markdown": "$fontSize-normal",
     "fontSize-Text-codefence": "$fontSize-small",
     "lineHeight-Text-codefence": "$fontHeight-normal",
+    "borderRadius-HtmlTable": "30px",
+
+    // --- NestedApp
+    "border-NestedApp": "1px solid transparent",
 
     dark: {
-      "textColor-NavLink--active": "#3E8CDE",
-      "textColor-NavLink--hover--active": "#3E8CDE",
-      "color-scrollbar-NavPanel": "$color-secondary-300",
+      "color-primary": "#3367cc",
+
+      "backgroundColor-content-App": "$color-surface-100",
+      "backgroundColor": "$color-surface-100",
+      "backgroundColor-NavPanel": "$color-surface-50",
+      "backgroundColor-navPanel-App": "$color-surface-50",
+
+      "backgroundColor-frame-NestedApp": "$color-primary-50",
+      "border-NestedApp": "1px solid $color-surface-200",
+
+      "backgroundColor-HtmlThead": "$color-surface-50",
     }
   },
   resources: {},
