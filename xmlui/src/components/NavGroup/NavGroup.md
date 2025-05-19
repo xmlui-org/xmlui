@@ -4,8 +4,8 @@
 
 The primary use of a `NavGroup` is to create an application menu with submenus, as the following example shows:
 
-```xmlui-pg
----app copy display name="Example: NavGroup in App" height="200px"
+```xmlui-pg copy display name="Example: NavGroup in App" height="230px"
+---app
 <App layout="condensed">
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -35,7 +35,7 @@ Here, the highlighted `NavGroup` element nests other `NavLink` and `NavGroup` el
 
 You do not have to use `NavGroup` within `NavPanel`; you can nest it into other components to represent a menu, like in the following example:
 
-```xmlui-g copy display name="Example: NavGroup in a Stack" height="200px"
+```xmlui-pg copy display name="Example: NavGroup in a Stack" height="230px"
 <App>
   <HStack verticalAlignment="center">
     <Text>Use this menu:</Text>
@@ -63,7 +63,7 @@ You can also provide custom icons for a specific NavGroup component via it's res
 
 See the following for an example of all variants:
 
-```xmlui-pg copy display name="Example: custom icons in horizontal layout" height="220px"
+```xmlui-pg copy display name="Example: custom icons in horizontal layout" height="200px"
 <App layout="horizontal">
   <NavGroup icon="email" label="Send To"
     iconVerticalExpanded="arrowup" iconVerticalCollapsed="arrowbottom">
@@ -86,7 +86,7 @@ This property defines an optional icon to display along with the `NavGroup` labe
 
 Look at this example:
 
-```xmlui-pg copy {3, 5} display name="Example: label and icon" height="220px"
+```xmlui-pg copy {3, 5} display name="Example: label and icon" height="230px"
 <App>
   <HStack verticalAlignment="center">
     <NavGroup icon="email" label="Send To" >
