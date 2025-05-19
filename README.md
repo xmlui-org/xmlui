@@ -1,3 +1,5 @@
+![NPM Version](https://img.shields.io/npm/v/xmlui) [![Smoke Tests (e2e smoke tests, unit tests)](https://github.com/xmlui-com/xmlui/actions/workflows/run-smoke-tests.yml/badge.svg)](https://github.com/xmlui-com/xmlui/actions/workflows/run-smoke-tests.yml)
+
 # xmlui
 
 **xmlui** is a modern web UI framework designed to empower desktop developers to effortlessly create web apps without deep knowledge of HTML, CSS, or JavaScript.
