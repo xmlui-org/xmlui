@@ -1,7 +1,7 @@
 import type { CSSProperties, MouseEventHandler, ReactNode, Ref } from "react";
 import type React from "react";
 import { forwardRef, useCallback, useContext, useMemo, useState } from "react";
-import { NavLink as RrdNavLink, useLocation } from "@remix-run/react";
+import { NavLink as RrdNavLink } from "@remix-run/react";
 import type { To } from "react-router";
 import classnames from "classnames";
 
@@ -48,7 +48,6 @@ export const NavLink = forwardRef(function NavLink(
 ) {
   const appLayoutContext = useAppLayoutContext();
   const navPanelContext = useContext(NavPanelContext);
-  const location = useLocation();
 
   // This is for applying the active indicator for the button
   //
