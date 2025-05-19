@@ -70,7 +70,7 @@ export const navGroupComponentRenderer = createComponentRenderer(
     return (
       <NavGroup
         label={extractValue.asDisplayText(node.props.label)}
-        disabled={!extractValue.asOptionalBoolean(node.props.enabled)}
+        disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
         to={extractValue.asOptionalString(node.props.to)}
         icon={<Icon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />}
         node={node}

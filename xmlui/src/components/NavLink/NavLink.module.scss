@@ -125,8 +125,8 @@ $transition:
     }
   }
 
-  &.displayIndicator,
   &.displayIndicator {
+    // Indicator
     &:after {
       transition: $transition;
       position: absolute;
@@ -175,6 +175,15 @@ $transition:
       }
       &:after {
         background-color: $color-indicator-NavLink--active;
+      }
+
+      // hover on an active element
+      &:hover {
+        color: $textColor-NavLink--hover--active;
+        background-color: $backgroundColor-NavLink--hover--active;
+        * {
+          color: $textColor-NavLink--hover--active;
+        }
       }
     }
 
