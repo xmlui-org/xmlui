@@ -1,8 +1,9 @@
-import { CSSProperties, ForwardedRef, forwardRef, useEffect, useState } from "react";
+import type { CSSProperties, ForwardedRef} from "react";
+import { forwardRef, useEffect, useState } from "react";
 
 import styles from "./Spinner.module.scss";
 
-interface SpinnerProps {
+type SpinnerProps  = {
   delay?: number;
   fullScreen?: boolean;
   style?: CSSProperties;

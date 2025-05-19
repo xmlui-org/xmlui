@@ -27,14 +27,6 @@ export const StandalonePlayground = () => {
   }, []);
 
   useEffect(() => {
-    document.documentElement.style.scrollbarGutter = "auto";
-
-    return () => {
-      document.documentElement.style.scrollbarGutter = "";
-    };
-  }, []);
-
-  useEffect(() => {
     const getApp = async () => {
       try {
         const data = JSON.parse(await decompressData(queryParams.app as string));
@@ -84,21 +76,19 @@ export const StandalonePlayground = () => {
     id,
   ]);
 
-  return (
-    <ToastProvider>
-      <PlaygroundContext.Provider value={playgroundContextValue}>
-        <ErrorBoundary>
-          {loading && <Spinner />}
-          {!loading && (
-            <div className={styles.standalonePlayground}>
-              {!playgroundState.options.previewMode && <Header standalone={true} />}
-              <div style={{ flexGrow: 1, overflow: "auto" }}>
-                <PlaygroundContent standalone={true} />
-              </div>
+  return <ToastProvider>
+    <PlaygroundContext.Provider value={playgroundContextValue}>
+      <ErrorBoundary>
+        {loading && <Spinner />}
+        {!loading && (
+          <div className={styles.standalonePlayground}>
+            {!playgroundState.options.previewMode && <Header standalone={true} />}
+            <div style={{ flexGrow: 1, overflow: "auto" }}>
+              <PlaygroundContent standalone={true} />
             </div>
-          )}
-        </ErrorBoundary>
-      </PlaygroundContext.Provider>
-    </ToastProvider>
-  );
+          </div>
+        )}
+      </ErrorBoundary>
+    </PlaygroundContext.Provider>
+  </ToastProvider>
 };

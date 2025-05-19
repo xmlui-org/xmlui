@@ -6,9 +6,7 @@ import {
   CompoundComponentDef,
   ThemeDefinition,
   XmlUiHelper,
-  XmlUiNode,
-  SolidThemeDefinition,
-  XmlUiThemeDefinition,
+  XmlUiNode
 } from "xmlui";
 import { decompress } from "../playground/utils";
 
@@ -60,11 +58,6 @@ export async function decompressData(source: string) {
   const compressed = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
   return await decompress(compressed);
 }
-
-export const builtInThemes: Array<ThemeDefinition> = [
-  { ...SolidThemeDefinition, name: "Solid" },
-  { ...XmlUiThemeDefinition, name: "Xmlui" },
-];
 
 export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
   editorStatus: "idle",
@@ -183,7 +176,7 @@ export const handleDownloadZip = async (appDescription: any) => {
       type: "blob",
       platform: operatingSystem === "Windows" ? "DOS" : "UNIX",
     });
-    saveAs(content, `${appDescription.config.name.trim()}.zip`);
+    saveAs(content, `${(appDescription.config.name || 'xmlui-playground-app').trim()}.zip`);
   } catch (error) {
     console.error("An error occurred while generating the ZIP:", error);
   }

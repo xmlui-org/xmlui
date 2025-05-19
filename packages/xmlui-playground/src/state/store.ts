@@ -6,9 +6,9 @@ import {
   CompoundComponentDef,
   ThemeDefinition,
   errReportComponent,
-  xmlUiMarkupToComponent,
+  xmlUiMarkupToComponent, ThemeTone,
+  builtInThemes
 } from "xmlui";
-import { builtInThemes } from "../utils/helpers";
 
 type Orientation = "horizontal" | "vertical";
 
@@ -20,7 +20,7 @@ type Options = {
   allowStandalone?: boolean;
   id: number;
   activeTheme?: string;
-  activeTone?: string;
+  activeTone?: ThemeTone;
   language: "xmlui" | "json";
   emulatedApi?: string;
   fixedTheme?: boolean;

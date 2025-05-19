@@ -1,4 +1,4 @@
-<Fragment>
+<Fragment xmlns:XMLUIExtensions="component-ns">
     <App layout="vertical-full-header" noScrollbarGutters="false" when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
             <SpaceFiller/>
@@ -20,13 +20,13 @@
         <Pages defaultRoute="/">
             <!-- Custom documentation pages -->
             <Page url="/">
-                <MarkdownPage url="pages/introduction.md" />
+                <MarkdownPage url="/pages/introduction.md" />
             </Page>
             <Page url="/cheat-sheet">
-                <MarkdownPage url="pages/cheat-sheet.md" />
+                <MarkdownPage url="/pages/cheat-sheet.md" />
             </Page>
             <Page url="/glossary">
-                <MarkdownPage url="pages/glossary.md" />
+                <MarkdownPage url="/pages/glossary.md" />
             </Page>
 
             <!-- Generated component reference pages -->
@@ -38,16 +38,5 @@
             <Text>Created with <Text variant="strong"> XMLUI</Text></Text>
         </Footer>
     </App>
-    <App
-            xmlns:XMLUIExtensions="component-ns"
-            when="{window.location.hash.includes('/playground')}"
-            scrollWholePage="false" paddingVertical="0" horizontalPadding="0"
-            maxWidth="100%"
-    >
-        <Pages defaultRoute="/playground">
-            <Page url="/playground" paddingLeft="0" paddingRight="0">
-                <XMLUIExtensions:StandalonePlayground />
-            </Page>
-        </Pages>
-    </App>
+    <XMLUIExtensions:StandalonePlayground  when="{window.location.hash.includes('/playground')}"/>
 </Fragment>

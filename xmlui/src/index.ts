@@ -7,6 +7,7 @@ import StandaloneApp, { startApp } from "./components-core/StandaloneApp";
 import type {
   ComponentDef,
   ComponentLike,
+  ComponentMetadata,
   CompoundComponentDef,
 } from "./abstractions/ComponentDefs";
 import { createMetadata, d } from "./abstractions/ComponentDefs";
@@ -22,25 +23,26 @@ import { useTheme } from "./components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
 import { getColor } from "./components-core/utils/css-utils";
 import { useColors } from "./components-core/utils/hooks";
-import type { ComponentRendererDef, RendererContext } from "./abstractions/RendererDefs";
+import type {
+  ComponentRendererDef,
+  RegisterComponentApiFn,
+  RendererContext,
+} from "./abstractions/RendererDefs";
 import { parseScssVar } from "./components-core/theming/themeVars";
-import type { RegisterComponentApiFn } from "./abstractions/RendererDefs";
-import type { ComponentMetadata } from "./abstractions/ComponentDefs";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
-import { ThemeDefinition } from "./abstractions/ThemingDefs";
+import type { ThemeDefinition, ThemeTone } from "./abstractions/ThemingDefs";
 import { useDevTools } from "./components-core/InspectorContext";
 import { useLogger } from "./logging/LoggerContext";
 import { TabItemComponent } from "./components/Tabs/TabItemNative";
 import { Tabs } from "./components/Tabs/TabsNative";
-import { useApiWorkerContext } from "./components/NestedApp/ApiWorkerContext";
 import { errReportComponent, xmlUiMarkupToComponent } from "./components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "./components-core/interception/ApiInterceptorProvider";
-import { ThemeTone } from "./abstractions/ThemingDefs";
 import { Spinner } from "./components/Spinner/SpinnerNative";
-import { SolidThemeDefinition } from "./components-core/theming/themes/solid";
-import { XmlUiThemeDefinition } from "./components-core/theming/themes/xmlui";
-import { XmlUiHelper, XmlUiNode } from "./parsers/xmlui-parser";
+import type { XmlUiNode } from "./parsers/xmlui-parser";
+import { XmlUiHelper } from "./parsers/xmlui-parser";
 import { Text } from "./components/Text/TextNative";
+import { NestedApp } from "./components/NestedApp/NestedAppNative";
+import { builtInThemes } from "./components-core/theming/ThemeProvider";
 
 export type {
   ThemeDefinition,
@@ -81,13 +83,12 @@ export {
   toCssVar,
   useDevTools,
   useLogger,
-  useApiWorkerContext,
   errReportComponent,
   xmlUiMarkupToComponent,
   ApiInterceptorProvider,
   Spinner,
-  SolidThemeDefinition,
-  XmlUiThemeDefinition,
+  builtInThemes,
   XmlUiHelper,
-  Text
+  Text,
+  NestedApp,
 };

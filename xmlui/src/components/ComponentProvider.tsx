@@ -728,6 +728,10 @@ export class ComponentRegistry {
     this.extensionManager?.unSubscribeFromRegistrations(this.extensionRegistered);
   }
 
+  getExtensionManager() {
+    return this.extensionManager;
+  };
+
   private extensionRegistered = (extension: Extension) => {
     extension.components?.forEach((c) => {
       if ("type" in c) {

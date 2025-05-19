@@ -19,10 +19,9 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "backgroundColor": "$color-surface-0",
     
     // --- AppHeader
-    "height-AppHeader": "64px",
     "paddingInline-AppHeader": "$space-4",
-    "paddingTop-logo-AppHeader": "$space-3_5",
-    "paddingBottom-logo-AppHeader": "$space-3_5",
+    "paddingTop-logo-AppHeader": "$space-3",
+    "paddingBottom-logo-AppHeader": "$space-3",
 
     // --- NavPanel
     "backgroundColor-NavPanel": "$color-surface-50",
