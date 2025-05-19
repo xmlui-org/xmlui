@@ -237,10 +237,10 @@ The same variable name can be declared in nested scopes. The engine resolves the
     <Stack width="50%">
       <Markdown><![CDATA[
 ```xmlui
-<App var.myVar="myVar is 'Hello, from App!'">
-  <H1>{myVar}</H1>
-  <VStack var.myVar="myVar is 'Hello, from VStack'!">
-    <Text>{myVar}</Text>
+<App var.title="var.title is 'Hello, from App!'">
+  <H1>{title}</H1>
+  <VStack var.title="title is 'Hello, from VStack'!">
+    <Text>{title}</Text>
   </VStack>
 </App>
 ```
@@ -250,10 +250,10 @@ The same variable name can be declared in nested scopes. The engine resolves the
     <Stack width="50%">
       <Markdown><![CDATA[
 ```xmlui-pg name="Defining and using nested variables"
-<App var.myVar="myVar is 'Hello, from App!'">
-  <H1>{myVar}</H1>
-  <VStack var.myVar="myVar is 'Hello, from VStack'!">
-    <Text>{myVar}</Text>
+<App var.title="var.title is 'Hello, from App!'">
+  <H1>{title}</H1>
+  <VStack var.title="var.title is 'Hello, from VStack'!">
+    <Text>{title}</Text>
   </VStack>
 </App>
 ```
