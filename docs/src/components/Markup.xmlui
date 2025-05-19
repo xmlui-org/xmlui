@@ -113,7 +113,7 @@ Or a complex JSON object, in which case you'll write an outer set of curly brace
       <FormItem type="checkbox" label="toilets" bindTo="toilets" />
     </HStack>
     <property name="buttonRowTemplate">
-        <Button type="submit" icon="search" label="Search"/>
+        <Button id="search" type="submit" icon="search" label="Search"/>
     </property>
 </Form>
 
@@ -190,7 +190,7 @@ You can declare a variable using the `var` prefix.
   </HStack>
 
 <Markdown><![CDATA[
-Or using the special `<variable>` tag.
+Or using the `<variable>` helper tag.
 ]]></Markdown>
 
 <HStack
@@ -301,6 +301,53 @@ In [Reactive data binding](/reactive-intro) we saw how a `Select` can cause a `T
 The `Button`'s click handler increments `count` directly. But because `countTimes3` is define using an expression that refers to `count`, the engine reevalautes that expression each time `count` changes and updates `countTimes3` indirectly.
 ]]></Markdown>
 
+<H3>Event handlers</H3>
 
+<Markdown><![CDATA[
+We've seen two ways to declare variables: a `var` declaration in an XML attribute, or the `variable` tag. A similar pattern applies to event handlers. The `Button` to increment the count declares its handler in an attribute whose name combines the `on` prefix with the name [click](/components/Button#click). You may also use the `<event>` helper tag with no prefix for the event name.
+]]></Markdown>
 
+<HStack verticalAlignment="center">
+    <Stack width="50%">
+      <Markdown><![CDATA[
+```xmlui
+<App var.count="{0}" >
+  <Button label="Click to increment the count">
+    <event name="click">
+      { count++ }
+    </event>
+    <Text>Click count = {count}</Text>
+  </Button>
+</App>
+```
+]]></Markdown>
+    </Stack>
+    <SpaceFiller />
+    <Stack width="50%">
+      <Markdown><![CDATA[
+```xmlui-pg name="Declare an event handler using the <event> tag"
+<App var.count="{0}" >
+  <Button label="Click to increment the count">
+    <event name="click">
+      { count++ }
+    </event>
+    <Text>Click count = {count}</Text>
+  </Button>
+</App>
+```
+]]></Markdown>
+    </Stack>
+  </HStack>
+
+<Markdown><![CDATA[
+> [!INFO]
+> Why use the `<event>` tag? In this example there's no reason to prefer it. But as we saw above, you declare a `Form`'s `buttonRowTemplate` property in XMLUI markup using the `<property>` helper tag. The same pattern applies when a button's handler is an XMLUI component like `<APICall>`.
+> ```
+>   <Button label="Click to increment the count on the server">
+>    <event name="click">
+>      <APICall url="/count/increment" />
+>    </event>
+>    <Text>Click count = {count}</Text>
+>  </Button>
+]]></Markdown>
 </Component>
