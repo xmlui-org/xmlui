@@ -1,5 +1,11 @@
 # xmlui-playground
 
+## 0.1.2
+
+### Patch Changes
+
+- bae8280: rework preview component
+
 ## 0.1.1
 
 ### Patch Changes

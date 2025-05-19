@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.9.34
+
+### Patch Changes
+
+- bae8280: export NestedApp component
+- 415aa66: Added color palette colors for CodeBlock, vertical NavPanel now has fixed scrollbar gutter, fixed vertical collapsed icon for NavGroup.
+
 ## 0.9.33
 
 ### Patch Changes
