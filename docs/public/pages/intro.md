@@ -3,12 +3,10 @@
 XMLUI is a framework for building user interfaces declaratively, with XML markup and flexible theming. XMLUI apps are:
 
 - **Easy to create**. Build on the web platform with little or no knowledge of JavaScript, CSS, or React.
-
 - **Beautiful by default**. Enjoy themes that look great out of the box and are easy to modify.
-
 - **Connected**. Read and write APIs with little or no scripting.
-
 - **Modular**. Use a comprehensive suite of [components](/components/_overview) that you can extend with — again! — little or no scripting.
+- **Easy to deploy**. Just drop a handful of files onto a static webserver.
 
 This paragraph is static text displayed by XMLUI's [Markdown](/components/Markdown) component.
 

@@ -3,7 +3,7 @@
     <H1>Themes</H1>
 
     <Markdown><![CDATA[
-We've seen how XMLUI enables reactive data binding without requiring you to master React's complexity. The same principle applies to layout and style: XMLUI's theme system ensures that your apps look good and behave gracefully without requiring you to master the complexity of CSS (Cascading Style Sheets). We are using a custom theme called `earthtone`. Use the dropdown to switch to the default theme. Use the [ToneChangerButton](/components/ToneChangerButton) to switch between light and dark modes.
+We've seen how XMLUI enables reactive data binding without requiring you to master React's complexity. The same principle applies to layout and style: XMLUI's theme system ensures that your apps look good and behave gracefully without requiring you to master the complexity of CSS (Cascading Style Sheets). We are using a custom theme called `earthtone`. Use the dropdown to switch to the default theme. Then use the [ToneChangerButton](/components/ToneChangerButton) to switch between light and dark modes.
 ]]></Markdown>
 
     <HStack>
@@ -11,7 +11,7 @@ We've seen how XMLUI enables reactive data binding without requiring you to mast
         <Select
             id="pickTheme"
             width="30%"
-            initialValue="earthtone"
+            initialValue="xmlui"
             onDidChange="(newTheme) => setTheme(newTheme)"
         >
             <Option value="earthtone" label="earthtone" />
@@ -23,7 +23,7 @@ We've seen how XMLUI enables reactive data binding without requiring you to mast
     </HStack>
 
     <Markdown><![CDATA[
-You've now switched the settings for [thousands of theme variables](/xmlui-theme). Each theme variable defines the value that influences an aspect of a component's appearance: text color and font, background color, margin, border, padding, etc. They follow a naming conventional that enables a setting to control appearance globally or in progressively more granular ways. For example, here are the variables that can control the border color of a solid button using the primary color when the mouse hovers over it:
+You've now switched the settings for [thousands of theme variables](/xmlui-theme). Each theme variable defines the value that influences an aspect of a component's appearance: text color and font, background color, margin, border, padding, etc. They follow a naming convention that enables a setting to control appearance globally or in progressively more granular ways. For example, here are the variables that can control the border color of a solid button using the primary color when the mouse hovers over it:
 
 ```text
 color-primary
