@@ -128,9 +128,7 @@ export const DevTools = () => {
     };
 
     const appQueryString = await createQueryString(JSON.stringify(data));
-    const playgroundBaseUrl =
-      import.meta.env?.MODE === "development" ? "http://localhost:3000" : "https://docs.xmlui.com";
-    window.open(`${playgroundBaseUrl}/playground#${appQueryString}`, "_blank");
+    window.open(`/#/playground#${appQueryString}`, "_blank");
   }, [value, projectCompilation, inspectedNode]);
 
   useEffect(() => {
