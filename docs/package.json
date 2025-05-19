@@ -4,11 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "start": "xmlui start",
-    "build": "xmlui build",
     "preview": "xmlui preview",
-    "build-prod": "npm run build -- --prod",
-    "release-ci": "npm run build-prod && xmlui zip-dist",
-    "release-prod": "npm run build-prod && xmlui zip-dist"
+    "build:docs": "xmlui build --buildMode=INLINE_ALL && xmlui zip-dist --target=dist/ui.zip"
   },
   "dependencies": {
     "shiki": "^3.3.0",
