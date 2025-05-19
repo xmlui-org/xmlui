@@ -231,18 +231,35 @@ Or using the special `<variable>` tag.
 
 <H3>Nested variables</H3>
 
-<Markdown><![CDATA[
 The same variable name can be declared in nested scopes. The engine resolves the name to the variable in the closest (innermost) scope.
 
-```xmlui copy
-<App var.myVar="Hello, from App!">
-  <H1>{myVar}</H1> <!-- Displays: Hello, from App! -->
-  <VStack var.myVar="Hello, from VStack!">
-    <Text>{myVar}</Text> <!-- Displays: Hello, from VStack! -->
+<HStack verticalAlignment="center">
+    <Stack width="50%">
+      <Markdown><![CDATA[
+```xmlui
+<App var.myVar="myVar is 'Hello, from App!'">
+  <H1>{myVar}</H1>
+  <VStack var.myVar="myVar is 'Hello, from VStack'!">
+    <Text>{myVar}</Text>
   </VStack>
 </App>
 ```
 ]]></Markdown>
+    </Stack>
+    <SpaceFiller />
+    <Stack width="50%">
+      <Markdown><![CDATA[
+```xmlui-pg name="Defining and using nested variables"
+<App var.myVar="myVar is 'Hello, from App!'">
+  <H1>{myVar}</H1>
+  <VStack var.myVar="myVar is 'Hello, from VStack'!">
+    <Text>{myVar}</Text>
+  </VStack>
+</App>
+```
+]]></Markdown>
+    </Stack>
+  </HStack>
 
 <H3>Reactive variables</H3>
 
