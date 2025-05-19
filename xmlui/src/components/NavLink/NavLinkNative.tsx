@@ -1,7 +1,7 @@
 import type { CSSProperties, MouseEventHandler, ReactNode, Ref } from "react";
 import type React from "react";
 import { forwardRef, useCallback, useContext, useMemo, useState } from "react";
-import { NavLink as RrdNavLink } from "@remix-run/react";
+import { NavLink as RrdNavLink, useLocation } from "@remix-run/react";
 import type { To } from "react-router";
 import classnames from "classnames";
 
@@ -46,18 +46,23 @@ export const NavLink = forwardRef(function NavLink(
   }: Props,
   ref: Ref<HTMLButtonElement | HTMLAnchorElement>,
 ) {
-  // This is for applying the hover indicator for the button
+  const appLayoutContext = useAppLayoutContext();
+  const navPanelContext = useContext(NavPanelContext);
+  const location = useLocation();
+
+  // This is for applying the active indicator for the button
+  //
+  // NOTE: there is a bug if you use Actions.navigate in the onClick handler, the indicator is not removed after click
+  // The issue needs to be resolved by either using contextual state (the NavLink knows it is active or not)
+  // or by rethinking the component and removing the <button> -> Discuss!
   const [isClicked, setIsClicked] = useState(false);
-  const _onClick = useCallback(
+  const onClickForButton = useCallback(
     (event: React.MouseEvent<Element, MouseEvent>) => {
-      onClick?.(event);
       setIsClicked((last) => !last);
+      onClick?.(event);
     },
     [onClick],
   );
-
-  const appLayoutContext = useAppLayoutContext();
-  const navPanelContext = useContext(NavPanelContext);
 
   let safeVertical = vertical;
   if (appLayoutContext && safeVertical === undefined) {
@@ -79,16 +84,14 @@ export const NavLink = forwardRef(function NavLink(
   });
   let content = null;
 
-  //console.log(disabled);
   if (disabled || !smartTo) {
     content = (
       <button
         id={uid}
         {...rest}
         ref={ref as Ref<HTMLButtonElement>}
-        onClick={_onClick}
+        onClick={onClickForButton}
         className={classnames(sharedClasses, {
-          //[styles.routeActive]: displayActive && forceActive,
           [styles.active]: displayActive && (isClicked || forceActive),
         })}
         style={styleObj}
@@ -106,7 +109,7 @@ export const NavLink = forwardRef(function NavLink(
         ref={ref as Ref<HTMLAnchorElement>}
         to={smartTo as To}
         style={styleObj}
-        onClick={_onClick}
+        onClick={onClick}
         className={({ isActive }) =>
           classnames(sharedClasses, {
             [styles.active]: displayActive && (isActive || forceActive),
