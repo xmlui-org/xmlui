@@ -64,6 +64,15 @@
             <ThemesIntro />
         </Page>
 
+        <Page url="/layout-intro">
+            <LayoutIntro />
+        </Page>
+
+
+        <Page url="/markup">
+            <Markup />
+        </Page>
+
         <Page url="/icons">
             <Icons />
         </Page>
