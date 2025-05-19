@@ -37,22 +37,25 @@ export const NavLink = forwardRef(function NavLink(
     to,
     sx = {},
     displayActive = true,
+    forceActive,
     vertical,
     style,
     onClick,
     icon,
-    forceActive,
     ...rest
   }: Props,
-  ref: Ref<any>,
+  ref: Ref<HTMLButtonElement | HTMLAnchorElement>,
 ) {
   // This is for applying the hover indicator for the button
-  const [ isClicked, setIsClicked ] = useState(false);
-  const _onClick = useCallback((event: React.MouseEvent<Element, MouseEvent>) => {
-    onClick?.(event);
-    setIsClicked((last) => !last);
-  }, [onClick]);
-  
+  const [isClicked, setIsClicked] = useState(false);
+  const _onClick = useCallback(
+    (event: React.MouseEvent<Element, MouseEvent>) => {
+      onClick?.(event);
+      setIsClicked((last) => !last);
+    },
+    [onClick],
+  );
+
   const appLayoutContext = useAppLayoutContext();
   const navPanelContext = useContext(NavPanelContext);
 
@@ -69,25 +72,24 @@ export const NavLink = forwardRef(function NavLink(
   }, [to]) as To;
 
   const styleObj = { ...sx, ...style };
-
-  const baseClasses = classnames(styles.content, styles.base, {
+  const sharedClasses = classnames(styles.linkWrapper, {
     [styles.disabled]: disabled,
     [styles.vertical]: safeVertical,
-    [styles.includeHoverIndicator]: displayActive,
-    [styles.navItemActive]: displayActive && (isClicked || forceActive),
+    [styles.displayIndicator]: displayActive,
   });
-
   let content = null;
 
+  //console.log(disabled);
   if (disabled || !smartTo) {
     content = (
       <button
+        id={uid}
         {...rest}
-        ref={ref}
+        ref={ref as Ref<HTMLButtonElement>}
         onClick={_onClick}
-        className={classnames(baseClasses, {
-          [styles.displayActive]: displayActive,
-          [styles.active]: isClicked,
+        className={classnames(sharedClasses, {
+          //[styles.routeActive]: displayActive && forceActive,
+          [styles.active]: displayActive && (isClicked || forceActive),
         })}
         style={styleObj}
         disabled={disabled}
@@ -101,14 +103,13 @@ export const NavLink = forwardRef(function NavLink(
       <RrdNavLink
         id={uid}
         {...rest}
-        ref={ref}
+        ref={ref as Ref<HTMLAnchorElement>}
         to={smartTo as To}
         style={styleObj}
         onClick={_onClick}
         className={({ isActive }) =>
-          classnames(baseClasses, {
-            [styles.displayActive]: displayActive,
-            [styles.navItemActive]: displayActive && (isActive || forceActive),
+          classnames(sharedClasses, {
+            [styles.active]: displayActive && (isActive || forceActive),
           })
         }
       >

@@ -5,7 +5,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Icon } from "../Icon/IconNative";
-import { dLabel } from "../metadata-helpers";
+import { dEnabled, dLabel } from "../metadata-helpers";
 import { defaultProps, NavGroup } from "./NavGroupNative";
 
 const COMP = "NavGroup";
@@ -17,6 +17,7 @@ export const NavGroupMd = createMetadata({
   props: {
     label: dLabel(),
     initiallyExpanded: d('This property defines whether the group is initially expanded or collapsed.'),
+    enabled: dEnabled(),
     to: {
       description: `This property defines an optional navigation link.`,
       valueType: "string",
@@ -69,6 +70,7 @@ export const navGroupComponentRenderer = createComponentRenderer(
     return (
       <NavGroup
         label={extractValue.asDisplayText(node.props.label)}
+        disabled={!extractValue.asOptionalBoolean(node.props.enabled)}
         to={extractValue.asOptionalString(node.props.to)}
         icon={<Icon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />}
         node={node}
