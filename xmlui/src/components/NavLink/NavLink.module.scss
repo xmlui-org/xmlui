@@ -178,10 +178,9 @@ $transition:
       }
     }
 
-    // this is for the link component
-    &:disabled:active:after,
-    &.disabled:active:after,
-    // this is for the button component
+    // This selector ensures that the indicator is visible when the link is disabled but is currently active
+    // Do so only for the button component
+    // Also works in NavGroups
     &:disabled.active:after,
     &.disabled.active:after {
       background-color: t.$textColor--disabled;
