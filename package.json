@@ -21,10 +21,11 @@
     "changeset:add": "changeset add",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "build-xmlui": "turbo run build:xmlui-all --filter=xmlui",
-    "test-xmlui": "turbo run build:xmlui-all test:xmlui-all --filter=xmlui --filter=xmlui-e2e",
-    "test-xmlui-smoke": "turbo run build:xmlui-all test:xmlui-smoke --filter=xmlui --filter=xmlui-e2e",
-    "publish-packages": "turbo run build:xmlui-all build:extension test:xmlui-all && npm run changeset:publish",
-    "build-extensions": "turbo run build:extension"
+    "build-xmlui": "turbo run build:xmlui-all",
+    "test-xmlui": "turbo run build:xmlui-all test:xmlui-all",
+    "test-xmlui-smoke": "turbo run build:xmlui-all test:xmlui-smoke",
+    "publish-packages": "turbo run build:xmlui-all test:xmlui-all && npm run changeset:publish",
+    "build-extensions": "turbo run build:extension",
+    "build-docs": "turbo run build:xmlui-all build:docs"
   }
 }

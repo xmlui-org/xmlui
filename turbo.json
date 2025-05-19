@@ -18,7 +18,11 @@
       "outputs": ["dist/**"]
     },
     "build:xmlui-all": {
-      "dependsOn": ["build:bin", "build:xmlui-metadata", "build:xmlui", "build:xmlui-standalone"],
+      "dependsOn": ["build:bin", "build:xmlui-metadata", "build:xmlui", "build:xmlui-standalone", "build:extension"],
+      "outputs": ["dist/**"]
+    },
+    "build:docs": {
+      "dependsOn": ["^build:extension", "^build:xmlui"],
       "outputs": ["dist/**"]
     },
     "build:xmlui-test-bed": {
