@@ -390,6 +390,7 @@ This component does not expose any methods.
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-content-App | $backgroundColor | $backgroundColor |
+| [backgroundColor](../styles-and-themes/common-units/#color)-navPanel-App | $backgroundColor | $backgroundColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderLeft](../styles-and-themes/common-units/#border)-content-App | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | $boxShadow-spread | $boxShadow-spread |

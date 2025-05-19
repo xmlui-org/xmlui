@@ -6,8 +6,8 @@ The `NavGroup` component is a container for grouping related navigation targets 
 
 The primary use of a `NavGroup` is to create an application menu with submenus, as the following example shows:
 
-```xmlui-pg
----app copy display name="Example: NavGroup in App" height="200px"
+```xmlui-pg copy display name="Example: NavGroup in App" height="230px"
+---app
 <App layout="condensed">
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -37,7 +37,7 @@ Here, the highlighted `NavGroup` element nests other `NavLink` and `NavGroup` el
 
 You do not have to use `NavGroup` within `NavPanel`; you can nest it into other components to represent a menu, like in the following example:
 
-```xmlui-g copy display name="Example: NavGroup in a Stack" height="200px"
+```xmlui-pg copy display name="Example: NavGroup in a Stack" height="230px"
 <App>
   <HStack verticalAlignment="center">
     <Text>Use this menu:</Text>
@@ -65,7 +65,7 @@ You can also provide custom icons for a specific NavGroup component via it's res
 
 See the following for an example of all variants:
 
-```xmlui-pg copy display name="Example: custom icons in horizontal layout" height="220px"
+```xmlui-pg copy display name="Example: custom icons in horizontal layout" height="200px"
 <App layout="horizontal">
   <NavGroup icon="email" label="Send To"
     iconVerticalExpanded="arrowup" iconVerticalCollapsed="arrowbottom">
@@ -82,6 +82,10 @@ See the following for an example of all variants:
 
 ## Properties
 
+### `enabled (default: true)`
+
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
 ### `icon`
 
 This property defines an optional icon to display along with the `NavGroup` label.
@@ -90,7 +94,7 @@ This property defines an optional icon to display along with the `NavGroup` labe
 
 Look at this example:
 
-```xmlui-pg copy {3, 5} display name="Example: label and icon" height="220px"
+```xmlui-pg copy {3, 5} display name="Example: label and icon" height="230px"
 <App>
   <HStack verticalAlignment="center">
     <NavGroup icon="email" label="Send To" >
@@ -118,7 +122,7 @@ Set a custom icon to display when the navigation menu is expanded, is in a **hor
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconVerticalCollapsed (default: "chevronright")`
+### `iconVerticalCollapsed (default: "chevronup")`
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 

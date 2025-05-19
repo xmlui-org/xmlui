@@ -46,7 +46,6 @@ This component does not expose any methods.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-NavPanel | $backgroundColor | $backgroundColor |
-| [backgroundColor](../styles-and-themes/common-units/#color)-scrollbar-NavPanel | *none* | *none* |
 | [border](../styles-and-themes/common-units/#border)-NavPanel | 0px solid $borderColor | 0px solid $borderColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-NavPanel | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
@@ -81,7 +80,6 @@ This component does not expose any methods.
 | [borderWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel-vertical | 4px 0 4px 0 rgb(0 0 0 / 10%) | 4px 0 4px 0 rgb(0 0 0 / 10%) |
-| [color](../styles-and-themes/common-units/#color)-scrollbar-NavPanel | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
 | [padding](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
