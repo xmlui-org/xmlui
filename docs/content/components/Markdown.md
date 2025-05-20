@@ -172,6 +172,10 @@ This boolean property specifies whether leading indents should be removed from t
 </App>
 ```
 
+### `showHeadingAnchors (default: false)` [#showheadinganchors-default-false]
+
+This boolean property specifies whether heading anchors should be displayed. If set to `true`, heading anchors will be displayed on hover next to headings.
+
 ## Events [#events]
 
 This component does not have any events.

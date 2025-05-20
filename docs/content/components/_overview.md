@@ -61,7 +61,7 @@
 | 56 | [Option](./components/Option) | `Option` is a non-visual component describing a selection option. Other components (such as `Select`, `AutoComplete`, and others) may use nested `Option` instances from which the user can select. | stable |
 | 57 | [Page](./components/Page) | The `Page` component defines what content is displayed when the user navigates to a particular URL that is associated with the page. | stable |
 | 58 | [PageMetaTitle](./components/PageMetaTitle) | A PageMetaTitle component allows setting up (or changing) the app title to display with the current browser tab. | stable |
-| 59 | [Pages](./components/Pages) | The `Pages` component is used as a container for [`Page`](./Page.mdx) components within an [`App`](./App.mdx). | stable |
+| 59 | [Pages](./components/Pages) | The `Pages` component is used as a container for [`Page`](/components/Page) components within an [`App`](/components/App). | stable |
 | 60 | [PasswordInput](./components/PasswordInput) | The `Password` component is a specialized version of the `TextBox` component that allows users to input and edit passwords. | experimental |
 | 61 | [ProgressBar](./components/ProgressBar) | A `ProgressBar` component visually represents the progress of a task or process. | stable |
 | 62 | [Queue](./components/Queue) | The `Queue` component provides an API to enqueue elements and defines events to process queued elements in a FIFO order. | stable |

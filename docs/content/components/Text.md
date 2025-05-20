@@ -342,6 +342,7 @@ This component does not expose any methods.
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-sample | $fontFamily-monospace | $fontFamily-monospace |
 | [fontSize](../styles-and-themes/common-units/#size)-Text | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-markdown | $fontSize-normal | $fontSize-normal |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-small | $fontSize-small |

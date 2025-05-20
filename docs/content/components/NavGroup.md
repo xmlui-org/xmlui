@@ -82,6 +82,10 @@ See the following for an example of all variants:
 
 ## Properties [#properties]
 
+### `enabled (default: true)` [#enabled-default-true]
+
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
 ### `icon` [#icon]
 
 This property defines an optional icon to display along with the `NavGroup` label.
@@ -118,7 +122,7 @@ Set a custom icon to display when the navigation menu is expanded, is in a **hor
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconVerticalCollapsed (default: "chevronright")` [#iconverticalcollapsed-default-chevronright]
+### `iconVerticalCollapsed (default: "chevronup")` [#iconverticalcollapsed-default-chevronup]
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 

@@ -133,7 +133,7 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-resizer-Splitter | $backgroundColor-Card | $backgroundColor-Card |
+| [backgroundColor](../styles-and-themes/common-units/#color)-resizer-Splitter | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Splitter | *none* | *none* |
 | [border](../styles-and-themes/common-units/#border)-Splitter | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Splitter | *none* | *none* |

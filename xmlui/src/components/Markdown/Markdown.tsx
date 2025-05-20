@@ -35,7 +35,7 @@ export const MarkdownMd = createMetadata({
       description:
         "This boolean property specifies whether heading anchors should be " +
         "displayed. If set to `true`, heading anchors will be displayed on hover " +
-        "next to all headings in the markdown.",
+        "next to headings.",
       valueType: "boolean",
       defaultValue: false,
     },
