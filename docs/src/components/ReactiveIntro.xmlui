@@ -136,11 +136,32 @@ The `resultSelector` property on the `DataSource` targets the nested `stations` 
 
 The `Select` is wired to the `Table`. When you make a new selection, the table fills with details for the selected line. Try it!
 
-How does this work? Note above how the `Select` declares the property `id="lines"`. That makes `lines` a variable accessible other XMLUI components, and `lines.value` holds the value of the current selection.
+How does this work? Note  how the `Select` declares the property `id="lines"`.
 
-Now look at the `url` property of the `DataSource`: it embeds a reference to `lines.value`. When you loaded this page, that URL fetched details for the initial value of the `Select`. Changing the selection changes `lines.value` which causes the `DataSource` to fetch a new batch of details. Likewise the `Table`'s `data` property refers to `stations`, the id of the `DataSource`. So when the `DataSource` fetches fresh data, the `Table` notices the change and refills with that fresh data.
+```
+<Select id="lines" initialValue="bakerloo" width="30%">
+```
 
-There's a name for this pattern: reactive data binding. It's what spreadsheets do when a change in one cell propagates to others that refer to it. It's what the popular framework React enables for web apps. React, as you may know, is a complex beast that only expert programmers can tame. Fortunately the expert programmers who build XMLUI have done that for you. When you build apps declaratively with XMLUI you enjoy the benefit of reactive data binding without the burden of React's complexity. You don't need to write code to make this magic happen, it's automatic!
+That makes `lines` a variable accessible other XMLUI components, and `lines.value` holds the value of the current selection.
+
+Now look at the `url` property of the `DataSource`.
+
+```
+<DataSource
+  id="stations"
+  url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
+  resultSelector="stations"/>
+```
+
+it embeds a reference to `lines.value`. When you loaded this page, that URL fetched details for the initial value of the `Select`. Changing the selection changes `lines.value` which causes the `DataSource` to fetch a new batch of details. Likewise the `Table`'s `data` property refers to `stations`, the id of the `DataSource`.
+
+```
+<Table data="{stations}">
+```
+
+So when the `DataSource` fetches fresh data, the `Table` notices the change and refills with that fresh data.
+
+There's a name for this pattern: reactive data binding. It's what spreadsheets do when a change in one cell propagates to others that refer to it. And it's what the popular framework React enables for web apps. React, as you may know, is a complex beast that only expert programmers can tame. Fortunately the expert programmers who build XMLUI have done that for you. When you build apps declaratively with XMLUI you enjoy the benefit of reactive data binding without the burden of React's complexity. You don't need to write code to make this magic happen, it's automatic!
     ]]></Markdown>
 
         <ContentSeparator marginTop="2rem" height="20rem" orientation="vertical" size="2px" />

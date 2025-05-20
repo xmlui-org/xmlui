@@ -7,14 +7,16 @@
 
     <NavPanel>
 
-        <NavGroup label="Learn XMLUI" initiallyExpanded="true">
+        <NavGroup 
+
+        <NavGroup label="Learn XMLUI" initiallyExpanded="{true}">
             <NavLink label="Introduction" to="/" />
             <NavLink label="Reactive Data" to="/reactive-intro" />
             <NavLink label="Components" to="/components-intro" />
             <NavLink label="Themes" to="/themes-intro" />
         </NavGroup>
 
-        <NavGroup label="Create XMLUI Apps" initiallyExpanded="false">
+        <NavGroup label="Create XMLUI Apps" initiallyExpanded="{false}">
             <NavLink label="Markup" to="/markup" />
             <NavLink label="Code" to="/code" />
             <NavLink label="The App Component" to="/appComponent" />
@@ -40,6 +42,7 @@
         <NavLink label="Glossary" to="/tbd" />
         <NavLink label="Palettes" to="/palettes" />
         <NavLink label="Icons" to="/icons" />
+        <NavLink label="Test" to="/test" />
 
         <RecursiveNavTree items="{appGlobals.navPanelContent}"/>
 
@@ -67,7 +70,6 @@
         <Page url="/layout-intro">
             <LayoutIntro />
         </Page>
-
 
         <Page url="/markup">
             <Markup />
@@ -117,10 +119,14 @@
             <TBD />
         </Page>
 
-
         <Page url="/themes">
             <Markdown data="pages/themes.md" />
         </Page>
+
+        <Page url="/test">
+            <Markdown data="pages/test.md" />
+        </Page>
+
 
         <Page url="/*">
             <MarkdownPage content="{appGlobals.content[$routeParams['*']]}" />
