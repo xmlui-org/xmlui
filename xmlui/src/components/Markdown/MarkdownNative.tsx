@@ -466,7 +466,9 @@ function LinkAwareHeading({ children, level }: LinkAwareHeadingProps) {
     <Heading level={level} id={anchorId}>
       {headingLabel}
       {anchorId && (
-        <a href={href} id={anchorId} aria-label="Section heading anchor">
+        // NOTE: Anchor is hidden from screen readers
+        // TODO: make sure this is a good idea
+        <a href={href} id={anchorId} aria-hidden="true">
           #
         </a>
       )}
