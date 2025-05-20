@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.36
+
+### Patch Changes
+
+- 6b0f2c1: fix: itemWithLabel fills the available width if no other value is specified
+
 ## 0.9.35
 
 ### Patch Changes
