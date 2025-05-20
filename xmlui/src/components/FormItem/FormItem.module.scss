@@ -45,7 +45,11 @@ $themeVars: ();
   &.shrinkToLabel {
     width: fit-content;
   }
-  
+
+  .itemWithLabel {
+    width: 100%;
+  }
+
   .inputLabel {
     display: flex;
     color: createThemeVar("textColor-FormItemLabel");

@@ -68,7 +68,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     // });
   }
   return (
-    <div style={style} ref={ref}>
+    <div style={style} ref={ref} className={styles.itemWithLabel}>
       <div
         className={classnames(styles.container, {
           [styles.top]: labelPosition === "top",
