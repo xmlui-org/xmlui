@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.35
+
+### Patch Changes
+
+- ef3cd6e: Reworked NavLink & NavGroup styling: added disabled, hover & active states to button version
+
 ## 0.9.34
 
 ### Patch Changes
