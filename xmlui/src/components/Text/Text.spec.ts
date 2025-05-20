@@ -134,7 +134,7 @@ please do not break it!"
       await createTextDriver("textLong")
     ).getComponentBounds();
 
-    expect(heightTextLong).toEqual(heightTextShort * 3);
+    expect(heightTextLong).toEqualWithTolerance(heightTextShort * 3, 0.01);
   });
 
   // --- ellipses

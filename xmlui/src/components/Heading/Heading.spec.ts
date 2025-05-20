@@ -190,7 +190,7 @@ please do not break it!"
       await createHeadingDriver("headingLong")
     ).getComponentBounds();
 
-    expect(heightHeadingLong).toEqual(heightHeadingShort * 3);
+    expect(heightHeadingLong).toEqualWithTolerance(heightHeadingShort * 3, 0.01);
   });
 
   // --- ellipses

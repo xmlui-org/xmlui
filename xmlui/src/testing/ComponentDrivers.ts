@@ -119,6 +119,10 @@ export class ComponentDriver {
   blur = async (options?: { timeout?: number }) => {
     await this.locator.blur(options);
   };
+
+  hover = async (options?: { timeout?: number }) => {
+    await this.locator.hover(options);
+  };
 }
 
 export class TestStateDriver {

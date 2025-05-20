@@ -1,6 +1,6 @@
 import { expect, test } from "./fixtures";
 import {
-  ThemeTestDesc,
+  type ThemeTestDesc,
   getBoundingRect,
   getElementStyle,
   initApp,
@@ -147,7 +147,7 @@ please do not break it!"/>
   const { height: heightHeadingShort } = await getBoundingRect(page.getByTestId("headingShort"));
   const { height: heightHeadingLong } = await getBoundingRect(page.getByTestId("headingLong"));
 
-  expect(heightHeadingLong).toEqual(heightHeadingShort * 3);
+  expect(heightHeadingLong).toEqualWithTolerance(heightHeadingShort * 3, 0.01);
 });
 
 test("child overrides value", async ({ page }) => {

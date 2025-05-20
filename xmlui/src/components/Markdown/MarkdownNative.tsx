@@ -22,6 +22,7 @@ type MarkdownProps = {
   children: ReactNode;
   style?: CSSProperties;
   codeHighlighter?: CodeHighlighter;
+  showHeadingAnchors?: boolean;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -60,6 +61,7 @@ export const Markdown = memo(function Markdown({
   children,
   style,
   codeHighlighter,
+  showHeadingAnchors = false,
 }: MarkdownProps) {
   if (typeof children !== "string") {
     return null;
@@ -106,22 +108,46 @@ export const Markdown = memo(function Markdown({
             }
           },
           h1({ children }) {
-            return <LinkAwareHeading level="h1">{children}</LinkAwareHeading>;
+            return (
+              <LinkAwareHeading level="h1" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           h2({ children }) {
-            return <LinkAwareHeading level="h2">{children}</LinkAwareHeading>;
+            return (
+              <LinkAwareHeading level="h2" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           h3({ children }) {
-            return <LinkAwareHeading level="h3">{children}</LinkAwareHeading>;
+            return (
+              <LinkAwareHeading level="h3" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           h4({ children }) {
-            return <LinkAwareHeading level="h4">{children}</LinkAwareHeading>;
+            return (
+              <LinkAwareHeading level="h4" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           h5({ children }) {
-            return <LinkAwareHeading level="h5">{children}</LinkAwareHeading>;
+            return (
+              <LinkAwareHeading level="h5" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           h6({ children }) {
-            return <LinkAwareHeading level="h6">{children}</LinkAwareHeading>;
+            return (
+              <LinkAwareHeading level="h6" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           p({ id, children }) {
             return (
@@ -421,9 +447,10 @@ const ListItem = ({ children, style }: ListItemProps) => {
 type LinkAwareHeadingProps = {
   children: React.ReactNode;
   level: string;
+  showHeadingAnchors?: boolean;
 };
 
-function LinkAwareHeading({ children, level }: LinkAwareHeadingProps) {
+function LinkAwareHeading({ children, level, showHeadingAnchors }: LinkAwareHeadingProps) {
   let headingLabel: React.ReactNode = "";
   let anchorId = "";
   if (!children) return <></>;
@@ -465,7 +492,7 @@ function LinkAwareHeading({ children, level }: LinkAwareHeadingProps) {
   return (
     <Heading level={level} id={anchorId}>
       {headingLabel}
-      {anchorId && (
+      {showHeadingAnchors && anchorId && (
         // NOTE: Anchor is hidden from screen readers
         // TODO: make sure this is a good idea
         <a href={href} id={anchorId} aria-hidden="true">
