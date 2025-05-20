@@ -6,7 +6,6 @@ import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout, defaultProps } from "./FlowLayoutNative";
-import { de } from "date-fns/locale";
 
 const COMP = "FlowLayout";
 
