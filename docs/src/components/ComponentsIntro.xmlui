@@ -78,6 +78,8 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 
     <SpaceFiller />
 
+    <Stack d
+
     <Stack width="50%">
       <TubeStops line="waterloo-city" />
     </Stack>
@@ -162,7 +164,7 @@ The `TubeStops` component:
 
 When you use custom components to access, transform, and present data, your XMLUI markup stays clean, readable, and easy to read and maintain.
 
-Another way to keep your markup clean: rely on XMLUI's layout and style engine to make your app look good and behave gracefully by default. You can adjust the (many!) settings that define an XMLUI [Theme](/components/Theme), but you'll rarely need to.
+Another way to keep your markup clean: rely on XMLUI's layout and style engine to make your app look good and behave gracefully by default. You can adjust the (many!) settings that define an XMLUI [Theme](/components/Theme), but you'll rarely need to. Let's learn about themes next.
 
 ]]></Markdown>
 

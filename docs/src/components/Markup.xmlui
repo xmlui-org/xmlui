@@ -39,7 +39,7 @@ An attribute may be a literal string that sets the value of a property.
 <Markdown><![CDATA[
 ## Expressions
 
-An attribute may also be a JavaScript expression that dynamically sets the value of a property.
+An attribute may also be a JavaScript expression — enclosed in curly braces `{ }` — that dynamically sets the value of a property.
 ]]></Markdown>
 
 <HStack
