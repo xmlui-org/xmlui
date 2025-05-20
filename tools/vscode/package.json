@@ -75,9 +75,7 @@
   },
   "scripts": {
     "build:vsix": "vsce package",
-    "vscode:prepublish": "npm run build:xmlui-metadata --prefix ../../xmlui && npm run generate-langserver-metadata --prefix ../../xmlui && npm run build",
     "build": "node esbuild.js --production",
-    "build:temporarily-not-using-cuz-typescrip-config-issues": "npm run type-check && npm run build",
     "type-check": "tsc --noEmit",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
