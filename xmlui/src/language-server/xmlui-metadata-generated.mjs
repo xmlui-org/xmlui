@@ -2093,6 +2093,7 @@ export default {
     },
     "themeVars": {
       "width-navPanel-App": "var(--xmlui-width-navPanel-App)",
+      "backgroundColor-navPanel-App": "var(--xmlui-backgroundColor-navPanel-App)",
       "boxShadow-header-App": "var(--xmlui-boxShadow-header-App)",
       "boxShadow-navPanel-App": "var(--xmlui-boxShadow-navPanel-App)",
       "backgroundColor-content-App": "var(--xmlui-backgroundColor-content-App)",
@@ -2111,6 +2112,7 @@ export default {
     },
     "defaultThemeVars": {
       "width-navPanel-App": "$space-64",
+      "backgroundColor-navPanel-App": "$backgroundColor",
       "maxWidth-content-App": "$maxWidth-content",
       "boxShadow-header-App": "$boxShadow-spread",
       "boxShadow-navPanel-App": "$boxShadow-spread",
@@ -3715,7 +3717,8 @@ export default {
       "Input:outlineWidth-Switch--focus": "var(--xmlui-outlineWidth-Switch--focus)",
       "Input:outlineColor-Switch--focus": "var(--xmlui-outlineColor-Switch--focus)",
       "Input:outlineStyle-Switch--focus": "var(--xmlui-outlineStyle-Switch--focus)",
-      "Input:outlineOffset-Switch--focus": "var(--xmlui-outlineOffset-Switch--focus)"
+      "Input:outlineOffset-Switch--focus": "var(--xmlui-outlineOffset-Switch--focus)",
+      "backgroundColor-indicator-checked-Switch": "var(--xmlui-backgroundColor-indicator-checked-Switch)"
     },
     "defaultThemeVars": {
       "borderColor-checked-Checkbox-error": "$borderColor-Checkbox-error",
@@ -9438,6 +9441,11 @@ export default {
       "initiallyExpanded": {
         "description": "This property defines whether the group is initially expanded or collapsed."
       },
+      "enabled": {
+        "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
       "to": {
         "description": "This property defines an optional navigation link.",
         "valueType": "string"
@@ -9464,7 +9472,7 @@ export default {
       "iconVerticalCollapsed": {
         "description": "Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
         "valueType": "string",
-        "defaultValue": "chevronright"
+        "defaultValue": "chevronup"
       }
     },
     "themeVars": {
@@ -9584,14 +9592,20 @@ export default {
       "borderStartEndRadius-NavLink": "var(--xmlui-borderStartEndRadius-NavLink, var(--xmlui-borderRadius-NavLink))",
       "borderEndStartRadius-NavLink": "var(--xmlui-borderEndStartRadius-NavLink, var(--xmlui-borderRadius-NavLink))",
       "borderEndEndRadius-NavLink": "var(--xmlui-borderEndEndRadius-NavLink, var(--xmlui-borderRadius-NavLink))",
-      "backgroundColor-NavLink": "var(--xmlui-backgroundColor-NavLink)",
-      "backgroundColor-NavLink--hover": "var(--xmlui-backgroundColor-NavLink--hover)",
-      "backgroundColor-NavLink--hover--active": "var(--xmlui-backgroundColor-NavLink--hover--active)",
-      "backgroundColor-NavLink--active": "var(--xmlui-backgroundColor-NavLink--active)",
-      "backgroundColor-NavLink--pressed": "var(--xmlui-backgroundColor-NavLink--pressed)",
-      "backgroundColor-NavLink--pressed--active": "var(--xmlui-backgroundColor-NavLink--pressed--active)",
+      "outlineWidth-NavLink--focus": "var(--xmlui-outlineWidth-NavLink--focus)",
+      "outlineColor-NavLink--focus": "var(--xmlui-outlineColor-NavLink--focus)",
+      "outlineStyle-NavLink--focus": "var(--xmlui-outlineStyle-NavLink--focus)",
+      "outlineOffset-NavLink--focus": "var(--xmlui-outlineOffset-NavLink--focus)",
+      "fontFamily-NavLink": "var(--xmlui-fontFamily-NavLink)",
+      "fontWeight-NavLink": "var(--xmlui-fontWeight-NavLink)",
+      "fontWeight-NavLink--pressed": "var(--xmlui-fontWeight-NavLink--pressed)",
+      "fontWeight-NavLink--active": "var(--xmlui-fontWeight-NavLink--active)",
       "fontSize-NavLink": "var(--xmlui-fontSize-NavLink)",
       "wordWrap-NavLink": "var(--xmlui-wordWrap-NavLink)",
+      "backgroundColor-NavLink": "var(--xmlui-backgroundColor-NavLink)",
+      "backgroundColor-NavLink--hover": "var(--xmlui-backgroundColor-NavLink--hover)",
+      "backgroundColor-NavLink--active": "var(--xmlui-backgroundColor-NavLink--active)",
+      "backgroundColor-NavLink--pressed": "var(--xmlui-backgroundColor-NavLink--pressed)",
       "textColor-NavLink": "var(--xmlui-textColor-NavLink)",
       "textColor-NavLink--hover": "var(--xmlui-textColor-NavLink--hover)",
       "textColor-NavLink--active": "var(--xmlui-textColor-NavLink--active)",
@@ -9599,20 +9613,14 @@ export default {
       "textColor-NavLink--pressed": "var(--xmlui-textColor-NavLink--pressed)",
       "textColor-NavLink--pressed--active": "var(--xmlui-textColor-NavLink--pressed--active)",
       "color-icon-NavLink": "var(--xmlui-color-icon-NavLink)",
-      "fontFamily-NavLink": "var(--xmlui-fontFamily-NavLink)",
-      "fontWeight-NavLink": "var(--xmlui-fontWeight-NavLink)",
-      "fontWeight-NavLink--pressed": "var(--xmlui-fontWeight-NavLink--pressed)",
-      "fontWeight-NavLink--active": "var(--xmlui-fontWeight-NavLink--active)",
-      "borderRadius-indicator-NavLink": "var(--xmlui-borderRadius-indicator-NavLink)",
-      "thickness-indicator-NavLink": "var(--xmlui-thickness-indicator-NavLink)",
       "color-indicator-NavLink": "var(--xmlui-color-indicator-NavLink)",
       "color-indicator-NavLink--hover": "var(--xmlui-color-indicator-NavLink--hover)",
       "color-indicator-NavLink--active": "var(--xmlui-color-indicator-NavLink--active)",
+      "backgroundColor-NavLink--hover--active": "var(--xmlui-backgroundColor-NavLink--hover--active)",
       "color-indicator-NavLink--pressed": "var(--xmlui-color-indicator-NavLink--pressed)",
-      "outlineWidth-NavLink--focus": "var(--xmlui-outlineWidth-NavLink--focus)",
-      "outlineColor-NavLink--focus": "var(--xmlui-outlineColor-NavLink--focus)",
-      "outlineStyle-NavLink--focus": "var(--xmlui-outlineStyle-NavLink--focus)",
-      "outlineOffset-NavLink--focus": "var(--xmlui-outlineOffset-NavLink--focus)"
+      "backgroundColor-NavLink--pressed--active": "var(--xmlui-backgroundColor-NavLink--pressed--active)",
+      "thickness-indicator-NavLink": "var(--xmlui-thickness-indicator-NavLink)",
+      "borderRadius-indicator-NavLink": "var(--xmlui-borderRadius-indicator-NavLink)"
     },
     "themeVarDescriptions": {
       "color-indicator-NavLink": "Provides the following states: `--hover`, `--active`, `--pressed`"
@@ -9698,8 +9706,6 @@ export default {
       "paddingTop-logo-NavPanel": "var(--xmlui-paddingTop-logo-NavPanel, var(--xmlui-paddingVertical-logo-NavPanel, var(--xmlui-padding-logo-NavPanel)))",
       "paddingBottom-logo-NavPanel": "var(--xmlui-paddingBottom-logo-NavPanel, var(--xmlui-paddingVertical-logo-NavPanel, var(--xmlui-padding-logo-NavPanel)))",
       "marginBottom-logo-NavPanel": "var(--xmlui-marginBottom-logo-NavPanel)",
-      "color-scrollbar-NavPanel": "var(--xmlui-color-scrollbar-NavPanel)",
-      "backgroundColor-scrollbar-NavPanel": "var(--xmlui-backgroundColor-scrollbar-NavPanel)",
       "maxWidth-content-App": "var(--xmlui-maxWidth-content-App)",
       "height-AppHeader": "var(--xmlui-height-AppHeader)",
       "paddingVertical-AppHeader": "var(--xmlui-paddingVertical-AppHeader)",
@@ -10273,6 +10279,7 @@ export default {
       "Input:borderColor-RadioGroupOption-error": "var(--xmlui-borderColor-RadioGroupOption-error)",
       "Input:borderColor-RadioGroupOption-warning": "var(--xmlui-borderColor-RadioGroupOption-warning)",
       "Input:borderColor-RadioGroupOption-success": "var(--xmlui-borderColor-RadioGroupOption-success)",
+      "Input:backgroundColor-checked-RadioGroupOption-indicator": "var(--xmlui-backgroundColor-checked-RadioGroupOption-indicator)",
       "backgroundColor-checked-RadioGroupOption-default": "var(--xmlui-backgroundColor-checked-RadioGroupOption-default)",
       "backgroundColor-checked-RadioGroupOption--disabled": "var(--xmlui-backgroundColor-checked-RadioGroupOption--disabled)",
       "backgroundColor-checked-RadioGroupOption-error": "var(--xmlui-backgroundColor-checked-RadioGroupOption-error)",
@@ -10291,7 +10298,8 @@ export default {
     },
     "defaultThemeVars": {
       "gap-RadioGroupOption": "$space-1_5",
-      "borderWidth-RadioGroupOption": "2px",
+      "borderWidth-RadioGroupOption": "1px",
+      "backgroundColor-checked-RadioGroupOption-indicator": "$backgroundColor-primary",
       "backgroundColor-checked-RadioGroupOption--disabled]": "$borderColor-RadioGroupOption--disabled",
       "backgroundColor-checked-RadioGroupOption-error": "$borderColor-RadioGroupOption-error",
       "backgroundColor-checked-RadioGroupOption-warning": "$borderColor-RadioGroupOption-warning",
@@ -10918,7 +10926,7 @@ export default {
       "cursor-resizer-vertical-Splitter": "var(--xmlui-cursor-resizer-vertical-Splitter)"
     },
     "defaultThemeVars": {
-      "backgroundColor-resizer-Splitter": "$backgroundColor-Card",
+      "backgroundColor-resizer-Splitter": "$color-surface-100",
       "thickness-resizer-Splitter": "5px",
       "cursor-resizer-horizontal-Splitter": "ew-resize",
       "cursor-resizer-vertical-Splitter": "ns-resize"
@@ -10985,7 +10993,7 @@ export default {
       "cursor-resizer-vertical-Splitter": "var(--xmlui-cursor-resizer-vertical-Splitter)"
     },
     "defaultThemeVars": {
-      "backgroundColor-resizer-Splitter": "$backgroundColor-Card",
+      "backgroundColor-resizer-Splitter": "$color-surface-100",
       "thickness-resizer-Splitter": "5px",
       "cursor-resizer-horizontal-Splitter": "ew-resize",
       "cursor-resizer-vertical-Splitter": "ns-resize"
@@ -11053,7 +11061,7 @@ export default {
       "cursor-resizer-vertical-Splitter": "var(--xmlui-cursor-resizer-vertical-Splitter)"
     },
     "defaultThemeVars": {
-      "backgroundColor-resizer-Splitter": "$backgroundColor-Card",
+      "backgroundColor-resizer-Splitter": "$color-surface-100",
       "thickness-resizer-Splitter": "5px",
       "cursor-resizer-horizontal-Splitter": "ew-resize",
       "cursor-resizer-vertical-Splitter": "ns-resize"
@@ -11585,7 +11593,8 @@ export default {
       "Input:outlineWidth-Switch--focus": "var(--xmlui-outlineWidth-Switch--focus)",
       "Input:outlineColor-Switch--focus": "var(--xmlui-outlineColor-Switch--focus)",
       "Input:outlineStyle-Switch--focus": "var(--xmlui-outlineStyle-Switch--focus)",
-      "Input:outlineOffset-Switch--focus": "var(--xmlui-outlineOffset-Switch--focus)"
+      "Input:outlineOffset-Switch--focus": "var(--xmlui-outlineOffset-Switch--focus)",
+      "backgroundColor-indicator-checked-Switch": "var(--xmlui-backgroundColor-indicator-checked-Switch)"
     },
     "defaultThemeVars": {
       "borderColor-checked-Switch-error": "$borderColor-Switch-error",
@@ -11594,9 +11603,11 @@ export default {
       "backgroundColor-checked-Switch-warning": "$borderColor-Switch-warning",
       "borderColor-checked-Switch-success": "$borderColor-Switch-success",
       "backgroundColor-checked-Switch-success": "$borderColor-Switch-success",
-      "backgroundColor-Switch": "$color-surface-400",
-      "borderColor-Switch": "$color-surface-400",
-      "backgroundColor-indicator-Switch": "$backgroundColor-primary",
+      "backgroundColor-Switch": "$backgroundColor-primary",
+      "borderColor-Switch": "$color-surface-200",
+      "borderWidth-Switch": "1px",
+      "backgroundColor-indicator-Switch": "$color-surface-200",
+      "backgroundColor-indicator-checked-Switch": "$backgroundColor-primary",
       "borderColor-checked-Switch": "$color-primary-500",
       "backgroundColor-checked-Switch": "$color-primary-500",
       "backgroundColor-Switch--disabled": "$color-surface-200"

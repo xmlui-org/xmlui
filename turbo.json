@@ -17,8 +17,17 @@
       "dependsOn": ["^build:extension"],
       "outputs": ["dist/**"]
     },
+    "build:vsix": {
+      "outputs": ["xmlui-vscode-*.vsix"]
+    },
     "build:xmlui-all": {
-      "dependsOn": ["build:bin", "build:xmlui-metadata", "build:xmlui", "build:xmlui-standalone", "build:extension"],
+      "dependsOn": [
+        "build:bin",
+        "build:xmlui-metadata",
+        "build:xmlui",
+        "build:xmlui-standalone",
+        "build:extension"
+      ],
       "outputs": ["dist/**"]
     },
     "build:docs": {
