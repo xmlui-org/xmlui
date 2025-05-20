@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.9
+
+### Patch Changes
+
+- c92223c: When we launch the playground from the devtools, it now appears on a subpage instead of under the docs on a different domain.
+
 ## 0.1.8
 
 ### Patch Changes
