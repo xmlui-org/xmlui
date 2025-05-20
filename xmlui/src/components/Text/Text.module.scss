@@ -65,8 +65,6 @@ $component: "Text";
   :not(.text.codefence) > &.code,
   :not(.text.codefence) > &code {
     @include textVariant("code");
-    // --- We may add some opacity to the code element
-    // opacity: 0.75;
   }
 
   // For code blocks using <![CDATA[ + <code> tags
@@ -76,7 +74,6 @@ $component: "Text";
     // TEMP: solution for a demo - need to re-evaluate how to truncate/wrap code blocks
     overflow-x: auto;
     text-overflow: initial;
-    font-size: t.$fontSize-small;
     line-height: 1.4;
   }
 

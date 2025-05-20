@@ -5,11 +5,11 @@
 
 AppState is a functional component (without a visible user interface) that helps store and manage the app's state.
 
-## Using AppState
+## Using AppState [#using-appstate]
 
 Variables in xmlui are a straightforward tool for managing states. However, a variable's scope is the app's main file or the particular component file in which it is declared. To access the variable's value (the stored state), you must pass its value to components wanting to leverage it.
 
-### Storing State in Variables
+### Storing State in Variables [#storing-state-in-variables]
 
 In the following example, the main file of the app declares a variable, `enhancedMode`, which is toggled with a checkbox:
 
@@ -42,7 +42,7 @@ When you define an `AppState`, you can set its `initialValue` property to initia
 You can try how this app works:
 ```
 
-### Storing State in AppState
+### Storing State in AppState [#storing-state-in-appstate]
 
 What if `Component1` and `Component2` had nested components using `enhancedMode`? You must also pass them to the nested components (via properties). What if you have not only one but a dozen of similar properties and a long chain of nested components? The "use a variable" pattern soon becomes a state management nightmare.
 
@@ -84,7 +84,7 @@ The components may use their own `AppState` object to access the state value:
 The modified app works the same way as the previous one (using variables):
 ```
 
-### State Buckets
+### State Buckets [#state-buckets]
 
 With the `AppState` component, you can use separate state objects. The `bucket` property of `AppState` is an identifier (using the "default" string by default). While multiple `AppState` objects use the same `bucket` property value, they refer to the same state object.
 
@@ -101,23 +101,23 @@ If you want to run the sample with explicit state buckets (for example, with the
 <AppState id="state" bucket="settings" />
 ```
 
-## Properties
+## Properties [#properties]
 
-### `bucket (default: "default")`
+### `bucket (default: "default")` [#bucket-default-default]
 
 This property is the identifier of the bucket to which the `AppState` instance is bound. Multiple `AppState` instances with the same bucket will share the same state object: any of them updating the state will cause the other instances to view the new, updated state.
 
-### `initialValue`
+### `initialValue` [#initialvalue]
 
 This property contains the initial state value. Though you can use multiple `AppState`component instances for the same bucket with their `initialValue` set, it may result in faulty app logic. When xmlui instantiates an `AppState` with an explicit initial value, that value is immediately set. Multiple initial values may result in undesired initialization.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `update`
+### `update` [#update]
 
 This method updates the application state object bound to the `AppState` instance. The function's single argument is an object that specifies the new state value.
 
@@ -151,6 +151,6 @@ The new state value will be:
 }
 ```
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

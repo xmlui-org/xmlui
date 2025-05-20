@@ -7,13 +7,13 @@ The component provides context values with which you can access some internal pr
 - `$param`: This value represents the first parameters passed to the `execute()` method to display the modal dialog.
 - `$params`: This value represents the array of parameters passed to the `execute()` method. You can use `$params[0]` to access the first and `$params[1]` to access the second (and so on) parameters. `$param` is the same as `$params[0]`.
 
-## Properties
+## Properties [#properties]
 
-### `body`
+### `body` [#body]
 
 This property sets the request body. The object you pass here will be serialized to JSON when sending the request. Use the `rawBody` property to send another request body using its native format. When you define `body` and `rawBody`, the latest one prevails.
 
-### `completedNotificationMessage`
+### `completedNotificationMessage` [#completednotificationmessage]
 
 This property defines the message to display automatically when the operation has been completed.
 
@@ -27,19 +27,19 @@ This property customizes the success message displayed in a toast after the fini
   completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
 ```
 
-### `confirmButtonLabel`
+### `confirmButtonLabel` [#confirmbuttonlabel]
 
 This optional string property enables the customization of the submit button in the confirmation dialog that is displayed before the `APICall` is executed.
 
-### `confirmMessage`
+### `confirmMessage` [#confirmmessage]
 
 This optional string sets the message in the confirmation dialog that is displayed before the `APICall` is executed.
 
-### `confirmTitle`
+### `confirmTitle` [#confirmtitle]
 
 This optional string sets the title in the confirmation dialog that is displayed before the `APICall` is executed.
 
-### `errorNotificationMessage`
+### `errorNotificationMessage` [#errornotificationmessage]
 
 This property defines the message to display automatically when the operation results in an error.
 
@@ -53,52 +53,52 @@ This property customizes the message displayed in a toast when the API invocatio
   errorNotificationMessage="${error.statusCode}, {JSON.stringify($error.details)}" />
 ```
 
-### `headers`
+### `headers` [#headers]
 
 You can define request header values as key and value pairs, where the key is the ID of the particular header and the value is that header's value.
 
-### `inProgressNotificationMessage`
+### `inProgressNotificationMessage` [#inprogressnotificationmessage]
 
 This property customizes the message that is displayed in a toast while the API operation is in progress.
 
-### `method (default: "get")`
+### `method (default: "get")` [#method-default-get]
 
 The method of data manipulation can be done via setting this property.
 
 Available values: `get` **(default)**, `post`, `put`, `delete`, `patch`, `head`, `options`, `trace`, `connect`
 
-### `queryParams`
+### `queryParams` [#queryparams]
 
 This property sets the query parameters for the request. The object you pass here will be serialized to a query string and appended to the request URL. You can specify key and value pairs where the key is the name of a particular query parameter and the value is that parameter's value.
 
-### `rawBody`
+### `rawBody` [#rawbody]
 
 This property sets the request body to the value provided here without any conversion. Use the * `body` property if you want the object sent in JSON. When you define `body` and `rawBody`, the latest one prevails.
 
-### `url (required)`
+### `url (required)` [#url-required]
 
 Use this property to set the URL to send data to.
 
-## Events
+## Events [#events]
 
-### `beforeRequest`
+### `beforeRequest` [#beforerequest]
 
 This event fires before the request is sent. Returning an explicit boolean`false` value will prevent the request from being sent.
 
-### `error`
+### `error` [#error]
 
 This event fires when a request results in an error.
 
-### `success`
+### `success` [#success]
 
 This event fires when a request results in a success.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `execute`
+### `execute` [#execute]
 
 This method triggers the invocation of the API. You can pass an arbitrary number of parameters to the method. In the `APICall` instance, you can access those with the `$param` and `$params` context values.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

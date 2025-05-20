@@ -2,9 +2,9 @@
 
 The `NavLink` component defines a navigation target (app navigation menu item) within the app; it is associated with a particular in-app navigation target (or an external link).
 
-## Using NavLink
+## Using NavLink [#using-navlink]
 
-### `NavLink` Appearance
+### `NavLink` Appearance [#navlink-appearance]
 
 You can use the `label` and `icon` properties of a `NavLink` to set its text and icon to display.
 If you want a custom appearance, you can nest define custom visuals for the `NavLink` by nesting:
@@ -31,7 +31,7 @@ If you want a custom appearance, you can nest define custom visuals for the `Nav
 </App>
 ```
 
-### Actions
+### Actions [#actions]
 
 By default, activating (clicking) a link navigates to the target URL.
 However, you can create a link that executes an explicit action responding to the `click` event instead of the default navigation:
@@ -51,13 +51,13 @@ However, you can create a link that executes an explicit action responding to th
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `active (default: false)`
+### `active (default: false)` [#active-default-false]
 
 This property indicates if the particular navigation is an active link. An active link has a particular visual appearance, provided its [`displayActive`](#displayactive) property is set to `true`.
 
-### `displayActive (default: true)`
+### `displayActive (default: true)` [#displayactive-default-true]
 
 This Boolean property indicates if the active state of a link should have a visual indication. Setting it to `false` removes the visual indication of an active link.
 
@@ -72,7 +72,7 @@ This Boolean property indicates if the active state of a link should have a visu
 </App>
 ```
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -96,7 +96,7 @@ In the following app, the "Hotels" link is disabled:
 </App>
 ```
 
-### `icon`
+### `icon` [#icon]
 
 This property allows you to add an icon (specify the icon's name) to the navigation link.
 
@@ -116,7 +116,7 @@ This property allows you to add an icon (specify the icon's name) to the navigat
 </App>
 ```
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
@@ -131,7 +131,7 @@ This property sets the label of the component.
 </App>
 ```
 
-### `target (default: "_self")`
+### `target (default: "_self")` [#target-default-self]
 
 This property specifies how to open the clicked link.
 
@@ -163,11 +163,11 @@ The following example opens the "About XMLUI" link in a new tab:
 </App>
 ```
 
-### `to`
+### `to` [#to]
 
 This property defines the URL of the link.
 
-### `vertical (default: false)`
+### `vertical (default: false)` [#vertical-default-false]
 
 This property sets how the active status is displayed on the `NavLink` component. If set to true, the indicator is displayed on the side which lends itself to a vertically aligned navigation menu.
 
@@ -188,9 +188,9 @@ The default value for this property is `false`.
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `click`
+### `click` [#click]
 
 This event is triggered when the NavLink is clicked.
 
@@ -215,13 +215,13 @@ The following example shows a message and navigates to the "/status" link after 
 </App>
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
@@ -295,7 +295,7 @@ This component does not expose any methods.
 | [thickness](../styles-and-themes/common-units/#size)-indicator-NavLink | $space-0_5 | $space-0_5 |
 | wordWrap-NavLink | *none* | *none* |
 
-### Variable Explanations
+### Variable Explanations [#variable-explanations]
 
 | Theme Variable | Description |
 | --- | --- |

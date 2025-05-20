@@ -24,9 +24,9 @@ For the shorthand versions see their reference page: [H1](./H1), [H2](./H2), [H3
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `ellipses (default: true)`
+### `ellipses (default: true)` [#ellipses-default-true]
 
 This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).
 
@@ -48,7 +48,7 @@ This property indicates whether ellipses should be displayed (`true`) when the h
 </App>
 ```
 
-### `level (default: "h1")`
+### `level (default: "h1")` [#level-default-h1]
 
 This property sets the visual significance (level) of the heading.
 
@@ -65,7 +65,7 @@ Available values: `h1` **(default)**, `h2`, `h3`, `h4`, `h5`, `h6`
 
 For a visual example, see the component description.
 
-### `maxLines`
+### `maxLines` [#maxlines]
 
 This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified.
 
@@ -78,11 +78,11 @@ This property determines the maximum number of lines the component can wrap to. 
 </App>
 ```
 
-### `omitFromToc (default: false)`
+### `omitFromToc (default: false)` [#omitfromtoc-default-false]
 
 If true, this heading will be excluded from the table of contents.
 
-### `preserveLinebreaks`
+### `preserveLinebreaks` [#preservelinebreaks]
 
 This property indicates whether linebreaks should be preserved when displaying text.
 
@@ -113,7 +113,7 @@ You can observe the effect of using `preserveLinebreaks`:
 > Remember to use the `value` property of `Heading`.
 > Linebreaks are converted to spaces when nesting the text in the `Heading` component.
 
-### `value`
+### `value` [#value]
 
 This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.
 
@@ -125,17 +125,17 @@ This property determines the text displayed in the heading. `Heading` also accep
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

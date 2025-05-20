@@ -5,18 +5,18 @@
 
 See the \`FlowLayout\` reference documentation for details on sizing children.
 
-## Properties
+## Properties [#properties]
 
 This component does not have any properties.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

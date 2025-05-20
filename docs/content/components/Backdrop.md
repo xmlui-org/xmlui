@@ -17,28 +17,28 @@ The `Backdrop` component is a semi-transparent overlay that appears on top of it
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `backgroundColor (default: "black")`
+### `backgroundColor (default: "black")` [#backgroundcolor-default-black]
 
 The background color of the backdrop.
 
-### `opacity (default: 0.1)`
+### `opacity (default: 0.1)` [#opacity-default-0-1]
 
 The opacity of the backdrop.
 
-### `overlayTemplate`
+### `overlayTemplate` [#overlaytemplate]
 
 This property defines the component template for an optional overlay to display over the component.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

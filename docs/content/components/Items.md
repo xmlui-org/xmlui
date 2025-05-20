@@ -9,7 +9,7 @@ The component provides context values with which you can access some internal pr
 - `$item`: This value represents the current iteration item while the component renders its children.
 - `$itemIndex`: This integer value represents the current iteration index (zero-based) while rendering children.
 
-## Use children as Content Template
+## Use children as Content Template [#use-children-as-content-template]
 
 The [itemTemplate](#itemtemplate) property can be replaced by setting the item template component directly as the Items's child.
 In the following example, the two Items are functionally the same:
@@ -29,28 +29,28 @@ In the following example, the two Items are functionally the same:
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `data`
+### `data` [#data]
 
 This property contains the list of data items (obtained from a data source) this component renders.
 
-### `itemTemplate`
+### `itemTemplate` [#itemtemplate]
 
 The component template to display a single item
 
-### `reverse`
+### `reverse` [#reverse]
 
 This property reverses the order in which data is mapped to template components.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

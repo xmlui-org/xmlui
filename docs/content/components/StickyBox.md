@@ -3,9 +3,9 @@
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls.
 
-## Properties
+## Properties [#properties]
 
-### `to (default: "top")`
+### `to (default: "top")` [#to-default-top]
 
 This property determines whether the StickyBox should be anchored to the `top` or `bottom`.
 
@@ -22,17 +22,17 @@ Available values: `top` **(default)**, `bottom`
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

@@ -2,9 +2,9 @@
 
 The `Badge` is a text label that accepts a color map to define its background color and, optionally, its label color.
 
-## Properties
+## Properties [#properties]
 
-### `colorMap`
+### `colorMap` [#colormap]
 
 The `Badge` component supports the mapping of a list of colors using the `value` prop as the key. Provide the component with a list or key-value pairs in two ways:
 
@@ -30,7 +30,7 @@ The `Badge` component supports the mapping of a list of colors using the `value`
 </App>
 ```
 
-### `value (required)`
+### `value (required)` [#value-required]
 
 The text that the component displays
 
@@ -40,7 +40,7 @@ The text that the component displays
 </App>  
 ```
 
-### `variant (default: "badge")`
+### `variant (default: "badge")` [#variant-default-badge]
 
 Modifies the shape of the component. Comes in the regular `badge` variant or the `pill` variant with fully rounded corners.
 
@@ -53,17 +53,17 @@ Available values: `badge` **(default)**, `pill`
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

@@ -7,7 +7,7 @@ The component provides context values with which you can access some internal pr
 
 - `$item`: This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option.
 
-## Using AutoComplete
+## Using AutoComplete [#using-autocomplete]
 
 ```xmlui-pg copy display height="200px" name="Example: Using AutoComplete"
 <App>
@@ -19,17 +19,17 @@ The component provides context values with which you can access some internal pr
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `dropdownHeight`
+### `dropdownHeight` [#dropdownheight]
 
 This property sets the height of the dropdown list.
 
-### `emptyListTemplate`
+### `emptyListTemplate` [#emptylisttemplate]
 
 This property defines the template to display when the list of options is empty.
 
@@ -43,23 +43,23 @@ This property defines the template to display when the list of options is empty.
 </App>
 ```
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-### `initialValue`
+### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-### `labelBreak (default: false)`
+### `labelBreak (default: false)` [#labelbreak-default-false]
 
 This boolean value indicates if the `AutoComplete` labels can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")`
+### `labelPosition (default: "top")` [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -72,15 +72,15 @@ Available values:
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
 
-### `labelWidth`
+### `labelWidth` [#labelwidth]
 
 This property sets the width of the `AutoComplete`.
 
-### `maxLength`
+### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input it accepts.
 
-### `multi (default: false)`
+### `multi (default: false)` [#multi-default-false]
 
 The `true` value of the property indicates if the user can select multiple items.
 
@@ -96,7 +96,7 @@ The `true` value of the property indicates if the user can select multiple items
     </App>
 ```
 
-### `optionTemplate`
+### `optionTemplate` [#optiontemplate]
 
 This property enables the customization of list items. To access the attributes of a list item use the `$item` context variable.
 
@@ -113,19 +113,19 @@ This property enables the customization of list items. To access the attributes 
 </App>
 ```
 
-### `placeholder`
+### `placeholder` [#placeholder]
 
 A placeholder text that is visible in the input field when its empty.
 
-### `readOnly (default: false)`
+### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required`
+### `required` [#required]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")`
+### `validationStatus (default: "none")` [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -137,37 +137,37 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-## Events
+## Events [#events]
 
-### `didChange`
+### `didChange` [#didchange]
 
 This event is triggered when value of AutoComplete has changed.
 
-### `gotFocus`
+### `gotFocus` [#gotfocus]
 
 This event is triggered when the AutoComplete has received the focus.
 
-### `lostFocus`
+### `lostFocus` [#lostfocus]
 
 This event is triggered when the AutoComplete has lost the focus.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `focus`
+### `focus` [#focus]
 
 This method sets the focus on the AutoComplete.
 
-### `setValue`
+### `setValue` [#setvalue]
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-### `value`
+### `value` [#value]
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

@@ -3,27 +3,27 @@
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position.
 
-## Properties
+## Properties [#properties]
 
-### `maxHeadingLevel (default: "6")`
+### `maxHeadingLevel (default: "6")` [#maxheadinglevel-default-6]
 
 Defines the maximum heading level (1 to 6) to include in the table of contents. For example, if it is 2, then `H1` and `H2` are displayed, but lower levels (`H3` to `H6`) are not.
 
-### `smoothScrolling (default: "false")`
+### `smoothScrolling (default: "false")` [#smoothscrolling-default-false]
 
 This property indicates that smooth scrolling is used while scrolling the selected table of contents items into view.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

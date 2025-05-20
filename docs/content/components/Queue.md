@@ -10,7 +10,7 @@ The component provides context values with which you can access some internal pr
 - `$completedItems`: A list containing the queue items that have been completed (fully processed).
 - `$queuedItems`: A list containing the items waiting in the queue, icluding the completed items.
 
-## Using Queue
+## Using Queue [#using-queue]
 
 As its name suggests, the `Queue` component keeps a queue of items to process. You can add items to the queue with the `enqueueItem` (or `enqueueItems`) method. Once the queue has some items to process, the engine reads them one by one (in FIFO order) and processes an item with the `process` event handler.
 Though `Queue` is a non-visual component, it can render UI for reporting progress through its `progressFeedback` property. Also, when the queue gets empty, the UI can render a result summary through the `resultFeedback` property.
@@ -55,23 +55,23 @@ A `ChangeListener` instance observes queue length changes and stores the actual 
 
 Try the app by clicking the button several times. Check how the queue processes the items and displays feedback.
 
-## Properties
+## Properties [#properties]
 
-### `clearAfterFinish`
+### `clearAfterFinish` [#clearafterfinish]
 
 This property indicates the completed items (successful or error) should be removed from the queue after completion.
 
-### `progressFeedback`
+### `progressFeedback` [#progressfeedback]
 
 This property defines the component template of the UI that displays progress information whenever, the queue's `progressReport` function in invoked.
 
-### `resultFeedback`
+### `resultFeedback` [#resultfeedback]
 
 This property defines the component template of the UI that displays result information when the queue becomes empty after processing all queued items.
 
-## Events
+## Events [#events]
 
-### `complete`
+### `complete` [#complete]
 
 The queue fires this event when the queue gets empty after processing all items. The event handler has no arguments.
 
@@ -104,7 +104,7 @@ The following sample displays a tick mark every time the queue is emptied:
 </App>
 ```
 
-### `didProcess`
+### `didProcess` [#didprocess]
 
 This event is fired when the processing of a queued item has been successfully processed.
 
@@ -139,7 +139,7 @@ The following sample uses the `didProcess` event handler to add a tick symbol to
 </App>
 ```
 
-### `process`
+### `process` [#process]
 
 This event is fired to process the next item in the queue. If the processing cannot proceed because of some error, raise an exception, and the queue will handle that.
 
@@ -151,7 +151,7 @@ The parameter of the event handler is an object with these properties:
 
 See the example in the [Using Queue](#using-queue) section.
 
-### `processError`
+### `processError` [#processerror]
 
 This event is fired when processing an item raises an error. The event handler method receives two parameters. The first is the error raised during the processing of the item; the second is an object with these properties:
 
@@ -194,7 +194,7 @@ The following sample generates an error for every fourth item, and gives an erro
 Click the button several times to see how processing errors are handled in the UI.
 ```
 
-### `willProcess`
+### `willProcess` [#willprocess]
 
 This event is triggered to process a particular item.
 
@@ -234,9 +234,9 @@ The following sample declares a `willProcess` event handler that will skip proce
 Click the button several times and see how the number of skipped items increments.
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `enqueueItem`
+### `enqueueItem` [#enqueueitem]
 
 This method enqueues the item passed in the method parameter. The new item will be processed after the current queue items have been handled. The method retrieves the unique ID of the newly added item; this ID can be used later in other methods, such as `remove`.
 
@@ -256,15 +256,15 @@ The following example stores and displays this item when a new item is put into 
 </App>
 ```
 
-### `enqueueItems`
+### `enqueueItems` [#enqueueitems]
 
 This method enqueues the array of items passed in the method parameter. The new items will be processed after the current queue items have been handled. The method retrieves an array of unique IDs, one for each new item. An item ID can be used later in other methods, such as `remove`.
 
-### `getQueueLength`
+### `getQueueLength` [#getqueuelength]
 
 This method retrieves the current queue length. The queue contains only those items that are not fully processed yet.
 
-### `getQueuedItems`
+### `getQueuedItems` [#getqueueditems]
 
 You can use this method to return the items in the queue. These items contain all entries not removed from the queue yet, including pending, in-progress, and completed items.
 
@@ -278,7 +278,7 @@ This method returns the items currently in the queue with their entire context. 
 
 > **Note**: When all items are processed, the queue removes the items and fires the `complete` event. When the event handler runs, the queue is empty, and `getQueuedItems` returns an empty list.
 
-### `remove`
+### `remove` [#remove]
 
 This method retrieves the current queue length. The queue contains only those items that are not fully processed yet.
 
@@ -323,6 +323,6 @@ The following example emulates a file-processing application. When a file is abo
 </App>
 ```
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

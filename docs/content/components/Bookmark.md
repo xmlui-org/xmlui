@@ -5,14 +5,14 @@ As its name suggests, this component places a bookmark into its parent component
 >[!INFO]
 > Pop out the examples in this article to view them on full screen.
 
-## Using Bookmark
+## Using Bookmark [#using-bookmark]
 
 Use `Bookmark` as a standalone tag or wrap children with it.
 
 >[!INFO]
 > We suggest using a standalone bookmark, which does not increase the nesting depth.
 
-### Standalone
+### Standalone [#standalone]
 
 Add an `id` property to `Bookmark` instances and use the same identifiers in links with hash tags, as the following example shows:
 
@@ -39,7 +39,7 @@ Add an `id` property to `Bookmark` instances and use the same identifiers in lin
 Clicking a link scrolls the bookmarked component adjacent to the corresponding `Bookmark` tag into the view:
 ```
 
-### With nested children
+### With nested children [#with-nested-children]
 
 Alternatively, you can nest components into `Bookmark`:
 
@@ -69,32 +69,32 @@ Alternatively, you can nest components into `Bookmark`:
 You can try; this example works like the previous one:
 ```
 
-## Properties
+## Properties [#properties]
 
-### `level (default: 1)`
+### `level (default: 1)` [#level-default-1]
 
 The level of the bookmark. The level is used to determine the bookmark's position in the table of contents.
 
-### `omitFromToc (default: false)`
+### `omitFromToc (default: false)` [#omitfromtoc-default-false]
 
 If true, this bookmark will be excluded from the table of contents.
 
-### `title`
+### `title` [#title]
 
 Defines the text to display the bookmark in the table of contents. If this property is empty, the text falls back to the value of `id`.
 
-### `uid`
+### `uid` [#uid]
 
 The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

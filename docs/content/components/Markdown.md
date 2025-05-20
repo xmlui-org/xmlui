@@ -2,7 +2,7 @@
 
 `Markdown` displays plain text styled using markdown syntax.
 
-## Using Markdown
+## Using Markdown [#using-markdown]
 
 The `Markdown` component allows you to specify its textual content in two ways:
 - You can leverage the `content` property. Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
@@ -16,9 +16,9 @@ Indentation is also essential in Markdown. Start the markdown text in the first 
 <App layout="horizontal-sticky">
   <Markdown>
     <![CDATA[
-# My Adventure in Markdown Land
+# My Adventure in Markdown Land [#my-adventure-in-markdown-land]
 
-## The Beginning
+## The Beginning [#the-beginning]
 
 In the bustling city of Markdownville, I embarked on a journey to discover the 
 secrets of Markdown. My adventure started in the heart of the city, where the 
@@ -32,7 +32,7 @@ is just enough**.
 
 If not bold, then simply *italic letters give visual diversity*.
 
-## Exploring Blockquotes
+## Exploring Blockquotes [#exploring-blockquotes]
 
 As I journeyed further, I encountered blockquotes that spoke of the beauty of 
 simplicity:
@@ -41,7 +41,7 @@ simplicity:
 > the paragraphs.
 > > Like so
 
-## The Power of Lists
+## The Power of Lists [#the-power-of-lists]
 
 I also discovered the power of lists, which were as versatile as the inhabitants 
 of Markdownville:
@@ -57,21 +57,21 @@ I found that I can create ordered lists as well:
 2. The second item.
 3. Third item.
 
-## The Image
+## The Image [#the-image]
 
 Text is not the only thing I found through my journey. The power of images 
 materialized in front of me:
 
 ![Colors image](/resources/images/components/markdown/colors.png)
 
-## Navigating with Hyperlinks
+## Navigating with Hyperlinks [#navigating-with-hyperlinks]
 
 Hyperlinks, like signposts, marked other paths that branched off from the road 
 I was treading:
 - [Source of all truth](https://github.com/xmlui-com/xmlui)
 - [Back to where we started](https://ncrm.azurewebsites.net/)
 
-## The Horizontal Rule
+## The Horizontal Rule [#the-horizontal-rule]
 
 In the quiet corners of Markdownville, I found the Horizontal Rule, a line that 
 symbolizes the end of a section:
@@ -106,7 +106,7 @@ These are also found in the **Basic Syntax** table of [this markdown guide](http
 Note that further components may be added later,
 like elements from the [Github Flavored Markdown or GFM syntax](https://github.github.com/gfm/).
 
-## Binding Expressions
+## Binding Expressions [#binding-expressions]
 
 Our `Markdown` component is capable of evaluating binding expressions just as other XMLUI components.
 Use the `@{}` syntax to wrap expressions that need to be evaluated.
@@ -130,9 +130,9 @@ Function calls are executed: @{x()}
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `content`
+### `content` [#content]
 
 This property sets the markdown content to display.
 
@@ -152,7 +152,7 @@ Use this property when the text you provide is not static but a result of calcul
 </App>
 ```
 
-### `removeIndents (default: true)`
+### `removeIndents (default: true)` [#removeindents-default-true]
 
 This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.
 
@@ -172,15 +172,15 @@ This boolean property specifies whether leading indents should be removed from t
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 The component itself cannot be styled.
 
@@ -201,7 +201,7 @@ Or they are components specifically created and used in the Markdown component.
 
 These markdown-specific components are the following:
 
-### Blockquote
+### Blockquote [#blockquote]
 
 A blockquote is a sentence or paragraph specially formatted to draw attention to the reader. You can use the following theme variables with blockquotes:
 
@@ -234,7 +234,7 @@ A blockquote is a sentence or paragraph specially formatted to draw attention to
 </App>
 ```
 
-### HorizontalRule
+### HorizontalRule [#horizontalrule]
 
 This element visually separates content. The following theme variables influence how the rule looks like:
 
@@ -265,7 +265,7 @@ Section 2
 >[!INFO]
 > The `HorizontalRule` component looks similar to the `ContentSeparator` component. They are not the same and are styled separately.
 
-### ListItem
+### ListItem [#listitem]
 
 These are the supported theme variables in an ordered or unordered list:
 
@@ -286,7 +286,7 @@ These are the supported theme variables in an ordered or unordered list:
 </App>
 ```
 
-### OrderedList
+### OrderedList [#orderedlist]
 
 This element represents an ordered list with Arabic numbers as markers.
 Lists can be nested into one another; the counter will start anew if nested. Ordered lists support these theme variables:
@@ -308,7 +308,7 @@ Lists can be nested into one another; the counter will start anew if nested. Ord
 </App>
 ```
 
-### UnorderedList
+### UnorderedList [#unorderedlist]
 
 This element represents an unordered list with marker symbols. Lists can be nested into one another; different levels of nested lists will have different markers. These are the theme variables unordered lists support:
 
@@ -333,7 +333,7 @@ This element represents an unordered list with marker symbols. Lists can be nest
 </App>
 ```
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

@@ -2,7 +2,7 @@
 
 The `DataSource` component manages fetching data from an API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component.
 
-## Structural Sharing
+## Structural Sharing [#structural-sharing]
 
 `DataSource` uses a technique called "structural sharing" to ensure that as many data references as possible will be kept intact and not cause extra UI refresh. If data is fetched from an API endpoint, you'll usually get a completely new reference by json parsing the response. However, `DataSource` will keep the original reference if *nothing* has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts.
 
@@ -10,13 +10,13 @@ When you initiate the refetching of data (e.g., with the `refetch` method or set
 
 By default, structural sharing is turned on. If you do not need this behavior, set the `structuralSharing` property to `false`.
 
-## Properties
+## Properties [#properties]
 
-### `body`
+### `body` [#body]
 
 Set the request body. The object you pass is serialized as a JSON string.
 
-### `completedNotificationMessage`
+### `completedNotificationMessage` [#completednotificationmessage]
 
 Set the message to display when the data fetch completes.
 
@@ -29,7 +29,7 @@ This property customizes the success message displayed in a toast after the fini
   completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
 ```
 
-### `errorNotificationMessage`
+### `errorNotificationMessage` [#errornotificationmessage]
 
 Set the message to display when the there is an error.
 
@@ -43,45 +43,45 @@ This property customizes the message displayed in a toast when the API invocatio
   errorNotificationMessage="${error.statusCode}, {JSON.stringify($error.details)}" />
 ```
 
-### `headers`
+### `headers` [#headers]
 
 Set request headers. Pass an object whose keys are header names and values are header values.
 
-### `id (required)`
+### `id (required)` [#id-required]
 
 Set the ID used by other components to access the retrieved data in the `value`property of a `DataSource`, or status info in the `loaded` and `error` properties.
 
-### `inProgressNotificationMessage`
+### `inProgressNotificationMessage` [#inprogressnotificationmessage]
 
 Set the message to display when the data fetch is in progress.
 
-### `method (default: "get")`
+### `method (default: "get")` [#method-default-get]
 
 Set the HTTP method.
 
 Available values: `get` **(default)**, `post`, `put`, `delete`, `patch`, `head`, `options`, `trace`, `connect`
 
-### `nextPageSelector`
+### `nextPageSelector` [#nextpageselector]
 
 When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the next page information from the response deserialized to an object.
 
-### `pollIntervalInSeconds`
+### `pollIntervalInSeconds` [#pollintervalinseconds]
 
 Set the interval for periodic data fetching. If the data changes on refresh, XMLUI will re-render components that refer directly or indirectly to the `DataSource`. 
 
-### `prevPageSelector`
+### `prevPageSelector` [#prevpageselector]
 
 When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the previous page information from the response deserialized to an object.
 
-### `queryParams`
+### `queryParams` [#queryparams]
 
 Append key/value pairs to the URL.
 
-### `rawBody`
+### `rawBody` [#rawbody]
 
 Set the request body with no serialization. Use it to send a payload  that has already been serialized to a JSON string.
 
-### `resultSelector`
+### `resultSelector` [#resultselector]
 
 Set an object key to extract a subset of the response data.
 
@@ -182,50 +182,50 @@ This `Table` uses the filtered array.
 </Table>
 ```
 
-### `structuralSharing (default: "true")`
+### `structuralSharing (default: "true")` [#structuralsharing-default-true]
 
 This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.
 
-### `transformResult`
+### `transformResult` [#transformresult]
 
 Set a function to perform a final transformation of the response data.
 
-### `url (required)`
+### `url (required)` [#url-required]
 
 Set the URL.
 
-## Events
+## Events [#events]
 
-### `error`
+### `error` [#error]
 
 This event fires when a request results in an error.
 
-### `loaded`
+### `loaded` [#loaded]
 
 The component triggers this event when the fetch operation has been completed and the data is loaded. The event has two arguments. The first is the data loaded; the second indicates if the event is a result of a refetch.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `inProgress`
+### `inProgress` [#inprogress]
 
 This property indicates if the data is being fetched.
 
-### `isRefetching`
+### `isRefetching` [#isrefetching]
 
 This property indicates if the data is being re-fetched.
 
-### `loaded`
+### `loaded` [#loaded]
 
 This property indicates if the data has been loaded.
 
-### `refetch`
+### `refetch` [#refetch]
 
 This method requests the re-fetch of the data.
 
-### `value`
+### `value` [#value]
 
 This property retrieves the data queried from the source after optional transformations.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

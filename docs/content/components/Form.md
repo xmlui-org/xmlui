@@ -9,9 +9,9 @@ The component provides context values with which you can access some internal pr
 
 You can learn more about this component in the [Using Forms](/learning/using-components/forms/) article.
 
-## Properties
+## Properties [#properties]
 
-### `buttonRowTemplate`
+### `buttonRowTemplate` [#buttonrowtemplate]
 
 This property allows defining a custom component to display the buttons at the bottom of the form.
 
@@ -44,23 +44,23 @@ The following example demonstrates using it:
 This example mimics a one-second search and turns off the submit button during the operation. Also, it adds a Test Search Server button:
 ```
 
-### `cancelLabel (default: "Cancel")`
+### `cancelLabel (default: "Cancel")` [#cancellabel-default-cancel]
 
 This property defines the label of the Cancel button.
 
-### `data`
+### `data` [#data]
 
 This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form.
 
-### `enabled`
+### `enabled` [#enabled]
 
 Whether the form is enabled or not. The default value is `true`.
 
-### `itemLabelBreak (default: true)`
+### `itemLabelBreak (default: true)` [#itemlabelbreak-default-true]
 
 This boolean value indicates if form item labels can be split into multiple lines if it would overflow the available label width. Individual `FormItem` instances can override this property.
 
-### `itemLabelPosition (default: "top")`
+### `itemLabelPosition (default: "top")` [#itemlabelposition-default-top]
 
 This property sets the position of the item labels within the form.Individual `FormItem` instances can override this property.
 
@@ -73,45 +73,45 @@ Available values:
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
 
-### `itemLabelWidth`
+### `itemLabelWidth` [#itemlabelwidth]
 
 This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property.
 
-### `keepModalOpenOnSubmit (default: false)`
+### `keepModalOpenOnSubmit (default: false)` [#keepmodalopenonsubmit-default-false]
 
 This property prevents the modal from closing when the form is submitted.
 
-### `saveInProgressLabel (default: "Saving...")`
+### `saveInProgressLabel (default: "Saving...")` [#saveinprogresslabel-default-saving-]
 
 This property defines the label of the Save button to display during the form data submit (save) operation.
 
-### `saveLabel (default: "Save")`
+### `saveLabel (default: "Save")` [#savelabel-default-save]
 
 This property defines the label of the Save button.
 
-### `submitMethod`
+### `submitMethod` [#submitmethod]
 
 This property sets the HTTP method to use when submitting the form data. If not defined, `put` is used when the form has initial data; otherwise, `post`.
 
-### `submitUrl`
+### `submitUrl` [#submiturl]
 
 URL to submit the form data.
 
-### `swapCancelAndSave`
+### `swapCancelAndSave` [#swapcancelandsave]
 
 By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
 
-## Events
+## Events [#events]
 
-### `cancel`
+### `cancel` [#cancel]
 
 The form infrastructure fires this event when the form is canceled.
 
-### `reset`
+### `reset` [#reset]
 
 The form infrastructure fires this event when the form is reset.
 
-### `submit`
+### `submit` [#submit]
 
 The form infrastructure fires this event when the form is submitted. The event argument is the current `data` value to save.
 
@@ -129,13 +129,13 @@ The form infrastructure fires this event when the form is submitted. The event a
 </App>  
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `reset`
+### `reset` [#reset]
 
 Call this event to reset the form to its initial state.
 
-### `update`
+### `update` [#update]
 
 You can pass a data object to update the form data. The properties in the passed data object are updated to their values accordingly. Other form properties remain intact.
 
@@ -164,9 +164,9 @@ This method updates the form data with the change passed in its parameter. The p
 </App>  
 ```
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

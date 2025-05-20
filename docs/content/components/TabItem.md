@@ -2,20 +2,20 @@
 
 `TabItem` is a non-visual component describing a tab. Tabs component may use nested TabItem instances from which the user can select.
 
-## Properties
+## Properties [#properties]
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

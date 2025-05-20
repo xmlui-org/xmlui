@@ -8,15 +8,15 @@ The `NumberBox` is an input control component and is often used in forms. See th
 >[!INFO]
 > You can paste characters copied to the clipboard into a `NumberBox` only if the content with the pasted character results in a valid integer of float number (according to the `integersOnly` value). Otherwise, the paste operation is ignored.
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 If this boolean prop is set to true, the `NumberBox` input will be focused when appearing on the UI.
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -28,7 +28,7 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
 </App>
 ```
 
-### `endIcon`
+### `endIcon` [#endicon]
 
 This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
@@ -48,7 +48,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 </App>
 ```
 
-### `endText`
+### `endText` [#endtext]
 
 This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
@@ -68,11 +68,11 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 </App>
 ```
 
-### `gap`
+### `gap` [#gap]
 
 This property defines the gap between the adornments and the input area.
 
-### `hasSpinBox (default: true)`
+### `hasSpinBox (default: true)` [#hasspinbox-default-true]
 
 This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.
 
@@ -83,7 +83,7 @@ This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the 
 </App>
 ```
 
-### `initialValue`
+### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
 
@@ -95,7 +95,7 @@ The initial value displayed in the input field.
 </App>
 ```
 
-### `integersOnly (default: false)`
+### `integersOnly (default: false)` [#integersonly-default-false]
 
 This boolean property signs whether the input field accepts integers only (`true`) or not (`false`).
 
@@ -106,15 +106,15 @@ This boolean property signs whether the input field accepts integers only (`true
 </App>
 ```
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-### `labelBreak (default: false)`
+### `labelBreak (default: false)` [#labelbreak-default-false]
 
 This boolean value indicates if the `NumberBox` labels can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")`
+### `labelPosition (default: "top")` [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -127,15 +127,15 @@ Available values:
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
 
-### `labelWidth`
+### `labelWidth` [#labelwidth]
 
 This property sets the width of the `NumberBox`.
 
-### `maxLength`
+### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input it accepts.
 
-### `maxValue`
+### `maxValue` [#maxvalue]
 
 The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.
 
@@ -151,7 +151,7 @@ Try to enter a bigger value into the input field below than the maximum allowed.
 </App>
 ```
 
-### `minValue`
+### `minValue` [#minvalue]
 
 The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.
 
@@ -163,7 +163,7 @@ Try to enter a bigger value into the input field below than the minimum allowed.
 </App>
 ```
 
-### `placeholder`
+### `placeholder` [#placeholder]
 
 A placeholder text that is visible in the input field when its empty.
 
@@ -175,7 +175,7 @@ A placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly (default: false)`
+### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -187,11 +187,11 @@ If true, the component's value cannot be modified with user interactions.
 </App>
 ```
 
-### `required`
+### `required` [#required]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `startIcon`
+### `startIcon` [#starticon]
 
 This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
@@ -211,7 +211,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 </App>
 ```
 
-### `startText`
+### `startText` [#starttext]
 
 This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
@@ -231,7 +231,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 </App>
 ```
 
-### `step (default: 1)`
+### `step (default: 1)` [#step-default-1]
 
 This prop governs how big the step when clicking on the spinner of the field.
 
@@ -245,7 +245,7 @@ Note that only integers are allowed to be entered.
 </App>
 ```
 
-### `validationStatus (default: "none")`
+### `validationStatus (default: "none")` [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -274,7 +274,7 @@ This prop is used to visually indicate status changes reacting to form field val
 </App>
 ```
 
-### `zeroOrPositive (default: false)`
+### `zeroOrPositive (default: false)` [#zeroorpositive-default-false]
 
 This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
 
@@ -287,9 +287,9 @@ By default, this property is set to `false`.
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `didChange`
+### `didChange` [#didchange]
 
 This event is triggered when value of NumberBox has changed.
 
@@ -304,7 +304,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 </App>
 ```
 
-### `gotFocus`
+### `gotFocus` [#gotfocus]
 
 This event is triggered when the NumberBox has received the focus.
 
@@ -322,7 +322,7 @@ This event is triggered when the `NumberBox` receives focus. The following sampl
 Click into the `NumberBox` (and then click the text below):
 ```
 
-### `lostFocus`
+### `lostFocus` [#lostfocus]
 
 This event is triggered when the NumberBox has lost the focus.
 
@@ -330,13 +330,13 @@ This event is triggered when the `NumberBox` loses focus.
 
 (See the example above)
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `focus`
+### `focus` [#focus]
 
 This method sets the focus on the NumberBox.
 
-### `setValue`
+### `setValue` [#setvalue]
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
@@ -359,7 +359,7 @@ You can use this method to set the component's current value programmatically.
 </App>
 ```
 
-### `value`
+### `value` [#value]
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
@@ -367,9 +367,9 @@ You can query this read-only API property to get the input component's current v
 
 See an example in the `setValue` API method.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

@@ -8,7 +8,7 @@ Contexts follow a specificity rule.
 
 Learn more about styling theming and theming context in [Themes and Styles Overview](../learning/themes/overview/#style-scopes).
 
-## Using `Theme`
+## Using `Theme` [#using-theme]
 
 In contrast to other components, `Theme` accepts theme variables as properties.
 You can define specific styles for components nested in `Theme` using these theme variables.
@@ -36,9 +36,9 @@ and sets several theme variables to style the `ProgressBar` component:
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `root`
+### `root` [#root]
 
 This property indicates whether the component is at the root of the application.
 
@@ -50,7 +50,7 @@ If so, it will set a number of important settings for the app:
 
 Otherwise, the `Theme` component will just provide the theme context to its children.
 
-### `themeId`
+### `themeId` [#themeid]
 
 This property specifies which theme to use by setting the theme's id.
 
@@ -80,7 +80,7 @@ This property specifies which theme to use by setting the theme's id.
 </App>
 ```
 
-### `tone (default: "light")`
+### `tone (default: "light")` [#tone-default-light]
 
 This property allows the setting of the current theme's tone.
 
@@ -105,14 +105,14 @@ Available values: `light` **(default)**, `dark`
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 The `Theme` component is a styling wrapper that influences the nested components' visual appearance. It cannot be styled.

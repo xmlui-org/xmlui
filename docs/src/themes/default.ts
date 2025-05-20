@@ -68,7 +68,6 @@ export const DefaultDocsTheme: ThemeDefinition = {
 
     // --- Markdown
     "fontSize-Text-markdown": "$fontSize-normal",
-    "fontSize-Text-codefence": "$fontSize-small",
     "lineHeight-Text-codefence": "$fontHeight-normal",
     "borderRadius-HtmlTable": "30px",
 

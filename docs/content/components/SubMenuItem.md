@@ -2,24 +2,24 @@
 
 This component represents a nested menu item within another menu or menu item.
 
-## Properties
+## Properties [#properties]
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-### `triggerTemplate`
+### `triggerTemplate` [#triggertemplate]
 
 This property allows you to define a custom trigger instead of the default one provided by `SubMenuItem`.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

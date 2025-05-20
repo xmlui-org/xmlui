@@ -2,7 +2,7 @@
 
 `Redirect` is a component that immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). The redirection works only within the app.
 
-## Using `Redirect`
+## Using `Redirect` [#using-redirect]
 
 The following app demonstrates two different patterns for using `Redirect`.
 
@@ -37,20 +37,20 @@ The following app demonstrates two different patterns for using `Redirect`.
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `to`
+### `to` [#to]
 
 This property defines the URL to which this component is about to redirect requests.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

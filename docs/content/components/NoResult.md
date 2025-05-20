@@ -2,9 +2,9 @@
 
 `NoResult` is a component that displays a visual indication that some data query (search) resulted in no (zero) items.
 
-## Properties
+## Properties [#properties]
 
-### `hideIcon (default: "false")`
+### `hideIcon (default: "false")` [#hideicon-default-false]
 
 This boolean property indicates if the icon should be hidden.
 
@@ -17,7 +17,7 @@ This boolean property indicates if the icon should be hidden.
 </App>
 ```
 
-### `icon`
+### `icon` [#icon]
 
 This property defines the icon to display with the component.
 
@@ -29,7 +29,7 @@ This property defines the icon to display with the component. For a list of of a
 </App>
 ```
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
@@ -41,17 +41,17 @@ Customize the displayed text using this property. Leave empty to omit it.
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

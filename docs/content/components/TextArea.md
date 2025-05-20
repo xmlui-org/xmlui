@@ -7,13 +7,13 @@ The `TextArea` is an input control component and is often used in forms. See the
 
 To add new lines to the input field press `Shift` + `Enter`.
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `autoSize (default: false)`
+### `autoSize (default: false)` [#autosize-default-false]
 
 If set to `true`, this boolean property enables the `TextArea` to resize automatically based on the number of lines inside it.
 
@@ -27,7 +27,7 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 </App>
 ```
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -37,7 +37,7 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `enterSubmits (default: true)`
+### `enterSubmits (default: true)` [#entersubmits-default-true]
 
 This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.
 
@@ -55,11 +55,11 @@ See [Using Forms](../learning/forms.mdx) for details.
 </App>
 ```
 
-### `escResets (default: false)`
+### `escResets (default: false)` [#escresets-default-false]
 
 This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.
 
-### `initialValue`
+### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
 
@@ -71,15 +71,15 @@ The initial value displayed in the input field.
 </App>
 ```
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-### `labelBreak (default: false)`
+### `labelBreak (default: false)` [#labelbreak-default-false]
 
 This boolean value indicates if the `TextArea` labels can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")`
+### `labelPosition (default: "top")` [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -92,15 +92,15 @@ Available values:
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
 
-### `labelWidth`
+### `labelWidth` [#labelwidth]
 
 This property sets the width of the `TextArea`.
 
-### `maxLength`
+### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input it accepts.
 
-### `maxRows`
+### `maxRows` [#maxrows]
 
 This optional property sets the maximum number of text rows the `TextArea` can grow.
 
@@ -118,7 +118,7 @@ This optional property sets the maximum number of text rows the `TextArea` can g
 </App>
 ```
 
-### `minRows`
+### `minRows` [#minrows]
 
 This optional property sets the minimum number of text rows the `TextArea` can shrink.
 
@@ -130,7 +130,7 @@ This optional property sets the minimum number of text rows the `TextArea` can s
 </App>
 ```
 
-### `placeholder`
+### `placeholder` [#placeholder]
 
 A placeholder text that is visible in the input field when its empty.
 
@@ -140,7 +140,7 @@ A placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly (default: false)`
+### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -150,11 +150,11 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required`
+### `required` [#required]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `resize`
+### `resize` [#resize]
 
 This optional property specifies in which dimensions can the `TextArea` be resized by the user.
 
@@ -180,7 +180,7 @@ Drag the small resize indicators at the bottom right on each of the controls in 
 </App>
 ```
 
-### `rows (default: 2)`
+### `rows (default: 2)` [#rows-default-2]
 
 Specifies the number of rows the component initially has.
 
@@ -192,7 +192,7 @@ Specifies the number of rows the component initially has.
 </App>
 ```
 
-### `validationStatus (default: "none")`
+### `validationStatus (default: "none")` [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -215,9 +215,9 @@ This prop is used to visually indicate status changes reacting to form field val
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `didChange`
+### `didChange` [#didchange]
 
 This event is triggered when value of TextArea has changed.
 
@@ -230,7 +230,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 </App>
 ```
 
-### `gotFocus`
+### `gotFocus` [#gotfocus]
 
 This event is triggered when the TextArea has received the focus.
 
@@ -247,13 +247,13 @@ Note how clicking elsewhere resets the text to the original.
 </App>
 ```
 
-### `lostFocus`
+### `lostFocus` [#lostfocus]
 
 This event is triggered when the TextArea has lost the focus.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `focus`
+### `focus` [#focus]
 
 This method sets the focus on the TextArea.
 
@@ -264,7 +264,7 @@ This method sets the focus on the TextArea.
 </App>
 ```
 
-### `setValue`
+### `setValue` [#setvalue]
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
@@ -283,7 +283,7 @@ You can use this method to set the component's current value programmatically (`
 </App>
 ```
 
-### `value`
+### `value` [#value]
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
@@ -296,6 +296,6 @@ In the example below, typing in the `TextArea` will also display the length of t
 </App>
 ```
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

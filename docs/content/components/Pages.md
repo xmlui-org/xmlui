@@ -1,12 +1,12 @@
 # Pages [#pages]
 
-The `Pages` component is used as a container for [`Page`](/components/Page) components within an [`App`](/components/App).
+The `Pages` component is used as a container for [`Page`](./Page.mdx) components within an [`App`](./App.mdx).
 
 See the [\`Page\` docs](/components/Page) for a short description.
 
 Examples for both components can be found here.
 
-### Using the Pages and Page components
+### Using the Pages and Page components [#using-the-pages-and-page-components]
 
 The `Page` component has a property called `url`. This is the route associated with the `Page's` contents.
 You can provide a link to this route to display a particular `Page`.
@@ -30,9 +30,9 @@ No page is fetched from the server, thus the application operates as a [Single P
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `defaultRoute`
+### `defaultRoute` [#defaultroute]
 
 The default route when displaying the app
 
@@ -53,14 +53,14 @@ The default route when displaying the app
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

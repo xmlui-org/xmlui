@@ -2,7 +2,7 @@
 
 The `FileUploadDropZone` component allows users to upload files to a web application by dragging and dropping files from their local file system onto a designated area within the UI.
 
-## Using `FileUploadDropZone`
+## Using `FileUploadDropZone` [#using-fileuploaddropzone]
 
 The component provides a surface on which you can drag files or paste files from the clipboard. The following example demonstrates how to use the component.
 
@@ -22,9 +22,9 @@ You can try it by dragging one or more files to the cyan surface. When you drop 
 You can also paste files from the clipboard: click the drop zone (cyan area) and then use the keyboard shortcut set on your OS.
 ```
 
-## Properties
+## Properties [#properties]
 
-### `allowPaste (default: true)`
+### `allowPaste (default: true)` [#allowpaste-default-true]
 
 This property indicates if the drop zone accepts files pasted from the clipboard (`true`) or only dragged files (`false`).
 
@@ -44,29 +44,29 @@ The following example sets this property to `false` and, thus, it turns off past
 Try it! When you copy a file to a clipboard, you cannot paste it with the keyboard shortcut of your OS.
 ```
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 If set to `false`, the drop zone will be disabled and users will not be able to upload files.
 
-### `text (default: "Drop files here")`
+### `text (default: "Drop files here")` [#text-default-drop-files-here]
 
 With this property, you can change the default text to display when files are dragged over the drop zone.
 
-## Events
+## Events [#events]
 
-### `upload`
+### `upload` [#upload]
 
 This component accepts files for upload but does not perform the actual operation. It fires the `upload` event and passes the list files to upload in the method's argument. You can use the passed file information to implement the upload (according to the protocol your backend supports).
 
 Each item passed in the event argument is an instance of [File](https://developer.mozilla.org/en-US/docs/Web/API/File).
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

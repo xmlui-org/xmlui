@@ -5,19 +5,19 @@ The `App` component provides a UI frame for XMLUI apps. According to predefined 
 >[!INFO]
 > You can learn more details about using this component [here](../learning/using-components/app-component).
 
-## Properties
+## Properties [#properties]
 
-### `defaultTheme (default: "xmlui")`
+### `defaultTheme (default: "xmlui")` [#defaulttheme-default-xmlui]
 
 This property sets the app's default theme.
 
-### `defaultTone (default: "light")`
+### `defaultTone (default: "light")` [#defaulttone-default-light]
 
 This property sets the app's default tone ("light" or "dark").
 
 Available values: `light` **(default)**, `dark`
 
-### `layout`
+### `layout` [#layout]
 
 This property sets the layout template of the app. This setting determines the position and size of the app parts (such as header, navigation bar, footer, etc.) and the app's scroll behavior.
 
@@ -67,7 +67,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-#### `horizontal`
+#### `horizontal` [#horizontal]
 
 ```xmlui-pg copy name="Example: 'horizontal' layout" height="350px" 
 <App layout="horizontal">
@@ -100,7 +100,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-#### `horizontal-sticky`
+#### `horizontal-sticky` [#horizontal-sticky]
 
 ```xmlui-pg copy name="Example: 'horizontal-sticky' layout" height="350px" 
 <App layout="horizontal-sticky">
@@ -133,7 +133,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-#### `condensed`
+#### `condensed` [#condensed]
 
 ```xmlui-pg copy name="Example: 'condensed' layout" height="350px" 
 <App layout="condensed">
@@ -164,7 +164,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-#### `condensed-sticky`
+#### `condensed-sticky` [#condensed-sticky]
 
 ```xmlui-pg copy name="Example: 'condensed-sticky' layout" height="350px" 
 <App layout="condensed-sticky">
@@ -195,7 +195,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-#### `vertical`
+#### `vertical` [#vertical]
 
 ```xmlui-pg copy name="Example: 'vertical' layout" height="300px" 
 <App layout="vertical">
@@ -226,7 +226,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-#### `vertical-sticky`
+#### `vertical-sticky` [#vertical-sticky]
 
 ```xmlui-pg copy name="Example: 'vertical-sticky' layout" height="300px"
 <App layout="vertical-sticky">
@@ -257,7 +257,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 </App>
 ```
 
-#### `vertical-full-header`
+#### `vertical-full-header` [#vertical-full-header]
 
 ```xmlui-pg copy name="Example: 'vertical-full-header' layout" height="300px"
 <App layout="vertical-full-header">
@@ -292,7 +292,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 For a detailed list on the different kinds of layouts available see [this short guide](../learning/using-components/app-component.mdx).
 
-### `loggedInUser`
+### `loggedInUser` [#loggedinuser]
 
 Stores information about the currently logged in user.
 
@@ -313,31 +313,31 @@ Currently, there is no restriction on what the user data must look like.
 </App>
 ```
 
-### `logo`
+### `logo` [#logo]
 
 Optional logo path
 
-### `logo-dark`
+### `logo-dark` [#logo-dark]
 
 Optional logo path in dark tone
 
-### `logo-light`
+### `logo-light` [#logo-light]
 
 Optional logo path in light tone
 
-### `logoTemplate`
+### `logoTemplate` [#logotemplate]
 
 Optional template of the app logo
 
-### `name`
+### `name` [#name]
 
 Optional application name (visible in the browser tab)
 
-### `noScrollbarGutters (default: false)`
+### `noScrollbarGutters (default: false)` [#noscrollbargutters-default-false]
 
 This boolean property specifies whether the scrollbar gutters should be hidden.
 
-### `scrollWholePage (default: true)`
+### `scrollWholePage (default: true)` [#scrollwholepage-default-true]
 
 This boolean property specifies whether the whole page should scroll (`true`) or just the content area (`false`). The default value is `true`.
 
@@ -362,9 +362,9 @@ The default value is `true`.
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `ready`
+### `ready` [#ready]
 
 This event fires when the `App` component finishes rendering on the page.
 
@@ -378,19 +378,18 @@ Use it as `onReady` when inlining it on the component.
   </App>
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-content-App | $backgroundColor | $backgroundColor |
-| [backgroundColor](../styles-and-themes/common-units/#color)-navPanel-App | $backgroundColor | $backgroundColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderLeft](../styles-and-themes/common-units/#border)-content-App | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | $boxShadow-spread | $boxShadow-spread |
@@ -399,7 +398,7 @@ This component does not expose any methods.
 | [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
 | [width](../styles-and-themes/common-units/#size)-navPanel-App | $space-64 | $space-64 |
 
-### Variable Explanations
+### Variable Explanations [#variable-explanations]
 
 | Theme Variable | Description |
 | --- | --- |

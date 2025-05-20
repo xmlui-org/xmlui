@@ -2,9 +2,9 @@
 
 A `ContentSeparator` is a component that divides or separates content visually within a layout. It serves as a visual cue to distinguish between different sections or groups of content, helping to improve readability and organization.
 
-## Properties
+## Properties [#properties]
 
-### `orientation (default: "horizontal")`
+### `orientation (default: "horizontal")` [#orientation-default-horizontal]
 
 Sets the main axis of the component
 
@@ -34,7 +34,7 @@ See the demo for an example under [`size`](#size).
 </App>
 ```
 
-### `size`
+### `size` [#size]
 
 This property defines the component's height (if the `orientation` is horizontal) or the width (if the `orientation` is vertical).
 
@@ -67,17 +67,17 @@ This property defines the component's height (if the `orientation` is horizontal
 > For the horizontal separator, you can set the `height` property; the vertical separator offers the `width` property instead of `size`.
 > Nonetheless, we suggest you use the `size` property.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
