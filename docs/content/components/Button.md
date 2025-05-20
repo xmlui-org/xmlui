@@ -4,13 +4,13 @@ Button is an interactive element that triggers an action when clicked.
 
 Use the `Button` component to trigger various actions.
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 Indicates if the button should receive focus when the page loads.
 
-### `contentPosition (default: "center")`
+### `contentPosition (default: "center")` [#contentposition-default-center]
 
 This optional value determines how the label and icon (or nested children) should be placedinside the Button component.
 
@@ -33,11 +33,11 @@ Available values:
 </App>
 ```
 
-### `contextualLabel`
+### `contextualLabel` [#contextuallabel]
 
 This optional value is used to provide an accessible name for the Button in the context of its usage.
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 The value of this property indicates whether the button accepts actions (`true`) or does not react to them (`false`).
 
@@ -51,7 +51,7 @@ The value of this property indicates whether the button accepts actions (`true`)
 </App>
 ```
 
-### `icon`
+### `icon` [#icon]
 
 This string value denotes an icon name. The framework will render an icon if XMLUI recognizes the icon by its name. If no label is specified and an icon is set, the Button displays only that icon.
 
@@ -64,7 +64,7 @@ This string value denotes an icon name. The framework will render an icon if XML
 </App>
 ```
 
-### `iconPosition (default: "start")`
+### `iconPosition (default: "start")` [#iconposition-default-start]
 
 This optional string determines the location of the icon in the Button.
 
@@ -100,7 +100,7 @@ Available values:
 </App>
 ```
 
-### `label`
+### `label` [#label]
 
 This property is an optional string to set a label for the Button. If no label is specified and an icon is set, the Button will modify its styling to look like a small icon button. When the Button has nested children, it will display them and ignore the value of the `label` prop.
 
@@ -115,7 +115,7 @@ This property is an optional string to set a label for the Button. If no label i
 </App>
 ```
 
-### `orientation (default: "horizontal")`
+### `orientation (default: "horizontal")` [#orientation-default-horizontal]
 
 This property sets the main axis along which the nested components are rendered.
 
@@ -126,7 +126,7 @@ Available values:
 | `horizontal` | The component will fill the available space horizontally **(default)** |
 | `vertical` | The component will fill the available space vertically |
 
-### `size (default: "sm")`
+### `size (default: "sm")` [#size-default-sm]
 
 Sets the size of the button.
 
@@ -158,7 +158,7 @@ Available values:
 </App>
 ```
 
-### `themeColor (default: "primary")`
+### `themeColor (default: "primary")` [#themecolor-default-primary]
 
 Sets the button color scheme defined in the application theme.
 
@@ -180,7 +180,7 @@ Available values:
 </App>  
 ```
 
-### `type (default: "button")`
+### `type (default: "button")` [#type-default-button]
 
 This optional string describes how the Button appears in an HTML context. You rarely need to set this property explicitly.
 
@@ -192,7 +192,7 @@ Available values:
 | `submit` | The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component. |
 | `reset` | Resets all the controls to their initial values. Using it is ill advised for UX reasons. |
 
-### `variant (default: "solid")`
+### `variant (default: "solid")` [#variant-default-solid]
 
 The button variant determines the level of emphasis the button should possess.
 
@@ -215,9 +215,9 @@ Available values:
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `click`
+### `click` [#click]
 
 This event is triggered when the Button is clicked.
 
@@ -227,7 +227,7 @@ This event is triggered when the Button is clicked.
 </App>
 ```
 
-### `gotFocus`
+### `gotFocus` [#gotfocus]
 
 This event is triggered when the Button has received the focus.
 
@@ -243,19 +243,19 @@ This event is triggered when the Button has received the focus.
 </App>
 ```
 
-### `lostFocus`
+### `lostFocus` [#lostfocus]
 
 This event is triggered when the Button has lost the focus.
 
 (See the example above)
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Fixed width and height
+### Fixed width and height [#fixed-width-and-height]
 
 Using a set of buttons with a fixed width or height is often helpful. So `Button` supports these theme variables:
 - `width-Button`
@@ -277,7 +277,7 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 </App>
 ```
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

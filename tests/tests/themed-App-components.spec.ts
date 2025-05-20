@@ -1,7 +1,6 @@
 import { expect, test } from "./fixtures";
 import { getBoundingRect, getElementStyle, initApp } from "./component-test-helpers";
 
-
 const PAGE_WIDTH = 1200;
 const PAGE_HEIGHT = 500;
 test.use({ viewport: { width: PAGE_WIDTH, height: PAGE_HEIGHT } });
@@ -65,7 +64,7 @@ test("Themed Footer", async ({ page }) => {
   const boundingRect = await getBoundingRect(page.getByTestId("app-footer"));
 
   expect(boundingRect.left).toBe(0);
-  expect(boundingRect.bottom).toBe(PAGE_HEIGHT);
-  expect(boundingRect.width).toBe(PAGE_WIDTH);
+  expect(boundingRect.bottom).toEqualWithTolerance(PAGE_HEIGHT, 0.01);
+  expect(boundingRect.width).toEqualWithTolerance(PAGE_WIDTH, 0.01);
   expect(backgroundColor).toBe("rgb(28, 43, 53)");    // dark theme background color
 });

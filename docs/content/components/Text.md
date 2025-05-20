@@ -7,9 +7,9 @@ You can learn more about this component in the [Working with Text](/learning/usi
 Also note that variants of the `Text` component are also mapped to HtmlTag components.
 See the [variant](#variant) section to check which variant maps to which HtmlTag.
 
-## Properties
+## Properties [#properties]
 
-### `ellipses (default: false)`
+### `ellipses (default: false)` [#ellipses-default-false]
 
 This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
 
@@ -33,7 +33,7 @@ This property indicates whether ellipses should be displayed when the text is cr
 </App>
 ```
 
-### `maxLines`
+### `maxLines` [#maxlines]
 
 This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines.
 
@@ -48,7 +48,7 @@ This property determines the maximum number of lines the component can wrap to. 
 </App>
 ```
 
-### `preserveLinebreaks (default: "false")`
+### `preserveLinebreaks (default: "false")` [#preservelinebreaks-default-false]
 
 This property indicates if linebreaks should be preserved when displaying text.
 
@@ -77,7 +77,7 @@ This property indicates if linebreaks should be preserved when displaying text.
 > **Note**: Remember to use the `value` property of the `Text`.
 > Linebreaks are converted to spaces when nesting the text inside the `Text` component.
 
-### `value`
+### `value` [#value]
 
 The text to be displayed. This value can also be set via nesting the text into the `Text` component.
 
@@ -88,7 +88,7 @@ The text to be displayed. This value can also be set via nesting the text into t
 </App>
 ```
 
-### `variant`
+### `variant` [#variant]
 
 An optional string value that provides named presets for text variants with a unique combination of font style, weight, size, color, and other parameters. If not defined, the text uses the current style of its context.
 
@@ -304,17 +304,17 @@ The table below indicates which Text `variant` maps to which HtmlTag component.
 | `em`        | em        |
 | `paragraph` | p         |
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
@@ -342,6 +342,7 @@ This component does not expose any methods.
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-sample | $fontFamily-monospace | $fontFamily-monospace |
 | [fontSize](../styles-and-themes/common-units/#size)-Text | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-markdown | $fontSize-normal | $fontSize-normal |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-small | $fontSize-small |

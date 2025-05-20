@@ -22,6 +22,7 @@ type MarkdownProps = {
   children: ReactNode;
   style?: CSSProperties;
   codeHighlighter?: CodeHighlighter;
+  showHeadingAnchors?: boolean;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -60,31 +61,12 @@ export const Markdown = memo(function Markdown({
   children,
   style,
   codeHighlighter,
+  showHeadingAnchors = false,
 }: MarkdownProps) {
   if (typeof children !== "string") {
     return null;
   }
-
   children = removeIndents ? removeTextIndents(children) : children;
-
-  const renderHeading = (level: string, children: ReactNode) => {
-    if (typeof children === "string") {
-      const [headingLabel, anchorId] = getCustomAnchor(children);
-      if (anchorId) {
-        const currentPath = window.location.href.replace(/(?<!\/)#.*$/, "");
-        const href = `${currentPath}#${anchorId}`;
-        return (
-          <Heading level={level} id={anchorId}>
-            {headingLabel}
-            <a href={href} id={anchorId} aria-label="Permalink for this section">
-              #
-            </a>
-          </Heading>
-        );
-      }
-    }
-    return <Heading level={level}>{children}</Heading>;
-  };
 
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
@@ -126,22 +108,46 @@ export const Markdown = memo(function Markdown({
             }
           },
           h1({ children }) {
-            return renderHeading("h1", children);
+            return (
+              <LinkAwareHeading level="h1" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           h2({ children }) {
-            return renderHeading("h2", children);
+            return (
+              <LinkAwareHeading level="h2" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           h3({ children }) {
-            return renderHeading("h3", children);
+            return (
+              <LinkAwareHeading level="h3" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           h4({ children }) {
-            return renderHeading("h4", children);
+            return (
+              <LinkAwareHeading level="h4" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           h5({ children }) {
-            return renderHeading("h5", children);
+            return (
+              <LinkAwareHeading level="h5" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           h6({ children }) {
-            return renderHeading("h6", children);
+            return (
+              <LinkAwareHeading level="h6" showHeadingAnchors={showHeadingAnchors}>
+                {children}
+              </LinkAwareHeading>
+            );
           },
           p({ id, children }) {
             return (
@@ -295,46 +301,6 @@ export const Markdown = memo(function Markdown({
   );
 });
 
-function removeTextIndents(input: string): string {
-  if (!input) {
-    return "";
-  }
-
-  const lines = input.split("\n");
-
-  // Find the shortest starting whitespace length
-  const minIndent = lines.reduce((min, line) => {
-    const match = line.match(/^\s*/);
-    const indentLength = match ? match[0].length : 0;
-    return line.trim() ? Math.min(min, indentLength) : min;
-  }, Infinity);
-
-  // Remove the shortest starting whitespace length from each line
-  const trimmedLines = lines.map((line) =>
-    line.startsWith(" ".repeat(minIndent)) ? line.slice(minIndent) : line,
-  );
-
-  return trimmedLines.join("\n");
-}
-
-function getCustomAnchor(value: string): [string, string] {
-  if (!value) {
-    return ["", ""];
-  }
-
-  // --- Match the pattern: "Heading text [#anchor]"
-  const match = value.match(/^(.*?)\s*\[#([^\]]+)\]$/);
-
-  if (match) {
-    const headingLabel = match[1].trim(); // Extract the heading text
-    const anchorId = match[2].trim(); // Extract the anchor ID
-    return [headingLabel, anchorId];
-  }
-
-  // If no match, return the full value as the heading label and an empty anchor ID
-  return [value.trim(), ""];
-}
-
 const HorizontalRule = () => {
   return <hr className={styles.horizontalRule} />;
 };
@@ -477,3 +443,133 @@ const ListItem = ({ children, style }: ListItemProps) => {
     </li>
   );
 };
+
+type LinkAwareHeadingProps = {
+  children: React.ReactNode;
+  level: string;
+  showHeadingAnchors?: boolean;
+};
+
+function LinkAwareHeading({ children, level, showHeadingAnchors }: LinkAwareHeadingProps) {
+  let headingLabel: React.ReactNode = "";
+  let anchorId = "";
+  if (!children) return <></>;
+
+  if (typeof children === "string") {
+    [headingLabel, anchorId] = getCustomAnchor(children);
+    // At this point, the anchorId might still be empty
+  } else if (Array.isArray(children)) {
+    if (children.length === 0) return <></>;
+    if (children.length === 1) {
+      headingLabel = children[0];
+    } else {
+      headingLabel = children.slice(0, -1);
+      const last = children[children.length - 1];
+
+      // Check for explicit anchor at the end
+      if (typeof last === "string") {
+        const match = last.trim().match(/^\[#([^\]]+)\]$/);
+        if (match && match.length > 0) {
+          anchorId = match[1];
+        }
+      }
+    }
+  } else {
+    // Provided children are not a string or array but still valid React elements
+    // if it contains text, use it as the heading label
+    const headingContent = extractTextNodes(children);
+    if (!headingContent) return <></>;
+    headingLabel = children;
+  }
+
+  // Generate implicit anchor if not provided
+  if (!anchorId) {
+    anchorId = headingToAnchorLink(extractTextNodes(headingLabel));
+  }
+
+  const currentPath = window.location.href.replace(/(?<!\/)#.*$/, "");
+  const href = `${currentPath}#${anchorId}`;
+  return (
+    <Heading level={level} id={anchorId}>
+      {headingLabel}
+      {showHeadingAnchors && anchorId && (
+        // NOTE: Anchor is hidden from screen readers
+        // TODO: make sure this is a good idea
+        <a href={href} id={anchorId} aria-hidden="true">
+          #
+        </a>
+      )}
+    </Heading>
+  );
+}
+
+// --- Helper functions
+
+function removeTextIndents(input: string): string {
+  if (!input) {
+    return "";
+  }
+
+  const lines = input.split("\n");
+
+  // Find the shortest starting whitespace length
+  const minIndent = lines.reduce((min, line) => {
+    const match = line.match(/^\s*/);
+    const indentLength = match ? match[0].length : 0;
+    return line.trim() ? Math.min(min, indentLength) : min;
+  }, Infinity);
+
+  // Remove the shortest starting whitespace length from each line
+  const trimmedLines = lines.map((line) =>
+    line.startsWith(" ".repeat(minIndent)) ? line.slice(minIndent) : line,
+  );
+
+  return trimmedLines.join("\n");
+}
+
+function getCustomAnchor(value: string): [string, string] {
+  if (!value) {
+    return ["", ""];
+  }
+
+  // --- Match the pattern: "Heading text [#anchor]"
+  const match = value.match(/^(.*?)\s*\[#([^\]]+)\]$/);
+
+  if (match) {
+    const headingLabel = match[1].trim(); // Extract the heading text
+    const anchorId = match[2].trim(); // Extract the anchor ID
+    return [headingLabel, anchorId];
+  }
+
+  // If no match, return the full value as the heading label and an empty anchor ID
+  return [value.trim(), ""];
+}
+
+function headingToAnchorLink(rawStr: string) {
+  return (
+    rawStr
+      .trim()
+      .toLocaleLowerCase()
+      // replace all non-alphanumeric characters with hyphens
+      .replaceAll(/[^A-Za-z0-9-]/g, "-")
+      // remove multiple hyphens
+      .replaceAll(/--+/g, "-")
+      // remove leading and trailing hyphens
+      .replace(/^-|-$/, "")
+      // remove backticks
+      .replace(/`/g, "")
+      // remove parentheses
+      .replace(/"|'/g, "")
+  );
+}
+
+function extractTextNodes(node: React.ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return node.toString();
+  if (React.isValidElement(node) && node.props && node.props.children) {
+    if (Array.isArray(node.props.children)) {
+      return node.props.children.map(extractTextNodes).join("");
+    }
+    return extractTextNodes(node.props.children);
+  }
+  return "";
+}

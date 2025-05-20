@@ -2,7 +2,7 @@
 
 The `Card` component is a container for cohesive elements, often rendered visually as a card.
 
-## Using Card
+## Using Card [#using-card]
 
 `Card` is a container; it does not have any explicit properties.
 You can nest the card's content into the `<Card>` tag:
@@ -37,23 +37,23 @@ Prestyled elements always appear above other children.
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `avatarSize`
+### `avatarSize` [#avatarsize]
 
 This prop sets the size of the avatar. The default value is `sm`.
 
 Available values: `xs`, `sm`, `md`, `lg`
 
-### `avatarUrl`
+### `avatarUrl` [#avatarurl]
 
 Show the avatar (`true`) or not (`false`). If not specified, the Card will show the first letters of the [`title`](#title).
 
-### `linkTo`
+### `linkTo` [#linkto]
 
 This property wraps the title in a `Link` component that is clickable to navigate.
 
-### `orientation (default: "vertical")`
+### `orientation (default: "vertical")` [#orientation-default-vertical]
 
 An optional property that governs the Card's orientation (whether the Card lays out its children in a row or a column). If the orientation is set to `horizontal`, the Card will display its children in a row, except for its [`title`](#title) and [`subtitle`](#subtitle).
 
@@ -75,7 +75,7 @@ Available values:
 </App>
 ```
 
-### `showAvatar (default: false)`
+### `showAvatar (default: false)` [#showavatar-default-false]
 
 Indicates whether the Card should be displayed
 
@@ -89,7 +89,7 @@ Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is aut
 </App>
 ```
 
-### `subtitle`
+### `subtitle` [#subtitle]
 
 This prop sets the prestyled subtitle.
 
@@ -101,7 +101,7 @@ This prop sets the prestyled subtitle.
 </App>
 ```
 
-### `title`
+### `title` [#title]
 
 This prop sets the prestyled title.
 
@@ -113,9 +113,9 @@ This prop sets the prestyled title.
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `click`
+### `click` [#click]
 
 This event is triggered when the Card is clicked.
 
@@ -133,13 +133,13 @@ This event is triggered when the `Card` is clicked.
 </App>
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
@@ -191,7 +191,7 @@ This component does not expose any methods.
 | [paddingVertical](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)ment-title-Card | center | center |
 
-### Variable Explanations
+### Variable Explanations [#variable-explanations]
 
 | Theme Variable | Description |
 | --- | --- |

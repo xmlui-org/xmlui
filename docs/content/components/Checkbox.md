@@ -4,7 +4,7 @@ The `Checkbox` component allows users to make binary choices, typically between 
 
 To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](../learning/using-components/forms).
 
-## Use children as Content Template
+## Use children as Content Template [#use-children-as-content-template]
 
 The [inputTemplate](#inputtemplate) property can be replaced by setting the item template component directly as the Checkbox's child.
 In the following example, the two Checkbox are functionally the same:
@@ -24,13 +24,13 @@ In the following example, the two Checkbox are functionally the same:
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -49,7 +49,7 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `indeterminate (default: false)`
+### `indeterminate (default: false)` [#indeterminate-default-false]
 
 The `true` value of this property signals that the component is in an _intedeterminate state_.
 
@@ -78,15 +78,15 @@ The following sample binds the state of two checkboxes to one and updates the st
 Try this sample by clicking the bottom group of checkboxes.
 ```
 
-### `initialValue (default: false)`
+### `initialValue (default: false)` [#initialvalue-default-false]
 
 This property sets the component's initial value.
 
-### `inputTemplate`
+### `inputTemplate` [#inputtemplate]
 
 This property is used to define a custom checkbox input template
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
@@ -97,11 +97,11 @@ This property sets the label of the component.
 </App>
 ```
 
-### `labelBreak (default: false)`
+### `labelBreak (default: false)` [#labelbreak-default-false]
 
 This boolean value indicates if the `Checkbox` labels can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "end")`
+### `labelPosition (default: "end")` [#labelposition-default-end]
 
 Places the label at the given position of the component.
 
@@ -123,11 +123,11 @@ Available values:
 </App>
 ```
 
-### `labelWidth`
+### `labelWidth` [#labelwidth]
 
 This property sets the width of the `Checkbox`.
 
-### `readOnly (default: false)`
+### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -138,11 +138,11 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required`
+### `required` [#required]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")`
+### `validationStatus (default: "none")` [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -154,9 +154,9 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-## Events
+## Events [#events]
 
-### `didChange`
+### `didChange` [#didchange]
 
 This event is triggered when value of Checkbox has changed.
 
@@ -171,7 +171,7 @@ This event is triggered when value of Checkbox has changed.
 </App>
 ```
 
-### `gotFocus`
+### `gotFocus` [#gotfocus]
 
 This event is triggered when the Checkbox has received the focus.
 
@@ -188,15 +188,15 @@ Click the `Checkbox` in the example demo to change the label text. Note how clic
 </App>
 ```
 
-### `lostFocus`
+### `lostFocus` [#lostfocus]
 
 This event is triggered when the Checkbox has lost the focus.
 
 (See the example above)
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `setValue`
+### `setValue` [#setvalue]
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
@@ -222,7 +222,7 @@ You can use this method to set the checkbox's current value programmatically (`t
 </App>
 ```
 
-### `value`
+### `value` [#value]
 
 You can query this read-only API property to query the component's current value (`true`: checked, `false`: unchecked).
 
@@ -230,9 +230,9 @@ You can query this read-only API property to query the checkbox's current value 
 
 See an example in the `setValue` API method.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

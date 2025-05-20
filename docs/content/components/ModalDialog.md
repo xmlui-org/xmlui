@@ -7,14 +7,14 @@ The component provides context values with which you can access some internal pr
 - `$param`: This value represents the first parameters passed to the `open()` method to display the modal dialog.
 - `$params`: This value represents the array of parameters passed to the `open()` method. You can use `$params[0]` to access the first and `$params[1]` to access the second (and so on) parameters. `$param` is the same as `$params[0]`.
 
-## Using the Component
+## Using the Component [#using-the-component]
 
 >[!INFO]
 > When using the examples in this article, pop them out to the full screen to check how they work.
 
 Opening and closing the modal dialog can be done in two ways depending on circumstances.
 
-### With Imperative API
+### With Imperative API [#with-imperative-api]
 
 Event-driven display of the `ModalDialog` dialog is also possible using imperative API.
 
@@ -36,7 +36,7 @@ operations of the component in the `onClick` event handlers.
 >[!INFO]
 > The imperative approach is perhaps the most intuitive way to display and hide modal dialogs.
 
-### With `when`
+### With `when` [#with-when]
 
 The `when` property accepts a primitive boolean or a binding expression resolving to a boolean value to toggle the display of a component.
 
@@ -59,7 +59,7 @@ Click on the button in the demo below to open the modal dialog. Click anywhere o
 
 Setting the `when` property is the most straightforward way for deep-linked modals. If you use deep links with query parameters to show a particular dialog, you can set the `when` property to show or hide the dialog according to parameter values.
 
-### The `ModalDialog` as a Container
+### The `ModalDialog` as a Container [#the-modaldialog-as-a-container]
 
 The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx), that it also accepts child components.
 
@@ -78,9 +78,9 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
 >[!INFO]
 > When a form is nested into a modal dialog, closing the form (canceling it or completing its submit action) automatically closes the dialog.
 
-## Properties
+## Properties [#properties]
 
-### `closeButtonVisible (default: true)`
+### `closeButtonVisible (default: true)` [#closebuttonvisible-default-true]
 
 Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.
 
@@ -94,7 +94,7 @@ Shows (`true`) or hides (`false`) the visibility of the close button on the dial
 Click outside the dialog to close it.
 ```
 
-### `fullScreen (default: false)`
+### `fullScreen (default: false)` [#fullscreen-default-false]
 
 Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).
 
@@ -108,7 +108,7 @@ Toggles whether the dialog encompasses the whole UI (`true`) or not and has a mi
 Click the button to display a full-screen dialog. The icon at the top-right corner of the dialog allows you to close it.
 ```
 
-### `title`
+### `title` [#title]
 
 Provides a prestyled heading to display the intent of the dialog.
 
@@ -119,9 +119,9 @@ Provides a prestyled heading to display the intent of the dialog.
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `close`
+### `close` [#close]
 
 This event is fired when the close button is pressed or the user clicks outside the `ModalDialog`.
 
@@ -143,7 +143,7 @@ In this example, the `close` event counts how many times you closed the dialog:
 Open and close the dialog several times to test that it changes the counter.
 ```
 
-### `open`
+### `open` [#open]
 
 This event is fired when the `ModalDialog` is opened either via a `when` or an imperative API call (`open()`).
 
@@ -165,23 +165,23 @@ In this example, the `open` event counts how many times you opened the dialog:
 Open and close the dialog several times to test that it changes the counter.
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `close`
+### `close` [#close]
 
 This method is used to close the `ModalDialog`. Invoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
 
-### `open`
+### `open` [#open]
 
 This method imperatively opens the modal dialog. You can pass an arbitrary number of parameters to the method. In the `ModalDialog` instance, you can access those with the `$paramq` and `$params` context values.
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

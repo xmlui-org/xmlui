@@ -3,13 +3,13 @@
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `TextBox` is an input component that allows users to input and edit textual data.
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -19,7 +19,7 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `endIcon`
+### `endIcon` [#endicon]
 
 This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
@@ -37,7 +37,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 </App>
 ```
 
-### `endText`
+### `endText` [#endtext]
 
 This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
@@ -55,11 +55,11 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 </App>
 ```
 
-### `gap`
+### `gap` [#gap]
 
 This property defines the gap between the adornments and the input area.
 
-### `initialValue`
+### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
 
@@ -69,15 +69,15 @@ This property sets the component's initial value.
 </App>
 ```
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-### `labelBreak (default: false)`
+### `labelBreak (default: false)` [#labelbreak-default-false]
 
 This boolean value indicates if the `TextBox` labels can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")`
+### `labelPosition (default: "top")` [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -90,11 +90,11 @@ Available values:
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
 
-### `labelWidth`
+### `labelWidth` [#labelwidth]
 
 This property sets the width of the `TextBox`.
 
-### `maxLength`
+### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input it accepts.
 
@@ -106,7 +106,7 @@ Try to enter a longer value into the input field below.
 </App>
 ```
 
-### `placeholder`
+### `placeholder` [#placeholder]
 
 A placeholder text that is visible in the input field when its empty.
 
@@ -116,7 +116,7 @@ A placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly (default: false)`
+### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -126,11 +126,11 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required`
+### `required` [#required]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `startIcon`
+### `startIcon` [#starticon]
 
 This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
@@ -148,7 +148,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 </App>
 ```
 
-### `startText`
+### `startText` [#starttext]
 
 This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
@@ -166,7 +166,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 </App>
 ```
 
-### `validationStatus (default: "none")`
+### `validationStatus (default: "none")` [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -187,9 +187,9 @@ Available values:
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `didChange`
+### `didChange` [#didchange]
 
 This event is triggered when value of TextBox has changed.
 
@@ -202,7 +202,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 </App>
 ```
 
-### `gotFocus`
+### `gotFocus` [#gotfocus]
 
 This event is triggered when the TextBox has received the focus.
 
@@ -220,13 +220,13 @@ Note how clicking elsewhere resets the text to its original.
 </App>
 ```
 
-### `lostFocus`
+### `lostFocus` [#lostfocus]
 
 This event is triggered when the TextBox has lost the focus.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `focus`
+### `focus` [#focus]
 
 This method sets the focus on the TextBox.
 
@@ -237,7 +237,7 @@ This method sets the focus on the TextBox.
 </App>
 ```
 
-### `setValue`
+### `setValue` [#setvalue]
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
@@ -258,7 +258,7 @@ You can use this method to set the component's current value programmatically (`
 </App>
 ```
 
-### `value`
+### `value` [#value]
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
@@ -271,9 +271,9 @@ In the example below, typing in the `TextBox` will also display the length of th
 </App>
 ```
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

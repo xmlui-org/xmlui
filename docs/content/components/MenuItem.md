@@ -4,9 +4,9 @@ This property represents a leaf item in a menu hierarchy. Clicking the item trig
 
 See the [`DropdownMenu` component](./DropdownMenu) for using this component in menus.
 
-## Properties
+## Properties [#properties]
 
-### `active (default: false)`
+### `active (default: false)` [#active-default-false]
 
 This property indicates if the specified menu item is active.
 
@@ -20,11 +20,11 @@ This property indicates if the specified menu item is active.
 </App>
 ```
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-### `icon`
+### `icon` [#icon]
 
 This property names an optional icon to display with the menu item.
 
@@ -38,7 +38,7 @@ This property names an optional icon to display with the menu item.
 </App>
 ```
 
-### `iconPosition (default: "start")`
+### `iconPosition (default: "start")` [#iconposition-default-start]
 
 This property allows you to determine the position of the icon displayed in the menu item.
 
@@ -59,17 +59,17 @@ Available values:
 </App>
 ```
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-### `to`
+### `to` [#to]
 
 This property defines the URL of the menu item. If this property is defined (and the `click` event does not have an event handler), clicking the menu item navigates to this link.
 
-## Events
+## Events [#events]
 
-### `click`
+### `click` [#click]
 
 This event is triggered when the MenuItem is clicked.
 
@@ -85,13 +85,13 @@ If both properties are defined, `click` takes precedence.
 </DropdownMenu>
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

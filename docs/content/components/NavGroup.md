@@ -2,7 +2,7 @@
 
 The `NavGroup` component is a container for grouping related navigation targets (`NavLink` components). It can be displayed as a submenu in the App's UI.
 
-## Using `NavGroup`
+## Using `NavGroup` [#using-navgroup]
 
 The primary use of a `NavGroup` is to create an application menu with submenus, as the following example shows:
 
@@ -55,7 +55,7 @@ You do not have to use `NavGroup` within `NavPanel`; you can nest it into other 
 </App>
 ```
 
-### Custom Icons
+### Custom Icons [#custom-icons]
 
 You can also provide custom icons for a specific NavGroup component via it's respective property:
 - [iconHorizontalCollapsed](#iconHorizontalCollapsed)
@@ -80,13 +80,13 @@ See the following for an example of all variants:
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-### `icon`
+### `icon` [#icon]
 
 This property defines an optional icon to display along with the `NavGroup` label.
 
@@ -110,35 +110,35 @@ Look at this example:
 </App>
 ```
 
-### `iconHorizontalCollapsed (default: "chevronright")`
+### `iconHorizontalCollapsed (default: "chevronright")` [#iconhorizontalcollapsed-default-chevronright]
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **horizontal** app layout, and is in a navigation submenu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconHorizontalExpanded (default: "chevronleft")`
+### `iconHorizontalExpanded (default: "chevronleft")` [#iconhorizontalexpanded-default-chevronleft]
 
 Set a custom icon to display when the navigation menu is expanded, is in a **horizontal** app layout, and is in a navigation submenu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconVerticalCollapsed (default: "chevronup")`
+### `iconVerticalCollapsed (default: "chevronup")` [#iconverticalcollapsed-default-chevronup]
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconVerticalExpanded (default: "chevrondown")`
+### `iconVerticalExpanded (default: "chevrondown")` [#iconverticalexpanded-default-chevrondown]
 
 Set a custom icon to display when the navigation menu is expanded, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `initiallyExpanded`
+### `initiallyExpanded` [#initiallyexpanded]
 
 This property defines whether the group is initially expanded or collapsed.
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
@@ -146,21 +146,21 @@ This property sets the text displayed as the name of the `NavGroup`.
 
 For an example, see the [section on the icon property](#icon).
 
-### `to`
+### `to` [#to]
 
 This property defines an optional navigation link.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

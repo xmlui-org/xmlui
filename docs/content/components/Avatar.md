@@ -2,9 +2,9 @@
 
 The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials.
 
-## Properties
+## Properties [#properties]
 
-### `name`
+### `name` [#name]
 
 This property sets the name value the Avatar uses to display initials.
 
@@ -14,7 +14,7 @@ This property sets the name value the Avatar uses to display initials.
 </App>
 ```
 
-### `size (default: "sm")`
+### `size (default: "sm")` [#size-default-sm]
 
 This property defines the display size of the Avatar.
 
@@ -39,7 +39,7 @@ Available values:
 </App>
 ```
 
-### `url`
+### `url` [#url]
 
 This property specifies the URL of the image to display in the Avatar.
 
@@ -49,9 +49,9 @@ This property specifies the URL of the image to display in the Avatar.
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `click`
+### `click` [#click]
 
 This event is triggered when the avatar is clicked.
 
@@ -64,13 +64,13 @@ This event is triggered when the avatar is clicked.
 </App>
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

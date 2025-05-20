@@ -6,9 +6,9 @@
 >[!INFO]
 > You can learn more details about using this component [here](../learning/using-components/app-component).
 
-## Properties
+## Properties [#properties]
 
-### `logoTemplate`
+### `logoTemplate` [#logotemplate]
 
 This property defines the template to use for the logo. With this property, you can construct your custom logo instead of using a single image.
 
@@ -40,7 +40,7 @@ With this property, you can construct your custom logo instead of using a single
 </App>
 ```
 
-### `profileMenuTemplate`
+### `profileMenuTemplate` [#profilemenutemplate]
 
 This property makes the profile menu slot of the `AppHeader` component customizable.
 
@@ -61,29 +61,29 @@ It accepts component definitions.
 </App>
 ```
 
-### `showLogo (default: true)`
+### `showLogo (default: true)` [#showlogo-default-true]
 
 Show the logo in the header
 
-### `title`
+### `title` [#title]
 
 Title for the application logo
 
-### `titleTemplate`
+### `titleTemplate` [#titletemplate]
 
 This property defines the template to use for the title. With this property, you can construct your custom title instead of using a single image.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
@@ -141,7 +141,7 @@ This component does not expose any methods.
 | [paddingVertical](../styles-and-themes/common-units/#size)-logo-AppHeader | $space-4 | $space-4 |
 | [width](../styles-and-themes/common-units/#size)-logo-AppHeader | *none* | *none* |
 
-### Variable Explanations
+### Variable Explanations [#variable-explanations]
 
 | Theme Variable | Description |
 | --- | --- |

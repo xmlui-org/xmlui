@@ -3,13 +3,13 @@
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `dateFormat (default: "MM/dd/yyyy")`
+### `dateFormat (default: "MM/dd/yyyy")` [#dateformat-default-mm-dd-yyyy]
 
 The format of the date displayed in the input field
 
@@ -37,7 +37,7 @@ The table below shows the available date formats:
 </App>
 ```
 
-### `disabledDates`
+### `disabledDates` [#disableddates]
 
 An array of dates that are disabled
 
@@ -47,7 +47,7 @@ An array of dates that are disabled
 </App>  
 ```
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -57,15 +57,15 @@ This boolean property value indicates whether the component responds to user eve
 </App>  
 ```
 
-### `endIcon`
+### `endIcon` [#endicon]
 
 This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
-### `endText`
+### `endText` [#endtext]
 
 This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
-### `fromDate`
+### `fromDate` [#fromdate]
 
 The start date of the range of selectable dates
 
@@ -75,7 +75,7 @@ The start date of the range of selectable dates
 </App>
 ```
 
-### `initialValue`
+### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
 
@@ -85,11 +85,11 @@ This property sets the component's initial value.
 </App>  
 ```
 
-### `inline (default: false)`
+### `inline (default: false)` [#inline-default-false]
 
 Whether to display the datepicker inline
 
-### `mode (default: "single")`
+### `mode (default: "single")` [#mode-default-single]
 
 The mode of the datepicker (single or range)
 
@@ -102,7 +102,7 @@ Available values: `single` **(default)**, `range`
 </App>
 ```
 
-### `placeholder`
+### `placeholder` [#placeholder]
 
 A placeholder text that is visible in the input field when its empty.
 
@@ -112,11 +112,11 @@ A placeholder text that is visible in the input field when its empty.
 </App>  
 ```
 
-### `readOnly (default: false)`
+### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `showWeekNumber (default: false)`
+### `showWeekNumber (default: false)` [#showweeknumber-default-false]
 
 Whether to show the week number in the calendar
 
@@ -126,15 +126,15 @@ Whether to show the week number in the calendar
 </App>
 ```
 
-### `startIcon`
+### `startIcon` [#starticon]
 
 This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
-### `startText`
+### `startText` [#starttext]
 
 This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
-### `toDate`
+### `toDate` [#todate]
 
 The end date of the range of selectable dates
 
@@ -144,7 +144,7 @@ The end date of the range of selectable dates
 </App>
 ```
 
-### `validationStatus (default: "none")`
+### `validationStatus (default: "none")` [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -171,7 +171,7 @@ Available values:
 </App>
 ```
 
-### `weekStartsOn (default: 0)`
+### `weekStartsOn (default: 0)` [#weekstartson-default-0]
 
 The first day of the week. 0 is Sunday, 1 is Monday, etc.
 
@@ -203,9 +203,9 @@ Available values:
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `didChange`
+### `didChange` [#didchange]
 
 This event is triggered when value of DatePicker has changed.
 
@@ -218,7 +218,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 </App>
 ```
 
-### `gotFocus`
+### `gotFocus` [#gotfocus]
 
 This event is triggered when the DatePicker has received the focus.
 
@@ -235,17 +235,17 @@ Note how clicking elsewhere resets the text to the original.
 </App>
 ```
 
-### `lostFocus`
+### `lostFocus` [#lostfocus]
 
 This event is triggered when the DatePicker has lost the focus.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `focus`
+### `focus` [#focus]
 
 This method sets the focus on the DatePicker.
 
-### `setValue`
+### `setValue` [#setvalue]
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
@@ -266,13 +266,13 @@ You can use this method to set the component's current value programmatically (`
 </App>
 ```
 
-### `value`
+### `value` [#value]
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

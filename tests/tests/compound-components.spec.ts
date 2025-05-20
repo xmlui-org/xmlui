@@ -335,7 +335,7 @@ ${EXPECTED_VALUE2}
     `,
   });
 
-  await expect(page.getByText(EXPECTED_VALUE1, { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Hello, world!', exact: true })).toBeVisible();
   await expect(page.getByText(EXPECTED_VALUE2, { exact: true })).toBeVisible();
 });
 

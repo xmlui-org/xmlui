@@ -4,7 +4,7 @@ The `Spinner` component is an animated indicator that represents a particular ac
 
 While it is visible, the action is yet to be completed; on completion, the UI logic may opt to remove the component.
 
-## Using the `Spinner`
+## Using the `Spinner` [#using-the-spinner]
 
 ```xmlui-pg copy display name="Example: using Spinner"
 <App>
@@ -15,9 +15,9 @@ While it is visible, the action is yet to be completed; on completion, the UI lo
 >[!INFO]
 > `Spinner` ignores the `width`, `minWidth`, `maxWidth`, `height`, `minHeight`, and `maxHeight` properties. If you want to change its size, use the `size-Spinner` theme variable (see details is the [Styling](#styling) section).
 
-## Properties
+## Properties [#properties]
 
-### `delay (default: 400)`
+### `delay (default: 400)` [#delay-default-400]
 
 The delay in milliseconds before the spinner is displayed.
 
@@ -36,7 +36,7 @@ Use the buttons to toggle between the two `Spinners`.
 </App>
 ```
 
-### `fullScreen (default: false)`
+### `fullScreen (default: false)` [#fullscreen-default-false]
 
 If set to `true`, the component will be rendered in a full screen container.
 
@@ -46,17 +46,17 @@ If set to `true`, the component will be rendered in a full screen container.
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

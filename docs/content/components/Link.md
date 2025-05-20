@@ -2,9 +2,9 @@
 
 A `Link` component represents a navigation target within the app or a reference to an external web URL.
 
-## Using Link
+## Using Link [#using-link]
 
-### `Link` Appearance
+### `Link` Appearance [#link-appearance]
 
 You can use the `label` and `icon` properties of a `Link` to set its text and icon to display. If you want a custom appearance, you can nest your visual representation into `Link`:
 
@@ -19,9 +19,9 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `active (default: false)`
+### `active (default: false)` [#active-default-false]
 
 Indicates whether this link is active or not. If so, it will have a distinct visual appearance.
 
@@ -33,7 +33,7 @@ Indicates whether this link is active or not. If so, it will have a distinct vis
 </App>
 ```
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -45,7 +45,7 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `icon`
+### `icon` [#icon]
 
 This property allows you to add an icon (specify the icon's name) to the link.
 
@@ -59,11 +59,11 @@ This property allows you to add an icon (specify the icon's name) to the link.
 >[!INFO]
 > If you want to specify paddings and gaps or put the icon to the right of the link text, use your custom link template (nest it into `Link`).
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-### `target (default: "_self")`
+### `target (default: "_self")` [#target-default-self]
 
 This property specifies where to open the link represented by the `Link`. This property accepts the following values (in accordance with the HTML standard):
 
@@ -87,21 +87,21 @@ The following sample opens its link in a new tab:
 </App>
 ```
 
-### `to`
+### `to` [#to]
 
 This property defines the URL of the link.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
@@ -189,7 +189,7 @@ This component does not expose any methods.
 | wordWrap-Link | *none* | *none* |
 | writingMode-Link | *none* | *none* |
 
-### Variable Explanations
+### Variable Explanations [#variable-explanations]
 
 | Theme Variable | Description |
 | --- | --- |

@@ -31,6 +31,14 @@ export const MarkdownMd = createMetadata({
       valueType: "boolean",
       defaultValue: true,
     },
+    showHeadingAnchors: {
+      description:
+        "This boolean property specifies whether heading anchors should be " +
+        "displayed. If set to `true`, heading anchors will be displayed on hover " +
+        "next to headings.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
   },
 
   defaultThemeVars: {
@@ -104,6 +112,7 @@ export const markdownComponentRenderer = createComponentRenderer(
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
+        showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors, false)}
       >
         {renderedChildren}
       </TransformedMarkdown>
@@ -117,6 +126,7 @@ type TransformedMarkdownProps = {
   style: React.CSSProperties;
   extractValue: ValueExtractor;
   codeHighlighter?: CodeHighlighter;
+  showHeadingAnchors?: boolean;
 };
 
 const TransformedMarkdown = ({
@@ -125,6 +135,7 @@ const TransformedMarkdown = ({
   style,
   extractValue,
   codeHighlighter,
+  showHeadingAnchors,
 }: TransformedMarkdownProps) => {
   const markdownContent = useMemo(() => {
     if (typeof children !== "string") {
@@ -144,12 +155,17 @@ const TransformedMarkdown = ({
         convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
         resolvedMd.slice(nextPlayground[1]);
     }
-    resolvedMd = parseBindingExpression(resolvedMd, extractValue)
+    resolvedMd = parseBindingExpression(resolvedMd, extractValue);
     return resolvedMd;
   }, [children, extractValue]);
 
   return (
-    <Markdown removeIndents={removeIndents} codeHighlighter={codeHighlighter} style={style}>
+    <Markdown
+      removeIndents={removeIndents}
+      codeHighlighter={codeHighlighter}
+      style={style}
+      showHeadingAnchors={showHeadingAnchors}
+    >
       {markdownContent}
     </Markdown>
   );

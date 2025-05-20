@@ -2,9 +2,9 @@
 
 `Option` is a non-visual component describing a selection option. Other components (such as `Select`, `AutoComplete`, and others) may use nested `Option` instances from which the user can select.
 
-## Using `Option`
+## Using `Option` [#using-option]
 
-### With `AutoComplete`
+### With `AutoComplete` [#with-autocomplete]
 
 ```xmlui-pg copy {4-6} display name="Example: Option in a AutoComplete" height="275px"
 <App>
@@ -17,7 +17,7 @@
 </App>
 ```
 
-### With `Select`
+### With `Select` [#with-select]
 
 ```xmlui-pg copy {4-6} display name="Example: Option in a Select" height="275px"
 <App>
@@ -30,7 +30,7 @@
 </App>
 ```
 
-## Use children as Content Template
+## Use children as Content Template [#use-children-as-content-template]
 
 The [optionTemplate](#optiontemplate) property can be replaced by setting the item template component directly as the Option's child.
 In the following example, the two Option are functionally the same:
@@ -50,13 +50,13 @@ In the following example, the two Option are functionally the same:
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-### `label`
+### `label` [#label]
 
 This property defines the text to display for the option. If `label` is not defined, `Option` will use the `value` as the label.
 
@@ -75,11 +75,11 @@ This property defines the text to display for the option. If `label` is not defi
 </App>
 ```
 
-### `optionTemplate`
+### `optionTemplate` [#optiontemplate]
 
 This property is used to define a custom option template
 
-### `value`
+### `value` [#value]
 
 This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value.
 
@@ -98,14 +98,14 @@ This property defines the value of the option. If `value` is not defined, `Optio
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

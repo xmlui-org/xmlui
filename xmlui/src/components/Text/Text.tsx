@@ -55,6 +55,7 @@ export const TextMd = createMetadata({
     [`textColor-${COMP}`]: "$textColor-primary",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
+    [`fontSize-${COMP}-codefence`]: "$fontSize-small",
     [`fontFamily-${COMP}-code`]: "$fontFamily-monospace",
     [`fontSize-${COMP}-code`]: "$fontSize-small",
     [`borderWidth-${COMP}-code`]: "1px",

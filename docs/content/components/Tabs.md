@@ -25,9 +25,9 @@ Content is provided to a tab via placing child components under the `TabItem`.
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `activeTab`
+### `activeTab` [#activetab]
 
 This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab.
 
@@ -47,7 +47,7 @@ This property indicates the index of the active tab. The indexing starts from 0,
 </App>
 ```
 
-### `orientation (default: "vertical")`
+### `orientation (default: "vertical")` [#orientation-default-vertical]
 
 This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top.
 
@@ -69,7 +69,7 @@ Available values: `horizontal`, `vertical` **(default)**
 </App>
 ```
 
-### `tabTemplate`
+### `tabTemplate` [#tabtemplate]
 
 This property declares the template for the clickable tab area.
 
@@ -92,19 +92,19 @@ This property declares the template for the clickable tab area.
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `next`
+### `next` [#next]
 
 This method selects the next tab.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

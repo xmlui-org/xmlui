@@ -23,7 +23,7 @@ In the following examples all use the same list of data which looks like so:
 
 The data is provided as JSON.
 
-## Use children as Content Template
+## Use children as Content Template [#use-children-as-content-template]
 
 The [itemTemplate](#itemtemplate) property can be replaced by setting the item template component directly as the List's child.
 In the following example, the two List are functionally the same:
@@ -43,9 +43,9 @@ In the following example, the two List are functionally the same:
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `availableGroups`
+### `availableGroups` [#availablegroups]
 
 This property is an array of group names that the `List` will display.
 
@@ -126,7 +126,7 @@ This property is an array of group names that the `List` will display.
 </App>
 ```
 
-### `borderCollapse (default: true)`
+### `borderCollapse (default: true)` [#bordercollapse-default-true]
 
 Collapse items borders
 
@@ -274,7 +274,7 @@ Note how the `List` on the right has different borders:
 </App>
 ```
 
-### `data`
+### `data` [#data]
 
 The component receives data via this property. The `data` property is a list of items that the `List` can display.
 
@@ -361,7 +361,7 @@ See the [itemTemplate section](#itemtemplate).
 </App>
 ```
 
-### `defaultGroups`
+### `defaultGroups` [#defaultgroups]
 
 This property adds a list of default groups for the `List` and displays the group headers in the specified order. If the data contains group headers not in this list, those headers are also displayed (after the ones in this list); however, their order is not deterministic.
 
@@ -447,7 +447,7 @@ This property adds a list of default groups for the `List` and displays the grou
 </App>
 ```
 
-### `emptyListTemplate`
+### `emptyListTemplate` [#emptylisttemplate]
 
 This property defines the template to display when the list is empty.
 
@@ -463,7 +463,7 @@ This property defines the template to display when the list is empty.
 </App>
 ```
 
-### `groupBy`
+### `groupBy` [#groupby]
 
 This property sets which attribute of the data is used to group the list items. If the attribute does not appear in the data, it will be ignored.
 
@@ -548,7 +548,7 @@ This property sets which attribute of the data is used to group the list items. 
 </App>
 ```
 
-### `groupFooterTemplate`
+### `groupFooterTemplate` [#groupfootertemplate]
 
 Enables the customization of how the the footer of each group is displayed. Combine with [`groupHeaderTemplate`](#groupHeaderTemplate) to customize sections. You can use the `$item` context variable to access an item group and map its individual attributes.
 
@@ -646,7 +646,7 @@ groupBy="category">
 </App>
 ```
 
-### `groupHeaderTemplate`
+### `groupHeaderTemplate` [#groupheadertemplate]
 
 Enables the customization of how the groups are displayed, similarly to the [`itemTemplate`](#itemtemplate). You can use the `$item` context variable to access an item group and map its individual attributes.
 
@@ -732,7 +732,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 </App>
 ```
 
-### `groupsInitiallyExpanded`
+### `groupsInitiallyExpanded` [#groupsinitiallyexpanded]
 
 This Boolean property defines whether the list groups are initially expanded.
 
@@ -886,7 +886,7 @@ Note how the groups in the right `List` are expanded by default:
 </App>
 ```
 
-### `hideEmptyGroups (default: true)`
+### `hideEmptyGroups (default: true)` [#hideemptygroups-default-true]
 
 This boolean property indicates if empty groups should be hidden (no header and footer are displayed).
 
@@ -1044,7 +1044,7 @@ Note how the `meats` category is not displayed in the right `List`:
 </App>
 ```
 
-### `idKey (default: "id")`
+### `idKey (default: "id")` [#idkey-default-id]
 
 Denotes which attribute of an item acts as the ID or key of the item
 
@@ -1109,7 +1109,7 @@ Denotes which attribute of an item acts as the ID or key of the item
 </App>
 ```
 
-### `itemTemplate`
+### `itemTemplate` [#itemtemplate]
 
 This property allows the customization of mapping data items to components. You can use the `$item` context variable to access an item and map its individual attributes.
 
@@ -1202,7 +1202,7 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 </App>
 ```
 
-### `limit`
+### `limit` [#limit]
 
 This property limits the number of items displayed in the `List`.
 
@@ -1267,7 +1267,7 @@ This property limits the number of items displayed in the `List`.
 </App>
 ```
 
-### `loading`
+### `loading` [#loading]
 
 This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property.
 
@@ -1277,7 +1277,7 @@ This property delays the rendering of children until it is set to `false`, or th
 </App>
 ```
 
-### `orderBy`
+### `orderBy` [#orderby]
 
 This property enables the ordering of list items by specifying an attribute in the data.
 
@@ -1344,7 +1344,7 @@ This property enables the ordering of list items by specifying an attribute in t
 </App>
 ```
 
-### `pageInfo`
+### `pageInfo` [#pageinfo]
 
 This property contains the current page information. Setting this property also enures the `List` uses pagination.
 
@@ -1357,7 +1357,7 @@ It contains the following boolean attributes:
 | `isFetchingPrevPage` | _TBD_                                |
 | `isFetchingNextPage` | _TBD_                                |
 
-### `scrollAnchor (default: "top")`
+### `scrollAnchor (default: "top")` [#scrollanchor-default-top]
 
 This property pins the scroll position to a specified location of the list. Available values are shown below.
 
@@ -1424,13 +1424,13 @@ Available values: `top` **(default)**, `bottom`
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `scrollToBottom`
+### `scrollToBottom` [#scrolltobottom]
 
 This method scrolls the list to the bottom.
 
@@ -1461,25 +1461,25 @@ The following example demonstrates `scrollToBottom` and all the other scroll met
 </App>
 ```
 
-### `scrollToId`
+### `scrollToId` [#scrolltoid]
 
 This method scrolls the list to a specific item. The method accepts an item ID as a parameter.
 
 See the [`scrollToBottom`](#scrolltobottom) example.
 
-### `scrollToIndex`
+### `scrollToIndex` [#scrolltoindex]
 
 This method scrolls the list to a specific index. The method accepts an index as a parameter.
 
 See the [`scrollToBottom`](#scrolltobottom) example.
 
-### `scrollToTop`
+### `scrollToTop` [#scrolltotop]
 
 This method scrolls the list to the top.
 
 See the [`scrollToBottom`](#scrolltobottom) example.
 
-## Styling
+## Styling [#styling]
 
 `List` is a layout container; its purpose is to render nested child components.
 `List` has no theme variables to change its visual appearance.

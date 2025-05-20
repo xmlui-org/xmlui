@@ -2,9 +2,9 @@
 
 `NavPanel` is a placeholder within `App` to define the app's navigation (menu) structure.
 
-## Properties
+## Properties [#properties]
 
-### `logoTemplate`
+### `logoTemplate` [#logotemplate]
 
 This property defines the logo template to display in the navigation panel with the `vertical` and `vertical-sticky` layout.
 
@@ -31,17 +31,17 @@ This property defines the logo template to display in the navigation panel with 
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

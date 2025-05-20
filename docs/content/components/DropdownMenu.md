@@ -21,9 +21,9 @@ You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `Dro
 Try this dropdown menu:
 ```
 
-## Properties
+## Properties [#properties]
 
-### `alignment (default: "start")`
+### `alignment (default: "start")` [#alignment-default-start]
 
 This property allows you to determine the alignment of the dropdown panel with the displayed menu items.
 
@@ -56,7 +56,7 @@ Available values are:
 </App>
 ```
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -81,15 +81,15 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-### `triggerButtonIcon (default: "chevrondown")`
+### `triggerButtonIcon (default: "chevrondown")` [#triggerbuttonicon-default-chevrondown]
 
 This property defines the icon to display on the trigger button.
 
-### `triggerButtonIconPosition (default: "end")`
+### `triggerButtonIconPosition (default: "end")` [#triggerbuttoniconposition-default-end]
 
 This property defines the position of the icon on the trigger button.
 
@@ -100,7 +100,7 @@ Available values:
 | `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
 | `end` | The icon will appear at the end (right side when the left-to-right direction is set) **(default)** |
 
-### `triggerButtonThemeColor (default: "primary")`
+### `triggerButtonThemeColor (default: "primary")` [#triggerbuttonthemecolor-default-primary]
 
 This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
@@ -112,7 +112,7 @@ Available values:
 | `primary` | Primary theme color **(default)** |
 | `secondary` | Secondary theme color |
 
-### `triggerButtonVariant (default: "ghost")`
+### `triggerButtonVariant (default: "ghost")` [#triggerbuttonvariant-default-ghost]
 
 This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
@@ -124,7 +124,7 @@ Available values:
 | `outlined` | The button is displayed with a border and a transparent background. |
 | `ghost` | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. **(default)** |
 
-### `triggerTemplate`
+### `triggerTemplate` [#triggertemplate]
 
 This property allows you to define a custom trigger instead of the default one provided by `DropdownMenu`.
 
@@ -141,9 +141,9 @@ This property allows you to define a custom trigger instead of the default one p
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `willOpen`
+### `willOpen` [#willopen]
 
 This event fires when the `DropdownMenu` component is opened.
 
@@ -161,9 +161,9 @@ This event fires when the `DropdownMenu` component is opened.
 </App>
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `close`
+### `close` [#close]
 
 This method command closes the dropdown.
 
@@ -178,9 +178,9 @@ This method command closes the dropdown.
 </App>
 ```
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

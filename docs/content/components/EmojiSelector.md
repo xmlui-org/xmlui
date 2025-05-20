@@ -3,9 +3,9 @@
 >[!WARNING]
 > This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `EmojiSelector` component provides users with a graphical interface to browse, search and select emojis to insert into text fields, messages, or other forms of communication.
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
@@ -15,9 +15,9 @@ If this property is set to `true`, the component gets the focus automatically wh
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `select`
+### `select` [#select]
 
 This event is fired when the user selects an emoticon from this component.
 
@@ -30,10 +30,10 @@ This event is fired when the user selects an emoticon from this component.
 </App>
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

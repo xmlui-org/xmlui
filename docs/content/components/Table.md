@@ -28,17 +28,17 @@ All samples use table columns with the following definition unless noted otherwi
 
 > **Note**: See [`Column`](../components/Column) to learn more about table columns.
 
-## Properties
+## Properties [#properties]
 
-### `alwaysShowSelectionHeader (default: false)`
+### `alwaysShowSelectionHeader (default: false)` [#alwaysshowselectionheader-default-false]
 
 This property indicates when the row selection header is displayed. When the value is `true,` the selection header is always visible. Otherwise, it is displayed only when hovered.
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `data`
+### `data` [#data]
 
 The component receives data via this property. The `data` property is a list of items that the `Table` can display.
 
@@ -126,7 +126,7 @@ Here, the component displays rocket information coming from the official SpaceX 
 </App>
 ```
 
-### `enableMultiRowSelection (default: true)`
+### `enableMultiRowSelection (default: true)` [#enablemultirowselection-default-true]
 
 This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.
 
@@ -209,7 +209,7 @@ By default, the value of this property is `true`.
 </App>
 ```
 
-### `headerHeight`
+### `headerHeight` [#headerheight]
 
 This optional property is used to specify the height of the table header.
 
@@ -285,7 +285,7 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
 </App>
 ```
 
-### `hideHeader (default: false)`
+### `hideHeader (default: false)` [#hideheader-default-false]
 
 Set the header visibility using this property. Set it to `true` to hide the header.
 
@@ -362,7 +362,7 @@ The default value is `false`.
 </App>
 ```
 
-### `iconNoSort`
+### `iconNoSort` [#iconnosort]
 
 Allows setting the icon displayed in the Table column header when sorting is enabled, but the column remains unsorted.
 
@@ -439,7 +439,7 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
 </App>
 ```
 
-### `iconSortAsc`
+### `iconSortAsc` [#iconsortasc]
 
 Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order.
 
@@ -516,7 +516,7 @@ sorting is done according to the column, and the column is sorted in ascending o
 </App>
 ```
 
-### `iconSortDesc`
+### `iconSortDesc` [#iconsortdesc]
 
 Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order.
 
@@ -595,7 +595,7 @@ Select a column header and set it to descending ordering.
 </App>
 ```
 
-### `isPaginated (default: false)`
+### `isPaginated (default: false)` [#ispaginated-default-false]
 
 This property adds pagination controls to the `Table`.
 
@@ -669,7 +669,7 @@ This property adds pagination controls to the `Table`.
 </App>
 ```
 
-### `loading`
+### `loading` [#loading]
 
 This boolean property indicates if the component is fetching (or processing) data. This property is useful when data is loaded conditionally or receiving it takes some time.
 
@@ -685,11 +685,11 @@ This property is useful when data is loaded conditionally or receiving it takes 
 </App>
 ```
 
-### `noBottomBorder (default: false)`
+### `noBottomBorder (default: false)` [#nobottomborder-default-false]
 
 This property indicates whether the table should have a bottom border. When set to `true`, the table does not have a bottom border. Otherwise, it has a bottom border.
 
-### `noDataTemplate`
+### `noDataTemplate` [#nodatatemplate]
 
 A property to customize what to display if the table does not contain any data.
 
@@ -705,7 +705,7 @@ A property to customize what to display if the table does not contain any data.
 </App>
 ```
 
-### `pageSizes`
+### `pageSizes` [#pagesizes]
 
 This property holds an array of page sizes (numbers) the user can select for pagination. If this property is not defined, the component allows only a page size of 10 items.
 
@@ -783,7 +783,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
 </App>
 ```
 
-### `rowDisabledPredicate`
+### `rowDisabledPredicate` [#rowdisabledpredicate]
 
 This property defines a predicate function with a return value that determines if the row should be disabled. The function retrieves the item to display and should return a Boolean-like value.
 
@@ -863,7 +863,7 @@ The following example disables all table rows where the item's quantity exceeds 
 </App>
 ```
 
-### `rowsSelectable`
+### `rowsSelectable` [#rowsselectable]
 
 Indicates whether the rows are selectable (`true`) or not (`false`).
 
@@ -939,7 +939,7 @@ The default value is `false`.
 </App>
 ```
 
-### `sortBy`
+### `sortBy` [#sortby]
 
 This property is used to determine which data attributes to sort by.
 
@@ -1013,7 +1013,7 @@ This property is used to determine which data attributes to sort by.
 </App>
 ```
 
-### `sortDirection`
+### `sortDirection` [#sortdirection]
 
 This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set.
 
@@ -1087,9 +1087,9 @@ This property determines the sort order to be `ascending` or `descending`. This 
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `selectionDidChange`
+### `selectionDidChange` [#selectiondidchange]
 
 This event is triggered when the table's current selection (the rows selected) changes. Its parameter is an array of the selected table row items. 
 
@@ -1174,7 +1174,7 @@ Click on any of the column headers to trigger a new sorting:
 </App>
 ```
 
-### `sortingDidChange`
+### `sortingDidChange` [#sortingdidchange]
 
 This event is fired when the table data sorting has changed. It has two arguments: the column's name and the sort direction. When the column name is empty, the table displays the data list as it received it.
 
@@ -1255,7 +1255,7 @@ Click on any of the column headers to trigger a new sorting:
 </App>
 ```
 
-### `willSort`
+### `willSort` [#willsort]
 
 This event is fired before the table data is sorted. It has two arguments: the column's name and the sort direction. When the method returns a literal `false` value (and not any other falsy one), the method indicates that the sorting should be aborted.
 
@@ -1340,9 +1340,9 @@ clicking that column header still does not sort because `willSort` prevents it:
 </App>
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `clearSelection`
+### `clearSelection` [#clearselection]
 
 This method clears the list of currently selected table rows.
 
@@ -1431,33 +1431,33 @@ This method clears the list of currently selected table rows.
 </App>
 ```
 
-### `getSelectedIds`
+### `getSelectedIds` [#getselectedids]
 
 This method returns the list of currently selected table rows IDs.
 
 (See the [example](#clearselection) at the `clearSelection` method)
 
-### `getSelectedItems`
+### `getSelectedItems` [#getselecteditems]
 
 This method returns the list of currently selected table rows items.
 
 (See the [example](#clearselection) at the `clearSelection` method)
 
-### `selectAll`
+### `selectAll` [#selectall]
 
 This method selects all the rows in the table. This method has no effect if the rowsSelectable property is set to `false`.
 
 (See the [example](#clearselection) at the `clearSelection` method)
 
-### `selectId`
+### `selectId` [#selectid]
 
 This method selects the row with the specified ID. This method has no effect if the `rowsSelectable` property is set to `false`. The method argument can be a single id or an array of them.
 
 (See the [example](#clearselection) at the `clearSelection` method)
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

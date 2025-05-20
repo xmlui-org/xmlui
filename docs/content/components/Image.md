@@ -2,9 +2,9 @@
 
 The `Image` component represents or depicts an object, scene, idea, or other concept with a picture.
 
-## Properties
+## Properties [#properties]
 
-### `alt`
+### `alt` [#alt]
 
 This property specifies an alternate text for the image.
 
@@ -20,11 +20,11 @@ This is useful in two cases:
 </App>
 ```
 
-### `animation`
+### `animation` [#animation]
 
 The animation object to be applied to the component
 
-### `aspectRatio`
+### `aspectRatio` [#aspectratio]
 
 This property sets a preferred aspect ratio for the image, which will be used in the calculation of auto sizes and some other layout functions.
 
@@ -36,7 +36,7 @@ This property sets a preferred aspect ratio for the image, which will be used in
 </App>
 ```
 
-### `fit (default: "contain")`
+### `fit (default: "contain")` [#fit-default-contain]
 
 This property sets how the image content should be resized to fit its container.
 
@@ -60,20 +60,20 @@ This property sets how the image content should be resized to fit its container.
 </App>
 ```
 
-### `lazyLoad`
+### `lazyLoad` [#lazyload]
 
 Lazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it). The default value is eager (`false`).
 
 Lazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it).
 The default value is eager (\`false\`).
 
-### `src`
+### `src` [#src]
 
 This property is used to indicate the source (path) of the image to display.
 
-## Events
+## Events [#events]
 
-### `click`
+### `click` [#click]
 
 This event is triggered when the Image is clicked.
 
@@ -91,10 +91,10 @@ This event is triggered when the image is clicked.
 </App>
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

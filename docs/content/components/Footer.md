@@ -5,21 +5,21 @@ The `Footer` is a component that acts as a placeholder within `App`.
 >[!INFO]
 > Learn more about using this component [here](../learning/app-component).
 
-## Properties
+## Properties [#properties]
 
 This component does not have any properties.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

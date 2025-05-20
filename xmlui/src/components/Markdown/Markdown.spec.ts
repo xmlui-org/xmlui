@@ -1,5 +1,6 @@
 import { SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
+import type { HeadingLevel } from "../Heading/abstractions";
 
 // --- Testing
 
@@ -117,6 +118,51 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       'Hello there {"a":"[xmlui function]","x":null,"b":{"c":3,"d":"asdadsda","e":"[xmlui function]"}} How are you true';
     await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
     await expect((await createMarkdownDriver()).component).toHaveText(EXPECTED);
+  });
+
+  const headingLevelsWithMarkdown: Array<{ level: HeadingLevel; md: string }> = [
+    { level: "h1", md: "# Heading" },
+    { level: "h2", md: "## Heading" },
+    { level: "h3", md: "### Heading" },
+    { level: "h4", md: "#### Heading" },
+    { level: "h5", md: "##### Heading" },
+    { level: "h6", md: "###### Heading" },
+  ];
+  headingLevelsWithMarkdown.forEach(({ level, md }) => {
+    test(`can render anchor link for '${level}'`, async ({ initTestBed, createMarkdownDriver }) => {
+      const SOURCE = md;
+      await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+      const driver = await createMarkdownDriver();
+      expect(await driver.hasHtmlElement("a")).toBe(true);
+    });
+  });
+
+  test("show implicit anchor links", async ({ initTestBed, createMarkdownDriver }) => {
+    const SOURCE = "## Heading";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    expect(await driver.hasHtmlElement("a")).toBe(true);
+  });
+
+  test("show explicit anchor links", async ({ initTestBed, createMarkdownDriver }) => {
+    const SOURCE = "## Heading [#heading]";
+    await initTestBed(`<Markdown showHeadingAnchors="true"><![CDATA[${SOURCE}]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    expect(await driver.hasHtmlElement("a")).toBe(true);
+  });
+
+  test("don't render implicit anchor links", async ({ initTestBed, createMarkdownDriver }) => {
+    const SOURCE = "## Heading";
+    await initTestBed(`<Markdown showHeadingAnchors="false"><![CDATA[${SOURCE}]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    expect(await driver.hasHtmlElement("a")).toBe(false);
+  });
+
+  test("don't render explicit anchor links", async ({ initTestBed, createMarkdownDriver }) => {
+    const SOURCE = "## Heading [#heading]";
+    await initTestBed(`<Markdown showHeadingAnchors="false"><![CDATA[${SOURCE}]]></Markdown>`);
+    const driver = await createMarkdownDriver();
+    expect(await driver.hasHtmlElement("a")).toBe(false);
   });
 });
 

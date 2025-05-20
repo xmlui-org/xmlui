@@ -2,9 +2,9 @@
 
 A `ProgressBar` component visually represents the progress of a task or process.
 
-## Properties
+## Properties [#properties]
 
-### `value (default: 0)`
+### `value (default: 0)` [#value-default-0]
 
 This property defines the progress value with a number between 0 and 1.
 
@@ -20,17 +20,17 @@ The following example demonstrates using it:
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

@@ -4,13 +4,13 @@ The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption
 
 `RadioGroup` is often used in forms. See the [Using Forms](/learning/using-components/forms.mdx) guide for details.
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -28,7 +28,7 @@ This property indicates whether the input accepts user actions (`true`) or not (
 </App>
 ```
 
-### `initialValue`
+### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
 
@@ -46,15 +46,15 @@ This property defines the initial value of the selected option within the group.
 </App>
 ```
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-### `labelBreak (default: false)`
+### `labelBreak (default: false)` [#labelbreak-default-false]
 
 This boolean value indicates if the `RadioGroup` labels can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")`
+### `labelPosition (default: "top")` [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -67,23 +67,23 @@ Available values:
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
 
-### `labelWidth`
+### `labelWidth` [#labelwidth]
 
 This property sets the width of the `RadioGroup`.
 
-### `orientation`
+### `orientation` [#orientation]
 
 (*** NOT IMPLEMENTED YET ***) This property sets the orientation of the options within the radio group.
 
-### `readOnly (default: false)`
+### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required`
+### `required` [#required]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")`
+### `validationStatus (default: "none")` [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -122,9 +122,9 @@ This prop is used to visually indicate status changes reacting to form field val
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `didChange`
+### `didChange` [#didchange]
 
 This event is triggered when value of RadioGroup has changed.
 
@@ -143,23 +143,23 @@ This event is triggered after the user has changed the field value. The followin
 Select one of the available options and see how the `Text` underneath it is updated in parallel:
 ```
 
-### `gotFocus`
+### `gotFocus` [#gotfocus]
 
 This event is triggered when the RadioGroup has received the focus.
 
-### `lostFocus`
+### `lostFocus` [#lostfocus]
 
 This event is triggered when the RadioGroup has lost the focus.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 `RadioGroup` is a component that governs its children and stores the selected value. It does not support styling; however, you can style the options within the group. When you set the theme variables for the group's options, use the `RadioGroupOption` name.
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

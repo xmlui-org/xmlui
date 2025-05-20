@@ -2,13 +2,13 @@
 
 The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state.
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -30,15 +30,15 @@ it is `true` by default.
 </App>
 ```
 
-### `indeterminate (default: false)`
+### `indeterminate (default: false)` [#indeterminate-default-false]
 
 The `true` value of this property signals that the component is in an _intedeterminate state_.
 
-### `initialValue (default: false)`
+### `initialValue (default: false)` [#initialvalue-default-false]
 
 This property sets the component's initial value.
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
@@ -51,11 +51,11 @@ This property sets the label of the component.
 </App>
 ```
 
-### `labelBreak (default: false)`
+### `labelBreak (default: false)` [#labelbreak-default-false]
 
 This boolean value indicates if the `Switch` labels can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "end")`
+### `labelPosition (default: "end")` [#labelposition-default-end]
 
 Places the label at the given position of the component.
 
@@ -77,11 +77,11 @@ Available values:
 </App>
 ```
 
-### `labelWidth`
+### `labelWidth` [#labelwidth]
 
 This property sets the width of the `Switch`.
 
-### `readOnly (default: false)`
+### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
@@ -94,11 +94,11 @@ If true, the value of the component cannot be modified.
 </App>
 ```
 
-### `required`
+### `required` [#required]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `validationStatus (default: "none")`
+### `validationStatus (default: "none")` [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -110,9 +110,9 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-## Events
+## Events [#events]
 
-### `didChange`
+### `didChange` [#didchange]
 
 This event is triggered when value of Switch has changed.
 
@@ -127,7 +127,7 @@ A read-only switch never fires this event, and it won't fire if the switch's val
 </App>
 ```
 
-### `gotFocus`
+### `gotFocus` [#gotfocus]
 
 This event is triggered when the Switch has received the focus.
 
@@ -146,13 +146,13 @@ Click the `Switch` in the example demo to change the label text. Note how clicki
 </App>
 ```
 
-### `lostFocus`
+### `lostFocus` [#lostfocus]
 
 This event is triggered when the Switch has lost the focus.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `setValue`
+### `setValue` [#setvalue]
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
@@ -176,13 +176,13 @@ You can use this method to set the component's current value programmatically (`
 </App>
 ```
 
-### `value`
+### `value` [#value]
 
 You can query this read-only API property to query the component's current value (`true`: checked, `false`: unchecked).
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

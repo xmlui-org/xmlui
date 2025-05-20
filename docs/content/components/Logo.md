@@ -7,7 +7,7 @@ import xmluiLogo from  "../../component-samples/Logo/xmlui-logo.svg";
 
 You can learn more about using logos in application layouts in the [App Component](/learning/using-components/app-component/) article.
 
-## Using Logo
+## Using Logo [#using-logo]
 
 The framework checks the application manifest for a logo resource (SVG file).
 If found, it loads and displays it in the Logo component.
@@ -55,18 +55,18 @@ It also uses the `Logo` component within the template definition:
 The markup displays the app's logo:
 ```
 
-## Properties
+## Properties [#properties]
 
 This component does not have any properties.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

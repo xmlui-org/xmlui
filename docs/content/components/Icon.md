@@ -5,9 +5,9 @@
 
 It is a small visual element, which is used to graphically represent functions, features, or types of content within a user interface.
 
-## Properties
+## Properties [#properties]
 
-### `fallback`
+### `fallback` [#fallback]
 
 This optional property provides a way to handle situations when the provided [icon name](#name) is not found in the registry.
 
@@ -17,7 +17,7 @@ This optional property provides a way to handle situations when the provided [ic
 </App>
 ```
 
-### `name`
+### `name` [#name]
 
 This string property specifies the name of the icon to display. All icons have unique names and identifying the name is case-sensitive.
 
@@ -37,7 +37,7 @@ Nothing is displayed if the icon name is not found in the registry.
 </App>
 ```
 
-### `size`
+### `size` [#size]
 
 This property defines the size of the `Icon`. Note that setting the `height` and/or the `width` of the component will override this property.
 
@@ -55,17 +55,17 @@ Available values: `xs`, `sm`, `md`, `lg`
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

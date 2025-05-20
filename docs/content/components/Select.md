@@ -8,7 +8,7 @@ The component provides context values with which you can access some internal pr
 - `$item`: This property represents the value of an item in the dropdown list.
 - `$itemContext`: This property provides a `removeItem` method to delete the particular value from the selection.
 
-## Using `Select`
+## Using `Select` [#using-select]
 
 The component accepts `Option` components as children defining a particular option's label-value pair.
 `Option` requires a `value` property and while also having a `label` that is displayed in the list.
@@ -36,13 +36,13 @@ You can use `Select` with dynamic options:
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `dropdownHeight`
+### `dropdownHeight` [#dropdownheight]
 
 This property sets the height of the dropdown list.
 
@@ -65,7 +65,7 @@ This property sets the height of the dropdown list.
 </App>
 ```
 
-### `emptyListTemplate`
+### `emptyListTemplate` [#emptylisttemplate]
 
 This optional property provides the ability to customize what is displayed when the list of options is empty.
 
@@ -88,7 +88,7 @@ Click on the second field to see the custom empty list indicator.
 </App>
 ```
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -98,15 +98,15 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `inProgress`
+### `inProgress` [#inprogress]
 
 This property indicates whether the component is in progress. It can be used to show a loading message.
 
-### `inProgressNotificationMessage`
+### `inProgressNotificationMessage` [#inprogressnotificationmessage]
 
 This property indicates the message to display when the component is in progress.
 
-### `initialValue`
+### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
 
@@ -120,15 +120,15 @@ This property sets the component's initial value.
 </App>
 ```
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
-### `labelBreak (default: false)`
+### `labelBreak (default: false)` [#labelbreak-default-false]
 
 This boolean value indicates if the `Select` labels can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")`
+### `labelPosition (default: "top")` [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -141,15 +141,15 @@ Available values:
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
 
-### `labelWidth`
+### `labelWidth` [#labelwidth]
 
 This property sets the width of the `Select`.
 
-### `maxLength`
+### `maxLength` [#maxlength]
 
 This property sets the maximum length of the input it accepts.
 
-### `multiSelect (default: false)`
+### `multiSelect (default: false)` [#multiselect-default-false]
 
 The `true` value of the property indicates if the user can select multiple items.
 
@@ -172,7 +172,7 @@ The `true` value of the property indicates if the user can select multiple items
 </App>
 ```
 
-### `optionLabelTemplate`
+### `optionLabelTemplate` [#optionlabeltemplate]
 
 This property allows replacing the default template to display an option in the dropdown list.
 
@@ -196,7 +196,7 @@ In the template definition, you can use the `$item` context property to access t
 </App>
 ```
 
-### `optionTemplate`
+### `optionTemplate` [#optiontemplate]
 
 This property allows replacing the default template to display an option in the dropdown list.
 
@@ -216,7 +216,7 @@ This property allows replacing the default template to display an option in the 
 </App>
 ```
 
-### `placeholder`
+### `placeholder` [#placeholder]
 
 A placeholder text that is visible in the input field when its empty.
 
@@ -230,19 +230,19 @@ A placeholder text that is visible in the input field when its empty.
 </App>
 ```
 
-### `readOnly (default: false)`
+### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required`
+### `required` [#required]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `searchable`
+### `searchable` [#searchable]
 
 This property enables the search functionality in the dropdown list.
 
-### `validationStatus (default: "none")`
+### `validationStatus (default: "none")` [#validationstatus-default-none]
 
 This property allows you to set the validation status of the input component.
 
@@ -263,7 +263,7 @@ Available values:
 </App>
 ```
 
-### `valueTemplate`
+### `valueTemplate` [#valuetemplate]
 
 This property allows replacing the default template to display a selected value when multiple selections (`multiSelect` is `true`) are enabled.
 
@@ -293,9 +293,9 @@ In the template definition, you can use the `$item` context property to access t
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `didChange`
+### `didChange` [#didchange]
 
 This event is triggered when value of Select has changed.
 
@@ -311,7 +311,7 @@ This event is triggered when value of Select has changed.
 </App>
 ```
 
-### `gotFocus`
+### `gotFocus` [#gotfocus]
 
 This event is triggered when the Select has received the focus.
 
@@ -329,13 +329,13 @@ This event is triggered when the Select has received the focus.
 </App>
 ```
 
-### `lostFocus`
+### `lostFocus` [#lostfocus]
 
 This event is triggered when the Select has lost the focus.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
-### `focus`
+### `focus` [#focus]
 
 This method sets the focus on the Select.
 
@@ -350,11 +350,11 @@ This method sets the focus on the Select.
 </App>
 ```
 
-### `reset`
+### `reset` [#reset]
 
 This method resets the component to its initial value, or clears the selection if no initial value was provided.
 
-### `setValue`
+### `setValue` [#setvalue]
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
@@ -376,13 +376,13 @@ You can use this method to set the component's current value programmatically (`
 </App>
 ```
 
-### `value`
+### `value` [#value]
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

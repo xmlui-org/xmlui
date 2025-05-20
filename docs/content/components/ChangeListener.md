@@ -2,9 +2,9 @@
 
 `ChangeListener` is a functional component (it renders no UI) to trigger an action when a particular value (component property, state, etc.) changes.
 
-## Properties
+## Properties [#properties]
 
-### `listenTo`
+### `listenTo` [#listento]
 
 Value to the changes of which this component listens.
 
@@ -20,7 +20,7 @@ The following sample demonstrates using this property. Every time the user click
 </App>
 ```
 
-### `throttleWaitInMs (default: 0)`
+### `throttleWaitInMs (default: 0)` [#throttlewaitinms-default-0]
 
 This variable sets a throttling time (in milliseconds) to apply when executing the `didChange` event handler. All changes within that throttling time will only fire the `didChange` event once.
 
@@ -42,9 +42,9 @@ The following example works like the previous one (in the `listen` prop's descri
 </App>
 ```
 
-## Events
+## Events [#events]
 
-### `didChange`
+### `didChange` [#didchange]
 
 This event is triggered when value of ChangeListener has changed.
 
@@ -52,10 +52,10 @@ This event is fired when the component observes a value change (within the speci
 
 The event argument is an object with `prevValue` and `newValue` properties that (as their name suggests) contain the previous and the new values.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

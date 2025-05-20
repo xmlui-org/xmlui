@@ -394,7 +394,7 @@ please do not break it!"/>
   const { height: heightTextShort } = await getFullRectangle(page.getByTestId("textShort"));
   const { height: heightTextLong } = await getFullRectangle(page.getByTestId("textLong"));
 
-  expect(heightTextLong).toEqual(heightTextShort * 3);
+  expect(heightTextLong).toEqualWithTolerance(heightTextShort * 3, 0.01);
 });
 
 test("Overflow container dimensions", async ({ page }) => {

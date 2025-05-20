@@ -2,20 +2,20 @@
 
 A PageMetaTitle component allows setting up (or changing) the app title to display with the current browser tab.
 
-## Properties
+## Properties [#properties]
 
-### `value`
+### `value` [#value]
 
 This property sets the page's title to display in the browser tab.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 This component does not have any styles.

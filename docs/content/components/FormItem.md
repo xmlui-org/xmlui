@@ -11,13 +11,13 @@ The component provides context values with which you can access some internal pr
 
 You can learn more about this component in the [Forms](../../create-apps/forms.mdx) article.
 
-## Properties
+## Properties [#properties]
 
-### `autoFocus (default: false)`
+### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `bindTo`
+### `bindTo` [#bindto]
 
 This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name.
 
@@ -34,7 +34,7 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
 </App>
 ```
 
-### `customValidationsDebounce (default: 0)`
+### `customValidationsDebounce (default: 0)` [#customvalidationsdebounce-default-0]
 
 This optional number prop determines the time interval between two runs of a custom validation.
 
@@ -58,7 +58,7 @@ Note how changing the input in the demo below will result in a slight delay of i
 </App>
 ```
 
-### `enabled (default: true)`
+### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
@@ -71,11 +71,11 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `gap`
+### `gap` [#gap]
 
 This property defines the gap between the adornments and the input area.
 
-### `initialValue`
+### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
 
@@ -88,11 +88,11 @@ This property sets the component's initial value.
 </App>
 ```
 
-### `inputTemplate`
+### `inputTemplate` [#inputtemplate]
 
 This property is used to define a custom input template.
 
-### `label`
+### `label` [#label]
 
 This property sets the label of the component.
 
@@ -104,11 +104,11 @@ This property sets the label of the component.
 </App>
 ```
 
-### `labelBreak (default: true)`
+### `labelBreak (default: true)` [#labelbreak-default-true]
 
 This boolean value indicates if the label can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")`
+### `labelPosition (default: "top")` [#labelposition-default-top]
 
 Places the label at the given position of the component.
 
@@ -135,11 +135,11 @@ Different input components have different layout methods
 </App>
 ```
 
-### `labelWidth`
+### `labelWidth` [#labelwidth]
 
 This property sets the width of the item label.
 
-### `lengthInvalidMessage`
+### `lengthInvalidMessage` [#lengthinvalidmessage]
 
 This optional string property is used to customize the message that is displayed on a failed length check: [minLength](#minlength) or [maxLength](#maxlength).
 
@@ -156,7 +156,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 </App>
 ```
 
-### `lengthInvalidSeverity (default: "error")`
+### `lengthInvalidSeverity (default: "error")` [#lengthinvalidseverity-default-error]
 
 This property sets the severity level of the length validation.
 
@@ -175,7 +175,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 </App>
 ```
 
-### `maxLength`
+### `maxLength` [#maxlength]
 
 Checks whether the input has a maximum length of a specified value.
 
@@ -194,11 +194,11 @@ In the demo below, try to enter an input longer than 4 characters or submit the 
 </App>
 ```
 
-### `maxTextLength`
+### `maxTextLength` [#maxtextlength]
 
 The maximum length of the text in the input field
 
-### `maxValue`
+### `maxValue` [#maxvalue]
 
 Checks whether the input has the maximum specified value.
 
@@ -217,7 +217,7 @@ In the demo below, enter an input greater than 99 or just submit the form as is.
 </App>
 ```
 
-### `minLength`
+### `minLength` [#minlength]
 
 Checks whether the input has a minimum length of a specified value.
 
@@ -233,7 +233,7 @@ In the demo below, enter an input shorter than 4 characters or just submit the f
 </App>
 ```
 
-### `minValue`
+### `minValue` [#minvalue]
 
 Checks whether the input has the minimum specified value.
 
@@ -252,7 +252,7 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 </App>
 ```
 
-### `pattern`
+### `pattern` [#pattern]
 
 Checks whether the input fits a predefined regular expression.
 
@@ -276,7 +276,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 </App>
 ```
 
-### `patternInvalidMessage`
+### `patternInvalidMessage` [#patterninvalidmessage]
 
 This optional string property is used to customize the message that is displayed on a failed pattern test.
 
@@ -295,7 +295,7 @@ In the demo below, enter anything that does not look like an email and click out
 </App>
 ```
 
-### `patternInvalidSeverity (default: "error")`
+### `patternInvalidSeverity (default: "error")` [#patterninvalidseverity-default-error]
 
 This property sets the severity level of the pattern validation.
 
@@ -314,7 +314,7 @@ In the demo below, enter a string of characters that does not look like an email
 </App>
 ```
 
-### `rangeInvalidMessage`
+### `rangeInvalidMessage` [#rangeinvalidmessage]
 
 This optional string property is used to customize the message that is displayed when a value is out of range.
 
@@ -337,7 +337,7 @@ Just submitting the form as is also produces the same error.
 </App>
 ```
 
-### `rangeInvalidSeverity (default: "error")`
+### `rangeInvalidSeverity (default: "error")` [#rangeinvalidseverity-default-error]
 
 This property sets the severity level of the value range validation.
 
@@ -361,7 +361,7 @@ Just submitting the form as is also produces the same error.
 </App>
 ```
 
-### `regex`
+### `regex` [#regex]
 
 Checks whether the input fits the provided regular expression.
 
@@ -377,7 +377,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 </App>
 ```
 
-### `regexInvalidMessage`
+### `regexInvalidMessage` [#regexinvalidmessage]
 
 This optional string property is used to customize the message that is displayed on a failed regular expression test.
 
@@ -396,7 +396,7 @@ In the demo below, enter a password that is not a lowercase string and click out
 </App>
 ```
 
-### `regexInvalidSeverity (default: "error")`
+### `regexInvalidSeverity (default: "error")` [#regexinvalidseverity-default-error]
 
 This property sets the severity level of regular expression validation.
 
@@ -416,7 +416,7 @@ Just submitting the form as is also produces the same error.
 </App>
 ```
 
-### `required`
+### `required` [#required]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -430,7 +430,7 @@ Set this property to `true` to indicate it must have a value before submitting t
 </App>
 ```
 
-### `requiredInvalidMessage`
+### `requiredInvalidMessage` [#requiredinvalidmessage]
 
 This optional string property is used to customize the message that is displayed if the field is not filled in.
 
@@ -451,7 +451,7 @@ In the demo below, leave the field empty and click outside to see the regular an
 </App>
 ```
 
-### `type (default: "text")`
+### `type (default: "text")` [#type-default-text]
 
 This property is used to determine the specific input control the FormItem will wrap around. Note that the control names start with a lowercase letter and map to input components found in XMLUI.
 
@@ -480,7 +480,7 @@ Available values:
 > For custom controls, there is no need to explicitly set the `type` to `custom`.
 > Omitting the type and providing child components implicitly sets it to custom.
 
-### `validationMode (default: "errorLate")`
+### `validationMode (default: "errorLate")` [#validationmode-default-errorlate]
 
 This property sets what kind of validation mode or strategy to employ for a particular input field.
 
@@ -492,9 +492,9 @@ Available values:
 | `onChanged` | Display error (if present) for every keystroke. |
 | `onLostFocus` | Show/hide error (if present) only if the field loses focus. |
 
-## Events
+## Events [#events]
 
-### `validate`
+### `validate` [#validate]
 
 This event is used to define a custom validation function.
 
@@ -512,13 +512,13 @@ In the demo below, leave the field as is and submit the form or enter an input t
 </App>
 ```
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
-### Theme Variables
+### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |

@@ -13,9 +13,9 @@ The component provides context values with which you can access some internal pr
 
 Throught this documentation page the data used is the same that is found in the [`Table` component documentation](./Table.mdx#properties).
 
-## Properties
+## Properties [#properties]
 
-### `bindTo`
+### `bindTo` [#bindto]
 
 Indicates what part of the data to lay out in the column.
 
@@ -85,11 +85,11 @@ Indicates what part of the data to lay out in the column.
 </App>
 ```
 
-### `canResize`
+### `canResize` [#canresize]
 
 This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.
 
-### `canSort`
+### `canSort` [#cansort]
 
 This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`).
 
@@ -165,7 +165,7 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
 </App>
 ```
 
-### `header`
+### `header` [#header]
 
 Adds a label for a particular column.
 
@@ -239,15 +239,15 @@ Adds a label for a particular column.
 </App>
 ```
 
-### `maxWidth`
+### `maxWidth` [#maxwidth]
 
 Indicates the maximum width a particular column can have. Same rules apply as with [width](#width).
 
-### `minWidth`
+### `minWidth` [#minwidth]
 
 Indicates the minimum width a particular column can have. Same rules apply as with [width](#width).
 
-### `pinTo`
+### `pinTo` [#pinto]
 
 This property allows the column to be pinned to the `left` (left-to-right writing style) or `right` (left-to-right writing style) edge of the table. If the writing style is right-to-left, the locations are switched.
 
@@ -336,7 +336,7 @@ Scroll the table contents horizontally to see how the pinned columns are display
 </App>
 ```
 
-### `width`
+### `width` [#width]
 
 This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*`, `2*`, etc.). You will get an error if you use any other unit (or value).
 
@@ -414,14 +414,14 @@ Check what happens when you resize table columns:
 </App>
 ```
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 Styling is done via the [`Table` component](./Table.mdx).

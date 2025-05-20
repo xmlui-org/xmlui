@@ -2,7 +2,7 @@
 
 The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. Its behavior depends on the layout container in which it is used.
 
-## Using `SpaceFiller`
+## Using `SpaceFiller` [#using-spacefiller]
 
 In a `Stack`, `SpaceFiller` pushes the children following it to the other end of the container:
 
@@ -29,18 +29,18 @@ In a `FlowLayout`, `SpaceFiller` acts as a line break for a row. The children fo
 </App>
 ```
 
-## Properties
+## Properties [#properties]
 
 This component does not have any properties.
 
-## Events
+## Events [#events]
 
 This component does not have any events.
 
-## Exposed Methods
+## Exposed Methods [#exposed-methods]
 
 This component does not expose any methods.
 
-## Styling
+## Styling [#styling]
 
 `SpaceFiller` ignores all layout properties; it cannot be styled.
