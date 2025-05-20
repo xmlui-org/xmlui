@@ -1,6 +1,6 @@
 import {
-  CSSProperties,
-  ForwardedRef,
+  type CSSProperties,
+  type ForwardedRef,
   forwardRef,
   useEffect,
   useLayoutEffect,

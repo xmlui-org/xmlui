@@ -42,30 +42,12 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "textColor-NavLink--hover--active": "$color-primary-500",
   
     // --- TOC
-    "paddingTop-TableOfContents": "0",
-    "borderLeftWidth-TableOfContentsItem": "1px",
-    "borderLeftWidth-TableOfContentsItem--active": "1px",
-    "borderColor-TableOfContentsItem": "transparent",
-    "borderColor-TableOfContentsItem--active": "transparent",
-
-    "wordWrap-TableOfContentsItem": "break-word",
-    "fontSize-TableOfContentsItem": "$fontSize-small",
-    "fontWeight-TableOfContentsItem--active": "bold",
     "fontWeight-TableOfContentsItem--pressed--active": "bold",
     "fontWeight-TableOfContentsItem": "600",
     "textColor-TableOfContentsItem": "$color-secondary-500",
     "textColor-TableOfContentsItem--hover": "$color-surface-900",
-
-    "paddingLeft-TableOfContentsItem": "0.75rem",
-    "paddingTop-TableOfContentsItem": "0.35rem",
-    "paddingBottom-TableOfContentsItem": "0.35rem",
-    
-    "paddingLeft-TableOfContentsItem-level-3": "2rem",
     "fontWeight-TableOfContentsItem-level-3": "400",
-    "paddingLeft-TableOfContentsItem-level-4": "3rem",
-    "paddingLeft-TableOfContentsItem-level-5": "3rem",
-    "paddingLeft-TableOfContentsItem-level-6": "3rem",
-
+    
     // --- Markdown
     "fontSize-Text-markdown": "$fontSize-normal",
     "lineHeight-Text-codefence": "$fontHeight-normal",
