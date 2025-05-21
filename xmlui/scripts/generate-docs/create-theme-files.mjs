@@ -10,6 +10,10 @@ if (!existsSync(OUTPUT_DIR)) {
   mkdirSync(OUTPUT_DIR, { recursive: true });
 }
 
+if (collectedThemes === undefined) {
+  console.log("No theme information found. Please run the metadata build first.");
+  process.exit(1);
+}
 const rootTheme = collectedThemes.root;
 
 // --- Extract theme variable information from components
@@ -17,9 +21,15 @@ let themeVarsData = {};
 let light = {};
 let dark = {};
 
+if (collectedComponentMetadata === undefined) {
+  console.log("No component metadata found. Please run the metadata build first.");
+  process.exit(1);
+}
+
 // --- Obtain theme variables from components
 Object.keys(collectedComponentMetadata)
-  .toSorted()
+  //.toSorted() <- Not supported in Node versions under 20
+  .slice().sort()
   .forEach((key) => {
     const component = collectedComponentMetadata[key];
     const { themeVars, defaultThemeVars } = component;
