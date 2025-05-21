@@ -1,0 +1,41 @@
+<Component name="Test">
+
+<DataSource
+  id="stops"
+  url="https://api.tfl.gov.uk/Line/bakerloo/StopPoints"
+  transformResult="{
+    // The function receives the array of stops fetched from the API
+    stops => stops.map(stop => {
+      // Helper function to extract a property value by key from additionalProperties
+      const getProp = key => {
+        if (!stop.additionalProperties) return '';
+        const propObj = stop.additionalProperties.find(p => p.key === key);
+        return propObj ? propObj.value : '';
+      };
+
+      // Return a new object with only the properties we care about
+      return {
+        // The common name of the stop (e.g., 'Baker Street Underground Station')
+        name: stop.commonName,
+
+        // The zone, WiFi, and toilets info, extracted from additionalProperties
+        zone: getProp('Zone'),
+        wifi: getProp('WiFi'),
+        toilets: getProp('Toilets'),
+
+        // A comma-separated list of line names that serve this stop
+        lines: stop.lines
+          ? stop.lines.map(line => line.name).join(', ')
+          : ''
+      };
+    })
+  }"
+/>
+
+
+<Text preserveLinebreaks="{true}">
+  {JSON.stringify(stops, null, 2)}
+</Text>
+
+</Component>
+

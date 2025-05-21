@@ -78,8 +78,6 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 
     <SpaceFiller />
 
-    <Stack d
-
     <Stack width="50%">
       <TubeStops line="waterloo-city" />
     </Stack>
@@ -101,7 +99,7 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
   <DataSource
     id="stops"
     url="https://api.tfl.gov.uk/Line/{$props.line}/StopPoints"
-    transformResult="{transformStops}"
+    transformResult="{window.transformStops}"
   />
 
   <Text variant="strong">{$props.line}</Text>
@@ -130,25 +128,28 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
     <Markdown width="50%"><![CDATA[
 <details>
 <summary>transformStops function</summary>
-<pre>
-function transformStops(stops) {
-    return stops.map(stop => {
-      // Helper to extract a value from additionalProperties by key
-      const getProp = (key) => {
-        const prop = stop.additionalProperties &&
-          stop.additionalProperties.find(p => p.key === key);
-        return prop ? prop.value : '';
-      };
-      return {
-        name: stop.commonName,
-        zone: getProp('Zone'),
-        wifi: getProp('WiFi'),
-        toilets: getProp('Toilets'),
-        lines: stop.lines ? stop.lines.map(line => line.name).join(', ') : ''
-      };
-    });
+<pre><code>
+window.transformStops = function(stops) {
+  return stops.map(function(stop) {
+  // Helper to extract a value from additionalProperties by key
+    function getProp(key) {
+      if (!stop.additionalProperties) return '';
+      var propObj = stop.additionalProperties.find(function(p) { return p.key === key; });
+      return propObj ? propObj.value : '';
+    }
+    return {
+      name: stop.commonName,
+      zone: getProp('Zone'),
+      wifi: getProp('WiFi'),
+      toilets: getProp('Toilets'),
+      // A comma-separated list of line names that serve this stop
+      lines: stop.lines
+        ? stop.lines.map(function(line) { return line.name; }).join(', ')
+        : ''
+    };
+  });
 }
-</pre>
+</code></pre>
 </details>
 ]]></Markdown>
 
@@ -164,10 +165,12 @@ The `TubeStops` component:
 
 When you use custom components to access, transform, and present data, your XMLUI markup stays clean, readable, and easy to read and maintain.
 
-Another way to keep your markup clean: rely on XMLUI's layout and style engine to make your app look good and behave gracefully by default. You can adjust the (many!) settings that define an XMLUI [Theme](/components/Theme), but you'll rarely need to. Let's learn about themes next.
+Another way to keep your markup clean: rely on XMLUI's layout and style engine to make your app look good and behave gracefully by default. You can adjust the (many!) settings that define an XMLUI [Theme](/components/Theme), but you'll rarely need to. The next chapter explains why.
 
 ]]></Markdown>
 
 <Link icon="arrowright" label="Themes" to="/themes-intro" />
+
+
 
 </Component>
