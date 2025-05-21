@@ -3,8 +3,6 @@
 <H1>XMLUI Code</H1>
 
 <Markdown><![CDATA[
-# XMLUI Code
-
 With XMLUI you can go a long way without coding anything more than small JavaScript snippets like those we've seen in the [Markup](/markup) chapter.
 
 ![js snippets](/resources/js-snippets.png)
@@ -133,7 +131,7 @@ You can use either or both of these strategies in an XMLUI app. Use `index.html`
 - Your function will be reused across components
 - You like keeping all your functions in one place for convenient review
 - You need to debug your function
-- Your function interacts with JavaScript libraries you load into `index.html`
+- Your function interacts with JavaScript libraries you load via `index.html`
 - You are unfamiliar with "modern" JavaScript features like arrow functions
 
 Use code-behind if:
