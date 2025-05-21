@@ -10,7 +10,8 @@
   "dependencies": {
     "shiki": "^3.3.0",
     "xmlui": "*",
-    "xmlui-playground": "*"
+    "xmlui-playground": "*",
+    "xmlui-search": "*"
   },
   "msw": {
     "workerDirectory": [

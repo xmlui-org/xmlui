@@ -1,6 +1,5 @@
 import { createComponentRenderer, createMetadata, parseScssVar } from "xmlui";
-import { Search } from "./Search";
-import { Search2 } from "./Search2";
+import { Search, defaultProps } from "./Search";
 
 const COMP = "Search";
 export const SearchMd = createMetadata({
@@ -12,50 +11,23 @@ export const SearchMd = createMetadata({
     },
     limit: {
       description: ``,
+      valueType: "number",
+      defaultValue: defaultProps.limit,
     },
   },
   //themeVars: parseScssVar(styles.themeVars),
 });
 
-const SearchComponent = createComponentRenderer(COMP, SearchMd, ({ node, extractValue }) => {
+const searchComponentRenderer = createComponentRenderer(COMP, SearchMd, ({ node, extractValue }) => {
   return (
     <Search
       data={extractValue(node.props?.data)}
-      limit={extractValue.asOptionalNumber(node.props?.limit)}
+      limit={extractValue.asOptionalNumber(node.props?.limit, defaultProps.limit)}
     />
   );
 });
 
-const COMP2 = "Search2";
-export const Search2Md = createMetadata({
-  description: `The \`${COMP2}\` component provides a search component.`,
-  status: "experimental",
-  props: {
-    data: {
-      description: ``,
-    },
-    limit: {
-      description: ``,
-    },
-  },
-  //themeVars: parseScssVar(styles.themeVars),
-});
-
-const SearchComponent2 = createComponentRenderer(
-  COMP2,
-  Search2Md,
-  ({ node, extractValue, registerComponentApi }) => {
-    return (
-      <Search2
-        data={extractValue(node.props?.data)}
-        limit={extractValue.asOptionalNumber(node.props?.limit)}
-        registerComponentApi={registerComponentApi}
-      />
-    );
-  },
-);
-
 export default {
   namespace: "XMLUIExtensions",
-  components: [SearchComponent, SearchComponent2],
+  components: [searchComponentRenderer],
 };

@@ -1,13 +1,11 @@
 import { startApp } from "xmlui";
-import demo from "./src";
+import Search from "./src";
 
 export const runtime = import.meta.glob(`/demo/**`, { eager: true });
-startApp(runtime, demo);
+startApp(runtime, Search);
 
 if (import.meta.hot) {
   import.meta.hot.accept((newModule) => {
-    startApp(newModule?.runtime, demo);
+    startApp(newModule?.runtime, Search);
   });
 }
-
-export default demo;
