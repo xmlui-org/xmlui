@@ -74,7 +74,7 @@ export const navGroupComponentRenderer = createComponentRenderer(
         to={extractValue.asOptionalString(node.props.to)}
         icon={<Icon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />}
         node={node}
-        initiallyExpanded={extractValue.asBoolean(node.props.initiallyExpanded)}
+        initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}
         renderChild={renderChild}
         iconHorizontalExpanded={extractValue.asOptionalString(node.props.iconHorizontalExpanded)}
         iconVerticalExpanded={extractValue.asOptionalString(node.props.iconVerticalExpanded)}
