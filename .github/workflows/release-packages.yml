@@ -64,10 +64,13 @@ jobs:
         if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
-      - name: Publish to NPM and Create GitHub Releases
+      - name: Create Version PR or Publish to NPM and Create GitHub Releases
         id: changesets_publish
         uses: changesets/action@v1
         with:
+          version: npm run changeset:version
+          commit: "chore: version packages for stable release"
+          title: "Version Packages for Stable Release"
           publish: npm run publish-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -97,6 +100,7 @@ jobs:
         with:
           files: "tools/vscode/*.vsix"
           tag_name: xmlui-vscode@${{ steps.get_xmlui_vscode_version.outputs.version }}
+          fail_on_unmatched_files: true
       - name: Output Published Packages Info
         if: steps.changesets_publish.outputs.published == 'true'
         run: |
