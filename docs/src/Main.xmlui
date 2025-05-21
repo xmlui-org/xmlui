@@ -7,8 +7,6 @@
 
     <NavPanel>
 
-        <NavGroup 
-
         <NavGroup label="Learn XMLUI" initiallyExpanded="{true}">
             <NavLink label="Introduction" to="/" />
             <NavLink label="Reactive Data" to="/reactive-intro" />
@@ -26,22 +24,16 @@
             <NavLink label="Modal Dialogs" to="/modalDialogs" />
         </NavGroup>
 
-
-        <NavGroup label="Code" >
-            <NavLink label="Code Behind" to="/tbd" />
-            <NavLink label="Properties" to="/tbd" />
-            <NavLink label="Expressions" to="/tbd" />
-            <NavLink label="Context Variable" to="/tbd" />
-        </NavGroup>
-
         <NavGroup label="Themes" >
             <NavLink label="Layout Values" to="/tbd" />
             <NavLink label="Variables" to="/tbd" />
         </NavGroup>
 
-        <NavLink label="Glossary" to="/tbd" />
+        <NavLink label="Helper Tags" to="/tbd" />
+        <NavLink label="Context Variables" to="/tbd" />
         <NavLink label="Palettes" to="/palettes" />
         <NavLink label="Icons" to="/icons" />
+        <NavLink label="Glossary" to="/tbd" />
         <NavLink label="Test" to="/test" />
 
         <RecursiveNavTree items="{appGlobals.navPanelContent}"/>
@@ -75,6 +67,11 @@
             <Markup />
         </Page>
 
+        <Page url="/code">
+            <Code />
+        </Page>
+
+
         <Page url="/icons">
             <Icons />
         </Page>
@@ -87,13 +84,6 @@
             <Markdown data="pages/xmlui-theme.md" />
         </Page>
 
-        <Page url="/markup">
-            <TBD />
-        </Page>
-
-        <Page url="/code">
-            <TBD />
-        </Page>
 
         <Page url="/appComponent">
             <TBD />
@@ -124,7 +114,7 @@
         </Page>
 
         <Page url="/test">
-            <Markdown data="pages/test.md" />
+           <Test />
         </Page>
 
 

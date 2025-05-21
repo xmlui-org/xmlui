@@ -23,5 +23,6 @@
     </Column>
   </Table>
 
+<Text preserveLinebreaks="true">{JSON.stringify(stops, null, 2)}</Text>
 
 </Component>
