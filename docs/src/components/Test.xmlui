@@ -1,41 +1,30 @@
 <Component name="Test">
 
-<DataSource
-  id="stops"
-  url="https://api.tfl.gov.uk/Line/bakerloo/StopPoints"
-  transformResult="{
-    // The function receives the array of stops fetched from the API
-    stops => stops.map(stop => {
-      // Helper function to extract a property value by key from additionalProperties
-      const getProp = key => {
-        if (!stop.additionalProperties) return '';
-        const propObj = stop.additionalProperties.find(p => p.key === key);
-        return propObj ? propObj.value : '';
-      };
+<Markdown><![CDATA[
 
-      // Return a new object with only the properties we care about
-      return {
-        // The common name of the stop (e.g., 'Baker Street Underground Station')
-        name: stop.commonName,
+```xmlui-pg
+<App var.count="{1}">
 
-        // The zone, WiFi, and toilets info, extracted from additionalProperties
-        zone: getProp('Zone'),
-        wifi: getProp('WiFi'),
-        toilets: getProp('Toilets'),
+<Button label="1" onClick="{
+  console.log('clicked');
+  count++;
+  toast('count now' + count)
+}" />
 
-        // A comma-separated list of line names that serve this stop
-        lines: stop.lines
-          ? stop.lines.map(line => line.name).join(', ')
-          : ''
-      };
-    })
-  }"
-/>
+<Button label="1">
+  <event name="click">
+  {
+    console.log('clicked');
+    count++;
+    toast('count now' + count)
+  }
+  </event>
+</Button>
 
+</App>
+```
+]]></Markdown>
 
-<Text preserveLinebreaks="{true}">
-  {JSON.stringify(stops, null, 2)}
-</Text>
 
 </Component>
 

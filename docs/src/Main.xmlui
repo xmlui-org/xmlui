@@ -14,7 +14,7 @@
             <NavLink label="Themes" to="/themes-intro" />
         </NavGroup>
 
-        <NavGroup label="Create XMLUI Apps" initiallyExpanded="{false}">
+        <NavGroup label="Create XMLUI Apps" initiallyExpanded="{true}">
             <NavLink label="Markup" to="/markup" />
             <NavLink label="Code" to="/code" />
             <NavLink label="The App Component" to="/appComponent" />
@@ -31,6 +31,7 @@
 
         <NavLink label="Helper Tags" to="/tbd" />
         <NavLink label="Context Variables" to="/tbd" />
+        <NavLink label="Globals" to="/globals" />
         <NavLink label="Palettes" to="/palettes" />
         <NavLink label="Icons" to="/icons" />
         <NavLink label="Glossary" to="/tbd" />
@@ -79,6 +80,11 @@
         <Page url="/palettes">
             <Palettes />
         </Page>
+
+        <Page url="/globals">
+          <Markdown data="pages/globals.md" />
+        </Page>
+
 
         <Page url="/xmlui-theme">
             <Markdown data="pages/xmlui-theme.md" />
