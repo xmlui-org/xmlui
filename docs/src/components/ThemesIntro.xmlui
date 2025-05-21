@@ -12,7 +12,7 @@ We've seen how XMLUI enables reactive data binding without requiring you to mast
             id="pickTheme"
             width="30%"
             initialValue="xmlui"
-            onDidChange="(newTheme) => setTheme(newTheme)"
+            onDidChange="{ (newTheme) => setTheme(newTheme) }"
         >
             <Option value="earthtone" label="earthtone" />
             <Option value="xmlui" label="xmlui" />
