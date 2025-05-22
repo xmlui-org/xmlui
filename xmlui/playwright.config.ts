@@ -46,6 +46,7 @@ export default defineConfig({
   projects: [
     {
       name: "non-smoke",
+      grepInvert: /@smoke/
     },
     {
       name: "smoke",

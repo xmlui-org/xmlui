@@ -1,16 +1,16 @@
-import type { SetupWorker} from "msw/browser";
+import type { SetupWorker } from "msw/browser";
 import { setupWorker } from "msw/browser";
-import type { RequestHandler} from "msw";
+import type { RequestHandler } from "msw";
 import { http } from "msw";
 import { isArray } from "lodash-es";
 
-import { ApiInterceptor } from "../interception/ApiInterceptor";
+import { ApiInterceptor } from "./ApiInterceptor";
 import type { ApiInterceptorDefinition } from "./abstractions";
 
 // Create handlers for the specified API interceptor
-function createHandlers(api: ApiInterceptor): RequestHandler[] {
+function createHandlers(api: ApiInterceptor) {
   const operations = api.getOperations();
-  let handlers: RequestHandler[] = [];
+  let handlers: Array<RequestHandler> = [];
   Object.entries(operations).forEach(([operationId, operation]) => {
     let urls = [operation.url];
     if (isArray(operation.url)) {
@@ -42,6 +42,7 @@ export const createApiInterceptorWorker = async (
   if (!worker) {
     worker = setupWorker();
   }
-  worker.use(...handlers);
+  // https://github.com/mswjs/msw/issues/2495
+  worker.use(...handlers as any);
   return worker;
 };

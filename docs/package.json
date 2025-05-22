@@ -11,5 +11,10 @@
     "shiki": "^3.3.0",
     "xmlui": "*",
     "xmlui-playground": "*"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
