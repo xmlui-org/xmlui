@@ -7,7 +7,7 @@ import { createComponentRenderer } from "./renderers";
 
 let highlighter: HighlighterCore | null = null;
 
-export function XmluiCodeHighlighter({ value }: { value: string }) {
+export function XmluiCodeHighlighter({ value, style }: { value: string, style?: React.CSSProperties }) {
   const { activeThemeTone } = useTheme();
 
   const [initialized, setInitialized] = useState(false);
@@ -60,6 +60,7 @@ export function XmluiCodeHighlighter({ value }: { value: string }) {
           [styles.dark]: activeThemeTone === "dark",
           [styles.light]: activeThemeTone === "light",
         })}
+        style={style}
         dangerouslySetInnerHTML={{
           __html: html,
         }}
@@ -71,7 +72,7 @@ export function XmluiCodeHighlighter({ value }: { value: string }) {
 export const codeComponentRenderer = createComponentRenderer(
   "XmluiCodehighlighter",
   {},
-  ({ node, renderChild }) => {
-    return <XmluiCodeHighlighter value={renderChild(node.children) as string} />;
+  ({ node, renderChild, layoutCss }) => {
+    return <XmluiCodeHighlighter value={renderChild(node.children) as string} style={layoutCss} />;
   },
 );
