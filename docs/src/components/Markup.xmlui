@@ -10,28 +10,20 @@ When you write XML markup to create an XMLUI app, you use XML tags to name compo
 An attribute may be a literal string that sets the value of a property.
 ]]></Markdown>
 
-  <FlowLayout >
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+  <TwoColumnCode>
+    <property name="codeTemplate">
+      <![CDATA[
 ```xmlui
 <Text value="This is rendered as text." />
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+      ]]>
+    </property>
+    <![CDATA[
 ```xmlui-pg  name="A literal property"
 <Text value="This is rendered as text." />
 ```
-</Stack>
-</HStack>
-        ]]>
-      </Markdown>
-    </Stack>
-  </FlowLayout>
+    ]]>
+  </TwoColumnCode>
 
 <Markdown><![CDATA[
 ## Expressions
@@ -39,53 +31,41 @@ An attribute may be a literal string that sets the value of a property.
 An attribute may also be a JavaScript expression — enclosed in curly braces `{ }` — that dynamically sets the value of a property.
 ]]></Markdown>
 
-  <FlowLayout verticalAlignment="center">
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+  <TwoColumnCode>
+    <property name="codeTemplate">
+      <![CDATA[
 ```xmlui
 <Text value="Life, the universe, and everything: { 6 * 7 }" />
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+      ]]>
+    </property>
+    <![CDATA[
 ```xmlui-pg name="A dynamic property"
 <Text value="Life, the universe, and everything: { 6 * 7 }" />
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-  </FlowLayout> 
+    ]]>
+  </TwoColumnCode>
   
   An expression can hold a JSON list. 
   
-  <FlowLayout>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+  <TwoColumnCode>
+    <property name="codeTemplate">
+      <![CDATA[
 ```xmlui
 <Items data="{ [ 'Bakerloo', 'Central', 'Circle'] }"
-<Text> $item </Text>
+  <Text>{ $item }</Text>
 </Items>
 ```
       ]]>
-      </Markdown>
-    </Stack>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+    </property>
+    <![CDATA[
 ```xmlui-pg name="A JSON list"
 <Items data="{ [ 'Bakerloo', 'Central', 'Circle'] }" >
-<Text> { $item } </Text>
+  <Text>{ $item }</Text>
 </Items>
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-  </FlowLayout>
+    ]]>
+  </TwoColumnCode>
 
   <Markdown>
     <![CDATA[
@@ -93,12 +73,12 @@ Or a complex JSON object, in which case you'll write an outer set of curly brace
     ]]>
   </Markdown>
 
-  <FlowLayout>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown><![CDATA[
+  <TwoColumnCode>
+    <property name="codeTemplate">
+      <![CDATA[
 ```xmlui
 <Form id="searchForm" padding="0.5rem"
-  data='{ { station: "Brixton", wifi: true, toilets: false } }'
+  data='{{ station: "Brixton", wifi: true, toilets: false }}'
   onSubmit="() => { preview.setValue(JSON.stringify($data)) }"
 >
     <Text>Search for station amenities</Text>
@@ -115,11 +95,8 @@ Or a complex JSON object, in which case you'll write an outer set of curly brace
 <TextArea id="preview" />
 ```
       ]]>
-      </Markdown>
-    </Stack>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+    </property>
+    <![CDATA[
 ```xmlui-pg name="A complex JSON object"
 <Form id="searchForm" padding="0.5rem"
   data='{{ station: "Brixton", wifi: true, toilets: false }}'
@@ -138,10 +115,8 @@ Or a complex JSON object, in which case you'll write an outer set of curly brace
 
 <TextArea id="preview" />
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-  </FlowLayout>
+      ]]>
+  </TwoColumnCode>
 
   <Markdown>
     <![CDATA[
@@ -160,23 +135,19 @@ You can declare a variable using the `var` prefix.
     ]]>
   </Markdown>
 
-  <FlowLayout>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+  <TwoColumnCode>
+    <property name="codeTemplate">
+      <![CDATA[
 ```xmlui
 <App var.stations="{ [ 'Bakerloo', 'Central', 'Circle'] }">
-  <Items data="{stations"}>
+  <Items data="{stations}">
     <Text>{$item}</Text>
   </Items>
 </App>
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-    <Stack width="*">
-      <Markdown>
-        <![CDATA[
+      ]]>
+    </property>
+    <![CDATA[
 ```xmlui-pg name="Declaring a variable with var"
 <App var.stations="{ [ 'Bakerloo', 'Central', 'Circle'] }">
   <Items data="{stations}">
@@ -184,10 +155,8 @@ You can declare a variable using the `var` prefix.
   </Items>
 </App>
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-  </FlowLayout>
+    ]]>
+  </TwoColumnCode>
 
   <Markdown>
     <![CDATA[
@@ -195,10 +164,9 @@ Or using the `<variable>` helper tag.
     ]]>
   </Markdown>
 
-  <FlowLayout>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+  <TwoColumnCode>
+    <property name="codeTemplate">
+      <![CDATA[
 ```xmlui
 <App>
   <variable
@@ -209,12 +177,9 @@ Or using the `<variable>` helper tag.
   </Items>
 </App>
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-    <Stack width="*">
-      <Markdown>
-        <![CDATA[
+      ]]>
+    </property>
+    <![CDATA[
 ```xmlui-pg name="Declaring a variable with <variable>"
 <App>
   <variable
@@ -225,20 +190,17 @@ Or using the `<variable>` helper tag.
   </Items>
 </App>
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-  </FlowLayout>
+    ]]>
+  </TwoColumnCode>
 
 
 <H3>Nested variables</H3>
 
 The same variable name can be declared in nested scopes. The engine resolves the name to the variable in the closest (innermost) scope.
 
-<FlowLayout>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+  <TwoColumnCode>
+    <property name="codeTemplate">
+      <![CDATA[
 ```xmlui
 <App var.title="var.title is 'Hello, from App!'">
   <H1>{title}</H1>
@@ -248,11 +210,8 @@ The same variable name can be declared in nested scopes. The engine resolves the
 </App>
 ```
         ]]>
-      </Markdown>
-    </Stack>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+    </property>
+    <![CDATA[
 ```xmlui-pg name="Defining and using nested variables"
 <App var.title="var.title is 'Hello, from App!'">
   <H1>{title}</H1>
@@ -261,10 +220,8 @@ The same variable name can be declared in nested scopes. The engine resolves the
   </VStack>
 </App>
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-  </FlowLayout>
+    ]]>
+  </TwoColumnCode>
 
   <H3>Reactive variables</H3>
 
@@ -274,10 +231,9 @@ In [Reactive data binding](/reactive-intro) we saw how a `Select` can cause a `T
     ]]>
   </Markdown>
 
-  <FlowLayout>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+  <TwoColumnCode>
+    <property name="codeTemplate">
+      <![CDATA[
 ```xmlui
 <App var.count="{0}" var.countTimes3="{3 * count}" >
   <Button
@@ -287,12 +243,9 @@ In [Reactive data binding](/reactive-intro) we saw how a `Select` can cause a `T
   <Text>Click count * 3 = {countTimes3}</Text>
 </App>
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-    <Stack width="*">
-      <Markdown>
-        <![CDATA[
+      ]]>
+    </property>
+    <![CDATA[
 ```xmlui-pg name="Defining and using reactive variables"
 <App var.count="{0}" var.countTimes3="{3 * count}" >
   <Button
@@ -302,10 +255,8 @@ In [Reactive data binding](/reactive-intro) we saw how a `Select` can cause a `T
   <Text>Click count * 3 = {countTimes3} (changes indirectly)</Text>
 </App>
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-  </FlowLayout>
+    ]]>
+  </TwoColumnCode>
 
   <Markdown>
     <![CDATA[
@@ -321,10 +272,9 @@ We've seen two ways to declare variables: a `var` declaration in an XML attribut
     ]]>
   </Markdown>
 
-  <FlowLayout>
-    <Stack width="*" height="100%" verticalAlignment="center">
-      <Markdown>
-        <![CDATA[
+  <TwoColumnCode>
+    <property name="codeTemplate">
+      <![CDATA[
 ```xmlui
 <App var.count="{0}" >
   <Button label="Click to increment the count">
@@ -335,12 +285,9 @@ We've seen two ways to declare variables: a `var` declaration in an XML attribut
   </Button>
 </App>
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-    <Stack width="*">
-      <Markdown>
-        <![CDATA[
+      ]]>
+    </property>
+    <![CDATA[
 ```xmlui-pg name="Declare an event handler using the <event> tag"
 <App var.count="{0}" >
   <Button label="Click to increment the count">
@@ -351,22 +298,20 @@ We've seen two ways to declare variables: a `var` declaration in an XML attribut
   </Button>
 </App>
 ```
-        ]]>
-      </Markdown>
-    </Stack>
-  </FlowLayout>
+    ]]>
+  </TwoColumnCode>
 
-  <Markdown>
+  <Markdown codeHighlighter="{appGlobals.highlighter}">
     <![CDATA[
 > [!INFO]
 > Why use the `<event>` tag? In this example there's no reason to prefer it. But as we saw above, you declare a `Form`'s `buttonRowTemplate` property in XMLUI markup using the `<property>` helper tag. The same pattern applies when a button's handler is an XMLUI component like `<APICall>`.
-> ```
->   <Button label="Click to increment the count on the server">
->    <event name="click">
->      <APICall url="/count/increment" />
->    </event>
->    <Text>Click count = {count}</Text>
->  </Button>
+> ```xmlui
+> <Button label="Click to increment the count on the server">
+>   <event name="click">
+>     <APICall url="/count/increment" />
+>   </event>
+>   <Text>Click count = {count}</Text>
+> </Button>
     ]]>
   </Markdown>
 </Component>
