@@ -21,7 +21,7 @@
     "prepare-docs-data": "npm run build:xmlui-metadata",
     "generate-all-docs": "npm run build:xmlui-metadata && npm run build:ext-meta && npm run generate-docs",
     "export-themes": "npm run prepare-docs-data && node scripts/generate-docs/create-theme-files.mjs",
-    "generate-langserver-metadata": "node scripts/get-langserver-metadata.mjs > src/language-server/xmlui-metadata-generated.mjs"
+    "gen:langserver-metadata": "node scripts/get-langserver-metadata.mjs > src/language-server/xmlui-metadata-generated.mjs"
   },
   "dependencies": {
     "@eslint-community/regexpp": "4.10.0",

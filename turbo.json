@@ -11,14 +11,33 @@
       "outputs": ["dist/standalone/**"]
     },
     "build:xmlui-metadata": {
+      "inputs": ["$TURBO_DEFAULT$", "!src/language-server/xmlui-metadata-generated.mjs"],
       "outputs": ["dist/metadata/**"]
+    },
+    "gen:langserver-metadata": {
+      "dependsOn": ["build:xmlui-metadata"],
+      "outputs": ["src/language-server/xmlui-metadata-generated.mjs"]
     },
     "build:extension": {
       "dependsOn": ["^build:extension"],
       "outputs": ["dist/**"]
     },
+    "xmlui-vscode#build:vsix": {
+      "dependsOn": ["xmlui-vscode#build"],
+      "outputs": ["xmlui-vscode-*.vsix"]
+    },
+    "xmlui-vscode#build": {
+      "dependsOn": ["^gen:langserver-metadata"],
+      "outputs": ["dist/**"]
+    },
     "build:xmlui-all": {
-      "dependsOn": ["build:bin", "build:xmlui-metadata", "build:xmlui", "build:xmlui-standalone", "build:extension"],
+      "dependsOn": [
+        "build:bin",
+        "build:xmlui-metadata",
+        "build:xmlui",
+        "build:xmlui-standalone",
+        "build:extension"
+      ],
       "outputs": ["dist/**"]
     },
     "build:docs": {
