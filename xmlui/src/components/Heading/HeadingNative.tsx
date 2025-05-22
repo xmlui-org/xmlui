@@ -17,6 +17,7 @@ import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import type { HeadingLevel } from "./abstractions";
+import { Link } from "@remix-run/react";
 
 export type HeadingProps = {
   uid?: string;
@@ -106,10 +107,18 @@ export const Heading = forwardRef(function Heading(
       {anchorId && (
         <span ref={anchorRef} id={anchorId} className={styles.anchorRef} data-anchor={true} />
       )}
-      {showAnchor && anchorId && (
-        <a href={`#${anchorId}`} aria-hidden="true">#</a>
-      )}
       {children}
+      {showAnchor && anchorId && (
+        <Link to={`#${anchorId}`} aria-hidden="true" onClick={(event) => {
+          // cmd/ctrl + click - open in new tab, don't prevent that
+          if(tableOfContentsContext){
+            if (!event.ctrlKey && !event.metaKey && !event.metaKey) {
+              event.preventDefault();
+            }
+            tableOfContentsContext.scrollToAnchor(anchorId, true);
+          }
+        }}>#</Link>
+      )}
     </Element>
   );
 });
