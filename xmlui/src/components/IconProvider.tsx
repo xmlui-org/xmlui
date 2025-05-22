@@ -110,6 +110,11 @@ import { MoonIcon } from "./Icon/MoonIcon";
 import { StarsIcon } from "./Icon/StarsIcon";
 import { LightToDarkIcon } from "./Icon/LightToDark";
 import { DarkToLightIcon } from "./Icon/DarkToLightIcon";
+import { AdmonitionInfoIcon } from "./Icon/AdmonitionInfo";
+import { AdmonitionWarningIcon } from "./Icon/AdmonitionWarning";
+import { AdmonitionDangerIcon } from "./Icon/AdmonitionDanger";
+import { AdmonitionNoteIcon } from "./Icon/AdmonitionNote";
+import { AdmonitionTipIcon } from "./Icon/AdmonitionTip";
 
 type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
 
@@ -267,6 +272,12 @@ registerIconRenderer("trending-level", (props: IconBaseProps) => <TrendingLevelI
 registerIconRenderer("sortasc", (props: IconBaseProps) => <SortAscendingIcon {...props} />);
 registerIconRenderer("sortdesc", (props: IconBaseProps) => <SortDescendingIcon {...props} />);
 registerIconRenderer("nosort", (props: IconBaseProps) => <NoSortIcon {...props} />);
+
+registerIconRenderer("admonition_info", (props: IconBaseProps) => <AdmonitionInfoIcon {...props} />);
+registerIconRenderer("admonition_warning", (props: IconBaseProps) => <AdmonitionWarningIcon {...props} />);
+registerIconRenderer("admonition_danger", (props: IconBaseProps) => <AdmonitionDangerIcon {...props} />);
+registerIconRenderer("admonition_note", (props: IconBaseProps) => <AdmonitionNoteIcon {...props} />);
+registerIconRenderer("admonition_tip", (props: IconBaseProps) => <AdmonitionTipIcon {...props} />);
 
 // --- IDE extras (temporary)
 registerIconRenderer("arrowdown", (props: IconBaseProps) => <BsArrowDownShort {...props} />);
