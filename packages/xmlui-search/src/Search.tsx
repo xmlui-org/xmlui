@@ -1,5 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { LocalLink, AutoComplete, TextBox, VisuallyHidden } from "xmlui";
+import { LocalLink, AutoComplete, TextBox, VisuallyHidden, OptionNative } from "xmlui";
 import Fuse, { type FuseResult } from "fuse.js";
 
 type Props = {
@@ -21,6 +21,14 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
   const [inputValue, setInputValue] = useState("");
   const [debouncedValue, setDebouncedValue] = useState("");
   const [show, setShow] = useState(false);
+
+  const targetRef = useRef<HTMLInputElement>(null);
+  const [width, setWidth] = useState(0);
+  const updateWidth = () => {
+    if (targetRef.current) {
+      setWidth(targetRef.current.offsetWidth);
+    }
+  };
 
   const searchOptions = useMemo(() => {
     return {
@@ -91,17 +99,49 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
     };
   }, [inputValue]);
 
+  useEffect(() => {
+    updateWidth(); // Initial measurement
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
   return (
     <form role="search" style={{ position: "relative" }}>
       <VisuallyHidden>
         <label htmlFor={id}>Search Field</label>
       </VisuallyHidden>
-      <TextBox
+      {/* <AutoComplete
         id={id}
-        type="search"
         placeholder="Type to search..."
         value={inputValue}
         style={{ height: "30px" }}
+        onDidChange={(value) =>
+          setInputValue(() => {
+            fuse.search(value);
+            return value;
+          })
+        }
+        onFocus={() => setShow(true)}
+      >
+        {results &&
+          results.map((result) => {
+            return (
+              <OptionNative
+                key={result.item.path}
+                value={result.item.path}
+                label={result.item.path.split("/").pop()}
+                labelText={result.item.path.split("/").pop()}
+              />
+            );
+          })}
+      </AutoComplete> */}
+      <TextBox
+        id={id}
+        ref={targetRef}
+        type="search"
+        placeholder="Type to search..."
+        value={inputValue}
+        style={{ height: "30px", width: "280px" }}
         startIcon="search"
         onDidChange={(value) =>
           setInputValue(() => {
@@ -111,7 +151,6 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
         }
         onFocus={() => setShow(true)}
       />
-      {/* !!!!TEMP!!!! */}
       {show && results && results.length > 0 && (
         <ul
           style={{
@@ -120,14 +159,27 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
             padding: "12px",
             backgroundColor: "var(--xmlui-color-surface-0)",
             border: "1px solid var(--xmlui-color-secondary-900)",
-            borderRadius: "4px",
+            borderEndStartRadius: "4px",
+            borderEndEndRadius: "4px",
+            width: width + "px",
           }}
         >
           {results.map((result) => {
+            let label = "";
+            const match = result.item.content.match(/^#{1,6}\s+(.+?)(?:\s+\[#.*\])?\s*$/m);
+            if (match) {
+              label = match[1];
+            } else {
+              label = result.item.path.split("/").pop() || "";
+            }
             return (
               <li key={result.item.path} style={{ paddingBottom: "8px", listStyle: "none" }}>
-                <LocalLink to={result.item.path} onClick={() => setShow(false)}>
-                  {result.item.path.split("/").pop()}
+                <LocalLink
+                  to={result.item.path}
+                  onClick={() => { setShow(false); setInputValue(""); }}
+                  style={{ textDecorationLine: "none" }}
+                >
+                  {label}
                 </LocalLink>
               </li>
             );
