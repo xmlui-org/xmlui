@@ -1,5 +1,11 @@
 # xmlui-vscode
 
+## 0.0.3
+
+### Patch Changes
+
+- e43b92a: another test change
+
 ## 0.0.2
 
 ### Patch Changes
