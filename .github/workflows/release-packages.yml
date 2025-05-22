@@ -49,20 +49,37 @@ jobs:
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-turbo-
-      - name: Store Playwright's Version
+      # - name: Store Playwright's Version
+      #   run: |
+      #     PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
+      #     echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+      #     echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      # - name: Cache Playwright Browsers for Playwright's Version
+      #   id: cache-playwright-browsers
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ~/.cache/ms-playwright
+      #     key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+      # - name: Install Playwright Browsers
+      #   if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+      #   run: npx playwright install --with-deps
+
+      - name: Get VSCode Extension release info
+        id: xmlui_vscode_release_info
         run: |
-          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
-          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
-          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
-      - name: Cache Playwright Browsers for Playwright's Version
-        id: cache-playwright-browsers
-        uses: actions/cache@v4
+          npm run changeset:status -- --output tmp.json
+          cat tmp.json | node CI/scripts/get-vscode-release-info.mjs >> $GITHUB_OUTPUT
+      - name: Build VSCode extension
+        if: success() && steps.xmlui_vscode_release_info.outputs.version
+        run: npm run build-vscode-extension
+      - name: Upload VSIX to Release
+        if: success() && steps.xmlui_vscode_release_info.outputs.version
+        uses: softprops/action-gh-release@v1
         with:
-          path: ~/.cache/ms-playwright
-          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
-      - name: Install Playwright Browsers
-        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps
+          files: "tools/vscode/*.vsix"
+          tag_name: xmlui-vscode@${{ steps.xmlui_vscode_release_info.outputs.version }}
+          fail_on_unmatched_files: true
+          body: ${{ steps.xmlui_vscode_release_info.outputs.releaseNotes }}
 
       - name: Create Version PR or Publish to NPM and Create GitHub Releases
         id: changesets_publish
@@ -71,36 +88,12 @@ jobs:
           version: npm run changeset:version
           commit: "chore: version packages for stable release"
           title: "Version Packages for Stable Release"
-          publish: npm run publish-packages
+          publish: npm run changeset:publish
+          # publish: npm run publish-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{secrets.PUBLISH_NPM_TOKEN}}
-      - name: Check and Package VSCode Extension
-        if: success()
-        run: |
-          # Parse the publishedPackages output and check for xmlui-vscode
-          PUBLISHED_PACKAGES='${{ steps.changesets_publish.outputs.publishedPackages }}'
-          if echo "$PUBLISHED_PACKAGES" | jq -e '.[] | select(.name == "xmlui-vscode")' > /dev/null; then
-            echo "xmlui-vscode was published, packaging extension..."
-            npm run create-vscode-extension
-          else
-            echo "xmlui-vscode was not in the published packages, skipping..."
-            exit 0
-          fi
 
-      - name: Get xmlui-vscode Version
-        if: success()
-        id: get_xmlui_vscode_version
-        run: |
-          VERSION=$(echo '${{ steps.changesets_publish.outputs.publishedPackages }}' | jq -r '.[] | select(.name == "xmlui-vscode") | .version')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-      - name: Upload VSIX to Release
-        if: success() && steps.get_xmlui_vscode_version.outputs.version != ''
-        uses: softprops/action-gh-release@v1
-        with:
-          files: "tools/vscode/*.vsix"
-          tag_name: xmlui-vscode@${{ steps.get_xmlui_vscode_version.outputs.version }}
-          fail_on_unmatched_files: true
       - name: Output Published Packages Info
         if: steps.changesets_publish.outputs.published == 'true'
         run: |
