@@ -134,14 +134,14 @@ In either case, visit http://localhost:8080 to view the app.
 
 ### Hosted deployment
 
-You can copy this structure to any webserver configured to serve `index.html` and its subfolders. But you might even need a conventional webserver.
+You can copy this structure to any webserver configured to serve `index.html` and its subfolders. But you might even need a conventional webserver, here are some common alternatives.
 
-#### Amazon AWS
+#### Use an AWS Bucket
 
-Here's the minimal app served from an AWS bucket: [http://xmlui-minimal.s3-website-us-east-1.amazonaws.com/](http://xmlui-minimal.s3-website-us-east-1.amazonaws.com/).
+Your app can run from an AWS bucket. Here's the minimal app served that way: [http://xmlui-minimal.s3-website-us-east-1.amazonaws.com/](http://xmlui-minimal.s3-website-us-east-1.amazonaws.com/).
 
 <details>
-<summary>steps required</summary>
+<summary>AWS recipe</summary>
 <ul>
 <li>Upload xmlui-minimal folder to an AWS bucket
 <li>In Permissions, turn off the 'Block public access' setting
@@ -164,14 +164,14 @@ Here's the minimal app served from an AWS bucket: [http://xmlui-minimal.s3-websi
 </ul>
 </details>
 
-#### Netlify
+#### Use Netlify
 
-Here's the minimal app served from Netlify: [https://xmlui-minimal.netlify.app/](https://xmlui-minimal.netlify.app/).
+You can just drag-and-drop the folder to Netlify: [https://xmlui-minimal.netlify.app/](https://xmlui-minimal.netlify.app/).
 
 <details>
-<summary>steps required</summary>
+<summary>Netlify recipe</summary>
 <ul>
-<li>Go to https://app.netlify.com/drop
+<li>Go to <a href="https://app.netlify.com/drop">https://app.netlify.com/drop</a>
 <li>Drag the xmlui-minimal folder to the drop target
 <li>Rename the appIn Permissions, allow 'PublicRead'
 </ul>

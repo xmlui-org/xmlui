@@ -6,143 +6,18 @@
             <ToneChangerButton />
         </AppHeader>
 
-    <NavPanel>
-
-        <NavGroup label="Learn XMLUI" initiallyExpanded="{true}">
-            <NavLink label="Introduction" to="/" />
-            <NavLink label="Reactive Data" to="/reactive-intro" />
-            <NavLink label="Components" to="/components-intro" />
-            <NavLink label="Themes" to="/themes-intro" />
-        </NavGroup>
-
-        <NavGroup label="Create XMLUI Apps" initiallyExpanded="{true}">
-            <NavLink label="Markup" to="/markup" />
-            <NavLink label="Code" to="/code" />
-            <NavLink label="The App Component" to="/appComponent" />
-            <NavLink label="Working with Text" to="/workingWithText" />
-            <NavLink label="Routing and Links" to="/routingAndLinks" />
-            <NavLink label="Forms" to="/forms" />
-            <NavLink label="Modal Dialogs" to="/modalDialogs" />
-        </NavGroup>
-
-        <NavGroup label="Themes" >
-            <NavLink label="Layout Values" to="/tbd" />
-            <NavLink label="Variables" to="/tbd" />
-        </NavGroup>
-
-        <NavLink label="Helper Tags" to="/tbd" />
-        <NavLink label="Context Variables" to="/tbd" />
-        <NavLink label="Globals" to="/globals" />
-        <NavLink label="Palettes" to="/palettes" />
-        <NavLink label="Icons" to="/icons" />
-        <NavLink label="Glossary" to="/tbd" />
-        <NavLink label="Test" to="/test" />
-
-        <RecursiveNavTree items="{appGlobals.navPanelContent}"/>
-
-        </NavPanel>
-
-
-    <Pages>
-
-        <Page url="/">
-            <Markdown data="/pages/intro.md" />
-        </Page>
-
-        <Page url="/reactive-intro">
-            <ReactiveIntro />
-        </Page>
-
-        <Page url="/components-intro">
-            <ComponentsIntro />
-        </Page>
-
-        <Page url="/themes-intro">
-            <ThemesIntro />
-        </Page>
-
-        <Page url="/layout-intro">
-            <LayoutIntro />
-        </Page>
-
-        <Page url="/markup">
-            <Markup />
-        </Page>
-
-        <Page url="/code">
-            <Code />
-        </Page>
-
-
-        <Page url="/icons">
-            <Icons />
-        </Page>
-
-        <Page url="/palettes">
-            <Palettes />
-        </Page>
-
-        <Page url="/globals">
-          <Markdown data="pages/globals.md" />
-        </Page>
-
-
-        <Page url="/xmlui-theme">
-            <Markdown data="pages/xmlui-theme.md" />
-        </Page>
-
-
-        <Page url="/appComponent">
-            <TBD />
-        </Page>
-
-        <Page url="/workingWithText">
-            <TBD />
-        </Page>
-
-        <Page url="/routingAndLinks">
-            <TBD />
-        </Page>
-
-        <Page url="/forms">
-            <TBD />
-        </Page>
-
-        <Page url="/modalDialogs">
-            <TBD />
-        </Page>
-
-        <Page url="/tbd">
-            <TBD />
-        </Page>
-
-        <Page url="/themes">
-            <Markdown data="pages/themes.md" />
-        </Page>
-
-        <Page url="/test">
-           <Test />
-        </Page>
-
-
-        <Page url="/*">
-            <MarkdownPage content="{appGlobals.content[$routeParams['*']]}" />
-         </Page>
-
-    </Pages>
-
-        <!--
-
         <NavPanel>
 
-            <NavGroup label="Learn XMLUI" initiallyExpanded="{true}" iconVerticalCollapsed="chevronright">
+            <NavGroup label="Learn XMLUI" initiallyExpanded="{true}"
+                iconVerticalCollapsed="chevronright">
                 <NavLink label="Introduction" to="/" />
                 <NavLink label="Reactive Data" to="/reactive-intro" />
                 <NavLink label="Components" to="/components-intro" />
                 <NavLink label="Themes" to="/themes-intro" />
             </NavGroup>
 
-            <NavGroup label="Create XMLUI Apps" initiallyExpanded="{true}" iconVerticalCollapsed="chevronright">
+            <NavGroup label="Create XMLUI Apps" initiallyExpanded="{true}"
+                iconVerticalCollapsed="chevronright">
                 <NavLink label="App Structure" to="/appStructure" />
                 <NavLink label="Markup" to="/markup" />
                 <NavLink label="Code" to="/code" />
@@ -153,6 +28,7 @@
                 <NavLink label="Forms" to="/forms" />
                 <NavLink label="Resources" to="/resources" />
                 <NavLink label="Modal Dialogs" to="/modalDialogs" />
+                <NavLink label="User-defined Components" to="/userDefinedComponents" />
             </NavGroup>
 
             <NavGroup label="Reference" iconVerticalCollapsed="chevronright">
@@ -321,6 +197,10 @@
 
             <Page url="/modalDialogs">
                 <Markdown data="/pages/modal-dialogs.md" />
+            </Page>
+
+            <Page url="/userDefinedComponents">
+                <Markdown data="/pages/user-defined-components.md" />
             </Page>
 
             <Page url="/styles-and-themes/layout-props">
