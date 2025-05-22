@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo, useId, useState, useLayoutEffect, useCallback } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import styles from "./NestedApp.module.scss";
@@ -10,7 +10,6 @@ import { RxOpenInNewWindow } from "react-icons/rx";
 import { errReportComponent, xmlUiMarkupToComponent } from "../../components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "../../components-core/interception/ApiInterceptorProvider";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
-import { setupWorker } from "msw/browser";
 import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { Tooltip } from "./Tooltip";
 import { useTheme } from "../../components-core/theming/ThemeContext";
@@ -42,7 +41,7 @@ export function NestedApp({
   title,
   height,
   allowPlaygroundPopup = true,
-  withFrame = true
+  withFrame = true,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
@@ -51,22 +50,24 @@ export function NestedApp({
   const [refreshVersion, setRefreshVersion] = useState(0);
   const theme = useTheme();
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
-  const {appGlobals} = useAppContext();
+  const { appGlobals } = useAppContext();
   const componentRegistry = useComponentRegistry();
 
-  const apiWorker = useMemo(() => {
-    if (typeof document !== "undefined") {
-      return setupWorker();
-    }
-  }, []);
+  const [apiWorker, setApiWorker] = useState(undefined);
 
   useEffect(() => {
-    apiWorker?.start({
-      onUnhandledRequest: "bypass",
-      quiet: true,
-    });
-    return () => apiWorker?.stop();
-  }, [apiWorker]);
+    let worker;
+    (async function () {
+      const { setupWorker } = await import("msw/browser");
+      worker = setupWorker();
+      worker.start({
+        onUnhandledRequest: "bypass",
+        quiet: true,
+      });
+      setApiWorker(worker);
+    })();
+    return () => worker?.stop();
+  }, []);
 
   // console.log("apiWorker", apiWorker);
 
@@ -105,7 +106,10 @@ export function NestedApp({
       },
     };
     const appQueryString = await createQueryString(JSON.stringify(data));
-    window.open(useHashBasedRouting ? `/#/playground#${appQueryString}` : `/playground#${appQueryString}`, "_blank");
+    window.open(
+      useHashBasedRouting ? `/#/playground#${appQueryString}` : `/playground#${appQueryString}`,
+      "_blank",
+    );
   }, [app, components, title, activeTheme, activeTone, useHashBasedRouting]);
 
   useEffect(() => {
@@ -226,6 +230,7 @@ export function NestedApp({
     allowPlaygroundPopup,
     apiWorker,
     app,
+    componentRegistry,
     components,
     config?.appGlobals,
     config?.defaultTheme,
@@ -240,12 +245,15 @@ export function NestedApp({
     theme.themeStyles,
     title,
     toneToApply,
+    withFrame,
   ]);
 
   useEffect(() => {
     return () => {
-      contentRootRef.current?.unmount();
-      contentRootRef.current = null;
+      setTimeout(()=>{
+        contentRootRef.current?.unmount();
+        contentRootRef.current = null;
+      });
     };
   }, []);
 

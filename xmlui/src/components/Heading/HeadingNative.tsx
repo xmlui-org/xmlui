@@ -1,4 +1,4 @@
-import {
+import React, {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
@@ -29,6 +29,7 @@ export type HeadingProps = {
   ellipses?: boolean;
   title?: string;
   className?: string;
+  showAnchor?: boolean;
   [furtherProps: string]: any;
 };
 
@@ -52,6 +53,7 @@ export const Heading = forwardRef(function Heading(
     ellipses = defaultProps.ellipses,
     className,
     omitFromToc = defaultProps.omitFromToc,
+    showAnchor,
     ...furtherProps
   }: HeadingProps,
   forwardedRef: ForwardedRef<HTMLHeadingElement>,
@@ -103,6 +105,9 @@ export const Heading = forwardRef(function Heading(
     >
       {anchorId && (
         <span ref={anchorRef} id={anchorId} className={styles.anchorRef} data-anchor={true} />
+      )}
+      {showAnchor && anchorId && (
+        <a href={`#${anchorId}`} aria-hidden="true">#</a>
       )}
       {children}
     </Element>

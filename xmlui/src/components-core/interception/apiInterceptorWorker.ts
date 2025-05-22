@@ -1,5 +1,7 @@
-import { SetupWorker, setupWorker } from "msw/browser";
-import { RequestHandler, http } from "msw";
+import type { SetupWorker} from "msw/browser";
+import { setupWorker } from "msw/browser";
+import type { RequestHandler} from "msw";
+import { http } from "msw";
 import { isArray } from "lodash-es";
 
 import { ApiInterceptor } from "../interception/ApiInterceptor";
