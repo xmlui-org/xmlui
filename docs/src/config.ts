@@ -193,7 +193,7 @@ const App: StandaloneAppDescription = {
   appGlobals: {
     navPanelContent: groupedNavPanelContent,
     content,
-    highlighter: {
+    codeHighlighter: {
       availableLangs: shikiHighlighter.getLoadedLanguages(),
       highlight,
     },
