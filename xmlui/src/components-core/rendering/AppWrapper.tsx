@@ -171,15 +171,17 @@ export const AppWrapper = ({
   // --- Select the router type for the app
   const Router = previewMode ? MemoryRouter : useHashBasedRouting ? HashRouter : BrowserRouter;
 
+  const shouldSkipClientRouter = previewMode ? false : (typeof window === "undefined" || process.env.VITE_REMIX);
+
   return (
     // <React.StrictMode>
     <ErrorBoundary node={node} location={"root-outer"}>
       <QueryClientProvider client={queryClient}>
         {/* No router in the REMIX environment */}
-        {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
+        {!!shouldSkipClientRouter && dynamicChildren}
 
         {/* Wrap the app in a router in other cases */}
-        {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
+        {!shouldSkipClientRouter && (
           <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
         )}
       </QueryClientProvider>

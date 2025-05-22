@@ -1,6 +1,6 @@
 import { type CSSProperties, memo, type ReactNode } from "react";
 import React from "react";
-import { MarkdownHooks } from "react-markdown";
+import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 
@@ -70,7 +70,7 @@ export const Markdown = memo(function Markdown({
 
   return (
     <div className={styles.markdownContent} style={{ ...style }}>
-      <MarkdownHooks
+      <ReactMarkdown
         remarkPlugins={[remarkGfm, markdownCodeBlockParser]}
         rehypePlugins={[rehypeRaw]}
         components={{
@@ -296,7 +296,7 @@ export const Markdown = memo(function Markdown({
         }}
       >
         {children as any}
-      </MarkdownHooks>
+      </ReactMarkdown>
     </div>
   );
 });
@@ -487,18 +487,11 @@ function LinkAwareHeading({ children, level, showHeadingAnchors }: LinkAwareHead
     anchorId = headingToAnchorLink(extractTextNodes(headingLabel));
   }
 
-  const currentPath = window.location.href.replace(/(?<!\/)#.*$/, "");
-  const href = `${currentPath}#${anchorId}`;
+  // const currentPath = window.location.href.replace(/(?<!\/)#.*$/, "");
+  // const href = `${currentPath}#${anchorId}`;
   return (
     <Heading level={level} id={anchorId}>
       {headingLabel}
-      {showHeadingAnchors && anchorId && (
-        // NOTE: Anchor is hidden from screen readers
-        // TODO: make sure this is a good idea
-        <a href={href} id={anchorId} aria-hidden="true">
-          #
-        </a>
-      )}
     </Heading>
   );
 }
