@@ -1,18 +1,20 @@
-import { readFileSync } from "fs";
-
 let data = "";
 process.stdin.on("data", (chunk) => {
   data += chunk;
 });
 process.stdin.on("end", () => {
-  // Read the changeset status JSON file
-  const changesetData = JSON.parse(readFileSync("tmp.json", "utf8"));
+  let changesetData;
+  try {
+    changesetData = JSON.parse(data);
+  } catch (e) {
+    process.exit(0);
+  }
 
   // Find the xmlui-vscode release info
-  const vsCodeRelease = changesetData.releases.find((r) => r.name === "xmlui-vscode");
+  const vsCodeRelease = changesetData?.releases?.find((r) => r.name === "xmlui-vscode");
 
   // If no release is planned, exit with empty outputs
-  if (!vsCodeRelease || vsCodeRelease.changesets.length === 0) {
+  if (!vsCodeRelease || vsCodeRelease.changesets?.length === 0) {
     process.exit(0);
   }
 
