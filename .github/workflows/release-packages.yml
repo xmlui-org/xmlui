@@ -67,8 +67,7 @@ jobs:
       - name: Get VSCode Extension release info
         id: xmlui_vscode_release_info
         run: |
-          touch changeset-status.json
-          npx changeset status --since=origin/main --output changeset-status.json
+          npx changeset status --since=origin/main --output changeset-status.json || touch changeset-status.json
           cat changeset-status.json | node CI/scripts/get-vscode-release-info.mjs >> $GITHUB_OUTPUT
       - name: Build VSCode extension
         if: success() && steps.xmlui_vscode_release_info.outputs.version
