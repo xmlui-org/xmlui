@@ -44,13 +44,14 @@ $componentName: "DatePicker";
 }
 
 $rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active");
-$rdp-bg-textColor-hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
+$backgroundColor-item-DatePicker--hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
 $rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
 $rdp-cell-size: 40px;
 $rdp-caption-font-size: 18px;
 $rdp-outline: 2px solid t.useVar($rdp-accent-color);
 $rdp-outline-selected: 3px solid t.useVar($rdp-accent-color);
 $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
+$borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selectedItem-DatePicker");
 
 .datePicker {
   display: flex;
@@ -128,8 +129,6 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 /* Variables declaration */
 /* prettier-ignore */
 .root {
-  --rdp-accent-background-color: #f0f0ff; /* The accent background color used for selected days and UI elements. */
-
   --rdp-day-height: 44px; /* The height of the day cells. */
   --rdp-day-width: 44px; /* The width of the day cells. */
 
@@ -138,10 +137,8 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
   --rdp-day_button-height: 42px; /* The height of the day cells. */
   --rdp-day_button-width: 42px; /* The width of the day cells. */
 
-  --rdp-selected-border: 2px solid $rdp-outline; /* The border of the selected days. */
   --rdp-disabled-opacity: 0.5; /* The opacity of the disabled days. */
   --rdp-outside-opacity: 0.75; /* The opacity of the days outside the current month. */
-  --rdp-today-color: $rdp-accent-color; /* The color of the today's date. */
 
   --rdp-dropdown-gap: 0.5rem;/* The gap between the dropdowns used in the month captons. */
 
@@ -152,11 +149,10 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
   --rdp-nav_button-width: 2.25rem; /* The width of the navigation buttons. */
   --rdp-nav-height: 2.75rem; /* The height of the navigation bar. */
 
-  --rdp-range_middle-background-color: var(--rdp-accent-background-color); /* The color of the background for days in the middle of a range. */
   --rdp-range_middle-color: inherit;/* The color of the range text. */
 
   --rdp-range_start-color: white; /* The color of the range text. */
-  --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction), transparent 50%, var(--rdp-range_middle-background-color) 50%); /* Used for the background of the start of the selected range. */
+  --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction), transparent 50%, $backgroundColor-item-DatePicker--hover 50%); /* Used for the background of the start of the selected range. */
   --rdp-range_start-date-background-color: $rdp-accent-color; /* The background color of the date when at the start of the selected range. */
 
   --rdp-range_end-background: linear-gradient(var(--rdp-gradient-direction), var(--rdp-range_middle-background-color) 50%, transparent 50%); /* Used for the background of the end of the selected range. */
@@ -220,6 +216,10 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
   height: var(--rdp-day_button-height);
   border: var(--rdp-day_button-border);
   border-radius: var(--rdp-day_button-border-radius);
+
+  &:hover {
+    background-color: $backgroundColor-item-DatePicker--hover;
+  }
 }
 
 .day_button:disabled {
@@ -238,8 +238,7 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 }
 
 .dropdown:focus-visible ~ .caption_label {
-  outline: 5px auto Highlight;
-  outline: 5px auto -webkit-focus-ring-color;
+  outline: 5px auto t.$outlineColor--focus;
 }
 
 .button_next,
@@ -398,7 +397,7 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 
 /* DAY MODIFIERS */
 .today:not(.outside) {
-  color: var(--rdp-today-color);
+  color: t.$color-primary-500;
 }
 
 .selected {
@@ -407,7 +406,7 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 }
 
 .selected .day_button {
-  border: var(--rdp-selected-border);
+  border: 2px solid $borderColor-selectedItem-DatePicker;;
 }
 
 .outside {
