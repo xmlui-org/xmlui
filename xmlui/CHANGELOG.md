@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.38
+
+### Patch Changes
+
+- d314bad: msw update
+
 ## 0.9.37
 
 ### Patch Changes
