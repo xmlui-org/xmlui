@@ -19,7 +19,6 @@
   "packageManager": "npm@10.9.2",
   "scripts": {
     "changeset:add": "changeset add",
-    "changeset:status": "changeset status",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
     "build-xmlui": "turbo run build:xmlui-all",

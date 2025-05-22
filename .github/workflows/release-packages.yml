@@ -49,25 +49,25 @@ jobs:
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-turbo-
-      # - name: Store Playwright's Version
-      #   run: |
-      #     PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
-      #     echo "Playwright's Version: $PLAYWRIGHT_VERSION"
-      #     echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
-      # - name: Cache Playwright Browsers for Playwright's Version
-      #   id: cache-playwright-browsers
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.cache/ms-playwright
-      #     key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
-      # - name: Install Playwright Browsers
-      #   if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
-      #   run: npx playwright install --with-deps
+      - name: Store Playwright's Version
+        run: |
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: Cache Playwright Browsers for Playwright's Version
+        id: cache-playwright-browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Install Playwright Browsers
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
 
       - name: Get VSCode Extension release info
         id: xmlui_vscode_release_info
         run: |
-          npm run changeset:status -- --since=origin/main --output tmp.json
+          npx changeset status --since=origin/main --output tmp.json
           cat tmp.json | node CI/scripts/get-vscode-release-info.mjs >> $GITHUB_OUTPUT
       - name: Build VSCode extension
         if: success() && steps.xmlui_vscode_release_info.outputs.version
@@ -88,8 +88,7 @@ jobs:
           version: npm run changeset:version
           commit: "chore: version packages for stable release"
           title: "Version Packages for Stable Release"
-          publish: npm run changeset:publish
-          # publish: npm run publish-packages
+          publish: npm run publish-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{secrets.PUBLISH_NPM_TOKEN}}
