@@ -21,6 +21,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useAppContext } from "../../components-core/AppContext";
 import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
 import classnames from "classnames";
+import Icon from "../Icon/IconNative";
 
 type MarkdownProps = {
   removeIndents?: boolean;
@@ -354,12 +355,12 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
     const type = match[1].toLowerCase();
 
     // Map admonition type to emoji
-    const emojiMap: Record<string, string> = {
-      info: "💡",
-      warning: "⚠️",
-      danger: "🚫",
-      note: "📝",
-      tip: "💬",
+    const emojiMap: Record<string, React.ReactNode> = {
+      info: <Icon name="admonition_info" />,
+      warning: <Icon name="admonition_warning" />,
+      danger: <Icon name="admonition_danger" />,
+      note: <Icon name="admonition_note" />,
+      tip: <Icon name="admonition_tip" />,
     };
 
     // Process children to remove the admonition marker
@@ -406,7 +407,7 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
       >
         <div className={styles.admonitionContainer}>
           <div className={`${styles.admonitionIcon} ${styles[type] || ""}`}>
-            {emojiMap[type] || "💡"}
+            {emojiMap[type] || <Icon name="admonition_info" />}
           </div>
           <div className={styles.admonitionContent}>{processedChildren}</div>
         </div>
