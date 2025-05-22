@@ -18,7 +18,6 @@ import { handleCompletion, handleCompletionResolve} from "./services/completion"
 import {handleHover} from "./services/hover";
 import { createXmlUiParser, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
 import { MetadataProvider, type ComponentMetadataCollection } from './services/common/metadata-utils';
-import { N } from 'vitest/dist/chunks/reporters.d.CfRkRKN2';
 
 const metaByComp = collectedComponentMetadata as ComponentMetadataCollection;
 const metadataProvider = new MetadataProvider(metaByComp);
