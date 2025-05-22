@@ -119,8 +119,9 @@
 
 
                 <NavGroup label="Themes" iconVerticalCollapsed="chevronright">
-                    <NavLink label="Theme Variables" to="/themeVariables" />
-                    <NavLink label="Common Units" to="/commonUnits" />
+                    <NavLink label="Layout Properties" to="/styles-and-themes/layout-prop" />
+                    <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables" />
+                    <NavLink label="Common Units" to="/styles-and-themes/common-units" />
                 </NavGroup>
 
                 <NavLink label="Helper Tags" to="/tbd" />
@@ -128,7 +129,7 @@
                 <NavLink label="Globals" to="/globals" />
                 <NavLink label="Palettes" to="/palettes" />
                 <NavLink label="Icons" to="/icons" />
-                <NavLink label="Glossary" to="/tbd" />
+                <NavLink label="Glossary" to="/glossary" />
                 <NavLink label="Test" to="/test" />
 
             </NavGroup>
@@ -190,12 +191,16 @@
                 <Markdown data="/pages/modal-dialogs.md" />
             </Page>
 
-            <Page url="/themeVariables">
-                <Markdown data="/pages/theme-variables.md" />
+            <Page url="/styles-and-themes/layout-props">
+                <Markdown data="/pages/styles-and-themes/layout-props.md" />
             </Page>
 
-            <Page url="/commonUnits">
-                <Markdown data="/pages/common-units.md" />
+            <Page url="/styles-and-themes/theme-variables">
+                <Markdown data="/pages/styles-and-themes/theme-variables.md" />
+            </Page>
+
+            <Page url="/styles-and-themes/common-units">
+                <Markdown data="/pages/styles-and-themes/common-units.md" />
             </Page>
 
             <Page url="/components/APICall">
@@ -468,6 +473,10 @@
 
             <Page url="/globals">
                 <Markdown data="pages/globals.md" />
+            </Page>
+
+            <Page url="/glossary">
+                <Markdown data="pages/glossary.md" />
             </Page>
 
             <Page url="/xmlui-theme">
