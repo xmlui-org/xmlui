@@ -16,6 +16,7 @@
             </NavGroup>
 
             <NavGroup label="Create XMLUI Apps" initiallyExpanded="{true}" iconVerticalCollapsed="chevronright">
+                <NavLink label="App Structure" to="/appStructure" />
                 <NavLink label="Markup" to="/markup" />
                 <NavLink label="Code" to="/code" />
                 <NavLink label="The App Component" to="/appComponent" />
@@ -153,6 +154,10 @@
 
             <Page url="/themes-intro">
                 <ThemesIntro />
+            </Page>
+
+            <Page url="/appStructure">
+                <Markdown data="/pages/app-structure.md" />
             </Page>
 
             <Page url="/markup">
