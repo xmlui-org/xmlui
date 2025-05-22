@@ -9274,6 +9274,11 @@ export default {
         "description": "This boolean property specifies whether leading indents should be removed from the markdown content. If set to `true`, the shortest indent found at the start of the content lines is removed from the beginning of every line.",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "showHeadingAnchors": {
+        "description": "This boolean property specifies whether heading anchors should be displayed. If set to `true`, heading anchors will be displayed on hover next to headings.",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "defaultThemeVars": {
@@ -12446,6 +12451,7 @@ export default {
       "textColor-Text": "$textColor-primary",
       "fontFamily-Text": "$fontFamily",
       "fontWeight-Text": "$fontWeight-normal",
+      "fontSize-Text-codefence": "$fontSize-small",
       "fontFamily-Text-code": "$fontFamily-monospace",
       "fontSize-Text-code": "$fontSize-small",
       "borderWidth-Text-code": "1px",
