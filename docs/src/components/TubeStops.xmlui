@@ -13,7 +13,7 @@
     <Column bindTo="zone" />
     <Column bindTo="wifi" >
       <Fragment when="{$item.wifi === 'yes'}">
-        <Icon name="checkmark">
+        <Icon name="checkmark"/>
       </Fragment>
     </Column>
     <Column bindTo="toilets" >
