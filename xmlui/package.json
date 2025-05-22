@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.9.36",
+  "version": "0.9.38",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -67,7 +67,7 @@
     "immer": "9.0.16",
     "lodash-es": "4.17.21",
     "memoize-one": "6.0.0",
-    "msw": "2.0.1",
+    "msw": "2.8.4",
     "oidc-client-ts": "2.1.0",
     "papaparse": "^5.5.2",
     "react": "18.2.0",
@@ -213,8 +213,8 @@
       "import": "./src/components-core/theming/_themes.scss"
     },
     "./vite-xmlui-plugin": {
-      "import": "./bin/vite-xmlui-plugin.ts",
-      "require": "./bin/vite-xmlui-plugin.ts"
+      "import": "./dist/scripts/bin/vite-xmlui-plugin.js",
+      "require": "./dist/scripts/bin/vite-xmlui-plugin.js"
     },
     "./language-server": {
       "import": "./src/language-server/server.ts",

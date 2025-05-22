@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { createDraft, finishDraft } from "immer";
 import type { QueryFunction } from "@tanstack/query-core/src/types";
@@ -14,7 +14,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
-import { usePrevious } from "../utils/hooks";
+import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 
 /**
  * The properties of the Loader component
@@ -131,15 +131,15 @@ export function Loader({
   const prevData = usePrevious(data);
   const prevError = usePrevious(error);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     loaderInProgressChanged(isFetching);
   }, [isFetching, loaderInProgressChanged]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     loaderIsRefetchingChanged(isRefetching);
   }, [isRefetching, loaderIsRefetchingChanged]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     //console.log("isRefetching", isRefetching);
     //console.log("[Loader] useLayoutEffect status:", status);
     //console.log("[Loader] useLayoutEffect data:", data);
@@ -163,7 +163,7 @@ export function Loader({
     }
   }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status, isRefetching]);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     return () => {
       loaderLoaded(undefined);
     };

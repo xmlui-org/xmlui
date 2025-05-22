@@ -1,4 +1,4 @@
-import {
+import React, {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
@@ -17,6 +17,7 @@ import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import type { HeadingLevel } from "./abstractions";
+import { Link } from "@remix-run/react";
 
 export type HeadingProps = {
   uid?: string;
@@ -29,6 +30,7 @@ export type HeadingProps = {
   ellipses?: boolean;
   title?: string;
   className?: string;
+  showAnchor?: boolean;
   [furtherProps: string]: any;
 };
 
@@ -52,6 +54,7 @@ export const Heading = forwardRef(function Heading(
     ellipses = defaultProps.ellipses,
     className,
     omitFromToc = defaultProps.omitFromToc,
+    showAnchor,
     ...furtherProps
   }: HeadingProps,
   forwardedRef: ForwardedRef<HTMLHeadingElement>,
@@ -105,6 +108,17 @@ export const Heading = forwardRef(function Heading(
         <span ref={anchorRef} id={anchorId} className={styles.anchorRef} data-anchor={true} />
       )}
       {children}
+      {showAnchor && anchorId && (
+        <Link to={`#${anchorId}`} aria-hidden="true" onClick={(event) => {
+          // cmd/ctrl + click - open in new tab, don't prevent that
+          if(tableOfContentsContext){
+            if (!event.ctrlKey && !event.metaKey && !event.metaKey) {
+              event.preventDefault();
+            }
+            tableOfContentsContext.scrollToAnchor(anchorId, true);
+          }
+        }}>#</Link>
+      )}
     </Element>
   );
 });

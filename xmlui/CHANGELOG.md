@@ -1,5 +1,18 @@
 # xmlui
 
+## 0.9.38
+
+### Patch Changes
+
+- d314bad: msw update
+
+## 0.9.37
+
+### Patch Changes
+
+- 1c33896: ssr fixes
+- 8d662f3: Added anchor links for headings in markdown. Showing anchors is disabled by default, use the showHeadingAnchors prop on a Markdown component to use it.
+
 ## 0.9.36
 
 ### Patch Changes

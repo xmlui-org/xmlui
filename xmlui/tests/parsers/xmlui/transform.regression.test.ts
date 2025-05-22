@@ -1,7 +1,6 @@
 import { describe, expect, assert, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
-import { P } from "msw/lib/core/GraphQLHandler-b42ca96f";
 import { ParserError } from "../../../src/parsers/xmlui-parser";
 
 describe("Xmlui transform - regression", () => {
