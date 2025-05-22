@@ -87,7 +87,7 @@ export const H1Md = createMetadata({
     [`fontSize-${H1}`]: "$fontSize-large",
     [`marginTop-${H1}`]: "0",
     [`marginBottom-${H1}`]: "0",
-    [`fontSize-${H1}-markdown`]: "$fontSize-larger",
+    [`fontSize-${H1}-markdown`]: "$fontSize-large",
     [`marginTop-${H1}-markdown`]: "0",
     [`marginBottom-${H1}-markdown`]: "$space-6",
     light: {
