@@ -41,8 +41,13 @@ import { Spinner } from "./components/Spinner/SpinnerNative";
 import type { XmlUiNode } from "./parsers/xmlui-parser";
 import { XmlUiHelper } from "./parsers/xmlui-parser";
 import { Text } from "./components/Text/TextNative";
+import { TextBox } from "./components/TextBox/TextBoxNative";
 import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
+import { VisuallyHidden } from "./components/VisuallyHidden";
+import { LocalLink } from "./components/Link/LinkNative";
+import { Select } from "./components/Select/SelectNative";
+import { AutoComplete } from "./components/AutoComplete/AutoCompleteNative";
 
 export type {
   ThemeDefinition,
@@ -90,5 +95,10 @@ export {
   builtInThemes,
   XmlUiHelper,
   Text,
+  TextBox,
   NestedApp,
+  VisuallyHidden,
+  LocalLink,
+  Select,
+  AutoComplete,
 };
