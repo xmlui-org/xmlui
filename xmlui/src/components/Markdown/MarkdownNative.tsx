@@ -487,10 +487,8 @@ function LinkAwareHeading({ children, level, showHeadingAnchors }: LinkAwareHead
     anchorId = headingToAnchorLink(extractTextNodes(headingLabel));
   }
 
-  // const currentPath = window.location.href.replace(/(?<!\/)#.*$/, "");
-  // const href = `${currentPath}#${anchorId}`;
   return (
-    <Heading level={level} id={anchorId}>
+    <Heading level={level} id={anchorId} showAnchor={showHeadingAnchors}>
       {headingLabel}
     </Heading>
   );
