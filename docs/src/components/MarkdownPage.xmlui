@@ -5,7 +5,6 @@
             <Markdown
                 content="{$props.content}"
                 data="{$props.url}"
-                codeHighlighter="{appGlobals.highlighter}"
                 showHeadingAnchors="true"
             />
         </VStack>

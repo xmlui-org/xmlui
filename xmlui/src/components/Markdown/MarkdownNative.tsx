@@ -12,8 +12,13 @@ import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
 import { NestedApp } from "../NestedApp/NestedAppNative";
-import { type CodeHighlighter, parseMetaAndHighlightCode } from "../CodeBlock/highlight-code";
+import {
+  type CodeHighlighter,
+  isCodeHighlighter,
+  parseMetaAndHighlightCode,
+} from "../CodeBlock/highlight-code";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { useAppContext } from "../../components-core/AppContext";
 import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
 import classnames from "classnames";
 
@@ -28,6 +33,17 @@ type MarkdownProps = {
 function PreTagComponent({ id, children, codeHighlighter }) {
   // TEMP: After ironing out theming for syntax highlighting, this should be removed
   const { activeThemeTone } = useTheme();
+  const { appGlobals } = useAppContext();
+
+  let _codeHighlighter = null;
+  if (codeHighlighter) {
+    _codeHighlighter = codeHighlighter;
+  } else {
+    _codeHighlighter = isCodeHighlighter(appGlobals.codeHighlighter)
+      ? appGlobals.codeHighlighter
+      : null;
+  }
+
   const defaultCodefence = (
     <CodeBlock>
       <Text uid={id} variant="codefence">
@@ -36,11 +52,11 @@ function PreTagComponent({ id, children, codeHighlighter }) {
     </CodeBlock>
   );
 
-  if (!codeHighlighter) {
+  if (!_codeHighlighter) {
     return defaultCodefence;
   }
 
-  const highlighterResult = parseMetaAndHighlightCode(children, codeHighlighter, activeThemeTone);
+  const highlighterResult = parseMetaAndHighlightCode(children, _codeHighlighter, activeThemeTone);
   if (!highlighterResult) {
     return defaultCodefence;
   }

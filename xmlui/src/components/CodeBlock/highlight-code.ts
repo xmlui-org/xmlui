@@ -219,6 +219,10 @@ export type CodeHighlighter = {
   availableLangs: string[];
 };
 
+export function isCodeHighlighter(obj: any): obj is CodeHighlighter {
+  return obj.highlight && typeof obj.highlight === "function" && obj.availableLangs;
+}
+
 type HighlighterResults = {
   classNames: string | null;
   cleanedHtmlStr: string;
