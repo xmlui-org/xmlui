@@ -4,10 +4,4 @@
   {  JSON.stringify(window.getComponentsList(appGlobals.navPanelContent), null, 2) }
 </Text>
 
-<Text>
-  {  JSON.stringify(appGlobals.navPanelContent) }
-</Text>
-
-
-
 </Component>

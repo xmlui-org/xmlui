@@ -155,7 +155,7 @@
             </Page>
 
             <Page url="/*">
-                <MarkdownPage content="{appGlobals.content[$routeParams['*']]}" />
+                <MarkdownPage content="{ appGlobals.content[$routeParams['*']] }" />
             </Page>
 
 

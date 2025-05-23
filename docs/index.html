@@ -39,13 +39,10 @@ window.transformStops = function(stops) {
 }
 
 window.getComponentsList = function(items) {
-  const collectPaths = (items) =>
-  items.flatMap(item =>
-    (item.path && !item.name.startsWith('_') ? [item.path] : [])
-    .concat(item.children ? collectPaths(item.children) : [])
-  );
-  return items;
+  const onlyComponents = items.filter(item => item.name === 'components');
+  return onlyComponents;
 }
+
     </script>
   </body>
 </html>
