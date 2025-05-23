@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.9.39
+
+### Patch Changes
+
+- b79ca46: improve: DatePicker - design update, XmluiCodeHighlighter - use layoutCss
+- bbec7a9: Added implicit code highlighter identification by Markdown if one is exposed under the name "codeHighlighter" in the appGlobals in config.
+- e67762b: Replaced Admonition emojis with icons
+
 ## 0.9.38
 
 ### Patch Changes

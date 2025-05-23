@@ -1,5 +1,7 @@
 # create-xmlui-app
 
+## 0.9.39
+
 ## 0.9.38
 
 ### Patch Changes
