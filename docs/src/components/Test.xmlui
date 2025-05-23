@@ -1,30 +1,13 @@
 <Component name="Test">
 
-<Markdown><![CDATA[
+<Text preserveLinebreaks="true">
+  {  JSON.stringify(window.getComponentsList(appGlobals.navPanelContent), null, 2) }
+</Text>
 
-```xmlui-pg
-<App var.count="{1}">
+<Text>
+  {  JSON.stringify(appGlobals.navPanelContent) }
+</Text>
 
-<Button label="1" onClick="{
-  console.log('clicked');
-  count++;
-  toast('count now' + count)
-}" />
-
-<Button label="1">
-  <event name="click">
-  {
-    console.log('clicked');
-    count++;
-    toast('count now' + count)
-  }
-  </event>
-</Button>
-
-</App>
-```
-]]></Markdown>
 
 
 </Component>
-
