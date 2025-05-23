@@ -6,7 +6,6 @@ import {
   type ReactNode,
   useMemo,
 } from "react";
-import type { To } from "react-router";
 import { Link } from "@remix-run/react";
 import classnames from "classnames";
 
@@ -15,6 +14,7 @@ import styles from "./Link.module.scss";
 import type { LinkTarget } from "../abstractions";
 import { createUrlWithQueryParams } from "../component-utils";
 import { Icon } from "../Icon/IconNative";
+import type { To } from "react-router-dom";
 
 // =====================================================================================================================
 // React Link component implementation
@@ -51,7 +51,7 @@ export const LocalLink = forwardRef(function LocalLink(
   return (
     <Node
       ref={forwardedRef as any}
-      to={smartTo as To} //TODO illesg
+      to={smartTo}
       style={style}
       target={target}
       onClick={onClick}

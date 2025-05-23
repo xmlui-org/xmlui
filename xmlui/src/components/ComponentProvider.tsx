@@ -511,18 +511,20 @@ export class ComponentRegistry {
       this.registerCoreComponent(tabsComponentRenderer);
       this.registerCoreComponent(bookmarkComponentRenderer);
       this.registerCoreComponent(tableOfContentsRenderer);
-      this.registerCoreComponent(breakoutComponentRenderer);
       this.registerCoreComponent(codeBlockComponentRenderer);
+      // --- Nested app and related components
+      this.registerCoreComponent(nestedAppComponentRenderer);
+      // --- New Bootstrap-inspired components
+      this.registerCoreComponent(carouselComponentRenderer);
+      this.registerCoreComponent(accordionComponentRenderer);
+      this.registerCoreComponent(sliderComponentRenderer);
+      this.registerCoreComponent(backdropComponentRenderer);
     }
+    this.registerCoreComponent(breakoutComponentRenderer);
     this.registerCoreComponent(themeComponentRenderer);
     this.registerCoreComponent(appStateComponentRenderer);
     this.registerCoreComponent(apiCallRenderer);
 
-    // --- New Bootstrap-inspired components
-    this.registerCoreComponent(carouselComponentRenderer);
-    this.registerCoreComponent(accordionComponentRenderer);
-    this.registerCoreComponent(sliderComponentRenderer);
-    this.registerCoreComponent(backdropComponentRenderer);
 
     this.registerCoreComponent(htmlATagRenderer);
     this.registerCoreComponent(htmlAbbrTagRenderer);
@@ -625,8 +627,6 @@ export class ComponentRegistry {
     this.registerCoreComponent(htmlVideoTagRenderer);
     this.registerCoreComponent(htmlWbrTagRenderer);
 
-    // --- Nested app and related components
-    this.registerCoreComponent(nestedAppComponentRenderer);
 
     this.registerActionFn(apiAction);
     this.registerActionFn(downloadAction);

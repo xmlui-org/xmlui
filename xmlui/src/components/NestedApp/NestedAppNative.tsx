@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import styles from "./NestedApp.module.scss";
@@ -180,51 +180,53 @@ export function NestedApp({
       </div>
     );
 
-    contentRootRef.current?.render(
-      <ErrorBoundary node={component}>
-        <ApiInterceptorProvider interceptor={mock} apiWorker={apiWorker}>
-          {withFrame ? (
-            <div className={styles.nestedAppContainer}>
-              <div className={styles.header}>
-                <span className={styles.headerText}>{title}</span>
-                <div className={styles.spacer} />
-                {allowPlaygroundPopup && (
+    startTransition(()=>{
+      contentRootRef.current?.render(
+        <ErrorBoundary node={component}>
+          <ApiInterceptorProvider interceptor={mock} apiWorker={apiWorker}>
+            {withFrame ? (
+              <div className={styles.nestedAppContainer}>
+                <div className={styles.header}>
+                  <span className={styles.headerText}>{title}</span>
+                  <div className={styles.spacer} />
+                  {allowPlaygroundPopup && (
+                    <Tooltip
+                      trigger={
+                        <button
+                          className={styles.headerButton}
+                          onClick={() => {
+                            openPlayground();
+                          }}
+                        >
+                          <RxOpenInNewWindow />
+                        </button>
+                      }
+                      label="Edit code in new window"
+                    />
+                  )}
                   <Tooltip
                     trigger={
                       <button
                         className={styles.headerButton}
                         onClick={() => {
-                          openPlayground();
+                          setRefreshVersion(refreshVersion + 1);
                         }}
                       >
-                        <RxOpenInNewWindow />
+                        <LiaUndoAltSolid />
                       </button>
                     }
-                    label="Edit code in new window"
+                    label="Reset the app"
                   />
-                )}
-                <Tooltip
-                  trigger={
-                    <button
-                      className={styles.headerButton}
-                      onClick={() => {
-                        setRefreshVersion(refreshVersion + 1);
-                      }}
-                    >
-                      <LiaUndoAltSolid />
-                    </button>
-                  }
-                  label="Reset the app"
-                />
+                </div>
+                {nestedAppRoot}
               </div>
-              {nestedAppRoot}
-            </div>
-          ) : (
-            nestedAppRoot
-          )}
-        </ApiInterceptorProvider>
-      </ErrorBoundary>,
-    );
+            ) : (
+              nestedAppRoot
+            )}
+          </ApiInterceptorProvider>
+        </ErrorBoundary>,
+      );
+    })
   }, [
     activeTheme,
     allowPlaygroundPopup,

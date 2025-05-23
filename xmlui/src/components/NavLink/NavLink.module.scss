@@ -8,148 +8,80 @@ $themeVars: ();
 }
 
 $component: "NavLink";
-
-// Borders & Paddings
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
-// Focus
-$outlineWidth-NavLink--focus: createThemeVar("outlineWidth-#{$component}--focus");
-$outlineColor-NavLink--focus: createThemeVar("outlineColor-#{$component}--focus");
-$outlineStyle-NavLink--focus: createThemeVar("outlineStyle-#{$component}--focus");
-$outlineOffset-NavLink--focus: createThemeVar("outlineOffset-#{$component}--focus");
-// Fonts
+$backgroundColor-NavLink: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-NavLink--hover: createThemeVar("backgroundColor-#{$component}--hover");
+$backgroundColor-NavLink--hover--active: createThemeVar("backgroundColor-#{$component}--hover--active");
+$backgroundColor-NavLink--active: createThemeVar("backgroundColor-#{$component}--active");
+$backgroundColor-NavLink--pressed: createThemeVar("backgroundColor-#{$component}--pressed");
+$backgroundColor-NavLink--pressed--active: createThemeVar("backgroundColor-#{$component}--pressed--active");
+$fontSize-NavLink: createThemeVar("fontSize-#{$component}");
+$wordWrap-NavLink: createThemeVar("wordWrap-#{$component}");
+$textColor-NavLink: createThemeVar("textColor-#{$component}");
+$textColor-NavLink--hover: createThemeVar("textColor-#{$component}--hover");
+$textColor-NavLink--active: createThemeVar("textColor-#{$component}--active");
+$textColor-NavLink--hover--active: createThemeVar("textColor-#{$component}--hover--active");
+$textColor-NavLink--pressed: createThemeVar("textColor-#{$component}--pressed");
+$textColor-NavLink--pressed--active: createThemeVar("textColor-#{$component}--pressed--active");
+$color-icon-NavLink: createThemeVar("color-icon-#{$component}");
 $fontFamily-NavLink: createThemeVar("fontFamily-#{$component}");
 $fontWeight-NavLink: createThemeVar("fontWeight-#{$component}");
 $fontWeight-NavLink--pressed: createThemeVar("fontWeight-#{$component}--pressed");
 $fontWeight-NavLink--active: createThemeVar("fontWeight-#{$component}--active");
-$fontSize-NavLink: createThemeVar("fontSize-#{$component}");
-$wordWrap-NavLink: createThemeVar("wordWrap-#{$component}");
-// Colors
-$backgroundColor-NavLink: createThemeVar("backgroundColor-#{$component}");
-$backgroundColor-NavLink--hover: createThemeVar("backgroundColor-#{$component}--hover");
-$backgroundColor-NavLink--active: createThemeVar("backgroundColor-#{$component}--active");
-$backgroundColor-NavLink--pressed: createThemeVar("backgroundColor-#{$component}--pressed");
-
-$textColor-NavLink: createThemeVar("textColor-#{$component}");
-$textColor-NavLink--hover: createThemeVar("textColor-#{$component}--hover");
-$textColor-NavLink--active: createThemeVar("textColor-#{$component}--active");
-// --hover-active: color of the indicator when the NavLink is hovered and is currently active
-$textColor-NavLink--hover--active: createThemeVar("textColor-#{$component}--hover--active");
-
-$textColor-NavLink--pressed: createThemeVar("textColor-#{$component}--pressed");
-// --pressed-active: color of the indicator when the NavLink is pressed and is the currently active link
-$textColor-NavLink--pressed--active: createThemeVar("textColor-#{$component}--pressed--active");
-$color-icon-NavLink: createThemeVar("color-icon-#{$component}");
-// Indicator
+$borderRadius-indicator-NavLink: createThemeVar("borderRadius-indicator-#{$component}");
+$thickness-indicator-NavLink: createThemeVar("thickness-indicator-#{$component}");
 $color-indicator-NavLink: createThemeVar("color-indicator-#{$component}");
 $color-indicator-NavLink--hover: createThemeVar("color-indicator-#{$component}--hover");
-// --active: link is currently active and the URL is the same as to where the link points to
 $color-indicator-NavLink--active: createThemeVar("color-indicator-#{$component}--active");
-// --hover-active: color of the indicator when the NavLink is hovered and is currently active
-$backgroundColor-NavLink--hover--active: createThemeVar(
-  "backgroundColor-#{$component}--hover--active"
-);
-// --pressed: style to use when user clicks on the link
 $color-indicator-NavLink--pressed: createThemeVar("color-indicator-#{$component}--pressed");
-// --pressed-active: color of the indicator when the NavLink is pressed and is the currently active link
-$backgroundColor-NavLink--pressed--active: createThemeVar(
-  "backgroundColor-#{$component}--pressed--active"
-);
 
-$thickness-indicator-NavLink: createThemeVar("thickness-indicator-#{$component}");
-$borderRadius-indicator-NavLink: createThemeVar("borderRadius-indicator-#{$component}");
+$transition: color 0.1s, background-color 0.1s;
 
-$transition:
-  color 0.1s,
-  background-color 0.1s;
-
-.linkWrapper {
-  outline: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-
-  position: relative;
-  flex-shrink: 0;
-  white-space: nowrap;
-  gap: t.$space-2;
-  // Border & Paddings
-  @include t.borderVars($themeVars, $component);
-  @include t.paddingVars($themeVars, $component);
-  // Fonts
-  font-size: $fontSize-NavLink;
-  font-weight: $fontWeight-NavLink;
-  font-family: $fontFamily-NavLink;
-  word-wrap: $wordWrap-NavLink;
-  // Color
-  color: $textColor-NavLink;
-  background-color: $backgroundColor-NavLink;
-  // Animation & Transitions
-  transition: $transition;
-
-  * {
+.content {
+  &.base {
+    @include t.borderVars($themeVars, $component);
+    @include t.paddingVars($themeVars, $component);
+    outline: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: t.$space-2;
+    font-size: $fontSize-NavLink;
+    font-weight: $fontWeight-NavLink;
+    font-family: $fontFamily-NavLink;
+    word-wrap: $wordWrap-NavLink;
+    position: relative;
+    transition: $transition;
     color: $textColor-NavLink;
-  }
-  // more specific than '*'
-  .icon {
-    color: $color-icon-NavLink;
-  }
-
-  &.disabled {
-    cursor: not-allowed;
-    color: t.$textColor--disabled;
+    background-color: $backgroundColor-NavLink;
+    flex-shrink: 0;
+    white-space: nowrap;
 
     .icon {
-      color: t.$textColor--disabled;
+      color: $color-icon-NavLink;
     }
-  }
 
-  &:focus-visible {
-    outline-width: $outlineWidth-NavLink--focus;
-    outline-color: $outlineColor-NavLink--focus;
-    outline-style: $outlineStyle-NavLink--focus;
-    outline-offset: $outlineOffset-NavLink--focus;
-  }
-
-  // --- Inside navigation menu
-  // In e.g. a NavGroup, hovering the link focuses it, so [SOMETHING] is always visible,
-  // that's why we have this selector here
-  &[role="menuitem"] {
-    outline: none;
-    &:not(:hover):focus-visible {
-      outline-width: $outlineWidth-NavLink--focus;
-      outline-color: $outlineColor-NavLink--focus;
-      outline-style: $outlineStyle-NavLink--focus;
-      outline-offset: $outlineOffset-NavLink--focus;
+    * {
+      color: $textColor-NavLink;
     }
-  }
 
-  &.displayIndicator {
-    // Indicator
-    &:after {
-      transition: $transition;
-      position: absolute;
-      left: 0.1em;
-      right: 0.1em;
-      bottom: 0;
-      height: $thickness-indicator-NavLink;
-      border-radius: $borderRadius-indicator-NavLink;
-      content: "";
-    }
-    &.vertical {
+    &.includeHoverIndicator {
       &:after {
-        top: 0;
+        transition: $transition;
+        position: absolute;
+        left: 0.1em;
+        right: 0.1em;
         bottom: 0;
-        left: 0;
-        right: auto;
-        width: $thickness-indicator-NavLink;
-        height: auto;
+        height: $thickness-indicator-NavLink;
+        border-radius: $borderRadius-indicator-NavLink;
+        content: "";
       }
     }
 
-    &:not([disabled]):hover,
-    &:not([class*="disabled"]):hover {
+    &:hover.displayActive,
+    &:focus-visible {
       color: $textColor-NavLink--hover;
       background-color: $backgroundColor-NavLink--hover;
       * {
@@ -160,12 +92,38 @@ $transition:
       }
     }
 
-    // this is for the link component
-    &:not([disabled]):active,
-    &:not([class*="disabled"]):active,
-    // this is for the button component
-    &:not([disabled]).active,
-    &:not([class*="disabled"]).active {
+
+    &:focus-visible{
+      outline-width: createThemeVar('outlineWidth-#{$component}--focus');
+      outline-color: createThemeVar('outlineColor-#{$component}--focus');
+      outline-style: createThemeVar('outlineStyle-#{$component}--focus');
+      outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
+    }
+
+    &[role='menuitem']{           //e.g. inside a navGroup, for hover it focuses the item, so it's always visible, that's why we have this selector here
+      outline: none;
+      &:not(:hover):focus-visible{
+        outline-width: createThemeVar('outlineWidth-#{$component}--focus');
+        outline-color: createThemeVar('outlineColor-#{$component}--focus');
+        outline-style: createThemeVar('outlineStyle-#{$component}--focus');
+        outline-offset: createThemeVar('outlineOffset-#{$component}--focus');
+      }
+    }
+
+    &:active.displayActive {
+      color: $textColor-NavLink--pressed;
+      background-color: $backgroundColor-NavLink--pressed;
+      font-weight: $fontWeight-NavLink--pressed;
+      * {
+        font-weight: $fontWeight-NavLink--pressed;
+        color: $textColor-NavLink--pressed;
+      }
+      &:after {
+        background-color: $color-indicator-NavLink--pressed;
+      }
+    }
+
+    &.navItemActive {
       color: $textColor-NavLink--active;
       background-color: $backgroundColor-NavLink--active;
       font-weight: $fontWeight-NavLink--active;
@@ -173,11 +131,9 @@ $transition:
         font-weight: $fontWeight-NavLink--active;
         color: $textColor-NavLink--active;
       }
-      &:after {
-        background-color: $color-indicator-NavLink--active;
+      & > * {
+        z-index: 1;
       }
-
-      // hover on an active element
       &:hover {
         color: $textColor-NavLink--hover--active;
         background-color: $backgroundColor-NavLink--hover--active;
@@ -185,14 +141,45 @@ $transition:
           color: $textColor-NavLink--hover--active;
         }
       }
+      &:after {
+        z-index: 0;
+        background-color: $color-indicator-NavLink--active;
+      }
+
+      &:active {
+        color: $textColor-NavLink--pressed--active;
+        background-color: $backgroundColor-NavLink--pressed--active;
+        font-weight: $fontWeight-NavLink--pressed;
+        * {
+          font-weight: $fontWeight-NavLink--pressed;
+          color: $textColor-NavLink--pressed--active;
+        }
+        &:after {
+          background-color: $color-indicator-NavLink--pressed;
+        }
+      }
     }
 
-    // This selector ensures that the indicator is visible when the link is disabled but is currently active
-    // Do so only for the button component
-    // Also works in NavGroups
-    &:disabled.active:after,
-    &.disabled.active:after {
-      background-color: t.$textColor--disabled;
+    &.disabled {
+      cursor: not-allowed;
+      color: t.$textColor--disabled;
+    }
+
+    &.vertical {
+      &:after {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: auto;
+        width: $thickness-indicator-NavLink;
+        height: auto;
+        border-radius: $borderRadius-indicator-NavLink;
+      }
+    }
+
+    &.indented {
+      padding-left: 2.4em;
+      flex-shrink: 0;
     }
   }
 }
