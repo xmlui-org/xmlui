@@ -21,7 +21,6 @@
                 <NavLink label="App Structure" to="/appStructure" />
                 <NavLink label="Markup" to="/markup" />
                 <NavLink label="Code" to="/code" />
-                <NavLink label="The App Component" to="/appComponent" />
                 <NavLink label="Layout" to="/layout" />
                 <NavLink label="Working with Text" to="/workingWithText" />
                 <NavLink label="Routing and Links" to="/routingAndLinks" />
@@ -167,10 +166,6 @@
 
             <Page url="/code">
                 <Code />
-            </Page>
-
-            <Page url="/appComponent">
-                <Markdown data="/pages/app-component.md" />
             </Page>
 
             <Page url="/layout">
