@@ -57,11 +57,10 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 
 ```xmlui
   <HStack>
+
     <Stack width="50%">
       <TubeStops line="victoria" />
     </Stack>
-
-    <SpaceFiller />
 
     <Stack width="50%">
       <TubeStops line="waterloo-city" />
@@ -75,14 +74,11 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
     <Stack width="50%">
       <TubeStops line="victoria" />
     </Stack>
-
-    <SpaceFiller />
-
     <Stack width="50%">
       <TubeStops line="waterloo-city" />
     </Stack>
-
   </HStack>
+
 
 <H2>Anatomy of a custom component</H2>
 
@@ -122,8 +118,6 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 </Component>
 ```
     ]]></Markdown>
-
-    <SpaceFiller />
 
     <Markdown width="50%"><![CDATA[
 <details>
