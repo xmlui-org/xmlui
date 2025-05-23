@@ -2,7 +2,7 @@ import type { CSSProperties, MouseEventHandler, ReactNode, Ref } from "react";
 import type React from "react";
 import { forwardRef, useContext, useMemo } from "react";
 import { NavLink as RrdNavLink } from "@remix-run/react";
-import type { To } from "react-router";
+import type { To } from "react-router-dom";
 import classnames from "classnames";
 
 import styles from "./NavLink.module.scss";

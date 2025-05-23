@@ -1,4 +1,4 @@
-import type { To } from "react-router";
+import type { To } from "react-router-dom";
 import { Navigate } from "@remix-run/react";
 
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
