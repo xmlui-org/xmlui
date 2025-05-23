@@ -1,6 +1,3 @@
-import { COMMON_VISUAL_PROPERTY_UNITS, COMMON_VISUAL_PROPERTY_UNITS_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_SIZE, COMPONENT_SPLITTER, LAYOUT_PROPERTIES, LAYOUT_PROPERTIES_COMPONENT_WIDTH_HEIGHT, REUSABLE_COMPONENTS, THEME_VARIABLES_SPACING_IN_LAYOUT_CONTAINERS } from "../../meta/pages";
-import { Callout } from 'nextra/components';
-
 # Layout
 
 An XMLUI app is a **hierarchical component tree** where parent components nest their children. While displaying children, each component arranges them with a particular strategy. For example, it puts children from in the same row horizontally, providing some gap among them.

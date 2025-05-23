@@ -123,13 +123,13 @@
 
 
                 <NavGroup label="Themes" iconVerticalCollapsed="chevronright">
-                    <NavLink label="Layout Properties" to="/styles-and-themes/layout-prop" />
+                    <NavLink label="Layout Properties" to="/styles-and-themes/layout-props" />
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables" />
                     <NavLink label="Common Units" to="/styles-and-themes/common-units" />
                 </NavGroup>
 
                 <NavLink label="Helper Tags" to="/tbd" />
-                <NavLink label="Context Variables" to="/tbd" />
+                <NavLink label="Context Variables" to="/contextVariables" />
                 <NavLink label="Globals" to="/globals" />
                 <NavLink label="Palettes" to="/palettes" />
                 <NavLink label="Icons" to="/icons" />
@@ -481,6 +481,10 @@
 
             <Page url="/palettes">
                 <Palettes />
+            </Page>
+
+            <Page url="/contextVariables">
+                <Markdown data="pages/context-variables.md" />
             </Page>
 
             <Page url="/globals">

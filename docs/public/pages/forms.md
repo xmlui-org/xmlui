@@ -1,11 +1,3 @@
-import { Callout } from 'nextra/components';
-import {
-  COMPONENT_FORMITEM,
-  COMPONENT_TEXT,
-  LAYOUT_DIMENSION_UNITS,
-  USING_MODAL_DIALOGS_INTEROPERABILITY_WITH_FORMS
-} from "../../meta/pages";
-
 # Using Forms
 
 <Callout type="info" emoji="💡">

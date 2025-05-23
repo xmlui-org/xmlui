@@ -1,16 +1,3 @@
-import { Callout } from 'nextra/components';
-import {
-  COMPONENT_H1,
-  COMPONENT_H2,
-  COMPONENT_H3,
-  COMPONENT_H4,
-  COMPONENT_H5,
-  COMPONENT_H6,
-  COMPONENT_HEADING,
-  COMPONENT_MARKDOWN,
-  COMPONENT_TEXT,
-} from "../../meta/pages";
-
 # Working with Text
 
 Text elements are frequently used in most apps as a part of the UI:

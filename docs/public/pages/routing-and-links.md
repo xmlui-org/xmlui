@@ -1,6 +1,3 @@
-import { Callout } from 'nextra/components';
-import { COMPONENT_BOOKMARK, COMPONENT_LINK, COMPONENT_TABLEOFCONTENTS } from '../../meta/pages';
-
 # Routing and Links
 
 <Callout type="info" emoji="💡">

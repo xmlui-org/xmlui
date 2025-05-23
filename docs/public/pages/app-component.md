@@ -1,7 +1,7 @@
 
 # The App Component
 
-You can use any component as your app's root. For example, you can display a simple text with this markup:
+You can use any component as your app's root. For example, you can display a simple text with this markup.
 
 ```xmlui copy
 <Text>Hello from XMLUI!</Text>
@@ -18,104 +18,42 @@ Instead of building the app layout from scratch, you can choose from a set of pr
 
 ## Layout Placeholders
 
-<Callout type="info" emoji="💡">
-The `App` component creates its layout by combining several components into an integrated UI. You can provide these constituent parts (each of them is optional) to let `App` organize them:
+The `App` component creates its layout by combining one or more of these optional components.
 
-- Application header
-- Navigation panel
-- Navigation-aware main content panel
-- Footer
-</Callout>
-
-In the markup, `App` has placeholders to define the particular parts of the UI:
 
 ```xmlui copy
 <App>
   <AppHeader>
-    <!-- Here comes the header -->
+    <!-- header stuff -->
   </AppHeader>
   <NavPanel>
-    <!-- Define the app's navigation menu here -->
+    <!-- navigation menu -->
   </NavPanel>
   <Pages>
-    <!-- Define the navigation-aware content here -->
+    <!-- navigation-aware content -->
   </Pages>
   <Footer>
-    <!-- This is a placeholder for the footer -->
+    <!-- footer stuff -->
   </Footer>
-  <!-- Any other content to render -->
+  <!-- anything else  -->
 </App>
 ```
 
-You can use these placeholder components:
-
-- `AppHeader`: The content of this placeholder describes the app's header template. If the application has a logo, it automatically inserts that into the header.
-- `NavPanel`: This section describes a hierarchical structure representing the app's main menu.
-- `Pages`: lists the individual UI parts (pages) the application navigates to (according to the selected menu item or programmatically).
-- `Footer`: `App` uses the section's contents as the footer.
-
-When all placeholders are empty (like in the previous sample markup), `App` renders an empty header and an empty main content section below the empty header:
-
-<Playground
-    name="Example: App with empty layout elements"
-    height={150}
-    app={`
-    <App>
+```xmlui-pg name="App with a logo and empty layout elements"
+    <App logo="resources/logo.svg">
       <AppHeader>
-        <!-- Here comes the header -->
       </AppHeader>
       <NavPanel>
-        <!-- Define the app's navigation menu here -->
       </NavPanel>
       <Pages>
-        <!-- Define the navigation-aware content here -->
       </Pages>
       <Footer>
-        <!-- This is a placeholder for the footer -->
       </Footer>
-      <!-- Any other content to render -->
     </App>
-  `}
-/>
-
-You can set the application logo using the `logo` property of `App`:
-
-```xmlui copy
-<App logo="resources/logo.svg">
-  <!-- ... -->
-</App>
 ```
 
-When the engine finds a logo in the app's manifest, it displays it in its header. So, the previous markup displays this UI after setting the logo resource:
+XMLUI considers any content added within the `App` tag but outside the layout placeholders as part of the main contents. This markup declares only a footer placeholder. The `<H1>` and `<H3>` components represent the main content. XMLUI renders this app, putting the main content and the footer in their expected places.
 
-<Playground
-    name="Example: App with empty layout elements and logo"
-    resources={{ logo: xmluiLogo }}
-    height={150}
-    app={`
-    <App>
-      <AppHeader>
-        <!-- Here comes the header -->
-      </AppHeader>
-      <NavPanel>
-        <!-- Define the app's navigation menu here -->
-      </NavPanel>
-      <Pages>
-        <!-- Define the navigation-aware content here -->
-      </Pages>
-      <Footer>
-        <!-- This is a placeholder for the footer -->
-      </Footer>
-      <!-- Any other content to render -->
-    </App>
-  `}
-/>
-
-Each layout placeholder is optional. If you leave any of these placeholders, the app component does not render the particular app section. You can change the order of the placeholder; for example, declare an app footer before the header and change the definition order of these sections.
-
-Also, XMLUI considers any content added within the `App` tag but outside the layout placeholders as part of the main contents.
-
-Look at this example:
 
 ```xmlui copy
 <App>
@@ -127,62 +65,26 @@ Look at this example:
 </App>
 ```
 
-This markup declares only a footer placeholder. The `<H1>` and `<H3>` components represent the main content. XMLUI renders this app, putting the main content and the footer in their expected place:
-
-<Playground
-  name="Example: App with content outside of placeholders"
-  height={240}
-  app={`
-    <App>
-      <H1>Welcome to my humble app!</H1>
-      <Footer>
-        This is my footer
-      </Footer>
-      <H3>This is a content outside the placeholders</H3>
-    </App>
-  `}
-/>
-
-## Layout Variants [#layout-variants]
-
-<Callout type="info" emoji="💡">
-The `App` component can render several layouts determining the location and behavior of app sections.
-</Callout>
-
-You can set the layout in several ways:
-
-- You can use the `layout` prop of the `App` component to set it to one of the predefined values.
-- You can use the `layout` theme variable to define the layout for a particular theme. This way, you can define layout-aware application themes.
-
-To get acquainted with these layouts, the samples below show different layout settings with this markup (using the `layout` property with the demonstrated variant):
-
-```xmlui copy
-<App layout="...">
-  <AppHeader title="Example App"/>
-  <NavPanel>
-    <NavLink label="Home" to="/" icon="home"/>
-    <NavLink label="About" to="/about"/>
-  </NavPanel>
-  <Pages defaultRoute="/">
-    <Page url="/">
-      <List data="https://api.spacexdata.com/v3/history">
-        <Card title="{$item.title}" subtitle="{$item.details}"/>
-      </List>
-    </Page>
-    <Page url="/About">
-      <Text value="About this app" />
-    </Page>
-  </Pages>
-  <Footer>Powered by XMLUI</Footer>
+```xmlui-pg name="App with content outside placeholders"
+<App>
+  <H1>Welcome to my humble app!</H1>
+  <Footer>
+    This is my footer
+  </Footer>
+  <H3>This is a content outside the placeholders</H3>
 </App>
 ```
 
-Also, the samples set an application logo.
+
+
+## Layout Variants
+
+The `App` component can render a variety of [horizontal and vertical layouts](/components/App#layouts). You can set the layout using the `layout` prop of the `App` component or with the `layout` theme variable.
 
 
 ### Horizontal Layout
 
-XMLUI supports several layouts that organize the app's navigation sections (header, menu structure) horizontally in a row. These variants are the following:
+These layouts organize the app's navigation sections (header, menu structure) horizontally in a row.
 
 - `horizontal`: This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page.
 - `horizontal-sticky`: Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom. When you scroll vertically, only the main content scrolls; the header and footer stay docked.
@@ -194,49 +96,107 @@ XMLUI supports several layouts that organize the app's navigation sections (head
 
 The navigation panel displays the items horizontally. When you scroll the content, all layout sections scroll with the app.
 
-<Playground
-  name="Example: 'horizontal' layout"
-  height={350}
-  resources={{ logo: xmluiLogo }}
-  app={horizontal}
-/>
+```xmlui-pg name="Example: horizontal layout"
+<App layout="horizontal">
+  <AppHeader title="Example App"/>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="About" to="/about"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <List limit="4" data="https://api.spacexdata.com/v3/history">
+        <Card title="{$item.title}" subtitle="{$item.details}"/>
+      </List>
+    </Page>
+    <Page url="/About">
+      <Text value="About this app" />
+    </Page>
+  </Pages>
+  <Footer>Built with XMLUI</Footer>
+</App>
+```
 
 #### `horizontal-sticky`
 
 The navigation panel displays the items horizontally. When you scroll the content, the heading and the navigation panel dock to the top, while the footer sticks to the bottom.
 
-<Playground
-  name="Example: 'horizontal-sticky' layout"
-  height={350}
-  resources={{ logo: xmluiLogo }}
-  app={horizontalSticky}
-/>
+```xmlui-pg name="Example: horizontal sticky: the list scrolls"
+<App layout="horizontal-sticky">
+  <AppHeader title="Example App"/>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="About" to="/about"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <List height="300px" limit="4" data="https://api.spacexdata.com/v3/history">
+        <Card title="{$item.title}" subtitle="{$item.details}"/>
+      </List>
+    </Page>
+    <Page url="/About">
+      <Text value="About this app" />
+    </Page>
+  </Pages>
+  <Footer>Built with XMLUI</Footer>
+</App>
+```
+
 
 #### `condensed`
 
 The app header is merged with the navigation panel, which displays the items horizontally. When you scroll the content, all layout sections scroll with the app.
 
-<Playground
-  name="Example: 'condensed' layout"
-  height={350}
-  resources={{ logo: xmluiLogo }}
-  app={condensed}
-/>
+```xmlui-pg name="Example: condensed"
+<App layout="condensed">
+  <AppHeader title="Example App"/>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="About" to="/about"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <List height="300px" limit="4" data="https://api.spacexdata.com/v3/history">
+        <Card title="{$item.title}" subtitle="{$item.details}"/>
+      </List>
+    </Page>
+    <Page url="/About">
+      <Text value="About this app" />
+    </Page>
+  </Pages>
+  <Footer>Built with XMLUI</Footer>
+</App>
+```
 
 #### `condensed-sticky`
 
 The app header is merged with the navigation panel, which displays the items horizontally. When you scroll the content, the heading and the navigation panel dock to the top, while the footer sticks to the bottom.
 
-<Playground
-  name="Example: 'condensed-sticky' layout"
-  height={350}
-  resources={{ logo: xmluiLogo }}
-  app={condensedSticky}
-/>
+```xmlui-pg name="Example: condensed-sticky"
+<App layout="condensed-sticky">
+  <AppHeader title="Example App"/>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="About" to="/about"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <List height="300px" limit="4" data="https://api.spacexdata.com/v3/history">
+        <Card title="{$item.title}" subtitle="{$item.details}"/>
+      </List>
+    </Page>
+    <Page url="/About">
+      <Text value="About this app" />
+    </Page>
+  </Pages>
+  <Footer>Built with XMLUI</Footer>
+</App>
+```
+
 
 ### Vertical Layout
 
-XMLUI supports several layouts that display the app's navigation sections (header, menu structure) vertically in a column to the left of the main content area. These variants are the following:
+These layouts that display the app's navigation sections (header, menu structure) vertically in a column to the left of the main content area.
 
 - `vertical`: The main content is aligned to the right (including the header and the footer), and its content is a single scroll container; every part of it moves as you scroll the page. This layout does not display the logo in the app header.
 - `vertical-sticky`: Similar to `vertical`, the header and the navigation bar dock to the top of the main content's viewport, while the footer sticks to the bottom. This layout does not display the logo in the app header.
@@ -244,43 +204,81 @@ XMLUI supports several layouts that display the app's navigation sections (heade
 
 When the navigation panel is collapsed, the app title is displayed to the right of the navigation menu icon. The following image shows the collapsed navigation panel:
 
-<br/>
-<Image alt="Test API" src="/resources/images/create-apps/collapsed-vertical.png" />
-
-The following vertical layout examples use the same markup as the horizontal ones.
-
 #### `vertical`
 
 Here, the app logo and the menu are docked to the left. On the right, the header, the main content, and the footer scroll with the app. Observe the empty app header! Now, the logo is moved to above the navigation panel.
 
-<Playground
-  name="Example: 'vertical' layout"
-  height={350}
-  resources={{ logo: xmluiLogo }}
-  app={vertical}
-/>
+```xmlui-pg name="Example: vertical"
+<App layout="vertical">
+  <AppHeader title="Example App"/>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="About" to="/about"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <List height="300px" limit="4" data="https://api.spacexdata.com/v3/history">
+        <Card title="{$item.title}" subtitle="{$item.details}"/>
+      </List>
+    </Page>
+    <Page url="/About">
+      <Text value="About this app" />
+    </Page>
+  </Pages>
+  <Footer>Built with XMLUI</Footer>
+</App>
+```
+
 
 #### `vertical-sticky`
 
 This layout is similar to the previous (`horizontal`) one. However, the app header sticks to the top of the main content (to the right), while the footer docks to the bottom.
 
-<Playground
-  name="Example: 'vertical-sticky' layout"
-  height={350}
-  resources={{ logo: xmluiLogo }}
-  app={verticalSticky}
-/>
+```xmlui-pg name="Example: vertical-sticky"
+<App layout="vertical-sticky">
+  <AppHeader title="Example App"/>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="About" to="/about"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <List height="300px" limit="4" data="https://api.spacexdata.com/v3/history">
+        <Card title="{$item.title}" subtitle="{$item.details}"/>
+      </List>
+    </Page>
+    <Page url="/About">
+      <Text value="About this app" />
+    </Page>
+  </Pages>
+  <Footer>Built with XMLUI</Footer>
+</App>
+```
 
 #### `vertical-full-header`
 
 This layout docks the app header to the top and the footer to the bottom. The navigation panel and the main content share the remaining area. When you scroll, only the main content moves; the other sections stick to the app's window.
 
-<Playground
-  name="Example: 'vertical-full-header' layout"
-  height={350}
-  resources={{ logo: xmluiLogo }}
-  app={verticalFullHeader}
-/>
+```xmlui-pg name="Example: vertical-full-header"
+<App layout="vertical-full-header">
+  <AppHeader title="Example App"/>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="About" to="/about"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <List height="300px" limit="4" data="https://api.spacexdata.com/v3/history">
+        <Card title="{$item.title}" subtitle="{$item.details}"/>
+      </List>
+    </Page>
+    <Page url="/About">
+      <Text value="About this app" />
+    </Page>
+  </Pages>
+  <Footer>Built with XMLUI</Footer>
+</App>
+```
 
 ## AppHeader
 

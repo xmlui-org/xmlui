@@ -1,9 +1,3 @@
-import { FileTree } from 'nextra/components'
-import { Callout } from 'nextra/components'
-import { THEMES, THEMES_WHAT_A_THEME_CONTAINS } from "../../meta/pages"
-import xmluiLogo from "./samples/resources/xmlui-logo.svg";
-import home from "./samples/resources/home.svg";
-
 # Working with Resources
 
 An XMLUI application, being a web application, can use static resources such as images, icons, fonts, etc provided by the application developer.
@@ -41,9 +35,9 @@ This is a fast way to add any static files to your project:
   logo="resources/custom-logo.svg">
   <AppHeader>
     <H2>Using Resources Tutorial</H2>
-  </AppHeader>  
-  <Image 
-    src="/resources/breakfast.jpg" fit="contain" 
+  </AppHeader>
+  <Image
+    src="/resources/breakfast.jpg" fit="contain"
     width="240px" />
 </App>
 ```
@@ -57,7 +51,7 @@ This is a fast way to add any static files to your project:
     name="Tutorial">
     <AppHeader>
       <H2>Using Resources Tutorial</H2>
-    </AppHeader>  
+    </AppHeader>
     <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px"/>
   </App>
   `}
@@ -94,7 +88,7 @@ Finally, you can access newly added resources by their handles defined in the co
   logo="custom-logo">
   <AppHeader>
     <H2>Using Resources Tutorial</H2>
-  </AppHeader>  
+  </AppHeader>
   <Image src="resource:breakfastImg" />
 </App>
 ```
@@ -109,7 +103,7 @@ Finally, you can access newly added resources by their handles defined in the co
     logo="custom-logo">
     <AppHeader>
       <H2>Using Resources Tutorial</H2>
-    </AppHeader>  
+    </AppHeader>
     <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px" />
   </App>
   `}

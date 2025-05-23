@@ -1,6 +1,3 @@
-import { Callout } from 'nextra/components'
-import { COMPONENT_MODALDIALOG } from "../../meta/pages"
-
 # Using Modal Dialogs
 
 <Callout type="info" emoji="💡">
