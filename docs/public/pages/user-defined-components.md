@@ -6,7 +6,7 @@
 
 This article will teach you the gritty-nitty details of component creation and customization.
 
-## Defining Reusable Components
+## Defining Components
 
 <Callout type="info" emoji="💡">
   Use the `<Component>` tag to declare a reusable component in the markup. This tag has a mandatory attribute, `name`, a unique identifier to the component.

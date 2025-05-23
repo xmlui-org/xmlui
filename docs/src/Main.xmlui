@@ -16,7 +16,7 @@
                 <NavLink label="Themes" to="/themes-intro" />
             </NavGroup>
 
-            <NavGroup label="Create XMLUI Apps" initiallyExpanded="{true}"
+            <NavGroup label="Create XMLUI Apps"
                 iconVerticalCollapsed="chevronright">
                 <NavLink label="App Structure" to="/appStructure" />
                 <NavLink label="Markup" to="/markup" />
@@ -128,13 +128,11 @@
                     <NavLink label="Common Units" to="/styles-and-themes/common-units" />
                 </NavGroup>
 
-                <NavLink label="Helper Tags" to="/tbd" />
                 <NavLink label="Context Variables" to="/contextVariables" />
                 <NavLink label="Globals" to="/globals" />
                 <NavLink label="Palettes" to="/palettes" />
                 <NavLink label="Icons" to="/icons" />
                 <NavLink label="Glossary" to="/glossary" />
-                <NavLink label="Test" to="/test" />
 
             </NavGroup>
 
