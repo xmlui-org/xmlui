@@ -56,6 +56,33 @@ interface CodeNode extends Node {
   meta: string | null;
 }
 
+/*
+ * Check if global object window is defined
+ */
+export function isBrowser() {
+  return typeof window !== 'undefined';
+}
+
+/*
+ * Decode base64 value, returns string
+ * @Params: string
+ */
+export function decodeValue(value) {
+  if (!value) {
+    return null;
+  }
+
+  const valueToString = value.toString();
+
+  if (isBrowser()) {
+    return window.btoa(valueToString);
+  }
+
+  const buff = Buffer.from(valueToString, 'ascii');
+  return buff.toString('base64');
+}
+
+
 export function markdownCodeBlockParser() {
   return function transformer(tree: Node) {
     visit(tree, "code", visitor);
@@ -88,7 +115,7 @@ export function markdownCodeBlockParser() {
         if (item.indexOf("=") === -1) {
           if (item.startsWith("/") && item.endsWith("/")) {
             const unparsedSubstrings = acc[CodeHighlighterMetaKeys.highlightSubstrings.data];
-            const newItemBase64 = window.btoa(item.substring(1, item.length - 1));
+            const newItemBase64 = decodeValue(item.substring(1, item.length - 1));
 
             if (!unparsedSubstrings) {
               acc[CodeHighlighterMetaKeys.highlightSubstrings.data] = newItemBase64;
