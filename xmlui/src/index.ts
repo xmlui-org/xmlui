@@ -48,6 +48,7 @@ import { VisuallyHidden } from "./components/VisuallyHidden";
 import { LocalLink } from "./components/Link/LinkNative";
 import { Select } from "./components/Select/SelectNative";
 import { AutoComplete } from "./components/AutoComplete/AutoCompleteNative";
+import { DropdownMenu, MenuItem } from "./components/DropdownMenu/DropdownMenuNative";
 
 export type {
   ThemeDefinition,
@@ -101,4 +102,6 @@ export {
   LocalLink,
   Select,
   AutoComplete,
+  DropdownMenu,
+  MenuItem,
 };

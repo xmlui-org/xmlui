@@ -1,10 +1,10 @@
-import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { LocalLink, AutoComplete, TextBox, VisuallyHidden, OptionNative } from "xmlui";
+import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { LocalLink, TextBox, VisuallyHidden } from "xmlui";
 import Fuse, { type FuseResult } from "fuse.js";
 
 type Props = {
   id?: string;
-  data: any;
+  data: Record<string, string>;
   limit?: number;
 };
 
@@ -12,14 +12,13 @@ export const defaultProps: Pick<Props, "limit"> = {
   limit: 10,
 };
 
-type SearchItem = { path: string; content: string };
+type SearchItem = { path: string, label: string; content: string };
 type SearchResult = FuseResult<SearchItem>;
 
 export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
   const _id = useId();
   id = id || _id;
   const [inputValue, setInputValue] = useState("");
-  const [debouncedValue, setDebouncedValue] = useState("");
   const [show, setShow] = useState(false);
 
   const targetRef = useRef<HTMLInputElement>(null);
@@ -35,46 +34,53 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
       // isCaseSensitive: false,
       // includeScore: false,
       // ignoreDiacritics: false,
-      // shouldSort: true,
-      includeMatches: true,
+      shouldSort: true,
+      // includeMatches: true,
       // findAllMatches: false,
-      // minMatchCharLength: 1,
+      // minMatchCharLength: 2,
       // location: 0,
-      // threshold: 0.6,
+      threshold: 0.4,
       // distance: 100,
       // useExtendedSearch: false,
       // ignoreLocation: false,
       // ignoreFieldNorm: false,
       // fieldNormWeight: 1,
-      keys: ["path", "content"],
+      keys: ["label", "content"],
     };
   }, []);
 
   const fuse = useMemo(() => {
-    const _data = Object.entries(data).map(
-      ([path, content]) =>
-        ({
+    const _data = Object.entries(data).map<SearchItem>(
+      ([path, content]) => {
+        let label = "";
+        const match = content.match(/^#{1,6}\s+(.+?)(?:\s+\[#.*\])?\s*$/m);
+        if (match) {
+          label = match[1];
+        } else {
+          label = path.split("/").pop() || path;
+        }
+        return {
           path,
+          label,
           content,
-        }) as SearchItem,
+        };
+      }
     );
     return new Fuse(_data, searchOptions);
   }, [data, searchOptions]);
 
   const results: SearchResult[] = useMemo(() => {
-    setShow(debouncedValue.length > 0);
-    return debouncedValue
+    setShow(inputValue.length > 0);
+    return inputValue
       ? fuse
-          .search(debouncedValue)
+          .search(inputValue)
           ?.map((result) => {
             // placeholder if we need to transform data
             return result;
           })
           ?.slice(0, limit)
       : [];
-  }, [debouncedValue, fuse, limit]);
-
-  //console.log(debouncedValue, " results: ", results);
+  }, [inputValue, fuse, limit]);
 
   useLayoutEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -88,53 +94,22 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
     };
   }, []);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(inputValue);
-    }, 500);
+  useLayoutEffect(() => {
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
 
-    // Cleanup timeout if inputValue changes before 500ms
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [inputValue]);
-
-  useEffect(() => {
-    updateWidth(); // Initial measurement
-    window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
+  const onClick = useCallback(() => {
+    setInputValue("");
+    setShow(false);
   }, []);
 
   return (
-    <form role="search" style={{ position: "relative" }}>
+    <div style={{ position: "relative" }}>
       <VisuallyHidden>
         <label htmlFor={id}>Search Field</label>
       </VisuallyHidden>
-      {/* <AutoComplete
-        id={id}
-        placeholder="Type to search..."
-        value={inputValue}
-        style={{ height: "30px" }}
-        onDidChange={(value) =>
-          setInputValue(() => {
-            fuse.search(value);
-            return value;
-          })
-        }
-        onFocus={() => setShow(true)}
-      >
-        {results &&
-          results.map((result) => {
-            return (
-              <OptionNative
-                key={result.item.path}
-                value={result.item.path}
-                label={result.item.path.split("/").pop()}
-                labelText={result.item.path.split("/").pop()}
-              />
-            );
-          })}
-      </AutoComplete> */}
       <TextBox
         id={id}
         ref={targetRef}
@@ -158,13 +133,77 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
             zIndex: 1,
             padding: "12px",
             backgroundColor: "var(--xmlui-color-surface-0)",
-            border: "1px solid var(--xmlui-color-secondary-900)",
+            border: "1px solid var(--xmlui-color-secondary-700)",
             borderEndStartRadius: "4px",
             borderEndEndRadius: "4px",
             width: width + "px",
           }}
         >
           {results.map((result) => {
+            return (
+              <li key={result.item.path} style={{ paddingBottom: "8px", listStyle: "none" }}>
+                <LocalLink
+                  to={result.item.path}
+                  onClick={onClick}
+                  style={{ textDecorationLine: "none" }}
+                >
+                  {result.item.label}
+                </LocalLink>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+/* <AutoComplete
+        id={id}
+        placeholder="Type to search..."
+        value={inputValue}
+        style={{ height: "30px" }}
+        onDidChange={(value) =>
+          setInputValue(() => {
+            fuse.search(value);
+            return value;
+          })
+        }
+        onFocus={() => setShow(true)}
+      >
+        {results &&
+          results.map((result) => {
+            return (
+              <OptionNative
+                key={result.item.path}
+                value={result.item.path}
+                label={result.item.path.split("/").pop()}
+                labelText={result.item.path.split("/").pop()}
+              />
+            );
+          })}
+      </AutoComplete> */
+/* <DropdownMenu
+        triggerTemplate={
+          <TextBox
+            id={id}
+            ref={targetRef}
+            type="search"
+            placeholder="Type to search..."
+            value={inputValue}
+            style={{ height: "30px", width: "280px" }}
+            startIcon="search"
+            onDidChange={(value) =>
+              setInputValue(() => {
+                fuse.search(value);
+                return value;
+              })
+            }
+          />
+        }
+        style={{ height: "30px", width: "280px" }}
+      >
+        {results.map((result) => {
             let label = "";
             const match = result.item.content.match(/^#{1,6}\s+(.+?)(?:\s+\[#.*\])?\s*$/m);
             if (match) {
@@ -173,7 +212,7 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
               label = result.item.path.split("/").pop() || "";
             }
             return (
-              <li key={result.item.path} style={{ paddingBottom: "8px", listStyle: "none" }}>
+              <MenuItem key={result.item.path}>
                 <LocalLink
                   to={result.item.path}
                   onClick={() => { setShow(false); setInputValue(""); }}
@@ -181,11 +220,7 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
                 >
                   {label}
                 </LocalLink>
-              </li>
+              </MenuItem>
             );
           })}
-        </ul>
-      )}
-    </form>
-  );
-};
+      </DropdownMenu> */
