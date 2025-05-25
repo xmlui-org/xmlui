@@ -142,6 +142,7 @@ export const datePickerComponentRenderer = createComponentRenderer(
   }) => {
     return (
       <DatePicker
+        id={node.uid}
         style={layoutCss}
         mode={extractValue(node.props?.mode)}
         value={state?.value}
@@ -165,6 +166,7 @@ export const datePickerComponentRenderer = createComponentRenderer(
         startIcon={extractValue.asOptionalString(node.props.startIcon)}
         endText={extractValue.asOptionalString(node.props.endText)}
         endIcon={extractValue.asOptionalString(node.props.endIcon)}
+        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
       />
     );
   },

@@ -15,7 +15,7 @@ export function Adornment({ iconName, text, className }: AdornmentProps) {
   return (
     <>
       {iconName || text ? (
-        <div className={classnames(styles.wrapper, className)}>
+        <div className={classnames(styles.wrapper, className)} role="presentation">
           <Icon name={iconName} style={{ color: "inherit" }} />
           {text && (
             <div style={{ display: "flex", userSelect: "none" }}>

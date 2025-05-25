@@ -337,6 +337,18 @@ export class SliderDriver extends ComponentDriver {}
 
 export class RangeDriver extends ComponentDriver {}
 
+// --- DatePicker
+
+export class DatePickerDriver extends ComponentDriver {
+  async toggleDropdownVisibility(){
+    await this.component.click();
+  }
+
+  async pickADay(value: string) {
+    await this.component.getByRole("gridcell", { name: value}).or(this.page.getByRole("gridcell", { name: value})).first().click({ force: true });
+  }
+}
+
 // --- Select
 
 export class SelectDriver extends ComponentDriver {
