@@ -1,6 +1,7 @@
 import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { LocalLink, TextBox, VisuallyHidden } from "xmlui";
 import Fuse, { type FuseResult } from "fuse.js";
+import styles from "./Search.module.scss";
 
 type Props = {
   id?: string;
@@ -116,7 +117,7 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
         type="search"
         placeholder="Type to search..."
         value={inputValue}
-        style={{ height: "30px", width: "280px" }}
+        style={{ height: "36px", width: "280px" }}
         startIcon="search"
         onDidChange={(value) =>
           setInputValue(() => {
@@ -131,9 +132,10 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
           style={{
             position: "absolute",
             zIndex: 1,
-            padding: "12px",
+            padding: "0",
+            marginTop: "2px",
             backgroundColor: "var(--xmlui-color-surface-0)",
-            border: "1px solid var(--xmlui-color-secondary-700)",
+            border: "1px solid var(--xmlui-color-surface-500)",
             borderEndStartRadius: "4px",
             borderEndEndRadius: "4px",
             width: width + "px",
@@ -141,7 +143,7 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
         >
           {results.map((result) => {
             return (
-              <li key={result.item.path} style={{ paddingBottom: "8px", listStyle: "none" }}>
+              <li key={result.item.path} className={styles.item}>
                 <LocalLink
                   to={result.item.path}
                   onClick={onClick}

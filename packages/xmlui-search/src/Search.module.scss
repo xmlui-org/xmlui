@@ -1,0 +1,25 @@
+@use "xmlui/themes.scss" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "Search";
+$themeVars: t.composeBorderVars($themeVars, $componentName);
+$themeVars: t.composePaddingVars($themeVars, $componentName);
+
+.item {
+  // TEMP
+  list-style: none;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+:export{
+  themeVars: t.json-stringify($themeVars)
+}
