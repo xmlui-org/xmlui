@@ -594,7 +594,7 @@ export function HiddenOption(option: Option) {
     return {
       ...option,
       label: label ?? node?.textContent ?? "",
-      keywords: [node?.textContent ?? ""],
+      keywords: [label ?? node?.textContent ?? ""],
     };
   }, [option, node]);
 

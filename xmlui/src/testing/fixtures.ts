@@ -45,7 +45,8 @@ import {
   TextDriver,
   ValidationDisplayDriver,
   ValidationSummaryDriver,
-  VStackDriver, DatePickerDriver
+  VStackDriver,
+  DatePickerDriver, AutoCompleteDriver
 } from "./ComponentDrivers";
 import { initComponent } from "./component-test-helpers";
 
@@ -251,6 +252,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(DatePickerDriver, testIdOrLocator);
     });
   },
+  createAutoCompleteDriver: async ({ createDriver }, use) => {
+    await use(async (testIdOrLocator?: string | Locator) => {
+      return createDriver(AutoCompleteDriver, testIdOrLocator);
+    });
+  },
   createSelectDriver: async ({ createDriver }, use) => {
     await use(async (testIdOrLocator?: string | Locator) => {
       return createDriver(SelectDriver, testIdOrLocator);
@@ -407,6 +413,7 @@ type TestDriverExtenderProps = {
   createSliderDriver: ComponentDriverMethod<SliderDriver>;
   createRangeDriver: ComponentDriverMethod<RangeDriver>;
   createDatePickerDriver: ComponentDriverMethod<DatePickerDriver>;
+  createAutoCompleteDriver: ComponentDriverMethod<AutoCompleteDriver>;
   createSelectDriver: ComponentDriverMethod<SelectDriver>;
   createRadioGroupDriver: ComponentDriverMethod<RadioGroupDriver>;
   createNumberBoxDriver: ComponentDriverMethod<NumberBoxDriver>;

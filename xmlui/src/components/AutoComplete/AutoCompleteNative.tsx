@@ -98,10 +98,10 @@ export const AutoComplete = forwardRef(function AutoComplete(
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null); // Added this
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [options, setOptions] = useState(new Set<Option>());
   const [inputValue, setInputValue] = useState("");
   const { root } = useTheme();
@@ -263,7 +263,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
     <AutoCompleteContext.Provider value={autoCompleteContextValue}>
       <OptionTypeProvider Component={HiddenOption}>
         <OptionContext.Provider value={optionContextValue}>
-          {children}
           <ItemWithLabel
             id={inputId}
             ref={forwardedRef}
@@ -277,7 +276,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
             onBlur={onBlur}
             style={style}
           >
-            <Popover open={open}>
+            <Popover open={open} onOpenChange={setOpen} modal={false}>
               <Cmd
                 ref={dropdownRef}
                 className={styles.command}
@@ -288,62 +287,38 @@ export const AutoComplete = forwardRef(function AutoComplete(
                 }}
               >
                 <PopoverTrigger
-                  style={{ width: "100%" }}
                   id={inputId}
                   onClick={() => {
                     if (!enabled) return;
                     inputRef?.current?.focus();
                   }}
+                  aria-haspopup="listbox"
+                  ref={setReferenceElement}
+                  style={{ width: "100%", ...style }}
+                  className={classnames(styles.badgeListWrapper, styles[validationStatus], {
+                    [styles.disabled]: !enabled,
+                    [styles.focused]: document.activeElement === inputRef.current,
+                  })}
                 >
-                  <div
-                    ref={setReferenceElement}
-                    style={style}
-                    className={classnames(styles.badgeListWrapper, styles[validationStatus], {
-                      [styles.disabled]: !enabled,
-                      [styles.focused]: document.activeElement === inputRef.current,
-                    })}
-                  >
-                    {multi ? (
-                      <div className={styles.badgeList}>
-                        {Array.isArray(value) &&
-                          value.map((v) => (
-                            <span key={v} className={styles.badge}>
-                              {Array.from(options).find((o) => o.value === v)?.label}
-                              <Icon
-                                name="close"
-                                size="sm"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  toggleOption(v);
-                                }}
-                              />
-                            </span>
-                          ))}
-                        <CmdInput
-                          id={id}
-                          autoFocus={autoFocus}
-                          ref={inputRef}
-                          value={inputValue}
-                          disabled={!enabled}
-                          onValueChange={(value) => {
-                            setOpen(true);
-                            setInputValue(value);
-                          }}
-                          onFocus={() => {
-                            setOpen(true);
-                            onFocus();
-                          }}
-                          onBlur={() => {
-                            setOpen(false);
-                            onBlur();
-                          }}
-                          placeholder={placeholder}
-                          className={styles.commandInput}
-                        />
-                      </div>
-                    ) : (
+                  {multi ? (
+                    <div className={styles.badgeList}>
+                      {Array.isArray(value) &&
+                        value.map((v) => (
+                          <span key={v} className={styles.badge}>
+                            {Array.from(options).find((o) => o.value === v)?.label}
+                            <Icon
+                              name="close"
+                              size="sm"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                toggleOption(v);
+                              }}
+                            />
+                          </span>
+                        ))}
                       <CmdInput
                         id={id}
+                        role="combobox"
                         autoFocus={autoFocus}
                         ref={inputRef}
                         value={inputValue}
@@ -363,22 +338,44 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         placeholder={placeholder}
                         className={styles.commandInput}
                       />
-                    )}
-                    <div className={styles.actions}>
-                      {value?.length > 0 && enabled && (
-                        <span
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            clearValue();
-                          }}
-                        >
-                          <Icon name="close" />
-                        </span>
-                      )}
-                      <span onClick={() => setOpen(true)}>
-                        <Icon name="chevrondown" />
-                      </span>
                     </div>
+                  ) : (
+                    <CmdInput
+                      id={id}
+                      autoFocus={autoFocus}
+                      ref={inputRef}
+                      value={inputValue}
+                      disabled={!enabled}
+                      onValueChange={(value) => {
+                        setOpen(true);
+                        setInputValue(value);
+                      }}
+                      onFocus={() => {
+                        setOpen(true);
+                        onFocus();
+                      }}
+                      onBlur={() => {
+                        setOpen(false);
+                        onBlur();
+                      }}
+                      placeholder={placeholder}
+                      className={styles.commandInput}
+                    />
+                  )}
+                  <div className={styles.actions}>
+                    {value?.length > 0 && enabled && (
+                      <span
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          clearValue();
+                        }}
+                      >
+                        <Icon name="close" />
+                      </span>
+                    )}
+                    <span onClick={() => setOpen(true)}>
+                      <Icon name="chevrondown" />
+                    </span>
                   </div>
                 </PopoverTrigger>
                 {open && (
@@ -391,6 +388,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       onOpenAutoFocus={(e) => e.preventDefault()}
                     >
                       <CmdList
+                        role="listbox"
                         className={styles.commandList}
                         onMouseUp={() => {
                           inputRef?.current?.focus();
@@ -402,14 +400,17 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         <CmdGroup>
                           {Array.from(options).map(
                             ({ value, label, enabled, keywords, labelText }) => (
-                              <AutoCompleteOption
-                                key={value}
-                                value={value}
-                                label={label}
-                                enabled={enabled}
-                                keywords={keywords}
-                                labelText={labelText}
-                              />
+                              <div>
+                                <AutoCompleteOption
+                                  key={value}
+                                  value={value}
+                                  label={label}
+                                  enabled={enabled}
+                                  keywords={keywords}
+                                  labelText={labelText}
+                                />
+                              </div>
+
                             ),
                           )}
                         </CmdGroup>
@@ -420,6 +421,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
               </Cmd>
             </Popover>
           </ItemWithLabel>
+          {children}
         </OptionContext.Provider>
       </OptionTypeProvider>
     </AutoCompleteContext.Provider>

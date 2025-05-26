@@ -349,11 +349,31 @@ export class DatePickerDriver extends ComponentDriver {
   }
 }
 
+// --- AutoComplete
+
+export class AutoCompleteDriver extends ComponentDriver {
+  async toggleOptionsVisibility() {
+    await this.component.click();
+  }
+
+  async selectLabel(value: string) {
+    await this.component.getByRole("option", { name: value }).or(this.page.getByRole("option", { name: value })).first().click({ force: true });
+  }
+
+  async searchFor(value: string) {
+    await this.page.getByRole("combobox").fill(value);
+  }
+
+  async chooseIndex(index: number) {
+    await this.locator.getByRole("option").nth(index).or(this.page.getByRole("option").nth(index)).first().click();
+  }
+}
+
 // --- Select
 
 export class SelectDriver extends ComponentDriver {
   async toggleOptionsVisibility(){
-    await this.component.click();
+    await this.component.getByRole("button").click();
   }
 
   async selectLabel(value: string) {

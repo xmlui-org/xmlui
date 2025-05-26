@@ -25,7 +25,7 @@ test("dynamic options displayed with Items component", async ({
   createSelectDriver,
   page
 }) => {
-  const { testStateDriver } = await initTestBed(`
+  await initTestBed(`
     <Select>
       <Items data="{['One', 'Two', 'Three']}" >
         <Option value="{$itemIndex}" label="{$item}" />
@@ -41,7 +41,7 @@ test("dynamic options displayed with Items component", async ({
 });
 
 test("changing selected option in form", async ({ initTestBed, createSelectDriver }) => {
-  const { testStateDriver } = await initTestBed(`
+  await initTestBed(`
     <Form data="{{sel: 'opt1'}}">
       <FormItem testId="mySelect" type="select" bindTo="sel">
         <Option value="opt1" label="first"/>
@@ -58,7 +58,7 @@ test("changing selected option in form", async ({ initTestBed, createSelectDrive
 });
 
 test("initialValue set to first valid value", async ({ page, initTestBed }) => {
-  const { testStateDriver } = await initTestBed(`
+  await initTestBed(`
     <Fragment>
       <Select id="mySelect" initialValue="{0}">
         <Option value="{0}" label="Zero"/>
@@ -74,7 +74,7 @@ test("initialValue set to first valid value", async ({ page, initTestBed }) => {
 });
 
 test("initialValue set to non-existant option", async ({ page, initTestBed }) => {
-  const { testStateDriver } = await initTestBed(`
+  await initTestBed(`
     <Fragment>
       <Select id="mySelect" initialValue="{42}">
         <Option value="{0}" label="Zero"/>
@@ -89,7 +89,7 @@ test("initialValue set to non-existant option", async ({ page, initTestBed }) =>
 
 
 test("reset works with initialValue", async ({ page, initTestBed, createSelectDriver, createButtonDriver }) => {
-  const { testStateDriver } = await initTestBed(`
+  await initTestBed(`
     <Fragment>
       <Select id="mySelect" initialValue="{0}">
         <Option value="{0}" label="Zero"/>
@@ -116,7 +116,7 @@ test("reset works with no intialValue", async ({
   createSelectDriver,
   createButtonDriver,
 }) => {
-  const { testStateDriver } = await initTestBed(`
+  await initTestBed(`
     <Fragment>
       <Select id="mySelect">
         <Option value="{0}" label="Zero"/>
