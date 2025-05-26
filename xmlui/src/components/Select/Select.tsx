@@ -37,7 +37,6 @@ export const SelectMd = createMetadata({
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
-    maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
     readOnly: dReadonly(),

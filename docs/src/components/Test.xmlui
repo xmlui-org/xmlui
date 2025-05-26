@@ -1,0 +1,7 @@
+<Component name="Test">
+
+<Text preserveLinebreaks="true">
+  {  JSON.stringify(window.getComponentsList(appGlobals.navPanelContent), null, 2) }
+</Text>
+
+</Component>

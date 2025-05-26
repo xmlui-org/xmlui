@@ -1,0 +1,820 @@
+<Component name="Palettes">
+
+  <HStack>
+
+
+    <Select
+      id="pickTheme"
+      width="30%"
+      initialValue="xmlui"
+      onDidChange="(newTheme) => setTheme(newTheme)"
+    >
+      <Option value="xmlui" label="xmlui" />
+      <Option value="earthtone" label="earthtone" />
+      <Option value="xmlui-green" label="xmlui-green" />
+      <Option value="xmlui-orange" label="xmlui-orange" />
+      <Option value="xmlui-gray" label="xmlui-gray" />
+    </Select>
+
+    <ToneChangerButton />
+  </HStack>
+
+  <H1>Surface</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-50">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-50</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-100">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-100</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-200">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-200</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-300">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-300</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-400">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-400</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-500">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-500</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-600">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-600</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-700">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-700</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-800">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-800</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-900">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-900</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface-950">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface-950</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-surface">&nbsp;</Text>
+        <Text fontSize="smaller">color-surface</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <H1>Primary</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-50">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-50</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-100">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-100</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-200">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-200</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-300">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-300</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-400">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-400</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-500">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-500</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-600">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-600</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-700">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-700</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-800">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-800</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-900">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-900</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-primary-950">&nbsp;</Text>
+        <Text fontSize="smaller">color-primary-950</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <H1>Secondary</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-50">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-50</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-100">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-100</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-200">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-200</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-300">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-300</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-400">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-400</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-500">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-500</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-600">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-600</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-700">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-700</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-800">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-800</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-900">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-900</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary-950">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary-950</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-secondary">&nbsp;</Text>
+        <Text fontSize="smaller">color-secondary</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <H1>Warning</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-50">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-50</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-100">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-100</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-200">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-200</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-300">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-300</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-400">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-400</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-500">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-500</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-600">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-600</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-700">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-700</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-800">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-800</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-900">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-900</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn-950">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn-950</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warn">&nbsp;</Text>
+        <Text fontSize="smaller">color-warn</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <H1>Danger</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-50">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-50</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-100">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-100</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-200">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-200</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-300">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-300</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-400">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-400</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-500">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-500</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-600">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-600</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-700">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-700</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-800">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-800</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-900">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-900</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger-950">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger-950</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-danger">&nbsp;</Text>
+        <Text fontSize="smaller">color-danger</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <H1>Attention</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-attention">&nbsp;</Text>
+        <Text fontSize="smaller">color-attention</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <H1>Success</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-50">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-50</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-100">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-100</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-200">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-200</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-300">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-300</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-400">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-400</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-500">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-500</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-600">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-600</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-700">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-700</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-800">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-800</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-900">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-900</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success-950">&nbsp;</Text>
+        <Text fontSize="smaller">color-success-950</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-success">&nbsp;</Text>
+        <Text fontSize="smaller">color-success</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <H1>Info</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-50">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-50</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-100">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-100</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-200">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-200</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-300">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-300</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-400">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-400</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-500">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-500</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-600">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-600</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-700">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-700</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-800">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-800</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-900">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-900</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info-950">&nbsp;</Text>
+        <Text fontSize="smaller">color-info-950</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-info">&nbsp;</Text>
+        <Text fontSize="smaller">color-info</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <H1>Utility</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-valid">&nbsp;</Text>
+        <Text fontSize="smaller">color-valid</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-warning">&nbsp;</Text>
+        <Text fontSize="smaller">color-warning</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$color-error">&nbsp;</Text>
+        <Text fontSize="smaller">color-error</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <H1>Text</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$textColor-primary">&nbsp;</Text>
+        <Text fontSize="smaller">textColor-primary</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$textColor-attention">&nbsp;</Text>
+        <Text fontSize="smaller">textColor-attention</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$textColor-subtitle">&nbsp;</Text>
+        <Text fontSize="smaller">textColor-subtitle</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$textColor--disabled">&nbsp;</Text>
+        <Text fontSize="smaller">textColor--disabled</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <H1>Background</H1>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$backgroundColor-primary">&nbsp;</Text>
+        <Text fontSize="smaller">backgroundColor-primary</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$backgroundColor-secondary">&nbsp;</Text>
+        <Text fontSize="smaller">backgroundColor-secondary</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$backgroundColor-attention">&nbsp;</Text>
+        <Text fontSize="smaller">backgroundColor-attention</Text>
+      </HStack>
+    </VStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$backgroundColor--disabled">&nbsp;</Text>
+        <Text fontSize="smaller">backgroundColor--disabled</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+  <HStack>
+
+    <VStack>
+      <HStack width="15rem">
+        <Text width="100px" backgroundColor="$backgroundColor--selected">&nbsp;</Text>
+        <Text fontSize="smaller">backgroundColor--selected</Text>
+      </HStack>
+    </VStack>
+
+  </HStack>
+
+</Component>

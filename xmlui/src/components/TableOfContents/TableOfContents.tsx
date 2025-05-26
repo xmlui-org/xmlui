@@ -6,6 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TableOfContents } from "./TableOfContentsNative";
 
 const COMP = "TableOfContents";
+const COMP_CHILD = "TableOfContentsItem";
 
 export const TableOfContentsMd = createMetadata({
   status: "experimental",
@@ -32,43 +33,18 @@ export const TableOfContentsMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`width-${COMP}`]: "auto",
-    [`height-${COMP}`]: "auto",
-    [`fontSize-${COMP}Item`]: "$fontSize-smaller",
-    [`fontWeight-${COMP}Item`]: "$fontWeight-normal",
-    [`fontFamily-${COMP}Item`]: "$fontFamily",
-    [`borderRadius-${COMP}Item`]: "0",
-    [`border-width-${COMP}Item`]: "$space-0_5",
-    [`border-style-${COMP}Item`]: "solid",
-    [`borderRadius-${COMP}Item--active`]: "0",
-    [`border-width-${COMP}Item--active`]: "$space-0_5",
-    [`border-style-${COMP}Item--active`]: "solid",
-    [`fontWeight-${COMP}Item--active`]: "$fontWeight-bold",
-    [`backgroundColor-${COMP}`]: "transparent",
-    [`paddingHorizontal-${COMP}`]: "$space-8",
-    [`paddingVertical-${COMP}`]: "$space-4",
-    [`paddingHorizontal-${COMP}Item`]: "$space-2",
-    [`paddingVertical-${COMP}Item`]: "$space-2",
-    [`paddingHorizontal-${COMP}Item-level-1`]: "unset",
-    [`paddingHorizontal-${COMP}Item-level-2`]: "unset",
-    [`paddingHorizontal-${COMP}Item-level-3`]: "unset",
-    [`paddingHorizontal-${COMP}Item-level-4`]: "unset",
-    [`paddingHorizontal-${COMP}Item-level-5`]: "unset",
-    [`paddingHorizontal-${COMP}Item-level-6`]: "unset",
-    [`marginTop-${COMP}`]: "0",
-    [`marginBottom-${COMP}`]: "0",
-    [`borderRadius-${COMP}`]: "0",
-    [`border-width-${COMP}`]: "0",
-    [`borderColor-${COMP}`]: "transparent",
-    [`border-style-${COMP}`]: "solid",
-    [`paddingLeft-${COMP}Item`]: "$space-1",
-    [`textTransform-${COMP}Item`]: "none",
-    [`verticalAlign-${COMP}Item`]: "baseline",
-    [`letterSpacing-${COMP}Item`]: "0",
-    [`color-${COMP}Item`]: "$textColor-primary",
-    [`borderColor-${COMP}Item`]: "$borderColor",
-    [`borderColor-${COMP}Item--active`]: "$color-primary-500",
-    [`color-${COMP}Item--active`]: "$color-primary-500",
+    [`padding-${COMP}`]: "$space-2",
+    [`textColor-${COMP_CHILD}`]: "$color-secondary-500",
+    [`textColor-${COMP_CHILD}--hover`]: "$textColor-primary",
+    [`fontSize-${COMP_CHILD}`]: "$fontSize-small",
+    [`wordWrap-${COMP_CHILD}`]: "break-word",
+
+    [`paddingVertical-${COMP_CHILD}`]: "$space-1",
+    [`paddingHorizontal-${COMP_CHILD}`]: "$space-1",
+    [`fontWeight-${COMP_CHILD}`]: "$fontWeight-bold",
+    [`fontStyle-${COMP_CHILD}-level-6`]: "italic",
+
+    [`color-${COMP_CHILD}--active`]: "$color-primary-500",
   },
 });
 
