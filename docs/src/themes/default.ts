@@ -42,12 +42,17 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "textColor-NavLink--hover--active": "$color-primary-500",
   
     // --- TOC
-    "fontWeight-TableOfContentsItem--pressed--active": "bold",
-    "fontWeight-TableOfContentsItem": "600",
-    "textColor-TableOfContentsItem": "$color-secondary-500",
-    "textColor-TableOfContentsItem--hover": "$color-surface-900",
-    "fontWeight-TableOfContentsItem-level-3": "400",
-    
+    "fontWeight-TableOfContentsItem-level-3": "normal",
+    "fontWeight-TableOfContentsItem-level-4": "normal",
+    "fontWeight-TableOfContentsItem-level-5": "normal",
+    "fontWeight-TableOfContentsItem-level-6": "normal",
+
+    "paddingLeft-TableOfContentsItem-level-2": "$space-3",
+    "paddingLeft-TableOfContentsItem-level-3": "$space-5",
+    "paddingLeft-TableOfContentsItem-level-4": "$space-6",
+    "paddingLeft-TableOfContentsItem-level-5": "$space-6",
+    "paddingLeft-TableOfContentsItem-level-6": "$space-6",
+        
     // --- Markdown
     "fontSize-Text-markdown": "$fontSize-normal",
     "lineHeight-Text-codefence": "$fontHeight-normal",

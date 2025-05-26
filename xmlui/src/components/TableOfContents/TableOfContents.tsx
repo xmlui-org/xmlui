@@ -33,23 +33,18 @@ export const TableOfContentsMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`paddingHorizontal-${COMP}`]: "$space-8",
-    [`paddingVertical-${COMP}`]: "$space-4",
-
+    [`padding-${COMP}`]: "$space-2",
+    [`textColor-${COMP_CHILD}`]: "$color-secondary-500",
+    [`textColor-${COMP_CHILD}--hover`]: "$textColoe-primary",
     [`fontSize-${COMP_CHILD}`]: "$fontSize-small",
     [`wordWrap-${COMP_CHILD}`]: "break-word",
-    [`paddingTop-${COMP_CHILD}`]: "$space-1_5",
-    [`paddingBottom-${COMP_CHILD}`]: "$space-1_5",
-    [`fontWeight-${COMP_CHILD}-level-1`]: "bold",
-    [`paddingLeft-${COMP_CHILD}-level-2`]: "$space-2_5",
-    [`paddingLeft-${COMP_CHILD}-level-3`]: "$space-3_5",
-    [`paddingLeft-${COMP_CHILD}-level-4`]: "$space-4",
-    [`paddingLeft-${COMP_CHILD}-level-5`]: "$space-5",
-    [`paddingLeft-${COMP_CHILD}-level-6`]: "$space-5",
+
+    [`paddingVertical-${COMP_CHILD}`]: "$space-1",
+    [`paddingHorizontal-${COMP_CHILD}`]: "$space-1",
+    [`fontWeight-${COMP_CHILD}`]: "$fontWeight-bold",
     [`fontStyle-${COMP_CHILD}-level-6`]: "italic",
+
     [`color-${COMP_CHILD}--active`]: "$color-primary-500",
-    [`fontWeight-${COMP_CHILD}--active`]: "bold",
-    [`textColor-${COMP_CHILD}--hover`]: "$color-primary-400",
   },
 });
 

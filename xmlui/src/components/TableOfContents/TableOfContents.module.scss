@@ -30,12 +30,15 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "#{$component}");
 
 .nav {
+  border-width: createThemeVar('borderWidth-#{$component}');
+  border-color: createThemeVar('borderColor-#{$component}');
+  border-style: createThemeVar('borderStyle-#{$component}');
   @include t.borderVars($themeVars, $component);
   @include t.paddingVars($themeVars, $component);
   background-color: $backgroundColor-TableOfContents;
-  min-width: 240px;
-  width: $width-TableOfContents;
+  min-width: 250px;
   align-self: flex-start;
+  width: $width-TableOfContents;
   height: $height-TableOfContents;
   max-height: calc(100vh - var(--header-abs-height) - var(--footer-abs-height));
   overflow-y: auto;
@@ -47,8 +50,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}");
   // --- Do not collapse these padding properties; they are intentionally expanded
   margin-top: createThemeVar("marginTop-#{$component}");
   margin-bottom: createThemeVar("marginBottom-#{$component}");
-  //padding: createThemeVar("paddingVertical-#{$component}") createThemeVar("paddingHorizontal-#{$component}");
-
+  
   .list {
     margin: 0;
     padding: 0;
@@ -56,14 +58,17 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}");
 
     .listItem {
       list-style-type: none;
-      border-left: createThemeVar("borderWidth-#{$componentItem}") createThemeVar("borderStyle-#{$componentItem}") createThemeVar("borderColor-#{$componentItem}");
+      border-width: createThemeVar('borderWidth-#{$componentItem}');
+      border-color: createThemeVar('borderColor-#{$componentItem}');
+      border-style: createThemeVar('borderStyle-#{$componentItem}');
+      @include t.borderVars($themeVars, $componentItem);
 
       .link {
-        color: createThemeVar("textColor-#{$componentItem}");
-        overflow-wrap: break-word;
         display: block;
-        @include t.paddingVars($themeVars, "#{$componentItem}");
-        @include t.textVars($themeVars, "#{$componentItem}");
+        overflow-wrap: break-word;
+        color: createThemeVar("textColor-#{$componentItem}");
+        @include t.paddingVars($themeVars, $componentItem);
+        @include t.textVars($themeVars, $componentItem);
 
         &.head_1 {
           @include t.paddingVars($themeVars, "#{$componentItem}-level-1");
@@ -97,17 +102,60 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}");
       }
 
       &:hover {
+        //border: createThemeVar("borderWidth-#{$componentItem}--hover") createThemeVar("borderStyle-#{$componentItem}--hover") createThemeVar("borderColor-#{$componentItem}--hover");
+        background-color: createThemeVar("backgroundColor-#{$componentItem}--hover");
+
         .link {
+          font-weight: createThemeVar("fontWeight-#{$componentItem}--hover");
           color: createThemeVar("textColor-#{$componentItem}--hover");
+
+          &.head_1 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-1--hover");
+          }
+          &.head_2 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-2--hover");
+          }
+          &.head_3 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-3--hover");
+          }
+          &.head_4 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-4--hover");
+          }
+          &.head_5 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-5--hover");
+          }
+          &.head_6 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-6--hover");
+          }
         }
       }
 
       &.active {
-        border-left: createThemeVar("borderWidth-#{$componentItem}--active") solid createThemeVar("borderColor-#{$component}Item--active");
+        //border: createThemeVar("borderWidth-#{$componentItem}--active") createThemeVar("borderStyle-#{$componentItem}--active") createThemeVar("borderColor-#{$componentItem}--active");
+        background-color: createThemeVar("backgroundColor-#{$componentItem}--active");
 
         .link {
           color: createThemeVar("color-#{$componentItem}--active");
           font-weight: createThemeVar("fontWeight-#{$componentItem}--active");
+
+          &.head_1 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-1--active");
+          }
+          &.head_2 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-2--active");
+          }
+          &.head_3 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-3--active");
+          }
+          &.head_4 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-4--active");
+          }
+          &.head_5 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-5--active");
+          }
+          &.head_6 {
+            font-weight: createThemeVar("fontWeight-#{$componentItem}-level-6--active");
+          }
         }
       }
     }
