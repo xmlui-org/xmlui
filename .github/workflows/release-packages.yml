@@ -114,10 +114,10 @@ jobs:
           echo "release tag for VSCode extension: $XMLUI_VSCODE_TAG"
           echo "tag already exists: $TAG_EXISTS"
       - name: Build VSCode extension
-        if: success() && steps.xmlui_vscode_info.outputs.tagExists == "false"
+        if: success() && steps.xmlui_vscode_info.outputs.tagExists == 'false'
         run: npm run build-vscode-extension
       - name: Upload VSIX to Release
-        if: success() && steps.xmlui_vscode_info.outputs.tagExists == "false"
+        if: success() && steps.xmlui_vscode_info.outputs.tagExists == 'false'
         uses: softprops/action-gh-release@v1
         with:
           files: "tools/vscode/*.vsix"
