@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.41
+
+### Patch Changes
+
+- 42416ba: test change for CI #2
+
 ## 0.9.40
 
 ### Patch Changes
