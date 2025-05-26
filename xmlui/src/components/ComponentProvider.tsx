@@ -29,7 +29,7 @@ import {
   headingComponentRenderer,
 } from "./Heading/Heading";
 import { textComponentRenderer } from "./Text/Text";
-import { helloWorldComponentRenderer } from "./HelloWorld";
+import { reactivityDebuggerComponentRenderer } from "./HelloWorld";
 import { fragmentComponentRenderer } from "../components-core/Fragment";
 import { tableComponentRenderer } from "./Table/Table";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
@@ -383,14 +383,15 @@ export class ComponentRegistry {
       this.registerCoreComponent(h3ComponentRenderer);
       this.registerCoreComponent(h4ComponentRenderer);
       this.registerCoreComponent(h5ComponentRenderer);
-      this.registerCoreComponent(h6ComponentRenderer);
+        this.registerCoreComponent(h6ComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Text !== "false") {
       this.registerCoreComponent(textComponentRenderer);
-      console.log("Registering HelloWorld", helloWorldComponentRenderer);
-this.registerCoreComponent(helloWorldComponentRenderer);
-      this.registerCoreComponent(helloWorldComponentRenderer);
     }
+
+    console.log("Registering ReactivityDebugger", reactivityDebuggerComponentRenderer);
+    this.registerCoreComponent(reactivityDebuggerComponentRenderer);
+
     if (process.env.VITE_USED_COMPONENTS_Fragment !== "false") {
       this.registerCoreComponent(fragmentComponentRenderer);
     }

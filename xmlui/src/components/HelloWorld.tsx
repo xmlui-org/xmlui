@@ -1,8 +1,8 @@
 import React from "react";
 import { createComponentRenderer } from "../components-core/renderers";
 
-export const helloWorldComponentRenderer = createComponentRenderer(
-  "HelloWorld",
+export const reactivityDebuggerComponentRenderer = createComponentRenderer(
+  "ReactivityDebugger",
   undefined,
-  () => <div>Hello, world!</div>
+  () => <div>Reactivity Debugger</div>
 );
