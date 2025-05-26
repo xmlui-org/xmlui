@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.40
+
+### Patch Changes
+
+- 34282f0: chage to test CI
+
 ## 0.9.39
 
 ### Patch Changes
