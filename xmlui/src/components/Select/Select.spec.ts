@@ -352,7 +352,7 @@ test.describe("searchable select", () => {
         <Option value="opt3" label="third"/>
       </Select>
     `);
-    await expect(page.getByPlaceholder("Please select an item")).toBeVisible();
+    await expect(page.getByText("Please select an item")).toBeVisible();
   });
 
   test('inProgressNotificationMessage shown when inProgress is true', async ({ initTestBed, page, createSelectDriver }) => {
