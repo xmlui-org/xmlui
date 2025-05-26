@@ -1,42 +1,170 @@
 <Fragment xmlns:XMLUIExtensions="component-ns">
-    <App layout="vertical-full-header" noScrollbarGutters="false" when="{!window.location.hash.includes('/playground')}">
+    <App layout="vertical-full-header" noScrollbarGutters="false"
+        when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
-            <SpaceFiller/>
+            <SpaceFiller />
             <ToneChangerButton />
         </AppHeader>
 
         <NavPanel>
-            <!-- Custom documentation pages navigation -->
-            <NavLink to="/" label="Introduction" />
 
-            <SectionHeader title="Quick Reference" />
-            <NavLink to="/cheat-sheet" label="XMLUI Cheat Sheet" />
-            <NavLink to="/glossary" label="Glossary" />
+            <NavGroup label="Learn XMLUI" initiallyExpanded="{true}"
+                iconVerticalCollapsed="chevronright">
+                <NavLink label="Introduction" to="/" />
+                <NavLink label="Reactive Data" to="/reactive-intro" />
+                <NavLink label="Components" to="/components-intro" />
+                <NavLink label="Themes" to="/themes-intro" />
+            </NavGroup>
 
-            <!-- Generated component reference navigation tree -->
-            <RecursiveNavTree items="{appGlobals.navPanelContent}"/>
+            <NavGroup label="Create XMLUI Apps"
+                iconVerticalCollapsed="chevronright">
+                <NavLink label="App Structure" to="/appStructure" />
+                <NavLink label="Markup" to="/markup" />
+                <NavLink label="Code" to="/code" />
+                <NavLink label="Layout" to="/layout" />
+                <NavLink label="Working with Text" to="/workingWithText" />
+                <NavLink label="Routing and Links" to="/routingAndLinks" />
+                <NavLink label="Forms" to="/forms" />
+                <NavLink label="Resources" to="/resources" />
+                <NavLink label="Modal Dialogs" to="/modalDialogs" />
+                <NavLink label="User-defined Components" to="/userDefinedComponents" />
+            </NavGroup>
+
+            <NavGroup label="Reference" iconVerticalCollapsed="chevronright">
+
+                <RecursiveNavTree items="{ window.getComponentsList(appGlobals.navPanelContent) }"/>
+
+                <NavGroup label="Themes" iconVerticalCollapsed="chevronright">
+                    <NavLink label="Layout Properties" to="/styles-and-themes/layout-props" />
+                    <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables" />
+                    <NavLink label="Common Units" to="/styles-and-themes/common-units" />
+                </NavGroup>
+
+                <NavLink label="Context Variables" to="/contextVariables" />
+                <NavLink label="Globals" to="/globals" />
+                <NavLink label="Palettes" to="/palettes" />
+                <NavLink label="Icons" to="/icons" />
+                <NavLink label="Glossary" to="/glossary" />
+                <NavLink label="Test" to="/test" />
+
+            </NavGroup>
+
         </NavPanel>
 
-        <Pages defaultRoute="/">
-            <!-- Custom documentation pages -->
+
+        <Pages>
+
             <Page url="/">
-                <MarkdownPage url="/pages/introduction.md" />
-            </Page>
-            <Page url="/cheat-sheet">
-                <MarkdownPage url="/pages/cheat-sheet.md" />
-            </Page>
-            <Page url="/glossary">
-                <MarkdownPage url="/pages/glossary.md" />
+                <Markdown data="/pages/intro.md" />
             </Page>
 
-            <!-- Generated component reference pages -->
-            <Page url="/*">
-                <MarkdownPage content="{appGlobals.content[$routeParams['*']]}" />
+            <Page url="/reactive-intro">
+                <ReactiveIntro />
             </Page>
+
+            <Page url="/components-intro">
+                <ComponentsIntro />
+            </Page>
+
+            <Page url="/themes-intro">
+                <ThemesIntro />
+            </Page>
+
+            <Page url="/appStructure">
+                <Markdown data="/pages/app-structure.md" />
+            </Page>
+
+            <Page url="/markup">
+                <Markup />
+            </Page>
+
+            <Page url="/code">
+                <Code />
+            </Page>
+
+            <Page url="/layout">
+                <Markdown data="/pages/layout.md" />
+            </Page>
+
+            <Page url="/workingWithText">
+                <Markdown data="/pages/working-with-text.md" />
+            </Page>
+
+            <Page url="/routingAndLinks">
+                <Markdown data="/pages/routing-and-links.md" />
+            </Page>
+
+            <Page url="/forms">
+                <Markdown data="/pages/forms.md" />
+            </Page>
+
+            <Page url="/resources">
+                <Markdown data="/pages/resources.md" />
+            </Page>
+
+            <Page url="/modalDialogs">
+                <Markdown data="/pages/modal-dialogs.md" />
+            </Page>
+
+            <Page url="/userDefinedComponents">
+                <Markdown data="/pages/user-defined-components.md" />
+            </Page>
+
+            <Page url="/styles-and-themes/layout-props">
+                <Markdown data="/pages/styles-and-themes/layout-props.md" />
+            </Page>
+
+            <Page url="/styles-and-themes/theme-variables">
+                <Markdown data="/pages/styles-and-themes/theme-variables.md" />
+            </Page>
+
+            <Page url="/styles-and-themes/common-units">
+                <Markdown data="/pages/styles-and-themes/common-units.md" />
+            </Page>
+
+            <Page url="/tbd">
+                <TBD />
+            </Page>
+
+            <Page url="/icons">
+                <Icons />
+            </Page>
+
+            <Page url="/palettes">
+                <Palettes />
+            </Page>
+
+            <Page url="/contextVariables">
+                <Markdown data="pages/context-variables.md" />
+            </Page>
+
+            <Page url="/globals">
+                <Markdown data="pages/globals.md" />
+            </Page>
+
+            <Page url="/glossary">
+                <Markdown data="pages/glossary.md" />
+            </Page>
+
+            <Page url="/xmlui-theme">
+                <Markdown data="pages/xmlui-theme.md" />
+            </Page>
+
+            <Page url="/test">
+                <Test />
+            </Page>
+
+            <Page url="/*">
+                <MarkdownPage content="{ appGlobals.content[$routeParams['*']] }" />
+            </Page>
+
+
         </Pages>
+
         <Footer>
             <Text>Created with <Text variant="strong"> XMLUI</Text></Text>
         </Footer>
+
     </App>
-    <XMLUIExtensions:StandalonePlayground  when="{window.location.hash.includes('/playground')}"/>
+    <XMLUIExtensions:StandalonePlayground when="{window.location.hash.includes('/playground')}" />
 </Fragment>

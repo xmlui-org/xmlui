@@ -1,0 +1,345 @@
+# Routing and Links
+
+<Callout type="info" emoji="💡">
+XMLUI implements its navigation mechanism using a technique called client-side routing. With this mechanism, you can assign client-side URLs to specific parts of the UI and trigger actions using the particular URL to navigate to the UI.
+</Callout>
+
+These links work as deep links within your app. You can save the link (send it to someone in an email). Clicking the link opens your browser and navigates directly to the specific part of the UI.
+
+In traditional websites, the browser requests a document from a web server, downloads and evaluates CSS and JavaScript assets, and renders the HTML sent from the server. When the user clicks a link, the process starts all over again for a new page.
+
+Client-side routing allows your app to update the URL from a link click without making another request for another document from the server. Instead, your app can immediately render some new UI.
+
+## Routing mechanisms
+
+<Callout type="info" emoji="💡">
+You can use two different routing mechanisms: *standard* and *hash* routing.
+</Callout>
+
+Both store the current location in the browser's address bar using clean URLs and navigate using the browser's built-in history stack. However, they differ in the URLs they send to the backend server.
+
+### Standard routing
+
+When you navigate a URL (e.g., refresh the current page), the browser sends the entire path to the web server. XMLUI apps are single-page web apps, and your web server should be configured accordingly.
+
+For example, if your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), it should be configured to retrieve the same `index.html` file even if the browser-sent URL contains path or query segments, such as `myComp.com/accountapp/leads/12` or `myComp.com/accountapp/list?zip=98005`
+
+If your web server is not configured this way, you'll receive 404 errors for the latest two (and similar) requests when refreshing the current page.
+
+<Callout type="note" emoji="📔">
+If you just navigate in an XMLUI app (without manual refresh), you won't get a 404 error. However, the refresh page function may result in 404.
+</Callout>
+
+We will not discuss server configuration details, as there are many aspects to it. If you want to try a production-grade web server locally, you can download [Nginx](https://nginx.org/) and modify the configuration file in `/etc/nginx/nginx.conf` to match the snippet below. Change the path to root and it will serve your application with standard routing.
+
+``` copy {10}
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    sendfile      on;
+
+    server {
+        root /path/to/your/project;
+
+        index index.html index.htm;
+
+        location ~ \.(js|css|png|jpg|jpeg|gif|ico|json|woff|woff2|ttf|eot|svg|xs|xmlui)$ {
+            add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+            expires off;
+            try_files $uri =404;
+        }
+
+        location / {
+        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+        expires off;
+            try_files $uri $uri/ /index.html;
+        }
+    }
+}
+```
+
+### Hash routing
+
+There are situations when you should not (or cannot) send the client-side URLs to the server. This may happen when you do not have complete control over the server. For example, you cannot set up the server to always retrieve the `index.html` file like a single-page app requires. Hash routing solves this issue.
+
+The URLs (the browser will display in its address bar) contain a hash mark sign. Thus, if your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), navigation URLs will look like `myComp.com/accountapp/#/leads/12` or `myComp.com/accountapp/#/list?zip=98005`. Even multiple hash marks may show up (for example, if you navigate to a bookmark: `myComp.com/accountapp/#/leads/12#callhistory`).
+
+The browser does not send the hash part of the URL to the server. The server receives only the part before the hash mark. The client-side routing mechanism uses the hash part to navigate within the app.
+
+Thus, using hash routing, the server will receive only `myComp.com/accountapp` independently of the app's navigation route.
+
+<Callout type="warning" emoji="⚠️">
+XMLUI turns on hash routing by default.
+</Callout>
+
+You can turn it off in the app's configuration file, as this example shows:
+
+```json
+{
+  "name": "MyHashRoutedApp",
+  "appGlobals": {
+    "useHashBasedRouting": false
+  }
+};
+```
+
+## Links
+
+XMLUI uses the specified links as absolute links (starting with a slash) or relative links, as the following example shows:
+
+```xmlui copy
+<App layout="vertical">
+  <NavPanel>
+    <NavLink to="/">Home</NavLink>
+    <NavLink to="/contacts">Contacts</NavLink>
+    <NavLink to="about">About</NavLink>
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      Home
+    </Page>
+    <Page url="contacts">
+      Contacts
+    </Page>
+    <Page url="about">
+      About
+    </Page>
+  </Pages>
+</App>
+```
+
+Here, `/` and `/contacts` are absolute links within the app, `about` is a relative link. As then `NavPanel` hierarchy is at the root level within the app, `/contacts` and `contacts` is the same URL.
+You can test it running the app; the `/contacts` link will match the related `Page` object's `contact` URL:
+
+<Playground
+  height={160}
+  name="Example: Links"
+  app={`
+    <App layout="vertical">
+      <NavPanel>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/contacts">Contacts</NavLink>
+        <NavLink to="about">About</NavLink>
+      </NavPanel>
+      <Pages>
+        <Page url="/">
+          Home
+        </Page>
+        <Page url="contacts">
+          Contacts
+        </Page>
+        <Page url="about">
+          About
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+### Dynamic route segments
+
+You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a valid identifier. In the target, you can query the value of these placeholders through the `$routeParams` context variable:
+
+```xmlui copy
+<App layout="vertical">
+  <NavPanel>
+    <NavLink to="/">Home</NavLink>
+    <NavLink to="/account/Cameron">Cameron</NavLink>
+    <NavLink to="/account/Joe">Joe</NavLink>
+    <NavLink to="/account/Kathy">Kathy</NavLink>
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      Home
+    </Page>
+    <Page url="/account/:id">
+      Account: {$routeParams.id}
+    </Page>
+  </Pages>
+</App>
+```
+
+The following example demonstrates using them:
+
+<Playground
+  height={180}
+  name="Example: dynamic route segments"
+  app={`
+    <App layout="vertical">
+      <NavPanel>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/account/Cameron">Cameron</NavLink>
+        <NavLink to="/account/Joe">Joe</NavLink>
+        <NavLink to="/account/Kathy">Kathy</NavLink>
+      </NavPanel>
+      <Pages>
+        <Page url="/">
+          Home
+        </Page>
+        <Page url="/account/:id">
+          Account: {$routeParams.id}
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+
+### Using query parameters
+
+Besides rout parameters, XMLUI supports using query parameters with routes, as the following example demonstrates:
+
+```xmlui copy /{$queryParams.from}-{$queryParams.to}/
+<App layout="vertical">
+  <NavPanel>
+    <NavLink to="/">Home</NavLink>
+    <NavLink to="/contacts">Contacts</NavLink>
+    <NavLink to="/report?from=December&to=February">Winter Report</NavLink>
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      Home
+    </Page>
+    <Page url="contacts">
+      Contacts
+    </Page>
+    <Page url="/report">
+      Reported period: {$queryParams.from}-{$queryParams.to}
+    </Page>
+  </Pages>
+</App>
+```
+
+The third link uses two query parameters, "from" and "to". The target page uses the `$queryParams` context variable to access them (try clicking the "Winter Report" link):
+
+<Playground
+  height={200}
+  name="Example: query parameters"
+  app={`
+    <App layout="vertical">
+      <NavPanel>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/contacts">Contacts</NavLink>
+        <NavLink to="/report?from=December&to=February">Winter Report</NavLink>
+      </NavPanel>
+      <Pages>
+        <Page url="/">
+          Home
+        </Page>
+        <Page url="contacts">
+          Contacts
+        </Page>
+        <Page url="/report">
+          Reported period: {$queryParams.from}-{$queryParams.to}
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+### Active links
+
+When the app visits a particular target in its available routes, the `NavLink` component matching with the visited route is marked as active, and it gets a visual indication (a blueish left border), like in this example:
+
+```xmlui copy
+<App layout="vertical">
+  <NavPanel>
+    <NavLink to="/">Home</NavLink>
+    <NavLink to="/about">About</NavLink>
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      Home
+    </Page>
+    <Page url="/about">
+      About this app
+    </Page>
+  </Pages>
+</App>
+```
+
+When you start the app, the route is "/" (by default) and matches the Home page's route specification. Thus, Home is marked as the active link. When you click About, the route changes to "/about," so the active link becomes About (its route specification matches the current route):
+
+<Playground
+  height={120}
+  name="Example: active links"
+  app={`
+    <App layout="vertical">
+      <NavPanel>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/about">About</NavLink>
+      </NavPanel>
+      <Pages>
+        <Page url="/">
+          Home
+        </Page>
+        <Page url="/about">
+          About this app
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+As a `NavLink` activity is based on matching, multiple active links may exist simultaneously. The following example demonstrates such a situation:
+
+```xmlui copy {4-5}
+<App layout="vertical">
+  <NavPanel>
+    <NavLink to="/">Home</NavLink>
+    <NavLink to="/report?from=December&to=February">Winter Report</NavLink>
+    <NavLink to="/report?from=June&to=August">Summer Report</NavLink>
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      Home
+    </Page>
+    <Page url="/report">
+      Reported period: {$queryParams.from}-{$queryParams.to}
+    </Page>
+  </Pages>
+</App>
+```
+
+Query parameters are not considered to be part of the route. So, in this sample, the Winter report and Summer report match the same route, "/report." If you select any of them, both links are marked active:
+
+<Playground
+  height={140}
+  name="Example: multiples active links simultaneously"
+  app={`
+    <App layout="vertical">
+      <NavPanel>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/report?from=December&to=February">Winter Report</NavLink>
+        <NavLink to="/report?from=June&to=August">Summer Report</NavLink>
+      </NavPanel>
+      <Pages>
+        <Page url="/">
+          Home
+        </Page>
+        <Page url="/report">
+          Reported period: {$queryParams.from}-{$queryParams.to}
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="📔">
+The semantic meaning of routes is analogous to routes used at the backend. When you send two requests with the same routes but different query parameters, they will reach the same backend endpoint. Of course, that endpoint may consider the query parameters, process them, and respond differently. However, this differentiation is not in the routing but in the processing mechanism.
+</Callout>
+
+### Nested routes
+
+<Callout type="warning" emoji="⚠️">
+XMLUI does not support nested routes. In the future, we may add this functionality to the framework.
+</Callout>
+
+## More about Using Links
+
+- <SmartLink href={COMPONENT_LINK}>`Link` reference documentation</SmartLink>
+- <SmartLink href={COMPONENT_BOOKMARK}>`Bookmark` reference documentation</SmartLink>
+- <SmartLink href={COMPONENT_TABLEOFCONTENTS}>`TableOfContents` reference documentation</SmartLink>
