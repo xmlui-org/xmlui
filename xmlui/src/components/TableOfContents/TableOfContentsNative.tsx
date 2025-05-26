@@ -1,6 +1,6 @@
 import {
-  CSSProperties,
-  ForwardedRef,
+  type CSSProperties,
+  type ForwardedRef,
   forwardRef,
   useEffect,
   useLayoutEffect,
@@ -33,7 +33,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
   useIsomorphicLayoutEffect(() => {
     return subscribeToActiveAnchorChange((id) => {
       const foundHeading = headings.find((heading) => heading.id === id);
-      if (foundHeading.level <= maxHeadingLevel) {
+      if (foundHeading?.level <= maxHeadingLevel) {
         setActiveId(id);
       }
     });
