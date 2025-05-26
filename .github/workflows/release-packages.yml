@@ -64,35 +64,50 @@ jobs:
         if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
-      - name: Get VSCode Extension release info
-        id: xmlui_vscode_release_info
-        run: |
-          npx changeset status --since=origin/main --output changeset-status.json || touch changeset-status.json
-          cat changeset-status.json | node CI/scripts/get-vscode-release-info.mjs >> $GITHUB_OUTPUT
-      - name: Build VSCode extension
-        if: success() && steps.xmlui_vscode_release_info.outputs.version
-        run: npm run build-vscode-extension
-      - name: Upload VSIX to Release
-        if: success() && steps.xmlui_vscode_release_info.outputs.version
-        uses: softprops/action-gh-release@v1
-        with:
-          files: "tools/vscode/*.vsix"
-          tag_name: xmlui-vscode@${{ steps.xmlui_vscode_release_info.outputs.version }}
-          fail_on_unmatched_files: true
-          body: ${{ steps.xmlui_vscode_release_info.outputs.releaseNotes }}
-
       - name: Create Version PR or Publish to NPM and Create GitHub Releases
         id: changesets_publish
         uses: changesets/action@v1
         with:
-          version: npm run changeset:version
-          commit: "chore: version packages for stable release"
-          title: "Version Packages for Stable Release"
           publish: npm run publish-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{secrets.PUBLISH_NPM_TOKEN}}
 
+      - name: Prepare standalone js file
+        if: steps.changesets_publish.outputs.published && contains(steps.changesets_publish.outputs.publishedPackages.*.name, 'xmlui')
+        run: |
+          XMLUI_VERSION=$(jq -r .version xmlui/package.json)
+          STANDALONE_FILENAME="xmlui-${XMLUI_VERSION}.js"
+          cp xmlui/dist/standalone/xmlui-standalone.umd.js $STANDALONE_FILENAME
+          echo "XMLUI_VERSION=$XMLUI_VERSION" >> $GITHUB_ENV
+          echo "STANDALONE_FILENAME=$STANDALONE_FILENAME" >> $GITHUB_ENV
+      - name: Upload standalone js file
+        if: success()
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "${{ env.STANDALONE_FILENAME }}"
+          tag_name: xmlui@${{ env.XMLUI_VERSION }}
+          fail_on_unmatched_files: true
+
+      - name: Get VSCode Extension release info
+        id: xmlui_vscode_info
+        if: steps.changesets_publish.outputs.published
+        run: |
+          XMLUI_VSCODE_VERSION=$(jq -r .version tools/vscode/package.json)
+          XMLUI_VSCODE_TAG="xmlui-vscode@{XMLUI_VSCODE_VERSION}"
+          XMLUI_VSCODE_TAG_EXISTING=$(git tag --list $XMLUI_VSCODE_TAG)
+          echo "tag=$XMLUI_VSCODE_TAG" >> $GITHUB_OUTPUT
+          echo "existingTag=$XMLUI_VSCODE_TAG_EXISTING" >> $GITHUB_OUTPUT
+      - name: Build VSCode extension
+        if: success() && steps.xmlui_vscode_info.outputs.existingTag != ''
+        run: npm run build-vscode-extension
+      - name: Upload VSIX to Release
+        if: success()
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "tools/vscode/*.vsix"
+          tag_name: ${{ steps.xmlui_vscode_info.outputs.tag }}
+          fail_on_unmatched_files: true
       - name: Output Published Packages Info
         if: steps.changesets_publish.outputs.published == 'true'
         run: |
