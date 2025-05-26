@@ -52,6 +52,7 @@ type Props = {
   inProgressNotificationMessage?: string;
   readOnly?: boolean;
   required?: boolean;
+  autoFocus?: boolean;
 };
 
 export const enum WeekDays {
@@ -129,14 +130,14 @@ export const DatePicker = forwardRef(function DatePicker(
     labelBreak,
     readOnly = false,
     required,
+    autoFocus = false,
   }: Props,
-  forwardedRef: React.Ref<HTMLDivElement>,
+  ref: React.Ref<HTMLDivElement>,
 ) {
   const _weekStartsOn = weekStartsOn >= 0 && weekStartsOn <= 6 ? weekStartsOn : WeekDays.Sunday;
   const [isButtonFocused, setIsButtonFocused] = useState(false);
   const [isMenuFocused, setIsMenuFocused] = useState(false);
-  const referenceElement = useRef<HTMLElement | null>(null);
-  const ref = forwardedRef ? composeRefs(referenceElement, forwardedRef) : referenceElement;
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const generatedId = useId();
   const inputId = id || generatedId;
 
@@ -193,8 +194,8 @@ export const DatePicker = forwardRef(function DatePicker(
 
   // Register component API for external interactions
   const focus = useCallback(() => {
-    referenceElement?.current?.focus();
-  }, [referenceElement?.current]);
+    referenceElement?.focus();
+  }, [referenceElement]);
 
   const setValue = useEvent((newValue: string) => {
     const parsedDate = parseDate(newValue);
@@ -262,10 +263,12 @@ export const DatePicker = forwardRef(function DatePicker(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      ref={ref}
     >
       {inline ? (
-        <div className={styles.inlinePickerMenu}>
+        <div className={styles.inlinePickerMenu} ref={(ref) => setReferenceElement(ref)}>
           <DayPicker
+            id={inputId}
             required={undefined}
             captionLayout="dropdown"
             fixedWeeks
@@ -279,13 +282,14 @@ export const DatePicker = forwardRef(function DatePicker(
             mode={mode === "single" ? "single" : "range"}
             selected={selected}
             onSelect={handleSelect}
-            autoFocus={!inline}
+            autoFocus={autoFocus}
             numberOfMonths={mode === "range" ? 2 : 1}
           />
         </div>
       ) : (
         <Popover open={open} onOpenChange={setOpen} modal={false}>
           <PopoverTrigger
+            ref={setReferenceElement}
             id={inputId}
             aria-haspopup={true}
             disabled={!enabled}
@@ -297,8 +301,9 @@ export const DatePicker = forwardRef(function DatePicker(
               [styles.warning]: validationStatus === "warning",
               [styles.valid]: validationStatus === "valid",
             })}
-            onFocus={handleOnButtonFocus}
-            onBlur={handleOnButtonBlur}
+            autoFocus={autoFocus}
+            onFocus={onFocus}
+            onBlur={onBlur}
           >
             <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
             <div className={styles.datePickerValue}>
@@ -336,18 +341,18 @@ export const DatePicker = forwardRef(function DatePicker(
                 required={undefined}
                 animate
                 fixedWeeks
+                autoFocus={autoFocus}
                 classNames={styles}
                 captionLayout="dropdown"
                 startMonth={startDate}
                 endMonth={endDate}
-                disabled={readOnly || disabled}
+                disabled={disabled}
                 weekStartsOn={_weekStartsOn}
                 showWeekNumber={showWeekNumber}
                 showOutsideDays
                 mode={mode === "single" ? "single" : "range"}
                 selected={selected}
                 onSelect={handleSelect}
-                autoFocus={!inline}
                 numberOfMonths={mode === "range" ? 2 : 1}
               />
             </PopoverContent>

@@ -40,7 +40,7 @@ test("opens calendar when clicked", async ({ initTestBed, page, createDatePicker
 });
 
 test("selects a date in single mode", async ({ initTestBed, page, createDatePickerDriver }) => {
-  const { testStateDriver } = await initTestBed(`
+  await initTestBed(`
     <Fragment>
       <DatePicker id="datePicker" mode="single" dateFormat="MM/dd/yyyy" />
       <Text id="text">Selected date: {datePicker.value}</Text>
@@ -70,7 +70,7 @@ test("selects a date range in range mode", async ({
   page,
   createDatePickerDriver,
 }) => {
-  const { testStateDriver } = await initTestBed(`
+  await initTestBed(`
     <Fragment>
       <DatePicker id="datePicker" mode="range" dateFormat="MM/dd/yyyy" />
     </Fragment>
@@ -159,7 +159,6 @@ test("handles different date formats", async ({ initTestBed, page, createDatePic
 test("weekStartsOn changes first day of week", async ({
   initTestBed,
   page,
-  createDatePickerDriver,
 }) => {
   await initTestBed(`
     <DatePicker weekStartsOn="1" inline="true" />
@@ -206,32 +205,44 @@ test.fixme("toDate restricts selectable dates", async ({ initTestBed, page }) =>
   await expect(todayCell).toHaveClass(/disabled/);
 });
 
-test("disabledDates prevents selection of specific dates", async ({ initTestBed, page }) => {
+test("disabledDates prevents selection of specific dates", async ({
+  initTestBed,
+  page,
+  createDatePickerDriver,
+}) => {
   const today = new Date();
   const todayFormatted = format(today, "MM/dd/yyyy");
 
   await initTestBed(`
-    <DatePicker disabledDates="{['${todayFormatted}']}" inline="true" />
+    <DatePicker disabledDates="{['${todayFormatted}']}" />
   `);
+
+  const driver = await createDatePickerDriver();
+  await driver.toggleDropdownVisibility();
 
   // Today should be disabled
   const todayDay = today.getDate().toString();
-  const todayCell = page.locator(".day").filter({ hasText: todayDay }).first();
-  await expect(todayCell).toHaveClass(/disabled/);
+  await driver.pickADay(todayDay);
+
+  await expect(page.getByRole("menu")).toBeVisible();
 });
 
-test("didChange event fires when date is selected", async ({ initTestBed, page }) => {
+test("didChange event fires when date is selected", async ({
+  initTestBed,
+  page,
+  createDatePickerDriver,
+}) => {
   await initTestBed(`
     <App var.selectedDate="">
-      <DatePicker onDidChange="(val) => selectedDate = val" />
+      <DatePicker id="datePicker" onDidChange="(val) => selectedDate = val" />
       <Text testId="text">{selectedDate}</Text>
     </App>
   `);
 
-  await page.locator("button").click();
-
-  // Select the 15th day of the current month
-  await page.locator(".day").filter({ hasText: "15" }).first().click();
+  const driver = await createDatePickerDriver("datePicker");
+  await driver.toggleDropdownVisibility();
+  // Select the 15 day of the current month
+  await driver.pickADay("15");
 
   // The selected date should be displayed in the text element
   const currentDate = new Date();
@@ -241,11 +252,16 @@ test("didChange event fires when date is selected", async ({ initTestBed, page }
   await expect(page.getByTestId("text")).toHaveText(formattedDate);
 });
 
-test("gotFocus and lostFocus events work correctly", async ({ initTestBed, page }) => {
+test("gotFocus and lostFocus events work correctly", async ({
+  initTestBed,
+  page,
+  createDatePickerDriver,
+}) => {
   await initTestBed(`
     <App var.isFocused="false">
       <Text testId="focusText">{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}</Text>
       <DatePicker
+        id="datePicker"
         onGotFocus="isFocused = true"
         onLostFocus="isFocused = false"
       />
@@ -256,18 +272,19 @@ test("gotFocus and lostFocus events work correctly", async ({ initTestBed, page 
   await expect(page.getByTestId("focusText")).toHaveText("DatePicker lost focus");
 
   // Focus the datepicker
-  await page.locator("button").focus();
+  const driver = await createDatePickerDriver("datePicker");
+  await driver.click();
   await expect(page.getByTestId("focusText")).toHaveText("DatePicker focused");
 
   // Blur the datepicker
-  await page.keyboard.press("Tab");
+  await page.locator("body").click(); // Click outside to blur
   await expect(page.getByTestId("focusText")).toHaveText("DatePicker lost focus");
 });
 
 test("setValue API works correctly", async ({ initTestBed, page }) => {
   await initTestBed(`
     <App>
-      <DatePicker id="picker" readOnly="true" />
+      <DatePicker id="picker" />
       <Button
         testId="setButton"
         label="Set Date"
@@ -280,53 +297,53 @@ test("setValue API works correctly", async ({ initTestBed, page }) => {
   `);
 
   // Initially empty
-  await expect(page.locator(".datePickerValue")).not.toContainText("05/25/2024");
+  await expect(page.getByText("05/25/2024")).not.toBeVisible();
 
   // Set the date
   await page.getByTestId("setButton").click();
-  await expect(page.locator(".datePickerValue")).toContainText("05/25/2024");
+  await expect(page.getByText("05/25/2024")).toBeVisible();
 
   // Clear the date
   await page.getByTestId("clearButton").click();
-  await expect(page.locator(".datePickerValue")).not.toContainText("05/25/2024");
+  await expect(page.getByText("05/25/2024")).not.toBeVisible();
 });
 
-test("focus API brings focus to the component", async ({ initTestBed, page }) => {
+test("focus API brings focus to the component", async ({ initTestBed, page, createDatePickerDriver }) => {
   await initTestBed(`
-    <App>
+    <App var.isFocused="false">
       <DatePicker id="picker" />
       <Button
         testId="focusButton"
         label="Focus DatePicker"
-        onClick="picker.focus()" />
+        onClick="picker.focus()"  
+       />
     </App>
   `);
+  const driver = await createDatePickerDriver("picker");
 
   // Focus the datepicker using the API
   await page.getByTestId("focusButton").click();
 
   // Check if the datepicker is focused
-  const isFocused = await page
-    .locator("button")
-    .first()
-    .evaluate((el) => document.activeElement === el);
-  expect(isFocused).toBeTruthy();
+  await expect(driver.component).toBeFocused();
 });
 
-test("autoFocus brings focus to the component on load", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <DatePicker autoFocus="true" />
-  `);
+test("autoFocus brings focus to the component on load", async ({ initTestBed, createDatePickerDriver }) => {
+    await initTestBed(`
+      <DatePicker autoFocus="true" />
+    `);
 
-  // Check if the datepicker is focused
-  const isFocused = await page
-    .locator("button")
-    .first()
-    .evaluate((el) => document.activeElement === el);
-  expect(isFocused).toBeTruthy();
-});
+    const driver = await createDatePickerDriver();
 
-test("readOnly prevents date selection but shows calendar", async ({ initTestBed, page, createDatePickerDriver }) => {
+    // Check if the datepicker is focused
+    await expect(driver.component).toBeFocused();
+  },);
+
+test("readOnly prevents date selection but shows calendar", async ({
+  initTestBed,
+  page,
+  createDatePickerDriver,
+}) => {
   const initialDate = "05/25/2024";
   await initTestBed(`
     <DatePicker readOnly="true" initialValue="${initialDate}" />
@@ -363,7 +380,7 @@ test("renders with adornments (startText, startIcon, endText, endIcon)", async (
   `);
 
   const adornments = page.getByRole("presentation");
-  const numberOfAdornments = await adornments.count()
+  const numberOfAdornments = await adornments.count();
   expect(numberOfAdornments).toBe(2);
   await expect(page.getByText(startText)).toBeVisible();
   await expect(page.getByText(endText)).toBeVisible();

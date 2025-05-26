@@ -9,12 +9,12 @@ import {
   dEnabled, dEndIcon, dEndText,
   dFocus,
   dGotFocus,
-  dInitialValue,
+  dInitialValue, dLabel, dLabelBreak, dLabelPosition, dLabelWidth,
   dLostFocus,
   dPlaceholder,
   dReadonly,
   dSetValueApi, dStartIcon, dStartText,
-  dValidationStatus,
+  dValidationStatus
 } from "../metadata-helpers";
 import { dateFormats, DatePicker, DatePickerModeValues, defaultProps, WeekDays } from "./DatePickerNative";
 
@@ -30,6 +30,10 @@ export const DatePickerMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(defaultProps.enabled),
     validationStatus: dValidationStatus(defaultProps.validationStatus),
+    label: dLabel(),
+    labelPosition: dLabelPosition("top"),
+    labelWidth: dLabelWidth(COMP),
+    labelBreak: dLabelBreak(COMP),
     mode: {
       description: "The mode of the datepicker (single or range)",
       valueType: "string",
@@ -167,6 +171,11 @@ export const datePickerComponentRenderer = createComponentRenderer(
         endText={extractValue.asOptionalString(node.props.endText)}
         endIcon={extractValue.asOptionalString(node.props.endIcon)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+        label={extractValue(node.props.label)}
+        labelPosition={extractValue(node.props.labelPosition)}
+        labelWidth={extractValue(node.props.labelWidth)}
+        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
       />
     );
   },
