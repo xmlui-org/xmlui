@@ -30,7 +30,6 @@ import {
 } from "./Heading/Heading";
 import { textComponentRenderer } from "./Text/Text";
 import { helloWorldComponentRenderer } from "./HelloWorld";
-import { helloWorldComponentRenderer } from "./HelloWorld";
 import { fragmentComponentRenderer } from "../components-core/Fragment";
 import { tableComponentRenderer } from "./Table/Table";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
@@ -388,7 +387,8 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Text !== "false") {
       this.registerCoreComponent(textComponentRenderer);
-      this.registerCoreComponent(helloWorldComponentRenderer);
+      console.log("Registering HelloWorld", helloWorldComponentRenderer);
+this.registerCoreComponent(helloWorldComponentRenderer);
       this.registerCoreComponent(helloWorldComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Fragment !== "false") {
