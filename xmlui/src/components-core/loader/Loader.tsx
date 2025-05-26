@@ -147,7 +147,11 @@ export function Loader({
     //console.log("[Loader] useLayoutEffect data !== prevData:", data !== prevData);
 
     if (status === "success" && data !== prevData) {
-      //console.log("[Loader] Calling loaderLoaded with data:", data);
+      // Instrumentation for DataSource reactivity
+      console.log(
+        `[DataSource Reactivity Debug] DataSource '${loader.props.id || loader.uid}' loaded new data:`,
+        data
+      );
       loaderLoaded(data);
       //we do this to push the onLoaded callback to the next event loop.
       // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have

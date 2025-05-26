@@ -29,7 +29,7 @@ import {
   headingComponentRenderer,
 } from "./Heading/Heading";
 import { textComponentRenderer } from "./Text/Text";
-import { reactivityDebuggerComponentRenderer } from "./HelloWorld";
+import { reactivityDebuggerComponentRenderer } from "./ReactivityDebugger";
 import { fragmentComponentRenderer } from "../components-core/Fragment";
 import { tableComponentRenderer } from "./Table/Table";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
