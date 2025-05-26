@@ -7,9 +7,19 @@ $themeVars: ();
 }
 
 $component: "TableOfContents";
+$backgroundColor-TableOfContents: createThemeVar("backgroundColor-#{$component}");
+$width-TableOfContents: createThemeVar("width-#{$component}");
+$height-TableOfContents: createThemeVar("height-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, $component);
+
 $componentItem: "TableOfContentsItem";
-$themeVars: t.composePaddingVars($themeVars, "#{$componentItem}");
-$themeVars: t.composeTextVars($themeVars, "#{$componentItem}");
+$themeVars: t.composeTextVars($themeVars, $componentItem);
+$themeVars: t.composeBorderVars($themeVars, $componentItem);
+$themeVars: t.composeBorderVars($themeVars, "#{$componentItem}--hover");
+$themeVars: t.composeBorderVars($themeVars, "#{$componentItem}--active");
+$themeVars: t.composePaddingVars($themeVars, $componentItem);
+
 $themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-1");
 $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-1");
 $themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-2");
@@ -22,12 +32,6 @@ $themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-5");
 $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-5");
 $themeVars: t.composePaddingVars($themeVars, "#{$componentItem}-level-6");
 $themeVars: t.composeTextVars($themeVars, "#{$componentItem}-level-6");
-
-$backgroundColor-TableOfContents: createThemeVar("backgroundColor-#{$component}");
-$width-TableOfContents: createThemeVar("width-#{$component}");
-$height-TableOfContents: createThemeVar("height-#{$component}");
-$themeVars: t.composeBorderVars($themeVars, $component);
-$themeVars: t.composePaddingVars($themeVars, "#{$component}");
 
 .nav {
   border-width: createThemeVar('borderWidth-#{$component}');
@@ -58,9 +62,6 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}");
 
     .listItem {
       list-style-type: none;
-      border-width: createThemeVar('borderWidth-#{$componentItem}');
-      border-color: createThemeVar('borderColor-#{$componentItem}');
-      border-style: createThemeVar('borderStyle-#{$componentItem}');
       @include t.borderVars($themeVars, $componentItem);
 
       .link {
@@ -102,7 +103,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}");
       }
 
       &:hover {
-        //border: createThemeVar("borderWidth-#{$componentItem}--hover") createThemeVar("borderStyle-#{$componentItem}--hover") createThemeVar("borderColor-#{$componentItem}--hover");
+        @include t.borderVars($themeVars, "#{$componentItem}--hover");
         background-color: createThemeVar("backgroundColor-#{$componentItem}--hover");
 
         .link {
@@ -131,7 +132,7 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}");
       }
 
       &.active {
-        //border: createThemeVar("borderWidth-#{$componentItem}--active") createThemeVar("borderStyle-#{$componentItem}--active") createThemeVar("borderColor-#{$componentItem}--active");
+        @include t.borderVars($themeVars, "#{$componentItem}--active");
         background-color: createThemeVar("backgroundColor-#{$componentItem}--active");
 
         .link {
