@@ -389,7 +389,9 @@ export class ComponentRegistry {
       this.registerCoreComponent(textComponentRenderer);
     }
 
-    console.log("Registering ReactivityDebugger", reactivityDebuggerComponentRenderer);
+    if (window.logReactivity) {
+      console.log("Registering ReactivityDebugger", reactivityDebuggerComponentRenderer);
+    }
     this.registerCoreComponent(reactivityDebuggerComponentRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Fragment !== "false") {

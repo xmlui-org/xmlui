@@ -56,9 +56,48 @@ export function Loader({
   structuralSharing = true
 }: LoaderProps) {
   // Log every render of Loader
-  console.log(`[Loader Render] DataSource '${loader.props.id || loader.uid}' status:`, loader);
+  if (window.logReactivity) {
+    console.log(`[Loader Render] DataSource '${loader.props.id || loader.uid}' status:`, loader);
+  }
   const { uid } = loader;
   const appContext = useAppContext();
+
+  // Extract and log the resolved URL for each render
+  const resolvedUrl = useMemo(() => {
+    try {
+      const url = extractParam(state, loader.props.url, appContext);
+      if (window.logReactivity) {
+        console.log(`[URL Resolution] DataSource '${loader.props.id || loader.uid}' resolved URL:`, url);
+      }
+      return url;
+    } catch (error) {
+      if (window.logReactivity) {
+        console.warn(`[URL Resolution] DataSource '${loader.props.id || loader.uid}' URL resolution failed:`, error);
+      }
+      return loader.props.url;
+    }
+  }, [state, loader.props.url, appContext, loader.props.id, loader.uid]);
+
+  const queryKey = useMemo(
+    () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
+    [appContext, loader.props, queryId, state, uid],
+  );
+  if (window.logReactivity) {
+    console.log(`[Loader QueryKey] DataSource '${loader.props.id || loader.uid}' queryKey:`, queryKey);
+  }
+  
+  // Track query key changes to detect what triggers API calls
+  const prevQueryKey = usePrevious(queryKey);
+  useEffect(() => {
+    if (prevQueryKey && JSON.stringify(prevQueryKey) !== JSON.stringify(queryKey)) {
+      if (window.logReactivity) {
+        console.log(`[Reactivity Trigger] DataSource '${loader.props.id || loader.uid}' queryKey changed:`);
+        console.log(`  Previous:`, prevQueryKey);
+        console.log(`  Current:`, queryKey);
+        console.log(`  This will trigger a new API call to:`, resolvedUrl);
+      }
+    }
+  }, [queryKey, prevQueryKey, loader.props.id, loader.uid, resolvedUrl]);
 
   // --- Rely on react-query to decide when data fetching should use the cache or when is should fetch the data from
   // --- its data source.
@@ -67,28 +106,52 @@ export function Loader({
   // --- error: Error information about the current query error (in "error" state)
   // --- refetch: The function that can be used to re-fetch the data (because of data/state changes)
   const { data, status, isFetching, error, refetch, isRefetching } = useQuery({
-    queryKey: useMemo(
-      () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
-      [appContext, loader.props, queryId, state, uid],
-    ),
+    queryKey,
     structuralSharing,
     queryFn: useCallback<QueryFunction>(
       async ({ signal }) => {
-        // console.log("[Loader queryFn] Starting to fetch data...");
+        // Enhanced API call instrumentation
+        const requestId = `${loader.props.id || loader.uid}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        const startTime = performance.now();
+        
+        if (window.logReactivity) {
+          console.log(`[API Call Start] DataSource '${loader.props.id || loader.uid}' (${requestId})`);
+          console.log(`  URL: ${resolvedUrl}`);
+          console.log(`  Method: ${loader.props.method || 'GET'}`);
+          console.log(`  Triggered by queryKey:`, queryKey);
+          console.log(`  Timestamp: ${new Date().toISOString()}`);
+        }
+        
         try {
           const newVar: any = await loaderFn(signal);
-          //console.log("[Loader queryFn] Data received:", newVar);
+          const duration = performance.now() - startTime;
+          
+          if (window.logReactivity) {
+            console.log(`[API Call Success] DataSource '${loader.props.id || loader.uid}' (${requestId})`);
+            console.log(`  Duration: ${duration.toFixed(2)}ms`);
+            console.log(`  Response size: ${JSON.stringify(newVar).length} chars`);
+            console.log(`  Data:`, newVar);
+          }
+          
           if (newVar === undefined) {
-            //console.log("[Loader queryFn] Data is undefined, returning null");
+            if (window.logReactivity) {
+              console.log(`[API Call] DataSource '${loader.props.id || loader.uid}' returned undefined, converting to null`);
+            }
             return null;
           }
           return newVar;
         } catch (error) {
-          //console.error("[Loader queryFn] Error fetching data:", error);
+          const duration = performance.now() - startTime;
+          
+          if (window.logReactivity) {
+            console.error(`[API Call Error] DataSource '${loader.props.id || loader.uid}' (${requestId})`);
+            console.error(`  Duration: ${duration.toFixed(2)}ms`);
+            console.error(`  Error:`, error);
+          }
           throw error;
         }
       },
-      [loaderFn],
+      [loaderFn, loader.props.id, loader.uid, resolvedUrl, queryKey],
     ),
     select: useCallback(
       (data: any) => {
@@ -117,7 +180,9 @@ export function Loader({
   });
 
   // Log status and data for each DataSource on every render
-  console.log(`[Loader Query] DataSource '${loader.props.id || loader.uid}' status: ${status}, data:`, data);
+  if (window.logReactivity) {
+    console.log(`[Loader Query] DataSource '${loader.props.id || loader.uid}' status: ${status}, data:`, data);
+  }
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
@@ -153,15 +218,17 @@ export function Loader({
 
     if (status === "success" && data !== prevData) {
       // Instrumentation for DataSource reactivity
-      console.log(
-        `[DataSource Reactivity Debug] DataSource '${loader.props.id || loader.uid}' loaded new data:`,
-        data
-      );
-      // New: log every call to loaderLoaded
-      console.log(
-        `[DataSource Reactivity Debug] DataSource '${loader.props.id || loader.uid}' loaderLoaded called with:`,
-        data
-      );
+      if (window.logReactivity) {
+        console.log(
+          `[DataSource Reactivity Debug] DataSource '${loader.props.id || loader.uid}' loaded new data:`,
+          data
+        );
+        // New: log every call to loaderLoaded
+        console.log(
+          `[DataSource Reactivity Debug] DataSource '${loader.props.id || loader.uid}' loaderLoaded called with:`,
+          data
+        );
+      }
       loaderLoaded(data);
       //we do this to push the onLoaded callback to the next event loop.
       // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have

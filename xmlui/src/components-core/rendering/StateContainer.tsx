@@ -76,6 +76,13 @@ export const StateContainer = memo(
     }: Props,
     ref,
   ) {
+    // Render tracking
+    const renderCount = useRef(0);
+    renderCount.current++;
+    if (window.logReactivity) {
+      console.log(`[Component Render] ${node.name || 'StateContainer'} render #${renderCount.current}`);
+    }
+
     const [version, setVersion] = useState(0);
     const routingParams = useRoutingParams();
     const memoedVars = useRef<MemoedVars>(new Map());
@@ -336,7 +343,45 @@ function useVars(
   const appContext = useAppContext();
   const referenceTrackedApi = useReferenceTrackedApi(componentState);
 
+  // Dependency change tracking
+  const prevDeps = useRef<{
+    appContext: any;
+    componentState: ContainerState;
+    fnDeps: Record<string, Array<string>>;
+    vars: ContainerState;
+    referenceTrackedApi: any;
+  }>();
+  
+  if (window.logReactivity && prevDeps.current) {
+    const current = { appContext, componentState, fnDeps, vars, referenceTrackedApi };
+    const prev = prevDeps.current;
+    
+    if (prev.appContext !== current.appContext) {
+      console.log('[useVars Dependency] appContext changed');
+    }
+    if (prev.componentState !== current.componentState) {
+      console.log('[useVars Dependency] componentState changed:', {
+        prev: Object.keys(prev.componentState),
+        current: Object.keys(current.componentState)
+      });
+    }
+    if (prev.fnDeps !== current.fnDeps) {
+      console.log('[useVars Dependency] fnDeps changed');
+    }
+    if (prev.vars !== current.vars) {
+      console.log('[useVars Dependency] vars changed');
+    }
+    if (prev.referenceTrackedApi !== current.referenceTrackedApi) {
+      console.log('[useVars Dependency] referenceTrackedApi changed');
+    }
+  }
+  
+  prevDeps.current = { appContext, componentState, fnDeps, vars, referenceTrackedApi };
+
   const resolvedVars = useMemo(() => {
+    if (window.logReactivity) {
+      console.log('[useVars Resolution] Starting variable resolution for:', Object.keys(vars));
+    }
     const ret: any = {};
 
     Object.entries(vars).forEach(([key, value]) => {
@@ -451,12 +496,30 @@ function useVars(
               stateDepValues,
               appContextDepValues,
             );
-console.log(
-  "[Reactivity Debug] Variable resolved:",
-  key,
-  "Value:", ret[key],
-  "Dependencies:", dependencies
-);
+// Enhanced variable change tracking
+if (window.logReactivity) {
+  const prevValue = memoedVars.current.get(`${key}-prevValue`);
+  if (prevValue !== undefined && prevValue !== ret[key]) {
+    console.log(
+      "[Variable Change] Variable '",
+      key,
+      "' changed from:",
+      prevValue,
+      "to:",
+      ret[key],
+      "Dependencies:",
+      dependencies
+    );
+  }
+  memoedVars.current.set(`${key}-prevValue`, ret[key]);
+
+  console.log(
+    "[Reactivity Debug] Variable resolved:",
+    key,
+    "Value:", ret[key],
+    "Dependencies:", dependencies
+  );
+}
 
         }
       }
