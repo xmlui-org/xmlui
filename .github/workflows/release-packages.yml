@@ -72,17 +72,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{secrets.PUBLISH_NPM_TOKEN}}
+      - name: Output Published Packages Info
+        if: steps.changesets_publish.outputs.published == 'true'
+        run: |
+          echo "Packages published: ${{ steps.changesets_publish.outputs.publishedPackages }}"
 
       - name: Prepare standalone js file
-        if: steps.changesets_publish.outputs.published && contains(steps.changesets_publish.outputs.publishedPackages.*.name, 'xmlui')
+        if: steps.changesets_publish.outputs.published == 'true' && contains(fromJSON(steps.changesets_publish.outputs.publishedPackages).*.name, 'xmlui')
         run: |
           XMLUI_VERSION=$(jq -r .version xmlui/package.json)
           STANDALONE_FILENAME="xmlui-${XMLUI_VERSION}.js"
           cp xmlui/dist/standalone/xmlui-standalone.umd.js $STANDALONE_FILENAME
           echo "XMLUI_VERSION=$XMLUI_VERSION" >> $GITHUB_ENV
           echo "STANDALONE_FILENAME=$STANDALONE_FILENAME" >> $GITHUB_ENV
+
+          echo "prepared xmlui-standalone.umd.js for release with filename: $STANDALONE_FILENAME"
       - name: Upload standalone js file
-        if: success()
+        if: env.STANDALONE_FILENAME != ''
         uses: softprops/action-gh-release@v1
         with:
           files: "${{ env.STANDALONE_FILENAME }}"
@@ -94,22 +100,26 @@ jobs:
         if: steps.changesets_publish.outputs.published
         run: |
           XMLUI_VSCODE_VERSION=$(jq -r .version tools/vscode/package.json)
-          XMLUI_VSCODE_TAG="xmlui-vscode@{XMLUI_VSCODE_VERSION}"
-          XMLUI_VSCODE_TAG_EXISTING=$(git tag --list $XMLUI_VSCODE_TAG)
+          XMLUI_VSCODE_TAG="xmlui-vscode@${XMLUI_VSCODE_VERSION}"
           echo "tag=$XMLUI_VSCODE_TAG" >> $GITHUB_OUTPUT
-          echo "existingTag=$XMLUI_VSCODE_TAG_EXISTING" >> $GITHUB_OUTPUT
+
+          XMLUI_VSCODE_TAG_EXISTING=$(git tag --list $XMLUI_VSCODE_TAG)
+          TAG_EXISTS="false"
+          if [ ! -z "$XMLUI_VSCODE_TAG_EXISTING" ]; then
+            TAG_EXISTS="true"
+          fi
+          echo "tagExists=$TAG_EXISTS" >> $GITHUB_OUTPUT
+
+          echo "current VSCode extension version: $XMLUI_VSCODE_TAG"
+          echo "release tag for VSCode extension: $XMLUI_VSCODE_TAG"
+          echo "tag already exists: $TAG_EXISTS"
       - name: Build VSCode extension
-        if: success() && steps.xmlui_vscode_info.outputs.existingTag != ''
+        if: success() && !steps.xmlui_vscode_info.outputs.tagExists
         run: npm run build-vscode-extension
       - name: Upload VSIX to Release
-        if: success()
+        if: success() && !steps.xmlui_vscode_info.outputs.tagExists
         uses: softprops/action-gh-release@v1
         with:
           files: "tools/vscode/*.vsix"
           tag_name: ${{ steps.xmlui_vscode_info.outputs.tag }}
           fail_on_unmatched_files: true
-      - name: Output Published Packages Info
-        if: steps.changesets_publish.outputs.published == 'true'
-        run: |
-          echo "Packages published: ${{ steps.changesets_publish.outputs.publishedPackages }}"
-          echo "GitHub Releases have been created."
