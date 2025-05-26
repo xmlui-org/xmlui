@@ -41,6 +41,9 @@ import {
   StatePartChangedFn,
 } from "./ContainerWrapper";
 
+// Reactivity logging check
+const logReactivity = typeof window !== 'undefined' && (window as any).logReactivity;
+
 // --- Properties of the MemoizedErrorProneContainer component
 type Props = {
   node: ContainerWrapperDef;
@@ -79,8 +82,8 @@ export const StateContainer = memo(
     // Render trackinga
     const renderCount = useRef(0);
     renderCount.current++;
-    if (window.logReactivity) {
-      console.log(`[Component Render] TBD`)
+    if (logReactivity) {
+      console.log(`[Component Render] ${(node as any).name || node.uid || 'StateContainer'} render #${renderCount.current}`);
     }
 
     const [version, setVersion] = useState(0);
@@ -352,7 +355,7 @@ function useVars(
     referenceTrackedApi: any;
   }>();
 
-  if (window.logReactivity && prevDeps.current) {
+  if (logReactivity && prevDeps.current) {
     const current = { appContext, componentState, fnDeps, vars, referenceTrackedApi };
     const prev = prevDeps.current;
 
@@ -379,7 +382,7 @@ function useVars(
   prevDeps.current = { appContext, componentState, fnDeps, vars, referenceTrackedApi };
 
   const resolvedVars = useMemo(() => {
-    if (window.logReactivity) {
+    if (logReactivity) {
       console.log('[useVars Resolution] Starting variable resolution for:', Object.keys(vars));
     }
     const ret: any = {};
@@ -497,7 +500,7 @@ function useVars(
               appContextDepValues,
             );
 // Enhanced variable change tracking
-if (window.logReactivity) {
+if (logReactivity) {
   const prevValue = memoedVars.current.get(`${key}-prevValue`);
   if (prevValue !== undefined && prevValue !== ret[key]) {
     console.log(

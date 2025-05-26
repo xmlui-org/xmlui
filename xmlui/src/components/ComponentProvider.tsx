@@ -242,6 +242,9 @@ import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
 import { codeBlockComponentRenderer } from "./CodeBlock/CodeBlock";
 
+// Reactivity logging check
+const logReactivity = typeof window !== 'undefined' && (window as any).logReactivity;
+
 /**
  * The framework has a specialized component concept, the "property holder
  * component." These components only hold property values but do not render
@@ -389,7 +392,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(textComponentRenderer);
     }
 
-    if (window.logReactivity) {
+    if (logReactivity) {
       console.log("Registering ReactivityDebugger", reactivityDebuggerComponentRenderer);
     }
     this.registerCoreComponent(reactivityDebuggerComponentRenderer);

@@ -16,6 +16,9 @@ import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 
+// Reactivity logging check
+const logReactivity = typeof window !== 'undefined' && (window as any).logReactivity;
+
 /**
  * The properties of the Loader component
  */
@@ -56,7 +59,7 @@ export function Loader({
   structuralSharing = true
 }: LoaderProps) {
   // Log every render of Loader
-  if (window.logReactivity) {
+  if (logReactivity) {
     console.log(`[Loader Render] DataSource '${loader.props.id || loader.uid}' status:`, loader);
   }
   const { uid } = loader;
@@ -66,12 +69,12 @@ export function Loader({
   const resolvedUrl = useMemo(() => {
     try {
       const url = extractParam(state, loader.props.url, appContext);
-      if (window.logReactivity) {
+      if (logReactivity) {
         console.log(`[URL Resolution] DataSource '${loader.props.id || loader.uid}' resolved URL:`, url);
       }
       return url;
     } catch (error) {
-      if (window.logReactivity) {
+      if (logReactivity) {
         console.warn(`[URL Resolution] DataSource '${loader.props.id || loader.uid}' URL resolution failed:`, error);
       }
       return loader.props.url;
@@ -82,7 +85,7 @@ export function Loader({
     () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
     [appContext, loader.props, queryId, state, uid],
   );
-  if (window.logReactivity) {
+  if (logReactivity) {
     console.log(`[Loader QueryKey] DataSource '${loader.props.id || loader.uid}' queryKey:`, queryKey);
   }
   
@@ -90,7 +93,7 @@ export function Loader({
   const prevQueryKey = usePrevious(queryKey);
   useEffect(() => {
     if (prevQueryKey && JSON.stringify(prevQueryKey) !== JSON.stringify(queryKey)) {
-      if (window.logReactivity) {
+      if (logReactivity) {
         console.log(`[Reactivity Trigger] DataSource '${loader.props.id || loader.uid}' queryKey changed:`);
         console.log(`  Previous:`, prevQueryKey);
         console.log(`  Current:`, queryKey);
@@ -114,7 +117,7 @@ export function Loader({
         const requestId = `${loader.props.id || loader.uid}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const startTime = performance.now();
         
-        if (window.logReactivity) {
+        if (logReactivity) {
           console.log(`[API Call Start] DataSource '${loader.props.id || loader.uid}' (${requestId})`);
           console.log(`  URL: ${resolvedUrl}`);
           console.log(`  Method: ${loader.props.method || 'GET'}`);
@@ -126,7 +129,7 @@ export function Loader({
           const newVar: any = await loaderFn(signal);
           const duration = performance.now() - startTime;
           
-          if (window.logReactivity) {
+          if (logReactivity) {
             console.log(`[API Call Success] DataSource '${loader.props.id || loader.uid}' (${requestId})`);
             console.log(`  Duration: ${duration.toFixed(2)}ms`);
             console.log(`  Response size: ${JSON.stringify(newVar).length} chars`);
@@ -134,7 +137,7 @@ export function Loader({
           }
           
           if (newVar === undefined) {
-            if (window.logReactivity) {
+            if (logReactivity) {
               console.log(`[API Call] DataSource '${loader.props.id || loader.uid}' returned undefined, converting to null`);
             }
             return null;
@@ -143,7 +146,7 @@ export function Loader({
         } catch (error) {
           const duration = performance.now() - startTime;
           
-          if (window.logReactivity) {
+          if (logReactivity) {
             console.error(`[API Call Error] DataSource '${loader.props.id || loader.uid}' (${requestId})`);
             console.error(`  Duration: ${duration.toFixed(2)}ms`);
             console.error(`  Error:`, error);
@@ -180,7 +183,7 @@ export function Loader({
   });
 
   // Log status and data for each DataSource on every render
-  if (window.logReactivity) {
+  if (logReactivity) {
     console.log(`[Loader Query] DataSource '${loader.props.id || loader.uid}' status: ${status}, data:`, data);
   }
 
@@ -218,7 +221,7 @@ export function Loader({
 
     if (status === "success" && data !== prevData) {
       // Instrumentation for DataSource reactivity
-      if (window.logReactivity) {
+      if (logReactivity) {
         console.log(
           `[DataSource Reactivity Debug] DataSource '${loader.props.id || loader.uid}' loaded new data:`,
           data
