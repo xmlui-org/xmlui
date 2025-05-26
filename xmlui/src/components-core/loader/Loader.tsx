@@ -182,6 +182,13 @@ export function Loader({
     retry: false,
   });
 
+  // Track status changes to see what triggers appContext updates
+  const prevStatus = usePrevious(status);
+  if (logReactivity && status !== prevStatus) {
+    console.log(`[DataSource Status Change] '${loader.props.id || loader.uid}': ${prevStatus} → ${status}`);
+    console.log('  This may trigger appContext updates affecting other components');
+  }
+
   // Log status and data for each DataSource on every render
   if (logReactivity) {
     console.log(`[Loader Query] DataSource '${loader.props.id || loader.uid}' status: ${status}, data:`, data);

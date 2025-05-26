@@ -7,7 +7,8 @@ import {
   useRef,
   useMemo,
   useReducer,
-  useCallback, ReactNode
+  useCallback,
+  ReactNode,
 } from "react";
 import produce from "immer";
 import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
@@ -19,7 +20,11 @@ import type { ContainerState } from "../../abstractions/ContainerDefs";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import type { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "../abstractions/containers";
-import { CodeDeclaration, ModuleErrors, T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
+import {
+  CodeDeclaration,
+  ModuleErrors,
+  T_ARROW_EXPRESSION,
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import { EMPTY_OBJECT } from "../constants";
 import { collectFnVarDeps } from "../rendering/collectFnVarDeps";
 import { createContainerReducer } from "../rendering/reducer";
@@ -42,7 +47,7 @@ import {
 } from "./ContainerWrapper";
 
 // Reactivity logging check
-const logReactivity = typeof window !== 'undefined' && (window as any).logReactivity;
+const logReactivity = typeof window !== "undefined" && (window as any).logReactivity;
 
 // --- Properties of the MemoizedErrorProneContainer component
 type Props = {
@@ -82,8 +87,12 @@ export const StateContainer = memo(
     // Render trackinga
     const renderCount = useRef(0);
     renderCount.current++;
+
     if (logReactivity) {
-      console.log(`[Component Render] ${(node as any).name || node.uid || 'StateContainer'} render #${renderCount.current}`);
+      console.log(`[Component Render] count: ${renderCount.current}`);
+      console.log(`[Component Render] type: ${node.type}`);
+      console.log(`[Component Render] vars: ${JSON.stringify(node.vars)}`);
+      console.log(`[Component Render] props: ${JSON.stringify(node.props)}`);
     }
 
     const [version, setVersion] = useState(0);
@@ -223,7 +232,7 @@ export const StateContainer = memo(
               value: newValue,
               target,
               actionType: action,
-              localVars: resolvedLocalVars
+              localVars: resolvedLocalVars,
             },
           });
         } else {
@@ -254,7 +263,10 @@ export const StateContainer = memo(
           isImplicit={isImplicit}
           ref={ref}
           uidInfoRef={uidInfoRef}
-          {...rest}>{children}</Container>
+          {...rest}
+        >
+          {children}
+        </Container>
       </ErrorBoundary>
     );
   }),
@@ -324,7 +336,10 @@ function useMergedState(localVars: ContainerState, componentState: ContainerStat
       if (ret[key] === undefined) {
         ret[key] = value;
       } else {
-        if ((isPlainObject(ret[key]) && isPlainObject(value)) || (Array.isArray(ret[key]) && Array.isArray(value))) {
+        if (
+          (isPlainObject(ret[key]) && isPlainObject(value)) ||
+          (Array.isArray(ret[key]) && Array.isArray(value))
+        ) {
           ret[key] = merge(cloneDeep(ret[key]), value);
         } else {
           ret[key] = value;
@@ -360,22 +375,38 @@ function useVars(
     const prev = prevDeps.current;
 
     if (prev.appContext !== current.appContext) {
-      console.log('[useVars Dependency] appContext changed');
+      console.log("[useVars Dependency] appContext changed");
+      console.log("  AppContext keys:", Object.keys(current.appContext));
+      const changedProps = Object.keys(current.appContext).filter(
+        (key) => prev.appContext[key] !== current.appContext[key],
+      );
+      console.log("  Changed properties:", changedProps);
+
+      changedProps.forEach((key) => {
+        console.log(
+          `    ${key}:`,
+          "prev =",
+          prev.appContext[key],
+          "current =",
+          current.appContext[key],
+        );
+      });
     }
+
     if (prev.componentState !== current.componentState) {
-      console.log('[useVars Dependency] componentState changed:', {
+      console.log("[useVars Dependency] componentState changed:", {
         prev: Object.keys(prev.componentState),
-        current: Object.keys(current.componentState)
+        current: Object.keys(current.componentState),
       });
     }
     if (prev.fnDeps !== current.fnDeps) {
-      console.log('[useVars Dependency] fnDeps changed');
+      console.log("[useVars Dependency] fnDeps changed");
     }
     if (prev.vars !== current.vars) {
-      console.log('[useVars Dependency] vars changed');
+      console.log("[useVars Dependency] vars changed");
     }
     if (prev.referenceTrackedApi !== current.referenceTrackedApi) {
-      console.log('[useVars Dependency] referenceTrackedApi changed');
+      console.log("[useVars Dependency] referenceTrackedApi changed");
     }
   }
 
@@ -383,7 +414,7 @@ function useVars(
 
   const resolvedVars = useMemo(() => {
     if (logReactivity) {
-      console.log('[useVars Resolution] Starting variable resolution for:', Object.keys(vars));
+      console.log("[useVars Resolution] Starting variable resolution for:", Object.keys(vars));
     }
     const ret: any = {};
 
@@ -499,31 +530,32 @@ function useVars(
               stateDepValues,
               appContextDepValues,
             );
-// Enhanced variable change tracking
-if (logReactivity) {
-  const prevValue = memoedVars.current.get(`${key}-prevValue`);
-  if (prevValue !== undefined && prevValue !== ret[key]) {
-    console.log(
-      "[Variable Change] Variable '",
-      key,
-      "' changed from:",
-      prevValue,
-      "to:",
-      ret[key],
-      "Dependencies:",
-      dependencies
-    );
-  }
-  memoedVars.current.set(`${key}-prevValue`, ret[key]);
+          // Enhanced variable change tracking
+          if (logReactivity) {
+            const prevValue = memoedVars.current.get(`${key}-prevValue`);
+            if (prevValue !== undefined && prevValue !== ret[key]) {
+              console.log(
+                "[Variable Change] Variable '",
+                key,
+                "' changed from:",
+                prevValue,
+                "to:",
+                ret[key],
+                "Dependencies:",
+                dependencies,
+              );
+            }
+            memoedVars.current.set(`${key}-prevValue`, ret[key]);
 
-  console.log(
-    "[Reactivity Debug] Variable resolved:",
-    key,
-    "Value:", ret[key],
-    "Dependencies:", dependencies
-  );
-}
-
+            console.log(
+              "[Reactivity Debug] Variable resolved:",
+              key,
+              "Value:",
+              ret[key],
+              "Dependencies:",
+              dependencies,
+            );
+          }
         }
       }
     });
