@@ -152,6 +152,11 @@ export function Loader({
         `[DataSource Reactivity Debug] DataSource '${loader.props.id || loader.uid}' loaded new data:`,
         data
       );
+      // New: log every call to loaderLoaded
+      console.log(
+        `[DataSource Reactivity Debug] DataSource '${loader.props.id || loader.uid}' loaderLoaded called with:`,
+        data
+      );
       loaderLoaded(data);
       //we do this to push the onLoaded callback to the next event loop.
       // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have
