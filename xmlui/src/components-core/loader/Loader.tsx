@@ -55,6 +55,8 @@ export function Loader({
   transformResult,
   structuralSharing = true
 }: LoaderProps) {
+  // Log every render of Loader
+  console.log(`[Loader Render] DataSource '${loader.props.id || loader.uid}' status:`, loader);
   const { uid } = loader;
   const appContext = useAppContext();
 
@@ -113,6 +115,9 @@ export function Loader({
     ),
     retry: false,
   });
+
+  // Log status and data for each DataSource on every render
+  console.log(`[Loader Query] DataSource '${loader.props.id || loader.uid}' status: ${status}, data:`, data);
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout;
