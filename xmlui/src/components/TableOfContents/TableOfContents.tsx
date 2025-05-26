@@ -35,7 +35,7 @@ export const TableOfContentsMd = createMetadata({
   defaultThemeVars: {
     [`padding-${COMP}`]: "$space-2",
     [`textColor-${COMP_CHILD}`]: "$color-secondary-500",
-    [`textColor-${COMP_CHILD}--hover`]: "$textColoe-primary",
+    [`textColor-${COMP_CHILD}--hover`]: "$textColor-primary",
     [`fontSize-${COMP_CHILD}`]: "$fontSize-small",
     [`wordWrap-${COMP_CHILD}`]: "break-word",
 
