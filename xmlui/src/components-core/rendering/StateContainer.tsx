@@ -76,11 +76,11 @@ export const StateContainer = memo(
     }: Props,
     ref,
   ) {
-    // Render tracking
+    // Render trackinga
     const renderCount = useRef(0);
     renderCount.current++;
     if (window.logReactivity) {
-      console.log(`[Component Render] ${node.name || 'StateContainer'} render #${renderCount.current}`);
+      console.log(`[Component Render] TBD`)
     }
 
     const [version, setVersion] = useState(0);
@@ -351,11 +351,11 @@ function useVars(
     vars: ContainerState;
     referenceTrackedApi: any;
   }>();
-  
+
   if (window.logReactivity && prevDeps.current) {
     const current = { appContext, componentState, fnDeps, vars, referenceTrackedApi };
     const prev = prevDeps.current;
-    
+
     if (prev.appContext !== current.appContext) {
       console.log('[useVars Dependency] appContext changed');
     }
@@ -375,7 +375,7 @@ function useVars(
       console.log('[useVars Dependency] referenceTrackedApi changed');
     }
   }
-  
+
   prevDeps.current = { appContext, componentState, fnDeps, vars, referenceTrackedApi };
 
   const resolvedVars = useMemo(() => {
