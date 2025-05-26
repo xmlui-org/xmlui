@@ -390,7 +390,6 @@ export const Select = forwardRef(function Select(
                     [styles.disabled]: !enabled,
                     [styles.multi]: multiSelect,
                   })}
-                  placeholder={placeholder}
                   autoFocus={autoFocus}
                 >
                   {multiSelect ? (
@@ -422,7 +421,7 @@ export const Select = forwardRef(function Select(
                         </div>
                       </div>
                     ) : (
-                      <span aria-placeholder={placeholder} className={styles.placeholder}>
+                      <span placeholder={placeholder} className={styles.placeholder}>
                         {placeholder}
                       </span>
                     )

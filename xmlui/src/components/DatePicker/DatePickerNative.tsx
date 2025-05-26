@@ -3,7 +3,6 @@ import { forwardRef, useRef, useCallback, useEffect, useMemo, useState } from "r
 import type { DateRange } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
 import { format, parse, isValid, parseISO } from "date-fns";
-import * as ReactDropdownMenu from "@radix-ui/react-dropdown-menu";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 import styles from "./DatePicker.module.scss";
@@ -15,6 +14,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-ui/react-popover";
 
 export const DatePickerModeValues = ["single", "range"] as const;
 type DatePickerMode = (typeof DatePickerModeValues)[number];
@@ -52,6 +52,7 @@ type Props = {
   inProgressNotificationMessage?: string;
   readOnly?: boolean;
   required?: boolean;
+  autoFocus?: boolean;
 };
 
 export const enum WeekDays {
@@ -127,18 +128,16 @@ export const DatePicker = forwardRef(function DatePicker(
     labelPosition,
     labelWidth,
     labelBreak,
-    inProgress,
-    inProgressNotificationMessage,
-    readOnly,
+    readOnly = false,
     required,
+    autoFocus = false,
   }: Props,
-  forwardedRef: React.Ref<HTMLDivElement>,
+  ref: React.Ref<HTMLDivElement>,
 ) {
   const _weekStartsOn = weekStartsOn >= 0 && weekStartsOn <= 6 ? weekStartsOn : WeekDays.Sunday;
   const [isButtonFocused, setIsButtonFocused] = useState(false);
   const [isMenuFocused, setIsMenuFocused] = useState(false);
-  const referenceElement = useRef<HTMLElement | null>(null);
-  const ref = forwardedRef ? composeRefs(referenceElement, forwardedRef) : referenceElement;
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const generatedId = useId();
   const inputId = id || generatedId;
 
@@ -195,8 +194,8 @@ export const DatePicker = forwardRef(function DatePicker(
 
   // Register component API for external interactions
   const focus = useCallback(() => {
-    referenceElement?.current?.focus();
-  }, [referenceElement?.current]);
+    referenceElement?.focus();
+  }, [referenceElement]);
 
   const setValue = useEvent((newValue: string) => {
     const parsedDate = parseDate(newValue);
@@ -225,6 +224,9 @@ export const DatePicker = forwardRef(function DatePicker(
 
   const handleSelect = useCallback(
     (dateOrRange?: Date | DateRange) => {
+      if (readOnly) {
+        return;
+      }
       if (!dateOrRange) {
         updateState({ value: undefined });
         onDidChange("");
@@ -261,10 +263,12 @@ export const DatePicker = forwardRef(function DatePicker(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      ref={ref}
     >
       {inline ? (
-        <div className={styles.inlinePickerMenu}>
+        <div className={styles.inlinePickerMenu} ref={(ref) => setReferenceElement(ref)}>
           <DayPicker
+            id={inputId}
             required={undefined}
             captionLayout="dropdown"
             fixedWeeks
@@ -278,49 +282,54 @@ export const DatePicker = forwardRef(function DatePicker(
             mode={mode === "single" ? "single" : "range"}
             selected={selected}
             onSelect={handleSelect}
-            autoFocus={!inline}
+            autoFocus={autoFocus}
             numberOfMonths={mode === "range" ? 2 : 1}
           />
         </div>
       ) : (
-        <ReactDropdownMenu.Root open={open} onOpenChange={setOpen} modal={false}>
-          <ReactDropdownMenu.Trigger asChild>
-            <button
-              disabled={!enabled}
-              id={id}
-              style={style}
-              className={classnames(styles.datePicker, {
-                [styles.disabled]: !enabled,
-                [styles.error]: validationStatus === "error",
-                [styles.warning]: validationStatus === "warning",
-                [styles.valid]: validationStatus === "valid",
-              })}
-              onFocus={handleOnButtonFocus}
-              onBlur={handleOnButtonBlur}
-            >
-              <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
-              <div className={styles.datePickerValue}>
-                {mode === "single" && selected ? (
-                  <>{format(selected, dateFormat)}</>
-                ) : mode === "range" && typeof selected === "object" && selected.from ? (
-                  selected.to ? (
-                    <>
-                      {format(selected.from, dateFormat)} - {format(selected.to, dateFormat)}
-                    </>
-                  ) : (
-                    <>{format(selected.from, dateFormat)}</>
-                  )
-                ) : placeholder ? (
-                  <span className={styles.placeholder}>{placeholder}</span>
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
+          <PopoverTrigger
+            ref={setReferenceElement}
+            id={inputId}
+            aria-haspopup={true}
+            disabled={!enabled}
+            style={style}
+            aria-expanded={open}
+            className={classnames(styles.datePicker, {
+              [styles.disabled]: !enabled,
+              [styles.error]: validationStatus === "error",
+              [styles.warning]: validationStatus === "warning",
+              [styles.valid]: validationStatus === "valid",
+            })}
+            autoFocus={autoFocus}
+            onFocus={onFocus}
+            onBlur={onBlur}
+          >
+            <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+            <div className={styles.datePickerValue}>
+              {mode === "single" && selected ? (
+                <>{format(selected, dateFormat)}</>
+              ) : mode === "range" && typeof selected === "object" && selected.from ? (
+                selected.to ? (
+                  <>
+                    {format(selected.from, dateFormat)} - {format(selected.to, dateFormat)}
+                  </>
                 ) : (
-                  <span>&nbsp;</span>
-                )}
-              </div>
-              <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
-            </button>
-          </ReactDropdownMenu.Trigger>
-          <ReactDropdownMenu.Portal container={root}>
-            <ReactDropdownMenu.Content
+                  <>{format(selected.from, dateFormat)}</>
+                )
+              ) : placeholder ? (
+                <span className={styles.placeholder} placeholder={placeholder}>
+                  {placeholder}
+                </span>
+              ) : (
+                <span>&nbsp;</span>
+              )}
+            </div>
+            <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+          </PopoverTrigger>
+          <PopoverPortal container={root}>
+            <PopoverContent
+              role="menu"
               align={"start"}
               sideOffset={5}
               className={styles.datePickerMenu}
@@ -332,6 +341,7 @@ export const DatePicker = forwardRef(function DatePicker(
                 required={undefined}
                 animate
                 fixedWeeks
+                autoFocus={autoFocus}
                 classNames={styles}
                 captionLayout="dropdown"
                 startMonth={startDate}
@@ -343,12 +353,11 @@ export const DatePicker = forwardRef(function DatePicker(
                 mode={mode === "single" ? "single" : "range"}
                 selected={selected}
                 onSelect={handleSelect}
-                autoFocus={!inline}
                 numberOfMonths={mode === "range" ? 2 : 1}
               />
-            </ReactDropdownMenu.Content>
-          </ReactDropdownMenu.Portal>
-        </ReactDropdownMenu.Root>
+            </PopoverContent>
+          </PopoverPortal>
+        </Popover>
       )}
     </ItemWithLabel>
   );

@@ -260,6 +260,10 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
   width: var(--rdp-nav_button-width);
   height: var(--rdp-nav_button-height);
+
+  &:hover {
+    background-color: $backgroundColor-item-DatePicker--hover;
+  }
 }
 
 .button_next:disabled,
@@ -309,6 +313,11 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   position: relative;
   display: inline-flex;
   align-items: center;
+
+  &:hover {
+    background-color: $backgroundColor-item-DatePicker--hover;
+    cursor: pointer;
+  }
 }
 
 .dropdown_root[data-disabled="true"] .chevron {
@@ -318,6 +327,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 .month_caption {
   display: flex;
   align-content: center;
+  padding: t.$space-3;
   height: var(--rdp-nav-height);
   font-weight: bold;
   font-size: large;
@@ -380,6 +390,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   padding: var(--rdp-weekday-padding);
   font-weight: 500;
   font-size: smaller;
+  color: t.$textColor-secondary;
   text-align: var(--rdp-weekday-text-align);
   text-transform: var(--rdp-weekday-text-transform);
 }
@@ -458,6 +469,11 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
 .focusable {
   cursor: pointer;
+}
+
+.datePickerValue {
+  display: flex;
+  flex: 1;
 }
 
 @keyframes rdp-slide_in_left {
