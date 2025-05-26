@@ -451,6 +451,13 @@ function useVars(
               stateDepValues,
               appContextDepValues,
             );
+console.log(
+  "[Reactivity Debug] Variable resolved:",
+  key,
+  "Value:", ret[key],
+  "Dependencies:", dependencies
+);
+
         }
       }
     });
