@@ -174,18 +174,18 @@ export const AppWrapper = ({
   const shouldSkipClientRouter = previewMode ? false : (typeof window === "undefined" || process.env.VITE_REMIX);
 
   return (
-    // <React.StrictMode>
-    <ErrorBoundary node={node} location={"root-outer"}>
-      <QueryClientProvider client={queryClient}>
-        {/* No router in the REMIX environment */}
-        {!!shouldSkipClientRouter && dynamicChildren}
+    <React.StrictMode>
+      <ErrorBoundary node={node} location={"root-outer"}>
+        <QueryClientProvider client={queryClient}>
+          {/* No router in the REMIX environment */}
+          {!!shouldSkipClientRouter && dynamicChildren}
 
-        {/* Wrap the app in a router in other cases */}
-        {!shouldSkipClientRouter && (
-          <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
-        )}
-      </QueryClientProvider>
-    </ErrorBoundary>
-    // </React.StrictMode>
+          {/* Wrap the app in a router in other cases */}
+          {!shouldSkipClientRouter && (
+            <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
+          )}
+        </QueryClientProvider>
+      </ErrorBoundary>
+    </React.StrictMode>
   );
 };

@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.9.38",
+  "version": "0.9.39",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -21,7 +21,7 @@
     "prepare-docs-data": "npm run build:xmlui-metadata",
     "generate-all-docs": "npm run build:xmlui-metadata && npm run build:ext-meta && npm run generate-docs",
     "export-themes": "npm run prepare-docs-data && node scripts/generate-docs/create-theme-files.mjs",
-    "generate-langserver-metadata": "node scripts/get-langserver-metadata.mjs > src/language-server/xmlui-metadata-generated.mjs"
+    "gen:langserver-metadata": "node scripts/get-langserver-metadata.mjs > src/language-server/xmlui-metadata-generated.mjs"
   },
   "dependencies": {
     "@eslint-community/regexpp": "4.10.0",
@@ -213,8 +213,8 @@
       "import": "./src/components-core/theming/_themes.scss"
     },
     "./vite-xmlui-plugin": {
-      "import": "./dist/scripts/bin/vite-xmlui-plugin.js",
-      "require": "./dist/scripts/bin/vite-xmlui-plugin.js"
+      "import": "./bin/vite-xmlui-plugin.ts",
+      "require": "./bin/vite-xmlui-plugin.ts"
     },
     "./language-server": {
       "import": "./src/language-server/server.ts",

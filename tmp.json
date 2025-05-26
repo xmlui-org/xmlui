@@ -1,0 +1,25 @@
+{
+  "changesets": [
+    {
+      "releases": [
+        {
+          "name": "xmlui-vscode",
+          "type": "patch"
+        }
+      ],
+      "summary": "another test change",
+      "id": "cruel-cows-stick"
+    }
+  ],
+  "releases": [
+    {
+      "name": "xmlui-vscode",
+      "type": "patch",
+      "oldVersion": "0.0.2",
+      "changesets": [
+        "cruel-cows-stick"
+      ],
+      "newVersion": "0.0.3"
+    }
+  ]
+}

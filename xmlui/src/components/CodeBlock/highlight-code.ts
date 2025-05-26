@@ -3,6 +3,25 @@ import { type ReactNode, isValidElement } from "react";
 const highlightRowsClass = "codeBlockHighlightRow";
 const highlightSubstringsClass = "codeBlockHighlightString";
 
+/*
+ * Encode string, returns base64 value
+ * @Params: string
+ */
+export function encodeValue(value) {
+  if (!value) {
+    return null;
+  }
+
+  const valueToString = value.toString();
+
+  if (typeof window !== 'undefined') {
+    return window.atob(valueToString);
+  }
+
+  const buff = Buffer.from(valueToString, 'base64');
+  return buff.toString('ascii');
+}
+
 /**
  * This function handles two things:
  * 1. The extraction of meta information from code blocks and exposing them as data-meta attributes
@@ -184,7 +203,7 @@ function parseSubstringHighlights(code: string, str?: string): ItemRowDecoration
   if (!code) return [];
   return str
     .split(" ")
-    .map((item) => window.atob(item))
+    .map((item) => encodeValue(item))
     .reduce((acc, item) => acc.concat(findAllNonOverlappingSubstrings(code, item)), []);
 
   function findAllNonOverlappingSubstrings(str: string, code: string) {
@@ -220,7 +239,7 @@ export type CodeHighlighter = {
 };
 
 export function isCodeHighlighter(obj: any): obj is CodeHighlighter {
-  return obj.highlight && typeof obj.highlight === "function" && obj.availableLangs;
+  return obj && obj.highlight && typeof obj.highlight === "function" && obj.availableLangs;
 }
 
 type HighlighterResults = {
