@@ -29,6 +29,18 @@ Object.keys(contentRuntime).map((filePath) => {
   navPanelContent.push(urlFragment);
 });
 
+
+const pagesRuntime: Record<string, any> = import.meta.glob(`/public/pages/**/*.md`, {
+  eager: true,
+  query: "?raw",
+});
+
+const prefetchedContent: Record<string, any> = {};
+Object.keys(pagesRuntime).map((filePath) => {
+  const urlFragment = filePath.substring("/public".length);
+  prefetchedContent[urlFragment] = pagesRuntime[filePath].default;
+});
+
 const shikiHighlighter = createHighlighterCoreSync({
   // @ts-ignore
   langs: [js, json, xmluiGrammar],
@@ -198,6 +210,7 @@ const App: StandaloneAppDescription = {
       availableLangs: shikiHighlighter.getLoadedLanguages(),
       highlight,
     },
+    prefetchedContent: prefetchedContent,
   },
 };
 
