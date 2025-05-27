@@ -55,7 +55,7 @@
         <Pages>
 
             <Page url="/">
-                <Markdown data="/pages/intro.md" />
+                <MarkdownPage url="/pages/intro.md" />
             </Page>
 
             <Page url="/reactive-intro">

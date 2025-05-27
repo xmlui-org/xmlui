@@ -70,14 +70,14 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 ```
 ]]></Markdown>
 
-  <HStack>
-    <Stack width="50%">
+  <FlowLayout>
+    <Stack width="*">
       <TubeStops line="victoria" />
     </Stack>
-    <Stack width="50%">
+    <Stack width="*">
       <TubeStops line="waterloo-city" />
     </Stack>
-  </HStack>
+  </FlowLayout>
 
 
 <H2>Anatomy of a custom component</H2>
@@ -85,9 +85,9 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 <Text>Here's the XMLUI markup for the <Text variant="code">TubeStops</Text> component.</Text>
 
 
-<HStack>
+<FlowLayout>
 
-    <Markdown width="50%"><![CDATA[
+    <Markdown width="*"><![CDATA[
 
 ```xmlui
 <Component name="TubeStops">
@@ -119,7 +119,7 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 ```
     ]]></Markdown>
 
-    <Markdown width="50%"><![CDATA[
+    <Markdown width="*"><![CDATA[
 <details>
 <summary>transformStops function</summary>
 <pre><code>
@@ -147,7 +147,7 @@ window.transformStops = function(stops) {
 </details>
 ]]></Markdown>
 
-</HStack>
+</FlowLayout>
 
 
 <Markdown><![CDATA[
@@ -163,8 +163,6 @@ Another way to keep your markup clean: rely on XMLUI's layout and style engine t
 
 ]]></Markdown>
 
-<Link icon="arrowright" label="Themes" to="/themes-intro" />
-
-
+  <Link icon="arrowright" label="Themes" to="/themes-intro" />
 
 </Component>

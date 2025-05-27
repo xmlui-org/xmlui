@@ -1,0 +1,9 @@
+<Component name="MarkdownWithToc">
+    <HStack>
+        <VStack width="*">
+            <Breadcrumb />
+            <Slot />
+        </VStack>
+        <TableOfContents maxHeadingLevel="3" width="$space-64" when="{mediaSize.sizeIndex > 3}"/>
+    </HStack>    
+</Component>
