@@ -43,6 +43,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 .badgeListWrapper {
   outline: none;
   width: 100%;
+  gap: t.$space-1;
   display: flex;
   padding: t.$space-1 t.$space-2;
   min-height: 2.5rem; /* h-12 */
@@ -79,7 +80,6 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 
 .badgeList {
   position: relative;
-  flex-grow: 1;
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -177,7 +177,6 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 
   &[data-disabled=true] {
     pointer-events: none;
-    opacity: 0.5;
     cursor: not-allowed;
     color: createThemeVar("textColor-item-#{$component}--disabled");
     font-style: italic;

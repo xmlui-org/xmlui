@@ -26,13 +26,13 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
 import styles from "../../components/AutoComplete/AutoComplete.module.scss";
 import Icon from "../../components/Icon/IconNative";
-import { HiddenOption } from "../Select/SelectNative";
 import OptionTypeProvider from "../../components/Option/OptionTypeProvider";
 import { AutoCompleteContext, useAutoComplete } from "./AutoCompleteContext";
 import { OptionContext, useOption } from "../Select/OptionContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { HiddenOption } from "../Select/HiddenOption";
 
 type AutoCompleteProps = {
   id?: string;
@@ -58,6 +58,8 @@ type AutoCompleteProps = {
   labelWidth?: string;
   labelBreak?: boolean;
   required?: boolean;
+  readOnly?: boolean;
+  creatable?: boolean;
 };
 
 function defaultRenderer(item: Option) {
@@ -87,6 +89,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     emptyListTemplate,
     style,
     children,
+    readOnly = false,
     autoFocus = false,
     dropdownHeight,
     multi = false,
@@ -95,10 +98,11 @@ export const AutoComplete = forwardRef(function AutoComplete(
     labelWidth,
     labelBreak,
     required = false,
+    creatable = false,
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -158,7 +162,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
 
   useEffect(() => {
     if (!multi) {
-      const label = Array.from(options).find((o) => o.value === value)?.label;
+      const label = Array.from(options).find((o) => `${o.value}` === `${value}`)?.label;
       setInputValue(label ? label + "" : "");
     }
   }, [multi, options, value]);
@@ -281,67 +285,47 @@ export const AutoComplete = forwardRef(function AutoComplete(
                 ref={dropdownRef}
                 className={styles.command}
                 filter={(value, search, keywords) => {
+                  if (readOnly) return 1;
                   const extendedValue = value + " " + keywords.join(" ");
                   if (extendedValue.toLowerCase().includes(search.toLowerCase())) return 1;
                   return 0;
                 }}
               >
-                <PopoverTrigger
-                  id={inputId}
-                  onClick={() => {
-                    if (!enabled) return;
-                    inputRef?.current?.focus();
-                  }}
-                  aria-haspopup="listbox"
-                  ref={setReferenceElement}
-                  style={{ width: "100%", ...style }}
-                  className={classnames(styles.badgeListWrapper, styles[validationStatus], {
-                    [styles.disabled]: !enabled,
-                    [styles.focused]: document.activeElement === inputRef.current,
-                  })}
-                >
-                  {multi ? (
-                    <div className={styles.badgeList}>
-                      {Array.isArray(value) &&
-                        value.map((v) => (
-                          <span key={v} className={styles.badge}>
-                            {Array.from(options).find((o) => o.value === v)?.label}
-                            <Icon
-                              name="close"
-                              size="sm"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                toggleOption(v);
-                              }}
-                            />
-                          </span>
-                        ))}
-                      <CmdInput
-                        id={id}
-                        role="combobox"
-                        autoFocus={autoFocus}
-                        ref={inputRef}
-                        value={inputValue}
-                        disabled={!enabled}
-                        onValueChange={(value) => {
-                          setOpen(true);
-                          setInputValue(value);
-                        }}
-                        onFocus={() => {
-                          setOpen(true);
-                          onFocus();
-                        }}
-                        onBlur={() => {
-                          setOpen(false);
-                          onBlur();
-                        }}
-                        placeholder={placeholder}
-                        className={styles.commandInput}
-                      />
-                    </div>
-                  ) : (
+                <PopoverTrigger asChild>
+                  <div
+                    id={inputId}
+                    tabIndex={-1}
+                    aria-haspopup="listbox"
+                    ref={setReferenceElement}
+                    style={{ width: "100%", ...style }}
+                    className={classnames(styles.badgeListWrapper, styles[validationStatus], {
+                      [styles.disabled]: !enabled,
+                      [styles.focused]: document.activeElement === inputRef.current,
+                    })}
+                  >
+                    {multi && (
+                      <div className={styles.badgeList}>
+                        {Array.isArray(value) &&
+                          value.map((v) => (
+                            <span key={v} className={styles.badge}>
+                              {Array.from(options).find((o) => `${o.value}` === `${v}`)?.label}
+                              {!readOnly && (
+                                <Icon
+                                  name="close"
+                                  size="sm"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    toggleOption(v);
+                                  }}
+                                />
+                              )}
+                            </span>
+                          ))}
+                      </div>
+                    )}
                     <CmdInput
                       id={id}
+                      readOnly={readOnly}
                       autoFocus={autoFocus}
                       ref={inputRef}
                       value={inputValue}
@@ -351,31 +335,29 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         setInputValue(value);
                       }}
                       onFocus={() => {
-                        setOpen(true);
                         onFocus();
                       }}
                       onBlur={() => {
-                        setOpen(false);
                         onBlur();
                       }}
                       placeholder={placeholder}
                       className={styles.commandInput}
                     />
-                  )}
-                  <div className={styles.actions}>
-                    {value?.length > 0 && enabled && (
-                      <span
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          clearValue();
-                        }}
-                      >
-                        <Icon name="close" />
+                    <div className={styles.actions}>
+                      {value?.length > 0 && enabled && !readOnly && (
+                        <span
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            clearValue();
+                          }}
+                        >
+                          <Icon name="close" />
+                        </span>
+                      )}
+                      <span onClick={() => setOpen(!open)}>
+                        <Icon name="chevrondown" />
                       </span>
-                    )}
-                    <span onClick={() => setOpen(true)}>
-                      <Icon name="chevrondown" />
-                    </span>
+                    </div>
                   </div>
                 </PopoverTrigger>
                 {open && (
@@ -396,21 +378,19 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         style={{ height: dropdownHeight }}
                       >
                         <CmdEmpty>{emptyListNode}</CmdEmpty>
-                        <CreatableItem />
+                        {creatable && <CreatableItem />}
                         <CmdGroup>
                           {Array.from(options).map(
                             ({ value, label, enabled, keywords, labelText }) => (
-                              <div>
-                                <AutoCompleteOption
-                                  key={value}
-                                  value={value}
-                                  label={label}
-                                  enabled={enabled}
-                                  keywords={keywords}
-                                  labelText={labelText}
-                                />
-                              </div>
-
+                              <AutoCompleteOption
+                                key={value}
+                                value={value}
+                                label={label}
+                                enabled={enabled}
+                                keywords={keywords}
+                                labelText={labelText}
+                                readOnly={readOnly}
+                              />
                             ),
                           )}
                         </CmdGroup>
@@ -466,7 +446,7 @@ function CreatableItem() {
   return <span style={{ display: "none" }} />;
 }
 
-function AutoCompleteOption({ value, label, enabled = true, keywords }: Option) {
+function AutoCompleteOption({ value, label, enabled = true, keywords, readOnly }: Option) {
   const id = useId();
   const { value: selectedValue, onChange, optionRenderer, multi, setOpen } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
@@ -477,16 +457,18 @@ function AutoCompleteOption({ value, label, enabled = true, keywords }: Option) 
       key={id}
       disabled={!enabled}
       value={`${value}`}
-      className={styles.autoCompleteOption}
+      className={classnames(styles.autoCompleteOption, {
+        [styles.disabledOption]: !enabled,
+      })}
       onMouseDown={(e) => {
         e.preventDefault();
         e.stopPropagation();
       }}
       onSelect={() => {
-        onChange(value);
+        if (!readOnly && enabled) onChange(value);
         setOpen(false);
       }}
-      data-state={selected ? "checked" : undefined}
+      data-state={enabled ? (selected ? "checked" : undefined) : "disabled"}
       keywords={keywords}
     >
       {optionRenderer({ label, value })}

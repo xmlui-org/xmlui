@@ -10,7 +10,6 @@ test("renders with default props", async ({ initTestBed, createAutoCompleteDrive
   await expect(driver.component).toBeVisible();
 });
 
-
 test("displays placeholder text", async ({ initTestBed, page }) => {
   const placeholder = "Search for an option";
   await initTestBed(`
@@ -36,7 +35,11 @@ test("initialValue sets the selected option", async ({ initTestBed, page }) => {
   await expect(page.getByRole("combobox")).toHaveValue("Bruce Wayne");
 });
 
-test.fixme("opens dropdown when clicked", async ({ initTestBed, page, createAutoCompleteDriver }) => {
+test("opens dropdown when double clicked", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
   await initTestBed(`
     <AutoComplete>
       <Option value="1" label="Bruce Wayne" />
@@ -45,11 +48,13 @@ test.fixme("opens dropdown when clicked", async ({ initTestBed, page, createAuto
     </AutoComplete>
   `);
 
+  const driver = await createAutoCompleteDriver();
+  await driver.click();
+
   await expect(page.getByRole("listbox")).toBeVisible();
 });
 
-
-test("selects an option when clicked", async ({ initTestBed, page }) => {
+test("selects an option when clicked", async ({ initTestBed, page, createAutoCompleteDriver }) => {
   await initTestBed(`
     <Fragment>
       <AutoComplete id="autoComplete">
@@ -61,15 +66,27 @@ test("selects an option when clicked", async ({ initTestBed, page }) => {
     </Fragment>
   `);
 
-  await page.locator(".command").click();
-  await page.getByText("Diana Prince").click();
+  const driver = await createAutoCompleteDriver("autoComplete");
 
+  // Open the dropdown
+  await driver.click();
+
+  // Wait for options to be visible before selecting
+  await page.getByRole("option", { name: "Diana Prince" }).waitFor({ state: "visible" });
+
+  // Select the option
+  await driver.selectLabel("Diana Prince");
+
+  // Verify the results
   await expect(page.getByTestId("text")).toHaveText("Selected value: 3");
-  await expect(page.getByText("Diana Prince")).toBeVisible();
+  await expect(page.getByRole("combobox")).toHaveValue("Diana Prince");
 });
 
-/*
-test("disabled option cannot be selected", async ({ initTestBed, page }) => {
+test("disabled option cannot be selected", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
   await initTestBed(`
     <Fragment>
       <AutoComplete id="autoComplete">
@@ -81,20 +98,21 @@ test("disabled option cannot be selected", async ({ initTestBed, page }) => {
     </Fragment>
   `);
 
-  await page.locator(".command").click();
+  const driver = await createAutoCompleteDriver("autoComplete");
+  await driver.click();
 
-  // Clark Kent should be disabled
-  const disabledOption = page.getByText("Clark Kent");
-  await expect(disabledOption).toHaveClass(/disabled/);
-
-  // Try to click the disabled option
-  await disabledOption.click({ force: true });
+  await driver.selectLabel("Clark Kent");
 
   // Value should not change to the disabled option
+  await expect(page.getByRole("combobox")).not.toHaveValue("Bruce Wayne");
   await expect(page.getByTestId("text")).not.toHaveText("Selected value: 2");
 });
 
-test("multi mode allows selecting multiple options", async ({ initTestBed, page }) => {
+test("multi mode allows selecting multiple options", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
   await initTestBed(`
     <Fragment>
       <AutoComplete id="autoComplete" multi="true">
@@ -106,15 +124,18 @@ test("multi mode allows selecting multiple options", async ({ initTestBed, page 
     </Fragment>
   `);
 
-  await page.locator(".command").click();
-  await page.getByText("Bruce Wayne").click();
+  const driver = await createAutoCompleteDriver("autoComplete");
+  await driver.click();
+
+  // Click the first option
+  await driver.selectLabel("Bruce Wayne");
 
   // First option should be selected
   await expect(page.getByTestId("text")).toHaveText("Selected values: 1");
 
   // Click another option
-  await page.locator(".command").click();
-  await page.getByText("Diana Prince").click();
+  await driver.click();
+  await driver.selectLabel("Diana Prince");
 
   // Both options should be selected
   await expect(page.getByTestId("text")).toHaveText("Selected values: 1,3");
@@ -124,7 +145,7 @@ test("multi mode allows selecting multiple options", async ({ initTestBed, page 
   await expect(page.getByText("Diana Prince")).toBeVisible();
 });
 
-test("searching filters options", async ({ initTestBed, page }) => {
+test("searching filters options", async ({ initTestBed, page, createAutoCompleteDriver }) => {
   await initTestBed(`
     <AutoComplete>
       <Option value="1" label="Bruce Wayne" />
@@ -135,7 +156,8 @@ test("searching filters options", async ({ initTestBed, page }) => {
     </AutoComplete>
   `);
 
-  await page.locator(".command").click();
+  const driver = await createAutoCompleteDriver();
+  await driver.click();
 
   // Type in the search field
   await page.keyboard.type("Bruce");
@@ -146,7 +168,11 @@ test("searching filters options", async ({ initTestBed, page }) => {
   await expect(page.getByText("Diana Prince")).not.toBeVisible();
 });
 
-test("emptyListTemplate is shown when no options match", async ({ initTestBed, page }) => {
+test("emptyListTemplate is shown when no options match", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
   await initTestBed(`
     <AutoComplete>
       <property name="emptyListTemplate">
@@ -158,7 +184,8 @@ test("emptyListTemplate is shown when no options match", async ({ initTestBed, p
     </AutoComplete>
   `);
 
-  await page.locator(".command").click();
+  const driver = await createAutoCompleteDriver();
+  await driver.click();
 
   // Type something that doesn't match any option
   await page.keyboard.type("Joker");
@@ -167,7 +194,11 @@ test("emptyListTemplate is shown when no options match", async ({ initTestBed, p
   await expect(page.getByText("No options found")).toBeVisible();
 });
 
-test("optionTemplate customizes option appearance", async ({ initTestBed, page }) => {
+test("optionTemplate customizes option appearance", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
   await initTestBed(`
     <AutoComplete>
       <property name="optionTemplate">
@@ -179,18 +210,20 @@ test("optionTemplate customizes option appearance", async ({ initTestBed, page }
     </AutoComplete>
   `);
 
-  await page.locator(".command").click();
+  const driver = await createAutoCompleteDriver();
+  await driver.click();
 
   // Options should be visible with custom styling
-  const options = page.getByText("Bruce Wayne");
-  await expect(options).toBeVisible();
-
-  // Check for center alignment (this is approximate since we can't directly check CSS in this test)
-  const optionElement = page.locator(".autoCompleteOption").first();
-  await expect(optionElement).toBeVisible();
+  await expect(page.getByText("Bruce Wayne")).toBeVisible();
+  await expect(page.getByText("Clark Kent")).toBeVisible();
+  await expect(page.getByText("Diana Prince")).toBeVisible();
 });
 
-test("readOnly prevents changing selection", async ({ initTestBed, page }) => {
+test("readOnly prevents changing selection", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
   await initTestBed(`
     <AutoComplete readOnly="true" initialValue="1">
       <Option value="1" label="Bruce Wayne" />
@@ -200,16 +233,23 @@ test("readOnly prevents changing selection", async ({ initTestBed, page }) => {
   `);
 
   // Initial value should be displayed
-  await expect(page.getByText("Bruce Wayne")).toBeVisible();
+  await expect(page.getByRole("combobox")).toHaveValue("Bruce Wayne");
 
   // Try to click to open dropdown
-  await page.locator(".command").click();
+  const driver = await createAutoCompleteDriver();
+  await driver.click();
 
-  // Dropdown should not open
-  await expect(page.locator(".popoverContent")).not.toBeVisible();
+  await driver.selectLabel("Clark Kent");
+
+  // Selection should not change
+  await expect(page.getByText("Clark Kent")).not.toBeVisible();
 });
 
-test("disabled state prevents interaction", async ({ initTestBed, page }) => {
+test("disabled state prevents interaction", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
   await initTestBed(`
     <AutoComplete enabled="false">
       <Option value="1" label="Bruce Wayne" />
@@ -218,40 +258,29 @@ test("disabled state prevents interaction", async ({ initTestBed, page }) => {
     </AutoComplete>
   `);
 
-  // Component should have disabled class
-  await expect(page.locator(".command")).toHaveClass(/disabled/);
+  const driver = await createAutoCompleteDriver();
 
   // Try to click to open dropdown
-  await page.locator(".command").click({ force: true });
+  await driver.click({ force: true });
+
+  // Try to type in the input
+  await page.keyboard.type("Joker");
 
   // Dropdown should not open
-  await expect(page.locator(".popoverContent")).not.toBeVisible();
+  await expect(page.getByRole("listbox")).not.toBeVisible();
+
+  // Input should not change
+  await expect(page.getByRole("combobox")).toHaveValue("");
 });
 
-test("validation states apply correct styling", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <App>
-      <AutoComplete testId="valid" validationStatus="valid">
-        <Option value="1" label="Bruce Wayne" />
-      </AutoComplete>
-      <AutoComplete testId="warning" validationStatus="warning">
-        <Option value="1" label="Bruce Wayne" />
-      </AutoComplete>
-      <AutoComplete testId="error" validationStatus="error">
-        <Option value="1" label="Bruce Wayne" />
-      </AutoComplete>
-    </App>
-  `);
-
-  await expect(page.getByTestId("valid")).toHaveClass(/valid/);
-  await expect(page.getByTestId("warning")).toHaveClass(/warning/);
-  await expect(page.getByTestId("error")).toHaveClass(/error/);
-});
-
-test("didChange event fires when option is selected", async ({ initTestBed, page }) => {
+test("didChange event fires when option is selected", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
   await initTestBed(`
     <App var.selectedValue="">
-      <AutoComplete onDidChange="(val) => selectedValue = val">
+      <AutoComplete id="autoComplete" onDidChange="(val) => selectedValue = val">
         <Option value="1" label="Bruce Wayne" />
         <Option value="2" label="Clark Kent" />
         <Option value="3" label="Diana Prince" />
@@ -260,17 +289,23 @@ test("didChange event fires when option is selected", async ({ initTestBed, page
     </App>
   `);
 
-  await page.locator(".command").click();
-  await page.getByText("Diana Prince").click();
+  const driver = await createAutoCompleteDriver("autoComplete");
+  await driver.click();
+  await driver.selectLabel("Diana Prince");
 
   await expect(page.getByTestId("text")).toHaveText("3");
 });
 
-test("gotFocus and lostFocus events work correctly", async ({ initTestBed, page }) => {
+test("gotFocus and lostFocus events work correctly", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
   await initTestBed(`
     <App var.isFocused="false">
       <Text testId="focusText">{isFocused === true ? 'AutoComplete focused' : 'AutoComplete lost focus'}</Text>
       <AutoComplete
+        id="autoComplete"
         onGotFocus="isFocused = true"
         onLostFocus="isFocused = false"
       >
@@ -283,7 +318,9 @@ test("gotFocus and lostFocus events work correctly", async ({ initTestBed, page 
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete lost focus");
 
   // Focus the autocomplete
-  await page.locator(".command").focus();
+  const driver = await createAutoCompleteDriver("autoComplete");
+  await driver.click();
+
   await expect(page.getByTestId("focusText")).toHaveText("AutoComplete focused");
 
   // Blur the autocomplete
@@ -313,12 +350,14 @@ test("setValue API works correctly", async ({ initTestBed, page }) => {
   // Set the value using the API
   await page.getByTestId("setButton").click();
   await expect(page.getByTestId("text")).toHaveText("Selected value: 2");
-  await expect(page.getByText("Clark Kent")).toBeVisible();
+  await expect(page.getByRole("combobox")).toHaveValue("Clark Kent");
 });
 
 test("focus API brings focus to the component", async ({ initTestBed, page }) => {
   await initTestBed(`
-    <App>
+    <App var.isFocused="false">
+      <Text testId="focusText">{isFocused === true ? 'AutoComplete focused' : 'AutoComplete lost focus'}</Text>
+ 
       <AutoComplete id="autoComplete">
         <Option value="1" label="Bruce Wayne" />
       </AutoComplete>
@@ -329,42 +368,32 @@ test("focus API brings focus to the component", async ({ initTestBed, page }) =>
     </App>
   `);
 
+  // Initial state
+  await expect(page.getByTestId("focusText")).toHaveText("AutoComplete lost focus");
+
   // Focus the autocomplete using the API
   await page.getByTestId("focusButton").click();
 
   // Check if the autocomplete is focused
-  const isFocused = await page.locator("input").first().evaluate(el => document.activeElement === el);
+  await expect(page.getByTestId("focusText")).toHaveText("AutoComplete lost focus");
+
+  const isFocused = await page
+    .getByRole("combobox")
+    .evaluate((el) => document.activeElement === el);
   expect(isFocused).toBeTruthy();
 });
 
 test("autoFocus brings focus to the component on load", async ({ initTestBed, page }) => {
   await initTestBed(`
-    <AutoComplete autoFocus="true">
-      <Option value="1" label="Bruce Wayne" />
-    </AutoComplete>
+    <App var.isFocused="false">
+      <Text testId="focusText">{isFocused === true ? 'AutoComplete focused' : 'AutoComplete lost focus'}</Text>
+      <AutoComplete autoFocus="true" onGotFocus="isFocused = true">
+        <Option value="1" label="Bruce Wayne" />
+      </AutoComplete>
+    </App>
   `);
 
-  // Check if the autocomplete is focused
-  const isFocused = await page.locator("input").first().evaluate(el => document.activeElement === el);
-  expect(isFocused).toBeTruthy();
-});
-
-test("dropdownHeight sets the height of the dropdown", async ({ initTestBed, page }) => {
-  const dropdownHeight = "200px";
-  await initTestBed(`
-    <AutoComplete dropdownHeight="${dropdownHeight}">
-      <Option value="1" label="Bruce Wayne" />
-      <Option value="2" label="Clark Kent" />
-      <Option value="3" label="Diana Prince" />
-    </AutoComplete>
-  `);
-
-  await page.locator(".command").click();
-
-  // Check if the dropdown has the specified height
-  const dropdown = page.locator(".popoverContent");
-  const style = await dropdown.getAttribute("style");
-  expect(style).toContain(`height: ${dropdownHeight}`);
+  await expect(page.getByTestId("focusText")).toHaveText("AutoComplete focused");
 });
 
 test("label is displayed correctly", async ({ initTestBed, page }) => {
@@ -378,39 +407,14 @@ test("label is displayed correctly", async ({ initTestBed, page }) => {
   await expect(page.getByText(label)).toBeVisible();
 });
 
-test("labelPosition changes label placement", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <AutoComplete label="Select a superhero" labelPosition="start" labelBreak="false">
-      <Option value="1" label="Bruce Wayne" />
-    </AutoComplete>
-  `);
-
-  // Check that the label is positioned to the left of the input
-  const labelElement = page.getByText("Select a superhero");
-  const inputElement = page.locator(".command");
-
-  const labelBox = await labelElement.boundingBox();
-  const inputBox = await inputElement.boundingBox();
-
-  // In left-to-right layout, label should be to the left of the input
-  expect(labelBox.x).toBeLessThan(inputBox.x);
-});
-
-test("required adds required indicator", async ({ initTestBed, page }) => {
-  await initTestBed(`
-    <AutoComplete label="Select a superhero" required="true">
-      <Option value="1" label="Bruce Wayne" />
-    </AutoComplete>
-  `);
-
-  // Required indicator should be visible
-  await expect(page.locator(".required")).toBeVisible();
-});
-
-test("creates new option when typing non-existing value", async ({ initTestBed, page }) => {
+test("creates new option when typing non-existing value", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
   await initTestBed(`
     <Fragment>
-      <AutoComplete id="autoComplete">
+      <AutoComplete id="autoComplete" creatable="true">
         <Option value="1" label="Bruce Wayne" />
         <Option value="2" label="Clark Kent" />
       </AutoComplete>
@@ -418,7 +422,8 @@ test("creates new option when typing non-existing value", async ({ initTestBed, 
     </Fragment>
   `);
 
-  await page.locator(".command").click();
+  const driver = await createAutoCompleteDriver("autoComplete");
+  await driver.click();
 
   // Type a new option
   await page.keyboard.type("Peter Parker");
@@ -431,6 +436,5 @@ test("creates new option when typing non-existing value", async ({ initTestBed, 
 
   // The new option should be selected
   await expect(page.getByTestId("text")).toHaveText("Selected value: Peter Parker");
-  await expect(page.getByText("Peter Parker")).toBeVisible();
+  await expect(page.getByRole("combobox")).toHaveValue("Peter Parker");
 });
-*/
