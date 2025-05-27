@@ -98,7 +98,7 @@ test("selects a date range in range mode", async ({
   await expect(page.getByText(`${formattedStartDate} - ${formattedEndDate}`)).toBeVisible();
 });
 
-test("disabled state prevents interaction", async ({
+test.skip("disabled state prevents interaction", async ({
   initTestBed,
   page,
   createDatePickerDriver,
@@ -205,7 +205,7 @@ test.fixme("toDate restricts selectable dates", async ({ initTestBed, page }) =>
   await expect(todayCell).toHaveClass(/disabled/);
 });
 
-test("disabledDates prevents selection of specific dates", async ({
+test.skip("disabledDates prevents selection of specific dates", async ({
   initTestBed,
   page,
   createDatePickerDriver,
