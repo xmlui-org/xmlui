@@ -373,7 +373,7 @@ export class AutoCompleteDriver extends ComponentDriver {
 
 export class SelectDriver extends ComponentDriver {
   async toggleOptionsVisibility(){
-    await this.component.getByRole("button").click();
+    await this.component.click();
   }
 
   async selectLabel(value: string) {
