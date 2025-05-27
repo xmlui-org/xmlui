@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useRef } from "react";
 
-const ReactivityDebugger = () => {
+const ReactivityDebugger = (props: any) => {
   const logReactivity = typeof window !== 'undefined' && (window as any).logReactivity;
+  const renderCount = useRef(0);
+  renderCount.current++;
+  
+  const id = props.id || 'unnamed';
+  const type = 'ReactivityDebugger';
   
   if (logReactivity) {
-    return "Reactivity Debug Active - Logging Enabled";
+    return `[${type}] id:${id} - Logging Enabled - Renders: ${renderCount.current}`;
   } else {
-    return "Reactivity Debug Active - Logging Disabled";
+    return `[${type}] id:${id} - Logging Disabled - Renders: ${renderCount.current}`;
   }
 };
 
