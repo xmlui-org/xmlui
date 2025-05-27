@@ -93,11 +93,12 @@ export const AppHeader = ({
           [styles.full]: !canRestrictContentWidth,
         })}
       >
-        {!navPanelVisible && hasRegisteredNavPanel && (
+        {hasRegisteredNavPanel && (
           <Button
             onClick={toggleDrawer}
             icon={<Icon name={"hamburger"} />}
             variant={"ghost"}
+            className={styles.drawerToggle}
             style={{ color: "inherit", flexShrink: 0 }}
           />
         )}

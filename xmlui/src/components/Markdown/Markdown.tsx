@@ -92,7 +92,7 @@ export const markdownComponentRenderer = createComponentRenderer(
     }
 
     // 2. "data" property fallback
-    if (!renderedChildren) {
+    if (!renderedChildren && typeof (node.props as any).data === "string") {
       renderedChildren = extractValue.asString((node.props as any).data);
     }
 
