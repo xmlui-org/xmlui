@@ -98,7 +98,7 @@ test("selects a date range in range mode", async ({
   await expect(page.getByText(`${formattedStartDate} - ${formattedEndDate}`)).toBeVisible();
 });
 
-test.skip("disabled state prevents interaction", async ({
+test("disabled state prevents interaction", async ({
   initTestBed,
   page,
   createDatePickerDriver,

@@ -4,7 +4,7 @@ import classnames from "classnames";
 import styles from "./Card.module.scss";
 
 import { Avatar } from "../Avatar/AvatarNative";
-import { LocalLink } from "../Link/LinkNative";
+import { LinkNative } from "../Link/LinkNative";
 import type { HeadingProps } from "../Heading/HeadingNative";
 import { Heading } from "../Heading/HeadingNative";
 import { Stack } from "../Stack/StackNative";
@@ -63,9 +63,9 @@ export const Card = forwardRef(function Card(
           <div className={styles.titleWrapper}>
             {linkTo ? (
               title ? (
-                <LocalLink to={linkTo + ""}>
+                <LinkNative to={linkTo + ""}>
                   <Heading {...titleProps}>{title}</Heading>
-                </LocalLink>
+                </LinkNative>
               ) : null
             ) : title ? (
               <Heading {...titleProps}>{title}</Heading>
