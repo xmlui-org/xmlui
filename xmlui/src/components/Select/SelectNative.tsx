@@ -38,6 +38,7 @@ import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext, useOption } from "./OptionContext";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { HiddenOption } from "./HiddenOption";
 
 export type SingleValueType = string | number;
 export type ValueType = SingleValueType | SingleValueType[];
