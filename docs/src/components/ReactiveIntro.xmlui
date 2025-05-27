@@ -1,11 +1,12 @@
 <Component name="ReactiveIntro">
 
+<MarkdownWithToc>
 <Markdown><![CDATA[
 # Reactive data binding
 
 Let's load that same London tube data into a [Select](/components/Select) component.
-]]></Markdown>
-
+]]>
+</Markdown>
     <HStack>
         <Markdown width="60%">
     <![CDATA[
@@ -203,5 +204,6 @@ So far we've seen examples of built-in XMLUI components. But it's easy to make y
     </HStack>
 
 <Link icon="arrowright" label="Components" to="/components-intro"/>
+</MarkdownWithToc>
 
 </Component>

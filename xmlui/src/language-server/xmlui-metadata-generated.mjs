@@ -2114,7 +2114,7 @@ export default {
       "width-navPanel-App": "$space-64",
       "backgroundColor-navPanel-App": "$backgroundColor",
       "maxWidth-content-App": "$maxWidth-content",
-      "boxShadow-header-App": "$boxShadow-spread",
+      "boxShadow-header-App": "-spread",
       "boxShadow-navPanel-App": "$boxShadow-spread",
       "scroll-padding-block-Pages": "$space-4",
       "backgroundColor-content-App": "$backgroundColor",

@@ -1,7 +1,7 @@
 {
   "_overview": "Components Overview",
-  "APICall": "APICall",
   "App": "App",
+  "APICall": "APICall",
   "AppHeader": "AppHeader",
   "AppState": "AppState",
   "AutoComplete": "AutoComplete",
