@@ -19,6 +19,14 @@ $backgroundColor-AppHeader: createThemeVar("backgroundColor-AppHeader");
 $borderBottom-NavPanel: createThemeVar("borderBottom-AppHeader");
 $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
 
+@include t.withMaxScreenSize(2) {
+  .wrapper.verticalFullHeader{
+    .navPanelWrapper{
+      display: none;
+    }
+  }
+}
+
 .wrapper {
   --footer-height: 0px;
   --header-height: 0px;

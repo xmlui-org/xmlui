@@ -127,6 +127,15 @@ $align-content-AppHeader: createThemeVar("align-content-#{$component}");
   }
 }
 
+.drawerToggle.drawerToggle{
+  display: none;
+  @include t.withMaxScreenSize(2) {
+    display: block;
+  }
+}
+
+
+
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVars: t.json-stringify($themeVars);
