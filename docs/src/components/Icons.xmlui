@@ -1,28 +1,43 @@
 <Component
     name="Icons"
     var.names = "{[
-        'assign', 'arrowup', 'arrowleft', 'arrowright', 'pause', 'play', 'date', 'hamburger',
-        'send', 'users', 'refresh', 'chevrondown', 'chevronup', 'chevronright', 'chevronleft',
-        'dotmenu', 'dotmenuhorizontal', 'noresult', 'crm', 'chat', 'pencil', 'cube', 'apps',
-        'permissions', 'close', 'star', 'help', 'compactlist', 'copy', 'move', 'rename',
-        'hyperlink', 'globe', 'link', 'looseList', 'options', 'search', 'filter', 'trash',
-        'pen', 'email', 'phone', 'home', 'user', 'exit', 'adduser', 'userminus', 'plus',
-        'inspect', 'plus-circle', 'filledplus', 'checkmark', 'valid', 'info', 'error',
-        'warning', 'board', 'list', 'folder', 'folder-outline', 'emptyfolder', 'pdf', 'txt',
-        'doc', 'docx', 'doc-outline', 'conf', 'code', 'codesandbox', 'box', 'xls', 'jpg',
-        'unknownfile', 'photo', 'previous', 'next', 'like', 'reply', 'attach', 'attach2',
-        'emoji', 'message', 'upload', 'split-vertical', 'split-horizontal', 'swap', 'download',
-        'note', 'binding', 'database', 'unlink', 'api', 'expression', 'hash', 'drive', 'lock',
-        'start', 'stop', 'restart', 'duplicate', 'connect', 'cog', 'sun', 'moon', 'share',
-        'new-window', 'paint', 'palette', 'trending-up', 'trending-down', 'trending-level',
-        'sortasc', 'sortdesc', 'nosort', 'arrowdown', 'square', 'squarehalf', 'squarefill'
+        'adduser', 'admonition_danger', 'admonition_info',
+        'admonition_note', 'admonition_tip', 'admonition_warning', 'api', 'apps',
+        'arrowdown', 'arrowleft', 'arrowright', 'arrowup', 'assign', 'attach',
+        'attach2', 'binding', 'board', 'box', 'chat', 'checkmark', 'chevrondown',
+        'chevronleft', 'chevronright', 'chevronup', 'close', 'cog', 'code',
+        'codesandbox', 'compactlist', 'conf', 'connect', 'copy',
+        'cube', 'date', 'database', 'darkToLight', 'doc', 'doc-outline', 'docx',
+        'dotmenu', 'dotmenuhorizontal', 'download', 'drive', 'duplicate',
+        'emptyfolder', 'emoji', 'error', 'exit', 'expression', 'filledplus',
+        'filter', 'folder', 'folder-outline', 'gif', 'globe', 'hash', 'help',
+        'home', 'hyperlink', 'info', 'inspect', 'jpeg', 'jpg', 'like',
+        'link', 'list', 'looseList', 'lock', 'message', 'moon', 'move',
+        'new-window', 'next', 'noresult', 'note', 'nosort', 'options', 'paint',
+        'palette', 'pause', 'pen', 'permissions', 'photo', 'phone', 'play',
+        'plus', 'plus-circle', 'png', 'ppt', 'pptx', 'previous', 'refresh',
+        'rename', 'reply', 'restart', 'search', 'send', 'share', 'sortasc',
+        'sortdesc', 'split-horizontal', 'split-vertical', 'square', 'squarefill',
+        'squarehalf', 'star', 'stars', 'start', 'stop', 'sun', 'swap', 'svg',
+        'tif', 'trash', 'trending-down', 'trending-level', 'trending-up', 'txt',
+        'unlink', 'unknownfile', 'upload', 'user', 'userminus', 'users', 'valid',
+        'warning', 'webp', 'xls', 'xlsx'
     ].toSorted()}"
 >
 <FlowLayout gap="$space-2" padding="$space-2">
     <Items data="{names}">
-        <VStack width="8rem" marginBottom="2rem">
-            <Icon name="{$item}" />
-            <Text fontSize="$text-xs">{$item}</Text>
+        <VStack 
+            width="12.5%" verticalAlignment="center" 
+            horizontalAlignment="center"
+            marginBottom="$space-8"
+            gap="$space-2">
+            <Icon 
+                padding="$space-2" 
+                name="{$item}" 
+                height="40px" 
+                width="40px" 
+                boxShadow="$boxShadow-spread-2" />
+            <Text fontSize="$fontSize-smaller">{$item}</Text>
         </VStack>
     </Items>
 </FlowLayout>
