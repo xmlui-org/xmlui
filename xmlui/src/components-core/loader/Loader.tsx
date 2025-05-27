@@ -187,6 +187,16 @@ export function Loader({
   if (logReactivity && status !== prevStatus) {
     console.log(`[DataSource Status Change] '${loader.props.id || loader.uid}': ${prevStatus} → ${status}`);
     console.log('  This may trigger appContext updates affecting other components');
+    
+    // Test the new SQLite logging
+    if (typeof window !== 'undefined' && window.logReactivityEvent) {
+      window.logReactivityEvent(
+        'datasource_status_change',
+        loader.props.id || loader.uid,
+        `${prevStatus} → ${status}`,
+        { prevStatus, status, timestamp: new Date().toISOString() }
+      );
+    }
   }
 
   // Log status and data for each DataSource on every render
