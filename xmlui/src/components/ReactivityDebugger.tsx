@@ -1,7 +1,7 @@
 import React from "react";
 
 const ReactivityDebugger = () => {
-  return <div>Reactivity Debugger Placeholder</div>;
+  return "Reactivity Debug Active";
 };
 
 export const reactivityDebuggerComponentRenderer = {
