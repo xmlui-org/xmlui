@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.9.42
+
+### Patch Changes
+
+- 1ab3881: ssr fixes, experimental prefetchedContent
+- 3d9729d: test: add tests for the DatePicker component
+
 ## 0.9.41
 
 ### Patch Changes
