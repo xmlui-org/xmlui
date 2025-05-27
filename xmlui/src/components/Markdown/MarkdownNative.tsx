@@ -9,7 +9,7 @@ import htmlTagStyles from "../HtmlTags/HtmlTags.module.scss";
 
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
-import { LocalLink } from "../Link/LinkNative";
+import { LinkNative } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
 import { NestedApp } from "../NestedApp/NestedAppNative";
 import {
@@ -237,12 +237,25 @@ export const Markdown = memo(function Markdown({
           },
 
           a({ children, href, ...props }) {
+            let target: string | undefined = undefined;
+            let label: React.ReactNode = children;
+
+            // --- Extract the optional target
+            if (typeof children === "string") {
+              const match = children.match(/^(.*)\|\s*target\s*=\s*([_a-zA-Z0-9-]+)\s*$/);
+              if (match) {
+                label = match[1].trim();
+                target = match[2];
+              }
+            }
+
             return (
-              <LocalLink to={href} {...(props as any)}>
-                {children}
-              </LocalLink>
+              <LinkNative to={href} target={target} {...(props as any)}>
+                {label}
+              </LinkNative>
             );
           },
+
           // TODO: somehow get the label from the containing li element
           input({ disabled, checked }) {
             return (

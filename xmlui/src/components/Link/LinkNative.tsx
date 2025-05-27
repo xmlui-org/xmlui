@@ -34,7 +34,7 @@ type Props = {
   >
 >;
 
-export const LocalLink = forwardRef(function LocalLink(
+export const LinkNative = forwardRef(function LinkNative(
   props: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
