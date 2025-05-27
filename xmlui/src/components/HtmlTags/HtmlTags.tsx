@@ -2,7 +2,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./HtmlTags.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { LocalLink } from "../Link/LinkNative";
+import { LinkNative } from "../Link/LinkNative";
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { PropsTrasform } from "../../components-core/utils/extractParam";
@@ -34,9 +34,9 @@ export const htmlATagRenderer = createComponentRenderer(
     const { disabled } = p.asOptionalBoolean("disabled");
     const { href, ...rest } = p.asRest();
     return (
-      <LocalLink to={href} disabled={disabled ?? false} style={layoutCss} {...rest}>
+      <LinkNative to={href} disabled={disabled ?? false} style={layoutCss} {...rest}>
         {renderChild(node.children)}
-      </LocalLink>
+      </LinkNative>
     );
   },
 );

@@ -500,6 +500,20 @@ $THEME-VAR-PREFIX: xmlui;
 }
 
 
+@mixin withMaxScreenSize($maxScreenSize) {
+  $query: "";
+  @for $i from 0 through $maxScreenSize {
+    @if $query == "" {
+      $query: "style(--screenSize: #{$i})";
+    } @else {
+      $query: "#{$query} or style(--screenSize: #{$i})";
+    }
+  }
+
+  @container (#{$query}) {
+    @content;
+  }
+}
 
 // =====================================================================================================================
 // CSS variables for miscellaneous shadows

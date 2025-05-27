@@ -187,8 +187,10 @@ export function ApiBoundComponent({
           props._data_url = operation.url;
         }
       }
-      props[key] = `{ ${loaderUid}.value }`;
-      props.loading = `{${loaderUid}.inProgress === undefined ? true : ${loaderUid}.inProgress}`;
+      //illesg really experimental brutal hack
+      const prefetchPathWithoutBindingExpression = operation.url?.trim().startsWith("{") ? operation.url?.trim().substring(1, operation.url.length - 1) : `'${operation.url}'`;
+      props[key] = `{ ${loaderUid}.value || ( appGlobals.prefetchedContent[${prefetchPathWithoutBindingExpression}] || appGlobals.prefetchedContent['/' + ${prefetchPathWithoutBindingExpression}] ) }`;
+      props.loading = `{ ${loaderUid}.inProgress === undefined ? true : ${loaderUid}.inProgress}`;
       props.pageInfo = `{${loaderUid}.pageInfo}`;
       events.requestFetchPrevPage = `${loaderUid}.fetchPrevPage()`;
       events.requestFetchNextPage = `${loaderUid}.fetchNextPage()`;

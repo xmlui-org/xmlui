@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.9.41",
+  "version": "0.9.42",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -111,7 +111,7 @@
     "@babel/core": "7.19.6",
     "@babel/preset-env": "7.19.4",
     "@babel/preset-typescript": "7.18.6",
-    "@playwright/test": "1.50.1",
+    "@playwright/test": "1.52.0",
     "@rollup/pluginutils": "5.1.0",
     "@types/adm-zip": "0.5.4",
     "@types/glob": "7.2.0",

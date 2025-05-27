@@ -5,7 +5,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dEnabled, dLabel } from "../metadata-helpers";
 import { LinkTargetMd } from "../abstractions";
-import { LocalLink } from "./LinkNative";
+import { LinkNative } from "./LinkNative";
 
 const COMP = "Link";
 
@@ -67,7 +67,7 @@ export const localLinkComponentRenderer = createComponentRenderer(
   LinkMd,
   ({ node, extractValue, renderChild, layoutCss }) => {
     return (
-      <LocalLink
+      <LinkNative
         to={extractValue(node.props.to)}
         icon={extractValue(node.props.icon)}
         active={extractValue.asOptionalBoolean(node.props.active, false)}
@@ -78,7 +78,7 @@ export const localLinkComponentRenderer = createComponentRenderer(
         {node.props.label
           ? extractValue.asDisplayText(node.props.label)
           : renderChild(node.children)}
-      </LocalLink>
+      </LinkNative>
     );
   },
 );

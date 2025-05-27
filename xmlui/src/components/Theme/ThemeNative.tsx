@@ -109,6 +109,34 @@ export function Theme({
     if (!isRoot) {
       rangeClassName = `${fromClass} ~ *:has(~ .${toClass})`;
       css += `color: var(${getVarKey("textColor-primary")});`;
+    } else {
+      css += `--screenSize: 0;`;
+      const maxWidthPhone = getThemeVar("maxWidth-phone");
+      const maxWidthLandscapePhone = getThemeVar("maxWidth-landscape-phone");
+      const maxWidthTablet = getThemeVar("maxWidth-tablet");
+      const maxWidthDesktop = getThemeVar("maxWidth-desktop");
+      const maxWidthLargeDesktop = getThemeVar("maxWidth-large-desktop");
+      const mediaClasses = ` @media (min-width: calc(${maxWidthPhone} + 1px)) {
+        --screenSize: 1;
+      }
+
+      @media (min-width: calc(${maxWidthLandscapePhone} + 1px)) {
+          --screenSize: 2;
+      }
+  
+      @media (min-width: calc(${maxWidthTablet} + 1px)) {
+          --screenSize: 3;
+      }
+  
+      @media (min-width: calc(${maxWidthDesktop} + 1px)) {
+          --screenSize: 4;
+      }
+  
+      @media (min-width: calc(${maxWidthLargeDesktop} + 1px)) {
+          --screenSize: 5;
+      }
+    `;
+      css += mediaClasses;
     }
     return {
       className,
@@ -117,7 +145,7 @@ export function Theme({
       toClass,
       css,
     };
-  }, [isRoot, themeCssVars, themeTone]);
+  }, [isRoot, themeCssVars, themeTone, getThemeVar]);
 
   // useInsertionEffect(() => {
   //   //PERF OPT IDEA: don't inject the css content that we already have

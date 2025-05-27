@@ -28,6 +28,9 @@ export const ImageMd = createMetadata({
       `This property sets a preferred aspect ratio for the image, which will be used in the ` +
         `calculation of auto sizes and some other layout functions.`,
     ),
+    inline: d(
+      `When set to true, the image will be displayed as an inline element instead of a block element.`
+    ),
     animation: d(`The animation object to be applied to the component`),
   },
   events: {
@@ -46,6 +49,7 @@ export const imageComponentRenderer = createComponentRenderer(
         alt={extractValue(node.props.alt)}
         fit={extractValue(node.props.fit)}
         lazyLoad={extractValue.asOptionalBoolean(node.props.lazyLoad)}
+        inline={extractValue.asOptionalBoolean(node.props.inline)}
         aspectRatio={extractValue(node.props.aspectRatio)}
         style={layoutCss}
         animation={extractValue(node.props.animation)}
