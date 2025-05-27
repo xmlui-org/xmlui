@@ -14,10 +14,11 @@ type Props = {
   lazyLoad?: boolean;
   aspectRatio?: string;
   animation?: object;
+  inline?: boolean;
 } & Pick<HTMLAttributes<HTMLImageElement>, "onClick">;
 
 export const Image = forwardRef(function Img(
-  { src, alt, fit = "contain", style, onClick, aspectRatio, lazyLoad }: Props,
+  { src, alt, fit = "contain", style, onClick, aspectRatio, lazyLoad, inline }: Props,
   ref,
 ) {
   return (
@@ -29,7 +30,14 @@ export const Image = forwardRef(function Img(
       className={classnames(styles.img, {
         [styles.clickable]: !!onClick,
       })}
-      style={{ objectFit: fit, boxShadow: "none", ...style, flexShrink: 1, aspectRatio: aspectRatio }}
+      style={{ 
+        objectFit: fit, 
+        boxShadow: "none", 
+        ...style, 
+        flexShrink: 1, 
+        aspectRatio: aspectRatio,
+        ...(inline ? { display: 'inline' } : {})
+      }}
       onClick={onClick}
     />
   );
