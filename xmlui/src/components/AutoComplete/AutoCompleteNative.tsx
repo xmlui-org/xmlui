@@ -113,6 +113,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const observer = useRef<ResizeObserver>();
   const generatedId = useId();
   const inputId = id || generatedId;
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -140,6 +141,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     (selectedValue: string) => {
       if (multi) {
         setInputValue("");
+        setSearchTerm("");
       } else {
         setOpen(true);
       }
@@ -164,6 +166,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     if (!multi) {
       const label = Array.from(options).find((o) => `${o.value}` === `${value}`)?.label;
       setInputValue(label ? label + "" : "");
+      setSearchTerm("");
     }
   }, [multi, options, value]);
 
@@ -286,6 +289,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                 className={styles.command}
                 filter={(value, search, keywords) => {
                   if (readOnly) return 1;
+                  if (!searchTerm || searchTerm.trim() === "") return 1;
                   const extendedValue = value + " " + keywords.join(" ");
                   if (extendedValue.toLowerCase().includes(search.toLowerCase())) return 1;
                   return 0;
@@ -333,6 +337,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       onValueChange={(value) => {
                         setOpen(true);
                         setInputValue(value);
+                        setSearchTerm(value);
                       }}
                       onFocus={() => {
                         onFocus();
