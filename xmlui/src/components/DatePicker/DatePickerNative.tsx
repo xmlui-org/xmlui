@@ -1,9 +1,8 @@
 import { type CSSProperties, useId } from "react";
-import { forwardRef, useRef, useCallback, useEffect, useMemo, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
 import { format, parse, isValid, parseISO } from "date-fns";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 import styles from "./DatePicker.module.scss";
 

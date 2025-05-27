@@ -42,6 +42,9 @@ export const AutoCompleteMd = createMetadata({
     required: dRequired(),
     readOnly: dReadonly(),
     enabled: dEnabled(),
+    creatable: d(
+      `This property allows the user to create new items that are not present in the list of options.`,
+    ),
     validationStatus: dValidationStatus(),
     label: dLabel(),
     labelPosition: dLabelPosition("top"),
@@ -89,7 +92,7 @@ export const AutoCompleteMd = createMetadata({
     [`minHeight-Input`]: "39px",
     [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
     [`fontSize-${COMP}-badge`]: "$fontSize-small",
-    [`paddingHorizontal-${COMP}-badge`]: "$space-1",
+    [`paddingHorizontal-${COMP}-badge`]: "$space-2",
     [`paddingVertical-${COMP}-badge`]: "$space-1",
     [`backgroundColor-${COMP}-badge--hover`]: "$color-primary-400",
     [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
@@ -118,6 +121,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         updateState={updateState}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
+        creatable={extractValue.asOptionalBoolean(node.props.creatable)}
         label={extractValue(node.props.label)}
         labelPosition={extractValue(node.props.labelPosition)}
         labelWidth={extractValue(node.props.labelWidth)}
@@ -132,6 +136,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
+        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         optionRenderer={
           node.props.optionTemplate
             ? (item) => {

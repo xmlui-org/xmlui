@@ -38,6 +38,7 @@ import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { OptionContext, useOption } from "./OptionContext";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import { HiddenOption } from "./HiddenOption";
 
 export type SingleValueType = string | number;
 export type ValueType = SingleValueType | SingleValueType[];
@@ -585,30 +586,6 @@ export const ComboboxOption = forwardRef(function Combobox(
     </CmdItem>
   );
 });
-
-export function HiddenOption(option: Option) {
-  const { optionRenderer, label } = option;
-  const { onOptionRemove, onOptionAdd } = useOption();
-  const [node, setNode] = useState(null);
-  const opt: Option = useMemo(() => {
-    return {
-      ...option,
-      label: label ?? node?.textContent ?? "",
-      keywords: [node?.textContent ?? ""],
-    };
-  }, [option, node]);
-
-  useEffect(() => {
-    onOptionAdd(opt);
-    return () => onOptionRemove(opt);
-  }, [opt, onOptionAdd, onOptionRemove]);
-
-  return (
-    <div ref={(el) => setNode(el)} style={{ display: "none" }}>
-      {optionRenderer?.({})}
-    </div>
-  );
-}
 
 const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
   (option, ref) => {
