@@ -123,6 +123,16 @@ export function Loader({
           console.log(`  Method: ${loader.props.method || 'GET'}`);
           console.log(`  Triggered by queryKey:`, queryKey);
           console.log(`  Timestamp: ${new Date().toISOString()}`);
+          
+          // Log to SQLite
+          if (typeof window !== 'undefined' && (window as any).logReactivityEvent) {
+            (window as any).logReactivityEvent(
+              'api_call_start',
+              loader.props.id || loader.uid,
+              `${loader.props.method || 'GET'} ${resolvedUrl}`,
+              { requestId, url: resolvedUrl, method: loader.props.method || 'GET', queryKey }
+            );
+          }
         }
         
         try {
@@ -134,6 +144,16 @@ export function Loader({
             console.log(`  Duration: ${duration.toFixed(2)}ms`);
             console.log(`  Response size: ${JSON.stringify(newVar).length} chars`);
             console.log(`  Data:`, newVar);
+            
+            // Log to SQLite
+            if (typeof window !== 'undefined' && (window as any).logReactivityEvent) {
+              (window as any).logReactivityEvent(
+                'api_call_success',
+                loader.props.id || loader.uid,
+                `${duration.toFixed(2)}ms - ${JSON.stringify(newVar).length} chars`,
+                { requestId, duration, responseSize: JSON.stringify(newVar).length, url: resolvedUrl }
+              );
+            }
           }
           
           if (newVar === undefined) {
@@ -189,8 +209,8 @@ export function Loader({
     console.log('  This may trigger appContext updates affecting other components');
     
     // Test the new SQLite logging
-    if (typeof window !== 'undefined' && window.logReactivityEvent) {
-      window.logReactivityEvent(
+    if (typeof window !== 'undefined' && (window as any).logReactivityEvent) {
+      (window as any).logReactivityEvent(
         'datasource_status_change',
         loader.props.id || loader.uid,
         `${prevStatus} → ${status}`,
