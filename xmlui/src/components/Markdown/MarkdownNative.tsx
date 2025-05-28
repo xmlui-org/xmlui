@@ -108,17 +108,105 @@ export const Markdown = memo(function Markdown({
           img({ children, node, ...props }) {
             const src = props?.src;
             const popOut = props?.["data-popout"];
+            const alt = props?.alt || "";
+            
+            // --- Determine if the image should be inline or block
+            let isInline = false;
+            
+            if (node) {
+              const nodeData = node as any;
+              
+              // --- Case 1: Image is part of a larger paragraph with other content
+              if (nodeData.parent && nodeData.parent.type === 'paragraph') {
+                if (nodeData.parent.children && nodeData.parent.children.length > 1) {
+                  // There are siblings in this paragraph - definitely inline
+                  isInline = true;
+                } else {
+                  // --- It's the only child in the paragraph, check if there's text before/after
+                  // --- by examining the parent of the paragraph
+                  const paragraphParent = nodeData.parent.parent;
+                  if (paragraphParent && paragraphParent.children) {
+                    const paragraphIndex = paragraphParent.children.indexOf(nodeData.parent);
+                    if (paragraphIndex > 0 || paragraphIndex < paragraphParent.children.length - 1) {
+                      // --- There are siblings before/after this paragraph, likely inline
+                      isInline = true;
+                    }
+                  }
+                }
+              }
+              
+              // --- Case 2: Image is inside a blockquote or other container with text
+              if (!isInline && nodeData.parent && 
+                  (nodeData.parent.type === 'paragraph' || 
+                   nodeData.parent.type === 'blockquote' || 
+                   nodeData.parent.type === 'emphasis' ||
+                   nodeData.parent.type === 'strong')) {
+
+                // --- Look for any parent nodes with other text content
+                let currentParent = nodeData.parent;
+                while (currentParent) {
+                  if (currentParent.children && currentParent.children.some(
+                    (child: any) => child !== nodeData && 
+                    ((child.type === 'text' && child.value && child.value.trim().length > 0) || 
+                     child.type !== 'text')
+                  )) {
+                    isInline = true;
+                    break;
+                  }
+                  currentParent = currentParent.parent;
+                }
+              }
+              
+              // --- For images without context clues, use file type and size as heuristics
+              // --- Case 3: Image looks like an icon based on filename or size
+              if (!isInline) {
+                // --- Check if the image is small enough to be considered an icon
+                // --- Small images are likely icons
+                const imgSize = props?.width || props?.height;
+                isInline = imgSize === undefined ? true : parseInt(imgSize.toString()) < 512;
+                
+                // Images with icon-like filenames
+                if (src && (
+                    src.includes('icon') || 
+                    src.endsWith('.svg') || 
+                    src.endsWith('.ico') || 
+                    src.includes('badge') ||
+                    src.includes('logo')
+                )) {
+                  isInline = true;
+                }
+              }
+            }
+            
+            // Apply styling based on whether image should be inline or block
+            const imgStyle = {
+              ...(props.style || {}),
+              display: isInline ? 'inline' : 'block',
+            };
+            
             if (popOut) {
               return (
                 <a href={src} target="_blank" rel="noreferrer">
-                  <img className={htmlTagStyles.htmlImage} {...props}>
+                  <img 
+                    src={src} 
+                    alt={alt}
+                    className={htmlTagStyles.htmlImage}
+                    style={imgStyle}
+                    {...props}
+                  >
                     {children}
                   </img>
                 </a>
               );
             } else {
               return (
-                <img className={htmlTagStyles.htmlImage} {...props}>
+                <img 
+                  src={src} 
+                  alt={alt}
+                  className={htmlTagStyles.htmlImage}
+                  style={imgStyle}
+                  {...props}
+                >
                   {children}
                 </img>
               );
