@@ -32,7 +32,7 @@
 
             <NavGroup label="Reference" iconVerticalCollapsed="chevronright">
 
-                <RecursiveNavTree items="{ window.getComponentsList(appGlobals.navPanelContent) }"/>
+                <RecursiveNavTree items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
 
                 <NavGroup label="Themes" iconVerticalCollapsed="chevronright">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props" />
