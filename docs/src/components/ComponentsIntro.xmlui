@@ -1,6 +1,7 @@
 <Component name="ComponentsIntro">
 
-  <Markdown><![CDATA[
+  <DocumentPage>
+    <Markdown><![CDATA[
 # Components
 
 We've already seen a number of XMLUI components in action: [DataSource](/components/DataSource),
@@ -164,5 +165,5 @@ Another way to keep your markup clean: rely on XMLUI's layout and style engine t
 ]]></Markdown>
 
   <Link icon="arrowright" label="Themes" to="/themes-intro" />
-
+  </DocumentPage>
 </Component>
