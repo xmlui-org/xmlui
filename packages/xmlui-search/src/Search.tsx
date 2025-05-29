@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { LocalLink, TextBox, VisuallyHidden, Text } from "xmlui";
+import { LinkNative, TextBox, VisuallyHidden, Text } from "xmlui";
 import Fuse, { type RangeTuple, type FuseResult, type FuseResultMatch } from "fuse.js";
 import styles from "./Search.module.scss";
 
@@ -195,7 +195,7 @@ function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: Sear
   return (
     <>
       <li key={`${item.path}-${idx}`} className={`${styles.item} ${styles.header}`}>
-        <LocalLink
+        <LinkNative
           to={item.path}
           onClick={onClick}
           style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
@@ -212,7 +212,7 @@ function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: Sear
                 </Text>
               )}
           </div>
-        </LocalLink>
+        </LinkNative>
       </li>
       {matches?.content?.indices &&
         formatContentSnippet(item.content, matches.content.indices, maxContentMatchNumber).map(
@@ -221,13 +221,13 @@ function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: Sear
               key={`${item.path}-${idx}-${snipIdx}`}
               className={`${styles.item} ${styles.content}`}
             >
-              <LocalLink
+              <LinkNative
                 to={item.path}
                 onClick={onClick}
                 style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
               >
                 <Text>{snippet}</Text>
-              </LocalLink>
+              </LinkNative>
             </li>
           ),
         )}
