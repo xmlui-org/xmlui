@@ -441,12 +441,31 @@ export function App({
       throw new Error("layout type not supported: " + safeLayout);
   }
 
+  // Memoize the rendered nav panel in drawer to prevent unnecessary re-renders
+  const memoizedNavPanelInDrawer = useMemo(
+    () => renderChild && navPanelDef ? renderChild(navPanelDef, { inDrawer: true }) : null,
+    [renderChild, navPanelDef]
+  );
+
+  // Memoize the helmet component
+  const memoizedHelmet = useMemo(
+    () => name !== undefined ? <Helmet defaultTitle={name} titleTemplate={`%s | ${name}`} /> : null,
+    [name]
+  );
+
+  // Memoize the onOpenChange callback
+  const handleOpenChange = useCallback((open) => {
+    setDrawerVisible(open);
+  }, []);
+  
   return (
     <>
-      {name !== undefined && <Helmet defaultTitle={name} titleTemplate={`%s | ${name}`} />}
+      {memoizedHelmet}
       <AppLayoutContext.Provider value={layoutContextValue}>
-        <Sheet open={drawerVisible} onOpenChange={(open) => setDrawerVisible(open)}>
-          <SheetContent side={"left"}>{renderChild(navPanelDef, { inDrawer: true })}</SheetContent>
+        <Sheet open={drawerVisible} onOpenChange={handleOpenChange}>
+          <SheetContent side={"left"}>
+            {memoizedNavPanelInDrawer}
+          </SheetContent>
         </Sheet>
         {content}
       </AppLayoutContext.Provider>
