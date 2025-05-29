@@ -103,7 +103,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [inputElement, setInputElement] = useState<HTMLInputElement | null>(null);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [options, setOptions] = useState(new Set<Option>());
@@ -114,6 +114,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
   const generatedId = useId();
   const inputId = id || generatedId;
   const [searchTerm, setSearchTerm] = useState("");
+  const [focused, setFocused] = useState(false);
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -136,6 +137,11 @@ export const AutoComplete = forwardRef(function AutoComplete(
       observer.current?.disconnect();
     };
   }, [referenceElement]);
+
+  const selectedOption = useMemo(() => {
+    if (!value) return null;
+    return Array.from(options).find((o) => `${o.value}` === `${value}`);
+  }, [value, options]);
 
   const toggleOption = useCallback(
     (selectedValue: string) => {
@@ -164,11 +170,10 @@ export const AutoComplete = forwardRef(function AutoComplete(
 
   useEffect(() => {
     if (!multi) {
-      const label = Array.from(options).find((o) => `${o.value}` === `${value}`)?.label;
-      setInputValue(label ? label + "" : "");
+      setInputValue(selectedOption?.label || "");
       setSearchTerm("");
     }
-  }, [multi, options, value]);
+  }, [multi, selectedOption]);
 
   // Clear selected value
   const clearValue = useCallback(() => {
@@ -190,33 +195,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
     });
   }, []);
 
-  const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-    if (
-      dropdownRef.current &&
-      !dropdownRef.current.contains(event.target as Node) &&
-      inputRef.current &&
-      !inputRef.current.contains(event.target as Node)
-    ) {
-      setOpen(false);
-      inputRef.current.blur();
-    }
-  };
-
-  useEffect(() => {
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("touchend", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchend", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchend", handleClickOutside);
-    };
-  }, [open]);
-
   // Render the "empty list" message
   const emptyListNode = useMemo(
     () =>
@@ -231,8 +209,8 @@ export const AutoComplete = forwardRef(function AutoComplete(
 
   // Register component API for external interactions
   const focus = useCallback(() => {
-    inputRef?.current?.focus();
-  }, [inputRef]);
+    inputElement?.focus();
+  }, [inputElement]);
 
   const setValue = useEvent((newValue: string) => {
     updateState({ value: Array.isArray(newValue) ? newValue : [newValue] });
@@ -304,7 +282,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                     style={{ width: "100%", ...style }}
                     className={classnames(styles.badgeListWrapper, styles[validationStatus], {
                       [styles.disabled]: !enabled,
-                      [styles.focused]: document.activeElement === inputRef.current,
+                      [styles.focused]: focused,
                     })}
                   >
                     {multi && (
@@ -312,7 +290,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         {Array.isArray(value) &&
                           value.map((v) => (
                             <span key={v} className={styles.badge}>
-                              {Array.from(options).find((o) => `${o.value}` === `${v}`)?.label}
+                              {selectedOption?.label}
                               {!readOnly && (
                                 <Icon
                                   name="close"
@@ -331,7 +309,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       id={id}
                       readOnly={readOnly}
                       autoFocus={autoFocus}
-                      ref={inputRef}
+                      ref={setInputElement}
                       value={inputValue}
                       disabled={!enabled}
                       onValueChange={(value) => {
@@ -340,16 +318,25 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         setSearchTerm(value);
                       }}
                       onFocus={() => {
+                        setFocused(true);
                         onFocus();
                       }}
                       onBlur={() => {
+                        setFocused(false);
+                        if (inputValue === "") {
+                          clearValue();
+                        } else {
+                          if (selectedOption && inputValue !== selectedOption.label) {
+                            setInputValue(selectedOption.label);
+                          }
+                        }
                         onBlur();
                       }}
                       placeholder={placeholder}
                       className={styles.commandInput}
                     />
                     <div className={styles.actions}>
-                      {value?.length > 0 && enabled && !readOnly && (
+                      {value?.length > 0 && enabled && !readOnly && focused && (
                         <span
                           onClick={(event) => {
                             event.stopPropagation();
@@ -377,27 +364,21 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       <CmdList
                         role="listbox"
                         className={styles.commandList}
-                        onMouseUp={() => {
-                          inputRef?.current?.focus();
-                        }}
                         style={{ height: dropdownHeight }}
                       >
                         <CmdEmpty>{emptyListNode}</CmdEmpty>
                         {creatable && <CreatableItem />}
                         <CmdGroup>
-                          {Array.from(options).map(
-                            ({ value, label, enabled, keywords, labelText }) => (
-                              <AutoCompleteOption
-                                key={value}
-                                value={value}
-                                label={label}
-                                enabled={enabled}
-                                keywords={keywords}
-                                labelText={labelText}
-                                readOnly={readOnly}
-                              />
-                            ),
-                          )}
+                          {Array.from(options).map(({ value, label, enabled, keywords }) => (
+                            <AutoCompleteOption
+                              key={value}
+                              value={value}
+                              label={label}
+                              enabled={enabled}
+                              keywords={keywords}
+                              readOnly={readOnly}
+                            />
+                          ))}
                         </CmdGroup>
                       </CmdList>
                     </PopoverContent>
@@ -433,7 +414,7 @@ function CreatableItem() {
         e.stopPropagation();
       }}
       onSelect={(value) => {
-        const newOption = { value, label: value, enabled: true, labelText: value };
+        const newOption = { value, label: value, enabled: true };
         onOptionAdd(newOption);
         onChange(value);
         setOpen(false);
