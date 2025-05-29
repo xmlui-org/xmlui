@@ -4,6 +4,10 @@ import type {
 	TextDocumentPositionParams,
 	InitializeResult,
   HoverParams,
+  TextDocumentContentChangeEvent,
+  TextDocumentChangeEvent,
+  Diagnostic,
+  Position,
 } from 'vscode-languageserver';
 import {
   MarkupKind,
@@ -16,8 +20,9 @@ import collectedComponentMetadata from "./xmlui-metadata-generated.mjs";
 import type {XmluiCompletionItem} from "./services/completion";
 import { handleCompletion, handleCompletionResolve} from "./services/completion";
 import {handleHover} from "./services/hover";
-import { createXmlUiParser, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
+import { createXmlUiParser, Error, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
 import { MetadataProvider, type ComponentMetadataCollection } from './services/common/metadata-utils';
+import { getDiagnostics } from './services/diagnostic';
 
 const metaByComp = collectedComponentMetadata as ComponentMetadataCollection;
 const metadataProvider = new MetadataProvider(metaByComp);
@@ -52,12 +57,10 @@ export function start(connection: Connection){
 	const result: InitializeResult = {
 		capabilities: {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
-			// Tell the client that this server supports code completion.
 			completionProvider: {
 				resolveProvider: true,
 				triggerCharacters: ["<", "/"],
 			},
-
 			hoverProvider: true,
 		}
 	};
@@ -84,7 +87,6 @@ export function start(connection: Connection){
   });
 
   connection.onCompletion(async ({ position, textDocument }: TextDocumentPositionParams) => {
-    connection.console.log(`Received request completion`);
     const document = documents.get(textDocument.uri);
     if (!document) {
       return [];
@@ -98,7 +100,6 @@ export function start(connection: Connection){
   });
 
   connection.onHover(({ position, textDocument }: HoverParams) => {
-    connection.console.log(`Received request hover`);
     const document = documents.get(textDocument.uri);
     if (!document) {
       return null;
@@ -136,6 +137,26 @@ export function start(connection: Connection){
       getText: parser.getText,
     });
     return { parseResult, getText: parser.getText };
+  }
+  documents.onDidClose(({document}) => {
+    parsedDocuments.delete(document.uri)
+  });
+
+  documents.onDidChangeContent(handleDocunentContentChange);
+
+  function handleDocunentContentChange({document}: {document: TextDocument}){
+    const { parseResult } = parseDocument(document);
+    const ctx = {
+      parseResult,
+      offsetToPos: (offset) => document.positionAt(offset),
+    }
+
+    const diagnostics = getDiagnostics(ctx);
+    connection.sendDiagnostics({
+      version: document.version,
+      uri: document.uri,
+      diagnostics
+    })
   }
 
   // Make the text document manager listen on the connection
