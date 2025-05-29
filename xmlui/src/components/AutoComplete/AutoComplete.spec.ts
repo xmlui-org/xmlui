@@ -239,10 +239,8 @@ test("readOnly prevents changing selection", async ({
   const driver = await createAutoCompleteDriver();
   await driver.click();
 
-  await driver.selectLabel("Clark Kent");
-
   // Selection should not change
-  await expect(page.getByText("Clark Kent")).not.toBeVisible();
+  await expect(page.getByRole("listbox")).not.toBeVisible();
 });
 
 test("disabled state prevents interaction", async ({

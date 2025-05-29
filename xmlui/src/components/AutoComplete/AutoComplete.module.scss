@@ -138,6 +138,10 @@ $themeVars: t.composeBorderVars($themeVars, $component);
   justify-content: space-between;
 }
 
+.action {
+  cursor: pointer;
+}
+
 .autoCompleteEmpty {
   display: flex;
   gap: .2rem;
