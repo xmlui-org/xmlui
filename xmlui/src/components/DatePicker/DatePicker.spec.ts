@@ -205,24 +205,24 @@ test.fixme("toDate restricts selectable dates", async ({ initTestBed, page }) =>
   await expect(todayCell).toHaveClass(/disabled/);
 });
 
-test.skip("disabledDates prevents selection of specific dates", async ({
+test("disabledDates prevents selection of specific dates", async ({
   initTestBed,
   page,
   createDatePickerDriver,
 }) => {
   const today = new Date();
-  const todayFormatted = format(today, "MM/dd/yyyy");
+  const testDayFormatted = format(new Date(today.getFullYear(), today.getMonth(), 15), "MM/dd/yyyy");
 
   await initTestBed(`
-    <DatePicker disabledDates="{['${todayFormatted}']}" />
+    <DatePicker disabledDates="{['${testDayFormatted}']}" />
   `);
 
   const driver = await createDatePickerDriver();
-  await driver.toggleDropdownVisibility();
+  await driver.click();
 
-  // Today should be disabled
-  const todayDay = today.getDate().toString();
-  await driver.pickADay(todayDay);
+  // Test day should be disabled
+  const testDay = new Date(today.getFullYear(), today.getMonth(), 15).getDate().toString();
+  await driver.pickADay(testDay);
 
   await expect(page.getByRole("menu")).toBeVisible();
 });
