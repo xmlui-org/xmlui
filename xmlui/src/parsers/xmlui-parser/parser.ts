@@ -154,12 +154,15 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   function parseTag() {
     startNode();
     bump(SyntaxKind.OpenNodeStart);
-
+    let errInName = false;
     let openTagName: Node | undefined = undefined;
     if (at(SyntaxKind.Identifier)) {
+      //todo: here to continue
       openTagName = parseTagName();
     } else {
       error(Diag_Tag_Identifier_Expected);
+      advance([SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart]);
+      errInName = true;
     }
 
     parseAttrList();
@@ -333,6 +336,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     return false;
   }
 
+  /** Bumps over the next token and marks it as an error node while adding an error to the error list*/
+  function errorAndBump(errCodeAndMsg: GeneralDiagnosticMessage) {
+    errRecover(errCodeAndMsg, []);
+  }
+
   function error({ code, message, category }: GeneralDiagnosticMessage) {
     const { pos, end } = peek();
     errors.push({
@@ -357,6 +365,15 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       end,
     });
   }
+
+  function advance(to: SyntaxKind[]) {
+    for (
+      let token = peek();
+      token.kind !== SyntaxKind.EndOfFileToken && !to.includes(token.kind);
+      token = bumpAny()
+    ){}
+  }
+
 
   function peek(inContent: boolean = false) {
     if (peekedToken !== undefined) {
@@ -563,10 +580,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  /** Bumps over the next token and marks it as an error node while adding an error to the error list*/
-  function errorAndBump(errCodeAndMsg: GeneralDiagnosticMessage) {
-    errRecover(errCodeAndMsg, []);
-  }
 
   function abandonNode() {
     const parentNode = parents[parents.length - 1];

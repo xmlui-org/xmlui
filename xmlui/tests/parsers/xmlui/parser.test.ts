@@ -354,6 +354,25 @@ describe("Xmlui parser - expected errors", () => {
     const { errors } = parseSource("<Stack></NotStack>");
     expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
   });
+
+  it("bad tokens in tag name and attrs result in 1 error", () => {
+    const { errors } = parseSource("<?name :></A>");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.expTagIdent);
+  });
+
+  it("bad token in attrList result in 1 error", () => {
+    const { errors } = parseSource("<A := ! '' ></A>");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.expAttrIdent);
+  });
+
+  it("missing > results 1 error", () => {
+    const { errors } = parseSource("<A <B/> </A>");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.expEndOrClose);
+  });
+
 });
 
 describe("Xmlui parser - child nodes", () => {
