@@ -119,9 +119,8 @@ function buildTreeFromPathsAndMeta(
       let existingNode = currentLevel?.find((node) => node.name === part);
 
       if (!existingNode) {
-        // Look up title/type in meta
+        // --- Look up title/type in meta
         const meta = metaByFolder[currentPath + "/_meta.json"];
-        console.log("meta", meta, currentPath + "/_meta.json");
         let title, type;
 
         if (meta?.default?.[part]) {
