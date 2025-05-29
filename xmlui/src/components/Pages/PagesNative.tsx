@@ -1,4 +1,4 @@
-import { CSSProperties, ReactNode, useMemo } from "react";
+import { CSSProperties, ReactNode, useContext, useMemo } from "react";
 import { Navigate, Route, Routes, useParams } from "@remix-run/react";
 import classnames from "classnames";
 
@@ -10,19 +10,21 @@ import styles from "./Pages.module.scss";
 
 // --- We need this component to make sure all the child routes are wrapped in a
 // --- container and  this way they can access the routeParams
+type RouteWrapperProps = {
+  childRoute?: ComponentDef | Array<ComponentDef>;
+  renderChild: RenderChildFn;
+  layoutContext?: LayoutContext;
+  style?: CSSProperties;
+  uid?: string;
+}
+
 export function RouteWrapper({
   childRoute = EMPTY_ARRAY,
   renderChild,
   layoutContext,
   style,
   uid,
-}: {
-  childRoute?: ComponentDef | Array<ComponentDef>;
-  renderChild: RenderChildFn;
-  layoutContext?: LayoutContext;
-  style?: CSSProperties;
-  uid?: string;
-}) {
+}: RouteWrapperProps) {
   const params = useParams();
 
   //we need to wrap the child route in a container to make sure the route params are available.

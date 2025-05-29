@@ -14,6 +14,10 @@ export const PageMd = createMetadata({
   props: {
     //TODO illesg rename to path
     url: d(`The URL of the route associated with the content.`),
+    navLabel: d(
+      "The label of the page that is displayed in the navigation panel. If provided, the " +
+        "a new entry will be added to the navigation panel.",
+    ),
   },
 });
 
