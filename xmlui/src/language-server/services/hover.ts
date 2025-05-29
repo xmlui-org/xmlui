@@ -7,6 +7,7 @@ import * as docGen from "./common/docs-generation";
 import type { ComponentMetadataCollection, MetadataProvider } from "./common/metadata-utils";
 import type { Hover,  Position } from "vscode-languageserver";
 import { MarkupKind } from "vscode-languageserver";
+import { offsetToPosRange } from "./common/lsp-utils";
 
 
 type SimpleHover = null | {
@@ -76,10 +77,7 @@ export function handleHover(ctx: HoverContex, position: number,): Hover {
       kind: MarkupKind.Markdown,
       value,
     },
-    range: {
-      start: ctx.offsetToPosition(range.pos),
-      end: ctx.offsetToPosition(range.end),
-    },
+    range: offsetToPosRange(ctx.offsetToPosition, range)
   };
 }
 

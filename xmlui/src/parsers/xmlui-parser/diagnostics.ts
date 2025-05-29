@@ -24,10 +24,10 @@ type DiagnosticMessageFromParser =
   | typeof Diag_Attr_Identifier_Expected;
 
 export enum DiagnosticCategory {
-  Warning,
-  Error,
-  Suggestion,
-  Message,
+  Error = 1,
+  Warning = 2,
+  Information = 3,
+  Hint = 4,
 }
 
 export enum ErrCodes {

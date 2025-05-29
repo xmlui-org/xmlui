@@ -1,4 +1,3 @@
-import { curry } from "lodash-es";
 import type { Node, GetText} from "../../../parsers/xmlui-parser";
 import { SyntaxKind } from "../../../parsers/xmlui-parser";
 
