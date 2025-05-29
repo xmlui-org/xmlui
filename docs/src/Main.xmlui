@@ -8,16 +8,14 @@
 
         <NavPanel>
 
-            <NavGroup label="Learn XMLUI" initiallyExpanded="{true}"
-                iconVerticalCollapsed="chevronright">
+            <NavGroup label="Learn XMLUI" initiallyExpanded="{true}">
                 <NavLink label="Introduction" to="/" />
                 <NavLink label="Reactive Data" to="/reactive-intro" />
                 <NavLink label="Components" to="/components-intro" />
                 <NavLink label="Themes" to="/themes-intro" />
             </NavGroup>
 
-            <NavGroup label="Create XMLUI Apps"
-                iconVerticalCollapsed="chevronright">
+            <NavGroup label="Create XMLUI Apps">
                 <NavLink label="App Structure" to="/appStructure" />
                 <NavLink label="Markup" to="/markup" />
                 <NavLink label="Code" to="/code" />
@@ -30,11 +28,11 @@
                 <NavLink label="User-defined Components" to="/userDefinedComponents" />
             </NavGroup>
 
-            <NavGroup label="Reference" iconVerticalCollapsed="chevronright">
+            <NavGroup label="Reference">
 
                 <RecursiveNavTree items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
 
-                <NavGroup label="Themes" iconVerticalCollapsed="chevronright">
+                <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props" />
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables" />
                     <NavLink label="Common Units" to="/styles-and-themes/common-units" />

@@ -9,6 +9,14 @@ import { appLayoutMd } from "./AppLayoutContext";
 import { App } from "./AppNative";
 import { useMemo, useRef } from "react";
 
+// --- Define a structure to represent navigation hierarchy
+interface NavHierarchyNode {
+  type: string;
+  label: string;
+  path?: string;
+  children?: NavHierarchyNode[];
+}
+
 const COMP = "App";
 
 export const AppMd = createMetadata({
@@ -267,7 +275,15 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
     });
 
     // --- Check if there is any extra NavPanel in Pages
-    const extraNavs = extractNavPanelFromPages();
+    const extraNavs = extractNavPanelFromPages(
+      Pages, 
+      NavPanel, 
+      processedNavRef, 
+      extractValue, 
+      parseHierarchyLabels, 
+      labelExistsInHierarchy, 
+      findOrCreateNavGroup
+    );
     
     // --- If we found extra navigation items
     if (extraNavs?.length) {
@@ -293,158 +309,6 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
       NavPanel,
       restChildren,
     };
-
-    function extractNavPanelFromPages(): ComponentDef[] | null {
-      // --- Skip extraction if we've already processed this navigation structure
-      // --- This prevents duplicate items when React renders twice in strict mode
-      if (!Pages || processedNavRef.current) return null;
-      
-      // --- Mark as processed
-      processedNavRef.current = true;
-
-      const extraNavs: ComponentDef[] = [];
-      
-      // --- Define a structure to represent navigation hierarchy
-      interface NavHierarchyNode {
-        type: string;
-        label: string;
-        path?: string;
-        children?: NavHierarchyNode[];
-      }
-      
-      // --- Root of navigation hierarchy
-      const navigationHierarchy: NavHierarchyNode[] = [];
-      
-      // --- Start processing the navigation tree if NavPanel exists
-      if (NavPanel?.children) {
-        processNavItems(NavPanel.children, navigationHierarchy);
-      }
-      
-      // --- Process Pages to create hierarchical navigation structure
-      Pages.children?.forEach((page) => {
-        if (page.type === "Page" && page.props.navLabel) {
-          const label = extractValue(page.props.navLabel);
-          const url = extractValue(page.props.url);
-          
-          // --- Parse hierarchy labels separated by unescaped pipe characters
-          const hierarchyLabels = parseHierarchyLabels(label);
-          
-          // --- Skip if we have no labels
-          if (hierarchyLabels.length === 0) {
-            return;
-          }
-          
-          // --- For a single level, just add a NavLink directly
-          if (hierarchyLabels.length === 1) {
-            // --- Check if this exact NavLink already exists in the navigation hierarchy
-            if (!labelExistsInHierarchy(hierarchyLabels[0], navigationHierarchy)) {
-              extraNavs.push({
-                type: "NavLink",
-                props: {
-                  label: hierarchyLabels[0],
-                  to: url
-                }
-              });
-            }
-            return;
-          }
-          
-          // --- For multi-level hierarchies, create NavGroups and a final NavLink
-          let currentLevel = extraNavs;
-          
-          // --- Create NavGroups for all levels except the last one
-          for (let i = 0; i < hierarchyLabels.length - 1; i++) {
-            const groupLabel = hierarchyLabels[i];
-            const navGroup = findOrCreateNavGroup(currentLevel, groupLabel);
-            
-            // --- Initialize children array if it doesn't exist
-            if (!navGroup.children) {
-              navGroup.children = [];
-            }
-            
-            // --- Move to the next level
-            currentLevel = navGroup.children;
-          }
-          
-          // --- Add the leaf NavLink to the deepest NavGroup
-          const leafLabel = hierarchyLabels[hierarchyLabels.length - 1];
-          
-          // --- Check if this NavLink already exists at this level
-          const existingNavLink = currentLevel.find(item => 
-            item.type === "NavLink" && 
-            item.props?.label === leafLabel
-          );
-          
-          if (!existingNavLink) {
-            currentLevel.push({
-              type: "NavLink",
-              props: {
-                label: leafLabel,
-                to: url
-              }
-            });
-          }
-        }
-      });
-      
-      return extraNavs;
-      
-      // --- Helper functions moved below the return statement ---
-      
-      // --- Process the entire navigation tree recursively and build hierarchy
-      function processNavItems(items: ComponentDef[], parentHierarchy: NavHierarchyNode[]) {
-        items.forEach((navItem) => {
-          // --- Process NavLink items
-          if (navItem.type === "NavLink") {
-            let itemLabel = navItem.props?.label;
-            let itemPath = navItem.props?.to;
-            
-            if (!itemLabel) {
-              if (navItem.children?.length === 1 && navItem.children[0].type === "TextNode") {
-                itemLabel = navItem.children[0].props.value;
-              }
-            }
-            
-            if (itemLabel) {
-              const labelValue = extractValue(itemLabel);
-              
-              // --- Add to hierarchy
-              parentHierarchy.push({
-                type: "NavLink",
-                label: labelValue,
-                path: itemPath ? extractValue(itemPath) : undefined
-              });
-            }
-          } 
-          // --- Process NavGroup items (which may contain nested NavLink or NavGroup items)
-          else if (navItem.type === "NavGroup") {
-            let groupLabel = navItem.props?.label;
-            
-            if (groupLabel) {
-              const labelValue = extractValue(groupLabel);
-              
-              // --- Create group node
-              const groupNode: NavHierarchyNode = {
-                type: "NavGroup",
-                label: labelValue,
-                children: []
-              };
-              
-              // --- Add to parent hierarchy
-              parentHierarchy.push(groupNode);
-              
-              // --- Recursively process children of the NavGroup
-              if (navItem.children && navItem.children.length > 0) {
-                processNavItems(navItem.children, groupNode.children);
-              }
-            } else if (navItem.children && navItem.children.length > 0) {
-              // --- If no label but has children, still process them under parent
-              processNavItems(navItem.children, parentHierarchy);
-            }
-          }
-        });
-      }      // Using the memoized helper functions from outside the scope
-    }
   }, [node.children, parseHierarchyLabels, labelExistsInHierarchy, findOrCreateNavGroup]);
 
   // --- Memoize all app props to prevent unnecessary re-renders
@@ -513,3 +377,158 @@ export const appRenderer = createComponentRenderer(
     );
   },
 );
+
+// --- Process the entire navigation tree recursively and build hierarchy
+function processNavItems(
+  items: ComponentDef[], 
+  parentHierarchy: NavHierarchyNode[],
+  extractValue: (value: any) => any
+) {
+  items.forEach((navItem) => {
+    // --- Process NavLink items
+    if (navItem.type === "NavLink") {
+      let itemLabel = navItem.props?.label;
+      let itemPath = navItem.props?.to;
+      
+      if (!itemLabel) {
+        if (navItem.children?.length === 1 && navItem.children[0].type === "TextNode") {
+          itemLabel = navItem.children[0].props.value;
+        }
+      }
+      
+      if (itemLabel) {
+        const labelValue = extractValue(itemLabel);
+        
+        // --- Add to hierarchy
+        parentHierarchy.push({
+          type: "NavLink",
+          label: labelValue,
+          path: itemPath ? extractValue(itemPath) : undefined
+        });
+      }
+    } 
+    // --- Process NavGroup items (which may contain nested NavLink or NavGroup items)
+    else if (navItem.type === "NavGroup") {
+      let groupLabel = navItem.props?.label;
+      
+      if (groupLabel) {
+        const labelValue = extractValue(groupLabel);
+        
+        // --- Create group node
+        const groupNode: NavHierarchyNode = {
+          type: "NavGroup",
+          label: labelValue,
+          children: []
+        };
+        
+        // --- Add to parent hierarchy
+        parentHierarchy.push(groupNode);
+        
+        // --- Recursively process children of the NavGroup
+        if (navItem.children && navItem.children.length > 0) {
+          processNavItems(navItem.children, groupNode.children, extractValue);
+        }
+      } else if (navItem.children && navItem.children.length > 0) {
+        // --- If no label but has children, still process them under parent
+        processNavItems(navItem.children, parentHierarchy, extractValue);
+      }
+    }
+  });
+}
+
+// --- Extract navigation panel items from Pages component
+function extractNavPanelFromPages(
+  Pages: ComponentDef,
+  NavPanel: ComponentDef | undefined,
+  processedNavRef: React.MutableRefObject<boolean>,
+  extractValue: (value: any) => any, 
+  parseHierarchyLabels: (labelText: string) => string[],
+  labelExistsInHierarchy: (searchLabel: string, hierarchy: NavHierarchyNode[]) => boolean,
+  findOrCreateNavGroup: (navItems: ComponentDef[], groupLabel: string) => ComponentDef
+): ComponentDef[] | null {
+  // --- Skip extraction if we've already processed this navigation structure
+  // --- This prevents duplicate items when React renders twice in strict mode
+  if (!Pages || processedNavRef.current) return null;
+  
+  // --- Mark as processed
+  processedNavRef.current = true;
+
+  const extraNavs: ComponentDef[] = [];
+  
+  // --- Root of navigation hierarchy
+  const navigationHierarchy: NavHierarchyNode[] = [];
+  
+  // --- Start processing the navigation tree if NavPanel exists
+  if (NavPanel?.children) {
+    processNavItems(NavPanel.children, navigationHierarchy, extractValue);
+  }
+  
+  // --- Process Pages to create hierarchical navigation structure
+  Pages.children?.forEach((page) => {
+    if (page.type === "Page" && page.props.navLabel) {
+      const label = extractValue(page.props.navLabel);
+      const url = extractValue(page.props.url);
+      
+      // --- Parse hierarchy labels separated by unescaped pipe characters
+      const hierarchyLabels = parseHierarchyLabels(label);
+      
+      // --- Skip if we have no labels
+      if (hierarchyLabels.length === 0) {
+        return;
+      }
+      
+      // --- For a single level, just add a NavLink directly
+      if (hierarchyLabels.length === 1) {
+        // --- Check if this exact NavLink already exists in the navigation hierarchy
+        if (!labelExistsInHierarchy(hierarchyLabels[0], navigationHierarchy)) {
+          extraNavs.push({
+            type: "NavLink",
+            props: {
+              label: hierarchyLabels[0],
+              to: url
+            }
+          });
+        }
+        return;
+      }
+      
+      // --- For multi-level hierarchies, create NavGroups and a final NavLink
+      let currentLevel = extraNavs;
+      
+      // --- Create NavGroups for all levels except the last one
+      for (let i = 0; i < hierarchyLabels.length - 1; i++) {
+        const groupLabel = hierarchyLabels[i];
+        const navGroup = findOrCreateNavGroup(currentLevel, groupLabel);
+        
+        // --- Initialize children array if it doesn't exist
+        if (!navGroup.children) {
+          navGroup.children = [];
+        }
+        
+        // --- Move to the next level
+        currentLevel = navGroup.children;
+      }
+      
+      // --- Add the leaf NavLink to the deepest NavGroup
+      const leafLabel = hierarchyLabels[hierarchyLabels.length - 1];
+      
+      // --- Check if this NavLink already exists at this level
+      const existingNavLink = currentLevel.find(item => 
+        item.type === "NavLink" && 
+        item.props?.label === leafLabel
+      );
+      
+      if (!existingNavLink) {
+        currentLevel.push({
+          type: "NavLink",
+          props: {
+            label: leafLabel,
+            to: url
+          }
+        });
+      }
+    }
+  });
+  
+  return extraNavs;
+}

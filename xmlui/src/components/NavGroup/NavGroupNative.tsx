@@ -57,10 +57,10 @@ export const defaultProps: Pick<
   | "iconVerticalExpanded"
   | "iconVerticalCollapsed"
 > = {
-  iconHorizontalExpanded: "chevronleft",
+  iconHorizontalExpanded: "chevronright",
   iconHorizontalCollapsed: "chevronright",
   iconVerticalExpanded: "chevrondown",
-  iconVerticalCollapsed: "chevronup",
+  iconVerticalCollapsed: "chevronright",
 };
 
 const NavGroupContext = createContext({
@@ -252,7 +252,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
         <NavLink icon={icon} style={{ flexShrink: 0 }} vertical={level >= 1} to={to} disabled={disabled}>
           {label}
           <div style={{ flex: 1 }} />
-          {level === 0 && <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
+          {level === 0 && <Icon name={iconVerticalExpanded} />}
           {level >= 1 && (
             <Icon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
           )}
