@@ -108,6 +108,115 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
   const processedNavRef = useRef(false);
   
+  // --- Memoize the layout type to avoid unnecessary re-extraction
+  const layoutType = useMemo(() => extractValue(node.props.layout), [node.props.layout, extractValue]);
+  
+  // --- Memoize helper functions that are used in multiple places
+  
+  // --- Parse a string into hierarchy labels, handling escaped pipe characters
+  const parseHierarchyLabels = useMemo(() => {
+    // Cache to hold previously computed results
+    const cache = new Map<string, string[]>();
+    
+    return (labelText: string): string[] => {
+      // Return cached result if we've seen this input before
+      if (cache.has(labelText)) {
+        return cache.get(labelText)!;
+      }
+      
+      const result: string[] = [];
+      let currentLabel = "";
+      let escaped = false;
+      
+      for (let i = 0; i < labelText.length; i++) {
+        const char = labelText[i];
+        
+        if (escaped) {
+          // --- If this character was escaped, just add it literally
+          currentLabel += char;
+          escaped = false;
+        } else if (char === "\\") {
+          // --- Start of an escape sequence
+          escaped = true;
+        } else if (char === "|") {
+          // --- Unescaped pipe indicates hierarchy separator
+          result.push(currentLabel.trim());
+          currentLabel = "";
+        } else {
+          // --- Regular character
+          currentLabel += char;
+        }
+      }
+      
+      // --- Don't forget to add the last segment
+      if (currentLabel.length > 0) {
+        result.push(currentLabel.trim());
+      }
+      
+      // Cache the result
+      cache.set(labelText, result);
+      
+      return result;
+    };
+  }, []);
+  
+  // --- Helper function to check if a label exists in the navigation hierarchy
+  const labelExistsInHierarchy = useMemo(() => {
+    // Cache for previously checked labels within a hierarchy
+    const cache = new Map<string, boolean>();
+    
+    return (searchLabel: string, hierarchy: any[]): boolean => {
+      // Create a cache key (could be improved with a better serialization of hierarchy)
+      const cacheKey = searchLabel + '_' + hierarchy.length;
+      
+      if (cache.has(cacheKey)) {
+        return cache.get(cacheKey)!;
+      }
+      
+      const result = hierarchy.some(node => {
+        if (node.label === searchLabel) {
+          return true;
+        }
+        
+        if (node.children && node.children.length > 0) {
+          return labelExistsInHierarchy(searchLabel, node.children);
+        }
+        
+        return false;
+      });
+      
+      cache.set(cacheKey, result);
+      return result;
+    };
+  }, []);
+  
+  // --- Helper function to find or create NavGroups in the hierarchy
+  const findOrCreateNavGroup = useMemo(() => {
+    return (navItems: any[], groupLabel: string): any => {
+      // --- Check if a NavGroup with this label already exists
+      const existingGroup = navItems.find(item => 
+        item.type === "NavGroup" && 
+        item.props?.label === groupLabel
+      );
+      
+      if (existingGroup) {
+        return existingGroup;
+      }
+      
+      // --- Create a new NavGroup and add it to the array
+      const newGroup = {
+        type: "NavGroup",
+        props: {
+          label: groupLabel
+        },
+        children: []
+      };
+      
+      navItems.push(newGroup);
+      return newGroup;
+    };
+  }, []);
+  
   const { AppHeader, Footer, NavPanel, restChildren } = useMemo(() => {
     let AppHeader: ComponentDef;
     let Footer: ComponentDef;
@@ -160,12 +269,22 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
     // --- Check if there is any extra NavPanel in Pages
     const extraNavs = extractNavPanelFromPages();
     
-    // --- Create a new NavPanel with combined children instead of mutating the existing one
-    if (extraNavs?.length && NavPanel) {
-      NavPanel = {
-        ...NavPanel,
-        children: NavPanel.children ? [...NavPanel.children, ...extraNavs] : extraNavs
-      };
+    // --- If we found extra navigation items
+    if (extraNavs?.length) {
+      if (NavPanel) {
+        // --- Create a new NavPanel with combined children instead of mutating the existing one
+        NavPanel = {
+          ...NavPanel,
+          children: NavPanel.children ? [...NavPanel.children, ...extraNavs] : extraNavs
+        };
+      } else {
+        // --- Create a new NavPanel component definition if none exists
+        NavPanel = {
+          type: "NavPanel",
+          props: {},
+          children: extraNavs
+        };
+      }
     }
 
     return {
@@ -179,7 +298,6 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
       // --- Skip extraction if we've already processed this navigation structure
       // --- This prevents duplicate items when React renders twice in strict mode
       if (!Pages || processedNavRef.current) return null;
-      if (!NavPanel?.children) return null;
       
       // --- Mark as processed
       processedNavRef.current = true;
@@ -197,8 +315,10 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
       // --- Root of navigation hierarchy
       const navigationHierarchy: NavHierarchyNode[] = [];
       
-      // --- Start processing the navigation tree
-      processNavItems(NavPanel.children, navigationHierarchy);
+      // --- Start processing the navigation tree if NavPanel exists
+      if (NavPanel?.children) {
+        processNavItems(NavPanel.children, navigationHierarchy);
+      }
       
       // --- Process Pages to create hierarchical navigation structure
       Pages.children?.forEach((page) => {
@@ -323,112 +443,57 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
             }
           }
         });
-      }
-
-      // --- Helper function to check if a label exists in the navigation hierarchy
-      function labelExistsInHierarchy(searchLabel: string, hierarchy: NavHierarchyNode[]): boolean {
-        for (const node of hierarchy) {
-          if (node.label === searchLabel) {
-            return true;
-          }
-          
-          if (node.children && node.children.length > 0) {
-            if (labelExistsInHierarchy(searchLabel, node.children)) {
-              return true;
-            }
-          }
-        }
-        return false;
-      }
-
-      // --- Parse a string into hierarchy labels, handling escaped pipe characters
-      function parseHierarchyLabels(labelText: string): string[] {
-        const result: string[] = [];
-        let currentLabel = "";
-        let escaped = false;
-        
-        for (let i = 0; i < labelText.length; i++) {
-          const char = labelText[i];
-          
-          if (escaped) {
-            // --- If this character was escaped, just add it literally
-            currentLabel += char;
-            escaped = false;
-          } else if (char === "\\") {
-            // --- Start of an escape sequence
-            escaped = true;
-          } else if (char === "|") {
-            // --- Unescaped pipe indicates hierarchy separator
-            result.push(currentLabel.trim());
-            currentLabel = "";
-          } else {
-            // --- Regular character
-            currentLabel += char;
-          }
-        }
-        
-        // --- Don't forget to add the last segment
-        if (currentLabel.length > 0) {
-          result.push(currentLabel.trim());
-        }
-        
-        return result;
-      }
-      
-      // --- Helper function to find or create NavGroups in the hierarchy
-      function findOrCreateNavGroup(
-        navItems: ComponentDef[], 
-        groupLabel: string
-      ): ComponentDef {
-        // --- Check if a NavGroup with this label already exists
-        const existingGroup = navItems.find(item => 
-          item.type === "NavGroup" && 
-          item.props?.label === groupLabel
-        );
-        
-        if (existingGroup) {
-          return existingGroup;
-        }
-        
-        // --- Create a new NavGroup and add it to the array
-        const newGroup: ComponentDef = {
-          type: "NavGroup",
-          props: {
-            label: groupLabel
-          },
-          children: []
-        };
-        
-        navItems.push(newGroup);
-        return newGroup;
-      }
+      }      // Using the memoized helper functions from outside the scope
     }
-  }, [node.children]);
+  }, [node.children, parseHierarchyLabels, labelExistsInHierarchy, findOrCreateNavGroup]);
 
-  const layoutType = extractValue(node.props.layout);
+  // --- Memoize all app props to prevent unnecessary re-renders
+  const appProps = useMemo(() => ({
+    scrollWholePage: extractValue.asOptionalBoolean(node.props.scrollWholePage, true),
+    noScrollbarGutters: extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false),
+    style,
+    layout: layoutType,
+    loggedInUser: extractValue(node.props.loggedInUser),
+    onReady: lookupEventHandler("ready"),
+    name: extractValue(node.props.name),
+    logo: extractValue(node.props.logo),
+    logoDark: extractValue(node.props["logo-dark"]),
+    logoLight: extractValue(node.props["logo-light"]),
+    defaultTone: extractValue(node.props.defaultTone),
+    defaultTheme: extractValue(node.props.defaultTheme)
+  }), [
+    extractValue, 
+    layoutType, 
+    lookupEventHandler, 
+    node.props.loggedInUser, 
+    node.props.noScrollbarGutters, 
+    node.props.scrollWholePage,
+    node.props.name,
+    node.props.logo,
+    node.props["logo-dark"],
+    node.props["logo-light"],
+    node.props.defaultTone,
+    node.props.defaultTheme,
+    style
+  ]);
 
+  // Memoize the rendered children to prevent unnecessary re-renders
+  const renderedHeader = useMemo(() => renderChild(AppHeader), [AppHeader, renderChild]);
+  const renderedFooter = useMemo(() => renderChild(Footer), [Footer, renderChild]);
+  const renderedNavPanel = useMemo(() => renderChild(NavPanel), [NavPanel, renderChild]);
+  const renderedContent = useMemo(() => renderChild(restChildren), [restChildren, renderChild]);
+  
   return (
     <App
-      scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
-      noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
-      style={style}
-      layout={layoutType}
-      loggedInUser={extractValue(node.props.loggedInUser)}
-      onReady={lookupEventHandler("ready")}
-      header={renderChild(AppHeader)}
-      footer={renderChild(Footer)}
-      navPanel={renderChild(NavPanel)}
+      {...appProps}
+      header={renderedHeader}
+      footer={renderedFooter}
+      navPanel={renderedNavPanel}
       navPanelDef={NavPanel}
       logoContentDef={node.props.logoTemplate}
       renderChild={renderChild}
-      name={extractValue(node.props.name)}
-      logo={extractValue(node.props.logo)}
-      logoDark={extractValue(node.props["logo-dark"])}
-      logoLight={extractValue(node.props["logo-light"])}
-      defaultTone={extractValue(node.props.defaultTone)}
-      defaultTheme={extractValue(node.props.defaultTheme)}
     >
-      {renderChild(restChildren)}
+      {renderedContent}
     </App>
   );
 }
