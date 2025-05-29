@@ -19,6 +19,7 @@ $height-Footer: createThemeVar("height-#{$component}");
 $fontSize-Footer: createThemeVar("fontSize-#{$component}");
 $verticalAlign-Footer: createThemeVar("verticalAlign-#{$component}");
 $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
+$maxWidth-App: createThemeVar("maxWidth-App");
 
 .outerWrapper{
   @include t.borderVars($themeVars, $component);
@@ -40,7 +41,7 @@ $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
   margin: 0 auto;
 
   &.full{
-    max-width: 100%;
+    max-width: $maxWidth-App;
   }
 }
 
