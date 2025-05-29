@@ -1,35 +1,26 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { LocalLink, TextBox, VisuallyHidden, Text } from "xmlui";
-import Fuse, { type RangeTuple, type FuseResult } from "fuse.js";
+import Fuse, { type RangeTuple, type FuseResult, type FuseResultMatch } from "fuse.js";
 import styles from "./Search.module.scss";
 
 type Props = {
   id?: string;
   data: Record<string, string>;
   limit?: number;
+  maxContentMatchNumber?: number;
 };
 
-export const defaultProps: Pick<Props, "limit"> = {
+export const defaultProps: Pick<Props, "limit" | "maxContentMatchNumber"> = {
   limit: 10,
+  maxContentMatchNumber: 3,
 };
 
-type SearchItem = { path: string; title: string; content: string };
-type SearchItemKeys = (keyof SearchItem)[];
-type SearchResult = Omit<FuseResult<SearchItem>, "refIndex" | "matches"> & {
-  key: string;
-  matches: ReadonlyArray<RangeTuple>;
-};
-
-export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
+export const Search = ({
+  id,
+  data,
+  limit = defaultProps.limit,
+  maxContentMatchNumber = defaultProps.maxContentMatchNumber,
+}: Props) => {
   const _id = useId();
   id = id || _id;
   const [inputValue, setInputValue] = useState("");
@@ -38,12 +29,12 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
   // render-related state
   const [show, setShow] = useState(false);
   const targetRef = useRef<HTMLInputElement>(null);
-  const [width, setWidth] = useState(0);
+  /* const [width, setWidth] = useState(0);
   const updateWidth = () => {
     if (targetRef.current) {
       setWidth(targetRef.current.offsetWidth);
     }
-  };
+  }; */
 
   const searchOptions = useMemo(() => {
     // Separating the title from the content produces better results
@@ -68,7 +59,7 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
   }, []);
   const fuse = useMemo(() => {
     // --- Step 1: Convert data to a format better handled by the search engine
-    const _data = Object.entries(data).map<SearchItem>(([path, content]) => {
+    const _data = Object.entries(data).map<SearchItemData>(([path, content]) => {
       let title = "";
       const titleRegex = /^#{1,6}\s+(.+?)(?:\s+\[#.*\])?\s*$/m;
       const match = content.match(titleRegex);
@@ -94,28 +85,29 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
       ? []
       : fuse
           .search(debouncedValue)
-          // The limit is used here to limit the number of results _per article_
+          // This is to limit the number of results _per article_
           .slice(0, limit);
 
-    const mapped = limited.flatMap((result) => {
-      const keysExpanded = result.matches
-        ?.map((match) => {
-          return {
-            item: result.item,
-            score: result.score,
-            key: match.key || "",
-            matches: match.indices ?? [],
+    const mapped = limited.map((result) => {
+      const mappedMatches: MatchesByKey = {};
+      result.matches?.forEach((match) => {
+        if (match.key !== undefined) {
+          mappedMatches[match.key as keyof SearchItemData] = {
+            indices: match.indices.filter(
+              // Tweak this value to limit the number of matches
+              // Most matches are too short to be useful
+              (index) => index[1] - index[0] >= debouncedValue.length - 1,
+            ),
+            value: match.value,
           };
-        }) ?? [
-        {
-          item: result.item,
-          score: result.score,
-          key: "",
-          matches: [],
-        },
-      ];
+        }
+      });
 
-      return keysExpanded;
+      return {
+        item: result.item,
+        score: result.score ?? 100,
+        matches: mappedMatches,
+      };
     });
 
     // TODO: Add any additional post-processing here
@@ -136,11 +128,11 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
     };
   }, []);
 
-  useLayoutEffect(() => {
+  /* useLayoutEffect(() => {
     updateWidth();
     window.addEventListener("resize", updateWidth);
     return () => window.removeEventListener("resize", updateWidth);
-  }, []);
+  }, []); */
 
   const onClick = useCallback(() => {
     setInputValue("");
@@ -170,54 +162,93 @@ export const Search = ({ id, data, limit = defaultProps.limit }: Props) => {
       />
       {/* --- Step 3: Render results */}
       {show && results && results.length > 0 && (
-        <ul className={styles.list} style={{ width: width + "px" }}>
-          {results.map((result, idx) => {
-            if (result.key === "title") {
-              return (
-                <li key={`${result.item.path}-${idx}`} className={styles.item}>
-                  <LocalLink
-                    to={result.item.path}
-                    onClick={onClick}
-                    style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
-                  >
-                    <Text variant="subtitle">
-                      {highlightText(result.item.title, result.matches) || result.item.title}
-                    </Text>
-                  </LocalLink>
-                </li>
-              );
-            }
-
-            const snippets = formatContentSnippet(result.item.content, result.matches);
-            return snippets.map((snippet, snipIdx) => (
-              <li
-                key={`${result.item.path}-${idx}-${snipIdx}`}
-                className={`${styles.item} ${styles.snippet}`}
-              >
-                <LocalLink
-                  to={result.item.path}
-                  onClick={onClick}
-                  style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
-                >
-                  <Text>{snippet}</Text>
-                </LocalLink>
-              </li>
-            ));
-          })}
+        <ul className={styles.list} /* style={{ minWidth: width + "px" }} */>
+          {results.map((result, idx) => (
+            <SearchItem
+              key={`${result.item.path}-${idx}`}
+              idx={idx}
+              item={result.item}
+              matches={result.matches}
+              maxContentMatchNumber={maxContentMatchNumber}
+              onClick={onClick}
+            />
+          ))}
         </ul>
       )}
     </div>
   );
 };
 
+type SearchItemProps = SearchResult & {
+  idx: string | number;
+  maxContentMatchNumber?: number;
+  onClick?: () => void;
+};
+
 /**
- * Formats a snippet of text. Determine which ranges are highlighted and how big the snippet is.
+ * Renders a single search result.
+ * Use the `item` prop to access the data original data.
+ *
  */
-function formatContentSnippet(text: string, ranges?: readonly RangeTuple[]) {
+function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: SearchItemProps) {
+  const _maxContentMatchNumber = maxContentMatchNumber ?? 0;
+  return (
+    <>
+      <li key={`${item.path}-${idx}`} className={`${styles.item} ${styles.header}`}>
+        <LocalLink
+          to={item.path}
+          onClick={onClick}
+          style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
+        >
+          <div>
+            <Text variant="subtitle">
+              {highlightText(item.title, matches?.title?.indices) || item.title}
+            </Text>
+            {/* Display the number of other matches if there are any */}
+            {matches?.content?.indices &&
+              matches?.content?.indices.length - _maxContentMatchNumber > 0 && (
+                <Text variant="italic">
+                  {` and ${matches?.content?.indices.length - _maxContentMatchNumber} other matches`}
+                </Text>
+              )}
+          </div>
+        </LocalLink>
+      </li>
+      {matches?.content?.indices &&
+        formatContentSnippet(item.content, matches.content.indices, maxContentMatchNumber).map(
+          (snippet, snipIdx) => (
+            <li
+              key={`${item.path}-${idx}-${snipIdx}`}
+              className={`${styles.item} ${styles.content}`}
+            >
+              <LocalLink
+                to={item.path}
+                onClick={onClick}
+                style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
+              >
+                <Text>{snippet}</Text>
+              </LocalLink>
+            </li>
+          ),
+        )}
+    </>
+  );
+}
+
+// --- Utilities
+
+/**
+ * Formats a snippet of text. Determines which ranges are highlighted and how big the snippet is.
+ */
+function formatContentSnippet(
+  text: string,
+  ranges?: readonly RangeTuple[],
+  maxContentMatchNumber?: number,
+) {
   if (!ranges || ranges.length === 0) return [text.slice(0, 100)];
   const contextLength = 50;
 
-  const highlightRanges = ranges?.slice(0, 3);
+  const highlightRanges = ranges?.slice(0, maxContentMatchNumber);
   const contextRanges: RangeTuple[] = highlightRanges.map(([start, end]) => {
     let contextStart = 0;
     let contextEnd = text.length - 1;
@@ -232,7 +263,17 @@ function formatContentSnippet(text: string, ranges?: readonly RangeTuple[]) {
   });
 
   return contextRanges.map(([start, end], idx) => {
-    return highlightText(text.slice(start, end + 1), [highlightRanges[idx]]);
+    const textWithEllipsis: React.ReactNode[] = [];
+    if (start > 0) {
+      textWithEllipsis.push("...");
+    }
+
+    textWithEllipsis.push(highlightText(text.slice(start, end + 1), [highlightRanges[idx]]));
+
+    if (end < text.length - 1) {
+      textWithEllipsis.push("...");
+    }
+    return textWithEllipsis;
   });
 }
 
@@ -317,187 +358,11 @@ function removeMarkdownFormatting(markdown: string) {
   );
 }
 
-// --- TODO: Graveyard, will remove later
-
-/* function highlight(fuseSearchResult: any, highlightClassName: string = 'highlight') {
-  const set = (obj: object, path: string, value: any) => {
-      const pathValue = path.split('.');
-      let i;
-
-      for (i = 0; i < pathValue.length - 1; i++) {
-        obj = obj[pathValue[i]];
-      }
-
-      obj[pathValue[i]] = value;
-  };
-
-  const generateHighlightedText = (inputText: string, regions: number[] = []) => {
-    let content = '';
-    let nextUnhighlightedRegionStartingIndex = 0;
-
-    regions.forEach(region => {
-      const lastRegionNextIndex = region[1] + 1;
-
-      content += [
-        inputText.substring(nextUnhighlightedRegionStartingIndex, region[0]),
-        `<span class="${highlightClassName}">`,
-        inputText.substring(region[0], lastRegionNextIndex),
-        '</span>',
-      ].join('');
-
-      nextUnhighlightedRegionStartingIndex = lastRegionNextIndex;
-    });
-
-    content += inputText.substring(nextUnhighlightedRegionStartingIndex);
-
-    return content;
-  };
-
-  return fuseSearchResult
-    .filter(({ matches }: any) => matches && matches.length)
-    .map(({ item, matches }: any) => {
-      const highlightedItem = { ...item };
-
-      matches.forEach((match: any) => {
-        set(highlightedItem, match.key, generateHighlightedText(match.value, match.indices));
-      });
-
-      return highlightedItem;
-    });
-}; */
-
-/* <AutoComplete
-        id={id}
-        placeholder="Type to search..."
-        value={inputValue}
-        style={{ height: "30px" }}
-        onDidChange={(value) =>
-          setInputValue(() => {
-            fuse.search(value);
-            return value;
-          })
-        }
-        onFocus={() => setShow(true)}
-      >
-        {results &&
-          results.map((result) => {
-            return (
-              <OptionNative
-                key={result.item.path}
-                value={result.item.path}
-                label={result.item.path.split("/").pop()}
-                labelText={result.item.path.split("/").pop()}
-              />
-            );
-          })}
-      </AutoComplete> */
-/* <DropdownMenu
-        triggerTemplate={
-          <TextBox
-            id={id}
-            ref={targetRef}
-            type="search"
-            placeholder="Type to search..."
-            value={inputValue}
-            style={{ height: "30px", width: "280px" }}
-            startIcon="search"
-            onDidChange={(value) =>
-              setInputValue(() => {
-                fuse.search(value);
-                return value;
-              })
-            }
-          />
-        }
-        style={{ height: "30px", width: "280px" }}
-      >
-        {results.map((result) => {
-            let label = "";
-            const match = result.item.content.match(/^#{1,6}\s+(.+?)(?:\s+\[#.*\])?\s*$/m);
-            if (match) {
-              label = match[1];
-            } else {
-              label = result.item.path.split("/").pop() || "";
-            }
-            return (
-              <MenuItem key={result.item.path}>
-                <LocalLink
-                  to={result.item.path}
-                  onClick={() => { setShow(false); setInputValue(""); }}
-                  style={{ textDecorationLine: "none" }}
-                >
-                  {label}
-                </LocalLink>
-              </MenuItem>
-            );
-          })}
-      </DropdownMenu> */
-
-/* function partition<T>(array: Array<T>, discriminator: (v: T) => boolean) {
-  return array.reduce(
-    ([pass, fail], elem) => {
-      return discriminator(elem) ? [[...pass, elem], fail] : [pass, [...fail, elem]];
-    },
-    [[] as T[], [] as T[]],
-  );
-} */
-
-// {show && results && results.length > 0 && (
-//         <ul className={styles.list} style={{ width: width + "px" }}>
-//           {results.map((result, idx) => {
-//             const [titleIndexes, contentIndexes] = partition(
-//               // @ts-ignore
-//               result.matches ?? [],
-//               (match) => match.key === "label",
-//             );
-
-//             const title =
-//               titleIndexes.length === 0
-//                 ? result.item.label
-//                 : titleIndexes.map((match) => highlightText(result.item.label, match.indices));
-
-//             const content: React.ReactNode[] = contentIndexes.map((match) => {
-//               const contentToDisplay = Math.min(200, result.item.content.length);
-//               /* const [inContent, restContent] = partition(
-//                 // @ts-ignore
-//                 match.indices,
-//                 (idx) => idx[1] <= contentToDisplay,
-//               ); */
-//               const inContent = match.indices;
-//               if (inContent.length === 0) return null;
-//               //const startIdx = inContent[0][0];
-//               return (
-//                 <Text key={"content"}>
-//                   {highlightText(result.item.content, inContent)}
-//                   {contentToDisplay < result.item.content.length && "..."}
-//                 </Text>
-//               );
-//             });
-
-//             return (
-//               <Fragment key={result.item.path}>
-//                 {title && (
-//                   <li key={`${result.item.path}-title`} className={styles.item}>
-//                     <Text>
-//                       Title:{" "}
-//                       <LocalLink
-//                         to={result.item.path}
-//                         onClick={onClick}
-//                         style={{ textDecorationLine: "none" }}
-//                       >
-//                         <Text>{title}</Text>
-//                       </LocalLink>
-//                     </Text>
-//                   </li>
-//                 )}
-//                 {/* {content && content.length > 0 && (
-//                   <li key={`${result.item.path}-content`} className={styles.item}>
-//                     {content}
-//                   </li>
-//                 )} */}
-//                 {/* idx < results.length - 1 && <div className={styles.divider} /> */}
-//               </Fragment>
-//             );
-//           })}
-//         </ul>
-//       )}
+type SearchItemData = { path: string; title: string; content: string };
+type SearchItemKeys = (keyof SearchItemData)[];
+type MatchesByKey = Partial<
+  Record<keyof SearchItemData, Pick<FuseResultMatch, "indices" | "value">>
+>;
+type SearchResult = Omit<FuseResult<SearchItemData>, "refIndex" | "matches"> & {
+  matches: MatchesByKey;
+};
