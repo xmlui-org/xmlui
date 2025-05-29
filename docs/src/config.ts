@@ -19,7 +19,6 @@ const contentRuntime: Record<string, any> = import.meta.glob(`/content/**/*.{md,
 // @ts-ignore
 const metaJsons: Record<string, MetaJson> = import.meta.glob(`/content/**/_meta.json`, {
   eager: true,
-  query: "?raw",
 });
 
 const content: Record<string, any> = {};
@@ -29,6 +28,7 @@ Object.keys(contentRuntime).map((filePath) => {
   content[omitIndexFromPath(urlFragment)] = contentRuntime[filePath].default;
   navPanelContent.push(urlFragment);
 });
+
 
 const pagesRuntime: Record<string, any> = import.meta.glob(`/public/pages/**/*.md`, {
   eager: true,
@@ -119,34 +119,18 @@ function buildTreeFromPathsAndMeta(
       let existingNode = currentLevel?.find((node) => node.name === part);
 
       if (!existingNode) {
-        // Look up title/type in meta
+        // --- Look up title/type in meta
         const meta = metaByFolder[currentPath + "/_meta.json"];
-        console.log("meta", meta, currentPath + "/_meta.json");
-        let title: any, type: any;
+        let title, type;
 
-        if (meta?.default) {
-          // Extract property names in the order they are defined in the JSON string
-          const orderedPropertyNames: string[] = [];
-          const propertyRegex = /"([^"]+)"\s*:/g;
-          let match;
-          while ((match = propertyRegex.exec(meta.default)) !== null) {
-            const propName = match[1];
-            if (!orderedPropertyNames.includes(propName)) {
-              orderedPropertyNames.push(propName);
-            }
+        if (meta?.default?.[part]) {
+          const metaEntry = meta.default[part];
+          if (typeof metaEntry === "string") {
+            title = metaEntry;
+          } else if (typeof metaEntry === "object") {
+            title = metaEntry.title;
+            type = metaEntry.type;
           }
-          const info = JSON.parse(meta.default);
-          orderedPropertyNames.forEach((propName) => {
-            if (info?.[propName]) {
-              const metaEntry = info[part];
-              if (typeof metaEntry === "string") {
-                title = metaEntry;
-              } else if (typeof metaEntry === "object") {
-                title = metaEntry.title;
-                type = metaEntry.type;
-              }
-            }
-          });
         }
 
         existingNode = {
@@ -175,20 +159,7 @@ function buildTreeFromPathsAndMeta(
     const meta = metaByFolder[path + "/_meta.json"];
     if (!meta?.default) return;
 
-    // Extract property names in the exact order they appear in the JSON string
-    const order: string[] = [];
-    const propertyRegex = /"([^"]+)"\s*:/g;
-    let match;
-
-    // Find all top-level property names in their original order
-    while ((match = propertyRegex.exec(meta.default)) !== null) {
-      const propName = match[1];
-      // Only add if not already in the array (to handle nested structures)
-      if (!order.includes(propName)) {
-        order.push(propName);
-      }
-    }
-
+    const order = Object.keys(meta.default);
     order.forEach((orderKey) => {
       if (!level.find((item) => item.name === orderKey)) {
         level.push({

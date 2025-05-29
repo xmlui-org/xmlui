@@ -71,7 +71,7 @@
             </Page>
 
             <Page url="/appStructure">
-                <Markdown data="/pages/app-structure.md" />
+                <MarkdownPage url="/pages/app-structure.md" />
             </Page>
 
             <Page url="/markup">
