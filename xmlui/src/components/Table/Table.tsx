@@ -73,15 +73,18 @@ export const TableMd = createMetadata({
     },
     iconNoSort: d(
       `Allows setting the icon displayed in the ${COMP} column header when sorting is ` +
-        `enabled, but the column remains unsorted.`,
+        `enabled, but the column remains unsorted. You can change the default icon for all ${COMP} ` +
+        `instances with the "icon.nosort:Table" declaration in the app configuration file.`,
     ),
     iconSortAsc: d(
       `Allows setting the icon displayed in the ${COMP} column header when sorting is enabled, ` +
-        `and the column is sorted in ascending order.`,
+        `and the column is sorted in ascending order. You can change the default icon for all ${COMP} ` +
+        `instances with the "icon.sortasc:Table" declaration in the app configuration file.`,
     ),
     iconSortDesc: d(
       `Allows setting the icon displayed in the ${COMP} column header when sorting is enabled, ` +
-        `and the column is sorted in descending order.`,
+        `and the column is sorted in descending order. You can change the default icon for all ${COMP} ` +
+        `instances with the "icon.sortdesc:Table" declaration in the app configuration file.`,
     ),
     enableMultiRowSelection: {
       description:

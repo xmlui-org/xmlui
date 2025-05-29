@@ -25,6 +25,7 @@ import { Icon } from "../Icon/IconNative";
 import { FileInput, isFileArray } from "./FileInputNative";
 
 const COMP = "FileInput";
+const DEFAULT_ICON = "browse:FileInput";
 
 export const FileInputMd = createMetadata({
   description:
@@ -45,7 +46,10 @@ export const FileInputMd = createMetadata({
     labelBreak: dLabelBreak(COMP),
     buttonVariant: d("The button variant to use", buttonVariantNames),
     buttonLabel: d(`This property is an optional string to set a label for the button part.`),
-    buttonIcon: d("The ID of the icon to display in the button"),
+    buttonIcon: d(
+      `The ID of the icon to display in the button. You can change the default icon for all ${COMP} ` +
+      `instances with the "icon.browse:FileInput" declaration in the app configuration file.`
+    ),
     buttonIconPosition: d(
       `This optional string determines the location of the button icon.`,
       iconPositionNames,
@@ -103,14 +107,14 @@ export const fileInputRenderer = createComponentRenderer(
   COMP,
   FileInputMd,
   ({ node, state, updateState, extractValue, lookupEventHandler, registerComponentApi }) => {
-    const iconName = extractValue.asString(node.props.buttonIcon);
+    const iconName = extractValue.asOptionalString(node.props.buttonIcon) || DEFAULT_ICON;
     return (
       <FileInput
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         variant={extractValue(node.props.buttonVariant)}
         buttonThemeColor={extractValue(node.props.buttonThemeColor)}
         buttonSize={extractValue(node.props.buttonSize)}
-        buttonIcon={<Icon name={iconName} />}
+        buttonIcon={<Icon name={iconName} fallback="folder-open" />}
         buttonIconPosition={extractValue(node.props.buttonIconPosition)}
         buttonLabel={extractValue.asOptionalString(node.props.buttonLabel)}
         updateState={updateState}

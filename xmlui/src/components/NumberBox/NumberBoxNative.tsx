@@ -59,6 +59,8 @@ type Props = {
   endText?: string;
   endIcon?: string;
   gap?: string;
+  spinnerUpIcon?: string;
+  spinnerDownIcon?: string;
   autoFocus?: boolean;
   readOnly?: boolean;
   required?: boolean;
@@ -94,6 +96,8 @@ export const NumberBox = forwardRef(function NumberBox(
     endText,
     endIcon,
     gap,
+    spinnerUpIcon,
+    spinnerDownIcon,
     autoFocus,
     readOnly,
     required,
@@ -433,7 +437,7 @@ export const NumberBox = forwardRef(function NumberBox(
               disabled={!enabled || readOnly}
               ref={upButton}
             >
-              <Icon name="chevronup" size="sm" />
+              <Icon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
             </Button>
             <Button
               data-spinner="down"
@@ -445,7 +449,7 @@ export const NumberBox = forwardRef(function NumberBox(
               disabled={!enabled || readOnly}
               ref={downButton}
             >
-              <Icon name="chevrondown" size="sm" />
+              <Icon name={spinnerDownIcon || "spinnerDown:NumberBox"} fallback="chevrondown" size="sm" />
             </Button>
           </div>
         )}
