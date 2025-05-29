@@ -17,6 +17,8 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "boxShadow-header-App": "none",
     "backgroundColor-content-App": "$color-surface-0",
     "backgroundColor": "$color-surface-0",
+
+    "textColor-Text-marked": "$color-primary-500",
     
     // --- AppHeader
     "paddingInline-AppHeader": "$space-4",

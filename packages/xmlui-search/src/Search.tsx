@@ -21,6 +21,7 @@ export const Search = ({
   limit = defaultProps.limit,
   maxContentMatchNumber = defaultProps.maxContentMatchNumber,
 }: Props) => {
+  const ref = useRef<HTMLUListElement>(null);
   const _id = useId();
   id = id || _id;
   const [inputValue, setInputValue] = useState("");
@@ -29,13 +30,8 @@ export const Search = ({
   // render-related state
   const [show, setShow] = useState(false);
   const targetRef = useRef<HTMLInputElement>(null);
-  /* const [width, setWidth] = useState(0);
-  const updateWidth = () => {
-    if (targetRef.current) {
-      setWidth(targetRef.current.offsetWidth);
-    }
-  }; */
 
+  // --- Step 1: Set parameters for the search engine
   const searchOptions = useMemo(() => {
     // Separating the title from the content produces better results
     const keys: SearchItemKeys = ["title", "content"];
@@ -57,8 +53,8 @@ export const Search = ({
       keys,
     };
   }, []);
+  // --- Step 2: Convert data to a format better handled by the search engine
   const fuse = useMemo(() => {
-    // --- Step 1: Convert data to a format better handled by the search engine
     const _data = Object.entries(data).map<SearchItemData>(([path, content]) => {
       let title = "";
       const titleRegex = /^#{1,6}\s+(.+?)(?:\s+\[#.*\])?\s*$/m;
@@ -78,7 +74,7 @@ export const Search = ({
     return new Fuse(_data, searchOptions);
   }, [data, searchOptions]);
 
-  // --- Step 2: Execute search engine search & post-process results
+  // --- Step 3: Execute search & post-process results
   const results: SearchResult[] = useMemo(() => {
     setShow(debouncedValue.length > 0);
     const limited = !debouncedValue
@@ -128,12 +124,6 @@ export const Search = ({
     };
   }, []);
 
-  /* useLayoutEffect(() => {
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
-  }, []); */
-
   const onClick = useCallback(() => {
     setInputValue("");
     setShow(false);
@@ -160,9 +150,9 @@ export const Search = ({
         }
         onFocus={() => setShow(true)}
       />
-      {/* --- Step 3: Render results */}
+      {/* --- Step 4: Render results */}
       {show && results && results.length > 0 && (
-        <ul className={styles.list} /* style={{ minWidth: width + "px" }} */>
+        <ul ref={ref} className={styles.list}>
           {results.map((result, idx) => (
             <SearchItem
               key={`${result.item.path}-${idx}`}
@@ -191,7 +181,6 @@ type SearchItemProps = SearchResult & {
  *
  */
 function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: SearchItemProps) {
-  const _maxContentMatchNumber = maxContentMatchNumber ?? 0;
   return (
     <>
       <li key={`${item.path}-${idx}`} className={`${styles.item} ${styles.header}`}>
@@ -200,37 +189,41 @@ function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: Sear
           onClick={onClick}
           style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
         >
-          <div>
+          <div style={{ width: "100%" }}>
             <Text variant="subtitle">
-              {highlightText(item.title, matches?.title?.indices) || item.title}
+              <Text variant="strong">
+                {highlightText(item.title, matches?.title?.indices) || item.title}
+              </Text>
             </Text>
+            <div
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              {matches?.content?.indices &&
+                formatContentSnippet(
+                  item.content,
+                  matches.content.indices,
+                  maxContentMatchNumber,
+                ).map((snippet, snipIdx) => (
+                  <div key={`${item.path}-${idx}-${snipIdx}`} className={styles.snippet}>
+                    <Text>{snippet}</Text>
+                  </div>
+                ))}
+            </div>
             {/* Display the number of other matches if there are any */}
-            {matches?.content?.indices &&
-              matches?.content?.indices.length - _maxContentMatchNumber > 0 && (
-                <Text variant="italic">
-                  {` and ${matches?.content?.indices.length - _maxContentMatchNumber} other matches`}
+            {matches?.content?.indices && (
+              <Text variant="em">
+                <Text variant="secondary">
+                  {`${matches?.content?.indices.length} matches in this article`}
                 </Text>
-              )}
+              </Text>
+            )}
           </div>
         </LinkNative>
       </li>
-      {matches?.content?.indices &&
-        formatContentSnippet(item.content, matches.content.indices, maxContentMatchNumber).map(
-          (snippet, snipIdx) => (
-            <li
-              key={`${item.path}-${idx}-${snipIdx}`}
-              className={`${styles.item} ${styles.content}`}
-            >
-              <LinkNative
-                to={item.path}
-                onClick={onClick}
-                style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
-              >
-                <Text>{snippet}</Text>
-              </LinkNative>
-            </li>
-          ),
-        )}
     </>
   );
 }
@@ -315,6 +308,7 @@ function useDebounce(value: string, delay: number) {
   return debouncedValue;
 }
 
+// --- Step 0: Remove markdown formatting
 function removeMarkdownFormatting(markdown: string) {
   return (
     markdown

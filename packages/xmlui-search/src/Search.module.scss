@@ -7,31 +7,57 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$componentName: "Search";
+$component: "Search";
+$themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composePaddingVars($themeVars, $component);
+$backgroundColor-Search: createThemeVar("backgroundColor-#{$component}");
+$boxShadow-Search: createThemeVar("boxShadow-#{$component}");
+
+$componentChild: "SearchItem";
+$backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentChild}--hover");
 
 // --- TEMP
 .list {
+  @include t.borderVars($themeVars, $component);
+  @include t.paddingVars($themeVars, $component);
   position: absolute;
   right: 0;
   z-index: 1;
-  padding: 1rem;
+  padding: 0.75rem;
   margin-top: 2px;
-  background-color: var(--xmlui-color-surface-0);
-  border: 1px solid var(--xmlui-color-surface-500);
+  background-color: $backgroundColor-Search;
+  box-shadow: $boxShadow-Search;
   border-radius: 4px;
   max-height: 360px;
   overflow-y: auto;
   scrollbar-gutter: stable;
+  scrollbar-width: thin;
   width: 500px;
 
   .item {
     list-style: none;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
     padding-inline: 0.75rem;
 
     &:hover {
-      background-color: var(--xmlui-color-primary-100);
+      background-color: $backgroundColor-SearchItem--hover;
+    }
+
+    & > a {
+      color: var(--xmlui-textColor-primary);
+
+      &:hover {
+        color: var(--xmlui-textColor-primary);
+      }
+      &:active {
+        color: var(--xmlui-textColor-primary);
+      }
+    }
+
+    & > a .snippet {
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
     }
 
     &.header:has(+ .content):not(:first-child) {
@@ -41,13 +67,13 @@ $componentName: "Search";
     &.content {}
   }
 
-  .divider {
+  /* .divider {
     border-top: 2px solid var(--xmlui-color-secondary-300);
     width: 100%;
     margin-top: 4px;
     margin-bottom: 4px;
     padding-inline: 12px;
-  }
+  } */
 }
 // --- TEMP END
 
