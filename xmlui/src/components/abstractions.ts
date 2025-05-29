@@ -5,8 +5,7 @@ import type { PropertyValueDescription } from "../abstractions/ComponentDefs";
  * Several components offer a list of options to select from. This type describes such an option.
  */
 export type Option = {
-  label: string | ReactNode;
-  labelText?: string;
+  label: string;
   value: string;
   enabled?: boolean;
   style?: CSSProperties;
