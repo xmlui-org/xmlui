@@ -55,7 +55,7 @@
         <Pages>
 
             <Page url="/">
-                <MarkdownPage url="/pages/intro.md" />
+                <DocumentPage url="/pages/intro.md" />
             </Page>
 
             <Page url="/reactive-intro">
@@ -71,7 +71,7 @@
             </Page>
 
             <Page url="/appStructure">
-                <MarkdownPage url="/pages/app-structure.md" />
+                <DocumentPage url="/pages/app-structure.md" />
             </Page>
 
             <Page url="/markup">
@@ -155,7 +155,7 @@
             </Page>
 
             <Page url="/*">
-                <MarkdownPage content="{ appGlobals.content[$routeParams['*']] }" />
+                <DocumentPage content="{ appGlobals.content[$routeParams['*']] }" />
             </Page>
 
 

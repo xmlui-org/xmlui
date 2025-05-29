@@ -1,5 +1,7 @@
 <Component name="Markup">
 
+<DocumentPage>
+
   <Markdown><![CDATA[
 # XML Markup
 
@@ -314,4 +316,6 @@ We've seen two ways to declare variables: a `var` declaration in an XML attribut
 > </Button>
     ]]>
   </Markdown>
+
+</DocumentPage>
 </Component>
