@@ -1,4 +1,11 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, {
+  MutableRefObject,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { isEqual } from "lodash-es";
 
 import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
@@ -235,7 +242,6 @@ export function useReferenceTrackedApi(componentState: ContainerState) {
 export const useIsomorphicLayoutEffect =
   typeof document !== "undefined" ? useLayoutEffect : useEffect;
 
-
 // https://stackoverflow.com/a/49186677
 function getScrollParent(element: HTMLElement) {
   let style = getComputedStyle(element);
@@ -246,7 +252,7 @@ function getScrollParent(element: HTMLElement) {
     return document.body;
   }
   for (let parent = element; ; parent = parent.parentElement) {
-    if(!parent){
+    if (!parent) {
       return null;
     }
     style = getComputedStyle(parent);
@@ -269,7 +275,6 @@ export const useScrollParent = (element?: HTMLElement): HTMLElement => {
   return scrollParent;
 };
 
-
 // because safari doesn't support scrollend event...
 export const useScrollEventHandler = (
   element: HTMLElement | null | undefined,
@@ -281,11 +286,11 @@ export const useScrollEventHandler = (
     onScrollEnd?: () => void;
   },
 ) => {
-  const thisRef = useRef({scrolling: false});
+  const thisRef = useRef({ scrolling: false });
   useIsomorphicLayoutEffect(() => {
     let timer;
     let listener = () => {
-      if(!thisRef.current.scrolling){
+      if (!thisRef.current.scrolling) {
         onScrollStart?.();
       }
       thisRef.current.scrolling = true;
@@ -315,16 +320,17 @@ function realBackgroundColor(elem: HTMLElement) {
   }
 }
 
-
-export const useRealBackground = (element: HTMLElement)=>{
+export const useRealBackground = (element: HTMLElement) => {
   const { activeThemeTone, activeThemeId } = useTheme();
   const [counter, setCounter] = useState(0);
-  useEffect(()=>{
-    return setCounter(prev => prev + 1);
+  useEffect(() => {
+    return setCounter((prev) => prev + 1);
   }, [activeThemeTone, activeThemeId]);
-  return useMemo(()=> element ? realBackgroundColor(element) : 'transparent', [element, counter]);
-}
-
+  return useMemo(
+    () => (element ? realBackgroundColor(element) : "transparent"),
+    [element, counter],
+  );
+};
 
 // export const useIsInViewport = (ref, observerOptions) => {
 //   const [entered, setEntered] = useState(false);
@@ -352,3 +358,38 @@ export const useRealBackground = (element: HTMLElement)=>{
 //
 //   return entered;
 // };
+
+export const useStartMargin = (
+  hasOutsideScroll: boolean,
+  parentRef: MutableRefObject<HTMLElement | null | undefined>,
+  scrollRef: MutableRefObject<HTMLElement | null | undefined>,
+) => {
+  const [startMargin, setStartMargin] = useState<number>(0);
+
+  const calculateStartMargin = useEvent(() => {
+    if (!hasOutsideScroll) {
+      return 0;
+    }
+    const precedingElement = parentRef.current;
+    const scrollContainer = scrollRef.current;
+
+    if (precedingElement && scrollContainer) {
+      const precedingRect = precedingElement.getBoundingClientRect();
+      const scrollContainerRect = scrollContainer.getBoundingClientRect();
+
+      // It's important that scrollContainer is indeed the element whose scrollTop is relevant
+      const scrollTopOfScrollContainer = scrollContainer.scrollTop;
+
+      const calculatedMargin =
+        precedingRect.top - scrollContainerRect.top + scrollTopOfScrollContainer;
+      return calculatedMargin;
+    }
+    return 0;
+  });
+
+  useResizeObserver(scrollRef, () => {
+    setStartMargin(calculateStartMargin());
+  });
+
+  return startMargin;
+};
