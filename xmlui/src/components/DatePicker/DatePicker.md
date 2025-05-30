@@ -135,21 +135,21 @@ The table below shows the available date formats:
 
 %-PROP-END
 
-%-PROP-START fromDate
+%-PROP-START minValue
 
-```xmlui-pg copy display name="Example: fromDate" height="120px"
+```xmlui-pg copy display name="Example: minValue" height="120px"
 <App>
-  <DatePicker fromDate="05/24/2024" />
+  <DatePicker minValue="05/24/2024" />
 </App>
 ```
 
 %-PROP-END
 
-%-PROP-START toDate
+%-PROP-START maxValue
 
-```xmlui-pg copy display name="Example: toDate" height="120px"
+```xmlui-pg copy display name="Example: maxValue" height="120px"
 <App>
-  <DatePicker toDate="05/26/2024" />
+  <DatePicker maxValue="05/26/2024" />
 </App>
 ```
 

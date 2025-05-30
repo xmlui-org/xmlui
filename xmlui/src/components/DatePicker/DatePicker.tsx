@@ -86,11 +86,11 @@ export const DatePickerMd = createMetadata({
         },
       ],
     },
-    fromDate: {
+    minValue: {
       description: "The start date of the range of selectable dates",
       valueType: "string",
     },
-    toDate: {
+    maxValue: {
       description: "The end date of the range of selectable dates",
       valueType: "string",
     },
@@ -162,8 +162,8 @@ export const datePickerComponentRenderer = createComponentRenderer(
         dateFormat={extractValue(node.props.dateFormat)}
         showWeekNumber={extractValue.asOptionalBoolean(node.props.showWeekNumber)}
         weekStartsOn={extractValue(node.props.weekStartsOn)}
-        fromDate={extractValue(node.props.fromDate)}
-        toDate={extractValue(node.props.toDate)}
+        minValue={extractValue(node.props.minValue)}
+        maxValue={extractValue(node.props.maxValue)}
         disabledDates={extractValue(node.props.disabledDates)}
         inline={extractValue.asOptionalBoolean(node.props.inline)}
         startText={extractValue.asOptionalString(node.props.startText)}
