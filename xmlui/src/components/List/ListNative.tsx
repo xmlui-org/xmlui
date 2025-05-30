@@ -26,7 +26,7 @@ import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
 import { Card } from "../Card/CardNative";
 import type { CustomItemComponentProps, VListHandle } from "virtua";
 import { Virtualizer } from "virtua";
-import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { useIsomorphicLayoutEffect, useStartMargin } from "../../components-core/utils/hooks";
 import { ScrollContext } from "../../components-core/ScrollContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
@@ -292,9 +292,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const scrollRef = useContext(ScrollContext);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
-  const offsetsRef = useRef({
-    offsetTop: 0,
-  });
+
 
   const hasOutsideScroll =
     scrollRef &&
@@ -462,6 +460,8 @@ export const ListNative = forwardRef(function DynamicHeightList(
 
   const rowCount = rows?.length ?? 0;
 
+  const startMargin = useStartMargin(hasOutsideScroll, parentRef, scrollRef);
+
   return (
     <ListItemTypeContext.Provider value={rowTypeContextValue}>
       <ListContext.Provider value={expandContextValue}>
@@ -498,11 +498,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 scrollRef={scrollElementRef}
                 shift={shift}
                 onScroll={onScroll}
-                startMargin={
-                  hasOutsideScroll
-                    ? parentRef.current?.offsetTop - scrollRef.current?.offsetTop || 0
-                    : 0
-                }
+                startMargin={startMargin}
                 item={Item as CustomItemComponent}
                 count={rowCount}
               >

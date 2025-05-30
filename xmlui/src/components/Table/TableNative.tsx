@@ -1,6 +1,7 @@
-import type { CSSProperties, ReactNode } from "react";
 import {
+  CSSProperties,
   forwardRef,
+  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -26,7 +27,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { observeElementOffset, useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { orderBy } from "lodash-es";
 import classnames from "classnames";
 
@@ -42,6 +43,7 @@ import {
   useIsomorphicLayoutEffect,
   usePrevious,
   useResizeObserver,
+  useStartMargin,
 } from "../../components-core/utils/hooks";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
@@ -297,7 +299,7 @@ export const Table = forwardRef(
         const customColumn = {
           ...col,
           header: col.header ?? col.accessorKey ?? " ",
-          id: 'col_' + idx,
+          id: "col_" + idx,
           size: width,
           minSize: minWidth,
           maxSize: maxWidth,
@@ -488,22 +490,14 @@ export const Table = forwardRef(
       style?.height === undefined &&
       style?.flex === undefined;
 
-    const myObserveElementOffset = useCallback(
-      (instance: Virtualizer<any, Element>, cb: (offset: number, isScrolling: boolean) => void) => {
-        return observeElementOffset(instance, (offset, isScrolling) => {
-          //based on this: https://github.com/TanStack/virtual/issues/387
-          const parentContainerOffset = !hasOutsideScroll ? 0 : wrapperRef.current?.offsetTop || 0;
-          cb(offset - parentContainerOffset, isScrolling);
-        });
-      },
-      [hasOutsideScroll],
-    );
+    const startMargin = useStartMargin(hasOutsideScroll, wrapperRef, scrollRef);
+
     const rowVirtualizer = useVirtualizer({
       count: rows.length,
       getScrollElement: useCallback(() => {
         return hasOutsideScroll && scrollRef?.current ? scrollRef?.current : wrapperRef.current;
       }, [scrollRef, hasOutsideScroll]),
-      observeElementOffset: myObserveElementOffset,
+      scrollMargin: startMargin,
       estimateSize: useCallback(() => {
         return estimatedHeightRef.current || 30;
       }, []),
@@ -512,12 +506,12 @@ export const Table = forwardRef(
 
     const paddingTop =
       rowVirtualizer.getVirtualItems().length > 0
-        ? rowVirtualizer.getVirtualItems()?.[0]?.start || 0
+        ? rowVirtualizer.getVirtualItems()?.[0]?.start - startMargin || 0
         : 0;
     const paddingBottom =
       rowVirtualizer.getVirtualItems().length > 0
         ? rowVirtualizer.getTotalSize() -
-          (rowVirtualizer.getVirtualItems()?.[rowVirtualizer.getVirtualItems().length - 1]?.end ||
+          (rowVirtualizer.getVirtualItems()?.[rowVirtualizer.getVirtualItems().length - 1]?.end - startMargin ||
             0)
         : 0;
 
@@ -677,73 +671,75 @@ export const Table = forwardRef(
               ))}
             </thead>
           )}
-          {hasData && <tbody className={styles.tableBody}>
-            {paddingTop > 0 && (
-              <tr>
-                <td style={{ height: `${paddingTop}px` }} />
-              </tr>
-            )}
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const rowIndex = virtualRow.index;
-              const row = rows[rowIndex];
-              return (
-                <tr
-                  data-index={rowIndex}
-                  key={`${row.id}-${rowIndex}`}
-                  className={classnames(styles.row, {
-                    [styles.selected]: row.getIsSelected(),
-                    [styles.focused]: focusedIndex === rowIndex,
-                    [styles.disabled]: rowDisabledPredicate(row.original),
-                    [styles.noBottomBorder]: noBottomBorder,
-                  })}
-                  ref={(el) => {
-                    if (el && estimatedHeightRef.current === null) {
-                      estimatedHeightRef.current = Math.round(el.getBoundingClientRect().height);
-                    }
-                    rowVirtualizer.measureElement(el);
-                  }}
-                  onClick={(event) => {
-                    if (event.defaultPrevented) {
-                      return;
-                    }
-                    const target = event.target as HTMLElement;
-                    if (target.tagName.toLowerCase() === "input") {
-                      return;
-                    }
-                    toggleRow(row.original, event);
-                  }}
-                >
-                  {row.getVisibleCells().map((cell, i) => {
-                    const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
-                    const size = cell.column.getSize();
-                    return (
-                      <td
-                        className={styles.cell}
-                        key={`${cell.id}-${i}`}
-                        style={{
-                          // width: size,
-                          width: size,
-                          ...getCommonPinningStyles(cell.column),
-                        }}
-                      >
-                        {cellRenderer
-                          ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
-                          : (flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            ) as ReactNode)}
-                      </td>
-                    );
-                  })}
+          {hasData && (
+            <tbody className={styles.tableBody}>
+              {paddingTop > 0 && (
+                <tr>
+                  <td style={{ height: `${paddingTop}px` }} />
                 </tr>
-              );
-            })}
-            {paddingBottom > 0 && (
-              <tr>
-                <td style={{ height: `${paddingBottom}px` }} />
-              </tr>
-            )}
-          </tbody>}
+              )}
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const rowIndex = virtualRow.index;
+                const row = rows[rowIndex];
+                return (
+                  <tr
+                    data-index={rowIndex}
+                    key={`${row.id}-${rowIndex}`}
+                    className={classnames(styles.row, {
+                      [styles.selected]: row.getIsSelected(),
+                      [styles.focused]: focusedIndex === rowIndex,
+                      [styles.disabled]: rowDisabledPredicate(row.original),
+                      [styles.noBottomBorder]: noBottomBorder,
+                    })}
+                    ref={(el) => {
+                      if (el && estimatedHeightRef.current === null) {
+                        estimatedHeightRef.current = Math.round(el.getBoundingClientRect().height);
+                      }
+                      rowVirtualizer.measureElement(el);
+                    }}
+                    onClick={(event) => {
+                      if (event.defaultPrevented) {
+                        return;
+                      }
+                      const target = event.target as HTMLElement;
+                      if (target.tagName.toLowerCase() === "input") {
+                        return;
+                      }
+                      toggleRow(row.original, event);
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell, i) => {
+                      const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
+                      const size = cell.column.getSize();
+                      return (
+                        <td
+                          className={styles.cell}
+                          key={`${cell.id}-${i}`}
+                          style={{
+                            // width: size,
+                            width: size,
+                            ...getCommonPinningStyles(cell.column),
+                          }}
+                        >
+                          {cellRenderer
+                            ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
+                            : (flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              ) as ReactNode)}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+              {paddingBottom > 0 && (
+                <tr>
+                  <td style={{ height: `${paddingBottom}px` }} />
+                </tr>
+              )}
+            </tbody>
+          )}
         </table>
         {loading && !hasData && (
           <div className={styles.loadingWrapper}>
