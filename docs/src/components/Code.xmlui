@@ -1,8 +1,8 @@
 <Component name="Code">
-
-<H1>XMLUI Code</H1>
-
-<Markdown><![CDATA[
+  <H1>XMLUI Code
+  </H1>
+  <Markdown>
+    <![CDATA[
 With XMLUI you can go a long way without coding anything more than small JavaScript snippets like those we've seen in the [Markup](/markup) chapter.
 
 ![js snippets](/resources/js-snippets.png)
@@ -93,11 +93,13 @@ Here's an example of the transformed output.
 We defined the function in XMLUI's `index.html` like so:
 
 ```
-<script>
+
+    <script>
 window.transformStops = function(stops) {
   ...
 }
-</script>
+
+    </script>
 ```
 
 When you define functions in `index.html` you can keep everything in one place for easy reference, and debug your functions in the browser's devtools environment.
@@ -145,7 +147,8 @@ Use code-behind if:
 When you write JavaScript expressions in XMLUI attributes you typically write single expressions, not multiline code blocks. But you can write multiline code blocks in some event handlers, for example click handlers.
 
 ```xmlui
-<Button label="onClick" onClick="{
+
+    <Button label="onClick" onClick="{
   console.log('clicked');
   count++;
   toast('count now' + count)
@@ -153,29 +156,28 @@ When you write JavaScript expressions in XMLUI attributes you typically write si
 ```
 
 ```xmlui
-<Button label="event tag">
-  <event name="click">
+
+    <Button label="event tag">
+      <event name="click">
   {
     console.log('clicked');
     count++;
     toast('count now' + count)
   }
-  </event>
-</Button>
+  
+      </event>
+    </Button>
 ```
-]]></Markdown>
-
-
-
-
-<Markdown><![CDATA[
+]]>
+  </Markdown>
+  <Markdown>
+    <![CDATA[
 _
-]]></Markdown>
-
-
-<Markdown><![CDATA[
+]]>
+  </Markdown>
+  <Markdown>
+    <![CDATA[
 _
-]]></Markdown>
-
-
+]]>
+  </Markdown>
 </Component>

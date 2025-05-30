@@ -2114,7 +2114,7 @@ export default {
       "width-navPanel-App": "$space-64",
       "backgroundColor-navPanel-App": "$backgroundColor",
       "maxWidth-content-App": "$maxWidth-content",
-      "boxShadow-header-App": "-spread",
+      "boxShadow-header-App": "$boxShadow-spread",
       "boxShadow-navPanel-App": "$boxShadow-spread",
       "scroll-padding-block-Pages": "$space-4",
       "backgroundColor-content-App": "$backgroundColor",
@@ -2281,6 +2281,9 @@ export default {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
         "valueType": "boolean",
         "defaultValue": true
+      },
+      "creatable": {
+        "description": "This property allows the user to create new items that are not present in the list of options."
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
@@ -2498,7 +2501,7 @@ export default {
       "minHeight-Input": "39px",
       "backgroundColor-AutoComplete-badge": "$color-primary-500",
       "fontSize-AutoComplete-badge": "$fontSize-small",
-      "paddingHorizontal-AutoComplete-badge": "$space-1",
+      "paddingHorizontal-AutoComplete-badge": "$space-2",
       "paddingVertical-AutoComplete-badge": "$space-1",
       "backgroundColor-AutoComplete-badge--hover": "$color-primary-400",
       "backgroundColor-AutoComplete-badge--active": "$color-primary-500",
@@ -4122,6 +4125,40 @@ export default {
         ],
         "defaultValue": "none"
       },
+      "label": {
+        "description": "This property sets the label of the component.",
+        "valueType": "string"
+      },
+      "labelPosition": {
+        "description": "Places the label at the given position of the component.",
+        "availableValues": [
+          {
+            "value": "start",
+            "description": "The left side of the input (left-to-right) or the right side of the input (right-to-left)"
+          },
+          {
+            "value": "end",
+            "description": "The right side of the input (left-to-right) or the left side of the input (right-to-left)"
+          },
+          {
+            "value": "top",
+            "description": "The top of the input"
+          },
+          {
+            "value": "bottom",
+            "description": "The bottom of the input"
+          }
+        ],
+        "defaultValue": "top"
+      },
+      "labelWidth": {
+        "description": "This property sets the width of the `DatePicker`."
+      },
+      "labelBreak": {
+        "description": "This boolean value indicates if the `DatePicker` labels can be split into multiple lines if it would overflow the available label width.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
       "mode": {
         "description": "The mode of the datepicker (single or range)",
         "valueType": "string",
@@ -4186,11 +4223,11 @@ export default {
           }
         ]
       },
-      "fromDate": {
+      "minValue": {
         "description": "The start date of the range of selectable dates",
         "valueType": "string"
       },
-      "toDate": {
+      "maxValue": {
         "description": "The end date of the range of selectable dates",
         "valueType": "string"
       },
@@ -4247,6 +4284,7 @@ export default {
       "Input:backgroundColor-item-DatePicker--hover": "var(--xmlui-backgroundColor-item-DatePicker--hover)",
       "Input:textColor-value-DatePicker": "var(--xmlui-textColor-value-DatePicker)",
       "Input:minHeight-DatePicker": "var(--xmlui-minHeight-DatePicker)",
+      "Input:borderColor-selectedItem-DatePicker": "var(--xmlui-borderColor-selectedItem-DatePicker)",
       "Input:fontSize-DatePicker": "var(--xmlui-fontSize-DatePicker)",
       "Input:borderRadius-DatePicker-default": "var(--xmlui-borderRadius-DatePicker-default)",
       "Input:borderColor-DatePicker-default": "var(--xmlui-borderColor-DatePicker-default)",
@@ -4331,6 +4369,7 @@ export default {
       "boxShadow-menu-DatePicker": "$boxShadow-md",
       "borderRadius-menu-DatePicker": "$borderRadius",
       "textColor-value-DatePicker": "$textColor-primary",
+      "borderColor-selectedItem-DatePicker": "$color-primary-200",
       "backgroundColor-menu-DatePicker": "$color-surface-50",
       "backgroundColor-item-DatePicker--hover": "$color-surface-100",
       "backgroundColor-item-DatePicker--active": "$color-surface-200"
@@ -4410,8 +4449,8 @@ export default {
         "defaultValue": "primary"
       },
       "triggerButtonIcon": {
-        "description": "This property defines the icon to display on the trigger button.",
-        "defaultValue": "chevrondown",
+        "description": "This property defines the icon to display on the trigger button. You can change the default icon for all DropdownMenu instances with the \"icon.triggerButton:DropdownMenu\" declaration in the app configuration file.",
+        "defaultValue": "triggerButton:DropdownMenu",
         "valueType": "string"
       },
       "triggerButtonIconPosition": {
@@ -4505,7 +4544,7 @@ export default {
         "defaultValue": "start"
       },
       "icon": {
-        "description": "This property names an optional icon to display with the menu item.",
+        "description": "This property names an optional icon to display with the menu item. You can use component-specific icons in the format \"iconName:MenuItem\".",
         "valueType": "string"
       },
       "label": {
@@ -4701,7 +4740,7 @@ export default {
         "description": "This property is an optional string to set a label for the button part."
       },
       "buttonIcon": {
-        "description": "The ID of the icon to display in the button"
+        "description": "The ID of the icon to display in the button. You can change the default icon for all FileInput instances with the \"icon.browse:FileInput\" declaration in the app configuration file."
       },
       "buttonIconPosition": {
         "description": "This optional string determines the location of the button icon.",
@@ -4895,7 +4934,8 @@ export default {
       "height-Footer": "var(--xmlui-height-Footer)",
       "fontSize-Footer": "var(--xmlui-fontSize-Footer)",
       "verticalAlign-Footer": "var(--xmlui-verticalAlign-Footer)",
-      "maxWidth-content-Footer": "var(--xmlui-maxWidth-content-Footer)"
+      "maxWidth-content-Footer": "var(--xmlui-maxWidth-content-Footer)",
+      "maxWidth-App": "var(--xmlui-maxWidth-App)"
     },
     "defaultThemeVars": {
       "backgroundColor-Footer": "$backgroundColor-AppHeader",
@@ -6314,7 +6354,7 @@ export default {
       "fontSize-H1": "$fontSize-large",
       "marginTop-H1": "0",
       "marginBottom-H1": "0",
-      "fontSize-H1-markdown": "$fontSize-larger",
+      "fontSize-H1-markdown": "$fontSize-large",
       "marginTop-H1-markdown": "0",
       "marginBottom-H1-markdown": "$space-6",
       "light": {},
@@ -8787,8 +8827,7 @@ export default {
       }
     },
     "themeVars": {
-      "size-Icon": "var(--xmlui-size-Icon)",
-      "thickness-stroke-Icon": "var(--xmlui-thickness-stroke-Icon)"
+      "size-Icon": "var(--xmlui-size-Icon)"
     },
     "defaultThemeVars": {
       "size-Icon": "1.25em"
@@ -8813,6 +8852,9 @@ export default {
       },
       "aspectRatio": {
         "description": "This property sets a preferred aspect ratio for the image, which will be used in the calculation of auto sizes and some other layout functions."
+      },
+      "inline": {
+        "description": "When set to true, the image will be displayed as an inline element instead of a block element."
       },
       "animation": {
         "description": "The animation object to be applied to the component"
@@ -9462,7 +9504,7 @@ export default {
       "iconHorizontalExpanded": {
         "description": "Set a custom icon to display when the navigation menu is expanded, is in a **horizontal** app layout, and is in a navigation submenu.",
         "valueType": "string",
-        "defaultValue": "chevronleft"
+        "defaultValue": "chevronright"
       },
       "iconVerticalExpanded": {
         "description": "Set a custom icon to display when the navigation menu is expanded, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
@@ -9477,7 +9519,7 @@ export default {
       "iconVerticalCollapsed": {
         "description": "Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
         "valueType": "string",
-        "defaultValue": "chevronup"
+        "defaultValue": "chevronright"
       }
     },
     "themeVars": {
@@ -9597,20 +9639,14 @@ export default {
       "borderStartEndRadius-NavLink": "var(--xmlui-borderStartEndRadius-NavLink, var(--xmlui-borderRadius-NavLink))",
       "borderEndStartRadius-NavLink": "var(--xmlui-borderEndStartRadius-NavLink, var(--xmlui-borderRadius-NavLink))",
       "borderEndEndRadius-NavLink": "var(--xmlui-borderEndEndRadius-NavLink, var(--xmlui-borderRadius-NavLink))",
-      "outlineWidth-NavLink--focus": "var(--xmlui-outlineWidth-NavLink--focus)",
-      "outlineColor-NavLink--focus": "var(--xmlui-outlineColor-NavLink--focus)",
-      "outlineStyle-NavLink--focus": "var(--xmlui-outlineStyle-NavLink--focus)",
-      "outlineOffset-NavLink--focus": "var(--xmlui-outlineOffset-NavLink--focus)",
-      "fontFamily-NavLink": "var(--xmlui-fontFamily-NavLink)",
-      "fontWeight-NavLink": "var(--xmlui-fontWeight-NavLink)",
-      "fontWeight-NavLink--pressed": "var(--xmlui-fontWeight-NavLink--pressed)",
-      "fontWeight-NavLink--active": "var(--xmlui-fontWeight-NavLink--active)",
-      "fontSize-NavLink": "var(--xmlui-fontSize-NavLink)",
-      "wordWrap-NavLink": "var(--xmlui-wordWrap-NavLink)",
       "backgroundColor-NavLink": "var(--xmlui-backgroundColor-NavLink)",
       "backgroundColor-NavLink--hover": "var(--xmlui-backgroundColor-NavLink--hover)",
+      "backgroundColor-NavLink--hover--active": "var(--xmlui-backgroundColor-NavLink--hover--active)",
       "backgroundColor-NavLink--active": "var(--xmlui-backgroundColor-NavLink--active)",
       "backgroundColor-NavLink--pressed": "var(--xmlui-backgroundColor-NavLink--pressed)",
+      "backgroundColor-NavLink--pressed--active": "var(--xmlui-backgroundColor-NavLink--pressed--active)",
+      "fontSize-NavLink": "var(--xmlui-fontSize-NavLink)",
+      "wordWrap-NavLink": "var(--xmlui-wordWrap-NavLink)",
       "textColor-NavLink": "var(--xmlui-textColor-NavLink)",
       "textColor-NavLink--hover": "var(--xmlui-textColor-NavLink--hover)",
       "textColor-NavLink--active": "var(--xmlui-textColor-NavLink--active)",
@@ -9618,14 +9654,20 @@ export default {
       "textColor-NavLink--pressed": "var(--xmlui-textColor-NavLink--pressed)",
       "textColor-NavLink--pressed--active": "var(--xmlui-textColor-NavLink--pressed--active)",
       "color-icon-NavLink": "var(--xmlui-color-icon-NavLink)",
+      "fontFamily-NavLink": "var(--xmlui-fontFamily-NavLink)",
+      "fontWeight-NavLink": "var(--xmlui-fontWeight-NavLink)",
+      "fontWeight-NavLink--pressed": "var(--xmlui-fontWeight-NavLink--pressed)",
+      "fontWeight-NavLink--active": "var(--xmlui-fontWeight-NavLink--active)",
+      "borderRadius-indicator-NavLink": "var(--xmlui-borderRadius-indicator-NavLink)",
+      "thickness-indicator-NavLink": "var(--xmlui-thickness-indicator-NavLink)",
       "color-indicator-NavLink": "var(--xmlui-color-indicator-NavLink)",
       "color-indicator-NavLink--hover": "var(--xmlui-color-indicator-NavLink--hover)",
       "color-indicator-NavLink--active": "var(--xmlui-color-indicator-NavLink--active)",
-      "backgroundColor-NavLink--hover--active": "var(--xmlui-backgroundColor-NavLink--hover--active)",
       "color-indicator-NavLink--pressed": "var(--xmlui-color-indicator-NavLink--pressed)",
-      "backgroundColor-NavLink--pressed--active": "var(--xmlui-backgroundColor-NavLink--pressed--active)",
-      "thickness-indicator-NavLink": "var(--xmlui-thickness-indicator-NavLink)",
-      "borderRadius-indicator-NavLink": "var(--xmlui-borderRadius-indicator-NavLink)"
+      "outlineWidth-NavLink--focus": "var(--xmlui-outlineWidth-NavLink--focus)",
+      "outlineColor-NavLink--focus": "var(--xmlui-outlineColor-NavLink--focus)",
+      "outlineStyle-NavLink--focus": "var(--xmlui-outlineStyle-NavLink--focus)",
+      "outlineOffset-NavLink--focus": "var(--xmlui-outlineOffset-NavLink--focus)"
     },
     "themeVarDescriptions": {
       "color-indicator-NavLink": "Provides the following states: `--hover`, `--active`, `--pressed`"
@@ -9904,6 +9946,12 @@ export default {
         "valueType": "boolean",
         "defaultValue": true
       },
+      "spinnerUpIcon": {
+        "description": "Allows setting the icon displayed in the NumberBox spinner for incrementing values. You can change the default icon for all NumberBox instances with the \"icon.spinnerUp:NumberBox\" declaration in the app configuration file."
+      },
+      "spinnerDownIcon": {
+        "description": "Allows setting the icon displayed in the NumberBox spinner for decrementing values. You can change the default icon for all NumberBox instances with the \"icon.spinnerDown:NumberBox\" declaration in the app configuration file."
+      },
       "step": {
         "description": "This prop governs how big the step when clicking on the spinner of the field.",
         "valueType": "number",
@@ -10078,6 +10126,9 @@ export default {
     "props": {
       "url": {
         "description": "The URL of the route associated with the content."
+      },
+      "navLabel": {
+        "description": "The label of the page that is displayed in the navigation panel. If provided, the a new entry will be added to the navigation panel."
       }
     }
   },
@@ -10352,10 +10403,6 @@ export default {
       },
       "initialValue": {
         "description": "This property sets the component's initial value."
-      },
-      "maxLength": {
-        "description": "This property sets the maximum length of the input it accepts.",
-        "valueType": "number"
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -11669,13 +11716,13 @@ export default {
         "defaultValue": false
       },
       "iconNoSort": {
-        "description": "Allows setting the icon displayed in the Table column header when sorting is enabled, but the column remains unsorted."
+        "description": "Allows setting the icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the \"icon.nosort:Table\" declaration in the app configuration file."
       },
       "iconSortAsc": {
-        "description": "Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order."
+        "description": "Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order. You can change the default icon for all Table instances with the \"icon.sortasc:Table\" declaration in the app configuration file."
       },
       "iconSortDesc": {
-        "description": "Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order."
+        "description": "Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order. You can change the default icon for all Table instances with the \"icon.sortdesc:Table\" declaration in the app configuration file."
       },
       "enableMultiRowSelection": {
         "description": "This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.",
@@ -11834,13 +11881,48 @@ export default {
       }
     },
     "themeVars": {
-      "padding-TableOfContentsItem": "var(--xmlui-padding-TableOfContentsItem)",
-      "paddingHorizontal-TableOfContentsItem": "var(--xmlui-paddingHorizontal-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem))",
-      "paddingVertical-TableOfContentsItem": "var(--xmlui-paddingVertical-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem))",
-      "paddingLeft-TableOfContentsItem": "var(--xmlui-paddingLeft-TableOfContentsItem, var(--xmlui-paddingHorizontal-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
-      "paddingRight-TableOfContentsItem": "var(--xmlui-paddingRight-TableOfContentsItem, var(--xmlui-paddingHorizontal-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
-      "paddingTop-TableOfContentsItem": "var(--xmlui-paddingTop-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
-      "paddingBottom-TableOfContentsItem": "var(--xmlui-paddingBottom-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
+      "backgroundColor-TableOfContents": "var(--xmlui-backgroundColor-TableOfContents)",
+      "width-TableOfContents": "var(--xmlui-width-TableOfContents)",
+      "height-TableOfContents": "var(--xmlui-height-TableOfContents)",
+      "border-TableOfContents": "var(--xmlui-border-TableOfContents)",
+      "borderHorizontal-TableOfContents": "var(--xmlui-borderHorizontal-TableOfContents, var(--xmlui-border-TableOfContents))",
+      "borderVertical-TableOfContents": "var(--xmlui-borderVertical-TableOfContents, var(--xmlui-border-TableOfContents))",
+      "borderLeft-TableOfContents": "var(--xmlui-borderLeft-TableOfContents, var(--xmlui-borderHorizontal-TableOfContents, var(--xmlui-border-TableOfContents)))",
+      "borderRight-TableOfContents": "var(--xmlui-borderRight-TableOfContents, var(--xmlui-borderHorizontal-TableOfContents, var(--xmlui-border-TableOfContents)))",
+      "borderTop-TableOfContents": "var(--xmlui-borderTop-TableOfContents, var(--xmlui-borderVertical-TableOfContents, var(--xmlui-border-TableOfContents)))",
+      "borderBottom-TableOfContents": "var(--xmlui-borderBottom-TableOfContents, var(--xmlui-borderVertical-TableOfContents, var(--xmlui-border-TableOfContents)))",
+      "borderWidth-TableOfContents": "var(--xmlui-borderWidth-TableOfContents)",
+      "borderHorizontalWidth-TableOfContents": "var(--xmlui-borderHorizontalWidth-TableOfContents, var(--xmlui-borderWidth-TableOfContents))",
+      "borderLeftWidth-TableOfContents": "var(--xmlui-borderLeftWidth-TableOfContents, var(--xmlui-borderHorizontalWidth-TableOfContents, var(--xmlui-borderWidth-TableOfContents)))",
+      "borderRightWidth-TableOfContents": "var(--xmlui-borderRightWidth-TableOfContents, var(--xmlui-borderHorizontalWidth-TableOfContents, var(--xmlui-borderWidth-TableOfContents)))",
+      "borderVerticalWidth-TableOfContents": "var(--xmlui-borderVerticalWidth-TableOfContents, var(--xmlui-borderWidth-TableOfContents))",
+      "borderTopWidth-TableOfContents": "var(--xmlui-borderTopWidth-TableOfContents, var(--xmlui-borderVerticalWidth-TableOfContents, var(--xmlui-borderWidth-TableOfContents)))",
+      "borderBottomWidth-TableOfContents": "var(--xmlui-borderBottomWidth-TableOfContents, var(--xmlui-borderVerticalWidth-TableOfContents, var(--xmlui-borderWidth-TableOfContents)))",
+      "borderStyle-TableOfContents": "var(--xmlui-borderStyle-TableOfContents)",
+      "borderHorizontalStyle-TableOfContents": "var(--xmlui-borderHorizontalStyle-TableOfContents, var(--xmlui-borderStyle-TableOfContents))",
+      "borderLeftStyle-TableOfContents": "var(--xmlui-borderLeftStyle-TableOfContents, var(--xmlui-borderHorizontalStyle-TableOfContents, var(--xmlui-borderStyle-TableOfContents)))",
+      "borderRightStyle-TableOfContents": "var(--xmlui-borderRightStyle-TableOfContents, var(--xmlui-borderHorizontalStyle-TableOfContents, var(--xmlui-borderStyle-TableOfContents)))",
+      "borderVerticalStyle-TableOfContents": "var(--xmlui-borderVerticalStyle-TableOfContents, var(--xmlui-borderStyle-TableOfContents))",
+      "borderTopStyle-TableOfContents": "var(--xmlui-borderTopStyle-TableOfContents, var(--xmlui-borderVerticalStyle-TableOfContents, var(--xmlui-borderStyle-TableOfContents)))",
+      "borderBottomStyle-TableOfContents": "var(--xmlui-borderBottomStyle-TableOfContents, var(--xmlui-borderVerticalStyle-TableOfContents, var(--xmlui-borderStyle-TableOfContents)))",
+      "borderColor-TableOfContents": "var(--xmlui-borderColor-TableOfContents)",
+      "borderHorizontalColor-TableOfContents": "var(--xmlui-borderHorizontalColor-TableOfContents, var(--xmlui-borderColor-TableOfContents))",
+      "borderLeftColor-TableOfContents": "var(--xmlui-borderLeftColor-TableOfContents, var(--xmlui-borderHorizontalColor-TableOfContents, var(--xmlui-borderColor-TableOfContents)))",
+      "borderRightColor-TableOfContents": "var(--xmlui-borderRightColor-TableOfContents, var(--xmlui-borderHorizontalColor-TableOfContents, var(--xmlui-borderColor-TableOfContents)))",
+      "borderVerticalColor-TableOfContents": "var(--xmlui-borderVerticalColor-TableOfContents, var(--xmlui-borderColor-TableOfContents))",
+      "borderTopColor-TableOfContents": "var(--xmlui-borderTopColor-TableOfContents, var(--xmlui-borderVerticalColor-TableOfContents, var(--xmlui-borderColor-TableOfContents)))",
+      "borderBottomColor-TableOfContents": "var(--xmlui-borderBottomColor-TableOfContents, var(--xmlui-borderVerticalColor-TableOfContents, var(--xmlui-borderColor-TableOfContents)))",
+      "borderStartStartRadius-TableOfContents": "var(--xmlui-borderStartStartRadius-TableOfContents, var(--xmlui-borderRadius-TableOfContents))",
+      "borderStartEndRadius-TableOfContents": "var(--xmlui-borderStartEndRadius-TableOfContents, var(--xmlui-borderRadius-TableOfContents))",
+      "borderEndStartRadius-TableOfContents": "var(--xmlui-borderEndStartRadius-TableOfContents, var(--xmlui-borderRadius-TableOfContents))",
+      "borderEndEndRadius-TableOfContents": "var(--xmlui-borderEndEndRadius-TableOfContents, var(--xmlui-borderRadius-TableOfContents))",
+      "padding-TableOfContents": "var(--xmlui-padding-TableOfContents)",
+      "paddingHorizontal-TableOfContents": "var(--xmlui-paddingHorizontal-TableOfContents, var(--xmlui-padding-TableOfContents))",
+      "paddingVertical-TableOfContents": "var(--xmlui-paddingVertical-TableOfContents, var(--xmlui-padding-TableOfContents))",
+      "paddingLeft-TableOfContents": "var(--xmlui-paddingLeft-TableOfContents, var(--xmlui-paddingHorizontal-TableOfContents, var(--xmlui-padding-TableOfContents)))",
+      "paddingRight-TableOfContents": "var(--xmlui-paddingRight-TableOfContents, var(--xmlui-paddingHorizontal-TableOfContents, var(--xmlui-padding-TableOfContents)))",
+      "paddingTop-TableOfContents": "var(--xmlui-paddingTop-TableOfContents, var(--xmlui-paddingVertical-TableOfContents, var(--xmlui-padding-TableOfContents)))",
+      "paddingBottom-TableOfContents": "var(--xmlui-paddingBottom-TableOfContents, var(--xmlui-paddingVertical-TableOfContents, var(--xmlui-padding-TableOfContents)))",
       "textColor-TableOfContentsItem": "var(--xmlui-textColor-TableOfContentsItem)",
       "fontFamily-TableOfContentsItem": "var(--xmlui-fontFamily-TableOfContentsItem)",
       "fontSize-TableOfContentsItem": "var(--xmlui-fontSize-TableOfContentsItem)",
@@ -11867,6 +11949,109 @@ export default {
       "direction-TableOfContentsItem": "var(--xmlui-direction-TableOfContentsItem)",
       "writingMode-TableOfContentsItem": "var(--xmlui-writingMode-TableOfContentsItem)",
       "lineBreak-TableOfContentsItem": "var(--xmlui-lineBreak-TableOfContentsItem)",
+      "border-TableOfContentsItem": "var(--xmlui-border-TableOfContentsItem)",
+      "borderHorizontal-TableOfContentsItem": "var(--xmlui-borderHorizontal-TableOfContentsItem, var(--xmlui-border-TableOfContentsItem))",
+      "borderVertical-TableOfContentsItem": "var(--xmlui-borderVertical-TableOfContentsItem, var(--xmlui-border-TableOfContentsItem))",
+      "borderLeft-TableOfContentsItem": "var(--xmlui-borderLeft-TableOfContentsItem, var(--xmlui-borderHorizontal-TableOfContentsItem, var(--xmlui-border-TableOfContentsItem)))",
+      "borderRight-TableOfContentsItem": "var(--xmlui-borderRight-TableOfContentsItem, var(--xmlui-borderHorizontal-TableOfContentsItem, var(--xmlui-border-TableOfContentsItem)))",
+      "borderTop-TableOfContentsItem": "var(--xmlui-borderTop-TableOfContentsItem, var(--xmlui-borderVertical-TableOfContentsItem, var(--xmlui-border-TableOfContentsItem)))",
+      "borderBottom-TableOfContentsItem": "var(--xmlui-borderBottom-TableOfContentsItem, var(--xmlui-borderVertical-TableOfContentsItem, var(--xmlui-border-TableOfContentsItem)))",
+      "borderWidth-TableOfContentsItem": "var(--xmlui-borderWidth-TableOfContentsItem)",
+      "borderHorizontalWidth-TableOfContentsItem": "var(--xmlui-borderHorizontalWidth-TableOfContentsItem, var(--xmlui-borderWidth-TableOfContentsItem))",
+      "borderLeftWidth-TableOfContentsItem": "var(--xmlui-borderLeftWidth-TableOfContentsItem, var(--xmlui-borderHorizontalWidth-TableOfContentsItem, var(--xmlui-borderWidth-TableOfContentsItem)))",
+      "borderRightWidth-TableOfContentsItem": "var(--xmlui-borderRightWidth-TableOfContentsItem, var(--xmlui-borderHorizontalWidth-TableOfContentsItem, var(--xmlui-borderWidth-TableOfContentsItem)))",
+      "borderVerticalWidth-TableOfContentsItem": "var(--xmlui-borderVerticalWidth-TableOfContentsItem, var(--xmlui-borderWidth-TableOfContentsItem))",
+      "borderTopWidth-TableOfContentsItem": "var(--xmlui-borderTopWidth-TableOfContentsItem, var(--xmlui-borderVerticalWidth-TableOfContentsItem, var(--xmlui-borderWidth-TableOfContentsItem)))",
+      "borderBottomWidth-TableOfContentsItem": "var(--xmlui-borderBottomWidth-TableOfContentsItem, var(--xmlui-borderVerticalWidth-TableOfContentsItem, var(--xmlui-borderWidth-TableOfContentsItem)))",
+      "borderStyle-TableOfContentsItem": "var(--xmlui-borderStyle-TableOfContentsItem)",
+      "borderHorizontalStyle-TableOfContentsItem": "var(--xmlui-borderHorizontalStyle-TableOfContentsItem, var(--xmlui-borderStyle-TableOfContentsItem))",
+      "borderLeftStyle-TableOfContentsItem": "var(--xmlui-borderLeftStyle-TableOfContentsItem, var(--xmlui-borderHorizontalStyle-TableOfContentsItem, var(--xmlui-borderStyle-TableOfContentsItem)))",
+      "borderRightStyle-TableOfContentsItem": "var(--xmlui-borderRightStyle-TableOfContentsItem, var(--xmlui-borderHorizontalStyle-TableOfContentsItem, var(--xmlui-borderStyle-TableOfContentsItem)))",
+      "borderVerticalStyle-TableOfContentsItem": "var(--xmlui-borderVerticalStyle-TableOfContentsItem, var(--xmlui-borderStyle-TableOfContentsItem))",
+      "borderTopStyle-TableOfContentsItem": "var(--xmlui-borderTopStyle-TableOfContentsItem, var(--xmlui-borderVerticalStyle-TableOfContentsItem, var(--xmlui-borderStyle-TableOfContentsItem)))",
+      "borderBottomStyle-TableOfContentsItem": "var(--xmlui-borderBottomStyle-TableOfContentsItem, var(--xmlui-borderVerticalStyle-TableOfContentsItem, var(--xmlui-borderStyle-TableOfContentsItem)))",
+      "borderColor-TableOfContentsItem": "var(--xmlui-borderColor-TableOfContentsItem)",
+      "borderHorizontalColor-TableOfContentsItem": "var(--xmlui-borderHorizontalColor-TableOfContentsItem, var(--xmlui-borderColor-TableOfContentsItem))",
+      "borderLeftColor-TableOfContentsItem": "var(--xmlui-borderLeftColor-TableOfContentsItem, var(--xmlui-borderHorizontalColor-TableOfContentsItem, var(--xmlui-borderColor-TableOfContentsItem)))",
+      "borderRightColor-TableOfContentsItem": "var(--xmlui-borderRightColor-TableOfContentsItem, var(--xmlui-borderHorizontalColor-TableOfContentsItem, var(--xmlui-borderColor-TableOfContentsItem)))",
+      "borderVerticalColor-TableOfContentsItem": "var(--xmlui-borderVerticalColor-TableOfContentsItem, var(--xmlui-borderColor-TableOfContentsItem))",
+      "borderTopColor-TableOfContentsItem": "var(--xmlui-borderTopColor-TableOfContentsItem, var(--xmlui-borderVerticalColor-TableOfContentsItem, var(--xmlui-borderColor-TableOfContentsItem)))",
+      "borderBottomColor-TableOfContentsItem": "var(--xmlui-borderBottomColor-TableOfContentsItem, var(--xmlui-borderVerticalColor-TableOfContentsItem, var(--xmlui-borderColor-TableOfContentsItem)))",
+      "borderStartStartRadius-TableOfContentsItem": "var(--xmlui-borderStartStartRadius-TableOfContentsItem, var(--xmlui-borderRadius-TableOfContentsItem))",
+      "borderStartEndRadius-TableOfContentsItem": "var(--xmlui-borderStartEndRadius-TableOfContentsItem, var(--xmlui-borderRadius-TableOfContentsItem))",
+      "borderEndStartRadius-TableOfContentsItem": "var(--xmlui-borderEndStartRadius-TableOfContentsItem, var(--xmlui-borderRadius-TableOfContentsItem))",
+      "borderEndEndRadius-TableOfContentsItem": "var(--xmlui-borderEndEndRadius-TableOfContentsItem, var(--xmlui-borderRadius-TableOfContentsItem))",
+      "border-TableOfContentsItem--hover": "var(--xmlui-border-TableOfContentsItem--hover)",
+      "borderHorizontal-TableOfContentsItem--hover": "var(--xmlui-borderHorizontal-TableOfContentsItem--hover, var(--xmlui-border-TableOfContentsItem--hover))",
+      "borderVertical-TableOfContentsItem--hover": "var(--xmlui-borderVertical-TableOfContentsItem--hover, var(--xmlui-border-TableOfContentsItem--hover))",
+      "borderLeft-TableOfContentsItem--hover": "var(--xmlui-borderLeft-TableOfContentsItem--hover, var(--xmlui-borderHorizontal-TableOfContentsItem--hover, var(--xmlui-border-TableOfContentsItem--hover)))",
+      "borderRight-TableOfContentsItem--hover": "var(--xmlui-borderRight-TableOfContentsItem--hover, var(--xmlui-borderHorizontal-TableOfContentsItem--hover, var(--xmlui-border-TableOfContentsItem--hover)))",
+      "borderTop-TableOfContentsItem--hover": "var(--xmlui-borderTop-TableOfContentsItem--hover, var(--xmlui-borderVertical-TableOfContentsItem--hover, var(--xmlui-border-TableOfContentsItem--hover)))",
+      "borderBottom-TableOfContentsItem--hover": "var(--xmlui-borderBottom-TableOfContentsItem--hover, var(--xmlui-borderVertical-TableOfContentsItem--hover, var(--xmlui-border-TableOfContentsItem--hover)))",
+      "borderWidth-TableOfContentsItem--hover": "var(--xmlui-borderWidth-TableOfContentsItem--hover)",
+      "borderHorizontalWidth-TableOfContentsItem--hover": "var(--xmlui-borderHorizontalWidth-TableOfContentsItem--hover, var(--xmlui-borderWidth-TableOfContentsItem--hover))",
+      "borderLeftWidth-TableOfContentsItem--hover": "var(--xmlui-borderLeftWidth-TableOfContentsItem--hover, var(--xmlui-borderHorizontalWidth-TableOfContentsItem--hover, var(--xmlui-borderWidth-TableOfContentsItem--hover)))",
+      "borderRightWidth-TableOfContentsItem--hover": "var(--xmlui-borderRightWidth-TableOfContentsItem--hover, var(--xmlui-borderHorizontalWidth-TableOfContentsItem--hover, var(--xmlui-borderWidth-TableOfContentsItem--hover)))",
+      "borderVerticalWidth-TableOfContentsItem--hover": "var(--xmlui-borderVerticalWidth-TableOfContentsItem--hover, var(--xmlui-borderWidth-TableOfContentsItem--hover))",
+      "borderTopWidth-TableOfContentsItem--hover": "var(--xmlui-borderTopWidth-TableOfContentsItem--hover, var(--xmlui-borderVerticalWidth-TableOfContentsItem--hover, var(--xmlui-borderWidth-TableOfContentsItem--hover)))",
+      "borderBottomWidth-TableOfContentsItem--hover": "var(--xmlui-borderBottomWidth-TableOfContentsItem--hover, var(--xmlui-borderVerticalWidth-TableOfContentsItem--hover, var(--xmlui-borderWidth-TableOfContentsItem--hover)))",
+      "borderStyle-TableOfContentsItem--hover": "var(--xmlui-borderStyle-TableOfContentsItem--hover)",
+      "borderHorizontalStyle-TableOfContentsItem--hover": "var(--xmlui-borderHorizontalStyle-TableOfContentsItem--hover, var(--xmlui-borderStyle-TableOfContentsItem--hover))",
+      "borderLeftStyle-TableOfContentsItem--hover": "var(--xmlui-borderLeftStyle-TableOfContentsItem--hover, var(--xmlui-borderHorizontalStyle-TableOfContentsItem--hover, var(--xmlui-borderStyle-TableOfContentsItem--hover)))",
+      "borderRightStyle-TableOfContentsItem--hover": "var(--xmlui-borderRightStyle-TableOfContentsItem--hover, var(--xmlui-borderHorizontalStyle-TableOfContentsItem--hover, var(--xmlui-borderStyle-TableOfContentsItem--hover)))",
+      "borderVerticalStyle-TableOfContentsItem--hover": "var(--xmlui-borderVerticalStyle-TableOfContentsItem--hover, var(--xmlui-borderStyle-TableOfContentsItem--hover))",
+      "borderTopStyle-TableOfContentsItem--hover": "var(--xmlui-borderTopStyle-TableOfContentsItem--hover, var(--xmlui-borderVerticalStyle-TableOfContentsItem--hover, var(--xmlui-borderStyle-TableOfContentsItem--hover)))",
+      "borderBottomStyle-TableOfContentsItem--hover": "var(--xmlui-borderBottomStyle-TableOfContentsItem--hover, var(--xmlui-borderVerticalStyle-TableOfContentsItem--hover, var(--xmlui-borderStyle-TableOfContentsItem--hover)))",
+      "borderColor-TableOfContentsItem--hover": "var(--xmlui-borderColor-TableOfContentsItem--hover)",
+      "borderHorizontalColor-TableOfContentsItem--hover": "var(--xmlui-borderHorizontalColor-TableOfContentsItem--hover, var(--xmlui-borderColor-TableOfContentsItem--hover))",
+      "borderLeftColor-TableOfContentsItem--hover": "var(--xmlui-borderLeftColor-TableOfContentsItem--hover, var(--xmlui-borderHorizontalColor-TableOfContentsItem--hover, var(--xmlui-borderColor-TableOfContentsItem--hover)))",
+      "borderRightColor-TableOfContentsItem--hover": "var(--xmlui-borderRightColor-TableOfContentsItem--hover, var(--xmlui-borderHorizontalColor-TableOfContentsItem--hover, var(--xmlui-borderColor-TableOfContentsItem--hover)))",
+      "borderVerticalColor-TableOfContentsItem--hover": "var(--xmlui-borderVerticalColor-TableOfContentsItem--hover, var(--xmlui-borderColor-TableOfContentsItem--hover))",
+      "borderTopColor-TableOfContentsItem--hover": "var(--xmlui-borderTopColor-TableOfContentsItem--hover, var(--xmlui-borderVerticalColor-TableOfContentsItem--hover, var(--xmlui-borderColor-TableOfContentsItem--hover)))",
+      "borderBottomColor-TableOfContentsItem--hover": "var(--xmlui-borderBottomColor-TableOfContentsItem--hover, var(--xmlui-borderVerticalColor-TableOfContentsItem--hover, var(--xmlui-borderColor-TableOfContentsItem--hover)))",
+      "borderStartStartRadius-TableOfContentsItem--hover": "var(--xmlui-borderStartStartRadius-TableOfContentsItem--hover, var(--xmlui-borderRadius-TableOfContentsItem--hover))",
+      "borderStartEndRadius-TableOfContentsItem--hover": "var(--xmlui-borderStartEndRadius-TableOfContentsItem--hover, var(--xmlui-borderRadius-TableOfContentsItem--hover))",
+      "borderEndStartRadius-TableOfContentsItem--hover": "var(--xmlui-borderEndStartRadius-TableOfContentsItem--hover, var(--xmlui-borderRadius-TableOfContentsItem--hover))",
+      "borderEndEndRadius-TableOfContentsItem--hover": "var(--xmlui-borderEndEndRadius-TableOfContentsItem--hover, var(--xmlui-borderRadius-TableOfContentsItem--hover))",
+      "border-TableOfContentsItem--active": "var(--xmlui-border-TableOfContentsItem--active)",
+      "borderHorizontal-TableOfContentsItem--active": "var(--xmlui-borderHorizontal-TableOfContentsItem--active, var(--xmlui-border-TableOfContentsItem--active))",
+      "borderVertical-TableOfContentsItem--active": "var(--xmlui-borderVertical-TableOfContentsItem--active, var(--xmlui-border-TableOfContentsItem--active))",
+      "borderLeft-TableOfContentsItem--active": "var(--xmlui-borderLeft-TableOfContentsItem--active, var(--xmlui-borderHorizontal-TableOfContentsItem--active, var(--xmlui-border-TableOfContentsItem--active)))",
+      "borderRight-TableOfContentsItem--active": "var(--xmlui-borderRight-TableOfContentsItem--active, var(--xmlui-borderHorizontal-TableOfContentsItem--active, var(--xmlui-border-TableOfContentsItem--active)))",
+      "borderTop-TableOfContentsItem--active": "var(--xmlui-borderTop-TableOfContentsItem--active, var(--xmlui-borderVertical-TableOfContentsItem--active, var(--xmlui-border-TableOfContentsItem--active)))",
+      "borderBottom-TableOfContentsItem--active": "var(--xmlui-borderBottom-TableOfContentsItem--active, var(--xmlui-borderVertical-TableOfContentsItem--active, var(--xmlui-border-TableOfContentsItem--active)))",
+      "borderWidth-TableOfContentsItem--active": "var(--xmlui-borderWidth-TableOfContentsItem--active)",
+      "borderHorizontalWidth-TableOfContentsItem--active": "var(--xmlui-borderHorizontalWidth-TableOfContentsItem--active, var(--xmlui-borderWidth-TableOfContentsItem--active))",
+      "borderLeftWidth-TableOfContentsItem--active": "var(--xmlui-borderLeftWidth-TableOfContentsItem--active, var(--xmlui-borderHorizontalWidth-TableOfContentsItem--active, var(--xmlui-borderWidth-TableOfContentsItem--active)))",
+      "borderRightWidth-TableOfContentsItem--active": "var(--xmlui-borderRightWidth-TableOfContentsItem--active, var(--xmlui-borderHorizontalWidth-TableOfContentsItem--active, var(--xmlui-borderWidth-TableOfContentsItem--active)))",
+      "borderVerticalWidth-TableOfContentsItem--active": "var(--xmlui-borderVerticalWidth-TableOfContentsItem--active, var(--xmlui-borderWidth-TableOfContentsItem--active))",
+      "borderTopWidth-TableOfContentsItem--active": "var(--xmlui-borderTopWidth-TableOfContentsItem--active, var(--xmlui-borderVerticalWidth-TableOfContentsItem--active, var(--xmlui-borderWidth-TableOfContentsItem--active)))",
+      "borderBottomWidth-TableOfContentsItem--active": "var(--xmlui-borderBottomWidth-TableOfContentsItem--active, var(--xmlui-borderVerticalWidth-TableOfContentsItem--active, var(--xmlui-borderWidth-TableOfContentsItem--active)))",
+      "borderStyle-TableOfContentsItem--active": "var(--xmlui-borderStyle-TableOfContentsItem--active)",
+      "borderHorizontalStyle-TableOfContentsItem--active": "var(--xmlui-borderHorizontalStyle-TableOfContentsItem--active, var(--xmlui-borderStyle-TableOfContentsItem--active))",
+      "borderLeftStyle-TableOfContentsItem--active": "var(--xmlui-borderLeftStyle-TableOfContentsItem--active, var(--xmlui-borderHorizontalStyle-TableOfContentsItem--active, var(--xmlui-borderStyle-TableOfContentsItem--active)))",
+      "borderRightStyle-TableOfContentsItem--active": "var(--xmlui-borderRightStyle-TableOfContentsItem--active, var(--xmlui-borderHorizontalStyle-TableOfContentsItem--active, var(--xmlui-borderStyle-TableOfContentsItem--active)))",
+      "borderVerticalStyle-TableOfContentsItem--active": "var(--xmlui-borderVerticalStyle-TableOfContentsItem--active, var(--xmlui-borderStyle-TableOfContentsItem--active))",
+      "borderTopStyle-TableOfContentsItem--active": "var(--xmlui-borderTopStyle-TableOfContentsItem--active, var(--xmlui-borderVerticalStyle-TableOfContentsItem--active, var(--xmlui-borderStyle-TableOfContentsItem--active)))",
+      "borderBottomStyle-TableOfContentsItem--active": "var(--xmlui-borderBottomStyle-TableOfContentsItem--active, var(--xmlui-borderVerticalStyle-TableOfContentsItem--active, var(--xmlui-borderStyle-TableOfContentsItem--active)))",
+      "borderColor-TableOfContentsItem--active": "var(--xmlui-borderColor-TableOfContentsItem--active)",
+      "borderHorizontalColor-TableOfContentsItem--active": "var(--xmlui-borderHorizontalColor-TableOfContentsItem--active, var(--xmlui-borderColor-TableOfContentsItem--active))",
+      "borderLeftColor-TableOfContentsItem--active": "var(--xmlui-borderLeftColor-TableOfContentsItem--active, var(--xmlui-borderHorizontalColor-TableOfContentsItem--active, var(--xmlui-borderColor-TableOfContentsItem--active)))",
+      "borderRightColor-TableOfContentsItem--active": "var(--xmlui-borderRightColor-TableOfContentsItem--active, var(--xmlui-borderHorizontalColor-TableOfContentsItem--active, var(--xmlui-borderColor-TableOfContentsItem--active)))",
+      "borderVerticalColor-TableOfContentsItem--active": "var(--xmlui-borderVerticalColor-TableOfContentsItem--active, var(--xmlui-borderColor-TableOfContentsItem--active))",
+      "borderTopColor-TableOfContentsItem--active": "var(--xmlui-borderTopColor-TableOfContentsItem--active, var(--xmlui-borderVerticalColor-TableOfContentsItem--active, var(--xmlui-borderColor-TableOfContentsItem--active)))",
+      "borderBottomColor-TableOfContentsItem--active": "var(--xmlui-borderBottomColor-TableOfContentsItem--active, var(--xmlui-borderVerticalColor-TableOfContentsItem--active, var(--xmlui-borderColor-TableOfContentsItem--active)))",
+      "borderStartStartRadius-TableOfContentsItem--active": "var(--xmlui-borderStartStartRadius-TableOfContentsItem--active, var(--xmlui-borderRadius-TableOfContentsItem--active))",
+      "borderStartEndRadius-TableOfContentsItem--active": "var(--xmlui-borderStartEndRadius-TableOfContentsItem--active, var(--xmlui-borderRadius-TableOfContentsItem--active))",
+      "borderEndStartRadius-TableOfContentsItem--active": "var(--xmlui-borderEndStartRadius-TableOfContentsItem--active, var(--xmlui-borderRadius-TableOfContentsItem--active))",
+      "borderEndEndRadius-TableOfContentsItem--active": "var(--xmlui-borderEndEndRadius-TableOfContentsItem--active, var(--xmlui-borderRadius-TableOfContentsItem--active))",
+      "padding-TableOfContentsItem": "var(--xmlui-padding-TableOfContentsItem)",
+      "paddingHorizontal-TableOfContentsItem": "var(--xmlui-paddingHorizontal-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem))",
+      "paddingVertical-TableOfContentsItem": "var(--xmlui-paddingVertical-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem))",
+      "paddingLeft-TableOfContentsItem": "var(--xmlui-paddingLeft-TableOfContentsItem, var(--xmlui-paddingHorizontal-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
+      "paddingRight-TableOfContentsItem": "var(--xmlui-paddingRight-TableOfContentsItem, var(--xmlui-paddingHorizontal-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
+      "paddingTop-TableOfContentsItem": "var(--xmlui-paddingTop-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
+      "paddingBottom-TableOfContentsItem": "var(--xmlui-paddingBottom-TableOfContentsItem, var(--xmlui-paddingVertical-TableOfContentsItem, var(--xmlui-padding-TableOfContentsItem)))",
       "padding-TableOfContentsItem-level-1": "var(--xmlui-padding-TableOfContentsItem-level-1)",
       "paddingHorizontal-TableOfContentsItem-level-1": "var(--xmlui-paddingHorizontal-TableOfContentsItem-level-1, var(--xmlui-padding-TableOfContentsItem-level-1))",
       "paddingVertical-TableOfContentsItem-level-1": "var(--xmlui-paddingVertical-TableOfContentsItem-level-1, var(--xmlui-padding-TableOfContentsItem-level-1))",
@@ -12065,63 +12250,37 @@ export default {
       "direction-TableOfContentsItem-level-6": "var(--xmlui-direction-TableOfContentsItem-level-6)",
       "writingMode-TableOfContentsItem-level-6": "var(--xmlui-writingMode-TableOfContentsItem-level-6)",
       "lineBreak-TableOfContentsItem-level-6": "var(--xmlui-lineBreak-TableOfContentsItem-level-6)",
-      "backgroundColor-TableOfContents": "var(--xmlui-backgroundColor-TableOfContents)",
-      "width-TableOfContents": "var(--xmlui-width-TableOfContents)",
-      "height-TableOfContents": "var(--xmlui-height-TableOfContents)",
-      "borderRadius-TableOfContents": "var(--xmlui-borderRadius-TableOfContents)",
-      "borderColor-TableOfContents": "var(--xmlui-borderColor-TableOfContents)",
-      "borderWidth-TableOfContents": "var(--xmlui-borderWidth-TableOfContents)",
-      "borderStyle-TableOfContents": "var(--xmlui-borderStyle-TableOfContents)",
       "marginTop-TableOfContents": "var(--xmlui-marginTop-TableOfContents)",
       "marginBottom-TableOfContents": "var(--xmlui-marginBottom-TableOfContents)",
-      "paddingVertical-TableOfContents": "var(--xmlui-paddingVertical-TableOfContents)",
-      "paddingHorizontal-TableOfContents": "var(--xmlui-paddingHorizontal-TableOfContents)",
-      "borderWidth-TableOfContentsItem": "var(--xmlui-borderWidth-TableOfContentsItem)",
-      "borderStyle-TableOfContentsItem": "var(--xmlui-borderStyle-TableOfContentsItem)",
-      "borderColor-TableOfContentsItem": "var(--xmlui-borderColor-TableOfContentsItem)",
+      "backgroundColor-TableOfContentsItem--hover": "var(--xmlui-backgroundColor-TableOfContentsItem--hover)",
+      "fontWeight-TableOfContentsItem--hover": "var(--xmlui-fontWeight-TableOfContentsItem--hover)",
       "textColor-TableOfContentsItem--hover": "var(--xmlui-textColor-TableOfContentsItem--hover)",
-      "borderWidth-TableOfContentsItem--active": "var(--xmlui-borderWidth-TableOfContentsItem--active)",
-      "borderColor-TableOfContentsItem--active": "var(--xmlui-borderColor-TableOfContentsItem--active)",
+      "fontWeight-TableOfContentsItem-level-1--hover": "var(--xmlui-fontWeight-TableOfContentsItem-level-1--hover)",
+      "fontWeight-TableOfContentsItem-level-2--hover": "var(--xmlui-fontWeight-TableOfContentsItem-level-2--hover)",
+      "fontWeight-TableOfContentsItem-level-3--hover": "var(--xmlui-fontWeight-TableOfContentsItem-level-3--hover)",
+      "fontWeight-TableOfContentsItem-level-4--hover": "var(--xmlui-fontWeight-TableOfContentsItem-level-4--hover)",
+      "fontWeight-TableOfContentsItem-level-5--hover": "var(--xmlui-fontWeight-TableOfContentsItem-level-5--hover)",
+      "fontWeight-TableOfContentsItem-level-6--hover": "var(--xmlui-fontWeight-TableOfContentsItem-level-6--hover)",
+      "backgroundColor-TableOfContentsItem--active": "var(--xmlui-backgroundColor-TableOfContentsItem--active)",
       "color-TableOfContentsItem--active": "var(--xmlui-color-TableOfContentsItem--active)",
-      "fontWeight-TableOfContentsItem--active": "var(--xmlui-fontWeight-TableOfContentsItem--active)"
+      "fontWeight-TableOfContentsItem--active": "var(--xmlui-fontWeight-TableOfContentsItem--active)",
+      "fontWeight-TableOfContentsItem-level-1--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-1--active)",
+      "fontWeight-TableOfContentsItem-level-2--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-2--active)",
+      "fontWeight-TableOfContentsItem-level-3--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-3--active)",
+      "fontWeight-TableOfContentsItem-level-4--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-4--active)",
+      "fontWeight-TableOfContentsItem-level-5--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-5--active)",
+      "fontWeight-TableOfContentsItem-level-6--active": "var(--xmlui-fontWeight-TableOfContentsItem-level-6--active)"
     },
     "defaultThemeVars": {
-      "width-TableOfContents": "auto",
-      "height-TableOfContents": "auto",
-      "fontSize-TableOfContentsItem": "$fontSize-smaller",
-      "fontWeight-TableOfContentsItem": "$fontWeight-normal",
-      "fontFamily-TableOfContentsItem": "$fontFamily",
-      "borderRadius-TableOfContentsItem": "0",
-      "border-width-TableOfContentsItem": "$space-0_5",
-      "border-style-TableOfContentsItem": "solid",
-      "borderRadius-TableOfContentsItem--active": "0",
-      "border-width-TableOfContentsItem--active": "$space-0_5",
-      "border-style-TableOfContentsItem--active": "solid",
-      "fontWeight-TableOfContentsItem--active": "$fontWeight-bold",
-      "backgroundColor-TableOfContents": "transparent",
-      "paddingHorizontal-TableOfContents": "$space-8",
-      "paddingVertical-TableOfContents": "$space-4",
-      "paddingHorizontal-TableOfContentsItem": "$space-2",
-      "paddingVertical-TableOfContentsItem": "$space-2",
-      "paddingHorizontal-TableOfContentsItem-level-1": "unset",
-      "paddingHorizontal-TableOfContentsItem-level-2": "unset",
-      "paddingHorizontal-TableOfContentsItem-level-3": "unset",
-      "paddingHorizontal-TableOfContentsItem-level-4": "unset",
-      "paddingHorizontal-TableOfContentsItem-level-5": "unset",
-      "paddingHorizontal-TableOfContentsItem-level-6": "unset",
-      "marginTop-TableOfContents": "0",
-      "marginBottom-TableOfContents": "0",
-      "borderRadius-TableOfContents": "0",
-      "border-width-TableOfContents": "0",
-      "borderColor-TableOfContents": "transparent",
-      "border-style-TableOfContents": "solid",
-      "paddingLeft-TableOfContentsItem": "$space-1",
-      "textTransform-TableOfContentsItem": "none",
-      "verticalAlign-TableOfContentsItem": "baseline",
-      "letterSpacing-TableOfContentsItem": "0",
-      "color-TableOfContentsItem": "$textColor-primary",
-      "borderColor-TableOfContentsItem": "$borderColor",
-      "borderColor-TableOfContentsItem--active": "$color-primary-500",
+      "padding-TableOfContents": "$space-2",
+      "textColor-TableOfContentsItem": "$color-secondary-500",
+      "textColor-TableOfContentsItem--hover": "$textColor-primary",
+      "fontSize-TableOfContentsItem": "$fontSize-small",
+      "wordWrap-TableOfContentsItem": "break-word",
+      "paddingVertical-TableOfContentsItem": "$space-1",
+      "paddingHorizontal-TableOfContentsItem": "$space-1",
+      "fontWeight-TableOfContentsItem": "$fontWeight-bold",
+      "fontStyle-TableOfContentsItem-level-6": "italic",
       "color-TableOfContentsItem--active": "$color-primary-500"
     }
   },
@@ -13282,7 +13441,14 @@ export default {
   "ToneChangerButton": {
     "status": "experimental",
     "description": "The `ToneChangerButton` component is a component that allows the user to change the tone of the app.",
-    "props": {}
+    "props": {
+      "lightToDarkIcon": {
+        "description": "The icon displayed when the theme is in light mode and will switch to dark. You can change the default icon for all ToneChangerButton instances with the \"icon.lightToDark:ToneChangerButton\" declaration in the app configuration file."
+      },
+      "darkToLightIcon": {
+        "description": "The icon displayed when the theme is in dark mode and will switch to light. You can change the default icon for all ToneChangerButton instances with the \"icon.darkToLight:ToneChangerButton\" declaration in the app configuration file."
+      }
+    }
   },
   "Tree": {
     "status": "in progress",

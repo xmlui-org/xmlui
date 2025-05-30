@@ -1,0 +1,101 @@
+<App    var.userName="Guest"     var.isLoggedIn="false"  var.counter="0">
+  <Page       title="XMLUI Formatter Test"     backgroundColor="#f5f5f5">
+    <!-- Header section -->
+    <HStack      spacing="4"    padding="16px"     backgroundColor="#2a2a2a"    color="white">
+      <Image    width="32px"   height="32px"   src="/logo.png" />
+      <Text     value="XMLUI Formatter Test"     fontSize="20px"    fontWeight="bold" />
+      <Spacer />
+      <Text    value="{`Hello, ${userName}!`}"   fontSize="16px" />
+      <Button   label="{isLoggedIn ? 'Logout' : 'Login'}"    
+                onClick="{() => isLoggedIn = !isLoggedIn}" />
+    </HStack>
+
+    <!-- Main content -->
+    <VStack     spacing="8"    padding="24px"   alignItems="stretch">
+      <Card>
+        <CardHeader>
+          <Text value="Counter Example"  fontSize="18px" fontWeight="bold" />
+        </CardHeader>
+        <CardBody>
+          <HStack spacing="4"  alignItems="center">
+            <Button  label="-"  onClick="{() => counter--}"  disabled="{counter <= 0}" />
+            <Text   value="{counter}"     fontSize="24px"   fontWeight="bold" />
+            <Button  label="+"  onClick="{() => counter++}" />
+          </HStack>
+        </CardBody>
+      </Card>
+
+      <!-- Form with multiple attributes -->
+      <Form      onSubmit="{handleSubmit}"  id="testForm">
+        <VStack    spacing="4">
+          <TextInput
+            label="Username"
+            placeholder="Enter username"
+            value="{userName}"
+            onChange="{(e) => userName = e.target.value}" 
+            required="true"
+          />
+          
+          <Select 
+            label="Role"
+            placeholder="Select role"
+            options="{[
+              {value: 'admin', label: 'Administrator'},
+              {value: 'user', label: 'Regular User'},
+              {value: 'guest', label: 'Guest User'}
+            ]}"
+          />
+
+          <CheckBox   
+            label="Receive notifications"  
+            value="{receiveNotifications}" 
+            onChange="{(e) => receiveNotifications = e.target.checked}" 
+          />
+
+          <HStack>
+            <Button   type="submit"   label="Save"  variant="primary" />
+            <Button   type="button"   label="Cancel"  variant="outline" />
+          </HStack>
+        </VStack>
+      </Form>
+    </VStack>
+
+    <!-- Script section -->
+    <script>
+      // This is a test script block that should preserve its formatting
+      function handleSubmit(event) {
+        event.preventDefault();
+        
+        console.log('Form submitted with values:');
+        console.log('Username:', userName);
+        console.log('Is logged in:', isLoggedIn);
+        console.log('Counter:', counter);
+        
+        // Complex logic with indentation
+        if (userName.length > 0) {
+          if (isLoggedIn) {
+            // Update user profile
+            updateProfile(userName, {
+              counter: counter,
+              lastUpdated: new Date().toISOString()
+            });
+          } else {
+            // Show login prompt
+            showLoginPrompt();
+          }
+        } else {
+          console.error('Username cannot be empty');
+        }
+      }
+      
+      function updateProfile(name, data) {
+        // This would call an API in a real app
+        console.log(`Updating profile for ${name}:`, data);
+      }
+      
+      function showLoginPrompt() {
+        console.log('Please log in first');
+      }
+    </script>
+  </Page>
+</App>

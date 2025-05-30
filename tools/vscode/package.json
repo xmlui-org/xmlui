@@ -4,7 +4,7 @@
   "author": "Norbert Hajagos",
   "publisher": "norbidotdev",
   "license": "MIT",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "private": true,
   "categories": [],
   "keywords": [],
@@ -25,7 +25,7 @@
   "contributes": {
     "configuration": {
       "type": "object",
-      "title": " configuration",
+      "title": "XMLUI configuration",
       "properties": {
         "XMLUILanguageService.trace.server": {
           "scope": "window",
@@ -37,6 +37,36 @@
           ],
           "default": "off",
           "description": "Traces the communication between VS Code and the language server."
+        },
+        "xmlui.format.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable the XMLUI formatter"
+        },
+        "xmlui.format.preserveAttributeLineBreaks": {
+          "type": "boolean",
+          "default": true,
+          "description": "Preserve line breaks in attributes"
+        },
+        "xmlui.format.preserveScriptContent": {
+          "type": "boolean",
+          "default": true,
+          "description": "Preserve formatting in script blocks"
+        },
+        "xmlui.format.maxLineLength": {
+          "type": "number",
+          "default": 120,
+          "description": "Maximum line length before wrapping attributes"
+        },
+        "xmlui.format.indentBindingExpressions": {
+          "type": "boolean",
+          "default": false,
+          "description": "Format and indent binding expressions"
+        },
+        "xmlui.format.sortAttributes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Sort element attributes alphabetically"
         }
       }
     },
@@ -76,10 +106,12 @@
   "scripts": {
     "build:vsix": "vsce package",
     "build": "node esbuild.js --production",
+    "build:all": "./build.sh",
     "type-check": "tsc --noEmit",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
-    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json"
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "format-test": "node ./dist/extension.js --test ./test-samples/complex-sample.xmlui"
   },
   "dependencies": {
     "vscode-languageclient": "^9.0.1",
