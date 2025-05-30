@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { ExtensionContext } from 'vscode';
+import { ExtensionContext, languages, workspace } from 'vscode';
 
 import {
 	LanguageClient,
@@ -7,6 +7,7 @@ import {
 	ServerOptions,
 	TransportKind
 } from 'vscode-languageclient/node';
+import { XmluiFormattingProvider } from './formatter';
 
 let client: LanguageClient;
 
@@ -34,6 +35,15 @@ export function activate(context: ExtensionContext) {
 		'XMLUI Language Service',
 		serverOptions,
 		clientOptions
+	);
+
+	// Register our custom formatter provider
+	const formattingProvider = new XmluiFormattingProvider();
+	context.subscriptions.push(
+		languages.registerDocumentFormattingEditProvider(
+			{ language: 'xmlui', scheme: 'file' },
+			formattingProvider
+		)
 	);
 
 	// Start the client. This will also launch the server
