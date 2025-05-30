@@ -157,42 +157,66 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     let errInName = false;
     let openTagName: Node | undefined = undefined;
     if (at(SyntaxKind.Identifier)) {
-      //todo: here to continue
       openTagName = parseTagName();
     } else {
       error(Diag_Tag_Identifier_Expected);
-      advance([SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart]);
+      advance([SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart, SyntaxKind.CData, SyntaxKind.Script]);
       errInName = true;
     }
 
-    parseAttrList();
+    if(!errInName){
+      parseAttrList();
+    }
 
-    if (eat(SyntaxKind.NodeClose)) {
-      completeNode(SyntaxKind.ElementNode);
-      return;
-    } else if (eat(SyntaxKind.NodeEnd)) {
-      parseContent();
-      if (eat(SyntaxKind.CloseNodeStart)) {
-        if (at(SyntaxKind.Identifier)) {
-          const closeTagName = parseTagName();
-          const namesMismatch =
-            openTagName !== undefined && !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
-          if (namesMismatch) {
-            error(MakeErr.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
-          }
-        } else {
-          errRecover(Diag_Tag_Identifier_Expected, [SyntaxKind.NodeEnd]);
-        }
-        if (!eat(SyntaxKind.NodeEnd)) {
-          error(Diag_End_Token_Expected);
+    switch (peek().kind){
+      case SyntaxKind.NodeClose:{
+        bumpAny();
+        completeNode(SyntaxKind.ElementNode);
+        return;
+      }
+      case SyntaxKind.NodeEnd:{
+        bumpAny();
+        parseContent();
+        parseClosingTag(openTagName);
+        completeNode(SyntaxKind.ElementNode);
+        return;
+      }
+      case SyntaxKind.OpenNodeStart:
+      case SyntaxKind.Script:
+      case SyntaxKind.CData: {
+        break;
+      }
+
+      case SyntaxKind.CloseNodeStart:{
+        error(Diag_End_Or_Close_Token_Expected);
+        parseClosingTag(openTagName);
+        completeNode(SyntaxKind.ElementNode);
+        return;
+      }
+
+      default:{
+        error(Diag_End_Or_Close_Token_Expected);
+      }
+    }
+  }
+
+  function parseClosingTag(openTagName: Node){
+    if (eat(SyntaxKind.CloseNodeStart)) {
+      if (at(SyntaxKind.Identifier)) {
+        const closeTagName = parseTagName();
+        const namesMismatch =
+          openTagName !== undefined && !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
+        if (namesMismatch) {
+          error(MakeErr.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
         }
       } else {
-        error(Diag_CloseNodeStart_Token_Expected);
+        errRecover(Diag_Tag_Identifier_Expected, [SyntaxKind.NodeEnd]);
       }
-      completeNode(SyntaxKind.ElementNode);
-      return;
+      if (!eat(SyntaxKind.NodeEnd)) {
+        error(Diag_End_Token_Expected);
+      }
     } else {
-      error(Diag_End_Or_Close_Token_Expected);
+      error(Diag_CloseNodeStart_Token_Expected);
     }
   }
 
