@@ -169,13 +169,13 @@ test("weekStartsOn changes first day of week", async ({
   await expect(weekDays.first()).toContainText("Mo");
 });
 
-test.fixme("fromDate restricts selectable dates", async ({ initTestBed, page }) => {
+test.fixme("minValue restricts selectable dates", async ({ initTestBed, page }) => {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const fromDate = format(tomorrow, "MM/dd/yyyy");
+  const minValue = format(tomorrow, "MM/dd/yyyy");
 
   await initTestBed(`
-    <DatePicker fromDate="${fromDate}" inline="true" />
+    <DatePicker minValue="${minValue}" inline="true" />
   `);
 
   // Today should be disabled
@@ -187,13 +187,13 @@ test.fixme("fromDate restricts selectable dates", async ({ initTestBed, page }) 
   await expect(todayCell).toHaveClass(/disabled/);
 });
 
-test.fixme("toDate restricts selectable dates", async ({ initTestBed, page }) => {
+test.fixme("maxValue restricts selectable dates", async ({ initTestBed, page }) => {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
-  const toDate = format(yesterday, "MM/dd/yyyy");
+  const maxValue = format(yesterday, "MM/dd/yyyy");
 
   await initTestBed(`
-    <DatePicker toDate="${toDate}" inline="true" />
+    <DatePicker maxValue="${maxValue}" inline="true" />
   `);
 
   // Today should be disabled

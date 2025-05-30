@@ -35,8 +35,8 @@ type Props = {
   dateFormat?: DateFormat;
   showWeekNumber?: boolean;
   weekStartsOn?: WeekDays;
-  fromDate?: string;
-  toDate?: string;
+  minValue?: string;
+  maxValue?: string;
   disabledDates?: string[];
   inline?: boolean;
   startText?: string;
@@ -113,8 +113,8 @@ export const DatePicker = forwardRef(function DatePicker(
     dateFormat = defaultProps.dateFormat,
     showWeekNumber = defaultProps.showWeekNumber,
     weekStartsOn = defaultProps.weekStartsOn,
-    fromDate,
-    toDate,
+    minValue,
+    maxValue,
     disabledDates = defaultProps.disabledDates,
     style,
     registerComponentApi,
@@ -161,12 +161,12 @@ export const DatePicker = forwardRef(function DatePicker(
   }, [dateFormat]);
 
   const startDate = useMemo(() => {
-    return fromDate ? parse(fromDate, dateFormat, new Date()) : undefined;
-  }, [fromDate, dateFormat]);
+    return minValue ? parse(minValue, dateFormat, new Date()) : undefined;
+  }, [minValue, dateFormat]);
 
   const endDate = useMemo(() => {
-    return toDate ? parse(toDate, dateFormat, new Date()) : undefined;
-  }, [toDate, dateFormat]);
+    return maxValue ? parse(maxValue, dateFormat, new Date()) : undefined;
+  }, [maxValue, dateFormat]);
 
   const disabled = useMemo(() => {
     return disabledDates?.map((date) => parse(date, dateFormat, new Date()));
