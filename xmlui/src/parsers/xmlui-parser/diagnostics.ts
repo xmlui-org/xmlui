@@ -33,7 +33,7 @@ export enum DiagnosticCategory {
 export enum ErrCodes {
   onlyOneElem = "U002",
   expTagOpen = "U003",
-  expTagIdent = "U004",
+  expTagName = "U004",
   expCloseStart = "U005",
   expEndOrClose = "U006",
   tagNameMismatch = "U007",
@@ -43,6 +43,7 @@ export enum ErrCodes {
   expAttrValue = "U011",
   duplAttr = "U012",
   uppercaseAttr = "U013",
+  tagNameExpAfterNamespace = "U014",
   invalidChar = "W001",
   untermStr = "W002",
   untermComment = "W007",
@@ -99,8 +100,8 @@ export const Diag_CloseNodeStart_Token_Expected = {
 
 export const Diag_Tag_Identifier_Expected = {
   category: DiagnosticCategory.Error,
-  code: ErrCodes.expTagIdent,
-  message: "A tag identifier expected.",
+  code: ErrCodes.expTagName,
+  message: "A tag name expected.",
 } as const;
 
 export const Diag_Attr_Value_Expected = {
@@ -131,4 +132,10 @@ export const Diag_Attr_Identifier_Expected = {
   category: DiagnosticCategory.Error,
   code: ErrCodes.expAttrIdent,
   message: `An attribute identifier expected.`,
+} as const;
+
+export const Diag_Tag_Name_Afterd_Namespace_Expected = {
+  category: DiagnosticCategory.Error,
+  code: ErrCodes.tagNameExpAfterNamespace,
+  message: `A tag name expected after a namespaces.`,
 } as const;

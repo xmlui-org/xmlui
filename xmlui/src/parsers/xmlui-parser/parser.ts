@@ -159,9 +159,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     if (at(SyntaxKind.Identifier)) {
       openTagName = parseTagName();
     } else {
-      error(Diag_Tag_Identifier_Expected);
-      advance([SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart, SyntaxKind.CData, SyntaxKind.Script]);
       errInName = true;
+      startNode();
+      advance([SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart, SyntaxKind.CData, SyntaxKind.Script]);
+      const errNode = completeNode(SyntaxKind.ErrorNode);
+      errorAt(Diag_Tag_Identifier_Expected, errNode.pos, errNode.end)
     }
 
     if(!errInName){
@@ -184,7 +186,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       case SyntaxKind.OpenNodeStart:
       case SyntaxKind.Script:
       case SyntaxKind.CData: {
-        break;
+        completeNode(SyntaxKind.ElementNode);
+        error(Diag_End_Or_Close_Token_Expected);
+        return;
       }
 
       case SyntaxKind.CloseNodeStart:{
@@ -343,7 +347,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
    * @param recoveryTokens the [FollowSet](https://www.geeksforgeeks.org/follow-set-in-syntax-analysis/) of the parsed InnerNode. These tokens (or the EoF token) won't be skipped
    * @returns true if the current token is in the recovery set or EoF
    * */
-
   function errRecover(
     errCodeAndMsg: GeneralDiagnosticMessage,
     recoveryTokens: SyntaxKind[],
@@ -359,6 +362,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     completeNode(SyntaxKind.ErrorNode);
     return false;
   }
+
 
   /** Bumps over the next token and marks it as an error node while adding an error to the error list*/
   function errorAndBump(errCodeAndMsg: GeneralDiagnosticMessage) {
