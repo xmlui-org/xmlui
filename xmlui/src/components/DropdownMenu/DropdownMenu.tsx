@@ -50,7 +50,9 @@ export const DropdownMenuMd = createMetadata({
       defaultValue: defaultDropdownMenuProps.triggerButtonThemeColor,
     },
     triggerButtonIcon: {
-      description: `This property defines the icon to display on the trigger button.`,
+      description: `This property defines the icon to display on the trigger button. You can change the default icon ` +
+        `for all ${DDMCOMP} instances with the "icon.triggerButton:DropdownMenu" declaration in the app ` +
+        `configuration file.`,
       defaultValue: defaultDropdownMenuProps.triggerButtonIcon,
       valueType: "string",
     },
@@ -114,7 +116,7 @@ export const MenuItemMd = createMetadata({
       defaultValue: defaultMenuItemProps.iconPosition,
     },
     icon: {
-      description: `This property names an optional icon to display with the menu item.`,
+      description: `This property names an optional icon to display with the menu item. You can use component-specific icons in the format "iconName:MenuItem".`,
       valueType: "string",
     },
     label: dLabel(),
@@ -173,7 +175,7 @@ export const menuItemRenderer = createComponentRenderer(
         label={extractValue(node.props?.label)}
         style={layoutCss}
         iconPosition={extractValue(node.props.iconPosition)}
-        icon={node.props?.icon && <Icon name={extractValue(node.props.icon)} />}
+        icon={node.props?.icon && <Icon name={extractValue(node.props.icon)} fallback={extractValue(node.props.icon)} />}
         active={extractValue.asOptionalBoolean(node.props.active, false)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
       >

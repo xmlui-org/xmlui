@@ -61,6 +61,16 @@ export const NumberBoxMd = createMetadata({
       valueType: "boolean",
       defaultValue: true,
     },
+    spinnerUpIcon: d(
+      `Allows setting the icon displayed in the ${COMP} spinner for incrementing values. You can change ` +
+      `the default icon for all ${COMP} instances with the "icon.spinnerUp:NumberBox" declaration in the ` +
+      `app configuration file.`,
+    ),
+    spinnerDownIcon: d(
+      `Allows setting the icon displayed in the ${COMP} spinner for decrementing values. You can change ` +
+      `the default icon for all ${COMP} instances with the "icon.spinnerDown:NumberBox" declaration in the ` +
+      `app configuration file.`,
+    ),
     step: {
       description: `This prop governs how big the step when clicking on the spinner of the field.`,
       valueType: "number",
@@ -138,6 +148,8 @@ export const numberBoxComponentRenderer = createComponentRenderer(
         endText={extractValue.asOptionalString(node.props.endText)}
         gap={extractValue.asOptionalString(node.props.gap)}
         endIcon={extractValue.asOptionalString(node.props.endIcon)}
+        spinnerUpIcon={extractValue.asOptionalString(node.props.spinnerUpIcon)}
+        spinnerDownIcon={extractValue.asOptionalString(node.props.spinnerDownIcon)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         maxLength={extractValue(node.props.maxLength)}

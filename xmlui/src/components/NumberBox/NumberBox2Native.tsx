@@ -78,6 +78,8 @@ type AdornmentProps = {
   startIcon?: string;
   endText?: string;
   endIcon?: string;
+  spinnerUpIcon?: string;
+  spinnerDownIcon?: string;
 };
 
 export const NumberBox2 = forwardRef(function NumberBox2(
@@ -105,6 +107,8 @@ export const NumberBox2 = forwardRef(function NumberBox2(
     startIcon,
     endText,
     endIcon,
+    spinnerUpIcon,
+    spinnerDownIcon,
     autoFocus,
     readOnly,
     required,
@@ -404,7 +408,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
               disabled={!enabled || readOnly}
               ref={upButton}
             >
-              <Icon name="chevronup" size="sm" />
+              <Icon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
             </Button>
             <Button
               data-spinner="down"
@@ -416,7 +420,7 @@ export const NumberBox2 = forwardRef(function NumberBox2(
               disabled={!enabled || readOnly}
               ref={downButton}
             >
-              <Icon name="chevrondown" size="sm" />
+              <Icon name={spinnerDownIcon || "spinnerDown:NumberBox"} fallback="chevrondown" size="sm" />
             </Button>
           </div>
         )}

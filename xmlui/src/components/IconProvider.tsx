@@ -141,7 +141,7 @@ function registerIconRenderer(name: string | string[], renderer: IconRenderer<an
       pool.set(n, { renderer });
     });
   } else {
-    pool.set(name, { renderer });
+    pool.set(name.toLowerCase(), { renderer });
   }
 }
 
@@ -200,8 +200,8 @@ registerIconRenderer("plus", (props: IconBaseProps) => <PlusIcon {...props} />);
 registerIconRenderer("inspect", (props: IconBaseProps) => <InspectIcon {...props} />);
 registerIconRenderer("plus-circle", (props: IconBaseProps) => <AiOutlinePlusCircle {...props} />);
 registerIconRenderer("filledplus", (props: IconBaseProps) => <FillPlusCircleIcon {...props} />);
-registerIconRenderer("darkToLight", (props: IconBaseProps) => <DarkToLightIcon {...props} />);
-registerIconRenderer("lightToDark", (props: IconBaseProps) => <LightToDarkIcon {...props} />);
+registerIconRenderer("darktolight", (props: IconBaseProps) => <DarkToLightIcon {...props} />);
+registerIconRenderer("lighttodark", (props: IconBaseProps) => <LightToDarkIcon {...props} />);
 registerIconRenderer("checkmark", (props: IconBaseProps) => <CheckIcon {...props} />);
 registerIconRenderer("valid", (props: IconBaseProps) => <FiCheckCircle {...props} />);
 registerIconRenderer("info", (props: IconBaseProps) => <FiAlertOctagon {...props} />);

@@ -110,6 +110,7 @@ function useFindIconRenderer(name?: string, fallback?: string) {
       if (iconRenderer) return iconRenderer;
     }
   }
+
   if (fallback && typeof fallback === "string") {
     const iconRenderer = iconRegistry.lookupIconRenderer(fallback.toLowerCase());
     if (iconRenderer) return iconRenderer;

@@ -43,7 +43,7 @@ export const defaultDropdownMenuProps: Pick<
   alignment: "start",
   triggerButtonVariant: "ghost",
   triggerButtonThemeColor: "primary",
-  triggerButtonIcon: "chevrondown",
+  triggerButtonIcon: "triggerButton:DropdownMenu", // Use component-specific icon resource pattern
   triggerButtonIconPosition: "end",
 };
 
@@ -91,7 +91,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
           triggerTemplate
         ) : (
           <Button
-            icon={<Icon name={triggerButtonIcon} />}
+            icon={<Icon name={triggerButtonIcon} fallback="chevrondown" />}
             iconPosition={triggerButtonIconPosition}
             type="button"
             variant={triggerButtonVariant as ButtonVariant}
