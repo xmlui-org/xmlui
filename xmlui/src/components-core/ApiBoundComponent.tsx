@@ -6,6 +6,7 @@ import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs"
 import type { UploadActionComponent } from "./action/FileUploadAction";
 import type { DownloadActionComponent } from "./action/FileDownloadAction";
 import type { ApiActionComponent } from "../components/APICall/APICall";
+import { parseAttributeValue } from "./script-runner/AttributeValueParser";
 
 type ApiBoundComponentProps = {
   uid: symbol;
@@ -187,9 +188,23 @@ export function ApiBoundComponent({
           props._data_url = operation.url;
         }
       }
-      //illesg really experimental brutal hack
-      const prefetchPathWithoutBindingExpression = operation.url?.trim().startsWith("{") ? operation.url?.trim().substring(1, operation.url.length - 1) : `'${operation.url}'`;
-      props[key] = `{ ${loaderUid}.value || ( appGlobals.prefetchedContent[${prefetchPathWithoutBindingExpression}] || appGlobals.prefetchedContent['/' + ${prefetchPathWithoutBindingExpression}] ) }`;
+      //illesg really experimental
+      let prefetchKey = null;
+      const { segments } = parseAttributeValue(operation.url?.trim());
+      if (segments?.length === 1) {
+        if (segments[0].literal) {
+          prefetchKey = `"${segments[0].literal}"`;
+        } else if (segments[0].expr) {
+          // we remove the first and last characters, which are the curly braces
+          prefetchKey = operation.url?.trim().substring(1, operation.url.length - 1);
+        }
+      }
+      if (prefetchKey === null) {
+        props[key] = `{ ${loaderUid}.value }`;
+      } else {
+        props[key] =
+          `{ ${loaderUid}.value || ( appGlobals.prefetchedContent[${prefetchKey}] || appGlobals.prefetchedContent['/' + ${prefetchKey}] ) }`;
+      }
       props.loading = `{ ${loaderUid}.inProgress === undefined ? true : ${loaderUid}.inProgress}`;
       props.pageInfo = `{${loaderUid}.pageInfo}`;
       events.requestFetchPrevPage = `${loaderUid}.fetchPrevPage()`;
