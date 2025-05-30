@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.9.43
+
+### Patch Changes
+
+- e2324bb: fix prefetchedContent handling
+- cacbf26: improve: AutoComplete - updating the selection logic, improved handling of readOnly and multi states, and removing unused or redundant code, improving tests
+- 05c8dfe: test: DatePicker - fix e2e "disabled state prevents interaction"
+- 42571db: test: create tests for the AutoComplete component, fix bugs
+- 05205c7: Add diagnostics to language server
+- 0a3d059: fix initial offset calculation for virtualized table/list
+
 ## 0.9.42
 
 ### Patch Changes
