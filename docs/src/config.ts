@@ -75,14 +75,16 @@ function highlight(
     }) ?? [];
 
   const highlightedSubstrings: DecorationItem[] =
-    meta?.highlightSubstrings?.map((str: DecorationItem) => {
-      return {
-        // line and character are 0-indexed
-        start: str.start,
-        end: str.end,
-        properties: str.properties,
-      };
-    }) ?? [];
+    [...(meta?.highlightSubstringsEmphasized ?? []), ...(meta?.highlightSubstrings ?? [])]?.map(
+      (str: DecorationItem) => {
+        return {
+          // line and character are 0-indexed
+          start: str.start,
+          end: str.end,
+          properties: str.properties,
+        };
+      },
+    ) ?? [];
 
   const opts = {
     lang,

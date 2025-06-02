@@ -2,6 +2,7 @@ import { type ReactNode, isValidElement } from "react";
 
 const highlightRowsClass = "codeBlockHighlightRow";
 const highlightSubstringsClass = "codeBlockHighlightString";
+const highlightSubstringsEmphasisClass = "codeBlockHighlightStringEmphasis";
 
 /*
  * Encode string, returns base64 value
@@ -14,12 +15,12 @@ export function encodeValue(value) {
 
   const valueToString = value.toString();
 
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     return window.atob(valueToString);
   }
 
-  const buff = Buffer.from(valueToString, 'base64');
-  return buff.toString('ascii');
+  const buff = Buffer.from(valueToString, "base64");
+  return buff.toString("ascii");
 }
 
 /**
@@ -150,6 +151,11 @@ function extractMetaFromChildren(
         code,
         meta[CodeHighlighterMetaKeys.highlightSubstrings.data],
       ),
+      [CodeHighlighterMetaKeys.highlightSubstringsEmphasized.prop]: parseSubstringHighlights(
+        code,
+        meta[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data],
+        true,
+      ),
     };
   }
   return {};
@@ -198,12 +204,17 @@ function parseRowHighlights(codeLines: number, str?: string): ItemRowDecoration[
   }
 }
 
-function parseSubstringHighlights(code: string, str?: string): ItemRowDecoration[] {
+function parseSubstringHighlights(
+  code: string,
+  str?: string,
+  emphasized = false,
+): ItemRowDecoration[] {
   if (!str) return [];
   if (!code) return [];
   return str
     .split(" ")
     .map((item) => encodeValue(item))
+    .filter((item) => item.trim() !== "")
     .reduce((acc, item) => acc.concat(findAllNonOverlappingSubstrings(code, item)), []);
 
   function findAllNonOverlappingSubstrings(str: string, code: string) {
@@ -218,7 +229,9 @@ function parseSubstringHighlights(code: string, str?: string): ItemRowDecoration
       result.push({
         start: index,
         end: index + searchLength,
-        properties: { class: highlightSubstringsClass },
+        properties: {
+          class: emphasized ? highlightSubstringsEmphasisClass : highlightSubstringsClass,
+        },
       });
       startIndex = index + searchLength; // Jump past this match
     }
@@ -271,6 +284,10 @@ export const CodeHighlighterMetaKeys = {
   rowNumbers: { data: "data-row-numbers", prop: "rowNumbers" },
   highlightRows: { data: "data-highlight-rows", prop: "highlightRows" },
   highlightSubstrings: { data: "data-highlight-substrings", prop: "highlightSubstrings" },
+  highlightSubstringsEmphasized: {
+    data: "data-highlight-substrings-emp",
+    prop: "highlightSubstringsEmphasized",
+  },
 };
 export const CodeHighlighterMetaKeysData = Object.values(CodeHighlighterMetaKeys).map(
   (item) => item.data,

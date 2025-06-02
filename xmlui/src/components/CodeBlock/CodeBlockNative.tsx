@@ -124,6 +124,17 @@ export function markdownCodeBlockParser() {
                 `${unparsedSubstrings} ${newItemBase64}`;
             }
           }
+          if (item.startsWith("!/") && item.endsWith("/")) {
+            const unparsedSubstrings = acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data];
+            const newItemBase64 = decodeValue(item.substring(2, item.length - 1));
+
+            if (!unparsedSubstrings) {
+              acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data] = newItemBase64;
+            } else {
+              acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data] =
+                `${unparsedSubstrings} ${newItemBase64}`;
+            }
+          }
           if (item.startsWith("{") && item.endsWith("}")) {
             const unparsedRows = acc[CodeHighlighterMetaKeys.highlightRows.data];
             const newItem = item.substring(1, item.length - 1);
