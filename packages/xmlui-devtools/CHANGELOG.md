@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.10
+
+### Patch Changes
+
+- 3eab4a3: improve: design updates - devtools, playground, docs
+
 ## 0.1.9
 
 ### Patch Changes
