@@ -46,6 +46,8 @@ import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
 import { LinkNative } from "./components/Link/LinkNative";
+import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
+import { Logo } from "./components/Logo/LogoNative";
 
 export type {
   ThemeDefinition,
@@ -97,4 +99,6 @@ export {
   NestedApp,
   VisuallyHidden,
   LinkNative,
+  ToneChangerButton,
+  Logo
 };

@@ -108,7 +108,7 @@ export const DevTools = () => {
         defaultTheme: "",
         defaultTone: "",
         logo: "",
-        name: "",
+        name: "XMLUI App",
         description: "",
         resources: {},
         themes: [],
@@ -284,11 +284,13 @@ export const DevTools = () => {
                 Code
               </Button>
             </Trigger>
-            <Trigger value={"console"} asChild>
-              <Button variant={"ghost"} size={"sm"}>
-                Console
-              </Button>
-            </Trigger>
+            {process.env.VITE_DEV_MODE && (
+              <Trigger value={"console"} asChild>
+                <Button variant={"ghost"} size={"sm"}>
+                  Console
+                </Button>
+              </Trigger>
+            )}
           </div>
           <div className={styles.actions}>
             <DropdownMenu.Root open={dropdownOpen} onOpenChange={setDropdownOpen}>
@@ -300,7 +302,7 @@ export const DevTools = () => {
               <DropdownMenu.Portal container={root}>
                 <DropdownMenu.Content className={styles.menu}>
                   <DropdownMenu.Item className={styles.menuItem}>
-                    Dock side
+                    <span style={{ paddingLeft: 4 }}>Dock side</span>
                     <div className={styles.sideButtons}>
                       <Button
                         style={{ padding: 8 }}
@@ -360,20 +362,22 @@ export const DevTools = () => {
             </button>
           </div>
         </Content>
-        <Content value={"console"} className={styles.content}>
-          <div className={styles.console}>
-            {logs.map((log, idx) => (
-              <div key={idx}>
-                <span className={styles.timestamp}>{log.timestamp.toLocaleTimeString()}:</span>{" "}
-                {log.args.map((arg, i) => (
-                  <span key={i}>
-                    {typeof arg === "object" ? trySafeStringify(arg) : String(arg)}{" "}
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-        </Content>
+        {process.env.VITE_DEV_MODE && (
+          <Content value={"console"} className={styles.content}>
+            <div className={styles.console}>
+              {logs.map((log, idx) => (
+                <div key={idx}>
+                  <span className={styles.timestamp}>{log.timestamp.toLocaleTimeString()}:</span>{" "}
+                  {log.args.map((arg, i) => (
+                    <span key={i}>
+                      {typeof arg === "object" ? trySafeStringify(arg) : String(arg)}{" "}
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </Content>
+        )}
       </Root>
     </Rnd>
   );

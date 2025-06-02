@@ -232,7 +232,7 @@ export const builtInThemes: Array<ThemeDefinition> = [
   XmlUiPurpleThemeDefinition,
   XmlUiCyanThemeDefinition,
   XmlUiRedThemeDefinition,
-  SolidThemeDefinition,
+  /*SolidThemeDefinition,*/
 ];
 
 type ThemeProviderProps = {

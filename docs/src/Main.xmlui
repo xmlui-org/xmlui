@@ -1,8 +1,8 @@
 <Fragment xmlns:XMLUIExtensions="component-ns">
     <App layout="vertical-full-header" noScrollbarGutters="false"
-        when="{!window.location.hash.includes('/playground')}">
+         when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
-            <SpaceFiller/>
+            <SpaceFiller />
             <XMLUIExtensions:Search data="{{ ...appGlobals.content, ...appGlobals.prefetchedContent }}" />
             <ToneChangerButton />
         </AppHeader>
@@ -31,7 +31,7 @@
 
             <NavGroup label="Reference">
 
-                <RecursiveNavTree items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
+                <RecursiveNavTree items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }" />
 
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props" />
@@ -159,11 +159,14 @@
 
 
         </Pages>
-
         <Footer>
-            <Text>Created with <Text variant="strong"> XMLUI</Text></Text>
+                <Card border="0" width="100%" padding="0">
+                    <CHStack gap="$space-1" paddingBottom="0">
+                        Powered by
+                        <Logo width="60px" />
+                    </CHStack>
+                </Card>
         </Footer>
-
     </App>
     <XMLUIExtensions:StandalonePlayground when="{window.location.hash.includes('/playground')}" />
 </Fragment>
