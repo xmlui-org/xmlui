@@ -148,6 +148,9 @@
     "@rollup/rollup-linux-x64-gnu": "4.20.0",
     "@rollup/rollup-win32-x64-msvc": "4.20.0"
   },
+  "resolutions": {
+    "@radix-ui/react-dismissable-layer": "1.1.10"
+  },
   "files": [
     "dist",
     "src/styles"

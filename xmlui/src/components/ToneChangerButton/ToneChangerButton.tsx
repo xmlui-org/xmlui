@@ -25,12 +25,12 @@ export const ToneChangerButtonMd = createMetadata({
   },
 });
 
-function ToneChangerButton({ 
-  lightToDarkIcon = LIGHT_TO_DARK_ICON, 
-  darkToLightIcon = DARK_TO_LIGHT_ICON 
+export function ToneChangerButton({
+  lightToDarkIcon = LIGHT_TO_DARK_ICON,
+  darkToLightIcon = DARK_TO_LIGHT_ICON
 }) {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
-  
+
   // Use the direct icon name as both the main icon and the fallback
   // This ensures we always have a working icon
   const iconName = activeThemeTone === "light" ? lightToDarkIcon : darkToLightIcon;
@@ -55,7 +55,7 @@ export const toneChangerButtonComponentRenderer = createComponentRenderer(
   COMP,
   ToneChangerButtonMd,
   ({ node, extractValue }) => {
-    return <ToneChangerButton 
+    return <ToneChangerButton
       lightToDarkIcon={extractValue.asOptionalString(node.props.lightToDarkIcon)}
       darkToLightIcon={extractValue.asOptionalString(node.props.darkToLightIcon)}
     />;

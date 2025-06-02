@@ -10,10 +10,10 @@ import { createQueryString } from "./utils";
 import { Box } from "./Box";
 import { Tooltip } from "./Tooltip";
 import ConfirmationDialog from "./ConfirmationDialog";
-import { ToneSwitcher } from "./ToneSwitcher";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { CodeSelector } from "./CodeSelector";
-import { Text } from "xmlui";
+import { Button, Text, Logo } from "xmlui";
+import { ToneSwitcher } from "./ToneSwitcher";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { appDescription, options, dispatch } = usePlayground();
@@ -56,11 +56,15 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
 
   return (
     <div className={classnames(styles.header)}>
-      <Box>
-        <Box styles={{ gap: "1rem" }}>
-          <Text>{appDescription.config?.name}</Text>
+      <Box styles={{ padding: 0, justifyContent: "space-between", flexWrap: "wrap" }}>
+        <div style={{display: "flex", alignItems: "center"}}>
+          <Logo style={{ width: "93.8281px", padding: 12, paddingLeft: 0 }} />
           {!options.previewMode && standalone && <CodeSelector />}
-        </Box>
+        </div>
+        <div>
+          <Text>{appDescription.config?.name}</Text>
+        </div>
+        <div style={{display: "flex", alignItems: "center"}}>
         {standalone && (
           <>
             {!options.fixedTheme && <Tooltip trigger={<ToneSwitcher />} label="Change tone" />}
@@ -71,48 +75,52 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
               )}
           </>
         )}
-        {!options.previewMode && show && (
-          <>
-            {!standalone && (
+          {!options.previewMode && show && (
+            <>
+              {!standalone && (
+                <Tooltip
+                  trigger={
+                    <div>
+                      <Button variant="ghost" onClick={() => openStandaloneApp(false)}>
+                        <RxOpenInNewWindow />
+                      </Button>
+                    </div>
+                  }
+                  label="Edit code in new window"
+                />
+              )}
+              <ConfirmationDialog
+                open={dialogOpen}
+                onOpenChange={setDialogOpen}
+                title="Confirm Reset"
+                description="Are you sure you want to reset the app? This action cannot be undone and will reset all code to its initial state."
+                onConfirm={() => {
+                  dispatch(resetApp());
+                  setDialogOpen(false);
+                }}
+                confirmText="Confirm"
+                cancelText="Cancel"
+              />
               <Tooltip
                 trigger={
-                  <button className={styles.button} onClick={() => openStandaloneApp(false)}>
-                    <RxOpenInNewWindow />
-                  </button>
+                  <div>
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        if (standalone) {
+                          setDialogOpen(true);
+                        } else {
+                          dispatch(resetApp());
+                        }
+                      }}
+                    >
+                      <LiaUndoAltSolid height={24} width={24} />
+                    </Button>
+                  </div>
                 }
-                label="Edit code in new window"
+                label="Reset the app"
               />
-            )}
-            <ConfirmationDialog
-              open={dialogOpen}
-              onOpenChange={setDialogOpen}
-              title="Confirm Reset"
-              description="Are you sure you want to reset the app? This action cannot be undone and will reset all code to its initial state."
-              onConfirm={() => {
-                dispatch(resetApp());
-                setDialogOpen(false);
-              }}
-              confirmText="Confirm"
-              cancelText="Cancel"
-            />
-            <Tooltip
-              trigger={
-                <button
-                  className={styles.button}
-                  onClick={() => {
-                    if (standalone) {
-                      setDialogOpen(true);
-                    } else {
-                      dispatch(resetApp());
-                    }
-                  }}
-                >
-                  <LiaUndoAltSolid />
-                </button>
-              }
-              label="Reset the app"
-            />
-            {/*            {standalone && (
+              {/*            {standalone && (
               <>
                 <Tooltip
                   trigger={
@@ -136,28 +144,33 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                 />
               </>
             )}*/}
-          </>
-        )}
-        {standalone && (
-          <>
-            <Tooltip
-              trigger={
-                <button className={styles.button} onClick={() => openStandaloneApp()}>
-                  <RxOpenInNewWindow />
-                </button>
-              }
-              label="Preview in fullscreen"
-            />
-            <Tooltip
-              trigger={
-                <button className={styles.button} onClick={() => download()}>
-                  <RxDownload />
-                </button>
-              }
-              label="Download app"
-            />
-          </>
-        )}
+            </>
+          )}
+          {standalone && (
+            <>
+              <Tooltip
+                trigger={
+                  <div>
+                    <Button variant="ghost" onClick={() => openStandaloneApp()}>
+                      <RxOpenInNewWindow height={24} width={24} />
+                    </Button>
+                  </div>
+                }
+                label="Preview in fullscreen"
+              />
+              <Tooltip
+                trigger={
+                  <div>
+                    <Button variant="ghost" onClick={() => download()}>
+                      <RxDownload height={24} width={24} />
+                    </Button>
+                  </div>
+                }
+                label="Download app"
+              />
+            </>
+          )}
+        </div>
       </Box>
       {appDescription.config?.description && (
         <div className={styles.description}>{appDescription.config?.description}</div>
