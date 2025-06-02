@@ -36,6 +36,9 @@ $backgroundColor-CodeBlock-highlightString: createThemeVar("backgroundColor-Code
 
 .codeBlockCopyWrapper {
   position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
 
   .codeBlockCopyButton {
     position: absolute;

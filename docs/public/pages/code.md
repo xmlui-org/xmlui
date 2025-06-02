@@ -1,8 +1,5 @@
-<Component name="Code">
-  <H1>XMLUI Code
-  </H1>
-  <Markdown>
-    <![CDATA[
+# XMLUI Code
+
 With XMLUI you can go a long way without coding anything more than small JavaScript snippets like those we've seen in the [Markup](/markup) chapter.
 
 ![js snippets](/resources/js-snippets.png)
@@ -13,7 +10,7 @@ The last example uses a JavaScript [arrow function expression](https://developer
 
 The most elaborate function we've seen so far was this one, used in [Components](/components) chapter to extract data from a complex API response.
 
-```js
+```js copy
 window.transformStops = function(stops) {
   return stops.map(function(stop) {
   // Helper to extract a value from additionalProperties by key
@@ -45,29 +42,32 @@ Here's how it works.
 
 It helps to see the structure of a single object in the `stops` array.
 
-```
+```json
+{
   "commonName": "Baker Street Underground Station",
-    "placeType": "StopPoint",
-    "additionalProperties": [
-      {
-        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
-        "category": "ServiceInfo",
-        "key": "WiFi",
-        "sourceSystemKey": "StaticObjects",
-        "value": "yes"
-      },
-      {
-        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
-        "category": "Facility",
-        "key": "Car park",
-        "sourceSystemKey": "StaticObjects",
-        "value": "no"
-      },
+  "placeType": "StopPoint",
+  "additionalProperties": [
+    {
+      "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+      "category": "ServiceInfo",
+      "key": "WiFi",
+      "sourceSystemKey": "StaticObjects",
+      "value": "yes"
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+      "category": "Facility",
+      "key": "Car park",
+      "sourceSystemKey": "StaticObjects",
+      "value": "no"
+    },
+  ]
+}
 ```
 
 Here's an example of the transformed output.
 
-```
+```json
 {
   "value": [
     {
@@ -93,20 +93,18 @@ Here's an example of the transformed output.
 We defined the function in XMLUI's `index.html` like so:
 
 ```
-
-    <script>
-window.transformStops = function(stops) {
-  ...
-}
-
-    </script>
+<script>
+  window.transformStops = function(stops) {
+    ...
+  }
+</script>
 ```
 
 When you define functions in `index.html` you can keep everything in one place for easy reference, and debug your functions in the browser's devtools environment.
 
 You can alternatively put functions into XMLUI *code-behind* files. In this case, for the `TubeStops` component which lives in the file `TubeStops.xmlui`, you would create a parallel file called `TubeStops.xmlui.xs`. In that context, arrow functions are required, so the function would look like this.
 
-```
+```js
 function transformStops(stops) {
   return stops.map(stop => {
     // Helper to extract a value from additionalProperties by key
@@ -146,38 +144,22 @@ Use code-behind if:
 
 When you write JavaScript expressions in XMLUI attributes you typically write single expressions, not multiline code blocks. But you can write multiline code blocks in some event handlers, for example click handlers.
 
-```xmlui
-
-    <Button label="onClick" onClick="{
+```xmlui copy
+<Button label="onClick" onClick="{
   console.log('clicked');
   count++;
   toast('count now' + count)
 }" />
 ```
 
-```xmlui
-
-    <Button label="event tag">
-      <event name="click">
+```xmlui copy
+<Button label="event tag">
+  <event name="click">
   {
     console.log('clicked');
     count++;
     toast('count now' + count)
-  }
-  
-      </event>
-    </Button>
+  }  
+  </event>
+</Button>
 ```
-]]>
-  </Markdown>
-  <Markdown>
-    <![CDATA[
-_
-]]>
-  </Markdown>
-  <Markdown>
-    <![CDATA[
-_
-]]>
-  </Markdown>
-</Component>

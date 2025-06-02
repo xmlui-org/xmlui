@@ -13,7 +13,7 @@ import type { ValidationStatus } from "../abstractions";
 
 type Props = {
   id?: string;
-  type?: "text" | "password";
+  type?: "text" | "password" | "search";
   value?: string;
   updateState?: UpdateStateFn;
   initialValue?: string;
@@ -73,7 +73,8 @@ export const TextBox = forwardRef(function TextBox(
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
-  id = id || useId();
+  const _id = useId();
+  id = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (autoFocus) {

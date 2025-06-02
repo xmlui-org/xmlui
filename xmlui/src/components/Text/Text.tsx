@@ -106,7 +106,7 @@ export const TextMd = createMetadata({
     [`borderColor-${COMP}-code`]: "$color-surface-300",
     [`backgroundColor-${COMP}-keyboard`]: "rgba($color-surface-100-rgb, .4)",
     [`borderColor-${COMP}-keyboard`]: "$color-surface-300",
-    [`backgroundColor-${COMP}-marked`]: "yellow",
+    [`backgroundColor-${COMP}-marked`]: "rgba($color-primary-200-rgb, .4)",
     [`color-${COMP}-placeholder`]: "$color-surface-500",
     [`color-${COMP}-codefence`]: "$color-surface-900",
     [`color-${COMP}-subheading`]: "$textColor-secondary",
