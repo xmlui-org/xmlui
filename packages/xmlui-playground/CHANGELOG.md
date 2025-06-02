@@ -1,5 +1,13 @@
 # xmlui-playground
 
+## 0.1.3
+
+### Patch Changes
+
+- 3eab4a3: improve: design updates - devtools, playground, docs
+- Updated dependencies [3eab4a3]
+  - xmlui-devtools@0.1.10
+
 ## 0.1.2
 
 ### Patch Changes

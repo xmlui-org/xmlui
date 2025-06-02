@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.9.44
+
+### Patch Changes
+
+- 3eab4a3: improve: design updates - devtools, playground, docs
+- 411cd34: fix: inbound links to headers in markdown (anchor scroll slightly off)
+- cdf96bb: fix: table inside flowlayout, horizontal scrollbar
+- 121c55c: Changed the background color of the `marked` Text variant.
+- f1092fe: Added emphasized substring highlights to CodeBlocks. Use it in markdown the following way: ```xmlui !/substr/
+
 ## 0.9.43
 
 ### Patch Changes
