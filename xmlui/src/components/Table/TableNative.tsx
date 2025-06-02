@@ -511,8 +511,8 @@ export const Table = forwardRef(
     const paddingBottom =
       rowVirtualizer.getVirtualItems().length > 0
         ? rowVirtualizer.getTotalSize() -
-          (rowVirtualizer.getVirtualItems()?.[rowVirtualizer.getVirtualItems().length - 1]?.end - startMargin ||
-            0)
+          (rowVirtualizer.getVirtualItems()?.[rowVirtualizer.getVirtualItems().length - 1]?.end -
+            startMargin || 0)
         : 0;
 
     const hasData = safeData.length !== 0;
@@ -623,8 +623,8 @@ export const Table = forwardRef(
                                 header.getContext(),
                               ) as ReactNode
                             }
-                            <span style={{ display: "inline-flex", maxWidth: 16 }}>
-                              {header.column.columnDef.enableSorting && (
+                            {header.column.columnDef.enableSorting && (
+                              <span style={{ display: "inline-flex", maxWidth: 16 }}>
                                 <ColumnOrderingIndicator
                                   iconSortAsc={iconSortAsc}
                                   iconSortDesc={iconSortDesc}
@@ -635,8 +635,8 @@ export const Table = forwardRef(
                                       : undefined
                                   }
                                 />
-                              )}
-                            </span>
+                              </span>
+                            )}
                           </div>
                         </ClickableHeader>
                         {header.column.getCanResize() && (

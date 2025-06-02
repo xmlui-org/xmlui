@@ -87,6 +87,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   flex-direction: row;
   gap: 0.5rem;
   align-items: center;
+  max-width: 100%;
   text-transform: $textTransform-heading-Table;
   font-size: $fontSize-heading-Table;
   color: $textColor-heading-Table;
