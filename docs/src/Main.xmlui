@@ -160,12 +160,12 @@
 
         </Pages>
         <Footer>
-                <Card border="0" width="100%" padding="0">
-                    <CHStack gap="$space-1" paddingBottom="0">
-                        Powered by
-                        <Logo width="60px" />
-                    </CHStack>
-                </Card>
+            <Card border="0" width="100%" padding="0">
+                <CHStack gap="$space-1" paddingBottom="0" verticalAlignment="center">
+                    Created with
+                    <Logo width="60px" />
+                </CHStack>
+            </Card>
         </Footer>
     </App>
     <XMLUIExtensions:StandalonePlayground when="{window.location.hash.includes('/playground')}" />
