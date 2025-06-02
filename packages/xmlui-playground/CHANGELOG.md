@@ -1,5 +1,13 @@
 # xmlui-playground
 
+## 0.1.4
+
+### Patch Changes
+
+- 2e88539: improve: add Tooltip to DevTools
+- Updated dependencies [2e88539]
+  - xmlui-devtools@0.1.11
+
 ## 0.1.3
 
 ### Patch Changes
