@@ -15,6 +15,7 @@ $marginTop-CodeBlock: createThemeVar("marginTop-CodeBlock");
 $marginBottom-CodeBlock: createThemeVar("marginBottom-CodeBlock");
 $backgroundColor-CodeBlock-highlightRow: createThemeVar("backgroundColor-CodeBlock-highlightRow");
 $backgroundColor-CodeBlock-highlightString: createThemeVar("backgroundColor-CodeBlock-highlightString");
+$borderColor-CodeBlock-highlightString-emphasis: createThemeVar("borderColor-CodeBlock-highlightString-emphasis");
 
 .codeBlock {
   @include t.borderVars($themeVars, "CodeBlock");
@@ -62,6 +63,12 @@ $backgroundColor-CodeBlock-highlightString: createThemeVar("backgroundColor-Code
   }
   .codeBlockHighlightString {
     background-color: $backgroundColor-CodeBlock-highlightString;
+    padding: 1px;
+  }
+  .codeBlockHighlightStringEmphasis {
+    border: 2px solid $borderColor-CodeBlock-highlightString-emphasis;
+    border-radius: 2px;
+    padding: 1px;
   }
 }
 
