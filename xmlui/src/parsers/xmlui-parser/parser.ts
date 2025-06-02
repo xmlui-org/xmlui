@@ -151,45 +151,79 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
+
   function parseTag() {
     startNode();
     bump(SyntaxKind.OpenNodeStart);
-
+    let errInName = false;
     let openTagName: Node | undefined = undefined;
     if (at(SyntaxKind.Identifier)) {
       openTagName = parseTagName();
     } else {
-      error(Diag_Tag_Identifier_Expected);
+      errInName = true;
+      const errNode = errNodeUntil([SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart, SyntaxKind.CData, SyntaxKind.Script]);
+      if (errNode){
+        errorAt(Diag_Tag_Identifier_Expected, errNode.pos, errNode.end)
+      } else {
+        error(Diag_Tag_Identifier_Expected);
+      }
     }
 
-    parseAttrList();
+    if(!errInName){
+      parseAttrList();
+    }
 
-    if (eat(SyntaxKind.NodeClose)) {
-      completeNode(SyntaxKind.ElementNode);
-      return;
-    } else if (eat(SyntaxKind.NodeEnd)) {
-      parseContent();
-      if (eat(SyntaxKind.CloseNodeStart)) {
-        if (at(SyntaxKind.Identifier)) {
-          const closeTagName = parseTagName();
-          const namesMismatch =
-            openTagName !== undefined && !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
-          if (namesMismatch) {
-            error(MakeErr.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
-          }
-        } else {
-          errRecover(Diag_Tag_Identifier_Expected, [SyntaxKind.NodeEnd]);
-        }
-        if (!eat(SyntaxKind.NodeEnd)) {
-          error(Diag_End_Token_Expected);
+    switch (peek().kind){
+      case SyntaxKind.NodeClose:{
+        bumpAny();
+        completeNode(SyntaxKind.ElementNode);
+        return;
+      }
+      case SyntaxKind.NodeEnd:{
+        bumpAny();
+        parseContent();
+        parseClosingTag(openTagName);
+        completeNode(SyntaxKind.ElementNode);
+        return;
+      }
+      case SyntaxKind.OpenNodeStart:
+      case SyntaxKind.Script:
+      case SyntaxKind.CData: {
+        completeNode(SyntaxKind.ElementNode);
+        error(Diag_End_Or_Close_Token_Expected);
+        return;
+      }
+
+      case SyntaxKind.CloseNodeStart:{
+        error(Diag_End_Or_Close_Token_Expected);
+        parseClosingTag(openTagName);
+        completeNode(SyntaxKind.ElementNode);
+        return;
+      }
+
+      default:{
+        error(Diag_End_Or_Close_Token_Expected);
+      }
+    }
+  }
+
+  function parseClosingTag(openTagName: Node){
+    if (eat(SyntaxKind.CloseNodeStart)) {
+      if (at(SyntaxKind.Identifier)) {
+        const closeTagName = parseTagName();
+        const namesMismatch =
+          openTagName !== undefined && !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
+        if (namesMismatch) {
+          error(MakeErr.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
         }
       } else {
-        error(Diag_CloseNodeStart_Token_Expected);
+        errRecover(Diag_Tag_Identifier_Expected, [SyntaxKind.NodeEnd]);
       }
-      completeNode(SyntaxKind.ElementNode);
-      return;
+      if (!eat(SyntaxKind.NodeEnd)) {
+        error(Diag_End_Token_Expected);
+      }
     } else {
-      error(Diag_End_Or_Close_Token_Expected);
+      error(Diag_CloseNodeStart_Token_Expected);
     }
   }
 
@@ -311,12 +345,22 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     return kinds.includes(peek().kind);
   }
 
+  function errNodeUntil(tokens: SyntaxKind[]): Node | null {
+    startNode();
+    advance(tokens);
+    if(node.children!.length === 0){
+      abandonNode();
+      return null;
+    } else {
+      return completeNode(SyntaxKind.ErrorNode);
+    }
+  }
+
   /**
    * report an error and skip the next token if it isn't in the recoveryTokens. EoF isn't skipped.
    * @param recoveryTokens the [FollowSet](https://www.geeksforgeeks.org/follow-set-in-syntax-analysis/) of the parsed InnerNode. These tokens (or the EoF token) won't be skipped
    * @returns true if the current token is in the recovery set or EoF
    * */
-
   function errRecover(
     errCodeAndMsg: GeneralDiagnosticMessage,
     recoveryTokens: SyntaxKind[],
@@ -331,6 +375,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     bumpAny();
     completeNode(SyntaxKind.ErrorNode);
     return false;
+  }
+
+  /** Bumps over the next token and marks it as an error node while adding an error to the error list*/
+  function errorAndBump(errCodeAndMsg: GeneralDiagnosticMessage) {
+    errRecover(errCodeAndMsg, []);
   }
 
   function error({ code, message, category }: GeneralDiagnosticMessage) {
@@ -357,6 +406,15 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       end,
     });
   }
+
+  function advance(to: SyntaxKind[]) {
+    for (
+      let token = peek();
+      token.kind !== SyntaxKind.EndOfFileToken && !to.includes(token.kind);
+      bumpAny(), token = peek()
+    ){}
+  }
+
 
   function peek(inContent: boolean = false) {
     if (peekedToken !== undefined) {
@@ -563,10 +621,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  /** Bumps over the next token and marks it as an error node while adding an error to the error list*/
-  function errorAndBump(errCodeAndMsg: GeneralDiagnosticMessage) {
-    errRecover(errCodeAndMsg, []);
-  }
 
   function abandonNode() {
     const parentNode = parents[parents.length - 1];
