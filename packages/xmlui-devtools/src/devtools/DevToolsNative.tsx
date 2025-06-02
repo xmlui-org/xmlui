@@ -14,6 +14,7 @@ import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
 import xmluiLight from "../syntax/monaco/xmlui-light";
 import xmluiDark from "../syntax/monaco/xmlui-dark";
 import { createQueryString } from "./utils";
+import { Tooltip } from "./Tooltip";
 
 function trySafeStringify(obj: any): string {
   try {
@@ -304,50 +305,60 @@ export const DevTools = () => {
                   <DropdownMenu.Item className={styles.menuItem}>
                     <span style={{ paddingLeft: 4 }}>Dock side</span>
                     <div className={styles.sideButtons}>
-                      <Button
-                        style={{ padding: 8 }}
-                        onClick={() => {
-                          setSide("left");
-                        }}
-                        variant={"ghost"}
-                      >
-                        <BiDockLeft color={"currentColor"} size={16} />
-                      </Button>
-                      <Button
-                        style={{ padding: 8 }}
-                        onClick={() => {
-                          setSide("bottom");
-                        }}
-                        variant={"ghost"}
-                      >
-                        <BiDockBottom color={"currentColor"} size={16} />
-                      </Button>
-                      <Button
-                        style={{ padding: 8 }}
-                        onClick={() => {
-                          setSide("right");
-                        }}
-                        variant={"ghost"}
-                      >
-                        <BiDockRight color={"currentColor"} size={16} />
-                      </Button>
+                      <Tooltip label={"Dock to left"}>
+                        <Button
+                          style={{ padding: 8 }}
+                          onClick={() => {
+                            setSide("left");
+                          }}
+                          variant={"ghost"}
+                        >
+                          <BiDockLeft color={"currentColor"} size={16} />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip label={"Dock to bottom"}>
+                        <Button
+                          style={{ padding: 8 }}
+                          onClick={() => {
+                            setSide("bottom");
+                          }}
+                          variant={"ghost"}
+                        >
+                          <BiDockBottom color={"currentColor"} size={16} />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip label={"Dock to right"}>
+                        <Button
+                          style={{ padding: 8 }}
+                          onClick={() => {
+                            setSide("right");
+                          }}
+                          variant={"ghost"}
+                        >
+                          <BiDockRight color={"currentColor"} size={16} />
+                        </Button>
+                      </Tooltip>
                     </div>
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
-            <Button
-              onClick={popupPlayground}
-              size={"xs"}
-              variant={"ghost"}
-              icon={<Icon name={"new-window"} />}
-            />
-            <Button
-              onClick={() => setIsOpen?.(false)}
-              size={"xs"}
-              variant={"ghost"}
-              icon={<Icon name={"close"} />}
-            />
+            <Tooltip label={"Edit code in new window"}>
+              <Button
+                onClick={popupPlayground}
+                size={"xs"}
+                variant={"ghost"}
+                icon={<Icon name={"new-window"} />}
+              />
+            </Tooltip>
+            <Tooltip label={"Close DevTools"}>
+              <Button
+                onClick={() => setIsOpen?.(false)}
+                size={"xs"}
+                variant={"ghost"}
+                icon={<Icon name={"close"} />}
+              />
+            </Tooltip>
           </div>
         </List>
         <Content value={"code"} className={styles.content}>
