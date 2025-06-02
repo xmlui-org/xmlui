@@ -68,6 +68,9 @@ $textDecorationLine-anchor-Heading: createThemeVar("textDecorationLine-anchor-He
     @include heading("H6");
   }
 
+  --my-scroll-margin-top: var(--header-height);
+  scroll-margin-top: var(--my-scroll-margin-top);
+
   a {
     opacity: 0; // Hide the <a> element by default
     margin-left: $gap-anchor-Heading;
@@ -84,9 +87,9 @@ $textDecorationLine-anchor-Heading: createThemeVar("textDecorationLine-anchor-He
 }
 
 .anchorRef {
-  --my-scroll-margin-top: var(--header-height);
   width: 0;
   height: 0;
+  --my-scroll-margin-top: var(--header-height);
   scroll-margin-top: var(--my-scroll-margin-top);
 }
 
