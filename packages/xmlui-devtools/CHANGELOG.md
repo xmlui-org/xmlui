@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.11
+
+### Patch Changes
+
+- 2e88539: improve: add Tooltip to DevTools
+
 ## 0.1.10
 
 ### Patch Changes
