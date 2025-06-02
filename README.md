@@ -1,16 +1,14 @@
 ![NPM Version](https://img.shields.io/npm/v/xmlui) [![Smoke Tests (e2e smoke tests, unit tests)](https://github.com/xmlui-com/xmlui/actions/workflows/run-smoke-tests.yml/badge.svg)](https://github.com/xmlui-com/xmlui/actions/workflows/run-smoke-tests.yml)
 
-# xmlui
+# XMLUI
 
-**xmlui** is a modern web UI framework designed to empower desktop developers to effortlessly create web apps without deep knowledge of HTML, CSS, or JavaScript.
+**XMLUI** is a framework for building user interfaces declaratively, with XML markup and flexible theming.
 
-## Key Features
-
-- **Declarative UI Markup**: Use simple expressions and code snippets directly in the markup to express UI logic.
-- **Web Methods Integration**: Native support for fetching and invoking web methods via simple URLs.
-- **Attractive, Themeable Components**: Ships with a variety of visually appealing components that are easily customizable.
-- **Custom Component Creation**: Easily create your own reusable components from the framework’s extensive library.
-- **Comprehensive Component Library**: Includes about a hundred ready-to-use visual and non-visual components.
+- **Easy to create**. Build on the web platform with little or no knowledge of JavaScript, CSS, or React.
+- **Beautiful by default**. Enjoy themes that look great out of the box and are easy to modify.
+- **Connected**. Read and write APIs with little or no scripting.
+- **Modular**. Use a comprehensive suite of components that you can extend with — again! — little or no scripting.
+- **Easy to deploy**. Just drop a handful of files onto a static webserver.
 
 ## Getting Started
 
@@ -18,7 +16,7 @@ To get started with **xmlui**, simply clone the repository and follow the instal
 
 ## Documentation
 
-For detailed documentation, including installation instructions, usage guidelines, and API references, please visit the [Documentation](https://ncrm.azurewebsites.net/).
+For detailed documentation, including installation instructions, usage guidelines, and API references, please visit the [Documentation](https://docs.xmlui.com/).
 
 ## Contributing
 
