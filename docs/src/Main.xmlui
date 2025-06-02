@@ -74,15 +74,15 @@
             </Page>
 
             <Page url="/markup">
-                <Markup />
+                <DocumentPage url="/pages/markup.md" />
             </Page>
 
             <Page url="/code">
-                <Code />
+                <DocumentPage url="/pages/code.md" />
             </Page>
 
             <Page url="/layout">
-                <Markdown data="/pages/layout.md" />
+                <DocumentPage url="/pages/layout.md" />
             </Page>
 
             <Page url="/working-with-text">
