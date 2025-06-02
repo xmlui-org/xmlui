@@ -29,7 +29,6 @@ Object.keys(contentRuntime).map((filePath) => {
   navPanelContent.push(urlFragment);
 });
 
-
 const pagesRuntime: Record<string, any> = import.meta.glob(`/public/pages/**/*.md`, {
   eager: true,
   query: "?raw",
@@ -37,7 +36,11 @@ const pagesRuntime: Record<string, any> = import.meta.glob(`/public/pages/**/*.m
 
 const prefetchedContent: Record<string, any> = {};
 Object.keys(pagesRuntime).map((filePath) => {
-  const urlFragment = filePath.substring("/public".length);
+  const urlFragment = filePath
+    .substring("/public".length)
+    .replace("/pages", "")
+    .replace(".mdx", "")
+    .replace(".md", "");
   prefetchedContent[urlFragment] = pagesRuntime[filePath].default;
 });
 
@@ -209,7 +212,7 @@ const App: StandaloneAppDescription = {
       availableLangs: shikiHighlighter.getLoadedLanguages(),
       highlight,
     },
-    prefetchedContent: prefetchedContent,
+    prefetchedContent,
   },
 };
 
