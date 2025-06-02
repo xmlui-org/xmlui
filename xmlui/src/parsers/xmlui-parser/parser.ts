@@ -151,6 +151,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
+
   function parseTag() {
     startNode();
     bump(SyntaxKind.OpenNodeStart);
@@ -160,10 +161,12 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       openTagName = parseTagName();
     } else {
       errInName = true;
-      startNode();
-      advance([SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart, SyntaxKind.CData, SyntaxKind.Script]);
-      const errNode = completeNode(SyntaxKind.ErrorNode);
-      errorAt(Diag_Tag_Identifier_Expected, errNode.pos, errNode.end)
+      const errNode = errNodeUntil([SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart, SyntaxKind.CData, SyntaxKind.Script]);
+      if (errNode){
+        errorAt(Diag_Tag_Identifier_Expected, errNode.pos, errNode.end)
+      } else {
+        error(Diag_Tag_Identifier_Expected);
+      }
     }
 
     if(!errInName){
@@ -342,6 +345,17 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     return kinds.includes(peek().kind);
   }
 
+  function errNodeUntil(tokens: SyntaxKind[]): Node | null {
+    startNode();
+    advance(tokens);
+    if(node.children!.length === 0){
+      abandonNode();
+      return null;
+    } else {
+      return completeNode(SyntaxKind.ErrorNode);
+    }
+  }
+
   /**
    * report an error and skip the next token if it isn't in the recoveryTokens. EoF isn't skipped.
    * @param recoveryTokens the [FollowSet](https://www.geeksforgeeks.org/follow-set-in-syntax-analysis/) of the parsed InnerNode. These tokens (or the EoF token) won't be skipped
@@ -362,7 +376,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     completeNode(SyntaxKind.ErrorNode);
     return false;
   }
-
 
   /** Bumps over the next token and marks it as an error node while adding an error to the error list*/
   function errorAndBump(errCodeAndMsg: GeneralDiagnosticMessage) {
@@ -398,7 +411,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     for (
       let token = peek();
       token.kind !== SyntaxKind.EndOfFileToken && !to.includes(token.kind);
-      token = bumpAny()
+      bumpAny(), token = peek()
     ){}
   }
 
