@@ -37,36 +37,6 @@
           ],
           "default": "off",
           "description": "Traces the communication between VS Code and the language server."
-        },
-        "xmlui.format.enabled": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable/disable the XMLUI formatter"
-        },
-        "xmlui.format.preserveAttributeLineBreaks": {
-          "type": "boolean",
-          "default": true,
-          "description": "Preserve line breaks in attributes"
-        },
-        "xmlui.format.preserveScriptContent": {
-          "type": "boolean",
-          "default": true,
-          "description": "Preserve formatting in script blocks"
-        },
-        "xmlui.format.maxLineLength": {
-          "type": "number",
-          "default": 120,
-          "description": "Maximum line length before wrapping attributes"
-        },
-        "xmlui.format.indentBindingExpressions": {
-          "type": "boolean",
-          "default": false,
-          "description": "Format and indent binding expressions"
-        },
-        "xmlui.format.sortAttributes": {
-          "type": "boolean",
-          "default": false,
-          "description": "Sort element attributes alphabetically"
         }
       }
     },

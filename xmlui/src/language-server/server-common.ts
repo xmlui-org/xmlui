@@ -8,6 +8,7 @@ import type {
   TextDocumentChangeEvent,
   Diagnostic,
   Position,
+  DocumentFormattingParams,
 } from 'vscode-languageserver';
 import {
   MarkupKind,
@@ -20,6 +21,7 @@ import collectedComponentMetadata from "./xmlui-metadata-generated.mjs";
 import type {XmluiCompletionItem} from "./services/completion";
 import { handleCompletion, handleCompletionResolve} from "./services/completion";
 import {handleHover} from "./services/hover";
+import { handleDocumentFormatting } from "./services/format";
 import { createXmlUiParser, Error, type GetText, type ParseResult } from '../parsers/xmlui-parser/parser';
 import { MetadataProvider, type ComponentMetadataCollection } from './services/common/metadata-utils';
 import { getDiagnostics } from './services/diagnostic';
@@ -62,6 +64,7 @@ export function start(connection: Connection){
 				triggerCharacters: ["<", "/"],
 			},
 			hoverProvider: true,
+			documentFormattingProvider: true,
 		}
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -113,6 +116,14 @@ export function start(connection: Connection){
       offsetToPosition: (offset: number) => document.positionAt(offset)
     }
     return handleHover(ctx, document.offsetAt(position));
+  });
+
+  connection.onDocumentFormatting(({ textDocument, options }: DocumentFormattingParams) => {
+    const document = documents.get(textDocument.uri);
+    if (!document) {
+      return null;
+    }
+    return handleDocumentFormatting(document, options);
   });
 
   const parsedDocuments = new Map();
