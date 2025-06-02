@@ -57,37 +57,36 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   return (
     <div className={classnames(styles.header)}>
       <Box styles={{ padding: 0, justifyContent: "space-between", flexWrap: "wrap" }}>
-        <div style={{display: "flex", alignItems: "center"}}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <Logo style={{ width: "93.8281px", padding: 12, paddingLeft: 0 }} />
           {!options.previewMode && standalone && <CodeSelector />}
         </div>
-        <div>
-          <Text>{appDescription.config?.name}</Text>
-        </div>
-        <div style={{display: "flex", alignItems: "center"}}>
-        {standalone && (
-          <>
-            {!options.fixedTheme && <Tooltip trigger={<ToneSwitcher />} label="Change tone" />}
-            {!options.fixedTheme &&
-              appDescription.availableThemes &&
-              appDescription.availableThemes.length > 1 && (
-                <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
+        <Text>{appDescription.config?.name}</Text>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {standalone && (
+            <>
+              {!options.fixedTheme && (
+                <Tooltip label="Change tone">
+                  <ToneSwitcher />
+                </Tooltip>
               )}
-          </>
-        )}
+              {!options.fixedTheme &&
+                appDescription.availableThemes &&
+                appDescription.availableThemes.length > 1 && (
+                  <Tooltip label="Change theme">
+                    <ThemeSwitcher />
+                  </Tooltip>
+                )}
+            </>
+          )}
           {!options.previewMode && show && (
             <>
               {!standalone && (
-                <Tooltip
-                  trigger={
-                    <div>
-                      <Button variant="ghost" onClick={() => openStandaloneApp(false)}>
-                        <RxOpenInNewWindow />
-                      </Button>
-                    </div>
-                  }
-                  label="Edit code in new window"
-                />
+                <Tooltip label="Edit code in new window">
+                  <Button variant="ghost" onClick={() => openStandaloneApp(false)}>
+                    <RxOpenInNewWindow />
+                  </Button>
+                </Tooltip>
               )}
               <ConfirmationDialog
                 open={dialogOpen}
@@ -101,25 +100,20 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                 confirmText="Confirm"
                 cancelText="Cancel"
               />
-              <Tooltip
-                trigger={
-                  <div>
-                    <Button
-                      variant="ghost"
-                      onClick={() => {
-                        if (standalone) {
-                          setDialogOpen(true);
-                        } else {
-                          dispatch(resetApp());
-                        }
-                      }}
-                    >
-                      <LiaUndoAltSolid height={24} width={24} />
-                    </Button>
-                  </div>
-                }
-                label="Reset the app"
-              />
+              <Tooltip label="Reset the app">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    if (standalone) {
+                      setDialogOpen(true);
+                    } else {
+                      dispatch(resetApp());
+                    }
+                  }}
+                >
+                  <LiaUndoAltSolid height={24} width={24} />
+                </Button>
+              </Tooltip>
               {/*            {standalone && (
               <>
                 <Tooltip
@@ -148,26 +142,16 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           )}
           {standalone && (
             <>
-              <Tooltip
-                trigger={
-                  <div>
-                    <Button variant="ghost" onClick={() => openStandaloneApp()}>
-                      <RxOpenInNewWindow height={24} width={24} />
-                    </Button>
-                  </div>
-                }
-                label="Preview in fullscreen"
-              />
-              <Tooltip
-                trigger={
-                  <div>
-                    <Button variant="ghost" onClick={() => download()}>
-                      <RxDownload height={24} width={24} />
-                    </Button>
-                  </div>
-                }
-                label="Download app"
-              />
+              <Tooltip label="Preview in fullscreen">
+                <Button variant="ghost" onClick={() => openStandaloneApp()}>
+                  <RxOpenInNewWindow height={24} width={24} />
+                </Button>
+              </Tooltip>
+              <Tooltip label="Download app">
+                <Button variant="ghost" onClick={() => download()}>
+                  <RxDownload height={24} width={24} />
+                </Button>
+              </Tooltip>
             </>
           )}
         </div>

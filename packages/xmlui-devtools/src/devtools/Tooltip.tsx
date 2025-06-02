@@ -9,9 +9,7 @@ export const Tooltip = ({ children, label }: { children: ReactNode; label: strin
     <Provider>
       <Root>
         <Trigger asChild>
-          <div>
-            {children}
-          </div>
+          <div>{children}</div>
         </Trigger>
         <Portal container={root}>
           <Content className={styles.TooltipContent} sideOffset={5}>
