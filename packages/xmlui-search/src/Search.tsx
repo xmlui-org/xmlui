@@ -313,9 +313,10 @@ function removeMarkdownFormatting(markdown: string) {
   return (
     markdown
       // Remove code blocks
-      .replace(/```\S*\n([\s\S]*?)```/g, "")
-      // Remove inline code
-      .replace(/`[^`]*`/g, "")
+      // NOTE: retain code blocks for now
+      // .replace(/```\S*\n([\s\S]*?)```/g, "")
+      // Remove inline code ticks
+      .replace(/`([^`]*)`/g, "$1")
       // Remove images ![alt](url)
       .replace(/!\[.*?\]\(.*?\)/g, "")
       // Remove links [text](url)
