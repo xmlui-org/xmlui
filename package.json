@@ -23,6 +23,7 @@
     "changeset:publish": "changeset publish",
     "build-xmlui": "turbo run build:xmlui-all",
     "build-vscode-extension": "turbo run xmlui-vscode#build:vsix",
+    "test-xmlui:ci": "CI=true npm run test-xmlui",
     "test-xmlui": "turbo run build:xmlui-all test:xmlui-all",
     "test-xmlui-smoke": "turbo run build:xmlui-all test:xmlui-smoke",
     "publish-packages": "turbo run build:xmlui-all test:xmlui-all && npm run changeset:publish",
