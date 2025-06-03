@@ -400,6 +400,12 @@ export const Container = memo(
           handler = (...eventArgs: any[]) => {
             return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
           };
+        } else if ((src as any).type) {
+          // --- We have an arrow expression to execute
+          fnCacheKey = `${options?.eventName};${JSON.stringify(src)}`;
+          handler = (...eventArgs: any[]) => {
+            return runCodeAsync(src, uid, options, ...cloneDeep(eventArgs));
+          };
         } else {
           // --- We have an unknown event handler
           throw new Error("Invalid event handler");
