@@ -1,14 +1,22 @@
 import { describe, test, expect } from 'vitest';
 import { format } from '../../src/language-server/services/format';
+import { createXmlUiParser } from '../../src/parsers/xmlui-parser';
+import type { FormattingOptions } from 'vscode-languageserver';
 
 describe('XML Formatter', () => {
   // Helper function to test idempotency
-  function testIdempotency(input: string, options: { lineSeparator?: string; indentation?: string } = {}) {
-    const defaultOptions = { lineSeparator: '\n', indentation: '  ', ...options };
-    const firstFormat = format(input, defaultOptions);
+  function testIdempotency(input: string, options: FormattingOptions = {tabSize: 2, insertSpaces: true}) {
+    const parser1 = createXmlUiParser(input);
+    const { node: node1 } = parser1.parse();
+    const defaultOptions: FormattingOptions = { insertSpaces: true, tabSize: 2, ...options };
+
+    const firstFormat = format(node1, parser1.getText, defaultOptions);
     if (firstFormat === null) return null;
 
-    const secondFormat = format(firstFormat, defaultOptions);
+    const parser2 = createXmlUiParser(firstFormat);
+    const { node: node2 } = parser2.parse();
+    const secondFormat = format(node2, parser2.getText, defaultOptions);
+
     expect(secondFormat).toBe(firstFormat);
     return firstFormat;
   }
@@ -16,7 +24,7 @@ describe('XML Formatter', () => {
   describe('Format Options', () => {
     test('should respect custom indentation', () => {
       const input = '<Fragment><Text>Content</Text></Fragment>';
-      const result = testIdempotency(input, { indentation: '    ' });
+      const result = testIdempotency(input, { tabSize: 4, insertSpaces: true});
 
       expect(result).toEqual(
 `<Fragment>
@@ -28,7 +36,7 @@ describe('XML Formatter', () => {
 
     test('should respect tab indentation', () => {
       const input = '<Fragment><Text>Content</Text></Fragment>';
-      const result = testIdempotency(input, { indentation: '\t' });
+      const result = testIdempotency(input, { tabSize: 4, insertSpaces: false});
 
       expect(result).toEqual(
 `<Fragment>
@@ -38,17 +46,6 @@ describe('XML Formatter', () => {
 </Fragment>`);
     });
 
-    test('should respect custom line separator', () => {
-      const input = '<Fragment><Text>Content</Text></Fragment>';
-      const result = testIdempotency(input, { lineSeparator: '\r\n' });
-
-      expect(result).toEqual(
-`<Fragment>\r
-  <Text>\r
-    Content\r
-  </Text>\r
-</Fragment>`);
-    });
   });
 
   describe('Basic XML Formatting', () => {
@@ -143,7 +140,7 @@ describe('XML Formatter', () => {
   describe('Ill-formed XML Handling', () => {
     test('should return null for malformed CDATA', () => {
       const input = '<Text><![CDATA[Unclosed CDATA</Text>';
-      const result = format(input, { indentation: '  ', lineSeparator: '\n' });
+      const result = testIdempotency(input );
 
       expect(result).toBeNull();
     });
@@ -151,12 +148,12 @@ describe('XML Formatter', () => {
 
   describe('Edge Cases', () => {
     test('should handle empty string', () => {
-      const result = format('', { indentation: '  ', lineSeparator: '\n' });
+      const result = testIdempotency('');
       expect(result).toBeNull();
     });
 
     test('should handle whitespace-only string', () => {
-      const result = format('   \n  \t  ', { indentation: '  ', lineSeparator: '\n' });
+      const result = testIdempotency('   \n  \t  ', );
       expect(result).toBeNull();
     });
 

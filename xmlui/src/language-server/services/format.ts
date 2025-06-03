@@ -1,48 +1,67 @@
 import xmlFormat, {type XMLFormatterOptions} from 'xml-formatter';
 import type { FormattingOptions, TextEdit, Range, Position } from 'vscode-languageserver';
-import { TextDocument } from 'vscode-languageserver-textdocument';
+import type { TextDocument } from 'vscode-languageserver-textdocument';
+import type { GetText, Node } from '../../parsers/xmlui-parser';
 
 type FormatOptions = Pick<XMLFormatterOptions, "lineSeparator" | "indentation">;
 
-export function format(input: string, { lineSeparator, indentation }: FormatOptions) : string | null {
-  try {
-    return xmlFormat(input, { lineSeparator, indentation, strictMode: false, });
-  } catch(e){
-    console.error(e);
-    return null;
-  }
-}
 
-export function handleDocumentFormatting(
-  document: TextDocument,
-  options: FormattingOptions
-): TextEdit[] | null {
-  const formatOptions: FormatOptions = {
-    indentation: options.insertSpaces ? ' '.repeat(options.tabSize) : '\t',
-    lineSeparator: '\n' // Default to LF, could be made configurable
-  };
+type FormattingContex = {
+  node: Node;
+  getText: GetText;
+  offsetToPosition: (offset: number) => Position;
+  options: FormattingOptions,
+};
 
-  const content = document.getText();
-  const formatted = format(content, formatOptions);
+export function handleDocumentFormatting({
+  node,
+  getText,
+  options,
+  offsetToPosition
+}: FormattingContex): TextEdit[] | null {
 
-  if (formatted === null) {
-    return null;
-  }
+  const formatted = format(node, getText, options);
+
   // If content is already formatted correctly, return empty array
-  if (formatted === content) {
+  const unformattedContent = getText(node);
+  if (formatted === unformattedContent) {
     return [];
   }
 
-  // Calculate the range to replace (entire document)
-  const lastCharIdx = content.length === 0 ? 0 : content.length - 1;
-
-  const range: Range = {
+  const lastCharIdx = unformattedContent.length === 0 ? 0 : unformattedContent.length - 1;
+  const entireDocumentRange: Range = {
     start: { line: 0, character: 0 },
-    end: document.positionAt(lastCharIdx)
+    end: offsetToPosition(lastCharIdx)
   };
 
   return [{
-    range,
+    range: entireDocumentRange,
     newText: formatted
   }];
+}
+
+class XmluiFormatter {
+  private readonly getText: GetText;
+  private indentationToken: string;
+  private indentationLevel: number;
+  private newlineToken: string = "\n";
+
+  constructor(node: Node, getText: GetText){
+    this.getText = getText;
+  }
+
+  format(options: FormattingOptions): string {
+    this.indentationToken = options.insertSpaces ? " ".repeat(options.tabSize) : "\t";
+    return "hi";
+  }
+
+  private indent = (level: number): string => {
+    return this.indentationToken.repeat(level);
+  };
+}
+
+export function format(node: Node, getText: GetText, options: FormattingOptions) : string | null {
+  const formatter = new XmluiFormatter(node, getText);
+  const formattedString = formatter.format(options);
+  return formattedString;
 }
