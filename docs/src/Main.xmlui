@@ -21,8 +21,9 @@
                 <NavLink label="Markup" to="/markup" />
                 <NavLink label="Code" to="/code" />
                 <NavLink label="Layout" to="/layout" />
-                <NavLink label="Working with Text" to="/working-with-text" />
-                <NavLink label="Routing and Links" to="/routing-and-links" />
+                <NavLink label="Working with Text" to="/workingWithText" />
+                <NavLink label="Working with Markdown" to="/workingWithMarkdown" />
+                <NavLink label="Routing and Links" to="/routingAndLinks" />
                 <NavLink label="Forms" to="/forms" />
                 <NavLink label="Resources" to="/resources" />
                 <NavLink label="Modal Dialogs" to="/modal-dialogs" />
@@ -54,11 +55,11 @@
         <Pages>
 
             <Page url="/">
-                <DocumentPage url="/pages/intro.md" />
+                <DocumentPage hideToc="true" url="/pages/intro.md" />
             </Page>
 
             <Page url="/reactive-intro">
-                <ReactiveIntro />
+                <DocumentPage hideToc="true" url="/pages/reactive-intro.md" />
             </Page>
 
             <Page url="/components-intro">
@@ -85,11 +86,16 @@
                 <DocumentPage url="/pages/layout.md" />
             </Page>
 
-            <Page url="/working-with-text">
-                <Markdown data="/pages/working-with-text.md" />
+            <Page url="/workingWithText">
+                <DocumentPage url="/pages/working-with-text.md" />
             </Page>
 
-            <Page url="/routing-and-links">
+            <Page hideToc="true" url="/workingWithMarkdown">
+                <DocumentPage url="/pages/working-with-markdown.md" />
+            </Page>
+
+
+            <Page url="/routingAndLinks">
                 <Markdown data="/pages/routing-and-links.md" />
             </Page>
 
