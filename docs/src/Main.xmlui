@@ -97,22 +97,22 @@
                 <DocumentPage url="/pages/forms.md"/>
             </Page>
             <Page url="/resources">
-                <Markdown data="/pages/resources.md"/>
+                <DocumentPage url="/pages/resources.md"/>
             </Page>
             <Page url="/modal-dialogs">
-                <Markdown data="/pages/modal-dialogs.md"/>
+                <DocumentPage url="/pages/modal-dialogs.md"/>
             </Page>
             <Page url="/user-defined-components">
-                <Markdown data="/pages/user-defined-components.md"/>
+                <DocumentPage url="/pages/user-defined-components.md"/>
             </Page>
             <Page url="/styles-and-themes/layout-props">
-                <Markdown data="/pages/styles-and-themes/layout-props.md"/>
+                <DocumentPage url="/pages/styles-and-themes/layout-props.md"/>
             </Page>
             <Page url="/styles-and-themes/theme-variables">
-                <Markdown data="/pages/styles-and-themes/theme-variables.md"/>
+                <DocumentPage url="/pages/styles-and-themes/theme-variables.md"/>
             </Page>
             <Page url="/styles-and-themes/common-units">
-                <Markdown data="/pages/styles-and-themes/common-units.md"/>
+                <DocumentPage url="/pages/styles-and-themes/common-units.md"/>
             </Page>
             <Page url="/tbd">
                 <TBD/>
@@ -124,16 +124,16 @@
                 <Palettes/>
             </Page>
             <Page url="/context-variables">
-                <Markdown data="/pages/context-variables.md"/>
+                <DocumentPage url="/pages/context-variables.md"/>
             </Page>
             <Page url="/globals">
-                <Markdown data="pages/globals.md"/>
+                <DocumentPage url="pages/globals.md"/>
             </Page>
             <Page url="/glossary">
-                <Markdown data="/pages/glossary.md"/>
+                <DocumentPage url="/pages/glossary.md"/>
             </Page>
             <Page url="/xmlui-theme">
-                <Markdown data="/pages/xmlui-theme.md"/>
+                <DocumentPage url="/pages/xmlui-theme.md"/>
             </Page>
             <Page url="/test">
                 <Test/>
