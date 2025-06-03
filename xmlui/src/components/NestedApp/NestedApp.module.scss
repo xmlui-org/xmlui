@@ -15,6 +15,8 @@ $backgroundColor-frame-NestedApp: createThemeVar("backgroundColor-frame-#{$compo
 $gap-frame-NestedApp: createThemeVar("gap-frame-#{$component}");
 $marginTop-NestedApp: createThemeVar("marginTop-#{$component}");
 $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
+$boxShadow-NestedApp: createThemeVar("boxShadow-#{$component}");
+// --- End of theme variables collection
 
 .nestedAppContainer {
   @include t.borderVars($themeVars, $component);
@@ -26,7 +28,7 @@ $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
   // A filter, backdrop-filter, transform, or perspective value other than none. ..."
 
   // so we do this to make the position 'fixed' elements to be positioned relative to the nestedAppContainer
-  transform: scale(1);
+  //transform: scale(1);
   margin-top: $marginTop-NestedApp;
   margin-bottom: $marginBottom-NestedApp;
   width: 100%;
@@ -36,6 +38,7 @@ $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
   gap: $gap-frame-NestedApp;
   background-color: $backgroundColor-frame-NestedApp;
   align-content: center;
+  box-shadow: $boxShadow-NestedApp;
 
   .header {
     width: 100%;
@@ -56,11 +59,6 @@ $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
       place-self: stretch;
     }
   }
-}
-
-.nestedApp {
-  width: 100%;
-  background-color: transparent;
 }
 
 :is(html[class~=dark]) {

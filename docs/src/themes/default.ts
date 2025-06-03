@@ -62,7 +62,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "borderRadius-HtmlTable": "30px",
 
     // --- NestedApp
-    "border-NestedApp": "1px solid transparent",
+    "border-NestedApp": "1px solid $color-surface-100",
 
     dark: {
       "color-primary": "#3367cc",
