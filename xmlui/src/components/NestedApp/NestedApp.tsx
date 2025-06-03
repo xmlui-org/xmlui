@@ -46,11 +46,12 @@ export const NestedAppMd = createMetadata({
     [`marginTop-${COMP}`]: "$space-3",
     [`marginBottom-${COMP}`]: "$space-3",
     [`padding-${COMP}`]: "$space-4",
-    [`paddingTop-${COMP}`]: "$space-3",
+    [`paddingTop-${COMP}`]: "$space-2",
     [`borderRadius-${COMP}`]: "$space-4",
-    [`backgroundColor-frame-${COMP}`]: "$color-primary-100",
+    [`backgroundColor-frame-${COMP}`]: "$color-primary-50",
     [`gap-frame-${COMP}`]: "$space-4",
     [`fontWeight-header-${COMP}`]: "$fontWeight-bold",
+    [`boxShadow-${COMP}`]: "$boxShadow-md",
   },
 });
 
