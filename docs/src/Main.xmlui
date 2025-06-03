@@ -1,11 +1,16 @@
 <Fragment xmlns:XMLUIExtensions="component-ns">
     <App layout="vertical-full-header" noScrollbarGutters="false" when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
+            <property name="logoTemplate">
+                <Link to="/" height="100%">
+                    <Logo padding="$space-3" paddingLeft="0"/>
+                </Link>
+            </property>
             <SpaceFiller/>
             <XMLUIExtensions:Search data="{{ ...appGlobals.content, ...appGlobals.prefetchedContent }}"/>
             <ToneChangerButton/>
         </AppHeader>
-        
+
         <NavPanel>
             <NavGroup label="Learn XMLUI" initiallyExpanded="{true}">
                 <NavLink label="Introduction" to="/"/>
@@ -41,26 +46,26 @@
                 <NavLink label="Test" to="/test"/>
             </NavGroup>
         </NavPanel>
-        
+
         <Pages>
             <Page url="/">
-                <DocumentPage 
-                    hideToc="true" 
-                    url="/pages/intro.md" 
-                    nextLink="/reactive-intro" 
+                <DocumentPage
+                    hideToc="true"
+                    url="/pages/intro.md"
+                    nextLink="/reactive-intro"
                     nextTitle="Reactive Data"/>
             </Page>
 
             <Page url="/reactive-intro">
-                <DocumentPage 
-                    hideToc="true" 
-                    url="/pages/reactive-intro.md" 
-                    prevLink="/" 
-                    prevTitle="Introduction" 
-                    nextLink="/components-intro" 
+                <DocumentPage
+                    hideToc="true"
+                    url="/pages/reactive-intro.md"
+                    prevLink="/"
+                    prevTitle="Introduction"
+                    nextLink="/components-intro"
                     nextTitle="Components"/>
             </Page>
-            
+
             <Page url="/components-intro">
                 <ComponentsIntro/>
             </Page>
@@ -141,7 +146,7 @@
             <Card border="0" width="100%" padding="0">
                 <CHStack gap="$space-1" paddingBottom="0" verticalAlignment="center">
                     Created with
-                    <Logo width="60px"/>
+                    <Logo width="50px" />
                 </CHStack>
             </Card>
         </Footer>
