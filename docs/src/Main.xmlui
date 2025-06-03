@@ -59,7 +59,7 @@
             </Page>
 
             <Page url="/reactive-intro">
-                <ReactiveIntro />
+                <DocumentPage hideToc="true" url="/pages/reactive-intro.md" />
             </Page>
 
             <Page url="/components-intro">
