@@ -64,6 +64,9 @@ export const DefaultDocsTheme: ThemeDefinition = {
     // --- NestedApp
     "border-NestedApp": "1px solid $color-surface-100",
 
+    // --- Footer
+    "fontSize-Footer": "16px",
+
     dark: {
       "color-primary": "#3367cc",
 
