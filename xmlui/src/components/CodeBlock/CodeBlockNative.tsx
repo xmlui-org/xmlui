@@ -20,7 +20,9 @@ export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps)
   if (!meta) {
     return (
       <div className={styles.codeBlock} style={style}>
-        {children}
+        <div className={styles.codeBlockContent}>
+          {children}
+        </div>
       </div>
     );
   }
@@ -31,7 +33,7 @@ export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps)
           <Text variant="em">{meta.filename}</Text>
         </div>
       )}
-      <div className={styles.codeBlockCopyWrapper}>
+      <div className={styles.codeBlockContent}>
         {children}
         <div className={styles.codeBlockCopyButton}>
           <Button
@@ -112,53 +114,52 @@ export function markdownCodeBlockParser() {
       (acc, item) => {
         item = item.trim();
         if (item === "") return acc;
-        if (item.indexOf("=") === -1) {
-          if (item.startsWith("/") && item.endsWith("/")) {
-            const unparsedSubstrings = acc[CodeHighlighterMetaKeys.highlightSubstrings.data];
-            const newItemBase64 = decodeValue(item.substring(1, item.length - 1));
 
-            if (!unparsedSubstrings) {
-              acc[CodeHighlighterMetaKeys.highlightSubstrings.data] = newItemBase64;
-            } else {
-              acc[CodeHighlighterMetaKeys.highlightSubstrings.data] =
-                `${unparsedSubstrings} ${newItemBase64}`;
-            }
-          }
-          if (item.startsWith("!/") && item.endsWith("/")) {
-            const unparsedSubstrings = acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data];
-            const newItemBase64 = decodeValue(item.substring(2, item.length - 1));
-
-            if (!unparsedSubstrings) {
-              acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data] = newItemBase64;
-            } else {
-              acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data] =
-                `${unparsedSubstrings} ${newItemBase64}`;
-            }
-          }
-          if (item.startsWith("{") && item.endsWith("}")) {
-            const unparsedRows = acc[CodeHighlighterMetaKeys.highlightRows.data];
-            const newItem = item.substring(1, item.length - 1);
-
-            if (!unparsedRows) {
-              acc[CodeHighlighterMetaKeys.highlightRows.data] = newItem;
-            } else {
-              acc[CodeHighlighterMetaKeys.highlightRows.data] = `${unparsedRows}, ${newItem}`;
-            }
-          }
-          if (item === "copy") {
-            acc[CodeHighlighterMetaKeys.copy.data] = "true";
-          }
-          if (item === "rowNumbers") {
-            acc[CodeHighlighterMetaKeys.rowNumbers.data] = "true";
-          }
-          return acc;
+        if (item.toLocaleLowerCase().startsWith("filename=")) {
+          const index = item.indexOf("=");
+          acc[CodeHighlighterMetaKeys.filename.data] = item
+            .substring(index + 1)
+            .replace(/"(.+)"/, "$1")
+            .replace(/'(.+)'/, "$1");
         }
-        const index = item.indexOf("=");
-        if (item.substring(0, index) !== "filename") return acc;
-        acc["dataFilename"] = item
-          .substring(index + 1)
-          .replace(/"(.+)"/, "$1")
-          .replace(/'(.+)'/, "$1");
+        if (item.startsWith("/") && item.endsWith("/")) {
+          const unparsedSubstrings = acc[CodeHighlighterMetaKeys.highlightSubstrings.data];
+          const newItemBase64 = decodeValue(item.substring(1, item.length - 1));
+
+          if (!unparsedSubstrings) {
+            acc[CodeHighlighterMetaKeys.highlightSubstrings.data] = newItemBase64;
+          } else {
+            acc[CodeHighlighterMetaKeys.highlightSubstrings.data] =
+              `${unparsedSubstrings} ${newItemBase64}`;
+          }
+        }
+        if (item.startsWith("!/") && item.endsWith("/")) {
+          const unparsedSubstrings = acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data];
+          const newItemBase64 = decodeValue(item.substring(2, item.length - 1));
+
+          if (!unparsedSubstrings) {
+            acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data] = newItemBase64;
+          } else {
+            acc[CodeHighlighterMetaKeys.highlightSubstringsEmphasized.data] =
+              `${unparsedSubstrings} ${newItemBase64}`;
+          }
+        }
+        if (item.startsWith("{") && item.endsWith("}")) {
+          const unparsedRows = acc[CodeHighlighterMetaKeys.highlightRows.data];
+          const newItem = item.substring(1, item.length - 1);
+
+          if (!unparsedRows) {
+            acc[CodeHighlighterMetaKeys.highlightRows.data] = newItem;
+          } else {
+            acc[CodeHighlighterMetaKeys.highlightRows.data] = `${unparsedRows}, ${newItem}`;
+          }
+        }
+        if (item === "copy") {
+          acc[CodeHighlighterMetaKeys.copy.data] = "true";
+        }
+        if (item === "rowNumbers") {
+          acc[CodeHighlighterMetaKeys.rowNumbers.data] = "true";
+        }
         return acc;
       },
       {} as Record<string, string>,

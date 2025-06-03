@@ -140,9 +140,10 @@ function extractMetaFromChildren(
       [CodeHighlighterMetaKeys.language.prop]: meta[CodeHighlighterMetaKeys.language.data],
       [CodeHighlighterMetaKeys.copy.prop]: parseBoolean(meta[CodeHighlighterMetaKeys.copy.data]),
       [CodeHighlighterMetaKeys.filename.prop]: meta[CodeHighlighterMetaKeys.filename.data],
-      [CodeHighlighterMetaKeys.rowNumbers.prop]: parseBoolean(
+      // NOTE: Row numbers are disabled for now, because applying the highlight class removes the "numbered" class
+      /* [CodeHighlighterMetaKeys.rowNumbers.prop]: parseBoolean(
         meta[CodeHighlighterMetaKeys.rowNumbers.data],
-      ),
+      ), */
       [CodeHighlighterMetaKeys.highlightRows.prop]: parseRowHighlights(
         code.split("\n").length,
         meta[CodeHighlighterMetaKeys.highlightRows.data],
