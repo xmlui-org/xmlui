@@ -16,7 +16,7 @@ We've seen how XMLUI enables reactive data binding without requiring you to mast
             onDidChange="{ (newTheme) => setTheme(newTheme) }"
         >
             <Option value="earthtone" label="earthtone" />
-            <Option value="xmlui" label="xmlui" />
+            <Option value="default" label="xmlui" />
         </Select>
 
         <ToneChangerButton />
@@ -74,7 +74,7 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
         <SpaceFiller />
 
         <Stack width="50%">
-            <Theme themeId="xmlui">
+            <Theme themeId="default">
                 <Card>
                     <Badge variant="pill">xmlui</Badge>
                     <TubeStops line="waterloo-city" />
