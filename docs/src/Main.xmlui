@@ -1,178 +1,150 @@
 <Fragment xmlns:XMLUIExtensions="component-ns">
-    <App layout="vertical-full-header" noScrollbarGutters="false"
-         when="{!window.location.hash.includes('/playground')}">
+    <App layout="vertical-full-header" noScrollbarGutters="false" when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
-            <SpaceFiller />
-            <XMLUIExtensions:Search data="{{ ...appGlobals.content, ...appGlobals.prefetchedContent }}" />
-            <ToneChangerButton />
+            <SpaceFiller/>
+            <XMLUIExtensions:Search data="{{ ...appGlobals.content, ...appGlobals.prefetchedContent }}"/>
+            <ToneChangerButton/>
         </AppHeader>
-
+        
         <NavPanel>
-
             <NavGroup label="Learn XMLUI" initiallyExpanded="{true}">
-                <NavLink label="Introduction" to="/" />
-                <NavLink label="Reactive Data" to="/reactive-intro" />
-                <NavLink label="Components" to="/components-intro" />
-                <NavLink label="Themes" to="/themes-intro" />
+                <NavLink label="Introduction" to="/"/>
+                <NavLink label="Reactive Data" to="/reactive-intro"/>
+                <NavLink label="Components" to="/components-intro"/>
+                <NavLink label="Themes" to="/themes-intro"/>
             </NavGroup>
-
             <NavGroup label="Create XMLUI Apps">
-                <NavLink label="App Structure" to="/app-structure" />
-                <NavLink label="Markup" to="/markup" />
-                <NavLink label="Code" to="/code" />
-                <NavLink label="Layout" to="/layout" />
-                <NavLink label="Working with Text" to="/workingWithText" />
-                <NavLink label="Working with Markdown" to="/workingWithMarkdown" />
-                <NavLink label="Routing and Links" to="/routingAndLinks" />
-                <NavLink label="Forms" to="/forms" />
-                <NavLink label="Resources" to="/resources" />
-                <NavLink label="Modal Dialogs" to="/modal-dialogs" />
-                <NavLink label="User-defined Components" to="/user-defined-components" />
+                <NavLink label="App Structure" to="/app-structure"/>
+                <NavLink label="Markup" to="/markup"/>
+                <NavLink label="Code" to="/code"/>
+                <NavLink label="Layout" to="/layout"/>
+                <NavLink label="Working with Text" to="/workingWithText"/>
+                <NavLink label="Working with Markdown" to="/workingWithMarkdown"/>
+                <NavLink label="Routing and Links" to="/routingAndLinks"/>
+                <NavLink label="Forms" to="/forms"/>
+                <NavLink label="Resources" to="/resources"/>
+                <NavLink label="Modal Dialogs" to="/modal-dialogs"/>
+                <NavLink label="User-defined Components" to="/user-defined-components"/>
             </NavGroup>
-
             <NavGroup label="Reference">
-
-                <RecursiveNavTree items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }" />
-
+                <RecursiveNavTree items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
                 <NavGroup label="Themes">
-                    <NavLink label="Layout Properties" to="/styles-and-themes/layout-props" />
-                    <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables" />
-                    <NavLink label="Common Units" to="/styles-and-themes/common-units" />
+                    <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
+                    <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
+                    <NavLink label="Common Units" to="/styles-and-themes/common-units"/>
                 </NavGroup>
-
-                <NavLink label="Context Variables" to="/context-variables" />
-                <NavLink label="Globals" to="/globals" />
-                <NavLink label="Palettes" to="/palettes" />
-                <NavLink label="Icons" to="/icons" />
-                <NavLink label="Glossary" to="/glossary" />
-                <NavLink label="Test" to="/test" />
-
+                <NavLink label="Context Variables" to="/context-variables"/>
+                <NavLink label="Globals" to="/globals"/>
+                <NavLink label="Palettes" to="/palettes"/>
+                <NavLink label="Icons" to="/icons"/>
+                <NavLink label="Glossary" to="/glossary"/>
+                <NavLink label="Test" to="/test"/>
             </NavGroup>
-
         </NavPanel>
-
-
+        
         <Pages>
-
             <Page url="/">
-                <DocumentPage hideToc="true" url="/pages/intro.md" />
+                <DocumentPage 
+                    hideToc="true" 
+                    url="/pages/intro.md" 
+                    nextLink="/reactive-intro" 
+                    nextTitle="Reactive Data"/>
             </Page>
 
             <Page url="/reactive-intro">
-                <DocumentPage hideToc="true" url="/pages/reactive-intro.md" />
+                <DocumentPage 
+                    hideToc="true" 
+                    url="/pages/reactive-intro.md" 
+                    prevLink="/" 
+                    prevTitle="Introduction" 
+                    nextLink="/components-intro" 
+                    nextTitle="Components"/>
             </Page>
-
+            
             <Page url="/components-intro">
-                <ComponentsIntro />
+                <ComponentsIntro/>
             </Page>
-
             <Page url="/themes-intro">
-                <ThemesIntro />
+                <ThemesIntro/>
             </Page>
-
             <Page url="/app-structure">
-                <DocumentPage url="/pages/app-structure.md" />
+                <DocumentPage url="/pages/app-structure.md"/>
             </Page>
-
             <Page url="/markup">
-                <DocumentPage url="/pages/markup.md" />
+                <DocumentPage url="/pages/markup.md"/>
             </Page>
-
             <Page url="/code">
-                <DocumentPage url="/pages/code.md" />
+                <DocumentPage url="/pages/code.md"/>
             </Page>
-
             <Page url="/layout">
-                <DocumentPage url="/pages/layout.md" />
+                <DocumentPage url="/pages/layout.md"/>
             </Page>
-
             <Page url="/workingWithText">
-                <DocumentPage url="/pages/working-with-text.md" />
+                <DocumentPage url="/pages/working-with-text.md"/>
             </Page>
-
             <Page hideToc="true" url="/workingWithMarkdown">
-                <DocumentPage url="/pages/working-with-markdown.md" />
+                <DocumentPage url="/pages/working-with-markdown.md"/>
             </Page>
-
-
             <Page url="/routingAndLinks">
-                <Markdown data="/pages/routing-and-links.md" />
+                <Markdown data="/pages/routing-and-links.md"/>
             </Page>
-
             <Page url="/forms">
-                <Markdown data="/pages/forms.md" />
+                <Markdown data="/pages/forms.md"/>
             </Page>
-
             <Page url="/resources">
-                <Markdown data="/pages/resources.md" />
+                <Markdown data="/pages/resources.md"/>
             </Page>
-
             <Page url="/modal-dialogs">
-                <Markdown data="/pages/modal-dialogs.md" />
+                <Markdown data="/pages/modal-dialogs.md"/>
             </Page>
-
             <Page url="/user-defined-components">
-                <Markdown data="/pages/user-defined-components.md" />
+                <Markdown data="/pages/user-defined-components.md"/>
             </Page>
-
             <Page url="/styles-and-themes/layout-props">
-                <Markdown data="/pages/styles-and-themes/layout-props.md" />
+                <Markdown data="/pages/styles-and-themes/layout-props.md"/>
             </Page>
-
             <Page url="/styles-and-themes/theme-variables">
-                <Markdown data="/pages/styles-and-themes/theme-variables.md" />
+                <Markdown data="/pages/styles-and-themes/theme-variables.md"/>
             </Page>
-
             <Page url="/styles-and-themes/common-units">
-                <Markdown data="/pages/styles-and-themes/common-units.md" />
+                <Markdown data="/pages/styles-and-themes/common-units.md"/>
             </Page>
-
             <Page url="/tbd">
-                <TBD />
+                <TBD/>
             </Page>
-
             <Page url="/icons">
-                <Icons />
+                <Icons/>
             </Page>
-
             <Page url="/palettes">
-                <Palettes />
+                <Palettes/>
             </Page>
-
             <Page url="/context-variables">
-                <Markdown data="/pages/context-variables.md" />
+                <Markdown data="/pages/context-variables.md"/>
             </Page>
-
             <Page url="/globals">
-                <Markdown data="pages/globals.md" />
+                <Markdown data="pages/globals.md"/>
             </Page>
-
             <Page url="/glossary">
-                <Markdown data="/pages/glossary.md" />
+                <Markdown data="/pages/glossary.md"/>
             </Page>
-
             <Page url="/xmlui-theme">
-                <Markdown data="/pages/xmlui-theme.md" />
+                <Markdown data="/pages/xmlui-theme.md"/>
             </Page>
-
             <Page url="/test">
-                <Test />
+                <Test/>
             </Page>
-
             <Page url="/*">
-                <DocumentPage content="{ appGlobals.content[$routeParams['*']] }" />
+                <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>
             </Page>
-
-
         </Pages>
         <Footer>
             <Card border="0" width="100%" padding="0">
                 <CHStack gap="$space-1" paddingBottom="0" verticalAlignment="center">
                     Created with
-                    <Logo width="60px" />
+                    <Logo width="60px"/>
                 </CHStack>
             </Card>
         </Footer>
     </App>
-    <XMLUIExtensions:StandalonePlayground when="{window.location.hash.includes('/playground')}" />
+    <XMLUIExtensions:StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
 </Fragment>
