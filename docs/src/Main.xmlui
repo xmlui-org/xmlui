@@ -91,10 +91,10 @@
                 <DocumentPage url="/pages/working-with-markdown.md"/>
             </Page>
             <Page url="/routingAndLinks">
-                <Markdown data="/pages/routing-and-links.md"/>
+                <DocumentPage url="/pages/routing-and-links.md"/>
             </Page>
             <Page url="/forms">
-                <Markdown data="/pages/forms.md"/>
+                <DocumentPage url="/pages/forms.md"/>
             </Page>
             <Page url="/resources">
                 <Markdown data="/pages/resources.md"/>
