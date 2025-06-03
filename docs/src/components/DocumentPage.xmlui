@@ -1,21 +1,20 @@
 <Component name="DocumentPage">
     <HStack gap="$space-5">
         <VStack width="*">
-            <Breadcrumb />
-            <Markdown
-                when="{$props.content || $props.url}"
-                content="{$props.content}"
-                data="{$props.url}"
-                showHeadingAnchors="true"
-            />
+            <Breadcrumb/>
+            <Markdown 
+                when="{$props.content || $props.url}" 
+                content="{$props.content}" 
+                data="{$props.url}" 
+                showHeadingAnchors="true" />
             <Slot when="{!$props.content && !$props.url}" />
+            <DocumentLinks 
+                prevLink="{$props.prevLink}" 
+                prevTitle="{$props.prevTitle}" 
+                nextLink="{$props.nextLink}" 
+                nextTitle="{$props.nextTitle}" />
         </VStack>
-        <TableOfContents 
-            width="$space-64"
-            when="{mediaSize.sizeIndex > 3 && !$props.hideToc}"
-            maxHeadingLevel="3" />
-        <VStack
-            width="$space-64" 
-            when="{mediaSize.sizeIndex > 3 && $props.hideToc}" />
-    </HStack>    
+        <TableOfContents width="$space-64" when="{mediaSize.sizeIndex > 3 && !$props.hideToc}" maxHeadingLevel="3" />
+        <VStack width="$space-64" when="{mediaSize.sizeIndex > 3 && $props.hideToc}" />
+    </HStack>
 </Component>

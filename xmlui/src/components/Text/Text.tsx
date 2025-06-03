@@ -103,7 +103,7 @@ export const TextMd = createMetadata({
     [`fontSize-${COMP}-markdown`]: "$fontSize-normal",
 
     [`backgroundColor-${COMP}-code`]: "rgba($color-surface-100-rgb, .4)",
-    [`borderColor-${COMP}-code`]: "$color-surface-300",
+    [`borderColor-${COMP}-code`]: "$color-surface-100",
     [`backgroundColor-${COMP}-keyboard`]: "rgba($color-surface-100-rgb, .4)",
     [`borderColor-${COMP}-keyboard`]: "$color-surface-300",
     [`backgroundColor-${COMP}-marked`]: "rgba($color-primary-200-rgb, .4)",

@@ -37,5 +37,3 @@ This is the XMLUI markup you'll see in the playground.
 The [List](/components/List/) component fetches JSON from a <a href="https://api.tfl.gov.uk/line/mode/tube/status" target="_blank">REST endpoint</a>. (Other components, like <a href="/components/Table" target="blank">Table</a>, use the `data` attribute the same way.) JSON objects returned from the API map to the `$item` context variable, and the [Text](/components/Text) component uses JavaScript dot notation and array indexing to extract station names and statuses.
 
 In this case the URL is static. In the next chapter you'll see how a data URL can vary to deliver changing data in response to UI interaction.
-
-→ [Reactive data binding](/reactive-intro)
