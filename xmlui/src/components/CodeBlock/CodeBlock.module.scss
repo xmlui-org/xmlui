@@ -35,7 +35,7 @@ $borderColor-CodeBlock-highlightString-emphasis: createThemeVar("borderColor-Cod
   border-start-end-radius: t.getThemeVar($themeVars, "borderStartEndRadius-CodeBlock");
 }
 
-.codeBlockCopyWrapper {
+.codeBlockContent {
   position: relative;
   display: flex;
   align-items: center;
@@ -54,6 +54,10 @@ $borderColor-CodeBlock-highlightString-emphasis: createThemeVar("borderColor-Cod
     .codeBlockCopyButton {
       display: block;
     }
+  }
+
+  pre {
+    flex-grow: 1;
   }
 }
 
