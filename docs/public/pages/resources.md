@@ -1,69 +1,32 @@
-# Working with Resources
+# Resources
 
-An XMLUI application, being a web application, can use static resources such as images, icons, fonts, etc provided by the application developer.
-The XMLUI framework is then able to load these resources and use them seamlessly without the need to define how to load and manage these resources.
+An XMLUI app can use static resources such as images, icons, and font. You can keep them in any folder, we illustrate using the `/resources` convention. to load and manage these resources. Here's a simple tree of resources.
 
-## Adding Resources to a Project
+```
+resources/
+├── image.png
+├── favicon.ico
+├── favicon.png
+├── logo-dark.svg
+├── logo.svg
+```
 
-The following guide will walk you through adding different kinds of resources to your application and also how to use them.
+Given this structure you can refer to resources like so.
 
-### The `resources` Folder [#the-resource-folder]
-
-Resources are generally stored in the `resources` folder of an XLMUI project, similar how regular websites store static resources in their public folder.
-
-The first step of adding static resource files to your XMLUI application is moving or copying relevant files such as images to this folder.
-Here is an example of how the folder looks like for a simple project.
-
-<FileTree>
-  <FileTree.Folder name="resources" defaultOpen>
-    <FileTree.File name="favicon.ico" />
-    <FileTree.File name="custom-logo.svg" />
-    <FileTree.File name="empty-folder.svg" />
-    <FileTree.File name="hero-img.jpg" />
-    <FileTree.File name="my-font.woff2" />
-  </FileTree.Folder>
-</FileTree>
-
-### Using Resources Directly
-
-After adding the files you wish to use, you can opt to refer to them directly from code.
-This is a fast way to add any static files to your project:
-
-```xmlui copy filename="Main.xmlui"
+```xmlui
 <App
   name="Tutorial"
-  logo="resources/custom-logo.svg">
+  logo="resources/logo.svg">
+  logoDark="resources/logo-dark.svg">
   <AppHeader>
     <H2>Using Resources Tutorial</H2>
   </AppHeader>
-  <Image
-    src="/resources/breakfast.jpg" fit="contain"
-    width="240px" />
+  <Image src="/resources/image.png" />
 </App>
 ```
 
-<Playground
-  name="Example: Using Resources Directly"
-  previewOnly
-  resources={{ logo: xmluiLogo }}
-  app={`
-  <App
-    name="Tutorial">
-    <AppHeader>
-      <H2>Using Resources Tutorial</H2>
-    </AppHeader>
-    <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px"/>
-  </App>
-  `}
-/>
+Alternative you can enumerate resources in `config.json`.
 
-### Configuration File
-
-The other way you can refer to resources in your application code is by telling the application where to look for resources and what their handle should be.
-This is done in the project configuration file called `config.json` in the project root.
-
-Continuing with the example in the <SmartLink href="#the-resource-folder">The resource Folder</SmartLink> section,
-the configuration object in the file gets a `resources` entry which looks like so:
 
 ```json copy filename="config.json"
 {
@@ -77,6 +40,7 @@ the configuration object in the file gets a `resources` entry which looks like s
   }
 }
 ```
+
 
 ### Using Resources
 

@@ -1,12 +1,10 @@
-# Using Forms
+# Forms
 
-<Callout type="info" emoji="💡">
-  XMLUI has a robust form infrastructure allowing you to create forms without the hassle of managing, editing, validating, and saving the information you provide in the UI.
-</Callout>
+XMLUI enables to create forms without the hassle of managing, editing, validating, and saving the information you provide in the UI.
 
-The following example demonstrates the fundamental XMLUI concepts regarding forms:
+This example demonstrates the core elements: [Form](/components/Form) and [FormItem](/components/FormItem).
 
-```xmlui copy
+```xmlui-pg display
 <App>
   <Form data="{{ name: 'Joe', age: 43 }}">
     <FlowLayout>
@@ -18,137 +16,27 @@ The following example demonstrates the fundamental XMLUI concepts regarding form
 </App>
 ```
 
-<Playground
-  previewOnly
-  name="Example: XMLUI Form"
-  app={`
-    <App>
-      <Form data="{{ name: 'Joe', age: 43 }}" >
-        <FlowLayout>
-          <H3>Customer information</H3>
-          <FormItem bindTo="name" label="Customer name" minLength="2" />
-          <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
-        </FlowLayout>
-      </Form>
-    </App>
-  `}
-/>
-
-The code can be broken down into the following:
-
-- The `Form` component encapsulates the management of form UI elements and data handling; the `data` property is used to provide data to the form. In this example, the data is a customer's name and age.
-- The `FormItem` component manages an individual attribute in the data. The form in the example uses two fields: one for the name and another for the age. Each `FormItem` has properties in order to handle data:
+- `Form` encapsulates the management of form UI elements and data handling
+- The `data` property holds the form's data
+- `FormItem` manages a piece of the data
   - `bindTo` specifies the property name within the `data` to bind the corresponding field
-  - `type` determines the type of the input field that should be used in order to modify a given piece of data (number field, text area field, radio buttons, etc.)
-  - other properties are generally either for styling or to provide further constraints and arguments for a given input field (e.g. accept only 0 or positive numbers if a field has the number field type)
-
-## Form with FormItems
-
-<Callout type="info" emoji="💡">
-  The `Form` component is designed to work with `FormItem` components inside it to utilize all built-in features
-  that help in managing forms: displaying, validating, and saving data.
-
-  However, there is no restriction on what components you can use within a form.
-</Callout>
-
-```xmlui copy {8-10}
-<App>
-  <Form
-    data="{{ search: 'Seattle' }}"
-    onSubmit="toast.success('Searching!')"
-    saveLabel="Search">
-      Please specify the name to include in the search:
-      <FormItem bindTo="search" />
-      <Button
-        label="Select from dictionary"
-        onClick="toast('Displaying dictionary')" />
-  </Form>
-</App>
-```
-
-<Playground
-  previewOnly
-  name="Example: Form with non-FormItem #1"
-  app={`
-  <App>
-    <Form
-      data="{{ search: 'Seattle' }}"
-      onSubmit="toast.success('Searching!')"
-      saveLabel="Search">
-        Please specify the name to include in the search:
-        <FormItem bindTo="search" />
-        <Button
-          label="Select from dictionary"
-          onClick="toast('Displaying dictionary')" />
-    </Form>
-  </App>
-  `}
-/>
-
-<Callout type="info" emoji="💡">
-  Non-`FormItem` input components are not integrated into the form infrastructure.
-</Callout>
-
-The following example shows this by placing a regular `Checkbox` component in the `Form`.
-
-```xmlui copy {8}
-<App>
-  <Form
-    data="{{ search: 'Seattle', caseSensitive: 'false' }}"
-    onSubmit="(toSave) => toast.success('Searching for ' + JSON.stringify(toSave))"
-    saveLabel="Search" >
-      Please specify the name to include in the search:
-      <FormItem bindTo="search" />
-      <Checkbox label="Case sensitive?" initialValue="true" />
-  </Form>
-</App>
-```
-
-When you click "Search", the saved data structure does not contain the `caseSensitive` field.
-
-<Playground
-  previewOnly
-  name="Example: Form with non-FormItem #2"
-  app={`
-  <App>
-    <Form
-      data="{{ search: 'Seattle', caseSensitive: 'false' }}"
-      onSubmit="(toSave) => toast.success('Searching for ' + JSON.stringify(toSave))"
-      saveLabel="Search" >
-        Please specify the name to include in the search:
-        <FormItem bindTo="search" />
-        <Checkbox label="Case sensitive?" initialValue="true" />
-    </Form>
-  </App>
-  `}
-/>
-
-<Callout type="info" emoji="💡">
-  Adding other input components (as helpers) may still be helpful.
-  You can use them to manipulate form data.
-  For example, you can use the value of a checkbox to add some logic,
-  such as copying some data fields into other fields automatically.
-</Callout>
+  - `type` determines the kind of input field needed for a given piece of data (number field, text area field, radio buttons, etc.)
+  - other properties support styling or validation
 
 ## Form Layouts
 
-You can create any layout within a `Form` component.
-Instead of manually placing the components within a form,
-you can nest a form's content into a `FlowLayout` and use the width property of individual `FormItem` components with <SmartLink href="">percentage or star sizing</SmartLink>.
+You can any of XMLUI's layout mechanisms with a `Form`. Here is a single-column format using `FlowLayout`.
 
-<Callout type="info" emoji="💡">
-  `FlowLayout` is a responsive component. It ensures that your form is displayed correctly in mobile view as well.
-</Callout>
-
-### Single-Column Forms
-
-<Callout type="info" emoji="💡">
-  Unless you specify an explicit item width, each nested `FormItem` (within a `FlowLayout`) will fill the entire width of the form.
-</Callout>
-
-```xmlui copy
+```xmlui-pg display
 <App>
-  <Form data="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}">
+  <Form data="{
+    {
+      firstname: 'Jake',
+      lastname: 'Hard',
+      jobTitle: 'janitor',
+      experience: 'broom'
+     }
+  }">
     <FlowLayout>
       <FormItem label="Firstname" bindTo="firstname" />
       <FormItem label="Lastname" bindTo="lastname" />
@@ -159,28 +47,9 @@ you can nest a form's content into a `FlowLayout` and use the width property of 
 </App>
 ```
 
-<Playground
-  previewOnly
-  name="Example: Single-column Form Layout"
-  app={`
-  <App>
-    <Form data="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}">
-      <FlowLayout>
-        <FormItem label="Firstname" bindTo="firstname" />
-        <FormItem label="Lastname" bindTo="lastname" />
-        <FormItem label="Job Title" bindTo="jobTitle" />
-        <FormItem label="Experience" bindTo="experience" />
-      </FlowLayout>
-    </Form>
-  </App>
-  `}
-/>
+Set each item's width to `50%` to create a two-column layout.
 
-### Two-Column Forms
-
-Set each item's width to "50%" to create a two-column layout:
-
-```xmlui copy
+ ```xmlui-pg display
 <App>
   <Form
     data="{{
@@ -199,32 +68,9 @@ Set each item's width to "50%" to create a two-column layout:
 </App>
 ```
 
-<Playground
-  previewOnly
-  name="Example: Two-column Form Layout"
-  app={`
-    <App>
-      <Form
-        data="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}">
-        <FlowLayout>
-          <FormItem label="Firstname" bindTo="firstname" width="50%" />
-          <FormItem label="Lastname" bindTo="lastname" width="50%" />
-          <FormItem label="Job Title" bindTo="jobTitle" width="50%" />
-          <FormItem label="Experience" bindTo="experience" width="50%" />
-        </FlowLayout>
-      </Form>
-    </App>
-  `}
-/>
+Use star sizing to allocate widths flexibly. Here `Firstname` and `Lastname` equally share the space remaining after the 100-px-wide `Title`.
 
-### Multiple Items with Star Sizing
-
-<Callout type="info" emoji="💡">
-  XMLUI has layout containers that support <SmartLink href={LAYOUT_DIMENSION_UNITS}>star sizing</SmartLink> for their children.
-  This feature tells a component to fill up all remaining space in a row if other sibling component have their sizes specified.
-</Callout>
-
-```xmlui copy {14-15}
+```xmlui-pg display
 <App>
   <Form
     data="{{
@@ -248,109 +94,45 @@ Set each item's width to "50%" to create a two-column layout:
 </App>
 ```
 
-<Playground
-    previewOnly
-    name="Example: Star Sizing"
-    app={`
-    <App>
-      <Form
-        data="{{
-          title: 'Mr.',
-          firstname: 'Jake',
-          lastname: 'Hard',
-          jobTitle: 'janitor',
-          experience: 'broom'
-        }}"
-        onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-        <FlowLayout>
-          <HStack>
-            <FormItem label="Title" bindTo="title" width="100px" />
-            <FormItem label="Firstname" bindTo="firstname" width="*" />
-            <FormItem label="Lastname" bindTo="lastname" width="*" />
-          </HStack>
-          <FormItem label="Job Title" bindTo="jobTitle" width="50%" />
-          <FormItem label="Experience" bindTo="experience" width="50%" />
-        </FlowLayout>
-      </Form>
-    </App>
-  `}
-/>
+## FormItem
 
-## Input Components within FormItem
+`FormItem` is an intermediary layer between `Form` and an input component; it manages the data represented by that component. The `type` property of a `FormItem` specifies what input component to render.
 
-<Callout type="info" emoji="💡">
-  The `FormItem` component acts as an intermediary layer between the Form and whatever input control component is rendered through it.
-  It is responsible for managing the data represented by the corresponding input component.
-</Callout>
-
-The `type` property of a `FormItem` specifies what input component to render.
-If this property is empty, `FormItem` uses a <SmartLink href={COMPONENT_TEXT}>`TextBox`</SmartLink> as the input field.
-
-The `FormItem` supports these input components:
-
-| `type` Value    | Description |
+| type     | description |
 | --------------- | ----------- |
 | `checkbox`      | A checkbox representing a boolean value. |
 | `combobox`      | Lets the user select an item from a dropdown list of filterable items. Use the input field to filter the list. |
-| `custom`        | A custom input component to enable developers to specify their own input fields. |
 | `datePicker`    | An input to select dates. |
 | `file`          | An input to select a file or folder from the local machine. |
 | `integer`       | An input for integer values. |
-| `multiCombobox` | Lets the user select mulitple items from a filterable dropdown list. Use the input field to filter the list. |
-| `multiSelect`   | Lets the user select mulitple items from a dropdown list. |
+| `multiCombobox` | Lets the user select multiple items from a filterable dropdown list. Use the input field to filter the list. |
+| `multiSelect`   | Lets the user select multiple items from a dropdown list. |
 | `number`        | An input for numeric values (integer or floating-point). |
 | `radioGroup`    | A group of radio buttons (only one can be selected). |
 | `select`        | Lets the user select an item from a dropdown list. |
 | `switch`        | A switch component to toggle a boolean value. |
-| `text`          | A textbox to enter text. |
+| `text`          | A textbox to enter text.  This is the default if no type is specified. |
 | `textarea`      | A multiline textbox to enter text. |
 
-<Callout type="warning" emoji="⚠️">
-  `FromItem` renders a read-only text if you use a `type` value not in this table.
-</Callout>
-
-<Callout type="info" emoji="💡">
-  If you omit `type`, `FormItem` renders a textbox.
-  However, if you nest a custom component into `FormItem`, it behaves as if you set `type` to `custom`.
-</Callout>
-
-The following sections contain examples of using `FormItem` with different input types.
 
 ### Checkbox
 
-The `checkbox` type represents a checkbox input component:
-
-```xmlui copy {4-6}
+```xmlui-pg display
 <App>
   <Form data="{{ option1: true, option2: false, option3: true }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-    <FormItem type="checkbox" bindTo="option1" label="Option #1" />
-    <FormItem type="checkbox" bindTo="option2" label="Option #2" />
-    <FormItem type="checkbox" bindTo="option3" label="Option #3" />
+    <FormItem type="checkbox" bindTo="option1" label="Option #1" labelPosition="end" />
+    <FormItem type="checkbox" bindTo="option2" label="Option #2" labelPosition="end" />
+    <FormItem type="checkbox" bindTo="option3" label="Option #3" labelPosition="end" />
   </Form>
 </App>
 ```
 
-<Playground
-  name="Example: Checkbox"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{ option1: true, option2: false, option3: true }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="checkbox" bindTo="option1" label="Option #1" />
-      <FormItem type="checkbox" bindTo="option2" label="Option #2" />
-      <FormItem type="checkbox" bindTo="option3" label="Option #3" />
-    </Form>
-  </App>
-  `}
-/>
+[Checkbox component doc](/components/Checkbox)
 
 ### DatePicker
 
-The `datePicker` type represents a date picker input component:
-
-```xmlui copy {5}
+```xmlui-pg display
 <App>
   <Form
     data="{{ birthDate: '2021-04-08' }}"
@@ -360,25 +142,13 @@ The `datePicker` type represents a date picker input component:
 </App>
 ```
 
-<Playground
-  name="Example: DatePicker"
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{ birthDate: '2021-04-08' }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="datePicker" bindTo="birthDate" label="Birthdate" />
-    </Form>
-  </App>
-  `}
-/>
+[DatePicker component doc](/components/DatePicker)
 
 ### File
 
-The `file` type represents an input component allowing you to select one or multiple files:
+Use `file` to select one or multiple files.
 
-```xmlui copy {5}
+```xmlui-pg display
 <App>
   <Form
     data="{{ articles: null }}"
@@ -388,25 +158,11 @@ The `file` type represents an input component allowing you to select one or mult
 </App>
 ```
 
-<Playground
-  name="Example: File Input"
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{ articles: null }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="file" bindTo="articles" label="Articles file" />
-    </Form>
-  </App>
-  `}
-/>
+[DatePicker component doc](/components/DatePicker)
 
 ### Integer
 
-The `integer` type represents an input component for integer values:
-
-```xmlui copy {5}
+```xmlui-pg display
 <App>
   <Form
     data="{{ age: 30 }}"
@@ -416,25 +172,9 @@ The `integer` type represents an input component for integer values:
 </App>
 ```
 
-<Playground
-  name="Example: Integer Input"
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{ age: 30 }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="integer" bindTo="age" label="Age" />
-    </Form>
-  </App>
-  `}
-/>
-
 ### Number
 
-The `number` type represents an input component for numeric values (integer or floating-point):
-
-```xmlui copy {5}
+```xmlui-pg display
 <App>
   <Form
     data="{{ distance: 192.5 }}"
@@ -444,25 +184,9 @@ The `number` type represents an input component for numeric values (integer or f
 </App>
 ```
 
-<Playground
-  name="Example: Number Input"
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{ distance: 192.5 }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="number" bindTo="distance" label="Distance in miles" />
-    </Form>
-  </App>
-  `}
-/>
-
 ### RadioGroup
 
-The `radioGroup` type represents a group of mutually exclusive radio buttons (only one of them can be selected):
-
-```xmlui copy {5-10}
+```xmlui-pg display
 <App>
   <Form
     data="{{ title: 'Mr.' }}"
@@ -477,30 +201,12 @@ The `radioGroup` type represents a group of mutually exclusive radio buttons (on
 </App>
 ```
 
-<Playground
-  name="Example: RadioGroup"
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{ title: 'Mr.' }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="radioGroup" bindTo="title" label="Title">
-        <Option label="Mr." value="Mr." />
-        <Option label="Mrs." value="Mrs." />
-        <Option label="Ms." value="Ms." />
-        <Option label="Dr." value="Dr." />
-      </FormItem>
-    </Form>
-  </App>
-  `}
-/>
+[RadioGroup component doc](/components/RadioGroup)
+
 
 ### Select
 
-The `select` type represents a dropdown list; only the listed items can be selected:
-
-```xmlui copy {5-10}
+```xmlui-pg display
 <App>
   <Form
     data="{{ size: 'xs' }}"
@@ -515,31 +221,11 @@ The `select` type represents a dropdown list; only the listed items can be selec
 </App>
 ```
 
-<Playground
-  name="Example: Select"
-  previewOnly
-  height={240}
-  app={`
-  <App>
-    <Form
-      data="{{ size: 'xs' }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="select" bindTo="size" label="Box size">
-        <Option label="Extra small" value="xs" />
-        <Option label="Small" value="sm" />
-        <Option label="Medium" value="md" />
-        <Option label="Large" value="lg" />
-      </FormItem>
-    </Form>
-  </App>
-  `}
-/>
+[Select component doc](/components/Select)
 
 ### Switch
 
-The `switch` type represents a switch component to toggle a boolean value:
-
-```xmlui copy {5-7}
+```xmlui-pg display
 <App>
   <Form
     data="{{ showBorder: true, showText: false, hideShadow: true }}"
@@ -551,27 +237,12 @@ The `switch` type represents a switch component to toggle a boolean value:
 </App>
 ```
 
-<Playground
-  name="Example: Switch"
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{ showBorder: true, showText: false, hideShadow: true }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="switch" bindTo="showBorder" label="Show border" labelPosition="right" />
-      <FormItem type="switch" bindTo="showText" label="Show text" labelPosition="right" />
-      <FormItem type="switch" bindTo="hideShadow" label="Hide shadow" labelPosition="right" />
-    </Form>
-  </App>
-  `}
-/>
+[Switch component doc](/components/Switch)
+
 
 ### Text
 
-The `text` type represents a textbox to enter textual data:
-
-```xmlui copy {5}
+```xmlui-pg display
 <App>
   <Form
     data="{{ name: 'Joe' }}"
@@ -581,25 +252,11 @@ The `text` type represents a textbox to enter textual data:
 </App>
 ```
 
-<Playground
-  name="Example: Text Input"
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{ name: 'Joe' }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="text" bindTo="name" label="Name" />
-    </Form>
-  </App>
-  `}
-/>
+[Text component doc](/components/Text)
 
 ### TextArea
 
-The `textarea` type represents a multiline textbox to enter textual data:
-
-```xmlui copy {5}
+```xmlui-pg display
 <App>
   <Form
     data="{{ description: 'This is a description' }}"
@@ -609,26 +266,13 @@ The `textarea` type represents a multiline textbox to enter textual data:
 </App>
 ```
 
-<Playground
-  name="Example: TextArea"
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{ description: 'This is a description' }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="textarea" bindTo="description" label="Description" />
-    </Form>
-  </App>
-  `}
-/>
+[TextArea component doc](/components/TextArea)
 
-### Custom Input Components
+### Custom
 
-You can create your custom input component leveraging the XMLUI forms infrastructure.
-You can nest your custom component's markup into the wrapping `FormItem` as the following sample shows:
+You can create a custom input component that uses the XMLUI forms infrastructure.
 
-```xmlui copy {5-13}
+```xmlui-pg display
 <App>
   <Form
     data="{{ userAvailable: false }}"
@@ -646,42 +290,37 @@ You can nest your custom component's markup into the wrapping `FormItem` as the 
 </App>
 ```
 
-Custom input fields can use a simple API to communicate with the form infrastructure.
-The `$value` identifier represents the current value of the component.
-The custom component can use the `$setValue` method to change the component value.
+`$value` represents the current value of the component. `$setValue` changes the value.
 
-The following example shows a toggle button created using a regular `Button` component using the form API:
 
-<Playground
-  name="Example: Custom Input Field"
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{ userAvailable: false }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem bindTo="userAvailable">
-        <HStack>
-          <Button
-            label="Toggle"
-            backgroundColor="{$value === false ? 'red' : 'green'}"
-            onClick="$setValue(!$value)"
-          />
-        </HStack>
-      </FormItem>
-    </Form>
-  </App>
-  `}
-/>
+## Provide data
 
-## Referencing the Form Data
+You can define a `Form`s data structure and initial values directly.
 
-When you work with forms, the UI's appearance and behavior often depends on the current field values.
-The `$data` context variable allows you to access the current data within the form.
-
-The following example demonstrates how you can enable a field according to another's value.
 
 ```xmlui copy
+<Form data="{{ name: 'Joe', age: 43 }}" />
+```
+
+Or via an API endpoint.
+
+```xmlui
+<Form data="/path/to/resource" />
+```
+
+Use the `bindTo` property to access fields in the structure.
+
+```xmlui
+<Form data="{{ name: 'Joe' }}">
+  <FormItem bindTo="name" />
+</Form>
+```
+
+## Refer to data
+
+The `$data` variable holds all the form's data. You can use values in `$data` to control `FormItem` properties. Here the `Switch`s value sets the `enabled` property of a `FormItem`.
+
+```xmlui-pg display
 <App>
   <Form data="{{ isEnabled: true, name: 'Joe' }}">
     <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
@@ -690,22 +329,9 @@ The following example demonstrates how you can enable a field according to anoth
 </App>
 ```
 
-<Playground
-  name="Example: Referencing Data"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{ isEnabled: true, name: 'Joe' }}">
-      <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-      <FormItem enabled="{$data.isEnabled}" label="Name" bindTo="name" />
-    </Form>
-  </App>
-  `}
-/>
+Other components in the form can reference the form's data too. Here the `Text` updates reactively when input values change.
 
-You can reference field values in any other component within the form as well:
-
-```xmlui copy {5}
+```xmlui-pg display
 <App>
   <Form data="{{ firstname: 'John', lastname: 'Doe' }}">
     <FormItem label="Firstname" bindTo="firstname" />
@@ -715,28 +341,9 @@ You can reference field values in any other component within the form as well:
 </App>
 ```
 
-By updating any input field, the text with the full name will update accordingly:
+You can drill into `$data` to reference nested fields.
 
-<Playground
-  name="Example: Referencing Field Values"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{ firstname: 'John', lastname: 'Doe' }}">
-      <FormItem label="Firstname" bindTo="firstname" />
-      <FormItem label="Lastname" bindTo="lastname" />
-      <Text>Full name: {$data.firstname} {$data.lastname}</Text>
-    </Form>
-  </App>
-  `}
-/>
-
-## Managing Data
-
-The XMLUI forms infrastructure helps you manage the form data easily.
-The `data` property can be accessed directly and you can drill down to relevant data attributes:
-
-```xmlui copy /street/
+```xmlui-pg display
 <App>
   <Form
     data="{{
@@ -750,86 +357,15 @@ The `data` property can be accessed directly and you can drill down to relevant 
 </App>
 ```
 
-<Playground
-  name="Example: Using Data"
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{
-        name: 'John smith',
-        address: { street: '96th Ave N', city: 'Seattle', zip: '98005' }
-      }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem bindTo="name" label="Name" />
-      <FormItem bindTo="address.street" label="Street" />
-    </Form>
-  </App>
-  `}
-/>
+## Validate data
 
-There are two ways to provide data to an XMLUI component.
-The first is by defining the data directly:
+The `Form` handles client-side validation, reporting issues interactively. Server-side validation happens when the form data is sent to the server. The `Form` handles the server's response and displays it in a summary or below input fields.
 
-```xmlui copy
-<Form data="{{ name: 'Joe', age: 43 }}" />
-```
-
-The second is to use a URL to get data from an API endpoint:
-
-```xmlui
-<Form data="/path/to/resource" />
-```
-
-The attributes of the provided data can be accessed using the `FormItem` component via the `bindTo` property.
-The `FormItem` is designed to work with the `Form` component and access the value that it is "bound to" from an arbitrary depth in the component tree under the `Form`.
-
-```xmlui {2} copy
-<Form data="{{ name: 'Joe' }}">
-  <FormItem bindTo="name" />
-</Form>
-```
-
-## Submitting Data
-
-By default, the `Form` component provides a submit button to save the modified data.
-How this data will be used can be customized via the `onSubmit` event.
-All examples below are equal:
-
-```xmlui copy
-<App>
-  <Form onSubmit="toast('Saved!')" />
-  <Form event:submit="toast('Saved!')" />
-  <Form>
-    <event name="submit" value="toast('Saved!')" />
-  </Form>
-</App>
-```
-
-The event accepts either a block of code or a callback function.
-In both cases, you use our Javascript-like scripting language to describe the logic.
-
-When working with the callback function, you can access a `toSave` function parameter that contains the form data:
-
-```xmlui copy
-<Form
-  data="{{ name: 'Joe', age: 43 }}"
-  onSubmit="(toSave) => toast(JSON.stringify(toSave))" />
-```
-
-## Validation
-
-The `Form` handles client-side validation as you edit the form and shows any issues under the input fields.
-Server-side validation happens when the form data is sent to the server.
-The `Form` handles the server-side validation response and displays it in a summary or below input fields (depends on response).
-
-A `FormItem` has several properties related to validation, all of which will be outlined in the following sections.
+These are the `FormItem` validation properties.
 
 ### `minLength`
 
-This property defines the minimum length of a text input value.
-
-```xmlui copy
+```xmlui-pg display
 <App>
   <Form data="{{ name: 'Billy Bob' }}">
     <FormItem bindTo="name" minLength="10" label="minLength" />
@@ -837,25 +373,11 @@ This property defines the minimum length of a text input value.
 </App>
 ```
 
-Delete at least 5 characters from the input field below and click outside the field.
-
-<Playground
-  name="Field Validation: minLength"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{ name: 'Billy Bob' }}">
-      <FormItem bindTo="name" minLength="10" label="minLength" />
-    </Form>
-  </App>
-  `}
-/>
+Try submitting with fewer than 10 characters.
 
 ### `maxLength`
 
-This property defines the maximum length of a text input value.
-
-```xmlui copy
+```xmlui-pg display
 <App>
   <Form data="{{ name: 'Billy Bob' }}">
     <FormItem bindTo="name" maxLength="11" label="maxLength" />
@@ -863,25 +385,12 @@ This property defines the maximum length of a text input value.
 </App>
 ```
 
-The input must be no longer than the specified length.
-Try to enter more than 11 characters in the input field below - the input field will not let you.
+Try entering more than 11 characters.
 
-<Playground
-  name="Validation Example: maxLength"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{ name: 'Billy Bob' }}">
-      <FormItem bindTo="name" maxLength="11" label="maxLength" />
-    </Form>
-  </App>
-  `}
-/>
+If you don't want to limit the number of characters, but instead mark longer text as invalid, set `syncToValidation` to `false`.
 
-Sometimes, you do not want to constrain the number of characters in the text box; however, you want longer text to be marked as invalid.
-Set the `syncToValidation` property to "false" in order to do so.
 
-```xmlui copy /syncToValidation="false"/
+```xmlui-pg
 <App>
   <Form data="{{ name: 'Billy Bob' }}">
     <FormItem bindTo="name" maxLength="11" syncToValidation="false" label="maxLength" />
@@ -889,26 +398,10 @@ Set the `syncToValidation` property to "false" in order to do so.
 </App>
 ```
 
-Now, you can type more than 11 characters into the box.
-However, as you click outside, the validation message will indicate that the text is longer than expected.
-
-<Playground
-  name="Validation Example: maxLength with syncToValidation off"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{ name: 'Billy Bob' }}">
-      <FormItem bindTo="name" maxLength="11" syncToValidation="false" label="maxLength" />
-    </Form>
-  </App>
-  `}
-/>
 
 ### `minValue`
 
-The input value must be at least the specified value. The given value is inclusive.
-
-```xmlui copy
+```xmlui-pg display
 <App>
   <Form data="{{ age: 30 }}">
     <FormItem bindTo="age" type="number" minValue="32" label="minValue" />
@@ -916,23 +409,12 @@ The input value must be at least the specified value. The given value is inclusi
 </App>
 ```
 
-<Playground
-  name="Validation Example: minValue"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{ age: 30 }}" >
-      <FormItem bindTo="age" type="number" minValue="32" label="minValue" />
-    </Form>
-  </App>
-  `}
-/>
+Try entering a number smaller than 32.
+
 
 ### `maxValue`
 
-The input value must be smaller than the specified value. The given value is inclusive.
-
-```xmlui copy
+```xmlui-pg display
 <App>
   <Form data="{{ age: 30 }}" >
     <FormItem bindTo="age" type="number" maxValue="29" label="maxValue" />
@@ -940,23 +422,13 @@ The input value must be smaller than the specified value. The given value is inc
 </App>
 ```
 
-<Playground
-  name="Validation Example: maxValue"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{ age: 30 }}" >
-      <FormItem bindTo="age" type="number" maxValue="29" label="maxValue" />
-    </Form>
-  </App>
-  `}
-/>
+Try entering a larger smaller than 32.
 
 ### `pattern`
 
-Evaluate predefined regex patterns. These patterns are the following: "email", "url", "phone".
+Evaluate predefined regex patterns: "email", "url", or "phone".
 
-```xmlui copy
+```xmlui-pg
 <App>
   <Form data="{{
       mobile: '+13456123456',
@@ -970,31 +442,14 @@ Evaluate predefined regex patterns. These patterns are the following: "email", "
 </App>
 ```
 
-<Playground
-  name="Validation Example: pattern"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{
-      mobile: '+13456123456',
-      website: 'http://www.blogsite.com',
-      email: 'myemail@mail.com'
-    }}">
-      <FormItem bindTo="mobile" pattern="phone" label="mobilePattern" />
-      <FormItem bindTo="website" pattern="url" label="websitePattern" />
-      <FormItem bindTo="email" pattern="email" label="emailPattern" />
-    </Form>
-  </App>
-  `}
-/>
 
-See the <SmartLink href={COMPONENT_FORMITEM}>pattern property of the FormItem</SmartLink> for details.
+See the [pattern property](/components/FormItem) of `FormItem`.
 
 ### `regex`
 
-Evaluate a user-defined custom regex pattern.
+Evaluate a custom regex pattern.
 
-```xmlui copy
+```xmlui-pg display
 <App>
   <Form data="{{ password: 'hello' }}">
     <!-- Only all uppercase letters are accepted -->
@@ -1003,28 +458,11 @@ Evaluate a user-defined custom regex pattern.
 </App>
 ```
 
-<Playground
-  name="Validation Example: regex"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{ password: 'hello' }}">
-      <FormItem bindTo="password" regex="/^[A-Z]+$/" label="regex" />
-    </Form>
-  </App>
-  `}
-/>
+### Compound validation
 
-<Callout type="warning" emoji="⚠️">
-  When setting custom regular expressions, be sure only set the pattern itself.
-  There is no need to provide dashes, which may result in incorrect validation.
-</Callout>
+You can use multiple validations.
 
-### Combining Multiple Validations
-
-You also can combine more than one validation on a `FormItem`:
-
-```xmlui copy
+```xmlui-pg display
 <App>
   <Form data="{{ site: 'http://www.example.com' }}">
     <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" label="Multiple Validations" />
@@ -1032,31 +470,11 @@ You also can combine more than one validation on a `FormItem`:
 </App>
 ```
 
-<Playground
-  name="Multiple Validations"
-  previewOnly
-  app={`
-  <App>
-    <Form data="{{ site: 'http://www.example.com' }}">
-      <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" label="Multiple Validations" />
-    </Form>
-  </App>
-  `}
-/>
+### Validation-specific severity
 
-## Other Validation Properties
+By default, all validations have a severity level of **"error"**. You can set whether a validation should have a level of **"warning"** or **"error"**.
 
-### Validation-specific Severity
-
-<Callout type="info" emoji="💡">
-  By default, all validations have a severity level of **"error"**.
-  You can set whether a validation should have a level of **"warning"** or **"error"**.
-</Callout>
-
-Every validation type has a corresponding severity associated with it.
-See the <SmartLink href={COMPONENT_FORMITEM}>FormItem article</SmartLink> for each.
-
-```xmlui copy /patternInvalidSeverity/
+```xmlui-pg display
 <App>
   <Form data="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}" >
     <FormItem
@@ -1073,29 +491,11 @@ See the <SmartLink href={COMPONENT_FORMITEM}>FormItem article</SmartLink> for ea
 </App>
 ```
 
-<Playground
-  name="Validation Severity"
-  app={`
-  <App>
-    <Form data="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}" >
-      <FormItem bindTo="mobile" pattern="phone" patternInvalidSeverity="warning" label="mobilePattern" />
-      <FormItem bindTo="website" pattern="url" patternInvalidSeverity="error" label="websitePattern" />
-    </Form>
-  </App>
-  `}
-/>
+### Validation-specific messages
 
-### Validation-specific Messages
+Predefined validations have built-in messages that you can change.
 
-<Callout type="info" emoji="💡">
-  Sets what message to display as the result of validation.
-  Predefined validations already have a built-in message but you can customize it as necessary.
-</Callout>
-
-Every validation type has a corresponding severity associated with it.
-See the <SmartLink href={COMPONENT_FORMITEM}>FormItem article</SmartLink> for each.
-
-```xmlui copy {7}
+```xmlui-pg display
 <App>
   <Form data="{{ age: 20 }}" >
     <FormItem
@@ -1108,99 +508,58 @@ See the <SmartLink href={COMPONENT_FORMITEM}>FormItem article</SmartLink> for ea
 </App>
 ```
 
-<Playground
-  name="Validation Message"
-  app={`
-  <App>
-    <Form data="{{ age: 20 }}" >
-      <FormItem
-        bindTo="age"
-        type="number"
-        minValue="21"
-        rangeInvalidMessage="The given age is too low!"
-        label="Invalid Message" />
-    </Form>
-  </App>
-  `}
-/>
 
-### Server-side Validation
+## Server-side validation
 
-The `Form` component can receive and display a server-side validation response.
-
-- Field related issues are shown just like client-side validation errors, removed when a field is edited.
-- Non-field related issues are displayed in a validation summary view.
+The `Form` component can receive and display a server-side validation response. Field related issues are shown just like client-side validation errors, removed when a field is edited. Non-field related issues are displayed in a validation summary view.
 
 <br/>
 <Image alt="Server-side Validation" src="/resources/images/create-apps/using-forms.png" />
 
-## User Feedback with APICall
 
-Submitting the form via the `APICall` component triggers a visual confirmation of the operation's success.
-If the submission is successful, a success `Toast` component will appear for a few seconds.
-Otherwise, an error `Toast` component will show the error that occured.
 
-```xmlui copy {3-8, 15-20}
+## Submit data
+
+By default the `Form` component provides a submit button to save the modified data.
+
+```xmlui-pg display
 <App>
-  <Form data="{{ name: 'Joe' }}">
-    <event name="submit">
-      <APICall
-        url="/api/contacts/name"
-        method="POST"
-        body="{$param}" />
-    </event>
-    <FlowLayout>
-      <H3>Customer Name</H3>
-      <FormItem bindTo="name" label="Customer name" />
-    </FlowLayout>
-  </Form>
-  <Form data="{{ age: 43 }}">
-    <event name="submit">
-      <APICall
-        url="/api/contacts/age"
-        method="POST"
-        body="{$param}" />
-    </event>
-    <FlowLayout>
-      <H3>Customer Age</H3>
-      <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
-    </FlowLayout>
+  <Form onSubmit="toast('Saved!')" />
+</App>
+```
+
+The `onSubmit` accepts either a block of code or function. When you use a function it receives data in a parameter; in this example it's called `toSave` but you can use any name. The function can be defined inline, in a code-behind file, or in `index.html` attached to the global `window` variable. See the [Code](/code) chapter for details.
+
+```xmlui-pg display
+<App>
+  <Form
+    data="{{ name: 'Joe', age: 43 }}"
+    onSubmit="(d) => toast(JSON.stringify(d))"
+  >
+    <FormItem label="name" bindTo="name" />
+    <FormItem label="age" bindTo="age" />
   </Form>
 </App>
 ```
 
-<Playground
-  previewOnly
-  name="Example: Feedback"
-  app={`
-  <App>
-    <Form data="{{ name: 'Joe' }}" onSubmit="(toSave) => toast.success('Data saved!')">
-      <FlowLayout>
-        <H3>Customer Name</H3>
-        <FormItem bindTo="name" label="Customer name" />
-      </FlowLayout>
-    </Form>
-    <Form data="{{ age: 43 }}" onSubmit="(toSave) => toast.error('Network error!')">
-      <FlowLayout>
-        <H3>Customer Age</H3>
-        <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
-      </FlowLayout>
-    </Form>
-  </App>
-  `}
-/>
+To submit via an `APICall`, use the `event` helper tag to bridge between the form and the API. The `Form`s `data` attribute maps to the `APICall`'s `$param` context variable. A `Toast` popup reports success or error.
 
-## Using in Modal Dialogs
+```xmlui
+<App>
+  <Form data="{{ name: 'Joe', age: 43 }}">
+    <event name="submit">
+      <APICall
+        url="/api/contacts"
+        method="POST"
+        body="{$param}" />
+    </event>
+    <FormItem bindTo="name" label="name" />
+    <FormItem bindTo="age" label="age" />
+  </Form>
+</App>
+```
 
-The `ModalDialog` component supports `Form`s as a first-class citizen component:
-if a `Form` is provided as a direct child to a `ModalDialog`, it dialog's button row is replaced with the form's own button row.
+## Form in ModalDialog
 
-See a working example in <SmartLink href={USING_MODAL_DIALOGS_INTEROPERABILITY_WITH_FORMS}>this article</SmartLink>.
+[ModalDialog](/components/ModalDialog) supports `Form` as a first-class citizen component. When a `Form` nests directly in a `ModalDialog`, the dialog's button row is replaced with the form's own button row. When form submission is successful, the dialog closes.
 
-### Submitting with Warnings
-
-It is possible to save and submit a form with warnings present.
-If this is the case, the user will be prompted by a confirmation dialog to proceed with sending the data to the backend.
-
-<br/>
-<Image alt="Submitting with Warnings" src="/resources/images/create-apps/using-forms-warning-dialog.png" width={416} />
