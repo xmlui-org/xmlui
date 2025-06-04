@@ -1,7 +1,7 @@
 import { join, dirname } from "path";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { fileURLToPath } from "url";
-import { collectedThemes, collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
+import { collectedThemes, collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.mjs";
 
 const OUTPUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../../dist/themes");
 
