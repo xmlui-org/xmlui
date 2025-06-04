@@ -1,9 +1,10 @@
 import styles from "./TableOfContents.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TableOfContents } from "./TableOfContentsNative";
+import { useIndexerContext } from "../App/IndexerContext";
 
 const COMP = "TableOfContents";
 const COMP_CHILD = "TableOfContentsItem";
@@ -48,12 +49,20 @@ export const TableOfContentsMd = createMetadata({
   },
 });
 
+function IndexAwareTableOfContents(props) {
+  const { indexing } = useIndexerContext();
+  if (indexing) {
+    return null;
+  }
+  return <TableOfContents {...props} />;
+}
+
 export const tableOfContentsRenderer = createComponentRenderer(
   COMP,
   TableOfContentsMd,
   ({ layoutCss, node, extractValue }) => {
     return (
-      <TableOfContents
+      <IndexAwareTableOfContents
         style={layoutCss}
         smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
         maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}

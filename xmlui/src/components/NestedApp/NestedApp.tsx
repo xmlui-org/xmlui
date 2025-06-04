@@ -3,7 +3,7 @@ import styles from "./NestedApp.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { NestedApp } from "./NestedAppNative";
+import { IndexAwareNestedApp } from "./NestedAppNative";
 
 const COMP = "NestedApp";
 
@@ -60,7 +60,7 @@ export const nestedAppComponentRenderer = createComponentRenderer(
   NestedAppMd,
   ({ node, extractValue }) => {
     return (
-      <NestedApp
+      <IndexAwareNestedApp
         app={node.props?.app}
         api={extractValue(node.props?.api)}
         components={extractValue(node.props?.components)}

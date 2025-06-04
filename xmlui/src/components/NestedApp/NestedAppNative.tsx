@@ -17,6 +17,7 @@ import { EMPTY_ARRAY } from "../../components-core/constants";
 import { createQueryString } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
 import { useComponentRegistry } from "../ComponentRegistryContext";
+import { useIndexerContext } from "../App/IndexerContext";
 
 type NestedAppProps = {
   api?: any;
@@ -30,6 +31,27 @@ type NestedAppProps = {
   allowPlaygroundPopup?: boolean;
   withFrame?: boolean;
 };
+
+export function LazyNestedApp(props){
+  // const [shouldRender, setShouldRender] = useState(false);
+  // useEffect(()=>{
+  //   startTransition(()=>{
+  //     setShouldRender(true);
+  //   })
+  // }, []);
+  // if(!shouldRender){
+  //   return null;
+  // }
+  return <NestedApp {...props}/>
+}
+
+export function IndexAwareNestedApp(props){
+  const {indexing} = useIndexerContext();
+  if(indexing){
+    return null;
+  }
+  return <LazyNestedApp {...props}/>
+}
 
 export function NestedApp({
   api,
@@ -53,33 +75,33 @@ export function NestedApp({
   const { appGlobals } = useAppContext();
   const componentRegistry = useComponentRegistry();
 
-  const [apiWorker, setApiWorker] = useState(undefined);
+  // const [apiWorker, setApiWorker] = useState(undefined);
 
-  useEffect(() => {
-    let worker;
-    (async function () {
-      const { setupWorker } = await import("msw/browser");
-      worker = setupWorker();
-      worker.start({
-        onUnhandledRequest: "bypass",
-        quiet: true,
-      });
-      setApiWorker(worker);
-    })();
-    return () => worker?.stop();
-  }, []);
+  // useEffect(() => {
+  //   let worker;
+  //   (async function () {
+  //     const { setupWorker } = await import("msw/browser");
+  //     worker = setupWorker();
+  //     worker.start({
+  //       onUnhandledRequest: "bypass",
+  //       quiet: true,
+  //     });
+  //     setApiWorker(worker);
+  //   })();
+  //   return () => worker?.stop();
+  // }, []);
 
   // console.log("apiWorker", apiWorker);
 
-  const mock = useMemo(() => {
-    return api
-      ? {
-          type: "in-memory",
-          ...api,
-          apiUrl: "/api",
-        }
-      : undefined;
-  }, [api]);
+  // const mock = useMemo(() => {
+  //   return api
+  //     ? {
+  //         type: "in-memory",
+  //         ...api,
+  //         apiUrl: "/api",
+  //       }
+  //     : undefined;
+  // }, [api]);
 
   //console.log("mock", mock);
 
@@ -180,57 +202,53 @@ export function NestedApp({
       </div>
     );
 
-    startTransition(()=>{
-      contentRootRef.current?.render(
-        <ErrorBoundary node={component}>
-          <ApiInterceptorProvider interceptor={mock} apiWorker={apiWorker}>
-            {withFrame ? (
-              <div className={styles.nestedAppContainer}>
-                <div className={styles.header}>
-                  <span className={styles.headerText}>{title}</span>
-                  <div className={styles.spacer} />
-                  {allowPlaygroundPopup && (
-                    <Tooltip
-                      trigger={
-                        <button
-                          className={styles.headerButton}
-                          onClick={() => {
-                            openPlayground();
-                          }}
-                        >
-                          <RxOpenInNewWindow />
-                        </button>
-                      }
-                      label="Edit code in new window"
-                    />
-                  )}
-                  <Tooltip
-                    trigger={
-                      <button
-                        className={styles.headerButton}
-                        onClick={() => {
-                          setRefreshVersion(refreshVersion + 1);
-                        }}
-                      >
-                        <LiaUndoAltSolid />
-                      </button>
-                    }
-                    label="Reset the app"
-                  />
-                </div>
-                {nestedAppRoot}
-              </div>
-            ) : (
-              nestedAppRoot
-            )}
-          </ApiInterceptorProvider>
-        </ErrorBoundary>,
-      );
-    })
+    contentRootRef.current?.render(
+      <ErrorBoundary node={component}>
+        {withFrame ? (
+          <div className={styles.nestedAppContainer}>
+            <div className={styles.header}>
+              <span className={styles.headerText}>{title}</span>
+              <div className={styles.spacer} />
+              {allowPlaygroundPopup && (
+                <Tooltip
+                  trigger={
+                    <button
+                      className={styles.headerButton}
+                      onClick={() => {
+                        openPlayground();
+                      }}
+                    >
+                      <RxOpenInNewWindow />
+                    </button>
+                  }
+                  label="Edit code in new window"
+                />
+              )}
+              <Tooltip
+                trigger={
+                  <button
+                    className={styles.headerButton}
+                    onClick={() => {
+                      setRefreshVersion(refreshVersion + 1);
+                    }}
+                  >
+                    <LiaUndoAltSolid />
+                  </button>
+                }
+                label="Reset the app"
+              />
+            </div>
+            {nestedAppRoot}
+          </div>
+        ) : (
+          nestedAppRoot
+        )}
+      </ErrorBoundary>,
+    )
   }, [
     activeTheme,
     allowPlaygroundPopup,
-    apiWorker,
+    // apiWorker,
     app,
     componentRegistry,
     components,
@@ -240,7 +258,7 @@ export function NestedApp({
     config?.resources,
     config?.themes,
     height,
-    mock,
+    // mock,
     nestedAppId,
     openPlayground,
     refreshVersion,
@@ -250,11 +268,17 @@ export function NestedApp({
     withFrame,
   ]);
 
+  const mountedRef = useRef(false);
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
       setTimeout(()=>{
-        contentRootRef.current?.unmount();
-        contentRootRef.current = null;
+        // Unmount the content root after a delay (and only it the component is not mounted anymore, could happen in dev mode - double useEffect call)
+        if(!mountedRef.current){
+          contentRootRef.current?.unmount();
+          contentRootRef.current = null;
+        }
       });
     };
   }, []);

@@ -1,11 +1,11 @@
 <Fragment xmlns:XMLUIExtensions="component-ns">
     <App layout="vertical-full-header" noScrollbarGutters="false" when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
-            <SpaceFiller/>
-            <XMLUIExtensions:Search data="{{ ...appGlobals.content, ...appGlobals.prefetchedContent }}"/>
-            <ToneChangerButton/>
+            <SpaceFiller />
+            <XMLUIExtensions:Search data="{appGlobals.content}" />
+            <ToneChangerButton />
         </AppHeader>
-        
+
         <NavPanel>
             <NavGroup label="Learn XMLUI" initiallyExpanded="{true}">
                 <NavLink label="Introduction" to="/"/>
@@ -41,26 +41,26 @@
                 <NavLink label="Test" to="/test"/>
             </NavGroup>
         </NavPanel>
-        
+
         <Pages>
             <Page url="/">
-                <DocumentPage 
-                    hideToc="true" 
-                    url="/pages/intro.md" 
-                    nextLink="/reactive-intro" 
+                <DocumentPage
+                    hideToc="true"
+                    url="/pages/intro.md"
+                    nextLink="/reactive-intro"
                     nextTitle="Reactive Data"/>
             </Page>
 
             <Page url="/reactive-intro">
-                <DocumentPage 
-                    hideToc="true" 
-                    url="/pages/reactive-intro.md" 
-                    prevLink="/" 
-                    prevTitle="Introduction" 
-                    nextLink="/components-intro" 
+                <DocumentPage
+                    hideToc="true"
+                    url="/pages/reactive-intro.md"
+                    prevLink="/"
+                    prevTitle="Introduction"
+                    nextLink="/components-intro"
                     nextTitle="Components"/>
             </Page>
-            
+
             <Page url="/components-intro">
                 <ComponentsIntro/>
             </Page>

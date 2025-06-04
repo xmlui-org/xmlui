@@ -1,5 +1,4 @@
-import { type CSSProperties, memo, type ReactNode } from "react";
-import React from "react";
+import React, { type CSSProperties, memo, type ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -11,7 +10,7 @@ import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LinkNative } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
-import { NestedApp } from "../NestedApp/NestedAppNative";
+import { IndexAwareNestedApp } from "../NestedApp/NestedAppNative";
 import {
   type CodeHighlighter,
   isCodeHighlighter,
@@ -86,7 +85,7 @@ export const Markdown = memo(function Markdown({
   children = removeIndents ? removeTextIndents(children) : children;
 
   return (
-    <div className={styles.markdownContent} style={{ ...style }}>
+    <div className={styles.markdownContent} style={style}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, markdownCodeBlockParser]}
         rehypePlugins={[rehypeRaw]}
@@ -109,15 +108,15 @@ export const Markdown = memo(function Markdown({
             const src = props?.src;
             const popOut = props?.["data-popout"];
             const alt = props?.alt || "";
-            
+
             // --- Determine if the image should be inline or block
             let isInline = false;
-            
+
             if (node) {
               const nodeData = node as any;
-              
+
               // --- Case 1: Image is part of a larger paragraph with other content
-              if (nodeData.parent && nodeData.parent.type === 'paragraph') {
+              if (nodeData.parent && nodeData.parent.type === "paragraph") {
                 if (nodeData.parent.children && nodeData.parent.children.length > 1) {
                   // There are siblings in this paragraph - definitely inline
                   isInline = true;
@@ -127,36 +126,45 @@ export const Markdown = memo(function Markdown({
                   const paragraphParent = nodeData.parent.parent;
                   if (paragraphParent && paragraphParent.children) {
                     const paragraphIndex = paragraphParent.children.indexOf(nodeData.parent);
-                    if (paragraphIndex > 0 || paragraphIndex < paragraphParent.children.length - 1) {
+                    if (
+                      paragraphIndex > 0 ||
+                      paragraphIndex < paragraphParent.children.length - 1
+                    ) {
                       // --- There are siblings before/after this paragraph, likely inline
                       isInline = true;
                     }
                   }
                 }
               }
-              
-              // --- Case 2: Image is inside a blockquote or other container with text
-              if (!isInline && nodeData.parent && 
-                  (nodeData.parent.type === 'paragraph' || 
-                   nodeData.parent.type === 'blockquote' || 
-                   nodeData.parent.type === 'emphasis' ||
-                   nodeData.parent.type === 'strong')) {
 
+              // --- Case 2: Image is inside a blockquote or other container with text
+              if (
+                !isInline &&
+                nodeData.parent &&
+                (nodeData.parent.type === "paragraph" ||
+                  nodeData.parent.type === "blockquote" ||
+                  nodeData.parent.type === "emphasis" ||
+                  nodeData.parent.type === "strong")
+              ) {
                 // --- Look for any parent nodes with other text content
                 let currentParent = nodeData.parent;
                 while (currentParent) {
-                  if (currentParent.children && currentParent.children.some(
-                    (child: any) => child !== nodeData && 
-                    ((child.type === 'text' && child.value && child.value.trim().length > 0) || 
-                     child.type !== 'text')
-                  )) {
+                  if (
+                    currentParent.children &&
+                    currentParent.children.some(
+                      (child: any) =>
+                        child !== nodeData &&
+                        ((child.type === "text" && child.value && child.value.trim().length > 0) ||
+                          child.type !== "text"),
+                    )
+                  ) {
                     isInline = true;
                     break;
                   }
                   currentParent = currentParent.parent;
                 }
               }
-              
+
               // --- For images without context clues, use file type and size as heuristics
               // --- Case 3: Image looks like an icon based on filename or size
               if (!isInline) {
@@ -164,31 +172,32 @@ export const Markdown = memo(function Markdown({
                 // --- Small images are likely icons
                 const imgSize = props?.width || props?.height;
                 isInline = imgSize === undefined ? true : parseInt(imgSize.toString()) < 512;
-                
+
                 // Images with icon-like filenames
-                if (src && (
-                    src.includes('icon') || 
-                    src.endsWith('.svg') || 
-                    src.endsWith('.ico') || 
-                    src.includes('badge') ||
-                    src.includes('logo')
-                )) {
+                if (
+                  src &&
+                  (src.includes("icon") ||
+                    src.endsWith(".svg") ||
+                    src.endsWith(".ico") ||
+                    src.includes("badge") ||
+                    src.includes("logo"))
+                ) {
                   isInline = true;
                 }
               }
             }
-            
+
             // Apply styling based on whether image should be inline or block
             const imgStyle = {
               ...(props.style || {}),
-              display: isInline ? 'inline' : 'block',
+              display: isInline ? "inline" : "block",
             };
-            
+
             if (popOut) {
               return (
                 <a href={src} target="_blank" rel="noreferrer">
-                  <img 
-                    src={src} 
+                  <img
+                    src={src}
                     alt={alt}
                     className={htmlTagStyles.htmlImage}
                     style={imgStyle}
@@ -200,8 +209,8 @@ export const Markdown = memo(function Markdown({
               );
             } else {
               return (
-                <img 
-                  src={src} 
+                <img
+                  src={src}
                   alt={alt}
                   className={htmlTagStyles.htmlImage}
                   style={imgStyle}
@@ -384,7 +393,7 @@ export const Markdown = memo(function Markdown({
               const jsonContent = atob(dataContentBase64);
               const appProps = JSON.parse(jsonContent);
               return (
-                <NestedApp
+                <IndexAwareNestedApp
                   app={appProps.app}
                   config={appProps.config}
                   components={appProps.components}
@@ -398,7 +407,7 @@ export const Markdown = memo(function Markdown({
               );
             }
             return (
-              <NestedApp
+              <IndexAwareNestedApp
                 app={nestedProps.app}
                 config={nestedProps.config}
                 components={nestedProps.components}
