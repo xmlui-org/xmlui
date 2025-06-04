@@ -37,6 +37,29 @@ When it renders a button, XMLUI works up the chain from the most specific settin
         </Markdown>
         <Markdown>
             <![CDATA[
+
+Here's a simple example to show how the cascade of specificity works. If we override `textColor-primary` it applies to both `Text` and `Markdown`.
+
+```xmlui-pg display
+<Theme textColor-primary="red">
+  <Text>This is Text</Text>
+  <Markdown>This is Markdown</Markdown>
+</Theme>
+```
+
+But we can target `Markdown` for different treatment with a more specific theme variable.
+
+```xmlui-pg display
+<Theme
+  textColor-primary="red"
+  textColor-Text-markdown="blue"
+  >
+  <Text>This is Text</Text>
+  <Markdown>This is Markdown</Markdown>
+</Theme>
+```
+
+
 On [this page](/palettes) you can see the complete set of roles and explore how different themes express them. To create a new theme you can minimally supply just three values: for `$color-primary`, `$color-secondary`, and `$color-surface`. Here is the complete definition for our custom `earthtone` theme.
 
 ```json
@@ -76,7 +99,7 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
                 </Theme>
             </Stack>
         </HStack>
-        
+
         Here we vary the settings as shown.
 
         <HStack>
@@ -122,14 +145,14 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
 
             <HStack>
              <Stack width="*" height="100%">
-                <Theme 
-                    themeId="earthtone" 
-                    backgroundColor-Card="$color-secondary-100" 
-                    fontFamily="serif" 
-                    border-Badge="2px solid black" 
-                    textColor-Badge="black" 
-                    backgroundColor-Badge="yellow" 
-                    fontWeight-Badge="normal" 
+                <Theme
+                    themeId="earthtone"
+                    backgroundColor-Card="$color-secondary-100"
+                    fontFamily="serif"
+                    border-Badge="2px solid black"
+                    textColor-Badge="black"
+                    backgroundColor-Badge="yellow"
+                    fontWeight-Badge="normal"
                     fontSize-Badge="larger">
                     <Card>
                         <Badge variant="pill">
@@ -140,14 +163,14 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
                 </Theme>
             </Stack>
             <Stack width="*" height="100%">
-                <Theme 
-                    themeId="xmlui" 
-                    backgroundColor-Card="$color-danger-200" 
-                    fontFamily="monaco" 
-                    border-Badge="none" 
-                    textColor-Badge="$color-warning-900" 
-                    backgroundColor-Badge="$color-secondary-300" 
-                    fontWeight-Badge="bold" 
+                <Theme
+                    themeId="xmlui"
+                    backgroundColor-Card="$color-danger-200"
+                    fontFamily="monaco"
+                    border-Badge="none"
+                    textColor-Badge="$color-warning-900"
+                    backgroundColor-Badge="$color-secondary-300"
+                    fontWeight-Badge="bold"
                     fontSize-Badge="18pt">
                     <Card>
                         <Badge variant="pill">
@@ -159,10 +182,10 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
             </Stack>
         </HStack>
         It's easy to make a mess by varying these settings but you will rarely need to touch them. A designer of a custom theme might want to, but even then the defaults will handle almost every situation. And remember: you can create an entire new theme from just a handful of reference colors.
-    <DocumentLinks 
-      prevLink="/components-intro" 
-      prevTitle="Components" 
-      nextLink="/app-structure" 
+    <DocumentLinks
+      prevLink="/components-intro"
+      prevTitle="Components"
+      nextLink="/app-structure"
       nextTitle="App Structure"/>
     </DocumentPage>
 </Component>
