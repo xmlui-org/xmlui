@@ -129,7 +129,7 @@ export function BarChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style}>
+      <ResponsiveContainer style={style} width="100%" height="100%">
         <RBarChart
           accessibilityLayer
           data={data}

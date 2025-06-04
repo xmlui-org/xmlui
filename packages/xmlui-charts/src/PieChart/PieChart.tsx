@@ -40,6 +40,7 @@ export const PieChartMd = createMetadata({
     },
     width: d("The width of the chart"),
     height: d("The height of the chart"),
+    outerRadius: d("The outer radius of the pie chart, can be a number or a string (e.g., '100%')."),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

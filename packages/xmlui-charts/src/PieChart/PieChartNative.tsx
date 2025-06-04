@@ -28,6 +28,9 @@ export type PieChartProps = {
   innerRadius?: number;
   children?: ReactNode;
   showLegend?: boolean;
+  width?: string | number;
+  height?: string | number;
+  outerRadius?: string | number;
 };
 
 export const defaultProps: Pick<
@@ -116,6 +119,9 @@ export function PieChart({
   labelListPosition = defaultProps.labelListPosition,
   innerRadius = defaultProps.innerRadius,
   children,
+  width = "100%",
+  height = "100%",
+  outerRadius = "60%",
   showLegend = defaultProps.showLegend,
 }: PieChartProps) {
   const { getThemeVar } = useTheme();
@@ -174,7 +180,7 @@ export function PieChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style}>
+      <ResponsiveContainer style={style} width={width} height={height}>
         <RPieChart>
           <Tooltip content={<TooltipContent />} />
           <Pie
@@ -182,7 +188,7 @@ export function PieChart({
             dataKey={dataKey}
             nameKey={nameKey}
             innerRadius={innerRadius}
-            outerRadius="70%"
+            outerRadius={outerRadius}
             paddingAngle={1}
             activeShape={renderActiveShape}
             label={showLabel ? renderCustomizedLabel : false}
