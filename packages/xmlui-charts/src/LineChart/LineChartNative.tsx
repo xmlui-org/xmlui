@@ -105,8 +105,8 @@ export function LineChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style}>
-        <RLineChart accessibilityLayer data={data}>
+      <ResponsiveContainer style={style} width="100%" height="100%">
+        <RLineChart accessibilityLayer data={data} margin={{ top: 20, right: 30, left: 10, bottom: 40 }}>
           <XAxis
             interval="preserveEnd"
             dataKey={nameKey}
