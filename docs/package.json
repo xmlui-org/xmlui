@@ -1,7 +1,7 @@
 {
   "name": "xmlui-docs",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
