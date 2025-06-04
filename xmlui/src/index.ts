@@ -48,6 +48,7 @@ import { VisuallyHidden } from "./components/VisuallyHidden";
 import { LinkNative } from "./components/Link/LinkNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { Logo } from "./components/Logo/LogoNative";
+import { useSearchContextContent } from "./components/App/SearchContext";
 
 export type {
   ThemeDefinition,
@@ -100,5 +101,6 @@ export {
   VisuallyHidden,
   LinkNative,
   ToneChangerButton,
-  Logo
+  Logo,
+  useSearchContextContent
 };

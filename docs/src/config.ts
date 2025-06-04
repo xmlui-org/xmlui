@@ -36,11 +36,7 @@ const pagesRuntime: Record<string, any> = import.meta.glob(`/public/pages/**/*.m
 
 const prefetchedContent: Record<string, any> = {};
 Object.keys(pagesRuntime).map((filePath) => {
-  const urlFragment = filePath
-    .substring("/public".length)
-    .replace("/pages", "")
-    .replace(".mdx", "")
-    .replace(".md", "");
+  const urlFragment = filePath.substring("/public".length);
   prefetchedContent[urlFragment] = pagesRuntime[filePath].default;
 });
 
@@ -208,6 +204,7 @@ const App: StandaloneAppDescription = {
       "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
   appGlobals: {
+    searchIndexEnabled: true,
     navPanelContent: groupedNavPanelContent,
     content,
     codeHighlighter: {
