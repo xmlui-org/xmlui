@@ -4,7 +4,9 @@
     textColor-Link="$color-surface-400" 
     textColor-Link--hover="$color-primary-600" 
     backgroundColor-ContentSeparator="$color-surface-200">
-    <ContentSeparator marginVertical="$space-6"/>
+    <ContentSeparator 
+      marginVertical="$space-6" 
+      when="{$props.prevLink || $props.nextLink}"/>
     <HStack verticalAlignment="center" gap="$space-2">
       <Link when="{$props.prevLink}" to="{$props.prevLink}">
         <Icon name="chevronleft"/>
