@@ -1,4 +1,8 @@
-![NPM Version](https://img.shields.io/npm/v/xmlui) [![Smoke Tests (e2e smoke tests, unit tests)](https://github.com/xmlui-com/xmlui/actions/workflows/run-smoke-tests.yml/badge.svg)](https://github.com/xmlui-com/xmlui/actions/workflows/run-smoke-tests.yml)
+![NPM Version](https://img.shields.io/npm/v/xmlui) [![Smoke Tests (e2e smoke tests, unit tests)](https://github.com/xmlui-com/xmlui/actions/workflows/run-smoke-tests.yml/badge.svg)](https://github.com/xmlui-com/xmlui/actions/workflows/run-smoke-tests.yml) 
+
+![Number of stable components](https://img.shields.io/badge/stable%20components-88-brightgreen)
+
+
 
 # XMLUI
 
