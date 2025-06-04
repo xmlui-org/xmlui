@@ -1,7 +1,7 @@
 <Fragment xmlns:XMLUIExtensions="component-ns">
-    <App 
-        layout="vertical-full-header" 
-        noScrollbarGutters="false" 
+    <App
+        layout="vertical-full-header"
+        noScrollbarGutters="false"
         when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
             <property name="logoTemplate">
@@ -35,7 +35,7 @@
                 <NavLink label="User-defined Components" to="/user-defined-components"/>
             </NavGroup>
             <NavGroup label="Reference">
-                <RecursiveNavTree 
+                <RecursiveNavTree
                     items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
@@ -98,7 +98,7 @@
                 <DocumentPage url="/pages/modal-dialogs.md"/>
             </Page>
             <Page url="/user-defined-components">
-                <DocumentPage url="/pages/user-defined-components.md"/>
+                <UserDefinedComponents />
             </Page>
             <Page url="/styles-and-themes/layout-props">
                 <DocumentPage url="/pages/styles-and-themes/layout-props.md"/>
@@ -119,7 +119,14 @@
                 <Palettes/>
             </Page>
             <Page url="/context-variables">
+<<<<<<< HEAD
                 <DocumentPage url="/pages/context-variables.md" />
+=======
+                <DocumentPage
+                    url="/pages/context-variables.md"
+                    nextLink="/globals"
+                    nextTitle="Globals" />
+>>>>>>> 70dc06f6 (user-defined components)
             </Page>
             <Page url="/globals">
                 <DocumentPage url="pages/globals.md" />

@@ -1,0 +1,7 @@
+<Component name="IncButton">
+  <variable name="count" value="{0}" />
+  <Button
+    label="Click to increment: {count}"
+    onClick="count++; emitEvent('incremented', count)"
+  />
+</Component>
