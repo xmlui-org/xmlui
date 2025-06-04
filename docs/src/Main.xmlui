@@ -45,9 +45,9 @@
                 <NavLink label="Context Variables" to="/context-variables"/>
                 <NavLink label="Globals" to="/globals"/>
                 <NavLink label="Palettes" to="/palettes"/>
+                <NavLink label="Default Theme Variable" to="/xmlui-theme"/>
                 <NavLink label="Icons" to="/icons"/>
-                <NavLink label="Glossary" to="/glossary"/>
-                <NavLink label="Theme Variable Defaults" to="/xmlui-theme"/>
+                <!-- <NavLink label="Glossary" to="/glossary"/> -->
                 <!-- <NavLink label="Test" to="/test"/> -->
             </NavGroup>
         </NavPanel>
