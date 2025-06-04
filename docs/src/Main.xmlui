@@ -10,7 +10,7 @@
                 </Link>
             </property>
             <SpaceFiller/>
-            <XMLUIExtensions:Search data="{{ ...appGlobals.content, ...appGlobals.prefetchedContent }}"/>
+            <XMLUIExtensions:Search data="{appGlobals.content}"/>
             <ToneChangerButton/>
         </AppHeader>
 
@@ -74,7 +74,6 @@
             <Page url="/components-intro">
                 <ComponentsIntro/>
             </Page>
-            
             <Page url="/themes-intro">
                 <ThemesIntro/>
             </Page>

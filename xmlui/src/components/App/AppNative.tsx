@@ -26,6 +26,7 @@ import { Sheet, SheetContent } from "../../components/App/Sheet";
 import { AppContextAwareAppHeader } from "../../components/AppHeader/AppHeaderNative";
 import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
 import { AppLayoutContext } from "./AppLayoutContext";
+import { SearchContextProvider } from "./SearchContext";
 
 type Props = {
   children: ReactNode;
@@ -457,6 +458,8 @@ export function App({
   const handleOpenChange = useCallback((open) => {
     setDrawerVisible(open);
   }, []);
+
+
   
   return (
     <>
@@ -467,7 +470,9 @@ export function App({
             {memoizedNavPanelInDrawer}
           </SheetContent>
         </Sheet>
-        {content}
+        <SearchContextProvider>
+          {content}
+        </SearchContextProvider>
       </AppLayoutContext.Provider>
     </>
   );

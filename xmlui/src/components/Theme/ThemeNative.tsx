@@ -15,7 +15,8 @@ import { EMPTY_OBJECT } from "../../components-core/constants";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { NotificationToast } from "./NotificationToast";
 import { useDevTools } from "../../components-core/InspectorContext";
-import { ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
+import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
+import { useIndexerContext } from "../App/IndexerContext";
 
 function getClassName(css: string) {
   return `theme-${calculateHash(css)}`;
@@ -201,6 +202,11 @@ export function Theme({
         }
       : {};
   }, [devToolsEnabled, devToolsSide, devToolsSize]);
+
+  const {indexing} = useIndexerContext();
+  if(indexing){
+    return children;
+  }
 
   if (isRoot) {
     const faviconUrl = getResourceUrl("resource:favicon") || "/resources/favicon.ico";

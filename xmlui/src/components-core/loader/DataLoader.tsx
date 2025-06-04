@@ -20,6 +20,7 @@ import { PageableLoader } from "../loader/PageableLoader";
 import { Loader } from "../loader/Loader";
 import { useAppContext } from "../AppContext";
 import { useShallowCompareMemoize } from "../utils/hooks";
+import { useIndexerContext } from "../../components/App/IndexerContext";
 
 type LoaderProps = {
   loader: DataLoaderDef;
@@ -447,6 +448,14 @@ export const DataLoaderMd = createMetadata({
 
 type DataLoaderDef = ComponentDef<typeof DataLoaderMd>;
 
+function IndexAwareDataLoader(props){
+  const {indexing} = useIndexerContext();
+  if(indexing){
+    return null;
+  }
+  return <DataLoader {...props}/>
+}
+
 export const dataLoaderRenderer = createLoaderRenderer(
   "DataLoader",
   ({
@@ -467,7 +476,7 @@ export const dataLoaderRenderer = createLoaderRenderer(
     }
 
     return (
-      <DataLoader
+      <IndexAwareDataLoader
         loader={loader}
         state={state}
         loaderInProgressChanged={loaderInProgressChanged}

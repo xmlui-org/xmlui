@@ -23,14 +23,14 @@ export const LineChartMd = createMetadata({
     },
     hideX: {
       description:
-        "Determines whether the X-axis should be hidden. If set to (\`true\`), the axis will not be displayed.",
+        "Determines whether the X-axis should be hidden. If set to (`true`), the axis will not be displayed.",
       valueType: "boolean",
       defaultValue: defaultProps.hideX,
     },
     hideTooltip: {
       description:
         "Determines whether the tooltip should be hidden." +
-        "If set to (\`true\`), no tooltip will be shown when hovering over data points.",
+        "If set to (`true`), no tooltip will be shown when hovering over data points.",
       valueType: "boolean",
       defaultValue: defaultProps.hideTooltip,
     },
@@ -43,6 +43,10 @@ export const LineChartMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.showLegend,
     },
+    marginTop: d("The top margin of the chart"),
+    marginRight: d("The right margin of the chart"),
+    marginBottom: d("The bottom margin of the chart"),
+    marginLeft: d("The left margin of the chart"),
   },
 });
 
@@ -60,6 +64,10 @@ export const lineChartComponentRenderer = createComponentRenderer(
         hideX={extractValue(node.props?.hideX)}
         hideTooltip={extractValue(node.props?.hideTooltip)}
         showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
+        marginTop={extractValue.asOptionalNumber(node.props?.marginTop)}
+        marginRight={extractValue.asOptionalNumber(node.props?.marginRight)}
+        marginBottom={extractValue.asOptionalNumber(node.props?.marginBottom)}
+        marginLeft={extractValue.asOptionalNumber(node.props?.marginLeft)}
       >
         {renderChild(node.children)}
       </LineChart>

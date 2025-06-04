@@ -23,6 +23,10 @@ export type LineChartProps = {
   tickFormatter?: (value: any) => any;
   children?: ReactNode;
   showLegend?: boolean;
+  marginTop?: number;
+  marginRight?: number;
+  marginBottom?: number;
+  marginLeft?: number;
 };
 
 export const defaultProps: Pick<LineChartProps, "hideX" | "hideTooltip" | "showLegend"> = {
@@ -41,6 +45,10 @@ export function LineChart({
   tickFormatter,
   children,
   showLegend = false,
+  marginTop = 0,
+  marginRight = 0,
+  marginBottom = 0,
+  marginLeft = 0,
 }: LineChartProps) {
   const { getThemeVar } = useTheme();
 
@@ -85,7 +93,6 @@ export function LineChart({
     ];
   }, [getThemeVar]);
 
-
   const config = useMemo(() => {
     return Object.assign(
       {},
@@ -105,8 +112,12 @@ export function LineChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style}>
-        <RLineChart accessibilityLayer data={data}>
+      <ResponsiveContainer style={style} width="100%" height="100%">
+        <RLineChart
+          accessibilityLayer
+          data={data}
+          margin={{ top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft }}
+        >
           <XAxis
             interval="preserveEnd"
             dataKey={nameKey}
