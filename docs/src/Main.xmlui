@@ -69,6 +69,7 @@
             <Page url="/components-intro">
                 <ComponentsIntro/>
             </Page>
+            
             <Page url="/themes-intro">
                 <ThemesIntro/>
             </Page>

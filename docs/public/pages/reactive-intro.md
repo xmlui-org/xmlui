@@ -2,70 +2,45 @@
 
 Let's load that same London tube data into a [Select](/components/Select) component.
 
-```xmlui
-<Select id="lines" initialValue="bakerloo">
-   <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
-       <Option value="{$item.id}" label="{$item.name}" />
-   </Items>
-</Select>
-```
-
-```xmlui-pg
-<VStack height="200px">
-    <Select id="lines" initialValue="bakerloo">
+```xmlui-pg copy display height="280px"
+<App>
+  <Select id="lines" initialValue="bakerloo" dropdownHeight="200px">
     <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
-        <Option value="{$item.id}" label="{$item.name}" />
+      <Option value="{$item.id}" label="{$item.name}" />
     </Items>
-    </Select>
-</VStack>
+  </Select>
+</App>
 ```
 
 The `Select` uses the same API as the `List`. It contains an <a href="/components/Items">Items</a> component which is another way to loop through a sequence and embed a component that receives each item. In this case what's embedded is a selectable <a href="/components/Option">Option</a> which again receives the `$item` variable.
 
 Nothing happens yet when you select a tube line. Let's wire up the selection to display details for the selected line in a <a href="/components/Table">Table</a>.
 
-```xmlui
-<Select id="lines" initialValue="bakerloo">
-   <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
-       <Option value="{$item.id}" label="{$item.name}" />
-   </Items>
-</Select>
+```xmlui-pg
+---app copy display
+<App>
+  <Select id="lines" initialValue="bakerloo">
+    <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
+        <Option value="{$item.id}" label="{$item.name}" />
+    </Items>
+  </Select>
 
-<DataSource
-  id="stations"
-  url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
-  resultSelector="stations"/>
+  <DataSource
+    id="stations"
+    url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
+    resultSelector="stations"/>
 
-<Table data="{stations}">
+  <Table data="{stations}" height="280px">
     <Column bindTo="name" />
     <Column bindTo="modes" />
-</Table>
-```
-
-
+  </Table>
+</App>
+---desc
 The <a href="/components/DataSource">DataSource</a> component works like the `data` attribute we used with `List` and `Items`: it fetches from a REST endpoint. Unlike `List`,`Select`, and `Table`, `DataSource` isn't a visible component. It works behind the scenes to capture data for use by visible components.
 
 In this case the returned data object is big and complex, and we only want to display data from the `stations` object nested within it.
 The `resultSelector` property on the `DataSource` targets the nested `stations` object so we can feed just that data into the table.
-
-```xmlui-pg
-<Select id="lines" initialValue="bakerloo" width="30%">
-   <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
-       <Option value="{$item.id}" label="{$item.name}" />
-   </Items>
-</Select>
-
-<DataSource
-  id="stations"
-  url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
-  resultSelector="stations"/>
-
-<Table data="{stations}">
-    <Column bindTo="name" />
-    <Column bindTo="modes" />
-</Table>
 ```
-
 
 ## Reactive magic
 
@@ -73,7 +48,7 @@ The `Select` is wired to the `Table`. When you make a new selection, the table f
 
 How does this work? Note how the `Select` declares the property `id="lines"`.
 
-```
+```xmlui
 <Select id="lines" initialValue="bakerloo" width="30%">
 ```
 
@@ -81,7 +56,7 @@ That makes `lines` a variable accessible other XMLUI components, and `lines.valu
 
 Now look at the `url` property of the `DataSource`.
 
-```
+```xmlui !/{lines.value}/
 <DataSource
   id="stations"
   url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
@@ -90,7 +65,7 @@ Now look at the `url` property of the `DataSource`.
 
 it embeds a reference to `lines.value`. When you loaded this page, that URL fetched details for the initial value of the `Select`. Changing the selection changes `lines.value` which causes the `DataSource` to fetch a new batch of details. Likewise the `Table`'s `data` property refers to `stations`, the id of the `DataSource`.
 
-```
+```xmlui
 <Table data="{stations}">
 ```
 
