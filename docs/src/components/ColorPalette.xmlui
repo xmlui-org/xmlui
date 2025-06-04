@@ -1,0 +1,17 @@
+<Component name="ColorPalette">
+  <H2>{$props.title || $props.palette}</H2>
+  <FlowLayout >
+      <PaletteItem width="25%" color="color-{$props.palette}-50"/>
+      <PaletteItem width="25%" color="color-{$props.palette}-100"/>
+      <PaletteItem width="25%" color="color-{$props.palette}-200"/>
+      <PaletteItem width="25%" color="color-{$props.palette}-300"/>
+      <PaletteItem width="25%" color="color-{$props.palette}-400"/>
+      <PaletteItem width="25%" color="color-{$props.palette}-500"/>
+      <PaletteItem width="25%" color="color-{$props.palette}-600"/>
+      <PaletteItem width="25%" color="color-{$props.palette}-700"/>
+      <PaletteItem width="25%" color="color-{$props.palette}-800"/>
+      <PaletteItem width="25%" color="color-{$props.palette}-900"/>
+      <PaletteItem width="25%" color="color-{$props.palette}-950"/>
+      <PaletteItem width="25%" color="color-{$props.palette}"/>
+  </FlowLayout>
+</Component>

@@ -1,3 +1,8 @@
+# XMLUI Theme Variable Defaults
+
+XMLUI declares thousands of theme variables. In the following JSON object, each name-value pair describes a particular theme variable and its default value.
+
+> [!INFO] Values starting with `$` are references to other theme variables. The `null` value means that XMLUI does not have a default value for that theme variable. 
 ```json
 {
   "id": "xmlui",
