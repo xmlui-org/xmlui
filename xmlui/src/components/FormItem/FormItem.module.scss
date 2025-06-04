@@ -70,7 +70,8 @@ $themeVars: ();
 
     &.labelBreak {
       white-space: normal;
-      word-break: break-word;
+      word-break: normal;
+      overflow-wrap: break-word;
     }
 
     &.required {
@@ -89,6 +90,6 @@ $themeVars: ();
 }
 
 // --- We export the theme variables to add them to the component renderer
-:export{
+:export {
   themeVars: t.json-stringify($themeVars)
 }

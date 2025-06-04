@@ -2,6 +2,20 @@
 
 These are the key context variables available in XMLUI forms and components.
 
+| Variable         | Scope/Context                | What it Represents                        |
+|------------------|------------------------------|-------------------------------------------|
+| `$data`          | Inside `<Form>`              | The form's current data object            |
+| `$item`          | Inside iterators             | The current item in a list/array          |
+| `$param`           | In event handlers            | The event's payload (e.g., form data)     |
+| `$itemIndex`     | Inside iterators             | The current index in a list/array         |
+| `$validationResult` | In FormItem               | Result of latest validation               |
+| `$setValue`      | In FormItem                  | Function to set the value                 |
+| `$value`         | In FormItem                  | The current value                         |
+| `var.myVar`      | Declared in markup           | A scoped variable                         |
+| `myComponentId`  | Component with `id`          | Reference to the component instance       |
+
+
+
 ## `$data`
 
 - **Scope:** Available inside a `<Form>` and its children.
@@ -101,18 +115,4 @@ In components:
   <Text value="{myTextBox.value}" />
   ```
 
-
-## Summary
-
-| Variable         | Scope/Context                | What it Represents                        |
-|------------------|------------------------------|-------------------------------------------|
-| `$data`          | Inside `<Form>`              | The form's current data object            |
-| `$item`          | Inside iterators             | The current item in a list/array          |
-| `$param`           | In event handlers            | The event's payload (e.g., form data)     |
-| `$itemIndex`     | Inside iterators             | The current index in a list/array         |
-| `$validationResult` | In FormItem               | Result of latest validation               |
-| `$setValue`      | In FormItem                  | Function to set the value                 |
-| `$value`         | In FormItem                  | The current value                         |
-| `var.myVar`      | Declared in markup           | A scoped variable                         |
-| `myComponentId`  | Component with `id`          | Reference to the component instance       |
 

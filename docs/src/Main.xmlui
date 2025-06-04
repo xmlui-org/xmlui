@@ -1,9 +1,14 @@
 <Fragment xmlns:XMLUIExtensions="component-ns">
     <App layout="vertical-full-header" noScrollbarGutters="false" when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
-            <SpaceFiller />
-            <XMLUIExtensions:Search data="{appGlobals.content}" />
-            <ToneChangerButton />
+            <property name="logoTemplate">
+                <Link to="/" height="100%">
+                    <Logo padding="$space-3" paddingLeft="0"/>
+                </Link>
+            </property>
+            <SpaceFiller/>
+            <XMLUIExtensions:Search data="{appGlobals.content}"/>
+            <ToneChangerButton/>
         </AppHeader>
 
         <NavPanel>
@@ -64,6 +69,7 @@
             <Page url="/components-intro">
                 <ComponentsIntro/>
             </Page>
+
             <Page url="/themes-intro">
                 <ThemesIntro/>
             </Page>
@@ -86,28 +92,28 @@
                 <DocumentPage url="/pages/working-with-markdown.md"/>
             </Page>
             <Page url="/routingAndLinks">
-                <Markdown data="/pages/routing-and-links.md"/>
+                <DocumentPage url="/pages/routing-and-links.md"/>
             </Page>
             <Page url="/forms">
-                <Markdown data="/pages/forms.md"/>
+                <DocumentPage url="/pages/forms.md"/>
             </Page>
             <Page url="/resources">
-                <Markdown data="/pages/resources.md"/>
+                <DocumentPage url="/pages/resources.md"/>
             </Page>
             <Page url="/modal-dialogs">
-                <Markdown data="/pages/modal-dialogs.md"/>
+                <DocumentPage url="/pages/modal-dialogs.md"/>
             </Page>
             <Page url="/user-defined-components">
-                <Markdown data="/pages/user-defined-components.md"/>
+                <DocumentPage url="/pages/user-defined-components.md"/>
             </Page>
             <Page url="/styles-and-themes/layout-props">
-                <Markdown data="/pages/styles-and-themes/layout-props.md"/>
+                <DocumentPage url="/pages/styles-and-themes/layout-props.md"/>
             </Page>
             <Page url="/styles-and-themes/theme-variables">
-                <Markdown data="/pages/styles-and-themes/theme-variables.md"/>
+                <DocumentPage url="/pages/styles-and-themes/theme-variables.md"/>
             </Page>
             <Page url="/styles-and-themes/common-units">
-                <Markdown data="/pages/styles-and-themes/common-units.md"/>
+                <DocumentPage url="/pages/styles-and-themes/common-units.md"/>
             </Page>
             <Page url="/tbd">
                 <TBD/>
@@ -119,16 +125,16 @@
                 <Palettes/>
             </Page>
             <Page url="/context-variables">
-                <Markdown data="/pages/context-variables.md"/>
+                <DocumentPage url="/pages/context-variables.md"/>
             </Page>
             <Page url="/globals">
-                <Markdown data="pages/globals.md"/>
+                <DocumentPage url="pages/globals.md"/>
             </Page>
             <Page url="/glossary">
-                <Markdown data="/pages/glossary.md"/>
+                <DocumentPage url="/pages/glossary.md"/>
             </Page>
             <Page url="/xmlui-theme">
-                <Markdown data="/pages/xmlui-theme.md"/>
+                <DocumentPage url="/pages/xmlui-theme.md"/>
             </Page>
             <Page url="/test">
                 <Test/>
@@ -141,7 +147,7 @@
             <Card border="0" width="100%" padding="0">
                 <CHStack gap="$space-1" paddingBottom="0" verticalAlignment="center">
                     Created with
-                    <Logo width="60px"/>
+                    <Logo width="50px" />
                 </CHStack>
             </Card>
         </Footer>

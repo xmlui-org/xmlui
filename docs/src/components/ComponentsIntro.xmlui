@@ -1,7 +1,7 @@
 <Component name="ComponentsIntro">
-
   <DocumentPage>
-    <Markdown><![CDATA[
+    <Markdown>
+      <![CDATA[
 # Components
 
 We've already seen a number of XMLUI components in action: [DataSource](/components/DataSource),
@@ -69,26 +69,29 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 
   </HStack>
 ```
-]]></Markdown>
-
-  <FlowLayout>
-    <Stack width="*">
-      <TubeStops line="victoria" />
-    </Stack>
-    <Stack width="*">
-      <TubeStops line="waterloo-city" />
-    </Stack>
-  </FlowLayout>
-
-
-<H2>Anatomy of a custom component</H2>
-
-<Text>Here's the XMLUI markup for the <Text variant="code">TubeStops</Text> component.</Text>
-
-
-<FlowLayout>
-
-    <Markdown width="*"><![CDATA[
+]]>
+    </Markdown>
+    <FlowLayout>
+      <Stack width="*">
+        <TubeStops line="victoria"/>
+      </Stack>
+      <Stack width="*">
+        <TubeStops line="waterloo-city"/>
+      </Stack>
+    </FlowLayout>
+    <H2>
+      Anatomy of a custom component
+    </H2>
+    <Text>
+      Here's the XMLUI markup for the
+      <Text variant="code">
+        TubeStops
+      </Text>
+      component.
+    </Text>
+    <FlowLayout>
+      <Markdown width="*">
+        <![CDATA[
 
 ```xmlui
 <Component name="TubeStops">
@@ -118,9 +121,10 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 
 </Component>
 ```
-    ]]></Markdown>
-
-    <Markdown width="*"><![CDATA[
+    ]]>
+      </Markdown>
+      <Markdown width="*">
+        <![CDATA[
 <details>
 <summary>transformStops function</summary>
 <pre><code>
@@ -146,12 +150,11 @@ window.transformStops = function(stops) {
 }
 </code></pre>
 </details>
-]]></Markdown>
-
-</FlowLayout>
-
-
-<Markdown><![CDATA[
+]]>
+      </Markdown>
+    </FlowLayout>
+    <Markdown>
+      <![CDATA[
 The `TubeStops` component:
 
 - **Defines a dynamic data source**. When this page embeds `<TubeStops line="Bakerloo"/>`, the `TubeStops` component receives a `line` property used to form the URL that fetches data.
@@ -162,8 +165,12 @@ When you use custom components to access, transform, and present data, your XMLU
 
 Another way to keep your markup clean: rely on XMLUI's layout and style engine to make your app look good and behave gracefully by default. You can adjust the (many!) settings that define an XMLUI [Theme](/components/Theme), but you'll rarely need to. The next chapter explains why.
 
-]]></Markdown>
-
-  <Link icon="arrowright" label="Themes" to="/themes-intro" />
+]]>
+    </Markdown>
+    <DocumentLinks 
+      prevLink="/reactive-intro" 
+      prevTitle="Reactive Data" 
+      nextLink="/themes-intro" 
+      nextTitle="Themes"/>
   </DocumentPage>
 </Component>

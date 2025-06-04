@@ -44,8 +44,6 @@ The [demo app](tbd) exhibits the typical structure of an XMLUI app.
 | **`xmlui-test-server`** | *Optional*: server, you can use any static web server|
 
 
-## Deploying an XMLUI app
-
 You can deploy this tree structure (minus the optional `api.json`, `data.db`, and `xmlui-test-server`) to any static webserver that's configured to serve `index.html`. Consider this minimal app.
 
 ```
@@ -62,7 +60,7 @@ You can deploy this tree structure (minus the optional `api.json`, `data.db`, an
       └── 0.9.23.js
 ```
 
-### index.html
+## index.html
 
 ```<!DOCTYPE html>
 <html lang="en">
@@ -79,7 +77,7 @@ You can deploy this tree structure (minus the optional `api.json`, `data.db`, an
 </html>
 ```
 
-### Main.xmlui
+## Main.xmlui
 
 ```xmlui
 <App name="XMLUI Minimal">
@@ -97,7 +95,7 @@ You can deploy this tree structure (minus the optional `api.json`, `data.db`, an
 </App>
 ```
 
-### Home.xmlui
+## Home.xmlui
 
 ```xmlui
 <Component name="Home" >
@@ -107,7 +105,7 @@ A minimal XMLUI app
 </Component>
 ```
 
-### Local deployment
+## Local deployment
 
 If you are working locally, in a folder at the root of this tree, here are some ways you can serve the app.
 
@@ -132,11 +130,11 @@ Serving HTTP on :: port 8080 (http://[::]:8080/) ...
 
 In either case, visit http://localhost:8080 to view the app.
 
-### Hosted deployment
+## Hosted deployment
 
 You can copy this structure to any webserver configured to serve `index.html` and its subfolders. But you might even need a conventional webserver, here are some common alternatives.
 
-#### Use an AWS Bucket
+### Use an AWS Bucket
 
 Your app can run from an AWS bucket. Here's the minimal app served that way: [http://xmlui-minimal.s3-website-us-east-1.amazonaws.com/](http://xmlui-minimal.s3-website-us-east-1.amazonaws.com/).
 
@@ -164,7 +162,7 @@ Your app can run from an AWS bucket. Here's the minimal app served that way: [ht
 </ul>
 </details>
 
-#### Use Netlify
+### Use Netlify
 
 You can just drag-and-drop the folder to Netlify: [https://xmlui-minimal.netlify.app/](https://xmlui-minimal.netlify.app/).
 

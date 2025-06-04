@@ -8,16 +8,17 @@ export const DefaultDocsTheme: ThemeDefinition = {
     // NOTE: All of these theme vars should be assessed whether to have them in the default theme
 
     "color-surface": "#1e2734",
+    borderColor: "$color-secondary-100",
 
-    "fontFamily": "Inter, -apple-system, 'system-ui', 'San Francisco', 'Segoe UI', sans-serif",
+    fontFamily: "Inter, -apple-system, 'system-ui', 'San Francisco', 'Segoe UI', sans-serif",
     "font-feature-settings": "'cv03', 'cv04', 'cv11'",
     "maxWidth-App": "1320px",
 
     "maxWidth-content": "1200px",
     "boxShadow-navPanel-App": "none",
-    "boxShadow-header-App": "none",
+    /*    "boxShadow-header-App": "none",*/
     "backgroundColor-content-App": "$color-surface-0",
-    "backgroundColor": "$color-surface-0",
+    backgroundColor: "$color-surface-0",
 
     "textColor-Text-marked": "$color-primary-500",
 
@@ -64,11 +65,13 @@ export const DefaultDocsTheme: ThemeDefinition = {
     // --- NestedApp
     "border-NestedApp": "1px solid $color-surface-100",
 
+    // --- Footer
+    "fontSize-Footer": "16px",
     dark: {
       "color-primary": "#3367cc",
 
       "backgroundColor-content-App": "$color-surface-100",
-      "backgroundColor": "$color-surface-100",
+      backgroundColor: "$color-surface-100",
       "backgroundColor-NavPanel": "$color-surface-50",
       "backgroundColor-navPanel-App": "$color-surface-50",
 
@@ -76,7 +79,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
       "border-NestedApp": "1px solid $color-surface-200",
 
       "backgroundColor-HtmlThead": "$color-surface-50",
-    }
+    },
   },
   resources: {},
 };
