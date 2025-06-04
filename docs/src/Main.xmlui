@@ -48,7 +48,7 @@
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
                 <NavLink label="Theme Variable Defaults" to="/xmlui-theme"/>
-                <NavLink label="Test" to="/test"/>
+                <!-- <NavLink label="Test" to="/test"/> -->
             </NavGroup>
         </NavPanel>
 
@@ -58,7 +58,13 @@
             </Page>
 
             <Page url="/reactive-intro">
-                <DocumentPage hideToc="true" url="/pages/reactive-intro.md"/>
+                <DocumentPage
+                    hideToc="true"
+                    url="/pages/reactive-intro.md"
+                    prevLink="/"
+                    prevTitle="Introduction"
+                    nextLink="/components-intro"
+                    nextTitle="Components"/>
             </Page>
 
             <Page url="/components-intro">
@@ -119,14 +125,7 @@
                 <Palettes/>
             </Page>
             <Page url="/context-variables">
-<<<<<<< HEAD
                 <DocumentPage url="/pages/context-variables.md" />
-=======
-                <DocumentPage
-                    url="/pages/context-variables.md"
-                    nextLink="/globals"
-                    nextTitle="Globals" />
->>>>>>> 70dc06f6 (user-defined components)
             </Page>
             <Page url="/globals">
                 <DocumentPage url="pages/globals.md" />
@@ -135,7 +134,11 @@
                 <DocumentPage hideToc="true" url="/pages/glossary.md" />
             </Page>
             <Page url="/xmlui-theme">
-                <DocumentPage hideToc="true" url="/pages/xmlui-theme.md" />
+                <DocumentPage
+                    hideToc="true"
+                    url="/pages/xmlui-theme.md"
+                    prevLink="/glossary"
+                    prevTitle="Glossary"/>
             </Page>
             <Page url="/test">
                 <Test/>
