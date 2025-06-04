@@ -1,9 +1,23 @@
-import { useCallback, useDeferredValue, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { LinkNative, Text, TextBox, useSearchContextContent, VisuallyHidden } from "xmlui";
-import type { FuseOptionKeyObject, FuseResult, FuseResultMatch, IFuseOptions, RangeTuple } from "fuse.js";
+import type {
+  FuseOptionKeyObject,
+  FuseResult,
+  FuseResultMatch,
+  IFuseOptions,
+  RangeTuple,
+} from "fuse.js";
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
-
 
 type Props = {
   id?: string;
@@ -14,16 +28,19 @@ type Props = {
 
 export const defaultProps: Pick<Props, "limit" | "maxContentMatchNumber"> = {
   limit: 10,
-  maxContentMatchNumber: 3
+  maxContentMatchNumber: 3,
 };
 
-const keys: Array<FuseOptionKeyObject<SearchItemData>> = [{
-  name: "title",
-  weight: 2
-}, {
-  name: "content",
-  weight: 1
-}];
+const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
+  {
+    name: "title",
+    weight: 2,
+  },
+  {
+    name: "content",
+    weight: 1,
+  },
+];
 
 const searchOptions: IFuseOptions<SearchItemData> = {
   // isCaseSensitive: false,
@@ -34,21 +51,21 @@ const searchOptions: IFuseOptions<SearchItemData> = {
   // findAllMatches: false,
   minMatchCharLength: 2,
   // location: 0,
-  threshold: 0.1,
+  threshold: 0,
   distance: 500,
   // useExtendedSearch: false,
   ignoreLocation: true,
   // ignoreFieldNorm: false,
   // fieldNormWeight: 1,
-  keys
+  keys,
 };
 
 export const Search = ({
-                         id,
-                         data,
-                         limit = defaultProps.limit,
-                         maxContentMatchNumber = defaultProps.maxContentMatchNumber
-                       }: Props) => {
+  id,
+  data,
+  limit = defaultProps.limit,
+  maxContentMatchNumber = defaultProps.maxContentMatchNumber,
+}: Props) => {
   const content = useSearchContextContent();
   const _id = useId();
   const inputId = id || _id;
@@ -60,28 +77,32 @@ export const Search = ({
   const [show, setShow] = useState(false);
   const targetRef = useRef<HTMLInputElement>(null);
 
-  const dataFromMd = useMemo(() => Object.entries(data).map<SearchItemData>(([path, content]) => {
-    let title = "";
-    const titleRegex = /^#{1,6}\s+(.+?)(?:\s+\[#.*\])?\s*$/m;
-    const match = content.match(titleRegex);
-    if (match) {
-      title = match[1];
-    } else {
-      title = path.split("/").pop() || path;
-    }
-    return {
-      path,
-      title,
-      // Remove title after matching, since it is in the "label"
-      content: removeMarkdownFormatting(content.replace(titleRegex, ""))
-    };
-  }), [data]);
+  // --- Step 2: Convert data to a format better handled by the search engine
+  const dataFromMd = useMemo(
+    () =>
+      Object.entries(data).map<SearchItemData>(([path, content]) => {
+        let title = "";
+        const titleRegex = /^#{1,6}\s+(.+?)(?:\s+\[#.*\])?\s*$/m;
+        const match = content.match(titleRegex);
+        if (match) {
+          title = match[1];
+        } else {
+          title = path.split("/").pop() || path;
+        }
+        return {
+          path,
+          title,
+          // Remove title after matching, since it is in the "label"
+          content: removeMarkdownFormatting(content.replace(titleRegex, "")),
+        };
+      }),
+    [data],
+  );
 
   const mergedData = useMemo(() => {
     return [...dataFromMd, ...Object.values(content)];
   }, [content, dataFromMd]);
 
-  // --- Step 2: Convert data to a format better handled by the search engine
   const fuse = useMemo(() => {
     // console.log("Creating Fuse instance with data length:", mergedData.length);
     return new Fuse<SearchItemData>(mergedData, searchOptions);
@@ -89,37 +110,56 @@ export const Search = ({
 
   // --- Step 3: Execute search & post-process results
   const results: SearchResult[] = useMemo(() => {
+    // Ignore single characters
+    if (debouncedValue.length <= 1) return [];
+
     setShow(debouncedValue.length > 0);
     const limited = !debouncedValue
       ? []
-      : fuse
-        .search(debouncedValue, {
-          limit: limit
+      : fuse.search(debouncedValue, {
+          limit: limit,
         });
 
-    const mapped = limited.map((result) => {
-      const mappedMatches: MatchesByKey = {};
-      result.matches?.forEach((match) => {
-        if (match.key !== undefined) {
-          mappedMatches[match.key as keyof SearchItemData] = {
-            indices: match.indices.filter(
-              // Tweak this value to limit the number of matches
-              // Most matches are too short to be useful
-              (index) => index[1] - index[0] >= debouncedValue.length - 1
-            ),
-            value: match.value
-          };
-        }
-      });
+    const mapped = limited
+      .map((result) => {
+        const mappedMatches: MatchesByKey = {};
+        result.matches?.forEach((match) => {
+          if (match.key !== undefined) {
+            const matchKey = match.key as keyof SearchItemData;
+            mappedMatches[matchKey] = {
+              indices: match.indices
+                .filter(
+                  // Here we exclude results that are too short and not match the search term
+                  (index) => {
+                    if (match.key === "title") {
+                      return index[1] - index[0] >= debouncedValue.length - 1;
+                    }
+                    return (
+                      /* index[1] - index[0] >= debouncedValue.length - 1 && */
+                      result.item[matchKey]
+                        .slice(index[0], index[1] + 1).toLocaleLowerCase()
+                        .includes(debouncedValue.toLocaleLowerCase())
+                    );
+                  },
+                )
+                // Restrict highlights that are longer than the original search term
+                .map((index) => {
+                  const substr = getSubstringIndexes(result.item[matchKey], debouncedValue);
+                  if (substr) console.log(result.item[matchKey].slice(substr?.start, substr?.end));
+                  return !!substr ? [substr.start, substr.end] : index;
+                }),
+              value: match.value,
+            };
+          }
+        });
 
-      return {
-        item: result.item,
-        score: result.score,
-        matches: mappedMatches
-      };
-    });
-
-    // TODO: Add any additional post-processing here
+        return {
+          item: result.item,
+          score: result.score,
+          matches: mappedMatches,
+        };
+      })
+      .filter((item) => Object.values(item.matches).some((match) => match.indices.length > 0));
 
     return mapped;
   }, [debouncedValue, fuse, limit]);
@@ -155,9 +195,7 @@ export const Search = ({
         value={inputValue}
         style={{ height: "36px", width: "280px" }}
         startIcon="search"
-        onDidChange={(value) =>
-          setInputValue(value)
-        }
+        onDidChange={(value) => setInputValue(value)}
         onFocus={() => setShow(true)}
       />
       {/* --- Step 4: Render results */}
@@ -209,14 +247,14 @@ function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: Sear
               style={{
                 width: "100%",
                 display: "flex",
-                flexDirection: "column"
+                flexDirection: "column",
               }}
             >
               {matches?.content?.indices &&
                 formatContentSnippet(
                   item.content,
                   matches.content.indices,
-                  maxContentMatchNumber
+                  maxContentMatchNumber,
                 ).map((snippet, snipIdx) => (
                   <div key={`${item.path}-${idx}-${snipIdx}`} className={styles.snippet}>
                     <Text>{snippet}</Text>
@@ -246,13 +284,13 @@ function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: Sear
 function formatContentSnippet(
   text: string,
   ranges?: readonly RangeTuple[],
-  maxContentMatchNumber?: number
+  maxContentMatchNumber?: number,
 ) {
   if (!ranges || ranges.length === 0) return [text.slice(0, 100)];
   const contextLength = 50;
 
-  const highlightRanges = ranges?.slice(0, maxContentMatchNumber);
-  const contextRanges: RangeTuple[] = highlightRanges.map(([start, end]) => {
+  const limitedRanges = ranges.slice(0, maxContentMatchNumber);
+  const contextRanges: RangeTuple[] = limitedRanges.map(([start, end]) => {
     let contextStart = 0;
     let contextEnd = text.length - 1;
 
@@ -264,6 +302,9 @@ function formatContentSnippet(
     }
     return [contextStart, contextEnd];
   });
+  const highlightRanges: RangeTuple[] = limitedRanges.map(([start, end], idx) => {
+    return [start - contextRanges[idx][0], end - contextRanges[idx][1]];
+  });
 
   return contextRanges.map(([start, end], idx) => {
     const textWithEllipsis: React.ReactNode[] = [];
@@ -271,7 +312,7 @@ function formatContentSnippet(
       textWithEllipsis.push("...");
     }
 
-    textWithEllipsis.push(highlightText(text.slice(start, end + 1), [highlightRanges[idx]]));
+    textWithEllipsis.push(highlightText(text.slice(start, end), [highlightRanges[idx]]));
 
     if (end < text.length - 1) {
       textWithEllipsis.push("...");
@@ -295,7 +336,7 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
     result.push(
       <Text key={`${index}-highlighted`} variant="marked">
         {text.slice(start, end + 1)}
-      </Text>
+      </Text>,
     );
     lastIndex = end + 1;
   });
@@ -303,19 +344,6 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
     result.push(text.slice(lastIndex));
   }
   return result;
-}
-
-function useDebounce(value: string, delay: number) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-  return debouncedValue;
 }
 
 // --- Step 0: Remove markdown formatting
@@ -356,11 +384,20 @@ function removeMarkdownFormatting(markdown: string) {
       // Remove tables
       .replace(
         /^(\s*\|.*\|.*$(?:\r?\n|\r)+\s*\|[\s:-]+\|.*$(?:\r?\n|\r)+(?:\s*\|.*\|.*$(?:\r?\n|\r)*)*)/gim,
-        ""
+        "",
       )
       // Trim leading/trailing whitespace
       .trim()
   );
+}
+
+function getSubstringIndexes(str: string, substr: string) {
+  const start = str.indexOf(substr);
+  if (start === -1) {
+    return null; // Substring not found
+  }
+  const end = start + substr.length - 1;
+  return { start, end };
 }
 
 function pluralize(number: number, singular: string, plural: string): string {
