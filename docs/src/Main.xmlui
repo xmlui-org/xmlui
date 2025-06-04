@@ -27,7 +27,7 @@
                 <NavLink label="User-defined Components" to="/user-defined-components"/>
             </NavGroup>
             <NavGroup label="Reference">
-                <RecursiveNavTree items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
+                <RecursiveNavTree items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }" level="{1}"/>
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
