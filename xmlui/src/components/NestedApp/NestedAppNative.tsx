@@ -33,15 +33,15 @@ type NestedAppProps = {
 };
 
 export function LazyNestedApp(props){
-  // const [shouldRender, setShouldRender] = useState(false);
-  // useEffect(()=>{
-  //   startTransition(()=>{
-  //     setShouldRender(true);
-  //   })
-  // }, []);
-  // if(!shouldRender){
-  //   return null;
-  // }
+  const [shouldRender, setShouldRender] = useState(false);
+  useEffect(()=>{
+    startTransition(()=>{
+      setShouldRender(true);
+    })
+  }, []);
+  if(!shouldRender){
+    return null;
+  }
   return <NestedApp {...props}/>
 }
 

@@ -7,15 +7,13 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dComponent } from "../../components/metadata-helpers";
 import { appLayoutMd } from "./AppLayoutContext";
 import { App } from "./AppNative";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { PageMd } from "../Pages/Pages";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { IndexerContext } from "./IndexerContext";
 import { createPortal } from "react-dom";
 import { useAppContext } from "../../components-core/AppContext";
-import { useSearchContextUpdater } from "./SearchContext";
-
-import ReactDOMServer from 'react-dom/server';
+import { useSearchContextSetIndexing, useSearchContextUpdater } from "./SearchContext";
 
 // --- Define a structure to represent navigation hierarchy
 interface NavHierarchyNode {
@@ -385,36 +383,79 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
 
 const HIDDEN_STYLE = {
   display: "none",
-  position: "absolute",
-  isolation: "isolate",
-  pointerEvents: "none",
 };
 
 function SearchIndexCollector({ Pages, renderChild }) {
   const appContext = useAppContext();
-  const indexerContextValue = useMemo(() => {
-    return {
-      indexing: true,
-    };
-  }, []);
+  const indexerContextValue = useMemo(() => ({ indexing: true }), []);
+  const setIndexing = useSearchContextSetIndexing();
 
-  let memoedChildren = useMemo(()=>Pages?.children.map((child, i) =>
-    child.type === "Page" &&
-    !child.props?.url?.includes("*") &&
-    !child.props?.url?.includes(":") ? (
-      <PageIndexer Page={child} renderChild={renderChild} key={i} />
-    ) : null,
-  ), [Pages?.children, renderChild]);
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true); // Ensure document.body is available
 
-  if(!appContext.appGlobals?.searchIndexEnabled){
+    return ()=>{
+      setIndexing(false);
+    }
+  }, [setIndexing]);
+
+  // 1. Memoize the list of pages to be indexed
+  const pagesToIndex = useMemo(() => {
+    return (
+      Pages?.children?.filter(
+        (child) =>
+          child.type === "Page" && // Ensure 'Page' matches your actual component type name
+          child.props?.url && // Ensure URL exists
+          !child.props.url.includes("*") &&
+          !child.props.url.includes(":"),
+      ) || []
+    );
+  }, [Pages?.children]);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDoneIndexing, setIsDoneIndexing] = useState(false);
+  const [, startTransitionParent] = useTransition(); // Transition for parent updates
+
+  const handlePageIndexed = useCallback(() => {
+    startTransitionParent(() => {
+      // Transition the update to the next page
+      setCurrentIndex((prevIndex) => {
+        const nextIndex = prevIndex + 1;
+        if (nextIndex >= pagesToIndex.length) {
+          // console.log("All pages indexed.");
+          setIsDoneIndexing(true); // All pages processed
+        }
+        return nextIndex;
+      });
+    });
+  }, [pagesToIndex.length]); // Recreate if the total number of pages changes
+
+  if (!appContext.appGlobals?.searchIndexEnabled || isDoneIndexing || !isClient) {
+    return null;
+  }
+
+  const currentPageToProcess = pagesToIndex[currentIndex];
+
+  if (!currentPageToProcess) {
+    // This can happen if pagesToIndex is empty or currentIndex went out of bounds unexpectedly.
+    // Setting isDoneIndexing if pagesToIndex is empty initially.
+    if (pagesToIndex.length === 0 && currentIndex === 0 && !isDoneIndexing) {
+      setIsDoneIndexing(true);
+    }
     return null;
   }
 
   return (
     <IndexerContext.Provider value={indexerContextValue}>
       {createPortal(
-        <div style={HIDDEN_STYLE}>
-          {memoedChildren}
+        <div style={HIDDEN_STYLE} aria-hidden="true">
+          {/* Render only one PageIndexer at a time */}
+          <PageIndexer
+            Page={currentPageToProcess}
+            renderChild={renderChild}
+            onIndexed={handlePageIndexed}
+            key={currentPageToProcess.props?.url || currentIndex} // Key ensures re-mount
+          />
         </div>,
         document.body,
       )}
@@ -425,69 +466,70 @@ function SearchIndexCollector({ Pages, renderChild }) {
 function PageIndexer({
   Page,
   renderChild,
+  onIndexed,
 }: {
-  Page: ComponentDef<typeof PageMd>;
+  Page: ComponentDef<typeof PageMd>; // Use the defined PageMdProps
   renderChild: RenderChildFn;
+  onIndexed: () => void;
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const pageUrl = Page.props?.url || "";
-  const [collected, setCollected] = useState(false);
+  const navLabel = Page.props?.navLabel || "";
   const searchContextUpdater = useSearchContextUpdater();
 
-  const [inProgress, startTransition] = useTransition();
+  const [isContentRendered, setIsContentRendered] = useState(false);
+  const [isCollected, setIsCollected] = useState(false);
+  const [isProcessing, startTransition] = useTransition();
 
-  console.log("Starting indexing for page:", pageUrl, "in progress:", inProgress);
-
-  const [hydrated, setHydrated] = useState(false);
+  // Effect 1: Schedule the rendering of the Page's children (low priority)
   useEffect(() => {
+    // console.log(`PageIndexer (${pageUrl}): Scheduling content render.`);
     startTransition(() => {
-      setHydrated(true);
+      setIsContentRendered(true); // This will trigger rendering of Page.children
     });
-  }, []);
+  }, [pageUrl]); // Re-run if the Page prop itself changes identity (due to key in parent)
 
+  // Effect 2: Extract content once Page.children is rendered and ref is available (low priority)
   useEffect(() => {
-    if(hydrated){
-      // console.log("Indexing page:", pageUrl);
-      // console.log("Content:", contentRef.current?.textContent || "No content");
-
-      // 1. Clone the div to avoid modifying the original
-      const clone = contentRef.current.cloneNode(true);
-
-      // 2. Find and remove <style> and <script> elements from the clone
-      const elementsToRemove = clone.querySelectorAll('style, script');
-      elementsToRemove.forEach(el => el.remove());
-
-      // 3. Get the textContent from the cleaned clone
-      //    textContent is generally preferred for raw text.
-      //    Using .trim() to remove leading/trailing whitespace and .replace(/\s+/g, ' ') to normalize multiple spaces.
-      const textContent =  (clone.textContent || "").trim().replace(/\s+/g, ' ');
-
-      const entry = {
-        title: contentRef.current?.querySelector("h1")?.innerText || "",
-        content: textContent,
-        path: pageUrl
-      }
-
-      searchContextUpdater(entry);
+    if (isContentRendered && contentRef.current && !isCollected && !isProcessing) {
+      // console.log(`PageIndexer (${pageUrl}): Content rendered, scheduling extraction.`);
       startTransition(() => {
-        setCollected(true);
+        // console.log(`PageIndexer (${pageUrl}): Starting extraction...`);
+        const currentContent = contentRef.current; // Capture ref value
+        if (!currentContent) return;
+
+        const clone = currentContent.cloneNode(true) as HTMLDivElement;
+        const elementsToRemove = clone.querySelectorAll("style, script");
+        elementsToRemove.forEach((el) => el.remove());
+        const textContent = (clone.textContent || "").trim().replace(/\s+/g, " ");
+        const titleElement = currentContent.querySelector("h1");
+        const title = titleElement ? titleElement.innerText : (navLabel || pageUrl.split("/").pop() || pageUrl);
+
+        const entry = {
+          title: title,
+          content: textContent,
+          path: pageUrl,
+        };
+
+        searchContextUpdater(entry);
+        // console.log(`PageIndexer (${pageUrl}): Extraction complete, signaling parent.`);
+        onIndexed(); // Signal completion to parent
+        setIsCollected(true); // Mark as collected
       });
     }
-  }, [hydrated, pageUrl, searchContextUpdater]);
+  }, [isContentRendered, pageUrl, searchContextUpdater, onIndexed, isCollected, isProcessing, navLabel]); // Ensure all dependencies are listed
 
-  if(!hydrated){
+  // If this PageIndexer instance's work is done, or content not yet rendered, render nothing.
+  // The parent (SearchIndexCollector) will unmount this and mount the next one.
+  if (isCollected || !isContentRendered) {
+    // console.log(`PageIndexer (${pageUrl}): Null render (isCollected: ${isCollected}, isContentRendered: ${isContentRendered})`);
     return null;
   }
 
-  if (collected) {
-    return null;
-  }
-
-  return (
-    <div ref={contentRef}>
-      {renderChild(Page.children)}
-    </div>
-  );
+  // This part renders when isContentRendered is true and isCollected is false.
+  // The content needs to be in the DOM for contentRef.current to be populated.
+  // console.log(`PageIndexer (${pageUrl}): Rendering content for ref population.`);
+  return <div ref={contentRef}>{renderChild(Page.children)}</div>;
 }
 
 export const appRenderer = createComponentRenderer(
