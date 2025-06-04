@@ -1,5 +1,8 @@
 <Fragment xmlns:XMLUIExtensions="component-ns">
-    <App layout="vertical-full-header" noScrollbarGutters="false" when="{!window.location.hash.includes('/playground')}">
+    <App 
+        layout="vertical-full-header" 
+        noScrollbarGutters="false" 
+        when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
             <property name="logoTemplate">
                 <Link to="/" height="100%">
@@ -32,7 +35,8 @@
                 <NavLink label="User-defined Components" to="/user-defined-components"/>
             </NavGroup>
             <NavGroup label="Reference">
-                <RecursiveNavTree items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }" level="{1}"/>
+                <RecursiveNavTree 
+                    items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
@@ -43,6 +47,7 @@
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
+                <NavLink label="Theme Variable Defaults" to="/xmlui-theme"/>
                 <NavLink label="Test" to="/test"/>
             </NavGroup>
         </NavPanel>
@@ -69,7 +74,6 @@
             <Page url="/components-intro">
                 <ComponentsIntro/>
             </Page>
-
             <Page url="/themes-intro">
                 <ThemesIntro/>
             </Page>
@@ -125,16 +129,32 @@
                 <Palettes/>
             </Page>
             <Page url="/context-variables">
-                <DocumentPage url="/pages/context-variables.md"/>
+                <DocumentPage 
+                    url="/pages/context-variables.md"
+                    nextLink="/globals"
+                    nextTitle="Globals" />
             </Page>
             <Page url="/globals">
-                <DocumentPage url="pages/globals.md"/>
+                <DocumentPage url="pages/globals.md"
+                    prevLink="/context-variables"
+                    prevTitle="Context Variables"
+                    nextLink="/palettes"
+                    nextTitle="Palettes" />
             </Page>
             <Page url="/glossary">
-                <DocumentPage url="/pages/glossary.md"/>
+                <DocumentPage url="/pages/glossary.md"
+                    hideToc="true"
+                    prevLink="/icons"
+                    prevTitle="Icons"
+                    nextLink="/xmlui-theme"
+                    nextTitle="Theme Variable Defaults"/>
             </Page>
             <Page url="/xmlui-theme">
-                <DocumentPage url="/pages/xmlui-theme.md"/>
+                <DocumentPage 
+                    hideToc="true"
+                    url="/pages/xmlui-theme.md"
+                    prevLink="/glossary"
+                    prevTitle="Glossary"/>
             </Page>
             <Page url="/test">
                 <Test/>
