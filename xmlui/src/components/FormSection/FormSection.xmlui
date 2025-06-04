@@ -1,4 +1,4 @@
-<Component name="FormSection">
+<Component name="FormSection" >
   <VStack paddingBottom="{$props.paddingBottom ?? '1rem'}" gap="0">
     <Heading 
       when="{!!$props.heading}"

@@ -69,3 +69,26 @@ export function pathToNodeInAscendands(chain: Node[], predicate: (node: Node) =>
   }
   return null;
 }
+
+/**
+*
+* @param node an ElementNode
+*/
+export function isPairedNode(node: Node): boolean{
+  for (const c of node.children){
+    if (c.kind === SyntaxKind.CloseNodeStart){
+      return true;
+    } else if (c.kind === SyntaxKind.NodeClose){
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+*
+* @param node an ElementNode
+*/
+export function isSelfClosingNode(node: Node): boolean{
+  return !isPairedNode(node);
+}
