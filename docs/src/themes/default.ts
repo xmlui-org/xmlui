@@ -67,6 +67,12 @@ export const DefaultDocsTheme: ThemeDefinition = {
 
     // --- Footer
     "fontSize-Footer": "16px",
+
+    light: {
+      "textColor-DocumentLinks": "#5B6475",
+      "textColor-DocumentLinks--hover": "#1B232A",
+      "backgroundColor-separator-DocumentLinks": "#e2e5ea",
+    },
     dark: {
       "color-primary": "#3367cc",
 
@@ -79,6 +85,10 @@ export const DefaultDocsTheme: ThemeDefinition = {
       "border-NestedApp": "1px solid $color-surface-200",
 
       "backgroundColor-HtmlThead": "$color-surface-50",
+
+      "textColor-DocumentLinks": "#8E97A8",
+      "textColor-DocumentLinks--hover": "#F9FAFB",
+      "backgroundColor-separator-DocumentLinks": "#38475E",
     },
   },
   resources: {},
