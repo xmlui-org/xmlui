@@ -1,5 +1,16 @@
 # xmlui-docs
 
+## 0.0.3
+
+### Patch Changes
+
+- 69b4402: improve: docs - footer logo, FormItem - labelBreak
+- Updated dependencies [de8d63c]
+- Updated dependencies [bd6d1b4]
+- Updated dependencies [db5a5f4]
+- Updated dependencies [69b4402]
+  - xmlui@0.9.45
+
 ## 0.0.2
 
 ### Patch Changes

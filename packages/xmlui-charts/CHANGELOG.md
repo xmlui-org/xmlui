@@ -1,5 +1,11 @@
 # xmlui-charts
 
+## 0.1.22
+
+### Patch Changes
+
+- 5c6e92b: fix: LineChart, PieChart - layout issues
+
 ## 0.1.21
 
 ### Patch Changes

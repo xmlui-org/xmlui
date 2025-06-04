@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.9.45
+
+### Patch Changes
+
+- de8d63c: Fixed small issues in CodeBlocks: adjusted row highlight length, substring highlight now works with '=' signs, corrected minor vertical positioning of code without syntax highlight, temporarily removed row numbering.
+- bd6d1b4: experimental: runtime search indexing
+- db5a5f4: fix: Allow APICall as an event handler
+- 69b4402: improve: docs - footer logo, FormItem - labelBreak
+
 ## 0.9.44
 
 ### Patch Changes
