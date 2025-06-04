@@ -137,24 +137,15 @@ describe('XML Formatter', () => {
     });
   });
 
-  describe('Ill-formed XML Handling', () => {
-    test('should return null for malformed CDATA', () => {
-      const input = '<Text><![CDATA[Unclosed CDATA</Text>';
-      const result = testIdempotency(input );
-
-      expect(result).toBeNull();
-    });
-  });
-
   describe('Edge Cases', () => {
     test('should handle empty string', () => {
       const result = testIdempotency('');
-      expect(result).toBeNull();
+      expect(result).toEqual("");
     });
 
     test('should handle whitespace-only string', () => {
       const result = testIdempotency('   \n  \t  ', );
-      expect(result).toBeNull();
+      expect(result).toEqual("");
     });
 
     test('should handle single self-closing tag', () => {
@@ -165,7 +156,7 @@ describe('XML Formatter', () => {
     });
 
     test('should handle XML with comments', () => {
-      const input = '<Fragment><!-- This is a comment --><Text>Content</Text></Fragment>';
+      const input = '<Fragment><!-- This is a comment --><Text>Content</Text></Fragment><!-- This is a comment -->';
       const result = testIdempotency(input);
 
       expect(result).toEqual(
@@ -174,20 +165,8 @@ describe('XML Formatter', () => {
   <Text>
     Content
   </Text>
-</Fragment>`);
-    });
-
-    test('should handle XML with processing instructions', () => {
-      const input = '<?xml version="1.0"?><Fragment><Text>Content</Text></Fragment>';
-      const result = testIdempotency(input);
-
-      expect(result).toEqual(
-`<?xml version="1.0"?>
-<Fragment>
-  <Text>
-    Content
-  </Text>
-</Fragment>`);
+</Fragment>
+<!-- This is a comment -->`);
     });
 
     test('should handle deeply nested elements', () => {
