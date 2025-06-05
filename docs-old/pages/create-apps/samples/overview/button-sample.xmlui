@@ -1,4 +1,0 @@
-<Button label="Click to increment: {count}">
-  <variable name="count" value="0" />
-  <event name="click" value="count++" />
-</Button>

@@ -1,6 +1,0 @@
-<Form id="driveForm" data="{{car: 'Toyota Celica', year: '1999'}}" padding="1em">
-  <FlowLayout paddingBottom="1em" gap="1em">
-    <FormItem width="50%" label="Car Type" bindTo="car" type="text" />
-    <FormItem width="50%" label="Year" bindTo="year" type="integer" />
-  </FlowLayout>  
-</Form>

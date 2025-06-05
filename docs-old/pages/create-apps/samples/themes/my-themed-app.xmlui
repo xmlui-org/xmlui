@@ -1,5 +1,0 @@
-<App>
-  <H1>AcmeUI App</H1>
-  <Text>Welcome to the AcmeUI intranet home page!</Text>
-  <Button label="Search for more information" />
-</App>
