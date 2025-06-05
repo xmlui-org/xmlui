@@ -192,7 +192,7 @@ class XmluiFormatter {
   }
 
   printContentString(node: Node): string {
-    return this.getText(node);
+    return this.getText(node).trim();
   }
 
   private printEveryTrivia(node: Node): string {

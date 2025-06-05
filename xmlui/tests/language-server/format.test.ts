@@ -203,11 +203,11 @@ describe('XML Formatter', () => {
   describe('Real-world xmlui Examples', () => {
     test('should format typical xmlui component', () => {
       const input = `<Fragment>
-        <Text testId="textShort" width="200px">Short</Text>
-        <Text testId="textLong" width="200px" maxLines="2">
-          Though this long text does not fit into a single line, please do not break it!
-        </Text>
-      </Fragment>`;
+  <Text testId="textShort" width="200px">Short</Text>
+  <Text testId="textLong" width="200px" maxLines="2">
+    Though this long text does not fit into a single line, please do not break it!
+  </Text>
+</Fragment>`;
 
       const result = formatFromString(input);
 
