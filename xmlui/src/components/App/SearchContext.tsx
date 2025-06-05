@@ -38,7 +38,7 @@ export const useSearchContextUpdater = () => {
 };
 
 export const useSearchContextContent = () => {
-  return useContextSelector(SearchContext, (value) => value.content);
+  return useContextSelector(SearchContext, (value) => value?.content);
 };
 
 export const useSearchContextSetIndexing = () => {

@@ -8,7 +8,6 @@ import {
   useState,
   forwardRef,
   type ForwardedRef,
-  Fragment,
 } from "react";
 import {
   LinkNative,
@@ -36,7 +35,6 @@ import {
   PopoverTrigger,
   Portal,
 } from "@radix-ui/react-popover";
-import { Command } from "cmdk";
 
 type Props = {
   id?: string;
@@ -101,8 +99,6 @@ export const Search = ({
   const layout = useAppLayoutContext();
   const inDrawer = layout?.drawerVisible ?? false;
   const _root = inDrawer ? containerRef?.current?.closest(`div`) : root;
-
-  console.log(inDrawer, _root);
 
   const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
 
@@ -213,6 +209,7 @@ export const Search = ({
         if (activeIndex >= 0 && activeIndex < results.length) {
           setActiveIndex(-1);
         }
+        setShow(false);
         itemLinkRefs.current[activeIndex]?.click();
       } else if (e.key === "Escape") {
         setActiveIndex(-1);
@@ -236,82 +233,9 @@ export const Search = ({
     }
   }, [activeIndex, navigationSource]);
 
-  //console.log(activeIndex, results.length);
-
-  /* const WrapperNode = ({ inDrawer, children }: { inDrawer: boolean; children: React.ReactNode }) => {
-    if (inDrawer) {
-      return <div ref={containerRef}>{children}</div>;
-    }
-    return <div>{children}</div>;
-  }; */
-  /* if (inDrawer) {
-    return (
-      <div ref={containerRef}>
-        <VisuallyHidden>
-          <label htmlFor={inputId}>Search Field</label>
-        </VisuallyHidden>
-        <TextBox
-          id={inputId}
-          ref={inputRef}
-          type="search"
-          placeholder="Type to search..."
-          value={inputValue}
-          style={{ height: "36px", width: "100%" }}
-          startIcon="search"
-          onDidChange={(value) =>
-            setInputValue(() => {
-              setActiveIndex(-1);
-              return value;
-            })
-          }
-          onFocus={() => setShow(true)}
-          onKeyDown={handleKeyDown}
-          aria-autocomplete="list"
-          aria-controls="dropdown-list"
-          aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
-        />
-        {show && results && results.length === 0 && (
-          <Text variant="secondary">No results</Text>
-        )}
-        {show && results && results.length > 0 && (
-          <div className={classnames(styles.listPanel, styles.inDrawer)}>
-            <ul className={styles.list} role="listbox">
-              {results.map((result, idx) => {
-                return (
-                  <li
-                    role="option"
-                    key={`${result.item.path}-${idx}`}
-                    className={classnames(styles.item, styles.header, {
-                      [styles.keyboardFocus]: activeIndex === idx,
-                    })}
-                    onMouseEnter={() => {
-                      setActiveIndex(idx);
-                      setNavigationSource("mouse");
-                    }}
-                    ref={(el) => (itemRefs.current[idx] = el!)}
-                    aria-selected={activeIndex === idx}
-                  >
-                    <SearchItemContent
-                      ref={(el) => (itemLinkRefs.current[idx] = el!)}
-                      idx={idx}
-                      item={result.item}
-                      matches={result.matches}
-                      maxContentMatchNumber={maxContentMatchNumber}
-                      onClick={onClick}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-      </div>
-    );
-  } */
-
   return (
     <Popover open={show} onOpenChange={setShow}>
-      <div>
+      <div ref={containerRef} className={styles.container}>
         <VisuallyHidden>
           <label htmlFor={inputId}>Search Field</label>
         </VisuallyHidden>
@@ -322,7 +246,7 @@ export const Search = ({
             type="search"
             placeholder="Type to search..."
             value={inputValue}
-            style={{ height: "36px", width: "280px" }}
+            style={{ height: "36px", width: inDrawer ? "100%" : "280px" }}
             startIcon="search"
             onDidChange={(value) =>
               setInputValue(() => {
@@ -330,7 +254,9 @@ export const Search = ({
                 return value;
               })
             }
-            onFocus={() => setShow(true)}
+            onFocus={() => {
+              if (debouncedValue.length > 0) setShow(true);
+            }}
             onKeyDown={handleKeyDown}
             aria-autocomplete="list"
             aria-controls="dropdown-list"
@@ -338,8 +264,8 @@ export const Search = ({
           />
         </PopoverTrigger>
         <PopoverAnchor />
-        {show && results && results.length > 0 && (
-          <Portal container={root}>
+        {show && results && (
+          <Portal container={_root}>
             <PopoverContent
               align="end"
               onOpenAutoFocus={(e) => e.preventDefault()}
@@ -348,34 +274,42 @@ export const Search = ({
                 [styles.inDrawer]: inDrawer,
               })}
             >
-              <ul className={styles.list} role="listbox">
-                {results.map((result, idx) => {
-                  return (
-                    <li
-                      role="option"
-                      key={`${result.item.path}-${idx}`}
-                      className={classnames(styles.item, styles.header, {
-                        [styles.keyboardFocus]: activeIndex === idx,
-                      })}
-                      onMouseEnter={() => {
-                        setActiveIndex(idx);
-                        setNavigationSource("mouse");
-                      }}
-                      ref={(el) => (itemRefs.current[idx] = el!)}
-                      aria-selected={activeIndex === idx}
-                    >
-                      <SearchItemContent
-                        ref={(el) => (itemLinkRefs.current[idx] = el!)}
-                        idx={idx}
-                        item={result.item}
-                        matches={result.matches}
-                        maxContentMatchNumber={maxContentMatchNumber}
-                        onClick={onClick}
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
+              {debouncedValue && (
+                <ul className={styles.list} role="listbox">
+                  {results.length > 0 &&
+                    results.map((result, idx) => {
+                      return (
+                        <li
+                          role="option"
+                          key={`${result.item.path}-${idx}`}
+                          className={classnames(styles.item, styles.header, {
+                            [styles.keyboardFocus]: activeIndex === idx,
+                          })}
+                          onMouseEnter={() => {
+                            setActiveIndex(idx);
+                            setNavigationSource("mouse");
+                          }}
+                          ref={(el) => (itemRefs.current[idx] = el!)}
+                          aria-selected={activeIndex === idx}
+                        >
+                          <SearchItemContent
+                            ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                            idx={idx}
+                            item={result.item}
+                            matches={result.matches}
+                            maxContentMatchNumber={maxContentMatchNumber}
+                            onClick={onClick}
+                          />
+                        </li>
+                      );
+                    })}
+                  {results.length === 0 && (
+                    <div className={styles.noResults}>
+                      <Text variant="em">No results</Text>
+                    </div>
+                  )}
+                </ul>
+              )}
             </PopoverContent>
           </Portal>
         )}

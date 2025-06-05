@@ -25,6 +25,7 @@ type Props = {
   onDidChange?: (newValue: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   registerComponentApi?: RegisterComponentApiFn;
   startText?: string;
   startIcon?: string;
@@ -56,6 +57,7 @@ export const TextBox = forwardRef(function TextBox(
     onDidChange = noop,
     onFocus = noop,
     onBlur = noop,
+    onKeyDown = noop,
     registerComponentApi,
     startText,
     startIcon,
@@ -174,6 +176,7 @@ export const TextBox = forwardRef(function TextBox(
           onChange={onInputChange}
           onFocus={handleOnFocus}
           onBlur={handleOnBlur}
+          onKeyDown={onKeyDown}
           ref={inputRef}
           readOnly={readOnly}
           autoFocus={autoFocus}

@@ -3,7 +3,9 @@ import { Search, defaultProps } from "./Search";
 import styles from "./Search.module.scss";
 
 const COMP = "Search";
-const COMP_ITEM = "SearchItem";
+const COMP_PANEL = `${COMP}Panel`;
+const COMP_ITEM = `${COMP}Item`;
+
 export const SearchMd = createMetadata({
   description: `The \`${COMP}\` component provides a search component.`,
   status: "experimental",
@@ -19,20 +21,20 @@ export const SearchMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "$color-surface-0",
-    [`borderRadius-${COMP}`]: "8px",
-    [`borderWidth-${COMP}`]: "1px",
-    [`borderStyle-${COMP}`]: "solid",
-    [`borderColor-${COMP}`]: "#E2E5EA",
-    [`boxShadow-${COMP}`]: "$boxShadow-md",
+    [`backgroundColor-${COMP_PANEL}`]: "$color-surface-0",
+    [`borderRadius-${COMP_PANEL}`]: "8px",
+    [`borderWidth-${COMP_PANEL}`]: "1px",
+    [`borderStyle-${COMP_PANEL}`]: "solid",
+    [`borderColor-${COMP_PANEL}`]: "$color-surface-200",
+    [`boxShadow-${COMP_PANEL}`]: "$boxShadow-md",
 
     [`backgroundColor-${COMP_ITEM}--hover`]: "$color-primary-50",
     [`borderColor-${COMP_ITEM}--focus`]: "$color-primary-400",
     [`borderRadius-${COMP_ITEM}`]: "4px",
 
     dark: {
-      [`backgroundColor-${COMP}`]: "$color-surface-100",
-      [`borderColor-${COMP}`]: "$color-surface-300",
+      [`backgroundColor-${COMP_PANEL}`]: "$color-surface-100",
+      [`borderColor-${COMP_PANEL}`]: "$color-surface-300",
       [`backgroundColor-${COMP_ITEM}--hover`]: "rgba($color-primary-200-rgb, .4)",
     }
   },

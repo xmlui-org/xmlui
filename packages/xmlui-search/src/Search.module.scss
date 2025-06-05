@@ -7,26 +7,33 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$component: "Search";
-$themeVars: t.composeBorderVars($themeVars, $component);
-$themeVars: t.composePaddingVars($themeVars, $component);
-$backgroundColor-Search: createThemeVar("backgroundColor-#{$component}");
-$boxShadow-Search: createThemeVar("boxShadow-#{$component}");
+$componentContainer: "SearchContainer";
+$themeVars: t.composePaddingVars($themeVars, $componentContainer);
 
-$componentChild: "SearchItem";
-$borderRadius-SearchItem: createThemeVar("borderRadius-#{$componentChild}");
-$backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentChild}--hover");
-$borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentChild}--focus");
+$componentListPanel: "SearchPanel";
+$themeVars: t.composeBorderVars($themeVars, $componentListPanel);
+$themeVars: t.composePaddingVars($themeVars, $componentListPanel);
+$backgroundColor-Search: createThemeVar("backgroundColor-#{$componentListPanel}");
+$boxShadow-Search: createThemeVar("boxShadow-#{$componentListPanel}");
+
+$componentListItem: "SearchItem";
+$borderRadius-SearchItem: createThemeVar("borderRadius-#{$componentListItem}");
+$backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentListItem}--hover");
+$borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem}--focus");
+
+.container {
+  @include t.paddingVars($themeVars, $componentContainer);
+}
 
 .listPanel {
-  @include t.borderVars($themeVars, $component);
-  @include t.paddingVars($themeVars, $component);
+  @include t.borderVars($themeVars, $componentListPanel);
+  @include t.paddingVars($themeVars, $componentListPanel);
   overflow: hidden;
-  max-width: 580px;
+  width: 580px;
 
   &.inDrawer {
-    width: 100%;
-    max-width: unset;
+    width: var(--radix-popover-trigger-width);
+    z-index: 1;
   }
 }
 
@@ -40,7 +47,14 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentChild}--
   padding: 0.75rem;
 }
 
+.noResults {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .item {
+  list-style: none;
   padding-top: 0.4rem;
   padding-bottom: 0.4rem;
   padding-inline: 0.75rem;

@@ -6,15 +6,18 @@
         <AppHeader>
             <property name="logoTemplate">
                 <Link to="/" height="100%">
-                    <Logo padding="$space-3" paddingLeft="0"/>
+                    <Logo padding="$space-3" paddingLeft="0" />
                 </Link>
             </property>
             <SpaceFiller/>
-            <XMLUIExtensions:Search data="{appGlobals.plainTextContent}"/>
+            <XMLUIExtensions:Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
             <ToneChangerButton/>
         </AppHeader>
 
         <NavPanel>
+            <Stack paddingHorizontal="$space-4" when="{mediaSize.sizeIndex <= 2}">
+                <XMLUIExtensions:Search data="{appGlobals.plainTextContent}" />
+            </Stack>
             <NavGroup label="Learn XMLUI" initiallyExpanded="{true}">
                 <NavLink label="Introduction" to="/"/>
                 <NavLink label="Reactive Data" to="/reactive-intro"/>
