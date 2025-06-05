@@ -1,5 +1,0 @@
-<VStack>
-  <IncButton />
-  <IncButton label="Another increment button" />
-  <IncButton label="Click to increment with 3" increment="3" />
-</VStack>
