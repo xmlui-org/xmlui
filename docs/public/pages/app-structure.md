@@ -62,7 +62,8 @@ You can deploy this tree structure (minus the optional `api.json`, `data.db`, an
 
 ## index.html
 
-```<!DOCTYPE html>
+```html
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -138,39 +139,31 @@ You can copy this structure to any webserver configured to serve `index.html` an
 
 Your app can run from an AWS bucket. Here's the minimal app served that way: [http://xmlui-minimal.s3-website-us-east-1.amazonaws.com/](http://xmlui-minimal.s3-website-us-east-1.amazonaws.com/).
 
-<details>
-<summary>AWS recipe</summary>
-<ul>
-<li>Upload xmlui-minimal folder to an AWS bucket
-<li>In Permissions, turn off the 'Block public access' setting
-<li>In Permissions, allow 'PublicRead'
-<pre>
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicRead",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::xmlui-minimal/*"
-        }
-    ]
-}
-</pre>
-<li>In Properties, turn on 'Static website hosting' and set 'index.html' as the default
-</ul>
-</details>
+> [!INFO] **AWS recipe**
+> - Upload xmlui-minimal folder to an AWS bucket
+> - In Permissions, turn off the 'Block public access' setting
+> - In Permissions, allow 'PublicRead'
+> ```
+> {
+>     "Version": "2012-10-17",
+>     "Statement": [
+>         {
+>             "Sid": "PublicRead",
+>             "Effect": "Allow",
+>             "Principal": "*",
+>             "Action": "s3:GetObject",
+>             "Resource": "arn:aws:s3:::xmlui-minimal/*"
+>         }
+>     ]
+> }
+> ```
+> - In Properties, turn on 'Static website hosting' and set 'index.html' as the default
 
 ### Use Netlify
 
 You can just drag-and-drop the folder to Netlify: [https://xmlui-minimal.netlify.app/](https://xmlui-minimal.netlify.app/).
 
-<details>
-<summary>Netlify recipe</summary>
-<ul>
-<li>Go to <a href="https://app.netlify.com/drop">https://app.netlify.com/drop</a>
-<li>Drag the xmlui-minimal folder to the drop target
-<li>Rename the appIn Permissions, allow 'PublicRead'
-</ul>
-</details>
+> [!INFO] **Netlify recipe**
+> - Go to <a href="https://app.netlify.com/drop">https://app.netlify.com/drop</a>
+> - Drag the xmlui-minimal folder to the drop target
+> - Rename the appIn Permissions, allow 'PublicRead'

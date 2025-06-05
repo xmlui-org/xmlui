@@ -2,7 +2,39 @@
 
 With XMLUI you can go a long way without coding anything more than small JavaScript snippets like those we've seen in the [Markup](/markup) chapter.
 
-![js snippets](/resources/js-snippets.png)
+An expression:
+
+```xmlui !/{ 6 * 7 }/
+<Text value="Life, the universe, and everything: { 6 * 7 }" />
+```
+
+A statement:
+
+```xmlui !/{ count++ }/
+<Button label="Click to increment the count">
+  <event name="click">
+    { count++ }
+  </event>
+</Button>
+```
+
+An object literal:
+
+```xmlui !/{ station: "Brixton", wifi: true, toilets: false }/
+<Form 
+  data='{{ station: "Brixton", wifi: true, toilets: false }}'
+  onSubmit="() => { preview.setValue(JSON.stringify($data)) }"
+>
+```
+
+A function call:
+
+```xmlui !/() => { preview.setValue(JSON.stringify($data)) }/
+<Form 
+  data='{{ station: "Brixton", wifi: true, toilets: false }}'
+  onSubmit="() => { preview.setValue(JSON.stringify($data)) }"
+>
+```
 
 The last example uses a JavaScript [arrow function expression](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions), a concise way to define and use a function in an XMLUI attribute. The function receives the value of a selected theme in the `newTheme` argument (a name of your choosing) and calls the [global](/globals) `setTheme` function with that value.
 
@@ -16,7 +48,9 @@ window.transformStops = function(stops) {
   // Helper to extract a value from additionalProperties by key
     function getProp(key) {
       if (!stop.additionalProperties) return '';
-      var propObj = stop.additionalProperties.find(function(p) { return p.key === key; });
+      var propObj = stop.additionalProperties.find(function(p) { 
+        return p.key === key; 
+      });
       return propObj ? propObj.value : '';
     }
     return {
@@ -92,7 +126,7 @@ Here's an example of the transformed output.
 
 We defined the function in XMLUI's `index.html` like so:
 
-```
+```html
 <script>
   window.transformStops = function(stops) {
     ...
@@ -109,7 +143,8 @@ function transformStops(stops) {
   return stops.map(stop => {
     // Helper to extract a value from additionalProperties by key
     const getProp = (key) => {
-      const prop = stop.additionalProperties && stop.additionalProperties.find(p => p.key === key);
+      const prop = stop.additionalProperties && 
+        stop.additionalProperties.find(p => p.key === key);
       return prop ? prop.value : '';
     };
     return {

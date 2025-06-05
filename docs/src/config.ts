@@ -6,6 +6,10 @@ import js from "@shikijs/langs/javascript";
 // @ts-ignore
 import json from "@shikijs/langs/json";
 
+// @ts-ignore
+import html from "@shikijs/langs/html";
+
+
 import xmluiGrammar from "./syntax/grammar.tmLanguage.json";
 import xmluiThemeLight from "./syntax/textMate/xmlui-light.json";
 import xmluiThemeDark from "./syntax/textMate/xmlui-dark.json";
@@ -42,7 +46,7 @@ Object.keys(pagesRuntime).map((filePath) => {
 
 const shikiHighlighter = createHighlighterCoreSync({
   // @ts-ignore
-  langs: [js, json, xmluiGrammar],
+  langs: [js, json, html, xmluiGrammar],
   // @ts-ignore
   themes: [xmluiThemeLight, xmluiThemeDark],
   engine: createJavaScriptRegexEngine(),

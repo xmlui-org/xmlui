@@ -54,21 +54,11 @@
 
         <Pages>
             <Page url="/">
-                <DocumentPage
-                    hideToc="true"
-                    url="/pages/intro.md"
-                    nextLink="/reactive-intro"
-                    nextTitle="Reactive Data"/>
+                <DocumentPage hideToc="true" url="/pages/intro.md" />
             </Page>
 
             <Page url="/reactive-intro">
-                <DocumentPage
-                    hideToc="true"
-                    url="/pages/reactive-intro.md"
-                    prevLink="/"
-                    prevTitle="Introduction"
-                    nextLink="/components-intro"
-                    nextTitle="Components"/>
+                <DocumentPage hideToc="true" url="/pages/reactive-intro.md"/>
             </Page>
 
             <Page url="/components-intro">
@@ -129,32 +119,16 @@
                 <Palettes/>
             </Page>
             <Page url="/context-variables">
-                <DocumentPage 
-                    url="/pages/context-variables.md"
-                    nextLink="/globals"
-                    nextTitle="Globals" />
+                <DocumentPage url="/pages/context-variables.md" />
             </Page>
             <Page url="/globals">
-                <DocumentPage url="pages/globals.md"
-                    prevLink="/context-variables"
-                    prevTitle="Context Variables"
-                    nextLink="/palettes"
-                    nextTitle="Palettes" />
+                <DocumentPage url="pages/globals.md" />
             </Page>
             <Page url="/glossary">
-                <DocumentPage url="/pages/glossary.md"
-                    hideToc="true"
-                    prevLink="/icons"
-                    prevTitle="Icons"
-                    nextLink="/xmlui-theme"
-                    nextTitle="Theme Variable Defaults"/>
+                <DocumentPage hideToc="true" url="/pages/glossary.md" />
             </Page>
             <Page url="/xmlui-theme">
-                <DocumentPage 
-                    hideToc="true"
-                    url="/pages/xmlui-theme.md"
-                    prevLink="/glossary"
-                    prevTitle="Glossary"/>
+                <DocumentPage hideToc="true" url="/pages/xmlui-theme.md" />
             </Page>
             <Page url="/test">
                 <Test/>

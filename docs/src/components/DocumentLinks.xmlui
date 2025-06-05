@@ -1,4 +1,6 @@
 <Component name="DocumentLinks">
+  <!-- 
+    We tempoprarily removed document links.
   <Theme 
     textDecorationLine-Link="none" 
     textColor-Link="$textColor-DocumentLinks" 
@@ -23,4 +25,5 @@
       </Link>
     </HStack>
   </Theme>
+  -->
 </Component>
