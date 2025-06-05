@@ -7,22 +7,25 @@ export const DefaultDocsTheme: ThemeDefinition = {
   themeVars: {
     // NOTE: All of these theme vars should be assessed whether to have them in the default theme
 
+    "color-primary": "#3367CC",
     "color-surface": "#1e2734",
-    borderColor: "$color-secondary-100",
+    "borderColor": "$color-surface-100",
 
     fontFamily: "Inter, -apple-system, 'system-ui', 'San Francisco', 'Segoe UI', sans-serif",
     "font-feature-settings": "'cv03', 'cv04', 'cv11'",
     "maxWidth-App": "1320px",
 
+
     "maxWidth-content": "1200px",
     "boxShadow-navPanel-App": "none",
-    /*    "boxShadow-header-App": "none",*/
+    "boxShadow-header-App": "none",
     "backgroundColor-content-App": "$color-surface-0",
     backgroundColor: "$color-surface-0",
 
     "textColor-Text-marked": "$color-primary-500",
 
     // --- AppHeader
+    "borderBottom-AppHeader": "1px solid $color-surface-200",
     "paddingInline-AppHeader": "$space-4",
     "paddingTop-logo-AppHeader": "$space-3",
     "paddingBottom-logo-AppHeader": "$space-3",
