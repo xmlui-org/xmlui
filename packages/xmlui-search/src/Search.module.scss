@@ -20,6 +20,10 @@ $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$component
 .searchInput {
   height: 36px;
   width: 280px;
+
+  &.inDrawer {
+    width: 100%;
+  }
 }
 
 .dropdownPanel {
@@ -27,6 +31,11 @@ $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$component
   @include t.paddingVars($themeVars, $component);
   overflow: hidden;
   max-width: 580px;
+
+  &.inDrawer {
+    width: var(--radix-popover-trigger-width);
+	  max-height: var(--radix-popover-content-available-height);
+  }
 }
 
 .listContainer {
@@ -46,6 +55,7 @@ $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$component
   border-radius: $borderRadius-SearchItem;
   cursor: pointer;
 
+  &.hover,
   &:hover {
     background-color: $backgroundColor-SearchItem--hover;
   }
@@ -61,6 +71,11 @@ $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$component
     }
   }
 
+  // Ensures the underlying link is visible on programmatic hover
+  &.hover > a {
+    color: var(--xmlui-textColor-primary);
+  }
+
   & > a .snippet {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
@@ -72,67 +87,6 @@ $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$component
 
   &.content {}
 }
-
-// --- TEMP
-/* .list {
-  @include t.borderVars($themeVars, $component);
-  @include t.paddingVars($themeVars, $component);
-  position: absolute;
-  right: 0;
-  z-index: 1;
-  padding: 0.75rem;
-  margin-top: 2px;
-  background-color: $backgroundColor-Search;
-  box-shadow: $boxShadow-Search;
-  border-radius: 4px;
-  max-height: 360px;
-  overflow-y: auto;
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  width: 500px;
-
-  .item {
-    list-style: none;
-    padding-top: 0.4rem;
-    padding-bottom: 0.4rem;
-    padding-inline: 0.75rem;
-
-    &:hover {
-      background-color: $backgroundColor-SearchItem--hover;
-    }
-
-    & > a {
-      color: var(--xmlui-textColor-primary);
-
-      &:hover {
-        color: var(--xmlui-textColor-primary);
-      }
-      &:active {
-        color: var(--xmlui-textColor-primary);
-      }
-    }
-
-    & > a .snippet {
-      padding-top: 0.25rem;
-      padding-bottom: 0.25rem;
-    }
-
-    &.header:has(+ .content):not(:first-child) {
-      margin-top: 0.5rem;
-    }
-
-    &.content {}
-  } */
-
-  /* .divider {
-    border-top: 2px solid var(--xmlui-color-secondary-300);
-    width: 100%;
-    margin-top: 4px;
-    margin-bottom: 4px;
-    padding-inline: 12px;
-  }
-}*/
-// --- TEMP END
 
 :export{
   themeVars: t.json-stringify($themeVars)

@@ -2,10 +2,12 @@ import {
   useCallback,
   useDeferredValue,
   useId,
-  useLayoutEffect,
+  useEffect,
   useMemo,
   useRef,
   useState,
+  forwardRef,
+  type ForwardedRef
 } from "react";
 import {
   LinkNative,
@@ -14,7 +16,7 @@ import {
   useSearchContextContent,
   useTheme,
   VisuallyHidden,
-  useAppLayoutContext
+  useAppLayoutContext,
 } from "xmlui";
 import type {
   FuseOptionKeyObject,
@@ -87,12 +89,17 @@ export const Search = ({
   const inputId = id || _id;
   const { root } = useTheme();
   const inputRef = useRef<HTMLInputElement>(null);
+  const itemRefs = useRef<HTMLLIElement[]>([]);
+  const itemLinkRefs = useRef<HTMLDivElement[]>([]);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
 
   const layout = useAppLayoutContext();
   const inDrawer = layout?.isInDrawer?.(inputRef) ?? false;
+
+  const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
 
   // render-related state
   const [show, setShow] = useState(false);
@@ -178,23 +185,53 @@ export const Search = ({
     return mapped;
   }, [debouncedValue, fuse, limit]);
 
-  // render related hooks
-  useLayoutEffect(() => {
-    const handler = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setShow(false);
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => {
-      document.removeEventListener("keydown", handler);
-    };
-  }, []);
-
   const onClick = useCallback(() => {
     setInputValue("");
+    setActiveIndex(-1);
     setShow(false);
   }, []);
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (!show) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev + 1) % results.length);
+        setNavigationSource("keyboard");
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev <= 0 ? results.length - 1 : prev - 1));
+        setNavigationSource("keyboard");
+      } else if (e.key === "Enter") {
+        if (activeIndex >= 0 && activeIndex < results.length) {
+          setActiveIndex(-1);
+        }
+        itemLinkRefs.current[activeIndex]?.click();
+      } else if (e.key === "Escape") {
+        setActiveIndex(-1);
+        setShow(false);
+      }
+    },
+    [activeIndex, results.length, show],
+  );
+
+  useEffect(() => {
+    if (
+      navigationSource === "keyboard" &&
+      activeIndex >= 0 &&
+      itemRefs.current[activeIndex] &&
+      typeof itemRefs.current[activeIndex].scrollIntoView === "function"
+    ) {
+      itemRefs.current[activeIndex].scrollIntoView({
+        block: "nearest",
+        behavior: "instant",
+      });
+    }
+  }, [activeIndex, navigationSource]);
+
+  console.log(activeIndex, results.length);
 
   /* return (
     <div style={{ position: "relative" }}>
@@ -238,59 +275,75 @@ export const Search = ({
           <label htmlFor={inputId}>Search Field</label>
         </VisuallyHidden>
         <PopoverTrigger asChild>
-          <CommandInput
+          <TextBox
             id={inputId}
             ref={inputRef}
-            typeof="search"
+            type="search"
             placeholder="Type to search..."
             value={inputValue}
-            className={classnames(styles.searchInput, {
-              [styles.inDrawer]: inDrawer,
-            })}
-            onValueChange={setInputValue}
-            onKeyDown={(event) => {
-              if (event.key === "ArrowDown") {
-                setShow(true);
-              }
-            }}
+            style={{ height: "36px", width: inDrawer ? "100%" : "280px" }}
+            startIcon="search"
+            onDidChange={(value) =>
+              setInputValue(() => {
+                setActiveIndex(-1);
+                return value;
+              })
+            }
+            onFocus={() => setShow(true)}
+            onKeyDown={handleKeyDown}
+            aria-autocomplete="list"
+            aria-controls="dropdown-list"
+            aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
           />
         </PopoverTrigger>
         <PopoverAnchor />
-        {results.length > 0 &&
+        {show && results && results.length > 0 && (
           <Portal container={root}>
             <PopoverContent
               align="end"
               onOpenAutoFocus={(e) => e.preventDefault()}
+              onEscapeKeyDown={() => setShow(false)}
               className={classnames(styles.dropdownPanel, {
                 [styles.inDrawer]: inDrawer,
               })}
             >
-              <CommandList className={styles.listContainer}>
-                <CommandGroup>
-                  {results.map((result, idx) => {
-                    return (
-                      <CommandItem key={`${result.item.path}-${idx}`} value={result.item.title}>
-                        <SearchItem
-                          key={`${result.item.path}-${idx}`}
-                          idx={idx}
-                          item={result.item}
-                          matches={result.matches}
-                          maxContentMatchNumber={maxContentMatchNumber}
-                          onClick={onClick}
-                        />
-                      </CommandItem>
-                    );
-                  })}
-                </CommandGroup>
-              </CommandList>
-            </PopoverContent>,
-          </Portal>}
+              <ul className={styles.listContainer} role="listbox">
+                {results.map((result, idx) => {
+                  return (
+                    <li
+                      role="option"
+                      key={`${result.item.path}-${idx}`}
+                      className={classnames(styles.item, styles.header, {
+                        [styles.hover]: activeIndex === idx,
+                      })}
+                      onMouseEnter={() => {
+                        setActiveIndex(idx);
+                        setNavigationSource("mouse");
+                      }}
+                      ref={(el) => (itemRefs.current[idx] = el!)}
+                      aria-selected={activeIndex === idx}
+                    >
+                      <SearchItemContent
+                        ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                        idx={idx}
+                        item={result.item}
+                        matches={result.matches}
+                        maxContentMatchNumber={maxContentMatchNumber}
+                        onClick={onClick}
+                      />
+                    </li>
+                  );
+                })}
+              </ul>
+            </PopoverContent>
+          </Portal>
+        )}
       </Command>
     </Popover>
   );
 };
 
-type SearchItemProps = SearchResult & {
+type SearchItemContentProps = SearchResult & {
   idx: string | number;
   maxContentMatchNumber?: number;
   onClick?: () => void;
@@ -301,51 +354,54 @@ type SearchItemProps = SearchResult & {
  * Use the `item` prop to access the data original data.
  *
  */
-function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: SearchItemProps) {
+const SearchItemContent = forwardRef(function SearchItemContent({
+  idx,
+  item,
+  matches,
+  maxContentMatchNumber,
+  onClick,
+}: SearchItemContentProps, forwardedRef: ForwardedRef<HTMLDivElement>,) {
   return (
-    <div key={`${item.path}-${idx}`} className={`${styles.item} ${styles.header}`}>
-      <LinkNative
-        to={item.path}
-        onClick={onClick}
-        style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
-      >
-        <div style={{ width: "100%" }}>
-          <Text variant="subtitle">
-            <Text variant="strong">
-              {highlightText(item.title, matches?.title?.indices) || item.title}
-            </Text>
+    <LinkNative
+      ref={forwardedRef}
+      to={item.path}
+      onClick={onClick}
+      style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
+    >
+      <div style={{ width: "100%" }}>
+        <Text variant="subtitle">
+          <Text variant="strong">
+            {highlightText(item.title, matches?.title?.indices) || item.title}
           </Text>
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            {matches?.content?.indices &&
-              formatContentSnippet(
-                item.content,
-                matches.content.indices,
-                maxContentMatchNumber,
-              ).map((snippet, snipIdx) => (
+        </Text>
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {matches?.content?.indices &&
+            formatContentSnippet(item.content, matches.content.indices, maxContentMatchNumber).map(
+              (snippet, snipIdx) => (
                 <div key={`${item.path}-${idx}-${snipIdx}`} className={styles.snippet}>
                   <Text>{snippet}</Text>
                 </div>
-              ))}
-          </div>
-          {/* Display the number of other matches if there are any */}
-          {matches?.content?.indices && (
-            <Text variant="em">
-              <Text variant="secondary">
-                {`${pluralize(matches?.content?.indices.length, "match", "matches")} in this article`}
-              </Text>
-            </Text>
-          )}
+              ),
+            )}
         </div>
-      </LinkNative>
-    </div>
+        {/* Display the number of other matches if there are any */}
+        {matches?.content?.indices && (
+          <Text variant="em">
+            <Text variant="secondary">
+              {`${pluralize(matches?.content?.indices.length, "match", "matches")} in this article`}
+            </Text>
+          </Text>
+        )}
+      </div>
+    </LinkNative>
   );
-}
+});
 
 // --- Utilities
 
