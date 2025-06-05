@@ -14,6 +14,7 @@ import {
   useSearchContextContent,
   useTheme,
   VisuallyHidden,
+  useAppLayoutContext
 } from "xmlui";
 import type {
   FuseOptionKeyObject,
@@ -24,8 +25,8 @@ import type {
 } from "fuse.js";
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
-
-import { Command, CommandInput, CommandItem, CommandList } from "cmdk";
+import classnames from "classnames";
+import { Command, CommandInput, CommandItem, CommandList, CommandGroup } from "cmdk";
 import {
   Popover,
   PopoverAnchor,
@@ -85,12 +86,16 @@ export const Search = ({
   const _id = useId();
   const inputId = id || _id;
   const { root } = useTheme();
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
 
+  const layout = useAppLayoutContext();
+  const inDrawer = layout?.isInDrawer?.(inputRef) ?? false;
+
   // render-related state
   const [show, setShow] = useState(false);
-  const targetRef = useRef<HTMLInputElement>(null);
 
   // --- Step 2: Convert data to a format better handled by the search engine
   const dataFromMd = useMemo(
@@ -110,7 +115,7 @@ export const Search = ({
   );
 
   const mergedData = useMemo(() => {
-    return [...dataFromMd, ...Object.values(content)];
+    return [...dataFromMd, ...Object.values(content ?? {})];
   }, [content, dataFromMd]);
 
   const fuse = useMemo(() => {
@@ -191,6 +196,41 @@ export const Search = ({
     setShow(false);
   }, []);
 
+  /* return (
+    <div style={{ position: "relative" }}>
+      <VisuallyHidden>
+        <label htmlFor={inputId}>Search Field</label>
+      </VisuallyHidden>
+      <TextBox
+        id={inputId}
+        ref={inputRef}
+        type="search"
+        placeholder="Type to search..."
+        value={inputValue}
+        style={{ height: "36px", width: "280px" }}
+        startIcon="search"
+        onDidChange={(value) =>
+          setInputValue(value)
+        }
+        onFocus={() => setShow(true)}
+      />
+      {show && results && results.length > 0 && (
+        <ul className={styles.list}>
+          {results.map((result, idx) => (
+            <SearchItem
+              key={`${result.item.path}-${idx}`}
+              idx={idx}
+              item={result.item}
+              matches={result.matches}
+              maxContentMatchNumber={maxContentMatchNumber}
+              onClick={onClick}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
+  ); */
+
   return (
     <Popover open={show} onOpenChange={setShow}>
       <Command shouldFilter={false}>
@@ -200,52 +240,51 @@ export const Search = ({
         <PopoverTrigger asChild>
           <CommandInput
             id={inputId}
+            ref={inputRef}
             typeof="search"
             placeholder="Type to search..."
             value={inputValue}
-            className={styles.searchInput}
+            className={classnames(styles.searchInput, {
+              [styles.inDrawer]: inDrawer,
+            })}
             onValueChange={setInputValue}
             onKeyDown={(event) => {
               if (event.key === "ArrowDown") {
                 setShow(true);
               }
-              if (event.key === "Enter") {
-                setShow((prev) => !prev);
-              }
             }}
           />
         </PopoverTrigger>
         <PopoverAnchor />
-        {results.length > 0 && (
+        {results.length > 0 &&
           <Portal container={root}>
             <PopoverContent
               align="end"
               onOpenAutoFocus={(e) => e.preventDefault()}
-              className={styles.dropdownPanel}
+              className={classnames(styles.dropdownPanel, {
+                [styles.inDrawer]: inDrawer,
+              })}
             >
               <CommandList className={styles.listContainer}>
-                {results.map((result, idx) => {
-                  return (
-                    <CommandItem
-                      key={`${result.item.path}-${idx}`}
-                      value={result.item.title}
-                      /* onSelect={() => itemRef.current?.click()} */
-                    >
-                      <SearchItem
-                        key={`${result.item.path}-${idx}`}
-                        idx={idx}
-                        item={result.item}
-                        matches={result.matches}
-                        maxContentMatchNumber={maxContentMatchNumber}
-                        onClick={onClick}
-                      />
-                    </CommandItem>
-                  );
-                })}
+                <CommandGroup>
+                  {results.map((result, idx) => {
+                    return (
+                      <CommandItem key={`${result.item.path}-${idx}`} value={result.item.title}>
+                        <SearchItem
+                          key={`${result.item.path}-${idx}`}
+                          idx={idx}
+                          item={result.item}
+                          matches={result.matches}
+                          maxContentMatchNumber={maxContentMatchNumber}
+                          onClick={onClick}
+                        />
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
               </CommandList>
-            </PopoverContent>
-          </Portal>
-        )}
+            </PopoverContent>,
+          </Portal>}
       </Command>
     </Popover>
   );
