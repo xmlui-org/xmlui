@@ -277,13 +277,15 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
 .chevron {
   display: inline-block;
-  fill: $rdp-accent-color;
+  fill: currentColor;
 }
 
 .root[dir="rtl"] .nav .chevron {
   transform: rotate(180deg);
   transform-origin: 50%;
 }
+
+
 
 .dropdowns {
   position: relative;
@@ -313,6 +315,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   position: relative;
   display: inline-flex;
   align-items: center;
+  padding: t.$space-1_5;
 
   &:hover {
     background-color: $backgroundColor-item-DatePicker--hover;
