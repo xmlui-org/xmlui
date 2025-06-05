@@ -20,15 +20,18 @@ export const SearchMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$color-surface-0",
-    [`borderRadius-${COMP}`]: "4px",
+    [`borderRadius-${COMP}`]: "8px",
     [`borderWidth-${COMP}`]: "1px",
     [`borderStyle-${COMP}`]: "solid",
-    [`borderColor-${COMP}`]: "$color-surface-300",
-    [`backgroundColor-${COMP_ITEM}--hover`]: "$color-primary-50",
+    [`borderColor-${COMP}`]: "#E2E5EA",
     [`boxShadow-${COMP}`]: "$boxShadow-md",
+
+    [`backgroundColor-${COMP_ITEM}--hover`]: "$color-primary-50",
+    [`borderRadius-${COMP_ITEM}`]: "4px",
 
     dark: {
       [`backgroundColor-${COMP}`]: "$color-surface-100",
+      [`borderColor-${COMP}`]: "$color-surface-300",
     }
   },
 });

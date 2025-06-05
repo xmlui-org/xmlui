@@ -1,14 +1,20 @@
 import {
   useCallback,
   useDeferredValue,
-  useEffect,
   useId,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { LinkNative, Text, TextBox, useSearchContextContent, VisuallyHidden } from "xmlui";
+import {
+  LinkNative,
+  Text,
+  TextBox,
+  useSearchContextContent,
+  useTheme,
+  VisuallyHidden,
+} from "xmlui";
 import type {
   FuseOptionKeyObject,
   FuseResult,
@@ -19,14 +25,23 @@ import type {
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 
+import { Command, CommandInput, CommandItem, CommandList } from "cmdk";
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverTrigger,
+  Portal,
+} from "@radix-ui/react-popover";
+
 type Props = {
   id?: string;
   data: Record<string, string>;
-  limit: number;
+  limit?: number;
   maxContentMatchNumber?: number;
 };
 
-export const defaultProps: Pick<Props, "limit" | "maxContentMatchNumber"> = {
+export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
   limit: 10,
   maxContentMatchNumber: 3,
 };
@@ -69,7 +84,7 @@ export const Search = ({
   const content = useSearchContextContent();
   const _id = useId();
   const inputId = id || _id;
-  const ref = useRef<HTMLUListElement>(null);
+  const { root } = useTheme();
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
 
@@ -111,9 +126,7 @@ export const Search = ({
     setShow(debouncedValue.length > 0);
     const limited = !debouncedValue
       ? []
-      : fuse.search(debouncedValue, {
-          limit: limit,
-        });
+      : fuse.search(debouncedValue, { limit: limit ?? defaultProps.limit });
 
     const mapped = limited
       .map((result) => {
@@ -121,6 +134,7 @@ export const Search = ({
         result.matches?.forEach((match) => {
           if (match.key !== undefined) {
             const matchKey = match.key as keyof SearchItemData;
+
             mappedMatches[matchKey] = {
               indices: match.indices
                 .filter(
@@ -132,7 +146,8 @@ export const Search = ({
                     return (
                       /* index[1] - index[0] >= debouncedValue.length - 1 && */
                       result.item[matchKey]
-                        .slice(index[0], index[1] + 1).toLocaleLowerCase()
+                        .slice(index[0], index[1] + 1)
+                        .toLocaleLowerCase()
                         .includes(debouncedValue.toLocaleLowerCase())
                     );
                   },
@@ -140,7 +155,6 @@ export const Search = ({
                 // Restrict highlights that are longer than the original search term
                 .map((index) => {
                   const substr = getSubstringIndexes(result.item[matchKey], debouncedValue);
-                  if (substr) console.log(result.item[matchKey].slice(substr?.start, substr?.end));
                   return !!substr ? [substr.start, substr.end] : index;
                 }),
               value: match.value,
@@ -178,37 +192,62 @@ export const Search = ({
   }, []);
 
   return (
-    <div style={{ position: "relative" }}>
-      <VisuallyHidden>
-        <label htmlFor={inputId}>Search Field</label>
-      </VisuallyHidden>
-      <TextBox
-        id={inputId}
-        ref={targetRef}
-        type="search"
-        placeholder="Type to search..."
-        value={inputValue}
-        style={{ height: "36px", width: "280px" }}
-        startIcon="search"
-        onDidChange={(value) => setInputValue(value)}
-        onFocus={() => setShow(true)}
-      />
-      {/* --- Step 4: Render results */}
-      {show && results && results.length > 0 && (
-        <ul ref={ref} className={styles.list}>
-          {results.map((result, idx) => (
-            <SearchItem
-              key={`${result.item.path}-${idx}`}
-              idx={idx}
-              item={result.item}
-              matches={result.matches}
-              maxContentMatchNumber={maxContentMatchNumber}
-              onClick={onClick}
-            />
-          ))}
-        </ul>
-      )}
-    </div>
+    <Popover open={show} onOpenChange={setShow}>
+      <Command shouldFilter={false}>
+        <VisuallyHidden>
+          <label htmlFor={inputId}>Search Field</label>
+        </VisuallyHidden>
+        <PopoverTrigger asChild>
+          <CommandInput
+            id={inputId}
+            typeof="search"
+            placeholder="Type to search..."
+            value={inputValue}
+            className={styles.searchInput}
+            onValueChange={setInputValue}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowDown") {
+                setShow(true);
+              }
+              if (event.key === "Enter") {
+                setShow((prev) => !prev);
+              }
+            }}
+          />
+        </PopoverTrigger>
+        <PopoverAnchor />
+        {results.length > 0 && (
+          <Portal container={root}>
+            <PopoverContent
+              align="end"
+              onOpenAutoFocus={(e) => e.preventDefault()}
+              className={styles.dropdownPanel}
+            >
+              <CommandList className={styles.listContainer}>
+                {results.map((result, idx) => {
+                  return (
+                    <CommandItem
+                      key={`${result.item.path}-${idx}`}
+                      value={result.item.title}
+                      /* onSelect={() => itemRef.current?.click()} */
+                    >
+                      <SearchItem
+                        key={`${result.item.path}-${idx}`}
+                        idx={idx}
+                        item={result.item}
+                        matches={result.matches}
+                        maxContentMatchNumber={maxContentMatchNumber}
+                        onClick={onClick}
+                      />
+                    </CommandItem>
+                  );
+                })}
+              </CommandList>
+            </PopoverContent>
+          </Portal>
+        )}
+      </Command>
+    </Popover>
   );
 };
 
@@ -225,49 +264,47 @@ type SearchItemProps = SearchResult & {
  */
 function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: SearchItemProps) {
   return (
-    <>
-      <li key={`${item.path}-${idx}`} className={`${styles.item} ${styles.header}`}>
-        <LinkNative
-          to={item.path}
-          onClick={onClick}
-          style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
-        >
-          <div style={{ width: "100%" }}>
-            <Text variant="subtitle">
-              <Text variant="strong">
-                {highlightText(item.title, matches?.title?.indices) || item.title}
+    <div key={`${item.path}-${idx}`} className={`${styles.item} ${styles.header}`}>
+      <LinkNative
+        to={item.path}
+        onClick={onClick}
+        style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
+      >
+        <div style={{ width: "100%" }}>
+          <Text variant="subtitle">
+            <Text variant="strong">
+              {highlightText(item.title, matches?.title?.indices) || item.title}
+            </Text>
+          </Text>
+          <div
+            style={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            {matches?.content?.indices &&
+              formatContentSnippet(
+                item.content,
+                matches.content.indices,
+                maxContentMatchNumber,
+              ).map((snippet, snipIdx) => (
+                <div key={`${item.path}-${idx}-${snipIdx}`} className={styles.snippet}>
+                  <Text>{snippet}</Text>
+                </div>
+              ))}
+          </div>
+          {/* Display the number of other matches if there are any */}
+          {matches?.content?.indices && (
+            <Text variant="em">
+              <Text variant="secondary">
+                {`${pluralize(matches?.content?.indices.length, "match", "matches")} in this article`}
               </Text>
             </Text>
-            <div
-              style={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {matches?.content?.indices &&
-                formatContentSnippet(
-                  item.content,
-                  matches.content.indices,
-                  maxContentMatchNumber,
-                ).map((snippet, snipIdx) => (
-                  <div key={`${item.path}-${idx}-${snipIdx}`} className={styles.snippet}>
-                    <Text>{snippet}</Text>
-                  </div>
-                ))}
-            </div>
-            {/* Display the number of other matches if there are any */}
-            {matches?.content?.indices && (
-              <Text variant="em">
-                <Text variant="secondary">
-                  {`${pluralize(matches?.content?.indices.length, "match", "matches")} in this article`}
-                </Text>
-              </Text>
-            )}
-          </div>
-        </LinkNative>
-      </li>
-    </>
+          )}
+        </div>
+      </LinkNative>
+    </div>
   );
 }
 

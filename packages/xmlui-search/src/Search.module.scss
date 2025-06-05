@@ -14,10 +14,67 @@ $backgroundColor-Search: createThemeVar("backgroundColor-#{$component}");
 $boxShadow-Search: createThemeVar("boxShadow-#{$component}");
 
 $componentChild: "SearchItem";
+$borderRadius-SearchItem: createThemeVar("borderRadius-#{$componentChild}");
 $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentChild}--hover");
 
+.searchInput {
+  height: 36px;
+  width: 280px;
+}
+
+.dropdownPanel {
+  @include t.borderVars($themeVars, $component);
+  @include t.paddingVars($themeVars, $component);
+  overflow: hidden;
+  max-width: 580px;
+}
+
+.listContainer {
+  background-color: $backgroundColor-Search;
+  box-shadow: $boxShadow-Search;
+  max-height: 360px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  padding: 0.75rem;
+}
+
+.item {
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  padding-inline: 0.75rem;
+  border-radius: $borderRadius-SearchItem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $backgroundColor-SearchItem--hover;
+  }
+
+  & > a {
+    color: var(--xmlui-textColor-primary);
+
+    &:hover {
+      color: var(--xmlui-textColor-primary);
+    }
+    &:active {
+      color: var(--xmlui-textColor-primary);
+    }
+  }
+
+  & > a .snippet {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  &.header:has(+ .content):not(:first-child) {
+    margin-top: 0.5rem;
+  }
+
+  &.content {}
+}
+
 // --- TEMP
-.list {
+/* .list {
   @include t.borderVars($themeVars, $component);
   @include t.paddingVars($themeVars, $component);
   position: absolute;
@@ -65,7 +122,7 @@ $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$component
     }
 
     &.content {}
-  }
+  } */
 
   /* .divider {
     border-top: 2px solid var(--xmlui-color-secondary-300);
@@ -73,8 +130,8 @@ $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$component
     margin-top: 4px;
     margin-bottom: 4px;
     padding-inline: 12px;
-  } */
-}
+  }
+}*/
 // --- TEMP END
 
 :export{
