@@ -27,11 +27,13 @@ export const SearchMd = createMetadata({
     [`boxShadow-${COMP}`]: "$boxShadow-md",
 
     [`backgroundColor-${COMP_ITEM}--hover`]: "$color-primary-50",
+    [`borderColor-${COMP_ITEM}--focus`]: "$color-primary-400",
     [`borderRadius-${COMP_ITEM}`]: "4px",
 
     dark: {
       [`backgroundColor-${COMP}`]: "$color-surface-100",
       [`borderColor-${COMP}`]: "$color-surface-300",
+      [`backgroundColor-${COMP_ITEM}--hover`]: "rgba($color-primary-200-rgb, .4)",
     }
   },
 });

@@ -7,7 +7,8 @@ import {
   useRef,
   useState,
   forwardRef,
-  type ForwardedRef
+  type ForwardedRef,
+  Fragment,
 } from "react";
 import {
   LinkNative,
@@ -28,7 +29,6 @@ import type {
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
-import { Command, CommandInput, CommandItem, CommandList, CommandGroup } from "cmdk";
 import {
   Popover,
   PopoverAnchor,
@@ -36,6 +36,7 @@ import {
   PopoverTrigger,
   Portal,
 } from "@radix-ui/react-popover";
+import { Command } from "cmdk";
 
 type Props = {
   id?: string;
@@ -88,6 +89,7 @@ export const Search = ({
   const _id = useId();
   const inputId = id || _id;
   const { root } = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<HTMLLIElement[]>([]);
   const itemLinkRefs = useRef<HTMLDivElement[]>([]);
@@ -97,7 +99,10 @@ export const Search = ({
   const debouncedValue = useDeferredValue(inputValue);
 
   const layout = useAppLayoutContext();
-  const inDrawer = layout?.isInDrawer?.(inputRef) ?? false;
+  const inDrawer = layout?.drawerVisible ?? false;
+  const _root = inDrawer ? containerRef?.current?.closest(`div`) : root;
+
+  console.log(inDrawer, _root);
 
   const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
 
@@ -231,46 +236,82 @@ export const Search = ({
     }
   }, [activeIndex, navigationSource]);
 
-  console.log(activeIndex, results.length);
+  //console.log(activeIndex, results.length);
 
-  /* return (
-    <div style={{ position: "relative" }}>
-      <VisuallyHidden>
-        <label htmlFor={inputId}>Search Field</label>
-      </VisuallyHidden>
-      <TextBox
-        id={inputId}
-        ref={inputRef}
-        type="search"
-        placeholder="Type to search..."
-        value={inputValue}
-        style={{ height: "36px", width: "280px" }}
-        startIcon="search"
-        onDidChange={(value) =>
-          setInputValue(value)
-        }
-        onFocus={() => setShow(true)}
-      />
-      {show && results && results.length > 0 && (
-        <ul className={styles.list}>
-          {results.map((result, idx) => (
-            <SearchItem
-              key={`${result.item.path}-${idx}`}
-              idx={idx}
-              item={result.item}
-              matches={result.matches}
-              maxContentMatchNumber={maxContentMatchNumber}
-              onClick={onClick}
-            />
-          ))}
-        </ul>
-      )}
-    </div>
-  ); */
+  /* const WrapperNode = ({ inDrawer, children }: { inDrawer: boolean; children: React.ReactNode }) => {
+    if (inDrawer) {
+      return <div ref={containerRef}>{children}</div>;
+    }
+    return <div>{children}</div>;
+  }; */
+  /* if (inDrawer) {
+    return (
+      <div ref={containerRef}>
+        <VisuallyHidden>
+          <label htmlFor={inputId}>Search Field</label>
+        </VisuallyHidden>
+        <TextBox
+          id={inputId}
+          ref={inputRef}
+          type="search"
+          placeholder="Type to search..."
+          value={inputValue}
+          style={{ height: "36px", width: "100%" }}
+          startIcon="search"
+          onDidChange={(value) =>
+            setInputValue(() => {
+              setActiveIndex(-1);
+              return value;
+            })
+          }
+          onFocus={() => setShow(true)}
+          onKeyDown={handleKeyDown}
+          aria-autocomplete="list"
+          aria-controls="dropdown-list"
+          aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+        />
+        {show && results && results.length === 0 && (
+          <Text variant="secondary">No results</Text>
+        )}
+        {show && results && results.length > 0 && (
+          <div className={classnames(styles.listPanel, styles.inDrawer)}>
+            <ul className={styles.list} role="listbox">
+              {results.map((result, idx) => {
+                return (
+                  <li
+                    role="option"
+                    key={`${result.item.path}-${idx}`}
+                    className={classnames(styles.item, styles.header, {
+                      [styles.keyboardFocus]: activeIndex === idx,
+                    })}
+                    onMouseEnter={() => {
+                      setActiveIndex(idx);
+                      setNavigationSource("mouse");
+                    }}
+                    ref={(el) => (itemRefs.current[idx] = el!)}
+                    aria-selected={activeIndex === idx}
+                  >
+                    <SearchItemContent
+                      ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                      idx={idx}
+                      item={result.item}
+                      matches={result.matches}
+                      maxContentMatchNumber={maxContentMatchNumber}
+                      onClick={onClick}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+  } */
 
   return (
     <Popover open={show} onOpenChange={setShow}>
-      <Command shouldFilter={false}>
+      <div>
         <VisuallyHidden>
           <label htmlFor={inputId}>Search Field</label>
         </VisuallyHidden>
@@ -281,7 +322,7 @@ export const Search = ({
             type="search"
             placeholder="Type to search..."
             value={inputValue}
-            style={{ height: "36px", width: inDrawer ? "100%" : "280px" }}
+            style={{ height: "36px", width: "280px" }}
             startIcon="search"
             onDidChange={(value) =>
               setInputValue(() => {
@@ -303,18 +344,18 @@ export const Search = ({
               align="end"
               onOpenAutoFocus={(e) => e.preventDefault()}
               onEscapeKeyDown={() => setShow(false)}
-              className={classnames(styles.dropdownPanel, {
+              className={classnames(styles.listPanel, {
                 [styles.inDrawer]: inDrawer,
               })}
             >
-              <ul className={styles.listContainer} role="listbox">
+              <ul className={styles.list} role="listbox">
                 {results.map((result, idx) => {
                   return (
                     <li
                       role="option"
                       key={`${result.item.path}-${idx}`}
                       className={classnames(styles.item, styles.header, {
-                        [styles.hover]: activeIndex === idx,
+                        [styles.keyboardFocus]: activeIndex === idx,
                       })}
                       onMouseEnter={() => {
                         setActiveIndex(idx);
@@ -338,7 +379,7 @@ export const Search = ({
             </PopoverContent>
           </Portal>
         )}
-      </Command>
+      </div>
     </Popover>
   );
 };
@@ -354,13 +395,10 @@ type SearchItemContentProps = SearchResult & {
  * Use the `item` prop to access the data original data.
  *
  */
-const SearchItemContent = forwardRef(function SearchItemContent({
-  idx,
-  item,
-  matches,
-  maxContentMatchNumber,
-  onClick,
-}: SearchItemContentProps, forwardedRef: ForwardedRef<HTMLDivElement>,) {
+const SearchItemContent = forwardRef(function SearchItemContent(
+  { idx, item, matches, maxContentMatchNumber, onClick }: SearchItemContentProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   return (
     <LinkNative
       ref={forwardedRef}

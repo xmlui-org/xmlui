@@ -16,29 +16,21 @@ $boxShadow-Search: createThemeVar("boxShadow-#{$component}");
 $componentChild: "SearchItem";
 $borderRadius-SearchItem: createThemeVar("borderRadius-#{$componentChild}");
 $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentChild}--hover");
+$borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentChild}--focus");
 
-.searchInput {
-  height: 36px;
-  width: 280px;
-
-  &.inDrawer {
-    width: 100%;
-  }
-}
-
-.dropdownPanel {
+.listPanel {
   @include t.borderVars($themeVars, $component);
   @include t.paddingVars($themeVars, $component);
   overflow: hidden;
   max-width: 580px;
 
   &.inDrawer {
-    width: var(--radix-popover-trigger-width);
-	  max-height: var(--radix-popover-content-available-height);
+    width: 100%;
+    max-width: unset;
   }
 }
 
-.listContainer {
+.list {
   background-color: $backgroundColor-Search;
   box-shadow: $boxShadow-Search;
   max-height: 360px;
@@ -53,11 +45,21 @@ $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$component
   padding-bottom: 0.4rem;
   padding-inline: 0.75rem;
   border-radius: $borderRadius-SearchItem;
+  border: 2px solid transparent;
   cursor: pointer;
 
-  &.hover,
+  
   &:hover {
     background-color: $backgroundColor-SearchItem--hover;
+  }
+  // This style is used to denote keyboard focus
+  &.keyboardFocus {
+    border-color: $borderColor-SearchItem--focus;
+    
+    // Ensures the underlying link is visible on programmatic hover
+    & > a {
+      color: var(--xmlui-textColor-primary);
+    }
   }
 
   & > a {
@@ -69,11 +71,6 @@ $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$component
     &:active {
       color: var(--xmlui-textColor-primary);
     }
-  }
-
-  // Ensures the underlying link is visible on programmatic hover
-  &.hover > a {
-    color: var(--xmlui-textColor-primary);
   }
 
   & > a .snippet {
