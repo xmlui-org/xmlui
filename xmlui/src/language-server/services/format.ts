@@ -9,6 +9,10 @@ type FormattingContex = {
   options: FormattingOptions,
 };
 
+export interface FormatOptions extends FormattingOptions{
+  maxLineLength?: number;
+}
+
 export function handleDocumentFormatting({
   node,
   getText,
@@ -39,15 +43,20 @@ export function handleDocumentFormatting({
 class XmluiFormatter {
   private readonly getText: GetText;
   private readonly startingNode: Node;
-  private readonly handleTrailingWhitespace: (string) => string;
+  private readonly maxLineLength: number;
+  private readonly tabSize: number;
+  private readonly handleTrailingWhitespace: (str: string) => string;
   private indentationToken: string;
-  private indentationLevel: number;
+  private indentationLvl: number;
   private newlineToken: string = "\n";
 
-  constructor(node: Node, getText: GetText, options: FormattingOptions){
+  constructor(node: Node, getText: GetText, options: FormatOptions){
     this.getText = getText;
     this.startingNode = node;
-    this.indentationLevel = 0;
+    this.indentationLvl = 0;
+    this.maxLineLength = 80;
+    this.tabSize = options.tabSize;
+
     this.indentationToken = options.insertSpaces ? " ".repeat(options.tabSize) : "\t";
     if (options.insertFinalNewline && !options.trimFinalNewlines){
       this.handleTrailingWhitespace = (formatted: string) =>{
@@ -58,10 +67,11 @@ class XmluiFormatter {
         return formatted.trimEnd();
       }
     }
+
   }
 
   format(): string {
-    let formattedStr;
+    let formattedStr: string;
     if (this.startingNode.kind !== SyntaxKind.ContentListNode){
       formattedStr = this.getText(this.startingNode);
     }
@@ -84,14 +94,14 @@ class XmluiFormatter {
         case SyntaxKind.CData:
         case SyntaxKind.Script:
         case SyntaxKind.ElementNode:
-          acc += this.indent()
+          acc += this.indent(this.indentationLvl)
           acc += this.printTagLike(c)
           acc += this.newlineToken;
           break;
 
         case SyntaxKind.StringLiteral:
         case SyntaxKind.TextNode:
-          acc += this.indent()
+          acc += this.indent(this.indentationLvl)
           acc += this.printContentString(c);
           acc += this.newlineToken
           break;
@@ -130,14 +140,16 @@ class XmluiFormatter {
     if (hasContentList){
       const contentListNode = node.children[contentListIdx];
 
-      ++this.indentationLevel;
+      ++this.indentationLvl;
       acc += this.newlineToken;
       acc += this.printContentListNode(contentListNode);
-      --this.indentationLevel;
+      --this.indentationLvl;
 
       const closeTagChildren = node.children.slice(contentListIdx+1);
-      acc += this.indent();
-      acc += this.printTag(closeTagChildren);
+      if (closeTagChildren.length > 0){
+        acc += this.indent(this.indentationLvl);
+        acc += this.printTag(closeTagChildren);
+      }
     }
     return acc;
   }
@@ -162,8 +174,25 @@ class XmluiFormatter {
           acc += this.printTagName(c);
           break;
         case SyntaxKind.AttributeListNode:
-          acc += " ";
-          acc += this.printAttrList(c);
+          const lineLenBeforeAttrs = this.indentationLvl * this.tabSize + acc.length;
+
+          const attrsFormatted = this.printAttrList(c);
+          const attrsCombinedLen = attrsFormatted.reduce((sum, attr) => attr.length + sum, 0);
+
+          const spacesBetweenAttrs = attrsFormatted.length - 1;
+          const potentialClosingTokenLen = 3; // " />".length
+          const sameLineAttrsTotalLen =
+            lineLenBeforeAttrs +
+            attrsCombinedLen +
+            spacesBetweenAttrs +
+            potentialClosingTokenLen;
+
+          if (sameLineAttrsTotalLen <= this.maxLineLength){
+            acc += " " + attrsFormatted.join(" ");
+          } else {
+            const wsBeforeAttr = this.newlineToken + this.indent(this.indentationLvl + 1);
+            acc += wsBeforeAttr + attrsFormatted.join(wsBeforeAttr);
+          }
           break;
         case SyntaxKind.ErrorNode:
           acc += this.getText(c);
@@ -171,12 +200,12 @@ class XmluiFormatter {
     }
     return acc;
   }
-  printAttrList(c: Node) {
-    const acc = "";
+
+  printAttrList(c: Node): string[]{
     const attrsFormatted = c.children.map((c) => {
       return this.printAttrNode(c);
     });
-    return attrsFormatted.join(" ");
+    return attrsFormatted;
   }
 
   printAttrNode(node: Node): string {
@@ -199,12 +228,12 @@ class XmluiFormatter {
     return (node.triviaBefore ?? []).map((trivia: Node) => this.getText(trivia)).join("");
   }
 
-  private indent(): string {
-    return this.indentationToken.repeat(this.indentationLevel);
+  private indent(lvl: number): string {
+    return this.indentationToken.repeat(lvl);
   };
 }
 
-export function format(node: Node, getText: GetText, options: FormattingOptions) : string | null {
+export function format(node: Node, getText: GetText, options: FormatOptions) : string | null {
   const formatter = new XmluiFormatter(node, getText, options);
   const formattedString = formatter.format();
   return formattedString;
