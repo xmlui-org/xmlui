@@ -29,6 +29,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "paddingInline-AppHeader": "$space-4",
     "paddingTop-logo-AppHeader": "$space-3",
     "paddingBottom-logo-AppHeader": "$space-3",
+    "boxShadow-header-App": "none",
 
     // --- NavPanel
     "backgroundColor-NavPanel": "$color-surface-50",
@@ -61,6 +62,8 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "paddingLeft-TableOfContentsItem-level-6": "$space-6",
 
     // --- Markdown
+    "fontSize-H1": "1.65rem",
+    "fontWeight-H1": "700",
     "fontSize-Text-markdown": "$fontSize-normal",
     "lineHeight-Text-codefence": "$fontHeight-normal",
     "borderRadius-HtmlTable": "30px",

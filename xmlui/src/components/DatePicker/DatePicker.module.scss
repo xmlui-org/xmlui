@@ -232,6 +232,8 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   position: relative;
   display: inline-flex;
   align-items: center;
+  padding-left: t.$space-2;
+  padding-right: t.$space-2;
 
   white-space: nowrap;
   border: 0;
@@ -289,7 +291,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: var(--rdp-dropdown-gap);
+  gap: 0;
 }
 .dropdown {
   z-index: 2;
@@ -328,7 +330,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 .month_caption {
   display: flex;
   align-content: center;
-  padding: t.$space-3;
+  padding: t.$space-3 t.$space-3 t.$space-3 t.$space-1;
   height: var(--rdp-nav-height);
   font-weight: bold;
   font-size: large;
