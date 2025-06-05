@@ -29,22 +29,24 @@ An expression can hold a JSON list.
 Or a complex JSON object, in which case you'll write an outer set of curly braces to introduce the expression and an inner set to define an object like this form's `data` property.
 
 ```xmlui-pg copy name="A complex JSON object" display
-<Form id="searchForm" padding="0.5rem"
-  data='{{ station: "Brixton", wifi: true, toilets: false }}'
-  onSubmit="() => { preview.setValue(JSON.stringify($data)) }"
->
-  <Text>Search for station amenities</Text>
-  <HStack>
-    <FormItem bindTo="station" />
-    <FormItem type="checkbox" label="wifi" bindTo="wifi" />
-    <FormItem type="checkbox" label="toilets" bindTo="toilets" />
-  </HStack>
-  <property name="buttonRowTemplate">
-      <Button type="submit" icon="search" label="Search"/>
-  </property>
-</Form>
+<App>
+  <Form id="searchForm" padding="0.5rem"
+    data='{{ station: "Brixton", wifi: true, toilets: false }}'
+    onSubmit="() => { preview.setValue(JSON.stringify($data)) }"
+  >
+    <Text>Search for station amenities</Text>
+    <HStack>
+      <FormItem bindTo="station" />
+      <FormItem type="checkbox" label="wifi" bindTo="wifi" />
+      <FormItem type="checkbox" label="toilets" bindTo="toilets" />
+    </HStack>
+    <property name="buttonRowTemplate">
+        <Button type="submit" icon="search" label="Search"/>
+    </property>
+  </Form>
 
-<TextArea id="preview" />
+  <TextArea id="preview" />
+</App>
 ```
 
 > [!INFO]

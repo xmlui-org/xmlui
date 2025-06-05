@@ -25,6 +25,5 @@ globalThis.transformStops = function(stops) {
 
 globalThis.getComponentsList = function(items) {
   const onlyComponents = items.filter(item => item.name === 'components');
-  console.log('Components found:', onlyComponents);
   return onlyComponents;
 }
