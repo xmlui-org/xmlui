@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.9.46
+
+### Patch Changes
+
+- e20e867: improve: DatePicker - change chevrons, Slider - design updates, change drawer icon's padding
+- 1f83bb2: Tables in Markdown scroll horizontally if there's not enough space.
+- c433512: Removed close button from TextBox if type="search". Move the Search package from internal, add arrow key selection in search results and add use it in navigation drawer on small screens.
+- bc68330: tweak search indexer
+- ef3d208: improve: DatePicker - update chevrons
+
 ## 0.9.45
 
 ### Patch Changes
