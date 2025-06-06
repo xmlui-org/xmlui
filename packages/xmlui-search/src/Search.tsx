@@ -90,7 +90,7 @@ export const Search = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<HTMLLIElement[]>([]);
-  const itemLinkRefs = useRef<HTMLDivElement[]>([]);
+  const itemLinkRefs = useRef<HTMLDivElement[]>([]); // <- this is a messy solution
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const [inputValue, setInputValue] = useState("");
@@ -136,7 +136,6 @@ export const Search = ({
     // Ignore single characters
     if (debouncedValue.length <= 1) return [];
 
-    setShow(debouncedValue.length > 0);
     const limited = !debouncedValue
       ? []
       : fuse.search(debouncedValue, { limit: limit ?? defaultProps.limit });
@@ -183,6 +182,7 @@ export const Search = ({
       })
       .filter((item) => Object.values(item.matches).some((match) => match.indices.length > 0));
 
+    if (mapped.length > 0) setShow(true);
     return mapped;
   }, [debouncedValue, fuse, limit]);
 
@@ -191,6 +191,10 @@ export const Search = ({
     setActiveIndex(-1);
     setShow(false);
   }, []);
+
+  const onInputFocus = useCallback(() => {
+    if (debouncedValue.length > 0) setShow(true);
+  }, [debouncedValue]);
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
@@ -219,6 +223,7 @@ export const Search = ({
     [activeIndex, results.length, show],
   );
 
+  // Does the scrolling to the active item
   useEffect(() => {
     if (
       navigationSource === "keyboard" &&
@@ -254,9 +259,7 @@ export const Search = ({
                 return value;
               })
             }
-            onFocus={() => {
-              if (debouncedValue.length > 0) setShow(true);
-            }}
+            onFocus={onInputFocus}
             onKeyDown={handleKeyDown}
             aria-autocomplete="list"
             aria-controls="dropdown-list"
@@ -264,52 +267,51 @@ export const Search = ({
           />
         </PopoverTrigger>
         <PopoverAnchor />
-        {show && results && (
+        {show && results && debouncedValue && (
           <Portal container={_root}>
             <PopoverContent
               align="end"
               onOpenAutoFocus={(e) => e.preventDefault()}
+              onCloseAutoFocus={(e) => e.preventDefault()}
               onEscapeKeyDown={() => setShow(false)}
               className={classnames(styles.listPanel, {
                 [styles.inDrawer]: inDrawer,
               })}
             >
-              {debouncedValue && (
-                <ul className={styles.list} role="listbox">
-                  {results.length > 0 &&
-                    results.map((result, idx) => {
-                      return (
-                        <li
-                          role="option"
-                          key={`${result.item.path}-${idx}`}
-                          className={classnames(styles.item, styles.header, {
-                            [styles.keyboardFocus]: activeIndex === idx,
-                          })}
-                          onMouseEnter={() => {
-                            setActiveIndex(idx);
-                            setNavigationSource("mouse");
-                          }}
-                          ref={(el) => (itemRefs.current[idx] = el!)}
-                          aria-selected={activeIndex === idx}
-                        >
-                          <SearchItemContent
-                            ref={(el) => (itemLinkRefs.current[idx] = el!)}
-                            idx={idx}
-                            item={result.item}
-                            matches={result.matches}
-                            maxContentMatchNumber={maxContentMatchNumber}
-                            onClick={onClick}
-                          />
-                        </li>
-                      );
-                    })}
-                  {results.length === 0 && (
-                    <div className={styles.noResults}>
-                      <Text variant="em">No results</Text>
-                    </div>
-                  )}
-                </ul>
-              )}
+              <ul className={styles.list} role="listbox">
+                {results.length > 0 &&
+                  results.map((result, idx) => {
+                    return (
+                      <li
+                        role="option"
+                        key={`${result.item.path}-${idx}`}
+                        className={classnames(styles.item, styles.header, {
+                          [styles.keyboardFocus]: activeIndex === idx,
+                        })}
+                        onMouseEnter={() => {
+                          setActiveIndex(idx);
+                          setNavigationSource("mouse");
+                        }}
+                        ref={(el) => (itemRefs.current[idx] = el!)}
+                        aria-selected={activeIndex === idx}
+                      >
+                        <SearchItemContent
+                          ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                          idx={idx}
+                          item={result.item}
+                          matches={result.matches}
+                          maxContentMatchNumber={maxContentMatchNumber}
+                          onClick={onClick}
+                        />
+                      </li>
+                    );
+                  })}
+                {results.length === 0 && (
+                  <div className={styles.noResults}>
+                    <Text variant="em">No results</Text>
+                  </div>
+                )}
+              </ul>
             </PopoverContent>
           </Portal>
         )}
