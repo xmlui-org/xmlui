@@ -49,6 +49,7 @@ import { LinkNative } from "./components/Link/LinkNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { Logo } from "./components/Logo/LogoNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
+import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 
 export type {
   ThemeDefinition,
@@ -102,5 +103,6 @@ export {
   LinkNative,
   ToneChangerButton,
   Logo,
-  useSearchContextContent
+  useSearchContextContent,
+  useAppLayoutContext,
 };

@@ -1,14 +1,23 @@
 import {
   useCallback,
   useDeferredValue,
-  useEffect,
   useId,
-  useLayoutEffect,
+  useEffect,
   useMemo,
   useRef,
   useState,
+  forwardRef,
+  type ForwardedRef,
 } from "react";
-import { LinkNative, Text, TextBox, useSearchContextContent, VisuallyHidden } from "xmlui";
+import {
+  LinkNative,
+  Text,
+  TextBox,
+  useSearchContextContent,
+  useTheme,
+  VisuallyHidden,
+  useAppLayoutContext,
+} from "xmlui";
 import type {
   FuseOptionKeyObject,
   FuseResult,
@@ -18,15 +27,23 @@ import type {
 } from "fuse.js";
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
+import classnames from "classnames";
+import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverTrigger,
+  Portal,
+} from "@radix-ui/react-popover";
 
 type Props = {
   id?: string;
   data: Record<string, string>;
-  limit: number;
+  limit?: number;
   maxContentMatchNumber?: number;
 };
 
-export const defaultProps: Pick<Props, "limit" | "maxContentMatchNumber"> = {
+export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
   limit: 10,
   maxContentMatchNumber: 3,
 };
@@ -69,13 +86,24 @@ export const Search = ({
   const content = useSearchContextContent();
   const _id = useId();
   const inputId = id || _id;
-  const ref = useRef<HTMLUListElement>(null);
+  const { root } = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const itemRefs = useRef<HTMLLIElement[]>([]);
+  const itemLinkRefs = useRef<HTMLDivElement[]>([]); // <- this is a messy solution
+  const [activeIndex, setActiveIndex] = useState(-1);
+
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
 
+  const layout = useAppLayoutContext();
+  const inDrawer = layout?.drawerVisible ?? false;
+  const _root = inDrawer ? containerRef?.current?.closest(`div`) : root;
+
+  const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
+
   // render-related state
   const [show, setShow] = useState(false);
-  const targetRef = useRef<HTMLInputElement>(null);
 
   // --- Step 2: Convert data to a format better handled by the search engine
   const dataFromMd = useMemo(
@@ -95,7 +123,7 @@ export const Search = ({
   );
 
   const mergedData = useMemo(() => {
-    return [...dataFromMd, ...Object.values(content)];
+    return [...dataFromMd, ...Object.values(content ?? {})];
   }, [content, dataFromMd]);
 
   const fuse = useMemo(() => {
@@ -108,12 +136,9 @@ export const Search = ({
     // Ignore single characters
     if (debouncedValue.length <= 1) return [];
 
-    setShow(debouncedValue.length > 0);
     const limited = !debouncedValue
       ? []
-      : fuse.search(debouncedValue, {
-          limit: limit,
-        });
+      : fuse.search(debouncedValue, { limit: limit ?? defaultProps.limit });
 
     const mapped = limited
       .map((result) => {
@@ -121,6 +146,7 @@ export const Search = ({
         result.matches?.forEach((match) => {
           if (match.key !== undefined) {
             const matchKey = match.key as keyof SearchItemData;
+
             mappedMatches[matchKey] = {
               indices: match.indices
                 .filter(
@@ -132,17 +158,17 @@ export const Search = ({
                     return (
                       /* index[1] - index[0] >= debouncedValue.length - 1 && */
                       result.item[matchKey]
-                        .slice(index[0], index[1] + 1).toLocaleLowerCase()
+                        .slice(index[0], index[1] + 1)
+                        .toLocaleLowerCase()
                         .includes(debouncedValue.toLocaleLowerCase())
                     );
                   },
-                )
-                // Restrict highlights that are longer than the original search term
+                ),
+                /* // Restrict highlights that are longer than the original search term
                 .map((index) => {
                   const substr = getSubstringIndexes(result.item[matchKey], debouncedValue);
-                  if (substr) console.log(result.item[matchKey].slice(substr?.start, substr?.end));
                   return !!substr ? [substr.start, substr.end] : index;
-                }),
+                }), */
               value: match.value,
             };
           }
@@ -156,63 +182,145 @@ export const Search = ({
       })
       .filter((item) => Object.values(item.matches).some((match) => match.indices.length > 0));
 
+    if (mapped.length > 0) setShow(true);
     return mapped;
   }, [debouncedValue, fuse, limit]);
 
-  // render related hooks
-  useLayoutEffect(() => {
-    const handler = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setShow(false);
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => {
-      document.removeEventListener("keydown", handler);
-    };
-  }, []);
-
   const onClick = useCallback(() => {
     setInputValue("");
+    setActiveIndex(-1);
     setShow(false);
   }, []);
 
+  const onInputFocus = useCallback(() => {
+    if (debouncedValue.length > 0) setShow(true);
+  }, [debouncedValue]);
+
+  // Handle keyboard navigation
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (!show) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev + 1) % results.length);
+        setNavigationSource("keyboard");
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev <= 0 ? results.length - 1 : prev - 1));
+        setNavigationSource("keyboard");
+      } else if (e.key === "Enter") {
+        if (activeIndex >= 0 && activeIndex < results.length) {
+          setActiveIndex(-1);
+        }
+        setShow(false);
+        itemLinkRefs.current[activeIndex]?.click();
+      } else if (e.key === "Escape") {
+        setActiveIndex(-1);
+        setShow(false);
+      }
+    },
+    [activeIndex, results.length, show],
+  );
+
+  // Does the scrolling to the active item
+  useEffect(() => {
+    if (
+      navigationSource === "keyboard" &&
+      activeIndex >= 0 &&
+      itemRefs.current[activeIndex] &&
+      typeof itemRefs.current[activeIndex].scrollIntoView === "function"
+    ) {
+      itemRefs.current[activeIndex].scrollIntoView({
+        block: "nearest",
+        behavior: "instant",
+      });
+    }
+  }, [activeIndex, navigationSource]);
+
   return (
-    <div style={{ position: "relative" }}>
-      <VisuallyHidden>
-        <label htmlFor={inputId}>Search Field</label>
-      </VisuallyHidden>
-      <TextBox
-        id={inputId}
-        ref={targetRef}
-        type="search"
-        placeholder="Type to search..."
-        value={inputValue}
-        style={{ height: "36px", width: "280px" }}
-        startIcon="search"
-        onDidChange={(value) => setInputValue(value)}
-        onFocus={() => setShow(true)}
-      />
-      {/* --- Step 4: Render results */}
-      {show && results && results.length > 0 && (
-        <ul ref={ref} className={styles.list}>
-          {results.map((result, idx) => (
-            <SearchItem
-              key={`${result.item.path}-${idx}`}
-              idx={idx}
-              item={result.item}
-              matches={result.matches}
-              maxContentMatchNumber={maxContentMatchNumber}
-              onClick={onClick}
-            />
-          ))}
-        </ul>
-      )}
-    </div>
+    <Popover open={show} onOpenChange={setShow}>
+      <div ref={containerRef} className={styles.container}>
+        <VisuallyHidden>
+          <label htmlFor={inputId}>Search Field</label>
+        </VisuallyHidden>
+        <PopoverTrigger asChild>
+          <TextBox
+            id={inputId}
+            ref={inputRef}
+            type="search"
+            placeholder="Type to search..."
+            value={inputValue}
+            style={{ height: "36px", width: inDrawer ? "100%" : "280px" }}
+            startIcon="search"
+            onDidChange={(value) =>
+              setInputValue(() => {
+                setActiveIndex(-1);
+                return value;
+              })
+            }
+            onFocus={onInputFocus}
+            onKeyDown={handleKeyDown}
+            aria-autocomplete="list"
+            aria-controls="dropdown-list"
+            aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+          />
+        </PopoverTrigger>
+        <PopoverAnchor />
+        {show && results && debouncedValue && (
+          <Portal container={_root}>
+            <PopoverContent
+              align="end"
+              onOpenAutoFocus={(e) => e.preventDefault()}
+              onCloseAutoFocus={(e) => e.preventDefault()}
+              onEscapeKeyDown={() => setShow(false)}
+              className={classnames(styles.listPanel, {
+                [styles.inDrawer]: inDrawer,
+              })}
+            >
+              <ul className={styles.list} role="listbox">
+                {results.length > 0 &&
+                  results.map((result, idx) => {
+                    return (
+                      <li
+                        role="option"
+                        key={`${result.item.path}-${idx}`}
+                        className={classnames(styles.item, styles.header, {
+                          [styles.keyboardFocus]: activeIndex === idx,
+                        })}
+                        onMouseEnter={() => {
+                          setActiveIndex(idx);
+                          setNavigationSource("mouse");
+                        }}
+                        ref={(el) => (itemRefs.current[idx] = el!)}
+                        aria-selected={activeIndex === idx}
+                      >
+                        <SearchItemContent
+                          ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                          idx={idx}
+                          item={result.item}
+                          matches={result.matches}
+                          maxContentMatchNumber={maxContentMatchNumber}
+                          onClick={onClick}
+                        />
+                      </li>
+                    );
+                  })}
+                {results.length === 0 && (
+                  <div className={styles.noResults}>
+                    <Text variant="em">No results</Text>
+                  </div>
+                )}
+              </ul>
+            </PopoverContent>
+          </Portal>
+        )}
+      </div>
+    </Popover>
   );
 };
 
-type SearchItemProps = SearchResult & {
+type SearchItemContentProps = SearchResult & {
   idx: string | number;
   maxContentMatchNumber?: number;
   onClick?: () => void;
@@ -223,53 +331,47 @@ type SearchItemProps = SearchResult & {
  * Use the `item` prop to access the data original data.
  *
  */
-function SearchItem({ idx, item, matches, maxContentMatchNumber, onClick }: SearchItemProps) {
+const SearchItemContent = forwardRef(function SearchItemContent(
+  { idx, item, matches, maxContentMatchNumber, onClick }: SearchItemContentProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   return (
-    <>
-      <li key={`${item.path}-${idx}`} className={`${styles.item} ${styles.header}`}>
-        <LinkNative
-          to={item.path}
-          onClick={onClick}
-          style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
+    <LinkNative
+      ref={forwardedRef}
+      to={item.path}
+      onClick={onClick}
+      style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
+    >
+      <div style={{ width: "100%" }}>
+        <Text variant="subtitle">
+          {highlightText(item.title, matches?.title?.indices) || item.title}
+        </Text>
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
-          <div style={{ width: "100%" }}>
-            <Text variant="subtitle">
-              <Text variant="strong">
-                {highlightText(item.title, matches?.title?.indices) || item.title}
-              </Text>
-            </Text>
-            <div
-              style={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              {matches?.content?.indices &&
-                formatContentSnippet(
-                  item.content,
-                  matches.content.indices,
-                  maxContentMatchNumber,
-                ).map((snippet, snipIdx) => (
-                  <div key={`${item.path}-${idx}-${snipIdx}`} className={styles.snippet}>
-                    <Text>{snippet}</Text>
-                  </div>
-                ))}
-            </div>
-            {/* Display the number of other matches if there are any */}
-            {matches?.content?.indices && (
-              <Text variant="em">
-                <Text variant="secondary">
-                  {`${pluralize(matches?.content?.indices.length, "match", "matches")} in this article`}
-                </Text>
-              </Text>
+          {matches?.content?.indices &&
+            formatContentSnippet(item.content, matches.content.indices, maxContentMatchNumber).map(
+              (snippet, snipIdx) => (
+                <div key={`${item.path}-${idx}-${snipIdx}`} className={styles.snippet}>
+                  <Text>{snippet}</Text>
+                </div>
+              ),
             )}
-          </div>
-        </LinkNative>
-      </li>
-    </>
+        </div>
+        {/* Display the number of other matches if there are any */}
+        {matches?.content?.indices && (
+          <Text variant="em">
+            {`${pluralize(matches?.content?.indices.length, "match", "matches")} in this article`}
+          </Text>
+        )}
+      </div>
+    </LinkNative>
   );
-}
+});
 
 // --- Utilities
 
@@ -329,7 +431,8 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
       result.push(text.slice(lastIndex, start));
     }
     result.push(
-      <Text key={`${index}-highlighted`} variant="marked">
+      // style is temporary, fontSize should be inherited if Text is inside other Text
+      <Text key={`${index}-highlighted`} variant="marked" style={{ fontSize: "inherit" }}>
         {text.slice(start, end + 1)}
       </Text>,
     );
