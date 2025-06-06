@@ -74,6 +74,7 @@ $component: "Text";
     font-size: createThemeVar("fontSize-#{$component}-code") !important;
     border-width: createThemeVar("borderWidth-#{$component}-code") !important;
     border-style: createThemeVar("borderStyle-#{$component}-code") !important;
+    border-color: createThemeVar("borderColor-#{$component}-code") !important;
     border-radius: createThemeVar("borderRadius-#{$component}-code") !important;
     padding-left: createThemeVar("paddingHorizontal-#{$component}-code") !important;
     padding-right: createThemeVar("paddingHorizontal-#{$component}-code") !important;
@@ -84,13 +85,15 @@ $component: "Text";
   // For code blocks using <![CDATA[ + <code> tags
   &.codefence:has(> .text.code),
   &.codefence:has(> code) {
-    //@include textVariant("codefence");
     @include t.ignoreTextVars();
     font-family: createThemeVar("fontFamily-#{$component}-code") !important;
     font-size: createThemeVar("fontSize-#{$component}-code") !important;
     border-width: createThemeVar("borderWidth-#{$component}-code") !important;
     border-style: createThemeVar("borderStyle-#{$component}-code") !important;
+    border-color: createThemeVar("borderColor-#{$component}-code") !important;
     border-radius: createThemeVar("borderRadius-#{$component}-code") !important;
+    font-family: createThemeVar("fontFamily-#{$component}-code") !important;
+    font-size: createThemeVar("fontSize-#{$component}-code") !important;
     padding-left: createThemeVar("paddingHorizontal-#{$component}-code") !important;
     padding-right: createThemeVar("paddingHorizontal-#{$component}-code") !important;
     padding-top: createThemeVar("paddingTop-#{$component}-code") !important;
@@ -142,7 +145,11 @@ $component: "Text";
   // ---
 
   &.deleted {
-    @include textVariant("deleted");
+    @include t.ignoreTextVars();
+    text-decoration-line: createThemeVar("textDecorationLine-#{$component}-deleted") !important;
+    text-decoration-color: createThemeVar("textDecorationColor-#{$component}-deleted") !important;
+    text-decoration-style: createThemeVar("textDecorationStyle-#{$component}-deleted") !important;
+    text-decoration-thickness: createThemeVar("textDecorationThickness-#{$component}-deleted") !important;
 
     // Based on accessibility concerns
     // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/del
@@ -165,7 +172,11 @@ $component: "Text";
   }
 
   &.inserted {
-    @include textVariant("inserted");
+    @include t.ignoreTextVars();
+    text-decoration-line: createThemeVar("textDecorationLine-#{$component}-inserted") !important;
+    text-decoration-color: createThemeVar("textDecorationColor-#{$component}-inserted") !important;
+    text-decoration-style: createThemeVar("textDecorationStyle-#{$component}-inserted") !important;
+    text-decoration-thickness: createThemeVar("textDecorationThickness-#{$component}-inserted") !important;
 
     // Based on accessibility concerns
     // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ins
