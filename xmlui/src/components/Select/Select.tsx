@@ -91,14 +91,11 @@ export const SelectMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-menu-${COMP}`]: "$color-surface-raised",
+    [`backgroundColor-menu-${COMP}`]:"$color-surface-raised",
     [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
     [`borderWidth-menu-${COMP}`]: "1px",
     [`borderColor-menu-${COMP}`]: "$borderColor",
-    [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
-    [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--active",
-    [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
     [`minHeight-Input`]: "39px",
     [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
     [`fontSize-${COMP}-badge`]: "$fontSize-small",
@@ -112,6 +109,10 @@ export const SelectMd = createMetadata({
     [`backgroundColor-${COMP}-badge--active`]: "$color-primary-500",
     [`textColor-item-${COMP}--disabled`]: "$color-surface-200",
     [`textColor-${COMP}-badge`]: "$color-surface-50",
+    [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
+    [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--hover",
+    [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
+
   },
 });
 

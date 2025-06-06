@@ -43,6 +43,7 @@ export const AppHeaderMd = createMetadata({
     [`width‑logo‑${COMP}`]: "Sets the width of the displayed logo",
   },
   defaultThemeVars: {
+    [`padding-drawerToggle-${COMP}`]: "$space-0_5",
     [`height-${COMP}`]: "$space-14",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content-App",
     [`maxWidth-${COMP}`]: "$maxWidth-App",
