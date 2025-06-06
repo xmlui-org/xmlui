@@ -61,14 +61,10 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   border-radius: $borderRadius-SearchItem;
   border: 2px solid transparent;
   cursor: pointer;
-
   
-  &:hover {
-    background-color: $backgroundColor-SearchItem--hover;
-  }
   // This style is used to denote keyboard focus
   &.keyboardFocus {
-    border-color: $borderColor-SearchItem--focus;
+    background-color: $backgroundColor-SearchItem--hover;
     
     // Ensures the underlying link is visible on programmatic hover
     & > a {
@@ -80,7 +76,7 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
     color: var(--xmlui-textColor-primary);
 
     &:hover {
-      color: var(--xmlui-textColor-primary);
+      color: inherit;
     }
     &:active {
       color: var(--xmlui-textColor-primary);
