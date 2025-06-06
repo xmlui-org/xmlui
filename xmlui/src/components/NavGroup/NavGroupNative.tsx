@@ -32,6 +32,7 @@ import { NavLink } from "../NavLink/NavLinkNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import type { NavGroupMd } from "./NavGroup";
+import { NavGroupContext } from "./NavGroupContext";
 
 type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;
 
@@ -63,13 +64,7 @@ export const defaultProps: Pick<
   iconVerticalCollapsed: "chevronright",
 };
 
-const NavGroupContext = createContext({
-  level: -1,
-  iconHorizontalCollapsed: defaultProps.iconHorizontalCollapsed,
-  iconHorizontalExpanded: defaultProps.iconHorizontalExpanded,
-  iconVerticalCollapsed: defaultProps.iconVerticalCollapsed,
-  iconVerticalExpanded: defaultProps.iconVerticalExpanded,
-});
+
 
 export const NavGroup = forwardRef(function NavGroup(
   {
@@ -172,7 +167,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 
   const toggleStyle = {
     ...style,
-    paddingLeft: level >= 1 ? level * 2 + "em" : undefined,
+    "--nav-link-level": level,
   };
 
   return (
@@ -188,22 +183,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
         <div style={{ flex: 1 }} />
         <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
-      {expanded &&
-        renderChild(node.children, {
-          wrapChild: ({ node }, renderedChild) => {
-            if (node.type === "NavLink") {
-              const element = renderedChild as ReactElement;
-              return cloneElement(element, {
-                ...mergeProps((renderedChild as ReactElement).props, {
-                  style: {
-                    paddingLeft: (level + 1) * 2 + "em",
-                  },
-                }),
-              });
-            }
-            return renderedChild;
-          },
-        })}
+      {expanded && renderChild(node.children)}
     </>
   );
 });

@@ -39,7 +39,13 @@ $color-indicator-NavLink--pressed: createThemeVar("color-indicator-#{$component}
 $transition: color 0.1s, background-color 0.1s;
 
 .content {
+  --nav-link-level: 0;
   &.base {
+    &::before{
+      content: "";
+      width: calc(var(--nav-link-level) * 1em);
+      display: block;
+    }
     @include t.borderVars($themeVars, $component);
     @include t.paddingVars($themeVars, $component);
     outline: inherit;
@@ -47,7 +53,6 @@ $transition: color 0.1s, background-color 0.1s;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: t.$space-2;
     font-size: $fontSize-NavLink;
     font-weight: $fontWeight-NavLink;
     font-family: $fontFamily-NavLink;
@@ -80,7 +85,7 @@ $transition: color 0.1s, background-color 0.1s;
       }
     }
 
-    &:hover.displayActive,
+    &:hover,
     &:focus-visible {
       color: $textColor-NavLink--hover;
       background-color: $backgroundColor-NavLink--hover;
@@ -182,6 +187,13 @@ $transition: color 0.1s, background-color 0.1s;
       flex-shrink: 0;
     }
   }
+}
+
+.innerContent{
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+  flex: 1;
 }
 
 // --- We export the theme variables to add them to the component renderer
