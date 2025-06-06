@@ -366,7 +366,11 @@ export const Markdown = memo(function Markdown({
             );
           },
           table({ children }) {
-            return <table className={htmlTagStyles.htmlTable}>{children}</table>;
+            return (
+              <div className={styles.tableScrollContainer}>
+                <table className={htmlTagStyles.htmlTable}>{children}</table>
+              </div>
+            );
           },
           tr({ children }) {
             return <tr className={htmlTagStyles.htmlTr}>{children}</tr>;

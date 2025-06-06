@@ -150,7 +150,8 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   .admonitionBlockquote {
     .admonitionContent {
       [class*="text_"][class*="markdown_"],
-      ul, ol {
+      ul,
+      ol {
         margin-top: 0;
         margin-bottom: 0;
       }
@@ -168,7 +169,7 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     display: flex;
     align-items: flex-start;
 
-    >input[type="checkbox"] {
+    > input[type="checkbox"] {
       margin-right: 8px;
       margin-top: 4px;
       flex-shrink: 0;
@@ -176,13 +177,19 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   }
 
   // First element should have no top margin
-    > *:first-child {
+  > *:first-child {
     margin-top: 0;
   }
 
   // Last element should have no bottom margin
   > *:last-child {
     margin-bottom: 0;
+  }
+
+  // --- Table
+  .tableScrollContainer {
+    overflow-x: auto;
+    width: 100%;
   }
 }
 
