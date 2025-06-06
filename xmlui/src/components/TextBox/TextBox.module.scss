@@ -95,18 +95,18 @@ $componentName: "TextBox";
     &::-ms-reveal {
       display: none;
     }
+
+    // Remove default search input styles if type="search"
+    &[type="search"]::-webkit-search-cancel-button,
+    &[type="search"]::-webkit-search-decoration {
+      -webkit-appearance: none;
+      appearance: none;
+    }
   }
 }
 
 .readOnly {
   cursor: default;
-}
-
-// Remove default search input styles if type="search"
-[type="search"]::-webkit-search-cancel-button,
-[type="search"]::-webkit-search-decoration {
-  -webkit-appearance: none;
-  appearance: none;
 }
 
 // --- We export the theme variables to add them to the component renderer
