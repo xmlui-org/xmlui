@@ -1,12 +1,13 @@
 import {
   cloneElement,
-  createContext,
   type CSSProperties,
   forwardRef,
   type ReactElement,
   type ReactNode,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -32,6 +33,9 @@ import { NavLink } from "../NavLink/NavLinkNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import type { NavGroupMd } from "./NavGroup";
+import { useLocation } from "@remix-run/react";
+import classnames from "classnames";
+import { NavGroupContext } from "./NavGroupContext";
 
 type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;
 
@@ -63,14 +67,6 @@ export const defaultProps: Pick<
   iconVerticalCollapsed: "chevronright",
 };
 
-const NavGroupContext = createContext({
-  level: -1,
-  iconHorizontalCollapsed: defaultProps.iconHorizontalCollapsed,
-  iconHorizontalExpanded: defaultProps.iconHorizontalExpanded,
-  iconVerticalCollapsed: defaultProps.iconVerticalCollapsed,
-  iconVerticalExpanded: defaultProps.iconVerticalExpanded,
-});
-
 export const NavGroup = forwardRef(function NavGroup(
   {
     node,
@@ -91,6 +87,7 @@ export const NavGroup = forwardRef(function NavGroup(
   const { level } = useContext(NavGroupContext);
   const appLayoutContext = useAppLayoutContext();
   const navPanelContext = useContext(NavPanelContext);
+
   let inline =
     appLayoutContext?.layout === "vertical" ||
     appLayoutContext?.layout === "vertical-sticky" ||
@@ -169,10 +166,20 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 ) {
   const { level, iconVerticalCollapsed, iconVerticalExpanded } = useContext(NavGroupContext);
   const [expanded, setExpanded] = useState(initiallyExpanded);
+  const groupContentInnerRef = useRef<HTMLDivElement>(null);
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    const hasActiveNavLink =
+      groupContentInnerRef.current.querySelector(".xmlui-navlink-active") !== null;
+    if (hasActiveNavLink) {
+      setExpanded(true);
+    }
+  }, [pathname]);
 
   const toggleStyle = {
     ...style,
-    paddingLeft: level >= 1 ? level * 2 + "em" : undefined,
+    "--nav-link-level": level,
   };
 
   return (
@@ -188,22 +195,15 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
         <div style={{ flex: 1 }} />
         <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
-      {expanded &&
-        renderChild(node.children, {
-          wrapChild: ({ node }, renderedChild) => {
-            if (node.type === "NavLink") {
-              const element = renderedChild as ReactElement;
-              return cloneElement(element, {
-                ...mergeProps((renderedChild as ReactElement).props, {
-                  style: {
-                    paddingLeft: (level + 1) * 2 + "em",
-                  },
-                }),
-              });
-            }
-            return renderedChild;
-          },
+      <div
+        className={classnames(styles.groupContent, {
+          [styles.expanded]: expanded,
         })}
+      >
+        <div className={styles.groupContentInner} ref={groupContentInnerRef}>
+          {renderChild(node.children)}
+        </div>
+      </div>
     </>
   );
 });
@@ -249,7 +249,13 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
   return (
     <Wrapper onOpenChange={(open) => setExpanded(open)}>
       <Trigger asChild disabled={disabled}>
-        <NavLink icon={icon} style={{ flexShrink: 0 }} vertical={level >= 1} to={to} disabled={disabled}>
+        <NavLink
+          icon={icon}
+          style={{ flexShrink: 0 }}
+          vertical={level >= 1}
+          to={to}
+          disabled={disabled}
+        >
           {label}
           <div style={{ flex: 1 }} />
           {level === 0 && <Icon name={iconVerticalExpanded} />}

@@ -11,6 +11,7 @@ import { createUrlWithQueryParams } from "../component-utils";
 import { getAppLayoutOrientation } from "../App/AppNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
+import { NavGroupContext } from "../NavGroup/NavGroupContext";
 
 type Props = {
   uid?: string;
@@ -18,7 +19,6 @@ type Props = {
   target?: LinkTarget;
   disabled?: boolean;
   children?: ReactNode;
-  sx?: CSSProperties;
   displayActive?: boolean;
   forceActive?: boolean;
   vertical?: boolean;
@@ -35,7 +35,6 @@ export const NavLink = forwardRef(function NavLink(
     children,
     disabled,
     to,
-    sx = {},
     displayActive = true,
     vertical,
     style,
@@ -48,6 +47,7 @@ export const NavLink = forwardRef(function NavLink(
 ) {
   const appLayoutContext = useAppLayoutContext();
   const navPanelContext = useContext(NavPanelContext);
+  const {level} = useContext(NavGroupContext);
   let safeVertical = vertical;
   if (appLayoutContext && safeVertical === undefined) {
     safeVertical =
@@ -59,7 +59,13 @@ export const NavLink = forwardRef(function NavLink(
     }
   }, [to]) as To;
 
-  const styleObj = { ...sx, ...style };
+  const styleObj = useMemo(()=>{
+    return {
+      "--nav-link-level": level + 1,
+      ...style,
+    }
+  }, [level, style]);
+
 
   const baseClasses = classnames(styles.content, styles.base, {
     [styles.disabled]: disabled,
@@ -68,8 +74,12 @@ export const NavLink = forwardRef(function NavLink(
     [styles.navItemActive]: displayActive && forceActive,
   });
 
+  let innerContent =
+    <div className={styles.innerContent}>
+    {icon}
+    {children}
+    </div>
   let content;
-
   if (disabled || !smartTo) {
     content = (
       <button
@@ -80,8 +90,7 @@ export const NavLink = forwardRef(function NavLink(
         style={styleObj}
         disabled={disabled}
       >
-        {icon}
-        {children}
+        {innerContent}
       </button>
     );
   } else {
@@ -97,11 +106,11 @@ export const NavLink = forwardRef(function NavLink(
           classnames(baseClasses, {
             [styles.displayActive]: displayActive,
             [styles.navItemActive]: displayActive && (isActive || forceActive),
+            'xmlui-navlink-active': isActive || forceActive
           })
         }
       >
-        {icon}
-        {children}
+        {innerContent}
       </RrdNavLink>
     );
   }
