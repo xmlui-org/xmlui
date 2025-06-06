@@ -168,7 +168,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-info": "$color-info-500",
     "color-valid": "$color-success-600",
     "color-warning": "$color-warn-700",
-    "color-error": "$color-danger-600",
+    "color-error": "$color-danger-500",
 
     // --- Default line height values (relative to the base unit, "space-base")
     "lineHeight-none": "1",
@@ -277,7 +277,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "borderColor-Input-default--focus": $colorSurface600,
     "borderColor-Input-default--success": $colorSuccess600,
     "borderColor-Input-default--warning": $colorWarn700,
-    "borderColor-Input-default--error": $colorDanger600,
+    "borderColor-Input-default--error": $colorDanger500,
 
     // --- InputLabel is a React component, so we define its default theme variables here
     "textColor-InputLabel-required": $colorDanger600,
