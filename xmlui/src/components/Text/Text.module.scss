@@ -61,7 +61,6 @@ $component: "Text";
   // codefence/<pre> elements are block level by default, even in another text element
   // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/pre
   .text.codefence {
-    @include t.ignoreTextVars();
     display: block;
     margin-top: createThemeVar("marginTop-#{$component}-codefence");
     margin-bottom: createThemeVar("marginBottom-#{$component}-codefence");
@@ -70,35 +69,13 @@ $component: "Text";
   // For inline code
   :not(.text.codefence) > &.code,
   :not(.text.codefence) > &code {
-    @include t.ignoreTextVars();
-    font-family: createThemeVar("fontFamily-#{$component}-code") !important;
-    font-size: createThemeVar("fontSize-#{$component}-code") !important;
-    border-width: createThemeVar("borderWidth-#{$component}-code") !important;
-    border-style: createThemeVar("borderStyle-#{$component}-code") !important;
-    border-color: createThemeVar("borderColor-#{$component}-code") !important;
-    border-radius: createThemeVar("borderRadius-#{$component}-code") !important;
-    padding-left: createThemeVar("paddingHorizontal-#{$component}-code") !important;
-    padding-right: createThemeVar("paddingHorizontal-#{$component}-code") !important;
-    padding-top: createThemeVar("paddingTop-#{$component}-code") !important;
-    padding-bottom: createThemeVar("paddingBottom-#{$component}-code") !important;
+    @include textVariant("code");
   }
 
   // For code blocks using <![CDATA[ + <code> tags
   &.codefence:has(> .text.code),
   &.codefence:has(> code) {
-    @include t.ignoreTextVars();
-    font-family: createThemeVar("fontFamily-#{$component}-code") !important;
-    font-size: createThemeVar("fontSize-#{$component}-code") !important;
-    border-width: createThemeVar("borderWidth-#{$component}-code") !important;
-    border-style: createThemeVar("borderStyle-#{$component}-code") !important;
-    border-color: createThemeVar("borderColor-#{$component}-code") !important;
-    border-radius: createThemeVar("borderRadius-#{$component}-code") !important;
-    font-family: createThemeVar("fontFamily-#{$component}-code") !important;
-    font-size: createThemeVar("fontSize-#{$component}-code") !important;
-    padding-left: createThemeVar("paddingHorizontal-#{$component}-code") !important;
-    padding-right: createThemeVar("paddingHorizontal-#{$component}-code") !important;
-    padding-top: createThemeVar("paddingTop-#{$component}-code") !important;
-    padding-bottom: createThemeVar("paddingBottom-#{$component}-code") !important;
+    @include textVariant("codefence");
     // TEMP: solution for a demo - need to re-evaluate how to truncate/wrap code blocks
     overflow-x: auto;
     text-overflow: initial;
@@ -114,6 +91,7 @@ $component: "Text";
   }
 
   &.codefence > code {
+    font-family: createThemeVar("fontFamily-#{$component}-codefence") !important;
     white-space: pre-wrap;
     //display: inline-block;
     width: 100%;
@@ -201,11 +179,26 @@ $component: "Text";
 
   // This is just a style placeholder
   &.keyboard {
-    @include textVariant("keyboard");
+    @include t.ignoreTextVars();
+    background-color: createThemeVar("backgroundColor-#{$component}-keyboard") !important;
+    font-family: createThemeVar("fontFamily-#{$component}-keyboard") !important;
+    font-weight: createThemeVar("fontWeight-#{$component}-keyboard") !important;
+    font-size: createThemeVar("fontSize-#{$component}-keyboard") !important;
+    border-width: createThemeVar("borderWidth-#{$component}-keyboard") !important;
+    border-color: createThemeVar("borderColor-#{$component}-keyboard") !important;
+    border-style: createThemeVar("borderStyle-#{$component}-keyboard") !important;
+    border-radius: createThemeVar("borderRadius-#{$component}-keyboard") !important;
+    padding-left: createThemeVar("paddingHorizontal-#{$component}-keyboard") !important;
+    padding-right: createThemeVar("paddingHorizontal-#{$component}-keyboard") !important;
   }
 
   &.marked {
-    @include textVariant("marked");
+    @include t.ignoreTextVars();
+    background-color: createThemeVar("backgroundColor-#{$component}-marked") !important;
+    color: createThemeVar("color-#{$component}-marked") !important;
+    font-weight: createThemeVar("fontWeight-#{$component}-marked") !important;
+    font-style: createThemeVar("fontStyle-#{$component}-marked") !important;
+    line-height: createThemeVar("lineHeight-#{$component}-marked") !important;
 
     // Based on accessibility concerns
     // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/mark
@@ -228,15 +221,20 @@ $component: "Text";
   }
 
   &.mono {
-    @include textVariant("mono");
+    @include t.ignoreTextVars();
+    font-family: createThemeVar("fontFamily-#{$component}-mono") !important;
   }
 
   &.sample {
-    @include textVariant("sample");
+    @include t.ignoreTextVars();
+    font-family: createThemeVar("fontFamily-#{$component}-sample") !important;
+    font-size: createThemeVar("fontSize-#{$component}-sample") !important;
   }
 
   &.sup {
-    @include textVariant("sup");
+    @include t.ignoreTextVars();
+    font-size: createThemeVar("fontSize-#{$component}-sup") !important;
+    vertical-align: createThemeVar("verticalAlign-#{$component}-sup") !important;
   }
 
   &.sub {
