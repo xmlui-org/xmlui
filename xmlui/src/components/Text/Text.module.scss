@@ -88,6 +88,7 @@ $component: "Text";
 
   &.codefence > code {
     white-space: pre-wrap;
+    font-family: createThemeVar("fontFamily-#{$component}-codefence");
     //display: inline-block;
     width: 100%;
   }
