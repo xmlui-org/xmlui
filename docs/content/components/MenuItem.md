@@ -26,7 +26,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `icon` [#icon]
 
-This property names an optional icon to display with the menu item.
+This property names an optional icon to display with the menu item. You can use component-specific icons in the format "iconName:MenuItem".
 
 ```xmlui-pg copy display name="Example: icon" height="200px"
 <App>

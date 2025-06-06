@@ -27,6 +27,10 @@ Available values: `top`, `left`, `right`, `bottom`, `inside` **(default)**, `out
 
 Specifies the key in the data objects that will be used to label the different data series.
 
+### `outerRadius`
+
+The outer radius of the pie chart, can be a number or a string (e.g., '100%').
+
 ### `showLabel (default: true)`
 
 Toggles whether to show labels (`true`) or not (`false`).

@@ -364,7 +364,7 @@ The default value is `false`.
 
 ### `iconNoSort` [#iconnosort]
 
-Allows setting the icon displayed in the Table column header when sorting is enabled, but the column remains unsorted.
+Allows setting the icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the "icon.nosort:Table" declaration in the app configuration file.
 
 Allows the customization of the icon displayed in a Table column header when when sorting is enabled
 and sorting is not done according to the column. Use the "-" (dash) value to sign that you do not want to display an icon when a table column is not sorted.
@@ -441,7 +441,7 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
 
 ### `iconSortAsc` [#iconsortasc]
 
-Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order.
+Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order. You can change the default icon for all Table instances with the "icon.sortasc:Table" declaration in the app configuration file.
 
 Allows the customization of the icon displayed in a Table column header when sorting is enabled,
 sorting is done according to the column, and the column is sorted in ascending order.
@@ -518,7 +518,7 @@ sorting is done according to the column, and the column is sorted in ascending o
 
 ### `iconSortDesc` [#iconsortdesc]
 
-Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order.
+Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order. You can change the default icon for all Table instances with the "icon.sortdesc:Table" declaration in the app configuration file.
 
 Allows the customization of the icon displayed in a Table column header when sorting is enabled,
 sorting is done according to the column, and the column is sorted in descending order.

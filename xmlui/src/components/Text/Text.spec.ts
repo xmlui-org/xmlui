@@ -325,7 +325,7 @@ test("textColor", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "rgb(255, 0, 0)";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textColor-Text-default": EXPECTED,
+      "textColor-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -337,7 +337,7 @@ test("fontFamily", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "sans-serif";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "fontFamily-Text-default": EXPECTED,
+      "fontFamily-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -349,7 +349,7 @@ test("fontSize", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "48px";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "fontSize-Text-default": EXPECTED,
+      "fontSize-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -361,7 +361,7 @@ test("fontStyle", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "italic";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "fontStyle-Text-default": EXPECTED,
+      "fontStyle-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -373,7 +373,7 @@ test("fontWeight", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "900";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "fontWeight-Text-default": EXPECTED,
+      "fontWeight-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -385,7 +385,7 @@ test("fontStretch", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "125%";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "fontStretch-Text-default": EXPECTED,
+      "fontStretch-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -397,7 +397,7 @@ test("textDecorationLine", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "underline";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textDecorationLine-Text-default": EXPECTED,
+      "textDecorationLine-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -409,7 +409,7 @@ test("textDecorationColor", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "rgb(255, 0, 0)";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textDecorationColor-Text-default": EXPECTED,
+      "textDecorationColor-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -421,7 +421,7 @@ test("textDecorationStyle", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "dotted";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textDecorationStyle-Text-default": EXPECTED,
+      "textDecorationStyle-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -433,7 +433,7 @@ test("textDecorationThickness", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "12px";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textDecorationThickness-Text-default": EXPECTED,
+      "textDecorationThickness-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -445,7 +445,7 @@ test("textUnderlineOffset", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "12px";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textUnderlineOffset-Text-default": EXPECTED,
+      "textUnderlineOffset-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -457,7 +457,7 @@ test("lineHeight", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "24px";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "lineHeight-Text-default": EXPECTED,
+      "lineHeight-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -469,7 +469,7 @@ test("backgroundColor", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "rgb(255, 0, 0)";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "backgroundColor-Text-default": EXPECTED,
+      "backgroundColor-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -481,7 +481,7 @@ test("textTransform", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "uppercase";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textTransform-Text-default": EXPECTED,
+      "textTransform-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -492,7 +492,7 @@ test("letterSpacing", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "12px";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "letterSpacing-Text-default": EXPECTED,
+      "letterSpacing-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -503,7 +503,7 @@ test("wordSpacing", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "12px";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "wordSpacing-Text-default": EXPECTED,
+      "wordSpacing-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -514,7 +514,7 @@ test("textShadow", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "rgba(0, 0, 0, 0.5) 2px 2px 2px";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textShadow-Text-default": EXPECTED,
+      "textShadow-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -525,7 +525,7 @@ test("textIndent", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "12px";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textIndent-Text-default": EXPECTED,
+      "textIndent-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -536,7 +536,7 @@ test("textAlign", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "center";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textAlign-Text-default": EXPECTED,
+      "textAlign-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -547,7 +547,7 @@ test("textAlignLast", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "center";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "textAlignLast-Text-default": EXPECTED,
+      "textAlignLast-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -558,7 +558,7 @@ test("wordBreak", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "break-all";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "wordBreak-Text-default": EXPECTED,
+      "wordBreak-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -569,7 +569,7 @@ test("direction", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "rtl";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "direction-Text-default": EXPECTED,
+      "direction-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -580,7 +580,7 @@ test("writingMode", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "vertical-rl";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "writingMode-Text-default": EXPECTED,
+      "writingMode-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;
@@ -591,7 +591,7 @@ test("LineBreak", async ({ initTestBed, createTextDriver }) => {
   const EXPECTED = "normal";
   await initTestBed('<Text value="Hello, World" />', {
     testThemeVars: {
-      "lineBreak-Text-default": EXPECTED,
+      "lineBreak-Text": EXPECTED,
     },
   });
   const component = (await createTextDriver()).component;

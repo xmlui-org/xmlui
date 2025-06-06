@@ -206,7 +206,7 @@ async function createSummary(
   let buffer = await readFile(filename, "utf8");
   const componentFolderName = basename(componentsSourceFolder);
 
-  buffer = createSectionHeading(buffer, `## ${sectionName}`);
+  buffer = createSectionHeading(buffer, `# ${sectionName}`);
   // The summary file may contain further sections other than the summary table.
   // Thus, we only (re)generate the section that contains the summary table.
   // This is done by finding the heading for the start of the summary table section and either the end of file

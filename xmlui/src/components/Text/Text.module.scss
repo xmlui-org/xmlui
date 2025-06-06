@@ -9,17 +9,18 @@ $themeVars: ();
 $component: "Text";
 
 @mixin textVariant($variant) {
-  $themeVars: t.composePaddingVars($themeVars, "#{$component}-#{$variant}");
-  $themeVars: t.composeBorderVars($themeVars, "#{$component}-#{$variant}");
-  $themeVars: t.composeTextVars($themeVars, "#{$component}-#{$variant}");
-  @include t.paddingVars($themeVars, "#{$component}-#{$variant}");
-  @include t.borderVars($themeVars, "#{$component}-#{$variant}");
-  @include t.textVars($themeVars, "#{$component}-#{$variant}");
-  margin-top: createThemeVar("marginTop-#{$component}-#{$variant}");
-  margin-bottom: createThemeVar("marginBottom-#{$component}-#{$variant}");
-  margin-left: createThemeVar("marginLeft-#{$component}-#{$variant}");
-  margin-right: createThemeVar("marginRight-#{$component}-#{$variant}");
-  vertical-align: createThemeVar("verticalAlign-#{$component}-#{$variant}");
+  $variantName: if($variant == "", "#{$component}", "#{$component}-#{$variant}");
+  $themeVars: t.composePaddingVars($themeVars, $variantName);
+  $themeVars: t.composeBorderVars($themeVars, $variantName);
+  $themeVars: t.composeTextVars($themeVars, $variantName, $component);
+  @include t.paddingVars($themeVars, $variantName);
+  @include t.borderVars($themeVars, $variantName);
+  @include t.textVars($themeVars, $variantName);
+  margin-top: createThemeVar("marginTop-#{$variantName}");
+  margin-bottom: createThemeVar("marginBottom-#{$variantName}");
+  margin-left: createThemeVar("marginLeft-#{$variantName}");
+  margin-right: createThemeVar("marginRight-#{$variantName}");
+  vertical-align: createThemeVar("verticalAlign-#{$variantName}");
 }
 
 .text {
@@ -28,7 +29,7 @@ $component: "Text";
   margin: 0;
   padding: 0;
   min-height: fit-content;
-  @include textVariant("default");
+  @include textVariant("");
 
   &.markdown {
     @include textVariant("markdown");

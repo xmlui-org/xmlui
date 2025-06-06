@@ -85,9 +85,9 @@ This boolean property value indicates whether the component responds to user eve
 
 This property sets the label of the component.
 
-### `triggerButtonIcon (default: "chevrondown")` [#triggerbuttonicon-default-chevrondown]
+### `triggerButtonIcon (default: "triggerButton:DropdownMenu")` [#triggerbuttonicon-default-triggerbutton-dropdownmenu]
 
-This property defines the icon to display on the trigger button.
+This property defines the icon to display on the trigger button. You can change the default icon for all DropdownMenu instances with the "icon.triggerButton:DropdownMenu" declaration in the app configuration file.
 
 ### `triggerButtonIconPosition (default: "end")` [#triggerbuttoniconposition-default-end]
 

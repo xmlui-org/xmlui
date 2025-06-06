@@ -21,6 +21,22 @@ Determines whether the tooltip should be hidden.If set to (`true`), no tooltip w
 
 Determines whether the X-axis should be hidden. If set to (`true`), the axis will not be displayed.
 
+### `marginBottom`
+
+The bottom margin of the chart
+
+### `marginLeft`
+
+The left margin of the chart
+
+### `marginRight`
+
+The right margin of the chart
+
+### `marginTop`
+
+The top margin of the chart
+
 ### `nameKey`
 
 The key in the data objects used for labeling different data series.

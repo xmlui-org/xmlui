@@ -70,4 +70,3 @@ This component does not expose any methods.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [size](../styles-and-themes/common-units/#size)-Icon | 1.25em | 1.25em |
-| [thickness](../styles-and-themes/common-units/#size)-stroke-Icon | *none* | *none* |

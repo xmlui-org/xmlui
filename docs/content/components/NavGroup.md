@@ -116,13 +116,13 @@ Set a custom icon to display when the navigation menu is collapsed, is in a **ho
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconHorizontalExpanded (default: "chevronleft")` [#iconhorizontalexpanded-default-chevronleft]
+### `iconHorizontalExpanded (default: "chevronright")` [#iconhorizontalexpanded-default-chevronright]
 
 Set a custom icon to display when the navigation menu is expanded, is in a **horizontal** app layout, and is in a navigation submenu.
 
 For an example, see the [Custom Icons section](#custom-icons).
 
-### `iconVerticalCollapsed (default: "chevronup")` [#iconverticalcollapsed-default-chevronup]
+### `iconVerticalCollapsed (default: "chevronright")` [#iconverticalcollapsed-default-chevronright]
 
 Set a custom icon to display when the navigation menu is collapsed, is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.
 
