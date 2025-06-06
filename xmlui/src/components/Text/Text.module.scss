@@ -41,15 +41,19 @@ $component: "Text";
   // }
 
   &.abbr {
-    @include textVariant("abbr");
+    @include t.ignoreTextVars();
+    font-weight: createThemeVar("fontWeight-#{$component}-abbr") !important;
+    text-transform: createThemeVar("textTransform-#{$component}-abbr") !important;
   }
 
   &.cite {
-    @include textVariant("cite");
+    @include t.ignoreTextVars();
+    font-style: createThemeVar("fontStyle-#{$component}-cite") !important;
   }
 
   &.em {
-    @include textVariant("em");
+    @include t.ignoreTextVars();
+    font-style: createThemeVar("fontStyle-#{$component}-em") !important;
   }
 
   // --- Styling <pre><code> elements
@@ -65,13 +69,32 @@ $component: "Text";
   // For inline code
   :not(.text.codefence) > &.code,
   :not(.text.codefence) > &code {
-    @include textVariant("code");
+    @include t.ignoreTextVars();
+    font-family: createThemeVar("fontFamily-#{$component}-code") !important;
+    font-size: createThemeVar("fontSize-#{$component}-code") !important;
+    border-width: createThemeVar("borderWidth-#{$component}-code") !important;
+    border-style: createThemeVar("borderStyle-#{$component}-code") !important;
+    border-radius: createThemeVar("borderRadius-#{$component}-code") !important;
+    padding-left: createThemeVar("paddingHorizontal-#{$component}-code") !important;
+    padding-right: createThemeVar("paddingHorizontal-#{$component}-code") !important;
+    padding-top: createThemeVar("paddingTop-#{$component}-code") !important;
+    padding-bottom: createThemeVar("paddingBottom-#{$component}-code") !important;
   }
 
   // For code blocks using <![CDATA[ + <code> tags
   &.codefence:has(> .text.code),
   &.codefence:has(> code) {
-    @include textVariant("codefence");
+    //@include textVariant("codefence");
+    @include t.ignoreTextVars();
+    font-family: createThemeVar("fontFamily-#{$component}-code") !important;
+    font-size: createThemeVar("fontSize-#{$component}-code") !important;
+    border-width: createThemeVar("borderWidth-#{$component}-code") !important;
+    border-style: createThemeVar("borderStyle-#{$component}-code") !important;
+    border-radius: createThemeVar("borderRadius-#{$component}-code") !important;
+    padding-left: createThemeVar("paddingHorizontal-#{$component}-code") !important;
+    padding-right: createThemeVar("paddingHorizontal-#{$component}-code") !important;
+    padding-top: createThemeVar("paddingTop-#{$component}-code") !important;
+    padding-bottom: createThemeVar("paddingBottom-#{$component}-code") !important;
     // TEMP: solution for a demo - need to re-evaluate how to truncate/wrap code blocks
     overflow-x: auto;
     text-overflow: initial;
