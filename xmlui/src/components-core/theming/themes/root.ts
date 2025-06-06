@@ -409,7 +409,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-surface": "$const-color-surface-500",
         "color-surface-base": "$color-surface-0",
         "color-surface-lower": "$color-surface-0",
-        "color-surface-raised": "$color-surface-100",
+        "color-surface-raised": "$color-surface-0",
         "color-surface-subtle": "$color-surface-50",
 
         // --- Primary color shades (bluish)
