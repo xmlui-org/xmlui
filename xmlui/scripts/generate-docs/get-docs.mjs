@@ -257,7 +257,21 @@ async function dynamicallyLoadExtensionPackages() {
         if (filePath.endsWith(`${basename(dir)}-metadata.js`) && existsSync(filePath)) {
           filePath = convertPath(relative(FOLDERS.script, filePath));
           const { componentMetadata } = await import(filePath);
-          extensionPackage.metadata = componentMetadata.metadata;
+          if (!componentMetadata) {
+            logger.warning(
+              `No meta object found for package: ${basename(dir)}.\n Have you built the package?`,
+            );
+            continue;
+          }
+          if (!componentMetadata.metadata) {
+            logger.warning(
+              `No component metadata found in meta object for package: ${basename(dir)}. `
+                + `Check the "meta/componentsMetadata.ts" file.`,
+            );
+            continue;
+          }
+
+          extensionPackage.metadata = componentMetadata.metadata ?? {};
           extensionPackage.description = componentMetadata.description ?? "";
           extensionPackage.state = componentMetadata.state ?? defaultPackageState;
         }
