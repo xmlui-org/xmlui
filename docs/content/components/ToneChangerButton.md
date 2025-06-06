@@ -18,7 +18,13 @@
 
 ## Properties [#properties]
 
-This component does not have any properties.
+### `darkToLightIcon` [#darktolighticon]
+
+The icon displayed when the theme is in dark mode and will switch to light. You can change the default icon for all ToneChangerButton instances with the "icon.darkToLight:ToneChangerButton" declaration in the app configuration file.
+
+### `lightToDarkIcon` [#lighttodarkicon]
+
+The icon displayed when the theme is in light mode and will switch to dark. You can change the default icon for all ToneChangerButton instances with the "icon.lightToDark:ToneChangerButton" declaration in the app configuration file.
 
 ## Events [#events]
 

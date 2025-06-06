@@ -145,10 +145,6 @@ Available values:
 
 This property sets the width of the `Select`.
 
-### `maxLength` [#maxlength]
-
-This property sets the maximum length of the input it accepts.
-
 ### `multiSelect (default: false)` [#multiselect-default-false]
 
 The `true` value of the property indicates if the user can select multiple items.

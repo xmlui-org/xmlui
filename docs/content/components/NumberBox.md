@@ -191,6 +191,14 @@ If true, the component's value cannot be modified with user interactions.
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
+### `spinnerDownIcon` [#spinnerdownicon]
+
+Allows setting the icon displayed in the NumberBox spinner for decrementing values. You can change the default icon for all NumberBox instances with the "icon.spinnerDown:NumberBox" declaration in the app configuration file.
+
+### `spinnerUpIcon` [#spinnerupicon]
+
+Allows setting the icon displayed in the NumberBox spinner for incrementing values. You can change the default icon for all NumberBox instances with the "icon.spinnerUp:NumberBox" declaration in the app configuration file.
+
 ### `startIcon` [#starticon]
 
 This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.

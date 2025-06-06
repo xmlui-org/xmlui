@@ -15,7 +15,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 ### `buttonIcon` [#buttonicon]
 
-The ID of the icon to display in the button
+The ID of the icon to display in the button. You can change the default icon for all FileInput instances with the "icon.browse:FileInput" declaration in the app configuration file.
 
 ### `buttonIconPosition` [#buttoniconposition]
 

@@ -4,6 +4,10 @@ The `Page` component defines what content is displayed when the user navigates t
 
 ## Properties [#properties]
 
+### `navLabel` [#navlabel]
+
+The label of the page that is displayed in the navigation panel. If provided, the a new entry will be added to the navigation panel.
+
 ### `url` [#url]
 
 The URL of the route associated with the content.

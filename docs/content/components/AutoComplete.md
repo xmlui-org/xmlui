@@ -25,6 +25,10 @@ The component provides context values with which you can access some internal pr
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
+### `creatable` [#creatable]
+
+This property allows the user to create new items that are not present in the list of options.
+
 ### `dropdownHeight` [#dropdownheight]
 
 This property sets the height of the dropdown list.
@@ -268,7 +272,7 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [outlineOffset](../styles-and-themes/common-units/#size)-AutoComplete--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-AutoComplete--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-AutoComplete--focus | *none* | *none* |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-1 | $space-1 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-2 | $space-2 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-1 | $space-1 |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete--disabled | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-AutoComplete-badge | $const-color-surface-50 | $const-color-surface-50 |

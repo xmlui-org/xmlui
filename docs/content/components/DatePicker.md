@@ -65,16 +65,6 @@ This property sets an icon to appear on the end (right side when the left-to-rig
 
 This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
-### `fromDate` [#fromdate]
-
-The start date of the range of selectable dates
-
-```xmlui-pg copy display name="Example: fromDate" height="120px"
-<App>
-  <DatePicker fromDate="05/24/2024" />
-</App>
-```
-
 ### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
@@ -88,6 +78,51 @@ This property sets the component's initial value.
 ### `inline (default: false)` [#inline-default-false]
 
 Whether to display the datepicker inline
+
+### `label` [#label]
+
+This property sets the label of the component.
+
+### `labelBreak (default: false)` [#labelbreak-default-false]
+
+This boolean value indicates if the `DatePicker` labels can be split into multiple lines if it would overflow the available label width.
+
+### `labelPosition (default: "top")` [#labelposition-default-top]
+
+Places the label at the given position of the component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
+| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
+| `top` | The top of the input **(default)** |
+| `bottom` | The bottom of the input |
+
+### `labelWidth` [#labelwidth]
+
+This property sets the width of the `DatePicker`.
+
+### `maxValue` [#maxvalue]
+
+The end date of the range of selectable dates
+
+```xmlui-pg copy display name="Example: maxValue" height="120px"
+<App>
+  <DatePicker maxValue="05/26/2024" />
+</App>
+```
+
+### `minValue` [#minvalue]
+
+The start date of the range of selectable dates
+
+```xmlui-pg copy display name="Example: minValue" height="120px"
+<App>
+  <DatePicker minValue="05/24/2024" />
+</App>
+```
 
 ### `mode (default: "single")` [#mode-default-single]
 
@@ -133,16 +168,6 @@ This property sets an icon to appear at the start (left side when the left-to-ri
 ### `startText` [#starttext]
 
 This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
-
-### `toDate` [#todate]
-
-The end date of the range of selectable dates
-
-```xmlui-pg copy display name="Example: toDate" height="120px"
-<App>
-  <DatePicker toDate="05/26/2024" />
-</App>
-```
 
 ### `validationStatus (default: "none")` [#validationstatus-default-none]
 
@@ -300,6 +325,8 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [borderColor](../styles-and-themes/common-units/#color)-DatePicker-success--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-DatePicker-warning | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-DatePicker-warning--hover | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-selectedItem-DatePicker | $color-primary-200 | $color-primary-200 |
+| [borderColor](../styles-and-themes/common-units/#color)-selectedItem-DatePicker | $color-primary-200 | $color-primary-200 |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-DatePicker-default | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-DatePicker-error | *none* | *none* |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-DatePicker-success | *none* | *none* |

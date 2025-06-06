@@ -60,6 +60,10 @@ This property sets how the image content should be resized to fit its container.
 </App>
 ```
 
+### `inline` [#inline]
+
+When set to true, the image will be displayed as an inline element instead of a block element.
+
 ### `lazyLoad` [#lazyload]
 
 Lazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it). The default value is eager (`false`).
