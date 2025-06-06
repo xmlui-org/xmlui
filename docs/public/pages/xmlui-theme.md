@@ -3148,7 +3148,7 @@ XMLUI declares thousands of theme variables. Here's an export of the default the
     "textTransform-Text-subheading": "uppercase",
     "paddingHorizontal-Text-tableheading": "$space-1",
     "fontWeight-Text-tableheading": "$fontWeight-bold",
-    "fontSize-Text-markdown": "$fontSize-normal",
+    "fontSize-Text-markdown": "$fontSize-Text",
     "backgroundColor-Text-code": "rgba($color-surface-100-rgb, .4)",
     "borderColor-Text-code": "$color-surface-100",
     "backgroundColor-Text-keyboard": "rgba($color-surface-100-rgb, .4)",

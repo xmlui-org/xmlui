@@ -7,6 +7,8 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$themeVars: t.composeTextVars($themeVars, "Text") !global;
+
 $paddingTop-MarkDown: createThemeVar("paddingTop-Markdown");
 $paddingBottom-MarkDown: createThemeVar("paddingBottom-Markdown");
 $backgroundColor-MarkDown: createThemeVar("backgroundColor-Markdown");
@@ -39,6 +41,7 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   background-color: $backgroundColor-MarkDown;
   min-width: 0;
   width: 100%;
+  @include t.textVars($themeVars, "Text");
 
   // --- Additional Heading styles
   h1 {

@@ -48,6 +48,9 @@ export const TextMd = createMetadata({
     [`borderStyle-${COMP}`]: "solid",
     [`fontSize-${COMP}`]: "$fontSize-small",
     [`borderWidth-${COMP}`]: "$space-0",
+
+
+
     [`fontWeight-${COMP}-abbr`]: "$fontWeight-bold",
     [`textTransform-${COMP}-abbr`]: "uppercase",
     [`fontSize-${COMP}-secondary`]: "$fontSize-small",
@@ -100,7 +103,6 @@ export const TextMd = createMetadata({
 
     [`marginTop-${COMP}-markdown`]: "$space-3",
     [`marginBottom-${COMP}-markdown`]: "$space-6",
-    [`fontSize-${COMP}-markdown`]: "$fontSize-normal",
 
     [`backgroundColor-${COMP}-code`]: "rgba($color-surface-100-rgb, .4)",
     [`borderColor-${COMP}-code`]: "$color-surface-100",
