@@ -106,6 +106,7 @@ export const NavLink = forwardRef(function NavLink(
           classnames(baseClasses, {
             [styles.displayActive]: displayActive,
             [styles.navItemActive]: displayActive && (isActive || forceActive),
+            'xmlui-navlink-active': isActive || forceActive
           })
         }
       >

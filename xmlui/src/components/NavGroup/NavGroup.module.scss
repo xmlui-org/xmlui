@@ -2,6 +2,7 @@
 
 // --- This code snippet is required to collect the theme variables used in this module
 $themeVars: ();
+$time: 0.3s;
 @function createThemeVar($componentVariable) {
   $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
   @return t.getThemeVar($themeVars, $componentVariable);
@@ -30,6 +31,33 @@ $borderRadius-dropdown-NavGroup: createThemeVar("borderRadius-dropdown-NavGroup"
   &:focus-visible {
     outline: none;
   }
+}
+
+.groupContent{
+  /* The core of the grid animation technique */
+  display: grid;
+  grid-template-rows: 0fr; /* Initially the content row has 0 height */
+  will-change: grid-template-rows;
+  transition: grid-template-rows $time cubic-bezier(0.4, 0, 0.2, 1);
+  .groupContentInner{
+    will-change: opacity;
+    opacity: 0;
+  }
+  &.expanded {
+    .groupContentInner{
+      opacity: 1;
+      overflow: hidden;
+    }
+    grid-template-rows: 1fr;
+  }
+}
+
+.groupContentInner{
+  transition: opacity $time ease-out;
+  /* This is the grid item. Its content determines the 'auto' height. */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 // --- We export the theme variables to add them to the component renderer
