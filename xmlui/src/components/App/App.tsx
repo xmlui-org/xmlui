@@ -501,9 +501,10 @@ function PageIndexer({
         const clone = currentContent.cloneNode(true) as HTMLDivElement;
         const elementsToRemove = clone.querySelectorAll("style, script");
         elementsToRemove.forEach((el) => el.remove());
-        const textContent = (clone.textContent || "").trim().replace(/\s+/g, " ");
-        const titleElement = currentContent.querySelector("h1");
+        const titleElement = clone.querySelector("h1");
         const title = titleElement ? titleElement.innerText : (navLabel || pageUrl.split("/").pop() || pageUrl);
+        titleElement?.remove(); // Remove title element from clone to avoid duplication
+        const textContent = (clone.textContent || "").trim().replace(/\s+/g, " ");
 
         const entry = {
           title: title,

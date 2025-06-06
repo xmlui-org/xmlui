@@ -10,7 +10,7 @@
                 </Link>
             </property>
             <SpaceFiller/>
-            <XMLUIExtensions:Search data="{appGlobals.content}"/>
+            <XMLUIExtensions:Search data="{appGlobals.plainTextContent}"/>
             <ToneChangerButton/>
         </AppHeader>
 
