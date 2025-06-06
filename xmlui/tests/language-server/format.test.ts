@@ -95,6 +95,17 @@ describe('XML Formatter', () => {
   <Button />
 </Fragment>`);
     });
+
+    test('should format key-only attribue', () => {
+      const input = '<Fragment><Input type="text" enabled/><Button/></Fragment>';
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<Fragment>
+  <Input type="text" enabled />
+  <Button />
+</Fragment>`);
+    });
   });
 
   describe('CDATA Handling', () => {
@@ -154,13 +165,25 @@ describe('XML Formatter', () => {
       expect(result).toEqual(`<Input type="text" />`);
     });
 
-    test('should handle XML with comments', () => {
-      const input = '<Fragment><!-- This is a comment --><Text>Content</Text></Fragment><!-- This is a comment -->';
+    test('should handle comments before tag', () => {
+      const input = '<Fragment><!-- This is a comment --><Text>Content</Text></Fragment>';
       const result = testIdempotency(input);
 
       expect(result).toEqual(
 `<Fragment>
   <!-- This is a comment -->
+  <Text>
+    Content
+  </Text>
+</Fragment>`);
+    });
+
+    test('should handle comments before eof', () => {
+      const input = '<Fragment><Text>Content</Text></Fragment><!-- This is a comment -->';
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<Fragment>
   <Text>
     Content
   </Text>
