@@ -81,19 +81,14 @@ export const Search = ({
   const dataFromMd = useMemo(
     () =>
       Object.entries(data).map<SearchItemData>(([path, content]) => {
-        let title = "";
-        const titleRegex = /^#{1,6}\s+(.+?)(?:\s+\[#.*\])?\s*$/m;
-        const match = content.match(titleRegex);
-        if (match) {
-          title = match[1];
-        } else {
-          title = path.split("/").pop() || path;
-        }
+        const lines = content.split('\n');
+        const firstLine = lines.length > 0 ? lines[0] : '';
+        // Remove title after matching, since it is in the "label"
+        const restContent = lines.length > 1 ? lines.slice(1).join('\n') : '';
         return {
           path,
-          title,
-          // Remove title after matching, since it is in the "label"
-          content: removeMarkdownFormatting(content.replace(titleRegex, "")),
+          title: firstLine,
+          content: restContent,
         };
       }),
     [data],
@@ -344,51 +339,6 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
     result.push(text.slice(lastIndex));
   }
   return result;
-}
-
-// --- Step 0: Remove markdown formatting
-function removeMarkdownFormatting(markdown: string) {
-  return (
-    markdown
-      // Remove code blocks
-      // NOTE: retain code blocks for now
-      // .replace(/```\S*\n([\s\S]*?)```/g, "")
-      // Remove inline code ticks
-      .replace(/`([^`]*)`/g, "$1")
-      // Remove images ![alt](url)
-      .replace(/!\[.*?\]\(.*?\)/g, "")
-      // Remove links [text](url)
-      .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1")
-      // Remove bold and italic (***, **, *, __, _)
-      .replace(/(\*\*\*|___)(.*?)\1/g, "$2")
-      .replace(/(\*\*|__)(.*?)\1/g, "$2")
-      .replace(/(\*|_)(.*?)\1/g, "$2")
-      // Remove blockquotes
-      .replace(/^\s{0,3}>\s?/gm, "")
-      // Remove headers
-      .replace(/^\s{0,3}(#{1,6})\s+/gm, "")
-      // Remove horizontal rules
-      .replace(/^\s{0,3}([-*_]\s?){3,}$/gm, "")
-      // Remove unordered lists
-      .replace(/^\s*[-+*]\s+/gm, "")
-      // Remove ordered lists
-      .replace(/^\s*\d+\.\s+/gm, "")
-      // Remove remaining HTML tags
-      .replace(/<[^>]+>/g, "")
-      // Remove extra spaces
-      .replace(/\s{2,}/g, " ")
-      // Remove explicit header anchors
-      .replace(/\[#[\s\S]*\]/g, "")
-      // Remove admonitions
-      .replace(/\[![\s\S]*\]/g, "")
-      // Remove tables
-      .replace(
-        /^(\s*\|.*\|.*$(?:\r?\n|\r)+\s*\|[\s:-]+\|.*$(?:\r?\n|\r)+(?:\s*\|.*\|.*$(?:\r?\n|\r)*)*)/gim,
-        "",
-      )
-      // Trim leading/trailing whitespace
-      .trim()
-  );
 }
 
 function getSubstringIndexes(str: string, substr: string) {
