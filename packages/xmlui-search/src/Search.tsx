@@ -163,12 +163,12 @@ export const Search = ({
                         .includes(debouncedValue.toLocaleLowerCase())
                     );
                   },
-                )
-                // Restrict highlights that are longer than the original search term
+                ),
+                /* // Restrict highlights that are longer than the original search term
                 .map((index) => {
                   const substr = getSubstringIndexes(result.item[matchKey], debouncedValue);
                   return !!substr ? [substr.start, substr.end] : index;
-                }),
+                }), */
               value: match.value,
             };
           }
@@ -344,9 +344,7 @@ const SearchItemContent = forwardRef(function SearchItemContent(
     >
       <div style={{ width: "100%" }}>
         <Text variant="subtitle">
-          <Text variant="strong">
-            {highlightText(item.title, matches?.title?.indices) || item.title}
-          </Text>
+          {highlightText(item.title, matches?.title?.indices) || item.title}
         </Text>
         <div
           style={{
@@ -367,9 +365,7 @@ const SearchItemContent = forwardRef(function SearchItemContent(
         {/* Display the number of other matches if there are any */}
         {matches?.content?.indices && (
           <Text variant="em">
-            <Text variant="secondary">
-              {`${pluralize(matches?.content?.indices.length, "match", "matches")} in this article`}
-            </Text>
+            {`${pluralize(matches?.content?.indices.length, "match", "matches")} in this article`}
           </Text>
         )}
       </div>
@@ -435,7 +431,8 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
       result.push(text.slice(lastIndex, start));
     }
     result.push(
-      <Text key={`${index}-highlighted`} variant="marked">
+      // style is temporary, fontSize should be inherited if Text is inside other Text
+      <Text key={`${index}-highlighted`} variant="marked" style={{ fontSize: "inherit" }}>
         {text.slice(start, end + 1)}
       </Text>,
     );
