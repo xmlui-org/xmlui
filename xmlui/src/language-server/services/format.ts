@@ -1,5 +1,6 @@
 import { type FormattingOptions, type TextEdit, type Range, type Position } from 'vscode-languageserver';
 import { SyntaxKind, type GetText, type Node } from '../../parsers/xmlui-parser';
+import { getTriviaNodes } from './common/syntax-node-utilities';
 
 
 type FormattingContex = {
@@ -174,6 +175,9 @@ class XmluiFormatter {
           acc += this.printTagName(c);
           break;
         case SyntaxKind.AttributeListNode:
+          const attrsAlreadyMultiline = c.children
+            .some((attr) => getTriviaNodes(attr).some(attrTrivia => attrTrivia.kind === SyntaxKind.NewLineTrivia));
+
           const lineLenBeforeAttrs = this.indentationLvl * this.tabSize + acc.length;
 
           const attrsFormatted = this.printAttrList(c);
@@ -187,11 +191,12 @@ class XmluiFormatter {
             spacesBetweenAttrs +
             potentialClosingTokenLen;
 
-          if (sameLineAttrsTotalLen <= this.maxLineLength){
-            acc += " " + attrsFormatted.join(" ");
-          } else {
+          const breakAttrsToMultipleLines = sameLineAttrsTotalLen > this.maxLineLength || attrsAlreadyMultiline
+          if (breakAttrsToMultipleLines){
             const wsBeforeAttr = this.newlineToken + this.indent(this.indentationLvl + 1);
             acc += wsBeforeAttr + attrsFormatted.join(wsBeforeAttr);
+          } else {
+            acc += " " + attrsFormatted.join(" ");
           }
           break;
         case SyntaxKind.ErrorNode:
@@ -215,9 +220,12 @@ class XmluiFormatter {
   }
 
   printTagName(node: Node): string{
+    const commentBefName = this.getCommentsSpaceJoined(node.children[0]);
+    let acc = commentBefName? ` ${commentBefName} `: "";
+
     return node.children.reduce((acc, c) => {
       return acc + this.getText(c);
-    }, "")
+    }, acc)
   }
 
   printContentString(node: Node): string {
@@ -231,6 +239,27 @@ class XmluiFormatter {
   private indent(lvl: number): string {
     return this.indentationToken.repeat(lvl);
   };
+
+  getComments(node: Node): string[] {
+    if (node.triviaBefore){
+      return node.triviaBefore.filter(({ kind }) => kind === SyntaxKind.CommentTrivia).map((comment) => this.getText(comment));
+    } else {
+      return [];
+    }
+  }
+
+  /**
+  *
+  * @returns null if the node doesn't have comment trivia,
+  * otherwise the comments, joined with a space char.
+  */
+  getCommentsSpaceJoined(node: Node): string | null {
+    const comments = this.getComments(node);
+    if (comments.length === 0){
+      return null;
+    }
+    return comments.join(" ");
+  }
 }
 
 export function format(node: Node, getText: GetText, options: FormatOptions) : string | null {

@@ -74,7 +74,7 @@ export function pathToNodeInAscendands(chain: Node[], predicate: (node: Node) =>
 *
 * @param node an ElementNode
 */
-export function isPairedNode(node: Node): boolean{
+function isPairedNode(node: Node): boolean{
   for (const c of node.children){
     if (c.kind === SyntaxKind.CloseNodeStart){
       return true;
@@ -89,6 +89,16 @@ export function isPairedNode(node: Node): boolean{
 *
 * @param node an ElementNode
 */
-export function isSelfClosingNode(node: Node): boolean{
+function isSelfClosingNode(node: Node): boolean{
   return !isPairedNode(node);
+}
+
+export function getTriviaNodes(node: Node): Node[] {
+  if (node.pos === node.start){
+    return [];
+  } else if (node.triviaBefore){
+    return node.triviaBefore;
+  } else {
+    return getTriviaNodes(node.children[0]);
+  }
 }

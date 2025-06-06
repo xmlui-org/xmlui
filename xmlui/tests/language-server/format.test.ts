@@ -147,6 +147,430 @@ describe('XML Formatter', () => {
     });
   });
 
+
+  describe('comments', () => {
+    test('single comment #1', () => {
+      const input =
+`<<!--c-->n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`< <!--c--> n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #2', () => {
+      const input =
+`<n<!--c--> attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n <!--c--> attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #3', () => {
+      const input =
+`<n attr<!--c-->="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr <!--c--> ="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #4', () => {
+      const input =
+`<n attr=<!--c-->"val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr= <!--c--> "val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #5', () => {
+      const input =
+`<n attr="val"<!--c--> attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" <!--c--> attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #6', () => {
+      const input =
+`<n attr="val" attr2<!--c-->>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2 <!--c--> >
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #7', () => {
+      const input =
+`<n attr="val" attr2><!--c-->
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2> <!--c-->
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #8', () => {
+      const input =
+`<n attr="val" attr2>
+  <!--c-->text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  <!--c-->
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #9', () => {
+      const input =
+`<n attr="val" attr2>
+  text1<!--c-->
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1 <!--c-->
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #10', () => {
+      const input =
+`<n attr="val" attr2>
+  text1
+  <!--c--><n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1
+  <!--c-->
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #11', () => {
+      const input =
+`<n attr="val" attr2>
+  text1
+  <n2<!--c-->
+    attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1
+  <n2
+    <!--c-->
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #12', () => {
+      const input =
+`<n attr="val" attr2>
+  text1
+  <n2
+    <!--c-->attr3="val2"
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1
+  <n2
+    <!--c-->
+    attr3="val2"
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #13', () => {
+      const input =
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"<!--c-->
+    attr4 />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    <!--c-->
+    attr4 />
+  text2
+</n>`);
+    });
+
+    test('single comment #14', () => {
+      const input =
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4<!--c--> />
+  text2
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4
+    <!--c--> />
+  text2
+</n>`);
+    });
+
+    test('single comment #15', () => {
+      const input =
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2<!--c-->
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2 <!--c-->
+</n>`);
+    });
+
+    test('single comment #16', () => {
+      const input =
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+  <!--c-->
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+  <!--c-->
+</n>`);
+    });
+
+    test('single comment #17', () => {
+      const input =
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n><!--c-->`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n> <!--c-->`);
+    });
+
+    test('single comment #19', () => {
+      const input =
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</<!--c-->n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</ <!--c--> n>`);
+    });
+
+    test('single comment #20', () => {
+      const input =
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n<!--c-->>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n attr="val" attr2>
+  text1
+  <n2
+    attr3="val2"
+    attr4 />
+  text2
+</n <!--c--> >`);
+    });
+
+    test('should handle comments before eof', () => {
+      const input = `<Fragment><Text>Content</Text></Fragment>
+        <!-- This is a comment -->`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<Fragment>
+  <Text>
+    Content
+  </Text>
+</Fragment>
+<!-- This is a comment -->`);
+    });
+
+  });
   describe('Edge Cases', () => {
     test('should handle empty string', () => {
       const result = testIdempotency('');
@@ -163,32 +587,6 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(`<Input type="text" />`);
-    });
-
-    test('should handle comments before tag', () => {
-      const input = '<Fragment><!-- This is a comment --><Text>Content</Text></Fragment>';
-      const result = testIdempotency(input);
-
-      expect(result).toEqual(
-`<Fragment>
-  <!-- This is a comment -->
-  <Text>
-    Content
-  </Text>
-</Fragment>`);
-    });
-
-    test('should handle comments before eof', () => {
-      const input = '<Fragment><Text>Content</Text></Fragment><!-- This is a comment -->';
-      const result = testIdempotency(input);
-
-      expect(result).toEqual(
-`<Fragment>
-  <Text>
-    Content
-  </Text>
-</Fragment>
-<!-- This is a comment -->`);
     });
 
     test('should handle deeply nested elements', () => {
