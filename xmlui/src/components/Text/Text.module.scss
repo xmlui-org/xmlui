@@ -61,6 +61,7 @@ $component: "Text";
   // codefence/<pre> elements are block level by default, even in another text element
   // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/pre
   .text.codefence {
+    @include t.ignoreTextVars();
     display: block;
     margin-top: createThemeVar("marginTop-#{$component}-codefence");
     margin-bottom: createThemeVar("marginBottom-#{$component}-codefence");
