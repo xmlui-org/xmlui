@@ -14,6 +14,7 @@ import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-ui/react-popover";
+import Icon from "../Icon/IconNative";
 
 export const DatePickerModeValues = ["single", "range"] as const;
 type DatePickerMode = (typeof DatePickerModeValues)[number];
@@ -95,6 +96,19 @@ export const defaultProps: Pick<
   showWeekNumber: false,
   weekStartsOn: WeekDays.Sunday,
   disabledDates: [],
+};
+
+const Chevron = ({ ...props }) => {
+  const { orientation = "left" } = props;
+  if (orientation === "up") {
+    return <Icon name={"chevronup"} size={"sm"} />;
+  } else if (orientation === "down") {
+    return <Icon name={"chevrondown"} size={"sm"} />;
+  } else if (orientation === "left") {
+    return <Icon name={"chevronleft"} size={"lg"} />;
+  } else if (orientation === "right") {
+    return <Icon name={"chevronright"} size={"lg"} />;
+  }
 };
 
 export const DatePicker = forwardRef(function DatePicker(
@@ -283,6 +297,9 @@ export const DatePicker = forwardRef(function DatePicker(
             onSelect={handleSelect}
             autoFocus={autoFocus}
             numberOfMonths={mode === "range" ? 2 : 1}
+            components={{
+              Chevron,
+            }}
           />
         </div>
       ) : (
@@ -353,6 +370,9 @@ export const DatePicker = forwardRef(function DatePicker(
                 selected={selected}
                 onSelect={handleSelect}
                 numberOfMonths={mode === "range" ? 2 : 1}
+                components={{
+                  Chevron,
+                }}
               />
             </PopoverContent>
           </PopoverPortal>
