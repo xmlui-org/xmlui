@@ -1,7 +1,7 @@
 <Fragment xmlns:XMLUIExtensions="component-ns">
-    <App 
-        layout="vertical-full-header" 
-        noScrollbarGutters="false" 
+    <App
+        layout="vertical-full-header"
+        noScrollbarGutters="false"
         when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
             <property name="logoTemplate">
@@ -35,7 +35,7 @@
                 <NavLink label="User-defined Components" to="/user-defined-components"/>
             </NavGroup>
             <NavGroup label="Reference">
-                <RecursiveNavTree 
+                <RecursiveNavTree
                     items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
@@ -45,10 +45,10 @@
                 <NavLink label="Context Variables" to="/context-variables"/>
                 <NavLink label="Globals" to="/globals"/>
                 <NavLink label="Palettes" to="/palettes"/>
+                <NavLink label="Default Theme Variable" to="/xmlui-theme"/>
                 <NavLink label="Icons" to="/icons"/>
-                <NavLink label="Glossary" to="/glossary"/>
-                <NavLink label="Theme Variable Defaults" to="/xmlui-theme"/>
-                <NavLink label="Test" to="/test"/>
+                <!-- <NavLink label="Glossary" to="/glossary"/> -->
+                <!-- <NavLink label="Test" to="/test"/> -->
             </NavGroup>
         </NavPanel>
 
@@ -58,7 +58,13 @@
             </Page>
 
             <Page url="/reactive-intro">
-                <DocumentPage hideToc="true" url="/pages/reactive-intro.md"/>
+                <DocumentPage
+                    hideToc="true"
+                    url="/pages/reactive-intro.md"
+                    prevLink="/"
+                    prevTitle="Introduction"
+                    nextLink="/components-intro"
+                    nextTitle="Components"/>
             </Page>
 
             <Page url="/components-intro">
@@ -98,7 +104,7 @@
                 <DocumentPage url="/pages/modal-dialogs.md"/>
             </Page>
             <Page url="/user-defined-components">
-                <DocumentPage url="/pages/user-defined-components.md"/>
+                <UserDefinedComponents />
             </Page>
             <Page url="/styles-and-themes/layout-props">
                 <DocumentPage url="/pages/styles-and-themes/layout-props.md"/>
@@ -128,7 +134,11 @@
                 <DocumentPage hideToc="true" url="/pages/glossary.md" />
             </Page>
             <Page url="/xmlui-theme">
-                <DocumentPage hideToc="true" url="/pages/xmlui-theme.md" />
+                <DocumentPage
+                    hideToc="true"
+                    url="/pages/xmlui-theme.md"
+                    prevLink="/glossary"
+                    prevTitle="Glossary"/>
             </Page>
             <Page url="/test">
                 <Test/>
