@@ -1,6 +1,7 @@
 # Navigation
 
-```xmlui-pg display
+```xmlui-pg
+---app copy display
 <App
   name="XMLUI Invoice"
   layout="vertical-full-header"
@@ -17,9 +18,15 @@
     <NavLink label="Invoices" to="/invoices" />
   </NavPanel>
 
-  <Page url="/">
-    <Dashboard01 />
-  </Page>
+  <Pages>
+    <Page url="/">
+      <Dashboard01 />
+    </Page>
+  </Pages>
 
-  </App>
-  ```
+</App>
+---comp
+<Component name="Dashboard01">
+  This is Dashboard01
+</Component>
+```
