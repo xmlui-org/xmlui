@@ -88,9 +88,9 @@ You can test it running the app; the `/contacts` link will match the related `Pa
 
 ## Dynamic route segments
 
-You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a valid identifier. In the target, you can query the value of these placeholders through the `$routeParams` context variable:
+You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a valid identifier. In the target, you can query the value of these placeholders through the `$routeParams` context variable.
 
-```xmlui copy
+```xmlui-pg display
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -108,31 +108,6 @@ You can use parameter placeholders in the URLs as part of the route. These place
   </Pages>
 </App>
 ```
-
-The following example demonstrates using them:
-
-<Playground
-  height={180}
-  name="Example: dynamic route segments"
-  app={`
-    <App layout="vertical">
-      <NavPanel>
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/account/Cameron">Cameron</NavLink>
-        <NavLink to="/account/Joe">Joe</NavLink>
-        <NavLink to="/account/Kathy">Kathy</NavLink>
-      </NavPanel>
-      <Pages>
-        <Page url="/">
-          Home
-        </Page>
-        <Page url="/account/:id">
-          Account: {$routeParams.id}
-        </Page>
-      </Pages>
-    </App>
-  `}
-/>
 
 
 ## Using query parameters

@@ -18,22 +18,26 @@
             <Stack paddingHorizontal="$space-4" when="{mediaSize.sizeIndex <= 2}">
                 <XMLUIExtensions:Search data="{appGlobals.plainTextContent}" />
             </Stack>
-            <NavGroup label="Learn XMLUI" initiallyExpanded="{true}">
+            <NavGroup label="Learn XMLUI">
                 <NavLink label="Introduction" to="/"/>
                 <NavLink label="Reactive Data" to="/reactive-intro"/>
                 <NavLink label="Components" to="/components-intro"/>
                 <NavLink label="Themes" to="/themes-intro"/>
             </NavGroup>
-            <NavGroup label="Create XMLUI Apps">
+            <NavGroup label="Tutorial">
+                <NavLink label="Introduction" to="/tutorial-01"/>
+                <NavLink label="Main.xmlui" to="/tutorial-02"/>
+                <NavLink label="Navigation" to="/tutorial-03"/>
+            </NavGroup>
+            <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure"/>
                 <NavLink label="Markup" to="/markup"/>
                 <NavLink label="Code" to="/code"/>
                 <NavLink label="Layout" to="/layout"/>
-                <NavLink label="Working with Text" to="/workingWithText"/>
-                <NavLink label="Working with Markdown" to="/workingWithMarkdown"/>
-                <NavLink label="Routing and Links" to="/routingAndLinks"/>
+                <NavLink label="Working with Text" to="/working-with-text"/>
+                <NavLink label="Working with Markdown" to="/working-with-markdown"/>
+                <NavLink label="Routing and Links" to="/routing-and-links"/>
                 <NavLink label="Forms" to="/forms"/>
-                <NavLink label="Resources" to="/resources"/>
                 <NavLink label="Modal Dialogs" to="/modal-dialogs"/>
                 <NavLink label="User-defined Components" to="/user-defined-components"/>
             </NavGroup>
@@ -50,8 +54,7 @@
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Default Theme Variable" to="/xmlui-theme"/>
                 <NavLink label="Icons" to="/icons"/>
-                <!-- <NavLink label="Glossary" to="/glossary"/> -->
-                <!-- <NavLink label="Test" to="/test"/> -->
+                <NavLink label="Test" to="/test"/>
             </NavGroup>
         </NavPanel>
 
@@ -59,22 +62,23 @@
             <Page url="/">
                 <DocumentPage hideToc="true" url="/pages/intro.md" />
             </Page>
-
             <Page url="/reactive-intro">
-                <DocumentPage
-                    hideToc="true"
-                    url="/pages/reactive-intro.md"
-                    prevLink="/"
-                    prevTitle="Introduction"
-                    nextLink="/components-intro"
-                    nextTitle="Components"/>
+                <DocumentPage hideToc="true" url="/pages/reactive-intro.md" />
             </Page>
-
             <Page url="/components-intro">
                 <ComponentsIntro/>
             </Page>
             <Page url="/themes-intro">
                 <ThemesIntro/>
+            </Page>
+            <Page url="/tutorial-01">
+                <DocumentPage hideToc="true" url="/pages/tutorial-01.md" />
+            </Page>
+            <Page url="/tutorial-02">
+                <DocumentPage hideToc="true" url="/pages/tutorial-02.md" />
+            </Page>
+            <Page url="/tutorial-03">
+                <DocumentPage hideToc="true" url="/pages/tutorial-03.md" />
             </Page>
             <Page url="/app-structure">
                 <DocumentPage url="/pages/app-structure.md"/>
@@ -88,13 +92,13 @@
             <Page url="/layout">
                 <DocumentPage url="/pages/layout.md"/>
             </Page>
-            <Page url="/workingWithText">
+            <Page url="/working-with-text">
                 <DocumentPage url="/pages/working-with-text.md"/>
             </Page>
-            <Page hideToc="true" url="/workingWithMarkdown">
+            <Page hideToc="true" url="/working-with-markdown">
                 <DocumentPage url="/pages/working-with-markdown.md"/>
             </Page>
-            <Page url="/routingAndLinks">
+            <Page url="/routing-and-links">
                 <DocumentPage url="/pages/routing-and-links.md"/>
             </Page>
             <Page url="/forms">
@@ -118,15 +122,6 @@
             <Page url="/styles-and-themes/common-units">
                 <DocumentPage url="/pages/styles-and-themes/common-units.md"/>
             </Page>
-            <Page url="/tbd">
-                <TBD/>
-            </Page>
-            <Page url="/icons">
-                <Icons/>
-            </Page>
-            <Page url="/palettes">
-                <Palettes/>
-            </Page>
             <Page url="/context-variables">
                 <DocumentPage url="/pages/context-variables.md" />
             </Page>
@@ -137,14 +132,13 @@
                 <DocumentPage hideToc="true" url="/pages/glossary.md" />
             </Page>
             <Page url="/xmlui-theme">
-                <DocumentPage
-                    hideToc="true"
-                    url="/pages/xmlui-theme.md"
-                    prevLink="/glossary"
-                    prevTitle="Glossary"/>
+                <DocumentPage hideToc="true" url="/pages/xmlui-theme.md" />
             </Page>
-            <Page url="/test">
-                <Test/>
+            <Page url="/icons">
+                <Icons/>
+            </Page>
+            <Page url="/palettes">
+                <Palettes/>
             </Page>
             <Page url="/*">
                 <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>

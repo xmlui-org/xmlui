@@ -8,13 +8,7 @@ Each component has a rectangular UI patch for rendering its content (and nested 
 
 The following app contains two components, an `App`, and a `Text`:
 
-```xmlui copy
-<App border="2px dotted red">
-  <Text border="2px dotted green">Hello from XMLUI</Text>
-</App>
-```
-
-```xmlui-pg
+```xmlui-pg display
 <App border="2px dotted red">
   <Text width="30%" border="2px dotted green">Hello from XMLUI</Text>
 </App>
@@ -34,19 +28,8 @@ When rendering its children, a component may render them with vertical or horizo
 
 `App` uses vertical orientation by default; `HStack` (horizontal stack) uses horizontal orientation.
 
-```xmlui copy
-<App>
-  <Text>First item</Text>
-  <HStack>
-    <Text>Second item</Text>
-    <Text>Third item</Text>
-    <Text>Fourth item</Text>
-  </HStack>
-  <Text>Fifth item</Text>
-</App>
-```
 
-```xmlui-pg
+```xmlui-pg display
 <App>
   <Text>First item</Text>
   <HStack>
@@ -89,21 +72,9 @@ Some languages (such as Hebrew and Arabic) are read from right to left. XMLUI co
 ## Paddings and gaps
 
 Each component may adjust the padding around children and gaps between adjacent children.
-</Callout>
 
-```xmlui
-<App border="2px dotted red">
-  <Text border="2px dotted green">First item</Text>
-  <HStack border="2px dotted green">
-    <Text border="2px dotted purple">Second item</Text>
-    <Text border="2px dotted purple">Third item</Text>
-    <Text border="2px dotted purple">Fourth item</Text>
-  </HStack>
-  <Text border="2px dotted green">Fifth item</Text>
-</App>
-```
 
-```xmlui-pg
+```xmlui-pg display
 <App border="2px dotted red">
   <Text border="2px dotted green">First item</Text>
   <HStack border="2px dotted green">
@@ -126,13 +97,7 @@ Each component may adjust the padding around children and gaps between adjacent 
 Each component has a default strategy for determining the dimensions (height and width) of its children.
 `VStack` determines its dimensions according to its content. If we want to display a 40px by 60px orange box with nothing in it and 60px wide orange-red box with empty content, we must explicitly set dimensions (and background color).
 
-```xmlui copy
-<App>
-  <VStack height="40px" width="60px" backgroundColor="orangered" />
-</App>
-```
-
-```xmlui-pg
+```xmlui-pg display
 <App>
   <VStack height="40px" width="60px" backgroundColor="orangered" />
 </App>
@@ -142,24 +107,7 @@ Each component has a default strategy for determining the dimensions (height and
 
 Components can align their children in the viewport both vertically and horizontally.
 
-```xmlui
-<App>
-  <HStack>
-    <VStack width="50%" border="2px dotted red" height="200px" horizontalAlignment="end">
-      <Text>Item #1</Text>
-      <Text>Item #2</Text>
-      <Text>Item #3</Text>
-    </VStack>
-    <VStack width="50%" border="2px dotted green" height="200px" verticalAlignment="center">
-      <Text>Item #1</Text>
-      <Text>Item #2</Text>
-      <Text>Item #3</Text>
-    </VStack>
-  </HStack>
-</App>
-```
-
-```xmlui-pg
+```xmlui-pg display
 <App>
   <HStack>
     <VStack width="50%" border="2px dotted red" height="200px" horizontalAlignment="end">

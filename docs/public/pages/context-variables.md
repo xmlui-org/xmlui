@@ -6,11 +6,12 @@ These are the key context variables available in XMLUI forms and components.
 |------------------|------------------------------|-------------------------------------------|
 | `$data`          | Inside `<Form>`              | The form's current data object            |
 | `$item`          | Inside iterators             | The current item in a list/array          |
-| `$param`           | In event handlers            | The event's payload (e.g., form data)     |
+| `$param`           | In event handlers            | The event's payload (e.g., form data)   |
 | `$itemIndex`     | Inside iterators             | The current index in a list/array         |
 | `$validationResult` | In FormItem               | Result of latest validation               |
 | `$setValue`      | In FormItem                  | Function to set the value                 |
 | `$value`         | In FormItem                  | The current value                         |
+| `$routeParams`   | In Page                      | Capture values from route placeholders    |
 | `var.myVar`      | Declared in markup           | A scoped variable                         |
 | `myComponentId`  | Component with `id`          | Reference to the component instance       |
 
@@ -104,6 +105,28 @@ In components:
     <Text>Count: {count}</Text>
   </App>
   ```
+
+In Pages:
+
+```xmlui
+<App layout="vertical">
+  <NavPanel>
+    <NavLink to="/">Home</NavLink>
+    <NavLink to="/account/Cameron">Cameron</NavLink>
+    <NavLink to="/account/Joe">Joe</NavLink>
+    <NavLink to="/account/Kathy">Kathy</NavLink>
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      Home
+    </Page>
+    <Page url="/account/:id">
+      Account: {$routeParams.id}
+    </Page>
+  </Pages>
+</App>
+```
+
 
 ## `myComponentId`
 - **Scope:** Any component with an `id` attribute.
