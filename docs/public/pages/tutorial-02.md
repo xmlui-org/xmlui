@@ -47,7 +47,13 @@ These things are optional. XMLUI's mission is to ensure what you build looks goo
 <AppState
   id="currentUser"
   bucket="userState"
-  initialValue="{{ username: 'demouser', display_name: 'Demo User', avatar_url: '/resources/demouser.png' }}"
+  initialValue="{
+     {
+        username: 'demouser',
+        display_name: 'Demo User',
+        avatar_url: '/resources/demouser.png'
+      }
+  }"
 />
 ```
 
