@@ -126,6 +126,7 @@ This component does not expose any methods.
 | [maxWidth](../styles-and-themes/common-units/#size)-AppHeader | $maxWidth-App | $maxWidth-App |
 | [maxWidth-content](../styles-and-themes/common-units/#size)-AppHeader | $maxWidth-content-App | $maxWidth-content-App |
 | [padding](../styles-and-themes/common-units/#size)-AppHeader | $paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader | $paddingTop-AppHeader $paddingRight-AppHeader $paddingBottom-AppHeader $paddingLeft-AppHeader |
+| [padding](../styles-and-themes/common-units/#size)-drawerToggle-AppHeader | $space-0_5 | $space-0_5 |
 | [padding](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader | $paddingTop-logo-AppHeader $paddingRight-logo-AppHeader $paddingBottom-logo-AppHeader $paddingLeft-logo-AppHeader |
 | [paddingBottom](../styles-and-themes/common-units/#size)-AppHeader | $paddingVertical-AppHeader | $paddingVertical-AppHeader |
 | [paddingBottom](../styles-and-themes/common-units/#size)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |

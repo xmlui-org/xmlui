@@ -2,6 +2,7 @@ import Color from "color";
 
 import { HVar, parseHVar } from "../theming/hvar";
 import { StyleParser } from "../../parsers/style-parser/StyleParser";
+import { toCssVar } from "./layout-resolver";
 
 export function isThemeVarName(varName: any) {
   return typeof varName === "string" && varName?.startsWith("$");
@@ -108,6 +109,35 @@ export function generateBaseFontSizes(theme: Record<string, string> | undefined)
   ret[`fontSize-small`] = `${0.875 * baseNum}${baseUnit}`;
   ret[`fontSize-smaller`] = `${0.75 * baseNum}${baseUnit}`;
   ret[`fontSize-tiny`] = `${0.625 * baseNum}${baseUnit}`;
+
+  return ret;
+}
+
+export function generateTextFontSizes(theme: Record<string, string> | undefined) {
+  if (!theme) {
+    return {};
+  }
+  const resolvedTheme = resolveThemeVars(theme);
+  const base = resolvedTheme["fontSize-Text"];
+  if (!base || typeof base !== "string") {
+    return {};
+  }
+
+  // --- Get the CSS variable name of fontSize-Text-keyboard
+  
+  const ret: Record<string, string> = {};
+  ret[`fontSize-Text-keyboard`] = `calc(${toCssVar("$fontSize-Text")} * 0.875)`;
+  ret[`fontSize-Text-sample`] = `calc(${toCssVar("$fontSize-Text")} * 0.875)`;
+  ret[`fontSize-Text-sup`] = `calc(${toCssVar("$fontSize-Text")} * 0.625)`;
+  ret[`fontSize-Text-sub`] = `calc(${toCssVar("$fontSize-Text")} * 0.625)`;
+  ret[`fontSize-Text-title`] = `calc(${toCssVar("$fontSize-Text")} * 1.5)`;
+  ret[`fontSize-Text-subtitle`] = `calc(${toCssVar("$fontSize-Text")} * 1.25)`;
+  ret[`fontSize-Text-small`] = `calc(${toCssVar("$fontSize-Text")} * 0.875)`;
+  ret[`fontSize-Text-placeholder`] = `calc(${toCssVar("$fontSize-Text")} * 0.875)`;
+  ret[`fontSize-Text-paragraph`] = toCssVar("$fontSize-Text");
+  ret[`fontSize-Text-subheading`] = `calc(${toCssVar("$fontSize-Text")} * 0.625)`;
+  ret[`fontSize-Text-tableheading`] = `calc(${toCssVar("$fontSize-Text")} * 0.625)`;
+  ret[`fontSize-Text-secondary`] = `calc(${toCssVar("$fontSize-Text")} * 0.875)`;
 
   return ret;
 }

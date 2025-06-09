@@ -29,7 +29,6 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "paddingInline-AppHeader": "$space-4",
     "paddingTop-logo-AppHeader": "$space-3",
     "paddingBottom-logo-AppHeader": "$space-3",
-    "boxShadow-header-App": "none",
 
     // --- NavPanel
     "backgroundColor-NavPanel": "$color-surface-50",

@@ -143,18 +143,18 @@ Your app can run from an AWS bucket. Here's the minimal app served that way: [ht
 > - Upload xmlui-minimal folder to an AWS bucket
 > - In Permissions, turn off the 'Block public access' setting
 > - In Permissions, allow 'PublicRead'
-> ```
+> ```json
 > {
->     "Version": "2012-10-17",
->     "Statement": [
->         {
->             "Sid": "PublicRead",
->             "Effect": "Allow",
->             "Principal": "*",
->             "Action": "s3:GetObject",
->             "Resource": "arn:aws:s3:::xmlui-minimal/*"
->         }
->     ]
+>   "Version": "2012-10-17",
+>   "Statement": [
+>     {
+>       "Sid": "PublicRead",
+>       "Effect": "Allow",
+>       "Principal": "*",
+>       "Action": "s3:GetObject",
+>       "Resource": "arn:aws:s3:::xmlui-minimal/*"
+>     }
+>   ]
 > }
 > ```
 > - In Properties, turn on 'Static website hosting' and set 'index.html' as the default
