@@ -1,5 +1,5 @@
 import { type FormattingOptions, type TextEdit, type Range, type Position } from 'vscode-languageserver';
-import { SyntaxKind, type GetText, type Node } from '../../parsers/xmlui-parser';
+import { SyntaxKind, type GetText, type Node, toDbgString } from '../../parsers/xmlui-parser';
 import { getTriviaNodes } from './common/syntax-node-utilities';
 
 
@@ -213,19 +213,48 @@ class XmluiFormatter {
     return attrsFormatted;
   }
 
+  /**
+  * trivia before the first child element is not handled, as that is
+  * the job of the parent function, that joins attrNodes together
+  *
+  * @param node attrNode
+  * @returns
+  */
   printAttrNode(node: Node): string {
-    return node.children.reduce((acc, c) => {
-      return acc + this.getText(c);
-    }, "");
+    let acc = this.printAttrKeyNode(node.children[0]);
+    const otherChildren = node.children.slice(1);
+    acc += this.printNodesSpaceJoinedCommentsBefore(otherChildren);
+    return acc;
+  }
+
+  printAttrKeyNode(node: Node): string {
+    let acc = this.getText(node.children[0]);
+
+    const otherChildren = node.children.slice(1);
+    acc += this.printNodesSpaceJoinedCommentsBefore(otherChildren);
+    return acc;
+  }
+
+  private printNodesSpaceJoinedCommentsBefore(nodes: Node[]){
+    let acc = "";
+    for (let node of nodes){
+      const comment = this.getCommentsSpaceJoined(node);
+      if (comment){
+        acc += " " + comment + " ";
+      }
+      acc += this.getText(node);
+    }
+    return acc;
+
   }
 
   printTagName(node: Node): string{
     const commentBefName = this.getCommentsSpaceJoined(node.children[0]);
-    let acc = commentBefName? ` ${commentBefName} `: "";
+    const firstTokenPrint = this.getText(node.children[0]);
+    let acc = commentBefName? ` ${commentBefName} ${firstTokenPrint}`: firstTokenPrint;
 
-    return node.children.reduce((acc, c) => {
-      return acc + this.getText(c);
-    }, acc)
+    acc += this.printNodesSpaceJoinedCommentsBefore(node.children.slice(1))
+    return acc;
   }
 
   printContentString(node: Node): string {
@@ -241,11 +270,8 @@ class XmluiFormatter {
   };
 
   getComments(node: Node): string[] {
-    if (node.triviaBefore){
-      return node.triviaBefore.filter(({ kind }) => kind === SyntaxKind.CommentTrivia).map((comment) => this.getText(comment));
-    } else {
-      return [];
-    }
+    const triviaNodes = getTriviaNodes(node);
+    return triviaNodes.filter(({ kind }) => kind === SyntaxKind.CommentTrivia).map((comment) => this.getText(comment));
   }
 
   /**

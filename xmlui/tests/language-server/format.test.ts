@@ -556,6 +556,34 @@ describe('XML Formatter', () => {
 </n <!--c--> >`);
     });
 
+    test("single comment before ':' in tag name ", () => {
+      const input =`<ns<!-- c -->:n attr="val" />`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(`<ns <!-- c --> :n attr="val" />`);
+    })
+
+    test("single comment after ':' in tag name ", () => {
+      const input =`<ns:<!-- c -->n attr="val" />`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(`<ns: <!-- c --> n attr="val" />`);
+    })
+
+    test("single comment before ':' in attr name", () => {
+      const input = `<n ns<!-- c -->:attr="val" />`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(`<n ns <!-- c --> :attr="val" />`);
+    });
+
+    test("single comment after ':' in attr name", () => {
+      const input = `<n ns:<!-- c -->attr="val" />`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(`<n ns: <!-- c --> attr="val" />`);
+    });
+
     test('should handle comments before eof', () => {
       const input = `<Fragment><Text>Content</Text></Fragment>
         <!-- This is a comment -->`;
