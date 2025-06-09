@@ -8,24 +8,34 @@ import { TreeDisplay, defaultProps } from "./TreeDisplayNative";
 const COMP = "TreeDisplay";
 
 export const TreeDisplayMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
     `The \`${COMP}\` component displays hierarchical data in a tree structure. ` +
-    `Currently, it simply displays the content as text, but will be extended with more tree display features in the future.`,
+    `It accepts an indented text format where each line is an entry in the tree, and ` +
+    `the number of leading spaces determines the nesting level. The component renders ` +
+    `the tree with SVG lines and continuous vertical guides to clearly visualize parent-child relationships in the hierarchy.`,
   props: {
     content: {
-      description: "The content to display in the tree.",
+      description: "The indented text content to display as a tree structure. Each level of indentation (using spaces) represents one level in the tree hierarchy.",
       valueType: "string",
       defaultValue: defaultProps.content,
+    },
+    itemHeight: {
+      description: "The height of each tree item in pixels.",
+      valueType: "number",
+      defaultValue: 24,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    [`backgroundColor-${COMP}`]: "$color-primary-50",
     [`padding-${COMP}`]: "$space-4",
+    [`paddingLeft-${COMP}`]: "$space-2",
     [`fontSize-${COMP}`]: "$fontSize-default",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
-    [`fontFamily-${COMP}`]: "$fontFamily-default",
+    [`fontFamily-${COMP}`]: "$fontFamily-monospace",
     [`color-${COMP}`]: "$textColor-primary",
+    [`color-connect-${COMP}`]: "$color-surface-200", 
   },
 });
 
@@ -37,6 +47,7 @@ export const treeDisplayComponentRenderer = createComponentRenderer(
       <TreeDisplay
         style={layoutCss}
         content={extractValue.asOptionalString(node.props.content)}
+        itemHeight={extractValue.asOptionalNumber(node.props.itemHeight)}
       >
         {renderChild(node.children)}
       </TreeDisplay>
