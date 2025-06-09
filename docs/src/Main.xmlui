@@ -29,6 +29,7 @@
                 <NavLink label="Main.xmlui" to="/tutorial-02"/>
                 <NavLink label="Navigation" to="/tutorial-03"/>
                 <NavLink label="InfoCards" to="/tutorial-04"/>
+                <NavLink label="Charts" to="/tutorial-05"/>
             </NavGroup>
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure"/>
@@ -87,6 +88,9 @@
             </Page>
             <Page url="/tutorial-04">
                 <DocumentPage hideToc="true" url="/pages/tutorial-04.md" />
+            </Page>
+            <Page url="/tutorial-05">
+                <DocumentPage hideToc="true" url="/pages/tutorial-05.md" />
             </Page>
             <Page url="/app-structure">
                 <DocumentPage url="/pages/app-structure.md"/>
