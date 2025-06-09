@@ -312,6 +312,7 @@ const TextVariantKeys = [
   "code", // use <code>
   "codefence", // use uniquely styled <![CDATA[
   "deleted", // use <del>
+  "inherit", 
   "inserted", // use <ins>
   "keyboard", // use <kbd>,
   "marked", // use <mark>
@@ -344,6 +345,7 @@ export const TextVariantElement: Record<TextVariant, TextVariantMapping> = {
   code: "code",
   codefence: "pre",
   deleted: "del",
+  inherit: "span",
   inserted: "ins",
   keyboard: "kbd",
   marked: "mark",
@@ -395,6 +397,10 @@ export const variantOptionsMd: TextPropertyValueDescription[] = [
   },
   { value: "deleted", description: "Represents text that has been deleted" },
   { value: "em", description: "Marks text to stress emphasis" },
+  {
+    value: "inherit",
+    description: "Represents text that inherits the style from its parent element",
+  },
   {
     value: "inserted",
     description: "Represents a range of text that has been added to a document",

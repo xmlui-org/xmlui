@@ -103,6 +103,7 @@ Available values:
 | `codefence` | Handles the display of code blocks if combined with a `code` variant |
 | `deleted` | Represents text that has been deleted |
 | `em` | Marks text to stress emphasis |
+| `inherit` | Represents text that inherits the style from its parent element |
 | `inserted` | Represents a range of text that has been added to a document |
 | `keyboard` | Represents a span of text denoting textual user input from a keyboard or voice input |
 | `marked` | Represents text which is marked or highlighted for reference or notation |
@@ -347,6 +348,7 @@ This component does not expose any methods.
 | [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-sample | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-secondary | $fontSize-small | $fontSize-small |
@@ -355,15 +357,19 @@ This component does not expose any methods.
 | [fontSize](../styles-and-themes/common-units/#size)-Text-subheading | $fontSize-H6 | $fontSize-H6 |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-subtitle | $fontSize-medium | $fontSize-medium |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-sup | $fontSize-smaller | $fontSize-smaller |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-tableheading | $fontSize-H6 | $fontSize-H6 |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-title | $fontSize-large | $fontSize-large |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-cite | italic | italic |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-em | italic | italic |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-marked | *none* | *none* |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-placeholder | *none* | *none* |
+| [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-subheading | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Text-var | italic | italic |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text | $fontWeight-normal | $fontWeight-normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-abbr | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-keyboard | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-marked | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-placeholder | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-subheading | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-tableheading | $fontWeight-bold | $fontWeight-bold |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text-caption | 0.05rem | 0.05rem |
@@ -371,65 +377,27 @@ This component does not expose any methods.
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-small | $lineHeight-tight | $lineHeight-tight |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-caption | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-markdown | $space-6 | $space-6 |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-placeholder | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-secondary | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-sub | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-subheading | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-subtitle | *none* | *none* |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text-tableheading | $space-4 | $space-4 |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-title | *none* | *none* |
-| [marginBottom](../styles-and-themes/common-units/#size)-Text-var | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-caption | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-placeholder | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-secondary | *none* | *none* |
 | [marginLeft](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-sub | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-subheading | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-subtitle | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-tableheading | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-title | *none* | *none* |
-| [marginLeft](../styles-and-themes/common-units/#size)-Text-var | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-caption | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-markdown | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-placeholder | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-secondary | *none* | *none* |
 | [marginRight](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-sub | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-subheading | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-subtitle | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-tableheading | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-title | *none* | *none* |
-| [marginRight](../styles-and-themes/common-units/#size)-Text-var | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-caption | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-code | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-codefence | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-markdown | $space-3 | $space-3 |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-placeholder | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-secondary | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-sub | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-subheading | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-subtitle | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-title | *none* | *none* |
-| [marginTop](../styles-and-themes/common-units/#size)-Text-var | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Text-code | 2px | 2px |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-code | $space-1 | $space-1 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-codefence | $space-3 | $space-3 |
@@ -449,18 +417,9 @@ This component does not expose any methods.
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-abbr | uppercase | uppercase |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-subheading | uppercase | uppercase |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-caption | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-code | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-codefence | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-markdown | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-paragraph | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-placeholder | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-secondary | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-small | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-subheading | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-subtitle | *none* | *none* |
 | [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-sup | super | super |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-tableheading | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-title | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-var | *none* | *none* |

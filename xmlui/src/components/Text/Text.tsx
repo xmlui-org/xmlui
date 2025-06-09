@@ -99,7 +99,9 @@ export const TextMd = createMetadata({
     [`marginTop-${COMP}-tableheading`]: "$space-1",
     [`marginBottom-${COMP}-tableheading`]: "$space-4",
     [`paddingHorizontal-${COMP}-tableheading`]: "$space-1",
+    [`fontSize-${COMP}-tableheading`]: "$fontSize-H6",
     [`fontWeight-${COMP}-tableheading`]: "$fontWeight-bold",
+
 
     [`marginTop-${COMP}-markdown`]: "$space-3",
     [`marginBottom-${COMP}-markdown`]: "$space-6",
