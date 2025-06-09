@@ -1,7 +1,5 @@
 # Slider
-
 The Slider component allows you to select numeric values or ranges. This example demonstrates how to use a slider for date range selection with reactive data filtering.
-
 ```xmlui-pg display copy
 ---app
 <App>
@@ -9,8 +7,10 @@ The Slider component allows you to select numeric values or ranges. This example
 </App>
 ---comp
 <Component name="SliderDemo">
+  <variable name="startDate" value="2022-06-01" />
+  <variable name="endDate" value="2022-06-30" />
+  
   <variable name="dailyData" value="{[
-
     {date: '2022-06-01', total: 1200},
     {date: '2022-06-02', total: 1850},
     {date: '2022-06-03', total: 0},
@@ -41,10 +41,38 @@ The Slider component allows you to select numeric values or ranges. This example
     {date: '2022-06-28', total: 1500},
     {date: '2022-06-29', total: 0},
     {date: '2022-06-30', total: 2200}
-
   ]}" />
 
-  <Text> { JSON.stringify(dailyData) } </Text>
+  <variable name="filteredData" value="{
+    dailyData.filter(item => item.date >= startDate && item.date <= endDate)
+  }" />
+
+  <VStack>
+    <H1>Date Range Slider Demo</H1>
+    
+    <Text>Range: {startDate} to {endDate} ({filteredData.length} records)</Text>
+    
+    <Slider
+      id="dateSlider"
+      label="Select Date Range"
+      minValue="0"
+      maxValue="29"
+      initialValue="[0, 29]"
+      step="1"
+      onDidChange="{
+        startDate = window.sliderValueToDate(dateSlider.value[0]);
+        endDate = window.sliderValueToDate(dateSlider.value[1]);
+      }"
+      valueFormat="{ (value) => window.sliderValueToDate(value) }"
+    />
+    
+    <Text>Total Revenue: ${filteredData.reduce((sum, item) => sum + item.total, 0)}</Text>
+  </VStack>
 </Component>
 ```
 
+This demonstrates:
+1. **Slider component** with dual thumbs for range selection
+2. **Reactive variables** that update when slider changes
+3. **Data filtering** based on the selected date range  
+4. **Custom value formatting** to show dates instead of numbers
