@@ -109,10 +109,10 @@ export const Search = ({
   const dataFromMd = useMemo(
     () =>
       Object.entries(data).map<SearchItemData>(([path, content]) => {
-        const lines = content.split('\n');
-        const firstLine = lines.length > 0 ? lines[0] : '';
+        const lines = content.split("\n");
+        const firstLine = lines.length > 0 ? lines[0] : "";
         // Remove title after matching, since it is in the "label"
-        const restContent = lines.length > 1 ? lines.slice(1).join('\n') : '';
+        const restContent = lines.length > 1 ? lines.slice(1).join("\n") : "";
         return {
           path,
           title: firstLine,
@@ -155,20 +155,34 @@ export const Search = ({
                     if (match.key === "title") {
                       return index[1] - index[0] >= debouncedValue.length - 1;
                     }
-                    return (
-                      /* index[1] - index[0] >= debouncedValue.length - 1 && */
-                      result.item[matchKey]
-                        .slice(index[0], index[1] + 1)
-                        .toLocaleLowerCase()
-                        .includes(debouncedValue.toLocaleLowerCase())
-                    );
+                    return result.item[matchKey]
+                      .slice(index[0], index[1] + 1)
+                      .toLocaleLowerCase()
+                      .includes(debouncedValue.toLocaleLowerCase());
                   },
-                ),
-                /* // Restrict highlights that are longer than the original search term
+                )
+                // Restrict highlights that are longer than the original search term
                 .map((index) => {
-                  const substr = getSubstringIndexes(result.item[matchKey], debouncedValue);
-                  return !!substr ? [substr.start, substr.end] : index;
-                }), */
+                  if (index[1] - index[0] > debouncedValue.length) {
+                    index[1] = index[0] + debouncedValue.length;
+                  }
+
+                  // If the highlight is not exactly on spot but near the correct position, move it
+                  const searchIdxMax = 3;
+                  for (let i = index[0]; i < Math.min(index[1], index[0] + searchIdxMax); i++) {
+                    if (
+                      result.item[matchKey]
+                        .slice(i, i + debouncedValue.length)
+                        .toLocaleLowerCase() === debouncedValue.toLocaleLowerCase()
+                    ) {
+                      index[0] = i;
+                      index[1] = i + debouncedValue.length - 1;
+                      break;
+                    }
+                  }
+
+                  return index;
+                }),
               value: match.value,
             };
           }
@@ -442,15 +456,6 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
     result.push(text.slice(lastIndex));
   }
   return result;
-}
-
-function getSubstringIndexes(str: string, substr: string) {
-  const start = str.indexOf(substr);
-  if (start === -1) {
-    return null; // Substring not found
-  }
-  const end = start + substr.length - 1;
-  return { start, end };
 }
 
 function pluralize(number: number, singular: string, plural: string): string {
