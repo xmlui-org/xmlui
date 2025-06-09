@@ -30,6 +30,7 @@
                 <NavLink label="Navigation" to="/tutorial-03"/>
                 <NavLink label="InfoCards" to="/tutorial-04"/>
                 <NavLink label="Charts" to="/tutorial-05"/>
+                <NavLink label="Slider" to="/tutorial-06"/>
             </NavGroup>
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure"/>
@@ -58,9 +59,7 @@
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
-                <!--
                 <NavLink label="Test" to="/test"/>
-                -->
             </NavGroup>
         </NavPanel>
 
@@ -91,6 +90,9 @@
             </Page>
             <Page url="/tutorial-05">
                 <DocumentPage hideToc="true" url="/pages/tutorial-05.md" />
+            </Page>
+            <Page url="/tutorial-06">
+                <DocumentPage hideToc="true" url="/pages/tutorial-06.md" />
             </Page>
             <Page url="/app-structure">
                 <DocumentPage url="/pages/app-structure.md"/>
@@ -157,6 +159,9 @@
             </Page>
             <Page url="/glossary">
                 <DocumentPage hideToc="true" url="/pages/glossary.md" />
+            </Page>
+            <Page url="/test">
+                <Test />
             </Page>
             <Page url="/*">
                 <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>
