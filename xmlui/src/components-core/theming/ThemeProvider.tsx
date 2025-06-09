@@ -6,6 +6,7 @@ import {
   generateBorderSegments,
   generateButtonTones,
   generatePaddingSegments,
+  generateTextFontSizes,
   resolveThemeVar,
 } from "./transformThemeVars";
 import { normalizePath } from "../utils/misc";
@@ -135,6 +136,7 @@ export function useCompiledTheme(
       },
       {
         ...themeDefChain[themeDefChain.length - 1].themeVars,
+        ...generateTextFontSizes(mergedThemeVars),
         ...(themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<
           string,
           string

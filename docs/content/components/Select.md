@@ -384,7 +384,7 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-item-Select | $backgroundColor-dropdown-item | $backgroundColor-dropdown-item |
 | [backgroundColor](../styles-and-themes/common-units/#color)-item-Select--active | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
-| [backgroundColor](../styles-and-themes/common-units/#color)-item-Select--hover | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
+| [backgroundColor](../styles-and-themes/common-units/#color)-item-Select--hover | $backgroundColor-dropdown-item--hover | $backgroundColor-dropdown-item--hover |
 | [backgroundColor](../styles-and-themes/common-units/#color)-menu-Select | $color-surface-raised | $color-surface-raised |
 | [backgroundColor](../styles-and-themes/common-units/#color)-menu-Select | $color-surface-raised | $color-surface-raised |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Select--disabled | *none* | *none* |
