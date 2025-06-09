@@ -12,6 +12,10 @@ The XMLUI engine provides a suite of [built-in components](/components/_overview
 
 A component may optionally define an `id` attribute used by other components to access its properties (e.g. `data`) and method (e.g. `setValue`).
 
+## Context variables
+
+Special variables automatically provided by XMLUI within specific scopes, prefixed with `$`. Key examples include `$item` (current item in iterations), `$data` (a form's data object), `$props` (properties passed to user-defined components), and `$value` (current field value in a [FormItem](/components/FormItem)).
+
 ## Data Binding
 
 This mechanism **fetches data from backend API endpoints** and makes it available to components. In most cases, you only need to provide a URL, and the framework handles the rest, ensuring the data is readily accessible.
@@ -23,6 +27,14 @@ An expression is snippet of code in an attribute value, wrapped in curly braces 
 ## Event handler
 
 An **event handler** in XMLUI responds to user or system events. You can change the component's default behavior by declaring an event handler.
+
+## Global functions
+
+These include functions for notification (`toast()`), navigation (`navigate()`), API operations (`Actions.callApi()`), theme management (`setTheme()`).
+
+## Helper tags
+
+XML tags that provide alternative syntax for declaring variables, properties, and event handlers. The `<variable>` tag declares variables as markup, `<property>` sets component properties using nested markup, and `<event>` declares event handlers as markup.
 
 ## Markup
 
@@ -44,13 +56,13 @@ A component property, declared with the `<property>` helper tag, whose value is 
 
 XMLUI enables automatic, reactive connections between data sources and UI components. A [DataSource](/components/DataSource) component, you can fetch data from REST endpoints and make it available to other components. When components reference each other through variables, changing data flows through the system just as spreadsheet cells update when their dependencies change.
 
-## Resource
+## Resources
 
-An external assets, such as an icon, image, or fonts, typically referenced via an URL.
+External assets, such as an icon, image, or fonts, typically referenced via an URL.
 
 ## Star sizing
 
-A flexible width allocation system used in components like [Table](/components/Table]. Values like `*`, `2*`, and `3*` define proportional column widths. For example, a column with `width="3*"` will take three times as much space as a column with `width="*"`, while fixed-width columns (like `100px`) take their exact specified space first.
+A flexible width allocation system used in components like [Table](/components/Table). Values like `*`, `2*`, and `3*` define proportional column widths. For example, a column with `width="3*"` will take three times as much space as a column with `width="*"`, while fixed-width columns (like `100px`) take their exact specified space first.
 
 ## Theme
 
@@ -63,6 +75,3 @@ A single setting within a theme definition. Changing the value of a theme variab
 ## Variable
 
 Like variables in conventional programming languages, XMLUI variables store application state. They are reactive, and automatically update when their dependencies change.
-
-
-
