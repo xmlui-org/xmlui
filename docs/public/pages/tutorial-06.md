@@ -1,6 +1,6 @@
 # Slider
 The Slider component allows you to select numeric values or ranges. This example demonstrates how to use a slider for date range selection with reactive data filtering.
-```xmlui-pg display copy
+```xmlui-pg
 ---app
 <App>
   <SliderDemo />
@@ -9,7 +9,7 @@ The Slider component allows you to select numeric values or ranges. This example
 <Component name="SliderDemo">
   <variable name="startDate" value="2022-06-01" />
   <variable name="endDate" value="2022-06-30" />
-  
+
   <variable name="dailyData" value="{[
     {date: '2022-06-01', total: 1200},
     {date: '2022-06-02', total: 1850},
@@ -49,9 +49,9 @@ The Slider component allows you to select numeric values or ranges. This example
 
   <VStack>
     <H1>Date Range Slider Demo</H1>
-    
+
     <Text>Range: {startDate} to {endDate} ({filteredData.length} records)</Text>
-    
+
     <Slider
       id="dateSlider"
       label="Select Date Range"
@@ -60,13 +60,29 @@ The Slider component allows you to select numeric values or ranges. This example
       initialValue="[0, 29]"
       step="1"
       onDidChange="{
-        startDate = window.sliderValueToDate(dateSlider.value[0]);
-        endDate = window.sliderValueToDate(dateSlider.value[1]);
+        if (window.sliderValueToDate) {
+          startDate = window.sliderValueToDate(dateSlider.value[0]);
+          endDate = window.sliderValueToDate(dateSlider.value[1]);
+          console.log('New dates:', startDate, endDate);
+        } else {
+          console.error('sliderValueToDate function not found');
+        }
       }"
-      valueFormat="{ (value) => window.sliderValueToDate(value) }"
+      valueFormat="{ (value) => {
+        console.log('valueFormat called with:', value, typeof value);
+        if (window.sliderValueToDate) {
+          const result = window.sliderValueToDate(value);
+          console.log('valueFormat result:', result);
+          return result;
+        } else {
+          console.error('sliderValueToDate not available in valueFormat');
+          return 'N/A';
+        }
+      }}"
     />
-    
+
     <Text>Total Revenue: ${filteredData.reduce((sum, item) => sum + item.total, 0)}</Text>
+
   </VStack>
 </Component>
 ```
@@ -74,5 +90,5 @@ The Slider component allows you to select numeric values or ranges. This example
 This demonstrates:
 1. **Slider component** with dual thumbs for range selection
 2. **Reactive variables** that update when slider changes
-3. **Data filtering** based on the selected date range  
+3. **Data filtering** based on the selected date range
 4. **Custom value formatting** to show dates instead of numbers
