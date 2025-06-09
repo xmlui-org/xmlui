@@ -1,4 +1,4 @@
-# Glossary of Terms
+# Glossary
 
 ## Code-behind file
 
@@ -36,17 +36,21 @@ A built-in component may provide methods for query its state and taking actions.
 
 A built-in component may have properties that govern its appearance and/or behavior, or functionality. A user-defined component can receive arbitrary properties in its `$props` context variable.
 
-## Resources
-
-Resources in XMLUI are **external assets**, such as icons, images, fonts, and more, that can be defined and referenced within the application, typically through a URL.
-
-## Star Sizing
-
-A flexible width allocation system used in components like [Table](/components/Table]. Values like `*`, `2*`, and `3*` define proportional column widthsFor example, a column with `width="3*"` will take three times as much space as a column with `width="*"`, while fixed-width columns (like `100px`) take their exact specified space first.
-
 ### Template property
 
-A component property, declared with the `property` helper tag, whose value is a component definition.
+A component property, declared with the `<property>` helper tag, whose value is a component definition.
+
+## Reactive data binding
+
+XMLUI enables automatic, reactive connections between data sources and UI components. A [DataSource](/components/DataSource) component, you can fetch data from REST endpoints and make it available to other components. When components reference each other through variables, changing data flows through the system just as spreadsheet cells update when their dependencies change.
+
+## Resource
+
+An external assets, such as an icon, image, or fonts, typically referenced via an URL.
+
+## Star sizing
+
+A flexible width allocation system used in components like [Table](/components/Table]. Values like `*`, `2*`, and `3*` define proportional column widths. For example, a column with `width="3*"` will take three times as much space as a column with `width="*"`, while fixed-width columns (like `100px`) take their exact specified space first.
 
 ## Theme
 
@@ -58,7 +62,7 @@ A single setting within a theme definition. Changing the value of a theme variab
 
 ## Variable
 
-XMLUI variables store state like programming language variables, but they are reactive and automatically update when their dependencies change.
+Like variables in conventional programming languages, XMLUI variables store application state. They are reactive, and automatically update when their dependencies change.
 
 
 
