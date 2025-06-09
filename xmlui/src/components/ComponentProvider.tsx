@@ -18,6 +18,7 @@ import { textAreaComponentRenderer } from "./TextArea/TextArea";
 import { navLinkComponentRenderer } from "./NavLink/NavLink";
 import { localLinkComponentRenderer } from "./Link/Link";
 import { treeComponentRenderer } from "./Tree/TreeComponent";
+import { treeDisplayComponentRenderer } from "./TreeDisplay/TreeDisplay";
 import { buttonComponentRenderer } from "./Button/Button";
 import {
   h1ComponentRenderer,
@@ -365,6 +366,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Tree !== "false") {
       this.registerCoreComponent(treeComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_TreeDisplay !== "false") {
+      this.registerCoreComponent(treeDisplayComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Button !== "false") {
       this.registerCoreComponent(buttonComponentRenderer);
