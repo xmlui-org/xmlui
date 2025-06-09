@@ -28,6 +28,7 @@
                 <NavLink label="Introduction" to="/tutorial-01"/>
                 <NavLink label="Main.xmlui" to="/tutorial-02"/>
                 <NavLink label="Navigation" to="/tutorial-03"/>
+                <NavLink label="InfoCards" to="/tutorial-04"/>
             </NavGroup>
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure"/>
@@ -47,14 +48,18 @@
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
+                    <NavLink label="Theme Variable Defaults" to="/styles-and-themes/theme-variable-defaults"/>
                     <NavLink label="Common Units" to="/styles-and-themes/common-units"/>
                 </NavGroup>
                 <NavLink label="Context Variables" to="/context-variables"/>
                 <NavLink label="Globals" to="/globals"/>
+                <NavLink label="Helper Tags" to="/helper-tags"/>
                 <NavLink label="Palettes" to="/palettes"/>
-                <NavLink label="Default Theme Variable" to="/xmlui-theme"/>
                 <NavLink label="Icons" to="/icons"/>
+                <NavLink label="Glossary" to="/glossary"/>
+                <!--
                 <NavLink label="Test" to="/test"/>
+                -->
             </NavGroup>
         </NavPanel>
 
@@ -79,6 +84,9 @@
             </Page>
             <Page url="/tutorial-03">
                 <DocumentPage hideToc="true" url="/pages/tutorial-03.md" />
+            </Page>
+            <Page url="/tutorial-04">
+                <DocumentPage hideToc="true" url="/pages/tutorial-04.md" />
             </Page>
             <Page url="/app-structure">
                 <DocumentPage url="/pages/app-structure.md"/>
@@ -119,6 +127,9 @@
             <Page url="/styles-and-themes/theme-variables">
                 <DocumentPage url="/pages/styles-and-themes/theme-variables.md"/>
             </Page>
+            <Page url="/styles-and-themes/theme-variable-defaults">
+                <DocumentPage hideToc="true" url="/pages/styles-and-themes/theme-variable-defaults.md" />
+            </Page>
             <Page url="/styles-and-themes/common-units">
                 <DocumentPage url="/pages/styles-and-themes/common-units.md"/>
             </Page>
@@ -128,17 +139,20 @@
             <Page url="/globals">
                 <DocumentPage url="pages/globals.md" />
             </Page>
+            <Page url="/helper-tags">
+                <DocumentPage url="pages/helper-tags.md" />
+            </Page>
             <Page url="/glossary">
                 <DocumentPage hideToc="true" url="/pages/glossary.md" />
-            </Page>
-            <Page url="/xmlui-theme">
-                <DocumentPage hideToc="true" url="/pages/xmlui-theme.md" />
             </Page>
             <Page url="/icons">
                 <Icons/>
             </Page>
             <Page url="/palettes">
                 <Palettes/>
+            </Page>
+            <Page url="/glossary">
+                <DocumentPage hideToc="true" url="/pages/glossary.md" />
             </Page>
             <Page url="/*">
                 <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>
