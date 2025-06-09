@@ -35,12 +35,13 @@ Nothing happens yet when you select a tube line. Let's wire up the selection to 
     <Column bindTo="modes" />
   </Table>
 </App>
----desc
+```
+
 The <a href="/components/DataSource">DataSource</a> component works like the `data` attribute we used with `List` and `Items`: it fetches from a REST endpoint. Unlike `List`,`Select`, and `Table`, `DataSource` isn't a visible component. It works behind the scenes to capture data for use by visible components.
 
 In this case the returned data object is big and complex, and we only want to display data from the `stations` object nested within it.
 The `resultSelector` property on the `DataSource` targets the nested `stations` object so we can feed just that data into the table.
-```
+
 
 ## Reactive magic
 
@@ -56,7 +57,7 @@ That makes `lines` a variable accessible other XMLUI components, and `lines.valu
 
 Now look at the `url` property of the `DataSource`.
 
-```xmlui !/{lines.value}/
+```xmlui /{lines.value}/
 <DataSource
   id="stations"
   url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
