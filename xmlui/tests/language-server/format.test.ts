@@ -266,7 +266,7 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2 <!--c--> >
+`<n attr="val" attr2 <!--c-->>
   text1
   <n2
     attr3="val2"
@@ -553,7 +553,7 @@ describe('XML Formatter', () => {
     attr3="val2"
     attr4 />
   text2
-</n <!--c--> >`);
+</n <!--c-->>`);
     });
 
     test('single comment, error node in before attributes', () => {
