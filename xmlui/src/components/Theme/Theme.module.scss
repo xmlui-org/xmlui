@@ -1,7 +1,8 @@
 @use "../../components-core/theming/themes" as t;
 
-.from, .to{
-  display: none;
+.wrapper{
+  //it makes the wrapper element behave like an 'invisible' element, so does not affect layout
+  display: contents;
 }
 
 .baseRootComponent {
