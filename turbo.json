@@ -33,11 +33,11 @@
     },
     "build:xmlui-all": {
       "dependsOn": [
+        "build:extension",
         "build:bin",
         "build:xmlui-metadata",
         "build:xmlui",
-        "build:xmlui-standalone",
-        "build:extension"
+        "build:xmlui-standalone"
       ],
       "outputs": ["dist/**"]
     },
