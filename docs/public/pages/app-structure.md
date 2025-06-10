@@ -2,31 +2,35 @@
 
 The [demo app](tbd) exhibits the typical structure of an XMLUI app.
 
-```
-├── index.html
-├── Main.xmlui
-├── config.json
-├── components
-│   ├── ClientDetails.xmlui
-│   ├── Clients.xmlui
+```xmlui-tree
+<root>
+  index.html
+  Main.xmlui
+  config.json
+  components
+    ClientDetails.xmlui
+    Clients.xmlui
     ...
-│   ├── MonthlyRevenue.xmlui
-│   └── WeeklyRevenue.xmlui
-├── resources
-│   ├── favicon.ico
-│   ├── xmlui-logo-inverted.svg
-│   └── xmlui-logo.svg
-├── themes
-│   └── invoice.json
-├── xmlui
-│   ├── 0.9.23.js  [[[ i recommend this practice in order to know when/whether to upgrade ]]]
-│   └── charts-0.1.21.js
-├── start.bat
-├── start.sh
-├── api.json
-├── data.db
-└── xmlui-test-server
+    MonthlyRevenue.xmlui
+    WeeklyRevenue.xmlui
+  resources
+    favicon.ico
+    xmlui-logo-inverted.svg
+    xmlui-logo.svg
+  themes
+    invoice.json
+  xmlui
+    0.9.23.js
+    charts-0.1.21.js
+  start.bat
+  start.sh
+  api.json
+  data.db
+  xmlui-test-server
 ```
+
+> [!INFO] The `xmlui` folder contains the xmlui engine with a version number, specifically `0.9.23.js`. I recommend this practice in order to know when/whether to upgrade.
+
 
 | file| description |
 |---|---|
@@ -46,18 +50,18 @@ The [demo app](tbd) exhibits the typical structure of an XMLUI app.
 
 You can deploy this tree structure (minus the optional `api.json`, `data.db`, and `xmlui-test-server`) to any static webserver that's configured to serve `index.html`. Consider this minimal app.
 
-```
-├── xmlui-minimal
-  ├── index.html
-  ├── Main.xmlui
-  ├── components
-  │   └── Home.xmlui
-  ├── resources
-  │   ├── favicon.ico
-  │   ├── xmlui-logo-inverted.svg
-  │   └── xmlui-logo.svg
-  └── xmlui
-      └── 0.9.23.js
+```xmlui-tree
+xmlui-minimal
+  index.html
+  Main.xmlui
+  components
+    Home.xmlui
+  resources
+    favicon.ico
+    xmlui-logo-inverted.svg
+    xmlui-logo.svg
+  xmlui
+    0.9.23.js
 ```
 
 ## index.html

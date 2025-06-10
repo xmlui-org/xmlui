@@ -322,3 +322,45 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
 
   return markdownContent;
 }
+
+export function observeTreeDisplay(content: string): [number, number, string] | null {
+  const startPattern = "```xmlui-tree";
+  const endPattern = "```";
+
+  const startIndex = content.indexOf(startPattern);
+  if (startIndex === -1) {
+    return null; // No match for the start pattern
+  }
+
+  // Find the end of the start pattern
+  const startContentIndex = content.indexOf("\n", startIndex);
+  if (startContentIndex === -1) {
+    return null; // Malformed pattern, no newline after start
+  }
+
+  // Search for the end pattern after the start content
+  let endIndex = startContentIndex;
+  while (endIndex !== -1) {
+    endIndex = content.indexOf(endPattern, endIndex + 1);
+    if (endIndex !== -1) {
+      // Check if the end pattern is not escaped
+      const precedingChar = content[endIndex - 1];
+      if (precedingChar !== "\\") {
+        return [
+          startIndex,
+          endIndex + endPattern.length,
+          content.substring(startIndex, endIndex + endPattern.length),
+        ];
+      }
+    }
+  }
+
+  return null; // No valid end pattern found
+}
+
+export function convertTreeDisplayToMarkdown(content: string): string {
+  if (content.startsWith("```xmlui-tree") && content.endsWith("```")) {
+    const treeContent = content.slice("```xmlui-tree".length, content.indexOf("```", "```xmlui-tree".length)).trim();
+    return `<section data-tree-content="${btoa(treeContent)}"></section>\n\n`;
+  }
+}

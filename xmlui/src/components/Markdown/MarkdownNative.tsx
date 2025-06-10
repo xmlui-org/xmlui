@@ -21,6 +21,7 @@ import { useAppContext } from "../../components-core/AppContext";
 import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
 import classnames from "classnames";
 import Icon from "../Icon/IconNative";
+import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
 
 type MarkdownProps = {
   removeIndents?: boolean;
@@ -424,6 +425,14 @@ export const Markdown = memo(function Markdown({
               />
             );
           },
+          section({ children, ...props }) {
+            const treeContentBase64 = props?.["data-tree-content"];
+            if (treeContentBase64 !== undefined) {
+              const content = atob(treeContentBase64);
+              return <TreeDisplay content={content} itemHeight={24} />;
+            }
+            return null;
+          }
         }}
       >
         {children as any}
