@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.com/schema.json",
+  "globalEnv": ["CI"],
   "tasks": {
     "build:bin": {
       "outputs": ["dist/scripts/**"]
@@ -54,12 +55,10 @@
       "outputs": []
     },
     "test:e2e-smoke": {
-      "env": ["CI"],
       "dependsOn": ["build:test-bed", "build:xmlui-test-bed"],
       "outputs": ["playwright-report/**"]
     },
     "test:e2e-non-smoke": {
-      "env": ["CI"],
       "dependsOn": ["test:e2e-smoke"],
       "outputs": ["playwright-report/**"]
     },

@@ -787,11 +787,11 @@ export class ComponentRegistry {
     if(!componentName){
       return undefined;
     }
-    // componentName without namespace, 1. app, 2. core, 3. XMLUIExtension
+    // componentName without namespace, 1. core, 2. app, 3. XMLUIExtension
     if (!componentName.includes(".")) {
       return (
-        this.pool.get(APP_NS)?.get(componentName) ||
         this.pool.get(CORE_NS)?.get(componentName) ||
+        this.pool.get(APP_NS)?.get(componentName) ||
         this.pool.get(EXTENSIONS_NS)?.get(componentName)
       );
     }
