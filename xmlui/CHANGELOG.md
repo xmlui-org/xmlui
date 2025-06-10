@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.9.47
+
+### Patch Changes
+
+- a5bef5d: feat: add "inherit" variant to Text
+- ecc52d1: XMLUIExtensions namespace is optional
+- 4322e1b: fix: search context scope
+- 391927c: feat: add xmlui-tree codefence (displays a tree) to Markdown
+
 ## 0.9.46
 
 ### Patch Changes
