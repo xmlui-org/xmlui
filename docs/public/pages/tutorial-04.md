@@ -24,7 +24,7 @@ The `Dashboard` page opens with a set of infocards. Here is a simplified version
 </HStack>
 ```
 
-In the app, `dashboardStats` is a `DataSource`.
+In the app, `dashboardStats` is a [DataSource](/components/DataSource).
 
 ```xmlui
 <DataSource id="dashboardStats" url="/api/dashboard/stats" method="GET" />
@@ -107,4 +107,6 @@ The first `InfoCard` specifies a `20%` width, the others use [star sizing](/glos
 
 </Component>
 ```
+
+Instead of using inline styles we could set theme variables for [Card](/components/Card) and [Text](/components/Text) that would govern all instances of these components. Encapsulating them in `InfoCard` allows for other instances of `Card` and `Text` that don't share this look and feel. `InfoCard` is not only reusable, with a `width` property that enables rows of varying length, but also stylistically distinct. Note that `InfoCard` is still themeable in one respect: it uses the abstract theme variable `$boxShadow-spread` instead of a hardcoded value.
 

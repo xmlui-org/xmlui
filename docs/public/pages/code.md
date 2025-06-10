@@ -21,7 +21,7 @@ A statement:
 An object literal:
 
 ```xmlui !/{ station: "Brixton", wifi: true, toilets: false }/
-<Form 
+<Form
   data='{{ station: "Brixton", wifi: true, toilets: false }}'
   onSubmit="() => { preview.setValue(JSON.stringify($data)) }"
 >
@@ -30,7 +30,7 @@ An object literal:
 A function call:
 
 ```xmlui !/() => { preview.setValue(JSON.stringify($data)) }/
-<Form 
+<Form
   data='{{ station: "Brixton", wifi: true, toilets: false }}'
   onSubmit="() => { preview.setValue(JSON.stringify($data)) }"
 >
@@ -48,8 +48,8 @@ window.transformStops = function(stops) {
   // Helper to extract a value from additionalProperties by key
     function getProp(key) {
       if (!stop.additionalProperties) return '';
-      var propObj = stop.additionalProperties.find(function(p) { 
-        return p.key === key; 
+      var propObj = stop.additionalProperties.find(function(p) {
+        return p.key === key;
       });
       return propObj ? propObj.value : '';
     }
@@ -143,7 +143,7 @@ function transformStops(stops) {
   return stops.map(stop => {
     // Helper to extract a value from additionalProperties by key
     const getProp = (key) => {
-      const prop = stop.additionalProperties && 
+      const prop = stop.additionalProperties &&
         stop.additionalProperties.find(p => p.key === key);
       return prop ? prop.value : '';
     };
@@ -194,7 +194,7 @@ When you write JavaScript expressions in XMLUI attributes you typically write si
     console.log('clicked');
     count++;
     toast('count now' + count)
-  }  
+  }
   </event>
 </Button>
 ```

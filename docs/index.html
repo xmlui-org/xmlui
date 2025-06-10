@@ -10,5 +10,49 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/index.ts"></script>
+
+<script>
+    window.sliderValueToDate = function( value ) {
+        console.log('sliderValueToDate', value)
+        // Convert a slider value (representing days from start date) to an actual date string
+        // value: number of days offset from startDate
+        // returns: date string in YYYY-MM-DD format
+
+        // Use fixed start date instead of window.startDate
+        const start = new Date('2022-06-01');  // <-- FIXED: hard-coded instead of window.startDate
+
+        // Create a new date by adding the slider value (days) to the start date
+        const resultDate = new Date(start);
+        resultDate.setDate(start.getDate() + value);
+
+        // Format the date as YYYY-MM-DD
+        const year = resultDate.getFullYear();
+        const month = String(resultDate.getMonth() + 1).padStart(2, '0'); // +1 because months are 0-indexed
+        const day = String(resultDate.getDate()).padStart(2, '0');
+
+        const result =`${year}-${month}-${day}`;
+        console.log('sliderValueToDate', result)
+        return result
+    }
+
+    window.dateToSliderValue = function( dateString ) {
+        // Convert a date string (YYYY-MM-DD) to a slider value (days from start date)
+        // dateString: date in YYYY-MM-DD format
+        // returns: number of days from the start date
+
+        // Use fixed start date instead of window.startDate
+        const start = new Date('2022-06-01');  // <-- FIXED: hard-coded instead of window.startDate
+
+        // Parse the input date and the global start date
+        const date = new Date(dateString);
+
+        // Calculate the difference in days
+        const diffTime = date.getTime() - start.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        return diffDays;
+    }
+
+</script>
   </body>
 </html>
