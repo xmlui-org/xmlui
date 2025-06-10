@@ -83,12 +83,24 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
               <Option value="{$item.name}" label="{$item.name}" />
             </Items>
           </FormItem>
+
           <Text width="20%">{ productDetails.value[0].description }</Text>
           <FormItem width="20%" bindTo="quantity"               type="number"   initialValue="1" minValue="1" />
           <FormItem width="20%" bindTo="price"  startText="$"                   initialValue="{ productDetails.value[0].price }" />
           <FormItem width="13%" bindTo="amount" startText="$"   enabled="false" initialValue="{ $item.price ? $item.quantity * $item.price : '' } " />
 
-          <Button width="*" variant="ghost" themeColor="attention" icon="close" onClick="lineItems.removeItem($itemIndex)" />
+<!--
+          <Icon width="*" name="close" size="md" color="red" onClick="lineItems.removeItem($itemIndex)" />
+-->
+
+          <Icon width="*" name="close" size="md" color="red" onClick="() => {
+            console.log('click')
+            const items = lineItems.value || [];
+            const index = items.indexOf($item);
+            if (index >= 0) lineItems.removeItem(index);
+          }
+          " />
+
         </FlowLayout>
       </FormItem>
       <HStack>
@@ -128,15 +140,18 @@ The `<CreateInvoice>` component encapsulates all the form logic. Let's review th
 
 ## Data sources
 
+As with `Invoices` we are again using stored data, the real API endpoints are `/clients` and `/products`.
+
 ```xmlui
 <Component name="CreateInvoice">
   <DataSource id="clients" url="/resources/files/clients.json" method="GET" />
   <DataSource id="products" url="/resources/files/products.json" method="GET" />
 ```
 
-As with `Invoices` we are again using stored data, the real API endpoints are `/clients` and `/products`.
 
 ## The Form tag
+
+This [Form](/components/Form) contains a dropdown menu of products, two date pickers, and an expandable set of lineitems. These parts separately feed into the form's `$data` [context variable](/context-variables) which accumulates the JSON payload sent to the server on submit with successful validation.
 
 ```xmlui
 <Form
@@ -144,7 +159,6 @@ As with `Invoices` we are again using stored data, the real API endpoints are `/
     onCancel="invoiceForm.reset()">
 ```
 
-This [Form](/components/Form) contains a dropdown menu of products, two date pickers, and an expandable set of lineitems. These parts separately feed into the form's `$data` [context variable](/context-variables) which accumulates the JSON payload sent to the server on submit with successful validation.
 
 ## The payload
 
@@ -165,6 +179,10 @@ A valid payload looks like this.
 The `Cancel` button resets all of the form's components and empties this data structure.
 
 ## Nested FormItems
+
+There is a top-level `FormItem` for `client`, `issue_date`, `due_date`, and `lineItems`. Their `bindTo` attributes name and populate corresponding fields in `$data`.
+
+Nested with within `lineItems` there is a `FormItem` for `product`, `quantity`, `price`, and `amount`. Their `bindTo` attributes name and define slots in an array of `lineItems` that's dynamically built on each click of the `Add Item` button.
 
 ```xmlui /<FormItem/
 <Card>

@@ -1,16 +1,12 @@
-# User-defined components
+# User-defined components [[TBD: Playground conversion and rewrite]]
 
-<Callout type="info" emoji="💡">
-  XLMUI has been designed with **reusable components** in mind. Besides the components out-of-the box, you can use the markup to create and utilize your reusable components within your app.
-</Callout>
+XLMUI has been designed with **reusable components** in mind. Besides the components out-of-the box, you can use the markup to create and utilize your reusable components within your app.
 
 This article will teach you the gritty-nitty details of component creation and customization.
 
 ## Defining Components
 
-<Callout type="info" emoji="💡">
-  Use the `<Component>` tag to declare a reusable component in the markup. This tag has a mandatory attribute, `name`, a unique identifier to the component.
-</Callout>
+Use the `<Component>` tag to declare a reusable component in the markup. This tag has a mandatory attribute, `name`, a unique identifier to the component.
 
 ```xmlui copy filename="components/LabeledValue.xmlui"
 <Component name="LabeledValue">
@@ -52,17 +48,13 @@ The XMLUI engine displays all `LabeledValue` component instances:
   `}
 />
 
-<Callout type="info" emoji="💡">
-  The component's name must start with an uppercase letter followed by letters, digits, the underscore (`_`), or the dollar sign (`$`) character. Components must be placed into separate files in the `components` folder within the app's root folder. **Use the same name for the component as its filename so that the browser can fetch the component.**
-</Callout>
+The component's name must start with an uppercase letter followed by letters, digits, the underscore (`_`), or the dollar sign (`$`) character. Components must be placed into separate files in the `components` folder within the app's root folder. **Use the same name for the component as its filename so that the browser can fetch the component.**
 
 The component must have content, at least a single nested tag to define the component's visual representation, and, optionally, it may have variables and methods assigned to the component.
 
 ## Using Properties
 
-<Callout type="info" emoji="💡">
-  Component definitions can refer to properties passed to component instances.
-</Callout>
+Component definitions can refer to properties passed to component instances.
 
 Though reusable components with a static appearance may be helpful, the real power comes when you can define component properties to influence the appearance and behavior of a particular reusable component.
 
@@ -105,9 +97,7 @@ Use the same markup to pass property values to reusable components as you do for
   `}
 />
 
-<Callout type="info" emoji="📔">
 XMLUI does not require defining component properties in advance. You just use your property through the `$props` identifier; the engine will immediately understand and render it.
-</Callout>
 
 Sometimes, it is helpful to have default values for properties. XMLUI makes it simple using the `??` operator, as you can see in the following component definition:
 
@@ -141,9 +131,7 @@ Sometimes, it is helpful to have default values for properties. XMLUI makes it s
 
 ## Using Events
 
-<Callout type="info" emoji="💡">
-  Similarly to properties, you can harness a reusable component with custom events.
-</Callout>
+Similarly to properties, you can harness a reusable component with custom events.
 
 Create a new reusable component, `<IncButton>`, which increments its value for every click. This component can notify its environment about increments by firing an event. This event receives the current counter as an event parameter:
 
@@ -187,9 +175,7 @@ Try using `<IncButton>` with the `incremented` event:
 
 ## Exposing Component Methods [#exposing-methods]
 
-<Callout type="info" emoji="💡">
-  In addition to properties and events, you can expose custom methods from a particular component.
-</Callout>
+In addition to properties and events, you can expose custom methods from a particular component.
 
 You can invoke these methods in other components to execute an operation or query some information in the exposing component.
 
@@ -204,9 +190,7 @@ The following code snippet shows a modified `<IncButton>` component that exposes
 </Component>
 ```
 
-<Callout type="info" emoji="📔">
-  Variables defined within a reusable component are invisible from outside. **However, with methods, you can expose them**.
-</Callout>
+Variables defined within a reusable component are invisible from outside. **However, with methods, you can expose them**.
 
 The updated component stores the counter value in a variable belonging to the entire component (and not enclosed within the `<Button>`). This line declares the `setValue` method with an arrow function with the parameter receiving the new value (`v`).
 
@@ -245,9 +229,7 @@ Try using this simple app:
 
 ## `<Slot>`
 
-<Callout type="info" emoji="💡">
-  You can use the `Slot` placeholder within a reusable component's definition to mark the location when the reusable component's children should be injected.
-</Callout>
+You can use the `Slot` placeholder within a reusable component's definition to mark the location when the reusable component's children should be injected.
 
 Here, `Slot` is nested into `VStack` to mark the location to inject `MyStack` children:
 
@@ -299,9 +281,7 @@ This sample injects children into `MyStack`:
 
 ### Default Slot Content
 
-<Callout type="info" emoji="💡">
 The `Slot` may display default content when the reusable component instance does not define children.
-</Callout>
 
 In this example, `Slot` declares a default view:
 
@@ -349,9 +329,7 @@ The engine renders the first `MyGreeting` instance with the default content, the
 
 ### Slot Context values
 
-<Callout type="info" emoji="💡">
 The `Slot` in a reusable component may define arbitrary properties it passes as context values to the children of the particular reusable component instance.
-</Callout>
 
 The following component, `RandomNumberDisplay`, generates a random number between its `minValue` and `maxValue` properties and delegates displaying that number to its consumer.
 
@@ -494,9 +472,7 @@ Let's create a reusable component, `MyBoxes`, with this markup:
 
 ### Reusable Components in a Stack
 
-<Callout type="info" emoji="💡">
-  When you nest a reusable component into a stack, **the engine ignores all layout-related properties decorating the reusable component instance**.
-</Callout>
+When you nest a reusable component into a stack, **the engine ignores all layout-related properties decorating the reusable component instance**.
 
 Nest the `MyBoxes` instances into an `HStack`:
 
@@ -595,9 +571,7 @@ Thus, the markup with `MyBoxes` in a wrapping `VStack` renders this:
 
 ### Reusable Components in a FlowLayout
 
-<Callout type="info" emoji="💡">
-  `FlowLayout` wraps each direct child in an internal container and removes the child's width settings. This internal container takes the width from the reusable component definition.
-</Callout>
+`FlowLayout` wraps each direct child in an internal container and removes the child's width settings. This internal container takes the width from the reusable component definition.
 
 Assume you use `MyBoxes` with a `FlowLayout`, like in this example:
 
@@ -627,9 +601,7 @@ Because of the internal wrapping, the engine renders a markup like this:
 </App>
 ```
 
-<Callout type="info" emoji="📔">
-  Note that the original `Stack` widths within `MyBoxes` are removed, and the 50% width of the first `MyBoxes` is transposed into the first virtual `FlowLayoutItem`.
-</Callout>
+Note that the original `Stack` widths within `MyBoxes` are removed, and the 50% width of the first `MyBoxes` is transposed into the first virtual `FlowLayoutItem`.
 
 <Playground
   name="Example: MyBoxes in FlowLayout"
@@ -651,9 +623,7 @@ Because of the internal wrapping, the engine renders a markup like this:
   `}
 />
 
-<Callout type="info" emoji="📔">
-  The purple and orange boxes are adjacent because the virtual `FlowLayoutItem` container does not use gaps. XMLUI does not provide a `FlowLayoutItem` component; we use this name here just for explanation.
-</Callout>
+The purple and orange boxes are adjacent because the virtual `FlowLayoutItem` container does not use gaps. XMLUI does not provide a `FlowLayoutItem` component; we use this name here just for explanation.
 
 ### Using Layout Containers Explicitly
 
@@ -668,9 +638,7 @@ You can explicitly wrap the children of a reusable component into a layout conta
 </Component>
 ```
 
-<Callout type="info" emoji="📔">
-  This definition adds a dotted green border to the component to display the UI patch it fills for demonstration purposes.
-</Callout>
+This definition adds a dotted green border to the component to display the UI patch it fills for demonstration purposes.
 
 Wrap two `MyBoxes` instances into an `HStack`:
 
@@ -707,9 +675,7 @@ The output differs from the one where you did not have an explicit layout contai
   `}
 />
 
-<Callout type="info" emoji="📔">
-  Remember, an item's width in a horizontal stack (unless explicitly set) accommodates the content's width, which is 100 + 50 = 150 pixels here. The dotted green background signs the boundary of the `HStack` arranging the purple and orange boxes. Do not forget that stacks ignore the layout properties, including the width set on a reusable component.
-</Callout>
+Remember, an item's width in a horizontal stack (unless explicitly set) accommodates the content's width, which is 100 + 50 = 150 pixels here. The dotted green background signs the boundary of the `HStack` arranging the purple and orange boxes. Do not forget that stacks ignore the layout properties, including the width set on a reusable component.
 
 You get this output when you wrap the two `MyBoxes` instances into a `VStack`:
 
@@ -735,9 +701,7 @@ You get this output when you wrap the two `MyBoxes` instances into a `VStack`:
   `}
 />
 
-<Callout type="info" emoji="📔">
-  Remember, an item's width in a vertical stack (unless explicitly set) is the entire width (100%) within the stack's parent. As the dotted green background signs, the `HStack` is as wide as its parent. Within this stack, the boxes still keep their explicit widths. Do not forget that `VStack` ignores the layout properties, including the width set on a reusable component.
-</Callout>
+Remember, an item's width in a vertical stack (unless explicitly set) is the entire width (100%) within the stack's parent. As the dotted green background signs, the `HStack` is as wide as its parent. Within this stack, the boxes still keep their explicit widths. Do not forget that `VStack` ignores the layout properties, including the width set on a reusable component.
 
 The display with a `FlowLayout`:
 
@@ -763,9 +727,7 @@ The display with a `FlowLayout`:
   `}
 />
 
-<Callout type="info" emoji="📔">
-  Remember, an item's width in a `FlowLayout` (unless explicitly set) is the entire width (100%) within the parent.
-</Callout>
+Remember, an item's width in a `FlowLayout` (unless explicitly set) is the entire width (100%) within the parent.
 
 
 ### Using Explicit Component Width
