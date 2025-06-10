@@ -46,9 +46,15 @@
       "outputs": ["dist/**"]
     },
     "build:xmlui-test-bed": {
+      "dependsOn": [
+        "build:extension"
+      ],
       "outputs": ["src/testing/infrastructure/dist/**"]
     },
     "build:test-bed": {
+      "dependsOn": [
+        "build:extension"
+      ],
       "outputs": ["dist/**"]
     },
     "test:unit": {
