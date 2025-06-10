@@ -1,7 +1,10 @@
 # Slider
-The Slider component allows you to select numeric values or ranges. This example demonstrates how to use a slider for date range selection with reactive data filtering.
+The `Dashboard` page continues with a chart of daily revenue that uses a [Slider](/components/Slider) to control both ends of a date range.
+
+Here is a simplified version of that mechanism. Try using both slider handles to adjust the date range and corresponding total revenue.
+
 ```xmlui-pg
----app
+---app display
 <App>
   <SliderDemo />
 </App>
@@ -48,37 +51,27 @@ The Slider component allows you to select numeric values or ranges. This example
   }" />
 
   <VStack>
-    <H1>Date Range Slider Demo</H1>
+    <H1>Slider Demo</H1>
 
-    <Text>Range: {startDate} to {endDate} ({filteredData.length} records)</Text>
+    <Text>Selected records: {filteredData.length}</Text>
 
     <Slider
       id="dateSlider"
-      label="Select Date Range"
-      minValue="0"
-      maxValue="29"
-      initialValue="[0, 29]"
-      step="1"
+      label="Date range"
+      minValue="{1}"
+      maxValue="{30}"
+      initialValue="{[1, 30]}"
+      step="{1}"
       onDidChange="{
-        if (window.sliderValueToDate) {
-          startDate = window.sliderValueToDate(dateSlider.value[0]);
-          endDate = window.sliderValueToDate(dateSlider.value[1]);
-          console.log('New dates:', startDate, endDate);
-        } else {
-          console.error('sliderValueToDate function not found');
-        }
+        startDate = window.sliderValueToDate(dateSlider.value[0]);
+        endDate = window.sliderValueToDate(dateSlider.value[1]);
       }"
       valueFormat="{ (value) => {
-        console.log('valueFormat called with:', value, typeof value);
-        if (window.sliderValueToDate) {
-          const result = window.sliderValueToDate(value);
-          console.log('valueFormat result:', result);
-          return result;
-        } else {
-          console.error('sliderValueToDate not available in valueFormat');
-          return 'N/A';
+        const result = window.sliderValueToDate(value);
+        console.log('valueFormat result:', result);
+        return result;
         }
-      }}"
+      }"
     />
 
     <Text>Total Revenue: ${filteredData.reduce((sum, item) => sum + item.total, 0)}</Text>
@@ -87,8 +80,56 @@ The Slider component allows you to select numeric values or ranges. This example
 </Component>
 ```
 
-This demonstrates:
-1. **Slider component** with dual thumbs for range selection
-2. **Reactive variables** that update when slider changes
-3. **Data filtering** based on the selected date range
-4. **Custom value formatting** to show dates instead of numbers
+Here's `SliderDemo`.
+
+```xmlui
+<Component name="SliderDemo">
+  <variable name="startDate" value="2022-06-01" />
+  <variable name="endDate" value="2022-06-30" />
+
+  <variable name="dailyData" value="{[
+    {date: '2022-06-01', total: 1200},
+    {date: '2022-06-02', total: 1850},
+    ...
+    {date: '2022-06-29', total: 0},
+    {date: '2022-06-30', total: 2200}
+  ]}" />
+
+  <variable name="filteredData" value="{
+    dailyData.filter(item => item.date >= startDate && item.date <= endDate)
+  }" />
+
+  <VStack>
+    <H1>Slider Demo</H1>
+
+    <Text>Selected records: {filteredData.length}</Text>
+
+    <Slider
+      id="dateSlider"
+      label="Date range"
+      minValue="{1}"
+      maxValue="{30}"
+      initialValue="{[1, 30]}"
+      step="{1}"
+      onDidChange="{
+        startDate = window.sliderValueToDate(dateSlider.value[0]);
+        endDate = window.sliderValueToDate(dateSlider.value[1]);
+      }"
+      valueFormat="{ (value) => {
+        const result = window.sliderValueToDate(value);
+        console.log('valueFormat result:', result);
+        return result;
+        }
+      }"
+    />
+
+    <Text>Total Revenue: ${filteredData.reduce((sum, item) => sum + item.total, 0)}</Text>
+
+  </VStack>
+</Component>
+```
+
+When the handles move, the slider's `onDidChange` event updates `startDate` and `endDate` using a function that translates the slider position to a date in the range of dates. In the Invoices app those variables form part of a `DataSource` URL that fires when there's a change; here they update the `filteredData` variable to simulate the real `DataSource`.
+
+The slider's `valueFormat` property uses the same function to report the new `startDate` and `endDate`.
+
