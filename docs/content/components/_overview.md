@@ -1,5 +1,4 @@
-
-## Components Overview [#components-overview]
+# Components Overview [#components-overview]
 
 | Num | Component | Description | Status |
 | :---: | :---: | --- | :---: |
@@ -88,3 +87,4 @@
 | 83 | [ToneChangerButton](./components/ToneChangerButton) | The `ToneChangerButton` component is a component that allows the user to change the tone of the app. | experimental |
 | 84 | [VSplitter](./components/VSplitter) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
 | 85 | [VStack](./components/VStack) | This component represents a stack rendering its contents vertically. | stable |
+

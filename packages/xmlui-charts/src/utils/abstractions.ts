@@ -1,6 +1,6 @@
 import type { LabelPosition } from "recharts/types/component/Label";
 
-export const LabelPositionValues: Exclude<
+export const LabelPositionValues: readonly Exclude<
   LabelPosition,
   {
     x?: number;
