@@ -1,4 +1,4 @@
-import { basename, extname, join, parse } from "path";
+import { basename, extname, join } from "path";
 import { existsSync, writeFileSync } from "fs";
 import { unlink, readFile, writeFile, readdir } from "fs/promises";
 import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
@@ -9,8 +9,8 @@ import { buildDownloadsMap } from "./build-downloads-map.mjs";
 import { FOLDERS } from "./folders.mjs";
 
 logger.setLevels(LOGGER_LEVELS.warning, LOGGER_LEVELS.error);
-const acceptedStatuses = ["stable", "experimental", "deprecated", "in progress"];
-const defaultStatus = "stable";
+const ACCEPTED_STATUSES = ["stable", "experimental", "deprecated", "in progress"];
+const DEFAULT_STATUS = "stable";
 
 export class DocsGenerator {
   metadata = [];
@@ -46,7 +46,7 @@ export class DocsGenerator {
           displayName,
           description: compData.description,
           descriptionRef,
-          componentFolder,
+          folderPath: componentFolder,
         };
 
         const entries = addDescriptionRef(extendedComponentData, [
@@ -93,10 +93,10 @@ export class DocsGenerator {
   /**
    * Generates the package description section in a specified file for a given Extension package.
    * @param {string} packageDescription The data to add to the file
-   * @param {string} sectionName Name of the section to (re)generate
+   * @param {string} sectionHeading Name & level of the section to (re)generate
    * @param {string} fileName The name and absolute path of the file to write to
    */
-  async generatePackageDescription(packageDescription, sectionName, fileName) {
+  async generatePackageDescription(packageDescription, sectionHeading, fileName) {
     logger.info("Creating package description section in specified file");
     try {
       const outFile = fileName || join(FOLDERS.pages, `${basename(this.folders.sourceFolder)}.md`);
@@ -106,11 +106,9 @@ export class DocsGenerator {
       }
       let buffer = await readFile(outFile, "utf8");
 
-      const sectionNameHeading = `## ${sectionName}`;
-      buffer = createSectionHeading(buffer, sectionNameHeading);
-      const { beforeSection, afterSection } = getSectionBeforeAndAfter(buffer, sectionName);
+      const { beforeSection, afterSection } = getSectionBeforeAndAfter(buffer, sectionHeading);
       const section =
-        beforeSection + "\n" + sectionNameHeading + "\n\n" + packageDescription + afterSection;
+        beforeSection + "\n" + sectionHeading + "\n\n" + packageDescription + afterSection;
 
       await writeFile(outFile, section.trim());
     } catch (error) {
@@ -124,30 +122,31 @@ export class DocsGenerator {
    * otherwise it appends one to the end of the file.
    * @param {string} summarySectionName The section to look for and add the summary to
    * @param {string?} summaryFileName The full path and name of the file to add the summary to
-   * @param {boolean?} tableRowNums Whether to add row numbers to the summary table
+   * @param {boolean?} hasRowNums Whether to add row numbers to the summary table
    */
-  async generateComponentsSummary(
-    summarySectionName = "Components",
-    summaryFileName,
-    tableRowNums,
-  ) {
+  async generateComponentsSummary(summarySectionName, summaryFileName, hasRowNums) {
     logger.info("Creating components summary");
     try {
       const outFile = summaryFileName || join(this.folders.outFolder, `_overview.md`);
-
       if (!existsSync(outFile)) {
         await writeFile(outFile, "");
       }
 
-      const summary = await createSummary(
+      const fileContents = await readFile(outFile, "utf8");
+
+      const table = createSummary(
         this.metadata,
-        outFile,
         this.folders.sourceFolder,
         this.folders.outFolder,
+        hasRowNums,
+      );
+      let { beforeSection, afterSection } = getSectionBeforeAndAfter(
+        fileContents,
         summarySectionName,
-        tableRowNums,
       );
 
+      beforeSection = beforeSection.length > 0 ? beforeSection + "\n\n" : beforeSection;
+      const summary = beforeSection + `${summarySectionName}\n\n` + table + "\n" + afterSection;
       await writeFile(outFile, summary);
     } catch (error) {
       processError(error);
@@ -195,78 +194,63 @@ export class DocsGenerator {
   }
 }
 
-async function createSummary(
-  metadata,
-  filename,
-  componentsSourceFolder,
-  componentsOutFolder,
-  sectionName = "Components",
-  rowNums = true,
-) {
-  let buffer = await readFile(filename, "utf8");
-  const componentFolderName = basename(componentsSourceFolder);
-
-  buffer = createSectionHeading(buffer, `# ${sectionName}`);
-  // The summary file may contain further sections other than the summary table.
-  // Thus, we only (re)generate the section that contains the summary table.
-  // This is done by finding the heading for the start of the summary table section and either the end of file
-  // or the next section heading.
-  const { beforeSection, afterSection } = getSectionBeforeAndAfter(buffer, sectionName);
-
-  const sortedMetadata = metadata.sort((a, b) => {
-    return a.displayName.localeCompare(b.displayName);
-  });
-
-  let table = "";
-  table += `## ${sectionName}\n\n`;
-  table += createTable({
-    rowNums,
-    headers: [
-      { value: "Component", style: "center" },
-      "Description",
-      { value: "Status", style: "center" },
-    ],
-    rows: sortedMetadata
-      .filter((component) => {
-        const componentStatus = component.status ?? defaultStatus;
-        return !acceptedStatuses.includes(componentStatus) ? false : true;
-      })
-      .map((component) => {
-        return [
-          existsSync(join(componentsOutFolder, `${component.displayName}.md`))
-            ? `[${component.displayName}](./${componentFolderName}/${component.displayName})`
-            : component.displayName,
-          component.description,
-          component.status ?? defaultStatus,
-        ];
-      }),
-  });
-
-  return beforeSection + "\n" + table + afterSection;
-}
-
-function createSectionHeading(buffer, sectionNameHeading) {
-  const lines = strBufferToLines(buffer);
-  const sectionStartIdx = lines.findIndex((line) => line.includes(sectionNameHeading));
-  if (sectionStartIdx === -1) {
-    buffer += `\n\n${sectionNameHeading}\n\n`;
+/**
+ * The summary file may contain further sections other than the summary table.
+ * Thus, we only (re)generate the section that contains the summary table.
+ * This is done by finding the heading for the start of the summary table section
+ * and either the end of file or the next section heading.
+ * @param {string} buffer the string containing the file contents
+ * @param {string} sectionHeading The section to look for, has to have heading level as well
+ */
+function getSectionBeforeAndAfter(buffer, sectionHeading) {
+  if (!sectionHeading) {
+    return { beforeSection: buffer, afterSection: "" };
   }
-  return buffer.trim();
-}
 
-function getSectionBeforeAndAfter(buffer, sectionName) {
   const lines = strBufferToLines(buffer);
-  const sectionStartIdx = lines.findIndex((line) => line.includes(`## ${sectionName}`));
-  const sectionEndIdx = lines
-    .slice(sectionStartIdx + 1)
-    .findIndex((line) => /^#+[\s\S]/.exec(line));
+  const sectionStartIdx = lines.findIndex((line) => line.includes(sectionHeading));
+
+  // Handle case where sectionHeading isn't found
+  if (sectionStartIdx === -1) {
+    return { beforeSection: buffer, afterSection: "" };
+  }
+
+  // Find the next heading after the section start
+  const afterLines = lines.slice(sectionStartIdx + 1);
+  const sectionEndIdx = afterLines.findIndex((line) => /^#+\s/.test(line));
+  const endIdx = sectionEndIdx === -1 ? afterLines.length : sectionEndIdx;
 
   const beforeSection = lines.slice(0, sectionStartIdx).join("\n");
-  const afterSection = lines
-    .slice(sectionStartIdx + 1, sectionStartIdx + 1 + sectionEndIdx)
-    .join("\n");
+  const afterSection = afterLines.slice(0, endIdx).join("\n");
 
   return { beforeSection, afterSection };
+}
+
+function createSummary(metadata, srcFolder, outFolder, hasRowNums = true) {
+  const headers = [
+    { value: "Component", style: "center" },
+    "Description",
+    { value: "Status", style: "center" },
+  ];
+  const rows = metadata
+    .sort((a, b) => a.displayName.localeCompare(b.displayName))
+    .filter((component) => {
+      const componentStatus = component.status ?? DEFAULT_STATUS;
+      return !ACCEPTED_STATUSES.includes(componentStatus) ? false : true;
+    })
+    .map((component) => {
+      const componentFilePath = join(outFolder, `${component.displayName}.md`);
+      const componentUrl = `./${basename(srcFolder)}/${component.displayName}`;
+      return [
+        existsSync(componentFilePath)
+          ? `[${component.displayName}](${componentUrl})`
+          : component.displayName,
+        component.description,
+        component.status ?? DEFAULT_STATUS,
+      ];
+    });
+
+  return createTable({ headers, rows, rowNums: hasRowNums });
 }
 
 function addDescriptionRef(component, entries = []) {

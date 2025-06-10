@@ -2,7 +2,7 @@ import { basename, join, extname, relative } from "path";
 import { lstatSync } from "fs";
 import { unlink, readdir, readFile, mkdir, writeFile, rm } from "fs/promises";
 import { ErrorWithSeverity, logger, LOGGER_LEVELS, processError } from "./logger.mjs";
-import { convertPath, deleteFileIfExists, fromKebabtoReadable } from "./utils.mjs";
+import { winPathToPosix, deleteFileIfExists, fromKebabtoReadable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.mjs";
 import { FOLDERS } from "./folders.mjs";
@@ -77,12 +77,12 @@ async function generateExtenionPackages(metadata) {
     componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
     await extensionGenerator.generatePackageDescription(
       metadata[packageName].description,
-      `${fromKebabtoReadable(packageName)} Package`,
+      `# ${fromKebabtoReadable(packageName)} Package`,
       indexFile,
     );
 
     // Create summary and index file for extension package
-    await extensionGenerator.generateComponentsSummary(`Package Components`, indexFile, false);
+    await extensionGenerator.generateComponentsSummary(`## Package Components`, indexFile, false);
 
     // Generate a _meta.json for the files in the extension
     extensionGenerator.writeMetaSummary(componentsAndFileNames, packageFolder);
@@ -139,7 +139,7 @@ async function generateComponents(metadata) {
   const summaryTitle = "Components Overview";
   const summaryFileName = "_overview";
   await metadataGenerator.generateComponentsSummary(
-    summaryTitle,
+    `# ${summaryTitle}`,
     join(outputFolder, `${summaryFileName}.md`),
   );
   componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
@@ -162,7 +162,7 @@ async function generateHtmlTagComponents(metadata) {
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
   await metadataGenerator.generateComponentsSummary(
-    "HtmlTag Components",
+    "# HtmlTag Components",
     join(FOLDERS.pages, "html-tag-components.md"),
   );
 }
@@ -255,7 +255,7 @@ async function dynamicallyLoadExtensionPackages() {
       for (const file of distContents) {
         let filePath = join(packageFolderDist, file);
         if (filePath.endsWith(`${basename(dir)}-metadata.js`) && existsSync(filePath)) {
-          filePath = convertPath(relative(FOLDERS.script, filePath));
+          filePath = winPathToPosix(relative(FOLDERS.script, filePath));
           const { componentMetadata } = await import(filePath);
           if (!componentMetadata) {
             logger.warning(

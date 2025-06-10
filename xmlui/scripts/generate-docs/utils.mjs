@@ -55,7 +55,7 @@ export function createTable({ headers = [], rows = [], rowNums = false }) {
  * Multi-liner (commented and compatible with really old javascript versions)
  * Source: https://stackoverflow.com/a/62732509
  */
-export function convertPath(windowsPath) {
+export function winPathToPosix(windowsPath) {
   // handle the edge-case of Window's long file names
   // See: https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#short-vs-long-names
   windowsPath = windowsPath.replace(/^\\\\\?\\/, "");
@@ -63,7 +63,7 @@ export function convertPath(windowsPath) {
   // convert the separators, valid since both \ and / can't be in a windows filename
   windowsPath = windowsPath.replace(/\\/g, "/");
 
-  // compress any // or /// to be just /, which is a safe oper under POSIX
+  // compress any // or /// to be just /, which is a safe operation under POSIX
   // and prevents accidental errors caused by manually doing path1+path2
   windowsPath = windowsPath.replace(/\/\/+/g, "/");
 
@@ -90,7 +90,7 @@ export function traverseDirectory(node, visitor, level = 0) {
   const dirContents = readdirSync(node.path);
   if (!node.children) node.children = dirContents;
   for (const itemName of dirContents) {
-    const itemPath = [convertPath(node.path), itemName].join(posix.sep);
+    const itemPath = [winPathToPosix(node.path), itemName].join(posix.sep);
     const itemIsDir = statSync(itemPath).isDirectory();
     const childNode = {
       name: itemName,
