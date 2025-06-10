@@ -82,7 +82,7 @@ Here is a simplified version of that mechanism. Try using both slider handles to
 
 Here's `SliderDemo`.
 
-```xmlui
+```xmlui /filteredData/ /startDate/ /endDate/ /sliderValueToDate/
 <Component name="SliderDemo">
   <variable name="startDate" value="2022-06-01" />
   <variable name="endDate" value="2022-06-30" />
@@ -129,7 +129,7 @@ Here's `SliderDemo`.
 </Component>
 ```
 
-When the handles move, the slider's `onDidChange` event updates `startDate` and `endDate` using a function that translates the slider position to a date in the range of dates. In the Invoices app those variables form part of a `DataSource` URL that fires when there's a change; here they update the `filteredData` variable to simulate the real `DataSource`.
+When the handles move, the slider's `onDidChange` event updates `startDate` and `endDate` using a function, `sliderValueToDate`, that translates the slider position to a date in the range of dates. In the Invoices app those variables form part of a `DataSource` URL that fires when there's a change; here they update the `filteredData` variable to simulate the real `DataSource`.
 
 The slider's `valueFormat` property uses the same function to report the new `startDate` and `endDate`.
 
