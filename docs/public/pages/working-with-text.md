@@ -5,7 +5,7 @@ Text elements appear in UI components such as menu items, titles, headings, labe
 You can nest text in any component that renders its children.
 
 
-```xmlui-pg display
+```xmlui-pg display name="Example: displaying text"
 <App>
   This is text!
   <Button label="This is text too." />
@@ -15,7 +15,7 @@ You can nest text in any component that renders its children.
 
 To gain more control we can use the  `Text` component.
 
-```xmlui-pg display
+```xmlui-pg display name="Example: Using the Text component"
 <App>
   <Text fontSize="1.5rem" color="purple">This is a text!</Text>
   <Button label="I'm just a button" />
@@ -27,7 +27,7 @@ Components that render text support theme variables. You can use them, for examp
 </Callout>
 
 
-```xmlui-pg display
+```xmlui-pg display name="Example: Text can be styled"
 <App>
   <Theme
     textColor-H1 = "red"
@@ -49,7 +49,7 @@ Components like `Text`, `H1` and `Badge` can display text in two ways:
 
 We've seen nesting, here's an example that uses the `value` property.
 
-```xmlui-pg display
+```xmlui-pg display name="Example: Text and the value property"
 <App>
   <H2 value="Text Content with Properties" />
   <Text value="This text is set in the 'value' property of 'Text'." />
@@ -60,7 +60,6 @@ We've seen nesting, here's an example that uses the `value` property.
 > With nested text, multiple consecutive spaces or newlines collapse to a single space. That doesn't happen when you set text using the `value`.
 
 Whitespace collapsing enables you to maintain source text that's broken into multiple lines for easier editing.
-
 
 The collapsed view renders neatly.
 
