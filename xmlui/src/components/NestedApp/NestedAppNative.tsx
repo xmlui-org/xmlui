@@ -149,9 +149,7 @@ export function NestedApp({
     if (!contentRootRef.current && shadowRef.current) {
       contentRootRef.current = ReactDOM.createRoot(shadowRef.current);
     }
-    let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
-      `<Fragment xmlns:XMLUIExtensions="component-ns">${app}</Fragment>`,
-    );
+    let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(app);
     if (errors.length > 0) {
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
     }
