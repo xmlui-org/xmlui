@@ -14,7 +14,7 @@
   "dependencies": {
     "recharts": "^2.15.1"
   },
-  "devDependencies": {
+  "peerDependencies": {
     "xmlui": "*"
   },
   "main": "./dist/xmlui-charts.js",

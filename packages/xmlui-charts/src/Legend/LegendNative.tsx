@@ -13,12 +13,12 @@ type Props = {
   align?: HorizontalAlignmentType;
 };
 
-export const verticalAlignmentValues: VerticalAlignmentType[] = [
+export const verticalAlignmentValues: readonly VerticalAlignmentType[] = [
   "top",
   "bottom",
   "middle",
 ] as const;
-export const horizontalAlignmentValues: HorizontalAlignmentType[] = [
+export const horizontalAlignmentValues: readonly HorizontalAlignmentType[] = [
   "left",
   "right",
   "center",

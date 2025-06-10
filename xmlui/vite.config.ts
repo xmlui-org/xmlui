@@ -28,10 +28,9 @@ export default ({ mode }) => {
           NODE_ENV: env.NODE_ENV,
           VITE_MOCK_ENABLED: true,
           VITE_MOCK_WORKER_LOCATION: "mockApi.js",
-          VITE_USED_COMPONENTS_Pdf: "false",
-          VITE_USED_COMPONENTS_Chart: "false",
-          VITE_USER_COMPONENTS_XmluiCodeHightlighter: "false",
+          VITE_USED_COMPONENTS_XmluiCodeHightlighter: "false",
           VITE_USED_COMPONENTS_Tree: "false",
+          // VITE_USED_COMPONENTS_Charts: "false",
           // VITE_USER_COMPONENTS_Inspect: "false",
           VITE_XMLUI_VERSION: `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
         },
@@ -85,7 +84,6 @@ export default ({ mode }) => {
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib: lib,
-      // minify: false,
       rollupOptions: {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external:
