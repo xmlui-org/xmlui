@@ -1,6 +1,5 @@
 ---
-"xmlui": minor
-"xmlui-docs": patch
+"xmlui": patch
 ---
 
 feat: add "inherit" variant to Text
