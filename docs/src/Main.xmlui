@@ -31,6 +31,9 @@
                 <NavLink label="InfoCards" to="/tutorial-04"/>
                 <NavLink label="Charts" to="/tutorial-05"/>
                 <NavLink label="Slider" to="/tutorial-06"/>
+                <NavLink label="Invoices" to="/tutorial-07"/>
+                <NavLink label="Create Invoice" to="/tutorial-08"/>
+                <NavLink label="Invoice Details" to="/tutorial-09"/>
             </NavGroup>
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure"/>
@@ -93,6 +96,15 @@
             </Page>
             <Page url="/tutorial-06">
                 <DocumentPage hideToc="true" url="/pages/tutorial-06.md" />
+            </Page>
+            <Page url="/tutorial-07">
+                <DocumentPage hideToc="true" url="/pages/tutorial-07.md" />
+            </Page>
+            <Page url="/tutorial-08">
+                <DocumentPage hideToc="true" url="/pages/tutorial-08.md" />
+            </Page>
+            <Page url="/tutorial-09">
+                <DocumentPage hideToc="true" url="/pages/tutorial-09.md" />
             </Page>
             <Page url="/app-structure">
                 <DocumentPage url="/pages/app-structure.md"/>
