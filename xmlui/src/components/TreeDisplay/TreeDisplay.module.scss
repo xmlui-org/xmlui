@@ -9,9 +9,11 @@ $themeVars: ();
 
 $component: "TreeDisplay";
 $fontSize-TreeDisplay: createThemeVar("fontSize-#{$component}");
+$themeVars: t.composeBorderVars($themeVars, $component);
 
 .treeDisplay {
   display: block;
+  @include t.borderVars($themeVars, $component);
   background-color: createThemeVar("backgroundColor-#{$component}");
   padding: createThemeVar("padding-#{$component}");
   padding-left: createThemeVar("paddingLeft-#{$component}");

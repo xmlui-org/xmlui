@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { parseBindingExpression } from "./parse-binding-expr";
 import type { CodeHighlighter } from "../CodeBlock/highlight-code";
-import { convertPlaygroundPatternToMarkdown, observePlaygroundPattern } from "./utils";
+import { convertPlaygroundPatternToMarkdown, convertTreeDisplayToMarkdown, observePlaygroundPattern, observeTreeDisplay } from "./utils";
 
 const COMP = "Markdown";
 
@@ -155,6 +155,16 @@ const TransformedMarkdown = ({
         convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
         resolvedMd.slice(nextPlayground[1]);
     }
+
+    while(true) {
+      const nextTreeDisplay = observeTreeDisplay(resolvedMd);
+      if (!nextTreeDisplay) break;
+      resolvedMd =
+        resolvedMd.slice(0, nextTreeDisplay[0]) +
+        convertTreeDisplayToMarkdown(nextTreeDisplay[2]) +
+        resolvedMd.slice(nextTreeDisplay[1]);
+    }
+
     resolvedMd = parseBindingExpression(resolvedMd, extractValue);
     return resolvedMd;
   }, [children, extractValue]);
