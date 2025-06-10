@@ -1,15 +1,15 @@
 import { describe, test, expect } from 'vitest';
 import { format, type FormatOptions } from '../../src/language-server/services/format';
-import { createXmlUiParser } from '../../src/parsers/xmlui-parser';
+import { createXmlUiParser, toDbgString } from '../../src/parsers/xmlui-parser';
 
 describe('XML Formatter', () => {
   function formatFromString(input: string, options: FormatOptions = {tabSize: 2, insertSpaces: true}){
 
-    const parser1 = createXmlUiParser(input);
-    const { node: node1 } = parser1.parse();
+    const parser = createXmlUiParser(input);
+    const { node } = parser.parse();
     const defaultOptions: FormatOptions = { insertSpaces: true, tabSize: 2, ...options };
 
-    return format(node1, parser1.getText, defaultOptions);
+    return format(node, parser.getText, defaultOptions);
   }
   // Helper function to test idempotency
   function testIdempotency(input: string, options: FormatOptions = {tabSize: 2, insertSpaces: true}) {
@@ -555,6 +555,19 @@ describe('XML Formatter', () => {
   text2
 </n <!--c--> >`);
     });
+
+    test('single comment, error node in before attributes', () => {
+          const input =
+    `<n attr="val" <!-- long, long commonet long, long commonet long, long commonet long, long commonet --> attr2 ? ></n2>`;
+          const result = testIdempotency(input);
+
+          expect(result).toEqual(
+    `<n
+      attr="val"
+      <!-- long, long commonet long, long commonet long, long commonet long, long commonet -->
+      attr2 ? >
+    </n2>`);
+        });
 
     test("single comment before ':' in tag name ", () => {
       const input =`<ns<!-- c -->:n attr="val" />`;

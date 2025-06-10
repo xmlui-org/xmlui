@@ -155,50 +155,25 @@ class XmluiFormatter {
     return acc;
   }
 
-  printTag(tagChildren: Node[]) {
+  private printTag(tagChildren: Node[]) {
     let acc = "";
-    for (const c of tagChildren){
+    for (let i = 0; i < tagChildren.length; ++i){
+      const c = tagChildren[i];
       switch(c.kind){
         case SyntaxKind.OpenNodeStart:
           acc += "<"
           break;
-        case SyntaxKind.NodeClose:
-          acc += " />"
-          break;
         case SyntaxKind.CloseNodeStart:
           acc += "</"
-          break;
-        case SyntaxKind.NodeEnd:
-          acc += ">"
           break;
         case SyntaxKind.TagNameNode:
           acc += this.printTagName(c);
           break;
+        case SyntaxKind.NodeClose:
+        case SyntaxKind.NodeEnd:
         case SyntaxKind.AttributeListNode:
-          const attrsAlreadyMultiline = c.children
-            .some((attr) => getTriviaNodes(attr).some(attrTrivia => attrTrivia.kind === SyntaxKind.NewLineTrivia));
-
-          const lineLenBeforeAttrs = this.indentationLvl * this.tabSize + acc.length;
-
-          const attrsFormatted = this.printAttrList(c);
-          const attrsCombinedLen = attrsFormatted.reduce((sum, attr) => attr.length + sum, 0);
-
-          const spacesBetweenAttrs = attrsFormatted.length - 1;
-          const potentialClosingTokenLen = 3; // " />".length
-          const sameLineAttrsTotalLen =
-            lineLenBeforeAttrs +
-            attrsCombinedLen +
-            spacesBetweenAttrs +
-            potentialClosingTokenLen;
-
-          const breakAttrsToMultipleLines = sameLineAttrsTotalLen > this.maxLineLength || attrsAlreadyMultiline
-          if (breakAttrsToMultipleLines){
-            const wsBeforeAttr = this.newlineToken + this.indent(this.indentationLvl + 1);
-            acc += wsBeforeAttr + attrsFormatted.join(wsBeforeAttr);
-          } else {
-            acc += " " + attrsFormatted.join(" ");
-          }
-          break;
+          acc += this.printTagAfterName(tagChildren.slice(i), acc);
+          return acc;
         case SyntaxKind.ErrorNode:
           acc += this.getText(c);
       }
@@ -206,11 +181,129 @@ class XmluiFormatter {
     return acc;
   }
 
-  printAttrList(c: Node): string[]{
-    const attrsFormatted = c.children.map((c) => {
-      return this.printAttrNode(c);
-    });
+  private printTagAfterName(nodes: Node[], tagAcc: string): string{
+    let acc: string = "";
+    let closingIsNodeClose = false;
+    let attrSegmentsFormatted: string[] = [];
+    let attrListOffsetInAcc: number;
+
+    let closingSegmentsFormatted: string[] = [];
+    let closingOffsetInAcc: number;
+
+    let attrsAlreadyMultiline = false;
+
+    for (let i = 0; i < nodes.length; ++i){
+      const c = nodes[i];
+      switch(c.kind){
+        case SyntaxKind.AttributeListNode:
+          attrSegmentsFormatted = this.printAttrList(c);
+
+          attrsAlreadyMultiline = c.children
+            .some((attr) => getTriviaNodes(attr).some(attrTrivia => attrTrivia.kind === SyntaxKind.NewLineTrivia));
+          attrListOffsetInAcc = acc.length
+          break;
+        case SyntaxKind.NodeClose: {
+          closingOffsetInAcc = acc.length
+          closingIsNodeClose = true;
+          const comments = this.getCommentsSpaceJoined(c);
+          if (comments){
+            closingSegmentsFormatted = [comments, "/>"];
+          } else {
+            closingSegmentsFormatted = ["/>"];
+          }
+          break;
+        }
+        case SyntaxKind.NodeEnd: {
+          closingOffsetInAcc = acc.length
+          closingIsNodeClose = false;
+
+          const comments = this.getCommentsSpaceJoined(c);
+          if (comments){
+            closingSegmentsFormatted = [comments, ">"];
+          } else {
+            closingSegmentsFormatted = [">"];
+          }
+          break;
+        }
+        case SyntaxKind.ErrorNode:
+          acc += this.getText(c, true);
+          break;
+      }
+    }
+
+    const lineLenBeforeAttrs = this.indentationLvl * this.tabSize + tagAcc.length;
+    const errorNodesLen = acc.length;
+
+    const restOfTag = attrSegmentsFormatted.concat(closingSegmentsFormatted);
+    const restOfTagNonWsLen = restOfTag.reduce((sum, attr) => attr.length + sum, 0);
+    const spacesBetweenRestOfTagNodes = attrSegmentsFormatted.length - 1;
+
+    const sameLineTagLen =
+      errorNodesLen +
+      lineLenBeforeAttrs +
+      restOfTagNonWsLen +
+      spacesBetweenRestOfTagNodes;
+
+    const breakAttrsToMultipleLines = attrsAlreadyMultiline || sameLineTagLen > this.maxLineLength
+
+    const attrsAndTrailingComments = attrSegmentsFormatted.concat(closingSegmentsFormatted.slice(0, -1));
+    const hasClosing = closingSegmentsFormatted.length > 0;
+    const closingFormatted = closingSegmentsFormatted.at(-1);
+
+    if (breakAttrsToMultipleLines) {
+      const wsBeforeAttr = this.newlineToken + this.indent(this.indentationLvl + 1);
+      const attrsFormatted = attrsAndTrailingComments.join(wsBeforeAttr);
+
+      if (attrsAndTrailingComments.length > 0 ){
+        acc += wsBeforeAttr + attrsFormatted ;
+      }
+      if (hasClosing){
+        if (closingIsNodeClose){
+          acc += " ";
+        }
+        acc += closingFormatted;
+      }
+    } else {
+      const wsBeforeAttr = " ";
+      const attrsFormatted = attrsAndTrailingComments.join(wsBeforeAttr);
+
+      if (attrsAndTrailingComments.length > 0 ){
+        acc += wsBeforeAttr + attrsFormatted ;
+      }
+      if (hasClosing){
+        if (closingIsNodeClose){
+          acc += " ";
+        }
+        acc += closingFormatted;
+      }
+    }
+    return acc;
+  }
+
+  private printAttrList(node: Node): string[] {
+    const attrsFormatted: string[] = [];
+    for (const c of node.children) {
+      const comments = this.getCommentsSpaceJoined(c);
+      if (comments){
+        attrsFormatted.push(comments);
+      }
+      attrsFormatted.push(this.printAttrNode(c));
+    }
     return attrsFormatted;
+  }
+
+  /**
+  *
+  * @param node a potential ErrorNode
+  * @returns the formatted string if the node was an ErrorNode
+  * otherwise `null`.
+  */
+  private printIfErrNode(node: Node): string | null{
+    if (node.kind === SyntaxKind.ErrorNode){
+      return this.getText(node, true);
+    } else {
+      return null
+    }
   }
 
   /**
@@ -221,6 +314,10 @@ class XmluiFormatter {
   * @returns
   */
   printAttrNode(node: Node): string {
+    const formattedErrNode = this.printIfErrNode(node);
+    if (formattedErrNode !== null) {
+      return formattedErrNode;
+    }
     let acc = this.printAttrKeyNode(node.children[0]);
     const otherChildren = node.children.slice(1);
     acc += this.printNodesSpaceJoinedCommentsBefore(otherChildren);
