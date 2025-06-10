@@ -78,3 +78,11 @@ test("extension doesn't render without namespace", async ({ page }) => {
 
   await expect(page.getByTestId("testComp")).not.toBeVisible();
 });
+
+test("XMLUIExtensions extension does render without namespace", async ({ page }) => {
+  await initApp(page, {
+    entryPoint: `<App><TestComponentInXMLUIExtensionsNamespace testId="testComp">EXTENSION CONTENT</TestComponentInXMLUIExtensionsNamespace></App>`
+  });
+
+  await expect(page.getByTestId("testComp")).toHaveText("EXTENSION CONTENT");
+});

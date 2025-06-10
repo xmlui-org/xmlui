@@ -126,7 +126,7 @@ Use `&nbsp;` to preserve spaces in a context where they would otherwise collapse
 ```xmlui-pg copy display
 <App>
   A series of non-breaking segments: [1&nbsp;2&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;4]
-<App>
+</App>
 ```
 
 

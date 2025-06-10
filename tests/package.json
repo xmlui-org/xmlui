@@ -6,7 +6,7 @@
     "start": "xmlui start",
     "build:test-bed": "xmlui build --build-mode=INLINE_ALL --withMock --withHostingMetaFiles",
     "test:e2e-smoke": "playwright test",
-    "test-ui": "npm run test -- --ui"
+    "test-ui": "npm run test:e2e-smoke -- --ui"
   },
   "dependencies": {
     "xmlui": "*"
