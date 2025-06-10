@@ -132,6 +132,7 @@ import { optionComponentRenderer } from "./Option/Option";
 import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
 import type StandaloneExtensionManager from "../components-core/StandaloneExtensionManager";
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
+import Charts from "xmlui-charts";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import type { Extension } from "../abstractions/ExtensionDefs";
 import {
@@ -483,12 +484,16 @@ export class ComponentRegistry {
       this.registerCoreComponent(imageComponentRenderer);
     }
 
-    if (process.env.VITE_USER_COMPONENTS_XmluiCodeHightlighter !== "false") {
+    if (process.env.VITE_USED_COMPONENTS_XmluiCodeHightlighter !== "false") {
       this.registerCoreComponent(codeComponentRenderer);
     }
 
-    if (process.env.VITE_USER_COMPONENTS_Markdown !== "false") {
+    if (process.env.VITE_USED_COMPONENTS_Markdown !== "false") {
       this.registerCoreComponent(markdownComponentRenderer);
+    }
+
+    if (process.env.VITE_USED_COMPONENTS_Charts !== "false") {
+      this.extensionRegistered(Charts);
     }
 
     if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
