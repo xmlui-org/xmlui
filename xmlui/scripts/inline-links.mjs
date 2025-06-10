@@ -54,7 +54,7 @@ export function traverseDirectory(node, visitor, level = 0) {
   const dirContents = fs.readdirSync(node.path);
   if (!node.children) node.children = dirContents;
   for (const itemName of dirContents) {
-    const itemPath = [convertPath(node.path), itemName].join(path.posix.sep);
+    const itemPath = [winPathToPosix(node.path), itemName].join(path.posix.sep);
     const itemIsDir = fs.statSync(itemPath).isDirectory();
     const childNode = {
       name: itemName,
@@ -72,7 +72,7 @@ export function traverseDirectory(node, visitor, level = 0) {
  * Multi-liner (commented and compatible with really old javascript versions)
  * Source: https://stackoverflow.com/a/62732509
  */
-export function convertPath(windowsPath) {
+export function winPathToPosix(windowsPath) {
   // handle the edge-case of Window's long file names
   // See: https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#short-vs-long-names
   windowsPath = windowsPath.replace(/^\\\\\?\\/, "");

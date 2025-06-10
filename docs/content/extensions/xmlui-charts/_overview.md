@@ -1,4 +1,4 @@
-## Xmlui Charts Package
+# Xmlui Charts Package
 
 The `Charts` package contains components that display data in a graphical way.All chart components use the same set of properties to receive data.All chart components accept a `LabelLst` component as a child to parametrize display labels.All chart components also accept a `Legend` component as a child to display the legend.
 
@@ -12,3 +12,4 @@ The `Charts` package contains components that display data in a graphical way.Al
 | [Legend](./xmlui-charts/Legend) | Legend component to be displayed in a chart component. | experimental |
 | [LineChart](./xmlui-charts/LineChart) | Represents a line chart component. | experimental |
 | [PieChart](./xmlui-charts/PieChart) | Represents a pie chart component. | experimental |
+
