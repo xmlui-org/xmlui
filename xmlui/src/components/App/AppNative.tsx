@@ -465,12 +465,12 @@ export function App({
     <>
       {memoizedHelmet}
       <AppLayoutContext.Provider value={layoutContextValue}>
-        <Sheet open={drawerVisible} onOpenChange={handleOpenChange}>
-          <SheetContent side={"left"}>
-            {memoizedNavPanelInDrawer}
-          </SheetContent>
-        </Sheet>
         <SearchContextProvider>
+          <Sheet open={drawerVisible} onOpenChange={handleOpenChange}>
+            <SheetContent side={"left"}>
+              {memoizedNavPanelInDrawer}
+            </SheetContent>
+          </Sheet>
           {content}
         </SearchContextProvider>
       </AppLayoutContext.Provider>
