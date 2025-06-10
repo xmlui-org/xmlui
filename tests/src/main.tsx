@@ -4,7 +4,7 @@ import StandaloneExtensionManager from "../../xmlui/src/components-core/Standalo
 
 const extensionManager = new StandaloneExtensionManager();
 
-extensionManager.registerExtension({
+extensionManager.registerExtension([{
   namespace: "TEST_NS",
   components: [
     {
@@ -14,7 +14,17 @@ extensionManager.registerExtension({
       },
     }
   ]
-});
+}, {
+  namespace: "XMLUIExtensions",
+  components: [
+    {
+      type: "TestComponentInXMLUIExtensionsNamespace",
+      renderer: ({renderChild, node})=>{
+        return <div>{renderChild(node.children)}</div>
+      },
+    }
+  ]
+}]);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <TestBed extensionManager={extensionManager}/>
