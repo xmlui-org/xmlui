@@ -1,5 +1,11 @@
 # xmlui-search
 
+## 0.1.2
+
+### Patch Changes
+
+- 4f1f4b7: Refined search term highlighting to better fit results.
+
 ## 0.1.1
 
 ### Patch Changes
