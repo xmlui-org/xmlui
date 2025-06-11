@@ -466,7 +466,8 @@ describe('XML Formatter', () => {
   <n2
     attr3="val2"
     attr4 />
-  text2 <!--c-->
+  text2
+  <!--c-->
 </n>`);
     });
 
@@ -588,6 +589,15 @@ describe('XML Formatter', () => {
 </n>`);
     });
 
+    test('single comment as the only content in tag', () => {
+      const input =`<n> <!-- c --> </n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n>
+  <!-- c -->
+</n>`);
+    });
 
     test('single comment, error node in before attributes', () => {
           const input =

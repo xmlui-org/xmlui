@@ -145,7 +145,6 @@ class XmluiFormatter {
           break;
 
         case SyntaxKind.EndOfFileToken:
-          // EOF comments are handled above, no additional content
           break;
       }
     }
@@ -166,11 +165,20 @@ class XmluiFormatter {
     let acc = ""
     const contentListIdx = node.children.findIndex(c => c.kind === SyntaxKind.ContentListNode);
     const hasContentList = contentListIdx !== -1;
+    const closeNodeStartIdx = node.children.findIndex(c => c.kind === SyntaxKind.CloseNodeStart);
+    const hasCloseNodeStart = closeNodeStartIdx !== -1;
 
-    const openTagChildrenCount = hasContentList? contentListIdx: node.children.length ;
-    const openTagChildren = node.children.slice(0, openTagChildrenCount);
+    let openTagNodeCount: number;
+    if (hasContentList){
+      openTagNodeCount = contentListIdx;
+    } else if ( hasCloseNodeStart){
+      openTagNodeCount = closeNodeStartIdx;
+    } else {
+      openTagNodeCount = node.children.length;
+    }
 
-    acc += this.printTag(openTagChildren);
+    const openTagNodes = node.children.slice(0, openTagNodeCount);
+    acc += this.printOpenTag(openTagNodes);
 
     if (hasContentList){
       const contentListNode = node.children[contentListIdx];
@@ -179,17 +187,22 @@ class XmluiFormatter {
       acc += this.newlineToken;
       acc += this.printContentListNode(contentListNode);
       --this.indentationLvl;
-
-      const closeTagNodes = node.children.slice(contentListIdx+1);
-      if (closeTagNodes.length > 0){
-        acc += this.indent(this.indentationLvl);
-        acc += this.printTag(closeTagNodes);
-      }
     }
+
+    let closeTagNodesStartIdx: number;
+    if (hasCloseNodeStart){
+      closeTagNodesStartIdx = closeNodeStartIdx
+    } else if (hasContentList){
+      closeTagNodesStartIdx = contentListIdx + 1
+    } else {
+      closeTagNodesStartIdx = openTagNodeCount + 1
+    }
+    const closeTagNodes = node.children.slice(closeTagNodesStartIdx);
+    acc += this.printClosingTag(closeTagNodes, hasContentList);
     return acc;
   }
 
-  private printTag(tagChildren: Node[]) {
+  private printOpenTag(tagChildren: Node[]) {
     let acc = "";
     for (let i = 0; i < tagChildren.length; ++i){
       const c = tagChildren[i];
@@ -209,7 +222,38 @@ class XmluiFormatter {
           acc += this.printTagAfterName(tagChildren.slice(i), acc);
           return acc;
         case SyntaxKind.ErrorNode:
-          acc += this.getText(c);
+          acc += this.getText(c, false);
+      }
+    }
+    return acc;
+  }
+
+
+  private printClosingTag(tagChildren: Node[], hasContentList: boolean) {
+    let acc = "";
+    for (let i = 0; i < tagChildren.length; ++i){
+      const c = tagChildren[i];
+      switch(c.kind){
+        case SyntaxKind.CloseNodeStart:
+          const comment = this.getCommentsSpaceJoined(c);
+          if (comment){
+            if (!hasContentList){
+              acc += this.newlineToken;
+            }
+            acc += this.indent(this.indentationLvl + 1);
+            acc += comment + this.newlineToken;
+          }
+
+          acc += this.indent(this.indentationLvl) + "</";
+          break;
+        case SyntaxKind.TagNameNode:
+          acc += this.printTagName(c);
+          break;
+        case SyntaxKind.NodeEnd:
+          acc += this.printTagAfterName(tagChildren.slice(i), acc);
+          return acc;
+        case SyntaxKind.ErrorNode:
+          acc += this.getText(c, false);
       }
     }
     return acc;
