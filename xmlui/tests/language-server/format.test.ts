@@ -556,6 +556,39 @@ describe('XML Formatter', () => {
 </n <!--c-->>`);
     });
 
+    test('single comment between tags does not break line', () => {
+      const input =
+`<n>
+  <n1 /> <!-- c -->
+  <n2 />
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n>
+  <n1 /> <!-- c -->
+  <n2 />
+</n>`);
+    });
+
+    test('single comment between tags keeps linebreak', () => {
+      const input =
+`<n>
+  <n1 />
+<!-- c -->
+  <n2 />
+</n>`;
+      const result = testIdempotency(input);
+
+      expect(result).toEqual(
+`<n>
+  <n1 />
+  <!-- c -->
+  <n2 />
+</n>`);
+    });
+
+
     test('single comment, error node in before attributes', () => {
           const input =
     `<n attr="val" <!-- long, long commonet long, long commonet long, long commonet long, long commonet --> attr2 ? ></n2>`;

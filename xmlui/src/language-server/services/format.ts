@@ -94,45 +94,39 @@ class XmluiFormatter {
       const c = node.children[i];
       const prevChild = i > 0 ? node.children[i - 1] : null;
 
-      // Handle comments before this child
-      // const comment = this.getCommentsSpaceJoined(c);
-      // const hasNewlineBeforeComment = this.hasNewlineBeforeComment(c);
-      // if (comment) {
-      //   // Check if comment should be inline with previous content
-      //   let shouldBeInline = false;
-      //   if (prevChild && comment && prevChild.kind === SyntaxKind.TextNode) {
-      //     const textContent = this.getText(prevChild);
-
-      //     // Check if text ends with exactly one space (indicating already formatted inline)
-      //     const endsWithSingleSpace = textContent.endsWith(' ') && !textContent.endsWith('  ');
-      //     const endsWithNewlineOrMultipleSpaces = /\n\s*$/.test(textContent) || textContent.endsWith('  ');
-
-      //     // Should be inline if:
-      //     // 1. Text doesn't end with newline/multiple spaces (original adjacent case)
-      //     // 2. OR text ends with single space (already formatted inline case)
-      //     // 3. AND no newline appears before the comment in trivia
-      //     // shouldBeInline = (!endsWithNewlineOrMultipleSpaces || endsWithSingleSpace) && !hasNewlineBeforeComment;
-
-      //     shouldBeInline =  !hasNewlineBeforeComment;
-      //   }
-
-      //   if (shouldBeInline) {
-      //     // Add inline comment to previous line
-      //     acc = acc.trimEnd() + " " + comment + this.newlineToken;
-      //   } else {
-      //     // Add comment on separate line
-      //     acc += this.indent(this.indentationLvl) + comment + this.newlineToken;
-      //   }
-      // }
-
       switch (c.kind){
         case SyntaxKind.CData:
         case SyntaxKind.Script:
-        case SyntaxKind.ElementNode:
+        case SyntaxKind.ElementNode: {
+          const comment = this.getCommentsSpaceJoined(c);
+          const prevIsText = prevChild?.kind === SyntaxKind.TextNode;
+
+          if (comment) {
+            let commentInline: boolean;
+
+            if (this.hasNewlineTriviaBeforeComment(c)) {
+              commentInline = false;
+            } else if (prevIsText) {
+              const prevText = this.getText(prevChild);
+              commentInline = !hasNewlineInTrailingWhitespace(prevText);
+            }
+
+            if (commentInline) {
+              if (acc.at(-1) === this.newlineToken) {
+                acc = acc.substring(0, acc.length - this.newlineToken.length);
+              }
+              acc += ` ${comment}${this.newlineToken}`;
+            } else {
+              acc += this.indent(this.indentationLvl) + comment + this.newlineToken;
+            }
+          }
+
+
           acc += this.indent(this.indentationLvl)
           acc += this.printTagLike(c)
           acc += this.newlineToken;
           break;
+        }
 
         case SyntaxKind.StringLiteral:
         case SyntaxKind.TextNode: {
@@ -186,10 +180,10 @@ class XmluiFormatter {
       acc += this.printContentListNode(contentListNode);
       --this.indentationLvl;
 
-      const closeTagChildren = node.children.slice(contentListIdx+1);
-      if (closeTagChildren.length > 0){
+      const closeTagNodes = node.children.slice(contentListIdx+1);
+      if (closeTagNodes.length > 0){
         acc += this.indent(this.indentationLvl);
-        acc += this.printTag(closeTagChildren);
+        acc += this.printTag(closeTagNodes);
       }
     }
     return acc;
@@ -427,7 +421,7 @@ class XmluiFormatter {
   /**
    * Check if comments have newlines before them
    */
-  hasNewlineBeforeComment(node: Node): boolean {
+  hasNewlineTriviaBeforeComment(node: Node): boolean {
     const triviaNodes = getTriviaNodes(node);
     for (let c of triviaNodes){
       if(c.kind === SyntaxKind.NewLineTrivia){
@@ -444,4 +438,11 @@ export function format(node: Node, getText: GetText, options: FormatOptions) : s
   const formatter = new XmluiFormatter(node, getText, options);
   const formattedString = formatter.format();
   return formattedString;
+}
+
+function hasNewlineInTrailingWhitespace(text:string): boolean {
+  const lastNewlineIdx = text.lastIndexOf("\n");
+  const trimmedPrevText = text.trimEnd();
+  const textEndedInNewline = lastNewlineIdx >= trimmedPrevText.length;
+  return textEndedInNewline;
 }
