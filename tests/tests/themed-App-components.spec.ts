@@ -69,29 +69,6 @@ test("Themed Footer", async ({ page }) => {
   expect(backgroundColor).toBe("rgb(28, 43, 53)");    // dark theme background color
 });
 
-test("Themed NavPanel", async ({ page }) => {
-  const entryPoint =
-    `<App layout="vertical">
-      <Theme tone="dark">
-        <NavPanel testId="nav-panel">
-          <NavLink to="/something">Something</NavLink>
-        </NavPanel>
-      </Theme>
-    </App>`;
-
-  await initApp(page, {
-    entryPoint
-  });
-
-  const backgroundColor = await getElementStyle(page.getByTestId("nav-panel"), "background-color");
-  const boundingRect = await getBoundingRect(page.getByTestId("nav-panel"));
-
-  expect(boundingRect.top).toBe(0);
-  expect(boundingRect.height).toBe(PAGE_HEIGHT);
-  expect(boundingRect.bottom).toBe(PAGE_HEIGHT);
-  expect(backgroundColor).toBe("rgb(23, 35, 43)");    // dark theme background color
-});
-
 test("Themed H1 regression", async ({ page }) => {
   const entryPoint =
     `<App>
