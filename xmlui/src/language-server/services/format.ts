@@ -420,6 +420,10 @@ class XmluiFormatter {
   private printNodesSpaceJoinedCommentsBefore(nodes: Node[]){
     let acc = "";
     for (let node of nodes){
+      if (node.kind === SyntaxKind.ErrorNode){
+        acc += this.getText(node, false);
+        continue;
+      }
       const comment = this.getCommentsSpaceJoined(node);
       if (comment){
         acc += " " + comment + " ";

@@ -605,11 +605,10 @@ describe('XML Formatter', () => {
           const result = testIdempotency(input);
 
           expect(result).toEqual(
-    `<n
-      attr="val"
-      <!-- long, long commonet long, long commonet long, long commonet long, long commonet -->
-      attr2 ? >
-    </n2>`);
+`<n
+  attr="val"
+  <!-- long, long commonet long, long commonet long, long commonet long, long commonet -->
+  attr2 ?></n2>`);
         });
 
     test("single comment before ':' in tag name ", () => {
