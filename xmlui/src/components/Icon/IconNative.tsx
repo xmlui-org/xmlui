@@ -18,18 +18,17 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const Icon = forwardRef(function Icon(
-  { name, fallback, style, className, size, ...restProps }: IconBaseProps,
+  { name, fallback, style, className, size, onClick, ...restProps }: IconBaseProps,
   ref,
 ) {
   const iconRenderer = useFindIconRenderer(name, fallback);
 
-  const computedSize =
-    typeof size === "string" ? mapSizeToIconPack(size) : size;
+  const computedSize = typeof size === "string" ? mapSizeToIconPack(size) : size;
   const width = computedSize || restProps.width;
   const height = computedSize || restProps.height;
   const computedProps = {
     // className is needed to apply a default color to the icon, thus other component classes can override this one
-    className: classnames(styles.base, className),
+    className: classnames(styles.base, className, { [styles.clickable]: !!onClick }),
     ...restProps,
     size: computedSize,
     width: width,
@@ -39,6 +38,7 @@ export const Icon = forwardRef(function Icon(
       "--icon-width": width,
       "--icon-height": height,
     },
+    onClick,
   };
 
   // ---

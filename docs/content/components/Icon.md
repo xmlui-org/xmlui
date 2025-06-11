@@ -57,7 +57,9 @@ Available values: `xs`, `sm`, `md`, `lg`
 
 ## Events [#events]
 
-This component does not have any events.
+### `click` [#click]
+
+This event is triggered when the icon is clicked.
 
 ## Exposed Methods [#exposed-methods]
 

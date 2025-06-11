@@ -1,4 +1,4 @@
-<Fragment xmlns:XMLUIExtensions="component-ns">
+<Theme fontSize-Text-codefence="9pt">
     <App
         layout="vertical-full-header"
         noScrollbarGutters="false"
@@ -10,13 +10,13 @@
                 </Link>
             </property>
             <SpaceFiller/>
-            <XMLUIExtensions:Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
+            <Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
             <ToneChangerButton/>
         </AppHeader>
 
         <NavPanel>
             <Stack paddingHorizontal="$space-4" when="{mediaSize.sizeIndex <= 2}">
-                <XMLUIExtensions:Search data="{appGlobals.plainTextContent}" />
+                <Search data="{appGlobals.plainTextContent}" />
             </Stack>
             <NavGroup label="Learn XMLUI">
                 <NavLink label="Introduction" to="/"/>
@@ -31,6 +31,9 @@
                 <NavLink label="InfoCards" to="/tutorial-04"/>
                 <NavLink label="Charts" to="/tutorial-05"/>
                 <NavLink label="Slider" to="/tutorial-06"/>
+                <NavLink label="Invoices" to="/tutorial-07"/>
+                <NavLink label="Create Invoice" to="/tutorial-08"/>
+                <NavLink label="Invoice Details" to="/tutorial-09"/>
             </NavGroup>
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure"/>
@@ -47,6 +50,8 @@
             <NavGroup label="Reference">
                 <RecursiveNavTree
                     items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
+                <RecursiveNavTree
+                    items="{ appGlobals.navPanelContent.filter(item => item.name === 'extensions') }"/>
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
@@ -93,6 +98,15 @@
             </Page>
             <Page url="/tutorial-06">
                 <DocumentPage hideToc="true" url="/pages/tutorial-06.md" />
+            </Page>
+            <Page url="/tutorial-07">
+                <DocumentPage hideToc="true" url="/pages/tutorial-07.md" />
+            </Page>
+            <Page url="/tutorial-08">
+                <DocumentPage hideToc="true" url="/pages/tutorial-08.md" />
+            </Page>
+            <Page url="/tutorial-09">
+                <DocumentPage hideToc="true" url="/pages/tutorial-09.md" />
             </Page>
             <Page url="/app-structure">
                 <DocumentPage url="/pages/app-structure.md"/>
@@ -176,5 +190,5 @@
             </Card>
         </Footer>
     </App>
-    <XMLUIExtensions:StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
-</Fragment>
+    <StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
+</Theme>

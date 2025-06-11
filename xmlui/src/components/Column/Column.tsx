@@ -18,7 +18,8 @@ export const ColumnMd = createMetadata({
       valueType: "string",
     },
     width: {
-      description: `This property defines the width of the column. You can use a numeric value, a pixel ` +
+      description:
+        `This property defines the width of the column. You can use a numeric value, a pixel ` +
         `value (such as \`100px\`), or a star size value (such as \`*\`, \`2*\`, etc.). ` +
         `You will get an error if you use any other unit (or value).`,
       valueType: "any",
@@ -32,19 +33,23 @@ export const ColumnMd = createMetadata({
       valueType: "any",
     },
     canSort: {
-      description: `This property sets whether the user can sort by a column by clicking on its header ` +
+      description:
+        `This property sets whether the user can sort by a column by clicking on its header ` +
         `(\`true\`) or not (\`false\`).`,
+      defaultValue: true,
       valueType: "boolean",
     },
     pinTo: {
-      description: `This property allows the column to be pinned to ` +
+      description:
+        `This property allows the column to be pinned to ` +
         `the \`left\` (left-to-right writing style) or \`right\` (left-to-right writing style) edge ` +
         `of the table. If the writing style is right-to-left, the locations are switched.`,
       availableValues: ["left", "right"],
       valueType: "string",
     },
     canResize: {
-      description: `This property indicates whether the user can resize the column. If set to ` +
+      description:
+        `This property indicates whether the user can resize the column. If set to ` +
         `\`true\`, the column can be resized by dragging the column border. If set to ` +
         `\`false\`, the column cannot be resized. Double-clicking the column border ` +
         `resets to the original size.`,
@@ -70,7 +75,7 @@ export const ColumnMd = createMetadata({
     $cell: {
       description: "The value of the cell being rendered.",
     },
-  }
+  },
 });
 
 export const columnComponentRenderer = createComponentRenderer(
@@ -83,7 +88,7 @@ export const columnComponentRenderer = createComponentRenderer(
         style={layoutCss}
         header={extractValue.asDisplayText(node.props.header)}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}
-        canSort={extractValue.asOptionalBoolean(node.props.canSort)}
+        canSort={extractValue.asOptionalBoolean(node.props.canSort, true)}
         canResize={extractValue.asOptionalBoolean(node.props.canResize)}
         pinTo={extractValue.asOptionalString(node.props.pinTo)}
         width={extractValue(node.props.width)}

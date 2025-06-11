@@ -1,4 +1,5 @@
-import { ReactNode, useId, useMemo, useState } from "react";
+import type { ReactNode} from "react";
+import React, { useId, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { createPortal } from "react-dom";
 import classnames from "classnames";
@@ -6,11 +7,9 @@ import classnames from "classnames";
 import styles from "./Theme.module.scss";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import type { LayoutContext } from "../../abstractions/RendererDefs";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
 import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
 import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
-import { getVarKey } from "../../components-core/theming/themeVars";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { NotificationToast } from "./NotificationToast";
@@ -93,7 +92,7 @@ export function Theme({
     getThemeVar,
   } = useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
 
-  const { css, className, rangeClassName, fromClass, toClass } = useMemo(() => {
+  const { css, className } = useMemo(() => {
     const vars = { ...themeCssVars, "color-scheme": themeTone };
     // const vars = themeCssVars;
     let css = Object.entries(vars)
@@ -102,15 +101,8 @@ export function Theme({
       })
       .join(" ");
 
-    css += `font-family: var(${getVarKey("fontFamily")});`;
     const className = getClassName(css);
-    const fromClass = `${className}-from`;
-    const toClass = `${className}-to`;
-    let rangeClassName;
-    if (!isRoot) {
-      rangeClassName = `${fromClass} ~ *:has(~ .${toClass})`;
-      css += `color: var(${getVarKey("textColor-primary")});`;
-    } else {
+    if (isRoot) {
       css += `--screenSize: 0;`;
       const maxWidthPhone = getThemeVar("maxWidth-phone");
       const maxWidthLandscapePhone = getThemeVar("maxWidth-landscape-phone");
@@ -141,30 +133,9 @@ export function Theme({
     }
     return {
       className,
-      rangeClassName,
-      fromClass,
-      toClass,
       css,
     };
   }, [isRoot, themeCssVars, themeTone, getThemeVar]);
-
-  // useInsertionEffect(() => {
-  //   //PERF OPT IDEA: don't inject the css content that we already have
-  //   // (e.g. in Items component we inject and generate classes for all items if we use a theme for an item, but they have the same content.
-  //   // We could inject one class, and use that instead. The harder part is keeping track of them, and remove when nobody uses them)
-  //   injectCSS(`.${className} {${css}}`, className);
-  //   if (rangeClassName) {
-  //     injectCSS(`.${rangeClassName} {${css}}`, rangeClassName);
-  //   }
-  //   let injectedClassNames = [className, rangeClassName];
-  //   return () => {
-  //     injectedClassNames.forEach(injectedClassName => {
-  //       if (injectedClassName) {
-  //         cleanupCss(injectedClassName);
-  //       }
-  //     });
-  //   };
-  // }, [className, css]);
 
   const [themeRoot, setThemeRoot] = useState(root);
 
@@ -203,8 +174,8 @@ export function Theme({
       : {};
   }, [devToolsEnabled, devToolsSide, devToolsSize]);
 
-  const {indexing} = useIndexerContext();
-  if(indexing){
+  const { indexing } = useIndexerContext();
+  if (indexing) {
     return children;
   }
 
@@ -241,11 +212,10 @@ export function Theme({
 
   return (
     <ThemeContext.Provider value={currentThemeContextValue}>
-      <style>{`.${rangeClassName} {${css}}`}</style>
       <style>{`.${className} {${css}}`}</style>
-      <div className={classnames(styles.from, fromClass)} />
-      {renderChild(node.children, { ...layoutContext, themeClassName: className })}
-      <div className={classnames(styles.to, toClass)} />
+      <div className={classnames(styles.baseRootComponent, styles.wrapper, className)}>
+        {renderChild(node.children, { ...layoutContext, themeClassName: className })}
+      </div>
       {root &&
         createPortal(
           <div

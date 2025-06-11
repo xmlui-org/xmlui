@@ -1,8 +1,4 @@
-import { Callout } from "nextra/components";
-
-# FileInput [#component-fileinput]
-
-<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
+# FileInput
 
 The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise).
 
@@ -21,7 +17,7 @@ A list of file types the input controls accepts provided as a string array.
 ```xmlui-pg copy display name="Example: acceptsFileType"
 <App>
   <FileInput acceptsFileType="{['.txt', '.jpg']}" />
-</App>  
+</App>
 ```
 
 ### `autoFocus (default: false)`
@@ -129,7 +125,7 @@ This boolean property indicates whether the component allows selecting directori
 ```xmlui-pg copy display name="Example: directory"
 <App>
   <FileInput directory="true" />
-</App>  
+</App>
 ```
 
 ### `enabled (default: true)`
@@ -272,7 +268,7 @@ This method sets the focus on the FileInput.
     <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
     <FileInput id="fileInputComponent" />
   </HStack>
-</App>  
+</App>
 ```
 
 ### `open`

@@ -25,6 +25,10 @@ export const IconMd = createMetadata({
         `[icon name](#name) is not found in the registry.`,
     ),
   },
+  events: {
+    click: d("This event is triggered when the icon is clicked."),
+  },
+
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`size-${COMP}`]: "1.25em",
@@ -34,13 +38,14 @@ export const IconMd = createMetadata({
 export const iconComponentRenderer = createComponentRenderer(
   COMP,
   IconMd,
-  ({ node, extractValue, layoutCss }) => {
+  ({ node, extractValue, layoutCss, lookupEventHandler }) => {
     return (
       <Icon
         name={extractValue.asOptionalString(node.props.name)}
         size={extractValue(node.props.size)}
         style={layoutCss}
         fallback={extractValue.asOptionalString(node.props.fallback)}
+        onClick={lookupEventHandler("click")}
       />
     );
   },
