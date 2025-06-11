@@ -267,7 +267,7 @@ export const formItemComponentRenderer = createComponentRenderer(
         );
     const resolvedRestProps = extractValue(nonLayoutCssProps);
     const formItemType = extractValue.asOptionalString(type);
-    const isCustomFormItem = formItemType === undefined && !!node.children;
+    const isCustomFormItem = (formItemType === undefined || formItemType === "custom") && !!node.children;
     const inputTemplate = node.children || node.props?.inputTemplate;
 
     return (

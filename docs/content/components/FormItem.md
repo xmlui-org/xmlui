@@ -474,7 +474,7 @@ Available values:
 | `slider` | Renders Slider |
 | `colorpicker` | Renders ColorPicker |
 | `items` | Renders Items |
-| `custom` | Custom control specified in children |
+| `custom` | A custom control specified in children. If `type` is not specified but the `FormItem` has children, it considers the control a custom one. |
 
 >[!INFO]
 > For custom controls, there is no need to explicitly set the `type` to `custom`.
