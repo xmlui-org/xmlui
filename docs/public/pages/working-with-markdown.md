@@ -4,9 +4,9 @@ When you use XMLUI to create an application's user interface, the [Text](/compon
 
 Native XMLUI components and corresponding Markdown elements share common theme variables. Consider this XMLUI `Table` that's styled according to the current theme.
 
-```xmlui-pg display
+```xmlui-pg display name="Example: using the Table component"
 <App>
-  <Table width="30%" data="{
+  <Table width="40%" data="{
     [{
       apples: 3,
       pears: 7,

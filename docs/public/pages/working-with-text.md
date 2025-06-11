@@ -63,7 +63,7 @@ Whitespace collapsing enables you to maintain source text that's broken into mul
 
 The collapsed view renders neatly.
 
-```xmlui-pg display
+```xmlui-pg display name="Example: whitespace collapsing"
 <App>
   This is a long text broken into multiple lines.
 
@@ -94,7 +94,7 @@ When you render text, it accommodates the current layout context. If that contex
 
 In an `HStack`, text segments render inline.
 
-```xmlui-pg copy display
+```xmlui-pg copy display name="Example: inline rendering"
 <App>
   <HStack>
     Show me a trash
@@ -108,7 +108,7 @@ In an `HStack`, text segments render inline.
 
 In a `VStack` they render as blocks.
 
-```xmlui-pg copy display
+```xmlui-pg copy display name="Example: block rendering"
 <App>
   <VStack>
     Show me a trash
@@ -122,7 +122,7 @@ In a `VStack` they render as blocks.
 
 Use `&nbsp;` to preserve spaces in a context where they would otherwise collapse.
 
-```xmlui-pg copy display
+```xmlui-pg copy display name="Example: non-breaking spaces"
 <App>
   A series of non-breaking segments: [1&nbsp;2&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;4]
 </App>
@@ -133,7 +133,7 @@ Use `&nbsp;` to preserve spaces in a context where they would otherwise collapse
 
 With long text you may need to control how that text is broken into new lines (if at all) and how to handle overflows. By default a long text breaks into multiple lines.
 
-```xmlui-pg copy display
+```xmlui-pg copy display name="Example: text breaks into multiple lines"
 <App>
   <Text width="200px">
     This long text does not fit into a width constraint of 200 pixels.
@@ -143,7 +143,7 @@ With long text you may need to control how that text is broken into new lines (i
 
 If necessary, breaks occur within a word.
 
-```xmlui-pg copy display
+```xmlui-pg copy display name="Example: break within a word"
 <App>
   <Text width="200px">
     ThisLongTextDoesNotFitInTheGivenConstraint of 200 pixels wide.
@@ -155,7 +155,7 @@ If necessary, breaks occur within a word.
 
 Sometimes you want to preserve line breaks, as when inspecting a JSON object.
 
-```xmlui-pg copy display
+```xmlui-pg copy display name="Example: preserving line breaks"
 <App
   var.data = "{
     {
@@ -170,11 +170,10 @@ Sometimes you want to preserve line breaks, as when inspecting a JSON object.
   </Text>
 </App>
 ```
-```
 
 ## Variants of the Text component
 
-In addition to the theme variables that govern the `Text` component, you can use the [variant](/components/Text#variant)` property to control styles directly.
+In addition to the theme variables that govern the `Text` component, you can use the [`variant`](/components/Text#variant) property to control styles directly.
 
 ```xmlui-pg
 <App>
