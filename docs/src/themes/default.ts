@@ -19,7 +19,10 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "boxShadow-navPanel-App": "none",
     "boxShadow-header-App": "none",
     "backgroundColor-content-App": "$color-surface-0",
-    backgroundColor: "$color-surface-0",
+    "backgroundColor": "$color-surface-0",
+
+    "fontSize-Text-codefence": "9pt",
+    "lineHeight-Text": "1.4",
 
     "textColor-Text-marked": "$color-primary-500",
 
