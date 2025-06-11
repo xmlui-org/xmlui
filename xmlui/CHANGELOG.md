@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.9.48
+
+### Patch Changes
+
+- b5104b0: feat: Icon component now handles the click event
+- 30d5c58: feat: Badge supports theme variable names in colormap
+- 2e7f51f: change: the canSort property of Column defaults to true
+- 4dd6d7f: feat: chart extension included by default
+- f7f0571: fix theme component
+
 ## 0.9.47
 
 ### Patch Changes
