@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.9.49
+
+### Patch Changes
+
+- 9afd588: fix: XmluiCodeHighlighter - update token colorizing (light/dark tone)
+- Updated dependencies [3b5e820]
+  - xmlui-charts@0.1.23
+
 ## 0.9.48
 
 ### Patch Changes

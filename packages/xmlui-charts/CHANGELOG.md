@@ -1,5 +1,13 @@
 # xmlui-charts
 
+## 0.1.23
+
+### Patch Changes
+
+- 3b5e820: fix: Charts - increasing the gap between label and value in the TooltipContent component
+- Updated dependencies [9afd588]
+  - xmlui@0.9.49
+
 ## 0.1.22
 
 ### Patch Changes
