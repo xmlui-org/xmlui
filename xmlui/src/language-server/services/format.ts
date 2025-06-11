@@ -94,7 +94,7 @@ class XmluiFormatter {
       const c = node.children[i];
       const prevChild = i > 0 ? node.children[i - 1] : null;
 
-      switch (c.kind){
+      switch (c.kind) {
         case SyntaxKind.CData:
         case SyntaxKind.Script:
         case SyntaxKind.ElementNode: {
@@ -131,7 +131,7 @@ class XmluiFormatter {
         case SyntaxKind.StringLiteral:
         case SyntaxKind.TextNode: {
           const formattedContent = this.printContentString(c);
-          if (formattedContent !== ""){
+          if (formattedContent !== "") {
             acc += this.indent(this.indentationLvl)
             acc += formattedContent;
             acc += this.newlineToken
@@ -141,10 +141,17 @@ class XmluiFormatter {
           break;
         }
         case SyntaxKind.ErrorNode:
-          acc += this.getText(node)
+          acc += this.getText(c, false);
           break;
 
         case SyntaxKind.EndOfFileToken:
+          const comment = this.getCommentsSpaceJoined(c)
+          if (comment) {
+            if (!this.hasNewlineTriviaBeforeComment(c) && acc.at(-1) === this.newlineToken){
+              acc = acc.substring(0, acc.length - this.newlineToken.length) + " ";
+            }
+            acc += this.indent(this.indentationLvl) + comment;
+          }
           break;
       }
     }
