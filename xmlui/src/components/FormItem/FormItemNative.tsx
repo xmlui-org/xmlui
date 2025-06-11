@@ -219,6 +219,7 @@ export const FormItem = memo(function FormItem({
   );
 
   let formControl = null;
+
   switch (type) {
     case "select": {
       formControl = (
