@@ -25,7 +25,7 @@
             <NavLink label="Themes" to="/themes-intro"/>
         </NavGroup>
         <NavGroup label="Tutorial">
-            <NavLink label="Introduction" to="/tutorial-01"/>
+            <NavLink label="XMLUI Invoice" to="/tutorial-01"/>
             <NavLink label="Main.xmlui" to="/tutorial-02"/>
             <NavLink label="Navigation" to="/tutorial-03"/>
             <NavLink label="InfoCards" to="/tutorial-04"/>

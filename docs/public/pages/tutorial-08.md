@@ -36,12 +36,12 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
         </Card>
 
         <Card border="none" width="25%" padding="0">
-          <FormItem type="datePicker" dateFormat="yyyy/MM/dd" initialValue="{ formatToday() }"
+          <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday() }"
             bindTo="issueDate" label="Issue date" />
         </Card>
 
         <Card border="none" width="25%" padding="0">
-          <FormItem type="datePicker" dateFormat="yyyy/MM/dd" initialValue="{ formatToday(30) }"
+          <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday(30) }"
             bindTo="dueDate" label="Due date" />
         </Card>
 
@@ -158,8 +158,8 @@ A valid payload looks like this.
 
 ```json
 {
-  "issueDate": "2025/06/10",
-  "dueDate": "2025/07/10",
+  "issueDate": "2025-06-10",
+  "dueDate": "2025-07-10",
   "client": "Abstergo Industries",
   "lineItems": [
       { "quantity": "1", "amount": 105, "product": "API Integration", "price": 105 },
