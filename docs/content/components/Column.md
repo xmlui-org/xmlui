@@ -89,7 +89,7 @@ Indicates what part of the data to lay out in the column.
 
 This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.
 
-### `canSort` [#cansort]
+### `canSort (default: true)` [#cansort-default-true]
 
 This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`).
 
