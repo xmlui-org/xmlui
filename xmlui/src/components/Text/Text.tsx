@@ -115,6 +115,10 @@ export const TextMd = createMetadata({
     [`color-${COMP}-codefence`]: "$color-surface-900",
     [`color-${COMP}-subheading`]: "$textColor-secondary",
     [`color-${COMP}-secondary`]: "$textColor-secondary",
+
+    dark: {
+      [`backgroundColor-${COMP}-marked`]: "rgba($color-primary-400-rgb, .4)",
+    }
   },
 });
 
