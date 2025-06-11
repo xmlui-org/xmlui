@@ -149,6 +149,8 @@ export interface CompoundComponentDef extends Scriptable {
    *   belonging to the particular component definition.
    */
   debug?: Record<string, any>;
+
+  codeBehind?: string;
 }
 
 /**

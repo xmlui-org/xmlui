@@ -7,7 +7,7 @@ import { ParserError, errorMessages } from "./ParserError";
 import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
-import { ParsedEventValue } from "../../abstractions/scripting/Compilation";
+import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -119,6 +119,8 @@ export function nodeToComponentDef(
       reportError("T004");
     }
 
+    const codeBehind = attrs.find((attr) => attr.name === "codeBehind");
+
     // --- Get "method" attributes
     let api: Record<string, any> | undefined;
     const apiAttrs = attrs.filter((attr) => attr.startSegment === "method");
@@ -200,6 +202,10 @@ export function nodeToComponentDef(
     if (vars) {
       nestedComponent.vars = { ...nestedComponent.vars, ...vars };
     }
+    if(codeBehind){
+      component.codeBehind = codeBehind.value;
+    }
+
     nestedComponent.debug = {
       source: {
         start: element.start,
@@ -413,6 +419,11 @@ export function nodeToComponentDef(
 
       if (name === "name" && !startSegment) {
         // --- We already processed name
+        return;
+      }
+
+      if (name === "codeBehind" && !startSegment) {
+        // --- We already processed codeBehind
         return;
       }
 
