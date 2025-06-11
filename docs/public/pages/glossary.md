@@ -74,4 +74,4 @@ A single setting within a theme definition. Changing the value of a theme variab
 
 ## Variable
 
-Like variables in conventional programming languages, XMLUI variables store application state. They are reactive, and automatically update when their dependencies change.
+Like variables in conventional programming languages, XMLUI variables store application state. They are reactive, and automatically update when their dependencies change. Variable names follow the rules for JavaScript identifier: start with a letter or underscore, then letters, numbers, or underscores.

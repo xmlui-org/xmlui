@@ -1,3 +1,4 @@
+<Theme>
 <App
     layout="vertical-full-header"
     noScrollbarGutters="false"
@@ -84,28 +85,28 @@
             <DocumentPage hideToc="true" url="/pages/tutorial-01.md" />
         </Page>
         <Page url="/tutorial-02">
-            <DocumentPage hideToc="true" url="/pages/tutorial-02.md" />
+            <DocumentPage url="/pages/tutorial-02.md" />
         </Page>
         <Page url="/tutorial-03">
-            <DocumentPage hideToc="true" url="/pages/tutorial-03.md" />
+            <DocumentPage url="/pages/tutorial-03.md" />
         </Page>
         <Page url="/tutorial-04">
-            <DocumentPage hideToc="true" url="/pages/tutorial-04.md" />
+            <DocumentPage url="/pages/tutorial-04.md" />
         </Page>
         <Page url="/tutorial-05">
-            <DocumentPage hideToc="true" url="/pages/tutorial-05.md" />
+            <DocumentPage url="/pages/tutorial-05.md" />
         </Page>
         <Page url="/tutorial-06">
-            <DocumentPage hideToc="true" url="/pages/tutorial-06.md" />
+            <DocumentPage url="/pages/tutorial-06.md" />
         </Page>
         <Page url="/tutorial-07">
-            <DocumentPage hideToc="true" url="/pages/tutorial-07.md" />
+            <DocumentPage url="/pages/tutorial-07.md" />
         </Page>
         <Page url="/tutorial-08">
-            <DocumentPage hideToc="true" url="/pages/tutorial-08.md" />
+            <DocumentPage url="/pages/tutorial-08.md" />
         </Page>
         <Page url="/tutorial-09">
-            <DocumentPage hideToc="true" url="/pages/tutorial-09.md" />
+            <DocumentPage url="/pages/tutorial-09.md" />
         </Page>
         <Page url="/app-structure">
             <DocumentPage url="/pages/app-structure.md"/>
@@ -189,6 +190,7 @@
         </Card>
     </Footer>
 
-    <StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
-    
 </App>
+
+<StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
+</Theme>

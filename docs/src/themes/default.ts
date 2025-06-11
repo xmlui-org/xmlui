@@ -22,7 +22,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "backgroundColor": "$color-surface-0",
 
     "fontSize-Text-codefence": "9pt",
-    "lineHeight-Text": "1.4",
+    "lineHeight-Text": "1.5",
     "marginBottom-Text-markdown": "0",
 
     "textColor-Text-marked": "$color-primary-500",

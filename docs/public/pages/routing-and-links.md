@@ -23,7 +23,7 @@ You can turn off hash routing and switch to standard routing using the app's `co
 
 When you navigate to an URL (e.g., refresh the current page), the browser sends the entire path to the web server. XMLUI apps are single-page web apps, and your web server should be configured accordingly.
 
-For example, if your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), it should be configured to retrieve the same `index.html` file even if the browser-sent URL contains path or query segments, such as ;`myComp.com/accountapp/leads/12` or `myComp.com/accountapp/list?zip=98005`
+For example, if your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), it should be configured to retrieve the same `index.html` file even if the browser-sent URL contains path or query segments, such as `myComp.com/accountapp/leads/12` or `myComp.com/accountapp/list?zip=98005`
 
 If your web server is not configured this way, you'll receive 404 errors for the latest two (and similar) requests when refreshing the current page. Here's a sample `nginx` configuration.
 
@@ -84,11 +84,9 @@ XMLUI uses the specified links as absolute links (starting with a slash) or rela
 
 Here, `/` and `/contacts` are absolute links within the app, `about` is a relative link. As then `NavPanel` hierarchy is at the root level within the app, `/contacts` and `contacts` is the same URL.
 
-You can test it running the app; the `/contacts` link will match the related `Page` object's `contact` URL:
-
 ## Dynamic route segments
 
-You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a valid identifier. In the target, you can query the value of these placeholders through the `$routeParams` context variable.
+You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a [valid identifier](/glossary#variable). In the target, you can query the value of these placeholders through the `$routeParams` context variable.
 
 ```xmlui-pg display
 <App layout="vertical">
@@ -112,9 +110,9 @@ You can use parameter placeholders in the URLs as part of the route. These place
 
 ## Using query parameters
 
-Besides rout parameters, XMLUI supports using query parameters with routes, as the following example demonstrates:
+ You can also use query parameters in routes. The third link uses two query parameters, "from" and "to". The target page uses the `$queryParams` context variable to access them.
 
-```xmlui copy /{$queryParams.from}-{$queryParams.to}/
+```xmlui-pg display copy /from=December&to=February/ /{$queryParams.from}-{$queryParams.to}/ name="try clicking Winter Report"
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -135,38 +133,12 @@ Besides rout parameters, XMLUI supports using query parameters with routes, as t
 </App>
 ```
 
-The third link uses two query parameters, "from" and "to". The target page uses the `$queryParams` context variable to access them (try clicking the "Winter Report" link):
-
-<Playground
-  height={200}
-  name="Example: query parameters"
-  app={`
-    <App layout="vertical">
-      <NavPanel>
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/contacts">Contacts</NavLink>
-        <NavLink to="/report?from=December&to=February">Winter Report</NavLink>
-      </NavPanel>
-      <Pages>
-        <Page url="/">
-          Home
-        </Page>
-        <Page url="contacts">
-          Contacts
-        </Page>
-        <Page url="/report">
-          Reported period: {$queryParams.from}-{$queryParams.to}
-        </Page>
-      </Pages>
-    </App>
-  `}
-/>
 
 ## Active links
 
 When the app visits a particular target in its available routes, the `NavLink` component matching with the visited route is marked as active, and it gets a visual indication (a blueish left border), like in this example:
 
-```xmlui copy
+```xmlui-pg display name="Active links"
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -185,31 +157,11 @@ When the app visits a particular target in its available routes, the `NavLink` c
 
 When you start the app, the route is "/" (by default) and matches the Home page's route specification. Thus, Home is marked as the active link. When you click About, the route changes to "/about," so the active link becomes About (its route specification matches the current route):
 
-<Playground
-  height={120}
-  name="Example: active links"
-  app={`
-    <App layout="vertical">
-      <NavPanel>
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/about">About</NavLink>
-      </NavPanel>
-      <Pages>
-        <Page url="/">
-          Home
-        </Page>
-        <Page url="/about">
-          About this app
-        </Page>
-      </Pages>
-    </App>
-  `}
-/>
 
 As a `NavLink` activity is based on matching, multiple active links may exist simultaneously. The following example demonstrates such a situation:
 
-```xmlui copy {4-5}
-<App layout="vertical">
+```xmlui-pg copy {4-5}
+<App display layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
     <NavLink to="/report?from=December&to=February">Winter Report</NavLink>
@@ -227,28 +179,6 @@ As a `NavLink` activity is based on matching, multiple active links may exist si
 ```
 
 Query parameters are not considered to be part of the route. So, in this sample, the Winter report and Summer report match the same route, "/report." If you select any of them, both links are marked active:
-
-<Playground
-  height={140}
-  name="Example: multiples active links simultaneously"
-  app={`
-    <App layout="vertical">
-      <NavPanel>
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/report?from=December&to=February">Winter Report</NavLink>
-        <NavLink to="/report?from=June&to=August">Summer Report</NavLink>
-      </NavPanel>
-      <Pages>
-        <Page url="/">
-          Home
-        </Page>
-        <Page url="/report">
-          Reported period: {$queryParams.from}-{$queryParams.to}
-        </Page>
-      </Pages>
-    </App>
-  `}
-/>
 
 The semantic meaning of routes is analogous to routes used at the backend. When you send two requests with the same routes but different query parameters, they will reach the same backend endpoint. Of course, that endpoint may consider the query parameters, process them, and respond differently. However, this differentiation is not in the routing but in the processing mechanism.
 
