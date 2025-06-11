@@ -3,8 +3,9 @@ import styles from "./Badge.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Badge, badgeVariantValues, type BadgeColors } from "./BadgeNative";
+import { Badge, badgeVariantValues, isBadgeColors, type BadgeColors } from "./BadgeNative";
 import { dInternal } from "../metadata-helpers";
+import { toCssVar } from "../../parsers/style-parser/StyleParser";
 
 const COMP = "Badge";
 
@@ -61,13 +62,29 @@ export const badgeComponentRenderer = createComponentRenderer(
   BadgeMd,
   ({ node, extractValue, renderChild, layoutCss }) => {
     const value = extractValue.asDisplayText(node.props.value);
-    const colorMap: Record<string, string> | Record<string, BadgeColors> | undefined = extractValue(
+    const colorMap: Record<string, string | BadgeColors> | undefined = extractValue(
       node.props?.colorMap,
     );
+    let colorValue: string | BadgeColors | undefined;
+    if (colorMap && value) {
+      const resolvedColor = colorMap[value];
+      if (typeof resolvedColor === "string") {
+        colorValue = resolveColor(resolvedColor);
+      } else if (isBadgeColors(resolvedColor)) {
+        colorValue = {
+          label: resolveColor(resolvedColor.label),
+          background: resolveColor(resolvedColor.background),
+        }
+      }
+    }
     return (
-      <Badge variant={extractValue(node.props.variant)} color={colorMap?.[value]} style={layoutCss}>
+      <Badge variant={extractValue(node.props.variant)} color={colorValue} style={layoutCss}>
         {value || renderChild(node.children)}
       </Badge>
     );
   },
 );
+
+function resolveColor(value: string): string {
+  return value.startsWith("$") ? toCssVar(value) : value;
+}

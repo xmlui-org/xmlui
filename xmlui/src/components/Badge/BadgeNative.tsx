@@ -10,6 +10,20 @@ export type BadgeColors = {
   background: string;
 };
 
+// --- Type guard for BadgeColors ---
+export function isBadgeColors(
+  color: any,
+): color is BadgeColors {
+  return (
+    typeof color === "object" &&
+    color !== null &&
+    "label" in color &&
+    "background" in color &&
+    typeof color.label === "string" &&
+    typeof color.background === "string"
+  );
+}
+
 type Props = {
   children?: React.ReactNode;
   variant?: BadgeVariant;
