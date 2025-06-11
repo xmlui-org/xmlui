@@ -4,10 +4,28 @@ import styles from "./XmluiCodeHighlighter.module.scss";
 import { useTheme } from "./theming/ThemeContext";
 import classnames from "classnames";
 import { createComponentRenderer } from "./renderers";
+// @ts-ignore
+import js from "@shikijs/langs/javascript";
+// @ts-ignore
+import json from "@shikijs/langs/json";
+
+// @ts-ignore
+import html from "@shikijs/langs/html";
+
+import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
+import xmluiGrammar from "../syntax/grammar.tmLanguage.json";
+import xmluiThemeLight from "../syntax/textMate/xmlui-light.json";
+import xmluiThemeDark from "../syntax/textMate/xmlui-dark.json";
 
 let highlighter: HighlighterCore | null = null;
 
-export function XmluiCodeHighlighter({ value, style }: { value: string, style?: React.CSSProperties }) {
+export function XmluiCodeHighlighter({
+  value,
+  style,
+}: {
+  value: string;
+  style?: React.CSSProperties;
+}) {
   const { activeThemeTone } = useTheme();
 
   const [initialized, setInitialized] = useState(false);
@@ -17,10 +35,11 @@ export function XmluiCodeHighlighter({ value, style }: { value: string, style?: 
         const { createHighlighterCore } = await import("shiki/core");
         highlighter = await createHighlighterCore({
           // @ts-ignore
-          themes: [import("../syntax/textMate/xmlui.json")],
+          themes: [xmluiThemeLight, xmluiThemeDark],
           // @ts-ignore
-          langs: [import("../syntax/grammar.tmLanguage.json")],
+          langs: [js, json, html, xmluiGrammar],
           loadWasm: import("shiki/wasm"),
+          engine: createJavaScriptRegexEngine(),
         });
       }
       setInitialized(true);
@@ -29,29 +48,15 @@ export function XmluiCodeHighlighter({ value, style }: { value: string, style?: 
     load();
   }, []);
 
-  const html = useMemo(() => {
+  const htmlCode = useMemo(() => {
     return !initialized || !highlighter
       ? ""
       : highlighter.codeToHtml(value, {
           lang: "xmlui",
-          theme: "xmlui",
-          colorReplacements: {
-            "#000001": "var(--syntax-token-component)",
-            "#000002": "var(--syntax-token-delimiter-angle)",
-            "#000003": "var(--syntax-token-attribute-name)",
-            "#000004": "var(--syntax-token-equal-sign)",
-            "#000005": "var(--syntax-token-string)",
-            "#000006": "var(--syntax-token-script)",
-            "#000007": "var(--syntax-token-helper)",
-            "#000008": "var(--syntax-token-comment)",
-            "#000009": "var(--syntax-token-escape)",
-            "#000010": "var(--syntax-token-constant)",
-            "#000011": "var(--syntax-token-cdata)",
-            "#000012": "var(--syntax-token-delimiter-curly)",
-            "#000013": "var(--syntax-token-text)",
-          },
+          theme: `xmlui-${activeThemeTone}`,
+          decorations: [],
         });
-  }, [initialized, value]);
+  }, [initialized, value, activeThemeTone]);
 
   return (
     <div className={styles.wrapper}>
@@ -62,7 +67,7 @@ export function XmluiCodeHighlighter({ value, style }: { value: string, style?: 
         })}
         style={style}
         dangerouslySetInnerHTML={{
-          __html: html,
+          __html: htmlCode,
         }}
       />
     </div>
