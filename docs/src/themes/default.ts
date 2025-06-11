@@ -61,7 +61,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
 
     // --- Search
     "fontSize-placeholder-TextBox": "$fontSize-small",
-    "borderColor-SearchPanel": "rgba(49,59,73,0.12)",
+    "borderColor-SearchPanel": "$color-surface-100",
 
     // --- Markdown
     "fontSize-H1": "1.65rem",
@@ -97,7 +97,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
       "textColor-DocumentLinks--hover": "#F9FAFB",
       "backgroundColor-separator-DocumentLinks": "#38475E",
 
-      "borderColor-SearchPanel": "rgba(255,255,255,0.12)",
+      "borderColor-SearchPanel": "$color-surface-200",
 
       "textColor-Link--hover": "$color-primary-600",
       "textDecorationColor-Link--hover": "$color-primary-600",
