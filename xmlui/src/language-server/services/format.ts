@@ -102,7 +102,7 @@ class XmluiFormatter {
           const prevIsText = prevChild?.kind === SyntaxKind.TextNode;
 
           if (comment) {
-            let commentInline: boolean;
+            let commentInline: boolean = true;
 
             if (this.hasNewlineTriviaBeforeComment(c)) {
               commentInline = false;
