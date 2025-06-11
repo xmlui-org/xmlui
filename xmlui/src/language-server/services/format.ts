@@ -90,7 +90,41 @@ class XmluiFormatter {
       return acc;
     }
 
-    for (const c of node.children){
+    for (let i = 0; i < node.children.length; i++){
+      const c = node.children[i];
+      const prevChild = i > 0 ? node.children[i - 1] : null;
+
+      // Handle comments before this child
+      // const comment = this.getCommentsSpaceJoined(c);
+      // const hasNewlineBeforeComment = this.hasNewlineBeforeComment(c);
+      // if (comment) {
+      //   // Check if comment should be inline with previous content
+      //   let shouldBeInline = false;
+      //   if (prevChild && comment && prevChild.kind === SyntaxKind.TextNode) {
+      //     const textContent = this.getText(prevChild);
+
+      //     // Check if text ends with exactly one space (indicating already formatted inline)
+      //     const endsWithSingleSpace = textContent.endsWith(' ') && !textContent.endsWith('  ');
+      //     const endsWithNewlineOrMultipleSpaces = /\n\s*$/.test(textContent) || textContent.endsWith('  ');
+
+      //     // Should be inline if:
+      //     // 1. Text doesn't end with newline/multiple spaces (original adjacent case)
+      //     // 2. OR text ends with single space (already formatted inline case)
+      //     // 3. AND no newline appears before the comment in trivia
+      //     // shouldBeInline = (!endsWithNewlineOrMultipleSpaces || endsWithSingleSpace) && !hasNewlineBeforeComment;
+
+      //     shouldBeInline =  !hasNewlineBeforeComment;
+      //   }
+
+      //   if (shouldBeInline) {
+      //     // Add inline comment to previous line
+      //     acc = acc.trimEnd() + " " + comment + this.newlineToken;
+      //   } else {
+      //     // Add comment on separate line
+      //     acc += this.indent(this.indentationLvl) + comment + this.newlineToken;
+      //   }
+      // }
+
       switch (c.kind){
         case SyntaxKind.CData:
         case SyntaxKind.Script:
@@ -101,17 +135,23 @@ class XmluiFormatter {
           break;
 
         case SyntaxKind.StringLiteral:
-        case SyntaxKind.TextNode:
-          acc += this.indent(this.indentationLvl)
-          acc += this.printContentString(c);
-          acc += this.newlineToken
+        case SyntaxKind.TextNode: {
+          const formattedContent = this.printContentString(c);
+          if (formattedContent !== ""){
+            acc += this.indent(this.indentationLvl)
+            acc += formattedContent;
+            acc += this.newlineToken
+          } else {
+            acc.trimEnd();
+          }
           break;
-
+        }
         case SyntaxKind.ErrorNode:
           acc += this.getText(node)
           break;
 
         case SyntaxKind.EndOfFileToken:
+          // EOF comments are handled above, no additional content
           break;
       }
     }
@@ -355,7 +395,7 @@ class XmluiFormatter {
   }
 
   printContentString(node: Node): string {
-    return this.getText(node).trim();
+    return this.getText(node, false).trim();
   }
 
   private printEveryTrivia(node: Node): string {
@@ -382,6 +422,21 @@ class XmluiFormatter {
       return null;
     }
     return comments.join(" ");
+  }
+
+  /**
+   * Check if comments have newlines before them
+   */
+  hasNewlineBeforeComment(node: Node): boolean {
+    const triviaNodes = getTriviaNodes(node);
+    for (let c of triviaNodes){
+      if(c.kind === SyntaxKind.NewLineTrivia){
+        return true;
+      } else if (c.kind === SyntaxKind.CommentTrivia){
+        return false;
+      }
+    }
+    return false;
   }
 }
 

@@ -287,7 +287,8 @@ describe('XML Formatter', () => {
       const result = testIdempotency(input);
 
       expect(result).toEqual(
-`<n attr="val" attr2> <!--c-->
+`<n attr="val" attr2>
+  <!--c-->
   text1
   <n2
     attr3="val2"
@@ -309,8 +310,7 @@ describe('XML Formatter', () => {
 
       expect(result).toEqual(
 `<n attr="val" attr2>
-  <!--c-->
-  text1
+  <!--c-->text1
   <n2
     attr3="val2"
     attr4 />
