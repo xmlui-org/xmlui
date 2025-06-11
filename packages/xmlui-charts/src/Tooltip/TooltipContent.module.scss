@@ -43,6 +43,7 @@ $componentName: "TooltipContent";
 .valueContainer {
   display: flex;
   flex: 1;
+  gap: t.$space-2;
   justify-content: space-between;
   align-items: center;
 }
