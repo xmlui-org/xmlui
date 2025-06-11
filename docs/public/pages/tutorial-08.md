@@ -49,11 +49,11 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
 
       <H2>Line Items</H2>
       <FlowLayout fontWeight="bold" backgroundColor="$color-surface-100" padding="$space-2">
-        <Text width="20%">Product/Service</Text>
-        <Text width="20%">Description</Text>
-        <Text width="20%">Quantity</Text>
-        <Text width="20%">Price</Text>
-        <Text width="20%">Amount</Text>
+        <Text width="25%">Product/Service</Text>
+        <Text width="25%">Description</Text>
+        <Text width="12%">Quantity</Text>
+        <Text width="12%">Price</Text>
+        <Text width="12%">Amount</Text>
       </FlowLayout>
 
       <FormItem
@@ -64,8 +64,11 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
         onValidate="(value) => Array.isArray(value) && value.length > 0 && value.every(item => item.product)"
         requiredInvalidMessage="At least one line item is required."
       >
-        <FlowLayout width="100%"
-          verticalAlignment="center">
+        <FlowLayout
+           width="100%"
+          verticalAlignment="center"
+          gap="$space-2"
+        >
           <DataSource
             id="productDetails"
             url="/resources/files/products.json"
@@ -74,32 +77,21 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
             transformResult="{(data) => data.filter(product => product.name === $item.product)}"
           />
           <FormItem
-            bindTo="product"
+            bindTo="product"d
             type="select"
             placeholder="select product"
-            width="20%"
+            width="25%"
           >
             <Items data="{products}">
               <Option value="{$item.name}" label="{$item.name}" />
             </Items>
           </FormItem>
 
-          <Text width="20%">{ productDetails.value[0].description }</Text>
-          <FormItem width="20%" bindTo="quantity"               type="number"   initialValue="1" minValue="1" />
-          <FormItem width="20%" bindTo="price"  startText="$"                   initialValue="{ productDetails.value[0].price }" />
-          <FormItem width="13%" bindTo="amount" startText="$"   enabled="false" initialValue="{ $item.price ? $item.quantity * $item.price : '' } " />
-
-<!--
-          <Icon width="*" name="close" size="md" color="red" onClick="lineItems.removeItem($itemIndex)" />
--->
-
-          <Icon width="*" name="close" size="md" color="red" onClick="() => {
-            console.log('click')
-            const items = lineItems.value || [];
-            const index = items.indexOf($item);
-            if (index >= 0) lineItems.removeItem(index);
-          }
-          " />
+          <Text width="25%">{ productDetails.value[0].description }</Text>
+          <FormItem width="12%" bindTo="quantity"               type="number"   initialValue="1" minValue="1" />
+          <FormItem width="12%" bindTo="price"  startText="$"                   initialValue="{ productDetails.value[0].price }" />
+          <FormItem width="12%" bindTo="amount" startText="$"   enabled="false" initialValue="{ $item.price ? $item.quantity * $item.price : '' } " />
+          <Button width="2rem" onClick="lineItems.removeItem($itemIndex)">X</Button>
 
         </FlowLayout>
       </FormItem>
@@ -256,7 +248,6 @@ Nested with within `lineItems` there is a `FormItem` for `product`, `quantity`, 
     <FormItem width="20%" bindTo="quantity"               type="number"   initialValue="1" minValue="1" />
     <FormItem width="20%" bindTo="price"  startText="$"                   initialValue="{ productDetails.value[0].price }" />
     <FormItem width="13%" bindTo="amount" startText="$"   enabled="false" initialValue="{ $item.price ? $item.quantity * $item.price : '' } " />
-
     <Button width="*" variant="ghost" themeColor="attention" icon="close" onClick="lineItems.removeItem($itemIndex)" />
   </FlowLayout>
 </FormItem>
@@ -298,4 +289,3 @@ Nested with within `lineItems` there is a `FormItem` for `product`, `quantity`, 
   </Form>
 </Component>
 -->
-```

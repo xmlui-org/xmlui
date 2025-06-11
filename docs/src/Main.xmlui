@@ -1,4 +1,5 @@
 <Fragment xmlns:XMLUIExtensions="component-ns">
+<Theme fontSize-Text-codefence="9pt">
     <App
         layout="vertical-full-header"
         noScrollbarGutters="false"
@@ -189,4 +190,5 @@
         </Footer>
     </App>
     <XMLUIExtensions:StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
+</Theme>
 </Fragment>

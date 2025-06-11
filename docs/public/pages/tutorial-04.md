@@ -2,7 +2,8 @@
 
 The `Dashboard` page opens with a set of infocards. Here is a simplified version of two of them.
 
-```xmlui-pg display
+```xmlui-pg
+<App>
 <variable name="dashboardStats" value="{
   {
     value:
@@ -22,6 +23,7 @@ The `Dashboard` page opens with a set of infocards. Here is a simplified version
       <Text>{ dashboardStats.value[0].paid_this_year } </Text>
   </Card>
 </HStack>
+</App>
 ```
 
 In the app, `dashboardStats` is a [DataSource](/components/DataSource).
