@@ -20,6 +20,8 @@ $gap-icon-Link: createThemeVar("gap-icon-#{$component}");
 $textUnderlineOffset-Link: createThemeVar("textUnderlineOffset-#{$component}");
 $textDecorationLine-Link: createThemeVar("textDecorationLine-#{$component}");
 $textDecorationColor-Link: createThemeVar("textDecorationColor-#{$component}");
+$textDecorationColor-Link--hover: createThemeVar("textDecorationColor-#{$component}--hover");
+$textDecorationColor-Link--active: createThemeVar("textDecorationColor-#{$component}--active");
 $textDecorationStyle-Link: createThemeVar("textDecorationStyle-#{$component}");
 $textDecorationThickness-Link: createThemeVar("textDecorationThickness-#{$component}");
 
@@ -75,9 +77,10 @@ $textDecorationThickness-Link: createThemeVar("textDecorationThickness-#{$compon
 .container:not(.active) {
   text-underline-offset: $textUnderlineOffset-Link;
   text-decoration-line: $textDecorationLine-Link;
+  text-decoration-color: $textDecorationColor-Link;
   &:not([disabled]) {
     &:hover {
-      text-decoration-color: $textDecorationColor-Link;
+      text-decoration-color: $textDecorationColor-Link--hover;
       text-decoration-style: $textDecorationStyle-Link;
       text-decoration-thickness: $textDecorationThickness-Link;
 
@@ -86,7 +89,7 @@ $textDecorationThickness-Link: createThemeVar("textDecorationThickness-#{$compon
       }
     }
     &:active {
-      text-decoration-color: $textDecorationColor-Link;
+      text-decoration-color: $textDecorationColor-Link--active;
       text-decoration-style: $textDecorationStyle-Link;
       text-decoration-thickness: $textDecorationThickness-Link;
 

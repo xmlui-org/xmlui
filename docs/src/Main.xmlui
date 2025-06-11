@@ -15,7 +15,7 @@
         </AppHeader>
 
         <NavPanel>
-            <Stack paddingHorizontal="$space-4" when="{mediaSize.sizeIndex <= 2}">
+            <Stack paddingHorizontal="$space-4" paddingBottom="$space-4" when="{mediaSize.sizeIndex <= 2}">
                 <Search data="{appGlobals.plainTextContent}" />
             </Stack>
             <NavGroup label="Learn XMLUI">
