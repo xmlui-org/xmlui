@@ -30,6 +30,8 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   @include t.paddingVars($themeVars, $componentListPanel);
   overflow: hidden;
   width: 580px;
+  margin-top: 4px;
+  box-shadow: $boxShadow-Search;
 
   &.inDrawer {
     width: var(--radix-popover-trigger-width);
@@ -39,7 +41,6 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
 
 .list {
   background-color: $backgroundColor-Search;
-  box-shadow: $boxShadow-Search;
   max-height: 360px;
   overflow-y: auto;
   scrollbar-gutter: stable;

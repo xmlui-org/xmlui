@@ -26,7 +26,7 @@ export const SearchMd = createMetadata({
     [`borderWidth-${COMP_PANEL}`]: "1px",
     [`borderStyle-${COMP_PANEL}`]: "solid",
     [`borderColor-${COMP_PANEL}`]: "$color-surface-200",
-    [`boxShadow-${COMP_PANEL}`]: "$boxShadow-md",
+    [`boxShadow-${COMP_PANEL}`]: "$boxShadow-xl",
 
     [`backgroundColor-${COMP_ITEM}--hover`]: "$color-primary-50",
     [`borderColor-${COMP_ITEM}--focus`]: "$color-primary-400",

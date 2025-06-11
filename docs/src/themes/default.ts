@@ -15,7 +15,6 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "font-feature-settings": "'cv03', 'cv04', 'cv11'",
     "maxWidth-App": "1320px",
 
-
     "maxWidth-content": "1200px",
     "boxShadow-navPanel-App": "none",
     "boxShadow-header-App": "none",
@@ -60,6 +59,10 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "paddingLeft-TableOfContentsItem-level-5": "$space-6",
     "paddingLeft-TableOfContentsItem-level-6": "$space-6",
 
+    // --- Search
+    "fontSize-placeholder-TextBox": "$fontSize-small",
+    "borderColor-SearchPanel": "rgba(49,59,73,0.12)",
+
     // --- Markdown
     "fontSize-H1": "1.65rem",
     "fontWeight-H1": "700",
@@ -93,6 +96,12 @@ export const DefaultDocsTheme: ThemeDefinition = {
       "textColor-DocumentLinks": "#8E97A8",
       "textColor-DocumentLinks--hover": "#F9FAFB",
       "backgroundColor-separator-DocumentLinks": "#38475E",
+
+      "borderColor-SearchPanel": "rgba(255,255,255,0.12)",
+
+      "textColor-Link--hover": "$color-primary-600",
+      "textDecorationColor-Link--hover": "$color-primary-600",
+      "textDecorationColor-Link--active": "$color-primary-600",
     },
   },
   resources: {},
