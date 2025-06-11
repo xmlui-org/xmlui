@@ -8,7 +8,7 @@ Each component has a rectangular UI patch for rendering its content (and nested 
 
 The following app contains two components, an `App`, and a `Text`:
 
-```xmlui-pg display
+```xmlui-pg display name="Example: viewport"
 <App border="2px dotted red">
   <Text width="30%" border="2px dotted green">Hello from XMLUI</Text>
 </App>
@@ -29,7 +29,7 @@ When rendering its children, a component may render them with vertical or horizo
 `App` uses vertical orientation by default; `HStack` (horizontal stack) uses horizontal orientation.
 
 
-```xmlui-pg display
+```xmlui-pg display name="Example: orientation"
 <App>
   <Text>First item</Text>
   <HStack>
@@ -45,19 +45,7 @@ When rendering its children, a component may render them with vertical or horizo
 
 Some languages (such as Hebrew and Arabic) are read from right to left. XMLUI components use this information to change their children's rendering direction. This example shows right-to-left.
 
-```xmlui copy /direction="rtl"/
-<App direction="rtl">
-  <Text>First item</Text>
-  <HStack>
-    <Text>Second item</Text>
-    <Text>Third item</Text>
-    <Text>Fourth item</Text>
-  </HStack>
-  <Text>Fifth item</Text>
-</App>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: direction" /direction="rtl"/
 <App direction="rtl">
   <Text>First item</Text>
   <HStack>
@@ -74,7 +62,7 @@ Some languages (such as Hebrew and Arabic) are read from right to left. XMLUI co
 Each component may adjust the padding around children and gaps between adjacent children.
 
 
-```xmlui-pg display
+```xmlui-pg display name="Example: paddings and gaps"
 <App border="2px dotted red">
   <Text border="2px dotted green">First item</Text>
   <HStack border="2px dotted green">
@@ -97,7 +85,7 @@ Each component may adjust the padding around children and gaps between adjacent 
 Each component has a default strategy for determining the dimensions (height and width) of its children.
 `VStack` determines its dimensions according to its content. If we want to display a 40px by 60px orange box with nothing in it and 60px wide orange-red box with empty content, we must explicitly set dimensions (and background color).
 
-```xmlui-pg display
+```xmlui-pg display name="Example: dimensions"
 <App>
   <VStack height="40px" width="60px" backgroundColor="orangered" />
 </App>
@@ -107,7 +95,7 @@ Each component has a default strategy for determining the dimensions (height and
 
 Components can align their children in the viewport both vertically and horizontally.
 
-```xmlui-pg display
+```xmlui-pg display name="Example: alignment"
 <App>
   <HStack>
     <VStack width="50%" border="2px dotted red" height="200px" horizontalAlignment="end">
@@ -151,18 +139,7 @@ To control a child's dimensions explicitly, instead of as determined by its cont
 
 The fundamental layout containers apply a default gap to ensuring that children have some space between them.
 
-```xmlui copy
-<App>
-  <HStack>
-    <Button>First button</Button>
-    <Button>Second button</Button>
-    <Button>Third button</Button>
-  </HStack>
-</App>
-```
-
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: default gaps"
 <App>
   <HStack>
     <Button>First button</Button>
@@ -174,17 +151,7 @@ The fundamental layout containers apply a default gap to ensuring that children 
 
 You can remove the gaps.
 
-```xmlui copy /gap="0"/
-<App>
-  <HStack gap="0">
-    <Button>First button</Button>
-    <Button>Second button</Button>
-    <Button>Third button</Button>
-  </HStack>
-</App>
-```
-
-```xmlui-pg
+```xmlui-pg copy display /gap="0"/ name="Example: default gaps removed"
 <App>
   <HStack gap="0">
     <Button>First button</Button>
@@ -197,24 +164,7 @@ You can remove the gaps.
 
 XMLUI offers several [predefined gap values](/styles-and-themes/theme-variables#spacing-in-layout-containers). Use these instead of inline literals like "16px" or "0.5rem" to enable theming and consistent design.
 
-```xmlui copy /gap="$gap-tight"/ /gap="$gap-loose"/
-<App>
-  <VStack>
-    <HStack gap="$gap-tight">
-      <Button>First button</Button>
-      <Button>Second button</Button>
-      <Button>Third button</Button>
-    </HStack>
-    <HStack gap="$gap-loose">
-      <Button>First button</Button>
-      <Button>Second button</Button>
-      <Button>Third button</Button>
-    </HStack>
-  </VStack>
-</App>
-```
-
-```xmlui-pg
+```xmlui-pg copy /gap="$gap-tight"/ /gap="$gap-loose"/ name="Example: predefined gap values"
 <App>
   <VStack>
     <HStack gap="$gap-tight">
@@ -237,17 +187,8 @@ Layout containers render their children in declaration order, subject to the cur
 
 This markup displays five boxes; the third is wider than the others.
 
-```xmlui
-<Stack height="20px" width="10%" backgroundColor="orangered" />
-<Stack height="20px" width="10%" backgroundColor="orangered" />
-<Stack height="20px" width="60%" backgroundColor="orangered" />
-<Stack height="20px" width="10%" backgroundColor="orangered" />
-<Stack height="20px" width="10%" backgroundColor="orangered" />
-```
-
-In a `VStack` each child takes a new row.
-
-```xmlui-pg
+```xmlui-pg name="Example: VStack"
+---app display copy 
 <App>
   <VStack>
     <Stack height="20px" width="20%" backgroundColor="orangered" />
@@ -257,11 +198,13 @@ In a `VStack` each child takes a new row.
     <Stack height="20px" width="20%" backgroundColor="orangered" />
   </VStack>
 </App>
+---desc
+In a `VStack` each child takes a new row.
 ```
 
-In an `HStack` they occupy one row. The app provides a horizontal scrollbar to accommodate overflow.
 
-```xmlui-pg
+```xmlui-pg name="Example: HStack"
+---app copy display
 <App>
   <HStack>
     <Stack height="20px" width="20%" backgroundColor="orangered" />
@@ -271,12 +214,13 @@ In an `HStack` they occupy one row. The app provides a horizontal scrollbar to a
     <Stack height="20px" width="20%" backgroundColor="orangered" />
   </HStack>
 </App>
+---desc
+In an `HStack` they occupy one row. The app provides a horizontal scrollbar to accommodate overflow.
 ```
 
 
-In a `FlowLayout` the children occupy new rows as needed.
-
-```xmlui-pg
+```xmlui-pg name="Example: HStack"
+---app copy display
 <App>
   <FlowLayout>
     <Stack height="20px" width="20%" backgroundColor="orangered" />
@@ -286,21 +230,13 @@ In a `FlowLayout` the children occupy new rows as needed.
     <Stack height="20px" width="20%" backgroundColor="orangered" />
   </FlowLayout>
 </App>
+---desc
+In a `FlowLayout` the children occupy new rows as needed.
 ```
-
 
 If you set an explicit `height` the layout container will use that height; otherwise, it accommodates the height of its children. This example uses the natural height of the content.
 
-```xmlui copy
-<VStack
-  backgroundColor="cyan"
-  horizontalAlignment="center"
-  verticalAlignment="center">
-  This is some text within a VStack
-</VStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: Text in VStack"
 <VStack
   backgroundColor="cyan"
   horizontalAlignment="center"
@@ -311,17 +247,7 @@ If you set an explicit `height` the layout container will use that height; other
 
 This example increases the height.
 
-```xmlui copy
-<VStack
-  height="160px"
-  backgroundColor="cyan"
-  horizontalAlignment="center"
-  verticalAlignment="center">
-  This is some text within a VStack
-</VStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: VStack with explicit height"
 <VStack
   height="160px"
   backgroundColor="cyan"
@@ -335,16 +261,7 @@ This example increases the height.
 
 Unless you use an explicit width, a layout container uses the entire width of its viewport. This example uses implicit width.
 
-```xmlui copy
-<VStack
-  backgroundColor="cyan"
-  horizontalAlignment="center"
-  verticalAlignment="center">
-  This is some text within a VStack
-</VStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: default container width"
 <VStack
   backgroundColor="cyan"
   horizontalAlignment="center"
@@ -355,17 +272,7 @@ Unless you use an explicit width, a layout container uses the entire width of it
 
 This one uses explicit width.
 
-```xmlui copy /width="400px"/
-<VStack
-  width="400px"
-  backgroundColor="cyan"
-  horizontalAlignment="center"
-  verticalAlignment="center">
-  This is some text within a VStack
-</VStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display /width="400px"/ name="Example: explicit container width"
 <VStack
   width="400px"
   backgroundColor="cyan"
@@ -395,15 +302,7 @@ The `horizontalAlignment` and `verticalAlignment` properties govern alignment wi
 
 This markup aligns the children of an `HStack` horizontally in the center:
 
-```xmlui copy /horizontalAlignment="center"/
-<HStack horizontalAlignment="center">
-  <Stack backgroundColor="red" height="36px" width="36px" />
-  <Stack backgroundColor="green" height="36px" width="36px" />
-  <Stack backgroundColor="blue" height="36px" width="36px" />
-</HStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display /horizontalAlignment="center"/ name="Example: horizontally centered content in a HStack"
 <HStack horizontalAlignment="center">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="36px" width="36px" />
@@ -413,15 +312,7 @@ This markup aligns the children of an `HStack` horizontally in the center:
 
 This markup aligns the children of a `VStack` horizontally to the end (right edge):
 
-```xmlui copy /horizontalAlignment="end"/
-<VStack  horizontalAlignment="end">
-  <Stack backgroundColor="red" height="36px" width="36px" />
-  <Stack backgroundColor="green" height="36px" width="36px" />
-  <Stack backgroundColor="blue" height="36px" width="36px" />
-</VStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display /horizontalAlignment="end"/ name="Example: horizontally centered content in a VStack"
 <VStack  horizontalAlignment="end">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="36px" width="36px" />
@@ -431,15 +322,7 @@ This markup aligns the children of a `VStack` horizontally to the end (right edg
 
 This markup aligns the children of an `HStack` vertically in the center:
 
-```xmlui copy /verticalAlignment="center"/
-<HStack verticalAlignment="center">
-  <Stack backgroundColor="red" height="36px" width="36px" />
-  <Stack backgroundColor="green" height="72px" width="36px" />
-  <Stack backgroundColor="blue" height="48px" width="36px" />
-</HStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display /verticalAlignment="center"/ name="Exmaple: vertically centered text in a HStack"
 <HStack verticalAlignment="center">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="72px" width="36px" />
@@ -452,14 +335,7 @@ This markup aligns the children of an `HStack` vertically in the center:
 
 A `VStack` component displays each of its children in a new row. If a child has no explicit (or component-specific) width, the `VStack` stretches the component to the entire viewport width. `VStack` keeps the child components' heights intact.
 
-```xmlui copy
-<VStack>
-  <H2 backgroundColor="orangered">I'm a heading with colored background</H2>
-  <Button>I'm a button</Button>
-</VStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: rendering children in a VStack "
 <VStack>
   <H2 backgroundColor="orangered">I'm a heading with colored background</H2>
   <Button>I'm a button</Button>
@@ -470,14 +346,7 @@ The `H2` component has no explicit size, so its width is set to the width of the
 
 When you use a `VStack` child with percentage height, the effective height is calculated from the entire stack height. Such a setup may cause overflow if the sum of percentages equals 100%, as the gaps between children are also included in the stack height. This example demonstrates an overflow.
 
-```xmlui copy
-<VStack height="200px" border="4px dotted green">
-  <Stack backgroundColor="cyan" height="50%" />
-  <Stack backgroundColor="orangered" height="50%" />
-</VStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: VStack with percentage height (overflow)"
 <VStack height="200px" border="4px dotted green">
   <Stack backgroundColor="cyan" height="50%" />
   <Stack backgroundColor="orangered" height="50%" />
@@ -486,14 +355,7 @@ When you use a `VStack` child with percentage height, the effective height is ca
 
 There is no overflow when the stack does not apply gaps.
 
-```xmlui copy /gap="0"/
-<VStack gap="0" height="200px" border="4px dotted green">
-  <Stack backgroundColor="cyan" height="50%" />
-  <Stack backgroundColor="orangered" height="50%" />
-</VStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display /gap="0"/ name="Example: VStack with percentage height (no overflow)"
 <VStack gap="0" height="200px" border="4px dotted green">
   <Stack backgroundColor="cyan" height="50%" />
   <Stack backgroundColor="orangered" height="50%" />
@@ -503,15 +365,7 @@ There is no overflow when the stack does not apply gaps.
 When you use a `VStack` child height with star sizing, the effective height is calculated from the remaining height of the entire stack after subtracting the heights of explicitly-sized children and gaps.
 Such a configuration will not cause overflow.
 
-```xmlui copy
-<VStack height="240px" border="4px dotted green">
-  <Stack backgroundColor="cyan" height="*" />
-  <H3>I'm a heading</H3>
-  <Stack backgroundColor="orangered" height="5*" />
-</VStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: VStack with star-sized height"
 <VStack height="240px" border="4px dotted green">
   <Stack backgroundColor="cyan" height="*" />
   <H3>I'm a heading</H3>
@@ -524,14 +378,7 @@ Such a configuration will not cause overflow.
 An `HStack` component displays each of its children in a single row. If a child has no explicit (or component-specific) width, the `HStack` fits the component width to its content. `HStack` sets the child components' heights to the stack's viewport height.
 </Callout>
 
-```xmlui copy
-<HStack>
-  <H2 backgroundColor="orangered">I'm a heading with colored background</H2>
-  <Button>I'm a button</Button>
-</HStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: rendering children in a HStack"
 <HStack>
   <H2 backgroundColor="orangered">I'm a heading with colored background</H2>
   <Button>I'm a button</Button>
@@ -543,15 +390,7 @@ The `H2` component has no explicit size, so it's stretched to the viewport width
 
 When you use a `HStack` child with percentage width, the effective width is calculated from the stack's viewport width. Such a setup may cause horizontal overflow if the sum of percentages equals 100%, as the gaps between children are also included in the stack height.
 
-
-```xmlui copy
-<HStack border="4px dotted green" height="200px">
-  <Stack backgroundColor="cyan" width="50%" />
-  <Stack backgroundColor="orangered" width="50%" />
-</HStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: HStack with percentage width (overflow)"
 <HStack border="4px dotted green" height="200px">
   <Stack backgroundColor="cyan" width="50%" />
   <Stack backgroundColor="orangered" width="50%" />
@@ -561,14 +400,7 @@ When you use a `HStack` child with percentage width, the effective width is calc
 
 When the stack does not apply gaps, there is no overflow:
 
-```xmlui copy /gap="0"/
-<HStack gap="0" border="4px dotted green" height="200px">
-  <Stack backgroundColor="cyan" width="50%" />
-  <Stack backgroundColor="orangered" width="50%" />
-</HStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display /gap="0"/ name="Example: HStack with percentage width (no overflow)"
 <HStack gap="0" border="4px dotted green" height="200px">
   <Stack backgroundColor="cyan" width="50%" />
   <Stack backgroundColor="orangered" width="50%" />
@@ -577,35 +409,17 @@ When the stack does not apply gaps, there is no overflow:
 
 When you use a `HStack` child with star sizing, the effective width is calculated from the remaining width of the stack's viewport width after subtracting the widths of explicitly sized children and gaps. Such a configuration will not cause overflow.
 
-```xmlui copy
+```xmlui-pg copy display name="Example: HStack with star-sized width"
 <HStack height="60px" border="4px dotted green">
   <Stack backgroundColor="cyan" width="*" />
   <H3>I'm a heading</H3>
   <Stack backgroundColor="orangered" width="2*" />
 </HStack>
 ```
-
-```xmlui-pg
-<HStack height="60px" border="4px dotted green">
-  <Stack backgroundColor="cyan" width="*" />
-  <H3>I'm a heading</H3>
-  <Stack backgroundColor="orangered" width="2*" />
-</HStack>
-```
-
 
 `HStack` has a `wrapContent` property. If you set it to `true`, the engine starts a new line (or column) when the subsequent child to render would overflow in the current line. Here the fourth child does not fit in the first line entirely, so it overflows:
 
-```xmlui copy {2}
-<HStack>
-  <Stack backgroundColor="red" height="36px" width="25%" />
-  <Stack backgroundColor="green" height="36px" width="40%" />
-  <Stack backgroundColor="blue" height="36px" width="20%" />
-  <Stack backgroundColor="purple" height="36px" width="30%" />
-</HStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: HStack with overflow in a single row"
 <HStack>
   <Stack backgroundColor="red" height="36px" width="25%" />
   <Stack backgroundColor="green" height="36px" width="40%" />
@@ -616,16 +430,7 @@ When you use a `HStack` child with star sizing, the effective width is calculate
 
 With `wrapContent` flag, the forth child begins a new line.
 
-```xmlui copy {2} /wrapContent="true"/
-<HStack wrapContent="true">
-  <Stack backgroundColor="red" height="36px" width="25%" />
-  <Stack backgroundColor="green" height="36px" width="40%" />
-  <Stack backgroundColor="blue" height="36px" width="20%" />
-  <Stack backgroundColor="purple" height="36px" width="30%" />
-</HStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display /wrapContent="true"/ name="Example: HStack with wrapContent"
 <HStack wrapContent="true">
   <Stack backgroundColor="red" height="36px" width="25%" />
   <Stack backgroundColor="green" height="36px" width="40%" />
@@ -638,15 +443,7 @@ With `wrapContent` flag, the forth child begins a new line.
 
 `CHStack` is a shorthand version of `Stack` with a horizontal orientation and centered contents.
 
-```xmlui copy
-<CHStack height="100px" width="200px" backgroundColor="lightgray">
-  <Stack backgroundColor="red" height="36px" width="36px" />
-  <Stack backgroundColor="green" height="72px" width="36px" />
-  <Stack backgroundColor="blue" height="48px" width="36px" />
-</CHStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: CHStack"
 <CHStack height="100px" width="200px" backgroundColor="lightgray">
   <Stack backgroundColor="red" height="36px" width="36px" />
   <Stack backgroundColor="green" height="72px" width="36px" />
@@ -658,20 +455,12 @@ With `wrapContent` flag, the forth child begins a new line.
 
 `CVStack` is a shorthand version of `Stack` with a vertical orientation and centered contents.
 
-```xmlui copy {2-4}
-<Stack
-  orientation="vertical"
-  verticalAlignment="center"
-  horizontalAlignment="center"
-/>
-```
-
-```xmlui-pg
-<Stack
-  orientation="vertical"
-  verticalAlignment="center"
-  horizontalAlignment="center"
-/>
+```xmlui-pg display copy name="Example: CVStack"
+<CVStack height="200px" width="100px" backgroundColor="lightgray">
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="36px" width="72px" />
+  <Stack backgroundColor="blue" height="36px" width="48px" />
+</CVStack>
 ```
 
 ## FlowLayout
@@ -683,15 +472,7 @@ With `wrapContent` flag, the forth child begins a new line.
 
 When you use an `HStack` with percentage sizing and the sum width of children is 100%, an overflow will occur because gaps require extra space.
 
-```xmlui copy
-<HStack>
-  <Stack backgroundColor="red" height="36px" width="25%" />
-  <Stack backgroundColor="green" height="36px" width="50%" />
-  <Stack backgroundColor="blue" height="36px" width="25%" />
-</HStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: HStack with overflow"
 <HStack>
   <Stack backgroundColor="red" height="36px" width="25%" />
   <Stack backgroundColor="green" height="36px" width="50%" />
@@ -701,15 +482,7 @@ When you use an `HStack` with percentage sizing and the sum width of children is
 
 `FlowLayout` handles this sizing issue by adjusting the child component dimensions, accounting for the gaps.
 
-```xmlui copy
-<FlowLayout>
-  <Stack backgroundColor="red" height="36px" width="25%" />
-  <Stack backgroundColor="green" height="36px" width="50%" />
-  <Stack backgroundColor="blue" height="36px" width="25%" />
-</FlowLayout>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: FlowLayout"
 <FlowLayout>
   <Stack backgroundColor="red" height="36px" width="25%" />
   <Stack backgroundColor="green" height="36px" width="50%" />
@@ -719,15 +492,7 @@ When you use an `HStack` with percentage sizing and the sum width of children is
 
 `FlowLayout` caps the size of items exceeding the available width. Here the red box is too wide but `FlowLayout` trims it back to 100% width.
 
-```xmlui copy /width="1000000px"/
-<FlowLayout>
-  <Stack backgroundColor="red" height="36px" width="1000000px" />
-  <Stack backgroundColor="green" height="36px" width="50%" />
-  <Stack backgroundColor="blue" height="36px" width="25%" />
-</FlowLayout>
-```
-
-```xmlui-pg
+```xmlui-pg copy /width="1000000px"/ name="Example: FlowLayout with size capping"
 <FlowLayout>
   <Stack backgroundColor="red" height="36px" width="1000000px" />
   <Stack backgroundColor="green" height="36px" width="50%" />
@@ -742,15 +507,7 @@ Note how the extreme width of the first child is capped to the space available f
 
 `SpaceFiller` fills unused space in layout containers. Its behavior depends on the layout container in which it is used. In a `Stack`, it pushes the children following it to the other end of the container.
 
-```xmlui copy {3}
-<HStack>
-  <Stack width="36px" height="36px" backgroundColor="red" />
-  <SpaceFiller />
-  <Stack width="36px" height="36px" backgroundColor="blue" />
-</HStack>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: SpaceFiller in a HStack"
 <HStack>
   <Stack width="36px" height="36px" backgroundColor="red" />
   <SpaceFiller />
@@ -760,16 +517,7 @@ Note how the extreme width of the first child is capped to the space available f
 
 In a `FlowLayout`, it acts as a line break for a row. The children following the `SpaceFiller` begin a new line.
 
-```xmlui copy {3}
-<FlowLayout>
-  <Stack width="20%" height="36px" backgroundColor="red" />
-  <SpaceFiller />
-  <Stack width="20%" height="36px" backgroundColor="green" />
-  <Stack width="20%" height="36px" backgroundColor="blue" />
-</FlowLayout>
-```
-
-```xmlui-pg
+```xmlui-pg copy display name="Example: SpaceFiller in a FlowLayout"
 <FlowLayout>
   <Stack width="20%" height="36px" backgroundColor="red" />
   <SpaceFiller />
@@ -784,17 +532,7 @@ In a `FlowLayout`, it acts as a line break for a row. The children following the
 
 Here's a horizontal splitter that sets some constraints on the size of the primary section.
 
-```xmlui copy /orientation="horizontal"/
-<HSplitter
-  height="100%"
-  minPrimarySize="10%"
-  maxPrimarySize="90%">
-  <CVStack backgroundColor="lightblue" height="100%">Primary</CVStack>
-  <CVStack backgroundColor="darksalmon" height="100%">Secondary</CVStack>
-</HSplitter>
-```
-
-```xmlui-pg
+```xmlui-pg copy display height="200px" name="Example: Splitter"
 <HSplitter
   height="100%"
   minPrimarySize="10%"
