@@ -69,10 +69,10 @@ const searchOptions: IFuseOptions<SearchItemData> = {
   minMatchCharLength: 2,
   // location: 0,
   threshold: 0,
-  distance: 500,
-  // useExtendedSearch: false,
+  // distance: 500,
+  // useExtendedSearch: true,
   ignoreLocation: true,
-  // ignoreFieldNorm: false,
+  ignoreFieldNorm: true,
   // fieldNormWeight: 1,
   keys,
 };
@@ -139,61 +139,7 @@ export const Search = ({
       ? []
       : fuse.search(debouncedValue, { limit: limit ?? defaultProps.limit });
 
-    const mapped = limited
-      .map((result) => {
-        const mappedMatches: MatchesByKey = {};
-        result.matches?.forEach((match) => {
-          if (match.key !== undefined) {
-            const matchKey = match.key as keyof SearchItemData;
-
-            mappedMatches[matchKey] = {
-              indices: match.indices
-                .filter(
-                  // Here we exclude results that are too short and not match the search term
-                  (index) => {
-                    if (match.key === "title") {
-                      return index[1] - index[0] >= debouncedValue.length - 1;
-                    }
-                    return result.item[matchKey]
-                      .slice(index[0], index[1] + 1)
-                      .toLocaleLowerCase()
-                      .includes(debouncedValue.toLocaleLowerCase());
-                  },
-                )
-                // Restrict highlights that are longer than the original search term
-                .map((index) => {
-                  if (index[1] - index[0] > debouncedValue.length) {
-                    index[1] = index[0] + debouncedValue.length;
-                  }
-
-                  // If the highlight is not exactly on spot but near the correct position, move it
-                  const searchIdxMax = 3;
-                  for (let i = index[0]; i < Math.min(index[1], index[0] + searchIdxMax); i++) {
-                    if (
-                      result.item[matchKey]
-                        .slice(i, i + debouncedValue.length)
-                        .toLocaleLowerCase() === debouncedValue.toLocaleLowerCase()
-                    ) {
-                      index[0] = i;
-                      index[1] = i + debouncedValue.length - 1;
-                      break;
-                    }
-                  }
-
-                  return index;
-                }),
-              value: match.value,
-            };
-          }
-        });
-
-        return {
-          item: result.item,
-          score: result.score,
-          matches: mappedMatches,
-        };
-      })
-      .filter((item) => Object.values(item.matches).some((match) => match.indices.length > 0));
+    const mapped = postProcessSearch(limited, debouncedValue);
 
     if (mapped.length > 0) setShow(true);
     return mapped;
@@ -384,6 +330,109 @@ const SearchItemContent = forwardRef(function SearchItemContent(
 });
 
 // --- Utilities
+
+function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debouncedValue: string) {
+  const options = {
+    // Determines the size of the area around a string index
+    // used in search filtering and highlight correction
+    idxDistance: 3,
+    // Minimum number of characters to trigger a long text search filter
+    longTextSearchThreshold: 25,
+    longTextIdxDistance: 8,
+    // Number of characters subtracted from the search term length
+    // to account for partial matches in the title
+    titleAcceptanceThreshold: 1,
+    // Number of characters subtracted from the search term length
+    // to account for partial matches in the content
+    contentAcceptanceThreshold: 2,
+  };
+
+  return searchResults
+    .map((result) => ({
+      item: result.item,
+      score: result.score,
+      matches: mapMatchIndices(result),
+    }))
+    .filter((item) => Object.values(item.matches).some((match) => match.indices.length > 0));
+
+  // ---
+
+  function mapMatchIndices(result: FuseResult<SearchItemData>) {
+    return (result.matches ?? [])
+      .filter((match) => !!match.key)
+      .reduce<MatchesByKey>((acc, match) => {
+        const validIndexes: RangeTuple[] = [];
+        const matchKey = match.key as keyof SearchItemData;
+
+        // Map match indexes to results
+        acc[matchKey] = {
+          value: match.value,
+          indices: match.indices
+            // Remove too short and some misaligned matches
+            .filter((index) => {
+              const foundSubstrLength = index[1] - index[0];
+              if (match.key === "title") {
+                return (
+                  foundSubstrLength >= debouncedValue.length - options.titleAcceptanceThreshold
+                );
+              }
+              // Long text search filter in content
+              if (debouncedValue.length > options.longTextSearchThreshold) {
+                const overlappingIdxArea = validIndexes.find(
+                  (vi) =>
+                    index[0] >= vi[0] - options.idxDistance &&
+                    index[0] <= vi[0] + options.idxDistance &&
+                    index[1] >= vi[1] - options.idxDistance &&
+                    index[1] <= vi[1] + options.idxDistance,
+                );
+
+                if (
+                  !overlappingIdxArea &&
+                  foundSubstrLength >= debouncedValue.length - options.contentAcceptanceThreshold &&
+                  foundSubstrLength <= debouncedValue.length + options.contentAcceptanceThreshold
+                ) {
+                  validIndexes.push(index);
+                  return true;
+                }
+                return false;
+              }
+              // Regular text search in content
+              return result.item[matchKey]
+                .slice(index[0], index[1] + 1)
+                .toLocaleLowerCase()
+                .includes(debouncedValue.toLocaleLowerCase());
+            })
+            // Restrict highlights that are longer than the original search term
+            .map((index) => {
+              if (index[1] - index[0] > debouncedValue.length) {
+                index[1] = index[0] + debouncedValue.length;
+              }
+
+              // If the highlight is not exactly on spot but near the correct position, move it
+              const areaStart = Math.max(index[0] - options.idxDistance, 0);
+              const areaEnd = Math.min(
+                index[1] + options.idxDistance,
+                result.item[matchKey].length,
+              );
+
+              for (let i = areaStart; i < areaEnd; i++) {
+                if (
+                  result.item[matchKey].slice(i, i + debouncedValue.length).toLocaleLowerCase() ===
+                  debouncedValue.toLocaleLowerCase()
+                ) {
+                  index[0] = i;
+                  index[1] = i + debouncedValue.length - 1;
+                  break;
+                }
+              }
+
+              return index;
+            })
+        };
+        return acc;
+      }, {});
+  }
+}
 
 /**
  * Formats a snippet of text. Determines which ranges are highlighted and how big the snippet is.
