@@ -838,7 +838,7 @@ export class ComponentRegistry {
    */
   hasComponent(componentName: string) {
     return (
-      this.pool.get(componentName) !== undefined ||
+      this.lookupComponentRenderer(componentName) !== undefined ||
       this.loaders.get(componentName) !== undefined ||
       this.actionFns.get(componentName) !== undefined
     );
