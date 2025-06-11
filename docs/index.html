@@ -35,24 +35,13 @@
         return result
     }
 
-    window.dateToSliderValue = function( dateString ) {
-        // Convert a date string (YYYY-MM-DD) to a slider value (days from start date)
-        // dateString: date in YYYY-MM-DD format
-        // returns: number of days from the start date
-
-        // Use fixed start date instead of window.startDate
-        const start = new Date('2022-06-01');  // <-- FIXED: hard-coded instead of window.startDate
-
-        // Parse the input date and the global start date
-        const date = new Date(dateString);
-
-        // Calculate the difference in days
-        const diffTime = date.getTime() - start.getTime();
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-        return diffDays;
+    window.formatToday = function (plusDays = 0) {
+        const date = new Date();
+        if (plusDays !== 0) {
+            date.setDate(date.getDate() + plusDays);
+        }
+        return date.toISOString().slice(0, 10).replace(/-/g, '/');
     }
-
 </script>
   </body>
 </html>

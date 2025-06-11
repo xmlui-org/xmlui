@@ -250,7 +250,6 @@ Query parameters are not considered to be part of the route. So, in this sample,
   `}
 />
 
-<Callout type="info" emoji="📔">
 The semantic meaning of routes is analogous to routes used at the backend. When you send two requests with the same routes but different query parameters, they will reach the same backend endpoint. Of course, that endpoint may consider the query parameters, process them, and respond differently. However, this differentiation is not in the routing but in the processing mechanism.
-</Callout>
+
 
