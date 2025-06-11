@@ -1,4 +1,3 @@
-<Fragment xmlns:XMLUIExtensions="component-ns">
 <Theme fontSize-Text-codefence="9pt">
     <App
         layout="vertical-full-header"
@@ -11,13 +10,13 @@
                 </Link>
             </property>
             <SpaceFiller/>
-            <XMLUIExtensions:Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
+            <Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
             <ToneChangerButton/>
         </AppHeader>
 
         <NavPanel>
             <Stack paddingHorizontal="$space-4" when="{mediaSize.sizeIndex <= 2}">
-                <XMLUIExtensions:Search data="{appGlobals.plainTextContent}" />
+                <Search data="{appGlobals.plainTextContent}" />
             </Stack>
             <NavGroup label="Learn XMLUI">
                 <NavLink label="Introduction" to="/"/>
@@ -51,6 +50,8 @@
             <NavGroup label="Reference">
                 <RecursiveNavTree
                     items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
+                <RecursiveNavTree
+                    items="{ appGlobals.navPanelContent.filter(item => item.name === 'extensions') }"/>
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
@@ -189,6 +190,5 @@
             </Card>
         </Footer>
     </App>
-    <XMLUIExtensions:StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
+    <StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
 </Theme>
-</Fragment>
