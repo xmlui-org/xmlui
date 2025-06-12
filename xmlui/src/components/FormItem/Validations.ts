@@ -12,18 +12,18 @@ import {
   type ValidateEventHandler,
   type ValidationMode,
   type ValidationResult,
-  type ValidationSeverity
+  type ValidationSeverity,
 } from "../Form/FormContext";
 import { fieldValidated, type FormAction } from "../Form/formActions";
 
-function isInputEmpty (value: any) {
+function isInputEmpty(value: any) {
   if (value === undefined || value === null || value === "") return true;
   if (typeof value === "string") return value.trim().length === 0;
 
   return isEmpty(value);
 }
 
-function isMinLengthValid (value: any = "", boundary: number) {
+function isMinLengthValid(value: any = "", boundary: number) {
   if (typeof value === "string") {
     return value.length >= boundary;
   }
@@ -31,7 +31,7 @@ function isMinLengthValid (value: any = "", boundary: number) {
   return true;
 }
 
-function isMaxLengthValid (value: any = "", boundary: number) {
+function isMaxLengthValid(value: any = "", boundary: number) {
   if (typeof value === "string") {
     return value.length <= boundary;
   }
@@ -39,21 +39,21 @@ function isMaxLengthValid (value: any = "", boundary: number) {
   return true;
 }
 
-function isMinValueValid (value: any = "", minValue: number) {
+function isMinValueValid(value: any = "", minValue: number) {
   if (typeof value !== "string" && !isNumber(value)) {
     console.warn("Range can only be used on strings and numbers");
   }
   return Number(value) >= minValue;
 }
 
-function isMaxValueValid (value: any = "", maxValue: number) {
+function isMaxValueValid(value: any = "", maxValue: number) {
   if (typeof value !== "string" && !isNumber(value)) {
     console.warn("Range can only be used on strings and numbers");
   }
   return Number(value) <= maxValue;
 }
 
-function isRegexValid (value: any = "", regex: string) {
+function isRegexValid(value: any = "", regex: string) {
   if (typeof value === "string") {
     const _value = stringToRegex(regex).test(value);
     return _value;
@@ -65,48 +65,55 @@ function isRegexValid (value: any = "", regex: string) {
   function stringToRegex(s: string) {
     const m = s.match(/^([/~@;%#'])(.*?)\1([gimsuy]*)$/);
     return m ? new RegExp(m[2], m[3]) : new RegExp(s);
- }
+  }
 }
 
 class FormItemValidator {
-  constructor (private validations: FormItemValidations, private onValidate: ValidateEventHandler, private value: any) {}
+  constructor(
+    private validations: FormItemValidations,
+    private onValidate: ValidateEventHandler,
+    private value: any,
+  ) {}
 
   preValidate = () => {
     const requiredResult = this.validateRequired();
-    let validationResults: SingleValidationResult[] = [ requiredResult ];
+    let validationResults: SingleValidationResult[] = [requiredResult];
     if (!requiredResult || requiredResult.isValid) {
       validationResults.push(
         this.validateLength(),
         this.validateRange(),
         this.validatePattern(),
-        this.validateRegex()
+        this.validateRegex(),
       );
     }
-    validationResults = validationResults.filter(result => result !== undefined) as Array<SingleValidationResult>;
+    validationResults = validationResults.filter(
+      (result) => result !== undefined,
+    ) as Array<SingleValidationResult>;
 
     return {
-      isValid: validationResults.find(result => !result.isValid) === undefined,
+      isValid: validationResults.find((result) => !result.isValid) === undefined,
       validatedValue: this.value,
       partial: this.onValidate !== undefined,
-      validations: validationResults
+      validations: validationResults,
     } as ValidationResult;
   };
-
 
   validate = async () => {
     const preValidateResult = this.preValidate();
     const constValidationResult = (await this.validateCustom()) || [];
-    preValidateResult.validations.push(...constValidationResult.map(res => ({ ...res, async: true })));
+    preValidateResult.validations.push(
+      ...constValidationResult.map((res) => ({ ...res, async: true })),
+    );
 
     return {
-      isValid: preValidateResult.validations.find(result => !result.isValid) === undefined,
+      isValid: preValidateResult.validations.find((result) => !result.isValid) === undefined,
       validatedValue: this.value,
       partial: false,
-      validations: preValidateResult.validations
+      validations: preValidateResult.validations,
     } as ValidationResult;
   };
 
-  private validateRequired (): SingleValidationResult | undefined {
+  private validateRequired(): SingleValidationResult | undefined {
     const { required, requiredInvalidMessage } = this.validations;
     if (!required) {
       return undefined;
@@ -114,12 +121,17 @@ class FormItemValidator {
     return {
       isValid: !isInputEmpty(this.value),
       invalidMessage: requiredInvalidMessage || "This field is required",
-      severity: "error"
+      severity: "error",
     };
   }
 
-  private validateLength (): SingleValidationResult | undefined {
-    const { minLength, maxLength, lengthInvalidMessage, lengthInvalidSeverity = "error" } = this.validations;
+  private validateLength(): SingleValidationResult | undefined {
+    const {
+      minLength,
+      maxLength,
+      lengthInvalidMessage,
+      lengthInvalidSeverity = "error",
+    } = this.validations;
     if (minLength === undefined && maxLength === undefined) {
       return undefined;
     }
@@ -127,27 +139,36 @@ class FormItemValidator {
       return {
         isValid: isMinLengthValid(this.value, minLength),
         invalidMessage:
-          lengthInvalidMessage || `Input should be at least ${minLength} ${pluralize(minLength, "character")}`,
-        severity: lengthInvalidSeverity
+          lengthInvalidMessage ||
+          `Input should be at least ${minLength} ${pluralize(minLength, "character")}`,
+        severity: lengthInvalidSeverity,
       };
     }
     if (minLength === undefined && maxLength !== undefined) {
       return {
         isValid: isMaxLengthValid(this.value, maxLength),
         invalidMessage:
-          lengthInvalidMessage || `Input should be up to ${maxLength} ${pluralize(maxLength, "character")}`,
-        severity: lengthInvalidSeverity
+          lengthInvalidMessage ||
+          `Input should be up to ${maxLength} ${pluralize(maxLength, "character")}`,
+        severity: lengthInvalidSeverity,
       };
     }
     return {
       isValid: isMinLengthValid(this.value, minLength!) && isMaxLengthValid(this.value, maxLength!),
-      invalidMessage: lengthInvalidMessage || `Input length should be between ${minLength} and ${maxLength}`,
-      severity: lengthInvalidSeverity
+      invalidMessage:
+        lengthInvalidMessage || `Input length should be between ${minLength} and ${maxLength}`,
+      severity: lengthInvalidSeverity,
     };
   }
 
-  private validateRange (): SingleValidationResult | undefined {
-    const { minValue, maxValue, rangeInvalidMessage, rangeInvalidSeverity = "error" } = this.validations;
+  private validateRange(): SingleValidationResult | undefined {
+    const {
+      minValue,
+      maxValue,
+      rangeInvalidMessage,
+      rangeInvalidSeverity = "error",
+    } = this.validations;
+
     if (minValue === undefined && maxValue === undefined) {
       return undefined;
     }
@@ -156,24 +177,39 @@ class FormItemValidator {
       return {
         isValid: isMinValueValid(this.value, minValue),
         invalidMessage: rangeInvalidMessage || `Input should be bigger than ${minValue}`,
-        severity: rangeInvalidSeverity
+        severity: rangeInvalidSeverity,
       };
     }
     if (minValue === undefined && maxValue !== undefined) {
       return {
         isValid: isMaxValueValid(this.value, maxValue),
         invalidMessage: rangeInvalidMessage || `Input should be smaller than ${maxValue}`,
-        severity: rangeInvalidSeverity
+        severity: rangeInvalidSeverity,
       };
     }
+
+    if (typeof this.value === "object" && Array.isArray(this.value)) {
+      // If the value is an array, we check if all elements are within the range
+      const allValid = this.value.every(
+        (val) => isMinValueValid(val, minValue!) && isMaxValueValid(val, maxValue!),
+      );
+
+      return {
+        isValid: allValid,
+        invalidMessage:
+          rangeInvalidMessage || `All inputs should be between ${minValue} and ${maxValue}`,
+        severity: rangeInvalidSeverity,
+      };
+    }
+
     return {
       isValid: isMinValueValid(this.value, minValue!) && isMaxValueValid(this.value, maxValue!),
       invalidMessage: rangeInvalidMessage || `Input should be between ${minValue} and ${maxValue}`,
-      severity: rangeInvalidSeverity
+      severity: rangeInvalidSeverity,
     };
   }
 
-  private validatePattern (): SingleValidationResult | undefined {
+  private validatePattern(): SingleValidationResult | undefined {
     const { pattern, patternInvalidMessage, patternInvalidSeverity = "error" } = this.validations;
     if (!pattern) {
       return undefined;
@@ -181,15 +217,17 @@ class FormItemValidator {
     switch (pattern.toLowerCase()) {
       case "email":
         return {
-          isValid: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(this.value),
+          isValid: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+            this.value,
+          ),
           invalidMessage: patternInvalidMessage || "Not a valid email address",
-          severity: patternInvalidSeverity
+          severity: patternInvalidSeverity,
         };
       case "phone":
         return {
           isValid: /^[a-zA-Z0-9#*)(+.\-_&']+$/g.test(this.value),
           invalidMessage: patternInvalidMessage || "Not a valid phone number",
-          severity: patternInvalidSeverity
+          severity: patternInvalidSeverity,
         };
       case "url":
         let url;
@@ -200,25 +238,25 @@ class FormItemValidator {
           return {
             isValid: false,
             invalidMessage: "Not a valid URL",
-            severity: patternInvalidSeverity
+            severity: patternInvalidSeverity,
           };
         }
 
         return {
           isValid: true,
-          severity: "valid"
+          severity: "valid",
         };
       default: {
         console.warn("Unknown pattern provided");
         return {
           isValid: true,
-          severity: "valid"
+          severity: "valid",
         };
       }
     }
   }
 
-  private validateRegex (): SingleValidationResult | undefined {
+  private validateRegex(): SingleValidationResult | undefined {
     const { regex, regexInvalidMessage, regexInvalidSeverity = "error" } = this.validations;
     if (regex === undefined) {
       return undefined;
@@ -226,11 +264,11 @@ class FormItemValidator {
     return {
       isValid: isRegexValid(this.value, regex),
       invalidMessage: regexInvalidMessage || "Input is not in the correct format",
-      severity: regexInvalidSeverity
+      severity: regexInvalidSeverity,
     };
   }
 
-  private async validateCustom (): Promise<Array<SingleValidationResult> | undefined> {
+  private async validateCustom(): Promise<Array<SingleValidationResult> | undefined> {
     if (!this.onValidate) {
       return undefined;
     }
@@ -241,8 +279,8 @@ class FormItemValidator {
         {
           isValid: validationFnResult,
           invalidMessage: "Invalid input",
-          severity: "error"
-        }
+          severity: "error",
+        },
       ];
     }
     if (!isArray(validationFnResult)) {
@@ -253,19 +291,23 @@ class FormItemValidator {
   }
 }
 
-async function asyncValidate (validations: FormItemValidations, onValidate: ValidateEventHandler, deferredValue: any) {
+async function asyncValidate(
+  validations: FormItemValidations,
+  onValidate: ValidateEventHandler,
+  deferredValue: any,
+) {
   const validator = new FormItemValidator(validations, onValidate, deferredValue);
   // console.log("calling async validate with ", deferredValue);
   return await validator.validate();
 }
 
-export function useValidation (
+export function useValidation(
   validations: FormItemValidations,
   onValidate: ValidateEventHandler,
   value: any,
   dispatch: Dispatch<ContainerAction | FormAction>,
   bindTo: string,
-  throttleWaitInMs: number = 0
+  throttleWaitInMs: number = 0,
 ) {
   const deferredValue = useDeferredValue(value);
 
@@ -273,14 +315,14 @@ export function useValidation (
     if (throttleWaitInMs !== 0) {
       return asyncThrottle(asyncValidate, throttleWaitInMs, {
         trailing: true,
-        leading: true
+        leading: true,
       });
     }
     return asyncValidate;
   }, [throttleWaitInMs]);
 
   useEffect(
-    function runAllValidations () {
+    function runAllValidations() {
       const validator = new FormItemValidator(validations, onValidate, deferredValue);
       let ignore = false;
       const partialResult = validator.preValidate();
@@ -300,11 +342,11 @@ export function useValidation (
         ignore = true;
       };
     },
-    [bindTo, deferredValue, dispatch, onValidate, throttledAsyncValidate, validations]
+    [bindTo, deferredValue, dispatch, onValidate, throttledAsyncValidate, validations],
   );
 }
 
-export function useValidationDisplay (
+export function useValidationDisplay(
   bindTo: string,
   value: any,
   validationResult: ValidationResult | undefined,
@@ -313,7 +355,8 @@ export function useValidationDisplay (
   isHelperTextShown: boolean;
   validationStatus: ValidationSeverity;
 } {
-  const interactionFlags: any = useFormContextPart(value => value.interactionFlags[bindTo]) || EMPTY_OBJECT;
+  const interactionFlags: any =
+    useFormContextPart((value) => value.interactionFlags[bindTo]) || EMPTY_OBJECT;
   const forceShowValidationResult = interactionFlags.forceShowValidationResult;
   const focused = interactionFlags.focused;
   const isValidLostFocus = interactionFlags.isValidLostFocus;
@@ -328,7 +371,10 @@ export function useValidationDisplay (
     if (val.isValid) {
       continue;
     }
-    if (highestValidationSeverity !== ("error" as ValidationSeverity) && val.severity === "warning") {
+    if (
+      highestValidationSeverity !== ("error" as ValidationSeverity) &&
+      val.severity === "warning"
+    ) {
       highestValidationSeverity = "warning";
     }
     if (val.severity === "error") {
@@ -340,7 +386,8 @@ export function useValidationDisplay (
   let isHelperTextShown = false;
   switch (validationMode) {
     case "errorLate":
-      isHelperTextShown = isDirty && (focused ? !invalidToValid && !isValidOnFocus : !isValidLostFocus);
+      isHelperTextShown =
+        isDirty && (focused ? !invalidToValid && !isValidOnFocus : !isValidLostFocus);
       break;
     case "onChanged":
       isHelperTextShown = isDirty;
@@ -359,29 +406,36 @@ export function useValidationDisplay (
   }
   return {
     isHelperTextShown,
-    validationStatus: isHelperTextShown ? highestValidationSeverity : "none"
+    validationStatus: isHelperTextShown ? highestValidationSeverity : "none",
   };
 }
 
-export function parseSeverity (severity: string | undefined) {
+export function parseSeverity(severity: string | undefined) {
   if (severity === undefined) {
     return undefined;
   }
-  if (severity === "error" || severity === "warning" || severity === "valid" || severity === "none") {
+  if (
+    severity === "error" ||
+    severity === "warning" ||
+    severity === "valid" ||
+    severity === "none"
+  ) {
     return severity as ValidationSeverity;
   }
   return "none";
 }
 
-export function groupInvalidValidationResultsBySeverity (validationResults: Array<ValidationResult>) {
+export function groupInvalidValidationResultsBySeverity(
+  validationResults: Array<ValidationResult>,
+) {
   const ret: Record<ValidationSeverity, Array<SingleValidationResult>> = {
     error: [],
     warning: [],
     valid: [],
-    none: []
+    none: [],
   };
   Object.entries(validationResults).forEach(([field, validationResult]) => {
-    validationResult.validations.forEach(singleValidationResult => {
+    validationResult.validations.forEach((singleValidationResult) => {
       if (!singleValidationResult.isValid) {
         ret[singleValidationResult.severity] = ret[singleValidationResult.severity] || [];
         ret[singleValidationResult.severity].push(singleValidationResult);
@@ -391,6 +445,6 @@ export function groupInvalidValidationResultsBySeverity (validationResults: Arra
   return ret;
 }
 
-function pluralize (count: number, word: string) {
+function pluralize(count: number, word: string) {
   return count === 1 ? word : word + "s";
 }
