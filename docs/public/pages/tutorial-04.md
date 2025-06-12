@@ -4,14 +4,14 @@ The `Dashboard` page opens with a set of infocards. Here is a simplified version
 
 ```xmlui-pg display
 <App>
-<variable name="dashboardStats" value="{
-  {
-    value:
-      [
-        { outstanding: 3569, paid_this_year: 1745}
-      ]
-  }
-}" />
+  <variable name="dashboardStats" value="{
+    {
+      value:
+        [
+          { outstanding: 3569, paid_this_year: 1745}
+        ]
+    }
+  }" />
 
 <HStack>
   <Card>
@@ -34,18 +34,10 @@ In the app, `dashboardStats` is a [DataSource](/components/DataSource).
 
 It returns a structure like the variable we've defined above: an object with a `value` key that points to a list of objects corresponding to rows in the database. In this case there's only one row because the query behind `/api/dashboard/stats` reports multiple values (count of invoices, total amount outstanding, total amount paid this year, etc) as columns in that single row.
 
-There are five infocards on the XMLUI Invoice dashboard. To style them all in a consistent way, the app defines an `InfoCard` that wraps `Card` and `Text`. These are in turn wrapped in a `Dashboard` that passes properties to `InfoCard`: `title`, `width`, `value`, and optionally a `currency` flag for `$` formatting.
+There are five infocards on the XMLUI Invoice dashboard. To style them all in a consistent way, the app defines an `InfoCard` that wraps `Card` and `Text`.
 
-`Dashboard` can define any set of names and values; `InfoCard` receives them in its `$props` [context variable](/context-variables).
 
-The first `InfoCard` specifies a `20%` width, the others use [star sizing](/glossary#star-sizing).
-
-```xmlui-pg display
----app
-<App>
-  <Dashboard />
-</App>
----comp display
+```xmlui /InfoCard/ /width/ /title/ /currency/ /value/
 <Component name="InfoCard">
 
     <Card width="{$props.width}" borderRadius="8px" boxShadow="$boxShadow-spread">
@@ -58,7 +50,75 @@ The first `InfoCard` specifies a `20%` width, the others use [star sizing](/glos
     </Card>
 
 </Component>
----comp display
+```
+
+ These are in turn wrapped in a `Dashboard` that passes properties to `InfoCard`: `title`, `width`, `value`, and optionally a `currency` flag for `$` formatting.
+
+```xmlui /Dashboard/ /InfoCard/ /width/ /title/ /currency/ /value/ /*/
+<Component name="Dashboard">
+
+    <DataSource id="dashboardStats" url="/api/dashboard/stats" method="GET" />
+
+    <HStack>
+        <H1>Dashboard</H1>
+        <SpaceFiller />
+        <Button label="Create Invoice" onClick="navigate('/invoices/new')" />
+    </HStack>
+
+    <HStack>
+        <InfoCard
+            width="20%"
+            title="Outstanding"
+            value="{ dashboardStats.value[0].outstanding }"
+            currency='true'
+        />
+        <InfoCard
+          width="*"
+          ...
+        />
+        <InfoCard
+          width="*"
+          ...
+        />
+        <InfoCard
+          width="*"
+          ...
+        />
+        <InfoCard
+          width="*"
+          ...
+        />
+    </HStack>
+
+</Component>
+```
+
+A [user-defined component](/components-intro) like `Dashboard` can define any set of names and values. `InfoCard` receives them in its `$props` [context variable](/context-variables). `InfoCard` is opinionated about `borderRadius` and `boxShadow`. It could also receive these in `$props` but chooses not to. And while it is strongly opinionated about the `borderRadius`, which it hardcodes, it is willing to use the theme variable `$boxShadow-spread` so that setting can be theme-governed.
+
+The first `InfoCard` specifies a `20%` width, the others use [star sizing](/glossary#star-sizing).
+
+Here's a more complete version of the row of `InfoCard`s used in the Invoices app.
+
+
+```xmlui-pg
+---app display
+<App>
+  <Dashboard />
+</App>
+---comp
+<Component name="InfoCard">
+
+    <Card width="{$props.width}" borderRadius="8px" boxShadow="$boxShadow-spread">
+
+        <Text>{$props.title}</Text>
+
+        <Text fontWeight="$fontWeight-extra-bold" fontSize="larger">
+            { $props.currency === 'true' ? '$' + $props.value : $props.value }
+        </Text>
+    </Card>
+
+</Component>
+---comp
 <Component name="Dashboard">
 
   <variable name="dashboardStats" value="{
@@ -109,6 +169,4 @@ The first `InfoCard` specifies a `20%` width, the others use [star sizing](/glos
 
 </Component>
 ```
-
-Instead of using inline styles we could set theme variables for [Card](/components/Card) and [Text](/components/Text) that would govern all instances of these components. Encapsulating them in `InfoCard` allows for other instances of `Card` and `Text` that don't share this look and feel. `InfoCard` is not only reusable, with a `width` property that enables rows of varying length, but also stylistically distinct. Note that `InfoCard` is still themeable in one respect: it uses the abstract theme variable `$boxShadow-spread` instead of a hardcoded value.
 
