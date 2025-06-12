@@ -43,4 +43,8 @@ This component does not expose any methods.
 
 ## Styling
 
-This component does not have any styles.
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [textColor](../styles-and-themes/common-units/#color)-labelList-PieChart | $textColor-primary | $textColor-primary |
