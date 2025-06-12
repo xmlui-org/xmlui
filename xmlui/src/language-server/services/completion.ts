@@ -1,7 +1,7 @@
 import type { MarkupContent, CompletionItem } from "vscode-languageserver";
 import { CompletionItemKind, MarkupKind } from "vscode-languageserver";
 import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
-import { FindTokenSuccess, findTokenAtPos } from "../../parsers/xmlui-parser/utils";
+import { FindTokenSuccess, findTokenAtPos, toDbgString } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import * as docGen from "./common/docs-generation";
@@ -94,7 +94,7 @@ export function handleCompletion(
 
       const pathToElementNode = pathToNodeInAscendands(chainBeforePos, (n) => n.kind === SyntaxKind.ElementNode);
       const parentOfnodeBefore = chainBeforePos.at(-2);
-      const completeCompName = parentOfnodeBefore.kind === SyntaxKind.TagNameNode && position === nodeBefore.end
+      const completeCompName = parentOfnodeBefore?.kind === SyntaxKind.TagNameNode && position === nodeBefore.end
       if (completeCompName){
         if (pathToElementNode && insideClosingTag(pathToElementNode)){
           const elementNode = pathToElementNode.at(-1);
@@ -112,8 +112,14 @@ export function handleCompletion(
   );
 
   if (completeForProp) {
-    const tagNameNode = findTagNameNodeInStack(chainAtPos);
+    const tagNameNode = findTagNameNodeInStack(chainBeforePos);
+    if (!tagNameNode){
+      return null;
+    }
     const compName = compNameForTagNameNode(tagNameNode, getText);
+    if (!compName){
+      return null;
+    }
     return completionForNewAttr(compName, metaByComp);
   }
   return null;
