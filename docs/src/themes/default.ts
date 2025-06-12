@@ -38,6 +38,7 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "paddingVertical-NavPanel": "$space-5",
     "borderRightWidth-NavPanel": "1px",
     "paddingVertical-logo-NavPanel": "$space-3",
+    "horizontalAlignment-logo-NavPanel": "flex-start",
     "maxWidth-Drawer": "100%",
 
     // --- NavLink

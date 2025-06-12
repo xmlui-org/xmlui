@@ -82,6 +82,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
     padding-bottom: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
     padding-inline: createThemeVar("paddingHorizontal-logo-#{$component}");
     margin-bottom: $marginBottom-logo-NavPanel;
+    justify-content: createThemeVar("horizontalAlignment-logo-#{$component}");
   }
 
   &.inDrawer {     //to make room for the close button
