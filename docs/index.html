@@ -37,6 +37,14 @@
       return result
     }
 
+    window.formatMonth = function (month) {
+      // Input: '2022-06'
+      const [year, monthNum] = month.split('-');
+      const date = new Date(year, monthNum - 1);
+      return date.toLocaleString('default', { month: 'short', year: '2-digit' });
+      // Output: 'Jun 22'
+    }
+
     window.formatToday = function (plusDays = 0) {
       const date = new Date();
       if (plusDays !== 0) {
