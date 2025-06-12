@@ -49,7 +49,7 @@ export const TextMd = createMetadata({
     [`fontSize-${COMP}`]: "$fontSize-small",
     [`borderWidth-${COMP}`]: "$space-0",
 
-
+    [`lineHeight-${COMP}-codefence`]: "1.4",
 
     [`fontWeight-${COMP}-abbr`]: "$fontWeight-bold",
     [`textTransform-${COMP}-abbr`]: "uppercase",

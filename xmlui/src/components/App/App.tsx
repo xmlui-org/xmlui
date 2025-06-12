@@ -1,4 +1,5 @@
 import styles from "./App.module.scss";
+import drawerStyles from "./Sheet.module.scss";
 
 import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
@@ -88,7 +89,7 @@ export const AppMd = createMetadata({
   events: {
     ready: d(`This event fires when the \`${COMP}\` component finishes rendering on the page.`),
   },
-  themeVars: parseScssVar(styles.themeVars),
+  themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
   themeVarDescriptions: {
     "maxWidth-content-App":
@@ -103,6 +104,7 @@ export const AppMd = createMetadata({
       "with one of the vertical layouts.",
   },
   defaultThemeVars: {
+    "maxWidth-Drawer": "20rem",
     [`width-navPanel-${COMP}`]: "$space-64",
     [`backgroundColor-navPanel-${COMP}`]: "$backgroundColor",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content",

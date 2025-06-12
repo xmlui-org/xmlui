@@ -1,196 +1,196 @@
-<Theme>
-<App
-    layout="vertical-full-header"
-    noScrollbarGutters="false"
-    when="{!window.location.hash.includes('/playground')}">
-    <AppHeader>
-        <property name="logoTemplate">
-            <Link to="/" height="100%">
-                <Logo padding="$space-3" paddingLeft="0" />
-            </Link>
-        </property>
-        <SpaceFiller/>
-        <Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
-        <ToneChangerButton/>
-    </AppHeader>
+<Fragment>
+    <App
+        layout="vertical"
+        noScrollbarGutters="false"
+        when="{!window.location.hash.includes('/playground')}">
+        <AppHeader>
+            <property name="logoTemplate">
+                <Link to="/">
+                    <Logo height="$space-8" />
+                </Link>
+            </property>
+            <SpaceFiller/>
+            <Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
+            <ToneChangerButton/>
+        </AppHeader>
 
-    <NavPanel>
-        <Stack paddingHorizontal="$space-4" paddingBottom="$space-4" when="{mediaSize.sizeIndex <= 2}">
-            <Search data="{appGlobals.plainTextContent}" />
-        </Stack>
-        <NavGroup initiallyExpanded="{true}" label="Learn XMLUI">
-            <NavLink label="Introduction" to="/"/>
-            <NavLink label="Reactive Data" to="/reactive-intro"/>
-            <NavLink label="Components" to="/components-intro"/>
-            <NavLink label="Themes" to="/themes-intro"/>
-        </NavGroup>
-        <NavGroup label="Tutorial">
-            <NavLink label="XMLUI Invoice" to="/tutorial-01"/>
-            <NavLink label="Main.xmlui" to="/tutorial-02"/>
-            <NavLink label="Navigation" to="/tutorial-03"/>
-            <NavLink label="InfoCards" to="/tutorial-04"/>
-            <NavLink label="Charts" to="/tutorial-05"/>
-            <NavLink label="Slider" to="/tutorial-06"/>
-            <NavLink label="Invoices" to="/tutorial-07"/>
-            <NavLink label="Create Invoice" to="/tutorial-08"/>
-            <NavLink label="Invoice Details" to="/tutorial-09"/>
-        </NavGroup>
-        <NavGroup label="Guides">
-            <NavLink label="App Structure" to="/app-structure"/>
-            <NavLink label="Markup" to="/markup"/>
-            <NavLink label="Code" to="/code"/>
-            <NavLink label="Layout" to="/layout"/>
-            <NavLink label="Working with Text" to="/working-with-text"/>
-            <NavLink label="Working with Markdown" to="/working-with-markdown"/>
-            <NavLink label="Routing and Links" to="/routing-and-links"/>
-            <NavLink label="Forms" to="/forms"/>
-            <NavLink label="Modal Dialogs" to="/modal-dialogs"/>
-            <NavLink label="User-defined Components" to="/user-defined-components"/>
-        </NavGroup>
-        <NavGroup label="Reference">
-            <RecursiveNavTree
-                items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
-            <RecursiveNavTree
-                items="{ appGlobals.navPanelContent.filter(item => item.name === 'extensions') }"/>
-            <NavGroup label="Themes">
-                <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
-                <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
-                <NavLink label="Theme Variable Defaults" to="/styles-and-themes/theme-variable-defaults"/>
-                <NavLink label="Common Units" to="/styles-and-themes/common-units"/>
+        <NavPanel>
+            <Stack paddingHorizontal="$space-4" paddingBottom="$space-4" when="{mediaSize.sizeIndex <= 2}">
+                <Search data="{appGlobals.plainTextContent}" />
+            </Stack>
+            <NavGroup initiallyExpanded="{true}" label="Learn XMLUI">
+                <NavLink label="Introduction" to="/"/>
+                <NavLink label="Reactive Data" to="/reactive-intro"/>
+                <NavLink label="Components" to="/components-intro"/>
+                <NavLink label="Themes" to="/themes-intro"/>
             </NavGroup>
-            <NavLink label="Context Variables" to="/context-variables"/>
-            <NavLink label="Globals" to="/globals"/>
-            <NavLink label="Helper Tags" to="/helper-tags"/>
-            <NavLink label="Palettes" to="/palettes"/>
-            <NavLink label="Icons" to="/icons"/>
-            <NavLink label="Glossary" to="/glossary"/>
-            <NavLink label="Test" to="/test"/>
-        </NavGroup>
-    </NavPanel>
+            <NavGroup label="Tutorial">
+                <NavLink label="XMLUI Invoice" to="/tutorial-01"/>
+                <NavLink label="Main.xmlui" to="/tutorial-02"/>
+                <NavLink label="Navigation" to="/tutorial-03"/>
+                <NavLink label="InfoCards" to="/tutorial-04"/>
+                <NavLink label="Charts" to="/tutorial-05"/>
+                <NavLink label="Slider" to="/tutorial-06"/>
+                <NavLink label="Invoices" to="/tutorial-07"/>
+                <NavLink label="Create Invoice" to="/tutorial-08"/>
+                <NavLink label="Invoice Details" to="/tutorial-09"/>
+            </NavGroup>
+            <NavGroup label="Guides">
+                <NavLink label="App Structure" to="/app-structure"/>
+                <NavLink label="Markup" to="/markup"/>
+                <NavLink label="Code" to="/code"/>
+                <NavLink label="Layout" to="/layout"/>
+                <NavLink label="Working with Text" to="/working-with-text"/>
+                <NavLink label="Working with Markdown" to="/working-with-markdown"/>
+                <NavLink label="Routing and Links" to="/routing-and-links"/>
+                <NavLink label="Forms" to="/forms"/>
+                <NavLink label="Modal Dialogs" to="/modal-dialogs"/>
+                <NavLink label="User-defined Components" to="/user-defined-components"/>
+            </NavGroup>
+            <NavGroup label="Reference">
+                <RecursiveNavTree
+                    items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
+                <RecursiveNavTree
+                    items="{ appGlobals.navPanelContent.filter(item => item.name === 'extensions') }"/>
+                <NavGroup label="Themes">
+                    <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
+                    <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
+                    <NavLink label="Theme Variable Defaults" to="/styles-and-themes/theme-variable-defaults"/>
+                    <NavLink label="Common Units" to="/styles-and-themes/common-units"/>
+                </NavGroup>
+                <NavLink label="Context Variables" to="/context-variables"/>
+                <NavLink label="Globals" to="/globals"/>
+                <NavLink label="Helper Tags" to="/helper-tags"/>
+                <NavLink label="Palettes" to="/palettes"/>
+                <NavLink label="Icons" to="/icons"/>
+                <NavLink label="Glossary" to="/glossary"/>
+                <NavLink label="Test" to="/test"/>
+            </NavGroup>
+        </NavPanel>
 
-    <Pages>
-        <Page url="/">
-            <DocumentPage hideToc="true" url="/pages/intro.md" />
-        </Page>
-        <Page url="/reactive-intro">
-            <DocumentPage hideToc="true" url="/pages/reactive-intro.md" />
-        </Page>
-        <Page url="/components-intro">
-            <ComponentsIntro/>
-        </Page>
-        <Page url="/themes-intro">
-            <ThemesIntro/>
-        </Page>
-        <Page url="/tutorial-01">
-            <DocumentPage hideToc="true" url="/pages/tutorial-01.md" />
-        </Page>
-        <Page url="/tutorial-02">
-            <DocumentPage url="/pages/tutorial-02.md" />
-        </Page>
-        <Page url="/tutorial-03">
-            <DocumentPage url="/pages/tutorial-03.md" />
-        </Page>
-        <Page url="/tutorial-04">
-            <DocumentPage url="/pages/tutorial-04.md" />
-        </Page>
-        <Page url="/tutorial-05">
-            <DocumentPage url="/pages/tutorial-05.md" />
-        </Page>
-        <Page url="/tutorial-06">
-            <DocumentPage url="/pages/tutorial-06.md" />
-        </Page>
-        <Page url="/tutorial-07">
-            <DocumentPage url="/pages/tutorial-07.md" />
-        </Page>
-        <Page url="/tutorial-08">
-            <DocumentPage url="/pages/tutorial-08.md" />
-        </Page>
-        <Page url="/tutorial-09">
-            <DocumentPage url="/pages/tutorial-09.md" />
-        </Page>
-        <Page url="/app-structure">
-            <DocumentPage url="/pages/app-structure.md"/>
-        </Page>
-        <Page url="/markup">
-            <DocumentPage url="/pages/markup.md"/>
-        </Page>
-        <Page url="/code">
-            <DocumentPage url="/pages/code.md"/>
-        </Page>
-        <Page url="/layout">
-            <DocumentPage url="/pages/layout.md"/>
-        </Page>
-        <Page url="/working-with-text">
-            <DocumentPage url="/pages/working-with-text.md"/>
-        </Page>
-        <Page hideToc="true" url="/working-with-markdown">
-            <DocumentPage url="/pages/working-with-markdown.md"/>
-        </Page>
-        <Page url="/routing-and-links">
-            <DocumentPage url="/pages/routing-and-links.md"/>
-        </Page>
-        <Page url="/forms">
-            <DocumentPage url="/pages/forms.md"/>
-        </Page>
-        <Page url="/resources">
-            <DocumentPage url="/pages/resources.md"/>
-        </Page>
-        <Page url="/modal-dialogs">
-            <DocumentPage url="/pages/modal-dialogs.md"/>
-        </Page>
-        <Page url="/user-defined-components">
-            <UserDefinedComponents />
-        </Page>
-        <Page url="/styles-and-themes/layout-props">
-            <DocumentPage url="/pages/styles-and-themes/layout-props.md"/>
-        </Page>
-        <Page url="/styles-and-themes/theme-variables">
-            <DocumentPage url="/pages/styles-and-themes/theme-variables.md"/>
-        </Page>
-        <Page url="/styles-and-themes/theme-variable-defaults">
-            <DocumentPage hideToc="true" url="/pages/styles-and-themes/theme-variable-defaults.md" />
-        </Page>
-        <Page url="/styles-and-themes/common-units">
-            <DocumentPage url="/pages/styles-and-themes/common-units.md"/>
-        </Page>
-        <Page url="/context-variables">
-            <DocumentPage url="/pages/context-variables.md" />
-        </Page>
-        <Page url="/globals">
-            <DocumentPage url="pages/globals.md" />
-        </Page>
-        <Page url="/helper-tags">
-            <DocumentPage url="pages/helper-tags.md" />
-        </Page>
-        <Page url="/glossary">
-            <DocumentPage hideToc="true" url="/pages/glossary.md" />
-        </Page>
-        <Page url="/icons">
-            <Icons/>
-        </Page>
-        <Page url="/palettes">
-            <Palettes/>
-        </Page>
-        <Page url="/glossary">
-            <DocumentPage hideToc="true" url="/pages/glossary.md" />
-        </Page>
-        <Page url="/test">
-            <Test />
-        </Page>
-        <Page url="/*">
-            <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>
-        </Page>
-    </Pages>
-    <Footer>
-        <Card border="0" width="100%" padding="0">
-            <CHStack gap="$space-1" paddingBottom="0" verticalAlignment="center">
-                Created with
-                <Logo width="50px" />
-            </CHStack>
-        </Card>
-    </Footer>
+        <Pages>
+            <Page url="/">
+                <DocumentPage hideToc="true" url="/pages/intro.md" />
+            </Page>
+            <Page url="/reactive-intro">
+                <DocumentPage hideToc="true" url="/pages/reactive-intro.md" />
+            </Page>
+            <Page url="/components-intro">
+                <ComponentsIntro/>
+            </Page>
+            <Page url="/themes-intro">
+                <ThemesIntro/>
+            </Page>
+            <Page url="/tutorial-01">
+                <DocumentPage hideToc="true" url="/pages/tutorial-01.md" />
+            </Page>
+            <Page url="/tutorial-02">
+                <DocumentPage url="/pages/tutorial-02.md" />
+            </Page>
+            <Page url="/tutorial-03">
+                <DocumentPage url="/pages/tutorial-03.md" />
+            </Page>
+            <Page url="/tutorial-04">
+                <DocumentPage url="/pages/tutorial-04.md" />
+            </Page>
+            <Page url="/tutorial-05">
+                <DocumentPage url="/pages/tutorial-05.md" />
+            </Page>
+            <Page url="/tutorial-06">
+                <DocumentPage url="/pages/tutorial-06.md" />
+            </Page>
+            <Page url="/tutorial-07">
+                <DocumentPage url="/pages/tutorial-07.md" />
+            </Page>
+            <Page url="/tutorial-08">
+                <DocumentPage url="/pages/tutorial-08.md" />
+            </Page>
+            <Page url="/tutorial-09">
+                <DocumentPage url="/pages/tutorial-09.md" />
+            </Page>
+            <Page url="/app-structure">
+                <DocumentPage url="/pages/app-structure.md"/>
+            </Page>
+            <Page url="/markup">
+                <DocumentPage url="/pages/markup.md"/>
+            </Page>
+            <Page url="/code">
+                <DocumentPage url="/pages/code.md"/>
+            </Page>
+            <Page url="/layout">
+                <DocumentPage url="/pages/layout.md"/>
+            </Page>
+            <Page url="/working-with-text">
+                <DocumentPage url="/pages/working-with-text.md"/>
+            </Page>
+            <Page hideToc="true" url="/working-with-markdown">
+                <DocumentPage url="/pages/working-with-markdown.md"/>
+            </Page>
+            <Page url="/routing-and-links">
+                <DocumentPage url="/pages/routing-and-links.md"/>
+            </Page>
+            <Page url="/forms">
+                <DocumentPage url="/pages/forms.md"/>
+            </Page>
+            <Page url="/resources">
+                <DocumentPage url="/pages/resources.md"/>
+            </Page>
+            <Page url="/modal-dialogs">
+                <DocumentPage url="/pages/modal-dialogs.md"/>
+            </Page>
+            <Page url="/user-defined-components">
+                <UserDefinedComponents />
+            </Page>
+            <Page url="/styles-and-themes/layout-props">
+                <DocumentPage url="/pages/styles-and-themes/layout-props.md"/>
+            </Page>
+            <Page url="/styles-and-themes/theme-variables">
+                <DocumentPage url="/pages/styles-and-themes/theme-variables.md"/>
+            </Page>
+            <Page url="/styles-and-themes/theme-variable-defaults">
+                <DocumentPage hideToc="true" url="/pages/styles-and-themes/theme-variable-defaults.md" />
+            </Page>
+            <Page url="/styles-and-themes/common-units">
+                <DocumentPage url="/pages/styles-and-themes/common-units.md"/>
+            </Page>
+            <Page url="/context-variables">
+                <DocumentPage url="/pages/context-variables.md" />
+            </Page>
+            <Page url="/globals">
+                <DocumentPage url="pages/globals.md" />
+            </Page>
+            <Page url="/helper-tags">
+                <DocumentPage url="pages/helper-tags.md" />
+            </Page>
+            <Page url="/glossary">
+                <DocumentPage hideToc="true" url="/pages/glossary.md" />
+            </Page>
+            <Page url="/icons">
+                <Icons/>
+            </Page>
+            <Page url="/palettes">
+                <Palettes/>
+            </Page>
+            <Page url="/glossary">
+                <DocumentPage hideToc="true" url="/pages/glossary.md" />
+            </Page>
+            <Page url="/test">
+                <Test />
+            </Page>
+            <Page url="/*">
+                <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>
+            </Page>
+        </Pages>
+        <Footer>
+            <Card border="0" width="100%" padding="0">
+                <CHStack gap="$space-1" paddingBottom="0" verticalAlignment="center">
+                    Created with
+                    <Logo width="50px" />
+                </CHStack>
+            </Card>
+        </Footer>
 
-</App>
+    </App>
 
-<StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
-</Theme>
+    <StandalonePlayground when="{window.location.hash.includes('/playground')}"/>
+</Fragment>

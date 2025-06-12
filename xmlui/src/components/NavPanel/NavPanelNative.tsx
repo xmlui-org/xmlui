@@ -76,8 +76,6 @@ export const NavPanel = forwardRef(function NavPanel(
   const vertical = appLayoutContext?.layout?.startsWith("vertical");
   const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
 
-  // console.log(appLayoutContext);
-
   if (inDrawer) {
     return (
       <DrawerNavPanel style={style} logoContent={safeLogoContent} className={className}>
