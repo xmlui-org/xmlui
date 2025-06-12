@@ -12,7 +12,7 @@ The component uses three critical properties of `DonutChart`.
 - `dataKey`: The object key that holds data.
 - `nameKey`: The object key whose value is the data label.
 
-```xmlui /data/ /dataKeys/ /nameKey/
+```xmlui /data/ /dataKey/ /nameKey/
 <Component
     name="Statuses"
     xmlns:XMLUIExtensions="component-ns"
@@ -72,15 +72,15 @@ The component uses three critical properties of `DonutChart`.
                   [
                     {
                       name: 'sent',
-                      value: dashboardStats.value[0].sent_invoices
+                      value: 10
                     },
                     {
                       name: 'draft',
-                      value: dashboardStats.value[0].draft_invoices
+                      value: 2
                     },
                     {
                       name: 'paid',
-                      value: dashboardStats.value[0].paid_invoices
+                      value: 3
                     },
                   ]
         }"
