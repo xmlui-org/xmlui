@@ -1,4 +1,4 @@
-import React, { type CSSProperties, memo, type ReactNode } from "react";
+import React, { type CSSProperties, memo, type ReactNode, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -87,18 +87,18 @@ export const Markdown = memo(function Markdown({
   }
   children = removeIndents ? removeTextIndents(children) : children;
 
-  const classifyImages = new Map<string, boolean>();
+  const imageInfo = useRef(new Map<string, boolean>());
+  const getImageKey = (node: any) =>
+    `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
+
   const markdownImgParser = () => {
-    classifyImages.clear();
+    imageInfo.current.clear();
     return function transformer(tree: Node) {
       visit(tree, "image", visitor);
     };
 
     function visitor(node: any, _: number, parent: Parent | undefined) {
-      const imgKey = `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
-
-      // --- Store if this image is inline (true) or block (false)
-      classifyImages.set(imgKey, parent.type === "paragraph" && parent.children.length > 1);
+      imageInfo.current.set(getImageKey(node), parent.type === "paragraph" && parent.children.length > 1);
     }
   };
 
@@ -129,9 +129,7 @@ export const Markdown = memo(function Markdown({
             const alt = props?.alt || "";
 
             // --- Determine if the image should be inline or block
-            let isInline = classifyImages.get(
-              `${node?.position?.start?.offset}|${node?.position?.end?.offset}`,
-            );
+            let isInline = imageInfo.current.get(getImageKey(node));
 
             // Apply styling based on whether image should be inline or block
             const imgStyle = {

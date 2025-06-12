@@ -29,15 +29,15 @@ The component uses three critical properties of `DonutChart`.
                   [
                     {
                       name: 'sent',
-                      value: 10
+                      value: dashboardStats.value[0].sent_invoices
                     },
                     {
                       name: 'draft',
-                      value: 2
+                      value: dashboardStats.value[0].draft_invoices
                     },
                     {
                       name: 'paid',
-                      value: 3
+                      value: dashboardStats.value[0].paid_invoices
                     },
                   ]
         }"
@@ -66,21 +66,21 @@ The component uses three critical properties of `DonutChart`.
         <H1>{$props.title}</H1>
 
         <Card height="400px">
-            <XMLUIExtensions:DonutChart
+            <DonutChart
                 layout="horizontal"
                 data="{
                   [
                     {
                       name: 'sent',
-                      value: 10
+                      value: dashboardStats.value[0].sent_invoices
                     },
                     {
                       name: 'draft',
-                      value: 2
+                      value: dashboardStats.value[0].draft_invoices
                     },
                     {
                       name: 'paid',
-                      value: 3
+                      value: dashboardStats.value[0].paid_invoices
                     },
                   ]
         }"
