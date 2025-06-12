@@ -1,47 +1,64 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/resources/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script>window.__PUBLIC_PATH = '/'</script>
-    <base href="/">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/index.ts"></script>
 
-<script>
-    window.sliderValueToDate = function( value ) {
-        console.log('sliderValueToDate', value)
-        // Convert a slider value (representing days from start date) to an actual date string
-        // value: number of days offset from startDate
-        // returns: date string in YYYY-MM-DD format
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/resources/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>window.__PUBLIC_PATH = '/'</script>
+  <base href="/">
+</head>
 
-        // Use fixed start date instead of window.startDate
-        const start = new Date('2022-06-01');  // <-- FIXED: hard-coded instead of window.startDate
+<body>
+  <div id="root"></div>
+  <script type="module" src="/index.ts"></script>
 
-        // Create a new date by adding the slider value (days) to the start date
-        const resultDate = new Date(start);
-        resultDate.setDate(start.getDate() + value);
+  <script>
+    window.sliderValueToDate = function (value) {
+      console.log('sliderValueToDate', value)
+      // Convert a slider value (representing days from start date) to an actual date string
+      // value: number of days offset from startDate
+      // returns: date string in YYYY-MM-DD format
 
-        // Format the date as YYYY-MM-DD
-        const year = resultDate.getFullYear();
-        const month = String(resultDate.getMonth() + 1).padStart(2, '0'); // +1 because months are 0-indexed
-        const day = String(resultDate.getDate()).padStart(2, '0');
+      // Use fixed start date instead of window.startDate
+      const start = new Date('2022-06-01');  // <-- FIXED: hard-coded instead of window.startDate
 
-        const result =`${year}-${month}-${day}`;
-        console.log('sliderValueToDate', result)
-        return result
+      // Create a new date by adding the slider value (days) to the start date
+      const resultDate = new Date(start);
+      resultDate.setDate(start.getDate() + value);
+
+      // Format the date as YYYY-MM-DD
+      const year = resultDate.getFullYear();
+      const month = String(resultDate.getMonth() + 1).padStart(2, '0'); // +1 because months are 0-indexed
+      const day = String(resultDate.getDate()).padStart(2, '0');
+
+      const result = `${year}-${month}-${day}`;
+      console.log('sliderValueToDate', result)
+      return result
     }
 
     window.formatToday = function (plusDays = 0) {
-        const date = new Date();
-        if (plusDays !== 0) {
-            date.setDate(date.getDate() + plusDays);
-        }
-        return date.toISOString().slice(0, 10).replace(/-/g, '/');
+      const date = new Date();
+      if (plusDays !== 0) {
+        date.setDate(date.getDate() + plusDays);
+      }
+      return date.toISOString().slice(0, 10).replace(/-/g, '/');
     }
-</script>
-  </body>
+
+    window.lineItemTotal = function (lineItems) {
+      if (!lineItems || !Array.isArray(lineItems)) {
+        return 0;
+      }
+
+      let total = 0;
+      for (const item of lineItems) {
+        if (item && typeof item.amount === 'number') {
+          total += item.amount;
+        }
+      }
+      return total;
+    }
+  </script>
+</body>
+
 </html>
