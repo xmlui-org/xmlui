@@ -335,6 +335,10 @@ In the example below, typing in the `TextBox` will also display the length of th
 | [color](../styles-and-themes/common-units/#color)-placeholder-TextBox-error | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-placeholder-TextBox-success | *none* | *none* |
 | [color](../styles-and-themes/common-units/#color)-placeholder-TextBox-warning | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-default | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-error | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-success | *none* | *none* |
+| [fontSize](../styles-and-themes/common-units/#size)-placeholder-TextBox-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-TextBox-default | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-TextBox-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-TextBox-success | *none* | *none* |

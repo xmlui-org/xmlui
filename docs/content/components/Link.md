@@ -171,11 +171,11 @@ This component does not expose any methods.
 | textAlign-Link | *none* | *none* |
 | textAlignLast-Link | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Link | $color-primary-500 | $color-primary-500 |
-| [textColor](../styles-and-themes/common-units/#color)-Link--active | $color-primary-500 | $color-primary-500 |
+| [textColor](../styles-and-themes/common-units/#color)-Link--active | $color-primary-400 | $color-primary-400 |
 | [textColor](../styles-and-themes/common-units/#color)-Link--hover | $color-primary-400 | $color-primary-400 |
 | [textColor](../styles-and-themes/common-units/#color)-Link--hover--active | $textColor-Link--active | $textColor-Link--active |
-| [textDecorationColor](../styles-and-themes/common-units/#color)-Link | $color-primary-400 | $color-primary-400 |
-| [textDecorationColor](../styles-and-themes/common-units/#color)-Link--active | $color-primary-200 | $color-primary-200 |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-Link | $color-primary-500 | $color-primary-500 |
+| [textDecorationColor](../styles-and-themes/common-units/#color)-Link--active | $color-primary-400 | $color-primary-400 |
 | [textDecorationColor](../styles-and-themes/common-units/#color)-Link--hover | $color-primary-400 | $color-primary-400 |
 | [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-Link | underline | underline |
 | [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-Link | solid | solid |
