@@ -446,6 +446,7 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [fontSize](../styles-and-themes/common-units/#size)-Select-error | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-success | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Select-warning | *none* | *none* |
+| [minHeight](../styles-and-themes/common-units/#size)-Input | 39px | 39px |
 | [opacity](../styles-and-themes/common-units/#opacity)-Select--disabled | 0.5 | 0.5 |
 | [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | 0.5 | 0.5 |
 | [outlineColor](../styles-and-themes/common-units/#color)-Select-default--focus | *none* | *none* |

@@ -319,6 +319,10 @@ export type ComponentMetadata<
   // Theme variable defaults for a particular tone-specific theme
   toneSpecificThemeVars?: Record<string, Record<string, string>>;
 
+  // Indicates that the documentation should include only the theme variables 
+  // including the component name
+  limitThemeVarsToComponent?: boolean;
+
   // Indicates that the component allows arbitrary props (not just the named ones)
   allowArbitraryProps?: boolean;
 

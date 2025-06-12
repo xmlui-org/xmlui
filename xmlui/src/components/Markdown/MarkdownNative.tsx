@@ -200,7 +200,6 @@ export const Markdown = memo(function Markdown({
                   <img
                     src={src}
                     alt={alt}
-                    className={htmlTagStyles.htmlImage}
                     style={imgStyle}
                     {...props}
                   >
@@ -213,7 +212,6 @@ export const Markdown = memo(function Markdown({
                 <img
                   src={src}
                   alt={alt}
-                  className={htmlTagStyles.htmlImage}
                   style={imgStyle}
                   {...props}
                 >

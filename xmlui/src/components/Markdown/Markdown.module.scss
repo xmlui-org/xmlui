@@ -75,6 +75,14 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     margin-bottom: createThemeVar("marginBottom-H6-markdown") !important;
   }
 
+  // --- Image
+  img {
+    margin-top: createThemeVar("marginTop-Image-markdown");
+    margin-bottom: createThemeVar("marginBottom-Image-markdown");
+    margin-left: createThemeVar("marginLeft-Image-markdown");
+    margin-right: createThemeVar("marginRight-Image-markdown");
+  }
+
   // --- Blockquote
 
   .blockquote {

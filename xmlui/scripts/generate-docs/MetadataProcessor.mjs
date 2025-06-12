@@ -686,7 +686,7 @@ function listThemeVars(component) {
       return partAValue.localeCompare(partBValue);
     })
     // --- Only list theme vars that contain the component name
-    .filter((themeVar) => themeVar.indexOf(component.displayName) !== -1)
+    .filter((themeVar) => !component.limitThemeVarsToComponent || themeVar.indexOf(component.displayName) !== -1)
     .map((themeVar) => {
       const parts = themeVar.split(":");
       if (parts.length > 1) {

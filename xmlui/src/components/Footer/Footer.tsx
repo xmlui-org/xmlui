@@ -10,6 +10,7 @@ const COMP = "Footer";
 export const FooterMd = createMetadata({
   description: `The \`${COMP}\` is a component that acts as a placeholder within \`App\`.`,
   themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$backgroundColor-AppHeader",
     [`verticalAlign-${COMP}`]: "center",
