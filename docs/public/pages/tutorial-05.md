@@ -124,12 +124,12 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 </Component>
 ```
 
-```xmlui-pg
----app
+```xmlui-pg /data/
+---app display /data/
 <App>
   <MonthlyStatus />
 </App>
----comp
+---comp display /data/
 <Component name="MonthlyStatus">
 
     <DataSource
