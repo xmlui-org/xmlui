@@ -1,5 +1,11 @@
 # xmlui-search
 
+## 0.1.3
+
+### Patch Changes
+
+- d349036: Tweaked Search dropdown panel styles. Corrected Link component text and decoration hover and active colors
+
 ## 0.1.2
 
 ### Patch Changes

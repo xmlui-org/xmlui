@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.9.50
+
+### Patch Changes
+
+- e6c3b39: standalone usage: explicit codeBehind reference
+- 85031c8: Make the "marked" Text variant have lighter background color in dark mode.
+- d349036: Tweaked Search dropdown panel styles. Corrected Link component text and decoration hover and active colors
+
 ## 0.9.49
 
 ### Patch Changes
