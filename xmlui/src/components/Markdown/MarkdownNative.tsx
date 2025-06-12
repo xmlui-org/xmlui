@@ -22,6 +22,8 @@ import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative
 import classnames from "classnames";
 import Icon from "../Icon/IconNative";
 import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
+import { visit } from "unist-util-visit";
+import type { Node, Parent } from "unist";
 
 type MarkdownProps = {
   removeIndents?: boolean;
@@ -88,7 +90,7 @@ export const Markdown = memo(function Markdown({
   return (
     <div className={styles.markdownContent} style={style}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, markdownCodeBlockParser]}
+        remarkPlugins={[remarkGfm, markdownCodeBlockParser, markdownImgParser]}
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
@@ -106,6 +108,7 @@ export const Markdown = memo(function Markdown({
             );
           },
           img({ children, node, ...props }) {
+            console.log("img", node);
             const src = props?.src;
             const popOut = props?.["data-popout"];
             const alt = props?.alt || "";
@@ -172,7 +175,7 @@ export const Markdown = memo(function Markdown({
                 // --- Check if the image is small enough to be considered an icon
                 // --- Small images are likely icons
                 const imgSize = props?.width || props?.height;
-                isInline = imgSize === undefined ? true : parseInt(imgSize.toString()) < 512;
+                isInline = imgSize === undefined ? true : parseInt(imgSize.toString()) < 128;
 
                 // Images with icon-like filenames
                 if (
@@ -197,12 +200,7 @@ export const Markdown = memo(function Markdown({
             if (popOut) {
               return (
                 <a href={src} target="_blank" rel="noreferrer">
-                  <img
-                    src={src}
-                    alt={alt}
-                    style={imgStyle}
-                    {...props}
-                  >
+                  <img src={src} alt={alt} style={imgStyle}>
                     {children}
                   </img>
                 </a>
@@ -214,6 +212,7 @@ export const Markdown = memo(function Markdown({
                   alt={alt}
                   style={imgStyle}
                   {...props}
+                  className={classnames({ [styles.block]: !isInline })}
                 >
                   {children}
                 </img>
@@ -430,7 +429,7 @@ export const Markdown = memo(function Markdown({
               return <TreeDisplay content={content} itemHeight={24} />;
             }
             return null;
-          }
+          },
         }}
       >
         {children as any}
@@ -700,4 +699,15 @@ function extractTextNodes(node: React.ReactNode): string {
     return extractTextNodes(node.props.children);
   }
   return "";
+}
+
+export function markdownImgParser() {
+  return function transformer(tree: Node) {
+    visit(tree, "image", visitor);
+  };
+
+  function visitor(node: any, _: number, parent: Parent | undefined) {
+    console.log("Visiting img node:", node, parent);
+    node.some = "some";
+  }
 }
