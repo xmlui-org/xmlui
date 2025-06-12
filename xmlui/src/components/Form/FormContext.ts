@@ -64,7 +64,7 @@ export interface FormItemValidations {
 }
 
 export const validationSeverityValues = ["error", "warning", "valid", "none"] as const;
-export type ValidationSeverity = typeof validationSeverityValues[number];
+export type ValidationSeverity = (typeof validationSeverityValues)[number];
 export const validationSeverityMd: PropertyValueDescription[] = [
   { value: "valid", description: "Visual indicator for an input that is accepted" },
   { value: "warning", description: "Visual indicator for an input that produced a warning" },
@@ -76,12 +76,12 @@ export type ValidateEventHandler = ((value: any) => Promise<ValidateFunctionResu
 type ValidateFunctionResult = boolean | SingleValidationResult | Array<SingleValidationResult>;
 
 export const validationModeValues = ["errorLate", "onChanged", "onLostFocus"] as const;
-export type ValidationMode = typeof validationModeValues[number];
+export type ValidationMode = (typeof validationModeValues)[number];
 export const defaultValidationMode = "errorLate";
 export const validationModeMd: PropertyValueDescription[] = [
   {
     value: "errorLate",
-    description: 
+    description:
       "Display the error when the field loses focus." +
       "If an error is already displayed, continue for every keystroke until input is accepted.",
   },
@@ -92,7 +92,7 @@ export const validationModeMd: PropertyValueDescription[] = [
   {
     value: "onLostFocus",
     description: "Show/hide error (if present) only if the field loses focus.",
-  }
+  },
 ];
 
 export const FormContext = createContext<IFormContext>(undefined as unknown as IFormContext);
@@ -185,7 +185,9 @@ export const formControlTypesMd: PropertyValueDescription[] = [
   },
   {
     value: "custom",
-    description: "Custom control specified in children",
-  }
+    description:
+      "A custom control specified in children. If `type` is not specified " +
+      "but the `FormItem` has children, it considers the control a custom one.",
+  },
 ];
-export type FormControlType = typeof formControlTypes[number];
+export type FormControlType = (typeof formControlTypes)[number];

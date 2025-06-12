@@ -70,6 +70,11 @@ export const MarkdownMd = createMetadata({
     "marginTop-HtmlLi": "$space-2_5",
     "marginBottom-HtmlLi": "$space-2_5",
 
+    "marginTop-Image-markdown": "$space-4",
+    "marginBottom-Image-markdown": "$space-4",
+    "marginLeft-Image-markdown": "$space-0",
+    "marginRight-Image-markdown": "$space-0",
+
     light: {
       // --- No light-specific theme vars
     },

@@ -64,6 +64,7 @@ export const CheckboxMd = createMetadata({
     setValue: dSetValueApi(),
   },
   themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`borderColor-checked-${COMP}-error`]: `$borderColor-${COMP}-error`,
     [`backgroundColor-checked-${COMP}-error`]: `$borderColor-${COMP}-error`,

@@ -89,6 +89,7 @@ export const AppMd = createMetadata({
     ready: d(`This event fires when the \`${COMP}\` component finishes rendering on the page.`),
   },
   themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
   themeVarDescriptions: {
     "maxWidth-content-App":
       "This theme variable defines the maximum width of the main content. If the main " +

@@ -50,6 +50,50 @@ The component uses three critical properties of `DonutChart`.
 </Component>
 ```
 
+```xmlui-pg
+---app
+<App>
+  <Statuses />
+</App>
+---comp
+<Component
+    name="Statuses"
+    xmlns:XMLUIExtensions="component-ns"
+>
+  <DataSource id="dashboardStats" url="/api/dashboard/stats" method="GET" />
+
+    <VStack width="{$props.width}">
+        <H1>{$props.title}</H1>
+
+        <Card height="400px">
+            <XMLUIExtensions:DonutChart
+                layout="horizontal"
+                data="{
+                  [
+                    {
+                      name: 'sent',
+                      value: dashboardStats.value[0].sent_invoices
+                    },
+                    {
+                      name: 'draft',
+                      value: dashboardStats.value[0].draft_invoices
+                    },
+                    {
+                      name: 'paid',
+                      value: dashboardStats.value[0].paid_invoices
+                    },
+                  ]
+        }"
+                dataKey="value" nameKey="name"
+            />
+        </Card>
+
+    </VStack>
+
+</Component>
+```
+
+
 [PieChart](/components/PieChart) and [DonutChart](/components/DonutChart) work with a single series of data and use `dataKey`. [BarChart](/components/BarChart) and [LineChart](/components/LineChart) can display multiple series denoted by `dataKeys`. We see that in the `MonthlyStatus` chart.
 
 ```xmlui /data/ /dataKeys/ /nameKey/

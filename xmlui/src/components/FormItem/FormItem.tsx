@@ -169,6 +169,17 @@ export const FormItemMd = createMetadata({
   events: {
     validate: d(`This event is used to define a custom validation function.`),
   },
+  apis: {
+    addItem: d(
+      "Adds a new item to the `FormItem` data where the particular form item holds " +
+        "a list. The function has a single parameter, the data to add to the `FormItem`. " +
+        "The new item is appended to the end of the list.",
+    ),
+    removeItem: d(
+      "Removes the item specified by its index from the list held by the FormItem. " +
+        "The function has a single argument, the index to remove.",
+    ),
+  },
   contextVars: {
     $value: d(
       `The context variable represents the current value of the \`${COMP}\`. It can be used in ` +
@@ -267,7 +278,8 @@ export const formItemComponentRenderer = createComponentRenderer(
         );
     const resolvedRestProps = extractValue(nonLayoutCssProps);
     const formItemType = extractValue.asOptionalString(type);
-    const isCustomFormItem = formItemType === undefined && !!node.children;
+    const isCustomFormItem =
+      (formItemType === undefined || formItemType === "custom") && !!node.children;
     const inputTemplate = node.children || node.props?.inputTemplate;
 
     return (
@@ -308,7 +320,7 @@ export const formItemComponentRenderer = createComponentRenderer(
         {isCustomFormItem ? (
           <CustomFormItem
             renderChild={renderChild}
-            node={node}
+            node={node as any}
             bindTo={extractValue.asString(bindTo)}
           />
         ) : (

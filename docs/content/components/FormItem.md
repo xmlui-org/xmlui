@@ -474,7 +474,7 @@ Available values:
 | `slider` | Renders Slider |
 | `colorpicker` | Renders ColorPicker |
 | `items` | Renders Items |
-| `custom` | Custom control specified in children |
+| `custom` | A custom control specified in children. If `type` is not specified but the `FormItem` has children, it considers the control a custom one. |
 
 >[!INFO]
 > For custom controls, there is no need to explicitly set the `type` to `custom`.
@@ -514,7 +514,13 @@ In the demo below, leave the field as is and submit the form or enter an input t
 
 ## Exposed Methods [#exposed-methods]
 
-This component does not expose any methods.
+### `addItem` [#additem]
+
+Adds a new item to the `FormItem` data where the particular form item holds a list. The function has a single parameter, the data to add to the `FormItem`. The new item is appended to the end of the list.
+
+### `removeItem` [#removeitem]
+
+Removes the item specified by its index from the list held by the FormItem. The function has a single argument, the index to remove.
 
 ## Styling [#styling]
 

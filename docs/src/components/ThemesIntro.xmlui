@@ -182,6 +182,8 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
             </Stack>
         </HStack>
 
-        It's easy to make a mess by varying these settings but you will rarely need to touch them. A designer of a custom theme might want to, but even then the defaults will handle almost every situation. And remember: you can create an entire new theme from just a handful of reference colors.
+    <Text>
+       It's easy to make a mess by varying these settings but you will rarely need to touch them. A designer of a custom theme might want to, but even then the defaults will handle almost every situation. And remember: you can create an entire new theme from just a handful of reference colors.
+    </Text>
     </DocumentPage>
 </Component>

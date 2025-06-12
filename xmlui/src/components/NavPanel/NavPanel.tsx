@@ -17,6 +17,7 @@ export const NavPanelMd = createMetadata({
     ),
   },
   themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$backgroundColor",
     [`border-${COMP}`]: '0px solid $borderColor',

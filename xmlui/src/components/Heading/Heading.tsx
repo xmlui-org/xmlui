@@ -55,6 +55,7 @@ export const HeadingMd = createMetadata({
     omitFromToc: OMIT_FROM_TOC_DESC,
   },
   themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`textColor-${COMP}`]: "inherit",

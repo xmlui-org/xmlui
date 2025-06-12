@@ -335,27 +335,6 @@ $marginBottom-HtmlDetails: createThemeVarDetails("marginBottom-HtmlDetails");
   margin-bottom: $marginBottom-HtmlDetails;
 }
 
-// --- Image
-
-$themeVarsImage: ();
-
-@function createThemeVarImage($componentVariable) {
-  $themeVarsImage: t.appendThemeVar($themeVarsImage, $componentVariable) !global;
-  @return t.getThemeVar($themeVarsImage, $componentVariable);
-}
-
-$themeVarsImage: t.composeBorderVars($themeVarsImage, "HtmlImage");
-$themeVarsImage: t.composePaddingVars($themeVarsImage, "HtmlImage");
-$width-htmlImage: createThemeVarImage("width-HtmlImage");
-$height-htmlImage: createThemeVarImage("height-HtmlImage");
-
-.htmlImage {
-  width: $width-htmlImage;
-  height: $height-htmlImage;
-  @include t.borderVars($themeVarsImage, "HtmlImage");
-  @include t.paddingVars($themeVarsImage, "HtmlImage");
-}
-
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVarsTable: t.json-stringify($themeVarsTable);

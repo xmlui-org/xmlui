@@ -70,6 +70,7 @@ export const DropdownMenuMd = createMetadata({
     close: d(`This method command closes the dropdown.`),
   },
   themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`backgroundColor-${DDMCOMP}`]: "$color-surface-raised",
     [`minWidth-${DDMCOMP}`]: "160px",
@@ -137,6 +138,7 @@ export const MenuItemMd = createMetadata({
     click: dClick(MICOMP),
   },
   themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`backgroundColor-${MICOMP}`]: "$backgroundColor-dropdown-item",
     [`color-${MICOMP}`]: "$textColor-primary",
@@ -217,6 +219,7 @@ export const MenuSeparatorMd = createMetadata({
   description: "This component displays a separator line between menu items.",
   docFolder: DDMCOMP,
   themeVars: parseScssVar(styles.themeVars),
+  limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`marginTop-${MSEP}`]: "$space-1",
     [`marginBottom-${MSEP}`]: "$space-1",

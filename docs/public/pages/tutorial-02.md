@@ -153,10 +153,12 @@ Each [Page](/components/Pages) is a container that binds to a route and holds XM
 
 ## Footer
 
-```xmlui
-<Footer>Built with XMLUI <ToneChangerButton /> </Footer>
+```xmlui-pg display name="Try clicking the ToneChanger"
+<App>
+  <Footer>Built with XMLUI <ToneChangerButton /> </Footer>
+</App>
 ```
 
-Our `Main.xmlui` concludes with a [Footer](/components/Footer) that includes a [ToneChangerButton](/components/ToneChangerButton).
+Our `Main.xmlui` concludes with a [Footer](/components/Footer) that embeds a [ToneChangerButton](/components/ToneChangerButton).
 
 

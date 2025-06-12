@@ -36,12 +36,12 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
         </Card>
 
         <Card border="none" width="25%" padding="0">
-          <FormItem type="datePicker" dateFormat="yyyy/MM/dd" initialValue="{ formatToday() }"
+          <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday() }"
             bindTo="issueDate" label="Issue date" />
         </Card>
 
         <Card border="none" width="25%" padding="0">
-          <FormItem type="datePicker" dateFormat="yyyy/MM/dd" initialValue="{ formatToday(30) }"
+          <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday(30) }"
             bindTo="dueDate" label="Due date" />
         </Card>
 
@@ -59,7 +59,7 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
       <FormItem
         bindTo="lineItems"
         type="items"
-        id="lineItems"
+        id="lineItemsForm"
         required="true"
         onValidate="(value) => Array.isArray(value) && value.length > 0 && value.every(item => item.product)"
         requiredInvalidMessage="At least one line item is required."
@@ -91,17 +91,17 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
           <FormItem width="12%" bindTo="quantity"               type="number"   initialValue="1" minValue="1" />
           <FormItem width="12%" bindTo="price"  startText="$"                   initialValue="{ productDetails.value[0].price }" />
           <FormItem width="12%" bindTo="amount" startText="$"   enabled="false" initialValue="{ $item.price ? $item.quantity * $item.price : '' } " />
-          <Button width="2rem" onClick="lineItems.removeItem($itemIndex)">X</Button>
+          <Button width="2rem" onClick="lineItemsForm.removeItem($itemIndex)">X</Button>
 
         </FlowLayout>
       </FormItem>
       <HStack>
-        <Button onClick="lineItems.addItem()">
+        <Button onClick="lineItemsForm.addItem()">
           Add Item
         </Button>
         <SpaceFiller />
         <Text>
-         Total: ${ ($data.lineItems || []).reduce((sum, item) => sum + (item.amount || 0), 0) }
+         Total: ${ window.lineItemTotal($data.lineItems) }
         </Text>
       </HStack>
     </Card>
@@ -116,7 +116,7 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
           client: $param.client,
           issueDate: $param.issueDate,
           dueDate: $param.dueDate,
-          total: ($param.lineItems || []).reduce((sum, item) => sum + (Number(item.amount) || 0), 0),
+          total: window.lineItemTotal($param.lineItems),
           items: JSON.stringify($param.lineItems || [])
           }
         }"
@@ -158,8 +158,8 @@ A valid payload looks like this.
 
 ```json
 {
-  "issueDate": "2025/06/10",
-  "dueDate": "2025/07/10",
+  "issueDate": "2025-06-10",
+  "dueDate": "2025-07-10",
   "client": "Abstergo Industries",
   "lineItems": [
       { "quantity": "1", "amount": 105, "product": "API Integration", "price": 105 },
@@ -174,7 +174,7 @@ The `Cancel` button resets all of the form's components and empties this data st
 
 There is a top-level `FormItem` for `client`, `issue_date`, `due_date`, and `lineItems`. Their `bindTo` attributes name and populate corresponding fields in `$data`.
 
-Nested with within `lineItems` there is a `FormItem` for `product`, `quantity`, `price`, and `amount`. Their `bindTo` attributes name and define slots in an array of `lineItems` that's dynamically built on each click of the `Add Item` button.
+Nested within `lineItems` there is a `FormItem` for `product`, `quantity`, `price`, and `amount`. Their `bindTo` attributes name and define slots in an array of `lineItems` that's dynamically built on each click of the `Add Item` button.
 
 ```xmlui /<FormItem/
 <Card>
@@ -197,12 +197,12 @@ Nested with within `lineItems` there is a `FormItem` for `product`, `quantity`, 
   </Card>
 
   <Card border="none" width="25%" padding="0">
-    <FormItem type="datePicker" dateFormat="yyyy/MM/dd" initialValue="{ formatToday() }"
+    <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday() }"
       bindTo="issueDate" label="Issue date" />
   </Card>
 
   <Card border="none" width="25%" padding="0">
-    <FormItem type="datePicker" dateFormat="yyyy/MM/dd" initialValue="{ formatToday(30) }"
+    <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday(30) }"
       bindTo="dueDate" label="Due date" />
   </Card>
 
@@ -220,9 +220,10 @@ Nested with within `lineItems` there is a `FormItem` for `product`, `quantity`, 
  <FormItem
   bindTo="lineItems"
   type="items"
-  id="lineItems"
+  id="lineItemsForm"
   required="true"
-  onValidate="(value) => Array.isArray(value) && value.length > 0 && value.every(item => item.product)"
+  onValidate="(value) => Array.isArray(value) && value.length > 0 &&
+    value.every(item => item.product)"
   requiredInvalidMessage="At least one line item is required."
 >
   <FlowLayout width="100%"
@@ -245,47 +246,51 @@ Nested with within `lineItems` there is a `FormItem` for `product`, `quantity`, 
       </Items>
     </FormItem>
     <Text width="20%">{ productDetails.value[0].description }</Text>
-    <FormItem width="20%" bindTo="quantity"               type="number"   initialValue="1" minValue="1" />
-    <FormItem width="20%" bindTo="price"  startText="$"                   initialValue="{ productDetails.value[0].price }" />
-    <FormItem width="13%" bindTo="amount" startText="$"   enabled="false" initialValue="{ $item.price ? $item.quantity * $item.price : '' } " />
-    <Button width="*" variant="ghost" themeColor="attention" icon="close" onClick="lineItems.removeItem($itemIndex)" />
+    <FormItem width="20%" bindTo="quantity" type="number" initialValue="1" minValue="1" />
+    <FormItem width="20%" bindTo="price"  startText="$" initialValue="{ productDetails.value[0].price }" />
+    <FormItem width="13%" bindTo="amount" startText="$" enabled="false" initialValue="{ $item.price ? $item.quantity * $item.price : '' } " />
+    <Button width="2rem" onClick="lineItemsForm.removeItem($itemIndex)">X</Button>
   </FlowLayout>
 </FormItem>
 ```
 
-<!--
+## Total for lineItems
 
+The `Add Item` button invokes the `addItem` method of [FormItem](/components/FormItem) to add a new empty row to the array. (Above we see the corresponding `removeItem` used when clicking the button at the end of a row.)
+
+The app defines a function, `lineItemTotal`, to receive the `lineItems` array and add up the amounts.
+
+```xmlui /lineItemTotal/
 <HStack>
-  <Button onClick="lineItems.addItem()">
+  <Button onClick="lineItemsForm.addItem()">
     Add Item
   </Button>
   <SpaceFiller />
   <Text>
-    Total: ${ ($data.lineItems || []).reduce((sum, item) => sum + (item.amount || 0), 0) }
+    Total: ${ window.lineItemTotal($data.lineItems) }
   </Text>
 </HStack>
-</Card>
+```
 
+The same function runs when the [APICall](/components/APICall) runs on form submission.
 
-    <event name="submit">
-      <APICall
-        url="https://httpbin.org/post"
-        method="POST"
-        inProgressNotificationMessage="Saving invoice..."
-        completedNotificationMessage="Invoice saved successfully"
-        body="{
-          {
-          client: $param.client,
-          issueDate: $param.issueDate,
-          dueDate: $param.dueDate,
-          total: ($param.lineItems || []).reduce((sum, item) => sum + (Number(item.amount) || 0), 0),
-          items: JSON.stringify($param.lineItems || [])
-          }
-        }"
-        onSuccess="Actions.navigate('/invoices')"
-      />
-    </event>
-
-  </Form>
-</Component>
--->
+```xmlui /lineItemTotal/
+<event name="submit">
+  <APICall
+    url="https://httpbin.org/post"
+    method="POST"
+    inProgressNotificationMessage="Saving invoice..."
+    completedNotificationMessage="Invoice saved successfully"
+    body="{
+      {
+      client: $param.client,
+      issueDate: $param.issueDate,
+      dueDate: $param.dueDate,
+      total: window.lineItemTotal($data.lineItems),
+      items: JSON.stringify($param.lineItems || [])
+      }
+    }"
+    onSuccess="Actions.navigate('/invoices')"
+  />
+</event>
+```
