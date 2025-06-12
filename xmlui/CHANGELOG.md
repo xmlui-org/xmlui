@@ -1,16 +1,11 @@
 # xmlui
 
-## 0.9.52
+## 0.9.51
 
 ### Patch Changes
 
 - ef7add9: Added theme variable for setting the horizontal alignment of the logo in the NavPanel.
 - ba2b5cd: Moved Drawer logo position to left.
-
-## 0.9.51
-
-### Patch Changes
-
 - 96273bf: fix: Slider - min/max value validation
 - 1a81bcf: fix: Markdown renders inline/block images correclty
 
