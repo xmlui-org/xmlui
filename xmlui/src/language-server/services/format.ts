@@ -1,4 +1,4 @@
-import { type FormattingOptions, type TextEdit, type Range, type Position } from 'vscode-languageserver';
+import { type FormattingOptions, type TextEdit, Range, type Position } from 'vscode-languageserver';
 import { SyntaxKind, type GetText, type Node, toDbgString } from '../../parsers/xmlui-parser';
 import { getTriviaNodes } from './common/syntax-node-utilities';
 
@@ -24,15 +24,14 @@ export function handleDocumentFormatting({
   const formatted = format(node, getText, options);
 
   // If content is already formatted correctly, return empty array
-  const unformattedContent = getText(node);
+  const unformattedContent = getText(node, false);
   if (formatted === unformattedContent) {
     return [];
   }
 
-  const lastCharIdx = unformattedContent.length === 0 ? 0 : unformattedContent.length - 1;
   const entireDocumentRange: Range = {
     start: { line: 0, character: 0 },
-    end: offsetToPosition(lastCharIdx)
+    end: offsetToPosition(unformattedContent.length)
   };
 
   return [{
@@ -40,7 +39,6 @@ export function handleDocumentFormatting({
     newText: formatted
   }];
 }
-
 class XmluiFormatter {
   private readonly getText: GetText;
   private readonly startingNode: Node;
