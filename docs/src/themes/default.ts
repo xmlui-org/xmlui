@@ -5,6 +5,8 @@ export const DefaultDocsTheme: ThemeDefinition = {
   id: "default",
   extends: ["xmlui"],
   themeVars: {
+
+    "padding-Text-code": "0",
     // NOTE: All of these theme vars should be assessed whether to have them in the default theme
 
     "color-primary": "#3367CC",
