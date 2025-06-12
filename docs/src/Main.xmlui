@@ -1,6 +1,6 @@
 <Fragment>
     <App
-        layout="vertical"
+        layout="vertical-full-header"
         noScrollbarGutters="false"
         when="{!window.location.hash.includes('/playground')}">
         <AppHeader>
