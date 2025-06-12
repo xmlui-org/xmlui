@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.9.52
+
+### Patch Changes
+
+- ef7add9: Added theme variable for setting the horizontal alignment of the logo in the NavPanel.
+- ba2b5cd: Moved Drawer logo position to left.
+
 ## 0.9.51
 
 ### Patch Changes
