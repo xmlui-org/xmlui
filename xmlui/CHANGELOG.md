@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.9.51
+
+### Patch Changes
+
+- 96273bf: fix: Slider - min/max value validation
+- 1a81bcf: fix: Markdown renders inline/block images correclty
+
 ## 0.9.50
 
 ### Patch Changes

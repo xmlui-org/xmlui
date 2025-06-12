@@ -1,5 +1,14 @@
 # xmlui-vscode
 
+## 0.1.2
+
+### Patch Changes
+
+- 2e808fa: Add custom xmlui formatter to better handle formatting erroneous syntax, long lines, and xmlui specific syntax, like backtick quoted strings, key-only attributes, etc...
+- Updated dependencies [96273bf]
+- Updated dependencies [1a81bcf]
+  - xmlui@0.9.51
+
 ## 0.1.1
 
 ### Patch Changes
