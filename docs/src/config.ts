@@ -258,7 +258,6 @@ function buildTreeFromPathsAndMeta(
 }
 
 const groupedNavPanelContent = buildTreeFromPathsAndMeta(navPanelContent, metaJsons);
-console.log(groupedNavPanelContent);
 const App: StandaloneAppDescription = {
   name: "XMLUI docs",
   defaultTheme: "default",

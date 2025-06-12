@@ -76,11 +76,11 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   }
 
   // --- Image
-  img {
-    margin-top: createThemeVar("marginTop-Image-markdown");
-    margin-bottom: createThemeVar("marginBottom-Image-markdown");
-    margin-left: createThemeVar("marginLeft-Image-markdown");
-    margin-right: createThemeVar("marginRight-Image-markdown");
+  .block {
+      margin-top: createThemeVar("marginTop-Image-markdown");
+      margin-bottom: createThemeVar("marginBottom-Image-markdown");
+      margin-left: createThemeVar("marginLeft-Image-markdown");
+      margin-right: createThemeVar("marginRight-Image-markdown");
   }
 
   // --- Blockquote

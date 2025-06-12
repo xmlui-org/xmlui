@@ -1,4 +1,4 @@
-import React, { type CSSProperties, memo, type ReactNode } from "react";
+import React, { type CSSProperties, memo, type ReactNode, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -22,6 +22,8 @@ import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative
 import classnames from "classnames";
 import Icon from "../Icon/IconNative";
 import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
+import { visit } from "unist-util-visit";
+import type { Node, Parent } from "unist";
 
 type MarkdownProps = {
   removeIndents?: boolean;
@@ -85,10 +87,25 @@ export const Markdown = memo(function Markdown({
   }
   children = removeIndents ? removeTextIndents(children) : children;
 
+  const imageInfo = useRef(new Map<string, boolean>());
+  const getImageKey = (node: any) =>
+    `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
+
+  const markdownImgParser = () => {
+    imageInfo.current.clear();
+    return function transformer(tree: Node) {
+      visit(tree, "image", visitor);
+    };
+
+    function visitor(node: any, _: number, parent: Parent | undefined) {
+      imageInfo.current.set(getImageKey(node), parent.type === "paragraph" && parent.children.length > 1);
+    }
+  };
+
   return (
     <div className={styles.markdownContent} style={style}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, markdownCodeBlockParser]}
+        remarkPlugins={[remarkGfm, markdownCodeBlockParser, markdownImgParser]}
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
@@ -106,87 +123,13 @@ export const Markdown = memo(function Markdown({
             );
           },
           img({ children, node, ...props }) {
+            console.log("img", node);
             const src = props?.src;
             const popOut = props?.["data-popout"];
             const alt = props?.alt || "";
 
             // --- Determine if the image should be inline or block
-            let isInline = false;
-
-            if (node) {
-              const nodeData = node as any;
-
-              // --- Case 1: Image is part of a larger paragraph with other content
-              if (nodeData.parent && nodeData.parent.type === "paragraph") {
-                if (nodeData.parent.children && nodeData.parent.children.length > 1) {
-                  // There are siblings in this paragraph - definitely inline
-                  isInline = true;
-                } else {
-                  // --- It's the only child in the paragraph, check if there's text before/after
-                  // --- by examining the parent of the paragraph
-                  const paragraphParent = nodeData.parent.parent;
-                  if (paragraphParent && paragraphParent.children) {
-                    const paragraphIndex = paragraphParent.children.indexOf(nodeData.parent);
-                    if (
-                      paragraphIndex > 0 ||
-                      paragraphIndex < paragraphParent.children.length - 1
-                    ) {
-                      // --- There are siblings before/after this paragraph, likely inline
-                      isInline = true;
-                    }
-                  }
-                }
-              }
-
-              // --- Case 2: Image is inside a blockquote or other container with text
-              if (
-                !isInline &&
-                nodeData.parent &&
-                (nodeData.parent.type === "paragraph" ||
-                  nodeData.parent.type === "blockquote" ||
-                  nodeData.parent.type === "emphasis" ||
-                  nodeData.parent.type === "strong")
-              ) {
-                // --- Look for any parent nodes with other text content
-                let currentParent = nodeData.parent;
-                while (currentParent) {
-                  if (
-                    currentParent.children &&
-                    currentParent.children.some(
-                      (child: any) =>
-                        child !== nodeData &&
-                        ((child.type === "text" && child.value && child.value.trim().length > 0) ||
-                          child.type !== "text"),
-                    )
-                  ) {
-                    isInline = true;
-                    break;
-                  }
-                  currentParent = currentParent.parent;
-                }
-              }
-
-              // --- For images without context clues, use file type and size as heuristics
-              // --- Case 3: Image looks like an icon based on filename or size
-              if (!isInline) {
-                // --- Check if the image is small enough to be considered an icon
-                // --- Small images are likely icons
-                const imgSize = props?.width || props?.height;
-                isInline = imgSize === undefined ? true : parseInt(imgSize.toString()) < 512;
-
-                // Images with icon-like filenames
-                if (
-                  src &&
-                  (src.includes("icon") ||
-                    src.endsWith(".svg") ||
-                    src.endsWith(".ico") ||
-                    src.includes("badge") ||
-                    src.includes("logo"))
-                ) {
-                  isInline = true;
-                }
-              }
-            }
+            let isInline = imageInfo.current.get(getImageKey(node));
 
             // Apply styling based on whether image should be inline or block
             const imgStyle = {
@@ -197,12 +140,7 @@ export const Markdown = memo(function Markdown({
             if (popOut) {
               return (
                 <a href={src} target="_blank" rel="noreferrer">
-                  <img
-                    src={src}
-                    alt={alt}
-                    style={imgStyle}
-                    {...props}
-                  >
+                  <img src={src} alt={alt} style={imgStyle}>
                     {children}
                   </img>
                 </a>
@@ -214,6 +152,7 @@ export const Markdown = memo(function Markdown({
                   alt={alt}
                   style={imgStyle}
                   {...props}
+                  className={classnames({ [styles.block]: !isInline })}
                 >
                   {children}
                 </img>
@@ -430,7 +369,7 @@ export const Markdown = memo(function Markdown({
               return <TreeDisplay content={content} itemHeight={24} />;
             }
             return null;
-          }
+          },
         }}
       >
         {children as any}
@@ -539,19 +478,6 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
     <blockquote className={styles.blockquote} style={style}>
       <div className={styles.blockquoteContainer}>{children}</div>
     </blockquote>
-  );
-};
-
-type UnorderedListProps = {
-  children: React.ReactNode;
-  style?: CSSProperties;
-};
-
-const UnorderedList = ({ children, style }: UnorderedListProps) => {
-  return (
-    <ul className={styles.unorderedList} style={style}>
-      {children}
-    </ul>
   );
 };
 
