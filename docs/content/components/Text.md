@@ -321,7 +321,7 @@ This component does not expose any methods.
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Text-code | rgba($color-surface-100-rgb, .4) | rgba($color-surface-100-rgb, .4) |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Text-keyboard | rgba($color-surface-100-rgb, .4) | rgba($color-surface-100-rgb, .4) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Text-marked | rgba($color-primary-200-rgb, .4) | rgba($color-primary-200-rgb, .4) |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-marked | rgba($color-primary-200-rgb, .4) | rgba($color-primary-400-rgb, .4) |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-code | $color-surface-100 | $color-surface-100 |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-300 | $color-surface-300 |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Text | $borderRadius | $borderRadius |
