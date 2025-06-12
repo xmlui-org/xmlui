@@ -105,7 +105,6 @@
     "vite-plugin-svgr": "4.2.0",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.11",
-    "xml-formatter": "^3.6.6",
     "yargs": "17.7.2",
     "xmlui-charts": "*"
   },

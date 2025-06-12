@@ -1,5 +1,5 @@
-import type { GetText, ParseResult } from "../../parsers/xmlui-parser/parser";
-import { findTokenAtPos, toDbgString } from "../../parsers/xmlui-parser/utils";
+import type { GetText } from "../../parsers/xmlui-parser/parser";
+import { findTokenAtPos } from "../../parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../parsers/xmlui-parser/syntax-kind";
 import type { Node } from "../../parsers/xmlui-parser/syntax-node";
 import { compNameForTagNameNode, findTagNameNodeInStack } from "./common/syntax-node-utilities";

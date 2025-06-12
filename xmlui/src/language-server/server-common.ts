@@ -123,7 +123,8 @@ export function start(connection: Connection){
     if (!document) {
       return null;
     }
-    return handleDocumentFormatting(document, options);
+    const { parseResult: {node}, getText } = parseDocument(document);
+    return handleDocumentFormatting({ node, getText, options, offsetToPosition: (offset) => document.positionAt(offset)});
   });
 
   const parsedDocuments = new Map();

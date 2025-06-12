@@ -69,3 +69,36 @@ export function pathToNodeInAscendands(chain: Node[], predicate: (node: Node) =>
   }
   return null;
 }
+
+/**
+*
+* @param node an ElementNode
+*/
+function isPairedNode(node: Node): boolean{
+  for (const c of node.children){
+    if (c.kind === SyntaxKind.CloseNodeStart){
+      return true;
+    } else if (c.kind === SyntaxKind.NodeClose){
+      return false;
+    }
+  }
+  return true;
+}
+
+/**
+*
+* @param node an ElementNode
+*/
+function isSelfClosingNode(node: Node): boolean{
+  return !isPairedNode(node);
+}
+
+export function getTriviaNodes(node: Node): Node[] {
+  if (node.pos === node.start){
+    return [];
+  } else if (node.triviaBefore){
+    return node.triviaBefore;
+  } else {
+    return getTriviaNodes(node.children[0]);
+  }
+}
