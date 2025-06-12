@@ -2,7 +2,7 @@
 
 The `Dashboard` page opens with a set of infocards. Here is a simplified version of two of them.
 
-```xmlui-pg
+```xmlui-pg display
 <App>
 <variable name="dashboardStats" value="{
   {
@@ -34,9 +34,9 @@ In the app, `dashboardStats` is a [DataSource](/components/DataSource).
 
 It returns a structure like the variable we've defined above: an object with a `value` key that points to a list of objects corresponding to rows in the database. In this case there's only one row because the query behind `/api/dashboard/stats` reports multiple values (count of invoices, total amount outstanding, total amount paid this year, etc) as columns in that single row.
 
-There are five infocards on the dashboard. To style them all in a consistent way, the app defines an `InfoCard` that wraps `Card` and `Text`. These are in turn wrapped in a `Dashboard` that passes properties to `InfoCard`: `title`, `width`, `value`, and optionally a `currency` flag `$` formatting.
+There are five infocards on the XMLUI Invoice dashboard. To style them all in a consistent way, the app defines an `InfoCard` that wraps `Card` and `Text`. These are in turn wrapped in a `Dashboard` that passes properties to `InfoCard`: `title`, `width`, `value`, and optionally a `currency` flag for `$` formatting.
 
-`Dashboard` can name any set of names and values; `InfoCard` receives them in its `$props` [context variable](/context-variables).
+`Dashboard` can define any set of names and values; `InfoCard` receives them in its `$props` [context variable](/context-variables).
 
 The first `InfoCard` specifies a `20%` width, the others use [star sizing](/glossary#star-sizing).
 
