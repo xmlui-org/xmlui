@@ -74,9 +74,8 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
 
 
 .logoWrapper{
-  &:not(:empty){
+  &:not(:empty) {
     display: flex;
-    justify-content: center;
     flex-shrink: 0;
     height: $height-NavPanel;
     padding-top: calc(#{createThemeVar("paddingVertical-logo-#{$component}")} + #{$paddingVertical-AppHeader});
@@ -85,8 +84,8 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
     margin-bottom: $marginBottom-logo-NavPanel;
   }
 
-  &.inDrawer{     //to make room for the close button
-    min-height: 40px;
+  &.inDrawer {     //to make room for the close button
+    min-height: 32px;
   }
 }
 

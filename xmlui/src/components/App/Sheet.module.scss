@@ -1,5 +1,13 @@
 @use "../../components-core/theming/themes" as t;
 
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$maxWidth-Drawer: createThemeVar("maxWidth-Drawer");
+
 //we do it with animations (instead of transitions) because: https://www.radix-ui.com/primitives/docs/guides/animation
 $reveal-anim-duration: 300ms;
 
@@ -98,7 +106,7 @@ $reveal-anim-duration: 300ms;
     border-right-width: 1px;
     width: 100%;
     height: 100%;
-    max-width: 20rem;
+    max-width: $maxWidth-Drawer;
   }
   
   &.right{
@@ -108,7 +116,7 @@ $reveal-anim-duration: 300ms;
     border-left-width: 1px;
     width: 100%;
     height: 100%;
-    max-width: 20rem;
+    max-width: $maxWidth-Drawer;
   }
 }
 
@@ -120,12 +128,13 @@ $reveal-anim-duration: 300ms;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.125rem;
+  border-radius: t.$borderRadius;
   transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 300ms;
   opacity: 0.7;
-  background-color: transparent;
+  padding: 0.25rem;
+  background-color: inherit;
   border: 0;
   cursor: pointer;
   z-index: 2;
@@ -134,4 +143,9 @@ $reveal-anim-duration: 300ms;
     opacity: 1;
   }
 
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
 }

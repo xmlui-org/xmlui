@@ -21,12 +21,10 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "backgroundColor-content-App": "$color-surface-0",
     "backgroundColor": "$color-surface-0",
 
-    "fontSize-Text-codefence": "9pt",
-    "lineHeight-Text": "1.5",
-    "marginBottom-Text-markdown": ".5rem",
-    "padding-Text-code": "0",
-
+    // --- Text
     "textColor-Text-marked": "$color-primary-500",
+    "fontSize-Text-codefence": "9pt",
+    "lineHeight-Text-codefence": "1.5",
 
     // --- AppHeader
     "borderBottom-AppHeader": "1px solid $color-surface-200",
@@ -39,6 +37,8 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "backgroundColor-navPanel-App": "$color-surface-50",
     "paddingVertical-NavPanel": "$space-5",
     "borderRightWidth-NavPanel": "1px",
+    "paddingVertical-logo-NavPanel": "$space-3",
+    "maxWidth-Drawer": "100%",
 
     // --- NavLink
     "textColor-NavLink": "$color-secondary-600",
@@ -71,7 +71,6 @@ export const DefaultDocsTheme: ThemeDefinition = {
     // --- Markdown
     "fontSize-H1": "1.65rem",
     "fontWeight-H1": "700",
-    "lineHeight-Text-codefence": "$fontHeight-normal",
     "borderRadius-HtmlTable": "30px",
 
     // --- NestedApp
