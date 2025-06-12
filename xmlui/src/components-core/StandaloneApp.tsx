@@ -469,6 +469,18 @@ function mergeAppDefWithRuntime(
   };
 }
 
+
+function resolvePath(basePath: string, relativePath: string) {
+  // Create a base URL. The 'http://dummy.com' is just a placeholder.
+  const baseUrl = new URL(basePath, 'http://dummy.com');
+
+  // Create a new URL by resolving the relative path against the base URL.
+  const resolvedUrl = new URL(relativePath, baseUrl);
+
+  // Return the pathname, removing the leading slash.
+  return resolvedUrl.pathname.substring(1);
+}
+
 /**
  * Fetch the up-to-date state of the source file
  * @param url The URL to fetch the source file from
@@ -603,17 +615,6 @@ function useStandalone(
         }
       }) as any;
 
-      // --- Fetch the main code-behind file (if any)
-      const entryPointCodeBehindPromise = new Promise(async (resolve) => {
-        try {
-          const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
-          const codeBehind = await parseCodeBehindResponse(resp);
-          resolve(codeBehind.hasError ? codeBehind : codeBehind.codeBehind);
-        } catch (e) {
-          resolve(null);
-        }
-      }) as any;
-
       // --- Fetch the configuration file (we do not check whether the content is semantically valid)
       let config: StandaloneJsonConfig = undefined;
       try {
@@ -648,10 +649,9 @@ function useStandalone(
       });
 
       // --- Let the promises resolve
-      const [loadedEntryPoint, loadedEntryPointCodeBehind, loadedComponents, themes] =
+      const [loadedEntryPoint, loadedComponents, themes] =
         await Promise.all([
           entryPointPromise,
-          entryPointCodeBehindPromise,
           Promise.all(componentPromises || []),
           Promise.all(themePromises || []),
         ]);
@@ -663,8 +663,23 @@ function useStandalone(
       if (loadedEntryPoint.hasError) {
         errorComponents.push(loadedEntryPoint!.component as ComponentDef);
       }
-      if (loadedEntryPointCodeBehind?.hasError) {
-        errorComponents.push(loadedEntryPointCodeBehind.component as ComponentDef);
+
+      let loadedEntryPointCodeBehind = null;
+      if(loadedEntryPoint.component.props?.codeBehind !== undefined){
+        // --- We have a code-behind file for the main component
+        loadedEntryPointCodeBehind = await  new Promise(async (resolve) => {
+          try {
+            const resp = await fetchWithoutCache(resolvePath(MAIN_FILE, loadedEntryPoint.component.props?.codeBehind || MAIN_CODE_BEHIND_FILE));
+            const codeBehind = await parseCodeBehindResponse(resp);
+            resolve(codeBehind.hasError ? codeBehind : codeBehind.codeBehind);
+          } catch (e) {
+            resolve(null);
+          }
+        }) as any;
+        if (loadedEntryPointCodeBehind.hasError) {
+          errorComponents.push(loadedEntryPointCodeBehind.component as ComponentDef);
+        }
+
       }
 
       // --- Check if any of the components have markup errors
@@ -771,31 +786,9 @@ function useStandalone(
             const componentPromise = fetchWithoutCache(
               `components/${componentPath}.${componentFileExtension}`,
             );
-            // --- Promises for the component code-behind files
-            const componentCodeBehindPromise = new Promise(async (resolve) => {
-              try {
-                const codeBehind = await fetchWithoutCache(
-                  `components/${componentPath}.${codeBehindFileExtension}`,
-                );
-                const codeBehindWrapper = await parseCodeBehindResponse(codeBehind);
-                if (codeBehindWrapper.hasError) {
-                  errorComponents.push(codeBehindWrapper.component as ComponentDef);
-                }
-                resolve(
-                  codeBehindWrapper.hasError
-                    ? (codeBehindWrapper.component as CompoundComponentDef)
-                    : codeBehindWrapper,
-                );
-              } catch {
-                resolve(null);
-              }
-            }) as Promise<CompoundComponentDef | ParsedResponse>;
 
             // --- Let the promises resolve
-            const [componentMarkup, componentCodeBehind] = await Promise.all([
-              componentPromise,
-              componentCodeBehindPromise,
-            ]);
+            const componentMarkup = await componentPromise;
 
             // --- Parse the component markup and check for errors
             const compWrapper = await parseComponentMarkupResponse(componentMarkup);
@@ -811,9 +804,34 @@ function useStandalone(
               definition: compWrapper.component as CompoundComponentDef,
             };
 
-            if (componentCodeBehind && "src" in componentCodeBehind) {
-              compCompilation.codeBehindSource = componentCodeBehind.src;
+            let componentCodeBehind = null;
+            if("codeBehind" in compWrapper.component && compWrapper.component?.codeBehind !== undefined){
+              // --- Promises for the component code-behind files
+              componentCodeBehind =  await new Promise(async (resolve) => {
+                try {
+                  const codeBehind = await fetchWithoutCache(
+                    resolvePath(`components/${componentPath}`, (compWrapper.component as CompoundComponentDef)?.codeBehind || `${componentPath}.${codeBehindFileExtension}`),
+                  );
+                  const codeBehindWrapper = await parseCodeBehindResponse(codeBehind);
+                  if (codeBehindWrapper.hasError) {
+                    errorComponents.push(codeBehindWrapper.component as ComponentDef);
+                  }
+                  resolve(
+                    codeBehindWrapper.hasError
+                      ? (codeBehindWrapper.component as CompoundComponentDef)
+                      : codeBehindWrapper,
+                  );
+                } catch {
+                  resolve(null);
+                }
+              }) as Promise<CompoundComponentDef | ParsedResponse>;
+
+              if (componentCodeBehind && "src" in componentCodeBehind) {
+                compCompilation.codeBehindSource = componentCodeBehind.src;
+              }
             }
+
+
             resolvedRuntime.projectCompilation.components.push(compCompilation);
 
             const compoundComp = {
