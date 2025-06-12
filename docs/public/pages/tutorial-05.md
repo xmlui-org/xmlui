@@ -23,7 +23,7 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
     <VStack width="{$props.width}">
         <H1>{$props.title}</H1>
 
-        <Card height="300px">
+        <Card height="400px">
             <DonutChart
                 layout="horizontal"
                 data="{
