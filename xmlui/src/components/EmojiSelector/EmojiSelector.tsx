@@ -2,7 +2,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { dAutoFocus } from "../metadata-helpers";
-import { EmojiSelector } from "./EmojiSelectorNative";
+import { EmojiSelector, defaultProps } from "./EmojiSelectorNative";
 
 const COMP = "EmojiSelector";
 
@@ -12,7 +12,10 @@ export const EmojiSelectorMd = createMetadata({
     `The \`${COMP}\` component provides users with a graphical interface to browse, search and ` + 
     `select emojis to insert into text fields, messages, or other forms of communication.`,
   props: {
-    autoFocus: dAutoFocus(),
+    autoFocus: {
+      ...dAutoFocus(),
+      defaultValue: defaultProps.autoFocus,
+    },
   },
   events: {
     select: d(`This event is fired when the user selects an emoticon from this component.`),

@@ -12,10 +12,16 @@ type Props = {
   autoFocus?: boolean;
 };
 
+export const defaultProps: Pick<Props, "theme" | "select" | "autoFocus"> = {
+  theme: EmojiPickerTheme.LIGHT,
+  select: noop,
+  autoFocus: false,
+};
+
 export const EmojiSelector = ({
-  select = noop,
-  theme = EmojiPickerTheme.LIGHT,
-  autoFocus = false,
+  select = defaultProps.select,
+  theme = defaultProps.theme,
+  autoFocus = defaultProps.autoFocus,
 }: Props) => (
   <EmojiPicker
     autoFocusSearch={autoFocus}

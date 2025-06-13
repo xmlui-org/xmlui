@@ -6,7 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject } from "../../components-core/theming/themes/base-utils";
 import { dComponent } from "../../components/metadata-helpers";
 import { SlotItem } from "../../components/SlotItem";
-import { AppContextAwareAppHeader } from "./AppHeaderNative";
+import { AppContextAwareAppHeader, defaultProps } from "./AppHeaderNative";
 
 const COMP = "AppHeader";
 
@@ -32,7 +32,7 @@ export const AppHeaderMd = createMetadata({
     showLogo: {
       description: "Show the logo in the header",
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.showLogo,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -66,7 +66,7 @@ export const appHeaderComponentRenderer = createComponentRenderer(
       <AppContextAwareAppHeader
         profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))} // NOTE: if this a component template, why is the default true?
         title={extractValue(node.props.title)}
-        showLogo={extractValue.asOptionalBoolean(node.props.showLogo, true)}
+        showLogo={extractValue.asOptionalBoolean(node.props.showLogo)}
         titleContent={
           titleTemplate && (
             <SlotItem

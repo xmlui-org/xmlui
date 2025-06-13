@@ -12,6 +12,10 @@ interface Props {
   uid: symbol;
 }
 
+export const defaultProps = {
+  method: "get",
+};
+
 export function APICallNative({ registerComponentApi, node, uid }: Props) {
   const execute = useEvent(
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {

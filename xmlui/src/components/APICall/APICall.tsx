@@ -3,7 +3,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import type { ApiOperationDef } from "../../components-core/RestApiProxy";
 import { dInternal } from "../../components/metadata-helpers";
 import { httpMethodNames } from "../abstractions";
-import { APICallNative } from "./APICallNative";
+import { APICallNative, defaultProps } from "./APICallNative";
 
 const COMP = "APICall";
 
@@ -38,7 +38,7 @@ export const APICallMd = createMetadata({
         "The method of data manipulation can be done via setting this property.",
       valueType: "string",
       availableValues: httpMethodNames,
-      defaultValue: "get",
+      defaultValue: defaultProps.method,
     },
     url: {
       description: "Use this property to set the URL to send data to.",

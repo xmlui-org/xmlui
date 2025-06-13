@@ -2,7 +2,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { dComponent } from "../../components/metadata-helpers";
 import { MemoizedItem } from "../../components/container-helpers";
-import { AccordionItemComponent } from "../../components/Accordion/AccordionItemNative";
+import { AccordionItemComponent, defaultProps } from "../../components/Accordion/AccordionItemNative";
 
 const COMP = "AccordionItem";
 
@@ -19,7 +19,7 @@ export const AccordionItemMd = createMetadata({
       `This property indicates if the ${COMP} is expanded (\`true\`) or collapsed (\`false\`).`,
       null,
       "boolean",
-      false,
+      defaultProps.initiallyExpanded,
     ),
   },
 });

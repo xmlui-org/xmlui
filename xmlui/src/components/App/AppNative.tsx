@@ -52,14 +52,22 @@ type Props = {
   defaultTheme?: string;
 };
 
+export const defaultProps: Pick<Props, "scrollWholePage" | "noScrollbarGutters" | "defaultTone" | "defaultTheme" | "onReady"> = {
+  scrollWholePage: true,
+  noScrollbarGutters: false,
+  defaultTone: "light",
+  defaultTheme: "xmlui",
+  onReady: noop,
+};
+
 export function App({
   children,
   style,
   layout,
   loggedInUser,
-  scrollWholePage,
-  noScrollbarGutters = false,
-  onReady = noop,
+  scrollWholePage = defaultProps.scrollWholePage,
+  noScrollbarGutters = defaultProps.noScrollbarGutters,
+  onReady = defaultProps.onReady,
   header,
   navPanel,
   footer,
@@ -68,8 +76,8 @@ export function App({
   logo,
   logoDark,
   logoLight,
-  defaultTone,
-  defaultTheme,
+  defaultTone = defaultProps.defaultTone,
+  defaultTheme = defaultProps.defaultTheme,
   renderChild,
   name,
 }: Props) {

@@ -27,8 +27,8 @@ export const BackdropMd = createMetadata({
     },
     opacity: {
       description: "The opacity of the backdrop.",
-      valueType: "number",
-      defaultValue: 0.1,
+      valueType: "string",
+      defaultValue: defaultProps.opacity,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
