@@ -1,6 +1,6 @@
 import type { Node } from "./syntax-node";
 import type { ScannerErrorCallback } from "./scanner";
-import type { DiagnosticMessageFromScanner, GeneralDiagnosticMessage } from "./diagnostics";
+import type { ScannerDiagnosticMessage, GeneralDiagnosticMessage } from "./diagnostics";
 
 import { CharacterCodes } from "./CharacterCodes";
 import { createScanner } from "./scanner";
@@ -9,7 +9,6 @@ import { tagNameNodesWithoutErrorsMatch   } from "./utils";
 import {
   Diag_Attr_Identifier_Expected,
   Diag_Attr_Value_Expected,
-  Diag_CloseNodeStart_Token_Expected,
   Diag_End_Or_Close_Token_Expected,
   Diag_End_Token_Expected,
   Diag_OpenNodeStart_Token_Expected,
@@ -17,38 +16,8 @@ import {
   Diag_Tag_Name_Afterd_Namespace_Expected,
   DiagnosticCategory,
   ErrCodes,
+  DIAGS
 } from "./diagnostics";
-
-const MakeErr = {
-  uppercaseAttr: function (attrName: string) {
-    return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.uppercaseAttr,
-      message: `Attribute name '${attrName}' cannot start with an uppercase letter.`,
-    };
-  },
-  duplAttr: function (attrName: string) {
-    return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.duplAttr,
-      message: `Duplicated attribute: '${attrName}'.`,
-    };
-  },
-  tagNameMismatch: function (openTagName: string, closeTagName: string) {
-    return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.tagNameMismatch,
-      message: `Opening and closing tag names should match. Opening tag has a name '${openTagName}', but the closing tag name is '${closeTagName}'.`,
-    };
-  },
-  invalidChar: function (char: string) {
-    return {
-      category: DiagnosticCategory.Error,
-      code: ErrCodes.invalidChar,
-      message: `Invalid character '${char}'.`,
-    };
-  },
-};
 
 export interface Error {
   readonly category: DiagnosticCategory;
@@ -84,7 +53,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   const parents: (IncompleteNode | Node)[] = [];
   let peekedToken: Node | undefined;
   let node: Node | IncompleteNode = { children: [] };
-  let errFromScanner: { message: DiagnosticMessageFromScanner; prefixLength: number } | undefined =
+  let errFromScanner: { message: ScannerDiagnosticMessage; prefixLength: number } | undefined =
     undefined;
 
   const onScannerErr: ScannerErrorCallback = function (message, length) {
@@ -213,7 +182,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           const namesMismatch =
             openTagName !== null && !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
           if (namesMismatch) {
-            error(MakeErr.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
+            error(DIAGS.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
           }
         }
       } else {
@@ -223,7 +192,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         error(Diag_End_Token_Expected);
       }
     } else {
-      error(Diag_CloseNodeStart_Token_Expected);
+      errorAt(DIAGS.expCloseStart(getText(openTagName)), openTagName.pos, openTagName.end);
     }
   }
 
@@ -334,10 +303,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     const faultyName = isDuplicate || nameStartsWithUppercase;
 
     if (isDuplicate) {
-      errorAt(MakeErr.duplAttr(attrName), nameIdent.pos, nameIdent.end);
+      errorAt(DIAGS.duplAttr(attrName), nameIdent.pos, nameIdent.end);
     }
     if (nameStartsWithUppercase) {
-      errorAt(MakeErr.uppercaseAttr(attrName), nameIdent.pos, nameIdent.end);
+      errorAt(DIAGS.uppercaseAttr(attrName), nameIdent.pos, nameIdent.end);
     }
     if (!faultyName) {
       attrNames.push({ name: attrName });
@@ -581,7 +550,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       if (errFromScanner !== undefined) {
         let err: GeneralDiagnosticMessage;
         if (errFromScanner.message.code === ErrCodes.invalidChar) {
-          err = MakeErr.invalidChar(scanner.getTokenText());
+          err = DIAGS.invalidChar(scanner.getTokenText());
         } else {
           err = errFromScanner.message;
         }

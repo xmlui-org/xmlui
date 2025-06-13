@@ -4,24 +4,50 @@ export interface GeneralDiagnosticMessage {
   message: string;
 }
 
-export type DiagnosticMessage = DiagnosticMessageFromScanner | DiagnosticMessageFromParser;
+export const DIAGS = {
+  expCloseStart: function(openTagName: string){
+    return {
+      category: DiagnosticCategory.Error,
+      code: ErrCodes.expCloseStart,
+      message: "A '</' token expected.",
+    }
+  },
+  uppercaseAttr: function (attrName: string) {
+    return {
+      category: DiagnosticCategory.Error,
+      code: ErrCodes.uppercaseAttr,
+      message: `Attribute name '${attrName}' cannot start with an uppercase letter.`,
+    };
+  },
+  duplAttr: function (attrName: string) {
+    return {
+      category: DiagnosticCategory.Error,
+      code: ErrCodes.duplAttr,
+      message: `Duplicated attribute: '${attrName}'.`,
+    };
+  },
+  tagNameMismatch: function (openTagName: string, closeTagName: string) {
+    return {
+      category: DiagnosticCategory.Error,
+      code: ErrCodes.tagNameMismatch,
+      message: `Opening and closing tag names should match. Opening tag has a name '${openTagName}', but the closing tag name is '${closeTagName}'.`,
+    };
+  },
+  invalidChar: function (char: string) {
+    return {
+      category: DiagnosticCategory.Error,
+      code: ErrCodes.invalidChar,
+      message: `Invalid character '${char}'.`,
+    };
+  },
+} as const;
 
-export type DiagnosticMessageFromScanner =
+export type ScannerDiagnosticMessage =
   | typeof Diag_Invalid_Character
   | typeof Diag_Unterminated_String_Literal
   | typeof Diag_Unterminated_Comment
   | typeof Diag_Unterminated_CData
   | typeof Diag_Unterminated_Script;
-
-type DiagnosticMessageFromParser =
-  | typeof Diag_End_Token_Expected
-  | typeof Diag_CloseNodeStart_Token_Expected
-  | typeof Diag_Tag_Identifier_Expected
-  | typeof Diag_Attr_Value_Expected
-  | typeof Diag_Eq_Token_Expected
-  | typeof Diag_OpenNodeStart_Token_Expected
-  | typeof Diag_End_Or_Close_Token_Expected
-  | typeof Diag_Attr_Identifier_Expected;
 
 export enum DiagnosticCategory {
   Error = 1,
