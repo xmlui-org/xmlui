@@ -2,7 +2,7 @@
 
 We've seen that the `Invoices` [Table](/components/Table) includes a `Details` [Column](/components/Column) with an icon. Clicking the icon opens a [ModalDialog](/components/ModalDialog) and sends it the current row of the table as `$item`.
 
-```xmlui /detailsDialog.open($item)/
+```xmlui /detailsDialog/
 <Table data="{invoices}">
     <Column  bindTo="invoice_number" />
     <Column  bindTo="client" />
@@ -18,7 +18,13 @@ We've seen that the `Invoices` [Table](/components/Table) includes a `Details` [
     <Column canSort="{false}" header="Details">
         <Icon name="doc-outline" onClick="detailsDialog.open($item)" />
     </Column>
-    </Table>
+</Table>
+```
+
+```xmlui /detailsDialog/
+<ModalDialog id="detailsDialog">
+  <InvoiceDetails details="{$params[0]}" />
+</ModalDialog>
 ```
 
 The `ModalDialog` wraps an `InvoiceDetails` component which displays an invoice and enables editing. Click the `Details` icon to open the viewer/editor.
