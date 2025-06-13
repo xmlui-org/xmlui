@@ -220,3 +220,8 @@ All modifiers can be combined in various ways:
 - Use `height` to ensure adequate space for the rendered output
 - Use `name` to provide clear context for what the example demonstrates
 - Combine `display` with appropriate sizing for optimal presentation
+
+
+### Descriptions
+
+Use `---desc` to inject narrative markdown. 
