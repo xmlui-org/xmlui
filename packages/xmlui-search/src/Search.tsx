@@ -87,7 +87,6 @@ export const Search = ({
   const _id = useId();
   const inputId = id || _id;
   const { root } = useTheme();
-  const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<HTMLLIElement[]>([]);
   const itemLinkRefs = useRef<HTMLDivElement[]>([]); // <- this is a messy solution
@@ -98,7 +97,7 @@ export const Search = ({
 
   const layout = useAppLayoutContext();
   const inDrawer = layout?.drawerVisible ?? false;
-  const _root = inDrawer ? containerRef?.current?.closest(`div`) : root;
+  const _root = inDrawer && inputRef.current ? inputRef.current?.closest(`div`) : root;
 
   const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
 
@@ -254,7 +253,6 @@ export const Search = ({
 
   return (
     <Popover open={show} onOpenChange={setShow}>
-      <div ref={containerRef} className={styles.container}>
         <VisuallyHidden>
           <label htmlFor={inputId}>Search Field</label>
         </VisuallyHidden>
@@ -280,7 +278,6 @@ export const Search = ({
             aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
           />
         </PopoverTrigger>
-        <PopoverAnchor />
         {show && results && debouncedValue && (
           <Portal container={_root}>
             <PopoverContent
@@ -329,7 +326,6 @@ export const Search = ({
             </PopoverContent>
           </Portal>
         )}
-      </div>
     </Popover>
   );
 };
