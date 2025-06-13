@@ -149,4 +149,79 @@ The first `when` guards the [DatePicker](/components/DatePicker)'s `dateAfter`, 
 
 The second `when` guards a [Fragment](/component/Fragment) so the results won't display until the `DataSource` has fetched them.
 
+
 ## Search everything
+
+Here is `SearchEverything`. Try typing `a`, then `c`, then `m`, and watch the results converge dynamically on `Acme`.
+
+```xmlui-pg height="400px"
+---app
+<App>
+  <SearchEverything />
+</App>
+---comp
+<Component name="SearchEverything">
+
+    <VStack marginTop="1rem">
+        <TextBox
+            placeholder="Enter search term..."
+            width="25rem"
+            id="searchTerm"
+        />
+
+        <DataSource id="clients" url="/resources/files/clients.json" />
+        <DataSource id="products" url="/resources/files/products.json" />
+        <DataSource id="allInvoices" url="/resources/files/invoices.json" />
+
+        <Fragment when="{searchTerm.value}">
+            <Card>
+                <VStack>
+                    <Text>Found {window.filterSearchResults(clients, products, allInvoices, searchTerm.value).length} results for
+                        "{searchTerm.value}":</Text>
+                    <Table data="{window.filterSearchResults(clients, products, allInvoices, searchTerm.value)}">
+                        <Column  bindTo="table_name" header="Type" width="100px" />
+                        <Column  bindTo="title" header="Title" width="*" />
+                        <Column  bindTo="snippet" header="Match Details" width="3*" />
+                    </Table>
+                </VStack>
+            </Card>
+        </Fragment>
+    </VStack>
+
+</Component>
+```
+
+There's nothing here we haven't seen, but `SearchEverything` illustrates a slight variation: there's only one `when`. It's on `Fragment` and wraps both the `DataSource` and the results.
+
+```xmlui
+<Component name="SearchEverything">
+
+    <VStack marginTop="1rem">
+        <TextBox
+            placeholder="Enter search term..."
+            width="25rem"
+            id="searchTerm"
+        />
+
+        <Fragment when="{searchTerm.value}">
+            <DataSource
+                id="search"
+                url="/api/search/{searchTerm.value}"
+            />
+
+            <Card>
+                <VStack>
+                    <Text>Found {search.value ? search.value.length : 0} results for
+                        "{searchTerm.value}":</Text>
+                    <Table data="{ search }">
+                        <Column  bindTo="table_name" header="Type" width="100px" />
+                        <Column  bindTo="title" header="Title" width="*" />
+                        <Column  bindTo="snippet" header="Match Details" width="3*" />
+                    </Table>
+                </VStack>
+            </Card>
+        </Fragment>
+    </VStack>
+
+</Component>
+```
