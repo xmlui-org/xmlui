@@ -13,6 +13,7 @@ interface Props {
 }
 
 export function APICallNative({ registerComponentApi, node, uid }: Props) {
+  // TODO pause until the apiInterceptorContext is initialized (to make sure the API calls are intercepted)
   const execute = useEvent(
     async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
       const options = eventArgs[1];
