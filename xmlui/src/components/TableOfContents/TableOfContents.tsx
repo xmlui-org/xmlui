@@ -41,8 +41,18 @@ export const TableOfContentsMd = createMetadata({
     [`wordWrap-${COMP_CHILD}`]: "break-word",
 
     [`paddingVertical-${COMP_CHILD}`]: "$space-1",
-    [`paddingHorizontal-${COMP_CHILD}`]: "$space-1",
+    [`paddingLeft-${COMP_CHILD}`]: "$space-1",
+    [`paddingLeft-${COMP_CHILD}-level-2`]: "$space-3",
+    [`paddingLeft-${COMP_CHILD}-level-3`]: "$space-5",
+    [`paddingLeft-${COMP_CHILD}-level-4`]: "$space-6",
+    [`paddingLeft-${COMP_CHILD}-level-5`]: "$space-6",
+    [`paddingLeft-${COMP_CHILD}-level-6`]: "$space-6",
     [`fontWeight-${COMP_CHILD}`]: "$fontWeight-bold",
+    [`fontWeight-${COMP_CHILD}-level-3`]: "normal",
+    [`fontWeight-${COMP_CHILD}-level-4`]: "normal",
+    [`fontWeight-${COMP_CHILD}-level-5`]: "normal",
+    [`fontWeight-${COMP_CHILD}-level-6`]: "normal",
+
     [`fontStyle-${COMP_CHILD}-level-6`]: "italic",
 
     [`color-${COMP_CHILD}--active`]: "$color-primary-500",

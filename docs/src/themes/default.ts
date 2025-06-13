@@ -6,30 +6,20 @@ export const DefaultDocsTheme: ThemeDefinition = {
   extends: ["xmlui"],
   themeVars: {
 
-    "padding-Text-code": "0",
     // NOTE: All of these theme vars should be assessed whether to have them in the default theme
 
     "color-primary": "#3367CC",
     "color-surface": "#1e2734",
     "borderColor": "$color-surface-100",
 
-    fontFamily: "Inter, -apple-system, 'system-ui', 'San Francisco', 'Segoe UI', sans-serif",
-    "font-feature-settings": "'cv03', 'cv04', 'cv11'",
     "maxWidth-App": "1320px",
 
     "maxWidth-content": "1200px",
     "boxShadow-navPanel-App": "none",
-    "boxShadow-header-App": "none",
     "backgroundColor-content-App": "$color-surface-0",
     "backgroundColor": "$color-surface-0",
 
-    // --- Text
-    "textColor-Text-marked": "$color-primary-500",
-    "fontSize-Text-codefence": "9pt",
-    "lineHeight-Text-codefence": "1.5",
-
     // --- AppHeader
-    "borderBottom-AppHeader": "1px solid $color-surface-200",
     "paddingInline-AppHeader": "$space-4",
     "paddingTop-logo-AppHeader": "$space-3",
     "paddingBottom-logo-AppHeader": "$space-3",
@@ -39,8 +29,6 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "backgroundColor-navPanel-App": "$color-surface-50",
     "paddingVertical-NavPanel": "$space-5",
     "borderRightWidth-NavPanel": "1px",
-    "paddingVertical-logo-NavPanel": "$space-3",
-    "horizontalAlignment-logo-NavPanel": "flex-start",
     "maxWidth-Drawer": "100%",
 
     // --- NavLink
@@ -55,18 +43,6 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "textColor-NavLink--active": "$color-primary-500",
     "textColor-NavLink--hover--active": "$color-primary-500",
 
-    // --- TOC
-    "fontWeight-TableOfContentsItem-level-3": "normal",
-    "fontWeight-TableOfContentsItem-level-4": "normal",
-    "fontWeight-TableOfContentsItem-level-5": "normal",
-    "fontWeight-TableOfContentsItem-level-6": "normal",
-
-    "paddingLeft-TableOfContentsItem-level-2": "$space-3",
-    "paddingLeft-TableOfContentsItem-level-3": "$space-5",
-    "paddingLeft-TableOfContentsItem-level-4": "$space-6",
-    "paddingLeft-TableOfContentsItem-level-5": "$space-6",
-    "paddingLeft-TableOfContentsItem-level-6": "$space-6",
-
     // --- Search
     "fontSize-placeholder-TextBox": "$fontSize-small",
     "borderColor-SearchPanel": "$color-surface-100",
@@ -75,9 +51,6 @@ export const DefaultDocsTheme: ThemeDefinition = {
     "fontSize-H1": "1.65rem",
     "fontWeight-H1": "700",
     "borderRadius-HtmlTable": "30px",
-
-    // --- NestedApp
-    "border-NestedApp": "1px solid $color-surface-100",
 
     // --- Footer
     "fontSize-Footer": "16px",

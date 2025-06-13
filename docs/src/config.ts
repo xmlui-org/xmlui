@@ -278,6 +278,7 @@ const App: StandaloneAppDescription = {
       highlight,
     },
     prefetchedContent,
+    lintSeverity: 'skip', // Turn off xmlui linting
   },
 };
 
