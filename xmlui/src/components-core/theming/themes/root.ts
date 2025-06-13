@@ -210,6 +210,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontSize-medium": "1.25rem",
     "fontSize-normal": "1rem",
     "fontSize-small": "0.875rem",
+    "fontSize-code": "0.80rem",
     "fontSize-smaller": "0.75rem",
     "fontSize-tiny": "0.625rem",
 
@@ -264,8 +265,8 @@ export const RootThemeDefinition: ThemeDefinition = {
     "backgroundColor-tree-row--selected--before": $colorPrimary50,
 
     // --- Border colors
-    "borderColor": $colorSurface200,
-    "borderColor--disabled": $colorSurface200,
+    "borderColor": $colorSurface100,
+    "borderColor--disabled": $colorSurface100,
 
     // --- Text colors
     "textColor-secondary": $colorSurface600,

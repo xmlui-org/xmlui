@@ -123,8 +123,8 @@
             <Page url="/working-with-text">
                 <DocumentPage url="/pages/working-with-text.md"/>
             </Page>
-            <Page hideToc="true" url="/working-with-markdown">
-                <DocumentPage url="/pages/working-with-markdown.md"/>
+            <Page url="/working-with-markdown">
+                <DocumentPage hideToc="true" url="/pages/working-with-markdown.md"/>
             </Page>
             <Page url="/routing-and-links">
                 <DocumentPage url="/pages/routing-and-links.md"/>
