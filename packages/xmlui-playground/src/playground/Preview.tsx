@@ -13,6 +13,7 @@ export function Preview() {
                api={appDescription.api}
                components={components}
                config={appDescription.config}
+               playgroundId={playgroundId}
                height={"100%"} />
   );
 }
