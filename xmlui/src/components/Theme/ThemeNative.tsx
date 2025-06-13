@@ -188,7 +188,7 @@ export function Theme({
           {!!faviconUrl && <link rel="icon" type="image/svg+xml" href={faviconUrl} />}
           {fontLinks?.map((fontLink) => <link href={fontLink} rel={"stylesheet"} key={fontLink} />)}
         </Helmet>
-        <style type="text/css" data-theme-root={true}>{`.${className}  {${css}}`}</style>
+        <style type="text/css" data-theme-root={true} dangerouslySetInnerHTML={{ __html: `.${className}  {${css}}` }} />
         <div
           style={inspectStyle}
           id={"_ui-engine-theme-root"}
@@ -212,7 +212,7 @@ export function Theme({
 
   return (
     <ThemeContext.Provider value={currentThemeContextValue}>
-      <style>{`.${className} {${css}}`}</style>
+      <style type="text/css" dangerouslySetInnerHTML={{ __html: `.${className}  {${css}}` }} />
       <div className={classnames(styles.baseRootComponent, styles.wrapper, className)}>
         {renderChild(node.children, { ...layoutContext, themeClassName: className })}
       </div>
