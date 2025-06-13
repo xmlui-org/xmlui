@@ -77,7 +77,7 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
             transformResult="{(data) => data.filter(product => product.name === $item.product)}"
           />
           <FormItem
-            bindTo="product"d
+            bindTo="product"
             type="select"
             placeholder="select product"
             width="25%"

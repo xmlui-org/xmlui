@@ -34,6 +34,7 @@
                 <NavLink label="Invoices" to="/tutorial-07"/>
                 <NavLink label="Create Invoice" to="/tutorial-08"/>
                 <NavLink label="Invoice Details" to="/tutorial-09"/>
+                <NavLink label="T10" to="/tutorial-10"/>
             </NavGroup>
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure"/>
@@ -107,6 +108,12 @@
             </Page>
             <Page url="/tutorial-09">
                 <DocumentPage url="/pages/tutorial-09.md" />
+            </Page>
+            <Page url="/tutorial-10">
+                <DocumentPage url="/pages/tutorial-10.md" />
+            </Page>
+            <Page url="/tutorial-11">
+                <DocumentPage url="/pages/tutorial-11.md" />
             </Page>
             <Page url="/app-structure">
                 <DocumentPage url="/pages/app-structure.md"/>
