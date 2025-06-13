@@ -28,4 +28,6 @@ This is SearchInvoicesAfter.
 <Component name="SearchEverything">
 This is SearchEverything.
 </Component>
+---desc
+Try switching between the two tabs.
 ```
