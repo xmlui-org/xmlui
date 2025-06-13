@@ -7,8 +7,12 @@ interface Props {
   style: CSSProperties;
 }
 
+export const defaultProps = {
+  value: 0,
+};
+
 export const ProgressBar = forwardRef(function ProgressBar(
-  { value = 0, style }: Props,
+  { value = defaultProps.value, style }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (

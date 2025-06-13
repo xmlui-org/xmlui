@@ -34,11 +34,17 @@ type Props = {
   >
 >;
 
+export const defaultProps: Pick<Props, "active" | "disabled" | "target"> = {
+  active: false,
+  disabled: false,
+  target: "_self",
+};
+
 export const LinkNative = forwardRef(function LinkNative(
   props: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const { to, children, icon, active, onClick, target, disabled, style, ...anchorProps } =
+  const { to, children, icon, active = defaultProps.active, onClick, target = defaultProps.target, disabled = defaultProps.disabled, style, ...anchorProps } =
     specifyTypes(props);
 
   const iconLink = !!icon && !children;

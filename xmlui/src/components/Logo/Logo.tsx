@@ -1,6 +1,6 @@
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { Logo } from "./LogoNative";
+import { Logo, defaultProps } from "./LogoNative";
 
 const COMP = "Logo";
 
@@ -9,6 +9,13 @@ export const LogoMd = createMetadata({
   description:
     `The \`${COMP}\` component represents a logo or a brand symbol. Usually, you use ` +
     `this component in the [\`AppHeader\`](./AppHeader.mdx#logotemplate).`,
+  props: {
+    alt: {
+      description: "Alternative text for the logo image for accessibility.",
+      type: "string",
+      defaultValue: defaultProps.alt,
+    }
+  }
 });
 
 export const logoComponentRenderer = createComponentRenderer(

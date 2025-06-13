@@ -17,8 +17,14 @@ type Props = {
   inline?: boolean;
 } & Pick<HTMLAttributes<HTMLImageElement>, "onClick">;
 
+export const defaultProps: Pick<Props, "fit" | "lazyLoad" | "inline"> = {
+  fit: "contain",
+  lazyLoad: false,
+  inline: false,
+};
+
 export const Image = forwardRef(function Img(
-  { src, alt, fit = "contain", style, onClick, aspectRatio, lazyLoad, inline }: Props,
+  { src, alt, fit = defaultProps.fit, style, onClick, aspectRatio, lazyLoad = defaultProps.lazyLoad, inline = defaultProps.inline }: Props,
   ref,
 ) {
   return (

@@ -25,6 +25,12 @@ import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 
+// Default props for the Markdown component
+export const defaultProps = {
+  removeIndents: true,
+  showHeadingAnchors: false,
+};
+
 type MarkdownProps = {
   removeIndents?: boolean;
   children: ReactNode;
@@ -76,11 +82,11 @@ function PreTagComponent({ id, children, codeHighlighter }) {
 }
 
 export const Markdown = memo(function Markdown({
-  removeIndents = true,
+  removeIndents = defaultProps.removeIndents,
   children,
   style,
   codeHighlighter,
-  showHeadingAnchors = false,
+  showHeadingAnchors = defaultProps.showHeadingAnchors,
 }: MarkdownProps) {
   if (typeof children !== "string") {
     return null;

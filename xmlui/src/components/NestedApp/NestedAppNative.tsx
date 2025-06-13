@@ -19,6 +19,13 @@ import { useAppContext } from "../../components-core/AppContext";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import { useIndexerContext } from "../App/IndexerContext";
 
+// Default props for NestedApp component
+export const defaultProps = {
+  allowPlaygroundPopup: true,
+  withFrame: true,
+  components: EMPTY_ARRAY
+};
+
 type NestedAppProps = {
   api?: any;
   app: string;
@@ -56,14 +63,14 @@ export function IndexAwareNestedApp(props){
 export function NestedApp({
   api,
   app,
-  components = EMPTY_ARRAY,
+  components = defaultProps.components,
   config,
   activeTheme,
   activeTone,
   title,
   height,
-  allowPlaygroundPopup = true,
-  withFrame = true,
+  allowPlaygroundPopup = defaultProps.allowPlaygroundPopup,
+  withFrame = defaultProps.withFrame,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
@@ -298,3 +305,5 @@ export function NestedApp({
     />
   );
 }
+
+NestedApp.defaultProps = defaultProps;

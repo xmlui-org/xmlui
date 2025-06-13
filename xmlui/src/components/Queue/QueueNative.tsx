@@ -23,6 +23,10 @@ import {
 // =====================================================================================================================
 // React Queue component implementation
 
+export const defaultProps = {
+  clearAfterFinish: false,
+};
+
 type Props = {
   registerComponentApi: RegisterComponentApiFn;
   willProcessItem?: AsyncFunction;
@@ -126,7 +130,7 @@ export function Queue({
   //progressFeedback,
   renderProgressFeedback,
   renderResultFeedback,
-  clearAfterFinish = true,
+  clearAfterFinish = defaultProps.clearAfterFinish,
 }: Props) {
   const runningActionItemRef = useRef<Set<string>>(new Set());
   const [queueState, dispatch] = useReducer(queueReducer, INITIAL_STATE);

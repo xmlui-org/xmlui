@@ -31,6 +31,21 @@ import { Adornment } from "../Input/InputAdornment";
 import { Button } from "../Button/ButtonNative";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
+// Default props for NumberBox component
+export const defaultProps = {
+  enabled: true,
+  validationStatus: "none" as ValidationStatus,
+  hasSpinBox: true,
+  integersOnly: false,
+  zeroOrPositive: false,
+  min: -NUMBERBOX_MAX_VALUE,
+  max: NUMBERBOX_MAX_VALUE,
+  updateState: noop,
+  onDidChange: noop,
+  onFocus: noop,
+  onBlur: noop,
+};
+
 // =====================================================================================================================
 // React NumberBox component definition
 
@@ -76,20 +91,20 @@ export const NumberBox = forwardRef(function NumberBox(
     value,
     initialValue,
     style,
-    enabled = true,
+    enabled = defaultProps.enabled,
     placeholder,
-    validationStatus = "none",
-    hasSpinBox = true,
+    validationStatus = defaultProps.validationStatus,
+    hasSpinBox = defaultProps.hasSpinBox,
     step,
-    integersOnly = false,
-    zeroOrPositive = false,
-    min = zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE,
-    max = NUMBERBOX_MAX_VALUE,
+    integersOnly = defaultProps.integersOnly,
+    zeroOrPositive = defaultProps.zeroOrPositive,
+    min = zeroOrPositive ? 0 : defaultProps.min,
+    max = defaultProps.max,
     maxLength,
-    updateState = noop,
-    onDidChange = noop,
-    onFocus = noop,
-    onBlur = noop,
+    updateState = defaultProps.updateState,
+    onDidChange = defaultProps.onDidChange,
+    onFocus = defaultProps.onFocus,
+    onBlur = defaultProps.onBlur,
     registerComponentApi,
     startText,
     startIcon,

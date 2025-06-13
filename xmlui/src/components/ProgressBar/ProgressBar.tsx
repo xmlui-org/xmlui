@@ -3,7 +3,7 @@ import styles from "./ProgressBar.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { ProgressBar } from "./ProgressBarNative";
+import { ProgressBar, defaultProps } from "./ProgressBarNative";
 
 const COMP = "ProgressBar";
 
@@ -13,7 +13,7 @@ export const ProgressBarMd = createMetadata({
     value: {
       description: `This property defines the progress value with a number between 0 and 1.`,
       valueType: "number",
-      defaultValue: 0,
+      defaultValue: defaultProps.value,
     },
   },
   themeVars: parseScssVar(styles.themeVars),

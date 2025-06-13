@@ -8,6 +8,11 @@ import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { PageMd } from "./Pages";
 import styles from "./Pages.module.scss";
 
+// Default props for Pages component
+export const defaultProps = {
+  defaultRoute: "/"
+};
+
 // --- We need this component to make sure all the child routes are wrapped in a
 // --- container and  this way they can access the routeParams
 type RouteWrapperProps = {

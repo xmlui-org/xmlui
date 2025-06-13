@@ -27,7 +27,7 @@ import {
   dValidationStatus,
   dValue,
 } from "../metadata-helpers";
-import { NumberBox2 } from "./NumberBox2Native";
+import { NumberBox2, defaultProps } from "./NumberBox2Native";
 
 const COMP = "NumberBox2";
 
@@ -40,7 +40,7 @@ export const NumberBoxMd2 = createMetadata({
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
     label: dLabel(),
-    labelPosition: dLabelPosition("top"),
+    labelPosition: dLabelPosition(defaultProps.labelPosition),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
     maxLength: dMaxLength(),
@@ -56,7 +56,7 @@ export const NumberBoxMd2 = createMetadata({
     hasSpinBox: {
       description: `This boolean prop shows (\`true\`) or hides (\`false\`) the spinner buttons for the input field.`,
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.hasSpinBox,
     },
     spinnerUpIcon: d(
       `Allows setting the icon displayed in the ${COMP} spinner for incrementing values. You can change ` +
@@ -71,28 +71,28 @@ export const NumberBoxMd2 = createMetadata({
     step: {
       description: `This prop governs how big the step when clicking on the spinner of the field.`,
       valueType: "number",
-      defaultValue: 1,
+      defaultValue: defaultProps.step,
     },
     integersOnly: {
       description:
         `This boolean property signs whether the input field accepts integers only (\`true\`) ` +
         `or not (\`false\`).`,
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.integersOnly,
     },
     maxFractionDigits: {
       description:
         `This prop sets the maximum number of decimal places allowed in the input field. ` +
         `If the number of decimal places is greater than this value, the value will be truncated to the maximum allowed decimal places. `,
       valueType: "number",
-      defaultValue: 3,
+      defaultValue: defaultProps.maxFractionDigits,
     },
     zeroOrPositive: {
       description:
         `This boolean property determines whether the input value can only be 0 or positive numbers ` +
         `(\`true\`) or also negative (\`false\`).`,
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.zeroOrPositive,
     },
     minValue: d(
       `The minimum value the input field allows. Can be a float or an integer if ` +

@@ -18,7 +18,7 @@ import {
   dRequired,
   dValidationStatus,
 } from "../metadata-helpers";
-import { RadioGroup } from "./RadioGroupNative";
+import { RadioGroup, defaultProps } from "./RadioGroupNative";
 
 const COMP = "RadioGroup";
 const RGOption = `RadioGroupOption`;
@@ -29,12 +29,24 @@ export const RadioGroupMd = createMetadata({
     `([\`RadioGroupOption\`](./RadioGroupOption.mdx) components) that allow users to select ` +
     `only one option from the group at a time.`,
   props: {
-    initialValue: dInitialValue(),
+    initialValue: {
+      ...dInitialValue(),
+      defaultValue: defaultProps.initialValue,
+    },
     autoFocus: dAutoFocus(),
-    required: dRequired(),
+    required: {
+      ...dRequired(),
+      defaultValue: defaultProps.required,
+    },
     readOnly: dReadonly(),
-    enabled: dEnabled(),
-    validationStatus: dValidationStatus(),
+    enabled: {
+      ...dEnabled(),
+      defaultValue: defaultProps.enabled,
+    },
+    validationStatus: {
+      ...dValidationStatus(),
+      defaultValue: defaultProps.validationStatus,
+    },
     orientation: d(
       `(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the ` +
         `options within the radio group.`,

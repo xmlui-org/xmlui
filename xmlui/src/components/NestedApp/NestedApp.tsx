@@ -3,7 +3,7 @@ import styles from "./NestedApp.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { IndexAwareNestedApp } from "./NestedAppNative";
+import { IndexAwareNestedApp, defaultProps } from "./NestedAppNative";
 
 const COMP = "NestedApp";
 
@@ -20,6 +20,7 @@ export const NestedAppMd = createMetadata({
     components: {
       description:
         "This property defines an optional list of components to be used with the nested app.",
+      defaultValue: defaultProps.components,
     },
     config: {
       description: "You can define the nested app's configuration with this property.",
@@ -39,6 +40,14 @@ export const NestedAppMd = createMetadata({
     allowPlaygroundPopup: {
       description:
         "This property defines whether the nested app can be opened in the xmlui playground.",
+      valueType: "boolean",
+      defaultValue: defaultProps.allowPlaygroundPopup,
+    },
+    withFrame: {
+      description:
+        "This property defines whether the nested app should be displayed with a frame.",
+      valueType: "boolean",
+      defaultValue: defaultProps.withFrame,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
