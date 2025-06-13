@@ -123,7 +123,6 @@ export const Markdown = memo(function Markdown({
             );
           },
           img({ children, node, ...props }) {
-            console.log("img", node);
             const src = props?.src;
             const popOut = props?.["data-popout"];
             const alt = props?.alt || "";
