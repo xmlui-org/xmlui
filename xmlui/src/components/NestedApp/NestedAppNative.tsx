@@ -75,6 +75,10 @@ export function NestedApp({
   const { appGlobals } = useAppContext();
   const componentRegistry = useComponentRegistry();
 
+  // TODO: At this point, "api" may be a string or an object. If it is a string, check if it
+  // can be parsed as a JSON string, and if so, parse it. If it is an object, use it directly.
+  // If JSON parsing fails, render an app displaying the error.
+
   // const [apiWorker, setApiWorker] = useState(undefined);
 
   // useEffect(() => {
