@@ -14,6 +14,7 @@ import {
   Diag_End_Token_Expected,
   Diag_OpenNodeStart_Token_Expected,
   Diag_Tag_Identifier_Expected,
+  Diag_Tag_Name_Afterd_Namespace_Expected,
   DiagnosticCategory,
   ErrCodes,
 } from "./diagnostics";
@@ -65,12 +66,8 @@ export type GetText = (n: Node, ignoreTrivia?: boolean) => string;
 
 export type ParseResult = { node: Node; errors: Error[] };
 
-const firstSetTagLike = [SyntaxKind.CData, SyntaxKind.Script, SyntaxKind.OpenNodeStart];
-// todo
-// const firstSetContent = firstSetTagLike.concat ([
-//   SyntaxKind.Identifier,
-//   SyntaxKind.StringLiteral,
-// ])
+const TAG_START_OR_END_TOKENS = [SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart, SyntaxKind.CData, SyntaxKind.Script];
+
 export function createXmlUiParser(source: string): {
   parse: () => ParseResult;
   getText: GetText;
@@ -155,13 +152,14 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   function parseTag() {
     startNode();
     bump(SyntaxKind.OpenNodeStart);
-    let errInName = false;
-    let openTagName: Node | undefined = undefined;
+    let errInName = true;
+    let openTagName: Node | null = null;
     if (at(SyntaxKind.Identifier)) {
-      openTagName = parseTagName();
+      const tagNameParseRes = parseTagName();
+      errInName = tagNameParseRes.errInName;
+      openTagName = tagNameParseRes.node;
     } else {
-      errInName = true;
-      const errNode = errNodeUntil([SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart, SyntaxKind.CData, SyntaxKind.Script]);
+      const errNode = errNodeUntil(TAG_START_OR_END_TOKENS);
       if (errNode){
         errorAt(Diag_Tag_Identifier_Expected, errNode.pos, errNode.end)
       } else {
@@ -182,7 +180,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       case SyntaxKind.NodeEnd:{
         bumpAny();
         parseContent();
-        parseClosingTag(openTagName);
+        parseClosingTag(openTagName, errInName);
         completeNode(SyntaxKind.ElementNode);
         return;
       }
@@ -196,7 +194,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
       case SyntaxKind.CloseNodeStart:{
         error(Diag_End_Or_Close_Token_Expected);
-        parseClosingTag(openTagName);
+        parseClosingTag(openTagName, errInName);
         completeNode(SyntaxKind.ElementNode);
         return;
       }
@@ -207,14 +205,16 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  function parseClosingTag(openTagName: Node){
+  function parseClosingTag(openTagName: Node | null, skipNameMatching: boolean){
     if (eat(SyntaxKind.CloseNodeStart)) {
       if (at(SyntaxKind.Identifier)) {
-        const closeTagName = parseTagName();
-        const namesMismatch =
-          openTagName !== undefined && !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
-        if (namesMismatch) {
-          error(MakeErr.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
+        const closeTagName = parseClosingTagName();
+        if (!skipNameMatching){
+          const namesMismatch =
+            openTagName !== null && !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
+          if (namesMismatch) {
+            error(MakeErr.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
+          }
         }
       } else {
         errRecover(Diag_Tag_Identifier_Expected, [SyntaxKind.NodeEnd]);
@@ -227,15 +227,30 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  function parseTagName(): Node {
+  function parseClosingTagName (): Node{
     startNode();
     bump(SyntaxKind.Identifier);
-    if (eat(SyntaxKind.Colon)) {
-      if (!eat(SyntaxKind.Identifier)) {
-        //TODO: error, possibly check for Eq and report that a name is missing before the attributes. Should parse as attribute then.
-      }
+    if (eat(SyntaxKind.Colon) && !eat(SyntaxKind.Identifier)) {
+      const nameNodeWithColon = completeNode(SyntaxKind.TagNameNode);
+      errorAt(Diag_Tag_Name_Afterd_Namespace_Expected, nameNodeWithColon.pos, nameNodeWithColon.end);
+      errNodeUntil(TAG_START_OR_END_TOKENS);
+      return nameNodeWithColon;
+    } else {
+      return completeNode(SyntaxKind.TagNameNode);
     }
-    return completeNode(SyntaxKind.TagNameNode);
+  }
+
+  function parseTagName(): { node: Node, errInName: boolean } {
+    startNode();
+    bump(SyntaxKind.Identifier);
+    if (eat(SyntaxKind.Colon) && !eat(SyntaxKind.Identifier)) {
+      const nameNodeWithColon = completeNode(SyntaxKind.TagNameNode);
+      errorAt(Diag_Tag_Name_Afterd_Namespace_Expected, nameNodeWithColon.pos, nameNodeWithColon.end);
+      errNodeUntil([SyntaxKind.Identifier, ...TAG_START_OR_END_TOKENS]);
+      return { node: nameNodeWithColon, errInName: true };
+    } else {
+      return { node: completeNode(SyntaxKind.TagNameNode), errInName: false };
+    }
   }
 
   function parseAttrList() {
