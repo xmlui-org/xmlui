@@ -21,10 +21,6 @@ $borderRadius-SearchItem: createThemeVar("borderRadius-#{$componentListItem}");
 $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentListItem}--hover");
 $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem}--focus");
 
-.container {
-  @include t.paddingVars($themeVars, $componentContainer);
-}
-
 .listPanel {
   @include t.borderVars($themeVars, $componentListPanel);
   @include t.paddingVars($themeVars, $componentListPanel);
