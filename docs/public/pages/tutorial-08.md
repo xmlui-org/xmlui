@@ -2,8 +2,8 @@
 
 Here's the `Create Invoice` form, using cached data for clients and products. The `Save` button is wired to a dummy API endpoint, try it as you explore the form to see how validation works when no client is selected, and/or when no line items are added.
 
-```xmlui-pg
----app display
+```xmlui-pg display name="Try saving in various stages of completion"
+---app
 <App>
   <CreateInvoice />
 </App>
@@ -128,7 +128,7 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
 </Component>
 ```
 
-The `<CreateInvoice>` component encapsulates all the form logic. Let's review the key points.
+The `CreateInvoice` component encapsulates all the form logic. Let's review the key points.
 
 ## Data sources
 
@@ -168,7 +168,7 @@ A valid payload looks like this.
 }
 ```
 
-The `Cancel` button resets all of the form's components and empties this data structure.
+The form's `Cancel` button resets all of its components and empties this data structure.
 
 ## Nested FormItems
 
