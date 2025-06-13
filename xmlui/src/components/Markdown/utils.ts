@@ -8,6 +8,8 @@ export type SegmentProps = {
   height?: string;
   content?: string;
   order?: number;
+  patterns?: string[];
+  borderedPatterns?: string[];
 };
 
 export type PlaygroundPattern = {
@@ -101,6 +103,24 @@ export function parseSegmentProps(input: string): SegmentProps {
   const heightMatch = input.match(/\bheight="([^"]+)"/);
   if (heightMatch) {
     segment.height = heightMatch[1];
+  }
+
+  // Match patterns enclosed in /pattern/ format
+  const patternMatches = input.match(/\/([^\/]+)\//g);
+  if (patternMatches) {
+    segment.patterns = patternMatches.map(pattern => 
+      // Remove the surrounding slashes
+      pattern.substring(1, pattern.length - 1)
+    );
+  }
+
+  // Match bordered patterns enclosed in !/pattern/ format
+  const borderedPatternMatches = input.match(/!\/(.[^\/]+)\//g);
+  if (borderedPatternMatches) {
+    segment.borderedPatterns = borderedPatternMatches.map(pattern => 
+      // Remove the leading !/ and trailing /
+      pattern.substring(2, pattern.length - 1)
+    );
   }
 
   return segment;
@@ -283,6 +303,12 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
         .join(",");
       segmentAttrs += `{${highlights}}`;
     }
+    if (segment.patterns && segment.patterns.length > 0) {
+      segmentAttrs += " " + segment.patterns.map((p) => `/${p}/`).join(" ");
+    }
+    if (segment.borderedPatterns && segment.borderedPatterns.length > 0) {
+      segmentAttrs += " " + segment.borderedPatterns.map((p) => `!/` + p + `/`).join(" ");
+    }
     segmentAttrs = segmentAttrs.trim().replace(/\s+/g, " ");
 
     switch (type) {
@@ -360,7 +386,9 @@ export function observeTreeDisplay(content: string): [number, number, string] | 
 
 export function convertTreeDisplayToMarkdown(content: string): string {
   if (content.startsWith("```xmlui-tree") && content.endsWith("```")) {
-    const treeContent = content.slice("```xmlui-tree".length, content.indexOf("```", "```xmlui-tree".length)).trim();
+    const treeContent = content
+      .slice("```xmlui-tree".length, content.indexOf("```", "```xmlui-tree".length))
+      .trim();
     return `<section data-tree-content="${btoa(treeContent)}"></section>\n\n`;
   }
 }

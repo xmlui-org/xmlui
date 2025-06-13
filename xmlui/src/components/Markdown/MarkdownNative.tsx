@@ -481,32 +481,6 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
   );
 };
 
-type OrderedListProps = {
-  children: React.ReactNode;
-  style?: CSSProperties;
-};
-
-const OrderedList = ({ children, style }: OrderedListProps) => {
-  return (
-    <ol className={styles.orderedList} style={style}>
-      {children}
-    </ol>
-  );
-};
-
-type ListItemProps = {
-  children: React.ReactNode;
-  style?: CSSProperties;
-};
-
-const ListItem = ({ children, style }: ListItemProps) => {
-  return (
-    <li className={styles.listItem} style={style}>
-      {children}
-    </li>
-  );
-};
-
 type LinkAwareHeadingProps = {
   children: React.ReactNode;
   level: string;
