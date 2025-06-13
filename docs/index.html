@@ -80,6 +80,18 @@
       created_at: "2025-04-19T23:45:47.937465",
       paid_date: null
     }
+
+    window.filterInvoicesAfter = function (data, dateAfter) {
+      if (!dateAfter) return data;
+      return data
+        .filter(invoice => new Date(invoice.issue_date) >= new Date(dateAfter))
+        .sort((a, b) => new Date(a.issue_date) - new Date(b.issue_date));
+    }
+
+    window.formatDate = function (date) {
+      return date.substring(0, 10)
+    }
+
   </script>
 </body>
 
