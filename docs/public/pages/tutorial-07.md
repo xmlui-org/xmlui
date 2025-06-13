@@ -67,12 +67,11 @@ Here is the app's `Invoices` page, with a cached subset of data. To view the tab
 </Component>
 ```
 
-Here is the `<Invoices>` component. The `Create Invoice` button is disabled for this part of the demo.
+Here is the `Invoices` component. The `Create Invoice` button is disabled for this part of the demo.
 
-```xmlui /id="invoices"/ /url=/ /transformResult/ /ModalDialog id="detailsDialog"/ /InvoiceDetails/ /navigate/ /StatusBadge/ /id="detailsDialog"/ /data="{invoices}"/ /onClick="detailsDialog.open($item)"/
-<Component
-    name="Invoices"
->
+```xmlui /id="invoices"/ /url=/ /transformResult/ /ModalDialog id="detailsDialog"/ /InvoiceDetails/ /navigate/ /StatusBadge/ /id="detailsDialog"/ /data="{invoices}"/ /onClick="detailsDialog.open($item)"/ /Create Invoice/
+<Component name="Invoices">
+
     <DataSource
         id="invoices"
         url="/resources/files/invoices.json"
@@ -112,12 +111,12 @@ Here is the `<Invoices>` component. The `Create Invoice` button is disabled for 
 </Component>
 ```
 
-The `id` attribute of the [DataSource](/components/DataSource) binds to the `data` attribute of the [Table](/components/Table). The `url` here refers to a static JSON file, normally it is the `/invoices` API endpoint. The `transformResult` attribute reduces the sample data for our purposes here, normally it isn't used.
+The `id` attribute of the [DataSource](/components/DataSource) is set to `invoices` which matches the `data` attribute of the [Table](/components/Table). The `url` here refers to a static JSON file, normally it is the `/api/invoices` endpoint. The `transformResult` attribute reduces the sample data for our purposes here, normally it isn't used.
 
-The id attribute of the [ModalDialog](/components/ModalDialog) maps to the `onClick` handler of the `Details` column. That handler is also disabled for this part of the demo. We'll see later how, when clicked, it loads `<InvoiceDetails>` into a `ModalDialog`. Note that one way to set the `maxWidth-ModalDialog` is to wrap the `ModelDialog` in a [Theme](/components/Theme).
+The id attribute of the [ModalDialog](/components/ModalDialog) maps to the `onClick` handler of the `Details` column. That handler is also disabled for this part of the demo. We'll see later how, when clicked, it loads the `InvoiceDetails` component into a `ModalDialog`. Note that one way to set the `maxWidth-ModalDialog` is to wrap the `ModelDialog` in a [Theme](/components/Theme).
 
-When enabled, the `CreateInvoice` button uses the global function `navigate` to go to the `<CreateInvoice>` page.
+When enabled, the `CreateInvoice` button uses the global function `navigate` to go to the page defined by the `CreateInvoice` component.
 
-Two of the columns in the table, `Status` and `Details`, show how a [Column](/components/Column) can contain XMLUI markup that may include user-defined (`<StatusBadge>`) and/or built-in (`<Icon>`) components. 
+Two of the columns in the table, `Status` and `Details`, show how a [Column](/components/Column) can contain XMLUI markup that may include user-defined (`StatusBadge`) and/or built-in (`Icon`) components.
 
 

@@ -1,6 +1,6 @@
 # Charts
 
-The `Dashboard` page continues with a donut chart that visualizes some of the same facts reported using `InfoCard`. We define it as a `<Statuses>` component whose width and title are defined by its containing `Dashboard` component. Here we'll use it standalone.
+The `Dashboard` page continues with a donut chart that visualizes some of the same facts reported using `InfoCard`. We define it as a `Statuses` component whose width and title are defined by its containing `Dashboard` component. Here we'll use it standalone.
 
 ```xmlui
 <App>

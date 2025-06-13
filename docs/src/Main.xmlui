@@ -34,6 +34,9 @@
                 <NavLink label="Invoices" to="/tutorial-07"/>
                 <NavLink label="Create Invoice" to="/tutorial-08"/>
                 <NavLink label="Invoice Details" to="/tutorial-09"/>
+                <NavLink label="Search" to="/tutorial-10"/>
+                <NavLink label="Import" to="/tutorial-11"/>
+                <NavLink label="Settings" to="/tutorial-12"/>
             </NavGroup>
             <NavGroup label="Guides">
                 <NavLink label="App Structure" to="/app-structure"/>
@@ -64,7 +67,9 @@
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
+                <!--
                 <NavLink label="Test" to="/test"/>
+                -->
             </NavGroup>
         </NavPanel>
 
@@ -107,6 +112,12 @@
             </Page>
             <Page url="/tutorial-09">
                 <DocumentPage url="/pages/tutorial-09.md" />
+            </Page>
+            <Page url="/tutorial-10">
+                <DocumentPage url="/pages/tutorial-10.md" />
+            </Page>
+            <Page url="/tutorial-11">
+                <DocumentPage url="/pages/tutorial-11.md" />
             </Page>
             <Page url="/app-structure">
                 <DocumentPage url="/pages/app-structure.md"/>
