@@ -5,7 +5,7 @@
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
-    "build:docs": "xmlui build --buildMode=INLINE_ALL && xmlui zip-dist --target=dist/ui.zip"
+    "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && xmlui zip-dist --target=dist/ui.zip"
   },
   "dependencies": {
     "shiki": "^3.3.0",
@@ -20,8 +20,8 @@
     ]
   },
   "devDependencies": {
-    "remark-parse": "^11.0.0",
-    "strip-markdown": "^6.0.0",
-    "unified": "^11.0.5"
+    "remark-parse": "11.0.0",
+    "strip-markdown": "6.0.0",
+    "unified": "11.0.5"
   }
 }

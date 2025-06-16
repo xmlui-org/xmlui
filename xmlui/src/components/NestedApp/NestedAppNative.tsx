@@ -18,6 +18,7 @@ import { createQueryString } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import { useIndexerContext } from "../App/IndexerContext";
+import { useApiInterceptorContext } from "../../components-core/interception/useApiInterceptorContext";
 
 // Default props for NestedApp component
 export const defaultProps = {
@@ -37,27 +38,28 @@ type NestedAppProps = {
   height?: string | number;
   allowPlaygroundPopup?: boolean;
   withFrame?: boolean;
+  playgroundId?: string;
 };
 
-export function LazyNestedApp(props){
+export function LazyNestedApp(props) {
   const [shouldRender, setShouldRender] = useState(false);
-  useEffect(()=>{
-    startTransition(()=>{
+  useEffect(() => {
+    startTransition(() => {
       setShouldRender(true);
-    })
+    });
   }, []);
-  if(!shouldRender){
+  if (!shouldRender) {
     return null;
   }
-  return <NestedApp {...props}/>
+  return <NestedApp {...props} />;
 }
 
-export function IndexAwareNestedApp(props){
-  const {indexing} = useIndexerContext();
-  if(indexing){
+export function IndexAwareNestedApp(props) {
+  const { indexing } = useIndexerContext();
+  if (indexing) {
     return null;
   }
-  return <LazyNestedApp {...props}/>
+  return <LazyNestedApp {...props} />;
 }
 
 export function NestedApp({
@@ -71,6 +73,7 @@ export function NestedApp({
   height,
   allowPlaygroundPopup = defaultProps.allowPlaygroundPopup,
   withFrame = defaultProps.withFrame,
+  playgroundId
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
@@ -81,38 +84,33 @@ export function NestedApp({
   const toneToApply = activeTone || config?.defaultTone || theme?.activeThemeTone;
   const { appGlobals } = useAppContext();
   const componentRegistry = useComponentRegistry();
+  const { interceptorWorker } = useApiInterceptorContext();
+  const safeId = playgroundId || nestedAppId;
+  const apiUrl = `/${safeId.replaceAll(":", "")}`;
 
   // TODO: At this point, "api" may be a string or an object. If it is a string, check if it
   // can be parsed as a JSON string, and if so, parse it. If it is an object, use it directly.
   // If JSON parsing fails, render an app displaying the error.
 
-  // const [apiWorker, setApiWorker] = useState(undefined);
-
-  // useEffect(() => {
-  //   let worker;
-  //   (async function () {
-  //     const { setupWorker } = await import("msw/browser");
-  //     worker = setupWorker();
-  //     worker.start({
-  //       onUnhandledRequest: "bypass",
-  //       quiet: true,
-  //     });
-  //     setApiWorker(worker);
-  //   })();
-  //   return () => worker?.stop();
-  // }, []);
-
-  // console.log("apiWorker", apiWorker);
-
-  // const mock = useMemo(() => {
-  //   return api
-  //     ? {
-  //         type: "in-memory",
-  //         ...api,
-  //         apiUrl: "/api",
-  //       }
-  //     : undefined;
-  // }, [api]);
+  const mock = useMemo(() => {
+    if (!api) {
+      return undefined;
+    }
+    let apiObject = api;
+    if (typeof api === "string") {
+      try {
+        apiObject = JSON.parse(api.replaceAll("\n", " "));
+      } catch (e) {
+        console.error("Failed to parse API definition", e);
+        return undefined;
+      }
+    }
+    return {
+      ...apiObject,
+      type: "in-memory",
+      apiUrl: apiUrl + (apiObject.apiUrl || ""),
+    };
+  }, [api, apiUrl]);
 
   //console.log("mock", mock);
 
@@ -127,6 +125,7 @@ export function NestedApp({
           themes: [],
           defaultTheme: activeTheme,
         },
+        api: api,
       },
       options: {
         fixedTheme: false,
@@ -143,7 +142,7 @@ export function NestedApp({
       useHashBasedRouting ? `/#/playground#${appQueryString}` : `/playground#${appQueryString}`,
       "_blank",
     );
-  }, [app, components, title, activeTheme, activeTone, useHashBasedRouting]);
+  }, [app, components, title, activeTheme, api, activeTone, useHashBasedRouting]);
 
   useEffect(() => {
     if (!shadowRef.current && rootRef.current) {
@@ -181,7 +180,7 @@ export function NestedApp({
     let globalProps = {
       name: config?.name,
       ...(config?.appGlobals || {}),
-      apiUrl: "",
+      apiUrl,
     };
 
     // css variables are leaking into to shadow dom, so we reset them here
@@ -190,25 +189,28 @@ export function NestedApp({
       themeVarReset[key] = "initial";
     });
 
+
     let nestedAppRoot = (
-      <div style={{ height, ...themeVarReset }}>
-        <AppRoot
-          key={`app-${nestedAppId}-${refreshVersion}`}
-          previewMode={true}
-          standalone={true}
-          trackContainerHeight={height ? "fixed" : "auto"}
-          node={component}
-          globalProps={globalProps}
-          defaultTheme={activeTheme || config?.defaultTheme}
-          defaultTone={toneToApply as ThemeTone}
-          contributes={{
-            compoundComponents,
-            themes: config?.themes,
-          }}
-          resources={config?.resources}
-          extensionManager={componentRegistry.getExtensionManager()}
-        />
-      </div>
+      <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
+        <div style={{ height, ...themeVarReset }}>
+          <AppRoot
+            key={`app-${nestedAppId}-${refreshVersion}`}
+            previewMode={true}
+            standalone={true}
+            trackContainerHeight={height ? "fixed" : "auto"}
+            node={component}
+            globalProps={globalProps}
+            defaultTheme={activeTheme || config?.defaultTheme}
+            defaultTone={toneToApply as ThemeTone}
+            contributes={{
+              compoundComponents,
+              themes: config?.themes,
+            }}
+            resources={config?.resources}
+            extensionManager={componentRegistry.getExtensionManager()}
+          />
+        </div>
+      </ApiInterceptorProvider>
     );
 
     contentRootRef.current?.render(
@@ -253,11 +255,11 @@ export function NestedApp({
           nestedAppRoot
         )}
       </ErrorBoundary>,
-    )
+    );
   }, [
     activeTheme,
     allowPlaygroundPopup,
-    // apiWorker,
+    interceptorWorker,
     app,
     componentRegistry,
     components,
@@ -267,7 +269,7 @@ export function NestedApp({
     config?.resources,
     config?.themes,
     height,
-    // mock,
+    mock,
     nestedAppId,
     openPlayground,
     refreshVersion,
@@ -275,6 +277,7 @@ export function NestedApp({
     title,
     toneToApply,
     withFrame,
+    apiUrl,
   ]);
 
   const mountedRef = useRef(false);
@@ -282,9 +285,9 @@ export function NestedApp({
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
-      setTimeout(()=>{
+      setTimeout(() => {
         // Unmount the content root after a delay (and only it the component is not mounted anymore, could happen in dev mode - double useEffect call)
-        if(!mountedRef.current){
+        if (!mountedRef.current) {
           contentRootRef.current?.unmount();
           contentRootRef.current = null;
         }

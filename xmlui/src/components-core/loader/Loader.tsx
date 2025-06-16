@@ -15,6 +15,7 @@ import type { ContainerState } from "../rendering/ContainerWrapper";
 import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
+import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 
 /**
  * The properties of the Loader component
@@ -57,6 +58,7 @@ export function Loader({
 }: LoaderProps) {
   const { uid } = loader;
   const appContext = useAppContext();
+  const {initialized} = useApiInterceptorContext();
 
   // --- Rely on react-query to decide when data fetching should use the cache or when is should fetch the data from
   // --- its data source.
@@ -64,12 +66,14 @@ export function Loader({
   // --- status: Query execution status
   // --- error: Error information about the current query error (in "error" state)
   // --- refetch: The function that can be used to re-fetch the data (because of data/state changes)
-  const { data, status, isFetching, error, refetch, isRefetching } = useQuery({
+  const { data, status, isFetching, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: useMemo(
       () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
       [appContext, loader.props, queryId, state, uid],
     ),
     structuralSharing,
+    //we pause the loaders if the apiInterceptor is not initialized (true when the app is not using mockApi)
+    enabled: initialized,
     queryFn: useCallback<QueryFunction>(
       async ({ signal }) => {
         // console.log("[Loader queryFn] Starting to fetch data...");
@@ -132,8 +136,8 @@ export function Loader({
   const prevError = usePrevious(error);
 
   useIsomorphicLayoutEffect(() => {
-    loaderInProgressChanged(isFetching);
-  }, [isFetching, loaderInProgressChanged]);
+    loaderInProgressChanged(isFetching || isLoading);
+  }, [isLoading, isFetching, loaderInProgressChanged]);
 
   useIsomorphicLayoutEffect(() => {
     loaderIsRefetchingChanged(isRefetching);

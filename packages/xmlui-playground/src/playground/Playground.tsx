@@ -44,7 +44,7 @@ export const playgroundComponentRenderer = createComponentRenderer(
         components={extractValue(node.props.components)}
         app={extractValue.asOptionalString(node.props.app)}
         name={extractValue.asOptionalString(node.props.name)}
-        api={{}}
+        api={extractValue(node.props.api)}
         description={extractValue.asOptionalString(node.props.description)}
       />
     );

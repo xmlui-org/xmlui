@@ -9,6 +9,7 @@ import type {
   Toast,
 } from "react-hot-toast";
 import type { ActionFunction } from "./ActionDefs";
+import type { SetupWorker } from "msw/browser";
 
 /**
  * This interface defines the properties and services of an app context that the application components can use when
@@ -377,6 +378,8 @@ export type LoggedInUserDto = {
 
 export interface IApiInterceptorContext {
   isMocked: (url: string) => boolean;
+  initialized: boolean;
+  interceptorWorker: SetupWorker | null;
 }
 
 type Message = ValueOrFunction<Renderable, Toast>;
