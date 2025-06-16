@@ -66,7 +66,7 @@ export function Loader({
   // --- status: Query execution status
   // --- error: Error information about the current query error (in "error" state)
   // --- refetch: The function that can be used to re-fetch the data (because of data/state changes)
-  const { data, status, isFetching, error, refetch, isRefetching } = useQuery({
+  const { data, status, isFetching, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: useMemo(
       () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
       [appContext, loader.props, queryId, state, uid],
@@ -136,8 +136,8 @@ export function Loader({
   const prevError = usePrevious(error);
 
   useIsomorphicLayoutEffect(() => {
-    loaderInProgressChanged(isFetching);
-  }, [isFetching, loaderInProgressChanged]);
+    loaderInProgressChanged(isFetching || isLoading);
+  }, [isLoading, isFetching, loaderInProgressChanged]);
 
   useIsomorphicLayoutEffect(() => {
     loaderIsRefetchingChanged(isRefetching);
