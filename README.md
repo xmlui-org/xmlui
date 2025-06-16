@@ -19,7 +19,7 @@ https://github.com/user-attachments/assets/880bdd55-485c-4970-9975-f34a249162c8
 
 ## Getting started
 
-Download the [starter kit](https://xmlui.com/downloads) which includes the XMLUI engine and `XMLUI Invoice`, a demo app that exercises many key features of the framework and illustrate common patterns.
+Download the [starter kit](https://xmlui.com/downloads) which includes the XMLUI engine and `XMLUI Invoice`, a demo app that exercises key features of the framework and illustrates common patterns.
 
 ## Documentation
 
