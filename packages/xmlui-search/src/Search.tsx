@@ -199,79 +199,79 @@ export const Search = ({
 
   return (
     <Popover open={show} onOpenChange={setShow}>
-        <VisuallyHidden>
-          <label htmlFor={inputId}>Search Field</label>
-        </VisuallyHidden>
-        <PopoverTrigger asChild>
-          <TextBox
-            id={inputId}
-            ref={inputRef}
-            type="search"
-            placeholder="Type to search..."
-            value={inputValue}
-            style={{ height: "36px", width: inDrawer ? "100%" : "280px" }}
-            startIcon="search"
-            onDidChange={(value) =>
-              setInputValue(() => {
-                setActiveIndex(-1);
-                return value;
-              })
-            }
-            onFocus={onInputFocus}
-            onKeyDown={handleKeyDown}
-            aria-autocomplete="list"
-            aria-controls="dropdown-list"
-            aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
-          />
-        </PopoverTrigger>
-        {show && results && debouncedValue && (
-          <Portal container={_root}>
-            <PopoverContent
-              align="end"
-              onOpenAutoFocus={(e) => e.preventDefault()}
-              onCloseAutoFocus={(e) => e.preventDefault()}
-              onEscapeKeyDown={() => setShow(false)}
-              className={classnames(styles.listPanel, {
-                [styles.inDrawer]: inDrawer,
-              })}
-            >
-              <ul className={styles.list} role="listbox">
-                {results.length > 0 &&
-                  results.map((result, idx) => {
-                    return (
-                      <li
-                        role="option"
-                        key={`${result.item.path}-${idx}`}
-                        className={classnames(styles.item, styles.header, {
-                          [styles.keyboardFocus]: activeIndex === idx,
-                        })}
-                        onMouseEnter={() => {
-                          setActiveIndex(idx);
-                          setNavigationSource("mouse");
-                        }}
-                        ref={(el) => (itemRefs.current[idx] = el!)}
-                        aria-selected={activeIndex === idx}
-                      >
-                        <SearchItemContent
-                          ref={(el) => (itemLinkRefs.current[idx] = el!)}
-                          idx={idx}
-                          item={result.item}
-                          matches={result.matches}
-                          maxContentMatchNumber={maxContentMatchNumber}
-                          onClick={onClick}
-                        />
-                      </li>
-                    );
-                  })}
-                {results.length === 0 && (
-                  <div className={styles.noResults}>
-                    <Text variant="em">No results</Text>
-                  </div>
-                )}
-              </ul>
-            </PopoverContent>
-          </Portal>
-        )}
+      <VisuallyHidden>
+        <label htmlFor={inputId}>Search Field</label>
+      </VisuallyHidden>
+      <PopoverTrigger asChild>
+        <TextBox
+          id={inputId}
+          ref={inputRef}
+          type="search"
+          placeholder="Type to search..."
+          value={inputValue}
+          style={{ height: "36px", width: inDrawer ? "100%" : "280px" }}
+          startIcon="search"
+          onDidChange={(value) =>
+            setInputValue(() => {
+              setActiveIndex(-1);
+              return value;
+            })
+          }
+          onFocus={onInputFocus}
+          onKeyDown={handleKeyDown}
+          aria-autocomplete="list"
+          aria-controls="dropdown-list"
+          aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+        />
+      </PopoverTrigger>
+      {show && results && debouncedValue && (
+        <Portal container={_root}>
+          <PopoverContent
+            align="end"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+            onEscapeKeyDown={() => setShow(false)}
+            className={classnames(styles.listPanel, {
+              [styles.inDrawer]: inDrawer,
+            })}
+          >
+            <ul className={styles.list} role="listbox">
+              {results.length > 0 &&
+                results.map((result, idx) => {
+                  return (
+                    <li
+                      role="option"
+                      key={`${result.item.path}-${idx}`}
+                      className={classnames(styles.item, styles.header, {
+                        [styles.keyboardFocus]: activeIndex === idx,
+                      })}
+                      onMouseEnter={() => {
+                        setActiveIndex(idx);
+                        setNavigationSource("mouse");
+                      }}
+                      ref={(el) => (itemRefs.current[idx] = el!)}
+                      aria-selected={activeIndex === idx}
+                    >
+                      <SearchItemContent
+                        ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                        idx={idx}
+                        item={result.item}
+                        matches={result.matches}
+                        maxContentMatchNumber={maxContentMatchNumber}
+                        onClick={onClick}
+                      />
+                    </li>
+                  );
+                })}
+              {results.length === 0 && (
+                <div className={styles.noResults}>
+                  <Text variant="em">No results</Text>
+                </div>
+              )}
+            </ul>
+          </PopoverContent>
+        </Portal>
+      )}
     </Popover>
   );
 };
@@ -335,16 +335,13 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
   const options = {
     // Determines the size of the area around a string index
     // used in search filtering and highlight correction
-    idxDistance: 3,
+    shortTextSearchRadius: 3,
     // Minimum number of characters to trigger a long text search filter
     longTextSearchThreshold: 25,
-    longTextIdxDistance: 8,
-    // Number of characters subtracted from the search term length
-    // to account for partial matches in the title
-    titleAcceptanceThreshold: 1,
-    // Number of characters subtracted from the search term length
-    // to account for partial matches in the content
-    contentAcceptanceThreshold: 2,
+    // Number of characters needed to accept the search term as a match in the title
+    titleAcceptanceThreshold: debouncedValue.length - 1,
+    // Number of character threshold to accept the search term as a match in the content
+    longContentAcceptance: Math.floor(debouncedValue.length * 0.5),
   };
 
   return searchResults
@@ -361,76 +358,99 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
     return (result.matches ?? [])
       .filter((match) => !!match.key)
       .reduce<MatchesByKey>((acc, match) => {
-        const validIndexes: RangeTuple[] = [];
         const matchKey = match.key as keyof SearchItemData;
+
+        // --- Prefilter matches that are too short/significantly misaligned compared to the search term
+        const filteredMatches = match.indices.filter((index) => {
+          const foundSubstrLength = index[1] - index[0];
+          // Title
+          if (matchKey === "title") {
+            return foundSubstrLength >= options.titleAcceptanceThreshold;
+          }
+          // Content: long text search
+          if (debouncedValue.length >= options.longTextSearchThreshold) {
+            return foundSubstrLength >= options.longContentAcceptance;
+          }
+          // Content: regular text search
+          return result.item[matchKey]
+            .slice(index[0], index[1] + 1)
+            .toLocaleLowerCase()
+            .includes(debouncedValue.toLocaleLowerCase());
+        });
+
+        // Restrict highlights that are longer than the original search term
+        const highlightAdjustedMatches = filteredMatches.reduce<RangeTuple[]>((matchAcc, index) => {
+          if (matchKey === "title") {
+            if (index[1] - index[0] > debouncedValue.length) {
+              index[1] = index[0] + debouncedValue.length;
+            }
+          }
+
+          if (debouncedValue.length < options.longTextSearchThreshold) {
+            // If the highlight is not exactly on spot but near the correct position, move it
+            const areaStart = Math.max(index[0] - options.shortTextSearchRadius, 0);
+            const areaEnd = Math.min(
+              index[1] + options.shortTextSearchRadius,
+              result.item[matchKey].length,
+            );
+
+            for (let i = areaStart; i < areaEnd; i++) {
+              if (
+                result.item[matchKey].slice(i, i + debouncedValue.length).toLocaleLowerCase() ===
+                debouncedValue.toLocaleLowerCase()
+              ) {
+                index[0] = i;
+                index[1] = i + debouncedValue.length - 1;
+                matchAcc.push(index);
+                break;
+              }
+            }
+          } else {
+            // Correct long text match indexes
+            const contentLength = result.item[matchKey].length;
+
+            const startIdx = Math.max(index[0] - 50, 0);
+            const endIdx = Math.min(index[1] + 50, contentLength);
+            const position = findSubstringPosition(
+              result.item[matchKey],
+              debouncedValue,
+              startIdx,
+              endIdx,
+            );
+            if (position !== -1) {
+              index[0] = position;
+              index[1] = position + debouncedValue.length - 1;
+
+              if (matchAcc.findIndex((m) => m[0] === index[0] && m[1] === index[1]) === -1) {
+                matchAcc.push(index);
+              }
+            }
+          }
+
+          return matchAcc;
+        }, []);
 
         // Map match indexes to results
         acc[matchKey] = {
           value: match.value,
-          indices: match.indices
-            // Remove too short and some misaligned matches
-            .filter((index) => {
-              const foundSubstrLength = index[1] - index[0];
-              if (match.key === "title") {
-                return (
-                  foundSubstrLength >= debouncedValue.length - options.titleAcceptanceThreshold
-                );
-              }
-              // Long text search filter in content
-              if (debouncedValue.length > options.longTextSearchThreshold) {
-                const overlappingIdxArea = validIndexes.find(
-                  (vi) =>
-                    index[0] >= vi[0] - options.idxDistance &&
-                    index[0] <= vi[0] + options.idxDistance &&
-                    index[1] >= vi[1] - options.idxDistance &&
-                    index[1] <= vi[1] + options.idxDistance,
-                );
-
-                if (
-                  !overlappingIdxArea &&
-                  foundSubstrLength >= debouncedValue.length - options.contentAcceptanceThreshold &&
-                  foundSubstrLength <= debouncedValue.length + options.contentAcceptanceThreshold
-                ) {
-                  validIndexes.push(index);
-                  return true;
-                }
-                return false;
-              }
-              // Regular text search in content
-              return result.item[matchKey]
-                .slice(index[0], index[1] + 1)
-                .toLocaleLowerCase()
-                .includes(debouncedValue.toLocaleLowerCase());
-            })
-            // Restrict highlights that are longer than the original search term
-            .map((index) => {
-              if (index[1] - index[0] > debouncedValue.length) {
-                index[1] = index[0] + debouncedValue.length;
-              }
-
-              // If the highlight is not exactly on spot but near the correct position, move it
-              const areaStart = Math.max(index[0] - options.idxDistance, 0);
-              const areaEnd = Math.min(
-                index[1] + options.idxDistance,
-                result.item[matchKey].length,
-              );
-
-              for (let i = areaStart; i < areaEnd; i++) {
-                if (
-                  result.item[matchKey].slice(i, i + debouncedValue.length).toLocaleLowerCase() ===
-                  debouncedValue.toLocaleLowerCase()
-                ) {
-                  index[0] = i;
-                  index[1] = i + debouncedValue.length - 1;
-                  break;
-                }
-              }
-
-              return index;
-            })
+          indices: highlightAdjustedMatches,
         };
         return acc;
       }, {});
+  }
+
+  function findSubstringPosition(content: string, term: string, startIdx: number, endIdx: number) {
+    for (let i = startIdx; i <= endIdx; i++) {
+      let match = true;
+      for (let j = 0; j < term.length; j++) {
+        if (content[i + j] !== term[j]) {
+          match = false;
+          break;
+        }
+      }
+      if (match) return i; // Exact match found at index i
+    }
+    return -1; // No match in the specified range
   }
 }
 
