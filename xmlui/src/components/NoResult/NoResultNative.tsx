@@ -4,6 +4,12 @@ import styles from "./NoResult.module.scss";
 
 import { Icon } from "../Icon/IconNative";
 
+// Default props for the NoResult component
+export const defaultProps = {
+  hideIcon: false,
+  icon: "noresult"
+};
+
 type Props = {
   label: string;
   icon?: string;
@@ -12,12 +18,12 @@ type Props = {
 };
 
 export const NoResult = forwardRef(function NoResult(
-  { label, icon, hideIcon = false, style }: Props,
+  { label, icon = defaultProps.icon, hideIcon = defaultProps.hideIcon, style }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
     <div className={styles.wrapper} style={style} ref={forwardedRef}>
-      {!hideIcon && <Icon name={icon ?? "noresult"} className={styles.icon} />}
+      {!hideIcon && <Icon name={icon} className={styles.icon} />}
       {label}
     </div>
   );

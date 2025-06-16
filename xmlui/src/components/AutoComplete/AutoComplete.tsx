@@ -25,7 +25,7 @@ import {
   dLabelWidth,
   dLabelBreak,
 } from "../metadata-helpers";
-import { AutoComplete } from "./AutoCompleteNative";
+import { AutoComplete, defaultProps } from "./AutoCompleteNative";
 
 const COMP = "AutoComplete";
 
@@ -38,20 +38,41 @@ export const AutoCompleteMd = createMetadata({
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
     maxLength: dMaxLength(),
-    autoFocus: dAutoFocus(),
-    required: dRequired(),
-    readOnly: dReadonly(),
-    enabled: dEnabled(),
+    autoFocus: {
+      ...dAutoFocus(),
+      defaultValue: defaultProps.autoFocus,
+    },
+    required: {
+      ...dRequired(),
+      defaultValue: defaultProps.required,
+    },
+    readOnly: {
+      ...dReadonly(),
+      defaultValue: defaultProps.readOnly,
+    },
+    enabled: {
+      ...dEnabled(),
+      defaultValue: defaultProps.enabled,
+    },
     creatable: d(
       `This property allows the user to create new items that are not present in the list of options.`,
     ),
-    validationStatus: dValidationStatus(),
+    validationStatus: {
+      ...dValidationStatus(),
+      defaultValue: defaultProps.validationStatus,
+    },
     label: dLabel(),
-    labelPosition: dLabelPosition("top"),
+    labelPosition: {
+      ...dLabelPosition(),
+      defaultValue: defaultProps.labelPosition,
+    },
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
     dropdownHeight: d("This property sets the height of the dropdown list."),
-    multi: dMulti(),
+    multi: {
+      ...dMulti(),
+      defaultValue: defaultProps.multi,
+    },
     optionTemplate: dComponent(
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,

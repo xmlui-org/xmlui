@@ -3,7 +3,7 @@ import styles from "./FileUploadDropZone.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { FileUploadDropZone } from "./FileUploadDropZoneNative";
+import { FileUploadDropZone, defaultProps } from "./FileUploadDropZoneNative";
 
 const COMP = "FileUploadDropZone";
 
@@ -16,7 +16,7 @@ export const FileUploadDropZoneMd = createMetadata({
       description:
         "With this property, you can change the default text to display when files " +
         "are dragged over the drop zone.",
-      defaultValue: "Drop files here",
+      defaultValue: defaultProps.text,
       type: "string",
     },
     allowPaste: {
@@ -25,7 +25,7 @@ export const FileUploadDropZoneMd = createMetadata({
         "clipboard (\`true\`) or " +
         "only dragged files (\`false\`).",
       type: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.allowPaste,
     },
     enabled: d(
       `If set to \`false\`, the drop zone will be disabled and users will not be able to upload files.`,

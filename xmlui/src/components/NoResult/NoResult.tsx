@@ -4,7 +4,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dLabel } from "../metadata-helpers";
-import { NoResult } from "./NoResultNative";
+import { NoResult, defaultProps } from "./NoResultNative";
 
 const COMP = "NoResult";
 
@@ -14,11 +14,15 @@ export const NoResultMd = createMetadata({
     `resulted in no (zero) items.`,
   props: {
     label: dLabel(),
-    icon: d(`This property defines the icon to display with the component.`),
+    icon: {
+      description: `This property defines the icon to display with the component.`,
+      valueType: "string",
+      defaultValue: defaultProps.icon,
+    },
     hideIcon: {
       description: `This boolean property indicates if the icon should be hidden.`,
       valueType: "boolean",
-      defaultValue: "false",
+      defaultValue: defaultProps.hideIcon,
     },
   },
   themeVars: parseScssVar(styles.themeVars),

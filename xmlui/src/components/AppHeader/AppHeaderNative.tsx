@@ -28,6 +28,11 @@ type Props = {
   hasRegisteredNavPanel?: boolean;
   titleContent?: ReactNode;
   registerSubNavPanelSlot?: (node: HTMLElement)=>void;
+  renderChild?: RenderChildFn;
+};
+
+export const defaultProps: Pick<Props, "showLogo"> = {
+  showLogo: true,
 };
 
 function tryLoadImage(url: string, onLoaded: () => void, onError: () => void) {
@@ -64,7 +69,7 @@ export const AppHeader = ({
   canRestrictContentWidth,
   navPanelVisible = true,
   toggleDrawer,
-  showLogo,
+  showLogo = defaultProps.showLogo,
   hasRegisteredNavPanel,
   title,
   titleContent,

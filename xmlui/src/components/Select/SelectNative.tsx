@@ -40,6 +40,20 @@ import { OptionContext, useOption } from "./OptionContext";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { HiddenOption } from "./HiddenOption";
 
+export const defaultProps = {
+  enabled: true,
+  placeholder: "",
+  autoFocus: false,
+  searchable: false,
+  multiSelect: false,
+  required: false,
+  inProgress: false,
+  inProgressNotificationMessage: "",
+  readOnly: false,
+  validationStatus: "none" as ValidationStatus,
+  labelBreak: false,
+};
+
 export type SingleValueType = string | number;
 export type ValueType = SingleValueType | SingleValueType[];
 type SelectProps = {
@@ -200,10 +214,10 @@ export const Select = forwardRef(function Select(
     id,
     initialValue,
     value,
-    enabled = true,
-    placeholder,
+    enabled = defaultProps.enabled,
+    placeholder = defaultProps.placeholder,
     updateState = noop,
-    validationStatus = "none",
+    validationStatus = defaultProps.validationStatus,
     onDidChange = noop,
     onFocus = noop,
     onBlur = noop,
@@ -215,16 +229,16 @@ export const Select = forwardRef(function Select(
     style,
     dropdownHeight,
     children,
-    autoFocus = false,
-    searchable = false,
-    multiSelect = false,
+    autoFocus = defaultProps.autoFocus,
+    searchable = defaultProps.searchable,
+    multiSelect = defaultProps.multiSelect,
     label,
     labelPosition,
     labelWidth,
-    labelBreak = false,
-    required = false,
-    inProgress = false,
-    inProgressNotificationMessage = "Loading...",
+    labelBreak = defaultProps.labelBreak,
+    required = defaultProps.required,
+    inProgress = defaultProps.inProgress,
+    inProgressNotificationMessage = defaultProps.inProgressNotificationMessage,
     readOnly = false,
   }: SelectProps,
   ref: React.ForwardedRef<HTMLDivElement>,

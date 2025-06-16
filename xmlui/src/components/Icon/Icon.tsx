@@ -2,7 +2,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./Icon.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import Icon from "./IconNative";
+import Icon, { defaultProps } from "./IconNative";
 
 const COMP = "Icon";
 
@@ -19,6 +19,7 @@ export const IconMd = createMetadata({
         `This property defines the size of the \`${COMP}\`. Note that setting the \`height\` and/or ` +
         `the \`width\` of the component will override this property.`,
       availableValues: ["xs", "sm", "md", "lg"],
+      defaultValue: defaultProps.size,
     },
     fallback: d(
       `This optional property provides a way to handle situations when the provided ` +

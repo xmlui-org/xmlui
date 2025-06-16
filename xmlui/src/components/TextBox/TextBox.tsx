@@ -29,7 +29,7 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import { TextBox } from "./TextBoxNative";
+import { TextBox, defaultProps } from "./TextBoxNative";
 
 const COMP = "TextBox";
 
@@ -38,7 +38,10 @@ export const TextBoxMd = createMetadata({
   description: `The \`${COMP}\` is an input component that allows users to input and edit textual data.`,
   props: {
     placeholder: dPlaceholder(),
-    initialValue: dInitialValue(),
+    initialValue: {
+      ...dInitialValue(),
+      defaultValue: defaultProps.initialValue,
+    },
     label: dLabel(),
     labelPosition: dLabelPosition("top"),
     labelWidth: dLabelWidth(COMP),
@@ -47,8 +50,14 @@ export const TextBoxMd = createMetadata({
     autoFocus: dAutoFocus(),
     required: dRequired(),
     readOnly: dReadonly(),
-    enabled: dEnabled(),
-    validationStatus: dValidationStatus(),
+    enabled: {
+      ...dEnabled(),
+      defaultValue: defaultProps.enabled,
+    },
+    validationStatus: {
+      ...dValidationStatus(),
+      defaultValue: defaultProps.validationStatus,
+    },
     startText: dStartText(),
     startIcon: dStartIcon(),
     endText: dEndText(),

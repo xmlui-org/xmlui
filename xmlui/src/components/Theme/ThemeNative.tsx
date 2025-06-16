@@ -46,14 +46,20 @@ type Props = {
   children?: ReactNode;
 };
 
+export const defaultProps = {
+  isRoot: false,
+  toastDuration: 5000,
+  themeVars: EMPTY_OBJECT
+};
+
 export function Theme({
   id,
-  isRoot = false,
+  isRoot = defaultProps.isRoot,
   renderChild,
   node,
   tone,
-  toastDuration = 5000,
-  themeVars = EMPTY_OBJECT,
+  toastDuration = defaultProps.toastDuration,
+  themeVars = defaultProps.themeVars,
   layoutContext,
   children,
 }: Props) {

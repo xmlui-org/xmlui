@@ -20,7 +20,7 @@ import {
   dSetValueApi, dValidationStatus,
   dValue,
 } from "../metadata-helpers";
-import { Slider } from "./SliderNative";
+import { Slider, defaultProps } from "./SliderNative";
 
 const COMP = "Slider";
 
@@ -35,21 +35,20 @@ export const SliderMd = createMetadata({
     labelPosition: dLabelPosition("top"),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
-    minValue: d(
-      `This property specifies the minimum value of the allowed input range.`,
-      null,
-      "number",
-      0,
-    ),
-    maxValue: d(
-      `This property specifies the maximum value of the allowed input range.`,
-      null,
-      "number",
-      10,
-    ),
-    step: d(
-      `This property defines the increment value for the slider, determining the allowed intervals between selectable values.`,
-    ),
+    minValue: {
+      description: `This property specifies the minimum value of the allowed input range.`,
+      valueType: "number",
+      defaultValue: defaultProps.min,
+    },
+    maxValue: {
+      description: `This property specifies the maximum value of the allowed input range.`,
+      valueType: "number",
+      defaultValue: defaultProps.max,
+    },
+    step: {
+      description: `This property defines the increment value for the slider, determining the allowed intervals between selectable values.`,
+      defaultValue: defaultProps.step,
+    },
     minStepsBetweenThumbs: d(
       `This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.`,
     ),
@@ -57,20 +56,22 @@ export const SliderMd = createMetadata({
     autoFocus: dAutoFocus(),
     required: dRequired(),
     readOnly: dReadonly(),
-    validationStatus: dValidationStatus(),
+    validationStatus: {
+      ...dValidationStatus(),
+      defaultValue: defaultProps.validationStatus,
+    },
     rangeStyle: d(`This property allows you to apply custom styles to the range element of the slider.`),
     thumbStyle: d(`This property allows you to apply custom styles to the thumb elements of the slider.`),
-    showValues: d(
-      `This property controls whether the slider shows the current values of the thumbs.`,
-      null,
-      "boolean",
-      true
-    ),
-    valueFormat: d(
-      `This property allows you to customize how the values are displayed.`,
-      null,
-      "any"
-    )
+    showValues: {
+      description: `This property controls whether the slider shows the current values of the thumbs.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.showValues,
+    },
+    valueFormat: {
+      description: `This property allows you to customize how the values are displayed.`,
+      valueType: "any",
+      defaultValue: "(value) => value.toString()",
+    }
   },
   events: {
     didChange: dDidChange(COMP),

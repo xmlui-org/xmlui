@@ -3,7 +3,7 @@ import styles from "./Spinner.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Spinner } from "./SpinnerNative";
+import { Spinner, defaultProps } from "./SpinnerNative";
 
 const COMP = "Spinner";
 
@@ -15,12 +15,12 @@ export const SpinnerMd = createMetadata({
     delay: {
       description: `The delay in milliseconds before the spinner is displayed.`,
       valueType: "number",
-      defaultValue: 400,
+      defaultValue: defaultProps.delay,
     },
     fullScreen: {
       description: `If set to \`true\`, the component will be rendered in a full screen container.`,
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.fullScreen,
     },
   },
   themeVars: parseScssVar(styles.themeVars),

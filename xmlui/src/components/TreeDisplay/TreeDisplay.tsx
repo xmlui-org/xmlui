@@ -23,7 +23,7 @@ export const TreeDisplayMd = createMetadata({
     itemHeight: {
       description: "The height of each tree item in pixels.",
       valueType: "number",
-      defaultValue: 24,
+      defaultValue: defaultProps.itemHeight,
     },
   },
   themeVars: parseScssVar(styles.themeVars),

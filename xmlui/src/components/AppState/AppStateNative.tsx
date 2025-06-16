@@ -2,8 +2,12 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { useAppStateContextPart } from "../../components/App/AppStateContext";
 
+export const defaultProps: Pick<{ bucket?: string }, "bucket"> = {
+  bucket: "default",
+};
+
 export function AppState({
-  bucket = "default",
+  bucket = defaultProps.bucket,
   updateState,
   initialValue,
   registerComponentApi,

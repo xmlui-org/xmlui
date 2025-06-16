@@ -2,7 +2,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
 import { dComponent, dInternal } from "../metadata-helpers";
-import { Items } from "./ItemsNative";
+import { Items, defaultProps } from "./ItemsNative";
 
 const COMP = "Items";
 
@@ -18,6 +18,8 @@ export const ItemsMd = createMetadata({
     reverse: {
       description:
         "This property reverses the order in which data is mapped to template components.",
+      type: "boolean",
+      defaultValue: defaultProps.reverse,
     },
     itemTemplate: dComponent("The component template to display a single item"),
   },

@@ -39,6 +39,20 @@ import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { isNaN } from "lodash-es";
 import { NumberParser, NumberFormatter } from "@internationalized/number";
 
+// Default props for NumberBox2 component
+export const defaultProps = {
+  zeroOrPositive: false,
+  min: -NUMBERBOX_MAX_VALUE,
+  max: NUMBERBOX_MAX_VALUE,
+  maxFractionDigits: 3,
+  enabled: true,
+  integersOnly: false,
+  validationStatus: "none" as ValidationStatus,
+  hasSpinBox: true,
+  step: 1,
+  labelPosition: "top",
+};
+
 type Props = {
   id?: string;
   style?: CSSProperties;
@@ -88,16 +102,16 @@ export const NumberBox2 = forwardRef(function NumberBox2(
     style,
     value,
     initialValue,
-    zeroOrPositive = false,
-    min = zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE,
-    max = NUMBERBOX_MAX_VALUE,
-    maxFractionDigits = 3,
-    enabled = true,
+    zeroOrPositive = defaultProps.zeroOrPositive,
+    min = zeroOrPositive ? 0 : defaultProps.min,
+    max = defaultProps.max,
+    maxFractionDigits = defaultProps.maxFractionDigits,
+    enabled = defaultProps.enabled,
     placeholder,
-    step,
-    integersOnly = false,
-    validationStatus = "none",
-    hasSpinBox = true,
+    step = defaultProps.step,
+    integersOnly = defaultProps.integersOnly,
+    validationStatus = defaultProps.validationStatus,
+    hasSpinBox = defaultProps.hasSpinBox,
     updateState = noop,
     onDidChange = noop,
     onFocus = noop,

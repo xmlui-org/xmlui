@@ -16,6 +16,10 @@ type CodeBlockProps = {
   style?: CSSProperties;
 };
 
+export const defaultProps = {
+  // No default props needed for this component currently
+};
+
 export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps) {
   if (!meta) {
     return (

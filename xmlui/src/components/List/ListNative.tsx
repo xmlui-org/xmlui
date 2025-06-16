@@ -38,6 +38,14 @@ import { MemoizedItem } from "../container-helpers";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { CustomItemComponent } from "virtua/lib/react/types";
 
+// Default props for List component
+export const defaultProps = {
+  idKey: "id",
+  scrollAnchor: "top" as ScrollAnchoring,
+  hideEmptyGroups: true,
+  borderCollapse: true
+};
+
 interface IExpandableListContext {
   isExpanded: (id: any) => boolean;
   toggleExpanded: (id: any, isExpanded: boolean) => void;
@@ -274,17 +282,17 @@ export const ListNative = forwardRef(function DynamicHeightList(
     groupBy,
     orderBy,
     availableGroups,
-    scrollAnchor = "top",
+    scrollAnchor = defaultProps.scrollAnchor,
     requestFetchPrevPage = noop,
     requestFetchNextPage = noop,
     pageInfo,
-    idKey = "id",
+    idKey = defaultProps.idKey,
     style,
     emptyListPlaceholder,
     groupsInitiallyExpanded = true,
     defaultGroups = EMPTY_ARRAY,
     registerComponentApi,
-    borderCollapse = true,
+    borderCollapse = defaultProps.borderCollapse,
   }: DynamicHeightListProps,
   ref,
 ) {

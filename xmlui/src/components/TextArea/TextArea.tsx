@@ -22,7 +22,7 @@ import {
   dSetValueApi,
   dValidationStatus,
 } from "../metadata-helpers";
-import { type ResizeOptions, TextArea } from "./TextAreaNative";
+import { type ResizeOptions, TextArea, defaultProps } from "./TextAreaNative";
 
 const COMP = "TextArea";
 
@@ -42,7 +42,7 @@ export const TextAreaMd = createMetadata({
         "This optional boolean property indicates whether pressing the \`Enter\` key on the " +
         "keyboard prompts the parent \`Form\` component to submit.",
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.enterSubmits,
     },
     escResets: {
       description:
@@ -60,7 +60,7 @@ export const TextAreaMd = createMetadata({
     rows: {
       description: `Specifies the number of rows the component initially has.`,
       valueType: "number",
-      defaultValue: 2,
+      defaultValue: defaultProps.rows,
     },
     autoSize: {
       description:
