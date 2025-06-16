@@ -25,7 +25,8 @@ Download the [starter kit](https://xmlui.com/downloads) which includes the XMLUI
 
 The [XMLUI documentation site](https://docs.xmlui.com) is itself an XMLUI app! 
 
-<a href="https://docs.xmlui.com"><img width="1285" alt="image" src="https://github.com/user-attachments/assets/bc1c5ae2-b451-4521-ac42-4538d128f72d" /></a>
+
+<a href="https://docs.xmlui.com"><img width="1285" alt="image" src="https://github.com/user-attachments/assets/9a54ae74-4f45-4079-a5d4-142e23fb4134" /></a>
 
 
 ## Contributing
