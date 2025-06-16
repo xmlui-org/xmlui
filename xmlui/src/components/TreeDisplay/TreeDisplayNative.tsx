@@ -16,8 +16,9 @@ type Props = {
   itemHeight?: number;
 };
 
-export const defaultProps: Pick<Props, "content"> = {
+export const defaultProps: Pick<Props, "content" | "itemHeight"> = {
   content: "",
+  itemHeight: 24
 };
 
 // Parse the indented text into a tree structure
@@ -216,7 +217,7 @@ const renderTreeNode = (
 };
 
 export const TreeDisplay = forwardRef(function TreeDisplay(
-  { style, children, content = "", itemHeight = 24 }: Props,
+  { style, children, content = defaultProps.content, itemHeight = defaultProps.itemHeight }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const contentString = (content || children?.toString() || "").toString();

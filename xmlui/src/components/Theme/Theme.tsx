@@ -1,7 +1,7 @@
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { ThemeTone } from "../../abstractions/ThemingDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { Theme } from "./ThemeNative";
+import { Theme, defaultProps } from "./ThemeNative";
 
 const COMP = "Theme";
 

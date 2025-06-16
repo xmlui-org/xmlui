@@ -9,6 +9,13 @@ import { useOnMount } from "../../components-core/utils/hooks";
 
 export const DEFAULT_ORIENTATION = "vertical";
 
+export const defaultProps = {
+  orientation: DEFAULT_ORIENTATION,
+  reverse: false,
+  hoverContainer: false,
+  visibleOnHover: false,
+};
+
 type Props = {
   children: ReactNode;
   orientation?: string;
@@ -30,13 +37,13 @@ export const Stack = forwardRef(function Stack(
   {
     uid,
     children,
-    orientation = DEFAULT_ORIENTATION,
+    orientation = defaultProps.orientation,
     horizontalAlignment,
     verticalAlignment,
     style,
-    reverse,
-    hoverContainer,
-    visibleOnHover,
+    reverse = defaultProps.reverse,
+    hoverContainer = defaultProps.hoverContainer,
+    visibleOnHover = defaultProps.visibleOnHover,
     onClick,
     onMount,
     ...rest

@@ -22,8 +22,13 @@ type Props = {
   maxHeadingLevel?: number;
 };
 
+export const defaultProps = {
+  smoothScrolling: false,
+  maxHeadingLevel: 6,
+};
+
 export const TableOfContents = forwardRef(function TableOfContents(
-  { style, smoothScrolling, maxHeadingLevel = 6 }: Props,
+  { style, smoothScrolling = defaultProps.smoothScrolling, maxHeadingLevel = defaultProps.maxHeadingLevel }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const tocRef = useRef<HTMLDivElement>(null);

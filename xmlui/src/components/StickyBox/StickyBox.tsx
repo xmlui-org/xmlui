@@ -3,7 +3,7 @@ import styles from "./StickyBox.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { StickyBox } from "./StickyBoxNative";
+import { StickyBox, defaultProps } from "./StickyBoxNative";
 
 const COMP = "StickyBox";
 
@@ -19,7 +19,7 @@ export const StickyBoxMd = createMetadata({
         "the \`top\` or \`bottom\`.",
       availableValues: ["top", "bottom"],
       valueType: "string",
-      defaultValue: "top",
+      defaultValue: defaultProps.to,
     },
   },
   themeVars: parseScssVar(styles.themeVars),

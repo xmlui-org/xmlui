@@ -20,15 +20,21 @@ type TextProps = {
   [variantSpecificProps: string]: any;
 };
 
+export const defaultProps = {
+  maxLines: 0,
+  preserveLinebreaks: false,
+  ellipses: true,
+};
+
 export const Text = forwardRef(function Text(
   {
     uid,
     variant,
-    maxLines = 0,
+    maxLines = defaultProps.maxLines,
     style,
     children,
-    preserveLinebreaks,
-    ellipses = true,
+    preserveLinebreaks = defaultProps.preserveLinebreaks,
+    ellipses = defaultProps.ellipses,
     ...variantSpecificProps
   }: TextProps,
   forwardedRef,

@@ -8,26 +8,35 @@ const COMP = "ToneChangerButton";
 const LIGHT_TO_DARK_ICON = "lightToDark:ToneChangerButton";
 const DARK_TO_LIGHT_ICON = "darkToLight:ToneChangerButton";
 
+export const defaultProps = {
+  lightToDarkIcon: LIGHT_TO_DARK_ICON,
+  darkToLightIcon: DARK_TO_LIGHT_ICON
+};
+
 export const ToneChangerButtonMd = createMetadata({
   status: "experimental",
   description: `The \`${COMP}\` component is a component that allows the user to change the tone of the app.`,
   props: {
-    lightToDarkIcon: d(
-      `The icon displayed when the theme is in light mode and will switch to dark. You can change ` +
-      `the default icon for all ${COMP} instances with the "icon.lightToDark:ToneChangerButton" ` +
-      `declaration in the app configuration file.`
-    ),
-    darkToLightIcon: d(
-      `The icon displayed when the theme is in dark mode and will switch to light. You can change ` +
-      `the default icon for all ${COMP} instances with the "icon.darkToLight:ToneChangerButton" ` +
-      `declaration in the app configuration file.`
-    ),
+    lightToDarkIcon: {
+      description:
+        `The icon displayed when the theme is in light mode and will switch to dark. You can change ` +
+        `the default icon for all ${COMP} instances with the "icon.lightToDark:ToneChangerButton" ` +
+        `declaration in the app configuration file.`,
+      defaultValue: defaultProps.lightToDarkIcon,
+    },
+    darkToLightIcon: {
+      description:
+        `The icon displayed when the theme is in dark mode and will switch to light. You can change ` +
+        `the default icon for all ${COMP} instances with the "icon.darkToLight:ToneChangerButton" ` +
+        `declaration in the app configuration file.`,
+      defaultValue: defaultProps.darkToLightIcon,
+    },
   },
 });
 
 export function ToneChangerButton({
-  lightToDarkIcon = LIGHT_TO_DARK_ICON,
-  darkToLightIcon = DARK_TO_LIGHT_ICON
+  lightToDarkIcon = defaultProps.lightToDarkIcon,
+  darkToLightIcon = defaultProps.darkToLightIcon
 }) {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
 

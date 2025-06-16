@@ -12,6 +12,11 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { useEvent } from "../../components-core/utils/misc";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 
+export const defaultProps = {
+  idKey: "id",
+  selectedItems: EMPTY_ARRAY,
+};
+
 type SelectionStoreProps = {
   idKey?: string;
   updateState: UpdateStateFn;
@@ -34,9 +39,9 @@ export const StandaloneSelectionStore = ({ children }) => {
 
 export const SelectionStore = ({
   updateState = noop,
-  idKey = "id",
+  idKey = defaultProps.idKey,
   children,
-  selectedItems = EMPTY_ARRAY,
+  selectedItems = defaultProps.selectedItems,
   registerComponentApi = noop,
 }: SelectionStoreProps) => {
   const [items, setItems] = useState<any[]>(selectedItems);

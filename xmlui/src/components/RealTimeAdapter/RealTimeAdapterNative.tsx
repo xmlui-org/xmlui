@@ -5,6 +5,10 @@ import RestApiProxy from "../../components-core/RestApiProxy";
 import { delay } from "../../components-core/utils/misc";
 import { useAppContext } from "../../components-core/AppContext";
 
+export const defaultProps = {
+  url: "",
+};
+
 type Props = {
   url: any;
   onEvent?: (...args: any[]) => void;
