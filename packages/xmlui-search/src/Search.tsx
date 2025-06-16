@@ -333,15 +333,16 @@ const SearchItemContent = forwardRef(function SearchItemContent(
 
 function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debouncedValue: string) {
   const options = {
-    // Determines the size of the area around a string index
-    // used in search filtering and highlight correction
-    shortTextSearchRadius: 3,
     // Minimum number of characters to trigger a long text search filter
     longTextSearchThreshold: 25,
     // Number of characters needed to accept the search term as a match in the title
     titleAcceptanceThreshold: debouncedValue.length - 1,
     // Number of character threshold to accept the search term as a match in the content
     longContentAcceptance: Math.floor(debouncedValue.length * 0.5),
+    // Determines the size of the area around a string index
+    // used in search filtering and highlight correction
+    shortTextSearchRadius: 3,
+    longTextSearchRadius: 50,
   };
 
   return searchResults
@@ -409,8 +410,8 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
             // Correct long text match indexes
             const contentLength = result.item[matchKey].length;
 
-            const startIdx = Math.max(index[0] - 50, 0);
-            const endIdx = Math.min(index[1] + 50, contentLength);
+            const startIdx = Math.max(index[0] - options.longTextSearchRadius, 0);
+            const endIdx = Math.min(index[1] + options.longTextSearchRadius, contentLength);
             const position = findSubstringPosition(
               result.item[matchKey],
               debouncedValue,
