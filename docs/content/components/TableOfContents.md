@@ -5,11 +5,11 @@
 
 ## Properties [#properties]
 
-### `maxHeadingLevel (default: "6")` [#maxheadinglevel-default-6]
+### `maxHeadingLevel (default: 6)` [#maxheadinglevel-default-6]
 
 Defines the maximum heading level (1 to 6) to include in the table of contents. For example, if it is 2, then `H1` and `H2` are displayed, but lower levels (`H3` to `H6`) are not.
 
-### `smoothScrolling (default: "false")` [#smoothscrolling-default-false]
+### `smoothScrolling (default: false)` [#smoothscrolling-default-false]
 
 This property indicates that smooth scrolling is used while scrolling the selected table of contents items into view.
 
@@ -217,16 +217,16 @@ This component does not expose any methods.
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-2 | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-2--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-2--hover | *none* | *none* |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-3 | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-3 | normal | normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-3--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-3--hover | *none* | *none* |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-4 | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-4 | normal | normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-4--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-4--hover | *none* | *none* |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-5 | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-5 | normal | normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-5--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-5--hover | *none* | *none* |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-6 | *none* | *none* |
+| [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-6 | normal | normal |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-6--active | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-TableOfContentsItem-level-6--hover | *none* | *none* |
 | [height](../styles-and-themes/common-units/#size)-TableOfContents | *none* | *none* |
@@ -270,7 +270,7 @@ This component does not expose any methods.
 | [paddingBottom](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-5 | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-6 | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-TableOfContents | *none* | *none* |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-TableOfContentsItem | $space-1 | $space-1 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-TableOfContentsItem | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-1 | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-2 | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-3 | *none* | *none* |
@@ -278,13 +278,13 @@ This component does not expose any methods.
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-5 | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-6 | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContents | *none* | *none* |
-| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem | $space-1 | $space-1 |
 | [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-1 | *none* | *none* |
-| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-2 | *none* | *none* |
-| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-3 | *none* | *none* |
-| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-4 | *none* | *none* |
-| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-5 | *none* | *none* |
-| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-6 | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-2 | $space-3 | $space-3 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-3 | $space-5 | $space-5 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-4 | $space-6 | $space-6 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-5 | $space-6 | $space-6 |
+| [paddingLeft](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-6 | $space-6 | $space-6 |
 | [paddingRight](../styles-and-themes/common-units/#size)-TableOfContents | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-TableOfContentsItem | *none* | *none* |
 | [paddingRight](../styles-and-themes/common-units/#size)-TableOfContentsItem-level-1 | *none* | *none* |

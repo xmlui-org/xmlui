@@ -57,7 +57,9 @@ The markup displays the app's logo:
 
 ## Properties [#properties]
 
-This component does not have any properties.
+### `alt (default: "Logo")` [#alt-default-logo]
+
+Alternative text for the logo image for accessibility.
 
 ## Events [#events]
 

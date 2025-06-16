@@ -25,7 +25,7 @@ This property sets a text to appear on the end (right side when the left-to-righ
 
 This property defines the gap between the adornments and the input area.
 
-### `initialValue` [#initialvalue]
+### `initialValue (default: "")` [#initialvalue-default-]
 
 This property sets the component's initial value.
 

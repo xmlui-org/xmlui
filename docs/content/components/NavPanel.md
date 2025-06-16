@@ -4,6 +4,10 @@
 
 ## Properties [#properties]
 
+### `inDrawer (default: false)` [#indrawer-default-false]
+
+This property determines if the navigation panel is displayed in a drawer.
+
 ### `logoTemplate` [#logotemplate]
 
 This property defines the logo template to display in the navigation panel with the `vertical` and `vertical-sticky` layout.
@@ -80,6 +84,7 @@ This component does not expose any methods.
 | [borderWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel-vertical | 4px 0 4px 0 rgb(0 0 0 / 10%) | 4px 0 4px 0 rgb(0 0 0 / 10%) |
+| horizontalAlignment-logo-NavPanel | center | center |
 | [marginBottom](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
 | [padding](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |

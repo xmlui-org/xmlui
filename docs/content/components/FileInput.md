@@ -27,11 +27,11 @@ Available values: `start`, `end`
 
 This property is an optional string to set a label for the button part.
 
-### `buttonPosition` [#buttonposition]
+### `buttonPosition (default: "end")` [#buttonposition-default-end]
 
-This property determines the position of the button relative to the input field. The default is "end".
+This property determines the position of the button relative to the input field.
 
-Available values: `start`, `end`
+Available values: `start`, `end` **(default)**
 
 ### `buttonSize` [#buttonsize]
 

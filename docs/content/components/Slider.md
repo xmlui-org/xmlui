@@ -70,7 +70,7 @@ Set this property to `true` to indicate it must have a value before submitting t
 
 This property controls whether the slider shows the current values of the thumbs.
 
-### `step` [#step]
+### `step (default: 1)` [#step-default-1]
 
 This property defines the increment value for the slider, determining the allowed intervals between selectable values.
 
@@ -90,7 +90,7 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-### `valueFormat` [#valueformat]
+### `valueFormat (default: "(value) => value.toString()")` [#valueformat-default-value-value-tostring]
 
 This property allows you to customize how the values are displayed.
 

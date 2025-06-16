@@ -47,11 +47,11 @@ This property indicates the index of the active tab. The indexing starts from 0,
 </App>
 ```
 
-### `orientation (default: "vertical")` [#orientation-default-vertical]
+### `orientation (default: "horizontal")` [#orientation-default-horizontal]
 
 This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top.
 
-Available values: `horizontal`, `vertical` **(default)**
+Available values: `horizontal` **(default)**, `vertical`
 
 ```xmlui-pg copy display name="Example: orientation" height="200px"
 <App>

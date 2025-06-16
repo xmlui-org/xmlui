@@ -63,7 +63,7 @@ This property allows you to add an icon (specify the icon's name) to the link.
 
 This property sets the label of the component.
 
-### `target (default: "_self")` [#target-default-self]
+### `target` [#target]
 
 This property specifies where to open the link represented by the `Link`. This property accepts the following values (in accordance with the HTML standard):
 
@@ -71,7 +71,7 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `_self` | The link will open in the same frame as it was clicked. **(default)** |
+| `_self` | The link will open in the same frame as it was clicked. |
 | `_blank` | The link will open in a new window or tab. |
 | `_parent` | The link will open in the parent frame. If no parent, behaves as _self. |
 | `_top` | The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self. |
