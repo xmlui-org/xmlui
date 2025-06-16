@@ -30,7 +30,6 @@ import styles from "./Search.module.scss";
 import classnames from "classnames";
 import {
   Popover,
-  PopoverAnchor,
   PopoverContent,
   PopoverTrigger,
   Portal,
@@ -392,14 +391,8 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
           const endIdx = Math.min(index[1] + textSearchRadius, origTextLength);
           const textSnippet = result.item[matchKey].toLocaleLowerCase();
 
-          const position = findSubstringPosition(
-            textSnippet,
-            debouncedValue.toLocaleLowerCase(),
-            startIdx,
-            endIdx,
-          );
-
-          if (position !== -1) {
+          const position = textSnippet.indexOf(debouncedValue.toLocaleLowerCase(), startIdx);
+          if (position !== -1 && position + debouncedValue.length - 1 <= endIdx) {
             index[0] = position;
             index[1] = position + debouncedValue.length - 1;
 
@@ -418,20 +411,6 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
         };
         return acc;
       }, {});
-  }
-
-  function findSubstringPosition(content: string, term: string, startIdx: number, endIdx: number) {
-    for (let i = startIdx; i <= endIdx; i++) {
-      let match = true;
-      for (let j = 0; j < term.length; j++) {
-        if (content[i + j] !== term[j]) {
-          match = false;
-          break;
-        }
-      }
-      if (match) return i; // Exact match found at index i
-    }
-    return -1; // No match in the specified range
   }
 }
 
