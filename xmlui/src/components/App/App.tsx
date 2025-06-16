@@ -397,9 +397,9 @@ function SearchIndexCollector({ Pages, renderChild }) {
   useEffect(() => {
     setIsClient(true); // Ensure document.body is available
 
-    return ()=>{
+    return () => {
       setIndexing(false);
-    }
+    };
   }, [setIndexing]);
 
   // 1. Memoize the list of pages to be indexed
@@ -505,7 +505,9 @@ function PageIndexer({
         const elementsToRemove = clone.querySelectorAll("style, script");
         elementsToRemove.forEach((el) => el.remove());
         const titleElement = clone.querySelector("h1");
-        const title = titleElement ? titleElement.innerText : (navLabel || pageUrl.split("/").pop() || pageUrl);
+        const title = titleElement
+          ? titleElement.innerText
+          : navLabel || pageUrl.split("/").pop() || pageUrl;
         titleElement?.remove(); // Remove title element from clone to avoid duplication
         const textContent = (clone.textContent || "").trim().replace(/\s+/g, " ");
 
@@ -521,7 +523,15 @@ function PageIndexer({
         setIsCollected(true); // Mark as collected
       });
     }
-  }, [isContentRendered, pageUrl, searchContextUpdater, onIndexed, isCollected, isProcessing, navLabel]); // Ensure all dependencies are listed
+  }, [
+    isContentRendered,
+    pageUrl,
+    searchContextUpdater,
+    onIndexed,
+    isCollected,
+    isProcessing,
+    navLabel,
+  ]); // Ensure all dependencies are listed
 
   // If this PageIndexer instance's work is done, or content not yet rendered, render nothing.
   // The parent (SearchIndexCollector) will unmount this and mount the next one.

@@ -76,8 +76,8 @@ export function App({
   logo,
   logoDark,
   logoLight,
-  defaultTone = defaultProps.defaultTone,
-  defaultTheme = defaultProps.defaultTheme,
+  defaultTone,
+  defaultTheme,
   renderChild,
   name,
 }: Props) {
