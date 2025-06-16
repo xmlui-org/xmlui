@@ -25,6 +25,13 @@ $borderColor-CodeBlock-highlightString-emphasis: createThemeVar("borderColor-Cod
   background-color: $backgroundColor-CodeBlock;
 }
 
+.copyButton {
+  opacity:  0.7;
+  &:hover{
+    opacity: 1;
+  }
+}
+
 .codeBlockHeader {
   padding: t.$space-1;
   padding-left: t.$space-3;

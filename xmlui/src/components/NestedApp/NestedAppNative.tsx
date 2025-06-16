@@ -92,7 +92,7 @@ export function NestedApp({
     let apiObject = api;
     if (typeof api === "string") {
       try {
-        apiObject = JSON.parse(api);
+        apiObject = JSON.parse(api.replaceAll("\n", " "));
       } catch (e) {
         console.error("Failed to parse API definition", e);
         return undefined;
@@ -183,7 +183,6 @@ export function NestedApp({
     });
 
 
-    console.log("NestedApp rendering" );
     let nestedAppRoot = (
       <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
         <div style={{ height, ...themeVarReset }}>

@@ -37,9 +37,9 @@ export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps)
         {children}
         <div className={styles.codeBlockCopyButton}>
           <Button
-            variant="outlined"
-            themeColor="primary"
-            size="sm"
+            variant="ghost"
+            size="xs"
+            className={styles.copyButton}
             icon={<Icon name={"copy"} aria-hidden />}
             onClick={() => {
               if (!textToCopy) return;
