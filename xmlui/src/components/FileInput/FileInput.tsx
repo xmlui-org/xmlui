@@ -22,7 +22,7 @@ import {
 } from "../../components/metadata-helpers";
 import { buttonThemeNames, buttonVariantNames, iconPositionNames, sizeMd } from "../abstractions";
 import { Icon } from "../Icon/IconNative";
-import { FileInput, isFileArray } from "./FileInputNative";
+import { FileInput, isFileArray, defaultProps } from "./FileInputNative";
 
 const COMP = "FileInput";
 const DEFAULT_ICON = "browse:FileInput";
@@ -57,26 +57,32 @@ export const FileInputMd = createMetadata({
     acceptsFileType: d(
       `A list of file types the input controls accepts provided as a string array.`,
     ),
-    multiple: d(
-      `This boolean property enables to add not just one (\`false\`), but multiple files to the field ` +
-        `(\`true\`). This is done either by dragging onto the field or by selecting multiple files ` +
-        `in the browser menu after clicking the input field button.`,
-      null,
-      "boolean",
-      false,
-    ),
-    directory: d(
-      `This boolean property indicates whether the component allows selecting directories (\`true\`) ` +
-        `or files only (\`false\`).`,
-      null,
-      "boolean",
-      false,
-    ),
-    buttonPosition: d(
-      `This property determines the position of the button relative to the input field. ` +
-        `The default is "end".`,
-      ["start", "end"],
-    ),
+    multiple: {
+      ...d(
+        `This boolean property enables to add not just one (\`false\`), but multiple files to the field ` +
+          `(\`true\`). This is done either by dragging onto the field or by selecting multiple files ` +
+          `in the browser menu after clicking the input field button.`,
+        null,
+        "boolean"
+      ),
+      defaultValue: defaultProps.multiple,
+    },
+    directory: {
+      ...d(
+        `This boolean property indicates whether the component allows selecting directories (\`true\`) ` +
+          `or files only (\`false\`).`,
+        null,
+        "boolean"
+      ),
+      defaultValue: defaultProps.directory,
+    },
+    buttonPosition: {
+      ...d(
+        `This property determines the position of the button relative to the input field.`,
+        ["start", "end"]
+      ),
+      defaultValue: defaultProps.buttonPosition,
+    },
     buttonSize: d("The size of the button (small, medium, large)", sizeMd),
     buttonThemeColor: d(
       "The button color scheme (primary, secondary, attention)",

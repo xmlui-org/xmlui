@@ -1,7 +1,7 @@
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
-import { Pages, RouteWrapper } from "./PagesNative";
+import { Pages, RouteWrapper, defaultProps } from "./PagesNative";
 
 const PAGE = "Page";
 
@@ -46,7 +46,10 @@ export const PagesMd = createMetadata({
     `The \`${COMP}\` component is used as a container for [\`Page\`](/components/Page) components ` +
     `within an [\`App\`](/components/App).`,
   props: {
-    defaultRoute: d(`The default route when displaying the app`),
+    defaultRoute: {
+      description: `The default route when displaying the app`,
+      defaultValue: defaultProps.defaultRoute,
+    },
   },
 });
 

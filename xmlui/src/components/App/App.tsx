@@ -7,7 +7,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 
 import { dComponent } from "../../components/metadata-helpers";
 import { appLayoutMd } from "./AppLayoutContext";
-import { App } from "./AppNative";
+import { App, defaultProps } from "./AppNative";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { PageMd } from "../Pages/Pages";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
@@ -66,24 +66,24 @@ export const AppMd = createMetadata({
         `This boolean property specifies whether the whole page should scroll (\`true\`) or just ` +
         `the content area (\`false\`). The default value is \`true\`.`,
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.scrollWholePage,
     },
     noScrollbarGutters: {
       description:
         "This boolean property specifies whether the scrollbar gutters should be hidden.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.noScrollbarGutters,
     },
     defaultTone: {
       description: 'This property sets the app\'s default tone ("light" or "dark").',
       valueType: "string",
-      defaultValue: "light",
+      defaultValue: defaultProps.defaultTone,
       availableValues: ["light", "dark"],
     },
     defaultTheme: {
       description: "This property sets the app's default theme.",
       valueType: "string",
-      defaultValue: "xmlui",
+      defaultValue: defaultProps.defaultTheme,
     },
   },
   events: {

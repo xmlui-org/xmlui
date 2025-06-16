@@ -8,6 +8,10 @@ import { useAppLayoutContext } from "../App/AppLayoutContext";
 // =====================================================================================================================
 // React Footer component implementation
 
+export const defaultProps = {
+  // No default props needed currently, but adding object for consistency
+};
+
 export const Footer = forwardRef(function Footer(
   {
     children,

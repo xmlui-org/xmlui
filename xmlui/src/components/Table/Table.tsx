@@ -15,7 +15,7 @@ import {
   StandaloneSelectionStore,
   useSelectionContext,
 } from "../SelectionStore/SelectionStoreNative";
-import { Table } from "./TableNative";
+import { Table, defaultProps } from "./TableNative";
 import type { RendererContext } from "../../abstractions/RendererDefs";
 
 const COMP = "Table";
@@ -38,7 +38,7 @@ export const TableMd = createMetadata({
     isPaginated: {
       description: `This property adds pagination controls to the \`${COMP}\`.`,
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.isPaginated,
     },
     loading: d(
       `This boolean property indicates if the component is fetching (or processing) data. This ` +
@@ -69,7 +69,7 @@ export const TableMd = createMetadata({
       description:
         "Set the header visibility using this property. Set it to \`true\` to hide the header.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.hideHeader,
     },
     iconNoSort: d(
       `Allows setting the icon displayed in the ${COMP} column header when sorting is ` +
@@ -92,7 +92,7 @@ export const TableMd = createMetadata({
         `This property only has an effect when the rowsSelectable property is set. Setting it ` +
         `to \`false\` limits selection to a single row.`,
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.enableMultiRowSelection,
     },
     alwaysShowSelectionHeader: {
       description:

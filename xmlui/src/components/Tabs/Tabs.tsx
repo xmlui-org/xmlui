@@ -6,7 +6,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 
 import { MemoizedItem } from "../container-helpers";
 import { dComponent } from "../metadata-helpers";
-import { Tabs } from "./TabsNative";
+import { Tabs, defaultProps } from "./TabsNative";
 
 const COMP = "Tabs";
 
@@ -24,7 +24,7 @@ export const TabsMd = createMetadata({
         `the tab sections are laid out on the left side of the content panel, while in vertical ` +
         `orientation, the buttons are at the top.`,
       availableValues: ["horizontal", "vertical"],
-      defaultValue: "vertical",
+      defaultValue: defaultProps.orientation,
       valueType: "string",
     },
     tabTemplate: dComponent(`This property declares the template for the clickable tab area.`),

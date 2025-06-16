@@ -1,6 +1,6 @@
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { Bookmark } from "./BookmarkNative";
+import { Bookmark, defaultProps } from "./BookmarkNative";
 
 const COMP = "Bookmark";
 
@@ -19,7 +19,7 @@ export const BookmarkMd = createMetadata({
       description: "The level of the bookmark. The level is used to determine the bookmark's " +
         "position in the table of contents.",
       valueType: "number",
-      defaultValue: 1,
+      defaultValue: defaultProps.level,
     },
     title: {
       description: "Defines the text to display the bookmark in the table of contents. If this property is " +
@@ -29,7 +29,7 @@ export const BookmarkMd = createMetadata({
     omitFromToc: {
       description: "If true, this bookmark will be excluded from the table of contents.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.omitFromToc,
     },
   },
 });

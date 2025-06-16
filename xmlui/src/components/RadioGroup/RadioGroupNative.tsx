@@ -21,6 +21,14 @@ import type { Option, ValidationStatus } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 
+export const defaultProps = {
+  value: "",
+  initialValue: "",
+  enabled: true,
+  validationStatus: "none" as ValidationStatus,
+  required: false,
+};
+
 const RadioGroupValidationStatusContext = createContext<{
   value?: string;
   status: ValidationStatus;
@@ -51,15 +59,15 @@ type RadioGroupProps = {
 export const RadioGroup = forwardRef(function RadioGroup(
   {
     id,
-    value = "",
-    initialValue = "",
-    enabled = true,
-    validationStatus = "none",
+    value = defaultProps.value,
+    initialValue = defaultProps.initialValue,
+    enabled = defaultProps.enabled,
+    validationStatus = defaultProps.validationStatus,
     label,
     labelPosition,
     labelWidth,
     labelBreak,
-    required = false,
+    required = defaultProps.required,
     updateState = noop,
     onDidChange = noop,
     onFocus = noop,

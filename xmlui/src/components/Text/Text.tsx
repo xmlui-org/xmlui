@@ -4,7 +4,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { variantOptionsMd, type VariantProps, VariantPropsKeys } from "../abstractions";
-import { Text } from "./TextNative";
+import { Text, defaultProps } from "./TextNative";
 
 const COMP = "Text";
 
@@ -32,14 +32,14 @@ export const TextMd = createMetadata({
     preserveLinebreaks: {
       description: `This property indicates if linebreaks should be preserved when displaying text.`,
       valueType: "boolean",
-      defaultValue: "false",
+      defaultValue: defaultProps.preserveLinebreaks,
     },
     ellipses: {
       description:
         "This property indicates whether ellipses should be displayed when the text is " +
         "cropped (\`true\`) or not (\`false\`).",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.ellipses,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -140,8 +140,8 @@ export const textComponentRenderer = createComponentRenderer(
         variant={extractValue(variant)}
         maxLines={extractValue.asOptionalNumber(maxLines)}
         style={layoutCss}
-        preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
-        ellipses={extractValue.asOptionalBoolean(ellipses, true)}
+        preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, defaultProps.preserveLinebreaks)}
+        ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}

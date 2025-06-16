@@ -3,7 +3,7 @@ import styles from "./TableOfContents.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { TableOfContents } from "./TableOfContentsNative";
+import { TableOfContents, defaultProps } from "./TableOfContentsNative";
 import { useIndexerContext } from "../App/IndexerContext";
 
 const COMP = "TableOfContents";
@@ -21,7 +21,7 @@ export const TableOfContentsMd = createMetadata({
         `This property indicates that smooth scrolling is used while scrolling the selected table ` +
         `of contents items into view.`,
       valueType: "boolean",
-      defaultValue: "false",
+      defaultValue: defaultProps.smoothScrolling,
     },
     maxHeadingLevel: {
       description:
@@ -29,7 +29,7 @@ export const TableOfContentsMd = createMetadata({
         "For example, if it is 2, then `H1` and `H2` are displayed, but lower levels " +
         "(`H3` to `H6`) are not.",
       valueType: "number",
-      defaultValue: "6",
+      defaultValue: defaultProps.maxHeadingLevel,
     },
   },
   themeVars: parseScssVar(styles.themeVars),

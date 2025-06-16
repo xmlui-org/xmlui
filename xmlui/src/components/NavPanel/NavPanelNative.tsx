@@ -10,6 +10,11 @@ import { Logo } from "../Logo/LogoNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
 
+// Default props for NavPanel component
+export const defaultProps = {
+  inDrawer: false,
+};
+
 interface INavPanelContext {
   inDrawer: boolean;
 }
@@ -54,7 +59,7 @@ export const NavPanel = forwardRef(function NavPanel(
     style,
     logoContent,
     className,
-    inDrawer,
+    inDrawer = defaultProps.inDrawer,
     renderChild,
   }: {
     children: ReactNode;

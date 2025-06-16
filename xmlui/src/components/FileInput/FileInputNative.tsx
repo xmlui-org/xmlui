@@ -57,13 +57,28 @@ type Props = {
   buttonPosition?: "start" | "end";
 };
 
+export const defaultProps: Pick<
+  Props,
+  "enabled" | "buttonPosition" | "buttonLabel" | "multiple" | "directory" | "updateState" | "onDidChange" | "onFocus" | "onBlur"
+> = {
+  enabled: true,
+  buttonPosition: "end",
+  buttonLabel: "Browse",
+  multiple: false,
+  directory: false,
+  updateState: noop,
+  onDidChange: noop,
+  onFocus: noop,
+  onBlur: noop,
+};
+
 export const FileInput = ({
   id,
-  enabled = true,
+  enabled = defaultProps.enabled,
   style,
   placeholder,
-  buttonPosition = "end",
-  buttonLabel = "Browse",
+  buttonPosition = defaultProps.buttonPosition,
+  buttonLabel = defaultProps.buttonLabel,
   buttonIcon,
   buttonIconPosition,
   variant,
@@ -72,16 +87,16 @@ export const FileInput = ({
 
   autoFocus,
   validationStatus,
-  updateState = noop,
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
+  updateState = defaultProps.updateState,
+  onDidChange = defaultProps.onDidChange,
+  onFocus = defaultProps.onFocus,
+  onBlur = defaultProps.onBlur,
   registerComponentApi,
   value,
   initialValue,
   acceptsFileType,
-  multiple = false,
-  directory = false,
+  multiple = defaultProps.multiple,
+  directory = defaultProps.directory,
   label,
   labelPosition,
   labelWidth,

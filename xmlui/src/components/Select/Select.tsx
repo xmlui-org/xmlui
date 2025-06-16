@@ -26,7 +26,7 @@ import {
   dComponent,
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
-import { Select } from "./SelectNative";
+import { Select, defaultProps } from "./SelectNative";
 import { SelectItemText } from "@radix-ui/react-select";
 
 const COMP = "Select";
@@ -35,17 +35,38 @@ export const SelectMd = createMetadata({
   description: "Provides a dropdown with a list of options to choose from.",
   status: "experimental",
   props: {
-    placeholder: dPlaceholder(),
+    placeholder: {
+      ...dPlaceholder(),
+      defaultValue: defaultProps.placeholder,
+    },
     initialValue: dInitialValue(),
-    autoFocus: dAutoFocus(),
-    required: dRequired(),
-    readOnly: dReadonly(),
-    enabled: dEnabled(),
-    validationStatus: dValidationStatus(),
+    autoFocus: {
+      ...dAutoFocus(),
+      defaultValue: defaultProps.autoFocus,
+    },
+    required: {
+      ...dRequired(),
+      defaultValue: defaultProps.required,
+    },
+    readOnly: {
+      ...dReadonly(),
+      defaultValue: defaultProps.readOnly,
+    },
+    enabled: {
+      ...dEnabled(),
+      defaultValue: defaultProps.enabled,
+    },
+    validationStatus: {
+      ...dValidationStatus(),
+      defaultValue: defaultProps.validationStatus,
+    },
     label: dLabel(),
     labelPosition: dLabelPosition("top"),
     labelWidth: dLabelWidth(COMP),
-    labelBreak: dLabelBreak(COMP),
+    labelBreak: {
+      ...dLabelBreak(COMP),
+      defaultValue: defaultProps.labelBreak,
+    },
     optionLabelTemplate: dComponent(
       `This property allows replacing the default template to display an option in the dropdown list.`,
     ),
@@ -61,14 +82,22 @@ export const SelectMd = createMetadata({
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
     ),
-    multiSelect: dMulti(),
-    searchable: d(`This property enables the search functionality in the dropdown list.`),
-    inProgress: d(
-      `This property indicates whether the component is in progress. It can be used to show a loading message.`,
-    ),
-    inProgressNotificationMessage: d(
-      `This property indicates the message to display when the component is in progress.`,
-    ),
+    multiSelect: {
+      ...dMulti(),
+      defaultValue: defaultProps.multiSelect,
+    },
+    searchable: {
+      description: `This property enables the search functionality in the dropdown list.`,
+      defaultValue: defaultProps.searchable,
+    },
+    inProgress: {
+      description: `This property indicates whether the component is in progress. It can be used to show a loading message.`,
+      defaultValue: defaultProps.inProgress,
+    },
+    inProgressNotificationMessage: {
+      description: `This property indicates the message to display when the component is in progress.`,
+      defaultValue: defaultProps.inProgressNotificationMessage,
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),

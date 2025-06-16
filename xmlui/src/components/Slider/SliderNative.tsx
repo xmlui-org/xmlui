@@ -10,6 +10,17 @@ import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
 
+export const defaultProps = {
+  step: 1,
+  min: 0,
+  max: 10,
+  enabled: true,
+  validationStatus: "none" as ValidationStatus,
+  tabIndex: -1,
+  showValues: true,
+  valueFormat: (value: number) => value.toString(),
+};
+
 type Props = {
   value?: number | number[];
   initialValue?: number | number[];
@@ -58,32 +69,32 @@ export const Slider = forwardRef(
   (
     {
       style,
-      step = 1,
-      min = 0,
-      max = 10,
+      step = defaultProps.step,
+      min = defaultProps.min,
+      max = defaultProps.max,
       inverted,
       updateState,
       onDidChange = noop,
       onFocus = noop,
       onBlur = noop,
       registerComponentApi,
-      enabled = true,
+      enabled = defaultProps.enabled,
       value,
       autoFocus,
       readOnly,
-      tabIndex = -1,
+      tabIndex = defaultProps.tabIndex,
       label,
       labelPosition,
       labelWidth,
       labelBreak,
       required,
-      validationStatus = "none",
+      validationStatus = defaultProps.validationStatus,
       initialValue,
       minStepsBetweenThumbs,
       rangeStyle,
       thumbStyle,
-      showValues = true,
-      valueFormat = (value) => value.toString(),
+      showValues = defaultProps.showValues,
+      valueFormat = defaultProps.valueFormat,
     }: Props,
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {

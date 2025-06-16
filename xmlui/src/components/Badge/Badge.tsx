@@ -3,7 +3,7 @@ import styles from "./Badge.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Badge, badgeVariantValues, isBadgeColors, type BadgeColors } from "./BadgeNative";
+import { Badge, badgeVariantValues, defaultProps, isBadgeColors, type BadgeColors } from "./BadgeNative";
 import { dInternal } from "../metadata-helpers";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 
@@ -24,7 +24,7 @@ export const BadgeMd = createMetadata({
         "with fully rounded corners.",
       type: "string",
       availableValues: badgeVariantValues,
-      defaultValue: "badge",
+      defaultValue: defaultProps.variant,
     },
     colorMap: {
       description:

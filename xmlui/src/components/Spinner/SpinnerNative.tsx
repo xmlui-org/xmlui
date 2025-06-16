@@ -3,6 +3,11 @@ import { forwardRef, useEffect, useState } from "react";
 
 import styles from "./Spinner.module.scss";
 
+export const defaultProps = {
+  delay: 400,
+  fullScreen: false
+};
+
 type SpinnerProps  = {
   delay?: number;
   fullScreen?: boolean;
@@ -11,7 +16,7 @@ type SpinnerProps  = {
 
 // source https://loading.io/css/
 export const Spinner = forwardRef(function Spinner(
-  { delay = 400, fullScreen = false, style }: SpinnerProps,
+  { delay = defaultProps.delay, fullScreen = defaultProps.fullScreen, style }: SpinnerProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const [pastDelay, setPastDelay] = useState(delay === 0);

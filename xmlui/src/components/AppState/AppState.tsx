@@ -1,6 +1,6 @@
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { AppState } from "./AppStateNative";
+import { AppState, defaultProps } from "./AppStateNative";
 
 const COMP = "AppState";
 
@@ -14,7 +14,7 @@ export const AppStateMd = createMetadata({
         `Multiple \`${COMP}\` instances with the same bucket will share the same state object: any ` +
         `of them updating the state will cause the other instances to view the new, updated state.`,
       valueType: "string",
-      defaultValue: "default",
+      defaultValue: defaultProps.bucket,
     },
     initialValue: {
       description: `This property contains the initial state value. Though you can use multiple \`${COMP}\`` +

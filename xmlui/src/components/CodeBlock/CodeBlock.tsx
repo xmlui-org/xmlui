@@ -3,7 +3,7 @@ import styles from "./CodeBlock.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { CodeBlock } from "./CodeBlockNative";
+import { CodeBlock, defaultProps } from "./CodeBlockNative";
 
 const COMP = "CodeBlock";
 

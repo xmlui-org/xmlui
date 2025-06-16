@@ -1,6 +1,6 @@
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { Column } from "./ColumnNative";
+import { Column, defaultProps } from "./ColumnNative";
 
 const COMP = "Column";
 
@@ -36,7 +36,7 @@ export const ColumnMd = createMetadata({
       description:
         `This property sets whether the user can sort by a column by clicking on its header ` +
         `(\`true\`) or not (\`false\`).`,
-      defaultValue: true,
+      defaultValue: defaultProps.canSort,
       valueType: "boolean",
     },
     pinTo: {
