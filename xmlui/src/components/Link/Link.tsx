@@ -27,7 +27,6 @@ export const LinkMd = createMetadata({
         `property accepts the following values (in accordance with the HTML standard):`,
       availableValues: LinkTargetMd,
       type: "string",
-      defaultValue: defaultProps.target,
     },
     label: dLabel(),
     icon: d(`This property allows you to add an icon (specify the icon's name) to the link.`),

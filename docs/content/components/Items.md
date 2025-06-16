@@ -39,7 +39,7 @@ This property contains the list of data items (obtained from a data source) this
 
 The component template to display a single item
 
-### `reverse` [#reverse]
+### `reverse (default: false)` [#reverse-default-false]
 
 This property reverses the order in which data is mapped to template components.
 

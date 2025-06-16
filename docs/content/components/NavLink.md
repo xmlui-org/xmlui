@@ -131,7 +131,7 @@ This property sets the label of the component.
 </App>
 ```
 
-### `target (default: "_self")` [#target-default-self]
+### `target` [#target]
 
 This property specifies how to open the clicked link.
 
@@ -139,7 +139,7 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `_self` | The link will open in the same frame as it was clicked. **(default)** |
+| `_self` | The link will open in the same frame as it was clicked. |
 | `_blank` | The link will open in a new window or tab. |
 | `_parent` | The link will open in the parent frame. If no parent, behaves as _self. |
 | `_top` | The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self. |
@@ -167,7 +167,7 @@ The following example opens the "About XMLUI" link in a new tab:
 
 This property defines the URL of the link.
 
-### `vertical (default: false)` [#vertical-default-false]
+### `vertical` [#vertical]
 
 This property sets how the active status is displayed on the `NavLink` component. If set to true, the indicator is displayed on the side which lends itself to a vertically aligned navigation menu.
 

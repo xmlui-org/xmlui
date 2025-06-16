@@ -98,11 +98,11 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `inProgress` [#inprogress]
+### `inProgress (default: false)` [#inprogress-default-false]
 
 This property indicates whether the component is in progress. It can be used to show a loading message.
 
-### `inProgressNotificationMessage` [#inprogressnotificationmessage]
+### `inProgressNotificationMessage (default: "")` [#inprogressnotificationmessage-default-]
 
 This property indicates the message to display when the component is in progress.
 
@@ -212,7 +212,7 @@ This property allows replacing the default template to display an option in the 
 </App>
 ```
 
-### `placeholder` [#placeholder]
+### `placeholder (default: "")` [#placeholder-default-]
 
 A placeholder text that is visible in the input field when its empty.
 
@@ -230,11 +230,11 @@ A placeholder text that is visible in the input field when its empty.
 
 Set this property to `true` to disallow changing the component value.
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
-### `searchable` [#searchable]
+### `searchable (default: false)` [#searchable-default-false]
 
 This property enables the search functionality in the dropdown list.
 

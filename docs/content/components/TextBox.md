@@ -59,7 +59,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 This property defines the gap between the adornments and the input area.
 
-### `initialValue` [#initialvalue]
+### `initialValue (default: "")` [#initialvalue-default-]
 
 This property sets the component's initial value.
 

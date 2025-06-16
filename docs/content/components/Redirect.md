@@ -39,7 +39,7 @@ The following app demonstrates two different patterns for using `Redirect`.
 
 ## Properties [#properties]
 
-### `to` [#to]
+### `to (default: "")` [#to-default-]
 
 This property defines the URL to which this component is about to redirect requests.
 

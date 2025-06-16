@@ -29,7 +29,6 @@ export const NavLinkMd = createMetadata({
       description: `This property specifies how to open the clicked link.`,
       availableValues: LinkTargetMd,
       type: "string",
-      defaultValue: defaultProps.target,
     },
     label: dLabel(),
     vertical: {
@@ -38,7 +37,6 @@ export const NavLinkMd = createMetadata({
         `set to true, the indicator is displayed on the side which lends itself to a vertically ` +
         `aligned navigation menu.`,
       valueType: "boolean",
-      defaultValue: defaultProps.vertical,
     },
     displayActive: {
       description:

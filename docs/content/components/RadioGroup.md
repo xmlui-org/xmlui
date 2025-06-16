@@ -28,7 +28,7 @@ This property indicates whether the input accepts user actions (`true`) or not (
 </App>
 ```
 
-### `initialValue` [#initialvalue]
+### `initialValue (default: "")` [#initialvalue-default-]
 
 This property sets the component's initial value.
 
@@ -79,7 +79,7 @@ This property sets the width of the `RadioGroup`.
 
 Set this property to `true` to disallow changing the component value.
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 

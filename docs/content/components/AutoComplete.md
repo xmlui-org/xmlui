@@ -63,7 +63,7 @@ This property sets the label of the component.
 
 This boolean value indicates if the `AutoComplete` labels can be split into multiple lines if it would overflow the available label width.
 
-### `labelPosition (default: "top")` [#labelposition-default-top]
+### `labelPosition` [#labelposition]
 
 Places the label at the given position of the component.
 
@@ -73,7 +73,7 @@ Available values:
 | --- | --- |
 | `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
 | `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
-| `top` | The top of the input **(default)** |
+| `top` | The top of the input |
 | `bottom` | The bottom of the input |
 
 ### `labelWidth` [#labelwidth]
@@ -125,7 +125,7 @@ A placeholder text that is visible in the input field when its empty.
 
 Set this property to `true` to disallow changing the component value.
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 

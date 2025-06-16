@@ -53,6 +53,15 @@ function DrawerNavPanel({
   );
 }
 
+type Props = {
+  children: ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  logoContent?: ReactNode;
+  inDrawer?: boolean;
+  renderChild: RenderChildFn;
+};
+
 export const NavPanel = forwardRef(function NavPanel(
   {
     children,
@@ -61,14 +70,7 @@ export const NavPanel = forwardRef(function NavPanel(
     className,
     inDrawer = defaultProps.inDrawer,
     renderChild,
-  }: {
-    children: ReactNode;
-    className?: string;
-    style?: React.CSSProperties;
-    logoContent?: ReactNode;
-    inDrawer?: boolean;
-    renderChild: RenderChildFn;
-  },
+  }: Props,
   forwardedRef,
 ) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);

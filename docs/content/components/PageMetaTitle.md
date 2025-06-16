@@ -4,7 +4,7 @@ A PageMetaTitle component allows setting up (or changing) the app title to displ
 
 ## Properties [#properties]
 
-### `value` [#value]
+### `value (default: "XMLUI Application")` [#value-default-xmlui-application]
 
 This property sets the page's title to display in the browser tab.
 

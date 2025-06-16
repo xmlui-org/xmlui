@@ -16,8 +16,6 @@ import { NavGroupContext } from "../NavGroup/NavGroupContext";
 // Default props for NavLink component
 export const defaultProps = {
   active: false,
-  target: "_self" as LinkTarget,
-  vertical: false,
   displayActive: true
 };
 
@@ -44,7 +42,7 @@ export const NavLink = forwardRef(function NavLink(
     disabled,
     to,
     displayActive = defaultProps.displayActive,
-    vertical = defaultProps.vertical,
+    vertical,
     style,
     onClick,
     icon,

@@ -39,7 +39,7 @@ Nothing is displayed if the icon name is not found in the registry.
 
 ### `size` [#size]
 
-This property defines the size of the `Icon`. Note that setting the `height` and/or the `width` of the component will override this property.
+This property defines the size of the `Icon`. Note that setting the `height` and/or the `width` of the component will override this property. You can use az explicit size value (e.g., 32px) or one of these predefined values: `xs`, `sm`, `md`, `lg`.
 
 Available values: `xs`, `sm`, `md`, `lg`
 

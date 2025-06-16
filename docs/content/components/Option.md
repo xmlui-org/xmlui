@@ -54,7 +54,7 @@ In the following example, the two Option are functionally the same:
 
 ### `enabled (default: true)` [#enabled-default-true]
 
-This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+This boolean property indicates whether the option is enabled or disabled.
 
 ### `label` [#label]
 

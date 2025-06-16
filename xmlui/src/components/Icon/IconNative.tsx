@@ -16,13 +16,9 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
   style?: CSSProperties;
 }
 
-export const defaultProps: Pick<IconBaseProps, "size"> = {
-  size: "sm",
-};
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const Icon = forwardRef(function Icon(
-  { name, fallback, style, className, size = defaultProps.size, onClick, ...restProps }: IconBaseProps,
+  { name, fallback, style, className, size, onClick, ...restProps }: IconBaseProps,
   ref,
 ) {
   const iconRenderer = useFindIconRenderer(name, fallback);

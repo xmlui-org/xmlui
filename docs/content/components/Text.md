@@ -9,7 +9,7 @@ See the [variant](#variant) section to check which variant maps to which HtmlTag
 
 ## Properties [#properties]
 
-### `ellipses (default: false)` [#ellipses-default-false]
+### `ellipses (default: true)` [#ellipses-default-true]
 
 This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
 
@@ -48,7 +48,7 @@ This property determines the maximum number of lines the component can wrap to. 
 </App>
 ```
 
-### `preserveLinebreaks (default: "false")` [#preservelinebreaks-default-false]
+### `preserveLinebreaks (default: false)` [#preservelinebreaks-default-false]
 
 This property indicates if linebreaks should be preserved when displaying text.
 
@@ -346,10 +346,10 @@ This component does not expose any methods.
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Text-sample | $fontFamily-monospace | $fontFamily-monospace |
 | [fontSize](../styles-and-themes/common-units/#size)-Text | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-code | $fontSize-small | $fontSize-small |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-codefence | $fontSize-code | $fontSize-code |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-keyboard | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-paragraph | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-small | $fontSize-small |
+| [fontSize](../styles-and-themes/common-units/#size)-Text-placeholder | $fontSize-smaller | $fontSize-smaller |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-sample | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-secondary | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-Text-small | $fontSize-small | $fontSize-small |
@@ -374,6 +374,7 @@ This component does not expose any methods.
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Text-tableheading | $fontWeight-bold | $fontWeight-bold |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text-caption | 0.05rem | 0.05rem |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Text-subheading | 0.04em | 0.04em |
+| [lineHeight](../styles-and-themes/common-units/#size)-Text-codefence | 1.5 | 1.5 |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-marked | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-Text-small | $lineHeight-tight | $lineHeight-tight |
 | [marginBottom](../styles-and-themes/common-units/#size)-Text | *none* | *none* |
@@ -399,7 +400,7 @@ This component does not expose any methods.
 | [marginTop](../styles-and-themes/common-units/#size)-Text-small | *none* | *none* |
 | [marginTop](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Text-code | 2px | 2px |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-code | $space-1 | $space-1 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-code | $space-0_5 | $space-0_5 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-codefence | $space-3 | $space-3 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-keyboard | $space-1 | $space-1 |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Text-tableheading | $space-1 | $space-1 |
