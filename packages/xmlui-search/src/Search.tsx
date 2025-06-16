@@ -379,7 +379,7 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
             .includes(debouncedValue.toLocaleLowerCase());
         });
 
-        // Restrict highlights that are longer than the original search term
+        // --- Restrict highlights that are longer than the original search term
         const highlightAdjustedMatches = filteredMatches.reduce<RangeTuple[]>((matchAcc, index) => {
           if (matchKey === "title") {
             if (index[1] - index[0] > debouncedValue.length) {
@@ -387,44 +387,26 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
             }
           }
 
+          const textLength = result.item[matchKey].length;
+          const text = result.item[matchKey].toLocaleLowerCase();
+          let startIdx = 0;
+          let endIdx = 0;
           if (debouncedValue.length < options.longTextSearchThreshold) {
-            // If the highlight is not exactly on spot but near the correct position, move it
-            const areaStart = Math.max(index[0] - options.shortTextSearchRadius, 0);
-            const areaEnd = Math.min(
-              index[1] + options.shortTextSearchRadius,
-              result.item[matchKey].length,
-            );
-
-            for (let i = areaStart; i < areaEnd; i++) {
-              if (
-                result.item[matchKey].slice(i, i + debouncedValue.length).toLocaleLowerCase() ===
-                debouncedValue.toLocaleLowerCase()
-              ) {
-                index[0] = i;
-                index[1] = i + debouncedValue.length - 1;
-                matchAcc.push(index);
-                break;
-              }
-            }
+            startIdx = Math.max(index[0] - options.shortTextSearchRadius, 0);
+            endIdx = Math.min(index[1] + options.shortTextSearchRadius, textLength);
           } else {
-            // Correct long text match indexes
-            const contentLength = result.item[matchKey].length;
+            startIdx = Math.max(index[0] - options.longTextSearchRadius, 0);
+            endIdx = Math.min(index[1] + options.longTextSearchRadius, textLength);
+          }
 
-            const startIdx = Math.max(index[0] - options.longTextSearchRadius, 0);
-            const endIdx = Math.min(index[1] + options.longTextSearchRadius, contentLength);
-            const position = findSubstringPosition(
-              result.item[matchKey],
-              debouncedValue,
-              startIdx,
-              endIdx,
-            );
-            if (position !== -1) {
-              index[0] = position;
-              index[1] = position + debouncedValue.length - 1;
+          const position = findSubstringPosition(text, debouncedValue.toLocaleLowerCase(), startIdx, endIdx);
 
-              if (matchAcc.findIndex((m) => m[0] === index[0] && m[1] === index[1]) === -1) {
-                matchAcc.push(index);
-              }
+          if (position !== -1) {
+            index[0] = position;
+            index[1] = position + debouncedValue.length - 1;
+
+            if (matchAcc.findIndex((m) => m[0] === index[0] && m[1] === index[1]) === -1) {
+              matchAcc.push(index);
             }
           }
 
