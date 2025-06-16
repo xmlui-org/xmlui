@@ -30,7 +30,6 @@ import styles from "./Search.module.scss";
 import classnames from "classnames";
 import {
   Popover,
-  PopoverAnchor,
   PopoverContent,
   PopoverTrigger,
   Portal,
@@ -69,10 +68,10 @@ const searchOptions: IFuseOptions<SearchItemData> = {
   minMatchCharLength: 2,
   // location: 0,
   threshold: 0,
-  distance: 500,
-  // useExtendedSearch: false,
+  // distance: 500,
+  // useExtendedSearch: true,
   ignoreLocation: true,
-  // ignoreFieldNorm: false,
+  ignoreFieldNorm: true,
   // fieldNormWeight: 1,
   keys,
 };
@@ -139,61 +138,7 @@ export const Search = ({
       ? []
       : fuse.search(debouncedValue, { limit: limit ?? defaultProps.limit });
 
-    const mapped = limited
-      .map((result) => {
-        const mappedMatches: MatchesByKey = {};
-        result.matches?.forEach((match) => {
-          if (match.key !== undefined) {
-            const matchKey = match.key as keyof SearchItemData;
-
-            mappedMatches[matchKey] = {
-              indices: match.indices
-                .filter(
-                  // Here we exclude results that are too short and not match the search term
-                  (index) => {
-                    if (match.key === "title") {
-                      return index[1] - index[0] >= debouncedValue.length - 1;
-                    }
-                    return result.item[matchKey]
-                      .slice(index[0], index[1] + 1)
-                      .toLocaleLowerCase()
-                      .includes(debouncedValue.toLocaleLowerCase());
-                  },
-                )
-                // Restrict highlights that are longer than the original search term
-                .map((index) => {
-                  if (index[1] - index[0] > debouncedValue.length) {
-                    index[1] = index[0] + debouncedValue.length;
-                  }
-
-                  // If the highlight is not exactly on spot but near the correct position, move it
-                  const searchIdxMax = 3;
-                  for (let i = index[0]; i < Math.min(index[1], index[0] + searchIdxMax); i++) {
-                    if (
-                      result.item[matchKey]
-                        .slice(i, i + debouncedValue.length)
-                        .toLocaleLowerCase() === debouncedValue.toLocaleLowerCase()
-                    ) {
-                      index[0] = i;
-                      index[1] = i + debouncedValue.length - 1;
-                      break;
-                    }
-                  }
-
-                  return index;
-                }),
-              value: match.value,
-            };
-          }
-        });
-
-        return {
-          item: result.item,
-          score: result.score,
-          matches: mappedMatches,
-        };
-      })
-      .filter((item) => Object.values(item.matches).some((match) => match.indices.length > 0));
+    const mapped = postProcessSearch(limited, debouncedValue);
 
     if (mapped.length > 0) setShow(true);
     return mapped;
@@ -253,79 +198,79 @@ export const Search = ({
 
   return (
     <Popover open={show} onOpenChange={setShow}>
-        <VisuallyHidden>
-          <label htmlFor={inputId}>Search Field</label>
-        </VisuallyHidden>
-        <PopoverTrigger asChild>
-          <TextBox
-            id={inputId}
-            ref={inputRef}
-            type="search"
-            placeholder="Type to search..."
-            value={inputValue}
-            style={{ height: "36px", width: inDrawer ? "100%" : "280px" }}
-            startIcon="search"
-            onDidChange={(value) =>
-              setInputValue(() => {
-                setActiveIndex(-1);
-                return value;
-              })
-            }
-            onFocus={onInputFocus}
-            onKeyDown={handleKeyDown}
-            aria-autocomplete="list"
-            aria-controls="dropdown-list"
-            aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
-          />
-        </PopoverTrigger>
-        {show && results && debouncedValue && (
-          <Portal container={_root}>
-            <PopoverContent
-              align="end"
-              onOpenAutoFocus={(e) => e.preventDefault()}
-              onCloseAutoFocus={(e) => e.preventDefault()}
-              onEscapeKeyDown={() => setShow(false)}
-              className={classnames(styles.listPanel, {
-                [styles.inDrawer]: inDrawer,
-              })}
-            >
-              <ul className={styles.list} role="listbox">
-                {results.length > 0 &&
-                  results.map((result, idx) => {
-                    return (
-                      <li
-                        role="option"
-                        key={`${result.item.path}-${idx}`}
-                        className={classnames(styles.item, styles.header, {
-                          [styles.keyboardFocus]: activeIndex === idx,
-                        })}
-                        onMouseEnter={() => {
-                          setActiveIndex(idx);
-                          setNavigationSource("mouse");
-                        }}
-                        ref={(el) => (itemRefs.current[idx] = el!)}
-                        aria-selected={activeIndex === idx}
-                      >
-                        <SearchItemContent
-                          ref={(el) => (itemLinkRefs.current[idx] = el!)}
-                          idx={idx}
-                          item={result.item}
-                          matches={result.matches}
-                          maxContentMatchNumber={maxContentMatchNumber}
-                          onClick={onClick}
-                        />
-                      </li>
-                    );
-                  })}
-                {results.length === 0 && (
-                  <div className={styles.noResults}>
-                    <Text variant="em">No results</Text>
-                  </div>
-                )}
-              </ul>
-            </PopoverContent>
-          </Portal>
-        )}
+      <VisuallyHidden>
+        <label htmlFor={inputId}>Search Field</label>
+      </VisuallyHidden>
+      <PopoverTrigger asChild>
+        <TextBox
+          id={inputId}
+          ref={inputRef}
+          type="search"
+          placeholder="Type to search..."
+          value={inputValue}
+          style={{ height: "36px", width: inDrawer ? "100%" : "280px" }}
+          startIcon="search"
+          onDidChange={(value) =>
+            setInputValue(() => {
+              setActiveIndex(-1);
+              return value;
+            })
+          }
+          onFocus={onInputFocus}
+          onKeyDown={handleKeyDown}
+          aria-autocomplete="list"
+          aria-controls="dropdown-list"
+          aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+        />
+      </PopoverTrigger>
+      {show && results && debouncedValue && (
+        <Portal container={_root}>
+          <PopoverContent
+            align="end"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+            onEscapeKeyDown={() => setShow(false)}
+            className={classnames(styles.listPanel, {
+              [styles.inDrawer]: inDrawer,
+            })}
+          >
+            <ul className={styles.list} role="listbox">
+              {results.length > 0 &&
+                results.map((result, idx) => {
+                  return (
+                    <li
+                      role="option"
+                      key={`${result.item.path}-${idx}`}
+                      className={classnames(styles.item, styles.header, {
+                        [styles.keyboardFocus]: activeIndex === idx,
+                      })}
+                      onMouseEnter={() => {
+                        setActiveIndex(idx);
+                        setNavigationSource("mouse");
+                      }}
+                      ref={(el) => (itemRefs.current[idx] = el!)}
+                      aria-selected={activeIndex === idx}
+                    >
+                      <SearchItemContent
+                        ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                        idx={idx}
+                        item={result.item}
+                        matches={result.matches}
+                        maxContentMatchNumber={maxContentMatchNumber}
+                        onClick={onClick}
+                      />
+                    </li>
+                  );
+                })}
+              {results.length === 0 && (
+                <div className={styles.noResults}>
+                  <Text variant="em">No results</Text>
+                </div>
+              )}
+            </ul>
+          </PopoverContent>
+        </Portal>
+      )}
     </Popover>
   );
 };
@@ -384,6 +329,90 @@ const SearchItemContent = forwardRef(function SearchItemContent(
 });
 
 // --- Utilities
+
+function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debouncedValue: string) {
+  // Minimum number of characters to trigger a long text search filter
+  const longTextSearchThreshold = 25;
+  // Number of characters needed to accept the search term as a match in the title
+  const titleAcceptanceThreshold = debouncedValue.length - 1;
+  // Number of character threshold to accept the search term as a match in the content
+  const longContentAcceptance = Math.floor(debouncedValue.length * 0.5);
+  // Determines the size of the area around a string index
+  // used in search filtering and highlight correction
+  const shortTextSearchRadius = 3;
+  const longTextSearchRadius = 50;
+  const textSearchRadius =
+    debouncedValue.length < longTextSearchThreshold ? shortTextSearchRadius : longTextSearchRadius;
+
+  return searchResults
+    .map((result) => ({
+      item: result.item,
+      score: result.score,
+      matches: mapMatchIndices(result),
+    }))
+    .filter((item) => Object.values(item.matches).some((match) => match.indices.length > 0));
+
+  // ---
+
+  function mapMatchIndices(result: FuseResult<SearchItemData>) {
+    return (result.matches ?? [])
+      .filter((match) => !!match.key)
+      .reduce<MatchesByKey>((acc, match) => {
+        const matchKey = match.key as keyof SearchItemData;
+
+        // --- Prefilter matches that are too short/significantly misaligned compared to the search term
+        const filteredMatches = match.indices.filter((index) => {
+          const foundSubstrLength = index[1] - index[0];
+          // Title
+          if (matchKey === "title") {
+            return foundSubstrLength >= titleAcceptanceThreshold;
+          }
+          // Content: long text search
+          if (debouncedValue.length >= longTextSearchThreshold) {
+            return foundSubstrLength >= longContentAcceptance;
+          }
+          // Content: regular text search
+          return result.item[matchKey]
+            .slice(index[0], index[1] + 1)
+            .toLocaleLowerCase()
+            .includes(debouncedValue.toLocaleLowerCase());
+        });
+
+        // --- Restrict highlights that are longer than the original search term
+        const highlightAdjustedMatches = filteredMatches.reduce<RangeTuple[]>((matchAcc, index) => {
+          if (matchKey === "title") {
+            if (index[1] - index[0] > debouncedValue.length) {
+              index[1] = index[0] + debouncedValue.length;
+            }
+          }
+
+          const origTextLength = result.item[matchKey].length;
+          const startIdx = Math.max(index[0] - textSearchRadius, 0);
+          const endIdx = Math.min(index[1] + textSearchRadius, origTextLength);
+          const textSnippet = result.item[matchKey].toLocaleLowerCase();
+
+          const position = textSnippet.indexOf(debouncedValue.toLocaleLowerCase(), startIdx);
+          if (position !== -1 && position + debouncedValue.length - 1 <= endIdx) {
+            index[0] = position;
+            index[1] = position + debouncedValue.length - 1;
+
+            if (matchAcc.findIndex((m) => m[0] === index[0] && m[1] === index[1]) === -1) {
+              matchAcc.push(index);
+            }
+          }
+
+          return matchAcc;
+        }, []);
+
+        // Map match indexes to results
+        acc[matchKey] = {
+          value: match.value,
+          indices: highlightAdjustedMatches,
+        };
+        return acc;
+      }, {});
+  }
+}
 
 /**
  * Formats a snippet of text. Determines which ranges are highlighted and how big the snippet is.
