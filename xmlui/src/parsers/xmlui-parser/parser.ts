@@ -153,9 +153,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
 
       case SyntaxKind.CloseNodeStart:{
-        error(DIAGS.expEndOrClose);
-        parseClosingTag(openTagName, errInName);
         completeNode(SyntaxKind.ElementNode);
+        error(DIAGS.expEndOrClose);
         return;
       }
 
@@ -173,7 +172,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           const namesMismatch =
             openTagName !== null && !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
           if (namesMismatch) {
-            error(DIAGS.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
+            const msg = DIAGS.tagNameMismatch(getText(openTagName!), getText(closeTagName));
+            errorAt(msg, closeTagName.pos, closeTagName.end);
           }
         }
       } else {

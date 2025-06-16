@@ -381,8 +381,30 @@ describe("Xmlui parser - expected errors", () => {
     expect(errors[0].code).toBe(ErrCodes.expAttrName);
   });
 
-  it("missing > results 1 error", () => {
-    const { errors } = parseSource("<A <B/> </A>");
+  it("missing /> before </ results in 1 error", () => {
+    const { errors, node } = parseSource("<A> <B </A>");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.expEndOrClose);
+    const tagA = node.children[0];
+    const tagAList = tagA.children[3];
+    const tagB = tagAList.children[0];
+    const tagACloseStart = tagA.children[4];
+
+    expect(tagA.kind).toEqual(SyntaxKind.ElementNode)
+    expect(tagAList.kind).toEqual(SyntaxKind.ContentListNode)
+    expect(tagB.kind).toEqual(SyntaxKind.ElementNode)
+    expect(tagB.children).toHaveLength(2)
+    expect(tagACloseStart.kind).toEqual(SyntaxKind.CloseNodeStart)
+
+  });
+
+  it("missing /> before < results in 1 error", () => {
+    const { errors } = parseSource(
+`<A>
+  <B
+  <C></C>
+  <D />
+</A>`);
     expect(errors).toHaveLength(1);
     expect(errors[0].code).toBe(ErrCodes.expEndOrClose);
   });
