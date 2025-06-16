@@ -1,6 +1,5 @@
 import { CharacterCodes } from "./CharacterCodes";
-import type {
-  DiagnosticMessageFromScanner} from "./diagnostics";
+import type { ScannerDiagnosticMessage} from "./diagnostics";
 import {
   Diag_Invalid_Character,
   Diag_Unterminated_CData,
@@ -10,7 +9,7 @@ import {
 } from "./diagnostics";
 import { SyntaxKind, isTrivia } from "./syntax-kind";
 
-export type ScannerErrorCallback = (message: DiagnosticMessageFromScanner, length: number, arg0?: any) => void;
+export type ScannerErrorCallback = (message: ScannerDiagnosticMessage, length: number, arg0?: any) => void;
 
 export interface Scanner {
   getStartPos(): number;
@@ -438,7 +437,7 @@ export function createScanner(
     return result;
   }
 
-  function error(message: DiagnosticMessageFromScanner, troublesomePrefixLength: number = 0): void {
+  function error(message: ScannerDiagnosticMessage, troublesomePrefixLength: number = 0): void {
     if (onError) {
       onError(message, troublesomePrefixLength);
     }

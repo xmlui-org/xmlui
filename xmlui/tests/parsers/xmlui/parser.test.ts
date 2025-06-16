@@ -330,7 +330,7 @@ describe("Xmlui parser", () => {
 
   it("<> regression #2", () => {
     const { errors } = parseSource("<Text >");
-    expect(errors[0].code).toBe(ErrCodes.expCloseStart);
+    expect(errors[0].code).toBe(ErrCodes.expCloseStartWithName);
   });
 });
 
@@ -358,7 +358,7 @@ describe("Xmlui parser - expected errors", () => {
   it("namespace without name has dedicated error, name matching turned off", () => {
     const { errors } = parseSource("<name:></A>");
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.tagNameExpAfterNamespace);
+    expect(errors[0].code).toBe(ErrCodes.expTagNameAfterNamespace);
   });
 
   it("bad tokens in tag name and attrs result in only the 1st error", () => {
@@ -368,14 +368,15 @@ describe("Xmlui parser - expected errors", () => {
   });
 
 
-    it("bad tokens in tag name and attrs result in only the 1st error", () => {
-      const { errors } = parseSource("<: name= >");
-      expect(errors).toHaveLength(1);
-      expect(errors[0].code).toBe(ErrCodes.expTagName);
-    });
+  it("bad tokens in tag name and attrs result in only the 1st error", () => {
+    const { errors } = parseSource("<: name= >");
+    expect(errors).toHaveLength(2);
+    expect(errors[0].code).toBe(ErrCodes.expTagName);
+    expect(errors[1].code).toBe(ErrCodes.expCloseStart);
+  });
 
   it("bad token in attrList result in 1 error", () => {
-    const { errors } = parseSource("<A := ! '' ></A>");
+    const { errors } = parseSource("<A := ! '' ! ></A>");
     expect(errors).toHaveLength(1);
     expect(errors[0].code).toBe(ErrCodes.expAttrIdent);
   });

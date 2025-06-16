@@ -4,13 +4,47 @@ export interface GeneralDiagnosticMessage {
   message: string;
 }
 
+export enum DiagnosticCategory {
+  Error = 1,
+  Warning = 2,
+  Information = 3,
+  Hint = 4,
+}
+
+export enum ErrCodes {
+  onlyOneElem = "U002",
+  expTagOpen = "U003",
+  expTagName = "U004",
+  expCloseStart = "U005",
+  expEndOrClose = "U006",
+  tagNameMismatch = "U007",
+  expEnd = "U008",
+  expAttrIdent = "U009",
+  expEq = "U010",
+  expAttrValue = "U011",
+  duplAttr = "U012",
+  uppercaseAttr = "U013",
+  expTagNameAfterNamespace = "U014",
+  expCloseStartWithName = "U015",
+  invalidChar = "W001",
+  untermStr = "W002",
+  untermComment = "W007",
+  untermCData = "W008",
+  untermScript = "W009",
+}
+
 export const DIAGS = {
-  expCloseStart: function(openTagName: string){
+  expCloseStartWithName: function(openTagName: string){
     return {
       category: DiagnosticCategory.Error,
-      code: ErrCodes.expCloseStart,
-      message: "A '</' token expected.",
+      code: ErrCodes.expCloseStartWithName,
+      message: `Opened tag has no closing pair. Expected to see '</${openTagName}>'.`,
     }
+  },
+  expCloseStart: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.expCloseStart,
+    message: "A '</' token expected.",
   },
   uppercaseAttr: function (attrName: string) {
     return {
@@ -40,42 +74,47 @@ export const DIAGS = {
       message: `Invalid character '${char}'.`,
     };
   },
+  expEnd: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.expEnd,
+    message: "A '>' token expected.",
+  },
+  expTagName: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.expTagName,
+    message: "A tag name expected.",
+  },
+  expAttrValue: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.expAttrValue,
+    message: "An attribute value expected.",
+  },
+  expEq: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.expEq,
+    message: "An '=' token expected.",
+  },
+  expTagOpen: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.expTagOpen,
+    message: "A '<' token expected.",
+  },
+  expEndOrClose: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.expEndOrClose,
+    message: `A '>' or '/>' token expected.`,
+  },
+  expAttrIdent: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.expAttrIdent,
+    message: `An attribute identifier expected.`,
+  },
+  expTagNameAfterNamespace: {
+    category: DiagnosticCategory.Error,
+    code: ErrCodes.expTagNameAfterNamespace,
+    message: `A tag name expected after a namespaces.`,
+  }
 } as const;
-
-export type ScannerDiagnosticMessage =
-  | typeof Diag_Invalid_Character
-  | typeof Diag_Unterminated_String_Literal
-  | typeof Diag_Unterminated_Comment
-  | typeof Diag_Unterminated_CData
-  | typeof Diag_Unterminated_Script;
-
-export enum DiagnosticCategory {
-  Error = 1,
-  Warning = 2,
-  Information = 3,
-  Hint = 4,
-}
-
-export enum ErrCodes {
-  onlyOneElem = "U002",
-  expTagOpen = "U003",
-  expTagName = "U004",
-  expCloseStart = "U005",
-  expEndOrClose = "U006",
-  tagNameMismatch = "U007",
-  expEnd = "U008",
-  expAttrIdent = "U009",
-  expEq = "U010",
-  expAttrValue = "U011",
-  duplAttr = "U012",
-  uppercaseAttr = "U013",
-  tagNameExpAfterNamespace = "U014",
-  invalidChar = "W001",
-  untermStr = "W002",
-  untermComment = "W007",
-  untermCData = "W008",
-  untermScript = "W009",
-}
 
 export function diagnosticCategoryName(d: { category: DiagnosticCategory }, lowerCase = true): string {
   const name = DiagnosticCategory[d.category];
@@ -112,56 +151,10 @@ export const Diag_Unterminated_Script = {
   message: "Unterminated script section",
 } as const;
 
-export const Diag_End_Token_Expected = {
-  category: DiagnosticCategory.Error,
-  code: ErrCodes.expEnd,
-  message: "A '>' token expected.",
-} as const;
 
-export const Diag_CloseNodeStart_Token_Expected = {
-  category: DiagnosticCategory.Error,
-  code: ErrCodes.expCloseStart,
-  message: "A '</' token expected.",
-} as const;
-
-export const Diag_Tag_Identifier_Expected = {
-  category: DiagnosticCategory.Error,
-  code: ErrCodes.expTagName,
-  message: "A tag name expected.",
-} as const;
-
-export const Diag_Attr_Value_Expected = {
-  category: DiagnosticCategory.Error,
-  code: ErrCodes.expAttrValue,
-  message: "An attribute value expected.",
-} as const;
-
-export const Diag_Eq_Token_Expected = {
-  category: DiagnosticCategory.Error,
-  code: ErrCodes.expEq,
-  message: "An '=' token expected.",
-} as const;
-
-export const Diag_OpenNodeStart_Token_Expected = {
-  category: DiagnosticCategory.Error,
-  code: ErrCodes.expTagOpen,
-  message: "A '<' token expected.",
-} as const;
-
-export const Diag_End_Or_Close_Token_Expected = {
-  category: DiagnosticCategory.Error,
-  code: ErrCodes.expEndOrClose,
-  message: `A '>' or '/>' token expected.`,
-} as const;
-
-export const Diag_Attr_Identifier_Expected = {
-  category: DiagnosticCategory.Error,
-  code: ErrCodes.expAttrIdent,
-  message: `An attribute identifier expected.`,
-} as const;
-
-export const Diag_Tag_Name_Afterd_Namespace_Expected = {
-  category: DiagnosticCategory.Error,
-  code: ErrCodes.tagNameExpAfterNamespace,
-  message: `A tag name expected after a namespaces.`,
-} as const;
+export type ScannerDiagnosticMessage =
+  | typeof Diag_Invalid_Character
+  | typeof Diag_Unterminated_String_Literal
+  | typeof Diag_Unterminated_Comment
+  | typeof Diag_Unterminated_CData
+  | typeof Diag_Unterminated_Script;

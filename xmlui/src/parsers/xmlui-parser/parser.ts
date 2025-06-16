@@ -1,20 +1,11 @@
 import type { Node } from "./syntax-node";
 import type { ScannerErrorCallback } from "./scanner";
-import type { ScannerDiagnosticMessage, GeneralDiagnosticMessage } from "./diagnostics";
-
+import type { ScannerDiagnosticMessage, GeneralDiagnosticMessage , DiagnosticCategory} from "./diagnostics";
 import { CharacterCodes } from "./CharacterCodes";
 import { createScanner } from "./scanner";
 import { SyntaxKind, getSyntaxKindStrRepr } from "./syntax-kind";
 import { tagNameNodesWithoutErrorsMatch   } from "./utils";
 import {
-  Diag_Attr_Identifier_Expected,
-  Diag_Attr_Value_Expected,
-  Diag_End_Or_Close_Token_Expected,
-  Diag_End_Token_Expected,
-  Diag_OpenNodeStart_Token_Expected,
-  Diag_Tag_Identifier_Expected,
-  Diag_Tag_Name_Afterd_Namespace_Expected,
-  DiagnosticCategory,
   ErrCodes,
   DIAGS
 } from "./diagnostics";
@@ -112,7 +103,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       if (at(SyntaxKind.OpenNodeStart)) {
         parseTag();
       } else {
-        errorAndBump(Diag_OpenNodeStart_Token_Expected);
+        errorAndBump(DIAGS.expTagOpen);
       }
     }
   }
@@ -130,9 +121,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     } else {
       const errNode = errNodeUntil(TAG_START_OR_END_TOKENS);
       if (errNode){
-        errorAt(Diag_Tag_Identifier_Expected, errNode.pos, errNode.end)
+        errorAt(DIAGS.expTagName, errNode.pos, errNode.end)
       } else {
-        error(Diag_Tag_Identifier_Expected);
+        error(DIAGS.expTagName);
       }
     }
 
@@ -157,19 +148,19 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       case SyntaxKind.Script:
       case SyntaxKind.CData: {
         completeNode(SyntaxKind.ElementNode);
-        error(Diag_End_Or_Close_Token_Expected);
+        error(DIAGS.expEndOrClose);
         return;
       }
 
       case SyntaxKind.CloseNodeStart:{
-        error(Diag_End_Or_Close_Token_Expected);
+        error(DIAGS.expEndOrClose);
         parseClosingTag(openTagName, errInName);
         completeNode(SyntaxKind.ElementNode);
         return;
       }
 
       default:{
-        error(Diag_End_Or_Close_Token_Expected);
+        error(DIAGS.expEndOrClose);
       }
     }
   }
@@ -186,13 +177,17 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           }
         }
       } else {
-        errRecover(Diag_Tag_Identifier_Expected, [SyntaxKind.NodeEnd]);
+        errRecover(DIAGS.expTagName, [SyntaxKind.NodeEnd]);
       }
       if (!eat(SyntaxKind.NodeEnd)) {
-        error(Diag_End_Token_Expected);
+        error(DIAGS.expEnd);
       }
     } else {
-      errorAt(DIAGS.expCloseStart(getText(openTagName)), openTagName.pos, openTagName.end);
+      if (openTagName){
+        errorAt(DIAGS.expCloseStartWithName(getText(openTagName)), openTagName.pos, openTagName.end);
+      } else {
+        error(DIAGS.expCloseStart);
+      }
     }
   }
 
@@ -201,7 +196,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     bump(SyntaxKind.Identifier);
     if (eat(SyntaxKind.Colon) && !eat(SyntaxKind.Identifier)) {
       const nameNodeWithColon = completeNode(SyntaxKind.TagNameNode);
-      errorAt(Diag_Tag_Name_Afterd_Namespace_Expected, nameNodeWithColon.pos, nameNodeWithColon.end);
+      errorAt(DIAGS.expTagNameAfterNamespace, nameNodeWithColon.pos, nameNodeWithColon.end);
       errNodeUntil(TAG_START_OR_END_TOKENS);
       return nameNodeWithColon;
     } else {
@@ -214,7 +209,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     bump(SyntaxKind.Identifier);
     if (eat(SyntaxKind.Colon) && !eat(SyntaxKind.Identifier)) {
       const nameNodeWithColon = completeNode(SyntaxKind.TagNameNode);
-      errorAt(Diag_Tag_Name_Afterd_Namespace_Expected, nameNodeWithColon.pos, nameNodeWithColon.end);
+      errorAt(DIAGS.expTagNameAfterNamespace, nameNodeWithColon.pos, nameNodeWithColon.end);
       errNodeUntil([SyntaxKind.Identifier, ...TAG_START_OR_END_TOKENS]);
       return { node: nameNodeWithColon, errInName: true };
     } else {
@@ -251,7 +246,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       parseAttrName(attrNames);
     } else {
       const attrNameFollow = [SyntaxKind.Equal];
-      const eqFollows = errRecover(Diag_Attr_Identifier_Expected, attrNameFollow);
+      const eqFollows = errRecover(DIAGS.expAttrIdent, attrNameFollow);
       if (!eqFollows) {
         return;
       }
@@ -260,7 +255,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     if (eat(SyntaxKind.Equal)) {
       if (!eat(SyntaxKind.StringLiteral)) {
         const attrFollowWithoutIdent = [SyntaxKind.NodeEnd, SyntaxKind.NodeClose];
-        errRecover(Diag_Attr_Value_Expected, attrFollowWithoutIdent);
+        errRecover(DIAGS.expAttrValue, attrFollowWithoutIdent);
       }
     }
 
@@ -277,7 +272,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       if (at(SyntaxKind.Identifier)) {
         nsIdent = bump(SyntaxKind.Identifier);
       } else {
-        errRecover(Diag_Attr_Identifier_Expected, [
+        errRecover(DIAGS.expAttrIdent, [
           SyntaxKind.NodeClose,
           SyntaxKind.NodeEnd,
           SyntaxKind.Equal,
