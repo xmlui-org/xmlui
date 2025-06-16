@@ -179,9 +179,15 @@ import {
 import { SliderMd } from "./Slider/Slider";
 import { ColorPickerMd } from "./ColorPicker/ColorPicker";
 
-import { ThemeDefinition } from "../abstractions/ThemingDefs";
+import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import { RootThemeDefinition } from "../components-core/theming/themes/root";
 import { XmlUiCyanThemeDefinition, XmlUiGrayThemeDefinition, XmlUiGreenThemeDefinition, XmlUiOrangeThemeDefinition, XmlUiPurpleThemeDefinition, XmlUiRedThemeDefinition, XmlUiThemeDefinition } from "../components-core/theming/themes/xmlui";
+import { BarChartMd } from "./Charts/BarChart/BarChart";
+import { DonutChartMd } from "./Charts/DonutChart/DonutChart";
+import { LabelListMd } from "./Charts/LabelList/LabelList";
+import { LegendMd } from "./Charts/Legend/Legend";
+import { LineChartMd } from "./Charts/LineChart/LineChart";
+import { PieChartMd } from "./Charts/PieChart/PieChart";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -378,6 +384,12 @@ export const collectedComponentMetadata = {
   Theme: ThemeMd,
   ToneChangerButton: ToneChangerButtonMd,
   Tree: TreeMd,
+  BarChart: BarChartMd,
+  DonutChart: DonutChartMd,
+  LabelList: LabelListMd,
+  Legend: LegendMd,
+  LineChart: LineChartMd,
+  PieChart: PieChartMd
 };
 
 export const collectedThemes: Record<string, ThemeDefinition> = {

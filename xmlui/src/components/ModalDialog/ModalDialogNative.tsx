@@ -237,4 +237,3 @@ export const ModalDialog = React.forwardRef(
 );
 
 ModalDialog.displayName = "ModalDialog";
-ModalDialog.defaultProps = defaultProps;

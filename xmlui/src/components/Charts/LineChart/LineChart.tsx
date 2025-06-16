@@ -1,5 +1,6 @@
-import { createComponentRenderer, createMetadata, d } from "xmlui";
+import { createMetadata, d } from "../../../abstractions/ComponentDefs";
 import { defaultProps, LineChart } from "./LineChartNative";
+import { createComponentRenderer } from "../../../components-core/renderers";
 
 const COMP = "LineChart";
 

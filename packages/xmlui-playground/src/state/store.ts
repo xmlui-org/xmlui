@@ -1,12 +1,13 @@
 import type { Dispatch } from "react";
 import { createContext } from "react";
 import produce from "immer";
-import {
+import type {
   ApiInterceptorDefinition,
   CompoundComponentDef,
-  ThemeDefinition,
+  ThemeDefinition, ThemeTone} from "xmlui";
+import {
   errReportComponent,
-  xmlUiMarkupToComponent, ThemeTone,
+  xmlUiMarkupToComponent,
   builtInThemes
 } from "xmlui";
 
@@ -77,7 +78,7 @@ type PlaygroundAction = {
     text?: string;
     appDescription?: AppDescription;
     options?: Options;
-    activeTone?: string;
+    activeTone?: ThemeTone;
     activeTheme?: string;
     content?: string;
     themes?: ThemeDefinition[];

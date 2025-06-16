@@ -13,19 +13,13 @@ import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import type { CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { Tooltip } from "./Tooltip";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { EMPTY_ARRAY } from "../../components-core/constants";
 import { createQueryString } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import { useIndexerContext } from "../App/IndexerContext";
 import { useApiInterceptorContext } from "../../components-core/interception/useApiInterceptorContext";
-
-// Default props for NestedApp component
-export const defaultProps = {
-  allowPlaygroundPopup: true,
-  withFrame: true,
-  components: EMPTY_ARRAY
-};
+import { EMPTY_ARRAY } from "../../components-core/constants";
+import { defaultProps } from "./defaultProps";
 
 type NestedAppProps = {
   api?: any;
@@ -65,7 +59,7 @@ export function IndexAwareNestedApp(props) {
 export function NestedApp({
   api,
   app,
-  components = defaultProps.components,
+  components = EMPTY_ARRAY,
   config,
   activeTheme,
   activeTone,
@@ -73,7 +67,7 @@ export function NestedApp({
   height,
   allowPlaygroundPopup = defaultProps.allowPlaygroundPopup,
   withFrame = defaultProps.withFrame,
-  playgroundId
+  playgroundId,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
@@ -188,7 +182,6 @@ export function NestedApp({
     Object.keys(theme.themeStyles).forEach((key) => {
       themeVarReset[key] = "initial";
     });
-
 
     let nestedAppRoot = (
       <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
@@ -308,5 +301,3 @@ export function NestedApp({
     />
   );
 }
-
-NestedApp.defaultProps = defaultProps;

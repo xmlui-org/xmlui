@@ -1,4 +1,5 @@
-import { createComponentRenderer, createMetadata } from "xmlui";
+import { createMetadata } from "../../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../../components-core/renderers";
 import {
   defaultProps,
   horizontalAlignmentValues,
