@@ -1,7 +1,6 @@
 # Icon [#icon]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.This component is the representation of an icon.
+This component is the representation of an icon.
 
 It is a small visual element, which is used to graphically represent functions, features, or types of content within a user interface.
 

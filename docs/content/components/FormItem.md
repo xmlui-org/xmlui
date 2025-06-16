@@ -1,7 +1,6 @@
 # FormItem [#formitem]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data.
+A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data.
 
 The component provides context values with which you can access some internal properties:
 
