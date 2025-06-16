@@ -1,9 +1,7 @@
-![NPM Version](https://img.shields.io/npm/v/xmlui?color=blue) [![Smoke Tests (e2e smoke tests, unit tests)](https://github.com/xmlui-com/xmlui/actions/workflows/run-smoke-tests.yml/badge.svg)](https://github.com/xmlui-com/xmlui/actions/workflows/run-smoke-tests.yml) 
-
-![Number of stable components](https://img.shields.io/badge/%23of%20stable%20components-88-brightgreen)
-![Number of experimental components](https://img.shields.io/badge/%23of%20experimental%20components-12-blue)
-![Number of extension packages](https://img.shields.io/badge/%23of%20extension%20packages-8-brightgreen)
-![Number of theme variables](https://img.shields.io/badge/%23of%20theme%20variables-3602-brightgreen)
+![NPM Version](https://img.shields.io/npm/v/xmlui?color=blue)
+![Components](https://img.shields.io/badge/Components-88-brightgreen)
+![Extension packages](https://img.shields.io/badge/Extension%20packages-8-brightgreen)
+![Theme variables](https://img.shields.io/badge/theme%20variables-3602-brightgreen)
 
 # XMLUI
 
@@ -15,13 +13,20 @@
 - **Modular**. Use a comprehensive suite of components that you can extend with — again! — little or no scripting.
 - **Easy to deploy**. Just drop a handful of files onto a static webserver.
 
-## Getting Started
+## See it in action
 
-To get started with **xmlui**, simply clone the repository and follow the installation instructions in the [Your first app](https://ncrm.azurewebsites.net/get-started/first-app/) article.
+https://github.com/user-attachments/assets/880bdd55-485c-4970-9975-f34a249162c8
+
+## Getting started
+
+Download the [starter kit](https://xmlui.com/downloads) which includes the XMLUI engine and `XMLUI Invoice`, a demo app that exercises many key feature of the framework and illustrate common patterns.
 
 ## Documentation
 
-For detailed documentation, including installation instructions, usage guidelines, and API references, please visit the [Documentation](https://docs.xmlui.com/).
+The [XMLUI documentation site](https://docs.xmlui.com) is itself an XMLUI app! 
+
+<a href="https://docs.xmlui.com"><img width="1285" alt="image" src="https://github.com/user-attachments/assets/bc1c5ae2-b451-4521-ac42-4538d128f72d" /></a>
+
 
 ## Contributing
 
