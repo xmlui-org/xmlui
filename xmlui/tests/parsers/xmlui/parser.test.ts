@@ -330,7 +330,7 @@ describe("Xmlui parser", () => {
 
   it("<> regression #2", () => {
     const { errors } = parseSource("<Text >");
-    expect(errors[0].code).toBe(ErrCodes.expCloseStart);
+    expect(errors[0].code).toBe(ErrCodes.expCloseStartWithName);
   });
 });
 
@@ -355,10 +355,10 @@ describe("Xmlui parser - expected errors", () => {
     expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
   });
 
-  it.todo("namespace without name has dedicated error, name matching turned off", () => {
+  it("namespace without name has dedicated error, name matching turned off", () => {
     const { errors } = parseSource("<name:></A>");
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.tagNameExpAfterNamespace);
+    expect(errors[0].code).toBe(ErrCodes.expTagNameAfterNamespace);
   });
 
   it("bad tokens in tag name and attrs result in only the 1st error", () => {
@@ -367,18 +367,66 @@ describe("Xmlui parser - expected errors", () => {
     expect(errors[0].code).toBe(ErrCodes.expTagName);
   });
 
-  it.todo("bad token in attrList result in 1 error", () => {
-    const { errors } = parseSource("<A := ! '' ></A>");
-    expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.expAttrIdent);
+
+  it("bad tokens in tag name and attrs result in only the 1st error", () => {
+    const { errors } = parseSource("<: name= >");
+    expect(errors).toHaveLength(2);
+    expect(errors[0].code).toBe(ErrCodes.expTagName);
+    expect(errors[1].code).toBe(ErrCodes.expCloseStart);
   });
 
-  it.todo("missing > results 1 error", () => {
-    const { errors } = parseSource("<A <B/> </A>");
+  it("bad token in attrList result in 1 error", () => {
+    const { errors } = parseSource("<A '' = ''  ></A>");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.expAttrName);
+  });
+
+  it("missing /> before </ results in 1 error", () => {
+    const { errors, node } = parseSource("<A> <B </A>");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.expEndOrClose);
+    const tagA = node.children[0];
+    const tagAList = tagA.children[3];
+    const tagB = tagAList.children[0];
+    const tagACloseStart = tagA.children[4];
+
+    expect(tagA.kind).toEqual(SyntaxKind.ElementNode)
+    expect(tagAList.kind).toEqual(SyntaxKind.ContentListNode)
+    expect(tagB.kind).toEqual(SyntaxKind.ElementNode)
+    expect(tagB.children).toHaveLength(2)
+    expect(tagACloseStart.kind).toEqual(SyntaxKind.CloseNodeStart)
+
+  });
+
+  it("missing /> before < results in 1 error", () => {
+    const { errors } = parseSource(
+`<A>
+  <B
+  <C></C>
+  <D />
+</A>`);
     expect(errors).toHaveLength(1);
     expect(errors[0].code).toBe(ErrCodes.expEndOrClose);
   });
 
+  it("duplicate attributes", () => {
+    const { errors } = parseSource("<A enabled enabled/>");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.duplAttr);
+  })
+
+  it("duplicate attributes with namespace", () => {
+    const { errors } = parseSource("<A ns:enabled ns:enabled/>");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.duplAttr);
+  });
+
+  it("namespace without attribute name", () => {
+    const { errors } = parseSource("<A ns:='hi' enabled/>");
+    console.log(errors)
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.expAttrNameAfterNamespace);
+  })
 });
 
 describe("Xmlui parser - child nodes", () => {
