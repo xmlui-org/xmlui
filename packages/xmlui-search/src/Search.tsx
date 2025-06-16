@@ -332,18 +332,18 @@ const SearchItemContent = forwardRef(function SearchItemContent(
 // --- Utilities
 
 function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debouncedValue: string) {
-  const options = {
-    // Minimum number of characters to trigger a long text search filter
-    longTextSearchThreshold: 25,
-    // Number of characters needed to accept the search term as a match in the title
-    titleAcceptanceThreshold: debouncedValue.length - 1,
-    // Number of character threshold to accept the search term as a match in the content
-    longContentAcceptance: Math.floor(debouncedValue.length * 0.5),
-    // Determines the size of the area around a string index
-    // used in search filtering and highlight correction
-    shortTextSearchRadius: 3,
-    longTextSearchRadius: 50,
-  };
+  // Minimum number of characters to trigger a long text search filter
+  const longTextSearchThreshold = 25;
+  // Number of characters needed to accept the search term as a match in the title
+  const titleAcceptanceThreshold = debouncedValue.length - 1;
+  // Number of character threshold to accept the search term as a match in the content
+  const longContentAcceptance = Math.floor(debouncedValue.length * 0.5);
+  // Determines the size of the area around a string index
+  // used in search filtering and highlight correction
+  const shortTextSearchRadius = 3;
+  const longTextSearchRadius = 50;
+  const textSearchRadius =
+    debouncedValue.length < longTextSearchThreshold ? shortTextSearchRadius : longTextSearchRadius;
 
   return searchResults
     .map((result) => ({
@@ -366,11 +366,11 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
           const foundSubstrLength = index[1] - index[0];
           // Title
           if (matchKey === "title") {
-            return foundSubstrLength >= options.titleAcceptanceThreshold;
+            return foundSubstrLength >= titleAcceptanceThreshold;
           }
           // Content: long text search
-          if (debouncedValue.length >= options.longTextSearchThreshold) {
-            return foundSubstrLength >= options.longContentAcceptance;
+          if (debouncedValue.length >= longTextSearchThreshold) {
+            return foundSubstrLength >= longContentAcceptance;
           }
           // Content: regular text search
           return result.item[matchKey]
@@ -387,19 +387,17 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
             }
           }
 
-          const textLength = result.item[matchKey].length;
-          const text = result.item[matchKey].toLocaleLowerCase();
-          let startIdx = 0;
-          let endIdx = 0;
-          if (debouncedValue.length < options.longTextSearchThreshold) {
-            startIdx = Math.max(index[0] - options.shortTextSearchRadius, 0);
-            endIdx = Math.min(index[1] + options.shortTextSearchRadius, textLength);
-          } else {
-            startIdx = Math.max(index[0] - options.longTextSearchRadius, 0);
-            endIdx = Math.min(index[1] + options.longTextSearchRadius, textLength);
-          }
+          const origTextLength = result.item[matchKey].length;
+          const startIdx = Math.max(index[0] - textSearchRadius, 0);
+          const endIdx = Math.min(index[1] + textSearchRadius, origTextLength);
+          const textSnippet = result.item[matchKey].toLocaleLowerCase();
 
-          const position = findSubstringPosition(text, debouncedValue.toLocaleLowerCase(), startIdx, endIdx);
+          const position = findSubstringPosition(
+            textSnippet,
+            debouncedValue.toLocaleLowerCase(),
+            startIdx,
+            endIdx,
+          );
 
           if (position !== -1) {
             index[0] = position;
