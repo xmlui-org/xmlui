@@ -220,17 +220,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   function parseAttrList() {
     startNode();
     const attrNames: { ns?: string; name: string }[] = [];
-    while (!atAnyOf([SyntaxKind.EndOfFileToken, SyntaxKind.NodeEnd, SyntaxKind.NodeClose])) {
+    while (!atAnyOf([SyntaxKind.EndOfFileToken, ...TAG_START_OR_END_TOKENS])) {
       parseAttr(attrNames);
-      // todo: was this usefuel?
-      // if (at(SyntaxKind.Identifier)) {
-      //   parseAttr(attrNames);
-      // } else {
-      //   const atTagLike = errRecover(Diag_Attr_Identifier_Expected, firstSetTagLike);
-      //   if (atTagLike) {
-      //     parseTagLike();
-      //   }
-      // }
     }
 
     if (node.children!.length === 0) {
@@ -245,11 +236,15 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     if (at(SyntaxKind.Identifier)) {
       parseAttrName(attrNames);
     } else {
-      const attrNameFollow = [SyntaxKind.Equal];
-      const eqFollows = errRecover(DIAGS.expAttrIdent, attrNameFollow);
-      if (!eqFollows) {
-        return;
+      const errNode = errNodeUntil([SyntaxKind.Identifier, ...TAG_START_OR_END_TOKENS]);
+      if (errNode){
+        errorAt(DIAGS.expAttrName, errNode.pos, errNode.end);
+        completeNode(SyntaxKind.AttributeNode);
+      } else {
+        abandonNode();
+        error(DIAGS.expAttrName);
       }
+      return;
     }
 
     if (eat(SyntaxKind.Equal)) {
@@ -263,20 +258,22 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   }
 
   function parseAttrName(attrNames: { ns?: string; name: string }[]) {
-    const nameIdent = peek();
+    let nameIdent = peek();
     let nsIdent = undefined;
 
     startNode();
     bump(SyntaxKind.Identifier);
     if (eat(SyntaxKind.Colon)) {
       if (at(SyntaxKind.Identifier)) {
-        nsIdent = bump(SyntaxKind.Identifier);
+        nsIdent = nameIdent;
+        nameIdent = bump(SyntaxKind.Identifier);
       } else {
-        errRecover(DIAGS.expAttrIdent, [
-          SyntaxKind.NodeClose,
-          SyntaxKind.NodeEnd,
-          SyntaxKind.Equal,
-        ]);
+        const errNode = errNodeUntil([SyntaxKind.Equal, SyntaxKind.Identifier, ...TAG_START_OR_END_TOKENS])
+        if (errNode){
+          errorAt(DIAGS.expAttrNameAfterNamespace, errNode.pos, errNode.end);
+        } else {
+          error(DIAGS.expAttrNameAfterNamespace);
+        }
       }
     }
     checkAttrName(attrNames, { nsIdent, nameIdent });
@@ -291,20 +288,21 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   /** emits errors when the attribute name is incorrect. Otherwise adds the attribute name to the list of valid names*/
   function checkAttrName(attrNames: AttrName[], { nameIdent, nsIdent }: { nameIdent: Node; nsIdent?: Node }) {
     const attrName = getText(nameIdent);
-    const attrNs = nsIdent === undefined ? undefined : getText(nsIdent);
+    const attrNs = nsIdent && getText(nsIdent);
     const attrKeyMatches = ({ ns, name }: AttrName) => name === attrName && ns === attrNs;
     const isDuplicate = attrNames.findIndex(attrKeyMatches) !== -1;
     const nameStartsWithUppercase = "A" <= attrName[0] && attrName[0] <= "Z";
     const faultyName = isDuplicate || nameStartsWithUppercase;
 
+    //TODO: account for the namespace as well
     if (isDuplicate) {
       errorAt(DIAGS.duplAttr(attrName), nameIdent.pos, nameIdent.end);
     }
-    if (nameStartsWithUppercase) {
+    if (!nsIdent && nameStartsWithUppercase) {
       errorAt(DIAGS.uppercaseAttr(attrName), nameIdent.pos, nameIdent.end);
     }
     if (!faultyName) {
-      attrNames.push({ name: attrName });
+      attrNames.push({ name: attrName, ns: attrNs });
     }
   }
 
@@ -324,6 +322,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     return kinds.includes(peek().kind);
   }
 
+  /**
+  *
+  * @param tokens that won't be consumed
+  * @returns the error node with the consumed tokens, or null if there were no tokens consumed
+  */
   function errNodeUntil(tokens: SyntaxKind[]): Node | null {
     startNode();
     advance(tokens);

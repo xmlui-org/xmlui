@@ -376,9 +376,9 @@ describe("Xmlui parser - expected errors", () => {
   });
 
   it("bad token in attrList result in 1 error", () => {
-    const { errors } = parseSource("<A := ! '' ! ></A>");
+    const { errors } = parseSource("<A '' = ''  ></A>");
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodes.expAttrIdent);
+    expect(errors[0].code).toBe(ErrCodes.expAttrName);
   });
 
   it("missing > results 1 error", () => {
@@ -387,6 +387,24 @@ describe("Xmlui parser - expected errors", () => {
     expect(errors[0].code).toBe(ErrCodes.expEndOrClose);
   });
 
+  it("duplicate attributes", () => {
+    const { errors } = parseSource("<A enabled enabled/>");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.duplAttr);
+  })
+
+  it("duplicate attributes with namespace", () => {
+    const { errors } = parseSource("<A ns:enabled ns:enabled/>");
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.duplAttr);
+  });
+
+  it("namespace without attribute name", () => {
+    const { errors } = parseSource("<A ns:='hi' enabled/>");
+    console.log(errors)
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodes.expAttrNameAfterNamespace);
+  })
 });
 
 describe("Xmlui parser - child nodes", () => {
