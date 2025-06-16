@@ -3,7 +3,8 @@ import styles from "./NestedApp.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { IndexAwareNestedApp, defaultProps } from "./NestedAppNative";
+import { IndexAwareNestedApp } from "./NestedAppNative";
+import { defaultProps } from "./defaultProps";
 
 const COMP = "NestedApp";
 

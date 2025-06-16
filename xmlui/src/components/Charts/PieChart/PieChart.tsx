@@ -1,7 +1,9 @@
-import { createComponentRenderer, createMetadata, d, parseScssVar } from "xmlui";
 import { defaultProps, PieChart } from "./PieChartNative";
 import styles from "./PieChartNative.module.scss";
 import { LabelPositionValues } from "../utils/abstractions";
+import { createMetadata, d } from "../../../abstractions/ComponentDefs";
+import { parseScssVar } from "../../../components-core/theming/themeVars";
+import { createComponentRenderer } from "../../../components-core/renderers";
 
 const COMP = "PieChart";
 

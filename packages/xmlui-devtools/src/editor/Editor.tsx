@@ -1,5 +1,6 @@
 import { Editor as MonacoEditor, useMonaco } from "@monaco-editor/react";
-import { CSSProperties, useEffect } from "react";
+import type { CSSProperties} from "react";
+import { useEffect } from "react";
 import { XmluiGrammar } from "../syntax/monaco/grammar.monacoLanguage";
 import xmluiLight from "../syntax/monaco/xmlui-light";
 import xmluiDark from "../syntax/monaco/xmlui-dark";

@@ -1,0 +1,8 @@
+// Default props for NestedApp component
+import { EMPTY_ARRAY } from "../../components-core/constants";
+
+export const defaultProps = {
+  allowPlaygroundPopup: true,
+  withFrame: true,
+  components: EMPTY_ARRAY
+};

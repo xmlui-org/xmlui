@@ -11,8 +11,7 @@
     "shiki": "^3.3.0",
     "xmlui": "*",
     "xmlui-playground": "*",
-    "xmlui-search": "*",
-    "xmlui-charts": "*"
+    "xmlui-search": "*"
   },
   "msw": {
     "workerDirectory": [

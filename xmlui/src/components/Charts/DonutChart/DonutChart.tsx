@@ -1,6 +1,8 @@
-import { createComponentRenderer, createMetadata, d, parseScssVar } from "xmlui";
+import { createMetadata } from "../../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../../components-core/renderers";
 import styles from "../PieChart/PieChartNative.module.scss";
 import { defaultProps, PieChart } from "../PieChart/PieChartNative";
+import { parseScssVar } from "../../../components-core/theming/themeVars";
 
 const COMP = "DonutChart";
 
