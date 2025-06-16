@@ -1,7 +1,9 @@
-import { createComponentRenderer, createMetadata, parseScssVar } from "xmlui";
 import styles from "./LabelListNative.module.scss";
 import { defaultProps, LabelList } from "./LabelListNative";
 import { LabelPositionValues } from "../utils/abstractions";
+import { createMetadata } from "../../../abstractions/ComponentDefs";
+import { parseScssVar } from "../../../components-core/theming/themeVars";
+import { createComponentRenderer } from "../../../components-core/renderers";
 
 const COMP = "LabelList";
 

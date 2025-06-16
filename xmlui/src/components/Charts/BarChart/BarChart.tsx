@@ -1,5 +1,6 @@
 import { BarChart, defaultProps } from "./BarChartNative";
-import { createComponentRenderer, createMetadata, d } from "xmlui";
+import { createMetadata } from "../../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../../components-core/renderers";
 
 const COMP = "BarChart";
 
