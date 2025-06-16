@@ -193,7 +193,7 @@ Here is `SearchEverything`. Try typing `a`, then `c`, then `m`, and watch the re
 
 There's nothing here we haven't seen, but `SearchEverything` illustrates a slight variation: there's only one `when`. It's on `Fragment` and wraps both the `DataSource` and the results.
 
-```xmlui
+```xmlui /when=/
 <Component name="SearchEverything">
 
     <VStack marginTop="1rem">
