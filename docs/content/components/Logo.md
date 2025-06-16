@@ -2,8 +2,7 @@ import xmluiLogo from  "../../component-samples/Logo/xmlui-logo.svg";
 
 # Logo [#logo]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `Logo` component represents a logo or a brand symbol. Usually, you use this component in the [`AppHeader`](./AppHeader.mdx#logotemplate).
+The `Logo` component represents a logo or a brand symbol. Usually, you use this component in the [`AppHeader`](./AppHeader.mdx#logotemplate).
 
 You can learn more about using logos in application layouts in the [App Component](/learning/using-components/app-component/) article.
 

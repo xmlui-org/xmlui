@@ -1,7 +1,6 @@
 # Select [#select]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.Provides a dropdown with a list of options to choose from.
+Provides a dropdown with a list of options to choose from.
 
 The component provides context values with which you can access some internal properties:
 

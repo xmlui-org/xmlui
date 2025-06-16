@@ -1,7 +1,6 @@
 # AutoComplete [#autocomplete]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.This component is a dropdown with a list of options. According to the `multi` property, the user can select one or more items.
+This component is a dropdown with a list of options. According to the `multi` property, the user can select one or more items.
 
 The component provides context values with which you can access some internal properties:
 

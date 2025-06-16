@@ -1,7 +1,6 @@
 # Tabs [#tabs]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `Tabs` component provides a tabbed layout where each tab has a clickable label and content.
+The `Tabs` component provides a tabbed layout where each tab has a clickable label and content.
 
 The component accepts only `TabItem` components as children.
 Other child components will not be displayed.
