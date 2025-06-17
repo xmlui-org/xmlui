@@ -15,6 +15,7 @@ import {
 } from "../abstractions";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { VisuallyHidden } from "../VisuallyHidden";
+import { useComponentStyle, useStyles } from "../../components-core/theming/StyleContext";
 
 type Props = {
   id?: string;
@@ -95,6 +96,7 @@ export const Button = React.forwardRef(function Button(
 ) {
   const innerRef = useRef<HTMLButtonElement>(null);
   const composedRef = ref ? composeRefs(ref, innerRef) : innerRef;
+  const className2 = useComponentStyle(style);
   useEffect(() => {
     if (autoFocus) {
       setTimeout(() => {
@@ -111,7 +113,7 @@ export const Button = React.forwardRef(function Button(
       id={id}
       type={type}
       ref={composedRef}
-      className={classnames(className, styles.button, {
+      className={classnames(className, styles.button, className2, {
         [styles.buttonHorizontal]: orientation === "horizontal",
         [styles.buttonVertical]: orientation === "vertical",
         [styles.xs]: size === "xs",
@@ -133,7 +135,6 @@ export const Button = React.forwardRef(function Button(
       autoFocus={autoFocus}
       disabled={disabled}
       form={formId}
-      style={style}
       onClick={onClick}
       onFocus={onFocus}
       onBlur={onBlur}

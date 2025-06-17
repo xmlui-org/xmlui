@@ -13,6 +13,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dClick, dInternal } from "../metadata-helpers";
 import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
+import { useComponentStyle } from "../../components-core/theming/StyleContext";
 
 const COMP = "Stack";
 
@@ -159,8 +160,8 @@ function renderStack({
       reverse={extractValue(node.props?.reverse)}
       hoverContainer={extractValue(node.props?.hoverContainer)}
       visibleOnHover={extractValue(node.props?.visibleOnHover)}
-      style={layoutCss}
       onMount={lookupEventHandler("mounted")}
+      style={layoutCss}
     >
       {renderChild(node.children, {
         type: "Stack",

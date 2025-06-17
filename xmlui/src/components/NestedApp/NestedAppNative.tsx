@@ -144,9 +144,6 @@ export function NestedApp({
       shadowRef.current = rootRef.current.attachShadow({ mode: "open" });
       const styleSheets = document.querySelectorAll('style, link[rel="stylesheet"]');
       styleSheets.forEach((el) => {
-        if (el.hasAttribute("data-theme-root")) {
-          return;
-        }
         shadowRef.current.appendChild(el.cloneNode(true));
       });
     }
@@ -177,15 +174,9 @@ export function NestedApp({
       apiUrl,
     };
 
-    // css variables are leaking into to shadow dom, so we reset them here
-    const themeVarReset = {};
-    Object.keys(theme.themeStyles).forEach((key) => {
-      themeVarReset[key] = "initial";
-    });
-
     let nestedAppRoot = (
       <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
-        <div style={{ height, ...themeVarReset }}>
+        <div style={{ height }}>
           <AppRoot
             key={`app-${nestedAppId}-${refreshVersion}`}
             previewMode={true}
@@ -266,7 +257,6 @@ export function NestedApp({
     nestedAppId,
     openPlayground,
     refreshVersion,
-    theme.themeStyles,
     title,
     toneToApply,
     withFrame,

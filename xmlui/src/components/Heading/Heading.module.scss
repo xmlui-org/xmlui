@@ -48,68 +48,71 @@ $textDecorationLine-anchor-Heading: createThemeVar("textDecorationLine-anchor-He
   text-underline-offset: createThemeVar("Heading:textUnderlineOffset-#{$level}");
 }
 
-.heading {
-  &.h1 {
-    @include heading("H1");
-  }
-  &.h2 {
-    @include heading("H2");
-  }
-  &.h3 {
-    @include heading("H3");
-  }
-  &.h4 {
-    @include heading("H4");
-  }
-  &.h5 {
-    @include heading("H5");
-  }
-  &.h6 {
-    @include heading("H6");
-  }
+@layer components{
+  .heading {
+    &.h1 {
+      @include heading("H1");
+    }
+    &.h2 {
+      @include heading("H2");
+    }
+    &.h3 {
+      @include heading("H3");
+    }
+    &.h4 {
+      @include heading("H4");
+    }
+    &.h5 {
+      @include heading("H5");
+    }
+    &.h6 {
+      @include heading("H6");
+    }
 
-  --my-scroll-margin-top: var(--header-height);
-  scroll-margin-top: var(--my-scroll-margin-top);
+    --my-scroll-margin-top: var(--header-height);
+    scroll-margin-top: var(--my-scroll-margin-top);
 
-  a {
-    opacity: 0; // Hide the <a> element by default
-    margin-left: $gap-anchor-Heading;
-    color: $color-anchor-Heading;
-    transition: opacity 0.2s ease-in-out; // Smooth transition for visibility
-  }
-
-  &:hover {
     a {
-      opacity: 1;
-      text-decoration: $textDecorationLine-anchor-Heading;
+      opacity: 0; // Hide the <a> element by default
+      margin-left: $gap-anchor-Heading;
+      color: $color-anchor-Heading;
+      transition: opacity 0.2s ease-in-out; // Smooth transition for visibility
+    }
+
+    &:hover {
+      a {
+        opacity: 1;
+        text-decoration: $textDecorationLine-anchor-Heading;
+      }
     }
   }
+
+  .anchorRef {
+    width: 0;
+    height: 0;
+    --my-scroll-margin-top: var(--header-height);
+    scroll-margin-top: var(--my-scroll-margin-top);
+  }
+
+  /*
+  This is a Chromium based solution that is supported by most modern browsers.
+  See this source for details: https://css-tricks.com/line-clampin/
+  */
+  .truncateOverflow {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .preserveLinebreaks {
+    white-space: pre-wrap;
+  }
+
+  .noEllipsis {
+    text-overflow: clip;
+  }
 }
 
-.anchorRef {
-  width: 0;
-  height: 0;
-  --my-scroll-margin-top: var(--header-height);
-  scroll-margin-top: var(--my-scroll-margin-top);
-}
-
-/*
-This is a Chromium based solution that is supported by most modern browsers.
-See this source for details: https://css-tricks.com/line-clampin/
-*/
-.truncateOverflow {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.preserveLinebreaks {
-  white-space: pre-wrap;
-}
-
-.noEllipsis {
-  text-overflow: clip;
-}
 
 // --- We export the theme variables to add them to the component renderer
 :export {

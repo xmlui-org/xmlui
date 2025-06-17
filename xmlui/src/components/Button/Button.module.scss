@@ -137,111 +137,114 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-lg");
   }
 }
 
-// --- CSS styles
-.button {
-  width: createThemeVar("width-Button");
-  height: createThemeVar("height-Button");
-  line-height: normal;
-  min-width: 0;
-  padding: 0;
-  margin: 0;
-  border-style: solid;
-  transition: color 0.2s, background 0.2s;
-  user-select: none;
-  cursor: pointer;
-  display: flex;
-  gap: t.$space-2;
-  justify-content: center;
-  align-items: center;
 
-  &.alignStart {
-    justify-content: start;
-  }
+@layer components{
+  // --- CSS styles
+  .button {
+    width: createThemeVar("width-Button");
+    height: createThemeVar("height-Button");
+    line-height: normal;
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    border-style: solid;
+    transition: color 0.2s, background 0.2s;
+    user-select: none;
+    cursor: pointer;
+    display: flex;
+    gap: t.$space-2;
+    justify-content: center;
+    align-items: center;
 
-  &.alignEnd {
-    justify-content: end;
-  }
-
-  * {
-    color: inherit;
-  }
-
-  &.buttonHorizontal {
-    flex-direction: row;
-    &.xs {
-      @include t.paddingVars($themeVars, "#{$component}-xs");
+    &.alignStart {
+      justify-content: start;
     }
 
-    &.sm {
-      @include t.paddingVars($themeVars, "#{$component}-sm");
+    &.alignEnd {
+      justify-content: end;
     }
 
-    &.md {
-      @include t.paddingVars($themeVars, "#{$component}-md");
+    * {
+      color: inherit;
     }
 
-    &.lg {
-      @include t.paddingVars($themeVars, "#{$component}-lg");
-    }
-  }
+    &.buttonHorizontal {
+      flex-direction: row;
+      &.xs {
+        @include t.paddingVars($themeVars, "#{$component}-xs");
+      }
 
-  &.buttonVertical {
-    flex-direction: column;
-    gap: t.$space-1;
-    width: fit-content;
-    height: fit-content;
+      &.sm {
+        @include t.paddingVars($themeVars, "#{$component}-sm");
+      }
 
-    &.xs {
-      @include t.paddingVars($themeVars, "#{$component}-xs");
-    }
+      &.md {
+        @include t.paddingVars($themeVars, "#{$component}-md");
+      }
 
-    &.sm {
-      @include t.paddingVars($themeVars, "#{$component}-sm");
-    }
-
-    &.md {
-      @include t.paddingVars($themeVars, "#{$component}-md");
+      &.lg {
+        @include t.paddingVars($themeVars, "#{$component}-lg");
+      }
     }
 
-    &.lg {
-      @include t.paddingVars($themeVars, "#{$component}-lg");
+    &.buttonVertical {
+      flex-direction: column;
+      gap: t.$space-1;
+      width: fit-content;
+      height: fit-content;
+
+      &.xs {
+        @include t.paddingVars($themeVars, "#{$component}-xs");
+      }
+
+      &.sm {
+        @include t.paddingVars($themeVars, "#{$component}-sm");
+      }
+
+      &.md {
+        @include t.paddingVars($themeVars, "#{$component}-md");
+      }
+
+      &.lg {
+        @include t.paddingVars($themeVars, "#{$component}-lg");
+      }
     }
-  }
 
-  &.solidPrimary {
-    @include solid('primary');
-  }
+    &.solidPrimary {
+      @include solid('primary');
+    }
 
-  &.solidSecondary {
-    @include solid('secondary');
-  }
+    &.solidSecondary {
+      @include solid('secondary');
+    }
 
-  &.solidAttention {
-    @include solid('attention');
-  }
+    &.solidAttention {
+      @include solid('attention');
+    }
 
-  &.outlinedPrimary {
-    @include outlined('primary');
-  }
+    &.outlinedPrimary {
+      @include outlined('primary');
+    }
 
-  &.outlinedSecondary {
-    @include outlined('secondary');
-  }
+    &.outlinedSecondary {
+      @include outlined('secondary');
+    }
 
-  &.outlinedAttention {
-    @include outlined('attention');
-  }
+    &.outlinedAttention {
+      @include outlined('attention');
+    }
 
-  &.ghostPrimary {
-    @include ghost('primary');
-  }
+    &.ghostPrimary {
+      @include ghost('primary');
+    }
 
-  &.ghostSecondary {
-    @include ghost('secondary');
-  }
+    &.ghostSecondary {
+      @include ghost('secondary');
+    }
 
-  &.ghostAttention {
-    @include ghost('attention');
+    &.ghostAttention {
+      @include ghost('attention');
+    }
   }
 }
 

@@ -31,6 +31,7 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
+import { useComponentStyle } from "../theming/StyleContext";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -219,6 +220,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     //   mediaSize: appContext.mediaSize,
     // });
   }, [appContext.mediaSize, layoutContextRef, safeNode.props, valueExtractor]);
+
+  // const className = useComponentStyle(cssProps);
 
   // --- As compileLayout generates new cssProps and nonCssProps objects every time, we need to
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.

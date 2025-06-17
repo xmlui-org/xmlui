@@ -16,23 +16,8 @@ import { NotificationToast } from "./NotificationToast";
 import { useDevTools } from "../../components-core/InspectorContext";
 import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import { useIndexerContext } from "../App/IndexerContext";
+import { useStyles } from "../../components-core/theming/StyleContext";
 
-function getClassName(css: string) {
-  return `theme-${calculateHash(css)}`;
-}
-
-function calculateHash(str: string) {
-  let hash = 0,
-    i: number,
-    chr: number;
-  if (str.length === 0) return hash;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-}
 
 type Props = {
   id?: string;
@@ -98,50 +83,56 @@ export function Theme({
     getThemeVar,
   } = useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
 
-  const { css, className } = useMemo(() => {
-    const vars = { ...themeCssVars, "color-scheme": themeTone };
-    // const vars = themeCssVars;
-    let css = Object.entries(vars)
-      .map(([key, value]) => {
-        return key + ":" + value + ";";
-      })
-      .join(" ");
+  const transformedStyles = useMemo(() => {
+    const ret = {
+      "&": {
+        ...themeCssVars, "colorScheme": themeTone
+      }
+    };
 
-    const className = getClassName(css);
     if (isRoot) {
-      css += `--screenSize: 0;`;
+      ret["&"]["--screenSize"] = 0;
+
       const maxWidthPhone = getThemeVar("maxWidth-phone");
       const maxWidthLandscapePhone = getThemeVar("maxWidth-landscape-phone");
       const maxWidthTablet = getThemeVar("maxWidth-tablet");
       const maxWidthDesktop = getThemeVar("maxWidth-desktop");
       const maxWidthLargeDesktop = getThemeVar("maxWidth-large-desktop");
-      const mediaClasses = ` @media (min-width: calc(${maxWidthPhone} + 1px)) {
-        --screenSize: 1;
+
+      ret[`@media (min-width: calc(${maxWidthPhone} + 1px))`] = {
+        "&": {
+          "--screenSize": 1
+        }
       }
 
-      @media (min-width: calc(${maxWidthLandscapePhone} + 1px)) {
-          --screenSize: 2;
+      ret[`@media (min-width: calc(${maxWidthLandscapePhone} + 1px))`] = {
+        "&": {
+          "--screenSize": 2
+        }
       }
-  
-      @media (min-width: calc(${maxWidthTablet} + 1px)) {
-          --screenSize: 3;
+
+      ret[`@media (min-width: calc(${maxWidthTablet} + 1px))`] = {
+        "&": {
+          "--screenSize": 3
+        }
       }
-  
-      @media (min-width: calc(${maxWidthDesktop} + 1px)) {
-          --screenSize: 4;
+
+      ret[`@media (min-width: calc(${maxWidthDesktop} + 1px))`] = {
+        "&": {
+          "--screenSize": 4
+        }
       }
-  
-      @media (min-width: calc(${maxWidthLargeDesktop} + 1px)) {
-          --screenSize: 5;
+
+      ret[`@media (min-width: calc(${maxWidthLargeDesktop} + 1px))`] = {
+        "&": {
+          "--screenSize": 5
+        }
       }
-    `;
-      css += mediaClasses;
     }
-    return {
-      className,
-      css,
-    };
+    return ret;
   }, [isRoot, themeCssVars, themeTone, getThemeVar]);
+
+  const className = useStyles(transformedStyles);
 
   const [themeRoot, setThemeRoot] = useState(root);
 
@@ -194,7 +185,6 @@ export function Theme({
           {!!faviconUrl && <link rel="icon" type="image/svg+xml" href={faviconUrl} />}
           {fontLinks?.map((fontLink) => <link href={fontLink} rel={"stylesheet"} key={fontLink} />)}
         </Helmet>
-        <style type="text/css" data-theme-root={true} dangerouslySetInnerHTML={{ __html: `.${className}  {${css}}` }} />
         <div
           style={inspectStyle}
           id={"_ui-engine-theme-root"}
@@ -218,7 +208,6 @@ export function Theme({
 
   return (
     <ThemeContext.Provider value={currentThemeContextValue}>
-      <style type="text/css" dangerouslySetInnerHTML={{ __html: `.${className}  {${css}}` }} />
       <div className={classnames(styles.baseRootComponent, styles.wrapper, className)}>
         {renderChild(node.children, { ...layoutContext, themeClassName: className })}
       </div>

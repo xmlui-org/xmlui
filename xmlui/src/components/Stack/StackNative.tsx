@@ -6,6 +6,7 @@ import styles from "./Stack.module.scss";
 
 import { useContentAlignment } from "../../components-core/component-hooks";
 import { useOnMount } from "../../components-core/utils/hooks";
+import { useComponentStyle } from "../../components-core/theming/StyleContext";
 
 export const DEFAULT_ORIENTATION = "vertical";
 
@@ -51,6 +52,7 @@ export const Stack = forwardRef(function Stack(
   ref: Ref<any>,
 ) {
   useOnMount(onMount);
+  const className = useComponentStyle(style);
   const { horizontal, vertical } = useContentAlignment(
     orientation,
     horizontalAlignment,
@@ -61,8 +63,8 @@ export const Stack = forwardRef(function Stack(
       {...rest}
       onClick={onClick}
       ref={ref}
-      style={style}
       className={classnames(
+        className,
         styles.base,
         {
           [styles.vertical]: orientation === "vertical",
