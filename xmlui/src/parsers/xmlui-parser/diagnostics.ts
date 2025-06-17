@@ -85,10 +85,10 @@ export const DIAGS = {
     code: ErrCodes.expTagName,
     message: "A tag name expected.",
   },
-  expAttrValue: {
+  expAttrStr: {
     category: DiagnosticCategory.Error,
     code: ErrCodes.expAttrValue,
-    message: "An attribute value expected.",
+    message: `A string expected as an attribute value after '='.`,
   },
   expEq: {
     category: DiagnosticCategory.Error,

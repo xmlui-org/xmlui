@@ -224,9 +224,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       if (!eat(SyntaxKind.StringLiteral)) {
         const errNode = errNodeUntil(RECOVER_ATTR);
         if (errNode){
-          errorAt(DIAGS.expAttrValue, errNode.pos, errNode.end)
+          errorAt(DIAGS.expAttrStr, errNode.pos, errNode.end)
         } else {
-          error(DIAGS.expAttrValue)
+          error(DIAGS.expAttrStr)
         }
       }
     }
