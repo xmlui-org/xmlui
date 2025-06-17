@@ -21,6 +21,8 @@
 
 %-PROP-START colorMap
 
+Provide the component with a list or key-value pairs in two ways:
+
 1. Only change the background color
 
 ```xmlui-pg copy display {2} name="Example: only background color"

@@ -6,23 +6,38 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dAutoFocus,
   dDidChange,
-  dEnabled, dEndIcon, dEndText,
+  dEnabled,
+  dEndIcon,
+  dEndText,
   dFocus,
   dGotFocus,
-  dInitialValue, dLabel, dLabelBreak, dLabelPosition, dLabelWidth,
+  dInitialValue,
+  dLabel,
+  dLabelBreak,
+  dLabelPosition,
+  dLabelWidth,
   dLostFocus,
   dPlaceholder,
   dReadonly,
-  dSetValueApi, dStartIcon, dStartText,
-  dValidationStatus
+  dSetValueApi,
+  dStartIcon,
+  dStartText,
+  dValidationStatus,
 } from "../metadata-helpers";
-import { dateFormats, DatePicker, DatePickerModeValues, defaultProps, WeekDays } from "./DatePickerNative";
+import {
+  dateFormats,
+  DatePicker,
+  DatePickerModeValues,
+  defaultProps,
+  WeekDays,
+} from "./DatePickerNative";
 
 const COMP = "DatePicker";
 
 export const DatePickerMd = createMetadata({
   status: "experimental",
-  description: "A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.",
+  description:
+    "A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -87,15 +102,19 @@ export const DatePickerMd = createMetadata({
       ],
     },
     minValue: {
-      description: "The start date of the range of selectable dates",
+      description:
+        "The optional start date of the selectable date range. If not defined, the range " +
+        "allows any dates in the past.",
       valueType: "string",
     },
     maxValue: {
-      description: "The end date of the range of selectable dates",
+      description:
+        "The optional end date of the selectable date range. If not defined, the range allows " +
+        "any future dates.",
       valueType: "string",
     },
     disabledDates: {
-      description: "An array of dates that are disabled",
+      description: "An optional array of dates that are disabled",
       valueType: "any",
     },
     inline: {

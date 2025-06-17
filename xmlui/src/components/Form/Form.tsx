@@ -3,7 +3,7 @@ import styles from "./Form.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dComponent, dInternal } from "../metadata-helpers";
+import { dComponent, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd } from "../abstractions";
 import { FormWithContextVar, defaultProps } from "./FormNative";
 
@@ -28,8 +28,10 @@ export const FormMd = createMetadata({
     },
     itemLabelWidth: {
       description:
-        `This property sets the width of the item labels within the form. Individual ` +
-        `\`FormItem\` instances can override this property.`,
+        "This property sets the width of the item labels within the form. Individual " +
+        "\`FormItem\` instances can override this property. If this property is not set, " +
+        "each form item nested in the form uses its calculated label width. These widths " +
+        "may be different for each item.",
       type: "string",
     },
     itemLabelBreak: {
@@ -47,8 +49,9 @@ export const FormMd = createMetadata({
     },
     data: {
       description:
-        `This property sets the initial value of the form's data structure. The form infrastructure ` +
-        `uses this value to set the initial state of form items within the form.`,
+        "This property sets the initial value of the form's data structure. The form infrastructure " +
+        "uses this value to set the initial state of form items within the form. If this property is" +
+        "not set, the form does not have an initial value.",
     },
     cancelLabel: {
       description: "This property defines the label of the Cancel button.",
@@ -72,6 +75,7 @@ export const FormMd = createMetadata({
         `By default, the Cancel button is to the left of the Save button. Set this property to ` +
         `\`true\` to swap them or \`false\` to keep their original location.`,
       type: "boolean",
+      defaultValue: defaultProps.swapCancelAndSave,
     },
     submitUrl: d(`URL to submit the form data.`),
     submitMethod: {
@@ -79,7 +83,7 @@ export const FormMd = createMetadata({
         "This property sets the HTTP method to use when submitting the form data. If not " +
         "defined, `put` is used when the form has initial data; otherwise, `post`.",
     },
-    enabled: d(`Whether the form is enabled or not. The default value is \`true\`.`),
+    enabled: dEnabled(),
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
   },
   events: {

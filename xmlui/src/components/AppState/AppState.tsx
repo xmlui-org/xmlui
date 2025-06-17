@@ -21,7 +21,7 @@ export const AppStateMd = createMetadata({
         `component instances for the same bucket with their \`initialValue\` set, it may result ` +
         `in faulty app logic. When xmlui instantiates an \`${COMP}\` with an explicit initial ` +
         `value, that value is immediately set. Multiple initial values may result in ` +
-        `undesired initialization.`,
+        `undesired initialization. By default, the bucked's initial state is undefined.`,
     },
   },
   apis: {

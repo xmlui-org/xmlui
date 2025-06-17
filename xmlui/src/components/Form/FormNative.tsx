@@ -244,6 +244,7 @@ export const defaultProps: Pick<
   | "itemLabelPosition"
   | "itemLabelBreak"
   | "keepModalOpenOnSubmit"
+  | "swapCancelAndSave"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -251,6 +252,7 @@ export const defaultProps: Pick<
   itemLabelPosition: "top",
   itemLabelBreak: true,
   keepModalOpenOnSubmit: false,
+  swapCancelAndSave: false,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX

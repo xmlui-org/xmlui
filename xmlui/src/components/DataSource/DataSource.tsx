@@ -20,7 +20,8 @@ export const DataSourceMd = createMetadata({
     id: {
       description:
         `Set the ID used by other components to access the retrieved data in the \`value\`` +
-        `property of a \`DataSource\`, or status info in the \`loaded\` and \`error\` properties.`,
+        "property of a \`DataSource\`, or status info in the \`loaded\` and \`error\` properties." +
+        "When no `id` is set, the component cannot be used programmatically.",
       isRequired: true,
       valueType: "string",
     },
@@ -30,7 +31,7 @@ export const DataSourceMd = createMetadata({
       valueType: "string",
     },
     body: {
-      description: `Set the request body. The object you pass is serialized as a JSON string.`,
+      description: `Set the optional request body. The object you pass is serialized as a JSON string.`,
       valueType: "any",
     },
     rawBody: {
@@ -40,7 +41,7 @@ export const DataSourceMd = createMetadata({
       valueType: "string",
     },
     queryParams: {
-      description: `Append key/value pairs to the URL.`,
+      description: `Append optional key-value pairs to the URL.`,
       valueType: "any",
     },
     headers: {
@@ -49,28 +50,40 @@ export const DataSourceMd = createMetadata({
     },
     pollIntervalInSeconds: {
       description:
-        `Set the interval for periodic data fetching. If the data changes on refresh, ` +
-        `XMLUI will re-render components that refer directly or indirectly to the \`DataSource\`. `,
+        "Set the interval for periodic data fetching. If the data changes on refresh, " +
+        "XMLUI will re-render components that refer directly or indirectly to the \`DataSource\`. " +
+        "If not set or set to zero, the component does not poll for data.",
       valueType: "number",
     },
     inProgressNotificationMessage: {
-      description: `Set the message to display when the data fetch is in progress.`,
+      description:
+        "Set the message to display when the data fetch is in progress. " +
+        "If the property value is not set, no progress message is displayed.",
       valueType: "string",
     },
     completedNotificationMessage: {
-      description: `Set the message to display when the data fetch completes.`,
+      description:
+        "Set the message to display when the data fetch completes." +
+        "If the property value is not set, no completion message is displayed.",
       valueType: "string",
     },
     errorNotificationMessage: {
-      description: `Set the message to display when the there is an error.`,
+      description:
+        "Set the message to display when the there is an error. " +
+        "You can use the `$error` context value in an expression to " +
+        "refer to the original error message.",
       valueType: "string",
     },
     resultSelector: {
-      description: `Set an object key to extract a subset of the response data.`,
+      description:
+        "Set an optional object key to extract a subset of the response data. If this " +
+        "value is not set, the entire response body is considered the result.",
       valueType: "string",
     },
     transformResult: {
-      description: `Set a function to perform a final transformation of the response data.`,
+      description:
+        "Set an optional function to perform a final transformation of the " +
+        "response data. If this value is not set, the result is not transformed.",
     },
     prevPageSelector: {
       description:
@@ -87,7 +100,7 @@ export const DataSourceMd = createMetadata({
     structuralSharing: {
       description:
         "This property allows structural sharing. When turned on, `DataSource` will keep " +
-        "the original reference if nothing has changed in the data. If a subset has " +
+        "the original reference if nothing has changed in the data. If a subset has " +
         "changed, `DataSource` will keep the unchanged parts and only replace the changed " +
         "parts. If you do not need this behavior, set this property to `false`.",
       defaultValue: "true",

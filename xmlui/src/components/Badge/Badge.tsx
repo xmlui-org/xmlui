@@ -3,7 +3,13 @@ import styles from "./Badge.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Badge, badgeVariantValues, defaultProps, isBadgeColors, type BadgeColors } from "./BadgeNative";
+import {
+  Badge,
+  badgeVariantValues,
+  defaultProps,
+  isBadgeColors,
+  type BadgeColors,
+} from "./BadgeNative";
 import { dInternal } from "../metadata-helpers";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 
@@ -14,7 +20,10 @@ export const BadgeMd = createMetadata({
   description: `The \`${COMP}\` is a text label that accepts a color map to define its background color and, optionally, its label color.`,
   props: {
     value: {
-      description: "The text that the component displays",
+      description:
+        "The text that the component displays. If this is not defined, the component renders " +
+        "its children as the content of the badge. If neither text nor any child is defined, " +
+        "the component renders a single frame for the badge with a non-breakable space.",
       type: "string",
       isRequired: true,
     },
@@ -29,7 +38,7 @@ export const BadgeMd = createMetadata({
     colorMap: {
       description:
         `The \`${COMP}\` component supports the mapping of a list of colors using the \`value\` prop as the ` +
-        `key. Provide the component with a list or key-value pairs in two ways:`,
+        `key. If this property is not set, no color mapping is used.`,
     },
     themeColor: dInternal(`(**NOT IMPLEMENTED YET**) The theme color of the component.`),
     indicatorText: dInternal(
@@ -74,12 +83,12 @@ export const badgeComponentRenderer = createComponentRenderer(
         colorValue = {
           label: resolveColor(resolvedColor.label),
           background: resolveColor(resolvedColor.background),
-        }
+        };
       }
     }
     return (
       <Badge variant={extractValue(node.props.variant)} color={colorValue} style={layoutCss}>
-        {value || renderChild(node.children)}
+        {value || (node.children && renderChild(node.children)) || String.fromCharCode(0xa0)}
       </Badge>
     );
   },

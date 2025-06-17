@@ -53,9 +53,12 @@ export const FileInputMd = createMetadata({
     buttonIconPosition: d(
       `This optional string determines the location of the button icon.`,
       iconPositionNames,
+      "string",
+      "start"
+
     ),
     acceptsFileType: d(
-      `A list of file types the input controls accepts provided as a string array.`,
+      `An optional list of file types the input controls accepts provided as a string array.`,
     ),
     multiple: {
       ...d(
@@ -87,6 +90,8 @@ export const FileInputMd = createMetadata({
     buttonThemeColor: d(
       "The button color scheme (primary, secondary, attention)",
       buttonThemeNames,
+      "string",
+      defaultProps.buttonThemeColor,
     ),
   },
   events: {
