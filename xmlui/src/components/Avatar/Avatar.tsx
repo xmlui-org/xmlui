@@ -9,8 +9,7 @@ import { Avatar, defaultProps } from "./AvatarNative";
 const COMP = "Avatar";
 
 export const AvatarMd = createMetadata({
-  description:
-    `The \`${COMP}\` component represents a user, group (or other entity's) avatar with a small image or initials.`,
+  description: `The \`${COMP}\` component represents a user, group (or other entity's) avatar with a small image or initials.`,
   props: {
     size: {
       description: `This property defines the display size of the ${COMP}.`,
@@ -19,11 +18,15 @@ export const AvatarMd = createMetadata({
       defaultValue: defaultProps.size,
     },
     name: {
-      description: `This property sets the name value the ${COMP} uses to display initials.`,
+      description:
+        `This property sets the name value the ${COMP} uses to display initials. If neither ` +
+        "this property nor \`url\` is defined, an empty avatar is displayed.",
       valueType: "string",
     },
     url: {
-      description: `This property specifies the URL of the image to display in the ${COMP}.`,
+      description:
+        `This property specifies the URL of the image to display in the ${COMP}. ` +
+        "If neither this property nor \`name\` is defined, an empty avatar is displayed.",
       valueType: "string",
     },
   },

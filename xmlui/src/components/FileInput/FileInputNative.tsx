@@ -59,13 +59,23 @@ type Props = {
 
 export const defaultProps: Pick<
   Props,
-  "enabled" | "buttonPosition" | "buttonLabel" | "multiple" | "directory" | "updateState" | "onDidChange" | "onFocus" | "onBlur"
+  | "enabled"
+  | "buttonPosition"
+  | "buttonLabel"
+  | "multiple"
+  | "directory"
+  | "updateState"
+  | "onDidChange"
+  | "onFocus"
+  | "onBlur"
+  | "buttonThemeColor"
 > = {
   enabled: true,
   buttonPosition: "end",
   buttonLabel: "Browse",
   multiple: false,
   directory: false,
+  buttonThemeColor: "primary",
   updateState: noop,
   onDidChange: noop,
   onFocus: noop,

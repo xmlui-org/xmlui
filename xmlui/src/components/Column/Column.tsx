@@ -10,18 +10,24 @@ export const ColumnMd = createMetadata({
     `column's visual properties and data bindings.`,
   props: {
     bindTo: {
-      description: `Indicates what part of the data to lay out in the column.`,
+      description:
+        "Indicates the name of the current row item's property, the value of which to " +
+        "lay out in the column. If this property is not defined, the column is not sortable.",
       valueType: "string",
     },
     header: {
-      description: `Adds a label for a particular column.`,
+      description:
+        "This property defines a label for a particular column. If not set, the " +
+        "`bindTo` property value is used for the label.",
       valueType: "string",
     },
     width: {
       description:
-        `This property defines the width of the column. You can use a numeric value, a pixel ` +
-        `value (such as \`100px\`), or a star size value (such as \`*\`, \`2*\`, etc.). ` +
-        `You will get an error if you use any other unit (or value).`,
+        "This property defines the width of the column. You can use a numeric value, a pixel " +
+        "value (such as \`100px\`), or a star size value (such as \`*\`, \`2*\`, etc.). " +
+        "You will get an error if you use any other unit (or value)." +
+        "If not defined, the component will use a width according to the column values and " +
+        "the available space.",
       valueType: "any",
     },
     minWidth: {
@@ -34,8 +40,8 @@ export const ColumnMd = createMetadata({
     },
     canSort: {
       description:
-        `This property sets whether the user can sort by a column by clicking on its header ` +
-        `(\`true\`) or not (\`false\`).`,
+        "This property sets whether the user can sort by a column by clicking on its header " +
+        "(\`true\`) or not (\`false\`). If the `bindTo` property is not defined, the column is not sortable.",
       defaultValue: defaultProps.canSort,
       valueType: "boolean",
     },
@@ -43,7 +49,8 @@ export const ColumnMd = createMetadata({
       description:
         `This property allows the column to be pinned to ` +
         `the \`left\` (left-to-right writing style) or \`right\` (left-to-right writing style) edge ` +
-        `of the table. If the writing style is right-to-left, the locations are switched.`,
+        "of the table. If the writing style is right-to-left, the locations are switched. " + 
+        "If this property is not set, the column is not pinned to any edge.",
       availableValues: ["left", "right"],
       valueType: "string",
     },
@@ -54,6 +61,7 @@ export const ColumnMd = createMetadata({
         `\`false\`, the column cannot be resized. Double-clicking the column border ` +
         `resets to the original size.`,
       valueType: "boolean",
+      defaultValue: defaultProps.canResize,
     },
   },
   contextVars: {

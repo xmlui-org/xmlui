@@ -56,6 +56,9 @@ export const AutoCompleteMd = createMetadata({
     },
     creatable: d(
       `This property allows the user to create new items that are not present in the list of options.`,
+      null,
+      "boolean",
+      defaultProps.creatable,
     ),
     validationStatus: {
       ...dValidationStatus(),

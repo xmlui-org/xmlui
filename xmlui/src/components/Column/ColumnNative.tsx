@@ -11,8 +11,9 @@ type Props = OurColumnMetadata & {
   renderChild: RenderChildFn;
 };
 
-export const defaultProps: Pick<Props, "canSort"> = {
+export const defaultProps: Pick<Props, "canSort" | "canResize"> = {
   canSort: true,
+  canResize: true,
 };
 
 export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) {

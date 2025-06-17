@@ -361,7 +361,7 @@ function DataLoader({
       const errorMessage = extractParam(
         {
           ...stateRef.current.state,
-          $error: error,
+          $error: error?.toString(),
         },
         loader.props.errorNotificationMessage,
         stateRef.current.appContext,

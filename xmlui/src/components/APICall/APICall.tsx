@@ -34,27 +34,27 @@ export const APICallMd = createMetadata({
     `is similar in nature to the \`DataSource\` component which retrieves data from the backend.`,
   props: {
     method: {
-      description:
-        "The method of data manipulation can be done via setting this property.",
+      description: "The method of data manipulation can be done via setting this property.",
       valueType: "string",
       availableValues: httpMethodNames,
       defaultValue: defaultProps.method,
     },
     url: {
-      description: "Use this property to set the URL to send data to.",
+      description:
+        "Use this property to set the URL to which data will be sent. If not provided, an empty URL is used.",
       isRequired: true,
       valueType: "string",
     },
     rawBody: {
       description:
-        "This property sets the request body to the value provided here without any conversion. " +
+        "This optional property sets the request body to the value provided here without any conversion. " +
         "Use the * \`body\` property if you want the object sent in JSON. When you define " +
         "\`body\` and \`rawBody\`, the latest one prevails.",
       valueType: "string",
     },
     body: {
       description:
-        "This property sets the request body. The object you pass here will be serialized to " +
+        "This optional property sets the request body. The object you pass here will be serialized to " +
         "JSON when sending the request. Use the \`rawBody\` property to send another request " +
         "body using its native format. When you define \`body\` and \`rawBody\`, the latest " +
         "one prevails.",
@@ -62,15 +62,15 @@ export const APICallMd = createMetadata({
     },
     queryParams: {
       description:
-        "This property sets the query parameters for the request. The object you pass here will " +
+        "This optional property sets the query parameters for the request. The object you pass here will " +
         "be serialized to a query string and appended to the request URL. You can specify key " +
         "and value pairs where the key is the name of a particular query parameter and the value " +
         "is that parameter's value.",
     },
     headers: {
       description:
-        "You can define request header values as key and value pairs, where the key is the ID of " +
-        "the particular header and the value is that header's value.",
+        "You can optionally define request header values as key-value pairs, where the key is the ID " +
+        "of the particular header and the value is that header's corresponding value.",
     },
     confirmTitle: {
       description:
@@ -92,20 +92,21 @@ export const APICallMd = createMetadata({
     },
     inProgressNotificationMessage: {
       description:
-        "This property customizes the message that is displayed in a toast while the API operation " +
-        "is in progress.",
+        "This property customizes the message that is displayed in a toast while the API " +
+        "operation is in progress. If not defined, no progress message is displayed.",
       valueType: "string",
     },
     errorNotificationMessage: {
       description:
-        "This property defines the message to display automatically when the operation results " +
-        "in an error.",
+        "This property defines the message to display automatically when the operation " +
+        "results in an error. You can use the `$error` context value in an expression to " +
+        "refer to the original error message.",
       valueType: "string",
     },
     completedNotificationMessage: {
       description:
         "This property defines the message to display automatically when the operation has " +
-        "been completed.",
+        "been completed. When this property is not defined, the completion does not display any message.",
       valueType: "string",
     },
     payloadType: dInternal(),

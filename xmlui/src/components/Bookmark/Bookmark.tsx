@@ -11,18 +11,22 @@ export const BookmarkMd = createMetadata({
   opaque: true,
   props: {
     uid: {
-      description: "The unique identifier of the bookmark. You can use this identifier in links to navigate " +
-        "to this component's location.",
+      description:
+        "The unique identifier of the bookmark. You can use this identifier in links " +
+        "to navigate to this component's location. If this identifier is not set, you cannot " +
+        "programmatically visit this bookmark.",
       valueType: "string",
     },
     level: {
-      description: "The level of the bookmark. The level is used to determine the bookmark's " +
+      description:
+        "The level of the bookmark. The level is used to determine the bookmark's " +
         "position in the table of contents.",
       valueType: "number",
       defaultValue: defaultProps.level,
     },
     title: {
-      description: "Defines the text to display the bookmark in the table of contents. If this property is " +
+      description:
+        "Defines the text to display the bookmark in the table of contents. If this property is " +
         "empty, the text falls back to the value of \`id\`.",
       valueType: "string",
     },

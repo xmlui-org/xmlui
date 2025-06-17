@@ -79,6 +79,7 @@ export const defaultProps: Partial<AutoCompleteProps> = {
   multi: false,
   required: false,
   validationStatus: "none",
+  creatable: false,
   optionRenderer: defaultRenderer,
   updateState: noop,
   onDidChange: noop,
@@ -112,7 +113,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     labelWidth,
     labelBreak,
     required = defaultProps.required,
-    creatable = false,
+    creatable = defaultProps.creatable,
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {

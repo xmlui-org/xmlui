@@ -1,6 +1,4 @@
-import type {
-  CSSProperties,
-  ReactNode} from "react";
+import type { CSSProperties, ReactNode } from "react";
 import {
   createContext,
   Fragment,
@@ -20,10 +18,9 @@ import type {
   FormControlType,
   FormItemValidations,
   ValidateEventHandler,
-  ValidationMode} from "../Form/FormContext";
-import {
-  useFormContextPart
+  ValidationMode,
 } from "../Form/FormContext";
+import { useFormContextPart } from "../Form/FormContext";
 import { TextBox } from "../TextBox/TextBoxNative";
 import { Toggle } from "../Toggle/Toggle";
 import { FileInput } from "../FileInput/FileInputNative";
@@ -85,12 +82,13 @@ type Props = {
 
 export const defaultProps: Pick<
   Props,
-  "type" | "labelBreak" | "enabled" | "customValidationsDebounce"
+  "type" | "labelBreak" | "enabled" | "customValidationsDebounce" | "gap"
 > = {
   type: "text",
   labelBreak: true,
   enabled: true,
   customValidationsDebounce: 0,
+  gap: "0",
 };
 
 const FormItemContext = createContext<any>({ parentFormItemId: null });
@@ -188,7 +186,7 @@ export const FormItem = memo(function FormItem({
   const isEnabled = enabled && formEnabled;
 
   useEffect(() => {
-    if(initialValue !== undefined){
+    if (initialValue !== undefined) {
       dispatch(fieldInitialized(formItemId, initialValue));
     }
   }, [dispatch, formItemId, initialValue]);

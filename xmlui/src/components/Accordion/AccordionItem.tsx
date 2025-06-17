@@ -2,7 +2,10 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { dComponent } from "../../components/metadata-helpers";
 import { MemoizedItem } from "../../components/container-helpers";
-import { AccordionItemComponent, defaultProps } from "../../components/Accordion/AccordionItemNative";
+import {
+  AccordionItemComponent,
+  defaultProps,
+} from "../../components/Accordion/AccordionItemNative";
 
 const COMP = "AccordionItem";
 
@@ -11,7 +14,11 @@ export const AccordionItemMd = createMetadata({
     `\`${COMP}\` is a non-visual component describing a tab. Tabs component may use nested ` +
     `${COMP} instances from which the user can select.`,
   props: {
-    header: d("This property declares the text used in the component's header."),
+    header: d(
+      "This property declares the text used in the component's header. If not provided, the header will be empty.",
+      null,
+      "string",
+    ),
     headerTemplate: dComponent(
       "This property describes the template to use as the component's header.",
     ),
