@@ -19,8 +19,9 @@ const [components, htmlTagComponents] = partitionMetadata(
 
 await generateComponents(components);
 
-const packagesMetadata = await dynamicallyLoadExtensionPackages();
-await generateExtenionPackages(packagesMetadata);
+// --- Temporarily disabled
+// const packagesMetadata = await dynamicallyLoadExtensionPackages();
+// await generateExtenionPackages(packagesMetadata);
 
 // --- Helpers
 

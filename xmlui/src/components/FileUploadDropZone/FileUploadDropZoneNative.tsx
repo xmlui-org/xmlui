@@ -25,16 +25,24 @@ type Props = {
   disabled?: boolean;
 };
 
+export const defaultProps: Pick<Props, "onUpload" | "uid" | "allowPaste" | "text" | "disabled"> = {
+  onUpload: asyncNoop,
+  uid: "fileUploadDialog",
+  allowPaste: true,
+  text: "Drop files here",
+  disabled: false,
+};
+
 export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
   {
     children,
-    onUpload = asyncNoop,
-    uid = "fileUploadDialog",
+    onUpload = defaultProps.onUpload,
+    uid = defaultProps.uid,
     registerComponentApi,
     style,
-    allowPaste = true,
-    text = "Drop files here",
-    disabled = false,
+    allowPaste = defaultProps.allowPaste,
+    text = defaultProps.text,
+    disabled = defaultProps.disabled,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {

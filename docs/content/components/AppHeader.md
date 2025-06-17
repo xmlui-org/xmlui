@@ -1,7 +1,6 @@
 # AppHeader [#appheader]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.`AppHeader` is a placeholder within `App` to define a custom application header.
+`AppHeader` is a placeholder within `App` to define a custom application header.
 
 >[!INFO]
 > You can learn more details about using this component [here](../learning/using-components/app-component).

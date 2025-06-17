@@ -155,17 +155,17 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
 export const Table = forwardRef(
   (
     {
-      data = EMPTY_ARRAY,
-      columns = EMPTY_ARRAY,
-      isPaginated = false,
-      loading = false,
+      data = defaultProps.data,
+      columns = defaultProps.columns,
+      isPaginated = defaultProps.isPaginated,
+      loading = defaultProps.loading,
       headerHeight,
-      rowsSelectable = false,
-      enableMultiRowSelection = true,
-      pageSizes = DEFAULT_PAGE_SIZES,
+      rowsSelectable = defaultProps.rowsSelectable,
+      enableMultiRowSelection = defaultProps.enableMultiRowSelection,
+      pageSizes = defaultProps.pageSizes,
       rowDisabledPredicate = defaultIsRowDisabled,
       sortBy,
-      sortingDirection = "ascending",
+      sortingDirection = defaultProps.sortingDirection,
       iconSortAsc,
       iconSortDesc,
       iconNoSort,
@@ -173,13 +173,13 @@ export const Table = forwardRef(
       willSort,
       style,
       noDataRenderer,
-      autoFocus = false,
-      hideHeader = false,
-      hideNoDataView = false,
-      alwaysShowSelectionHeader = false,
+      autoFocus = defaultProps.autoFocus,
+      hideHeader = defaultProps.hideHeader,
+      hideNoDataView = defaultProps.hideNoDataView,
+      alwaysShowSelectionHeader = defaultProps.alwaysShowSelectionHeader,
       registerComponentApi,
       onSelectionDidChange,
-      noBottomBorder = false,
+      noBottomBorder = defaultProps.noBottomBorder,
       // cols
     }: TableProps,
     forwardedRef,
@@ -863,3 +863,19 @@ function ColumnOrderingIndicator({
     <Icon name={iconNoSort} size="12" />
   ); //nosort
 }
+
+export const defaultProps = {
+  data: EMPTY_ARRAY,
+  columns: EMPTY_ARRAY,
+  isPaginated: false,
+  loading: false,
+  rowsSelectable: false,
+  enableMultiRowSelection: true,
+  pageSizes: [10],
+  sortingDirection: "ascending" as SortingDirection,
+  autoFocus: false,
+  hideHeader: false,
+  hideNoDataView: false,
+  alwaysShowSelectionHeader: false,
+  noBottomBorder: false,
+};

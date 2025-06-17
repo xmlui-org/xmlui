@@ -5,7 +5,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dEnabled, dLabel } from "../metadata-helpers";
 import { LinkTargetMd } from "../abstractions";
-import { LinkNative } from "./LinkNative";
+import { LinkNative, defaultProps } from "./LinkNative";
 
 const COMP = "Link";
 
@@ -19,7 +19,7 @@ export const LinkMd = createMetadata({
     active: {
       description: `Indicates whether this link is active or not. If so, it will have a distinct visual appearance.`,
       type: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.active,
     },
     target: {
       description:
@@ -27,7 +27,6 @@ export const LinkMd = createMetadata({
         `property accepts the following values (in accordance with the HTML standard):`,
       availableValues: LinkTargetMd,
       type: "string",
-      defaultValue: "_self",
     },
     label: dLabel(),
     icon: d(`This property allows you to add an icon (specify the icon's name) to the link.`),

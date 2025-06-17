@@ -1,7 +1,6 @@
 # FileInput [#fileinput]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise).
+The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise).
 
 ## Properties [#properties]
 
@@ -27,11 +26,11 @@ Available values: `start`, `end`
 
 This property is an optional string to set a label for the button part.
 
-### `buttonPosition` [#buttonposition]
+### `buttonPosition (default: "end")` [#buttonposition-default-end]
 
-This property determines the position of the button relative to the input field. The default is "end".
+This property determines the position of the button relative to the input field.
 
-Available values: `start`, `end`
+Available values: `start`, `end` **(default)**
 
 ### `buttonSize` [#buttonsize]
 

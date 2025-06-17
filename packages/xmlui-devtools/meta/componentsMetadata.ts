@@ -1,4 +1,4 @@
-import { EditorMd } from "../src/Editor";
+import { EditorMd } from "../src/devtools/DevTools";
 
 export const componentMetadata = {
   name: "Editor",

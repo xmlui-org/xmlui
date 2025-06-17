@@ -20,6 +20,12 @@ import { Icon } from "../Icon/IconNative";
 import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
 
+// Default props for ModalDialog component
+export const defaultProps = {
+  fullScreen: false,
+  closeButtonVisible: true,
+};
+
 // =====================================================================================================================
 // React component definition
 
@@ -119,9 +125,9 @@ export const ModalDialog = React.forwardRef(
       children,
       style,
       isInitiallyOpen,
-      fullScreen,
+      fullScreen = defaultProps.fullScreen,
       title,
-      closeButtonVisible = true,
+      closeButtonVisible = defaultProps.closeButtonVisible,
       onOpen,
       onClose,
     }: ModalProps,

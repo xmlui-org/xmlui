@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { SyntaxKind } from "../../../src/parsers/xmlui-parser/syntax-kind";
 import { createScanner } from "../../../src/parsers/xmlui-parser/scanner";
-import { DiagnosticCategory, DiagnosticMessage } from "../../../src/parsers/xmlui-parser/diagnostics";
+import type { ScannerDiagnosticMessage } from "../../../src/parsers/xmlui-parser/diagnostics";
+import { DiagnosticCategory } from "../../../src/parsers/xmlui-parser/diagnostics";
 import { CharacterCodes } from "../../../src/parsers/xmlui-parser/CharacterCodes";
 
 describe("XMLUI scanner - tokens", () => {
@@ -324,7 +325,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("Error: unknown token", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(true, "123wer", (err) => {
       msgs.push(err);
     });
@@ -344,7 +345,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("Error: unterminated string literal #1", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(true, "'str", (err) => {
       msgs.push(err);
     });
@@ -362,7 +363,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("Error: unterminated string literal #2", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(true, '"str', (err) => {
       msgs.push(err);
     });
@@ -380,7 +381,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("Error: unterminated string literal #3", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(true, "`str", (err) => {
       msgs.push(err);
     });
@@ -398,7 +399,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("scanTrivia #1", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(false, "");
 
     // --- Act
@@ -409,7 +410,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("scanTrivia #2", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(false, "   ");
 
     // --- Act
@@ -421,7 +422,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("scanTrivia #3", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(false, "<   ");
     scanner.scan();
 
@@ -435,7 +436,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("scanTrivia #3", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(false, "<id   ");
     scanner.scan();
 
@@ -449,7 +450,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("peekChar #1", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(false, "123456");
 
     // --- Act
@@ -462,7 +463,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("peekChar #2", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(false, "123456");
     scanner.scan();
     scanner.scan();
@@ -476,7 +477,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("peekChar #3", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(false, "123456");
 
     // --- Act
@@ -489,7 +490,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("peekChar #4", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const scanner = createScanner(false, "123456");
     scanner.scan();
     scanner.scan();
@@ -529,7 +530,7 @@ describe("XMLUI scanner - tokens", () => {
   });
 
   it("Error: Unterminated CDATA", () => {
-    const msgs: DiagnosticMessage[] = [];
+    const msgs: ScannerDiagnosticMessage[] = [];
     const source = "<![CDATA[This is it!]]";
     const scanner = createScanner(true, source, (err) => {
       msgs.push(err);

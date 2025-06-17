@@ -32,7 +32,7 @@ No page is fetched from the server, thus the application operates as a [Single P
 
 ## Properties [#properties]
 
-### `defaultRoute` [#defaultroute]
+### `defaultRoute (default: "/")` [#defaultroute-default-]
 
 The default route when displaying the app
 

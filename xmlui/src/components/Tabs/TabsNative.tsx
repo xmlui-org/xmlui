@@ -27,16 +27,22 @@ type Props = {
   distributeEvenly?: boolean;
 };
 
+export const defaultProps = {
+  activeTab: 0,
+  orientation: "horizontal" as "horizontal" | "vertical",
+  distributeEvenly: false,
+};
+
 export const Tabs = forwardRef(function Tabs(
   {
-    activeTab = 0,
-    orientation = "horizontal",
+    activeTab = defaultProps.activeTab,
+    orientation = defaultProps.orientation,
     tabRenderer,
     style,
     children,
     registerComponentApi,
     className,
-    distributeEvenly = false,
+    distributeEvenly = defaultProps.distributeEvenly,
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {

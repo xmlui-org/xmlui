@@ -13,6 +13,12 @@ import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import { NavGroupContext } from "../NavGroup/NavGroupContext";
 
+// Default props for NavLink component
+export const defaultProps = {
+  active: false,
+  displayActive: true
+};
+
 type Props = {
   uid?: string;
   to?: string;
@@ -35,7 +41,7 @@ export const NavLink = forwardRef(function NavLink(
     children,
     disabled,
     to,
-    displayActive = true,
+    displayActive = defaultProps.displayActive,
     vertical,
     style,
     onClick,

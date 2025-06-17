@@ -17,7 +17,8 @@ export const IconMd = createMetadata({
     size: {
       description:
         `This property defines the size of the \`${COMP}\`. Note that setting the \`height\` and/or ` +
-        `the \`width\` of the component will override this property.`,
+        `the \`width\` of the component will override this property. You can use az explicit size ` + 
+        "value (e.g., 32px) or one of these predefined values: `xs`, `sm`, `md`, `lg`.",
       availableValues: ["xs", "sm", "md", "lg"],
     },
     fallback: d(

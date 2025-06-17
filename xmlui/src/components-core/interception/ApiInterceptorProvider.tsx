@@ -20,6 +20,7 @@ export function ApiInterceptorProvider({
   useHashBasedRouting?: boolean;
 }) {
   const [initialized, setInitialized] = useState(!interceptor);
+  const [interceptorWorker, setInterceptorWorker] = useState<SetupWorker | null>(null);
 
   // --- Whenever the interceptor changes, update the provider accordingly
   useEffect(() => {
@@ -34,6 +35,7 @@ export function ApiInterceptorProvider({
           const { createApiInterceptorWorker } = await import("./apiInterceptorWorker");
           if (interceptor) {
             interceptorWorker = await createApiInterceptorWorker(interceptor, apiWorker);
+            setInterceptorWorker(interceptorWorker);
             // if the apiWorker comes from the outside, we don't handle the lifecycle here
             if (!apiWorker) {
               const workerFileLocation = normalizePath(
@@ -62,13 +64,15 @@ export function ApiInterceptorProvider({
 
   const contextValue: IApiInterceptorContext = useMemo(() => {
     return {
+      interceptorWorker,
+      initialized: initialized,
       isMocked: (url) => interceptor !== undefined && !!process.env.VITE_MOCK_ENABLED,
     };
-  }, [interceptor]);
+  }, [interceptorWorker, initialized, interceptor]);
 
   return (
     <ApiInterceptorContext.Provider value={contextValue}>
-      {initialized ? children || null : null}
+      {children}
     </ApiInterceptorContext.Provider>
   );
 }

@@ -132,8 +132,6 @@ import { optionComponentRenderer } from "./Option/Option";
 import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
 import type StandaloneExtensionManager from "../components-core/StandaloneExtensionManager";
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
-// @ts-ignore
-import Charts from "xmlui-charts";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import type { Extension } from "../abstractions/ExtensionDefs";
 import {
@@ -243,6 +241,12 @@ import { radioItemComponentRenderer } from "./RadioGroup/RadioItem";
 import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
 import { codeBlockComponentRenderer } from "./CodeBlock/CodeBlock";
+import { barChartComponentRenderer } from "./Charts/BarChart/BarChart";
+import { donutChartComponentRenderer } from "./Charts/DonutChart/DonutChart";
+import { labelListComponentRenderer } from "./Charts/LabelList/LabelList";
+import { legendComponentRenderer } from "./Charts/Legend/Legend";
+import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
+import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -494,7 +498,12 @@ export class ComponentRegistry {
     }
 
     if (process.env.VITE_USED_COMPONENTS_Charts !== "false") {
-      this.extensionRegistered(Charts);
+      this.registerCoreComponent(barChartComponentRenderer);
+      this.registerCoreComponent(donutChartComponentRenderer);
+      this.registerCoreComponent(labelListComponentRenderer);
+      this.registerCoreComponent(legendComponentRenderer);
+      this.registerCoreComponent(lineChartComponentRenderer);
+      this.registerCoreComponent(pieChartComponentRenderer);
     }
 
     if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {

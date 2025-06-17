@@ -7,7 +7,8 @@ import {
 } from "../state/store";
 import { INITIAL_PLAYGROUND_STATE, preprocessCode } from "../utils/helpers";
 import styles from "./PlaygroundNative.module.scss";
-import { ApiInterceptorDefinition, ErrorBoundary, ThemeDefinition } from "xmlui";
+import type { ApiInterceptorDefinition, ThemeDefinition, ThemeTone } from "xmlui";
+import { ErrorBoundary } from "xmlui";
 import { PlaygroundContent } from "./PlaygroundContent";
 import { Header } from "./Header";
 
@@ -18,7 +19,7 @@ type PlaygroundProps = {
   api?: ApiInterceptorDefinition;
   themes?: ThemeDefinition[];
   defaultTheme?: string;
-  defaultTone?: string;
+  defaultTone?: ThemeTone;
   resources?: any;
   components: string[];
   previewOnly?: boolean;

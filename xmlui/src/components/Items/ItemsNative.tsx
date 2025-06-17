@@ -10,7 +10,11 @@ type Props = {
   reverse?: boolean;
 };
 
-export function Items({ items, renderItem, reverse = false }: Props) {
+export const defaultProps: Pick<Props, "reverse"> = {
+  reverse: false,
+};
+
+export function Items({ items, renderItem, reverse = defaultProps.reverse }: Props) {
   const itemsToRender = useMemo(() => {
     if (!items) {
       return [];

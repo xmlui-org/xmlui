@@ -11,6 +11,10 @@ type Props = OurColumnMetadata & {
   renderChild: RenderChildFn;
 };
 
+export const defaultProps: Pick<Props, "canSort"> = {
+  canSort: true,
+};
+
 export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) {
   const id = useId();
   const { registerColumn, unRegisterColumn } = useTableContext();

@@ -1,11 +1,9 @@
-import { memo } from "react";
-
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import type { Option } from "../abstractions";
 import { dEnabled } from "../metadata-helpers";
-import { useOptionType } from "./OptionTypeProvider";
 import { MemoizedItem } from "../container-helpers";
+import { OptionNative, defaultProps } from "./OptionNative";
 
 const COMP = "Option";
 
@@ -23,20 +21,17 @@ export const OptionMd = createMetadata({
       `This property defines the value of the option. If \`value\` is not defined, ` +
         `\`Option\` will use the \`label\` as the value.`,
     ),
-    enabled: dEnabled(),
+    enabled: {
+      description: "This boolean property indicates whether the option is enabled or disabled.",
+      valueType: "boolean",
+      defaultValue: defaultProps.enabled,
+    },
     optionTemplate: d("This property is used to define a custom option template"),
   },
   childrenAsTemplate: "optionTemplate",
 });
 
-const OptionNative = memo((props: Option) => {
-  const OptionType = useOptionType();
-  if (!OptionType) {
-    return null;
-  }
-  return <OptionType {...props} />;
-});
-OptionNative.displayName = "OptionNative";
+
 
 export const optionComponentRenderer = createComponentRenderer(
   COMP,

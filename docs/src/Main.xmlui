@@ -192,15 +192,6 @@
                 <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>
             </Page>
         </Pages>
-        <Footer>
-            <Card border="0" width="100%" padding="0">
-                <CHStack gap="$space-1" paddingBottom="0" verticalAlignment="center">
-                    Created with
-                    <Logo width="50px" />
-                </CHStack>
-            </Card>
-        </Footer>
-
     </App>
 
     <StandalonePlayground when="{window.location.hash.includes('/playground')}"/>

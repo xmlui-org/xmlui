@@ -6,7 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { dComponent, dInternal } from "../metadata-helpers";
 import { scrollAnchoringValues } from "../abstractions";
-import { ListNative, MemoizedSection } from "./ListNative";
+import { ListNative, MemoizedSection, defaultProps } from "./ListNative";
 
 const COMP = "List";
 
@@ -36,7 +36,7 @@ export const ListMd = createMetadata({
       description: `This property pins the scroll position to a specified location of the list. Available values are shown below.`,
       availableValues: scrollAnchoringValues,
       type: "string",
-      defaultValue: "top",
+      defaultValue: defaultProps.scrollAnchor,
     },
     groupBy: d(
       `This property sets which attribute of the data is used to group the list items. ` +
@@ -72,7 +72,7 @@ export const ListMd = createMetadata({
     idKey: {
       description: "Denotes which attribute of an item acts as the ID or key of the item",
       type: "string",
-      defaultValue: "id",
+      defaultValue: defaultProps.idKey,
     },
     groupsInitiallyExpanded: d(
       `This Boolean property defines whether the list groups are initially expanded.`,
@@ -87,12 +87,12 @@ export const ListMd = createMetadata({
       description:
         "This boolean property indicates if empty groups should be hidden (no header and footer are displayed).",
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.hideEmptyGroups,
     },
     borderCollapse: {
       description: "Collapse items borders",
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.borderCollapse,
     },
   },
   childrenAsTemplate: "itemTemplate",

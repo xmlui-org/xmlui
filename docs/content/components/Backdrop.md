@@ -23,7 +23,7 @@ The `Backdrop` component is a semi-transparent overlay that appears on top of it
 
 The background color of the backdrop.
 
-### `opacity (default: 0.1)` [#opacity-default-0-1]
+### `opacity (default: "0.1")` [#opacity-default-0-1]
 
 The opacity of the backdrop.
 

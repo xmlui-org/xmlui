@@ -393,7 +393,7 @@ This component does not expose any methods.
 | [backgroundColor](../styles-and-themes/common-units/#color)-navPanel-App | $backgroundColor | $backgroundColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderLeft](../styles-and-themes/common-units/#border)-content-App | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | $boxShadow-spread | $boxShadow-spread |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | none | none |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | $boxShadow-spread | $boxShadow-spread |
 | [maxWidth](../styles-and-themes/common-units/#size)-App | *none* | *none* |
 | [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |

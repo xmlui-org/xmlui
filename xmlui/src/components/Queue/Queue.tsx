@@ -1,7 +1,7 @@
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
-import { Queue } from "./QueueNative";
+import { Queue, defaultProps } from "./QueueNative";
 
 const COMP = "Queue";
 
@@ -18,10 +18,11 @@ export const QueueMd = createMetadata({
       `This property defines the component template of the UI that displays result ` +
         `information when the queue becomes empty after processing all queued items.`,
     ),
-    clearAfterFinish: d(
-      `This property indicates the completed items (successful or error) should ` +
+    clearAfterFinish: {
+      description: `This property indicates the completed items (successful or error) should ` +
         `be removed from the queue after completion.`,
-    ),
+      defaultValue: defaultProps.clearAfterFinish,
+    },
   },
   nonVisual: true,
   events: {

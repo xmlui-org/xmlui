@@ -10,6 +10,11 @@ import { Logo } from "../Logo/LogoNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
 
+// Default props for NavPanel component
+export const defaultProps = {
+  inDrawer: false,
+};
+
 interface INavPanelContext {
   inDrawer: boolean;
 }
@@ -48,22 +53,24 @@ function DrawerNavPanel({
   );
 }
 
+type Props = {
+  children: ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  logoContent?: ReactNode;
+  inDrawer?: boolean;
+  renderChild: RenderChildFn;
+};
+
 export const NavPanel = forwardRef(function NavPanel(
   {
     children,
     style,
     logoContent,
     className,
-    inDrawer,
+    inDrawer = defaultProps.inDrawer,
     renderChild,
-  }: {
-    children: ReactNode;
-    className?: string;
-    style?: React.CSSProperties;
-    logoContent?: ReactNode;
-    inDrawer?: boolean;
-    renderChild: RenderChildFn;
-  },
+  }: Props,
   forwardedRef,
 ) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);

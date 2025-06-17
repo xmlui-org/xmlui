@@ -11,7 +11,7 @@ import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import type { OrientationOptions } from "../abstractions";
 import { dComponent } from "../metadata-helpers";
-import { Splitter } from "./SplitterNative";
+import { Splitter, defaultProps } from "./SplitterNative";
 
 const COMP = "Splitter";
 
@@ -25,7 +25,7 @@ const baseSplitterMd = createMetadata({
         `This optional booelan property indicates whether the \`${COMP}\` sections are layed out as ` +
         `primary and secondary (\`false\`) or secondary and primary (\`true\`) from left to right.`,
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.swapped,
     },
     splitterTemplate: dComponent(
       `The divider can be customized using XMLUI components via this property.`,
@@ -35,28 +35,28 @@ const baseSplitterMd = createMetadata({
         `This optional number property sets the initial size of the primary section. The unit of ` +
         `the size value is in pixels or percentages.`,
       valueType: "string",
-      defaultValue: "50%",
+      defaultValue: defaultProps.initialPrimarySize,
     },
     minPrimarySize: {
       description:
         `This property sets the minimum size the primary section can have. The unit of the size ` +
         `value is in pixels or percentages.`,
       valueType: "string",
-      defaultValue: "0%",
+      defaultValue: defaultProps.minPrimarySize,
     },
     maxPrimarySize: {
       description:
         `This property sets the maximum size the primary section can have. The unit of the size ` +
         `value is in pixels or percentages.`,
       valueType: "string",
-      defaultValue: "100%",
+      defaultValue: defaultProps.maxPrimarySize,
     },
     floating: {
       description:
         `Toggles whether the resizer is visible (\`false\`) or not (\`true\`) when not hovered ` +
         `or dragged. The default value is \`false\`, meaning the resizer is visible all the time.`,
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.floating,
     },
     orientation: {
       description:
@@ -65,7 +65,7 @@ const baseSplitterMd = createMetadata({
         `next to each other (\`horizontal\`).`,
       valueType: "string",
       availableValues: ["horizontal", "vertical"],
-      defaultValue: "vertical",
+      defaultValue: defaultProps.orientation,
     },
   },
   events: {

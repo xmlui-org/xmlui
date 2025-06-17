@@ -11,7 +11,7 @@ import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dClick, dInternal } from "../metadata-helpers";
-import { DEFAULT_ORIENTATION, Stack } from "./StackNative";
+import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
 
 const COMP = "Stack";
@@ -40,7 +40,7 @@ const stackMd = createMetadata({
     reverse: {
       description: "Optional boolean property to reverse the order of child elements.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.reverse,
     },
     wrapContent: {
       description:
@@ -54,12 +54,18 @@ const stackMd = createMetadata({
       "the Stack lays out its children in a row or a column).",
       availableValues: ["horizontal", "vertical"],
       valueType: "string",
-      defaultValue: DEFAULT_ORIENTATION,
+      defaultValue: defaultProps.orientation,
     },
     horizontalAlignment: HORIZONTAL_ALIGNMENT,
     verticalAlignment: VERTICAL_ALIGNMENT,
-    hoverContainer: dInternal("Reserved for future use"),
-    visibleOnHover: dInternal("Reserved for future use"),
+    hoverContainer: {
+      ...dInternal("Reserved for future use"),
+      defaultValue: defaultProps.hoverContainer,
+    },
+    visibleOnHover: {
+      ...dInternal("Reserved for future use"),
+      defaultValue: defaultProps.visibleOnHover,
+    },
   },
   events: {
     click: dClick(COMP),

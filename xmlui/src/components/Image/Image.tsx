@@ -4,7 +4,7 @@ import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { dClick } from "../metadata-helpers";
-import { Image } from "./ImageNative";
+import { Image, defaultProps } from "./ImageNative";
 
 const COMP = "Image";
 
@@ -18,19 +18,25 @@ export const ImageMd = createMetadata({
     fit: {
       description: "This property sets how the image content should be resized to fit its container.",
       type: "string",
-      defaultValue: "contain",
+      defaultValue: defaultProps.fit,
     },
-    lazyLoad: d(
-      `Lazy loading instructs the browser to load the image only when it is imminently needed ` +
-        `(e.g. user scrolls to it). The default value is eager (\`false\`).`,
-    ),
+    lazyLoad: {
+      description:
+        `Lazy loading instructs the browser to load the image only when it is imminently needed ` +
+        `(e.g. user scrolls to it).`,
+      type: "boolean",
+      defaultValue: defaultProps.lazyLoad,
+    },
     aspectRatio: d(
       `This property sets a preferred aspect ratio for the image, which will be used in the ` +
         `calculation of auto sizes and some other layout functions.`,
     ),
-    inline: d(
-      `When set to true, the image will be displayed as an inline element instead of a block element.`
-    ),
+    inline: {
+      description:
+        `When set to true, the image will be displayed as an inline element instead of a block element.`,
+      type: "boolean",
+      defaultValue: defaultProps.inline,
+    },
     animation: d(`The animation object to be applied to the component`),
   },
   events: {

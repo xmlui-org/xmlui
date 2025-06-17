@@ -9,3 +9,5 @@ This extension adds tools for working with [XMLUI](https://docs.xmlui.com) files
 - Diagnostics for errors
 
 ## Features
+
+![](./tools/vscode/resources/xmlui-markup-syntax-highlighting.png)

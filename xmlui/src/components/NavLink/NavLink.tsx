@@ -5,7 +5,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dClick, dEnabled, dLabel } from "../metadata-helpers";
 import { Icon } from "../Icon/IconNative";
-import { NavLink } from "./NavLinkNative";
+import { NavLink, defaultProps } from "./NavLinkNative";
 import { LinkTargetMd } from "../abstractions";
 
 const COMP = "NavLink";
@@ -23,13 +23,12 @@ export const NavLinkMd = createMetadata({
         `has a particular visual appearance, provided its [\`displayActive\`](#displayactive) ` +
         `property is set to \`true\`.`,
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.active,
     },
     target: {
       description: `This property specifies how to open the clicked link.`,
       availableValues: LinkTargetMd,
       type: "string",
-      defaultValue: "_self",
     },
     label: dLabel(),
     vertical: {
@@ -38,14 +37,13 @@ export const NavLinkMd = createMetadata({
         `set to true, the indicator is displayed on the side which lends itself to a vertically ` +
         `aligned navigation menu.`,
       valueType: "boolean",
-      defaultValue: false,
     },
     displayActive: {
       description:
         `This Boolean property indicates if the active state of a link should have a visual ` +
         `indication. Setting it to \`false\` removes the visual indication of an active link.`,
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.displayActive,
     },
     icon: d(
       `This property allows you to add an icon (specify the icon's name) to the navigation link.`,

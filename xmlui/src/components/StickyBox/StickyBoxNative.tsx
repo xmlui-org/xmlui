@@ -9,6 +9,10 @@ import {useRealBackground, useScrollParent} from "../../components-core/utils/ho
 // =====================================================================================================================
 // React StickyBox component implementation
 
+export const defaultProps = {
+    to: "top" as const,
+};
+
 type Props = {
     children: ReactNode;
     uid?: string;
@@ -16,7 +20,7 @@ type Props = {
     to: "top" | "bottom";
 };
 
-export function StickyBox({children, uid, layout, to = "top"}: Props) {
+export function StickyBox({children, uid, layout, to = defaultProps.to}: Props) {
     const sentinelRef = useRef(null);
     const [wrapper, setWrapper] = useState(null);
     const [stuck, setStuck] = useState(false);

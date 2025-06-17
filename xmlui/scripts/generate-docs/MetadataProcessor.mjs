@@ -581,11 +581,12 @@ function addComponentStatusDisclaimer(status) {
     case "stable":
       disclaimer = "";
       break;
-    case "experimental":
-      disclaimer =
-        "This component is in an **experimental** state; you can use it in your app. " +
-        "However, we may modify it, and it may even have breaking changes in the future.";
-      break;
+    // --- Tempoparily removed
+    // case "experimental":
+    //   disclaimer =
+    //     "This component is in an **experimental** state; you can use it in your app. " +
+    //     "However, we may modify it, and it may even have breaking changes in the future.";
+    //   break;
     case "deprecated":
       disclaimer =
         "This component has been **deprecated**. We may remove it in a future XMLUI version.";

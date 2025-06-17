@@ -4,7 +4,7 @@ import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dComponent } from "../metadata-helpers";
-import { NavPanel } from "./NavPanelNative";
+import { NavPanel, defaultProps } from "./NavPanelNative";
 
 const COMP = "NavPanel";
 
@@ -15,6 +15,11 @@ export const NavPanelMd = createMetadata({
       `This property defines the logo template to display in the navigation panel with the ` +
         `\`vertical\` and \`vertical-sticky\` layout.`,
     ),
+    inDrawer: {
+      description: `This property determines if the navigation panel is displayed in a drawer.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.inDrawer,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,

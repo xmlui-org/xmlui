@@ -1,7 +1,6 @@
 # TextBox [#textbox]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.The `TextBox` is an input component that allows users to input and edit textual data.
+The `TextBox` is an input component that allows users to input and edit textual data.
 
 ## Properties [#properties]
 
@@ -59,7 +58,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 This property defines the gap between the adornments and the input area.
 
-### `initialValue` [#initialvalue]
+### `initialValue (default: "")` [#initialvalue-default-]
 
 This property sets the component's initial value.
 

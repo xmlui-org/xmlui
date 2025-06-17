@@ -7,6 +7,15 @@ import { noop } from "../../components-core/constants";
 import { parseSize, toPercentage } from "../Splitter/utils";
 import { OrientationOptions } from "../abstractions";
 
+export const defaultProps = {
+  initialPrimarySize: "50%",
+  minPrimarySize: "0%",
+  maxPrimarySize: "100%",
+  orientation: "vertical" as OrientationOptions,
+  swapped: false,
+  floating: false,
+};
+
 type SplitterProps = {
   children: React.ReactNode[] | React.ReactNode;
   style?: React.CSSProperties;
@@ -21,14 +30,14 @@ type SplitterProps = {
 };
 
 export const Splitter = ({
-  initialPrimarySize = "50%",
-  minPrimarySize = "0%",
-  maxPrimarySize = "100%",
-  orientation = "vertical",
+  initialPrimarySize = defaultProps.initialPrimarySize,
+  minPrimarySize = defaultProps.minPrimarySize,
+  maxPrimarySize = defaultProps.maxPrimarySize,
+  orientation = defaultProps.orientation,
   children,
   style,
-  swapped = false,
-  floating = false,
+  swapped = defaultProps.swapped,
+  floating = defaultProps.floating,
   splitterTemplate,
   resize = noop,
 }: SplitterProps) => {

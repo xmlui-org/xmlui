@@ -38,8 +38,20 @@ type Props = {
   style?: React.CSSProperties;
 };
 
+export const defaultProps: Pick<Props, "initiallyExpanded" | "headerRenderer"> = {
+  initiallyExpanded: false,
+  headerRenderer: defaultRenderer,
+};
+
 export const AccordionItemComponent = forwardRef(function AccordionItemComponent(
-  { id, header, headerRenderer = defaultRenderer, content, initiallyExpanded, style }: Props,
+  { 
+    id, 
+    header, 
+    headerRenderer = defaultProps.headerRenderer, 
+    content, 
+    initiallyExpanded = defaultProps.initiallyExpanded, 
+    style 
+  }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const generatedId = useId();

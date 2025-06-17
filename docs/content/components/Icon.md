@@ -1,7 +1,6 @@
 # Icon [#icon]
 
->[!WARNING]
-> This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.This component is the representation of an icon.
+This component is the representation of an icon.
 
 It is a small visual element, which is used to graphically represent functions, features, or types of content within a user interface.
 
@@ -39,7 +38,7 @@ Nothing is displayed if the icon name is not found in the registry.
 
 ### `size` [#size]
 
-This property defines the size of the `Icon`. Note that setting the `height` and/or the `width` of the component will override this property.
+This property defines the size of the `Icon`. Note that setting the `height` and/or the `width` of the component will override this property. You can use az explicit size value (e.g., 32px) or one of these predefined values: `xs`, `sm`, `md`, `lg`.
 
 Available values: `xs`, `sm`, `md`, `lg`
 

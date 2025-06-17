@@ -7,13 +7,20 @@ import { createUrlWithQueryParams } from "../component-utils";
 
 const COMP = "Redirect";
 
+export const defaultProps = {
+  to: "",
+};
+
 export const RedirectMd = createMetadata({
   description:
     `\`${COMP}\` is a component that immediately redirects the browser to the URL in its ` +
     `\`to\` property when it gets visible (its \`when\` property gets \`true\`). The ` +
     `redirection works only within the app.`,
   props: {
-    to: d(`This property defines the URL to which this component is about to redirect requests.`),
+    to: {
+      description: `This property defines the URL to which this component is about to redirect requests.`,
+      defaultValue: defaultProps.to,
+    },
   },
 });
 

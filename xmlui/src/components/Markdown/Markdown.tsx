@@ -3,7 +3,7 @@ import styles from "./Markdown.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Markdown } from "./MarkdownNative";
+import { Markdown, defaultProps } from "./MarkdownNative";
 import type React from "react";
 import { useMemo } from "react";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
@@ -29,7 +29,7 @@ export const MarkdownMd = createMetadata({
         "indent found at the start of the content lines is removed from the " +
         "beginning of every line.",
       valueType: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.removeIndents,
     },
     showHeadingAnchors: {
       description:
@@ -37,7 +37,7 @@ export const MarkdownMd = createMetadata({
         "displayed. If set to `true`, heading anchors will be displayed on hover " +
         "next to headings.",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.showHeadingAnchors,
     },
   },
 

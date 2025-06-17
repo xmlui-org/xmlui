@@ -42,22 +42,35 @@ type Props = {
   required?: boolean;
 };
 
+export const defaultProps: Pick<Props, "type" | "value" | "initialValue" | "enabled" | "validationStatus" | "onDidChange" | "onFocus" | "onBlur" | "onKeyDown" | "updateState"> = {
+  type: "text",
+  value: "",
+  initialValue: "",
+  enabled: true,
+  validationStatus: "none",
+  onDidChange: noop,
+  onFocus: noop,
+  onBlur: noop,
+  onKeyDown: noop,
+  updateState: noop,
+};
+
 export const TextBox = forwardRef(function TextBox(
   {
     id,
-    type = "text",
-    value = "",
-    updateState = noop,
-    initialValue = "",
+    type = defaultProps.type,
+    value = defaultProps.value,
+    updateState = defaultProps.updateState,
+    initialValue = defaultProps.initialValue,
     style,
     maxLength,
-    enabled = true,
+    enabled = defaultProps.enabled,
     placeholder,
-    validationStatus = "none",
-    onDidChange = noop,
-    onFocus = noop,
-    onBlur = noop,
-    onKeyDown = noop,
+    validationStatus = defaultProps.validationStatus,
+    onDidChange = defaultProps.onDidChange,
+    onFocus = defaultProps.onFocus,
+    onBlur = defaultProps.onBlur,
+    onKeyDown = defaultProps.onKeyDown,
     registerComponentApi,
     startText,
     startIcon,
