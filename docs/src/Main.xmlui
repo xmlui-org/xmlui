@@ -81,6 +81,7 @@
                 <DocumentPage hideToc="true" url="/pages/reactive-intro.md" />
             </Page>
             <Page url="/components-intro">
+              <!--      TODO illesg: note, breaks ssr scroll (jumps to top after hydration)-->
                 <ComponentsIntro/>
             </Page>
             <Page url="/themes-intro">
