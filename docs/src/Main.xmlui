@@ -70,8 +70,8 @@
                 <!--
                 <NavLink label="Test" to="/test"/>
                 -->
-                <NavLink label="Downloads" to="/downloads"/>
             </NavGroup>
+            <NavLink label="Downloads" to="/downloads"/>
         </NavPanel>
 
         <Pages>
