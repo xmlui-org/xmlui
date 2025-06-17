@@ -29,36 +29,29 @@ The fastest way to get started with XMLUI is to download our starter kit, which 
 
 | Platform | Download
 |----------|----------
-| **macOS Intel** | [xmlui-invoice-macos-intel.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-macos-intel.tar.gz)
-| **macOS ARM64** | [xmlui-invoice-macos-arm64.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-macos-arm64.tar.gz)
-| **Windows AMD64** | [xmlui-invoice-windows-amd64.zip](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-windows-amd64.zip)
-| **Linux AMD64** | [xmlui-invoice-linux-amd64.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-linux-amd64.tar.gz)
+| macOS Intel | [xmlui-invoice-macos-intel.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-macos-intel.tar.gz)
+| macOS ARM64 | [xmlui-invoice-macos-arm64.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-macos-arm64.tar.gz)
+| Windows AMD64 | [xmlui-invoice-windows-amd64.zip](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-windows-amd64.zip)
+| Linux AMD64 | [xmlui-invoice-linux-amd64.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-linux-amd64.tar.gz)
 
 
 ### What's included
 
 **XMLUI Invoice**: A complete business application with client and product management, invoice creation and tracking, search, and charts.
 
-**XMLUI Engine**: The core framework file.
+**XMLUI engine**: The core framework file.
 
-**XMLUI Test Server**: A simple server to run the app.
+**XMLUI test server**: A simple server to run the app.
 
 ### Quick start
 
 Extract the files to a working folder and run the start script.
 
-### What's next?
+### See also
 
-**See it live**: Visit [demo.xmlui.com](https://demo.xmlui.com) to try the app online
+Visit [demo.xmlui.com](https://demo.xmlui.com) to explore a gallery of components.
 
-**Learn the concepts**: Read our [documentation](https://docs.xmlui.com) to understand XMLUI fundamentals
-
-**Join the community**: Check out our [GitHub Discussions](https://github.com/xmlui-com/xmlui/discussions) for tips and support
-
-## Documentation
-
-The [XMLUI documentation site](https://docs.xmlui.com) is itself an XMLUI app!
-
+Visit [docs.xmlui.com](https://docs.xmlui.com) for an introduction, a tutorial, and full documentation. The documentation site is itself an XMLUI app!
 
 <a href="https://docs.xmlui.com"><img width="1285" alt="image" src="https://github.com/user-attachments/assets/9a54ae74-4f45-4079-a5d4-142e23fb4134" /></a>
 
