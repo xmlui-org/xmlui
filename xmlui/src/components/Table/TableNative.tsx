@@ -724,12 +724,31 @@ export const Table = forwardRef(
                             ...getCommonPinningStyles(cell.column),
                           }}
                         >
-                          {cellRenderer
-                            ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
-                            : (flexRender(
+                          {/*we have to wrap it in a div, because tables...
+
+                          The "Last Cell" Problem: Why This Happens
+                          Even with box-sizing: border-box, the browser gives special treatment to the last column of a table.
+
+                          With table-layout: fixed, the browser calculates the widths for all columns.
+                          It strictly enforces the widths for columns 1, 2, 3, etc.
+                          The last column is often used as a "catch-all" to ensure the total width of all columns exactly matches the width of the <table> element itself (e.g., 100%).
+                          When you add padding-right to this very last cell, you create a conflict. The browser tries to simultaneously:
+                          Keep the cell's right edge perfectly aligned with the table's right edge.
+                          Render the padding inside that right edge.
+
+                          Solution: The Inner Wrapper <div>
+                          The most robust and common solution is to decouple the cell's width from its content's padding. You do this by adding a wrapper <div> inside the cell.
+                          The <td> will be responsible only for setting the rigid width.
+                          The inner <div> will be responsible only for handling the padding and content.
+                           */}
+                          <div className={styles.cellContent}>
+                            {cellRenderer
+                              ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
+                              : (flexRender(
                                 cell.column.columnDef.cell,
                                 cell.getContext(),
                               ) as ReactNode)}
+                          </div>
                         </td>
                       );
                     })}
