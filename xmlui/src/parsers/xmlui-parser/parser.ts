@@ -26,7 +26,9 @@ export type GetText = (n: Node, ignoreTrivia?: boolean) => string;
 
 export type ParseResult = { node: Node; errors: Error[] };
 
+const FILE_START_OR_END_TOKENS = [SyntaxKind.CData, SyntaxKind.Script, SyntaxKind.OpenNodeStart];
 const TAG_START_OR_END_TOKENS = [SyntaxKind.OpenNodeStart, SyntaxKind.NodeEnd, SyntaxKind.NodeClose, SyntaxKind.CloseNodeStart, SyntaxKind.CData, SyntaxKind.Script];
+const CONTENT_START_OR_END_TOKENS = [SyntaxKind.TextNode, SyntaxKind.StringLiteral, SyntaxKind.CData, SyntaxKind.Script, SyntaxKind.OpenNodeStart, SyntaxKind.CloseNodeStart];
 
 export function createXmlUiParser(source: string): {
   parse: () => ParseResult;
@@ -66,14 +68,19 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       switch (token.kind) {
         case SyntaxKind.TextNode:
         case SyntaxKind.StringLiteral:
-          bump(token.kind);
+        case SyntaxKind.CData:
+        case SyntaxKind.Script:
+          bumpAny();
+          break;
+        case SyntaxKind.OpenNodeStart:
+          parseTag();
           break;
         case SyntaxKind.CloseNodeStart:
-          break loop;
         case SyntaxKind.EndOfFileToken:
           break loop;
         default:
-          parseTagLike();
+          const errNode = errNodeUntil(CONTENT_START_OR_END_TOKENS);
+          errorAt(DIAGS.expTagOpen, errNode!.pos, errNode!.end)
           break;
       }
     }
@@ -91,23 +98,20 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         case SyntaxKind.EndOfFileToken:
           bumpAny();
           return;
+        case SyntaxKind.CData:
+        case SyntaxKind.Script:
+          bumpAny();
+          break;
+        case SyntaxKind.OpenNodeStart:
+          parseTag();
+          break;
         default:
-          parseTagLike();
+          const errNode = errNodeUntil(FILE_START_OR_END_TOKENS);
+          errorAt(DIAGS.expTagOpen, errNode!.pos, errNode!.end)
           break;
       }
     }
   }
-
-  function parseTagLike() {
-    if (!eat(SyntaxKind.CData) && !eat(SyntaxKind.Script)) {
-      if (at(SyntaxKind.OpenNodeStart)) {
-        parseTag();
-      } else {
-        errorAndBump(DIAGS.expTagOpen);
-      }
-    }
-  }
-
 
   function parseTag() {
     startNode();
@@ -137,6 +141,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         completeNode(SyntaxKind.ElementNode);
         return;
       }
+
       case SyntaxKind.NodeEnd:{
         bumpAny();
         parseContent();
@@ -346,11 +351,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     bumpAny();
     completeNode(SyntaxKind.ErrorNode);
     return false;
-  }
-
-  /** Bumps over the next token and marks it as an error node while adding an error to the error list*/
-  function errorAndBump(errCodeAndMsg: GeneralDiagnosticMessage) {
-    errRecover(errCodeAndMsg, []);
   }
 
   function error({ code, message, category }: GeneralDiagnosticMessage) {
