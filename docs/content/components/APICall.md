@@ -11,11 +11,11 @@ The component provides context values with which you can access some internal pr
 
 ### `body` [#body]
 
-This property sets the request body. The object you pass here will be serialized to JSON when sending the request. Use the `rawBody` property to send another request body using its native format. When you define `body` and `rawBody`, the latest one prevails.
+This optional property sets the request body. The object you pass here will be serialized to JSON when sending the request. Use the `rawBody` property to send another request body using its native format. When you define `body` and `rawBody`, the latest one prevails.
 
 ### `completedNotificationMessage` [#completednotificationmessage]
 
-This property defines the message to display automatically when the operation has been completed.
+This property defines the message to display automatically when the operation has been completed. When this property is not defined, the completion does not display any message.
 
 This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:
 
@@ -41,7 +41,7 @@ This optional string sets the title in the confirmation dialog that is displayed
 
 ### `errorNotificationMessage` [#errornotificationmessage]
 
-This property defines the message to display automatically when the operation results in an error.
+This property defines the message to display automatically when the operation results in an error. You can use the `$error` context value in an expression to refer to the original error message.
 
 This property customizes the message displayed in a toast when the API invocation results in an error. The `$error.statusCode` context variable can refer to the response's status code, while `$error. details` to the response body. For example, you can use the following code snippet to display the status code and the details:
 
@@ -55,11 +55,11 @@ This property customizes the message displayed in a toast when the API invocatio
 
 ### `headers` [#headers]
 
-You can define request header values as key and value pairs, where the key is the ID of the particular header and the value is that header's value.
+You can optionally define request header values as key-value pairs, where the key is the ID of the particular header and the value is that header's corresponding value.
 
 ### `inProgressNotificationMessage` [#inprogressnotificationmessage]
 
-This property customizes the message that is displayed in a toast while the API operation is in progress.
+This property customizes the message that is displayed in a toast while the API operation is in progress. If not defined, no progress message is displayed.
 
 ### `method (default: "get")` [#method-default-get]
 
@@ -69,15 +69,15 @@ Available values: `get` **(default)**, `post`, `put`, `delete`, `patch`, `head`,
 
 ### `queryParams` [#queryparams]
 
-This property sets the query parameters for the request. The object you pass here will be serialized to a query string and appended to the request URL. You can specify key and value pairs where the key is the name of a particular query parameter and the value is that parameter's value.
+This optional property sets the query parameters for the request. The object you pass here will be serialized to a query string and appended to the request URL. You can specify key and value pairs where the key is the name of a particular query parameter and the value is that parameter's value.
 
 ### `rawBody` [#rawbody]
 
-This property sets the request body to the value provided here without any conversion. Use the * `body` property if you want the object sent in JSON. When you define `body` and `rawBody`, the latest one prevails.
+This optional property sets the request body to the value provided here without any conversion. Use the * `body` property if you want the object sent in JSON. When you define `body` and `rawBody`, the latest one prevails.
 
 ### `url (required)` [#url-required]
 
-Use this property to set the URL to send data to.
+Use this property to set the URL to which data will be sent. If not provided, an empty URL is used.
 
 ## Events [#events]
 

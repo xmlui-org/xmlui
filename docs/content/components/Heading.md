@@ -67,7 +67,7 @@ For a visual example, see the component description.
 
 ### `maxLines` [#maxlines]
 
-This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified.
+This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines.
 
 ```xmlui-pg copy display name="Example: maxLines"
 <App>
@@ -82,7 +82,7 @@ This property determines the maximum number of lines the component can wrap to. 
 
 If true, this heading will be excluded from the table of contents.
 
-### `preserveLinebreaks` [#preservelinebreaks]
+### `preserveLinebreaks (default: false)` [#preservelinebreaks-default-false]
 
 This property indicates whether linebreaks should be preserved when displaying text.
 

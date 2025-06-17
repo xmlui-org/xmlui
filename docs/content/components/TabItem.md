@@ -6,7 +6,7 @@
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ## Events [#events]
 

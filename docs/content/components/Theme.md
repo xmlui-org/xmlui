@@ -38,7 +38,7 @@ and sets several theme variables to style the `ProgressBar` component:
 
 ## Properties [#properties]
 
-### `root` [#root]
+### `root (default: false)` [#root-default-false]
 
 This property indicates whether the component is at the root of the application.
 

@@ -294,7 +294,7 @@ For a detailed list on the different kinds of layouts available see [this short 
 
 ### `loggedInUser` [#loggedinuser]
 
-Stores information about the currently logged in user.
+Stores information about the currently logged-in user. By not defining this property, you can indicate that no user is logged in.
 
 Stores information about the currently logged in user.
 Currently, there is no restriction on what the user data must look like.
@@ -331,7 +331,7 @@ Optional template of the app logo
 
 ### `name` [#name]
 
-Optional application name (visible in the browser tab)
+Optional application name (visible in the browser tab). When you do not define this property, the tab name falls back to the one defined in the app's configuration. If the name is not configured, "XMLUI App" is displayed in the tab.
 
 ### `noScrollbarGutters (default: false)` [#noscrollbargutters-default-false]
 

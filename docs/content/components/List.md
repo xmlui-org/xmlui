@@ -46,7 +46,7 @@ In the following example, the two List are functionally the same:
 
 ### `availableGroups` [#availablegroups]
 
-This property is an array of group names that the `List` will display.
+This property is an array of group names that the `List` will display. If not set, all groups in the data are displayed.
 
 ```xmlui {5}
 <App>
@@ -362,7 +362,7 @@ See the [itemTemplate section](#itemtemplate).
 
 ### `defaultGroups` [#defaultgroups]
 
-This property adds a list of default groups for the `List` and displays the group headers in the specified order. If the data contains group headers not in this list, those headers are also displayed (after the ones in this list); however, their order is not deterministic.
+This property adds an optional list of default groups for the `List` and displays the group headers in the specified order. If the data contains group headers not in this list, those headers are also displayed (after the ones in this list); however, their order is not deterministic.
 
 >[!INFO]
 > For the `defaultGroups` property to work, the data must be sectioned using the [`groupBy`](#groupBy) property, and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
@@ -464,7 +464,7 @@ This property defines the template to display when the list is empty.
 
 ### `groupBy` [#groupby]
 
-This property sets which attribute of the data is used to group the list items. If the attribute does not appear in the data, it will be ignored.
+This property sets which data item property is used to group the list items. If not set, no grouping is done.
 
 >[!INFO]
 > For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeaderTemplate)
@@ -731,7 +731,7 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 </App>
 ```
 
-### `groupsInitiallyExpanded` [#groupsinitiallyexpanded]
+### `groupsInitiallyExpanded (default: true)` [#groupsinitiallyexpanded-default-true]
 
 This Boolean property defines whether the list groups are initially expanded.
 
@@ -1203,7 +1203,7 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 
 ### `limit` [#limit]
 
-This property limits the number of items displayed in the `List`.
+This property limits the number of items displayed in the `List`. If not set, all items are displayed.
 
 ```xmlui /limit="4"/
 <App>
@@ -1278,7 +1278,7 @@ This property delays the rendering of children until it is set to `false`, or th
 
 ### `orderBy` [#orderby]
 
-This property enables the ordering of list items by specifying an attribute in the data.
+This optioanl property enables the ordering of list items by specifying an attribute in the data.
 
 ```xmlui /orderBy="{{ field: 'quantity', direction: 'desc' }}"/
 <App>

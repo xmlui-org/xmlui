@@ -8,7 +8,7 @@ It is a small visual element, which is used to graphically represent functions, 
 
 ### `fallback` [#fallback]
 
-This optional property provides a way to handle situations when the provided [icon name](#name) is not found in the registry.
+This optional property provides a way to handle situations when the icon with the provided [icon name](#name) name does not exist. If the icon cannot be found, no icon is displayed.
 
 ```xmlui-pg copy display name="Example: fallback"
 <App>
@@ -18,7 +18,7 @@ This optional property provides a way to handle situations when the provided [ic
 
 ### `name` [#name]
 
-This string property specifies the name of the icon to display. All icons have unique names and identifying the name is case-sensitive.
+This string property specifies the name of the icon to display. All icons have unique, case-sensitive names identifying them. If the icon name is not set, the `fallback` value is used.
 
 The engine looks up the icon in its [registry]() and determines which icon is associated with the name that the component will show.
 Nothing is displayed if the icon name is not found in the registry.

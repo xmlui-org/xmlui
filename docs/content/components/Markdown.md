@@ -134,7 +134,7 @@ Function calls are executed: @{x()}
 
 ### `content` [#content]
 
-This property sets the markdown content to display.
+This property sets the markdown content to display. Alternatively, you can nest the markdown content as a child in a CDATA section. In neither this property value nor any child is defined, empty content is displayed.
 
 Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
 

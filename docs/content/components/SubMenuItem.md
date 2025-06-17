@@ -6,7 +6,7 @@ This component represents a nested menu item within another menu or menu item.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `triggerTemplate` [#triggertemplate]
 

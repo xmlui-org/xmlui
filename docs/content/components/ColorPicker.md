@@ -40,11 +40,11 @@ This property sets the component's initial value.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `ColorPicker` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `ColorPicker` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition (default: "top")` [#labelposition-default-top]
 
@@ -61,7 +61,7 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `ColorPicker`.
+This property sets the width of the `ColorPicker` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `readOnly (default: false)` [#readonly-default-false]
 
@@ -73,7 +73,7 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 

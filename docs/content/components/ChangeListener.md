@@ -6,7 +6,7 @@
 
 ### `listenTo` [#listento]
 
-Value to the changes of which this component listens.
+Value to the changes of which this component listens. If this property is not set, the `ChangeListener` is inactive.
 
 The following sample demonstrates using this property. Every time the user clicks the button, a counter is incremented. The `ChangeListener` component watches the counter's value. Whenever it changes, the component fires the `didChange` event, which stores whether the new counter value is even into the `isEven` variable.
 

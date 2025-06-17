@@ -31,7 +31,7 @@ This property defines the icon to display with the component. For a list of of a
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 Customize the displayed text using this property. Leave empty to omit it.
 

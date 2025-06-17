@@ -6,7 +6,9 @@ The `Badge` is a text label that accepts a color map to define its background co
 
 ### `colorMap` [#colormap]
 
-The `Badge` component supports the mapping of a list of colors using the `value` prop as the key. Provide the component with a list or key-value pairs in two ways:
+The `Badge` component supports the mapping of a list of colors using the `value` prop as the key. If this property is not set, no color mapping is used.
+
+Provide the component with a list or key-value pairs in two ways:
 
 1. Only change the background color
 
@@ -32,7 +34,7 @@ The `Badge` component supports the mapping of a list of colors using the `value`
 
 ### `value (required)` [#value-required]
 
-The text that the component displays
+The text that the component displays. If this is not defined, the component renders its children as the content of the badge. If neither text nor any child is defined, the component renders a single frame for the badge with a non-breakable space.
 
 ```xmlui-pg copy display name="Example: value" 
 <App>

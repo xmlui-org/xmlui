@@ -29,7 +29,7 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
 
 ### `endIcon` [#endicon]
 
-This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
+This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
 This string prop enables the display of an icon on the right side (left-to-right display) of the input field by providing a valid [icon name]().
 
@@ -49,7 +49,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 ### `endText` [#endtext]
 
-This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
+This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.
 
 This string prop enables the display of a custom string on the right side (left-to-right display) of the input field.
 
@@ -107,11 +107,11 @@ This boolean property signs whether the input field accepts integers only (`true
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `NumberBox` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `NumberBox` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition (default: "top")` [#labelposition-default-top]
 
@@ -128,7 +128,7 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `NumberBox`.
+This property sets the width of the `NumberBox` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `maxLength` [#maxlength]
 
@@ -136,7 +136,7 @@ This property sets the maximum length of the input it accepts.
 
 ### `maxValue` [#maxvalue]
 
-The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.
+The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no maximum value check is done.
 
 The maximum value the input field allows.
 Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`,
@@ -152,7 +152,7 @@ Try to enter a bigger value into the input field below than the maximum allowed.
 
 ### `minValue` [#minvalue]
 
-The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.
+The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no minimum value check is done.
 
 Try to enter a bigger value into the input field below than the minimum allowed.
 
@@ -164,7 +164,7 @@ Try to enter a bigger value into the input field below than the minimum allowed.
 
 ### `placeholder` [#placeholder]
 
-A placeholder text that is visible in the input field when its empty.
+An optional placeholder text that is visible in the input field when its empty.
 
 A placeholder text that is visible in the input field when its empty.
 
@@ -186,21 +186,21 @@ If true, the component's value cannot be modified with user interactions.
 </App>
 ```
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
 ### `spinnerDownIcon` [#spinnerdownicon]
 
-Allows setting the icon displayed in the NumberBox spinner for decrementing values. You can change the default icon for all NumberBox instances with the "icon.spinnerDown:NumberBox" declaration in the app configuration file.
+Allows setting an alternate icon displayed in the NumberBox spinner for decrementing values. You can change the default icon for all NumberBox instances with the "icon.spinnerDown:NumberBox" declaration in the app configuration file.
 
 ### `spinnerUpIcon` [#spinnerupicon]
 
-Allows setting the icon displayed in the NumberBox spinner for incrementing values. You can change the default icon for all NumberBox instances with the "icon.spinnerUp:NumberBox" declaration in the app configuration file.
+Allows setting an alternate icon displayed in the NumberBox spinner for incrementing values. You can change the default icon for all NumberBox instances with the "icon.spinnerUp:NumberBox" declaration in the app configuration file.
 
 ### `startIcon` [#starticon]
 
-This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
+This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
 This string prop enables the display of an icon on the left side (left-to-right display) of the input field by providing a valid [icon name]().
 
@@ -220,7 +220,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 ### `startText` [#starttext]
 
-This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
+This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 This string prop enables the display of a custom string on the left side (left-to-right display) of the input field.
 

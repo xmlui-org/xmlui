@@ -98,7 +98,7 @@ In the following app, the "Hotels" link is disabled:
 
 ### `icon` [#icon]
 
-This property allows you to add an icon (specify the icon's name) to the navigation link.
+This property allows you to add an optional icon (specify the icon's name) to the navigation link.
 
 ```xmlui-pg copy {6-7} display name="Example: icon" height="250px"
 <App layout="horizontal">
@@ -118,7 +118,7 @@ This property allows you to add an icon (specify the icon's name) to the navigat
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ```xmlui-pg copy display name="Example: label" height="250px"
 <App layout="horizontal">
@@ -133,7 +133,7 @@ This property sets the label of the component.
 
 ### `target` [#target]
 
-This property specifies how to open the clicked link.
+This optionally property specifies how to open the clicked link.
 
 Available values:
 
@@ -169,7 +169,7 @@ This property defines the URL of the link.
 
 ### `vertical` [#vertical]
 
-This property sets how the active status is displayed on the `NavLink` component. If set to true, the indicator is displayed on the side which lends itself to a vertically aligned navigation menu.
+This property sets how the active status is displayed on the `NavLink` component. If set to true, the indicator is displayed on the side which lends itself to a vertically aligned navigation menu. By default, it displays a horizontal indicator.
 
 Usually, you do not need to use this property.
 However, if you create a custom navigation menu component that runs vertically,

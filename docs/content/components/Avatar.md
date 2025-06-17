@@ -6,7 +6,7 @@ The `Avatar` component represents a user, group (or other entity's) avatar with 
 
 ### `name` [#name]
 
-This property sets the name value the Avatar uses to display initials.
+This property sets the name value the Avatar uses to display initials. If neither this property nor `url` is defined, an empty avatar is displayed.
 
 ```xmlui-pg copy display name="Example: name"
 <App>
@@ -41,7 +41,7 @@ Available values:
 
 ### `url` [#url]
 
-This property specifies the URL of the image to display in the Avatar.
+This property specifies the URL of the image to display in the Avatar. If neither this property nor `name` is defined, an empty avatar is displayed.
 
 ```xmlui-pg copy display name="Example: url"
 <App>
