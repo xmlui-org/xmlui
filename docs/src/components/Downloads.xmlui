@@ -11,11 +11,7 @@
                 <Items items="{downloads.value.engine.availableVersions}">
                     <Card>
                         <H2>xmlui@{$item.version}</H2>
-                        <Items items="{$item.changelogs}">
-                            <Text>
-                                - {$item}
-                            </Text>
-                        </Items>
+                        <Markdown content="{$item.changelogs.map(log => `- ${log}`).join('\n')}"/>
                         <Card backgroundColor="$backgroundColor-DownloadSection"
                               padding="$space-2" marginTop="$space-2">
                             <HStack verticalAlignment="center" padding="0">
@@ -40,11 +36,7 @@
                 <Items items="{downloads.value.packages}">
                     <Card>
                         <H2>{$item.name}@{$item.version}</H2>
-                        <Items items="{$item.changelogs}">
-                            <Text>
-                                - {$item}
-                            </Text>
-                        </Items>
+                        <Markdown content="{$item.changelogs.map(log => `- ${log}`).join('\n')}"/>
                         <Card backgroundColor="$backgroundColor-DownloadSection"
                               padding="$space-2" marginTop="$space-2">
                             <HStack verticalAlignment="center" padding="0">
