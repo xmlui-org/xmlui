@@ -1,11 +1,11 @@
-<Component name="Downloads">
+<Component name="ChangeLog">
     <DataSource id="downloads" url="/resources/files/downloads/downloads.json" method="GET" />
     <HStack>
         <VStack
                 width="*"
                 padding="$space-4"
         >
-            <H1>Downloads</H1>
+            <H1>Change Log</H1>
             <VStack gap="$space-2" marginBottom="$space-4">
                 <H2>Engine</H2>
                 <Items items="{downloads.value.engine.availableVersions}">
