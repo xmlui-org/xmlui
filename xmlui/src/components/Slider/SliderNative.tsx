@@ -9,6 +9,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
+import { min } from "date-fns";
 
 export const defaultProps = {
   step: 1,
@@ -19,6 +20,7 @@ export const defaultProps = {
   tabIndex: -1,
   showValues: true,
   valueFormat: (value: number) => value.toString(),
+  minStepsBetweenThumbs: 1,
 };
 
 type Props = {
@@ -90,7 +92,7 @@ export const Slider = forwardRef(
       required,
       validationStatus = defaultProps.validationStatus,
       initialValue,
-      minStepsBetweenThumbs,
+      minStepsBetweenThumbs = defaultProps.minStepsBetweenThumbs,
       rangeStyle,
       thumbStyle,
       showValues = defaultProps.showValues,
@@ -219,7 +221,7 @@ export const Slider = forwardRef(
       >
         <div className={styles.sliderContainer}>
           <Root
-            minStepsBetweenThumbs={minStepsBetweenThumbs || 1}
+            minStepsBetweenThumbs={minStepsBetweenThumbs}
             ref={inputRef}
             tabIndex={tabIndex}
             aria-readonly={readOnly}

@@ -11,15 +11,18 @@ export const QueueMd = createMetadata({
     `queued elements in a FIFO order.`,
   props: {
     progressFeedback: d(
-      `This property defines the component template of the UI that displays ` +
-        `progress information whenever, the queue's \`progressReport\` function in invoked.`,
+      "This property defines the component template of the UI that displays " +
+        "progress information whenever, the queue's \`progressReport\` function " +
+        "in invoked. If not set, no progress feedback is displayed.",
     ),
     resultFeedback: d(
-      `This property defines the component template of the UI that displays result ` +
-        `information when the queue becomes empty after processing all queued items.`,
+      "This property defines the component template of the UI that displays result " +
+        "information when the queue becomes empty after processing all queued items. If not set, " +
+        "no result feedback is displayed.",
     ),
     clearAfterFinish: {
-      description: `This property indicates the completed items (successful or error) should ` +
+      description:
+        `This property indicates the completed items (successful or error) should ` +
         `be removed from the queue after completion.`,
       defaultValue: defaultProps.clearAfterFinish,
     },

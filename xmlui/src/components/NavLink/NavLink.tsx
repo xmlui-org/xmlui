@@ -26,7 +26,7 @@ export const NavLinkMd = createMetadata({
       defaultValue: defaultProps.active,
     },
     target: {
-      description: `This property specifies how to open the clicked link.`,
+      description: `This optionally property specifies how to open the clicked link.`,
       availableValues: LinkTargetMd,
       type: "string",
     },
@@ -35,7 +35,7 @@ export const NavLinkMd = createMetadata({
       description:
         `This property sets how the active status is displayed on the \`${COMP}\` component. If ` +
         `set to true, the indicator is displayed on the side which lends itself to a vertically ` +
-        `aligned navigation menu.`,
+        `aligned navigation menu. By default, it displays a horizontal indicator.`,
       valueType: "boolean",
     },
     displayActive: {
@@ -46,7 +46,7 @@ export const NavLinkMd = createMetadata({
       defaultValue: defaultProps.displayActive,
     },
     icon: d(
-      `This property allows you to add an icon (specify the icon's name) to the navigation link.`,
+      `This property allows you to add an optional icon (specify the icon's name) to the navigation link.`,
     ),
   },
   events: {

@@ -37,13 +37,15 @@ import { Text } from "../Text/TextNative";
 import { MemoizedItem } from "../container-helpers";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { CustomItemComponent } from "virtua/lib/react/types";
+import { group } from "console";
 
 // Default props for List component
 export const defaultProps = {
   idKey: "id",
   scrollAnchor: "top" as ScrollAnchoring,
   hideEmptyGroups: true,
-  borderCollapse: true
+  borderCollapse: true,
+  groupsInitiallyExpanded: true,
 };
 
 interface IExpandableListContext {

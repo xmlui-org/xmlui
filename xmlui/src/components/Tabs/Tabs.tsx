@@ -16,7 +16,7 @@ export const TabsMd = createMetadata({
   props: {
     activeTab: d(
       `This property indicates the index of the active tab. The indexing starts from 0, ` +
-        `representing the starting (leftmost) tab.`,
+        `representing the starting (leftmost) tab. If not set, the first tab is selected by default.`,
     ),
     orientation: {
       description:

@@ -63,7 +63,9 @@ export const TextBoxMd = createMetadata({
     endText: dEndText(),
     endIcon: dEndIcon(),
     gap: {
-      description: "This property defines the gap between the adornments and the input area.",
+      description:
+        "This property defines the gap between the adornments and the input area. If not " +
+        "set, the gap declared by the current theme is used.",
     },
   },
   events: {

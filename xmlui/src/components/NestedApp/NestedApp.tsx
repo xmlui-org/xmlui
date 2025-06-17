@@ -27,16 +27,20 @@ export const NestedAppMd = createMetadata({
       description: "You can define the nested app's configuration with this property.",
     },
     activeTheme: {
-      description: "This property defines the active theme for the nested app.",
+      description:
+        "This property defines the active theme for the nested app. " +
+        "If not set, the default theme is used.",
     },
     activeTone: {
-      description: "This property defines the active tone for the nested app.",
+      description:
+        "This property defines the active tone for the nested app. " +
+        "If not set, the default tone is used.",
     },
     title: {
-      description: "The title of the nested app.",
+      description: "The optional title of the nested app. If not set, no title is displayed.",
     },
     height: {
-      description: "The height of the nested app.",
+      description: "The height of the nested app. If not set, the height is determined automatically.",
     },
     allowPlaygroundPopup: {
       description:
@@ -45,8 +49,7 @@ export const NestedAppMd = createMetadata({
       defaultValue: defaultProps.allowPlaygroundPopup,
     },
     withFrame: {
-      description:
-        "This property defines whether the nested app should be displayed with a frame.",
+      description: "This property defines whether the nested app should be displayed with a frame.",
       valueType: "boolean",
       defaultValue: defaultProps.withFrame,
     },

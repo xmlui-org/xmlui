@@ -9,7 +9,12 @@ import { useMemo } from "react";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { parseBindingExpression } from "./parse-binding-expr";
 import type { CodeHighlighter } from "../CodeBlock/highlight-code";
-import { convertPlaygroundPatternToMarkdown, convertTreeDisplayToMarkdown, observePlaygroundPattern, observeTreeDisplay } from "./utils";
+import {
+  convertPlaygroundPatternToMarkdown,
+  convertTreeDisplayToMarkdown,
+  observePlaygroundPattern,
+  observeTreeDisplay,
+} from "./utils";
 
 const COMP = "Markdown";
 
@@ -17,7 +22,11 @@ export const MarkdownMd = createMetadata({
   description: `\`${COMP}\` displays plain text styled using markdown syntax.`,
   themeVars: parseScssVar(styles.themeVars),
   props: {
-    content: d("This property sets the markdown content to display."),
+    content: d(
+      "This property sets the markdown content to display. Alternatively, you can nest " +
+        "the markdown content as a child in a CDATA section. In neither this property " +
+        "value nor any child is defined, empty content is displayed.",
+    ),
     codeHighlighter: {
       description: "This property sets the code highlighter to use.",
       isInternal: true,
@@ -161,7 +170,7 @@ const TransformedMarkdown = ({
         resolvedMd.slice(nextPlayground[1]);
     }
 
-    while(true) {
+    while (true) {
       const nextTreeDisplay = observeTreeDisplay(resolvedMd);
       if (!nextTreeDisplay) break;
       resolvedMd =

@@ -27,7 +27,8 @@ export const TextMd = createMetadata({
     maxLines: d(
       "This property determines the maximum number of lines the component can wrap to. " +
         "If there is no space to display all the contents, the component displays up to as " +
-        "many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines.",
+        "many lines as specified in this property. When the value is not defined, there is " +
+        "no limit on the displayed lines.",
     ),
     preserveLinebreaks: {
       description: `This property indicates if linebreaks should be preserved when displaying text.`,
@@ -102,7 +103,6 @@ export const TextMd = createMetadata({
     [`fontSize-${COMP}-tableheading`]: "$fontSize-H6",
     [`fontWeight-${COMP}-tableheading`]: "$fontWeight-bold",
 
-
     [`marginTop-${COMP}-markdown`]: "$space-3",
     [`marginBottom-${COMP}-markdown`]: "$space-6",
 
@@ -118,7 +118,7 @@ export const TextMd = createMetadata({
 
     dark: {
       [`backgroundColor-${COMP}-marked`]: "rgba($color-primary-400-rgb, .4)",
-    }
+    },
   },
 });
 
@@ -140,7 +140,10 @@ export const textComponentRenderer = createComponentRenderer(
         variant={extractValue(variant)}
         maxLines={extractValue.asOptionalNumber(maxLines)}
         style={layoutCss}
-        preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, defaultProps.preserveLinebreaks)}
+        preserveLinebreaks={extractValue.asOptionalBoolean(
+          preserveLinebreaks,
+          defaultProps.preserveLinebreaks,
+        )}
         ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
         {...variantSpecificProps}
       >
