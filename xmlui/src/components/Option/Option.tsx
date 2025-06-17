@@ -18,8 +18,9 @@ export const OptionMd = createMetadata({
         `\`Option\` will use the \`value\` as the label.`,
     ),
     value: d(
-      `This property defines the value of the option. If \`value\` is not defined, ` +
-        `\`Option\` will use the \`label\` as the value.`,
+      "This property defines the value of the option. If \`value\` is not defined, " +
+        "\`Option\` will use the \`label\` as the value. If neither is defined, " +
+        "the option is not displayed.",
     ),
     enabled: {
       description: "This boolean property indicates whether the option is enabled or disabled.",
@@ -30,8 +31,6 @@ export const OptionMd = createMetadata({
   },
   childrenAsTemplate: "optionTemplate",
 });
-
-
 
 export const optionComponentRenderer = createComponentRenderer(
   COMP,

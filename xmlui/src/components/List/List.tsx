@@ -31,7 +31,9 @@ export const ListMd = createMetadata({
       `This property delays the rendering of children until it is set to \`false\`, or the ` +
         `component receives usable list items via the [\`data\`](#data) property.`,
     ),
-    limit: d(`This property limits the number of items displayed in the \`${COMP}\`.`),
+    limit: d(
+      `This property limits the number of items displayed in the \`${COMP}\`. If not set, all items are displayed.`,
+    ),
     scrollAnchor: {
       description: `This property pins the scroll position to a specified location of the list. Available values are shown below.`,
       availableValues: scrollAnchoringValues,
@@ -39,14 +41,15 @@ export const ListMd = createMetadata({
       defaultValue: defaultProps.scrollAnchor,
     },
     groupBy: d(
-      `This property sets which attribute of the data is used to group the list items. ` +
-        `If the attribute does not appear in the data, it will be ignored.`,
+      "This property sets which data item property is used to group the list items. If not set, " +
+        "no grouping is done.",
     ),
     orderBy: d(
-      `This property enables the ordering of list items by specifying an attribute in the data.`,
+      `This optioanl property enables the ordering of list items by specifying an attribute in the data.`,
     ),
     availableGroups: d(
-      `This property is an array of group names that the \`${COMP}\` will display.`,
+      `This property is an array of group names that the \`${COMP}\` will display. ` +
+        "If not set, all groups in the data are displayed.",
     ),
     groupHeaderTemplate: dComponent(
       `Enables the customization of how the groups are displayed, similarly to the ` +
@@ -76,9 +79,12 @@ export const ListMd = createMetadata({
     },
     groupsInitiallyExpanded: d(
       `This Boolean property defines whether the list groups are initially expanded.`,
+      undefined,
+      "boolean",
+      defaultProps.groupsInitiallyExpanded,
     ),
     defaultGroups: d(
-      `This property adds a list of default groups for the \`${COMP}\` and displays the group ` +
+      `This property adds an optional list of default groups for the \`${COMP}\` and displays the group ` +
         `headers in the specified order. If the data contains group headers not in this list, ` +
         `those headers are also displayed (after the ones in this list); however, their order ` +
         `is not deterministic.`,

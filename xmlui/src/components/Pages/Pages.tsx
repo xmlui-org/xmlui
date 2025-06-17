@@ -1,6 +1,7 @@
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
+import { dInternal } from "../metadata-helpers";
 import { Pages, RouteWrapper, defaultProps } from "./PagesNative";
 
 const PAGE = "Page";
@@ -13,8 +14,10 @@ export const PageMd = createMetadata({
     `to a particular URL that is associated with the page.`,
   props: {
     //TODO illesg rename to path
-    url: d(`The URL of the route associated with the content.`),
-    navLabel: d(
+    url: d(
+      `The URL of the route associated with the content. If not set, the page is not available.`,
+    ),
+    navLabel: dInternal(
       "The label of the page that is displayed in the navigation panel. If provided, the " +
         "a new entry will be added to the navigation panel.",
     ),

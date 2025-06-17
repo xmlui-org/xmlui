@@ -14,7 +14,9 @@ export const LinkMd = createMetadata({
     `A \`${COMP}\` component represents a navigation target within the app or a ` +
     `reference to an external web URL.`,
   props: {
-    to: d(`This property defines the URL of the link.`),
+    to: d(
+      "This property defines the URL of the link. If the value is not defined, the link cannot be activated.",
+    ),
     enabled: dEnabled(),
     active: {
       description: `Indicates whether this link is active or not. If so, it will have a distinct visual appearance.`,
@@ -29,11 +31,12 @@ export const LinkMd = createMetadata({
       type: "string",
     },
     label: dLabel(),
-    icon: d(`This property allows you to add an icon (specify the icon's name) to the link.`),
+    icon: d(`This property allows you to add an optional icon (specify the icon's name) to the link.`),
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {
-    [`gap-icon-${COMP}`]: "This property defines the size of the gap between the icon and the label.",
+    [`gap-icon-${COMP}`]:
+      "This property defines the size of the gap between the icon and the label.",
   },
   defaultThemeVars: {
     [`border-${COMP}`]: "0px solid $borderColor",

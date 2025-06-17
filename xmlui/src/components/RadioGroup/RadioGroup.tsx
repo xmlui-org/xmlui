@@ -9,6 +9,7 @@ import {
   dEnabled,
   dGotFocus,
   dInitialValue,
+  dInternal,
   dLabel,
   dLabelBreak,
   dLabelPosition,
@@ -47,7 +48,7 @@ export const RadioGroupMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
-    orientation: d(
+    orientation: dInternal(
       `(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the ` +
         `options within the radio group.`,
     ),

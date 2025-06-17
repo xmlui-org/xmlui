@@ -1,4 +1,4 @@
-import type { ReactNode} from "react";
+import type { ReactNode } from "react";
 import React, { useId, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { createPortal } from "react-dom";
@@ -49,7 +49,8 @@ type Props = {
 export const defaultProps = {
   isRoot: false,
   toastDuration: 5000,
-  themeVars: EMPTY_OBJECT
+  themeVars: EMPTY_OBJECT,
+  root: false,
 };
 
 export function Theme({
@@ -194,7 +195,11 @@ export function Theme({
           {!!faviconUrl && <link rel="icon" type="image/svg+xml" href={faviconUrl} />}
           {fontLinks?.map((fontLink) => <link href={fontLink} rel={"stylesheet"} key={fontLink} />)}
         </Helmet>
-        <style type="text/css" data-theme-root={true} dangerouslySetInnerHTML={{ __html: `.${className}  {${css}}` }} />
+        <style
+          type="text/css"
+          data-theme-root={true}
+          dangerouslySetInnerHTML={{ __html: `.${className}  {${css}}` }}
+        />
         <div
           style={inspectStyle}
           id={"_ui-engine-theme-root"}

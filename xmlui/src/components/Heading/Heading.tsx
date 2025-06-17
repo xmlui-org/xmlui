@@ -19,9 +19,10 @@ const VALUE_DESC = d(
     `the \`value\` will be displayed.`,
 );
 const MAX_LINES_DESC = d(
-  `This property determines the maximum number of lines the component can wrap to. If there is ` +
-    `not enough space for all of the text, the component wraps the text up to as many ` +
-    `lines as specified.`,
+  "This optional property determines the maximum number of lines the component can wrap to. " +
+    "If there is not enough space for all of the text, the component wraps the text up to as many " +
+    "lines as specified. If the value is not specified, there is no limit on the number of " +
+    "displayed lines.",
 );
 const ELLIPSES_DESC = {
   description:
@@ -32,6 +33,9 @@ const ELLIPSES_DESC = {
 };
 const PRESERVE_DESC = d(
   `This property indicates whether linebreaks should be preserved when ` + `displaying text.`,
+  undefined,
+  "boolean",
+  defaultProps.preserveLinebreaks,
 );
 const LEVEL_DESC = (level: number) => `Represents a heading level ${level} text`;
 const OMIT_FROM_TOC_DESC = {
