@@ -144,22 +144,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         completeNode(SyntaxKind.ElementNode);
         return;
       }
-      case SyntaxKind.OpenNodeStart:
-      case SyntaxKind.Script:
-      case SyntaxKind.CData: {
+
+      default: {
         completeNode(SyntaxKind.ElementNode);
         error(DIAGS.expEndOrClose);
         return;
-      }
-
-      case SyntaxKind.CloseNodeStart:{
-        completeNode(SyntaxKind.ElementNode);
-        error(DIAGS.expEndOrClose);
-        return;
-      }
-
-      default:{
-        error(DIAGS.expEndOrClose);
       }
     }
   }
