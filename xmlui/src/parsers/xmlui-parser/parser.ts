@@ -329,34 +329,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  function at(kindToCheck: SyntaxKind): boolean {
-    return peek().kind === kindToCheck;
-  }
-
-  function eat(kind: SyntaxKind): boolean {
-    const kindMatched = at(kind);
-    if (kindMatched) {
-      bumpAny();
-    }
-    return kindMatched;
-  }
-
-  /**
-  *
-  * @param tokens that won't be consumed
-  * @returns the error node with the consumed tokens, or null if there were no tokens consumed
-  */
-  function errNodeUntil(tokens: readonly SyntaxKind[]): Node | null {
-    startNode();
-    advance(tokens);
-    if(node.children!.length === 0){
-      abandonNode();
-      return null;
-    } else {
-      return completeNode(SyntaxKind.ErrorNode);
-    }
-  }
-
   function error({ code, message, category }: GeneralDiagnosticMessage) {
     const { pos, end } = peek();
     errors.push({
@@ -382,6 +354,22 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     });
   }
 
+  /**
+  *
+  * @param tokens that won't be consumed
+  * @returns the error node with the consumed tokens, or null if there were no tokens consumed
+  */
+  function errNodeUntil(tokens: readonly SyntaxKind[]): Node | null {
+    startNode();
+    advance(tokens);
+    if(node.children!.length === 0){
+      abandonNode();
+      return null;
+    } else {
+      return completeNode(SyntaxKind.ErrorNode);
+    }
+  }
+
   function advance(to: readonly SyntaxKind[]) {
     for (
       let token = peek();
@@ -390,6 +378,17 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     ){}
   }
 
+  function eat(kind: SyntaxKind): boolean {
+    const kindMatched = at(kind);
+    if (kindMatched) {
+      bumpAny();
+    }
+    return kindMatched;
+  }
+
+  function at(kindToCheck: SyntaxKind): boolean {
+    return peek().kind === kindToCheck;
+  }
 
   function peek(inContent: boolean = false) {
     if (peekedToken !== undefined) {
