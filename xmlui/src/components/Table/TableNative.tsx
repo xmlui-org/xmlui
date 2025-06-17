@@ -304,7 +304,7 @@ export const Table = forwardRef(
           minSize: minWidth,
           maxSize: maxWidth,
           enableResizing: col.canResize,
-          enableSorting: col.canSort,
+          enableSorting: col.canSort && !!col.accessorKey,
           enablePinning: col.pinTo !== undefined,
           meta: {
             starSizedWidth,
@@ -611,7 +611,10 @@ export const Table = forwardRef(
                         }}
                       >
                         <ClickableHeader
-                          hasSorting={header.column.columnDef.enableSorting}
+                          hasSorting={
+                            header.column.columnDef.enableSorting &&
+                            !!header.column.columnDef.meta?.accessorKey
+                          }
                           updateSorting={() =>
                             _updateSorting(header.column.columnDef.meta?.accessorKey)
                           }
