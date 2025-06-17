@@ -136,11 +136,11 @@ For an example, see the [Custom Icons section](#custom-icons).
 
 ### `initiallyExpanded` [#initiallyexpanded]
 
-This property defines whether the group is initially expanded or collapsed.
+This property defines whether the group is initially expanded or collapsed. If not defined, the group is collapsed by default.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 This property sets the text displayed as the name of the `NavGroup`.
 

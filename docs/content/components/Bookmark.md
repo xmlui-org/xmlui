@@ -85,7 +85,7 @@ Defines the text to display the bookmark in the table of contents. If this prope
 
 ### `uid` [#uid]
 
-The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location.
+The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location. If this identifier is not set, you cannot programmatically visit this bookmark.
 
 ## Events [#events]
 

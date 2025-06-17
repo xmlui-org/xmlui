@@ -109,7 +109,7 @@ This property is the identifier of the bucket to which the `AppState` instance i
 
 ### `initialValue` [#initialvalue]
 
-This property contains the initial state value. Though you can use multiple `AppState`component instances for the same bucket with their `initialValue` set, it may result in faulty app logic. When xmlui instantiates an `AppState` with an explicit initial value, that value is immediately set. Multiple initial values may result in undesired initialization.
+This property contains the initial state value. Though you can use multiple `AppState`component instances for the same bucket with their `initialValue` set, it may result in faulty app logic. When xmlui instantiates an `AppState` with an explicit initial value, that value is immediately set. Multiple initial values may result in undesired initialization. By default, the bucked's initial state is undefined.
 
 ## Events [#events]
 

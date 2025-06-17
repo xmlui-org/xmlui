@@ -38,7 +38,7 @@ The table below shows the available date formats:
 
 ### `disabledDates` [#disableddates]
 
-An array of dates that are disabled
+An optional array of dates that are disabled
 
 ```xmlui-pg copy display name="Example: disabledDates" height="120px"
 <App>
@@ -58,11 +58,11 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `endIcon` [#endicon]
 
-This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
+This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ### `endText` [#endtext]
 
-This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
+This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ### `initialValue` [#initialvalue]
 
@@ -80,11 +80,11 @@ Whether to display the datepicker inline
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `DatePicker` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `DatePicker` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition (default: "top")` [#labelposition-default-top]
 
@@ -101,11 +101,11 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `DatePicker`.
+This property sets the width of the `DatePicker` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `maxValue` [#maxvalue]
 
-The end date of the range of selectable dates
+The optional end date of the selectable date range. If not defined, the range allows any future dates.
 
 ```xmlui-pg copy display name="Example: maxValue" height="120px"
 <App>
@@ -115,7 +115,7 @@ The end date of the range of selectable dates
 
 ### `minValue` [#minvalue]
 
-The start date of the range of selectable dates
+The optional start date of the selectable date range. If not defined, the range allows any dates in the past.
 
 ```xmlui-pg copy display name="Example: minValue" height="120px"
 <App>
@@ -138,7 +138,7 @@ Available values: `single` **(default)**, `range`
 
 ### `placeholder` [#placeholder]
 
-A placeholder text that is visible in the input field when its empty.
+An optional placeholder text that is visible in the input field when its empty.
 
 ```xmlui-pg copy display name="Example: placeholder" height="120px"
 <App>
@@ -162,11 +162,11 @@ Whether to show the week number in the calendar
 
 ### `startIcon` [#starticon]
 
-This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
+This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ### `startText` [#starttext]
 
-This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
+This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ### `validationStatus (default: "none")` [#validationstatus-default-none]
 

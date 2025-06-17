@@ -24,7 +24,7 @@ The component provides context values with which you can access some internal pr
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
-### `creatable` [#creatable]
+### `creatable (default: false)` [#creatable-default-false]
 
 This property allows the user to create new items that are not present in the list of options.
 
@@ -56,11 +56,11 @@ This property sets the component's initial value.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `AutoComplete` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `AutoComplete` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition` [#labelposition]
 
@@ -77,7 +77,7 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `AutoComplete`.
+This property sets the width of the `AutoComplete` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `maxLength` [#maxlength]
 
@@ -118,7 +118,7 @@ This property enables the customization of list items. To access the attributes 
 
 ### `placeholder` [#placeholder]
 
-A placeholder text that is visible in the input field when its empty.
+An optional placeholder text that is visible in the input field when its empty.
 
 ### `readOnly (default: false)` [#readonly-default-false]
 

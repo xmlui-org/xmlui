@@ -18,7 +18,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 ### `bindTo` [#bindto]
 
-This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name.
+This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name. If the property is not set, the input will be bound to an internal data field but not submitted.
 
 Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data looks like compared to the one set in `data`.
 
@@ -70,7 +70,7 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `gap` [#gap]
+### `gap (default: "0")` [#gap-default-0]
 
 This property defines the gap between the adornments and the input area.
 
@@ -93,7 +93,7 @@ This property is used to define a custom input template.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ```xmlui-pg copy display name="Example: label"
 <App>
@@ -136,7 +136,7 @@ Different input components have different layout methods
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the item label.
+This property sets the width of the `FormItem` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `lengthInvalidMessage` [#lengthinvalidmessage]
 
@@ -176,7 +176,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 
 ### `maxLength` [#maxlength]
 
-Checks whether the input has a maximum length of a specified value.
+This property sets the maximum length of the input value. If the value is not set, no maximum length check is done.
 
 Note that it is not possible for the user to enter a string larger than the value of the `maxLength`,
 but setting such a value programmatically still results in a validation check.
@@ -195,11 +195,11 @@ In the demo below, try to enter an input longer than 4 characters or submit the 
 
 ### `maxTextLength` [#maxtextlength]
 
-The maximum length of the text in the input field
+The maximum length of the text in the input field. If this value is not set, no maximum length constraint is set for the input field.
 
 ### `maxValue` [#maxvalue]
 
-Checks whether the input has the maximum specified value.
+The maximum value of the input. If this value is not specified, no maximum value check is done.
 
 Note that it is not possible for the user to enter a number larger than the value of the `maxValue`,
 but setting such a value programmatically still results in a validation check.
@@ -218,7 +218,7 @@ In the demo below, enter an input greater than 99 or just submit the form as is.
 
 ### `minLength` [#minlength]
 
-Checks whether the input has a minimum length of a specified value.
+This property sets the minimum length of the input value. If the value is not set, no minimum length check is done.
 
 In the demo below, enter an input shorter than 4 characters or just submit the form as is.
 
@@ -234,7 +234,7 @@ In the demo below, enter an input shorter than 4 characters or just submit the f
 
 ### `minValue` [#minvalue]
 
-Checks whether the input has the minimum specified value.
+The minimum value of the input. If this value is not specified, no minimum value check is done.
 
 Note that it is not possible for the user to enter a number smaller than the value of the `minValue`,
 but setting such a value programmatically still results in a validation check.
@@ -253,7 +253,7 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 
 ### `pattern` [#pattern]
 
-Checks whether the input fits a predefined regular expression.
+This value specifies a predefined regular expression to test the input value. If this value is not set, no pattern check is done.
 
 | Value   | Description                                                                                                                                                |
 | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -362,7 +362,7 @@ Just submitting the form as is also produces the same error.
 
 ### `regex` [#regex]
 
-Checks whether the input fits the provided regular expression.
+This value specifies a custom regular expression to test the input value. If this value is not set, no regular expression pattern check is done.
 
 In the demo below, enter an input that is not solely one lowercase string or just submit the form as is.
 
@@ -415,7 +415,7 @@ Just submitting the form as is also produces the same error.
 </App>
 ```
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -431,7 +431,7 @@ Set this property to `true` to indicate it must have a value before submitting t
 
 ### `requiredInvalidMessage` [#requiredinvalidmessage]
 
-This optional string property is used to customize the message that is displayed if the field is not filled in.
+This optional string property is used to customize the message that is displayed if the field is not filled in. If not defined, the default message is used.
 
 In the demo below, leave the field empty and click outside to see the regular and custom message.
 

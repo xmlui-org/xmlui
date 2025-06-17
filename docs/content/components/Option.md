@@ -81,7 +81,7 @@ This property is used to define a custom option template
 
 ### `value` [#value]
 
-This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value.
+This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value. If neither is defined, the option is not displayed.
 
 >[!INFO]
 > If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.

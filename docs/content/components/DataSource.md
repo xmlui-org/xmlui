@@ -14,11 +14,11 @@ By default, structural sharing is turned on. If you do not need this behavior, s
 
 ### `body` [#body]
 
-Set the request body. The object you pass is serialized as a JSON string.
+Set the optional request body. The object you pass is serialized as a JSON string.
 
 ### `completedNotificationMessage` [#completednotificationmessage]
 
-Set the message to display when the data fetch completes.
+Set the message to display when the data fetch completes.If the property value is not set, no completion message is displayed.
 
 This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:
 
@@ -31,7 +31,7 @@ This property customizes the success message displayed in a toast after the fini
 
 ### `errorNotificationMessage` [#errornotificationmessage]
 
-Set the message to display when the there is an error.
+Set the message to display when the there is an error. You can use the `$error` context value in an expression to refer to the original error message.
 
 This property customizes the message displayed in a toast when the API invocation results in an error. The `$error.statusCode` context variable can refer to the response's status code, while `$error. details` to the response body. For example, you can use the following code snippet to display the status code and the details:
 
@@ -49,11 +49,11 @@ Set request headers. Pass an object whose keys are header names and values are h
 
 ### `id (required)` [#id-required]
 
-Set the ID used by other components to access the retrieved data in the `value`property of a `DataSource`, or status info in the `loaded` and `error` properties.
+Set the ID used by other components to access the retrieved data in the `value`property of a `DataSource`, or status info in the `loaded` and `error` properties.When no `id` is set, the component cannot be used programmatically.
 
 ### `inProgressNotificationMessage` [#inprogressnotificationmessage]
 
-Set the message to display when the data fetch is in progress.
+Set the message to display when the data fetch is in progress. If the property value is not set, no progress message is displayed.
 
 ### `method (default: "get")` [#method-default-get]
 
@@ -67,7 +67,7 @@ When using `DataSource` with paging, the response may contain information about 
 
 ### `pollIntervalInSeconds` [#pollintervalinseconds]
 
-Set the interval for periodic data fetching. If the data changes on refresh, XMLUI will re-render components that refer directly or indirectly to the `DataSource`. 
+Set the interval for periodic data fetching. If the data changes on refresh, XMLUI will re-render components that refer directly or indirectly to the `DataSource`. If not set or set to zero, the component does not poll for data.
 
 ### `prevPageSelector` [#prevpageselector]
 
@@ -75,7 +75,7 @@ When using `DataSource` with paging, the response may contain information about 
 
 ### `queryParams` [#queryparams]
 
-Append key/value pairs to the URL.
+Append optional key-value pairs to the URL.
 
 ### `rawBody` [#rawbody]
 
@@ -83,7 +83,7 @@ Set the request body with no serialization. Use it to send a payload  that has a
 
 ### `resultSelector` [#resultselector]
 
-Set an object key to extract a subset of the response data.
+Set an optional object key to extract a subset of the response data. If this value is not set, the entire response body is considered the result.
 
 The selector can be a simple dot notation path (e.g., `value.results`) or a JavaScript expression that processes the data (e.g., `results.filter(item => item.type === 'active')`). The selector has access to standard JavaScript functions like `map` and `filter`, and operates on the full response body.
 
@@ -184,11 +184,11 @@ This `Table` uses the filtered array.
 
 ### `structuralSharing (default: "true")` [#structuralsharing-default-true]
 
-This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.
+This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.
 
 ### `transformResult` [#transformresult]
 
-Set a function to perform a final transformation of the response data.
+Set an optional function to perform a final transformation of the response data. If this value is not set, the result is not transformed.
 
 ### `url (required)` [#url-required]
 

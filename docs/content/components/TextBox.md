@@ -20,7 +20,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `endIcon` [#endicon]
 
-This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
+This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ```xmlui-pg copy display name="Example: endIcon"
 <App>
@@ -38,7 +38,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 ### `endText` [#endtext]
 
-This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
+This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ```xmlui-pg copy display name="Example: endText"
 <App>
@@ -56,7 +56,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 
 ### `gap` [#gap]
 
-This property defines the gap between the adornments and the input area.
+This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used.
 
 ### `initialValue (default: "")` [#initialvalue-default-]
 
@@ -70,11 +70,11 @@ This property sets the component's initial value.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `TextBox` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `TextBox` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition (default: "top")` [#labelposition-default-top]
 
@@ -91,7 +91,7 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `TextBox`.
+This property sets the width of the `TextBox` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `maxLength` [#maxlength]
 
@@ -107,7 +107,7 @@ Try to enter a longer value into the input field below.
 
 ### `placeholder` [#placeholder]
 
-A placeholder text that is visible in the input field when its empty.
+An optional placeholder text that is visible in the input field when its empty.
 
 ```xmlui-pg copy display name="Example: placeholder"
 <App>
@@ -125,13 +125,13 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
 ### `startIcon` [#starticon]
 
-This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
+This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ```xmlui-pg copy display name="Example: startIcon"
 <App>
@@ -149,7 +149,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 ### `startText` [#starttext]
 
-This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
+This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ```xmlui-pg copy display name="Example: startText"
 <App>

@@ -6,7 +6,7 @@ The `Image` component represents or depicts an object, scene, idea, or other con
 
 ### `alt` [#alt]
 
-This property specifies an alternate text for the image.
+This optional property specifies an alternate text for the image.
 
 This is useful in two cases:
 1. Accessibility: screen readers read the prop value to users so they know what the image is about.
@@ -20,13 +20,9 @@ This is useful in two cases:
 </App>
 ```
 
-### `animation` [#animation]
-
-The animation object to be applied to the component
-
 ### `aspectRatio` [#aspectratio]
 
-This property sets a preferred aspect ratio for the image, which will be used in the calculation of auto sizes and some other layout functions.
+This property sets a preferred aspect ratio for the image, which will be used in calculating auto sizes and other layout functions. If this value is not used, the original aspect ratio is kept. The value can be a number of a string (such as "16/9").
 
 ```xmlui-pg copy display name="Example: aspectRatio"
 <App>
@@ -73,7 +69,7 @@ The default value is eager (\`false\`).
 
 ### `src` [#src]
 
-This property is used to indicate the source (path) of the image to display.
+This property is used to indicate the source (path) of the image to display. When not defined, no image is displayed.
 
 ## Events [#events]
 

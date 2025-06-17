@@ -48,11 +48,11 @@ This property defines the initial value of the selected option within the group.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `RadioGroup` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `RadioGroup` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition (default: "top")` [#labelposition-default-top]
 
@@ -69,11 +69,7 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `RadioGroup`.
-
-### `orientation` [#orientation]
-
-(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the options within the radio group.
+This property sets the width of the `RadioGroup` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `readOnly (default: false)` [#readonly-default-false]
 

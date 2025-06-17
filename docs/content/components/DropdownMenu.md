@@ -83,7 +83,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `triggerButtonIcon (default: "triggerButton:DropdownMenu")` [#triggerbuttonicon-default-triggerbutton-dropdownmenu]
 
