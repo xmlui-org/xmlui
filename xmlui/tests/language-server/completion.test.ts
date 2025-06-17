@@ -40,6 +40,16 @@ describe('Completion', () => {
     expectToContainExactly(completionLabels, ["Button"]);
   });
 
+  it("list all attribute names with missing '>' token", () => {
+    const attrNames = completeAtPoundSign('<Button #</Button>').map(({ label }) => label);
+    expectToContainExactly(attrNames, allButtonProps);
+  });
+
+  it("list all attribute names between tag name and eof", () => {
+    const attrNames = completeAtPoundSign('<Button #').map(({ label }) => label);
+    expectToContainExactly(attrNames, allButtonProps);
+  });
+
   it("don't list anything after matching closing tag name",{todo:true},() => {
     const completionLabels = completeAtPoundSign('<Button>ha</Button #>').map(({label}) => label);
     expect(completionLabels).toBeNull();
