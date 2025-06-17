@@ -79,12 +79,11 @@ export function NestedApp({
   const { appGlobals } = useAppContext();
   const componentRegistry = useComponentRegistry();
   const { interceptorWorker } = useApiInterceptorContext();
-  const safeId = playgroundId || nestedAppId;
-  const apiUrl = `/${safeId.replaceAll(":", "")}`;
-
-  // TODO: At this point, "api" may be a string or an object. If it is a string, check if it
-  // can be parsed as a JSON string, and if so, parse it. If it is an object, use it directly.
-  // If JSON parsing fails, render an app displaying the error.
+  //TODO illesg: we should come up with something to make sure that nestedApps doesn't overwrite each other's mocked api endpoints
+  //   disabled for now, as it messes up the paths of not mocked APIs (e.g. resources/{staticJsonfiles})
+  //const safeId = playgroundId || nestedAppId;
+  //const apiUrl = api ? `/${safeId.replaceAll(":", "")}` : '';
+  const apiUrl = '';
 
   const mock = useMemo(() => {
     if (!api) {
@@ -102,9 +101,9 @@ export function NestedApp({
     return {
       ...apiObject,
       type: "in-memory",
-      apiUrl: apiUrl + (apiObject.apiUrl || ""),
+      // apiUrl: apiUrl + (apiObject.apiUrl || ""),
     };
-  }, [api, apiUrl]);
+  }, [api]);
 
   //console.log("mock", mock);
 
