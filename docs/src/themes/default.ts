@@ -10,14 +10,16 @@ export const DefaultDocsTheme: ThemeDefinition = {
 
     "color-primary": "#3367CC",
     "color-surface": "#1e2734",
-    "borderColor": "$color-surface-100",
+    borderColor: "$color-surface-100",
+
+    "backgroundColor-DownloadSection": "$color-surface-50",
 
     "maxWidth-App": "1320px",
 
     "maxWidth-content": "1200px",
     "boxShadow-navPanel-App": "none",
     "backgroundColor-content-App": "$color-surface-0",
-    "backgroundColor": "$color-surface-0",
+    backgroundColor: "$color-surface-0",
 
     // --- AppHeader
     "paddingInline-AppHeader": "$space-4",
