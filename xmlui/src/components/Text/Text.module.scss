@@ -52,7 +52,6 @@ $component: "Text";
   }
 
   &.em {
-    @include t.ignoreTextVars();
     font-style: createThemeVar("fontStyle-#{$component}-em");
   }
 
