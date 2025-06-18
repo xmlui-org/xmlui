@@ -14,12 +14,12 @@ export const CardMd = createMetadata({
   props: {
     avatarUrl: {
       description:
-        `Show the avatar (\`true\`) or not (\`false\`). If not specified, the ${COMP} will show the ` +
+        `The url for an avarar image. If not specified, but [\`showAvatar\`](#showAvatar) is true, ${COMP} will show the ` +
         `first letters of the [\`title\`](#title).`,
       type: "string",
     },
     showAvatar: {
-      description: `Indicates whether the ${COMP} should be displayed`,
+      description: `Indicates whether the avatar should be displayed`,
       valueType: "boolean",
       defaultValue: defaultProps.showAvatar,
     },
