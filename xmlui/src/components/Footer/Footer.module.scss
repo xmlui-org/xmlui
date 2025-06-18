@@ -19,6 +19,7 @@ $height-Footer: createThemeVar("height-#{$component}");
 $fontSize-Footer: createThemeVar("fontSize-#{$component}");
 $verticalAlign-Footer: createThemeVar("verticalAlign-#{$component}");
 $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
+$gap-Footer: createThemeVar("gap-#{$component}");
 $maxWidth-App: createThemeVar("maxWidth-App");
 
 .outerWrapper{
@@ -33,6 +34,7 @@ $maxWidth-App: createThemeVar("maxWidth-App");
   min-height: 0;
   height: 100%;
   flex-direction: row;
+  gap: $gap-Footer;
   @include t.paddingVars($themeVars, $component);
   font-size: $fontSize-Footer;
   align-items: $verticalAlign-Footer;

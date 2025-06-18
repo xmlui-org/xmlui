@@ -1510,13 +1510,13 @@ This method selects the row with the specified ID. This method has no effect if 
 | [outlineOffset](../styles-and-themes/common-units/#size)-heading-Table--focus | $outlineOffset--focus | $outlineOffset--focus |
 | [outlineStyle](../styles-and-themes/common-units/#border)-heading-Table--focus | $outlineStyle--focus | $outlineStyle--focus |
 | [outlineWidth](../styles-and-themes/common-units/#size)-heading-Table--focus | $outlineWidth--focus | $outlineWidth--focus |
-| [padding](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-heading-Table | $space-2 | $space-2 |
+| [padding](../styles-and-themes/common-units/#size)-cell-Table | $space-2 $space-0 $space-2 $space-2 | $space-2 $space-0 $space-2 $space-2 |
+| [padding](../styles-and-themes/common-units/#size)-heading-Table | $space-2 $space-0 $space-2 $space-2 | $space-2 $space-0 $space-2 $space-2 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-first-Table | $space-5 | $space-5 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-last-Table | $space-5 | $space-5 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-Table | $space-2 | $space-2 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-last-Table | $space-0 | $space-0 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
@@ -1524,7 +1524,7 @@ This method selects the row with the specified ID. This method has no effect if 
 | [paddingRight](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
-| [paddingVertical](../styles-and-themes/common-units/#size)-cell-Table | $space-2 | $space-2 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-heading-Table | $color-surface-500 | $color-surface-500 |
 | [textColor](../styles-and-themes/common-units/#color)-pagination-Table | $color-secondary | $color-secondary |
