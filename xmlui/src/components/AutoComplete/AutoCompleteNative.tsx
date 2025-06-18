@@ -44,6 +44,7 @@ type AutoCompleteProps = {
   optionRenderer?: (item: any) => ReactNode;
   emptyListTemplate?: ReactNode;
   style?: CSSProperties;
+  className?: string;
   onDidChange?: (newValue: string | string[]) => void;
   validationStatus?: ValidationStatus;
   onFocus?: () => void;
@@ -103,6 +104,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     optionRenderer = defaultProps.optionRenderer,
     emptyListTemplate,
     style,
+    className,
     children,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
@@ -281,7 +283,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
             enabled={enabled}
             onFocus={onFocus}
             onBlur={onBlur}
-            style={style}
+            className={className}
           >
             <Popover
               open={open}

@@ -5,6 +5,7 @@ import classnames from "classnames";
 import styles from "./Avatar.module.scss";
 
 type Props = {
+  className?: string;
   size?: string;
   url?: string;
   name?: string;
@@ -16,7 +17,7 @@ export const defaultProps: Pick<Props, "size"> = {
 };
 
 export const Avatar = forwardRef(function Avatar(
-  { size = defaultProps.size, url, name, style, onClick, ...rest }: Props,
+  { className, size = defaultProps.size, url, name, style, onClick, ...rest }: Props,
   ref: Ref<any>,
 ) {
   let abbrev = null;
@@ -32,13 +33,17 @@ export const Avatar = forwardRef(function Avatar(
     <div
       {...rest}
       ref={ref}
-      className={classnames(styles.container, {
-        [styles.xs]: size === "xs",
-        [styles.sm]: size === "sm",
-        [styles.md]: size === "md",
-        [styles.lg]: size === "lg",
-        [styles.clickable]: !!onClick,
-      })}
+      className={classnames(
+        className,
+        styles.container,
+        {
+          [styles.xs]: size === "xs",
+          [styles.sm]: size === "sm",
+          [styles.md]: size === "md",
+          [styles.lg]: size === "lg",
+          [styles.clickable]: !!onClick,
+        }
+      )}
       style={{ backgroundImage: url ? `url(${url})` : "none", ...style }}
       onClick={onClick}
     >

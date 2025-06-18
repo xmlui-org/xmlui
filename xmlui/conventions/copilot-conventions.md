@@ -137,3 +137,59 @@ When GitHub Copilot summarizes the conversation context for the XMLUI project, i
    - Maintain a list of components or tasks still pending review or updates.
 
 This convention ensures continuity in long-running tasks and helps maintain a consistent approach to code modifications across the XMLUI project.
+
+### Additional Learnings from Component Updates
+
+#### Handling Chart and Visualization Components
+
+1. **Using ResponsiveContainer with className**:
+   - When working with visualization libraries like recharts that use ResponsiveContainer, the `className` prop can be passed directly to the ResponsiveContainer.
+   - Example with BarChart:
+     ```tsx
+     // In BarChartNative.tsx
+     return (
+       <ResponsiveContainer className={className}>
+         {/* Chart components */}
+       </ResponsiveContainer>
+     );
+     ```
+   - No need for an extra wrapper div when the library's container components already support className.
+
+#### Maintaining Styling Best Practices
+
+1. **Consistency in Style Application**:
+   - When applying styles via className, be consistent with how the styles are applied to the component's root element.
+   - For components with complex rendering logic (like Avatar's conditional rendering based on url/name), ensure the className is properly applied regardless of the rendering path.
+
+2. **Style and Background Properties**:
+   - When a component has both `style` and `className` props, and style contains important visual properties:
+     ```tsx
+     // In AvatarNative.tsx
+     <div
+       className={classnames(className, styles.container, {...})}
+       style={{ backgroundImage: url ? `url(${url})` : "none", ...style }}
+     >
+     ```
+   - Consider if certain inline style properties can be moved to CSS classes for better maintainability.
+
+3. **Removing Unnecessary Style Properties**:
+   - When converting from `layoutCss`/`style` to `className`, review if all style properties are still needed.
+   - Properties like positioning, margins, and layout should generally move to CSS classes rather than remain as inline styles.
+
+#### Component Refactoring Patterns
+
+1. **Staged Refactoring**:
+   - For complex components, a staged approach works best:
+     1. First, update SCSS to use `@layer components`
+     2. Next, add `className` prop to component props
+     3. Update renderer to use `className` instead of `layoutCss`
+     4. Finally, review and update any component-specific styling logic
+
+2. **Testing Visual Components After Update**:
+   - After updating styling patterns, verify that:
+     - Component renders correctly at all sizes/variants
+     - Any conditional styling still works (hover states, active states, etc.)
+     - Layout and positioning remain consistent
+   - Use the component in various contexts to ensure it behaves as expected with the new styling approach.
+
+These learnings help maintain consistent styling patterns across the XMLUI component library while addressing the specific needs and challenges of different component types.
