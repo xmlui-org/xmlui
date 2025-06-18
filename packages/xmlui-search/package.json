@@ -1,6 +1,6 @@
 {
   "name": "xmlui-search",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "sideEffects": false,
   "type": "module",
   "scripts": {

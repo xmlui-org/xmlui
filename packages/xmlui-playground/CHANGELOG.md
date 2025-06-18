@@ -1,5 +1,13 @@
 # xmlui-playground
 
+## 0.1.5
+
+### Patch Changes
+
+- 2a461d8: NestedApp works with ApiInterceptor
+- Updated dependencies [f5b9f15]
+  - xmlui-devtools@0.1.12
+
 ## 0.1.4
 
 ### Patch Changes
