@@ -234,12 +234,12 @@ type HeadingComponentDef = ComponentDef<typeof HeadingMd>;
 type RenderHeadingProps = {
   node: HeadingComponentDef;
   extractValue: ValueExtractor;
-  layoutCss: CSSProperties;
+  className?: string;
   renderChild: RenderChildFn;
   level: string;
 };
 
-function renderHeading({ node, extractValue, layoutCss, level, renderChild }: RenderHeadingProps) {
+function renderHeading({ node, extractValue, className, level, renderChild }: RenderHeadingProps) {
   const { maxLines, preserveLinebreaks, ellipses, ...restProps } = node.props;
   return (
     <Heading
@@ -248,9 +248,9 @@ function renderHeading({ node, extractValue, layoutCss, level, renderChild }: Re
       maxLines={extractValue.asOptionalNumber(maxLines)}
       preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
       ellipses={extractValue.asOptionalBoolean(ellipses, true)}
-      style={layoutCss}
+      className={className}
       omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
-      {...resolveAndCleanProps(restProps, extractValue, layoutCss)}
+      {...resolveAndCleanProps(restProps, extractValue)}
     >
       {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}
     </Heading>
@@ -260,11 +260,11 @@ function renderHeading({ node, extractValue, layoutCss, level, renderChild }: Re
 export const headingComponentRenderer = createComponentRenderer(
   COMP,
   HeadingMd,
-  ({ node, extractValue, layoutCss, renderChild }) => {
+  ({ node, extractValue, className, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
-      layoutCss,
+      className,
       level: node.props.level,
       renderChild,
     });
@@ -274,11 +274,11 @@ export const headingComponentRenderer = createComponentRenderer(
 export const h1ComponentRenderer = createComponentRenderer(
   H1,
   H1Md,
-  ({ node, extractValue, layoutCss, renderChild }) => {
+  ({ node, extractValue, className, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
-      layoutCss,
+      className,
       level: "h1",
       renderChild,
     } as any);
@@ -288,11 +288,11 @@ export const h1ComponentRenderer = createComponentRenderer(
 export const h2ComponentRenderer = createComponentRenderer(
   H2,
   H2Md,
-  ({ node, extractValue, layoutCss, renderChild }) => {
+  ({ node, extractValue, className, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
-      layoutCss,
+      className,
       level: "h2",
       renderChild,
     } as any);
@@ -302,11 +302,11 @@ export const h2ComponentRenderer = createComponentRenderer(
 export const h3ComponentRenderer = createComponentRenderer(
   H3,
   H3Md,
-  ({ node, extractValue, layoutCss, renderChild }) => {
+  ({ node, extractValue, className, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
-      layoutCss,
+      className,
       level: "h3",
       renderChild,
     } as any);
@@ -316,11 +316,11 @@ export const h3ComponentRenderer = createComponentRenderer(
 export const h4ComponentRenderer = createComponentRenderer(
   H4,
   H4Md,
-  ({ node, extractValue, layoutCss, renderChild }) => {
+  ({ node, extractValue, className, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
-      layoutCss,
+      className,
       level: "h4",
       renderChild,
     } as any);
@@ -330,11 +330,11 @@ export const h4ComponentRenderer = createComponentRenderer(
 export const h5ComponentRenderer = createComponentRenderer(
   H5,
   H5Md,
-  ({ node, extractValue, layoutCss, renderChild }) => {
+  ({ node, extractValue, className, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
-      layoutCss,
+      className,
       level: "h5",
       renderChild,
     } as any);
@@ -344,11 +344,11 @@ export const h5ComponentRenderer = createComponentRenderer(
 export const h6ComponentRenderer = createComponentRenderer(
   H6,
   H6Md,
-  ({ node, extractValue, layoutCss, renderChild }) => {
+  ({ node, extractValue, className, renderChild }) => {
     return renderHeading({
       node,
       extractValue,
-      layoutCss,
+      className,
       level: "h6",
       renderChild,
     } as any);

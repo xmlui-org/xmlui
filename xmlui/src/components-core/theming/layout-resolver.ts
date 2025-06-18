@@ -1,5 +1,5 @@
-import { CSSProperties } from "react";
-import { LayoutContext } from "../../abstractions/RendererDefs";
+import type { CSSProperties } from "react";
+import type { LayoutContext } from "../../abstractions/RendererDefs";
 import { EMPTY_OBJECT } from "../constants";
 import { isEmpty } from "lodash-es";
 
@@ -9,7 +9,7 @@ const booleanRegex = /^(true|false)$/;
 const starSizeRegex = /^\d*\*$/;
 
 export type ResolvedLayout = {
-  cssProps: CSSProperties;
+  cssProps: Record<string, CSSProperties[keyof CSSProperties]>;
   issues: Set<string>;
 };
 

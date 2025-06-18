@@ -2,18 +2,17 @@ import type React from "react";
 
 import styles from "./Stack.module.scss";
 
-import { type ComponentDef, ComponentPropertyMetadata, createMetadata, d } from "../../abstractions/ComponentDefs";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
+import { type ComponentDef, createMetadata } from "../../abstractions/ComponentDefs";
+import type { RenderChildFn, ValueExtractor } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
-import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dClick, dInternal } from "../metadata-helpers";
-import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
+import { DEFAULT_ORIENTATION, defaultProps, Stack } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
-import { useComponentStyle } from "../../components-core/theming/StyleContext";
 
 const COMP = "Stack";
 
@@ -51,8 +50,9 @@ const stackMd = createMetadata({
       defaultValue: false,
     },
     orientation: {
-      description: "An optional property that governs the Stack's orientation (whether " + 
-      "the Stack lays out its children in a row or a column).",
+      description:
+        "An optional property that governs the Stack's orientation (whether " +
+        "the Stack lays out its children in a row or a column).",
       availableValues: ["horizontal", "vertical"],
       valueType: "string",
       defaultValue: defaultProps.orientation,
@@ -129,7 +129,7 @@ type RenderStackPars = {
     | CVStackComponentDef
     | CHStackComponentDef;
   extractValue: ValueExtractor;
-  layoutCss: React.CSSProperties;
+  className?: string;
   lookupEventHandler: (
     eventName: keyof NonNullable<StackComponentDef["events"]>,
   ) => AsyncFunction | undefined;
@@ -142,7 +142,7 @@ type RenderStackPars = {
 function renderStack({
   node,
   extractValue,
-  layoutCss,
+  className,
   orientation,
   horizontalAlignment,
   verticalAlignment,
@@ -161,7 +161,7 @@ function renderStack({
       hoverContainer={extractValue(node.props?.hoverContainer)}
       visibleOnHover={extractValue(node.props?.visibleOnHover)}
       onMount={lookupEventHandler("mounted")}
-      style={layoutCss}
+      className={className}
     >
       {renderChild(node.children, {
         type: "Stack",
@@ -174,14 +174,14 @@ function renderStack({
 export const stackComponentRenderer = createComponentRenderer(
   COMP,
   StackMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     const orientation = extractValue(node.props?.orientation) || DEFAULT_ORIENTATION;
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     return renderStack({
       node,
       extractValue,
-      layoutCss,
+      className,
       orientation,
       horizontalAlignment,
       verticalAlignment,
@@ -194,13 +194,13 @@ export const stackComponentRenderer = createComponentRenderer(
 export const vStackComponentRenderer = createComponentRenderer(
   "VStack",
   VStackMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     return renderStack({
       node,
       extractValue,
-      layoutCss,
+      className,
       lookupEventHandler,
       renderChild,
       orientation: "vertical",
@@ -213,13 +213,13 @@ export const vStackComponentRenderer = createComponentRenderer(
 export const hStackComponentRenderer = createComponentRenderer(
   "HStack",
   HStackMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     return renderStack({
       node,
       extractValue,
-      layoutCss,
+      className,
       lookupEventHandler,
       renderChild,
       orientation: "horizontal",
@@ -232,11 +232,11 @@ export const hStackComponentRenderer = createComponentRenderer(
 export const cvStackComponentRenderer = createComponentRenderer(
   "CVStack",
   CVStackMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     return renderStack({
       node,
       extractValue,
-      layoutCss,
+      className,
       lookupEventHandler,
       renderChild,
       orientation: "vertical",
@@ -249,11 +249,11 @@ export const cvStackComponentRenderer = createComponentRenderer(
 export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
     return renderStack({
       node,
       extractValue,
-      layoutCss,
+      className,
       lookupEventHandler,
       renderChild,
       orientation: "horizontal",

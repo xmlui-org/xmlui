@@ -26,6 +26,7 @@ function hashString(str: string): string {
     hash = (hash * 33) ^ str.charCodeAt(--i);
   }
   let s = (hash >>> 0).toString(36);
+  // console.log("hashString", str, "->", s);
   return s;
 }
 

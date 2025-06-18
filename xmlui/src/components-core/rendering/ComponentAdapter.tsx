@@ -227,6 +227,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
 
+  const className = useComponentStyle(stableLayoutCss);
+
+  const { inspectId, refreshInspection } = useInspector(safeNode, uid);
+
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
   let renderingError = null;
@@ -245,9 +249,11 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       renderChild: memoedRenderChild,
       registerComponentApi: memoedRegisterComponentApi,
       layoutCss: stableLayoutCss,
+      className,
       layoutContext: layoutContextRef?.current,
       uid,
     };
+
 
     if (safeNode.type === "Slot") {
       // --- Transpose the children from the parent component to the slot in
@@ -265,7 +271,6 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       renderedNode = renderer(rendererContext);
     }
 
-    const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
     // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
     // --- into the DOM object of the rendered React component.

@@ -165,7 +165,7 @@ export const ButtonMd = createMetadata({
 export const buttonComponentRenderer = createComponentRenderer(
   "Button",
   ButtonMd,
-  ({ node, extractValue, renderChild, lookupEventHandler, layoutCss }) => {
+  ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
     const iconName = extractValue.asString(node.props.icon);
     const label = extractValue.asDisplayText(node.props.label);
     return (
@@ -183,7 +183,7 @@ export const buttonComponentRenderer = createComponentRenderer(
         onClick={lookupEventHandler("click")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
-        style={layoutCss}
+        className={className}
         contextualLabel={extractValue.asOptionalString(node.props.contextualLabel)}
       >
         {renderChild(node.children, { type: "Stack", orientation: "horizontal" }) || label}

@@ -18,7 +18,6 @@ import { TableOfContentsContext } from "../../components-core/TableOfContentsCon
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import type { HeadingLevel } from "./abstractions";
 import { Link } from "@remix-run/react";
-import { useComponentStyle, useStyles } from "../../components-core/theming/StyleContext";
 
 export type HeadingProps = {
   uid?: string;
@@ -69,8 +68,6 @@ export const Heading = forwardRef(function Heading(
   const [anchorId, setAnchorId] = useState<string | null>(null);
   const anchorRef = useRef<HTMLAnchorElement>(null);
 
-  const styleClass = useComponentStyle(style);
-
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const registerHeading = tableOfContentsContext?.registerHeading;
 
@@ -103,8 +100,8 @@ export const Heading = forwardRef(function Heading(
       ref={ref}
       id={uid}
       title={title}
-      style={{ ...sx, ...getMaxLinesStyle(maxLines) }}
-      className={classnames(styles.heading, styles[Element], className || "", styleClass, {
+      style={{ ...sx, ...style, ...getMaxLinesStyle(maxLines) }}
+      className={classnames(styles.heading, styles[Element], className, {
         [styles.truncateOverflow]: maxLines > 0,
         [styles.preserveLinebreaks]: preserveLinebreaks,
         [styles.noEllipsis]: !ellipses,

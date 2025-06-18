@@ -59,7 +59,12 @@ export interface RendererContext<TMd extends ComponentMetadata = ComponentMetada
   lookupSyncCallback: LookupSyncFn;
 
   // --- These are the CSS property values the underlying React component can merge into its "style" property
+  /**
+   * @deprecated Use className instead.
+   */
   layoutCss: CSSProperties;
+
+  className?: string;
 }
 
 /**
