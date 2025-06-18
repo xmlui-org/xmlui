@@ -230,7 +230,7 @@ function createSummary(metadata, srcFolder, outFolder, hasRowNums = true) {
   const headers = [
     { value: "Component", style: "center" },
     "Description",
-    { value: "Status", style: "center" },
+    //{ value: "Status", style: "center" },
   ];
   const rows = metadata
     .sort((a, b) => a.displayName.localeCompare(b.displayName))
@@ -246,7 +246,7 @@ function createSummary(metadata, srcFolder, outFolder, hasRowNums = true) {
           ? `[${component.displayName}](${componentUrl})`
           : component.displayName,
         component.description,
-        component.status ?? DEFAULT_STATUS,
+        //component.status ?? DEFAULT_STATUS,
       ];
     });
 
