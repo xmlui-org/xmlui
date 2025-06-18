@@ -13,7 +13,6 @@ import { ThemeContext, useTheme, useThemes } from "../../components-core/theming
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { NotificationToast } from "./NotificationToast";
-import { useDevTools } from "../../components-core/InspectorContext";
 import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import { useIndexerContext } from "../App/IndexerContext";
 
@@ -169,18 +168,6 @@ export function Theme({
     getThemeVar,
   ]);
 
-  const { devToolsSize, devToolsSide, devToolsEnabled } = useDevTools();
-
-  const inspectStyle = useMemo(() => {
-    return devToolsEnabled
-      ? {
-          paddingBottom: devToolsSide === "bottom" ? devToolsSize : 0,
-          paddingLeft: devToolsSide === "left" ? devToolsSize : 0,
-          paddingRight: devToolsSide === "right" ? devToolsSize : 0,
-        }
-      : {};
-  }, [devToolsEnabled, devToolsSide, devToolsSize]);
-
   const { indexing } = useIndexerContext();
   if (indexing) {
     return children;
@@ -201,7 +188,6 @@ export function Theme({
           dangerouslySetInnerHTML={{ __html: `.${className}  {${css}}` }}
         />
         <div
-          style={inspectStyle}
           id={"_ui-engine-theme-root"}
           className={classnames(styles.baseRootComponent, className)}
           ref={(el) => {

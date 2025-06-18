@@ -50,6 +50,7 @@ import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerBut
 import { Logo } from "./components/Logo/LogoNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
+import { useEvent } from "./components-core/utils/misc";
 
 export type {
   ThemeDefinition,
@@ -105,4 +106,5 @@ export {
   Logo,
   useSearchContextContent,
   useAppLayoutContext,
+  useEvent,
 };
