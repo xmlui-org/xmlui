@@ -242,11 +242,11 @@ export function AppContent({
     if (lastHash.current !== hash) {
       lastHash.current = hash;
       if (!location.state?.preventHashScroll) {
-        // requestAnimationFrame(() => {
-        //   document
-        //     .getElementById(lastHash.current)
-        //     ?.scrollIntoView({ behavior: "instant", block: "start" });
-        // });
+        requestAnimationFrame(() => {
+          document
+            .getElementById(lastHash.current)
+            ?.scrollIntoView({ behavior: "instant", block: "start" });
+        });
       }
     }
   }, [location, scrollForceRefresh]);

@@ -197,14 +197,13 @@ export function App({
   }, []);
 
 
-  //causes problems with ssr, check if we still need it
-  // useIsomorphicLayoutEffect(() => {
-  //   scrollContainerRef.current?.scrollTo({
-  //     top: 0,
-  //     left: 0,
-  //     behavior: "instant", // Optional if you want to skip the scrolling animation
-  //   });
-  // }, [location.pathname]);
+  useIsomorphicLayoutEffect(() => {
+    scrollContainerRef.current?.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant", // Optional if you want to skip the scrolling animation
+    });
+  }, [location.pathname]);
 
   useEffect(() => {
     requestAnimationFrame(() => {
