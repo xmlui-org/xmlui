@@ -26,10 +26,6 @@ interface IInspectorContext {
   attach: (node: ComponentDef, uid: symbol, inspectId: string) => void;
   detach: (uid: symbol, inspectId: string) => void;
   refresh: (inspectId: string) => void;
-  devToolsSize?: number;
-  setDevToolsSize: (size: number) => void;
-  devToolsSide?: "bottom" | "left" | "right";
-  setDevToolsSide: (side: "bottom" | "left" | "right") => void;
   devToolsEnabled?: boolean;
   setIsOpen: (isOpen: boolean) => void;
   inspectedNode: any;
@@ -280,30 +276,30 @@ function InspectButton({
         : visible &&
           !!root &&
           createPortal(
-              <Button
-                variant={"ghost"}
-                className={classnames(styles.wrapper, "_debug-inspect-button")}
-                ref={(el) => setPopperElement(el)}
-                style={{ ...popperStyles.popper, padding: 0 }}
-                {...attributes.popper}
-                onMouseEnter={() => {
-                  hoverRef.current = true;
-                  if (timeoutRef.current) {
-                    clearTimeout(timeoutRef.current);
-                    timeoutRef.current = null;
-                  }
-                }}
-                onMouseLeave={() => {
-                  hoverRef.current = false;
-                  setVisible(false);
-                }}
-                onClick={() => {
-                  setInspectedNode(node);
-                  setShowCode(true);
-                }}
-              >
-                <PiFileCode className={styles.inspectIcon}/>
-              </Button>,
+            <Button
+              variant={"ghost"}
+              className={classnames(styles.wrapper, "_debug-inspect-button")}
+              ref={(el) => setPopperElement(el)}
+              style={{ ...popperStyles.popper, padding: 0 }}
+              {...attributes.popper}
+              onMouseEnter={() => {
+                hoverRef.current = true;
+                if (timeoutRef.current) {
+                  clearTimeout(timeoutRef.current);
+                  timeoutRef.current = null;
+                }
+              }}
+              onMouseLeave={() => {
+                hoverRef.current = false;
+                setVisible(false);
+              }}
+              onClick={() => {
+                setInspectedNode(node);
+                setShowCode(true);
+              }}
+            >
+              <PiFileCode className={styles.inspectIcon} />
+            </Button>,
             root,
           )}
     </>
@@ -318,10 +314,6 @@ export function useDevTools() {
     inspectedNode: context?.inspectedNode,
     sources: context?.sources,
     setIsOpen: context?.setIsOpen,
-    devToolsSize: context?.devToolsSize,
-    setDevToolsSize: context?.setDevToolsSize,
-    devToolsSide: context?.devToolsSide,
-    setDevToolsSide: context?.setDevToolsSide,
     devToolsEnabled: context?.devToolsEnabled,
     mockApi: context?.mockApi,
   };
