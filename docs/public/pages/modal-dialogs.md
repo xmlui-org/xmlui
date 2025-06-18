@@ -4,7 +4,7 @@ A `ModalDialog` can be invoked **declaratively** in markup or **imperatively** f
 
 This is the declarative method. You don't need to invoke the `ModalDialog`'s `open()` and `close()` functions directly. The `when` attribute controls opening and closing.
 
-```xmlui-pg display
+```xmlui-pg display {2, 3, 19}
 <App>
   <variable name="isDialogShown" value="{false}"/>
   <ModalDialog
@@ -32,7 +32,7 @@ This is the declarative method. You don't need to invoke the `ModalDialog`'s `op
 
 This is the imperative method. You invoke `ModalDialog`'s `open()` and `close()` functions explicitly via its ID.
 
-```xmlui-pg display
+```xmlui-pg display {3, 7, 19}
 <App>
   <ModalDialog
     id="dialog"
@@ -57,10 +57,11 @@ This is the imperative method. You invoke `ModalDialog`'s `open()` and `close()`
   </Pages>
 </App>
 ```
+
 When embedding a form in a dialog, the form's cancel and successful submit actions automatically close the dialog hosting the form (unless you change this logic). Note that you can pass data via `dialog.open()`, `ModalDialog` receives it as `$param`.
 
 
-```xmlui-pg display
+```xmlui-pg display {3, 23}
 <App>
   <ModalDialog id="dialog">
     <Text> ID: { $param } </Text>

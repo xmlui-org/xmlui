@@ -1,10 +1,10 @@
 # Routing and Links
 
-XMLUI implements client-side routing with URLs bound to UI views. You can use two different  routing mechanisms: *hash* and *standard*. Both store the current location in the browser's address bar and work with the browser's history stack. However, they differ in the URLs they send to the backend server.
+XMLUI implements client-side routing with URLs bound to UI views. You can use two different  routing mechanisms: **hash** and **standard**. Both store the current location in the browser's address bar and work with the browser's history stack. However, they differ in the URLs they send to the backend server.
 
 ## Hash routing (default)
 
-If you don't have complete control over the server, you may not be able to configure it to retrieve the `index.html` file as a single-page app requires. Hash routing solves this issue. If your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), navigation URLs will look like `myComp.com/accountapp/#/leads/12` or `myComp.com/accountapp/#/list?zip=98005`. Even multiple hash marks may show up (for example, if you navigate to a bookmark: `myComp.com/accountapp/#/leads/12#callhistory`).
+If you don't have complete control over the server, you may not be able to configure it to retrieve the `index.html` file as a single-page app requires. Hash routing solves this issue. If your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), navigation URLs will look like `myComp.com/accountapp/#/leads/12` or `myComp.com/accountapp/#/list?zip=98005`. Even multiple hash marks may show up (for example, if you navigate to a bookmark: `myComp.com/accountapp/#/leads/12#callhistory`.
 
 The server receives only the part of the URL (`myComp.com/accountapp`) that precedes the hash mark. The client-side routing mechanism uses the remainder to navigate within the app.
 
@@ -82,13 +82,13 @@ XMLUI uses the specified links as absolute links (starting with a slash) or rela
 </App>
 ```
 
-Here, `/` and `/contacts` are absolute links within the app, `about` is a relative link. As then `NavPanel` hierarchy is at the root level within the app, `/contacts` and `contacts` is the same URL.
+Here, `/` and `/contacts` are absolute links within the app, `about` is a relative link. As the `NavPanel` hierarchy is at the root level within the app, `/contacts` and `contacts` is the same URL.
 
 ## Dynamic route segments
 
 You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a [valid identifier](/glossary#variable). In the target, you can query the value of these placeholders through the `$routeParams` context variable.
 
-```xmlui-pg display
+```xmlui-pg display copy
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -138,7 +138,7 @@ You can use parameter placeholders in the URLs as part of the route. These place
 
 When the app visits a particular target in its available routes, the `NavLink` component matching with the visited route is marked as active, and it gets a visual indication (a blueish left border), like in this example:
 
-```xmlui-pg display name="Active links"
+```xmlui-pg copy display name="Active links"
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -160,7 +160,7 @@ When you start the app, the route is "/" (by default) and matches the Home page'
 
 As a `NavLink` activity is based on matching, multiple active links may exist simultaneously. The following example demonstrates such a situation:
 
-```xmlui-pg copy {4-5}
+```xmlui-pg copy display {4-5}
 <App display layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>

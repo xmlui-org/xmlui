@@ -35,7 +35,7 @@ It's saved as `components/NameValue.xmlui`. Let's use it!
 
 The component's name must start with an uppercase letter followed by letters, digits, the underscore (`_`), or the dollar sign (`$`) character. Components must be placed into separate files in the `components` folder within the app's root folder. The component's name must match its filename.
 
-You can define default values for properties.
+You can also define default values for properties.
 
 ```xmlui
 <Component name="NameValue">

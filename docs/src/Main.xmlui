@@ -186,9 +186,11 @@
             <Page url="/glossary">
                 <DocumentPage hideToc="true" url="/pages/glossary.md" />
             </Page>
+            <!--
             <Page url="/test">
                 <Test />
             </Page>
+            -->
             <Page url="/change-log">
                 <ChangeLog />
             </Page>
