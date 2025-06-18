@@ -26,7 +26,8 @@ export const AccordionMd = createMetadata({
     `based on user interaction.`,
   props: {
     triggerPosition: {
-      description: `This property indicates the position where the trigger icon should be displayed. The \`start\` ` +
+      description:
+        `This property indicates the position where the trigger icon should be displayed. The \`start\` ` +
         `value signs the trigger is before the header text (template), and \`end\` indicates that it ` +
         `follows the header.`,
       defaultValue: defaultProps.triggerPosition,
@@ -34,12 +35,16 @@ export const AccordionMd = createMetadata({
       availableValues: triggerPositionNames,
     },
     collapsedIcon: {
-      description: `This property is the name of the icon that is displayed when the accordion is collapsed.`,
+      description:
+        "This property is the name of the icon that is displayed when the accordion is " +
+        "collapsed. This property is the name of the icon that is displayed when the accordion is expanded. If not provided, a chevron-down icon is used.",
       valueType: "string",
       defaultValue: defaultProps.collapsedIcon,
     },
     expandedIcon: {
-      description: `This property is the name of the icon that is displayed when the accordion is expanded.`,
+      description:
+        "This property is the name of the icon that is displayed when the accordion is " +
+        "expanded. If not provided, a chevron-up icon is used.",
       valueType: "string",
     },
     hideIcon: {

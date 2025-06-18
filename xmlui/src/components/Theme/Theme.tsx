@@ -20,7 +20,7 @@ export const ThemeMd = createMetadata({
       valueType: "string",
       defaultValue: "light",
     },
-    root: d(`This property indicates whether the component is at the root of the application.`),
+    root: d(`This property indicates whether the component is at the root of the application.`, undefined, "boolean", defaultProps.root ),
   },
   opaque: true,
 });

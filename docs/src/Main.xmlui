@@ -71,6 +71,7 @@
                 <NavLink label="Test" to="/test"/>
                 -->
             </NavGroup>
+            <NavLink label="Change Log" to="/change-log"/>
         </NavPanel>
 
         <Pages>
@@ -188,6 +189,9 @@
             </Page>
             <Page url="/test">
                 <Test />
+            </Page>
+            <Page url="/change-log">
+                <ChangeLog />
             </Page>
             <Page url="/*">
                 <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>

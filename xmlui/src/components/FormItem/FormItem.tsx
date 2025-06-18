@@ -16,6 +16,7 @@ import {
   dInitialValue,
   dLabel,
   dLabelPosition,
+  dLabelWidth,
   dRequired,
 } from "../metadata-helpers";
 import { parseSeverity } from "./Validations";
@@ -38,14 +39,15 @@ export const FormItemMd = createMetadata({
   props: {
     bindTo: {
       description:
-        `This property binds a particular input field to one of the attributes of the \`Form\` data. ` +
-        `It names the property of the form's \`data\` data to get the input's initial value.` +
-        `When the field is saved, its value will be stored in the \`data\` property with this name.`,
+        "This property binds a particular input field to one of the attributes of the \`Form\` data. " +
+        "It names the property of the form's \`data\` data to get the input's initial value." +
+        "When the field is saved, its value will be stored in the \`data\` property with this name. " +
+        "If the property is not set, the input will be bound to an internal data field but not submitted.",
     },
     autoFocus: dAutoFocus(),
     label: dLabel(),
     labelPosition: dLabelPosition(),
-    labelWidth: d(`This property sets the width of the item label.`),
+    labelWidth: dLabelWidth(COMP),
     labelBreak: {
       description:
         `This boolean value indicates if the label can be split into multiple lines if it would ` +
@@ -79,26 +81,32 @@ export const FormItemMd = createMetadata({
     required: dRequired(),
     requiredInvalidMessage: {
       description:
-        `This optional string property is used to customize the message that is displayed if the ` +
-        `field is not filled in.`,
+        "This optional string property is used to customize the message that is displayed if the " +
+        "field is not filled in. If not defined, the default message is used.",
       valueType: "string",
     },
     minLength: {
-      description: `Checks whether the input has a minimum length of a specified value.`,
+      description:
+        "This property sets the minimum length of the input value. If the value is not set, " +
+        "no minimum length check is done.",
       valueType: "number",
     },
     maxLength: {
-      description: `Checks whether the input has a maximum length of a specified value.`,
+      description:
+        "This property sets the maximum length of the input value. If the value is not set, " +
+        "no maximum length check is done.",
       valueType: "number",
     },
     maxTextLength: {
-      description: `The maximum length of the text in the input field`,
+      description:
+        "The maximum length of the text in the input field. If this value is not set, " +
+        "no maximum length constraint is set for the input field.",
       valueType: "number",
     },
     lengthInvalidMessage: {
       description:
-        `This optional string property is used to customize the message that is displayed on a failed ` +
-        `length check: [minLength](#minlength) or [maxLength](#maxlength).`,
+        "This optional string property is used to customize the message that is displayed on a failed " +
+        "length check: [minLength](#minlength) or [maxLength](#maxlength).",
       valueType: "string",
     },
     lengthInvalidSeverity: {
@@ -108,11 +116,15 @@ export const FormItemMd = createMetadata({
       defaultValue: "error",
     },
     minValue: {
-      description: `Checks whether the input has the minimum specified value.`,
+      description:
+        "The minimum value of the input. If this value is not specified, no minimum " +
+        "value check is done.",
       valueType: "number",
     },
     maxValue: {
-      description: `Checks whether the input has the maximum specified value.`,
+      description:
+        "The maximum value of the input. If this value is not specified, no maximum " +
+        "value check is done.",
       valueType: "number",
     },
     rangeInvalidMessage: {
@@ -128,7 +140,9 @@ export const FormItemMd = createMetadata({
       defaultValue: "error",
     },
     pattern: {
-      description: `Checks whether the input fits a predefined regular expression.`,
+      description:
+        "This value specifies a predefined regular expression to test the input value. " +
+        "If this value is not set, no pattern check is done.",
       valueType: "string",
     },
     patternInvalidMessage: {
@@ -144,7 +158,9 @@ export const FormItemMd = createMetadata({
       defaultValue: "error",
     },
     regex: {
-      description: `Checks whether the input fits the provided regular expression.`,
+      description:
+        "This value specifies a custom regular expression to test the input value. If this value " +
+        "is not set, no regular expression pattern check is done.",
       valueType: "string",
     },
     regexInvalidMessage: {
@@ -164,6 +180,8 @@ export const FormItemMd = createMetadata({
     },
     gap: {
       description: "This property defines the gap between the adornments and the input area.",
+      valueType: "string",
+      defaultValue: defaultProps.gap,
     },
   },
   events: {

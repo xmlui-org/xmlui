@@ -72,11 +72,11 @@ The initial value displayed in the input field.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `TextArea` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `TextArea` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition (default: "top")` [#labelposition-default-top]
 
@@ -93,7 +93,7 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `TextArea`.
+This property sets the width of the `TextArea` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `maxLength` [#maxlength]
 
@@ -101,7 +101,7 @@ This property sets the maximum length of the input it accepts.
 
 ### `maxRows` [#maxrows]
 
-This optional property sets the maximum number of text rows the `TextArea` can grow.
+This optional property sets the maximum number of text rows the `TextArea` can grow. If not set, the number of rows is unlimited.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
@@ -119,7 +119,7 @@ This optional property sets the maximum number of text rows the `TextArea` can g
 
 ### `minRows` [#minrows]
 
-This optional property sets the minimum number of text rows the `TextArea` can shrink.
+This optional property sets the minimum number of text rows the `TextArea` can shrink. If not set, the minimum number of rows is 1.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
@@ -131,7 +131,7 @@ This optional property sets the minimum number of text rows the `TextArea` can s
 
 ### `placeholder` [#placeholder]
 
-A placeholder text that is visible in the input field when its empty.
+An optional placeholder text that is visible in the input field when its empty.
 
 ```xmlui-pg copy display name="Example: placeholder"
 <App>
@@ -149,7 +149,7 @@ Set this property to `true` to disallow changing the component value.
 </App>
 ```
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 

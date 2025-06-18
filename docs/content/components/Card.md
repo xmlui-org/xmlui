@@ -51,7 +51,7 @@ Show the avatar (`true`) or not (`false`). If not specified, the Card will show 
 
 ### `linkTo` [#linkto]
 
-This property wraps the title in a `Link` component that is clickable to navigate.
+This optional property wraps the title in a `Link` component that is clickable to navigate.
 
 ### `orientation (default: "vertical")` [#orientation-default-vertical]
 
@@ -91,7 +91,7 @@ Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is aut
 
 ### `subtitle` [#subtitle]
 
-This prop sets the prestyled subtitle.
+This prop sets the pre-styled subtitle. If the property is not set, no subtitle is displayed in the Card.
 
 This prop sets the prestyled subtitle.
 
@@ -103,7 +103,7 @@ This prop sets the prestyled subtitle.
 
 ### `title` [#title]
 
-This prop sets the prestyled title.
+This prop sets the pre-styled title. If the property is not set, no title is displayed in the Card.
 
 This prop sets the prestyled title.
 

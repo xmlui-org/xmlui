@@ -62,14 +62,14 @@ export const NumberBoxMd = createMetadata({
       defaultValue: true,
     },
     spinnerUpIcon: d(
-      `Allows setting the icon displayed in the ${COMP} spinner for incrementing values. You can change ` +
-      `the default icon for all ${COMP} instances with the "icon.spinnerUp:NumberBox" declaration in the ` +
-      `app configuration file.`,
+      `Allows setting an alternate icon displayed in the ${COMP} spinner for incrementing values. You can change ` +
+        `the default icon for all ${COMP} instances with the "icon.spinnerUp:NumberBox" declaration in the ` +
+        `app configuration file.`,
     ),
     spinnerDownIcon: d(
-      `Allows setting the icon displayed in the ${COMP} spinner for decrementing values. You can change ` +
-      `the default icon for all ${COMP} instances with the "icon.spinnerDown:NumberBox" declaration in the ` +
-      `app configuration file.`,
+      `Allows setting an alternate icon displayed in the ${COMP} spinner for decrementing values. You can change ` +
+        `the default icon for all ${COMP} instances with the "icon.spinnerDown:NumberBox" declaration in the ` +
+        `app configuration file.`,
     ),
     step: {
       description: `This prop governs how big the step when clicking on the spinner of the field.`,
@@ -91,12 +91,14 @@ export const NumberBoxMd = createMetadata({
       defaultValue: false,
     },
     minValue: d(
-      `The minimum value the input field allows. Can be a float or an integer if ` +
-        `[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer.`,
+      "The minimum value the input field allows. Can be a float or an integer if " +
+        "[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer." +
+        "If not set, no minimum value check is done.",
     ),
     maxValue: d(
-      `The maximum value the input field allows. Can be a float or an integer if ` +
-        `[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer.`,
+      "The maximum value the input field allows. Can be a float or an integer if " +
+        "[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer." +
+        "If not set, no maximum value check is done.",
     ),
   },
   events: {

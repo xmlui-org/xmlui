@@ -17,7 +17,7 @@ Throught this documentation page the data used is the same that is found in the 
 
 ### `bindTo` [#bindto]
 
-Indicates what part of the data to lay out in the column.
+Indicates the name of the current row item's property, the value of which to lay out in the column. If this property is not defined, the column is not sortable.
 
 ```xmlui copy {3}
 <App>
@@ -85,13 +85,13 @@ Indicates what part of the data to lay out in the column.
 </App>
 ```
 
-### `canResize` [#canresize]
+### `canResize (default: true)` [#canresize-default-true]
 
 This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.
 
 ### `canSort (default: true)` [#cansort-default-true]
 
-This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`).
+This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`). If the `bindTo` property is not defined, the column is not sortable.
 
 Click on either the `Name` or the `Quantity` column headers to order the data by that attribute.
 
@@ -167,7 +167,7 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
 
 ### `header` [#header]
 
-Adds a label for a particular column.
+This property defines a label for a particular column. If not set, the `bindTo` property value is used for the label.
 
 ```xmlui copy {3-4}
 <App>
@@ -249,7 +249,7 @@ Indicates the minimum width a particular column can have. Same rules apply as wi
 
 ### `pinTo` [#pinto]
 
-This property allows the column to be pinned to the `left` (left-to-right writing style) or `right` (left-to-right writing style) edge of the table. If the writing style is right-to-left, the locations are switched.
+This property allows the column to be pinned to the `left` (left-to-right writing style) or `right` (left-to-right writing style) edge of the table. If the writing style is right-to-left, the locations are switched. If this property is not set, the column is not pinned to any edge.
 
 Available values: `left`, `right`
 
@@ -338,7 +338,7 @@ Scroll the table contents horizontally to see how the pinned columns are display
 
 ### `width` [#width]
 
-This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*`, `2*`, etc.). You will get an error if you use any other unit (or value).
+This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*`, `2*`, etc.). You will get an error if you use any other unit (or value).If not defined, the component will use a width according to the column values and the available space.
 
 The following example sets the second column to an absolute size (size pixels), while the first and third columns have star sizes:
 

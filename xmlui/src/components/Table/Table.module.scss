@@ -85,8 +85,8 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
 .headerContent {
   display: flex;
   flex-direction: row;
-  gap: 0.5rem;
   align-items: center;
+  gap: t.$space-1;
   max-width: 100%;
   text-transform: $textTransform-heading-Table;
   font-size: $fontSize-heading-Table;
@@ -107,6 +107,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   white-space: nowrap;
   text-overflow: ellipsis;
   user-select: text;
+  overflow: hidden;
 }
 
 .table {
@@ -167,13 +168,18 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
     }
 
     .cell:first-child {
-      padding-left: $paddingHorizontal-cell-first-Table;
-      border-left: 0;
+      .cellContent{
+        padding-left: $paddingHorizontal-cell-first-Table;
+        border-left: 0;
+      }
+
     }
 
     .cell:last-child {
-      padding-right: $paddingHorizontal-cell-last-Table;
-      border-right: 0;
+      .cellContent{
+        padding-right: $paddingHorizontal-cell-last-Table;
+        border-right: 0;
+      }
     }
   }
 
@@ -226,9 +232,10 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   }
 }
 
-.cell {
+.cellContent {
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
   @include t.paddingVars($themeVars, "cell-#{$component}");
 }
 
@@ -320,7 +327,7 @@ $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   &:before{
     content: '';
     width: 1px;

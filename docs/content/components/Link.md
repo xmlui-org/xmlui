@@ -47,7 +47,7 @@ This boolean property value indicates whether the component responds to user eve
 
 ### `icon` [#icon]
 
-This property allows you to add an icon (specify the icon's name) to the link.
+This property allows you to add an optional icon (specify the icon's name) to the link.
 
 ```xmlui-pg copy display name="Example: icon"
 <App>
@@ -61,7 +61,7 @@ This property allows you to add an icon (specify the icon's name) to the link.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `target` [#target]
 
@@ -89,7 +89,7 @@ The following sample opens its link in a new tab:
 
 ### `to` [#to]
 
-This property defines the URL of the link.
+This property defines the URL of the link. If the value is not defined, the link cannot be activated.
 
 ## Events [#events]
 

@@ -1,0 +1,63 @@
+<Component name="ChangeLog">
+    <DataSource id="downloads" url="/resources/files/downloads/downloads.json" method="GET" />
+    <HStack>
+        <VStack
+                width="*"
+                padding="$space-4"
+        >
+            <H1>Change Log</H1>
+            <VStack gap="$space-2" marginBottom="$space-4">
+                <H2>Engine</H2>
+                <Items items="{downloads.value.engine.availableVersions}">
+                    <Card>
+                        <H2>xmlui@{$item.version}</H2>
+                        <Markdown content="{$item.changelogs.map(log => `- ${log}`).join('\n')}"/>
+                        <Card backgroundColor="$backgroundColor-DownloadSection"
+                              padding="$space-2" marginTop="$space-2">
+                            <HStack verticalAlignment="center" padding="0">
+                                <Icon name="cube" />
+                                <Link active="true" to=""
+                                      onClick="{Actions.download({url: '/resources/files/downloads', fileName: $item.fileName})}">
+                                    {$item.fileName}
+                                </Link>
+                                <SpaceFiller />
+                                <Text>{$item.fileSize}</Text>
+                                <Button variant="ghost" themeColor="primary" icon="download" padding="$space-2"
+                                        onClick="{Actions.download({url: '/resources/files/downloads', fileName: $item.fileName})}">
+                                    Download
+                                </Button>
+                            </HStack>
+                        </Card>
+                    </Card>
+                </Items>
+            </VStack>
+            <VStack gap="$space-2" marginBottom="$space-4">
+                <H2>Packages</H2>
+                <Items items="{downloads.value.packages}">
+                    <Card>
+                        <H2>{$item.name}@{$item.version}</H2>
+                        <Markdown content="{$item.changelogs.map(log => `- ${log}`).join('\n')}"/>
+                        <Card backgroundColor="$backgroundColor-DownloadSection"
+                              padding="$space-2" marginTop="$space-2">
+                            <HStack verticalAlignment="center" padding="0">
+                                <Icon name="cube" />
+                                <Link active="true"
+                                      to=""
+                                      onClick="{Actions.download({url: '/resources/files/downloads', fileName: $item.fileName})}">
+                                    {$item.fileName}
+                                </Link>
+                                <SpaceFiller />
+                                <Text>{$item.fileSize}</Text>
+                                <Button variant="ghost" themeColor="primary" icon="download" padding="$space-2"
+                                        onClick="{Actions.download({url: '/resources/files/downloads', fileName: $item.fileName})}">
+                                    Download
+                                </Button>
+                            </HStack>
+                        </Card>
+                    </Card>
+                </Items>
+            </VStack>
+        </VStack>
+        <TableOfContents width="$space-64" when="{mediaSize.sizeIndex > 3 && !$props.hideToc}" maxHeadingLevel="3" />
+    </HStack>
+</Component>

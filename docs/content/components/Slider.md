@@ -18,11 +18,11 @@ This property sets the component's initial value.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `Slider` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `Slider` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition (default: "top")` [#labelposition-default-top]
 
@@ -39,13 +39,13 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `Slider`.
+This property sets the width of the `Slider` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `maxValue (default: 10)` [#maxvalue-default-10]
 
 This property specifies the maximum value of the allowed input range.
 
-### `minStepsBetweenThumbs` [#minstepsbetweenthumbs]
+### `minStepsBetweenThumbs (default: 1)` [#minstepsbetweenthumbs-default-1]
 
 This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.
 
@@ -55,13 +55,13 @@ This property specifies the minimum value of the allowed input range.
 
 ### `rangeStyle` [#rangestyle]
 
-This property allows you to apply custom styles to the range element of the slider.
+This optional property allows you to apply custom styles to the range element of the slider.
 
 ### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
@@ -75,7 +75,7 @@ This property defines the increment value for the slider, determining the allowe
 
 ### `thumbStyle` [#thumbstyle]
 
-This property allows you to apply custom styles to the thumb elements of the slider.
+This optional property allows you to apply custom styles to the thumb elements of the slider.
 
 ### `validationStatus (default: "none")` [#validationstatus-default-none]
 

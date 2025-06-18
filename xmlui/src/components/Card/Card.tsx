@@ -13,7 +13,8 @@ export const CardMd = createMetadata({
   description: `The \`${COMP}\` component is a container for cohesive elements, often rendered visually as a card.`,
   props: {
     avatarUrl: {
-      description: `Show the avatar (\`true\`) or not (\`false\`). If not specified, the ${COMP} will show the ` +
+      description:
+        `Show the avatar (\`true\`) or not (\`false\`). If not specified, the ${COMP} will show the ` +
         `first letters of the [\`title\`](#title).`,
       type: "string",
     },
@@ -28,21 +29,27 @@ export const CardMd = createMetadata({
       valueType: "string",
     },
     title: {
-      description: `This prop sets the prestyled title.`,
+      description:
+        "This prop sets the pre-styled title. If the property is not set, no title " +
+        "is displayed in the Card.",
       valueType: "string",
     },
     subtitle: {
-      description: `This prop sets the prestyled subtitle.`,
+      description:
+        "This prop sets the pre-styled subtitle. If the property is not set, no subtitle " +
+        "is displayed in the Card.",
       valueType: "string",
     },
     linkTo: {
-      description: `This property wraps the title in a \`Link\` component that is clickable to navigate.`,
+      description:
+        "This optional property wraps the title in a \`Link\` component that is clickable to navigate.",
       valueType: "string",
     },
     orientation: {
-      description: `An optional property that governs the ${COMP}'s orientation ` +
+      description:
+        `An optional property that governs the ${COMP}'s orientation ` +
         `(whether the ${COMP} lays out its children in a row or a column). ` +
-        `If the orientation is set to \`horizontal\`, the ${COMP} will display `+
+        `If the orientation is set to \`horizontal\`, the ${COMP} will display ` +
         `its children in a row, except for its [\`title\`](#title) and [\`subtitle\`](#subtitle).`,
       availableValues: orientationOptionMd,
       valueType: "string",
@@ -68,9 +75,11 @@ export const CardMd = createMetadata({
     [`gap-${COMP}`]: "The gap between the component's children.",
     [`gap-title-${COMP}`]: "The gap between the title and the subtitle",
     [`gap-avatar-${COMP}`]: "The gap between the avatar and the title panel",
-    [`horizontalAlignment-title-${COMP}`]: "The horizontal alignment of panel with the title and subtitle",
-    [`verticalAlignment-title-${COMP}`]: "The vertical alignment of the title and subtitle to the avatar",
-  }
+    [`horizontalAlignment-title-${COMP}`]:
+      "The horizontal alignment of panel with the title and subtitle",
+    [`verticalAlignment-title-${COMP}`]:
+      "The vertical alignment of the title and subtitle to the avatar",
+  },
 });
 
 export const cardComponentRenderer = createComponentRenderer(

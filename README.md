@@ -7,11 +7,15 @@
 
 **XMLUI** is a framework for building user interfaces declaratively, with XML markup and flexible theming.
 
-- **Easy to create**. Build on the web platform with little or no knowledge of JavaScript, CSS, or React.
-- **Beautiful by default**. Enjoy themes that look great out of the box and are easy to modify.
-- **Connected**. Read and write APIs with little or no scripting.
-- **Modular**. Tap into a deep catalog components that you can extend with — again! — little or no scripting.
-- **Easy to deploy**. Just drop a handful of files onto a static webserver.
+**Easy to create**. Build on the web platform with little or no knowledge of JavaScript, CSS, or React.
+
+**Beautiful by default**. Enjoy themes that look great out of the box and are easy to modify.
+
+**Connected**. Read and write APIs with little or no scripting.
+
+**Modular**. Tap into a deep catalog components that you can extend with — again! — little or no scripting.
+
+**Easy to deploy**. Just drop a handful of files onto a static webserver.
 
 ## See it in action
 
@@ -19,12 +23,35 @@ https://github.com/user-attachments/assets/880bdd55-485c-4970-9975-f34a249162c8
 
 ## Getting started
 
-Download the [starter kit](https://xmlui.com/downloads) which includes the XMLUI engine and `XMLUI Invoice`, a demo app that exercises key features of the framework and illustrates common patterns.
+The fastest way to get started with XMLUI is to download our starter kit, which includes the XMLUI engine and `XMLUI Invoice` - a complete business application that demonstrates key features and common patterns.
 
-## Documentation
+### Download the starter kit
 
-The [XMLUI documentation site](https://docs.xmlui.com) is itself an XMLUI app! 
+| Platform | Download
+|----------|----------
+| macOS Intel | [xmlui-invoice-macos-intel.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-macos-intel.tar.gz)
+| macOS ARM64 | [xmlui-invoice-macos-arm64.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-macos-arm64.tar.gz)
+| Windows AMD64 | [xmlui-invoice-windows-amd64.zip](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-windows-amd64.zip)
+| Linux AMD64 | [xmlui-invoice-linux-amd64.tar.gz](https://github.com/xmlui-org/xmlui-invoice/releases/download/v1.0.0/xmlui-invoice-linux-amd64.tar.gz)
 
+
+### What's included
+
+**XMLUI Invoice**: A complete business application with client and product management, invoice creation and tracking, search, and charts.
+
+**XMLUI engine**: The core framework file.
+
+**XMLUI test server**: A simple server to run the app.
+
+### Quick start
+
+Extract the files to a working folder and run the start script.
+
+### See also
+
+Visit [demo.xmlui.com](https://demo.xmlui.com) to explore a gallery of components.
+
+Visit [docs.xmlui.com](https://docs.xmlui.com) for an introduction, a tutorial, and full documentation. The documentation site is itself an XMLUI app!
 
 <a href="https://docs.xmlui.com"><img width="1285" alt="image" src="https://github.com/user-attachments/assets/9a54ae74-4f45-4079-a5d4-142e23fb4134" /></a>
 

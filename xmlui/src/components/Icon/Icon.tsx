@@ -11,19 +11,20 @@ export const IconMd = createMetadata({
   description: `This component is the representation of an icon.`,
   props: {
     name: d(
-      `This string property specifies the name of the icon to display. All icons have unique names ` +
-        `and identifying the name is case-sensitive.`,
+      "This string property specifies the name of the icon to display. All icons have " +
+        "unique, case-sensitive names identifying them. If the icon name is not set, the " +
+        "`fallback` value is used.",
     ),
     size: {
       description:
         `This property defines the size of the \`${COMP}\`. Note that setting the \`height\` and/or ` +
-        `the \`width\` of the component will override this property. You can use az explicit size ` + 
+        `the \`width\` of the component will override this property. You can use az explicit size ` +
         "value (e.g., 32px) or one of these predefined values: `xs`, `sm`, `md`, `lg`.",
       availableValues: ["xs", "sm", "md", "lg"],
     },
     fallback: d(
-      `This optional property provides a way to handle situations when the provided ` +
-        `[icon name](#name) is not found in the registry.`,
+      "This optional property provides a way to handle situations when the icon with the provided " +
+        "[icon name](#name) name does not exist. If the icon cannot be found, no icon is displayed.",
     ),
   },
   events: {

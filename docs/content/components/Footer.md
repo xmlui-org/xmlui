@@ -57,6 +57,7 @@ This component does not expose any methods.
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Footer | $fontSize-small | $fontSize-small |
+| [gap](../styles-and-themes/common-units/#size)-Footer | $space-normal | $space-normal |
 | [height](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [maxWidth-content](../styles-and-themes/common-units/#size)-Footer | $maxWidth-content | $maxWidth-content |
 | [padding](../styles-and-themes/common-units/#size)-Footer | $space-2 $space-4 | $space-2 $space-4 |

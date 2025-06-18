@@ -28,7 +28,7 @@ Content is provided to a tab via placing child components under the `TabItem`.
 
 ### `activeTab` [#activetab]
 
-This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab.
+This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab. If not set, the first tab is selected by default.
 
 ```xmlui-pg copy display name="Example: activeTab" height="200px"
 <App>

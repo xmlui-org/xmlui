@@ -6,7 +6,7 @@ The `FileInput` is a user interface component that allows users to select files 
 
 ### `acceptsFileType` [#acceptsfiletype]
 
-A list of file types the input controls accepts provided as a string array.
+An optional list of file types the input controls accepts provided as a string array.
 
 ### `autoFocus (default: false)` [#autofocus-default-false]
 
@@ -16,11 +16,11 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 The ID of the icon to display in the button. You can change the default icon for all FileInput instances with the "icon.browse:FileInput" declaration in the app configuration file.
 
-### `buttonIconPosition` [#buttoniconposition]
+### `buttonIconPosition (default: "start")` [#buttoniconposition-default-start]
 
 This optional string determines the location of the button icon.
 
-Available values: `start`, `end`
+Available values: `start` **(default)**, `end`
 
 ### `buttonLabel` [#buttonlabel]
 
@@ -45,11 +45,11 @@ Available values:
 | `md` | Medium button |
 | `lg` | Large button |
 
-### `buttonThemeColor` [#buttonthemecolor]
+### `buttonThemeColor (default: "primary")` [#buttonthemecolor-default-primary]
 
 The button color scheme (primary, secondary, attention)
 
-Available values: `attention`, `primary`, `secondary`
+Available values: `attention`, `primary` **(default)**, `secondary`
 
 ### `buttonVariant` [#buttonvariant]
 
@@ -71,11 +71,11 @@ This property sets the component's initial value.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `FileInput` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `FileInput` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition (default: "top")` [#labelposition-default-top]
 
@@ -92,7 +92,7 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `FileInput`.
+This property sets the width of the `FileInput` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `multiple (default: false)` [#multiple-default-false]
 
@@ -100,13 +100,13 @@ This boolean property enables to add not just one (`false`), but multiple files 
 
 ### `placeholder` [#placeholder]
 
-A placeholder text that is visible in the input field when its empty.
+An optional placeholder text that is visible in the input field when its empty.
 
 ### `readOnly (default: false)` [#readonly-default-false]
 
 Set this property to `true` to disallow changing the component value.
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 

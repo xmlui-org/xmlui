@@ -17,7 +17,8 @@ import {
   dLostFocus,
   dReadonly,
   dRequired,
-  dSetValueApi, dValidationStatus,
+  dSetValueApi,
+  dValidationStatus,
   dValue,
 } from "../metadata-helpers";
 import { Slider, defaultProps } from "./SliderNative";
@@ -51,6 +52,9 @@ export const SliderMd = createMetadata({
     },
     minStepsBetweenThumbs: d(
       `This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.`,
+      undefined,
+      "number",
+      defaultProps.minStepsBetweenThumbs,
     ),
     enabled: dEnabled(),
     autoFocus: dAutoFocus(),
@@ -60,8 +64,12 @@ export const SliderMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
-    rangeStyle: d(`This property allows you to apply custom styles to the range element of the slider.`),
-    thumbStyle: d(`This property allows you to apply custom styles to the thumb elements of the slider.`),
+    rangeStyle: d(
+      `This optional property allows you to apply custom styles to the range element of the slider.`,
+    ),
+    thumbStyle: d(
+      `This optional property allows you to apply custom styles to the thumb elements of the slider.`,
+    ),
     showValues: {
       description: `This property controls whether the slider shows the current values of the thumbs.`,
       valueType: "boolean",
@@ -71,7 +79,7 @@ export const SliderMd = createMetadata({
       description: `This property allows you to customize how the values are displayed.`,
       valueType: "any",
       defaultValue: "(value) => value.toString()",
-    }
+    },
   },
   events: {
     didChange: dDidChange(COMP),

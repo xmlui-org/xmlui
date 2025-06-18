@@ -11,11 +11,14 @@ export const ChangeListenerMd = createMetadata({
     `particular value (component property, state, etc.) changes.`,
   props: {
     listenTo: {
-      description: `Value to the changes of which this component listens.`,
+      description:
+        "Value to the changes of which this component listens. If this property is not set, " +
+        "the `ChangeListener` is inactive.",
       valueType: "any",
     },
     throttleWaitInMs: {
-      description: `This variable sets a throttling time (in milliseconds) to apply when executing the \`didChange\` ` +
+      description:
+        `This variable sets a throttling time (in milliseconds) to apply when executing the \`didChange\` ` +
         `event handler. All changes within that throttling time will only fire the \`didChange\` event once.`,
       valueType: "number",
       defaultValue: defaultProps.throttleWaitInMs,

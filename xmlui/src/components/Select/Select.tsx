@@ -6,7 +6,6 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dPlaceholder,
   dInitialValue,
-  dMaxLength,
   dAutoFocus,
   dRequired,
   dReadonly,
@@ -77,7 +76,9 @@ export const SelectMd = createMetadata({
       `This property allows replacing the default template to display a selected value when ` +
         `multiple selections (\`multiSelect\` is \`true\`) are enabled.`,
     ),
-    dropdownHeight: d("This property sets the height of the dropdown list."),
+    dropdownHeight: d(
+      "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
+    ),
     emptyListTemplate: d(
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
@@ -120,7 +121,7 @@ export const SelectMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-menu-${COMP}`]:"$color-surface-raised",
+    [`backgroundColor-menu-${COMP}`]: "$color-surface-raised",
     [`boxShadow-menu-${COMP}`]: "$boxShadow-md",
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
     [`borderWidth-menu-${COMP}`]: "1px",
@@ -141,7 +142,6 @@ export const SelectMd = createMetadata({
     [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
     [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--hover",
     [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
-
   },
 });
 

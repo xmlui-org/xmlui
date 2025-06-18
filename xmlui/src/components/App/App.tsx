@@ -41,7 +41,9 @@ export const AppMd = createMetadata({
       availableValues: appLayoutMd,
     },
     loggedInUser: {
-      description: `Stores information about the currently logged in user.`,
+      description:
+        "Stores information about the currently logged-in user. By not defining this property, " +
+        "you can indicate that no user is logged in.",
       valueType: "string",
     },
     logoTemplate: dComponent("Optional template of the app logo"),
@@ -58,7 +60,10 @@ export const AppMd = createMetadata({
       valueType: "string",
     },
     name: {
-      description: "Optional application name (visible in the browser tab)",
+      description:
+        "Optional application name (visible in the browser tab). When you do not define " +
+        "this property, the tab name falls back to the one defined in the app\'s configuration. " +
+        'If the name is not configured, "XMLUI App" is displayed in the tab.',
       valueType: "string",
     },
     scrollWholePage: {

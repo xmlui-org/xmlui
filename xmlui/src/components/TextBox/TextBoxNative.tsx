@@ -42,7 +42,19 @@ type Props = {
   required?: boolean;
 };
 
-export const defaultProps: Pick<Props, "type" | "value" | "initialValue" | "enabled" | "validationStatus" | "onDidChange" | "onFocus" | "onBlur" | "onKeyDown" | "updateState"> = {
+export const defaultProps: Pick<
+  Props,
+  | "type"
+  | "value"
+  | "initialValue"
+  | "enabled"
+  | "validationStatus"
+  | "onDidChange"
+  | "onFocus"
+  | "onBlur"
+  | "onKeyDown"
+  | "updateState"
+> = {
   type: "text",
   value: "",
   initialValue: "",
@@ -175,7 +187,7 @@ export const TextBox = forwardRef(function TextBox(
         })}
         tabIndex={-1}
         onFocus={focus}
-        style={{gap}}
+        style={{ gap }}
       >
         <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
         <input

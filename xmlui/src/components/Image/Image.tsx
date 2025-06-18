@@ -3,7 +3,7 @@ import styles from "./Image.module.scss";
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { dClick } from "../metadata-helpers";
+import { dClick, dInternal } from "../metadata-helpers";
 import { Image, defaultProps } from "./ImageNative";
 
 const COMP = "Image";
@@ -13,10 +13,14 @@ export const ImageMd = createMetadata({
     `The \`${COMP}\` component represents or depicts an object, scene, idea, or other concept ` +
     `with a picture.`,
   props: {
-    src: d(`This property is used to indicate the source (path) of the image to display.`),
-    alt: d(`This property specifies an alternate text for the image.`),
+    src: d(
+      "This property is used to indicate the source (path) of the image to display. " +
+        "When not defined, no image is displayed.",
+    ),
+    alt: d(`This optional property specifies an alternate text for the image.`),
     fit: {
-      description: "This property sets how the image content should be resized to fit its container.",
+      description:
+        "This property sets how the image content should be resized to fit its container.",
       type: "string",
       defaultValue: defaultProps.fit,
     },
@@ -28,16 +32,16 @@ export const ImageMd = createMetadata({
       defaultValue: defaultProps.lazyLoad,
     },
     aspectRatio: d(
-      `This property sets a preferred aspect ratio for the image, which will be used in the ` +
-        `calculation of auto sizes and some other layout functions.`,
+      "This property sets a preferred aspect ratio for the image, which will be used in " +
+        "calculating auto sizes and other layout functions. If this value is not used, the " +
+        'original aspect ratio is kept. The value can be a number of a string (such as "16/9").',
     ),
     inline: {
-      description:
-        `When set to true, the image will be displayed as an inline element instead of a block element.`,
+      description: `When set to true, the image will be displayed as an inline element instead of a block element.`,
       type: "boolean",
       defaultValue: defaultProps.inline,
     },
-    animation: d(`The animation object to be applied to the component`),
+    animation: dInternal(`The optional animation object to be applied to the component`),
   },
   events: {
     click: dClick(COMP),

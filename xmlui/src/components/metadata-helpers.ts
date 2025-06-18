@@ -43,7 +43,9 @@ export function dIndeterminate(defaultValue?: boolean): ComponentPropertyMetadat
 
 export function dLabel(): ComponentPropertyMetadata {
   return {
-    description: `This property sets the label of the component.`,
+    description:
+      "This property sets the label of the component.  " +
+      "If not set, the component will not display a label.",
     valueType: "string",
   };
 }
@@ -58,14 +60,16 @@ export function dLabelPosition(def?: string): ComponentPropertyMetadata {
 
 export function dLabelWidth(comp: string): ComponentPropertyMetadata {
   return {
-    description: `This property sets the width of the \`${comp}\`.`,
+    description:
+      `This property sets the width of the \`${comp}\` component's label. ` +
+      "If not defined, the label's width will be determined by its content and the available space.",
   };
 }
 
 export function dLabelBreak(comp: string): ComponentPropertyMetadata {
   return {
     description:
-      `This boolean value indicates if the \`${comp}\` labels can be split into multiple ` +
+      `This boolean value indicates if the \`${comp}\` label can be split into multiple ` +
       `lines if it would overflow the available label width.`,
     valueType: "boolean",
     defaultValue: false,
@@ -146,7 +150,7 @@ export function dComponent(description: string): ComponentPropertyMetadata {
 
 export function dPlaceholder(): ComponentPropertyMetadata {
   return {
-    description: `A placeholder text that is visible in the input field when its empty.`,
+    description: `An optional placeholder text that is visible in the input field when its empty.`,
     valueType: "string",
   };
 }
@@ -164,13 +168,14 @@ export function dRequired(): ComponentPropertyMetadata {
       `Set this property to \`true\` to indicate it must have a value ` +
       `before submitting the containing form.`,
     valueType: "boolean",
+    defaultValue: false,
   };
 }
 
 export function dStartText(): ComponentPropertyMetadata {
   return {
     description:
-      `This property sets a text to appear at the start (left side when the ` +
+      `This property sets an optional text to appear at the start (left side when the ` +
       `left-to-right direction is set) of the input.`,
     valueType: "string",
   };
@@ -179,7 +184,7 @@ export function dStartText(): ComponentPropertyMetadata {
 export function dStartIcon(): ComponentPropertyMetadata {
   return {
     description:
-      `This property sets an icon to appear at the start (left side when the ` +
+      `This property sets an optional icon to appear at the start (left side when the ` +
       `left-to-right direction is set) of the input.`,
     valueType: "string",
   };
@@ -188,7 +193,7 @@ export function dStartIcon(): ComponentPropertyMetadata {
 export function dEndText(): ComponentPropertyMetadata {
   return {
     description:
-      `This property sets a text to appear on the end (right side when the ` +
+      `This property sets an optional text to appear on the end (right side when the ` +
       `left-to-right direction is set) of the input.`,
     valueType: "string",
   };
@@ -197,7 +202,7 @@ export function dEndText(): ComponentPropertyMetadata {
 export function dEndIcon(): ComponentPropertyMetadata {
   return {
     description:
-      `This property sets an icon to appear on the end (right side when the ` +
+      `This property sets an optional icon to appear on the end (right side when the ` +
       `left-to-right direction is set) of the input.`,
     valueType: "string",
   };

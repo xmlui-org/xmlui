@@ -35,11 +35,15 @@ export type HeadingProps = {
   [furtherProps: string]: any;
 };
 
-export const defaultProps: Pick<HeadingProps, "level" | "ellipses" | "omitFromToc" | "maxLines"> = {
+export const defaultProps: Pick<
+  HeadingProps,
+  "level" | "ellipses" | "omitFromToc" | "maxLines" | "preserveLinebreaks"
+> = {
   level: "h1",
   ellipses: true,
   omitFromToc: false,
   maxLines: 0,
+  preserveLinebreaks: false,
 };
 
 export const Heading = forwardRef(function Heading(
@@ -112,15 +116,21 @@ export const Heading = forwardRef(function Heading(
       )}
       {children}
       {showAnchor && anchorId && (
-        <Link to={`#${anchorId}`} aria-hidden="true" onClick={(event) => {
-          // cmd/ctrl + click - open in new tab, don't prevent that
-          if(tableOfContentsContext){
-            if (!event.ctrlKey && !event.metaKey && !event.metaKey) {
-              event.preventDefault();
+        <Link
+          to={`#${anchorId}`}
+          aria-hidden="true"
+          onClick={(event) => {
+            // cmd/ctrl + click - open in new tab, don't prevent that
+            if (tableOfContentsContext) {
+              if (!event.ctrlKey && !event.metaKey && !event.metaKey) {
+                event.preventDefault();
+              }
+              tableOfContentsContext.scrollToAnchor(anchorId, true);
             }
-            tableOfContentsContext.scrollToAnchor(anchorId, true);
-          }
-        }}>#</Link>
+          }}
+        >
+          #
+        </Link>
       )}
     </Element>
   );

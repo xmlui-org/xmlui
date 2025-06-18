@@ -364,7 +364,7 @@ The default value is `false`.
 
 ### `iconNoSort` [#iconnosort]
 
-Allows setting the icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the "icon.nosort:Table" declaration in the app configuration file.
+Allows setting an alternate icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the "icon.nosort:Table" declaration in the app configuration file.
 
 Allows the customization of the icon displayed in a Table column header when when sorting is enabled
 and sorting is not done according to the column. Use the "-" (dash) value to sign that you do not want to display an icon when a table column is not sorted.
@@ -441,7 +441,7 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
 
 ### `iconSortAsc` [#iconsortasc]
 
-Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order. You can change the default icon for all Table instances with the "icon.sortasc:Table" declaration in the app configuration file.
+Allows setting an alernate icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order. You can change the default icon for all Table instances with the "icon.sortasc:Table" declaration in the app configuration file.
 
 Allows the customization of the icon displayed in a Table column header when sorting is enabled,
 sorting is done according to the column, and the column is sorted in ascending order.
@@ -518,7 +518,7 @@ sorting is done according to the column, and the column is sorted in ascending o
 
 ### `iconSortDesc` [#iconsortdesc]
 
-Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order. You can change the default icon for all Table instances with the "icon.sortdesc:Table" declaration in the app configuration file.
+Allows setting an alternate icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order. You can change the default icon for all Table instances with the "icon.sortdesc:Table" declaration in the app configuration file.
 
 Allows the customization of the icon displayed in a Table column header when sorting is enabled,
 sorting is done according to the column, and the column is sorted in descending order.
@@ -941,7 +941,7 @@ The default value is `false`.
 
 ### `sortBy` [#sortby]
 
-This property is used to determine which data attributes to sort by.
+This property is used to determine which data property to sort by. If not defined, the data is not sorted
 
 ```xmlui copy /sortBy="quantity"/
 <App>
@@ -1015,7 +1015,7 @@ This property is used to determine which data attributes to sort by.
 
 ### `sortDirection` [#sortdirection]
 
-This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set.
+This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set. By default ascending order is used.
 
 ```xmlui copy /sortDirection="descending"/
 <App>
@@ -1510,13 +1510,13 @@ This method selects the row with the specified ID. This method has no effect if 
 | [outlineOffset](../styles-and-themes/common-units/#size)-heading-Table--focus | $outlineOffset--focus | $outlineOffset--focus |
 | [outlineStyle](../styles-and-themes/common-units/#border)-heading-Table--focus | $outlineStyle--focus | $outlineStyle--focus |
 | [outlineWidth](../styles-and-themes/common-units/#size)-heading-Table--focus | $outlineWidth--focus | $outlineWidth--focus |
-| [padding](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
-| [padding](../styles-and-themes/common-units/#size)-heading-Table | $space-2 | $space-2 |
+| [padding](../styles-and-themes/common-units/#size)-cell-Table | $space-2 $space-0 $space-2 $space-2 | $space-2 $space-0 $space-2 $space-2 |
+| [padding](../styles-and-themes/common-units/#size)-heading-Table | $space-2 $space-0 $space-2 $space-2 | $space-2 $space-0 $space-2 $space-2 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingBottom](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-first-Table | $space-5 | $space-5 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-last-Table | $space-5 | $space-5 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-Table | $space-2 | $space-2 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-last-Table | $space-0 | $space-0 |
+| [paddingHorizontal](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingLeft](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
@@ -1524,7 +1524,7 @@ This method selects the row with the specified ID. This method has no effect if 
 | [paddingRight](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
-| [paddingVertical](../styles-and-themes/common-units/#size)-cell-Table | $space-2 | $space-2 |
+| [paddingVertical](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-heading-Table | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-heading-Table | $color-surface-500 | $color-surface-500 |
 | [textColor](../styles-and-themes/common-units/#color)-pagination-Table | $color-secondary | $color-secondary |

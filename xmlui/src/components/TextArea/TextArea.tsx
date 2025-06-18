@@ -52,10 +52,12 @@ export const TextAreaMd = createMetadata({
       defaultValue: false,
     },
     maxRows: d(
-      `This optional property sets the maximum number of text rows the \`${COMP}\` can grow.`,
+      `This optional property sets the maximum number of text rows the \`${COMP}\` ` +
+        "can grow. If not set, the number of rows is unlimited.",
     ),
     minRows: d(
-      `This optional property sets the minimum number of text rows the \`${COMP}\` can shrink.`,
+      `This optional property sets the minimum number of text rows the \`${COMP}\` can shrink. ` +
+        `If not set, the minimum number of rows is 1.`,
     ),
     rows: {
       description: `Specifies the number of rows the component initially has.`,
@@ -81,8 +83,9 @@ export const TextAreaMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
-    resize: {description:
-      `This optional property specifies in which dimensions can the \`TextArea\` ` +
+    resize: {
+      description:
+        `This optional property specifies in which dimensions can the \`TextArea\` ` +
         `be resized by the user.`,
       availableValues: resizeOptionsMd,
     },

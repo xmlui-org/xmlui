@@ -15,8 +15,10 @@ export const ContentSeparatorMd = createMetadata({
     `helping to improve readability and organization.`,
   props: {
     size: {
-      description: `This property defines the component's height (if the \`orientation\` is horizontal) ` +
-        `or the width (if the \`orientation\` is vertical).`,
+      description:
+        "This property defines the component's height (if the \`orientation\` is horizontal) " +
+        "or the width (if the \`orientation\` is vertical). " +
+        "If not defined, the component uses the entire available width or height.",
       valueType: "any",
     },
     orientation: {
@@ -28,7 +30,7 @@ export const ContentSeparatorMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-${COMP}`]: "$borderColor",
+    [`backgroundColor-${COMP}`]: "$color-surface-200",
     [`size-${COMP}`]: "1px",
     light: {
       // --- No light-specific theme vars

@@ -40,7 +40,7 @@ This property sets the component's initial value.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 This property sets the label of the component.
 
@@ -53,7 +53,7 @@ This property sets the label of the component.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `Switch` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `Switch` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition (default: "end")` [#labelposition-default-end]
 
@@ -79,7 +79,7 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `Switch`.
+This property sets the width of the `Switch` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `readOnly (default: false)` [#readonly-default-false]
 
@@ -94,7 +94,7 @@ If true, the value of the component cannot be modified.
 </App>
 ```
 
-### `required` [#required]
+### `required (default: false)` [#required-default-false]
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 

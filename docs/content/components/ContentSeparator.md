@@ -36,7 +36,7 @@ See the demo for an example under [`size`](#size).
 
 ### `size` [#size]
 
-This property defines the component's height (if the `orientation` is horizontal) or the width (if the `orientation` is vertical).
+This property defines the component's height (if the `orientation` is horizontal) or the width (if the `orientation` is vertical). If not defined, the component uses the entire available width or height.
 
 ```xmlui-pg copy display name="Example: size"
 <App>
@@ -81,5 +81,5 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-ContentSeparator | $borderColor | $borderColor |
+| [backgroundColor](../styles-and-themes/common-units/#color)-ContentSeparator | $color-surface-200 | $color-surface-200 |
 | [size](../styles-and-themes/common-units/#size)-ContentSeparator | 1px | 1px |

@@ -43,7 +43,7 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 ### `dropdownHeight` [#dropdownheight]
 
-This property sets the height of the dropdown list.
+This property sets the height of the dropdown list. If not set, the height is determined automatically.
 
 ```xmlui-pg copy display name="Example: dropdownHeight" height="300px"
 <App>
@@ -121,11 +121,11 @@ This property sets the component's initial value.
 
 ### `label` [#label]
 
-This property sets the label of the component.
+This property sets the label of the component.  If not set, the component will not display a label.
 
 ### `labelBreak (default: false)` [#labelbreak-default-false]
 
-This boolean value indicates if the `Select` labels can be split into multiple lines if it would overflow the available label width.
+This boolean value indicates if the `Select` label can be split into multiple lines if it would overflow the available label width.
 
 ### `labelPosition (default: "top")` [#labelposition-default-top]
 
@@ -142,7 +142,7 @@ Available values:
 
 ### `labelWidth` [#labelwidth]
 
-This property sets the width of the `Select`.
+This property sets the width of the `Select` component's label. If not defined, the label's width will be determined by its content and the available space.
 
 ### `multiSelect (default: false)` [#multiselect-default-false]
 
@@ -213,7 +213,7 @@ This property allows replacing the default template to display an option in the 
 
 ### `placeholder (default: "")` [#placeholder-default-]
 
-A placeholder text that is visible in the input field when its empty.
+An optional placeholder text that is visible in the input field when its empty.
 
 ```xmlui-pg copy display name="Example: placeholder" height="200px"
 <App>

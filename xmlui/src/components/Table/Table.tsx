@@ -59,10 +59,14 @@ export const TableMd = createMetadata({
     noDataTemplate: dComponent(
       `A property to customize what to display if the table does not contain any data.`,
     ),
-    sortBy: d(`This property is used to determine which data attributes to sort by.`),
+    sortBy: d(
+      "This property is used to determine which data property to sort by. If not defined, " +
+        "the data is not sorted",
+    ),
     sortDirection: d(
-      `This property determines the sort order to be \`ascending\` or \`descending\`. This ` +
-        `property only works if the [\`sortBy\`](#sortby) property is also set.`,
+      "This property determines the sort order to be \`ascending\` or \`descending\`. This " +
+        "property only works if the [\`sortBy\`](#sortby) property is also set. By default " +
+        "ascending order is used.",
     ),
     autoFocus: dAutoFocus(),
     hideHeader: {
@@ -72,17 +76,17 @@ export const TableMd = createMetadata({
       defaultValue: defaultProps.hideHeader,
     },
     iconNoSort: d(
-      `Allows setting the icon displayed in the ${COMP} column header when sorting is ` +
+      `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is ` +
         `enabled, but the column remains unsorted. You can change the default icon for all ${COMP} ` +
         `instances with the "icon.nosort:Table" declaration in the app configuration file.`,
     ),
     iconSortAsc: d(
-      `Allows setting the icon displayed in the ${COMP} column header when sorting is enabled, ` +
+      `Allows setting an alernate icon displayed in the ${COMP} column header when sorting is enabled, ` +
         `and the column is sorted in ascending order. You can change the default icon for all ${COMP} ` +
         `instances with the "icon.sortasc:Table" declaration in the app configuration file.`,
     ),
     iconSortDesc: d(
-      `Allows setting the icon displayed in the ${COMP} column header when sorting is enabled, ` +
+      `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is enabled, ` +
         `and the column is sorted in descending order. You can change the default icon for all ${COMP} ` +
         `instances with the "icon.sortdesc:Table" declaration in the app configuration file.`,
     ),
@@ -108,7 +112,7 @@ export const TableMd = createMetadata({
         `\`true\`, the table does not have a bottom border. Otherwise, it has a bottom border.`,
       valueType: "boolean",
       defaultValue: false,
-    }
+    },
   },
   events: {
     sortingDidChange: d(
@@ -142,11 +146,10 @@ export const TableMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`padding-heading-${COMP}`]: `$space-2`,
-    [`paddingHorizontal-cell-${COMP}`]: "$space-2",
+    [`padding-heading-${COMP}`]: `$space-2 $space-0 $space-2 $space-2`,
+    [`padding-cell-${COMP}`]: "$space-2 $space-0 $space-2 $space-2",
     [`paddingHorizontal-cell-first-${COMP}`]: "$space-5",
-    [`paddingHorizontal-cell-last-${COMP}`]: "$space-5",
-    [`paddingVertical-cell-${COMP}`]: "$space-2",
+    [`paddingHorizontal-cell-last-${COMP}`]: "$space-0",
     [`border-cell-${COMP}`]: "1px solid $borderColor",
     [`outlineWidth-heading-${COMP}--focus`]: "$outlineWidth--focus",
     [`outlineStyle-heading-${COMP}--focus`]: "$outlineStyle--focus",
