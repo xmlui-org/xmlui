@@ -6,6 +6,8 @@ const {
   $colorSurface0,
   $colorSurface50,
   $colorSurface100,
+  $colorSurface200A80,
+  $colorSurface200A70,
   $colorSurface200,
   $colorSurface300,
   $colorSurface400,
@@ -195,7 +197,7 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- The app's default radius value
     borderRadius: "4px",
-    "outlineColor--focus": "rgba($color-primary-500-rgb, .5)",
+    "outlineColor--focus": "rgb(from $color-primary-500 r g b / 0.5)",
     "outlineWidth--focus": "2px",
     "outlineStyle--focus": "solid",
     "outlineOffset--focus": "0",
@@ -265,7 +267,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "backgroundColor-tree-row--selected--before": $colorPrimary50,
 
     // --- Border colors
-    "borderColor": $colorSurface100,
+    "borderColor": "rgb(from $color-surface-900 r g b / 0.1)",
     "borderColor--disabled": $colorSurface100,
 
     // --- Text colors

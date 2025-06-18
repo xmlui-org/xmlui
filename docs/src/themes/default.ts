@@ -10,7 +10,6 @@ export const DefaultDocsTheme: ThemeDefinition = {
 
     "color-primary": "#3367CC",
     "color-surface": "#1e2734",
-    borderColor: "$color-surface-100",
 
     "backgroundColor-DownloadSection": "$color-surface-50",
 

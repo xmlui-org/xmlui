@@ -17,8 +17,8 @@ export const CodeBlockMd = createMetadata({
     "backgroundColor-CodeBlock-header": "$color-primary-100",
     "marginTop-CodeBlock": "$space-5",
     "marginBottom-CodeBlock": "$space-5",
-    "backgroundColor-CodeBlock-highlightRow": "rgba($color-primary-200-rgb, .25)",
-    "backgroundColor-CodeBlock-highlightString": "rgba($color-primary-200-rgb, .5)",
+    "backgroundColor-CodeBlock-highlightRow": "rgb(from $color-primary-200 r g b / 0.25)",
+    "backgroundColor-CodeBlock-highlightString": "rgb(from $color-primary-200 r g b / 0.5)",
     "borderRadius-CodeBlock": "$space-2",
 
     "borderColor-CodeBlock-highlightString-emphasis": "$color-attention",
@@ -26,8 +26,8 @@ export const CodeBlockMd = createMetadata({
     dark: {
       "backgroundColor-CodeBlock-header": "$color-surface-200",
       "backgroundColor-CodeBlock": "$color-surface-50",
-      "backgroundColor-CodeBlock-highlightRow": "rgba($color-primary-300-rgb, .15)",
-      "backgroundColor-CodeBlock-highlightString": "rgba($color-primary-300-rgb, .5)",
+      "backgroundColor-CodeBlock-highlightRow": "rgb(from $color-primary-300 r g b / 0.15)",
+      "backgroundColor-CodeBlock-highlightString": "rgb(from $color-primary-300 r g b / 0.5)",
     }
   },
 });
