@@ -9,8 +9,8 @@ import {
   useMemo,
   useState
 } from "react";
-import type { StyleObjectType} from "./utils";
-import { StyleRegistry } from "./utils";
+import type { StyleObjectType} from "./StyleRegistry";
+import { StyleRegistry } from "./StyleRegistry";
 
 // The context is typed to hold either a StyleRegistry instance or null.
 const StyleContext = createContext<StyleRegistry | null>(null);

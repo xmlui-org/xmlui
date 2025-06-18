@@ -51,7 +51,7 @@ import { Logo } from "./components/Logo/LogoNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 import { StyleProvider } from "./components-core/theming/StyleContext";
-import { StyleRegistry } from "./components-core/theming/utils";
+import { StyleRegistry } from "./components-core/theming/StyleRegistry";
 
 export type {
   ThemeDefinition,
