@@ -212,7 +212,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "fontSize-medium": "1.25rem",
     "fontSize-normal": "1rem",
     "fontSize-small": "0.875rem",
-    "fontSize-code": "0.80rem",
+    "fontSize-code": "0.75rem",
     "fontSize-smaller": "0.75rem",
     "fontSize-tiny": "0.625rem",
 
