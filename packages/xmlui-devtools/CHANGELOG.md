@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.12
+
+### Patch Changes
+
+- f5b9f15: feat: xmlui-devtools - use it in a modal dialog
+
 ## 0.1.11
 
 ### Patch Changes

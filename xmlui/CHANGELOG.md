@@ -1,5 +1,20 @@
 # xmlui
 
+## 0.9.52
+
+### Patch Changes
+
+- d079208: The Footer component no provides a themeable gap between its children.
+- 2a461d8: feat: NestedApp works with ApiInterceptor
+- ad6d81e: fix NestedApp apiUrl overwrite
+- f5b9f15: feat: xmlui-devtools - use it in a modal dialog
+- 88e4741: fix: Table columns do not allow (and indicate) sorting when bindTo is not set
+- 7af4b4e: change default borderColor
+- 851ae21: fix table styling
+- 7872ed0: Default theme variables changed for App, NestedApp, TableOfContents, and Text
+- bf00dce: enhance xmlui parser error tolerance, recovering from unclosed tags
+- 38180ce: merge xmlui-charts into core
+
 ## 0.9.51
 
 ### Patch Changes
