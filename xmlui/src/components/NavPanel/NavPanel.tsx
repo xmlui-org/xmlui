@@ -26,6 +26,7 @@ export const NavPanelMd = createMetadata({
   defaultThemeVars: {
     [`horizontalAlignment-logo-${COMP}`]: "center",
     [`backgroundColor-${COMP}`]: "$backgroundColor",
+    [`backgroundColor-${COMP}-horizontal`]: "$backgroundColor-AppHeader",
     [`border-${COMP}`]: '0px solid $borderColor',
     [`paddingHorizontal-${COMP}`]: "0",
     [`paddingVertical-logo-${COMP}`]: "$space-4",
