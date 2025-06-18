@@ -28,7 +28,7 @@ export function generateBaseTones(theme: Record<string, string> | undefined) {
     return {};
   }
   const resolvedTheme = resolveThemeVars(theme);
-  let colorTones = {
+  return {
     ...generateBaseTonesForColor("color-primary", resolvedTheme),
     ...generateBaseTonesForColor("color-secondary", resolvedTheme),
     ...generateBaseTonesForColor("color-info", resolvedTheme),
@@ -36,12 +36,6 @@ export function generateBaseTones(theme: Record<string, string> | undefined) {
     ...generateBaseTonesForColor("color-warn", resolvedTheme),
     ...generateBaseTonesForColor("color-danger", resolvedTheme),
     ...generateBaseTonesForColor("color-surface", resolvedTheme, { distributeEven: true }),
-  };
-  return {
-    ...colorTones,
-    ...generateRbgChannelsForTone("color-surface", { ...resolvedTheme, ...colorTones }),
-    ...generateRbgChannelsForTone("color-primary", { ...resolvedTheme, ...colorTones }),
-    ...generateRbgChannelsForTone("color-secondary", { ...resolvedTheme, ...colorTones }),
   };
 }
 
@@ -769,22 +763,6 @@ function generateBaseTonesForColor(
     console.error("Error generating base tones for color:", varName);
     return {};
   }
-}
-
-function generateRbgChannelsForTone(varName: string, theme: Record<string, string>) {
-  return {
-    [`${varName}-50-rgb`]: getRgbChannelsString(theme[`${varName}-50`]),
-    [`${varName}-100-rgb`]: getRgbChannelsString(theme[`${varName}-100`]),
-    [`${varName}-200-rgb`]: getRgbChannelsString(theme[`${varName}-200`]),
-    [`${varName}-300-rgb`]: getRgbChannelsString(theme[`${varName}-300`]),
-    [`${varName}-400-rgb`]: getRgbChannelsString(theme[`${varName}-400`]),
-    [`${varName}-500-rgb`]: getRgbChannelsString(theme[`${varName}-500`]),
-    [`${varName}-600-rgb`]: getRgbChannelsString(theme[`${varName}-600`]),
-    [`${varName}-700-rgb`]: getRgbChannelsString(theme[`${varName}-700`]),
-    [`${varName}-800-rgb`]: getRgbChannelsString(theme[`${varName}-800`]),
-    [`${varName}-900-rgb`]: getRgbChannelsString(theme[`${varName}-900`]),
-    [`${varName}-950-rgb`]: getRgbChannelsString(theme[`${varName}-950`]),
-  };
 }
 
 function mapTones(

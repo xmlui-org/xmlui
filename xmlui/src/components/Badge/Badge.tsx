@@ -61,7 +61,7 @@ export const BadgeMd = createMetadata({
     [`borderRadius-${COMP}`]: "4px",
     [`fontSize-${COMP}`]: "0.8em",
     [`fontSize-${COMP}-pill`]: "0.8em",
-    [`backgroundColor-${COMP}`]: "rgba($color-secondary-500-rgb, .6)",
+    [`backgroundColor-${COMP}`]: "rgb(from $color-secondary-500 r g b / 0.6)",
     [`textColor-${COMP}`]: "$const-color-surface-0",
   },
 });

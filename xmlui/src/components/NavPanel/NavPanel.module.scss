@@ -10,6 +10,7 @@ $themeVars: ();
 
 $themeVars: t.composeBorderVars($themeVars, $component);
 $backgroundColor-NavPanel: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-NavPanel-horizontal: createThemeVar("backgroundColor-#{$component}-horizontal");
 $boxShadow-NavPanel: createThemeVar("boxShadow-#{$component}");
 $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "logo-#{$component}");
@@ -47,6 +48,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
   &.horizontal{
     box-shadow: none;
     height: $height-NavPanel;
+    background-color: $backgroundColor-NavPanel-horizontal;
 
     &:not(.condensed){
       .wrapperInner{
