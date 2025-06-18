@@ -174,9 +174,9 @@ export function Theme({
   const inspectStyle = useMemo(() => {
     return devToolsEnabled
       ? {
-          paddingBottom: devToolsSide === "bottom" ? devToolsSize : 0,
+         /* paddingBottom: devToolsSide === "bottom" ? devToolsSize : 0,
           paddingLeft: devToolsSide === "left" ? devToolsSize : 0,
-          paddingRight: devToolsSide === "right" ? devToolsSize : 0,
+          paddingRight: devToolsSide === "right" ? devToolsSize : 0,*/
         }
       : {};
   }, [devToolsEnabled, devToolsSide, devToolsSize]);
