@@ -23,16 +23,13 @@ To gain more control we can use the  `Text` component.
 </App>
 ```
 
-Components that render text support theme variables. You can use them, for example, to control the styling of the heading family of components ([Heading](/components/Heading), [H1](/components/H1), [H2](/components/H2), etc.
-</Callout>
-
+Components that render text support theme variables. You can use them, for example, to control the styling of the heading family of components ([Heading](/components/Heading), [H1](/components/H1), [H2](/components/H2), etc).
 
 ```xmlui-pg display name="Example: Text can be styled"
 <App>
   <Theme
     textColor-H1 = "red"
-    textColor-H2 = "green"
-    >
+    textColor-H2 = "green">
     <H1>My Main Title</H1>
     This document contains several sections.
     <H2>Section Title</H2>
@@ -155,7 +152,7 @@ If necessary, breaks occur within a word.
 
 Sometimes you want to preserve line breaks, as when inspecting a JSON object.
 
-```xmlui-pg copy display name="Example: preserving line breaks"
+```xmlui-pg copy display name="Example: preserving line breaks" /preserveLinebreaks="true"/
 <App
   var.data = "{
     {

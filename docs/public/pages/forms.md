@@ -96,24 +96,7 @@ Use star sizing to allocate widths flexibly. Here `Firstname` and `Lastname` equ
 
 ## FormItem
 
-`FormItem` is an intermediary layer between `Form` and an input component; it manages the data represented by that component. The `type` property of a `FormItem` specifies what input component to render.
-
-| type     | description |
-| --------------- | ----------- |
-| `checkbox`      | A checkbox representing a boolean value. |
-| `combobox`      | Lets the user select an item from a dropdown list of filterable items. Use the input field to filter the list. |
-| `datePicker`    | An input to select dates. |
-| `file`          | An input to select a file or folder from the local machine. |
-| `integer`       | An input for integer values. |
-| `multiCombobox` | Lets the user select multiple items from a filterable dropdown list. Use the input field to filter the list. |
-| `multiSelect`   | Lets the user select multiple items from a dropdown list. |
-| `number`        | An input for numeric values (integer or floating-point). |
-| `radioGroup`    | A group of radio buttons (only one can be selected). |
-| `select`        | Lets the user select an item from a dropdown list. |
-| `switch`        | A switch component to toggle a boolean value. |
-| `text`          | A textbox to enter text.  This is the default if no type is specified. |
-| `textarea`      | A multiline textbox to enter text. |
-
+`FormItem` is an intermediary layer between `Form` and an input component; it manages the data represented by that component. The [`type`](/components/FormItem#type-default-text) property of a `FormItem` specifies what input component to render.
 
 ### Checkbox
 
@@ -158,7 +141,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[DatePicker component doc](/components/DatePicker)
+[File component doc](/components/FileInput)
 
 ### Integer
 
@@ -172,6 +155,8 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
+[NumberBox component doc](/components/NumberBox)
+
 ### Number
 
 ```xmlui-pg display
@@ -183,6 +168,8 @@ Use `file` to select one or multiple files.
   </Form>
 </App>
 ```
+
+[NumberBox component doc](/components/NumberBox)
 
 ### RadioGroup
 
@@ -240,7 +227,7 @@ Use `file` to select one or multiple files.
 [Switch component doc](/components/Switch)
 
 
-### Text
+### TextBox
 
 ```xmlui-pg display
 <App>
@@ -252,7 +239,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[Text component doc](/components/Text)
+[TextBox component doc](/components/TextBox)
 
 ### TextArea
 
@@ -292,11 +279,9 @@ You can create a custom input component that uses the XMLUI forms infrastructure
 
 `$value` represents the current value of the component. `$setValue` changes the value.
 
-
 ## Provide data
 
 You can define a `Form`s data structure and initial values directly.
-
 
 ```xmlui copy
 <Form data="{{ name: 'Joe', age: 43 }}" />
@@ -343,7 +328,7 @@ Other components in the form can reference the form's data too. Here the `Text` 
 
 You can drill into `$data` to reference nested fields.
 
-```xmlui-pg display
+```xmlui-pg display {9}
 <App>
   <Form
     data="{{
@@ -422,7 +407,7 @@ Try entering a number smaller than 32.
 </App>
 ```
 
-Try entering a larger smaller than 32.
+Try entering a number larger than 32.
 
 ### `pattern`
 
