@@ -123,11 +123,11 @@ An instance of `TubeStops` extracts details for a given tube line. Multiple inst
 ```
     ]]>
       </Markdown>
+
+      <ExpandableItem summary="view the transformStops function">
       <Markdown width="*">
         <![CDATA[
-<details>
-<summary>transformStops function</summary>
-<pre><code>
+```
 window.transformStops = function(stops) {
   return stops.map(function(stop) {
   // Helper to extract a value from additionalProperties by key
@@ -148,10 +148,10 @@ window.transformStops = function(stops) {
     };
   });
 }
-</code></pre>
-</details>
+```
 ]]>
       </Markdown>
+    </ExpandableItem>
     </FlowLayout>
     <Markdown>
       <![CDATA[
