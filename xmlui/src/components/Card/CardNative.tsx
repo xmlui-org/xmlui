@@ -51,17 +51,21 @@ export const Card = forwardRef(function Card(
   return (
     <div
       ref={forwardedRef}
-      className={classnames(className, styles.wrapper, {
-        [styles.isClickable]: !!onClick,
-        [styles.vertical]: orientation === "vertical",
-        [styles.horizontal]: orientation === "horizontal",
-      })}
+      className={classnames(
+        styles.wrapper,
+        {
+          [styles.isClickable]: !!onClick,
+          [styles.vertical]: orientation === "vertical",
+          [styles.horizontal]: orientation === "horizontal",
+        },
+        className,
+      )}
       style={style}
       onClick={onClick}
     >
       {[title, subtitle, avatarUrl, showAvatar].some(Boolean) && (
         <div className={styles.avatarWrapper}>
-          {showAvatar && <Avatar url={avatarUrl} name={title} size={avatarSize}/>}
+          {showAvatar && <Avatar url={avatarUrl} name={title} size={avatarSize} />}
           <div className={styles.titleWrapper}>
             {linkTo ? (
               title ? (

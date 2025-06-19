@@ -18,6 +18,7 @@ import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 type Props = {
   style?: CSSProperties;
+  className?: string;
   smoothScrolling?: boolean;
   maxHeadingLevel?: number;
 };
@@ -28,11 +29,20 @@ export const defaultProps = {
 };
 
 export const TableOfContents = forwardRef(function TableOfContents(
-  { style, smoothScrolling = defaultProps.smoothScrolling, maxHeadingLevel = defaultProps.maxHeadingLevel }: Props,
+  {
+    style,
+    smoothScrolling = defaultProps.smoothScrolling,
+    maxHeadingLevel = defaultProps.maxHeadingLevel,
+  }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const tocRef = useRef<HTMLDivElement>(null);
-  const { headings, scrollToAnchor, subscribeToActiveAnchorChange, activeAnchorId: initialActiveAnchorId } = useTableOfContents();
+  const {
+    headings,
+    scrollToAnchor,
+    subscribeToActiveAnchorChange,
+    activeAnchorId: initialActiveAnchorId,
+  } = useTableOfContents();
   const [activeAnchorId, setActiveId] = useState(initialActiveAnchorId);
 
   useIsomorphicLayoutEffect(() => {
@@ -62,7 +72,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
   }, [activeAnchorId, headings]);
 
   return (
-    <div className={styles.nav} ref={ref} style={style}>
+    <div className={classnames(classnames, styles.nav)} ref={ref} style={style}>
       <ul className={styles.list}>
         {headings.map((value) => {
           if (value.level <= maxHeadingLevel) {

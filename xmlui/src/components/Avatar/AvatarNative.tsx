@@ -34,7 +34,6 @@ export const Avatar = forwardRef(function Avatar(
       {...rest}
       ref={ref}
       className={classnames(
-        className,
         styles.container,
         {
           [styles.xs]: size === "xs",
@@ -42,7 +41,8 @@ export const Avatar = forwardRef(function Avatar(
           [styles.md]: size === "md",
           [styles.lg]: size === "lg",
           [styles.clickable]: !!onClick,
-        }
+        },
+        className,
       )}
       style={{ backgroundImage: url ? `url(${url})` : "none", ...style }}
       onClick={onClick}

@@ -28,6 +28,7 @@ type Props = {
   placeholder?: string;
   updateState?: UpdateStateFn;
   style?: CSSProperties;
+  className?: string;
   onDidChange?: (newValue: string | { from: string; to: string }) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -131,6 +132,7 @@ export const DatePicker = forwardRef(function DatePicker(
     maxValue,
     disabledDates = defaultProps.disabledDates,
     style,
+    className,
     registerComponentApi,
     inline = defaultProps.inline,
     startText,
@@ -276,6 +278,7 @@ export const DatePicker = forwardRef(function DatePicker(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={className}
       ref={ref}
     >
       {inline ? (
@@ -316,7 +319,7 @@ export const DatePicker = forwardRef(function DatePicker(
               [styles.error]: validationStatus === "error",
               [styles.warning]: validationStatus === "warning",
               [styles.valid]: validationStatus === "valid",
-            })}
+            }, className)}
             autoFocus={autoFocus}
             onFocus={onFocus}
             onBlur={onBlur}

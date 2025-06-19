@@ -85,7 +85,7 @@ export const checkboxComponentRenderer = createComponentRenderer(
   ({
     node,
     extractValue,
-    layoutCss,
+    className,
     updateState,
     lookupEventHandler,
     state,
@@ -109,7 +109,7 @@ export const checkboxComponentRenderer = createComponentRenderer(
             : undefined
         }
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        style={layoutCss}
+        className={className}
         initialValue={extractValue.asOptionalBoolean(
           node.props.initialValue,
           defaultProps.initialValue,

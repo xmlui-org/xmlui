@@ -53,13 +53,13 @@ export const PieChartMd = createMetadata({
 export const pieChartComponentRenderer = createComponentRenderer(
   COMP,
   PieChartMd,
-  ({ extractValue, node, layoutCss, renderChild }: any) => {
+  ({ extractValue, node, className, renderChild }: any) => {
     return (
       <PieChart
         showLabelList={extractValue.asOptionalBoolean(node.props?.showLabelList)}
         labelListPosition={extractValue.asOptionalString(node.props?.labelListPosition)}
         data={extractValue(node.props?.data)}
-        style={layoutCss}
+        className={className}
         showLabel={extractValue.asOptionalBoolean(node.props?.showLabel)}
         showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
         dataKey={extractValue(node.props?.dataKey)}

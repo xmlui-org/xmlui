@@ -7,17 +7,17 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-
 $componentName: "PieChart";
 
-.chartContainer {
-  margin-left: auto;
-  margin-right: auto;
-  aspect-ratio: 1 / 1;
+@layer components {
+  .chartContainer {
+    margin-left: auto;
+    margin-right: auto;
+    aspect-ratio: 1 / 1;
+  }
 }
 
-
 // --- We export the theme variables to add them to the component renderer
-:export{
-  themeVars: t.json-stringify($themeVars)
+:export {
+  themeVars: t.json-stringify($themeVars);
 }

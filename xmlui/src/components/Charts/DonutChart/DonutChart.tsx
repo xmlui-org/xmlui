@@ -58,7 +58,7 @@ export const DonutChartMd = createMetadata({
 export const donutChartComponentRenderer = createComponentRenderer(
   COMP,
   DonutChartMd,
-  ({ extractValue, node, layoutCss, renderChild }: any) => {
+  ({ extractValue, node, className, renderChild }: any) => {
     return (
       <PieChart
         showLabelList={extractValue.asOptionalBoolean(
@@ -70,7 +70,7 @@ export const donutChartComponentRenderer = createComponentRenderer(
           defaultPropsDonut.innerRadius,
         )}
         data={extractValue(node.props?.data)}
-        style={layoutCss}
+        className={className}
         showLabel={extractValue.asOptionalBoolean(
           node.props?.showLabel,
           defaultPropsDonut.showLabel,

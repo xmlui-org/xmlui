@@ -1,6 +1,7 @@
 import type React from "react";
 import styles from "./CodeBlock.module.scss";
 import { Text } from "../Text/TextNative";
+import classnames from "classnames";
 import { type CodeHighlighterMeta, CodeHighlighterMetaKeys } from "./highlight-code";
 import { Button } from "../Button/ButtonNative";
 import Icon from "../Icon/IconNative";
@@ -14,16 +15,17 @@ type CodeBlockProps = {
   textToCopy?: string;
   meta?: CodeHighlighterMeta;
   style?: CSSProperties;
+  className?: string;
 };
 
 export const defaultProps = {
   // No default props needed for this component currently
 };
 
-export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps) {
+export function CodeBlock({ children, meta, textToCopy, style, className }: CodeBlockProps) {
   if (!meta) {
     return (
-      <div className={styles.codeBlock} style={style}>
+      <div className={classnames(styles.codeBlock, className)} style={style}>
         <div className={styles.codeBlockContent}>
           {children}
         </div>

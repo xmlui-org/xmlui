@@ -310,6 +310,7 @@ export const Table = forwardRef(
             starSizedWidth,
             pinTo: col.pinTo,
             style: col.style,
+            className: col.className,
             accessorKey: col.accessorKey,
             cellRenderer: col.cellRenderer,
           },

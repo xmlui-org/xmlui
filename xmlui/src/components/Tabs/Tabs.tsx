@@ -50,10 +50,10 @@ export const TabsMd = createMetadata({
 export const tabsComponentRenderer = createComponentRenderer(
   COMP,
   TabsMd,
-  ({ extractValue, node, renderChild, layoutCss, registerComponentApi }) => {
+  ({ extractValue, node, renderChild, className, registerComponentApi }) => {
     return (
       <Tabs
-        style={layoutCss}
+        className={className}
         tabRenderer={
           !!node?.props?.tabTemplate
             ? (item) => (

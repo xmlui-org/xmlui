@@ -18,6 +18,7 @@ export type LineChartProps = {
   dataKeys: string[];
   nameKey: string;
   style?: React.CSSProperties;
+  className?: string;
   hideX?: boolean;
   hideTooltip?: boolean;
   tickFormatter?: (value: any) => any;
@@ -40,6 +41,7 @@ export function LineChart({
   dataKeys = [],
   nameKey,
   style,
+  className,
   hideX = false,
   hideTooltip = false,
   tickFormatter,
@@ -112,7 +114,7 @@ export function LineChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style} width="100%" height="100%">
+      <ResponsiveContainer style={style} className={className} width="100%" height="100%">
         <RLineChart
           accessibilityLayer
           data={data}

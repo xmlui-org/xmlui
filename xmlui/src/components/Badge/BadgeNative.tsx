@@ -11,9 +11,7 @@ export type BadgeColors = {
 };
 
 // --- Type guard for BadgeColors ---
-export function isBadgeColors(
-  color: any,
-): color is BadgeColors {
+export function isBadgeColors(color: any): color is BadgeColors {
   return (
     typeof color === "object" &&
     color !== null &&
@@ -43,10 +41,13 @@ export const Badge = forwardRef(function Badge(
   return (
     <div
       ref={forwardedRef}
-      className={classnames(className, {
-        [styles.badge]: variant === "badge",
-        [styles.pill]: variant === "pill",
-      })}
+      className={classnames(
+        {
+          [styles.badge]: variant === "badge",
+          [styles.pill]: variant === "pill",
+        },
+        className,
+      )}
       style={{
         ...(color
           ? typeof color === "string"
