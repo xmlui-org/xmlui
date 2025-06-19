@@ -2,6 +2,7 @@ import { CSSProperties, ForwardedRef, forwardRef, ReactNode, useCallback, useEff
 import * as dropzone from "react-dropzone";
 
 import styles from "./FileUploadDropZone.module.scss";
+import classnames from "classnames";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
@@ -20,6 +21,7 @@ type Props = {
   uid?: string;
   registerComponentApi: RegisterComponentApiFn;
   style?: CSSProperties;
+  className?: string;
   allowPaste?: boolean;
   text?: string;
   disabled?: boolean;
@@ -40,6 +42,7 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     uid = defaultProps.uid,
     registerComponentApi,
     style,
+    className,
     allowPaste = defaultProps.allowPaste,
     text = defaultProps.text,
     disabled = defaultProps.disabled,
@@ -112,7 +115,7 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
     <div
       {...getRootProps()}
       style={style}
-      className={styles.wrapper}
+      className={classnames(styles.wrapper, className)}
       onPaste={handleOnPaste}
       ref={forwardedRef}
     >

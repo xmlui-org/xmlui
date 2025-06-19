@@ -6,18 +6,20 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: createThemeVar("gap-Form");
-}
+@layer components {
+  .wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: createThemeVar("gap-Form");
+  }
 
-.buttonRow{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: createThemeVar("gap-buttonRow-Form");
+  .buttonRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: createThemeVar("gap-buttonRow-Form");
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

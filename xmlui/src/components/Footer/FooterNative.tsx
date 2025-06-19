@@ -19,7 +19,7 @@ export const Footer = forwardRef(function Footer(
     className,
   }: {
     children: ReactNode;
-    style: React.CSSProperties;
+    style?: React.CSSProperties;
     className?: string;
   },
   forwardedRef: ForwardedRef<HTMLDivElement>,

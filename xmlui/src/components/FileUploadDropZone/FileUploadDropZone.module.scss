@@ -9,34 +9,38 @@ $themeVars: ();
 
 $backgroundColor-FileUploadDropZone: createThemeVar("backgroundColor-FileUploadDropZone");
 $textColor-FileUploadDropZone: createThemeVar("textColor-FileUploadDropZone");
-$backgroundColor-dropping-FileUploadDropZone: createThemeVar("backgroundColor-dropping-FileUploadDropZone");
+$backgroundColor-dropping-FileUploadDropZone: createThemeVar(
+  "backgroundColor-dropping-FileUploadDropZone"
+);
 $opacity-dropping-FileUploadDropZone: createThemeVar("opacity-dropping-FileUploadDropZone");
 
-.wrapper {
-  position: relative;
-  background-color: $backgroundColor-FileUploadDropZone;
-  color: $textColor-FileUploadDropZone;
-  display: flex;
-  flex-direction: column;
-}
+@layer components {
+  .wrapper {
+    position: relative;
+    background-color: $backgroundColor-FileUploadDropZone;
+    color: $textColor-FileUploadDropZone;
+    display: flex;
+    flex-direction: column;
+  }
 
-.dropPlaceholder {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-
-  &:before {
-    content: "";
+  .dropPlaceholder {
     position: absolute;
     inset: 0;
-    background-color: $backgroundColor-dropping-FileUploadDropZone;
-    opacity: $opacity-dropping-FileUploadDropZone; //0.5;
+    z-index: 1;
+    pointer-events: none;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    &:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-color: $backgroundColor-dropping-FileUploadDropZone;
+      opacity: $opacity-dropping-FileUploadDropZone; //0.5;
+    }
   }
 }
 

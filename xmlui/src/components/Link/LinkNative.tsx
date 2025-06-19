@@ -27,6 +27,7 @@ type Props = {
   disabled?: boolean;
   onClick?: () => void;
   style?: CSSProperties;
+  className?: string;
 } & Partial<
   Pick<
     HTMLAnchorElement,
@@ -43,8 +44,18 @@ export const LinkNative = forwardRef(function LinkNative(
   props: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const { to, children, icon, active = defaultProps.active, onClick, target, disabled = defaultProps.disabled, style, ...anchorProps } =
-    specifyTypes(props);
+  const {
+    to,
+    children,
+    icon,
+    active = defaultProps.active,
+    onClick,
+    target,
+    disabled = defaultProps.disabled,
+    style,
+    className,
+    ...anchorProps
+  } = specifyTypes(props);
 
   const iconLink = !!icon && !children;
   const smartTo = useMemo(() => {
@@ -64,7 +75,7 @@ export const LinkNative = forwardRef(function LinkNative(
         [styles.iconLink]: iconLink,
         [styles.active]: active,
         [styles.disabled]: disabled,
-      })}
+      }, className)}
       {...anchorProps}
     >
       {icon && (

@@ -23,6 +23,7 @@ type DropdownMenuProps = {
   label?: string;
   registerComponentApi?: RegisterComponentApiFn;
   style?: CSSProperties;
+  className?: string;
   alignment?: AlignmentOptions;
   onWillOpen?: () => Promise<boolean | undefined>;
   disabled?: boolean;
@@ -54,6 +55,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     label,
     registerComponentApi,
     style,
+    className,
     onWillOpen,
     alignment = defaultDropdownMenuProps.alignment,
     disabled = false,
@@ -106,7 +108,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
         <ReactDropdownMenu.Content
           align={alignment}
           style={style}
-          className={styles.DropdownMenuContent}
+          className={classnames(styles.DropdownMenuContent, className)}
         >
           {children}
         </ReactDropdownMenu.Content>
