@@ -1,6 +1,6 @@
 # LineChart [#linechart]
 
-Represents a line chart component.
+`LineChart` displays data as connected points over a continuous axis, ideal for showing trends, changes over time, or relationships between variables. Use it time series data, progress tracking, and comparing multiple data series on the same scale.
 
 ## Properties [#properties]
 

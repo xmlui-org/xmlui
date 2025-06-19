@@ -1,14 +1,19 @@
 # FormItem [#formitem]
 
-A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data.
+`FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically.
 
-The component provides context values with which you can access some internal properties:
+**Key features:**
+- **Data binding**: Automatically syncs control values with form data using the `bindTo` property
+- **Validation**: Displays validation states and error messages for the associated input
+- **Flexible labeling**: Supports labels, helper text, and various label positioning options
+- **Layout management**: Handles consistent spacing and alignment of form elements
 
-- `$setValue`: This function can be invoked to set the `FormItem` instance's value. The function has a single argument, the new value to set.
-- `$validationResult`: This variable represents the result of the latest validation of the `FormItem` instance.
-- `$value`: The context variable represents the current value of the `FormItem`. It can be used in expressions and code snippets within the `FormItem` instance.
+**Context variables:**
+- `$setValue`: Function to set the FormItem's value programmatically
+- `$validationResult`: Current validation state and error messages for this field
+- `$value`: Current value of the FormItem, accessible in expressions and code snippets
 
-You can learn more about this component in the [Forms](../../create-apps/forms.mdx) article.
+See [this guide](/forms) for details.
 
 ## Properties [#properties]
 
@@ -47,9 +52,9 @@ Note how changing the input in the demo below will result in a slight delay of i
     onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem
       customValidationsDebounce="3000"
-      onValidate="(value) => { 
-        validations += '| '; 
-        return value === value.toUpperCase(); 
+      onValidate="(value) => {
+        validations += '| ';
+        return value === value.toUpperCase();
       }"
       bindTo="name" />
     <Text value="{validations}" />

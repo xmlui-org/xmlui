@@ -1,9 +1,11 @@
 # AppHeader [#appheader]
 
-`AppHeader` is a placeholder within `App` to define a custom application header.
+`AppHeader` defines the top navigation bar of your application within the [`App`](/components/App) component. It automatically handles logo placement, application title, and user profile areas with built-in responsive behavior.
 
->[!INFO]
-> You can learn more details about using this component [here](../learning/using-components/app-component).
+**Key features:**
+- **Logo customization**: Use `logoTemplate` to create rich logo designs beyond simple images
+- **Profile menu**: Add user authentication displays, settings menus, or action buttons via `profileMenuTemplate`
+- **Layout integration**: Automatically positioned and styled based on your App's `layout` property
 
 ## Properties [#properties]
 

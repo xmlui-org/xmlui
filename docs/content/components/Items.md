@@ -1,13 +1,21 @@
 # Items [#items]
 
-The `Items` component maps sequential data items into component instances, representing each data item as a particular component.
+`Items` renders data arrays without built-in layout or styling, providing a lightweight alternative to `List`. Unlike `List`, it provides no virtualization, grouping, or visual formatting — just pure data iteration.
 
-The component provides context values with which you can access some internal properties:
+**Key features:**
+- **Simple iteration**: Maps data arrays to components using `$item`, `$itemIndex`, `$isFirst`, and `$isLast` context
+- **Layout agnostic**: No built-in styling or container—children determine the visual presentation
+- **Reverse ordering**: Optional `reverse` property to display data in opposite order
+- **Performance**: Lightweight alternative to `List` when you don't need virtualization or grouping
 
-- `$isFirst`: This boolean value indicates if the component renders its first item.
-- `$isLast`: This boolean value indicates if the component renders its last item.
-- `$item`: This value represents the current iteration item while the component renders its children.
-- `$itemIndex`: This integer value represents the current iteration index (zero-based) while rendering children.
+**Context variables:**
+- `$item`: Current data item being rendered
+- `$itemIndex`: Zero-based index of current item
+- `$isFirst`: Boolean indicating if this is the first item
+- `$isLast`: Boolean indicating if this is the last item
+
+**Items vs List:**
+Use `Items` for simple data mapping without layout requirements. Use `List` when you need virtualization (performance with large datasets), grouping, sorting, pagination, or built-in visual formatting.
 
 ## Use children as Content Template [#use-children-as-content-template]
 

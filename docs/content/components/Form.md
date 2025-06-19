@@ -1,12 +1,14 @@
 # Form [#form]
 
-A `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing.
+`Form` provides a structured container for collecting and validating user input, with built-in data binding, validation, and submission handling. It automatically manages form state and provides context for nested form controls to work together.
 
-The component provides context values with which you can access some internal properties:
+**Key features:**
+- **Automatic data binding**: Form controls automatically sync with form data using `bindTo` properties
+- **Built-in validation**: Validates individual fields and overall form state before submission
+- **Context sharing**: Provides `$data` and other context values accessible to all nested components
+- **Submission handling**: Manages form submission workflow and prevents invalid submissions
 
-- `$data`: This property represents the value of the form data. You can access the fields of the form using the IDs in the `bindTo` property of nested `FormItem` instances. `$data` also provides an `update` method as a shortcut to the Form's exposed `update` method.
-
-You can learn more about this component in the [Using Forms](/learning/using-components/forms/) article.
+See [this guide](/forms) for details.
 
 ## Properties [#properties]
 
@@ -38,7 +40,7 @@ The following example demonstrates using it:
         </HStack>
       </property>
   </Form>
-</App>  
+</App>
 ---desc
 This example mimics a one-second search and turns off the submit button during the operation. Also, it adds a Test Search Server button:
 ```
@@ -125,7 +127,7 @@ The form infrastructure fires this event when the form is submitted. The event a
         zeroOrPositive="true" />
     </FlowLayout>
   </Form>
-</App>  
+</App>
 ```
 
 ## Exposed Methods [#exposed-methods]
@@ -138,7 +140,7 @@ Call this event to reset the form to its initial state.
 
 You can pass a data object to update the form data. The properties in the passed data object are updated to their values accordingly. Other form properties remain intact.
 
-This method updates the form data with the change passed in its parameter. The parameter is a hash object, and this method updates the Form's properties accordingly. 
+This method updates the form data with the change passed in its parameter. The parameter is a hash object, and this method updates the Form's properties accordingly.
 
 ```xmlui-pg copy display name="Example: update"
 <App>
@@ -160,7 +162,7 @@ This method updates the form data with the change passed in its parameter. The p
       Update name and age
     </Button>
   </Form>
-</App>  
+</App>
 ```
 
 ## Styling [#styling]

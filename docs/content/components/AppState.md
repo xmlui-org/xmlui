@@ -1,9 +1,11 @@
 # AppState [#appstate]
 
->[!WARNING]
-> This component does not show up on the UI; it merely helps implement UI logic.
+`AppState` is an invisible component that provides global state management across your entire application. Unlike component variables that are scoped locally, AppState allows any component to access and update shared state without prop drilling.
 
-AppState is a functional component (without a visible user interface) that helps store and manage the app's state.
+**Key advantages over variables:**
+- **Global accessibility**: Any component can access the state by referencing the same `bucket`
+- **Automatic reactivity**: UI updates automatically when state changes, no manual prop passing required
+- **Cross-component coordination**: Perfect for user sessions, UI preferences, loading states, and shared data
 
 ## Using AppState [#using-appstate]
 
@@ -52,7 +54,7 @@ This situation is where `AppState` comes into the picture. With an `AppState` in
 
 Let's turn the previous example into one using `AppState`! The following code shows how we change the main app file:
 
-```xmlui-pg 
+```xmlui-pg
 ---app copy display filename="Main.xmlui"
 <App>
   <AppState id="appState" initialValue="{{ enhancedMode: false }}"/>

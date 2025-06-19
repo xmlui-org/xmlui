@@ -1,6 +1,12 @@
 # ChangeListener [#changelistener]
 
-`ChangeListener` is a functional component (it renders no UI) to trigger an action when a particular value (component property, state, etc.) changes.
+`ChangeListener` is an invisible component that watches for changes in values and triggers actions in response. It's essential for creating reactive behavior when you need to respond to data changes, state updates, or component property modifications outside of normal event handlers.
+
+**Key features:**
+- **Value monitoring**: Watches any expression, variable, or component property for changes
+- **Throttling support**: Prevents excessive triggering with `throttleWaitInMs` for rapid changes
+- **Previous/new values**: Access both old and new values in the change handler
+- **Reactive patterns**: Coordinates between components or triggers side effects
 
 ## Properties [#properties]
 

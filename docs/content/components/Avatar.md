@@ -1,6 +1,12 @@
 # Avatar [#avatar]
 
-The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials.
+`Avatar` displays a user or entity's profile picture as a circular image, with automatic fallback to initials when no image is provided. It's commonly used in headers, user lists, comments, and anywhere you need to represent a person or organization.
+
+**Key features:**
+- **Automatic fallback**: Shows initials when no image URL is provided or image fails to load
+- **Multiple sizes**: From `xs` (extra small) to `lg` (large) to fit different contexts
+- **Clickable**: Supports click events for profile actions, modals, or navigation
+- **Accessible**: Automatically generates appropriate alt text from the name
 
 ## Properties [#properties]
 

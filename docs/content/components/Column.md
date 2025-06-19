@@ -1,17 +1,19 @@
 # Column [#column]
+`Column` defines the structure and behavior of individual table columns within a [`Table`](/components/Table) component. Each Column controls data binding, header display, sorting capabilities, sizing, and can contain any XMLUI components for rich cell content.
 
-The `Column` component can be used within a `Table` to define a particular table column's visual properties and data bindings.
+**Key features:**
+- **Data binding**: Use `bindTo` to automatically display object properties
+- **Component embedding**: Place any component inside `Column`: `Button`, `Text`, `Icon`, etc.
+- **Interactive behavior**: Enable/disable sorting and column resizing
+- **Layout control**: Set width using pixels, star sizing (`*`, `2*`), or proportional values
+- **Column pinning**: Pin columns to left or right edges for sticky behavior
 
-The component provides context values with which you can access some internal properties:
+**Context variables available for embedded components:**
+- `$item`: The complete data row object being rendered
+- `$cell`: The specific cell value for this column
+- `$itemIndex` / `$rowIndex`: Zero-based row index
+- `$colIndex`: Zero-based column index
 
-- `$cell`: The value of the cell being rendered.
-- `$colIndex`: The index of the column being rendered.
-- `$item`: The data item being rendered.
-- `$itemIndex`: The index of the data item being rendered.
-- `$row`: The data item being rendered (the same as `$item`).
-- `$rowIndex`: The index of the data item being rendered (the same as `$itemIndex`).
-
-Throught this documentation page the data used is the same that is found in the [`Table` component documentation](./Table.mdx#properties).
 
 ## Properties [#properties]
 
@@ -98,9 +100,9 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
 ```xmlui copy /canSort/
 <App>
   <Table data='{[...]}'>
-    <Column canSort="true" bindTo="name" />
-    <Column canSort="true" bindTo="quantity" />
-    <Column canSort="false" bindTo="unit" />
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
+    <Column bindTo="unit" />
   </Table>
 </App>
 ```

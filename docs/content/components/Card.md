@@ -1,6 +1,12 @@
 # Card [#card]
 
-The `Card` component is a container for cohesive elements, often rendered visually as a card.
+`Card` is a versatile container that groups related content with a visual boundary, typically featuring background color, padding, borders, and rounded corners. It's ideal for organizing information, creating sections, and establishing visual hierarchy in your interface.
+
+**Key features:**
+- **Pre-styled elements**: Built-in support for `title`, `subtitle`, and `avatarUrl` properties
+- **Flexible layout**: Choose `vertical` (default) or `horizontal` orientation
+- **Visual grouping**: Automatic styling with background, borders, and spacing
+- **Clickable areas**: Supports click events for interactive cards
 
 ## Using Card [#using-card]
 

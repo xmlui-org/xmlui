@@ -1,6 +1,6 @@
 # Fragment [#fragment]
 
-The `Fragment` component encloses multiple child components into a single root component, so it can be used where only a single component definition is allowed.
+`Fragment` provides conditional rendering and grouping of components. It's often used to hide components until their dependent variables are available.
 
 ## Properties [#properties]
 

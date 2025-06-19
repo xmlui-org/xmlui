@@ -1,6 +1,6 @@
 # ColorPicker [#colorpicker]
 
-This component allows the user to select a color with the browser's default color picker control.
+`ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values.
 
 ## Using `ColorPicker` [#using-colorpicker]
 
@@ -29,9 +29,9 @@ This property sets the component's initial value.
 
 ```xmlui-pg copy display name="Example: using ColorPicker"
 <App>
-  <ColorPicker 
-    id="colorPicker" 
-    label="Select your favorite color" 
+  <ColorPicker
+    id="colorPicker"
+    label="Select your favorite color"
     initialValue="#ff0080"
     />
   <Text>Selected color: {colorPicker.value}</Text>
@@ -124,9 +124,9 @@ You can use this method to set the component's current value programmatically (`
 ```xmlui-pg copy display name="Example: setValue"
 <App>
   <App>
-    <ColorPicker 
-      id="colorPicker" 
-      label="Select your favorite color" 
+    <ColorPicker
+      id="colorPicker"
+      label="Select your favorite color"
       initialValue="#808080" />
     <HStack>
       <Button

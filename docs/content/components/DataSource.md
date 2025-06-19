@@ -1,6 +1,12 @@
 # DataSource [#datasource]
 
-The `DataSource` component manages fetching data from an API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component.
+`DataSource` fetches and caches data from API endpoints, versus [`APICall`](/components/APICall) which creates, updates or deletes data.
+
+**Key characteristics:**
+- **Conditional loading**: Use `when` property to prevent fetching until dependent data is ready
+- **Built-in caching**: Prevents unnecessary requests and provides instant data access
+- **Polling support**: Automatically refetch data at specified intervals
+- **Data transformation**: Process and filter responses before components use the data
 
 ## Structural Sharing [#structural-sharing]
 
@@ -193,6 +199,17 @@ Set an optional function to perform a final transformation of the response data.
 ### `url (required)` [#url-required]
 
 Set the URL.
+
+### `when` [#when]
+
+Prevent the `DataSource` from executing until the specified condition is true.
+
+```xmlui
+<DataSource
+  id="userProfile"
+  url="/api/users/{selectedUserId}/profile"
+  when="{selectedUserId}" />
+```
 
 ## Events [#events]
 

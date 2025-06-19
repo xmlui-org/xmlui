@@ -1,8 +1,8 @@
 # FormSection [#formsection]
 
-The `FormSection` is a component that groups cohesive elements together within a `Form`. This grouping is indicated visually: the child components of the `FormSection` are placed in a [`FlowLayout`](./FlowLayout.mdx) component.
+`FormSection` groups elements within a `Form`. Child components are placed in a [FlowLayout](/components/FlowLayout).
 
-See the \`FlowLayout\` reference documentation for details on sizing children.
+See [this guide](/forms) for details.
 
 ## Properties [#properties]
 

@@ -1,11 +1,17 @@
 # APICall [#apicall]
+`APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks.
 
-`APICall` creates, updates or deletes data on the backend, versus `DataSource` which fetches data.
+**Key characteristics:**
+- **Manual execution**: Call `execute()` method to trigger the API request
+- **Form integration**: Commonly used in `<event name="submit">` handlers for forms
+- **Parameter passing**: Pass data to the API call via `execute()` parameters
+- **Built-in notifications**: Supports automatic progress, success, and error messages
 
-It provides these context variables:
-
-- `$param`: The first parameters passed to the `execute()` method.
-- `$params`: The array of parameters passed to the `execute()` method. Use `$params[0]` to access the first, `$params[1]` to access the second, etc. `$param` is the same as `$params[0]`.
+**Context variables available during execution:**
+- `$param`: The first parameter passed to `execute()` method
+- `$params`: Array of all parameters passed to `execute()` method (access with `$params[0]`, `$params[1]`, etc.)
+- `$result`: Response data (available in `completedNotificationMessage` and `success` event)
+- `$error`: Error details (available in `errorNotificationMessage` and `error` event)
 
 ## Properties [#properties]
 

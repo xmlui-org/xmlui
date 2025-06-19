@@ -1,6 +1,6 @@
 # Link [#link]
 
-A `Link` component represents a navigation target within the app or a reference to an external web URL.
+`Link` creates clickable navigation elements for internal app routes or external URLs. You can use the `label` and `icon` properties for simple text links, or embed custom components like buttons, cards, or complex layouts for rich interactive link presentations.
 
 ## Using Link [#using-link]
 

@@ -1,10 +1,12 @@
 # AutoComplete [#autocomplete]
 
-This component is a dropdown with a list of options. According to the `multi` property, the user can select one or more items.
+`AutoComplete` is a searchable dropdown input that allows users to type and filter through options, with support for single or multiple selections. Unlike a basic [`Select`](/components/Select), it provides type-ahead functionality and can allow users to create new options.
 
-The component provides context values with which you can access some internal properties:
-
-- `$item`: This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option.
+**Key features:**
+- **Type-ahead filtering**: Users can type to narrow down options in real-time
+- **Multi-select support**: Set `multi="true"` to allow selecting multiple items
+- **Custom option creation**: Enable `creatable="true"` to let users add new options
+- **Rich customization**: Use `optionTemplate` to create complex option layouts
 
 ## Using AutoComplete [#using-autocomplete]
 

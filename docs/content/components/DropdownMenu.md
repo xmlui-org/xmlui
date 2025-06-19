@@ -1,6 +1,11 @@
 # DropdownMenu [#dropdownmenu]
 
-This component represents a dropdown menu with a trigger. When the user clicks the trigger, the dropdown menu displays its items.
+`DropdownMenu` provides a space-efficient way to present multiple options or actions through a collapsible interface. When clicked, the trigger button reveals a menu that can include items, separators, and nested submenus, making it ideal for navigation, action lists, or any situation requiring many options without permanent screen space.
+
+**Key features:**
+- **Hierarchical organization**: Supports nested submenus for complex menu structures
+- **Flexible triggers**: Customizable button trigger or use your own trigger component
+- **Progressive disclosure**: Reveals options on demand
 
 You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
 

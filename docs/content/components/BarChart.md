@@ -1,6 +1,12 @@
 # BarChart [#barchart]
 
-The `BarChart` component represents a bar chart.Accepts a `LabelLst` component as a child to parametrize display labels.
+`BarChart` displays data as horizontal or vertical bars, supporting both grouped and stacked layouts. It's ideal for comparing values across categories, showing revenue trends, or displaying any quantitative data over time or categories.
+
+**Key features:**
+- **Flexible orientation**: Choose horizontal or vertical bar layouts
+- **Multiple data series**: Display several metrics on the same chart with different colored bars
+- **Stacked vs grouped**: Stack bars on top of each other or place them side by side
+- **Custom formatting**: Use `tickFormatter` to format axis labels and [`LabelList`](/components/LabelList) for data labels
 
 ## Properties [#properties]
 
