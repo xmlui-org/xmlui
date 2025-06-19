@@ -199,6 +199,25 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     overflow-x: auto;
     width: 100%;
   }
+
+  // --- Details adornment
+  .detailsAdornment {
+    margin-top: $marginTop-Admonition;
+    margin-bottom: $marginBottom-Admonition;
+    border-radius: $borderRadius-Admonition;
+    background-color: $backgroundColor-Admonition;
+    @include t.borderVars($themeVars, "Admonition");
+    
+    // Override ExpandableItem styles for better integration
+    :global(.summary) {
+      padding: 0.5rem 1rem;
+      font-weight: 600; // Make summary text bold
+    }
+    
+    :global(.content) {
+      padding: 0 1rem 0.5rem 1rem;
+    }
+  }
 }
 
 // --- UnorderedList

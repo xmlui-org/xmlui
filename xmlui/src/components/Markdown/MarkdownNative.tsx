@@ -24,6 +24,7 @@ import Icon from "../Icon/IconNative";
 import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
+import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
 
 // Default props for the Markdown component
 export const defaultProps = {
@@ -117,7 +118,7 @@ export const Markdown = memo(function Markdown({
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
-            console.log("details", children)
+            console.log("details", children);
             return (
               <details className={htmlTagStyles.htmlDetails} {...props}>
                 {children}
@@ -415,22 +416,14 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
   // Extract all text content
   const allText: string = React.Children.toArray(children).map(extractTextContent).join("");
 
-  // Check for admonition pattern
+  // Check for adornment pattern
   const match = allText.match(/\[!([A-Z]+)\]/);
-  const isAdmonition = !!match;
+  const isAdornment = !!match;
 
-  if (isAdmonition && match && match[1]) {
+  if (isAdornment && match && match[1]) {
     const type = match[1].toLowerCase();
 
-    const iconMap: Record<string, React.ReactNode> = {
-      info: <Icon name="admonition_info" />,
-      warning: <Icon name="admonition_warning" />,
-      danger: <Icon name="admonition_danger" />,
-      note: <Icon name="admonition_note" />,
-      tip: <Icon name="admonition_tip" />,
-    };
-
-    // Process children to remove the admonition marker
+    // Process children to remove the adornment marker
     const processNode = (node: React.ReactNode): React.ReactNode => {
       if (typeof node === "string") {
         return node.replace(/\[!([A-Z]+)\]\s*/, "");
@@ -460,7 +453,63 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
 
     const processedChildren = React.Children.map(children, processNode);
 
-    // Render admonition blockquote with the updated structure
+    // Handle [!DETAILS] adornment
+    if (type === "details") {
+      // Extract summary from the original text
+      const originalText = allText;
+      const detailsMatch = originalText.match(/\[!DETAILS\](.*?)(?:\n|$)/);
+      const summaryText = detailsMatch && detailsMatch[1] ? detailsMatch[1].trim() : "Details";
+      
+      // Create separate content children without the summary line
+      // We need to find the first Text element and remove the summary from it
+      let contentWithoutSummary = [];
+      let foundFirstTextElement = false;
+      
+      React.Children.forEach(processedChildren, (child, index) => {
+        // Process the first text element to remove the summary line
+        if (!foundFirstTextElement && React.isValidElement(child) && child.props?.children) {
+          foundFirstTextElement = true;
+          
+          // Get the child's text content
+          const childText = extractTextContent(child.props.children);
+          
+          // Skip the first line which contains the summary
+          const lines = childText.split('\n');
+          if (lines.length > 1) {
+            // Create modified element with remaining content
+            const remainingContent = lines.slice(1).join('\n');
+            if (remainingContent.trim()) {
+              contentWithoutSummary.push(
+                React.cloneElement(
+                  child,
+                  child.props,
+                  remainingContent
+                )
+              );
+            }
+          }
+        } else {
+          // Keep all other elements unchanged
+          contentWithoutSummary.push(child);
+        }
+      });
+      
+      return (
+        <ExpandableItem summary={summaryText}>
+          {contentWithoutSummary}
+        </ExpandableItem>
+      );
+    }
+
+    const iconMap: Record<string, React.ReactNode> = {
+      info: <Icon name="admonition_info" />,
+      warning: <Icon name="admonition_warning" />,
+      danger: <Icon name="admonition_danger" />,
+      note: <Icon name="admonition_note" />,
+      tip: <Icon name="admonition_tip" />,
+    };
+
+    // Render adornment blockquote with the updated structure
     return (
       <blockquote
         className={classnames(styles.admonitionBlockquote, {
