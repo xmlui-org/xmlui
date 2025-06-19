@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 
 import { startApp } from "./components-core/StandaloneApp";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
-import * as all from "./index";
+import * as xmluiExports from "./index";
 
 const Xmlui = new StandaloneExtensionManager();
 
@@ -23,7 +23,6 @@ window.React = React;
 window.jsxRuntime = jsxRuntime;
 window.ReactDOM = ReactDOM;
 
-export default {
-  ...all,
-  standalone: Xmlui
-}
+// Export everything from index.ts plus the standalone extension manager
+const standaloneExports = { ...xmluiExports, standalone: Xmlui };
+export default standaloneExports;
