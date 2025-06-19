@@ -277,7 +277,7 @@ function InspectButton({
           !!root &&
           createPortal(
             <Button
-              variant={"ghost"}
+              variant={"outlined"}
               className={classnames(styles.wrapper, "_debug-inspect-button")}
               ref={(el) => setPopperElement(el)}
               style={{ ...popperStyles.popper, padding: 0 }}
@@ -298,7 +298,7 @@ function InspectButton({
                 setShowCode(true);
               }}
             >
-              <PiFileCode className={styles.inspectIcon} />
+              Show code
             </Button>,
             root,
           )}
