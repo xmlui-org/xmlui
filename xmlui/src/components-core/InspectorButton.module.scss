@@ -2,7 +2,10 @@
 
 .wrapper {
   position: relative;
-  opacity: .5;
+  opacity: .6;
+  gap: themes.$space-1;
+  padding: themes.$space-1_5 !important;
+
 
   &:hover {
     opacity: 1;
@@ -13,11 +16,6 @@
     pointer-events: none;
     display: none;
   }
-}
-
-
-.inspectIcon {
-  font-size: 1.4rem;
 }
 
 .inspectableNode {
