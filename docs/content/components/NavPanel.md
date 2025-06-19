@@ -50,6 +50,7 @@ This component does not expose any methods.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](../styles-and-themes/common-units/#color)-NavPanel | $backgroundColor | $backgroundColor |
+| [backgroundColor](../styles-and-themes/common-units/#color)-NavPanel-horizontal | $backgroundColor-AppHeader | $backgroundColor-AppHeader |
 | [border](../styles-and-themes/common-units/#border)-NavPanel | 0px solid $borderColor | 0px solid $borderColor |
 | [borderBottom](../styles-and-themes/common-units/#border)-NavPanel | *none* | *none* |
 | [borderBottomColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |

@@ -46,7 +46,6 @@ export const MarkdownMd = createMetadata({
         "displayed. If set to `true`, heading anchors will be displayed on hover " +
         "next to headings.",
       valueType: "boolean",
-      defaultValue: defaultProps.showHeadingAnchors,
     },
   },
 
@@ -126,7 +125,7 @@ export const markdownComponentRenderer = createComponentRenderer(
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
-        showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors, false)}
+        showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
       >
         {renderedChildren}
       </TransformedMarkdown>

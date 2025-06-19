@@ -319,9 +319,9 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Text-code | rgba($color-surface-100-rgb, .4) | rgba($color-surface-100-rgb, .4) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Text-keyboard | rgba($color-surface-100-rgb, .4) | rgba($color-surface-100-rgb, .4) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Text-marked | rgba($color-primary-200-rgb, .4) | rgba($color-primary-400-rgb, .4) |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-code | rgb(from $color-surface-100 r g b / 0.4) | rgb(from $color-surface-100 r g b / 0.4) |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-keyboard | rgb(from $color-surface-100 r g b / 0.4) | rgb(from $color-surface-100 r g b / 0.4) |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Text-marked | rgb(from $color-primary-200 r g b / 0.4) | rgb(from $color-primary-400 r g b / 0.4) |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-code | $color-surface-100 | $color-surface-100 |
 | [borderColor](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-300 | $color-surface-300 |
 | [borderRadius](../styles-and-themes/common-units/#border-rounding)-Text | $borderRadius | $borderRadius |

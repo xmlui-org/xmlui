@@ -28,7 +28,6 @@ import type { Node, Parent } from "unist";
 // Default props for the Markdown component
 export const defaultProps = {
   removeIndents: true,
-  showHeadingAnchors: false,
 };
 
 type MarkdownProps = {
@@ -86,7 +85,7 @@ export const Markdown = memo(function Markdown({
   children,
   style,
   codeHighlighter,
-  showHeadingAnchors = defaultProps.showHeadingAnchors,
+  showHeadingAnchors,
 }: MarkdownProps) {
   if (typeof children !== "string") {
     return null;
@@ -104,7 +103,10 @@ export const Markdown = memo(function Markdown({
     };
 
     function visitor(node: any, _: number, parent: Parent | undefined) {
-      imageInfo.current.set(getImageKey(node), parent.type === "paragraph" && parent.children.length > 1);
+      imageInfo.current.set(
+        getImageKey(node),
+        parent.type === "paragraph" && parent.children.length > 1,
+      );
     }
   };
 
@@ -493,6 +495,10 @@ type LinkAwareHeadingProps = {
 };
 
 function LinkAwareHeading({ children, level, showHeadingAnchors }: LinkAwareHeadingProps) {
+  const appContext = useAppContext();
+  if (showHeadingAnchors === undefined) {
+    showHeadingAnchors = appContext?.appGlobals?.showHeadingAnchors ?? false;
+  }
   let headingLabel: React.ReactNode = "";
   let anchorId = "";
   if (!children) return <></>;
@@ -513,6 +519,9 @@ function LinkAwareHeading({ children, level, showHeadingAnchors }: LinkAwareHead
         const match = last.trim().match(/^\[#([^\]]+)\]$/);
         if (match && match.length > 0) {
           anchorId = match[1];
+        } else {
+          // --- Generate a valid anchor ID from the last element
+          anchorId = headingToAnchorLink(extractTextNodes(last));
         }
       }
     }
