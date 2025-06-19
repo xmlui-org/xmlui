@@ -181,13 +181,23 @@ import { ColorPickerMd } from "./ColorPicker/ColorPicker";
 
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import { RootThemeDefinition } from "../components-core/theming/themes/root";
-import { XmlUiCyanThemeDefinition, XmlUiGrayThemeDefinition, XmlUiGreenThemeDefinition, XmlUiOrangeThemeDefinition, XmlUiPurpleThemeDefinition, XmlUiRedThemeDefinition, XmlUiThemeDefinition } from "../components-core/theming/themes/xmlui";
+import {
+  XmlUiCyanThemeDefinition,
+  XmlUiGrayThemeDefinition,
+  XmlUiGreenThemeDefinition,
+  XmlUiOrangeThemeDefinition,
+  XmlUiPurpleThemeDefinition,
+  XmlUiRedThemeDefinition,
+  XmlUiThemeDefinition,
+} from "../components-core/theming/themes/xmlui";
 import { BarChartMd } from "./Charts/BarChart/BarChart";
 import { DonutChartMd } from "./Charts/DonutChart/DonutChart";
 import { LabelListMd } from "./Charts/LabelList/LabelList";
 import { LegendMd } from "./Charts/Legend/Legend";
 import { LineChartMd } from "./Charts/LineChart/LineChart";
 import { PieChartMd } from "./Charts/PieChart/PieChart";
+import { ExpandableItem } from "./ExpandableItem/ExpandableItemNative";
+import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -319,6 +329,7 @@ export const collectedComponentMetadata = {
   MenuItem: MenuItemMd,
   SubMenuItem: SubMenuItemMd,
   EmojiSelector: EmojiSelectorMd,
+  ExpandableItem: ExpandableItemMd,
   FileInput: FileInputMd,
   FileUploadDropZone: FileUploadDropZoneMd,
   FlowLayout: FlowLayoutMd,
@@ -389,7 +400,7 @@ export const collectedComponentMetadata = {
   LabelList: LabelListMd,
   Legend: LegendMd,
   LineChart: LineChartMd,
-  PieChart: PieChartMd
+  PieChart: PieChartMd,
 };
 
 export const collectedThemes: Record<string, ThemeDefinition> = {
@@ -401,4 +412,4 @@ export const collectedThemes: Record<string, ThemeDefinition> = {
   xmluiPurple: XmlUiPurpleThemeDefinition,
   xmluiCyan: XmlUiCyanThemeDefinition,
   xmluiRed: XmlUiRedThemeDefinition,
-}
+};
