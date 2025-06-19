@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.9.53
+
+### Patch Changes
+
+- c64fa25: Allow turning on/off heading anchors in appGlobals
+- 73c2c21: wip: code inspector buttons - label change, devtools - animation update
+
 ## 0.9.52
 
 ### Patch Changes

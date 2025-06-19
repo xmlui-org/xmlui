@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.13
+
+### Patch Changes
+
+- 73c2c21: wip: code inspector buttons - label change, devtools - animation update
+
 ## 0.1.12
 
 ### Patch Changes
