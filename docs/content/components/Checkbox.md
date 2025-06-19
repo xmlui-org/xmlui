@@ -1,8 +1,13 @@
 # Checkbox [#checkbox]
 
-The `Checkbox` component allows users to make binary choices, typically between checked or unchecked. It consists of a small box that can be toggled on or off by clicking on it.
+`Checkbox` allows users to make binary choices with a clickable box that shows checked/unchecked states. It's essential for settings, preferences, multi-select lists, and accepting terms or conditions.
 
-To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](../learning/using-components/forms).
+**Key features:**
+- **Flexible labeling**: Position labels on any side and support custom label templates
+- **Validation support**: Built-in validation states for form error handling
+- **Indeterminate state**: Special visual state for mixed selections (useful for "select all" scenarios)
+
+To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](/forms).
 
 ## Use children as Content Template [#use-children-as-content-template]
 
@@ -163,9 +168,9 @@ This event is triggered when value of Checkbox has changed.
 ```xmlui-pg copy display name="Example: didChange"
 <App verticalAlignment="center" var.changes="">
   <Checkbox label="Changeable" onDidChange="changes += '+'" />
-  <Checkbox 
-    label="Readonly" 
-    readOnly="true" 
+  <Checkbox
+    label="Readonly"
+    readOnly="true"
     onDidChange="changes += '-'" />
   <Text value="Changes: {changes}" />
 </App>

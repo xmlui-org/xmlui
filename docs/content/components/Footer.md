@@ -1,9 +1,6 @@
 # Footer [#footer]
 
-The `Footer` is a component that acts as a placeholder within `App`.
-
->[!INFO]
-> Learn more about using this component [here](../learning/app-component).
+`Footer` provides a designated area at the bottom of your application for footer content such as branding, copyright notices, or utility controls like theme toggles.
 
 ## Properties [#properties]
 

@@ -1,6 +1,12 @@
 # FileInput [#fileinput]
 
-The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise).
+`FileInput` enables users to select files from their device's file system for upload or processing. It combines a text field displaying selected files with a customizable button that opens the system file browser. Use it for forms, media uploads, and document processing workflows.
+
+**Key features:**
+- **File type filtering**: Restrict selection to specific file types using `acceptsFileType`
+- **Multiple file selection**: Enable users to select multiple files simultaneously
+- **Directory selection**: Allow folder selection instead of individual files
+- **Customizable button**: Configure button text, icons, position, and styling to match your design
 
 ## Properties [#properties]
 

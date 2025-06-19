@@ -1,17 +1,23 @@
 # APICall [#apicall]
+`APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks.
 
-`APICall` is used to mutate (create, update or delete) some data on the backend. It is similar in nature to the `DataSource` component which retrieves data from the backend.
+**Key characteristics:**
+- **Manual execution**: Call `execute()` method to trigger the API request
+- **Form integration**: Commonly used in `<event name="submit">` handlers for forms
+- **Parameter passing**: Pass data to the API call via `execute()` parameters
+- **Built-in notifications**: Supports automatic progress, success, and error messages
 
-The component provides context values with which you can access some internal properties:
-
-- `$param`: This value represents the first parameters passed to the `execute()` method to display the modal dialog.
-- `$params`: This value represents the array of parameters passed to the `execute()` method. You can use `$params[0]` to access the first and `$params[1]` to access the second (and so on) parameters. `$param` is the same as `$params[0]`.
+**Context variables available during execution:**
+- `$param`: The first parameter passed to `execute()` method
+- `$params`: Array of all parameters passed to `execute()` method (access with `$params[0]`, `$params[1]`, etc.)
+- `$result`: Response data (available in `completedNotificationMessage` and `success` event)
+- `$error`: Error details (available in `errorNotificationMessage` and `error` event)
 
 ## Properties [#properties]
 
 ### `body` [#body]
 
-This optional property sets the request body. The object you pass here will be serialized to JSON when sending the request. Use the `rawBody` property to send another request body using its native format. When you define `body` and `rawBody`, the latest one prevails.
+This optional property sets the request body. Use to pass an object that will be serialized as a JSON string. If you have an object that is already serialized as a JSON string, use `rawBody` instead.
 
 ### `completedNotificationMessage` [#completednotificationmessage]
 
@@ -23,7 +29,7 @@ This property customizes the success message displayed in a toast after the fini
  <APICall
   id="ds"
   method="post"
-  url="/api/shopping-list" 
+  url="/api/shopping-list"
   completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
 ```
 
@@ -49,7 +55,7 @@ This property customizes the message displayed in a toast when the API invocatio
  <APICall
   id="ds"
   method="post"
-  url="/api/shopping-list" 
+  url="/api/shopping-list"
   errorNotificationMessage="${error.statusCode}, {JSON.stringify($error.details)}" />
 ```
 

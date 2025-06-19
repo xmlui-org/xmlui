@@ -1,6 +1,12 @@
 # DatePicker [#datepicker]
 
-A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.
+`DatePicker` provides an interactive calendar interface for selecting single dates or date ranges, with customizable formatting and validation options. It displays a text input that opens a calendar popup when clicked, offering both keyboard and mouse interaction.
+
+**Key features:**
+- **Flexible modes**: Single date selection (default) or date range selection
+- **Format customization**: Support for various date formats (MM/dd/yyyy, yyyy-MM-dd, etc.)
+- **Date restrictions**: Set minimum/maximum dates and disable specific dates
+- **Localization options**: Configure first day of week and show week numbers
 
 ## Properties [#properties]
 
@@ -43,7 +49,7 @@ An optional array of dates that are disabled
 ```xmlui-pg copy display name="Example: disabledDates" height="120px"
 <App>
   <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
-</App>  
+</App>
 ```
 
 ### `enabled (default: true)` [#enabled-default-true]
@@ -53,7 +59,7 @@ This boolean property value indicates whether the component responds to user eve
 ```xmlui-pg copy display name="Example: enabled" height="120px"
 <App>
   <DatePicker enabled="false" />
-</App>  
+</App>
 ```
 
 ### `endIcon` [#endicon]
@@ -71,7 +77,7 @@ This property sets the component's initial value.
 ```xmlui-pg copy display name="Example: initialValue" height="120px"
 <App>
   <DatePicker initialValue="05/25/2024" />
-</App>  
+</App>
 ```
 
 ### `inline (default: false)` [#inline-default-false]
@@ -143,7 +149,7 @@ An optional placeholder text that is visible in the input field when its empty.
 ```xmlui-pg copy display name="Example: placeholder" height="120px"
 <App>
   <DatePicker placeholder="This is a placeholder" />
-</App>  
+</App>
 ```
 
 ### `readOnly (default: false)` [#readonly-default-false]

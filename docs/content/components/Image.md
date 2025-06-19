@@ -1,6 +1,7 @@
 # Image [#image]
 
-The `Image` component represents or depicts an object, scene, idea, or other concept with a picture.
+`Image` displays pictures from URLs or local sources with built-in responsive sizing, aspect ratio control, and accessibility features. It handles different image formats and provides options for lazy loading and click interactions.
+
 
 ## Properties [#properties]
 
@@ -14,8 +15,8 @@ This is useful in two cases:
 
 ```xmlui-pg copy display name="Example: alt"
 <App>
-  <Image 
-    src="cantFindIt.jpg" 
+  <Image
+    src="cantFindIt.jpg"
     alt="This image depicts a wonderful scene not for human eyes" />
 </App>
 ```
@@ -26,8 +27,8 @@ This property sets a preferred aspect ratio for the image, which will be used in
 
 ```xmlui-pg copy display name="Example: aspectRatio"
 <App>
-  <Image 
-    src="/resources/images/components/image/breakfast.jpg" 
+  <Image
+    src="/resources/images/components/image/breakfast.jpg"
     aspectRatio="200 / 150" />
 </App>
 ```
@@ -44,13 +45,13 @@ This property sets how the image content should be resized to fit its container.
 ```xmlui-pg copy display name="Example: fit"
 <App>
   <HStack padding="1rem" height="280px" gap="1rem">
-    <Image 
-      src="/resources/images/components/image/breakfast.jpg" 
-      fit="contain" 
+    <Image
+      src="/resources/images/components/image/breakfast.jpg"
+      fit="contain"
       width="240px" />
-    <Image 
-      src="/resources/images/components/image/breakfast.jpg" 
-      fit="cover" 
+    <Image
+      src="/resources/images/components/image/breakfast.jpg"
+      fit="cover"
       width="240px" />
   </HStack>
 </App>

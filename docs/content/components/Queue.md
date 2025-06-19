@@ -1,14 +1,12 @@
 # Queue [#queue]
 
->[!WARNING]
-> This component does not show up on the UI; it merely helps implement UI logic.
+`Queue` manages sequential processing of items in FIFO (first-in, first-out) order. It is a non-visual component but provides UI progress reporting and result display.
 
-The `Queue` component provides an API to enqueue elements and defines events to process queued elements in a FIFO order.
+**Context variables**:
 
-The component provides context values with which you can access some internal properties:
+- `$completedItems`
+- `$queuedItems`
 
-- `$completedItems`: A list containing the queue items that have been completed (fully processed).
-- `$queuedItems`: A list containing the items waiting in the queue, icluding the completed items.
 
 ## Using Queue [#using-queue]
 
@@ -247,7 +245,7 @@ The following example stores and displays this item when a new item is put into 
   <Button
     label="Add a new item to the queue"
     onClick="{
-      const itemId = myQueue.enqueueItem(Math.random()); 
+      const itemId = myQueue.enqueueItem(Math.random());
       itemIds += itemId + ', '; queued++;
     }" />
   <Queue id="myQueue" onProcess="processing => {}" />
@@ -304,8 +302,8 @@ The following example emulates a file-processing application. When a file is abo
     onProcessError="(error, processing) => {
       if (error.message === 'Conflict') {
         console.log(error);
-        const result = confirm('Do you want to overwrite?', 
-          'File ' + processing.item.file + ' already exists', 
+        const result = confirm('Do you want to overwrite?',
+          'File ' + processing.item.file + ' already exists',
           'Overwrite');
         $this.remove(processing.actionItemId);
         if (result) {

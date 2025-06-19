@@ -1,8 +1,17 @@
 # RadioGroup [#radiogroup]
 
-The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](./RadioGroupOption.mdx) components) that allow users to select only one option from the group at a time.
+`RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.
 
-`RadioGroup` is often used in forms. See the [Using Forms](/learning/using-components/forms.mdx) guide for details.
+**Key features:**
+- **Exclusive selection**: Only one option can be selected at a time within the group
+- **Form integration**: Built-in validation states and seamless form compatibility
+- **Flexible layout**: Contains [Option](/components/Option) that can be arranged in any layout structure
+- **State management**: Automatically handles selection state and change events
+- **Accessibility support**: Proper keyboard navigation and screen reader compatibility
+- **Validation indicators**: Visual feedback for error, warning, and valid states
+
+
+`RadioGroup` is often used in forms. See [this guide](/forms) for details.
 
 ## Properties [#properties]
 

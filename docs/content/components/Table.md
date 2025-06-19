@@ -1,6 +1,14 @@
 # Table [#table]
 
-`Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells.
+`Table` presents structured data for viewing, sorting, selection, and interaction.
+
+**Key features:**
+- **Data integration**: Load data from APIs via [DataSource](/components/DataSource) or use static arrays
+- **Virtualization**: Only renders visible rows for smooth performance with large datasets
+- **Row selection**: Support single or multi-row selection for bulk operations
+- **Pagination**: Built-in pagination controls for managing large datasets
+
+Use `Column` to define headers, data binding, sorting behavior, and custom cell content.
 
 In the following sections the examples use data with the structure outlined below:
 
@@ -18,7 +26,7 @@ The data is provided as JSON. In the source code samples, the `data={[...]}` dec
 All samples use table columns with the following definition unless noted otherwise
 (The `...` declaration nested into `<Table>` represents this column definition):
 
-```xmlui copy 
+```xmlui copy
 <Table data='{[...]}'>
   <Column bindTo="name"/>
   <Column bindTo="quantity"/>
@@ -138,8 +146,8 @@ By default, the value of this property is `true`.
 
 ```xmlui copy /enableMultiRowSelection="false"/
 <App>
-  <Table data='{[...]}' 
-    rowsSelectable="true" 
+  <Table data='{[...]}'
+    rowsSelectable="true"
     enableMultiRowSelection="false">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -199,8 +207,8 @@ By default, the value of this property is `true`.
     category: "dairy",
     key: 0,
   },
-]}' 
-    rowsSelectable="true" 
+]}'
+    rowsSelectable="true"
     enableMultiRowSelection="false">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -276,7 +284,7 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     headerHeight="60px">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -353,7 +361,7 @@ The default value is `false`.
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     hideHeader="true">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -430,7 +438,7 @@ and sorting is not done according to the column. Use the "-" (dash) value to sig
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     sortBy="quantity" iconNoSort="close">
     <Column bindTo="name" canSort="true" />
     <Column bindTo="quantity" canSort="true" />
@@ -507,7 +515,7 @@ sorting is done according to the column, and the column is sorted in ascending o
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     sortBy="quantity" iconSortAsc="chevronup">
     <Column bindTo="name" canSort="true" />
     <Column bindTo="quantity" canSort="true" />
@@ -586,7 +594,7 @@ Select a column header and set it to descending ordering.
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     sortBy="quantity" iconSortDesc="chevrondown">
     <Column bindTo="name" canSort="true" />
     <Column bindTo="quantity" canSort="true" />
@@ -660,7 +668,7 @@ This property adds pagination controls to the `Table`.
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     isPaginated="true" pageSizes="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -774,7 +782,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     isPaginated="true" pageSizes="{[3, 6, 12]}">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -930,7 +938,7 @@ The default value is `false`.
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     rowsSelectable="true">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -1004,7 +1012,7 @@ This property is used to determine which data property to sort by. If not define
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     sortBy="quantity">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -1078,7 +1086,7 @@ This property determines the sort order to be `ascending` or `descending`. This 
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
     sortBy="quantity" sortDirection="descending">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
@@ -1091,7 +1099,7 @@ This property determines the sort order to be `ascending` or `descending`. This 
 
 ### `selectionDidChange` [#selectiondidchange]
 
-This event is triggered when the table's current selection (the rows selected) changes. Its parameter is an array of the selected table row items. 
+This event is triggered when the table's current selection (the rows selected) changes. Its parameter is an array of the selected table row items.
 
 Of course, if multiple-row selection is not allowed (`enableMultipleRowSelection` is false), this array will contain zero or one item.
 

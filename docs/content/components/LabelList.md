@@ -1,6 +1,7 @@
 # LabelList [#labellist]
 
-Label list component for a chart component.
+`LabelList` adds custom data labels to chart components when automatic labeling isn't sufficient. It's a specialized component for advanced chart customization scenarios where you need precise control over label positioning and appearance.
+
 
 ## Properties [#properties]
 

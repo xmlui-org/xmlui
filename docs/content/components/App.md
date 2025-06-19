@@ -1,9 +1,11 @@
 # App [#app]
 
-The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.
+The `App` component is the root container that defines your application's overall structure and layout. It provides a complete UI framework with built-in navigation, header, footer, and content areas that work together seamlessly.
 
->[!INFO]
-> You can learn more details about using this component [here](../learning/using-components/app-component).
+**Essential features:**
+- **Layout templates**: Choose from 7 predefined layouts (horizontal, vertical, condensed, etc.) with sticky navigation options
+- **Routing**: Built-in page routing via the [Pages](/components/Pages) component
+
 
 ## Properties [#properties]
 
@@ -69,7 +71,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `horizontal` [#horizontal]
 
-```xmlui-pg copy name="Example: 'horizontal' layout" height="350px" 
+```xmlui-pg copy name="Example: 'horizontal' layout" height="350px"
 <App layout="horizontal">
   <AppHeader>
     <property name="logoTemplate">
@@ -102,7 +104,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `horizontal-sticky` [#horizontal-sticky]
 
-```xmlui-pg copy name="Example: 'horizontal-sticky' layout" height="350px" 
+```xmlui-pg copy name="Example: 'horizontal-sticky' layout" height="350px"
 <App layout="horizontal-sticky">
   <AppHeader>
     <property name="logoTemplate">
@@ -135,7 +137,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `condensed` [#condensed]
 
-```xmlui-pg copy name="Example: 'condensed' layout" height="350px" 
+```xmlui-pg copy name="Example: 'condensed' layout" height="350px"
 <App layout="condensed">
   <property name="logoTemplate">
     <Heading level="h3" value="Example App"/>
@@ -166,7 +168,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `condensed-sticky` [#condensed-sticky]
 
-```xmlui-pg copy name="Example: 'condensed-sticky' layout" height="350px" 
+```xmlui-pg copy name="Example: 'condensed-sticky' layout" height="350px"
 <App layout="condensed-sticky">
   <property name="logoTemplate">
       <Heading level="h3" value="Example App"/>
@@ -197,7 +199,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `vertical` [#vertical]
 
-```xmlui-pg copy name="Example: 'vertical' layout" height="300px" 
+```xmlui-pg copy name="Example: 'vertical' layout" height="300px"
 <App layout="vertical">
   <property name="logoTemplate">
     <Heading level="h3" value="Example App"/>

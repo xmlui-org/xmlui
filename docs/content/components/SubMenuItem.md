@@ -1,6 +1,13 @@
 # SubMenuItem [#submenuitem]
 
-This component represents a nested menu item within another menu or menu item.
+`SubMenuItem` creates hierarchical menu structures by acting as both a menu item and a container for nested menu items. When clicked or hovered, it reveals a submenu containing additional [MenuItem](/components/MenuItem), [MenuSeparator](/components/MenuSeparator), or other [SubMenuItem](/components/SubMenuItems) components, enabling complex multi-level navigation and action organization.
+
+**Key features:**
+- **Hierarchical nesting**: Creates multi-level menu structures within [DropdownMenu](/components/DropdownMenu) components
+- **Dual functionality**: Acts as both a clickable menu item and a container for other menu components
+- **Custom triggers**: Configurable trigger appearance via triggerTemplate property
+- **Progressive disclosure**: Reveals nested options on hover or click interaction
+- **Unlimited depth**: Supports multiple levels of nesting for complex menu hierarchies
 
 ## Properties [#properties]
 

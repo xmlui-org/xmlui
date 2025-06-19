@@ -1,6 +1,6 @@
 # ExpandableItem [#expandableitem]
 
-This component represents an expandable/collapsible section, similar to the HTML details element. When the user clicks on the summary, the content expands or collapses.
+`ExpandableItem` creates expandable/collapsible section, similar to the HTML details disclosure element. When the user clicks on the `summary` the content expands or collapses.
 
 ## Properties [#properties]
 

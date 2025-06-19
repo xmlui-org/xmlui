@@ -1,8 +1,12 @@
 # Icon [#icon]
 
-This component is the representation of an icon.
+`Icon` displays scalable vector icons from XMLUI's built-in icon registry using simple name references. Icons are commonly used in buttons, navigation elements, and status indicators.
 
-It is a small visual element, which is used to graphically represent functions, features, or types of content within a user interface.
+**Key features:**
+- **Name-based lookup**: Reference icons by name from the built-in registry (e.g., "home", "search", "trash")
+- **Multiple sizes**: Choose from predefined sizes (xs, sm, md, lg) or set custom dimensions
+- **Fallback support**: Specify backup icons when the primary icon name doesn't exist
+- **Interactive**: Supports click events for creating icon buttons and clickable elements
 
 ## Properties [#properties]
 

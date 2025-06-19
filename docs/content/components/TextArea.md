@@ -1,8 +1,8 @@
 # TextArea [#textarea]
 
-`TextArea` is a component that provides a multiline text input area.
+`TextArea` provides a multiline text input area.
 
-The `TextArea` is an input control component and is often used in forms. See the [Using Forms](../learning/forms.mdx) guide for details.
+It is often used in forms, see [this guide](/forms) for details.
 
 To add new lines to the input field press `Shift` + `Enter`.
 

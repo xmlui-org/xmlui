@@ -1,6 +1,12 @@
 # Markdown [#markdown]
 
-`Markdown` displays plain text styled using markdown syntax.
+`Markdown` renders formatted text using markdown syntax. Use [Text](/working-with-text) for simple, styled text content, and `Markdown` when you need [rich formatting](/working-with-markdown).
+
+**Key features:**
+- **Rich formatting**: Support for headings, bold, italic, lists, links, images, blockquotes, and code blocks
+- **Dynamic content**: Use `@{}` binding expressions to inject variables and function results
+- **File loading**: Load markdown content from external files using the `data` property
+- **Binding expressions**: Evaluate variables and function calls within markdown content
 
 ## Using Markdown [#using-markdown]
 
@@ -20,30 +26,30 @@ Indentation is also essential in Markdown. Start the markdown text in the first 
 
 ## The Beginning [#the-beginning]
 
-In the bustling city of Markdownville, I embarked on a journey to discover the 
-secrets of Markdown. My adventure started in the heart of the city, where the 
+In the bustling city of Markdownville, I embarked on a journey to discover the
+secrets of Markdown. My adventure started in the heart of the city, where the
 first rule of Markdown was inscribed in stone:
 
 "To create a heading, add number signs (#) in front of a word or phrase.
 The number of number signs you use should correspond to the heading level."
 
-Headings give hierarchy to text but sometimes **emphasizing something with bold 
+Headings give hierarchy to text but sometimes **emphasizing something with bold
 is just enough**.
 
 If not bold, then simply *italic letters give visual diversity*.
 
 ## Exploring Blockquotes [#exploring-blockquotes]
 
-As I journeyed further, I encountered blockquotes that spoke of the beauty of 
+As I journeyed further, I encountered blockquotes that spoke of the beauty of
 simplicity:
 
-> Blockquotes can contain multiple paragraphs. Add a > on the blank lines between 
+> Blockquotes can contain multiple paragraphs. Add a > on the blank lines between
 > the paragraphs.
 > > Like so
 
 ## The Power of Lists [#the-power-of-lists]
 
-I also discovered the power of lists, which were as versatile as the inhabitants 
+I also discovered the power of lists, which were as versatile as the inhabitants
 of Markdownville:
 
 - This is the first list item.
@@ -59,21 +65,21 @@ I found that I can create ordered lists as well:
 
 ## The Image [#the-image]
 
-Text is not the only thing I found through my journey. The power of images 
+Text is not the only thing I found through my journey. The power of images
 materialized in front of me:
 
 ![Colors image](/resources/images/components/markdown/colors.png)
 
 ## Navigating with Hyperlinks [#navigating-with-hyperlinks]
 
-Hyperlinks, like signposts, marked other paths that branched off from the road 
+Hyperlinks, like signposts, marked other paths that branched off from the road
 I was treading:
 - [Source of all truth](https://github.com/xmlui-com/xmlui)
 - [Back to where we started](https://ncrm.azurewebsites.net/)
 
 ## The Horizontal Rule [#the-horizontal-rule]
 
-In the quiet corners of Markdownville, I found the Horizontal Rule, a line that 
+In the quiet corners of Markdownville, I found the Horizontal Rule, a line that
 symbolizes the end of a section:
 
 ***
@@ -164,8 +170,8 @@ This boolean property specifies whether leading indents should be removed from t
 
       ## The Beginning
 
-      In the bustling city of Markdownville, I embarked on a journey to 
-      discover the secrets of Markdown. My adventure started in the heart 
+      In the bustling city of Markdownville, I embarked on a journey to
+      discover the secrets of Markdown. My adventure started in the heart
       of the city, where the first rule of Markdown was inscribed in stone.
     ]]>
   </Markdown>
@@ -250,7 +256,7 @@ This element visually separates content. The following theme variables influence
 
 ```xmlui-pg copy display name="Example: styling a horizontal rule"
 <App>
-  <Theme 
+  <Theme
     borderColor-HorizontalRule="red"
     borderWidth-HorizontalRule="8px"
     borderStyle-HorizontalRule="dotted"
@@ -278,8 +284,8 @@ These are the supported theme variables in an ordered or unordered list:
 - `paddingLeft-ListItem`: determines how big the gap should be between the list item contents and the item marker
 
 ```xmlui-pg copy display name="Example: styling a list item"
-<App>  
-  <Theme paddingLeft-ListItem="40px"> 
+<App>
+  <Theme paddingLeft-ListItem="40px">
     <Markdown>
       <![CDATA[
 1. Get in the driver's seat and buckle up

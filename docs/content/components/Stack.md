@@ -1,13 +1,17 @@
 # Stack [#stack]
 
-`Stack` is a layout container displaying children in a horizontal or vertical stack.
+`Stack` is the fundamental layout container that organizes child elements in configurable horizontal or vertical arrangements. As the most versatile building block in XMLUI's layout system, it provides comprehensive alignment, spacing, and flow control options that serve as the foundation for all specialized stack variants.
 
-The Stack component is the primary and most versatile building block for laying out content. It can display its children horizontally or vertically, and it is possible to align its children easily along the horizontal and vertical axes.
+**Key features:**
+- **Dynamic orientation**: Switch between horizontal and vertical layouts programmatically
+- **Comprehensive alignment**: Precise control over both horizontal and vertical child positioning
+- **Flexible spacing**: Configurable gaps between elements with theme-aware sizing
+- **Content wrapping**: Automatic wrapping when space constraints require it
+- **Order control**: Reverse child element order with the reverse property
+- **Foundation for variants**: Powers HStack, VStack, CHStack, and CVStack specialized components
 
-See also: [HStack](./HStack), [VStack](./VStack), [CHStack](./CHStack), [CVStack](./CVStack).
+For common scenarios, consider the specialized variants: [HStack](/components/HStack) (horizontal), [VStack](/components/VStack) (vertical), [CHStack](/components/CHStack) (centered horizontal), and [CVStack](/components/CVStack) (centered vertical).
 
->[!INFO]
-> You can learn about the semantics and usage of layout container, including `Stack`, [here](/learning/layout-components).
 
 ## Properties [#properties]
 

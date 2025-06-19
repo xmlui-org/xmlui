@@ -1,6 +1,6 @@
 # DonutChart [#donutchart]
 
-Represents a derivative of the pie chart that is a donut chart.
+A derivative of [PieChart](/components/PieChart) with a hollow center.
 
 ## Properties [#properties]
 

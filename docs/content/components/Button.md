@@ -1,8 +1,12 @@
 # Button [#button]
 
-Button is an interactive element that triggers an action when clicked.
+`Button` is the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels.
 
-Use the `Button` component to trigger various actions.
+**Key features:**
+- **Visual hierarchy**: Choose from `solid`, `outlined`, or `ghost` variants to indicate importance
+- **Theme colors**: Use `primary`, `secondary`, or `attention` colors for different action types
+- **Icon support**: Add icons before or after text, or create icon-only buttons
+- **Form integration**: Automatically handles form submission when used in forms
 
 ## Properties [#properties]
 
@@ -86,15 +90,15 @@ Available values:
     <Button icon="drive" label="End" iconPosition="end" />
   </HStack>
   <HStack>
-    <Button 
-      icon="drive" 
-      label="Start (right-to-left)" 
-      iconPosition="start" 
+    <Button
+      icon="drive"
+      label="Start (right-to-left)"
+      iconPosition="start"
       direction="rtl" />
-    <Button 
-      icon="drive" 
-      label="End (right-to-left)" 
-      iconPosition="end" 
+    <Button
+      icon="drive"
+      label="End (right-to-left)"
+      iconPosition="end"
       direction="rtl" />
   </HStack>
 </App>
@@ -177,7 +181,7 @@ Available values:
     <Button label="Button" themeColor="secondary" />
     <Button label="Button" themeColor="attention" />
   </HStack>
-</App>  
+</App>
 ```
 
 ### `type (default: "button")` [#type-default-button]
@@ -234,8 +238,8 @@ This event is triggered when the Button has received the focus.
 ```xmlui-pg copy display name="Example: gotFocus"
 <App var.text="No event" >
   <HStack verticalAlignment="center" >
-    <Button label="First, click me!" 
-      onGotFocus="text = 'Focus received'" 
+    <Button label="First, click me!"
+      onGotFocus="text = 'Focus received'"
       onLostFocus="text = 'Focus lost'" />
     <Text value="Then, me!"/>
   </HStack>

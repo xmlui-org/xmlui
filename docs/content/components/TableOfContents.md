@@ -1,6 +1,6 @@
 # TableOfContents [#tableofcontents]
 
-The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position.
+`TableOfContents` component collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree.
 
 ## Properties [#properties]
 

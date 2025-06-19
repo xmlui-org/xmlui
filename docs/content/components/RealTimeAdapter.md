@@ -1,6 +1,6 @@
 # RealTimeAdapter [#realtimeadapter]
 
-`RealTimeAdapter` is a non-visual component that listens to real-time events through long-polling.
+`RealTimeAdapter` is a non-visual component that listens to real-time events.
 
 ## Properties [#properties]
 

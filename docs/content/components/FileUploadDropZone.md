@@ -1,6 +1,6 @@
 # FileUploadDropZone [#fileuploaddropzone]
 
-The `FileUploadDropZone` component allows users to upload files to a web application by dragging and dropping files from their local file system onto a designated area within the UI.
+`FileUploadDropZone` enables users to upload files by dragging and dropping files from their local file system onto a designated area within the UI.
 
 ## Using `FileUploadDropZone` [#using-fileuploaddropzone]
 
@@ -13,7 +13,7 @@ The component provides a surface on which you can drag files or paste files from
   <FileUploadDropZone backgroundColor="cyan" height="100px"
     onUpload="
       (files) => {
-        console.log(files); 
+        console.log(files);
         files.map(file => toast('file ' + file.path + ' uploaded'))}" />
 </App>
 ---desc

@@ -1,13 +1,24 @@
 # List [#list]
 
-The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport.
+`List` is a high-performance, virtualized container for rendering large datasets with built-in grouping, sorting, and visual formatting. It only renders visible items in the viewport, making it ideal for displaying thousands of records while maintaining smooth scrolling performance.
 
-The component provides context values with which you can access some internal properties:
+**Key features:**
+- **Virtualization**: Renders only visible items for optimal performance with large datasets
+- **Advanced grouping**: Group data by any field with customizable headers and footers
+- **Built-in sorting**: Sort by any data field in ascending or descending order
+- **Visual formatting**: Pre-styled list appearance with borders, spacing, and layout
+- **Pagination support**: Handle large datasets with built-in pagination controls
+- **Empty state handling**: Customizable templates for when no data is available
 
-- `$isFirst`: This boolean value indicates if the component renders its first item.
-- `$isLast`: This boolean value indicates if the component renders its last item.
-- `$item`: This property represents the value of an item in the data list.
-- `$itemIndex`: This integer value represents the current row index (zero-based) while rendering children.
+**Context variables:**
+- `$item`: Current data item being rendered
+- `$itemIndex`: Zero-based index of current item
+- `$isFirst`: Boolean indicating if this is the first item
+- `$isLast`: Boolean indicating if this is the last item
+- `$group`: Group information when using `groupBy` (available in group templates)
+
+**List vs Items:**
+Use `List` for complex data presentation requiring performance optimization, grouping, sorting, or visual formatting. Use `Items` for simple data iteration without layout requirements.
 
 In the following examples all use the same list of data which looks like so:
 
@@ -58,14 +69,14 @@ This property is an array of group names that the `List` will display. If not se
       <Stack>
         <Text variant="subtitle" value="{$group.key}" />
       </Stack>
-    </property>  
+    </property>
   </List>
 </App>
 ```
 
 ```xmlui-pg name="Example: availableGroups" height="400px"
 <App>
-  <List availableGroups="{['fruits', 'vegetables']}" groupBy="category" 
+  <List availableGroups="{['fruits', 'vegetables']}" groupBy="category"
   data='{[
   {
     id: 0,
@@ -120,7 +131,7 @@ This property is an array of group names that the `List` will display. If not se
       <Stack>
         <Text variant="subtitle" value="{$group.key}" />
       </Stack>
-    </property>  
+    </property>
   </List>
 </App>
 ```
@@ -740,9 +751,9 @@ Note how the groups in the right `List` are expanded by default:
 ```xmlui {3, 10}
 <App>
   <HStack gap="$space-2">
-    <List data="{[...]}" 
-      groupBy="category" 
-      groupsInitiallyExpanded="false" 
+    <List data="{[...]}"
+      groupBy="category"
+      groupsInitiallyExpanded="false"
       width="$space-48">
       <property name="groupHeaderTemplate">
         <Stack>
@@ -750,9 +761,9 @@ Note how the groups in the right `List` are expanded by default:
         </Stack>
       </property>
     </List>
-    <List data="{[...]}" 
-      groupBy="category" 
-      groupsInitiallyExpanded="true" 
+    <List data="{[...]}"
+      groupBy="category"
+      groupsInitiallyExpanded="true"
       width="$space-48">
       <property name="groupHeaderTemplate">
         <Stack>
@@ -766,7 +777,7 @@ Note how the groups in the right `List` are expanded by default:
 
 ```xmlui-pg name="Example: groupsInitiallyExpanded" height="400px"
 <App>
-  <HStack gap="$space-2"> 
+  <HStack gap="$space-2">
     <List data='{[
   {
     id: 0,
@@ -816,7 +827,7 @@ Note how the groups in the right `List` are expanded by default:
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
   groupBy="category" groupsInitiallyExpanded="false" width="$space-48">
     <property name="groupHeaderTemplate">
       <Stack>
@@ -873,7 +884,7 @@ Note how the groups in the right `List` are expanded by default:
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
       groupBy="category" groupsInitiallyExpanded="true" width="$space-48">
       <property name="groupHeaderTemplate">
         <Stack>
@@ -974,7 +985,7 @@ Note how the `meats` category is not displayed in the right `List`:
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
   defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="false" width="$space-48">
     <property name="groupHeaderTemplate">
       <Stack>
@@ -1031,7 +1042,7 @@ Note how the `meats` category is not displayed in the right `List`:
     category: "dairy",
     key: 0,
   },
-]}' 
+]}'
       defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="true" width="$space-48">
       <property name="groupHeaderTemplate">
         <Stack>
@@ -1288,8 +1299,8 @@ This optioanl property enables the ordering of list items by specifying an attri
 
 ```xmlui-pg name="Example: orderBy" height="400px"
 <App>
-  <List 
-    orderBy="{{ field: 'quantity', direction: 'desc' }}" 
+  <List
+    orderBy="{{ field: 'quantity', direction: 'desc' }}"
     data='{[
   {
     id: 0,
@@ -1445,8 +1456,8 @@ The following example demonstrates `scrollToBottom` and all the other scroll met
       <Button onClick="myList.scrollToId('item-40')">Scroll to ID 'item-40'</Button>
     </HStack>
   </AppHeader>
-  <List 
-    id="myList" 
+  <List
+    id="myList"
     data="{
       Array.from({ length: 100 })
       .map((_, i) => ({id: 'item-' + i, value: 'Item #' + i}))
