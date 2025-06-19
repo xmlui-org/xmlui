@@ -117,6 +117,7 @@ export const Markdown = memo(function Markdown({
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
+            console.log("details", children)
             return (
               <details className={htmlTagStyles.htmlDetails} {...props}>
                 {children}
