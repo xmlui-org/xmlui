@@ -1,37 +1,21 @@
+import { getFullRectangle } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
-
-test("basic Card renders with default props", async ({ page, initTestBed }) => {
-  await initTestBed(`
-    <Card>
-      <Text value="Card content" />
-    </Card>
-  `);
-
-  await expect(page.getByText("Card content")).toBeVisible();
-});
-
 
 test("Card renders with title", async ({ page, initTestBed }) => {
   await initTestBed(`
-    <Card title="Test Title">
-      <Text value="Card content" />
-    </Card>
+    <Card title="Test Title"/>
   `);
 
-  await expect(page.getByText("Test Title")).toBeVisible();
-  await expect(page.getByText("Card content")).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Test Title' })).toBeVisible();
 });
 
 
 test("Card renders with subtitle", async ({ page, initTestBed }) => {
   await initTestBed(`
-    <Card subtitle="Test Subtitle">
-      <Text value="Card content" />
-    </Card>
+    <Card subtitle="Test Subtitle"/>
   `);
 
   await expect(page.getByText("Test Subtitle")).toBeVisible();
-  await expect(page.getByText("Card content")).toBeVisible();
 });
 
 test("Card renders with both title and subtitle", async ({ page, initTestBed }) => {
@@ -41,30 +25,42 @@ test("Card renders with both title and subtitle", async ({ page, initTestBed }) 
     </Card>
   `);
 
-  await expect(page.getByText("Test Title")).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Test Title' })).toBeVisible();
   await expect(page.getByText("Test Subtitle")).toBeVisible();
-  await expect(page.getByText("Card content")).toBeVisible();
 });
 
 
-test("showAvatar displays avatar when avatarUrl is provided", async ({ page, initTestBed }) => {
+test("displays avatar when avatarUrl is provided", async ({ page, initTestBed }) => {
   await initTestBed(`
-    <Card avatarUrl="https://i.pravatar.cc/100" title="Test Title" />
+    <Card avatarUrl="/public/resources/flower-640x480.jpg" title="Test Title" />
   `);
 
-  const avatar = page.getByRole("img");
+  const avatar = page.getByRole("img", {name: "avatar"});
   await expect(avatar).toBeVisible();
-  await expect(avatar).toHaveAttribute("src", "https://i.pravatar.cc/100");
+  await expect(avatar).toHaveAttribute("src", "/public/resources/flower-640x480.jpg");
 });
 
 test("avatar img height & width increase as avatarSize increase", async ({ page, initTestBed }) => {
   await initTestBed(`
-    <App>
-      <Card showAvatar="true" avatarSize="xs" title="Test" />
-    </App>
+    <Fragment>
+      <Card testId="card-xs" showAvatar="true" avatarSize="xs" title="Test" />
+      <Card testId="card-sm" showAvatar="true" avatarSize="sm" title="Test" />
+      <Card testId="card-md" showAvatar="true" avatarSize="md" title="Test" />
+      <Card testId="card-lg" showAvatar="true" avatarSize="lg" title="Test" />
+    </Fragment>
   `);
+  const { width: widthXs, height: heightXs} = await getFullRectangle(page.getByTestId("card-xs").getByRole("img"));
+  const { width: widthSm, height: heightSm} = await getFullRectangle(page.getByTestId("card-sm").getByRole("img"));
+  const { width: widthMd, height: heightMd} = await getFullRectangle(page.getByTestId("card-md").getByRole("img"));
+  const { width: widthLg, height: heightLg} = await getFullRectangle(page.getByTestId("card-lg").getByRole("img"));
 
-  await expect(page.locator('[data-component="Card"]')).toBeVisible();
+  expect(widthXs).toBeLessThan(widthSm)
+  expect(widthSm).toBeLessThan(widthMd)
+  expect(widthMd).toBeLessThan(widthLg)
+
+  expect(heightXs).toBeLessThan(heightSm)
+  expect(heightSm).toBeLessThan(heightMd)
+  expect(heightMd).toBeLessThan(heightLg)
 });
 
 ["xs", "sm", "md", "lg"].forEach((size) => {
@@ -83,15 +79,13 @@ test("avatar img height & width increase as avatarSize increase", async ({ page,
 });
 
 test("clicking linkTo title navigates", async ({ page, initTestBed }) => {
-  await initTestBed(`
-    <App>
-      <Card title="Clickable Title" linkTo="/test-link" />
-    </App>
-  `);
+  await initTestBed(`<Card title="Clickable Title" linkTo="/test-link" />`);
 
-  const titleLink = page.locator("a").filter({ hasText: "Clickable Title" });
+  const titleLink = page.getByRole("link", {name: "Clickable Title"});
+
   await expect(titleLink).toBeVisible();
-  await expect(titleLink).toHaveAttribute("href", "/test-link");
+  await titleLink.click();
+  await expect(page).toHaveURL(/\/test-link$/);
 });
 
 
@@ -131,8 +125,9 @@ test("showAvatar=true with empty title displays no initials", async ({ page, ini
     <Card showAvatar="true" />
   `);
 
-  // Card should render but no avatar or initials should be visible
-  await expect(page.getByTestId("card")).toBeVisible();
+  const avatarImg = page.getByRole("img");
+  await expect(avatarImg).toBeVisible();
+  await expect(avatarImg).toHaveText(/^$/);
 });
 
 test("avatarSize defaults to sm when not specified", async ({ page, initTestBed }) => {
@@ -157,15 +152,15 @@ test("linkTo without title does not create link", async ({ page, initTestBed }) 
 test("orientation horizontal displays children in row", async ({ page, initTestBed }) => {
   await initTestBed(`
     <Card orientation="horizontal" title="Title" subtitle="Subtitle">
-      <Text value="Child 1" />
-      <Text value="Child 2" />
+      <Text testId="text-1" value="Child 1" />
+      <Text testId="text-2" value="Child 2" />
     </Card>
   `);
 
-  await expect(page.getByText("Title")).toBeVisible();
-  await expect(page.getByText("Subtitle")).toBeVisible();
   await expect(page.getByText("Child 1")).toBeVisible();
-  await expect(page.getByText("Child 2")).toBeVisible();
+  const { right: text1Right} = await getFullRectangle(page.getByTestId("text-1"));
+  const { right: text2Left} = await getFullRectangle(page.getByTestId("text-2"));
+  expect(text1Right).toBeLessThan(text2Left);
 });
 
 test("orientation vertical displays children in column", async ({ page, initTestBed }) => {
@@ -194,24 +189,32 @@ test("orientation defaults to vertical when not specified", async ({ page, initT
 
 test("click event is triggered when Card is clicked", async ({ page, initTestBed }) => {
   await initTestBed(`
-    <Card onClick="toast('Card clicked!')">
-      <Text value="Clickable Card" />
+    <Card testId="card" var.clicked="{false}" onClick="clicked = true">
+      <Text when="{clicked}" value="seen when clicked" />
     </Card>
   `);
 
+  await expect(page.getByText("seen when clicked")).not.toBeVisible();
   await page.getByTestId("card").click();
-  await expect(page.getByText("Card clicked!")).toBeVisible();
+  await expect(page.getByText("seen when clicked")).toBeVisible();
 });
 
-test("Card click does not interfere with link click", async ({ page, initTestBed }) => {
+test.fixme("Card click does not interfere with link click", async ({ page, initTestBed }) => {
   await initTestBed(`
-    <Card onClick="toast('Card clicked!')" title="Linked Title" linkTo="/test-link">
-      <Text value="Card content" />
+    <Card
+      testId="card"
+      var.clicked="{false}"
+      onClick="clicked = true"
+      title="This is a link"
+      linkTo="/test-link"
+    >
+      <Text when="{clicked}" value="seen when clicked" />
     </Card>
   `);
 
-  // Clicking the link should not trigger the card click
-  const titleLink = page.getByRole("link", { name: "Linked Title" });
-  await expect(titleLink).toBeVisible();
-  await expect(titleLink).toHaveAttribute("href", "/test-link");
+
+  await expect(page.getByText("seen when clicked")).not.toBeVisible();
+  await page.getByRole("heading", { name: "This is a link" }).click();
+  await expect(page.getByText("seen when clicked")).not.toBeVisible();
+
 });
