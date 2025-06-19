@@ -1,8 +1,5 @@
 %-DESC-START
 
->[!INFO]
-> You can learn more details about using this component [here](../learning/using-components/app-component).
-
 %-DESC-END
 
 %-PROP-START layout
@@ -43,7 +40,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `horizontal`
 
-```xmlui-pg copy name="Example: 'horizontal' layout" height="350px" 
+```xmlui-pg copy name="Example: 'horizontal' layout" height="350px"
 <App layout="horizontal">
   <AppHeader>
     <property name="logoTemplate">
@@ -76,7 +73,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `horizontal-sticky`
 
-```xmlui-pg copy name="Example: 'horizontal-sticky' layout" height="350px" 
+```xmlui-pg copy name="Example: 'horizontal-sticky' layout" height="350px"
 <App layout="horizontal-sticky">
   <AppHeader>
     <property name="logoTemplate">
@@ -109,7 +106,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `condensed`
 
-```xmlui-pg copy name="Example: 'condensed' layout" height="350px" 
+```xmlui-pg copy name="Example: 'condensed' layout" height="350px"
 <App layout="condensed">
   <property name="logoTemplate">
     <Heading level="h3" value="Example App"/>
@@ -140,7 +137,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `condensed-sticky`
 
-```xmlui-pg copy name="Example: 'condensed-sticky' layout" height="350px" 
+```xmlui-pg copy name="Example: 'condensed-sticky' layout" height="350px"
 <App layout="condensed-sticky">
   <property name="logoTemplate">
       <Heading level="h3" value="Example App"/>
@@ -171,7 +168,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `vertical`
 
-```xmlui-pg copy name="Example: 'vertical' layout" height="300px" 
+```xmlui-pg copy name="Example: 'vertical' layout" height="300px"
 <App layout="vertical">
   <property name="logoTemplate">
     <Heading level="h3" value="Example App"/>
