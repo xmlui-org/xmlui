@@ -43,6 +43,11 @@ export const ExpandableItemMd = createMetadata({
       availableValues: iconPositionMd,
       defaultValue: defaultExpandableItemProps.iconPosition,
     },
+    withSwitch: {
+      description: "When true, a switch is used instead of an icon to toggle the expanded state.",
+      valueType: "boolean",
+      defaultValue: defaultExpandableItemProps.withSwitch,
+    },
   },
   events: {
     expandedChange: d(`This event fires when the expandable item is expanded or collapsed. It provides a boolean value indicating the new state.`),
@@ -89,6 +94,7 @@ export const expandableItemComponentRenderer = createComponentRenderer(
         iconExpanded={extractValue(node.props?.iconExpanded) ?? defaultExpandableItemProps.iconExpanded}
         iconCollapsed={extractValue(node.props?.iconCollapsed) ?? defaultExpandableItemProps.iconCollapsed}
         iconPosition={extractValue.asOptionalString(node.props.iconPosition) ?? defaultExpandableItemProps.iconPosition}
+        withSwitch={extractValue.asOptionalBoolean(node.props.withSwitch, defaultExpandableItemProps.withSwitch)}
         onExpandedChange={lookupEventHandler("expandedChange")}
         style={layoutCss}
         registerComponentApi={registerComponentApi}

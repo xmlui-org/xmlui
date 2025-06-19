@@ -453,12 +453,13 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
 
     const processedChildren = React.Children.map(children, processNode);
 
-    // Handle [!DETAILS] adornment
-    if (type === "details") {
+    // Handle [!DETAILS] or [!SDETAILS] adornment
+    if (type === "details" || type === "sdetails") {
       // Extract summary from the original text
       const originalText = allText;
-      const detailsMatch = originalText.match(/\[!DETAILS\](.*?)(?:\n|$)/);
-      const summaryText = detailsMatch && detailsMatch[1] ? detailsMatch[1].trim() : "Details";
+      const detailsMatch = originalText.match(/\[!(S?DETAILS)\](.*?)(?:\n|$)/);
+      const summaryText = detailsMatch && detailsMatch[2] ? detailsMatch[2].trim() : "Details";
+      const withSwitch = type === "sdetails";
       
       // Create separate content children without the summary line
       // We need to find the first Text element and remove the summary from it
@@ -495,7 +496,10 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
       });
       
       return (
-        <ExpandableItem summary={summaryText}>
+        <ExpandableItem 
+          summary={summaryText}
+          withSwitch={withSwitch}
+        >
           {contentWithoutSummary}
         </ExpandableItem>
       );

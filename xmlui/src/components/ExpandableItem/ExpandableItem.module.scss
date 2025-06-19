@@ -50,18 +50,29 @@ $transition-ExpandableItem: createThemeVar("transition-ExpandableItem");
       }
       
       &.iconEnd {
-        flex-direction: row;
+        flex-direction: row-reverse;
+        justify-content: space-between;
       }
       
       .icon {
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+      }
+
+      .switch {
+        display: flex;
+        align-items: center;
       }
       
       .summaryContent {
-        flex-shrink: 1;
+        flex: 1;
+      }
+    }
+
+    &.withSwitch {
+      .summary {
+        cursor: pointer;
       }
     }
     
@@ -80,3 +91,4 @@ $transition-ExpandableItem: createThemeVar("transition-ExpandableItem");
 :export {
   themeVars: t.json-stringify($themeVars);
 }
+
