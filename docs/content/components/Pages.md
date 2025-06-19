@@ -1,10 +1,11 @@
 # Pages [#pages]
 
-The `Pages` component is used as a container for [`Page`](/components/Page) components within an [`App`](/components/App).
+`Pages` serves as the routing coordinator within an [App](/components/App), managing which [Page](/components/Page)  displays based on the current URL.
 
-See the [\`Page\` docs](/components/Page) for a short description.
-
-Examples for both components can be found here.
+**Key features:**
+- **Route coordination**: Automatically displays the correct Page based on current URL and navigation
+- **Default route handling**: Sets the initial page shown when the application loads
+- **Client-side routing**: Manages navigation without page refreshes or server requests
 
 ### Using the Pages and Page components [#using-the-pages-and-page-components]
 

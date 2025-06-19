@@ -1,12 +1,17 @@
 # Tabs [#tabs]
 
-The `Tabs` component provides a tabbed layout where each tab has a clickable label and content.
+`Tabs` enables users to switch among content panels using clickable tab headers. It provides an efficient way to present multiple related sections in a single interface area, with each tab containing distinct content defined by [TabItem](/components/TabItem) components.
 
-The component accepts only `TabItem` components as children.
-Other child components will not be displayed.
+**Key features:**
+- **Content organization**: Efficiently displays multiple content sections in a single interface area
+- **Flexible orientation**: Supports both horizontal (tabs on top) and vertical (tabs on side) layouts
+- **Active tab control**: Programmatically set which tab is initially selected
+- **Custom tab styling**: Configurable tab appearance via `tabTemplate` property
+- **Navigation methods**: Built-in methods for programmatic tab switching
 
-The `TabItem` component has a `label` prop to define the tab button label text.
-Content is provided to a tab via placing child components under the `TabItem`.
+**Usage pattern:**
+The component accepts only [TabItem](/components/TabItem) components as children. Other child components will not be displayed. Each [TabItem](/components/TabItem) has a `label` property for the tab button text, with content provided by placing child components within the [TabItem](/components/TabItem).
+
 
 ```xmlui-pg copy display name="Example: using Tabs" height="200px"
 <App>

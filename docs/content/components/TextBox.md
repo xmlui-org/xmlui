@@ -1,6 +1,13 @@
 # TextBox [#textbox]
 
-The `TextBox` is an input component that allows users to input and edit textual data.
+`TextBox` captures user text input for forms, search fields, and data entry with support for validation, icons, and formatting hints.
+
+**Key features:**
+- **Visual enhancements**: Add icons and text at start/end positions for context and branding
+- **Validation states**: Built-in visual indicators for valid, warning, and error states
+- **Input control**: Support for initial values, programmatic focus, and value setting
+
+Often used in forms, see [this guide](/forms) for details.
 
 ## Properties [#properties]
 

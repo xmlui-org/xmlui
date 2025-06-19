@@ -1,6 +1,13 @@
 # NavGroup [#navgroup]
 
-The `NavGroup` component is a container for grouping related navigation targets (`NavLink` components). It can be displayed as a submenu in the App's UI.
+`NavGroup` creates collapsible containers for organizing related navigation items into hierarchical menu structures. It groups `NavLink` components and other `NavGroup` components, providing expandable submenus with customizable icons and states.
+
+**Key features:**
+- **Hierarchical organization**: Creates nested menu structures by containing NavLinks and other NavGroups
+- **Expand/collapse behavior**: Users can toggle visibility of grouped navigation items
+- **Customizable icons**: Different icons for expanded/collapsed states and layout orientations
+- **Flexible placement**: Works within NavPanel for app navigation or standalone for custom menus
+- **Initial state control**: Configure whether groups start expanded or collapsed
 
 ## Using `NavGroup` [#using-navgroup]
 

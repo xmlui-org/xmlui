@@ -1,6 +1,6 @@
 # ToneChangerButton [#tonechangerbutton]
 
-The `ToneChangerButton` component is a component that allows the user to change the tone of the app.
+`ToneChangerButton` enables the user to switch between light and dark modes.
 
 ```xmlui-pg {4} copy display name="Example: using ToneChangerButton"
 <App>

@@ -1,6 +1,12 @@
 # Slider [#slider]
 
-The `Slider` component allows you to select a numeric value between a range specified by minimum and maximum values.
+`Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.
+
+**Key features:**
+- **Range selection**: Single value or dual-thumb range selection with configurable minimum separation
+- **Step control**: Precise incremental selection with customizable step values
+- **Value formatting**: Custom display formatting for current values and visual feedback
+
 
 ## Properties [#properties]
 

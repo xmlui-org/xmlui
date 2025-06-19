@@ -1,6 +1,13 @@
 # Option [#option]
 
-`Option` is a non-visual component describing a selection option. Other components (such as `Select`, `AutoComplete`, and others) may use nested `Option` instances from which the user can select.
+`Option` defines selectable items for choice-based components, providing both the underlying value and display text for selection interfaces. It serves as a non-visual data structure that describes individual choices within [Select](/components/Select), [AutoComplete](/components/AutoComplete), and other selection components.
+
+**Key features:**
+- **Value and label separation**: Define what gets stored (value) separately from what users see (label)
+- **Automatic fallbacks**: Uses label as value or value as label when only one is provided
+- **Custom templates**: Support for rich content via optionTemplate property or child components
+- **State management**: Built-in enabled/disabled states for individual options
+- **Data integration**: Works seamlessly with Items components for dynamic option lists
 
 ## Using `Option` [#using-option]
 

@@ -1,6 +1,11 @@
 # NavLink [#navlink]
 
-The `NavLink` component defines a navigation target (app navigation menu item) within the app; it is associated with a particular in-app navigation target (or an external link).
+`NavLink` creates interactive navigation items that connect users to different destinations within an app or external URLs. It automatically indicates active states, supports custom icons and labels, and can execute custom actions instead of navigation when needed.
+
+**Key features:**
+- **Custom actions**: Execute JavaScript code instead of navigation when using onClick handlers
+- **Visual customization**: Support for icons, labels, and completely custom nested content
+- **Accessibility support**: Proper focus management and keyboard navigation
 
 ## Using NavLink [#using-navlink]
 

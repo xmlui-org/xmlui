@@ -1,6 +1,6 @@
 # NoResult [#noresult]
 
-`NoResult` is a component that displays a visual indication that some data query (search) resulted in no (zero) items.
+`NoResult` displays a visual indication that a query or search returned nothing.
 
 ## Properties [#properties]
 

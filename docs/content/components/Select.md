@@ -1,11 +1,16 @@
 # Select [#select]
+`Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration.
 
-Provides a dropdown with a list of options to choose from.
+**Key features:**
+- **Flexible selection modes**: Single selection by default, with optional multi-select capability
+- **Option containers**: Uses Option components to define selectable items with separate values and labels
+- **Search functionality**: Optional filtering to quickly find options in large lists
+- **Custom templates**: Configurable option display, value presentation, and empty state templates
+- **Dynamic options**: Supports both static [Option](/components/Option) children and dynamic lists via [Items](/components/Items).
 
-The component provides context values with which you can access some internal properties:
-
-- `$item`: This property represents the value of an item in the dropdown list.
-- `$itemContext`: This property provides a `removeItem` method to delete the particular value from the selection.
+**Context variables:**
+- `$item`: Represents the current option's data (label and value properties)
+- `$itemContext`: Provides utility methods like `removeItem()` for multi-select scenarios
 
 ## Using `Select` [#using-select]
 

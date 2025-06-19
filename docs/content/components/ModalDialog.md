@@ -1,11 +1,17 @@
 # ModalDialog [#modaldialog]
 
-The `ModalDialog` component defines a modal dialog UI element that can be displayed over the existing UI - triggered by some action.
+`ModalDialog` creates overlay dialogs that appear on top of the main interface, ideal for forms, confirmations, detailed views, or any content that requires focused user attention. Dialogs are programmatically opened using the `open()` method and can receive parameters for dynamic content.
 
-The component provides context values with which you can access some internal properties:
+**Key features:**
+- **Overlay presentation**: Appears above existing content with backdrop dimming
+- **Programmatic control**: Open and close via exposed methods like `open()` and `close()`
+- **Parameter passing**: Accept data when opened for dynamic dialog content
+- **Focus management**: Automatically handles focus trapping and accessibility
+- **Form integration**: When containing Form components, automatically closes on form submission or cancellation (unless overridden)
 
-- `$param`: This value represents the first parameters passed to the `open()` method to display the modal dialog.
-- `$params`: This value represents the array of parameters passed to the `open()` method. You can use `$params[0]` to access the first and `$params[1]` to access the second (and so on) parameters. `$param` is the same as `$params[0]`.
+**Context variables:**
+- `$param`: First parameter passed to the `open()` method
+- `$params`: Array of all parameters passed to `open()` method (access with `$params[0]`, `$params[1]`, etc.)
 
 ## Using the Component [#using-the-component]
 
@@ -48,9 +54,9 @@ showing the modal in conjunction with an updated URL so that the opened state of
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <variable name="isDialogShown" value="{false}"/>
   <Button label="Open Dialog" onClick="isDialogShown = true" />
-  <ModalDialog 
-    when="{isDialogShown}" 
-    title="Example Dialog" 
+  <ModalDialog
+    when="{isDialogShown}"
+    title="Example Dialog"
     onClose="isDialogShown = false" />
 </App>
 ---desc

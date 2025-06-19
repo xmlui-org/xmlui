@@ -1,6 +1,6 @@
 # PasswordInput [#passwordinput]
 
-The `Password` component is a specialized version of the `TextBox` component that allows users to input and edit passwords.
+`Password` is a specialized [TextBox](/components/TextBox) that enables users to input and edit passwords.
 
 ## Properties [#properties]
 

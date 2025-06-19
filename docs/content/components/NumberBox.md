@@ -1,11 +1,16 @@
 # NumberBox [#numberbox]
 
-A `NumberBox` component allows users to input numeric values: either integer or floating point numbers. It also accepts empty values, where the stored value will be of type `null`.
+`NumberBox` provides a specialized input field for numeric values with built-in validation, spinner buttons, and flexible formatting options. It supports both integer and floating-point numbers, handles empty states as null values, and integrates seamlessly with form validation.
 
-The `NumberBox` is an input control component and is often used in forms. See the [Using Forms](/learning/using-components/forms/) guide for details.
+**Key features:**
+- **Flexible numeric input**: Accepts integers, floating-point numbers, or empty values (stored as null)
+- **Input constraints**: Configure minimum/maximum values, integer-only mode, and positive-only restrictions
+- **Spinner buttons**: Built-in increment/decrement buttons with customizable step values and icons
+- **Visual adornments**: Add icons or text to the start and end of the input field
+- **Validation**: Built-in validation status indicators and form compatibility
+- **Smart paste handling**: Only accepts pasted content that results in valid numeric values
 
->[!INFO]
-> You can paste characters copied to the clipboard into a `NumberBox` only if the content with the pasted character results in a valid integer of float number (according to the `integersOnly` value). Otherwise, the paste operation is ignored.
+The `NumberBox` is often used in forms. See the [this guide](/forms) for details.
 
 ## Properties [#properties]
 
