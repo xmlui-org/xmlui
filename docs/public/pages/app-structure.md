@@ -1,6 +1,6 @@
 # Structure of an XMLUI app
 
-The [demo app](tbd) exhibits the typical structure of an XMLUI app.
+The [XMLUI Invoice demo app](https://xmlui.com/#get-started) exhibits the typical structure of an XMLUI app.
 
 ```xmlui-tree
 <root>

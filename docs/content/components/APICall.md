@@ -1,17 +1,17 @@
 # APICall [#apicall]
 
-`APICall` is used to mutate (create, update or delete) some data on the backend. It is similar in nature to the `DataSource` component which retrieves data from the backend.
+`APICall` creates, updates or deletes data on the backend, versus `DataSource` which fetches data.
 
-The component provides context values with which you can access some internal properties:
+It provides these context variables:
 
-- `$param`: This value represents the first parameters passed to the `execute()` method to display the modal dialog.
-- `$params`: This value represents the array of parameters passed to the `execute()` method. You can use `$params[0]` to access the first and `$params[1]` to access the second (and so on) parameters. `$param` is the same as `$params[0]`.
+- `$param`: The first parameters passed to the `execute()` method.
+- `$params`: The array of parameters passed to the `execute()` method. Use `$params[0]` to access the first, `$params[1]` to access the second, etc. `$param` is the same as `$params[0]`.
 
 ## Properties [#properties]
 
 ### `body` [#body]
 
-This optional property sets the request body. The object you pass here will be serialized to JSON when sending the request. Use the `rawBody` property to send another request body using its native format. When you define `body` and `rawBody`, the latest one prevails.
+This optional property sets the request body. Use to pass an object that will be serialized as a JSON string. If you have an object that is already serialized as a JSON string, use `rawBody` instead.
 
 ### `completedNotificationMessage` [#completednotificationmessage]
 
@@ -23,7 +23,7 @@ This property customizes the success message displayed in a toast after the fini
  <APICall
   id="ds"
   method="post"
-  url="/api/shopping-list" 
+  url="/api/shopping-list"
   completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
 ```
 
@@ -49,7 +49,7 @@ This property customizes the message displayed in a toast when the API invocatio
  <APICall
   id="ds"
   method="post"
-  url="/api/shopping-list" 
+  url="/api/shopping-list"
   errorNotificationMessage="${error.statusCode}, {JSON.stringify($error.details)}" />
 ```
 
