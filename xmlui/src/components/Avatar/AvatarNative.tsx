@@ -3,7 +3,6 @@ import { forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./Avatar.module.scss";
-import { s } from "../../testing/infrastructure/dist/internal/chunks/index.iL26XEOH";
 
 type Props = {
   size?: string;

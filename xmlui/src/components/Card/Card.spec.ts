@@ -66,14 +66,21 @@ test("avatar img height & width increase as avatarSize increase", async ({ page,
 ["xs", "sm", "md", "lg"].forEach((size) => {
   test(`avatarSize ${size} shows image`, async ({ page, initTestBed }) => {
     await initTestBed(`
-        <Card avatarSize="${size}" avatarUrl="https://i.pravatar.cc/100" />
+        <Card avatarSize="${size}" avatarUrl="/public/resources/flower-640x480.jpg" />
     `);
+
+    const avatar = page.getByRole("img", {name: "avatar"});
+    await expect(avatar).toBeVisible();
+    await expect(avatar).toHaveAttribute("src", "/public/resources/flower-640x480.jpg");
   });
 
   test(`avatarSize ${size} shows initials`, async ({ page, initTestBed }) => {
     await initTestBed(`
-        <Card avatarSize="${size}" title="John Alan Peter" />
+        <Card showAvatar="true" avatarSize="${size}" title="John Alan Peter" />
     `);
+
+    const avatar = page.getByRole("img");
+    await expect(avatar).toContainText("JAP");
   });
 
 });
@@ -86,20 +93,6 @@ test("clicking linkTo title navigates", async ({ page, initTestBed }) => {
   await expect(titleLink).toBeVisible();
   await titleLink.click();
   await expect(page).toHaveURL(/\/test-link$/);
-});
-
-
-test("Card with invalid avatarSize uses default value", async ({ page, initTestBed }) => {
-  await initTestBed(`
-    <App>
-      <Card showAvatar="true" avatarSize="invalid" title="Test">
-        <Text value="Content" />
-      </Card>
-    </App>
-  `);
-
-  await expect(page.locator("text=Test")).toBeVisible();
-  await expect(page.locator("text=Content")).toBeVisible();
 });
 
 
@@ -130,12 +123,23 @@ test("showAvatar=true with empty title displays no initials", async ({ page, ini
   await expect(avatarImg).toHaveText(/^$/);
 });
 
-test("avatarSize defaults to sm when not specified", async ({ page, initTestBed }) => {
+test("avatarSize defaults to sm", async ({ page, initTestBed }) => {
   await initTestBed(`
-    <Card showAvatar="true" title="Test" />
+    <Fragment>
+      <Card testId="card-sm" showAvatar="true" avatarSize="sm" title="Test" />
+      <Card testId="card-default" showAvatar="true" title="Test" />
+      <Card testId="card-invalid" showAvatar="invalid-value" avatarSize="sm" title="Test" />
+    </Fragment>
   `);
+  const {width: widthSm, height: heightSm} = await getFullRectangle(page.getByTestId("card-sm"))
+  const {width: widthDefault, height: heightDefault} = await getFullRectangle(page.getByTestId("card-default"))
+  const {width: widthInvalid, height: heightInvalid} = await getFullRectangle(page.getByTestId("card-invalid"))
 
-  await expect(page.getByText("T", { exact: true })).toBeVisible();
+  expect(widthSm).toEqual(widthDefault);
+  expect(widthSm).toEqual(widthInvalid);
+
+  expect(heightSm).toEqual(heightDefault);
+  expect(heightSm).toEqual(heightInvalid);
 });
 
 test("linkTo without title does not create link", async ({ page, initTestBed }) => {
@@ -166,25 +170,15 @@ test("orientation horizontal displays children in row", async ({ page, initTestB
 test("orientation vertical displays children in column", async ({ page, initTestBed }) => {
   await initTestBed(`
     <Card orientation="vertical">
-      <Text value="Child 1" />
-      <Text value="Child 2" />
+      <Text testId="text-1" value="Child 1" />
+      <Text testId="text-2" value="Child 2" />
     </Card>
   `);
 
   await expect(page.getByText("Child 1")).toBeVisible();
-  await expect(page.getByText("Child 2")).toBeVisible();
-});
-
-test("orientation defaults to vertical when not specified", async ({ page, initTestBed }) => {
-  await initTestBed(`
-    <Card>
-      <Text value="Child 1" />
-      <Text value="Child 2" />
-    </Card>
-  `);
-
-  await expect(page.getByText("Child 1")).toBeVisible();
-  await expect(page.getByText("Child 2")).toBeVisible();
+  const { bottom: text1Bottom } = await getFullRectangle(page.getByTestId("text-1"));
+  const { top: text2Top } = await getFullRectangle(page.getByTestId("text-2"));
+  expect(text1Bottom).toBeLessThan(text2Top);
 });
 
 test("click event is triggered when Card is clicked", async ({ page, initTestBed }) => {
