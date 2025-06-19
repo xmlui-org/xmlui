@@ -12,6 +12,7 @@ import { Text } from "../Text/TextNative";
 
 type Props = {
   style?: CSSProperties;
+  className?: string;
   children?: ReactNode;
   title?: string;
   subtitle?: string;
@@ -33,6 +34,7 @@ export const Card = forwardRef(function Card(
     children,
     orientation = defaultProps.orientation,
     style,
+    className,
     title,
     subtitle,
     linkTo,
@@ -49,7 +51,7 @@ export const Card = forwardRef(function Card(
   return (
     <div
       ref={forwardedRef}
-      className={classnames(styles.wrapper, {
+      className={classnames(className, styles.wrapper, {
         [styles.isClickable]: !!onClick,
         [styles.vertical]: orientation === "vertical",
         [styles.horizontal]: orientation === "horizontal",

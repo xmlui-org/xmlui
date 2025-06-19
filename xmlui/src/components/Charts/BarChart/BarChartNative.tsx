@@ -22,6 +22,7 @@ export type BarChartProps = {
   stacked?: boolean;
   dataKeys?: string[];
   style?: CSSProperties;
+  className?: string;
   hideTickX?: boolean;
   hideTickY?: boolean;
   hideX?: boolean;
@@ -64,6 +65,7 @@ export function BarChart({
   hideX = defaultProps.hideX,
   tickFormatter = defaultProps.tickFormatter,
   style,
+  className,
   children,
   showLegend = defaultProps.showLegend,
 }: BarChartProps) {
@@ -129,7 +131,7 @@ export function BarChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style} width="100%" height="100%">
+      <ResponsiveContainer style={style} className={className} width="100%" height="100%">
         <RBarChart
           accessibilityLayer
           data={data}
