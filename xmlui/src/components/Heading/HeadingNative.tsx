@@ -18,6 +18,7 @@ import { TableOfContentsContext } from "../../components-core/TableOfContentsCon
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import type { HeadingLevel } from "./abstractions";
 import { Link } from "@remix-run/react";
+import { useAppContext } from "../../components-core/AppContext";
 
 export type HeadingProps = {
   uid?: string;
@@ -70,6 +71,10 @@ export const Heading = forwardRef(function Heading(
 
   const tableOfContentsContext = useContext(TableOfContentsContext);
   const registerHeading = tableOfContentsContext?.registerHeading;
+  const appContext = useAppContext();
+  if (showAnchor === undefined) {
+    showAnchor = appContext?.appGlobals?.showHeadingAnchors ?? false;
+  }
 
   const ref = forwardedRef ? composeRefs(elementRef, forwardedRef) : elementRef;
 

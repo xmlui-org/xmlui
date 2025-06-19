@@ -69,7 +69,7 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Badge | rgba($color-secondary-500-rgb, .6) | rgba($color-secondary-500-rgb, .6) |
+| [backgroundColor](../styles-and-themes/common-units/#color)-Badge | rgb(from $color-secondary-500 r g b / 0.6) | rgb(from $color-secondary-500 r g b / 0.6) |
 | [backgroundColor](../styles-and-themes/common-units/#color)-Badge-pill | *none* | *none* |
 | [border](../styles-and-themes/common-units/#border)-Badge | 0px solid $borderColor | 0px solid $borderColor |
 | [border](../styles-and-themes/common-units/#border)-Badge-pill | *none* | *none* |

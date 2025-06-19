@@ -5,8 +5,7 @@
             <Markdown 
                 when="{$props.content || $props.url}" 
                 content="{$props.content}" 
-                data="{$props.url}" 
-                showHeadingAnchors="true" />
+                data="{$props.url}" />
             <Slot when="{!$props.content && !$props.url}" />
             <DocumentLinks 
                 prevLink="{$props.prevLink}" 

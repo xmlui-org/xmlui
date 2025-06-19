@@ -113,6 +113,12 @@ You can observe the effect of using `preserveLinebreaks`:
 > Remember to use the `value` property of `Heading`.
 > Linebreaks are converted to spaces when nesting the text in the `Heading` component.
 
+### `showAnchor` [#showanchor]
+
+This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.
+
+If this property is not set, the engine checks if `showHeadingAnchors` flag is turned on in the global configuration (in the `appGlobals` configuration object) and displays the heading anchor accordingly.
+
 ### `value` [#value]
 
 This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.

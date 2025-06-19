@@ -57,6 +57,12 @@ export const HeadingMd = createMetadata({
     ellipses: ELLIPSES_DESC,
     preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
+    showAnchor: {
+      description:
+        "This property indicates whether an anchor link should be displayed next to the heading. " +
+        "If set to `true`, an anchor link will be displayed on hover next to the heading.",
+      type: "boolean",
+    }
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
@@ -235,11 +241,12 @@ type RenderHeadingProps = {
   node: HeadingComponentDef;
   extractValue: ValueExtractor;
   layoutCss: CSSProperties;
-  renderChild: RenderChildFn;
   level: string;
+  showAnchor?: boolean;
+  renderChild: RenderChildFn;
 };
 
-function renderHeading({ node, extractValue, layoutCss, level, renderChild }: RenderHeadingProps) {
+function renderHeading({ node, extractValue, layoutCss, level, showAnchor, renderChild }: RenderHeadingProps) {
   const { maxLines, preserveLinebreaks, ellipses, ...restProps } = node.props;
   return (
     <Heading
@@ -248,6 +255,7 @@ function renderHeading({ node, extractValue, layoutCss, level, renderChild }: Re
       maxLines={extractValue.asOptionalNumber(maxLines)}
       preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
       ellipses={extractValue.asOptionalBoolean(ellipses, true)}
+      showAnchor={extractValue.asOptionalBoolean(showAnchor)}
       style={layoutCss}
       omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
       {...resolveAndCleanProps(restProps, extractValue, layoutCss)}
