@@ -20,6 +20,7 @@ import { useIndexerContext } from "../App/IndexerContext";
 import { useApiInterceptorContext } from "../../components-core/interception/useApiInterceptorContext";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { defaultProps } from "./defaultProps";
+import { StyleInjectionTargetContext, StyleProvider } from "../../components-core/theming/StyleContext";
 
 type NestedAppProps = {
   api?: any;
@@ -143,7 +144,9 @@ export function NestedApp({
       shadowRef.current = rootRef.current.attachShadow({ mode: "open" });
       const styleSheets = document.querySelectorAll('style, link[rel="stylesheet"]');
       styleSheets.forEach((el) => {
-        shadowRef.current.appendChild(el.cloneNode(true));
+        if(!el.hasAttribute("data-style-hash")){
+          shadowRef.current.appendChild(el.cloneNode(true));
+        }
       });
     }
     if (!contentRootRef.current && shadowRef.current) {
@@ -173,27 +176,37 @@ export function NestedApp({
       apiUrl,
     };
 
+    // css variables are leaking into to shadow dom, so we reset them here
+    const themeVarReset = {};
+    Object.keys(theme.themeStyles).forEach((key) => {
+      themeVarReset[key] = "initial";
+    });
+
     let nestedAppRoot = (
-      <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
-        <div style={{ height }}>
-          <AppRoot
-            key={`app-${nestedAppId}-${refreshVersion}`}
-            previewMode={true}
-            standalone={true}
-            trackContainerHeight={height ? "fixed" : "auto"}
-            node={component}
-            globalProps={globalProps}
-            defaultTheme={activeTheme || config?.defaultTheme}
-            defaultTone={toneToApply as ThemeTone}
-            contributes={{
-              compoundComponents,
-              themes: config?.themes,
-            }}
-            resources={config?.resources}
-            extensionManager={componentRegistry.getExtensionManager()}
-          />
-        </div>
-      </ApiInterceptorProvider>
+      <StyleInjectionTargetContext.Provider value={shadowRef.current}>
+        <StyleProvider forceNew={true}>
+        <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
+          <div style={{ height, ...themeVarReset }}>
+            <AppRoot
+              key={`app-${nestedAppId}-${refreshVersion}`}
+              previewMode={true}
+              standalone={true}
+              trackContainerHeight={height ? "fixed" : "auto"}
+              node={component}
+              globalProps={globalProps}
+              defaultTheme={activeTheme || config?.defaultTheme}
+              defaultTone={toneToApply as ThemeTone}
+              contributes={{
+                compoundComponents,
+                themes: config?.themes,
+              }}
+              resources={config?.resources}
+              extensionManager={componentRegistry.getExtensionManager()}
+            />
+          </div>
+        </ApiInterceptorProvider>
+        </StyleProvider>
+      </StyleInjectionTargetContext.Provider>
     );
 
     contentRootRef.current?.render(
@@ -251,6 +264,7 @@ export function NestedApp({
     config?.name,
     config?.resources,
     config?.themes,
+    theme.themeStyles,
     height,
     mock,
     nestedAppId,

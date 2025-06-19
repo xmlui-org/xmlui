@@ -12,6 +12,7 @@ const StyleContext = createContext<StyleRegistry | null>(null);
 type StyleProviderProps = {
   children: React.ReactNode;
   styleRegistry?: StyleRegistry;
+  forceNew?: boolean; // Optional prop to force a new registry
 };
 
 /**
@@ -21,6 +22,7 @@ type StyleProviderProps = {
 export function StyleProvider({
   children,
   styleRegistry = new StyleRegistry(),
+  forceNew = false, // Optional prop to force a new registry
 }: StyleProviderProps) {
   // Check if a provider already exists above this one in the tree.
   const parentRegistry = useContext(StyleContext);
@@ -51,7 +53,7 @@ export function StyleProvider({
 
   // If we're already inside a provider, don't do anything. Just render the children.
   // This makes nesting StyleProviders safe and harmless.
-  if (parentRegistry) {
+  if (parentRegistry && !forceNew) {
     return <>{children}</>;
   }
 
@@ -79,9 +81,18 @@ export function useComponentStyle(styles?: Record<string, CSSProperties[keyof CS
   return useStyles(rootStyle);
 }
 
+export const StyleInjectionTargetContext = createContext<Document | ShadowRoot | null>(null);
+
+function useDomRoot(){
+  const domRoot = useContext(StyleInjectionTargetContext);
+  return domRoot || document;
+}
+
 export function useStyles(styles?: StyleObjectType): string {
   // we skip this whole thing if we're indexing
   const {indexing} = useIndexerContext();
+  const domRoot = useDomRoot();
+  const injectionTarget = domRoot instanceof ShadowRoot ? domRoot : document.head
   const registry = useStyleRegistry();
   const { className, styleHash } = useMemo(() => {
     if(indexing || !styles || styles === EMPTY_OBJECT || Object.keys(styles).length === 0) {
@@ -100,10 +111,10 @@ export function useStyles(styles?: StyleObjectType): string {
       const styleElement = document.createElement("style");
       styleElement.setAttribute("data-style-hash", styleHash);
       styleElement.innerHTML = `@layer dynamic {\n${css}\n}`;
-      document.head.appendChild(styleElement);
+      injectionTarget.appendChild(styleElement);
       registry.injected.add(styleHash);
     }
-  }, [registry, styleHash]);
+  }, [registry, styleHash, injectionTarget]);
 
   // HOOK 2: For lifecycle management (reference counting and CLEANUP).
   useEffect(() => {
@@ -128,11 +139,11 @@ export function useStyles(styles?: StyleObjectType): string {
           // If it's still zero, it means no component re-mounted to claim this style.
           // Now it's safe to perform the cleanup.
           registry.injected.delete(styleHash);
-          document.querySelector(`style[data-style-hash="${styleHash}"]`)?.remove();
+          injectionTarget.querySelector(`style[data-style-hash="${styleHash}"]`)?.remove();
         }
       }, 0); // A timeout of 0ms is sufficient to push this to the end of the event loop.
     };
-  }, [registry, styleHash]); // Dependency array ensures this runs once per style change.
+  }, [injectionTarget, registry, styleHash]); // Dependency array ensures this runs once per style change.
 
   return className;
 }

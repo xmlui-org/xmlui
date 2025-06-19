@@ -51,6 +51,7 @@ import type {
   ProjectCompilation,
 } from "../abstractions/scripting/Compilation";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
+import React from "react";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -135,31 +136,33 @@ function StandaloneApp({
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
 
   return (
-    <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
-      <AppRoot
-        projectCompilation={projectCompilation}
-        decorateComponentsWithTestId={shouldDecorateWithTestId}
-        node={entryPoint!}
-        standalone={true}
-        debugEnabled={debugEnabled}
-        // @ts-ignore
-        routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
-        globalProps={{
-          name: name,
-          ...(appGlobals || {}),
-        }}
-        defaultTheme={defaultTheme}
-        defaultTone={defaultTone as ThemeTone}
-        resources={resources}
-        resourceMap={resourceMap}
-        sources={sources}
-        extensionManager={extensionManager}
-        contributes={{
-          compoundComponents: components,
-          themes,
-        }}
-      />
-    </ApiInterceptorProvider>
+    <React.StrictMode>
+      <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
+        <AppRoot
+          projectCompilation={projectCompilation}
+          decorateComponentsWithTestId={shouldDecorateWithTestId}
+          node={entryPoint!}
+          standalone={true}
+          debugEnabled={debugEnabled}
+          // @ts-ignore
+          routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
+          globalProps={{
+            name: name,
+            ...(appGlobals || {}),
+          }}
+          defaultTheme={defaultTheme}
+          defaultTone={defaultTone as ThemeTone}
+          resources={resources}
+          resourceMap={resourceMap}
+          sources={sources}
+          extensionManager={extensionManager}
+          contributes={{
+            compoundComponents: components,
+            themes,
+          }}
+        />
+      </ApiInterceptorProvider>
+    </React.StrictMode>
   );
 }
 
