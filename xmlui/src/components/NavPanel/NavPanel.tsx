@@ -27,7 +27,7 @@ export const NavPanelMd = createMetadata({
     [`horizontalAlignment-logo-${COMP}`]: "center",
     [`backgroundColor-${COMP}`]: "$backgroundColor",
     [`backgroundColor-${COMP}-horizontal`]: "$backgroundColor-AppHeader",
-    [`border-${COMP}`]: '0px solid $borderColor',
+    [`border-${COMP}`]: "0px solid $borderColor",
     [`paddingHorizontal-${COMP}`]: "0",
     [`paddingVertical-logo-${COMP}`]: "$space-4",
     [`paddingHorizontal-logo-${COMP}`]: "$space-4",
@@ -39,17 +39,18 @@ export const NavPanelMd = createMetadata({
 export const navPanelRenderer = createComponentRenderer(
   COMP,
   NavPanelMd,
-  ({ node, renderChild, layoutCss, layoutContext }) => {
+  ({ node, renderChild, layoutCss, className, layoutContext }) => {
+    // TODO: How do we merge the `className` with the `layoutContext.themeClassName`?
     return (
-        <NavPanel
-            style={layoutCss}
-            logoContent={renderChild(node.props.logoTemplate)}
-            className={layoutContext?.themeClassName}
-            inDrawer={layoutContext?.inDrawer}
-            renderChild={renderChild}
-        >
-          {renderChild(node.children)}
-        </NavPanel>
+      <NavPanel
+        style={layoutCss}
+        logoContent={renderChild(node.props.logoTemplate)}
+        className={layoutContext?.themeClassName}
+        inDrawer={layoutContext?.inDrawer}
+        renderChild={renderChild}
+      >
+        {renderChild(node.children)}
+      </NavPanel>
     );
   },
 );

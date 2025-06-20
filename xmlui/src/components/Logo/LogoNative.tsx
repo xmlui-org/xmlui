@@ -8,12 +8,13 @@ export const defaultProps = {
   alt: "Logo",
 };
 
+type Props = {
+  style?: CSSProperties;
+  className?: string;
+};
+
 export const Logo = forwardRef(function Logo(
-  {
-    style,
-  }: {
-    style?: CSSProperties;
-  },
+  { style, className }: Props,
   forwardedRef: ForwardedRef<HTMLImageElement>,
 ) {
   const logoUrl = useLogoUrl();
@@ -27,6 +28,7 @@ export const Logo = forwardRef(function Logo(
       src={logoUrl}
       alt={defaultProps.alt}
       style={{ width: "auto", boxShadow: "none", ...style }}
+      className={className}
     />
   );
 });

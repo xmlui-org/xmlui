@@ -97,7 +97,7 @@ export const MarkdownMd = createMetadata({
 export const markdownComponentRenderer = createComponentRenderer(
   COMP,
   MarkdownMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, className }) => {
     let renderedChildren = "";
 
     // 1. Static content prop fallback
@@ -122,7 +122,7 @@ export const markdownComponentRenderer = createComponentRenderer(
 
     return (
       <TransformedMarkdown
-        style={layoutCss}
+        className={className}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         codeHighlighter={extractValue(node.props.codeHighlighter)}
         extractValue={extractValue}
@@ -137,7 +137,7 @@ export const markdownComponentRenderer = createComponentRenderer(
 type TransformedMarkdownProps = {
   children: React.ReactNode;
   removeIndents?: boolean;
-  style: React.CSSProperties;
+  className?: string;
   extractValue: ValueExtractor;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
@@ -146,7 +146,7 @@ type TransformedMarkdownProps = {
 const TransformedMarkdown = ({
   children,
   removeIndents,
-  style,
+  className,
   extractValue,
   codeHighlighter,
   showHeadingAnchors,
@@ -187,7 +187,7 @@ const TransformedMarkdown = ({
     <Markdown
       removeIndents={removeIndents}
       codeHighlighter={codeHighlighter}
-      style={style}
+      className={className}
       showHeadingAnchors={showHeadingAnchors}
     >
       {markdownContent}

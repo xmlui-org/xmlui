@@ -12,6 +12,7 @@ import { getAppLayoutOrientation } from "../App/AppNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import { NavGroupContext } from "../NavGroup/NavGroupContext";
+import { JSX } from "react/jsx-runtime";
 
 // Default props for NavLink component
 export const defaultProps = {
@@ -29,6 +30,7 @@ type Props = {
   forceActive?: boolean;
   vertical?: boolean;
   style?: CSSProperties;
+  className?: string;
   onClick?: MouseEventHandler;
   icon?: React.ReactNode;
   accessibilityProps?: any;
@@ -44,6 +46,7 @@ export const NavLink = forwardRef(function NavLink(
     displayActive = defaultProps.displayActive,
     vertical,
     style,
+    className,
     onClick,
     icon,
     forceActive,
@@ -78,14 +81,14 @@ export const NavLink = forwardRef(function NavLink(
     [styles.vertical]: safeVertical,
     [styles.includeHoverIndicator]: displayActive,
     [styles.navItemActive]: displayActive && forceActive,
-  });
+  }, className);
 
   let innerContent =
     <div className={styles.innerContent}>
     {icon}
     {children}
     </div>
-  let content;
+  let content: string | number | boolean | JSX.Element | Iterable<ReactNode>;
   if (disabled || !smartTo) {
     content = (
       <button

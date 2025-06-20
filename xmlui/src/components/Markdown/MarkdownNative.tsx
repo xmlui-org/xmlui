@@ -35,6 +35,7 @@ type MarkdownProps = {
   removeIndents?: boolean;
   children: ReactNode;
   style?: CSSProperties;
+  className?: string;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
 };
@@ -85,6 +86,7 @@ export const Markdown = memo(function Markdown({
   removeIndents = defaultProps.removeIndents,
   children,
   style,
+  className,
   codeHighlighter,
   showHeadingAnchors = defaultProps.showHeadingAnchors,
 }: MarkdownProps) {
@@ -104,12 +106,15 @@ export const Markdown = memo(function Markdown({
     };
 
     function visitor(node: any, _: number, parent: Parent | undefined) {
-      imageInfo.current.set(getImageKey(node), parent.type === "paragraph" && parent.children.length > 1);
+      imageInfo.current.set(
+        getImageKey(node),
+        parent.type === "paragraph" && parent.children.length > 1,
+      );
     }
   };
 
   return (
-    <div className={styles.markdownContent} style={style}>
+    <div className={classnames(styles.markdownContent, className)} style={style}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, markdownCodeBlockParser, markdownImgParser]}
         rehypePlugins={[rehypeRaw]}

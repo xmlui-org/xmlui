@@ -1,13 +1,15 @@
 @use "../../components-core/theming/themes" as t;
 
-.dialogContent {
-  display: flex;
-  flex-direction: column;
-}
+@layer components {
+  .dialogContent {
+    display: flex;
+    flex-direction: column;
+  }
 
-.dialogActions {
-  &:not(:empty){
-    margin-top: t.$space-4;
+  .dialogActions {
+    &:not(:empty) {
+      margin-top: t.$space-4;
+    }
   }
 }
 
