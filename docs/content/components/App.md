@@ -2,7 +2,7 @@
 
 The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.
 
->[!INFO]
+> [!INFO]
 > You can learn more details about using this component [here](../learning/using-components/app-component).
 
 ## Properties [#properties]

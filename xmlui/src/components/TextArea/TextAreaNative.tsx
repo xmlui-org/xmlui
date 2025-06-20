@@ -50,6 +50,7 @@ type Props = {
   onBlur?: () => void;
   controlled?: boolean;
   style?: CSSProperties;
+  className?: string;
   registerComponentApi?: RegisterComponentApiFn;
   autoSize?: boolean;
   maxRows?: number;
@@ -101,6 +102,7 @@ export const TextArea = forwardRef(function TextArea(
     enterSubmits = defaultProps.enterSubmits,
     escResets,
     style,
+    className,
     registerComponentApi,
     autoSize,
     maxRows,
@@ -263,10 +265,12 @@ export const TextArea = forwardRef(function TextArea(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
+        className={className}
       >
         <TextAreaResizable
           {...textareaProps}
           style={style as any}
+          className={className}
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
@@ -287,10 +291,12 @@ export const TextArea = forwardRef(function TextArea(
         onFocus={onFocus}
         onBlur={onBlur}
         style={style}
+        className={className}
       >
         <TextareaAutosize
           {...textareaProps}
           style={style as any}
+          className={className}
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
@@ -311,6 +317,7 @@ export const TextArea = forwardRef(function TextArea(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={className}
     >
       <textarea {...textareaProps} rows={rows} />
     </ItemWithLabel>

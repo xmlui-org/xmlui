@@ -3,7 +3,6 @@ import {
   type ForwardedRef,
   forwardRef,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -31,6 +30,7 @@ export const defaultProps = {
 export const TableOfContents = forwardRef(function TableOfContents(
   {
     style,
+    className,
     smoothScrolling = defaultProps.smoothScrolling,
     maxHeadingLevel = defaultProps.maxHeadingLevel,
   }: Props,
@@ -72,7 +72,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
   }, [activeAnchorId, headings]);
 
   return (
-    <div className={classnames(classnames, styles.nav)} ref={ref} style={style}>
+    <div className={classnames(styles.nav, className)} ref={ref} style={style}>
       <ul className={styles.list}>
         {headings.map((value) => {
           if (value.level <= maxHeadingLevel) {
