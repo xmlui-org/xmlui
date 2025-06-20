@@ -20,6 +20,7 @@ $textColor-ModalDialog: createThemeVar("Dialog:textColor-#{$component}");
 $minWidth-ModalDialog: createThemeVar("Dialog:minWidth-#{$component}");
 $maxWidth-ModalDialog: createThemeVar("Dialog:maxWidth-#{$component}");
 $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$component}");
+$duration-startAnimation-ModalDialog: createThemeVar("Dialog:duration-startAnimation-#{$component}");
 
 
 .overlay {
@@ -50,7 +51,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
   min-width: 240px;
   isolation: isolate;
   position: relative;
-  animation: contentShow 500ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: contentShow $duration-startAnimation-ModalDialog cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   max-height: 80vh;
