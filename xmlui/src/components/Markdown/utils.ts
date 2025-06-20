@@ -2,6 +2,8 @@ export type SegmentProps = {
   display?: boolean;
   copy?: boolean;
   noPopup?: boolean;
+  noFrame?: boolean;
+  sideBySide?: boolean;
   highlights?: (number | [number, number])[];
   filename?: string;
   name?: string;
@@ -72,6 +74,16 @@ export function parseSegmentProps(input: string): SegmentProps {
   // --- Match the "noPopup" flag
   if (/\bnoPopup\b/.test(input)) {
     segment.noPopup = true;
+  }
+  
+  // --- Match the "noFrame" flag
+  if (/\bnoFrame\b/.test(input)) {
+    segment.noFrame = true;
+  }
+
+  // --- Match the "sideBySide" flag
+  if (/\bsideBySide\b/.test(input)) {
+    segment.sideBySide = true;
   }
 
   // Match the "highlights" pattern
@@ -247,7 +259,11 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
 
   // --- Assemble the final markdown content
   let markdownContent = "";
-  const pgContent: any = { noPopup: pattern.default?.noPopup };
+  const pgContent: any = { 
+    noPopup: pattern.default?.noPopup, 
+    noFrame: pattern.default?.noFrame,
+    sideBySide: pattern.default?.sideBySide 
+  };
 
   // --- Extract optional playground attributes
   if (pattern.default.height) {
@@ -343,10 +359,9 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
 
   // --- Convert the JSON representation of pgContent to a base64 string
   const jsonString = JSON.stringify(pgContent);
-  const base64String = btoa(jsonString);
-  markdownContent += '<samp data-pg-content="' + base64String + '"></samp>\n\n';
-
-  return markdownContent;
+  const base64ContentString = btoa(jsonString);
+  const base64MarkdownString = btoa(markdownContent);
+  return '<samp data-pg-content="' + base64ContentString + '" data-pg-markdown="' + base64MarkdownString+ '"></samp>\n\n';
 }
 
 export function observeTreeDisplay(content: string): [number, number, string] | null {

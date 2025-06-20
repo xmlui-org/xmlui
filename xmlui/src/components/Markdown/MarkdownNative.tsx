@@ -10,7 +10,6 @@ import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LinkNative } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
-import { IndexAwareNestedApp } from "../NestedApp/NestedAppNative";
 import {
   type CodeHighlighter,
   isCodeHighlighter,
@@ -25,6 +24,7 @@ import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
 import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
+import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 
 // Default props for the Markdown component
 export const defaultProps = {
@@ -339,35 +339,25 @@ export const Markdown = memo(function Markdown({
           },
           samp({ ...props }) {
             const nestedProps = props as any;
+            const markdownContentBase64 = props?.["data-pg-markdown"];
+            const markdownContent = markdownContentBase64 ? atob(markdownContentBase64) : "";
             const dataContentBase64 = props?.["data-pg-content"];
-            if (dataContentBase64 !== undefined) {
-              const jsonContent = atob(dataContentBase64);
-              const appProps = JSON.parse(jsonContent);
-              return (
-                <IndexAwareNestedApp
-                  app={appProps.app}
-                  config={appProps.config}
-                  components={appProps.components}
-                  api={appProps.api}
-                  activeTheme={appProps.activeTheme}
-                  activeTone={appProps.activeTone}
-                  title={appProps.name}
-                  height={appProps.height}
-                  allowPlaygroundPopup={!appProps.noPopup}
-                />
-              );
-            }
+            const jsonContent = atob(dataContentBase64);
+            const appProps = JSON.parse(jsonContent);
             return (
-              <IndexAwareNestedApp
-                app={nestedProps.app}
-                config={nestedProps.config}
-                components={nestedProps.components}
-                api={nestedProps.api}
-                activeTheme={nestedProps.activeTheme}
-                activeTone={nestedProps.activeTone}
-                title={nestedProps.title}
-                height={nestedProps.height}
-                allowPlaygroundPopup={true}
+              <NestedAppAndCodeViewNative
+                markdown={markdownContent}
+                app={appProps.app}
+                config={appProps.config}
+                components={appProps.components}
+                api={appProps.api}
+                activeTheme={appProps.activeTheme}
+                activeTone={appProps.activeTone}
+                title={appProps.name}
+                height={appProps.height}
+                allowPlaygroundPopup={!appProps.noPopup}
+                withFrame={appProps.noFrame ? false : true}
+                sideBySide={appProps.sideBySide ?? false}
               />
             );
           },
@@ -460,33 +450,27 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
       const detailsMatch = originalText.match(/\[!(S?DETAILS)\](.*?)(?:\n|$)/);
       const summaryText = detailsMatch && detailsMatch[2] ? detailsMatch[2].trim() : "Details";
       const withSwitch = type === "sdetails";
-      
+
       // Create separate content children without the summary line
       // We need to find the first Text element and remove the summary from it
       let contentWithoutSummary = [];
       let foundFirstTextElement = false;
-      
+
       React.Children.forEach(processedChildren, (child, index) => {
         // Process the first text element to remove the summary line
         if (!foundFirstTextElement && React.isValidElement(child) && child.props?.children) {
           foundFirstTextElement = true;
-          
+
           // Get the child's text content
           const childText = extractTextContent(child.props.children);
-          
+
           // Skip the first line which contains the summary
-          const lines = childText.split('\n');
+          const lines = childText.split("\n");
           if (lines.length > 1) {
             // Create modified element with remaining content
-            const remainingContent = lines.slice(1).join('\n');
+            const remainingContent = lines.slice(1).join("\n");
             if (remainingContent.trim()) {
-              contentWithoutSummary.push(
-                React.cloneElement(
-                  child,
-                  child.props,
-                  remainingContent
-                )
-              );
+              contentWithoutSummary.push(React.cloneElement(child, child.props, remainingContent));
             }
           }
         } else {
@@ -494,12 +478,9 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
           contentWithoutSummary.push(child);
         }
       });
-      
+
       return (
-        <ExpandableItem 
-          summary={summaryText}
-          withSwitch={withSwitch}
-        >
+        <ExpandableItem summary={summaryText} withSwitch={withSwitch}>
           {contentWithoutSummary}
         </ExpandableItem>
       );

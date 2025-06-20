@@ -1,17 +1,26 @@
-import styles from "./NestedApp.module.scss";
+import styles from "./AppWithCodeView.module.scss";
 
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { IndexAwareNestedApp } from "./NestedAppNative";
+import { AppWithCodeViewNative } from "./AppWithCodeViewNative";
 import { defaultProps } from "./defaultProps";
 
-const COMP = "NestedApp";
+const COMP = "AppWithCodeView";
 
-export const NestedAppMd = createMetadata({
-  description: `The ${COMP} component allows you to nest an entire xmlui app into another one.
-`,
+export const AppWithCodeViewMd = createMetadata({
+  status: "experimental",
+  description: `The ${COMP} component displays a combination of markdown content and a nested xmlui app. 
+It supports both side-by-side and stacked layouts.`,
   props: {
+    markdown: {
+      description: "The markdown content to be displayed alongside the app",
+      valueType: "string",
+    },
+    sideBySide: {
+      description: "Whether to render the markdown and app side by side or stacked vertically",
+      valueType: "boolean",
+    },
     app: {
       description: "The source markup of the app to be nested",
     },
@@ -56,26 +65,17 @@ export const NestedAppMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
-  defaultThemeVars: {
-    [`marginTop-${COMP}`]: "$space-3",
-    [`marginBottom-${COMP}`]: "$space-3",
-    [`padding-${COMP}`]: "$space-4",
-    [`paddingTop-${COMP}`]: "$space-2",
-    [`border-${COMP}`]: "1px solid $color-surface-100",
-    [`borderRadius-${COMP}`]: "$space-4",
-    [`backgroundColor-frame-${COMP}`]: "$color-primary-50",
-    [`gap-frame-${COMP}`]: "$space-4",
-    [`fontWeight-header-${COMP}`]: "$fontWeight-bold",
-    [`boxShadow-${COMP}`]: "$boxShadow-md",
-  },
+  defaultThemeVars: {},
 });
 
-export const nestedAppComponentRenderer = createComponentRenderer(
+export const appWithCodeViewComponentRenderer = createComponentRenderer(
   COMP,
-  NestedAppMd,
+  AppWithCodeViewMd,
   ({ node, extractValue }) => {
     return (
-      <IndexAwareNestedApp
+      <AppWithCodeViewNative
+        markdown={extractValue(node.props?.markdown)}
+        sideBySide={extractValue.asOptionalBoolean(node.props?.sideBySide)}
         app={node.props?.app}
         api={extractValue(node.props?.api)}
         components={extractValue(node.props?.components)}
