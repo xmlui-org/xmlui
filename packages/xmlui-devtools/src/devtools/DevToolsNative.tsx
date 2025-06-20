@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useState } from "react";
-import { Icon, useTheme, useDevTools, Button } from "xmlui";
+import { useTheme, useDevTools } from "xmlui";
 import styles from "./DevToolsNative.module.scss";
 import { HiOutlineClipboardDocument, HiOutlineClipboardDocumentCheck } from "react-icons/hi2";
 import loader from "@monaco-editor/loader";
@@ -9,13 +9,11 @@ import { XmluiScripGrammar } from "../syntax/monaco/xmluiscript.monacoLanguage";
 import xmluiLight from "../syntax/monaco/xmlui-light";
 import xmluiDark from "../syntax/monaco/xmlui-dark";
 import { createQueryString } from "./utils";
-import { Tooltip } from "./Tooltip";
 import { ModalDialog } from "./ModalDialog";
 
 export const DevTools = () => {
   const { activeThemeTone } = useTheme();
-  const context = useDevTools();
-  const { mockApi, inspectedNode, sources, setIsOpen, projectCompilation } = context;
+  const { mockApi, inspectedNode, sources, setIsOpen, projectCompilation, isOpen } = useDevTools();
   const [copied, setCopied] = useState(false);
   const monacoEditorInstance = useRef<any>(null);
   const editorRef = useRef(null);
@@ -164,34 +162,7 @@ export const DevTools = () => {
   });
 
   return (
-    <ModalDialog
-      onClose={() => setIsOpen?.(false)}
-      title={
-        <div className={styles.header}>
-          <Button variant={"ghost"} size={"sm"}>
-            Code
-          </Button>
-          <div className={styles.actions}>
-            <Tooltip label={"Edit code in new window"}>
-              <Button
-                onClick={popupPlayground}
-                size={"xs"}
-                variant={"ghost"}
-                icon={<Icon name={"new-window"} />}
-              />
-            </Tooltip>
-            <Tooltip label={"Close DevTools"}>
-              <Button
-                onClick={() => setIsOpen?.(false)}
-                size={"xs"}
-                variant={"ghost"}
-                icon={<Icon name={"close"} />}
-              />
-            </Tooltip>
-          </div>
-        </div>
-      }
-    >
+    <ModalDialog setIsOpen={setIsOpen} isOpen={isOpen} popupPlayground={popupPlayground}>
       <div className={styles.editorContainer} ref={editorContainerRef}>
         <div ref={editorRef} className={styles.xmluiEditor} />
         <div className={styles.copyButton}>

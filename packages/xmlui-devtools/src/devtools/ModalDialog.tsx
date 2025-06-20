@@ -1,91 +1,38 @@
-import React, {
-  CSSProperties,
-  ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 import * as Dialog from "@radix-ui/react-dialog";
 
 import styles from "./ModalDialog.module.scss";
-import { useTheme, useEvent } from "xmlui";
-import { ModalVisibilityContext } from "./ModalVisibilityContext";
-
-// Default props for ModalDialog component
-export const defaultProps = {
-  fullScreen: false,
-  closeButtonVisible: true,
-};
+import { Button, Icon, useTheme } from "xmlui";
+import { motion, AnimatePresence } from "framer-motion";
+import { Tooltip } from "./Tooltip";
 
 // =====================================================================================================================
 // React component definition
 
-type OnClose = (...args: any[]) => Promise<boolean | undefined | void> | boolean | undefined | void;
-type OnOpen = (...args: any[]) => void;
 type ModalProps = {
-  isInitiallyOpen?: boolean;
   style?: CSSProperties;
-  onClose?: OnClose;
-  onOpen?: OnOpen;
   children?: ReactNode;
-  title?: ReactNode;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  popupPlayground: () => void;
 };
 
-const ModalStateContext = React.createContext(null);
-
-function useModalLocalOpenState(isInitiallyOpen: boolean, onOpen?: OnOpen, onClose?: OnClose) {
-  const [isOpen, setIsOpen] = useState(isInitiallyOpen);
-  const isClosing = useRef(false);
-  const [openParams, setOpenParams] = useState(null);
-
-  const doOpen = useEvent((...openParams: any) => {
-    setOpenParams(openParams);
-    onOpen?.();
-    setIsOpen(true);
-  });
-
-  const doClose = useEvent(async () => {
-    if (!isClosing.current) {
-      try {
-        isClosing.current = true;
-        const result = await onClose?.();
-        if (result === false) {
-          return;
-        }
-      } finally {
-        isClosing.current = false;
-      }
-    }
-    setIsOpen(false);
-  });
-
-  return useMemo(() => {
-    return {
-      isOpen,
-      doClose,
-      doOpen,
-      openParams,
-    };
-  }, [doClose, doOpen, isOpen, openParams]);
-}
-
-function useModalOpenState(isInitiallyOpen = true, onOpen?: OnOpen, onClose?: OnClose) {
-  const modalStateContext = useContext(ModalStateContext);
-  const modalLocalOpenState = useModalLocalOpenState(isInitiallyOpen, onOpen, onClose);
-  return modalStateContext || modalLocalOpenState;
-}
+const overlayVariants = {
+  visible: { opacity: 1 },
+  hidden: { opacity: 0 },
+};
+const contentVariants = {
+  visible: { opacity: 1, scale: 1 },
+  hidden: { opacity: 0, scale: 0.2 },
+};
 
 export const ModalDialog = React.forwardRef(
-  ({ children, style, isInitiallyOpen, title, onOpen, onClose }: ModalProps, ref) => {
+  ({ children, style, isOpen, setIsOpen, popupPlayground }: ModalProps, ref) => {
     const { root } = useTheme();
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
-
-    const { isOpen, doClose, doOpen } = useModalOpenState(isInitiallyOpen, onOpen, onClose);
 
     useEffect(() => {
       if (isOpen) {
@@ -107,51 +54,95 @@ export const ModalDialog = React.forwardRef(
       }
     }, [isOpen]);
 
-    const modalVisibilityContextValue = useMemo(() => {
-      return {
-        requestClose: () => {
-          return doClose();
-        },
-      };
-    }, [doClose]);
-
     if (!root) {
       return null;
     }
 
+    const onExitComplete = () => {
+      setIsOpen(false);
+    };
+
+    const [opened, setOpened] = useState(true);
+
     return (
-      <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? doOpen() : doClose())}>
+      <Dialog.Root defaultOpen={false} open={isOpen} onOpenChange={setOpened}>
         <Dialog.Portal container={root}>
-          <div className={styles.overlayBg} />
-          <Dialog.Overlay className={classnames(styles.overlay)}>
-            <Dialog.Content
-              className={classnames(styles.content)}
-              onPointerDownOutside={(event) => {
-                if (
-                  event.target instanceof Element &&
-                  event.target.closest("._debug-inspect-button") !== null
-                ) {
-                  //we prevent the auto modal close on clicking the inspect button
-                  event.preventDefault();
-                }
-              }}
-              ref={composedRef}
-              style={{ ...style, gap: undefined }}
-            >
-              {!!title && (
-                <Dialog.Title style={{ marginTop: 0 }}>
-                  <header id="dialogTitle" className={styles.dialogTitle}>
-                    {title}
-                  </header>
-                </Dialog.Title>
-              )}
-              <div className={styles.innerContent} style={{ gap: style?.gap }}>
-                <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
-                  {children}
-                </ModalVisibilityContext.Provider>
-              </div>
-            </Dialog.Content>
-          </Dialog.Overlay>
+          <AnimatePresence onExitComplete={onExitComplete}>
+            {opened && (
+              <Dialog.Overlay className={styles.overlay}>
+                <motion.div
+                  key="overlay"
+                  className={styles.overlayBg}
+                  variants={overlayVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  transition={{
+                    duration: 0.2,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                />
+                <motion.div
+                  className={styles.motionWrapper}
+                  variants={contentVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  transition={{
+                    duration: 0.6,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                >
+                  <Dialog.Content
+                    className={classnames(styles.content)}
+                    forceMount
+                    onPointerDownOutside={(event) => {
+                      if (
+                        event.target instanceof Element &&
+                        event.target.closest("._debug-inspect-button") !== null
+                      ) {
+                        //we prevent the auto modal close on clicking the inspect button
+                        event.preventDefault();
+                      }
+                    }}
+                    ref={composedRef}
+                    style={{ ...style, gap: undefined }}
+                  >
+                    <Dialog.Title style={{ marginTop: 0 }}>
+                      <header id="dialogTitle" className={styles.dialogTitle}>
+                        <div className={styles.header}>
+                          <Button variant={"ghost"} size={"sm"}>
+                            Code
+                          </Button>
+                          <div className={styles.actions}>
+                            <Tooltip label={"Edit code in new window"}>
+                              <Button
+                                onClick={popupPlayground}
+                                size={"xs"}
+                                variant={"ghost"}
+                                icon={<Icon name={"new-window"} />}
+                              />
+                            </Tooltip>
+                            <Tooltip label={"Close DevTools"}>
+                              <Button
+                                onClick={() => setOpened(false)}
+                                size={"xs"}
+                                variant={"ghost"}
+                                icon={<Icon name={"close"} />}
+                              />
+                            </Tooltip>
+                          </div>
+                        </div>
+                      </header>
+                    </Dialog.Title>
+                    <div className={styles.innerContent} style={{ gap: style?.gap }}>
+                      {children}
+                    </div>
+                  </Dialog.Content>
+                </motion.div>
+              </Dialog.Overlay>
+            )}
+          </AnimatePresence>
         </Dialog.Portal>
       </Dialog.Root>
     );

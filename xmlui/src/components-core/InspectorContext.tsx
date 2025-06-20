@@ -28,6 +28,7 @@ interface IInspectorContext {
   refresh: (inspectId: string) => void;
   devToolsEnabled?: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  isOpen: boolean;
   inspectedNode: any;
   projectCompilation: ProjectCompilation | undefined;
   setInspectMode: (inspectMode: (prev: any) => boolean) => void;
@@ -97,6 +98,7 @@ export function InspectorProvider({
       },
       inspectedNode,
       setIsOpen: setShowCode,
+      isOpen: showCode,
       devToolsSize,
       setDevToolsSize,
       devToolsSide,
@@ -113,6 +115,7 @@ export function InspectorProvider({
     sources,
     inspectedNode,
     showCode,
+    setShowCode,
     projectCompilation,
     inspectMode,
     mockApi,
@@ -309,13 +312,18 @@ function InspectButton({
 export function useDevTools() {
   const context = useContext(InspectorContext);
 
+  if (!context) {
+    throw new Error("useDevTools must be used within an InspectorProvider");
+  }
+
   return {
-    projectCompilation: context?.projectCompilation,
-    inspectedNode: context?.inspectedNode,
-    sources: context?.sources,
-    setIsOpen: context?.setIsOpen,
-    devToolsEnabled: context?.devToolsEnabled,
-    mockApi: context?.mockApi,
+    projectCompilation: context.projectCompilation,
+    inspectedNode: context.inspectedNode,
+    sources: context.sources,
+    isOpen: context.isOpen,
+    setIsOpen: context.setIsOpen,
+    devToolsEnabled: context.devToolsEnabled,
+    mockApi: context.mockApi,
   };
 }
 
