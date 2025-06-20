@@ -8,8 +8,11 @@ export const EditorMd = createMetadata({
   status: "experimental",
   props: {
   },
-  themeVars: parseScssVar({}),
-  defaultThemeVars: {},
+  themeVars: parseScssVar({
+  }),
+  defaultThemeVars: {
+    "duration-startAnimation-ModalDialog": "600ms"
+  },
 });
 
 export const devToolsComponentRenderer = createComponentRenderer(
