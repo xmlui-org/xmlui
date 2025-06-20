@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.54
+
+### Patch Changes
+
+- 2688a95: Change TreeDisplay theme variable defaults
+
 ## 0.9.53
 
 ### Patch Changes
