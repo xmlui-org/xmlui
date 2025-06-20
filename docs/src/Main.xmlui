@@ -67,11 +67,10 @@
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
-                <!--
-                <NavLink label="Test" to="/test"/>
-                -->
             </NavGroup>
             <NavLink label="Change Log" to="/change-log"/>
+            <NavLink label="MCP (experimental)" to="/mcp"/>
+
         </NavPanel>
 
         <Pages>
@@ -186,13 +185,11 @@
             <Page url="/glossary">
                 <DocumentPage hideToc="true" url="/pages/glossary.md" />
             </Page>
-            <!--
-            <Page url="/test">
-                <Test />
-            </Page>
-            -->
             <Page url="/change-log">
                 <ChangeLog />
+            </Page>
+            <Page url="/mcp">
+                <DocumentPage hideToc="true" url="/pages/mcp.md" />
             </Page>
             <Page url="/*">
                 <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>
