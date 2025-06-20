@@ -24,9 +24,10 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
 
 .overlay {
   position: fixed;
-  display: grid;
-  place-items: center;
   overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   inset: 0;
   padding: t.$space-4;
 }
@@ -35,7 +36,6 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
   background-color: $backgroundColor-overlay-ModalDialog;
   position: fixed;
   inset: 0;
-  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .content {

@@ -1,4 +1,4 @@
-import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
+import React, { CSSProperties, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -17,19 +17,36 @@ type ModalProps = {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   popupPlayground: () => void;
+  clickPosition: { x: number; y: number };
 };
 
 const overlayVariants = {
   visible: { opacity: 1 },
   hidden: { opacity: 0 },
 };
+
 const contentVariants = {
-  visible: { opacity: 1, scale: 1 },
-  hidden: { opacity: 0, scale: 0.2 },
+  initial: (custom: { x: number; y: number }) => ({
+    opacity: 0,
+    scale: 0.2,
+    x: custom.x - window.innerWidth / 2,
+    y: custom.y - window.innerHeight / 2,
+  }),
+  animate: {
+    opacity: 1,
+    scale: 1,
+    x: 0,
+    y: 0,
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.2,
+    transition: { duration: 0.2 },
+  },
 };
 
 export const ModalDialog = React.forwardRef(
-  ({ children, style, isOpen, setIsOpen, popupPlayground }: ModalProps, ref) => {
+  ({ children, style, isOpen, setIsOpen, popupPlayground, clickPosition }: ModalProps, ref) => {
     const { root } = useTheme();
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
@@ -64,6 +81,10 @@ export const ModalDialog = React.forwardRef(
 
     const [opened, setOpened] = useState(true);
 
+    useEffect(() => {
+      console.log("Click position updated:", clickPosition);
+    }, [clickPosition]);
+
     return (
       <Dialog.Root defaultOpen={false} open={isOpen} onOpenChange={setOpened}>
         <Dialog.Portal container={root}>
@@ -85,11 +106,12 @@ export const ModalDialog = React.forwardRef(
                 <motion.div
                   className={styles.motionWrapper}
                   variants={contentVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
+                  custom={{ x: clickPosition.x, y: clickPosition.y }}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
                   transition={{
-                    duration: 0.6,
+                    duration: 0.8,
                     ease: [0.16, 1, 0.3, 1],
                   }}
                 >

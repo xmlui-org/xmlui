@@ -13,7 +13,8 @@ import { ModalDialog } from "./ModalDialog";
 
 export const DevTools = () => {
   const { activeThemeTone } = useTheme();
-  const { mockApi, inspectedNode, sources, setIsOpen, projectCompilation, isOpen } = useDevTools();
+  const { mockApi, inspectedNode, sources, setIsOpen, projectCompilation, isOpen, clickPosition } =
+    useDevTools();
   const [copied, setCopied] = useState(false);
   const monacoEditorInstance = useRef<any>(null);
   const editorRef = useRef(null);
@@ -162,7 +163,12 @@ export const DevTools = () => {
   });
 
   return (
-    <ModalDialog setIsOpen={setIsOpen} isOpen={isOpen} popupPlayground={popupPlayground}>
+    <ModalDialog
+      setIsOpen={setIsOpen}
+      isOpen={isOpen}
+      popupPlayground={popupPlayground}
+      clickPosition={clickPosition}
+    >
       <div className={styles.editorContainer} ref={editorContainerRef}>
         <div ref={editorRef} className={styles.xmluiEditor} />
         <div className={styles.copyButton}>
