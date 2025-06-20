@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.14
+
+### Patch Changes
+
+- 9d9d930: feat: devtools - themeVariable for setting the duration of the modal's animation
+
 ## 0.1.13
 
 ### Patch Changes
