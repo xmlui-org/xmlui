@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.55
+
+### Patch Changes
+
+- d507ea8: Add AppWithCodeView component to display code and running app side-by-side
+
 ## 0.9.54
 
 ### Patch Changes
