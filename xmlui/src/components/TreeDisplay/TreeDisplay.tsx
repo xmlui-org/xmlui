@@ -32,7 +32,7 @@ export const TreeDisplayMd = createMetadata({
     [`borderRadius-${COMP}`]: "8px",
     [`padding-${COMP}`]: "$space-4",
     [`paddingLeft-${COMP}`]: "$space-2",
-    [`fontSize-${COMP}`]: "$fontSize-default",
+    [`fontSize-${COMP}`]: "$fontSize-code",
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
     [`fontFamily-${COMP}`]: "$fontFamily-monospace",
     [`color-${COMP}`]: "$textColor-primary",

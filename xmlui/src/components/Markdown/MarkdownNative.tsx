@@ -375,7 +375,7 @@ export const Markdown = memo(function Markdown({
             const treeContentBase64 = props?.["data-tree-content"];
             if (treeContentBase64 !== undefined) {
               const content = atob(treeContentBase64);
-              return <TreeDisplay content={content} itemHeight={24} />;
+              return <TreeDisplay content={content} />;
             }
             return null;
           },
