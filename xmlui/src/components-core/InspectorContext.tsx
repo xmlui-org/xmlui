@@ -28,11 +28,13 @@ interface IInspectorContext {
   refresh: (inspectId: string) => void;
   devToolsEnabled?: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  isOpen: boolean;
   inspectedNode: any;
   projectCompilation: ProjectCompilation | undefined;
   setInspectMode: (inspectMode: (prev: any) => boolean) => void;
   inspectMode: boolean;
   mockApi: any;
+  clickPosition: { x: number; y: number };
 }
 
 // --- The context object that is used to store the inspector information.
@@ -56,7 +58,10 @@ export function InspectorProvider({
   const [devToolsSize, setDevToolsSize] = useState(0);
   const [devToolsSide, setDevToolsSide] = useState<"bottom" | "left" | "right">("bottom");
   const [inspectMode, setInspectMode] = useState(false);
-
+  const [clickPosition, setClickPosition] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const componentRegistry = useComponentRegistry();
 
   const devToolsEntry = componentRegistry.lookupComponentRenderer("XMLUIDevtools.DevTools");
@@ -97,6 +102,7 @@ export function InspectorProvider({
       },
       inspectedNode,
       setIsOpen: setShowCode,
+      isOpen: showCode,
       devToolsSize,
       setDevToolsSize,
       devToolsSide,
@@ -106,6 +112,7 @@ export function InspectorProvider({
       setInspectMode,
       inspectMode,
       mockApi,
+      clickPosition,
     };
   }, [
     devToolsSide,
@@ -113,6 +120,8 @@ export function InspectorProvider({
     sources,
     inspectedNode,
     showCode,
+    clickPosition,
+    setShowCode,
     projectCompilation,
     inspectMode,
     mockApi,
@@ -132,6 +141,7 @@ export function InspectorProvider({
             <InspectButton
               inspectedNode={inspectedNode}
               setShowCode={setShowCode}
+              setClickPosition={setClickPosition}
               key={item.inspectId + +"-" + item.key}
               inspectId={item.inspectId}
               node={item.node}
@@ -151,6 +161,7 @@ function InspectButton({
   setInspectedNode,
   setShowCode,
   inspectMode,
+  setClickPosition,
 }: {
   inspectId: string;
   node: ComponentDef;
@@ -158,6 +169,7 @@ function InspectButton({
   setInspectedNode: (node: any) => void;
   setShowCode: (show: any) => void;
   inspectMode: boolean;
+  setClickPosition?: (position: { x: number; y: number }) => void;
 }) {
   const { root } = useTheme();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
@@ -296,6 +308,10 @@ function InspectButton({
               onClick={() => {
                 setInspectedNode(node);
                 setShowCode(true);
+                setClickPosition({
+                  x: popperElement?.getBoundingClientRect().left || 0,
+                  y: popperElement?.getBoundingClientRect().top || 0,
+                });
               }}
             >
               Show code
@@ -309,13 +325,19 @@ function InspectButton({
 export function useDevTools() {
   const context = useContext(InspectorContext);
 
+  if (!context) {
+    throw new Error("useDevTools must be used within an InspectorProvider");
+  }
+
   return {
-    projectCompilation: context?.projectCompilation,
-    inspectedNode: context?.inspectedNode,
-    sources: context?.sources,
-    setIsOpen: context?.setIsOpen,
-    devToolsEnabled: context?.devToolsEnabled,
-    mockApi: context?.mockApi,
+    projectCompilation: context.projectCompilation,
+    inspectedNode: context.inspectedNode,
+    sources: context.sources,
+    isOpen: context.isOpen,
+    setIsOpen: context.setIsOpen,
+    devToolsEnabled: context.devToolsEnabled,
+    mockApi: context.mockApi,
+    clickPosition: context.clickPosition,
   };
 }
 
