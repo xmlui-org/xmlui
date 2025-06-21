@@ -1,4 +1,4 @@
-import React, { CSSProperties, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -45,9 +45,25 @@ const contentVariants = {
   },
 };
 
+function durationToSeconds(durationString?: string) {
+  if (!durationString) {
+    return undefined;
+  }
+  const trimmedString = durationString.trim();
+
+  if (trimmedString.endsWith("ms")) {
+    const milliseconds = parseFloat(trimmedString);
+    return milliseconds / 1000;
+  } else if (trimmedString.endsWith("s")) {
+    return parseFloat(trimmedString);
+  } else {
+    return parseFloat(trimmedString);
+  }
+}
+
 export const ModalDialog = React.forwardRef(
   ({ children, style, isOpen, setIsOpen, popupPlayground, clickPosition }: ModalProps, ref) => {
-    const { root } = useTheme();
+    const { root, getThemeVar } = useTheme();
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
 
@@ -111,7 +127,8 @@ export const ModalDialog = React.forwardRef(
                   animate="animate"
                   exit="exit"
                   transition={{
-                    duration: 0.8,
+                    duration:
+                      durationToSeconds(getThemeVar("duration-startAnimation-ModalDialog")) || 0.8,
                     ease: [0.16, 1, 0.3, 1],
                   }}
                 >

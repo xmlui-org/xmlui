@@ -10,9 +10,7 @@ export const EditorMd = createMetadata({
   },
   themeVars: parseScssVar({
   }),
-  defaultThemeVars: {
-    "duration-startAnimation-ModalDialog": "600ms"
-  },
+  defaultThemeVars: {},
 });
 
 export const devToolsComponentRenderer = createComponentRenderer(
