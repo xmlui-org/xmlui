@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.56
+
+### Patch Changes
+
+- 9a3c3b6: feat: xmlui-devtools - start dialog animation from the click, use exit animation as well
+
 ## 0.9.55
 
 ### Patch Changes
