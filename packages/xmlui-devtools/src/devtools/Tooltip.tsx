@@ -1,16 +1,23 @@
 import { Provider, Root, Portal, Trigger, Content } from "@radix-ui/react-tooltip";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { useTheme } from "xmlui";
 import styles from "./Tooltip.module.scss";
 
-export const Tooltip = ({ children, label }: { children: ReactNode; label: string }) => {
+export const Tooltip = React.forwardRef(function (
+  {
+    children,
+    label,
+  }: {
+    children: ReactNode;
+    label: string;
+  },
+  ref: React.Ref<HTMLButtonElement>,
+) {
   const { root } = useTheme();
   return (
     <Provider>
       <Root>
-        <Trigger asChild>
-          <div>{children}</div>
-        </Trigger>
+        <Trigger ref={ref} asChild>{children}</Trigger>
         <Portal container={root}>
           <Content className={styles.TooltipContent} sideOffset={5}>
             {label}
@@ -19,4 +26,4 @@ export const Tooltip = ({ children, label }: { children: ReactNode; label: strin
       </Root>
     </Provider>
   );
-};
+});

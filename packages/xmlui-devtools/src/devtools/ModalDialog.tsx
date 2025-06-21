@@ -66,6 +66,7 @@ export const ModalDialog = React.forwardRef(
     const { root, getThemeVar } = useTheme();
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
+    const [rendered, setRendered] = useState(true);
 
     useEffect(() => {
       if (isOpen) {
@@ -95,18 +96,12 @@ export const ModalDialog = React.forwardRef(
       setIsOpen(false);
     };
 
-    const [opened, setOpened] = useState(true);
-
-    useEffect(() => {
-      console.log("Click position updated:", clickPosition);
-    }, [clickPosition]);
-
     return (
-      <Dialog.Root defaultOpen={false} open={isOpen} onOpenChange={setOpened}>
+      <Dialog.Root defaultOpen={false} open={isOpen} onOpenChange={setRendered}>
         <Dialog.Portal container={root}>
           <AnimatePresence onExitComplete={onExitComplete}>
-            {opened && (
-              <Dialog.Overlay className={styles.overlay}>
+            {rendered && (
+              <Dialog.Overlay className={styles.overlay} forceMount>
                 <motion.div
                   key="overlay"
                   className={styles.overlayBg}
@@ -120,7 +115,7 @@ export const ModalDialog = React.forwardRef(
                   }}
                 />
                 <motion.div
-                  className={styles.motionWrapper}
+                  className={styles.contentWrapper}
                   variants={contentVariants}
                   custom={{ x: clickPosition.x, y: clickPosition.y }}
                   initial="initial"
@@ -164,7 +159,7 @@ export const ModalDialog = React.forwardRef(
                             </Tooltip>
                             <Tooltip label={"Close DevTools"}>
                               <Button
-                                onClick={() => setOpened(false)}
+                                onClick={() => setRendered(false)}
                                 size={"xs"}
                                 variant={"ghost"}
                                 icon={<Icon name={"close"} />}
