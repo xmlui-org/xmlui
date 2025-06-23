@@ -38,13 +38,21 @@ export class DocsGenerator {
         const displayName = compName;
         const componentFolder = compData.specializedFrom || compData.docFolder || compName;
         const descriptionRef = join(componentFolder, `${displayName}.md`);
-        return {
+        const extendedComponentData = {
           ...compData,
           displayName,
           description: compData.description,
           descriptionRef,
           folderPath: componentFolder,
         };
+
+        const entries = addDescriptionRef(extendedComponentData, [
+          "props",
+          "events",
+          "apis",
+          "contextVars",
+        ]);
+        return { ...extendedComponentData, ...entries };
       });
   }
 
@@ -148,6 +156,25 @@ export class DocsGenerator {
       processError(error);
     }
   }
+}
+
+function addDescriptionRef(component, entries = []) {
+  const result = {};
+
+  if (component) {
+    entries.forEach((entry) => {
+      if (component[entry]) {
+        result[entry] = Object.fromEntries(
+          Object.entries(component[entry]).map(([k, v]) => {
+            v.descriptionRef = `${component.displayName}.md?${k}`;
+            return [k, v];
+          }),
+        );
+      }
+    });
+  }
+
+  return result;
 }
 
 /**

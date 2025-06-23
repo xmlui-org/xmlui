@@ -2,12 +2,17 @@ import * as fs from "fs";
 import * as path from "path";
 import { FOLDERS } from "./folders.mjs";
 import { createTable, getSectionBeforeAndAfter } from "./utils.mjs";
-import { processError } from "./logger.mjs";
+import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 
 const ACCEPTED_STATUSES = ["stable", "experimental", "deprecated", "in progress"];
 const DEFAULT_STATUS = "stable";
 
+logger.setLevels(LOGGER_LEVELS.warning, LOGGER_LEVELS.error);
+logger.info("Generating summary files...");
+
 // components
+logger.info("Components summary");
+
 const componentsMetaFolder = path.join(FOLDERS.script, "metadata", "components");
 const componentsOutFolder = path.join(FOLDERS.docsRoot, "content", "components");
 generateComponentsSummary(
@@ -15,11 +20,15 @@ generateComponentsSummary(
   "components",
   componentsOutFolder,
   "_overview.md",
-  "# Components Overview",
+  "# Components Overview [#components-overview]",
 );
+
+logger.info("Components summary DONE");
 
 // NOTE: Unused
 // extensions
+// logger.info("Extensions summary");
+
 // const extensionsMetaFolder = path.join(FOLDERS.script, "metadata", "extensions");
 // fs.readdirSync(extensionsMetaFolder).forEach((file) => {
 //   if (path.extname(file) === ".json") {
@@ -37,6 +46,8 @@ generateComponentsSummary(
 //     );
 //   }
 // });
+
+// logger.info("Extensions summary DONE");
 
 // NOTE: this does not work because we don't generate html tag docs
 // html tags
