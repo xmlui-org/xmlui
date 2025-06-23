@@ -39,7 +39,7 @@ function DrawerNavPanel({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   return (
     <NavPanelContext.Provider value={contextValue}>
-      <div ref={scrollContainerRef} className={classnames(styles.wrapper, className)}>
+      <div ref={scrollContainerRef} className={classnames(styles.wrapper, className)} style={style}>
         <ScrollContext.Provider value={scrollContainerRef}>
           <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
             {logoContent || <Logo />}
@@ -63,14 +63,7 @@ type Props = {
 };
 
 export const NavPanel = forwardRef(function NavPanel(
-  {
-    children,
-    style,
-    logoContent,
-    className,
-    inDrawer = defaultProps.inDrawer,
-    renderChild,
-  }: Props,
+  { children, style, logoContent, className, inDrawer = defaultProps.inDrawer, renderChild }: Props,
   forwardedRef,
 ) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -99,6 +92,7 @@ export const NavPanel = forwardRef(function NavPanel(
         [styles.vertical]: vertical,
         [styles.condensed]: isCondensed,
       })}
+      style={style}
     >
       <ScrollContext.Provider value={scrollContainerRef}>
         {showLogo && (
