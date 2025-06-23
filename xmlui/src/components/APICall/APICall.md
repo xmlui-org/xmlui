@@ -1,3 +1,13 @@
+%-DESC-START
+
+**Key characteristics:**
+- **Manual execution**: Call `execute()` method to trigger the API request
+- **Form integration**: Commonly used in `<event name="submit">` handlers for forms
+- **Parameter passing**: Pass data to the API call via `execute()` parameters
+- **Built-in notifications**: Supports automatic progress, success, and error messages
+
+%-DESC-END
+
 %-PROP-START completedNotificationMessage
 
 This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:

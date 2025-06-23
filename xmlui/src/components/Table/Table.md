@@ -1,5 +1,13 @@
 %-DESC-START
 
+**Key features:**
+- **Data integration**: Load data from APIs via [DataSource](/components/DataSource) or use static arrays
+- **Virtualization**: Only renders visible rows for smooth performance with large datasets
+- **Row selection**: Support single or multi-row selection for bulk operations
+- **Pagination**: Built-in pagination controls for managing large datasets
+
+Use `Column` to define headers, data binding, sorting behavior, and custom cell content.
+
 In the following sections the examples use data with the structure outlined below:
 
 | Id   | Name    | Quantity | Unit   | Category   |

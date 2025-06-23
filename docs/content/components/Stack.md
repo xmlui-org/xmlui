@@ -12,7 +12,6 @@
 
 For common scenarios, consider the specialized variants: [HStack](/components/HStack) (horizontal), [VStack](/components/VStack) (vertical), [CHStack](/components/CHStack) (centered horizontal), and [CVStack](/components/CVStack) (centered vertical).
 
-
 ## Properties [#properties]
 
 ### `gap (default: "$gap-normal")` [#gap-default-gap-normal]

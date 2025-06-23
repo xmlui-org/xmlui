@@ -7,8 +7,11 @@ const COMP = "TabItem";
 
 export const TabItemMd = createMetadata({
   description:
-    `\`${COMP}\` is a non-visual component describing a tab. Tabs component may use nested ` +
-    `${COMP} instances from which the user can select.`,
+    "`TabItem` defines individual tabs within a [Tabs](/components/Tabs) component, " +
+    "providing both the tab header label and the content that displays when the tab " +
+    "is selected. As a non-visual structural component, it serves as a container that " +
+    "organizes content into distinct, switchable sections.",
+  docFolder: "Tabs",
   props: {
     label: dLabel(),
   },

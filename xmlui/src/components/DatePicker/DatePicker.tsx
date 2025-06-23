@@ -37,7 +37,10 @@ const COMP = "DatePicker";
 export const DatePickerMd = createMetadata({
   status: "experimental",
   description:
-    "A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.",
+    "`DatePicker` provides an interactive calendar interface for selecting single dates " +
+    "or date ranges, with customizable formatting and validation options. It displays " +
+    "a text input that opens a calendar popup when clicked, offering both keyboard and " +
+    "mouse interaction.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),

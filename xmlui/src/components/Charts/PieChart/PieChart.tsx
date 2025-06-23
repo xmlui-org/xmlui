@@ -8,8 +8,11 @@ import { createComponentRenderer } from "../../../components-core/renderers";
 const COMP = "PieChart";
 
 export const PieChartMd = createMetadata({
-  description: "Represents a pie chart component.",
+  description:
+    "`PieChart` visualizes proportional data as circular segments; each slice " +
+    "represents a percentage of the whole.",
   status: "experimental",
+  docFolder: "Charts/PieChart",
   props: {
     data: {
       description: "The data to be displayed in the chart. Needs to be an array of objects.",
@@ -42,7 +45,9 @@ export const PieChartMd = createMetadata({
     },
     width: d("The width of the chart"),
     height: d("The height of the chart"),
-    outerRadius: d("The outer radius of the pie chart, can be a number or a string (e.g., '100%')."),
+    outerRadius: d(
+      "The outer radius of the pie chart, can be a number or a string (e.g., '100%').",
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

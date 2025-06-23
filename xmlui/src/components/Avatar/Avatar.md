@@ -1,3 +1,13 @@
+%-DESC-START
+
+**Key features:**
+- **Automatic fallback**: Shows initials when no image URL is provided or image fails to load
+- **Multiple sizes**: From `xs` (extra small) to `lg` (large) to fit different contexts
+- **Clickable**: Supports click events for profile actions, modals, or navigation
+- **Accessible**: Automatically generates appropriate alt text from the name
+
+%-DESC-END
+
 %-PROP-START name
 
 ```xmlui-pg copy display name="Example: name"

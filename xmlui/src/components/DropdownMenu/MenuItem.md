@@ -1,6 +1,13 @@
 %-DESC-START
 
-See the [`DropdownMenu` component](./DropdownMenu) for using this component in menus.
+**Key features:**
+- **Action handling**: Support both navigation (`to` property) and custom click handlers
+- **Visual feedback**: Built-in active, hover, and disabled states for clear user interaction
+- **Icon support**: Optional icons with flexible positioning (start or end)
+- **Menu integration**: Designed to work seamlessly within `DropdownMenu` and `SubMenuItem` hierarchies
+
+**Usage pattern:**
+Always used within menu containers like `DropdownMenu`. Use `to` for navigation or `onClick` for custom actions. For complex menu structures, combine with `MenuSeparator` and `SubMenuItem` components.
 
 %-DESC-END
 

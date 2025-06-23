@@ -1,9 +1,11 @@
 %-DESC-START
 
->[!INFO]
-> `Heading` follows the basic rules of the HTML heading elements (`<h1>`, ..., `<h6>`).
+**Key features:**
+- **Semantic levels**: Choose from h1 through h6 for proper document structure and accessibility
+- **Text overflow control**: Automatic ellipses and line limiting for long headings
+- **Anchor generation**: Optional hover anchors for deep linking to specific sections
 
-For the shorthand versions see their reference page: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
+For the shorthand versions see: [H1](/components/H1), [H2](/components/H2), [H3](/components/H3), [H4](/components/H4), [H5](/components/H5), [H6](/components/H6).
 
 ```xmlui-pg copy display name="Example: Headings with levels"
 <App>

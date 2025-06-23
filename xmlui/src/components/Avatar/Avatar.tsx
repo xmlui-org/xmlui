@@ -9,7 +9,11 @@ import { Avatar, defaultProps } from "./AvatarNative";
 const COMP = "Avatar";
 
 export const AvatarMd = createMetadata({
-  description: `The \`${COMP}\` component represents a user, group (or other entity's) avatar with a small image or initials.`,
+  description:
+    "`Avatar` displays a user or entity's profile picture as a circular image, " +
+    "with automatic fallback to initials when no image is provided. It's commonly " +
+    "used in headers, user lists, comments, and anywhere you need to represent a " +
+    "person or organization.",
   props: {
     size: {
       description: `This property defines the display size of the ${COMP}.`,

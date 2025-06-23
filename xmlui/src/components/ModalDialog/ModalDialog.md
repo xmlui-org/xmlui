@@ -1,5 +1,12 @@
 %-DESC-START
 
+**Key features:**
+- **Overlay presentation**: Appears above existing content with backdrop dimming
+- **Programmatic control**: Open and close via exposed methods like `open()` and `close()`
+- **Parameter passing**: Accept data when opened for dynamic dialog content
+- **Focus management**: Automatically handles focus trapping and accessibility
+- **Form integration**: When containing Form components, automatically closes on form submission or cancellation (unless overridden)
+
 ## Using the Component
 
 >[!INFO]

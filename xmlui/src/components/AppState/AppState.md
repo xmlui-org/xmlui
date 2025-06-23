@@ -1,5 +1,10 @@
 %-DESC-START
 
+**Key advantages over variables:**
+- **Global accessibility**: Any component can access the state by referencing the same `bucket`
+- **Automatic reactivity**: UI updates automatically when state changes, no manual prop passing required
+- **Cross-component coordination**: Perfect for user sessions, UI preferences, loading states, and shared data
+
 ## Using AppState
 
 Variables in xmlui are a straightforward tool for managing states. However, a variable's scope is the app's main file or the particular component file in which it is declared. To access the variable's value (the stored state), you must pass its value to components wanting to leverage it.

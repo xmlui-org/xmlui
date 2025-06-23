@@ -13,7 +13,7 @@ The component provides a surface on which you can drag files or paste files from
   <FileUploadDropZone backgroundColor="cyan" height="100px"
     onUpload="
       (files) => {
-        console.log(files);
+        console.log(files); 
         files.map(file => toast('file ' + file.path + ' uploaded'))}" />
 </App>
 ---desc

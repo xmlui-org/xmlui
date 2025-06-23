@@ -29,9 +29,9 @@ const COMP = "App";
 export const AppMd = createMetadata({
   status: "stable",
   description:
-    `The \`${COMP}\` component provides a UI frame for XMLUI apps. According to predefined (and ` +
-    `run-time configurable) structure templates, \`${COMP}\` allows you to display your ` +
-    `preferred layout.`,
+    "The `App` component is the root container that defines your application's overall " +
+    "structure and layout. It provides a complete UI framework with built-in navigation, " +
+    "header, footer, and content areas that work together seamlessly.",
   props: {
     layout: {
       description:

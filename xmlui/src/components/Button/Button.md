@@ -1,6 +1,10 @@
 %-DESC-START
 
-Use the `Button` component to trigger various actions.
+**Key features:**
+- **Visual hierarchy**: Choose from `solid`, `outlined`, or `ghost` variants to indicate importance
+- **Theme colors**: Use `primary`, `secondary`, or `attention` colors for different action types
+- **Icon support**: Add icons before or after text, or create icon-only buttons
+- **Form integration**: Automatically handles form submission when used in forms
 
 %-DESC-END
 

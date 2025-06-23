@@ -140,6 +140,19 @@ export class MetadataProcessor {
       result += addNonVisualDisclaimer(component.nonVisual);
 
       result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
+
+      // Add context variables if they exist
+      if (component.contextVars && Object.keys(component.contextVars ?? {}).length > 0) {
+        result += "\n\n**Context variables available during execution:**";
+        result += "\n\n";
+        Object.entries(component.contextVars)
+          .sort()
+          .forEach(([contextVarName, contextVar]) => {
+            if (contextVar.isInternal || !contextVar.description) return;
+            result += `- \`${contextVarName}\`: ${contextVar.description}\n`;
+          });
+      }
+      
       result += "\n\n";
 
       result += addChildrenTemplateSection(component);
@@ -356,22 +369,6 @@ function combineDescriptionAndDescriptionRef(
 
   if (component[SECTION_DESCRIPTION]) {
     descriptionBuffer = component[SECTION_DESCRIPTION];
-  }
-
-  if (sectionId === DESCRIPTION) {
-    if (component.contextVars && Object.keys(component.contextVars ?? {}).length > 0) {
-      descriptionBuffer +=
-        "\n\nThe component provides context values with which you can access some internal properties:";
-      descriptionBuffer += "\n\n";
-      Object.entries(component.contextVars)
-        .sort()
-        .forEach(([contextVarName, contextVar]) => {
-          if (contextVar.isInternal || !contextVar.description) return;
-          descriptionBuffer += `- \`${contextVarName}\`: ${contextVar.description}\n`;
-        });
-    } else {
-      descriptionBuffer += "\n\n";
-    }
   }
 
   if (sectionId === PROPS) {
@@ -608,10 +605,11 @@ function appendArticleId(articleId) {
 }
 
 function addNonVisualDisclaimer(isNonVisual) {
-  return isNonVisual
-    ? ">[!WARNING]\n> This component does not show up on the UI; " +
-        "it merely helps implement UI logic.\n\n"
-    : "";
+  return ""; // Temporarily disabled
+  // return isNonVisual
+  //   ? ">[!WARNING]\n> This component does not show up on the UI; " +
+  //       "it merely helps implement UI logic.\n\n"
+  //   : "";
 }
 
 function addDefaultValue(component) {
@@ -687,7 +685,10 @@ function listThemeVars(component) {
       return partAValue.localeCompare(partBValue);
     })
     // --- Only list theme vars that contain the component name
-    .filter((themeVar) => !component.limitThemeVarsToComponent || themeVar.indexOf(component.displayName) !== -1)
+    .filter(
+      (themeVar) =>
+        !component.limitThemeVarsToComponent || themeVar.indexOf(component.displayName) !== -1,
+    )
     .map((themeVar) => {
       const parts = themeVar.split(":");
       if (parts.length > 1) {

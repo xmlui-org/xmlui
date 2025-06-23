@@ -4,8 +4,6 @@
 
 It is often used in forms, see [this guide](/forms) for details.
 
-To add new lines to the input field press `Shift` + `Enter`.
-
 ## Properties [#properties]
 
 ### `autoFocus (default: false)` [#autofocus-default-false]

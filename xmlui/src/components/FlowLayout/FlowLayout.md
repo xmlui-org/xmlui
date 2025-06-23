@@ -1,6 +1,6 @@
 %-DESC-START
 
-For details on how to work with \`FlowLayout\` (like sizing children), see [this guide](../learning/using-components/layout-components.mdx#flowlayout).
+For details on how to work with \`FlowLayout\` (like sizing children), see [this guide](/layout#flowlayout).
 
 ## Using `SpaceFiller` with `FlowLayout`
 

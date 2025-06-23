@@ -1,5 +1,23 @@
 %-DESC-START
 
+**Key characteristics:**
+- **Conditional loading**: Use `when` property to prevent fetching until dependent data is ready
+- **Built-in caching**: Prevents unnecessary requests and provides instant data access
+- **Polling support**: Automatically refetch data at specified intervals
+- **Data transformation**: Process and filter responses before components use the data
+
+## Preventing the `DataSource` from Executing
+
+Prevent the `DataSource` from executing until the specified condition in the `when` attribute is true.
+
+```xmlui
+<DataSource
+  id="userProfile"
+  url="/api/users/{selectedUserId}/profile"
+  when="{selectedUserId}" />
+```
+
+
 ## Structural Sharing
 
 `DataSource` uses a technique called "structural sharing" to ensure that as many data references as possible will be kept intact and not cause extra UI refresh. If data is fetched from an API endpoint, you'll usually get a completely new reference by json parsing the response. However, `DataSource` will keep the original reference if *nothing* has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts.

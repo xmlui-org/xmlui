@@ -1,8 +1,6 @@
 %-DESC-START
 
-The `TextArea` is an input control component and is often used in forms. See the [Using Forms](../learning/forms.mdx) guide for details.
-
-To add new lines to the input field press `Shift` + `Enter`.
+It is often used in forms, see [this guide](/forms) for details.
 
 %-DESC-END
 

@@ -1,10 +1,8 @@
 %-DESC-START
 
-These sections are identified by their names: primary and secondary. They have a draggable bar between them.
-
 Most properties of the component focus on the primary section (e.g. sizing).
 
-See also: [\`HSplitter\`](./HSplitter.mdx), [\`VSplitter\`](./VSplitter.mdx).
+See also: [HSplitter](/components/HSplitter), [VSplitter](/components/VSplitter).
 
 %-DESC-END
 

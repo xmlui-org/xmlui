@@ -9,9 +9,8 @@ const COMP = "FormSection";
 export const FormSectionMd = createMetadata({
   status: "experimental",
   description:
-      `The \`${COMP}\` is a component that groups cohesive elements together within ` +
-      `a \`Form\`. This grouping is indicated visually: the child components of the \`${COMP}\` ` +
-      `are placed in a [\`FlowLayout\`](./FlowLayout.mdx) component.`,
+    "`FormSection` groups elements within a `Form`. Child components are placed in " +
+    "a [FlowLayout](/components/FlowLayout).",
 });
 
 const componentSource = `

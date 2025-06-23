@@ -1,5 +1,10 @@
 %-DESC-START
 
+**Key features:**
+- **Hierarchical organization**: Supports nested submenus for complex menu structures
+- **Flexible triggers**: Customizable button trigger or use your own trigger component
+- **Progressive disclosure**: Reveals options on demand
+
 You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
 
 ```xmlui-pg copy display name="Example: Using DropdownMenu" height="240px"

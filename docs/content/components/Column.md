@@ -1,4 +1,5 @@
 # Column [#column]
+
 `Column` defines the structure and behavior of individual table columns within a [`Table`](/components/Table) component. Each Column controls data binding, header display, sorting capabilities, sizing, and can contain any XMLUI components for rich cell content.
 
 **Key features:**
@@ -8,12 +9,14 @@
 - **Layout control**: Set width using pixels, star sizing (`*`, `2*`), or proportional values
 - **Column pinning**: Pin columns to left or right edges for sticky behavior
 
-**Context variables available for embedded components:**
-- `$item`: The complete data row object being rendered
-- `$cell`: The specific cell value for this column
-- `$itemIndex` / `$rowIndex`: Zero-based row index
-- `$colIndex`: Zero-based column index
+**Context variables available during execution:**
 
+- `$cell`: The specific cell value for this column
+- `$colIndex`: Zero-based column index
+- `$item`: The complete data row object being rendered
+- `$itemIndex`: Zero-based row index
+- `$row`: The complete data row object being rendered (the same as `$item`).
+- `$rowIndex`: Zero-based row index (the same as `$itemIndex`).
 
 ## Properties [#properties]
 
@@ -100,9 +103,9 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
 ```xmlui copy /canSort/
 <App>
   <Table data='{[...]}'>
-    <Column bindTo="name" />
-    <Column bindTo="quantity" />
-    <Column bindTo="unit" />
+    <Column canSort="true" bindTo="name" />
+    <Column canSort="true" bindTo="quantity" />
+    <Column canSort="false" bindTo="unit" />
   </Table>
 </App>
 ```

@@ -34,8 +34,10 @@ const COMP = "NumberBox";
 export const NumberBoxMd = createMetadata({
   status: "stable",
   description:
-    `A \`${COMP}\` component allows users to input numeric values: either integer or floating ` +
-    `point numbers. It also accepts empty values, where the stored value will be of type \`null\`.`,
+    "`NumberBox` provides a specialized input field for numeric values with built-in " +
+    "validation, spinner buttons, and flexible formatting options. It supports both " +
+    "integer and floating-point numbers, handles empty states as null values, and " +
+    "integrates seamlessly with form validation.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),

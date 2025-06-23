@@ -20,6 +20,10 @@
 </App>
 ```
 
+**Context variables available during execution:**
+
+- `$item`: This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option.
+
 ## Properties [#properties]
 
 ### `autoFocus (default: false)` [#autofocus-default-false]

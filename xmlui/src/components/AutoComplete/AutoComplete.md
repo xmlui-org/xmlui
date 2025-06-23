@@ -1,5 +1,11 @@
 %-DESC-START
 
+**Key features:**
+- **Type-ahead filtering**: Users can type to narrow down options in real-time
+- **Multi-select support**: Set `multi="true"` to allow selecting multiple items
+- **Custom option creation**: Enable `creatable="true"` to let users add new options
+- **Rich customization**: Use `optionTemplate` to create complex option layouts
+
 ## Using AutoComplete
 
 ```xmlui-pg copy display height="200px" name="Example: Using AutoComplete"

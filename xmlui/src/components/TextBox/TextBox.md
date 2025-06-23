@@ -1,3 +1,14 @@
+%-DESC-START
+
+**Key features:**
+- **Visual enhancements**: Add icons and text at start/end positions for context and branding
+- **Validation states**: Built-in visual indicators for valid, warning, and error states
+- **Input control**: Support for initial values, programmatic focus, and value setting
+
+Often used in forms, see [this guide](/forms) for details.
+
+%-DESC-END
+
 %-PROP-START placeholder
 
 ```xmlui-pg copy display name="Example: placeholder"

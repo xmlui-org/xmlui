@@ -6,8 +6,10 @@ const COMP = "Column";
 
 export const ColumnMd = createMetadata({
   description:
-    `The \`${COMP}\` component can be used within a \`Table\` to define a particular table ` +
-    `column's visual properties and data bindings.`,
+    "`Column` defines the structure and behavior of individual table columns " +
+    "within a [`Table`](/components/Table) component. Each Column controls data " +
+    "binding, header display, sorting capabilities, sizing, and can contain any " +
+    "XMLUI components for rich cell content.",
   props: {
     bindTo: {
       description:
@@ -49,7 +51,7 @@ export const ColumnMd = createMetadata({
       description:
         `This property allows the column to be pinned to ` +
         `the \`left\` (left-to-right writing style) or \`right\` (left-to-right writing style) edge ` +
-        "of the table. If the writing style is right-to-left, the locations are switched. " + 
+        "of the table. If the writing style is right-to-left, the locations are switched. " +
         "If this property is not set, the column is not pinned to any edge.",
       availableValues: ["left", "right"],
       valueType: "string",
@@ -66,22 +68,22 @@ export const ColumnMd = createMetadata({
   },
   contextVars: {
     $item: {
-      description: "The data item being rendered.",
-    },
-    $row: {
-      description: "The data item being rendered (the same as \`$item\`).",
-    },
-    $itemIndex: {
-      description: "The index of the data item being rendered.",
-    },
-    $rowIndex: {
-      description: "The index of the data item being rendered (the same as \`$itemIndex\`).",
-    },
-    $colIndex: {
-      description: "The index of the column being rendered.",
+      description: "The complete data row object being rendered",
     },
     $cell: {
-      description: "The value of the cell being rendered.",
+      description: "The specific cell value for this column",
+    },
+    $itemIndex: {
+      description: "Zero-based row index",
+    },
+    $colIndex: {
+      description: "Zero-based column index",
+    },
+    $row: {
+      description: "The complete data row object being rendered (the same as \`$item\`).",
+    },
+    $rowIndex: {
+      description: "Zero-based row index (the same as \`$itemIndex\`).",
     },
   },
 });

@@ -4,7 +4,9 @@ import { createComponentRenderer } from "./renderers";
 
 const COMP = "Fragment";
 export const FragmentMd = createMetadata({
-  description: `The \`${COMP}\` component encloses multiple child components into a single root component, so it can be used where only a single component definition is allowed.`,
+  description:
+    "`Fragment` provides conditional rendering and grouping of components. It's often " +
+    "used to hide components until their dependent variables are available.",
   opaque: true,
 });
 

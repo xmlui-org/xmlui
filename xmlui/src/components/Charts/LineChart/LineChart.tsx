@@ -5,7 +5,11 @@ import { createComponentRenderer } from "../../../components-core/renderers";
 const COMP = "LineChart";
 
 export const LineChartMd = createMetadata({
-  description: "Represents a line chart component.",
+  description:
+    "`LineChart` displays data as connected points over a continuous axis, ideal " +
+    "for showing trends, changes over time, or relationships between variables. " +
+    "Use it time series data, progress tracking, and comparing multiple data " +
+    "series on the same scale.",
   status: "experimental",
   props: {
     data: {

@@ -1,6 +1,6 @@
 %-DESC-START
 
-See the \`FlowLayout\` reference documentation for details on sizing children.
+See [this guide](/forms) for details.
 
 %-DESC-END
 

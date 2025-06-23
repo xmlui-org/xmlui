@@ -7,8 +7,10 @@ const COMP = "ChangeListener";
 
 export const ChangeListenerMd = createMetadata({
   description:
-    `\`${COMP}\` is a functional component (it renders no UI) to trigger an action when a ` +
-    `particular value (component property, state, etc.) changes.`,
+    "`ChangeListener` is an invisible component that watches for changes in values " +
+    "and triggers actions in response. It's essential for creating reactive behavior " +
+    "when you need to respond to data changes, state updates, or component property " +
+    "modifications outside of normal event handlers.",
   props: {
     listenTo: {
       description:

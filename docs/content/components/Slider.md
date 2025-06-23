@@ -7,7 +7,6 @@
 - **Step control**: Precise incremental selection with customizable step values
 - **Value formatting**: Custom display formatting for current values and visual feedback
 
-
 ## Properties [#properties]
 
 ### `autoFocus (default: false)` [#autofocus-default-false]

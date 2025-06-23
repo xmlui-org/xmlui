@@ -13,9 +13,9 @@ export const defaultProps = {
 
 export const RedirectMd = createMetadata({
   description:
-    `\`${COMP}\` is a component that immediately redirects the browser to the URL in its ` +
-    `\`to\` property when it gets visible (its \`when\` property gets \`true\`). The ` +
-    `redirection works only within the app.`,
+    "`Redirect` immediately redirects the browser to the URL in its `to` property when " +
+    "it gets visible (its `when` property gets `true`). It works only within " +
+    "[App](/components/App), not externally.",
   props: {
     to: {
       description: `This property defines the URL to which this component is about to redirect requests.`,

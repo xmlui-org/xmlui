@@ -1,4 +1,5 @@
 # APICall [#apicall]
+
 `APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks.
 
 **Key characteristics:**
@@ -8,10 +9,11 @@
 - **Built-in notifications**: Supports automatic progress, success, and error messages
 
 **Context variables available during execution:**
+
+- `$error`: Error details (available in `errorNotificationMessage` and `error` event)
 - `$param`: The first parameter passed to `execute()` method
 - `$params`: Array of all parameters passed to `execute()` method (access with `$params[0]`, `$params[1]`, etc.)
 - `$result`: Response data (available in `completedNotificationMessage` and `success` event)
-- `$error`: Error details (available in `errorNotificationMessage` and `error` event)
 
 ## Properties [#properties]
 
@@ -29,7 +31,7 @@ This property customizes the success message displayed in a toast after the fini
  <APICall
   id="ds"
   method="post"
-  url="/api/shopping-list"
+  url="/api/shopping-list" 
   completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
 ```
 
@@ -55,7 +57,7 @@ This property customizes the message displayed in a toast when the API invocatio
  <APICall
   id="ds"
   method="post"
-  url="/api/shopping-list"
+  url="/api/shopping-list" 
   errorNotificationMessage="${error.statusCode}, {JSON.stringify($error.details)}" />
 ```
 

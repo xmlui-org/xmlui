@@ -1,7 +1,9 @@
 %-DESC-START
 
->[!INFO]
-> You can learn more details about using this component [here](../learning/using-components/app-component).
+**Key features:**
+- **Logo customization**: Use `logoTemplate` to create rich logo designs beyond simple images
+- **Profile menu**: Add user authentication displays, settings menus, or action buttons via `profileMenuTemplate`
+- **Layout integration**: Automatically positioned and styled based on your App's `layout` property
 
 %-DESC-END
 

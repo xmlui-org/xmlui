@@ -8,7 +8,11 @@ import { createComponentRenderer } from "../../../components-core/renderers";
 const COMP = "LabelList";
 
 export const LabelListMd = createMetadata({
-  description: "Label list component for a chart component.",
+  description:
+    "`LabelList` adds custom data labels to chart components when automatic " +
+    "labeling isn't sufficient. It's a specialized component for advanced chart " +
+    "customization scenarios where you need precise control over label positioning " +
+    "and appearance.",
   status: "experimental",
   props: {
     key: {

@@ -8,7 +8,10 @@ const COMP = "Icon";
 
 export const IconMd = createMetadata({
   status: "stable",
-  description: `This component is the representation of an icon.`,
+  description:
+    "`Icon` displays scalable vector icons from XMLUI's built-in icon registry " +
+    "using simple name references. Icons are commonly used in buttons, navigation " +
+    "elements, and status indicators.",
   props: {
     name: d(
       "This string property specifies the name of the icon to display. All icons have " +

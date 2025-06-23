@@ -8,9 +8,9 @@ const COMP = "EmojiSelector";
 
 export const EmojiSelectorMd = createMetadata({
   status: "experimental",
-  description: 
-    `The \`${COMP}\` component provides users with a graphical interface to browse, search and ` + 
-    `select emojis to insert into text fields, messages, or other forms of communication.`,
+  description:
+    "`EmojiSelector` enables users to browse, search and select emojis from " +
+    "their system's native emoji set.",
   props: {
     autoFocus: {
       ...dAutoFocus(),

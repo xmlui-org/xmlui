@@ -17,8 +17,9 @@ const COMP = "Splitter";
 
 const baseSplitterMd = createMetadata({
   description:
-    `The \`${COMP}\` component divides a container (such as a window, panel, pane, etc.) ` +
-    `into two resizable sections.`,
+    "`Splitter` component divides a container into two resizable sections. These " +
+    "are are identified by their names: primary and secondary. They have a " +
+    "draggable bar between them.",
   props: {
     swapped: {
       description:

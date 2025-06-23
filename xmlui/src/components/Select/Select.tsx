@@ -31,7 +31,11 @@ import { SelectItemText } from "@radix-ui/react-select";
 const COMP = "Select";
 
 export const SelectMd = createMetadata({
-  description: "Provides a dropdown with a list of options to choose from.",
+  description:
+    "`Select` provides a dropdown interface for choosing from a list of options, " +
+    "supporting both single and multiple selection modes. It offers extensive " +
+    "customization capabilities including search functionality, custom templates, " +
+    "and comprehensive form integration.",
   status: "stable",
   props: {
     placeholder: {
@@ -114,10 +118,8 @@ export const SelectMd = createMetadata({
     ),
   },
   contextVars: {
-    $item: d(`This property represents the value of an item in the dropdown list.`),
-    $itemContext: d(
-      `This property provides a \`removeItem\` method to delete the particular value from the selection.`,
-    ),
+    $item: d("Represents the current option's data (label and value properties)"),
+    $itemContext: d("Provides utility methods like `removeItem()` for multi-select scenarios"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

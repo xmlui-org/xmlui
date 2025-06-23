@@ -9,8 +9,8 @@ const COMP = "FileUploadDropZone";
 
 export const FileUploadDropZoneMd = createMetadata({
   description:
-    `The \`${COMP}\` component allows users to upload files to a web application by dragging ` +
-    `and dropping files from their local file system onto a designated area within the UI.`,
+    "`FileUploadDropZone` enables users to upload files by dragging and dropping " +
+    "files from their local file system onto a designated area within the UI.",
   props: {
     text: {
       description:

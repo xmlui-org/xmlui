@@ -19,7 +19,10 @@ import {
 const COMP = "Markdown";
 
 export const MarkdownMd = createMetadata({
-  description: `\`${COMP}\` displays plain text styled using markdown syntax.`,
+  description:
+    "`Markdown` renders formatted text using markdown syntax. Use " +
+    "[Text](/working-with-text) for simple, styled text content, and `Markdown` " +
+    "when you need [rich formatting](/working-with-markdown).",
   themeVars: parseScssVar(styles.themeVars),
   props: {
     content: d(
