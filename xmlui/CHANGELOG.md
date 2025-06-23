@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.57
+
+### Patch Changes
+
+- 93a1e70: fix: NavPanel - use layoutCss
+
 ## 0.9.56
 
 ### Patch Changes
