@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.17
+
+### Patch Changes
+
+- 84a660d: fix: devtools - turn off stickyScroll
+
 ## 0.1.16
 
 ### Patch Changes
