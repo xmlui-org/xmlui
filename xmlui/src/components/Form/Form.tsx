@@ -10,7 +10,7 @@ import { FormWithContextVar, defaultProps } from "./FormNative";
 const COMP = "Form";
 
 export const FormMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
     `A \`${COMP}\` is a fundamental component that displays user interfaces that allow users to input ` +
     `(or change) data and submit it to the app (a server) for further processing.`,

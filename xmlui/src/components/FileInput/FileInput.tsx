@@ -28,10 +28,10 @@ const COMP = "FileInput";
 const DEFAULT_ICON = "browse:FileInput";
 
 export const FileInputMd = createMetadata({
+  status: "stable",
   description:
     `The \`${COMP}\` is a user interface component that allows users to select files from their ` +
     `device's file system for upload (or processing its content otherwise).`,
-  status: "experimental",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),

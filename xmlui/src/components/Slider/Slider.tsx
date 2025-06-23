@@ -26,7 +26,7 @@ import { Slider, defaultProps } from "./SliderNative";
 const COMP = "Slider";
 
 export const SliderMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
     `The \`${COMP}\` component allows you to select a numeric value ` +
     `between a range specified by minimum and maximum values.`,
