@@ -183,3 +183,35 @@ export function removeAdjacentNewlines(buffer) {
   }
   return result;
 }
+
+/**
+ * The summary file may contain further sections other than the summary table.
+ * Thus, we only (re)generate the section that contains the summary table.
+ * This is done by finding the heading for the start of the summary table section
+ * and either the end of file or the next section heading.
+ * @param {string} buffer the string containing the file contents
+ * @param {string} sectionHeading The section to look for, has to have heading level as well
+ */
+export function getSectionBeforeAndAfter(buffer, sectionHeading) {
+  if (!sectionHeading) {
+    return { beforeSection: buffer, afterSection: "" };
+  }
+
+  const lines = strBufferToLines(buffer);
+  const sectionStartIdx = lines.findIndex((line) => line.includes(sectionHeading));
+
+  // Handle case where sectionHeading isn't found
+  if (sectionStartIdx === -1) {
+    return { beforeSection: buffer, afterSection: "" };
+  }
+
+  // Find the next heading after the section start
+  const afterLines = lines.slice(sectionStartIdx + 1);
+  const sectionEndIdx = afterLines.findIndex((line) => /^#+\s/.test(line));
+  const endIdx = sectionEndIdx === -1 ? afterLines.length : sectionEndIdx;
+
+  const beforeSection = lines.slice(0, sectionStartIdx).join("\n");
+  const afterSection = afterLines.slice(0, endIdx).join("\n");
+
+  return { beforeSection, afterSection };
+}

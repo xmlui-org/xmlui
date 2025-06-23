@@ -20,7 +20,7 @@ const [components, htmlTagComponents] = partitionMetadata(
 await generateComponents(components);
 
 // --- Temporarily disabled
-// const packagesMetadata = await dynamicallyLoadExtensionPackages();
+//const packagesMetadata = await dynamicallyLoadExtensionPackages();
 // await generateExtenionPackages(packagesMetadata);
 
 // --- Helpers
@@ -82,9 +82,6 @@ async function generateExtenionPackages(metadata) {
       indexFile,
     );
 
-    // Create summary and index file for extension package
-    await extensionGenerator.generateComponentsSummary(`## Package Components`, indexFile, false);
-
     // Generate a _meta.json for the files in the extension
     extensionGenerator.writeMetaSummary(componentsAndFileNames, packageFolder);
   }
@@ -133,16 +130,9 @@ async function generateComponents(metadata) {
 
   let componentsAndFileNames = metadataGenerator.generateDocs();
 
-  if (componentsConfig?.exportToJson) {
-    await metadataGenerator.exportMetadataToJson();
-  }
-
   const summaryTitle = "Components Overview";
   const summaryFileName = "_overview";
-  await metadataGenerator.generateComponentsSummary(
-    `# ${summaryTitle}`,
-    join(outputFolder, `${summaryFileName}.md`),
-  );
+  await metadataGenerator.exportMetadataToJson();  
   componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
 
   metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
@@ -162,10 +152,7 @@ async function generateHtmlTagComponents(metadata) {
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
-  await metadataGenerator.generateComponentsSummary(
-    "# HtmlTag Components",
-    join(FOLDERS.pages, "html-tag-components.md"),
-  );
+  
 }
 
 async function cleanFolder(folderToClean) {

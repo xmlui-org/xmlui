@@ -3,14 +3,12 @@ import { existsSync, writeFileSync } from "fs";
 import { unlink, readFile, writeFile, readdir } from "fs/promises";
 import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import { MetadataProcessor } from "./MetadataProcessor.mjs";
-import { createTable, strBufferToLines, toHeadingPath } from "./utils.mjs";
+import { getSectionBeforeAndAfter, strBufferToLines, toHeadingPath } from "./utils.mjs";
 import { buildPagesMap } from "./build-pages-map.mjs";
 import { buildDownloadsMap } from "./build-downloads-map.mjs";
 import { FOLDERS } from "./folders.mjs";
 
 logger.setLevels(LOGGER_LEVELS.warning, LOGGER_LEVELS.error);
-const ACCEPTED_STATUSES = ["stable", "experimental", "deprecated", "in progress"];
-const DEFAULT_STATUS = "stable";
 
 export class DocsGenerator {
   metadata = [];
@@ -78,11 +76,15 @@ export class DocsGenerator {
     }
   }
 
-  async exportMetadataToJson() {
+  async exportMetadataToJson(folderName) {
     logger.info("Exporting metadata to JSON");
     try {
+      const outPath = join(FOLDERS.script, folderName ?? "");
+      if (!existsSync(outPath)) {
+        await mkdir(outPath, { recursive: true });
+      }
       await writeFile(
-        join(FOLDERS.script, "metadata.json"),
+        join(outPath, "metadata.json"),
         JSON.stringify(this.metadata, null, 2),
       );
     } catch (error) {
@@ -111,43 +113,6 @@ export class DocsGenerator {
         beforeSection + "\n" + sectionHeading + "\n\n" + packageDescription + afterSection;
 
       await writeFile(outFile, section.trim());
-    } catch (error) {
-      processError(error);
-    }
-  }
-
-  /**
-   * Generates the component summary table and adds it to the provided file.
-   * The function looks for the summary section in the provided file and regenerates it if present,
-   * otherwise it appends one to the end of the file.
-   * @param {string} summarySectionName The section to look for and add the summary to
-   * @param {string?} summaryFileName The full path and name of the file to add the summary to
-   * @param {boolean?} hasRowNums Whether to add row numbers to the summary table
-   */
-  async generateComponentsSummary(summarySectionName, summaryFileName, hasRowNums) {
-    logger.info("Creating components summary");
-    try {
-      const outFile = summaryFileName || join(this.folders.outFolder, `_overview.md`);
-      if (!existsSync(outFile)) {
-        await writeFile(outFile, "");
-      }
-
-      const fileContents = await readFile(outFile, "utf8");
-
-      const table = createSummary(
-        this.metadata,
-        this.folders.sourceFolder,
-        this.folders.outFolder,
-        hasRowNums,
-      );
-      let { beforeSection, afterSection } = getSectionBeforeAndAfter(
-        fileContents,
-        summarySectionName,
-      );
-
-      beforeSection = beforeSection.length > 0 ? beforeSection + "\n\n" : beforeSection;
-      const summary = beforeSection + `${summarySectionName}\n\n` + table + "\n" + afterSection;
-      await writeFile(outFile, summary);
     } catch (error) {
       processError(error);
     }
@@ -192,65 +157,6 @@ export class DocsGenerator {
       processError(error);
     }
   }
-}
-
-/**
- * The summary file may contain further sections other than the summary table.
- * Thus, we only (re)generate the section that contains the summary table.
- * This is done by finding the heading for the start of the summary table section
- * and either the end of file or the next section heading.
- * @param {string} buffer the string containing the file contents
- * @param {string} sectionHeading The section to look for, has to have heading level as well
- */
-function getSectionBeforeAndAfter(buffer, sectionHeading) {
-  if (!sectionHeading) {
-    return { beforeSection: buffer, afterSection: "" };
-  }
-
-  const lines = strBufferToLines(buffer);
-  const sectionStartIdx = lines.findIndex((line) => line.includes(sectionHeading));
-
-  // Handle case where sectionHeading isn't found
-  if (sectionStartIdx === -1) {
-    return { beforeSection: buffer, afterSection: "" };
-  }
-
-  // Find the next heading after the section start
-  const afterLines = lines.slice(sectionStartIdx + 1);
-  const sectionEndIdx = afterLines.findIndex((line) => /^#+\s/.test(line));
-  const endIdx = sectionEndIdx === -1 ? afterLines.length : sectionEndIdx;
-
-  const beforeSection = lines.slice(0, sectionStartIdx).join("\n");
-  const afterSection = afterLines.slice(0, endIdx).join("\n");
-
-  return { beforeSection, afterSection };
-}
-
-function createSummary(metadata, srcFolder, outFolder, hasRowNums = true) {
-  const headers = [
-    { value: "Component", style: "center" },
-    "Description",
-    //{ value: "Status", style: "center" },
-  ];
-  const rows = metadata
-    .sort((a, b) => a.displayName.localeCompare(b.displayName))
-    .filter((component) => {
-      const componentStatus = component.status ?? DEFAULT_STATUS;
-      return !ACCEPTED_STATUSES.includes(componentStatus) ? false : true;
-    })
-    .map((component) => {
-      const componentFilePath = join(outFolder, `${component.displayName}.md`);
-      const componentUrl = `./${basename(srcFolder)}/${component.displayName}`;
-      return [
-        existsSync(componentFilePath)
-          ? `[${component.displayName}](${componentUrl})`
-          : component.displayName,
-        component.description,
-        //component.status ?? DEFAULT_STATUS,
-      ];
-    });
-
-  return createTable({ headers, rows, rowNums: hasRowNums });
 }
 
 function addDescriptionRef(component, entries = []) {
