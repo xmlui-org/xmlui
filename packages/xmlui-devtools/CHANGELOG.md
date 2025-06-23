@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.16
+
+### Patch Changes
+
+- 9345bd4: Turn off sticky scroll
+
 ## 0.1.15
 
 ### Patch Changes
