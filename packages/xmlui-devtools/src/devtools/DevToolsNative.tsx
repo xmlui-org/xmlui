@@ -146,6 +146,7 @@ export const DevTools = () => {
             top: 10,
             bottom: 10,
           },
+          stickyScroll: { enabled: false },
         });
       });
     }
