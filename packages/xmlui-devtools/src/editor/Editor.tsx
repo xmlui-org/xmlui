@@ -58,6 +58,7 @@ export const Editor = ({
         minimap: { enabled: false },
         overviewRulerLanes: 0,
         hideCursorInOverviewRuler: true,
+        stickyScroll: { enabled: false },
       }}
       language={language}
       value={value}
