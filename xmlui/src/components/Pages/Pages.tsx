@@ -8,10 +8,12 @@ const PAGE = "Page";
 
 export const PageMd = createMetadata({
   status: "stable",
-  docFolder: PAGE,
+  docFolder: "Pages",
   description:
-    `The \`${PAGE}\` component defines what content is displayed when the user navigates ` +
-    `to a particular URL that is associated with the page.`,
+    "`Page` defines route endpoints within an application, mapping specific URL " +
+    "patterns to content that displays when users navigate to those routes. Each " +
+    "Page represents a distinct view or screen in your single-page application's " +
+    "routing system.",
   props: {
     //TODO illesg rename to path
     url: d(
@@ -46,8 +48,8 @@ const COMP = "Pages";
 
 export const PagesMd = createMetadata({
   description:
-    `The \`${COMP}\` component is used as a container for [\`Page\`](/components/Page) components ` +
-    `within an [\`App\`](/components/App).`,
+    "`Pages` serves as the routing coordinator within an [App](/components/App), " +
+    "managing which [Page](/components/Page)  displays based on the current URL.",
   props: {
     defaultRoute: {
       description: `The default route when displaying the app`,

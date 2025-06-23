@@ -12,7 +12,11 @@ const COMP = "Tabs";
 
 export const TabsMd = createMetadata({
   status: "experimental",
-  description: `The \`${COMP}\` component provides a tabbed layout where each tab has a clickable label and content.`,
+  description:
+    "`Tabs` enables users to switch among content panels using clickable tab headers. " +
+    "It provides an efficient way to present multiple related sections in a single " +
+    "interface area, with each tab containing distinct content defined by " +
+    "[TabItem](/components/TabItem) components.",
   props: {
     activeTab: d(
       `This property indicates the index of the active tab. The indexing starts from 0, ` +

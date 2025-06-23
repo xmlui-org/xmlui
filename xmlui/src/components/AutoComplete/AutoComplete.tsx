@@ -31,8 +31,10 @@ const COMP = "AutoComplete";
 
 export const AutoCompleteMd = createMetadata({
   description:
-    "This component is a dropdown with a list of options. According to the " +
-    "`multi` property, the user can select one or more items.",
+    "`AutoComplete` is a searchable dropdown input that allows users to type and " +
+    "filter through options, with support for single or multiple selections. Unlike " +
+    "a basic [`Select`](/components/Select), it provides type-ahead functionality " +
+    "and can allow users to create new options.",
   status: "experimental",
   props: {
     placeholder: dPlaceholder(),

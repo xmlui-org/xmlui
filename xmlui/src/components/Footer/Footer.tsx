@@ -8,7 +8,10 @@ import { Footer, defaultProps } from "./FooterNative";
 const COMP = "Footer";
 
 export const FooterMd = createMetadata({
-  description: `The \`${COMP}\` is a component that acts as a placeholder within \`App\`.`,
+  description:
+    "`Footer` provides a designated area at the bottom of your application for " +
+    "footer content such as branding, copyright notices, or utility controls like " +
+    "theme toggles.",
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {

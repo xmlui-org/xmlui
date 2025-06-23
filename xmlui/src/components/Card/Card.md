@@ -1,5 +1,10 @@
 %-desc-START
 
+**Key features:**
+- **Pre-styled elements**: Built-in support for `title`, `subtitle`, and `avatarUrl` properties
+- **Flexible layout**: Choose `vertical` (default) or `horizontal` orientation
+- **Visual grouping**: Automatic styling with background, borders, and spacing
+- **Clickable areas**: Supports click events for interactive cards
 ## Using Card
 
 `Card` is a container; it does not have any explicit properties.

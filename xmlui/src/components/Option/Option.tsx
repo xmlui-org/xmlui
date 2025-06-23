@@ -9,9 +9,11 @@ const COMP = "Option";
 
 export const OptionMd = createMetadata({
   description:
-    `\`${COMP}\` is a non-visual component describing a selection option. Other components ` +
-    `(such as \`Select\`, \`AutoComplete\`, and others) may use nested \`Option\` instances ` +
-    `from which the user can select.`,
+    "`Option` defines selectable items for choice-based components, providing both " +
+    "the underlying value and display text for selection interfaces. It serves as " +
+    "a non-visual data structure that describes individual choices within " +
+    "[Select](/components/Select), [AutoComplete](/components/AutoComplete), " +
+    "and other selection components.",
   props: {
     label: d(
       `This property defines the text to display for the option. If \`label\` is not defined, ` +

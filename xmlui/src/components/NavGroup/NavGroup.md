@@ -1,5 +1,12 @@
 %-DESC-START
 
+**Key features:**
+- **Hierarchical organization**: Creates nested menu structures by containing NavLinks and other NavGroups
+- **Expand/collapse behavior**: Users can toggle visibility of grouped navigation items
+- **Customizable icons**: Different icons for expanded/collapsed states and layout orientations
+- **Flexible placement**: Works within NavPanel for app navigation or standalone for custom menus
+- **Initial state control**: Configure whether groups start expanded or collapsed
+
 ## Using `NavGroup`
 
 The primary use of a `NavGroup` is to create an application menu with submenus, as the following example shows:

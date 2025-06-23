@@ -10,7 +10,6 @@
 - **Accessibility support**: Proper keyboard navigation and screen reader compatibility
 - **Validation indicators**: Visual feedback for error, warning, and valid states
 
-
 `RadioGroup` is often used in forms. See [this guide](/forms) for details.
 
 ## Properties [#properties]

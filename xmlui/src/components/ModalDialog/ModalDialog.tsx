@@ -6,14 +6,15 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject } from "../../components-core/theming/themes/base-utils";
 import { MemoizedItem } from "../container-helpers";
 import { ModalDialog, ModalDialogFrame, defaultProps } from "./ModalDialogNative";
-import { describe } from "yargs";
 
 const COMP = "ModalDialog";
 
 export const ModalDialogMd = createMetadata({
   description:
-    `The \`${COMP}\` component defines a modal dialog UI element that can be displayed over ` +
-    `the existing UI - triggered by some action.`,
+    "`ModalDialog` creates overlay dialogs that appear on top of the main interface, " +
+    "ideal for forms, confirmations, detailed views, or any content that requires " +
+    "focused user attention. Dialogs are programmatically opened using the `open()` " +
+    "method and can receive parameters for dynamic content.",
   props: {
     fullScreen: {
       description:
@@ -51,14 +52,9 @@ export const ModalDialogMd = createMetadata({
     ),
   },
   contextVars: {
-    $param: d(
-      "This value represents the first parameters passed to the \`open()\` method to " +
-        "display the modal dialog.",
-    ),
+    $param: d("First parameter passed to the `open()` method"),
     $params: d(
-      "This value represents the array of parameters passed to the \`open()\` method. " +
-        "You can use \`$params[0]\` to access the first and \`$params[1]\` to access the " +
-        "second (and so on) parameters. \`$param\` is the same as \`$params[0]\`.",
+      "Array of all parameters passed to `open()` method (access with `$params[0]`, `$params[1]`, etc.)",
     ),
   },
   themeVars: parseScssVar(styles.themeVars),

@@ -8,12 +8,13 @@
 - **Flexible labeling**: Supports labels, helper text, and various label positioning options
 - **Layout management**: Handles consistent spacing and alignment of form elements
 
-**Context variables:**
+See [this guide](/forms) for details.
+
+**Context variables available during execution:**
+
 - `$setValue`: Function to set the FormItem's value programmatically
 - `$validationResult`: Current validation state and error messages for this field
 - `$value`: Current value of the FormItem, accessible in expressions and code snippets
-
-See [this guide](/forms) for details.
 
 ## Properties [#properties]
 
@@ -52,9 +53,9 @@ Note how changing the input in the demo below will result in a slight delay of i
     onSubmit="(toSave) => toast(JSON.stringify(toSave))">
     <FormItem
       customValidationsDebounce="3000"
-      onValidate="(value) => {
-        validations += '| ';
-        return value === value.toUpperCase();
+      onValidate="(value) => { 
+        validations += '| '; 
+        return value === value.toUpperCase(); 
       }"
       bindTo="name" />
     <Text value="{validations}" />

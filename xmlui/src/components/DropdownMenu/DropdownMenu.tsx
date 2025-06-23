@@ -19,8 +19,11 @@ const DDMCOMP = "DropdownMenu";
 
 export const DropdownMenuMd = createMetadata({
   description:
-    `This component represents a dropdown menu with a trigger. When the user clicks the trigger, ` +
-    `the dropdown menu displays its items.`,
+    "`DropdownMenu` provides a space-efficient way to present multiple options or " +
+    "actions through a collapsible interface. When clicked, the trigger button reveals " +
+    "a menu that can include items, separators, and nested submenus, making it ideal " +
+    "for navigation, action lists, or any situation requiring many options without " +
+    "permanent screen space.",
   props: {
     label: dLabel(),
     triggerTemplate: dTriggerTemplate(DDMCOMP),
@@ -50,7 +53,8 @@ export const DropdownMenuMd = createMetadata({
       defaultValue: defaultDropdownMenuProps.triggerButtonThemeColor,
     },
     triggerButtonIcon: {
-      description: `This property defines the icon to display on the trigger button. You can change the default icon ` +
+      description:
+        `This property defines the icon to display on the trigger button. You can change the default icon ` +
         `for all ${DDMCOMP} instances with the "icon.triggerButton:DropdownMenu" declaration in the app ` +
         `configuration file.`,
       defaultValue: defaultDropdownMenuProps.triggerButtonIcon,
@@ -107,7 +111,11 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
 const MICOMP = "MenuItem";
 
 export const MenuItemMd = createMetadata({
-  description: `This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action.`,
+  description:
+    "`MenuItem` represents individual clickable items within dropdown menus and other " +
+    "menu components. Each menu item can display text, icons, and respond to clicks " +
+    "with either navigation or custom actions, making it the building block for " +
+    "interactive menu systems.",
   docFolder: DDMCOMP,
   props: {
     iconPosition: {
@@ -177,7 +185,11 @@ export const menuItemRenderer = createComponentRenderer(
         label={extractValue(node.props?.label)}
         style={layoutCss}
         iconPosition={extractValue(node.props.iconPosition)}
-        icon={node.props?.icon && <Icon name={extractValue(node.props.icon)} fallback={extractValue(node.props.icon)} />}
+        icon={
+          node.props?.icon && (
+            <Icon name={extractValue(node.props.icon)} fallback={extractValue(node.props.icon)} />
+          )
+        }
         active={extractValue.asOptionalBoolean(node.props.active, false)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
       >
@@ -190,7 +202,13 @@ export const menuItemRenderer = createComponentRenderer(
 const SMCOMP = "SubMenuItem";
 
 export const SubMenuItemMd = createMetadata({
-  description: "This component represents a nested menu item within another menu or menu item.",
+  description:
+    "`SubMenuItem` creates hierarchical menu structures by acting as both a menu " +
+    "item and a container for nested menu items. When clicked or hovered, it reveals " +
+    "a submenu containing additional [MenuItem](/components/MenuItem), " +
+    "[MenuSeparator](/components/MenuSeparator), or other " +
+    "[SubMenuItem](/components/SubMenuItems) components, enabling complex multi-level " +
+    "navigation and action organization.",
   docFolder: DDMCOMP,
   props: {
     label: dLabel(),
@@ -216,7 +234,9 @@ export const subMenuItemRenderer = createComponentRenderer(
 const MSEP = "MenuSeparator";
 
 export const MenuSeparatorMd = createMetadata({
-  description: "This component displays a separator line between menu items.",
+  description:
+    "`MenuSeparator` displays a separator line between menu items to group related " +
+    "menu options within `DropdownMenu`.",
   docFolder: DDMCOMP,
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,

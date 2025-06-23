@@ -33,9 +33,10 @@ const filteredValidationSeverityValues = validationSeverityValues.filter(
 export const FormItemMd = createMetadata({
   status: "stable",
   description:
-    `A \`${COMP}\` component represents a single input element within a \`Form\`. The value within ` +
-    `the \`${COMP}\` may be associated with a particular property within the encapsulating \`Form\` ` +
-    `component's data.`,
+    "`FormItem` wraps individual input controls within a `Form`, providing data " +
+    "binding, validation, labeling, and layout functionality. It connects form " +
+    "controls to the parent form's data model and handles validation feedback " +
+    "automatically.",
   props: {
     bindTo: {
       description:
@@ -199,17 +200,9 @@ export const FormItemMd = createMetadata({
     ),
   },
   contextVars: {
-    $value: d(
-      `The context variable represents the current value of the \`${COMP}\`. It can be used in ` +
-        `expressions and code snippets within the \`${COMP}\` instance.`,
-    ),
-    $setValue: d(
-      `This function can be invoked to set the \`${COMP}\` instance's value. The function has a ` +
-        `single argument, the new value to set.`,
-    ),
-    $validationResult: d(
-      `This variable represents the result of the latest validation of the \`${COMP}\` instance.`,
-    ),
+    $value: d("Current value of the FormItem, accessible in expressions and code snippets"),
+    $setValue: d("Function to set the FormItem's value programmatically"),
+    $validationResult: d("Current validation state and error messages for this field"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

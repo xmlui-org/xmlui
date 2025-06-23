@@ -54,7 +54,7 @@ This situation is where `AppState` comes into the picture. With an `AppState` in
 
 Let's turn the previous example into one using `AppState`! The following code shows how we change the main app file:
 
-```xmlui-pg
+```xmlui-pg 
 ---app copy display filename="Main.xmlui"
 <App>
   <AppState id="appState" initialValue="{{ enhancedMode: false }}"/>

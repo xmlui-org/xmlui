@@ -11,8 +11,8 @@ const COMP = "FlowLayout";
 
 export const FlowLayoutMd = createMetadata({
   description:
-    "This layout component is used to position content in rows with an auto wrapping feature: if " +
-    "the length of the items exceed the available space the layout will wrap into a new line.",
+    "`FlowLayout` positions content in rows with automatic wrapping. When items " +
+    "exceed the available horizontal space, they automatically wrap to a new line.",
   props: {
     gap: {
       description:

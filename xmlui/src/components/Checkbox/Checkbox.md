@@ -1,6 +1,11 @@
 %-DESC-START
 
-To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](../learning/using-components/forms).
+**Key features:**
+- **Flexible labeling**: Position labels on any side and support custom label templates
+- **Validation support**: Built-in validation states for form error handling
+- **Indeterminate state**: Special visual state for mixed selections (useful for "select all" scenarios)
+
+To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](/forms).
 
 %-DESC-END
 

@@ -1,5 +1,10 @@
 %-DESC-START
 
+**Key features:**
+- **Custom actions**: Execute JavaScript code instead of navigation when using onClick handlers
+- **Visual customization**: Support for icons, labels, and completely custom nested content
+- **Accessibility support**: Proper focus management and keyboard navigation
+
 ## Using NavLink
 
 ### `NavLink` Appearance

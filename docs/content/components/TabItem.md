@@ -11,7 +11,6 @@
 **Usage pattern:**
 Always used as a direct child of [Tabs](/components/Tabs) components. The `label` property defines the tab button text, while child components placed within the TabItem provide the content that displays when the tab is selected.
 
-
 ## Properties [#properties]
 
 ### `label` [#label]

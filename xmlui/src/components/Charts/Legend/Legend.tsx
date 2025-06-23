@@ -10,7 +10,11 @@ import {
 const COMP = "Legend";
 
 export const LegendMd = createMetadata({
-  description: "Legend component to be displayed in a chart component.",
+  description:
+    "`Legend` provides a standalone legend for chart components when you need " +
+    "custom positioning or styling beyond the chart's built-in `showLegend` " +
+    "property. Most charts can display legends automatically, but this component " +
+    "offers precise control over legend placement and alignment.",
   status: "experimental",
   props: {
     align: {

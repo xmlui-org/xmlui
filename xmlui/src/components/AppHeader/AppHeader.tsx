@@ -12,7 +12,10 @@ const COMP = "AppHeader";
 
 export const AppHeaderMd = createMetadata({
   status: "stable",
-  description: `\`${COMP}\` is a placeholder within \`App\` to define a custom application header.`,
+  description:
+    "`AppHeader` defines the top navigation bar of your application within the " +
+    "[`App`](/components/App) component. It automatically handles logo placement, " +
+    "application title, and user profile areas with built-in responsive behavior.",
   props: {
     profileMenuTemplate: dComponent(
       `This property makes the profile menu slot of the \`${COMP}\` component customizable.`,

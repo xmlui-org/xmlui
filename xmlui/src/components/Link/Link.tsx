@@ -11,8 +11,10 @@ const COMP = "Link";
 
 export const LinkMd = createMetadata({
   description:
-    `A \`${COMP}\` component represents a navigation target within the app or a ` +
-    `reference to an external web URL.`,
+    "`Link` creates clickable navigation elements for internal app routes or " +
+    "external URLs. You can use the `label` and `icon` properties for simple text " +
+    "links, or embed custom components like buttons, cards, or complex layouts " +
+    "for rich interactive link presentations.",
   props: {
     to: d(
       "This property defines the URL of the link. If the value is not defined, the link cannot be activated.",
@@ -31,7 +33,9 @@ export const LinkMd = createMetadata({
       type: "string",
     },
     label: dLabel(),
-    icon: d(`This property allows you to add an optional icon (specify the icon's name) to the link.`),
+    icon: d(
+      `This property allows you to add an optional icon (specify the icon's name) to the link.`,
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   themeVarDescriptions: {

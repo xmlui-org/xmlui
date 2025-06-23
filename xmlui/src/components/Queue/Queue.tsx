@@ -7,8 +7,8 @@ const COMP = "Queue";
 
 export const QueueMd = createMetadata({
   description:
-    `The \`Queue\` component provides an API to enqueue elements and defines events to process ` +
-    `queued elements in a FIFO order.`,
+    "`Queue` manages sequential processing of items in FIFO (first-in, first-out) " +
+    "order. It is a non-visual component but provides UI progress reporting and result display.",
   props: {
     progressFeedback: d(
       "This property defines the component template of the UI that displays " +

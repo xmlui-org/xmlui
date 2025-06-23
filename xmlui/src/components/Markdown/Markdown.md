@@ -1,5 +1,11 @@
 %-DESC-START
 
+**Key features:**
+- **Rich formatting**: Support for headings, bold, italic, lists, links, images, blockquotes, and code blocks
+- **Dynamic content**: Use `@{}` binding expressions to inject variables and function results
+- **File loading**: Load markdown content from external files using the `data` property
+- **Binding expressions**: Evaluate variables and function calls within markdown content
+
 ## Using Markdown
 
 The `Markdown` component allows you to specify its textual content in two ways:

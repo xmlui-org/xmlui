@@ -7,15 +7,17 @@ const COMP = "Logo";
 export const LogoMd = createMetadata({
   status: "stable",
   description:
-    `The \`${COMP}\` component represents a logo or a brand symbol. Usually, you use ` +
-    `this component in the [\`AppHeader\`](./AppHeader.mdx#logotemplate).`,
+    "`Logo` displays your application's brand symbol by automatically loading logo " +
+    "images defined in the app manifest. While logos are typically configured " +
+    "using App-level properties (`logo`, `logo-dark`), this component provides " +
+    "direct control when you need custom logo placement or templating.",
   props: {
     alt: {
       description: "Alternative text for the logo image for accessibility.",
       type: "string",
       defaultValue: defaultProps.alt,
-    }
-  }
+    },
+  },
 });
 
 export const logoComponentRenderer = createComponentRenderer(

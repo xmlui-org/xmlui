@@ -12,8 +12,10 @@ const COMP = "NavGroup";
 
 export const NavGroupMd = createMetadata({
   description:
-    `The \`${COMP}\` component is a container for grouping related navigation targets ` +
-    `(\`NavLink\` components). It can be displayed as a submenu in the App's UI.`,
+    "`NavGroup` creates collapsible containers for organizing related navigation " +
+    "items into hierarchical menu structures. It groups `NavLink` components and " +
+    "other `NavGroup` components, providing expandable submenus with customizable " +
+    "icons and states.",
   props: {
     label: dLabel(),
     initiallyExpanded: d(

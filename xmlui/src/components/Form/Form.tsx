@@ -12,8 +12,10 @@ const COMP = "Form";
 export const FormMd = createMetadata({
   status: "stable",
   description:
-    `A \`${COMP}\` is a fundamental component that displays user interfaces that allow users to input ` +
-    `(or change) data and submit it to the app (a server) for further processing.`,
+    "`Form` provides a structured container for collecting and validating user " +
+    "input, with built-in data binding, validation, and submission handling. It " +
+    "automatically manages form state and provides context for nested form controls " +
+    "to work together.",
   props: {
     buttonRowTemplate: dComponent(
       `This property allows defining a custom component to display the buttons at the bottom of the form.`,

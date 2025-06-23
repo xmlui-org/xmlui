@@ -13,9 +13,10 @@ const COMP = "List";
 export const ListMd = createMetadata({
   status: "stable",
   description:
-    `The \`${COMP}\` component is a robust layout container that renders associated data items ` +
-    `as a list of components. \`${COMP}\` is virtualized; it renders only items that are visible ` +
-    `in the viewport.`,
+    "`List` is a high-performance, virtualized container for rendering large " +
+    "datasets with built-in grouping, sorting, and visual formatting. It only " +
+    "renders visible items in the viewport, making it ideal for displaying " +
+    "thousands of records while maintaining smooth scrolling performance.",
   props: {
     data: d(
       `The component receives data via this property. The \`data\` property is a list of items ` +
@@ -113,12 +114,11 @@ export const ListMd = createMetadata({
     ),
   },
   contextVars: {
-    $item: d(`This property represents the value of an item in the data list.`),
-    $itemIndex: dComponent(
-      "This integer value represents the current row index (zero-based) while rendering children.",
-    ),
-    $isFirst: dComponent("This boolean value indicates if the component renders its first item."),
-    $isLast: dComponent("This boolean value indicates if the component renders its last item."),
+    $item: d("Current data item being rendered"),
+    $itemIndex: dComponent("Zero-based index of current item"),
+    $isFirst: dComponent("Boolean indicating if this is the first item"),
+    $isLast: dComponent("Boolean indicating if this is the last item"),
+    $group: dComponent("Group information when using `groupBy` (available in group templates)"),
   },
   themeVars: parseScssVar(styles.themeVars),
 });

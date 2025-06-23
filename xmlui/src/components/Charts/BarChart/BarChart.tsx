@@ -6,9 +6,11 @@ const COMP = "BarChart";
 
 export const BarChartMd = createMetadata({
   description:
-    `The \`${COMP}\` component represents a bar chart.` +
-    `Accepts a \`LabelLst\` component as a child to parametrize display labels.`,
+    "`BarChart` displays data as horizontal or vertical bars, supporting both grouped " +
+    "and stacked layouts. It's ideal for comparing values across categories, showing " +
+    "revenue trends, or displaying any quantitative data over time or categories.",
   status: "experimental",
+  docFolder: "Charts/BarChart",
   props: {
     data: {
       description:

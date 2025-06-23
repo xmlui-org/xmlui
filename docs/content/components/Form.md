@@ -10,6 +10,10 @@
 
 See [this guide](/forms) for details.
 
+**Context variables available during execution:**
+
+- `$data`: This property represents the value of the form data. You can access the fields of the form using the IDs in the `bindTo` property of nested `FormItem` instances. `$data` also provides an `update` method as a shortcut to the Form's exposed `update` method.
+
 ## Properties [#properties]
 
 ### `buttonRowTemplate` [#buttonrowtemplate]
@@ -40,7 +44,7 @@ The following example demonstrates using it:
         </HStack>
       </property>
   </Form>
-</App>
+</App>  
 ---desc
 This example mimics a one-second search and turns off the submit button during the operation. Also, it adds a Test Search Server button:
 ```
@@ -127,7 +131,7 @@ The form infrastructure fires this event when the form is submitted. The event a
         zeroOrPositive="true" />
     </FlowLayout>
   </Form>
-</App>
+</App>  
 ```
 
 ## Exposed Methods [#exposed-methods]
@@ -140,7 +144,7 @@ Call this event to reset the form to its initial state.
 
 You can pass a data object to update the form data. The properties in the passed data object are updated to their values accordingly. Other form properties remain intact.
 
-This method updates the form data with the change passed in its parameter. The parameter is a hash object, and this method updates the Form's properties accordingly.
+This method updates the form data with the change passed in its parameter. The parameter is a hash object, and this method updates the Form's properties accordingly. 
 
 ```xmlui-pg copy display name="Example: update"
 <App>
@@ -162,7 +166,7 @@ This method updates the form data with the change passed in its parameter. The p
       Update name and age
     </Button>
   </Form>
-</App>
+</App>  
 ```
 
 ## Styling [#styling]

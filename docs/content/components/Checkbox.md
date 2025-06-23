@@ -168,9 +168,9 @@ This event is triggered when value of Checkbox has changed.
 ```xmlui-pg copy display name="Example: didChange"
 <App verticalAlignment="center" var.changes="">
   <Checkbox label="Changeable" onDidChange="changes += '+'" />
-  <Checkbox
-    label="Readonly"
-    readOnly="true"
+  <Checkbox 
+    label="Readonly" 
+    readOnly="true" 
     onDidChange="changes += '-'" />
   <Text value="Changes: {changes}" />
 </App>

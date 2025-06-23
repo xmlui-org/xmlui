@@ -6,7 +6,6 @@ The `App` component is the root container that defines your application's overal
 - **Layout templates**: Choose from 7 predefined layouts (horizontal, vertical, condensed, etc.) with sticky navigation options
 - **Routing**: Built-in page routing via the [Pages](/components/Pages) component
 
-
 ## Properties [#properties]
 
 ### `defaultTheme (default: "xmlui")` [#defaulttheme-default-xmlui]

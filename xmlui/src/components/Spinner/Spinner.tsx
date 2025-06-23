@@ -9,8 +9,8 @@ const COMP = "Spinner";
 
 export const SpinnerMd = createMetadata({
   description:
-    `The \`${COMP}\` component is an animated indicator that represents a particular action ` +
-    `in progress without a deterministic progress value.`,
+    "`Spinner` is an animated indicator that represents an action in progress " +
+    "with no deterministic progress value.",
   props: {
     delay: {
       description: `The delay in milliseconds before the spinner is displayed.`,

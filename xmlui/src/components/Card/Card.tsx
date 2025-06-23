@@ -10,7 +10,11 @@ import { Card, defaultProps } from "./CardNative";
 const COMP = "Card";
 
 export const CardMd = createMetadata({
-  description: `The \`${COMP}\` component is a container for cohesive elements, often rendered visually as a card.`,
+  description:
+    "`Card` is a versatile container that groups related content with a visual " +
+    "boundary, typically featuring background color, padding, borders, and rounded " +
+    "corners. It's ideal for organizing information, creating sections, and " +
+    "establishing visual hierarchy in your interface.",
   props: {
     avatarUrl: {
       description:

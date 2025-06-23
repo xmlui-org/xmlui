@@ -9,10 +9,6 @@
 - **Focus management**: Automatically handles focus trapping and accessibility
 - **Form integration**: When containing Form components, automatically closes on form submission or cancellation (unless overridden)
 
-**Context variables:**
-- `$param`: First parameter passed to the `open()` method
-- `$params`: Array of all parameters passed to `open()` method (access with `$params[0]`, `$params[1]`, etc.)
-
 ## Using the Component [#using-the-component]
 
 >[!INFO]
@@ -54,9 +50,9 @@ showing the modal in conjunction with an updated URL so that the opened state of
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <variable name="isDialogShown" value="{false}"/>
   <Button label="Open Dialog" onClick="isDialogShown = true" />
-  <ModalDialog
-    when="{isDialogShown}"
-    title="Example Dialog"
+  <ModalDialog 
+    when="{isDialogShown}" 
+    title="Example Dialog" 
     onClose="isDialogShown = false" />
 </App>
 ---desc
@@ -83,6 +79,11 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
 
 >[!INFO]
 > When a form is nested into a modal dialog, closing the form (canceling it or completing its submit action) automatically closes the dialog.
+
+**Context variables available during execution:**
+
+- `$param`: First parameter passed to the `open()` method
+- `$params`: Array of all parameters passed to `open()` method (access with `$params[0]`, `$params[1]`, etc.)
 
 ## Properties [#properties]
 

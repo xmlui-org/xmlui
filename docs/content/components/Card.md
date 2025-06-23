@@ -7,7 +7,6 @@
 - **Flexible layout**: Choose `vertical` (default) or `horizontal` orientation
 - **Visual grouping**: Automatic styling with background, borders, and spacing
 - **Clickable areas**: Supports click events for interactive cards
-
 ## Using Card [#using-card]
 
 `Card` is a container; it does not have any explicit properties.
@@ -53,7 +52,7 @@ Available values: `xs`, `sm`, `md`, `lg`
 
 ### `avatarUrl` [#avatarurl]
 
-Show the avatar (`true`) or not (`false`). If not specified, the Card will show the first letters of the [`title`](#title).
+The url for an avarar image. If not specified, but [`showAvatar`](#showAvatar) is true, Card will show the first letters of the [`title`](#title).
 
 ### `linkTo` [#linkto]
 
@@ -83,7 +82,7 @@ Available values:
 
 ### `showAvatar (default: false)` [#showavatar-default-false]
 
-Indicates whether the Card should be displayed
+Indicates whether the avatar should be displayed
 
 Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is automatically set to true but can still be hidden.
 

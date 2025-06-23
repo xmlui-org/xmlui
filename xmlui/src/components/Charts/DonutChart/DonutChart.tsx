@@ -12,7 +12,7 @@ const defaultPropsDonut = {
 };
 
 export const DonutChartMd = createMetadata({
-  description: "Represents a derivative of the pie chart that is a donut chart.",
+  description: "A derivative of [PieChart](/components/PieChart) with a hollow center.",
   status: "experimental",
   props: {
     data: {

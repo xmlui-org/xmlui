@@ -9,7 +9,11 @@ import { NavPanel, defaultProps } from "./NavPanelNative";
 const COMP = "NavPanel";
 
 export const NavPanelMd = createMetadata({
-  description: `\`${COMP}\` is a placeholder within \`App\` to define the app's navigation (menu) structure.`,
+  description:
+    "`NavPanel` defines the navigation structure within an App, serving as a container " +
+    "for NavLink and NavGroup components that create your application's primary " +
+    "navigation menu. Its appearance and behavior automatically adapt based on the " +
+    "App's layout configuration.",
   props: {
     logoTemplate: dComponent(
       `This property defines the logo template to display in the navigation panel with the ` +
@@ -27,7 +31,7 @@ export const NavPanelMd = createMetadata({
     [`horizontalAlignment-logo-${COMP}`]: "center",
     [`backgroundColor-${COMP}`]: "$backgroundColor",
     [`backgroundColor-${COMP}-horizontal`]: "$backgroundColor-AppHeader",
-    [`border-${COMP}`]: '0px solid $borderColor',
+    [`border-${COMP}`]: "0px solid $borderColor",
     [`paddingHorizontal-${COMP}`]: "0",
     [`paddingVertical-logo-${COMP}`]: "$space-4",
     [`paddingHorizontal-logo-${COMP}`]: "$space-4",
@@ -41,15 +45,15 @@ export const navPanelRenderer = createComponentRenderer(
   NavPanelMd,
   ({ node, renderChild, layoutCss, layoutContext }) => {
     return (
-        <NavPanel
-            style={layoutCss}
-            logoContent={renderChild(node.props.logoTemplate)}
-            className={layoutContext?.themeClassName}
-            inDrawer={layoutContext?.inDrawer}
-            renderChild={renderChild}
-        >
-          {renderChild(node.children)}
-        </NavPanel>
+      <NavPanel
+        style={layoutCss}
+        logoContent={renderChild(node.props.logoTemplate)}
+        className={layoutContext?.themeClassName}
+        inDrawer={layoutContext?.inDrawer}
+        renderChild={renderChild}
+      >
+        {renderChild(node.children)}
+      </NavPanel>
     );
   },
 );

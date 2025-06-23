@@ -14,6 +14,12 @@
 
 An optional list of file types the input controls accepts provided as a string array.
 
+```xmlui-pg copy display name="Example: acceptsFileType"
+<App>
+  <FileInput acceptsFileType="{['.txt', '.jpg']}" />
+</App>
+```
+
 ### `autoFocus (default: false)` [#autofocus-default-false]
 
 If this property is set to `true`, the component gets the focus automatically when displayed.
@@ -22,15 +28,37 @@ If this property is set to `true`, the component gets the focus automatically wh
 
 The ID of the icon to display in the button. You can change the default icon for all FileInput instances with the "icon.browse:FileInput" declaration in the app configuration file.
 
+```xmlui-pg copy display name="Example: buttonIcon"
+<App>
+  <FileInput buttonIcon="drive" buttonLabel="Let there be drive" />
+  <FileInput buttonIcon="drive" />
+</App>
+```
+
 ### `buttonIconPosition (default: "start")` [#buttoniconposition-default-start]
 
 This optional string determines the location of the button icon.
 
 Available values: `start` **(default)**, `end`
 
+```xmlui-pg copy display name="Example: buttonIconPosition"
+<App>
+  <FileInput buttonIcon="drive" buttonLabel="End" buttonIconPosition="end" />
+</App>
+```
+
 ### `buttonLabel` [#buttonlabel]
 
 This property is an optional string to set a label for the button part.
+
+This property is an optional string to set a label for the button part.
+
+```xmlui-pg copy display name="Example: label"
+<App >
+  <FileInput />
+  <FileInput buttonLabel="I am the button label" />
+</App>
+```
 
 ### `buttonPosition (default: "end")` [#buttonposition-default-end]
 
@@ -51,17 +79,35 @@ Available values:
 | `md` | Medium button |
 | `lg` | Large button |
 
+```xmlui-pg copy display name="Example: buttonSize"
+<App>
+  <FileInput buttonSize="lg" />
+</App>
+```
+
 ### `buttonThemeColor (default: "primary")` [#buttonthemecolor-default-primary]
 
 The button color scheme (primary, secondary, attention)
 
 Available values: `attention`, `primary` **(default)**, `secondary`
 
+```xmlui-pg copy display name="Example: buttonThemeColor"
+<App>
+  <FileInput buttonThemeColor="secondary" />
+</App>
+```
+
 ### `buttonVariant` [#buttonvariant]
 
 The button variant to use
 
 Available values: `solid`, `outlined`, `ghost`
+
+```xmlui-pg copy display name="Example: buttonVariant"
+<App>
+  <FileInput buttonLabel="outlined" buttonVariant="outlined" />
+</App>
+```
 
 ### `directory (default: false)` [#directory-default-false]
 
@@ -104,6 +150,13 @@ This property sets the width of the `FileInput` component's label. If not define
 
 This boolean property enables to add not just one (`false`), but multiple files to the field (`true`). This is done either by dragging onto the field or by selecting multiple files in the browser menu after clicking the input field button.
 
+```xmlui-pg copy display name="Example: multiple"
+<App>
+  <FileInput multiple="false" />
+  <FileInput multiple="true" />
+</App>
+```
+
 ### `placeholder` [#placeholder]
 
 An optional placeholder text that is visible in the input field when its empty.
@@ -134,13 +187,38 @@ Available values:
 
 This event is triggered when value of FileInput has changed.
 
+Write in the input field and see how the `Text` underneath it is updated in accordingly.
+
+```xmlui-pg copy {2} display name="Example: didChange"
+<App var.field="">
+  <FileInput onDidChange="(file) => field = file[0]?.name" />
+  <Text value="{field}" />
+</App>`
+```
+
 ### `gotFocus` [#gotfocus]
 
 This event is triggered when the FileInput has received the focus.
 
+Clicking on the `FileInput` in the example demo changes the label text.
+Note how clicking elsewhere resets the text to the original.
+
+```xmlui-pg copy {3-4} display name="Example: gotFocus/lostFocus"
+<App>
+  <FileInput
+    buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
+    onGotFocus="focused = true"
+    onLostFocus="focused = false"
+    var.focused="{false}"
+  />
+</App>
+```
+
 ### `lostFocus` [#lostfocus]
 
 This event is triggered when the FileInput has lost the focus.
+
+(See the example above)
 
 ## Exposed Methods [#exposed-methods]
 
@@ -148,11 +226,31 @@ This event is triggered when the FileInput has lost the focus.
 
 This method sets the focus on the FileInput.
 
+```xmlui-pg copy {2-3} display name="Example: focus"
+<App>
+  <HStack>
+    <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+</App>
+```
+
 ### `open` [#open]
 
 This API command triggers the file browsing dialog to open.
 
+```xmlui-pg copy {3-4} display name="Example: open"
+<App>
+  <HStack>
+    <Button label="Open FileInput" onClick="fileInputComponent.open()" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+</App>
+```
+
 ### `setValue` [#setvalue]
+
+(**NOT IMPLEMENTED YET**) You can use this method to set the component's current value programmatically.
 
 (**NOT IMPLEMENTED YET**) You can use this method to set the component's current value programmatically.
 
@@ -160,6 +258,22 @@ This API command triggers the file browsing dialog to open.
 
 By setting an ID for the component, you can refer to the value of the field if set. If no value is set, the value will be undefined.
 
+In the example below, select a file using the file browser of the `FileInput` component
+and note how the `Text` component displays the selected file's name:
+
+```xmlui-pg copy {2-3} display name="Example: value"
+<App>
+  <HStack>
+    <Text value="Selected file name: {fileInputComponent.value}" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+</App>
+```
+
 ## Styling [#styling]
 
-This component does not have any styles.
+The `FileInput` component does not theme variables directly.
+However, it uses the [`Button`](./Button.mdx) and [`TextBox`](./TextBox.mdx) components under the hood.
+Thus, modifying the styles of both of these components affects the `FileInput`.
+
+See [Button styling](./Button.mdx#styling) and [TextBox styling](./TextBox.mdx#styling).

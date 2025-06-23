@@ -35,7 +35,9 @@ const COMP = "TextBox";
 
 export const TextBoxMd = createMetadata({
   status: "stable",
-  description: `The \`${COMP}\` is an input component that allows users to input and edit textual data.`,
+  description:
+    "`TextBox` captures user text input for forms, search fields, and data entry " +
+    "with support for validation, icons, and formatting hints.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: {
@@ -187,8 +189,8 @@ export const textBoxComponentRenderer = createComponentRenderer(
 export const PasswordMd = createMetadata({
   ...TextBoxMd,
   description:
-    "The \`Password\` component is a specialized version of the \`TextBox\` component that " +
-    "allows users to input and edit passwords.",
+    "`Password` is a specialized [TextBox](/components/TextBox) that enables users " +
+    "to input and edit passwords.",
 });
 
 export const passwordInputComponentRenderer = createComponentRenderer(

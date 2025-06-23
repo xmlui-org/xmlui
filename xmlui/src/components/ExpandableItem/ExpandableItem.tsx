@@ -11,19 +11,19 @@ const COMP = "ExpandableItem";
 
 export const ExpandableItemMd = createMetadata({
   description:
-    `This component represents an expandable/collapsible section, similar to the HTML details ` +
-    `element. When the user clicks on the summary, the content expands or collapses.`,
+    "`ExpandableItem` creates expandable/collapsible section, similar to the HTML " +
+    "details disclosure element. When the user clicks on the `summary` the content " +
+    "expands or collapses.",
   props: {
-    summary: dComponent(
-      "The summary content that is always visible and acts as the trigger."
-    ),
+    summary: dComponent("The summary content that is always visible and acts as the trigger."),
     initiallyExpanded: {
       description: "Determines if the component is initially expanded when rendered.",
       valueType: "boolean",
       defaultValue: defaultExpandableItemProps.initiallyExpanded,
     },
     enabled: {
-      description: "When true, the expandable item can be opened and closed. When false, it cannot be toggled.",
+      description:
+        "When true, the expandable item can be opened and closed. When false, it cannot be toggled.",
       valueType: "boolean",
       defaultValue: defaultExpandableItemProps.enabled,
     },
@@ -50,13 +50,17 @@ export const ExpandableItemMd = createMetadata({
     },
   },
   events: {
-    expandedChange: d(`This event fires when the expandable item is expanded or collapsed. It provides a boolean value indicating the new state.`),
+    expandedChange: d(
+      `This event fires when the expandable item is expanded or collapsed. It provides a boolean value indicating the new state.`,
+    ),
   },
   apis: {
     expand: d(`This method expands the expandable item.`),
     collapse: d(`This method collapses the expandable item.`),
     toggle: d(`This method toggles the expandable item's expanded state.`),
-    isExpanded: d(`This method returns a boolean indicating whether the expandable item is currently expanded.`),
+    isExpanded: d(
+      `This method returns a boolean indicating whether the expandable item is currently expanded.`,
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
@@ -89,12 +93,28 @@ export const expandableItemComponentRenderer = createComponentRenderer(
     return (
       <ExpandableItem
         summary={extractValue(node.props?.summary)}
-        initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded, defaultExpandableItemProps.initiallyExpanded)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled, defaultExpandableItemProps.enabled)}
-        iconExpanded={extractValue(node.props?.iconExpanded) ?? defaultExpandableItemProps.iconExpanded}
-        iconCollapsed={extractValue(node.props?.iconCollapsed) ?? defaultExpandableItemProps.iconCollapsed}
-        iconPosition={extractValue.asOptionalString(node.props.iconPosition) ?? defaultExpandableItemProps.iconPosition}
-        withSwitch={extractValue.asOptionalBoolean(node.props.withSwitch, defaultExpandableItemProps.withSwitch)}
+        initiallyExpanded={extractValue.asOptionalBoolean(
+          node.props.initiallyExpanded,
+          defaultExpandableItemProps.initiallyExpanded,
+        )}
+        enabled={extractValue.asOptionalBoolean(
+          node.props.enabled,
+          defaultExpandableItemProps.enabled,
+        )}
+        iconExpanded={
+          extractValue(node.props?.iconExpanded) ?? defaultExpandableItemProps.iconExpanded
+        }
+        iconCollapsed={
+          extractValue(node.props?.iconCollapsed) ?? defaultExpandableItemProps.iconCollapsed
+        }
+        iconPosition={
+          extractValue.asOptionalString(node.props.iconPosition) ??
+          defaultExpandableItemProps.iconPosition
+        }
+        withSwitch={extractValue.asOptionalBoolean(
+          node.props.withSwitch,
+          defaultExpandableItemProps.withSwitch,
+        )}
         onExpandedChange={lookupEventHandler("expandedChange")}
         style={layoutCss}
         registerComponentApi={registerComponentApi}

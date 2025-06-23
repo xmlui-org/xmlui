@@ -9,8 +9,8 @@ const COMP = "SpaceFiller";
 
 export const SpaceFillerMd = createMetadata({
   description:
-    `The \`${COMP}\` is a component that works well in layout containers to fill the ` +
-    `remaining (unused) space. Its behavior depends on the layout container in which it is used.`,
+    "`SpaceFiller` works well in layout containers to fill remaining (unused) " +
+    "space. Its behavior depends on the layout container in which it is used.",
   themeVars: parseScssVar(styles.themeVars),
 });
 

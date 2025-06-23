@@ -28,8 +28,10 @@ const COMP = "Slider";
 export const SliderMd = createMetadata({
   status: "stable",
   description:
-    `The \`${COMP}\` component allows you to select a numeric value ` +
-    `between a range specified by minimum and maximum values.`,
+    "`Slider` provides an interactive control for selecting numeric values within " +
+    "a defined range, supporting both single value selection and range selection with " +
+    "multiple thumbs. It offers precise control through customizable steps and visual " +
+    "feedback with formatted value display.",
   props: {
     initialValue: dInitialValue(),
     label: dLabel(),

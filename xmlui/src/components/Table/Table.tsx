@@ -22,8 +22,7 @@ const COMP = "Table";
 
 export const TableMd = createMetadata({
   description:
-    `\`${COMP}\` is a component that displays cells organized into rows and columns. The \`${COMP}\` ` +
-    `component is virtualized so it only renders visible cells.`,
+    "`Table` presents structured data for viewing, sorting, selection, and interaction.",
   props: {
     items: dInternal(
       `You can use \`items\` as an alias for the \`data\` property. ` +

@@ -1,3 +1,12 @@
+%-DESC-START
+
+**Key features:**
+- **Dynamic color mapping**: Automatically applies colors based on the badge value (e.g., status states)
+- **Two shape variants**: Choose between `badge` (rounded corners) or `pill` (fully rounded)
+- **Flexible color control**: Set just background color or customize both background and text colors
+
+%-DESC-END
+
 %-PROP-START value
 
 ```xmlui-pg copy display name="Example: value" 

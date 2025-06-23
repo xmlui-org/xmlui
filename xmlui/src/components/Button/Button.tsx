@@ -18,7 +18,10 @@ import { Button, defaultProps } from "./ButtonNative";
 const COMP = "Button";
 
 export const ButtonMd = createMetadata({
-  description: "Button is an interactive element that triggers an action when clicked.",
+  description:
+    "`Button` is the primary interactive component for triggering actions like " +
+    "form submissions, navigation, opening modals, and API calls. It supports " +
+    "multiple visual styles and sizes to match different UI contexts and importance levels.",
   status: "stable",
   props: {
     autoFocus: {

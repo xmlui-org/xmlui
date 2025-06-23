@@ -12,7 +12,6 @@
 **Usage pattern:**
 The component accepts only [TabItem](/components/TabItem) components as children. Other child components will not be displayed. Each [TabItem](/components/TabItem) has a `label` property for the tab button text, with content provided by placing child components within the [TabItem](/components/TabItem).
 
-
 ```xmlui-pg copy display name="Example: using Tabs" height="200px"
 <App>
   <Tabs>

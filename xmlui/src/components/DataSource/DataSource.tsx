@@ -8,9 +8,8 @@ const COMP = "DataSource";
 export const DataSourceMd = createMetadata({
   status: "stable",
   description:
-    `The \`${COMP}\` component manages fetching data from an API endpoint. This component ` +
-    `automatically manages the complexity of the fetch operation and caching. To manipulate data ` +
-    `on the backend, use the [\`APICall\`](./APICall.mdx) component.`,
+    "`DataSource` fetches and caches data from API endpoints, versus " +
+    "[`APICall`](/components/APICall) which creates, updates or deletes data.",
   props: {
     method: {
       description: `Set the HTTP method.`,

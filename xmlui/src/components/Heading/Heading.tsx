@@ -45,7 +45,11 @@ const OMIT_FROM_TOC_DESC = {
 };
 
 export const HeadingMd = createMetadata({
-  description: "Represents a heading text",
+  description:
+    "`Heading` displays hierarchical text headings with semantic importance levels " +
+    "from H1 to H6, following HTML heading standards. It provides text overflow " +
+    "handling, anchor link generation, and integrates with " +
+    "[TableOfContents](/components/TableOfContents).",
   props: {
     value: VALUE_DESC,
     level: {
@@ -62,7 +66,7 @@ export const HeadingMd = createMetadata({
         "This property indicates whether an anchor link should be displayed next to the heading. " +
         "If set to `true`, an anchor link will be displayed on hover next to the heading.",
       type: "boolean",
-    }
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
@@ -246,7 +250,14 @@ type RenderHeadingProps = {
   renderChild: RenderChildFn;
 };
 
-function renderHeading({ node, extractValue, layoutCss, level, showAnchor, renderChild }: RenderHeadingProps) {
+function renderHeading({
+  node,
+  extractValue,
+  layoutCss,
+  level,
+  showAnchor,
+  renderChild,
+}: RenderHeadingProps) {
   const { maxLines, preserveLinebreaks, ellipses, ...restProps } = node.props;
   return (
     <Heading

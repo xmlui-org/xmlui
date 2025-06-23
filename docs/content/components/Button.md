@@ -90,15 +90,15 @@ Available values:
     <Button icon="drive" label="End" iconPosition="end" />
   </HStack>
   <HStack>
-    <Button
-      icon="drive"
-      label="Start (right-to-left)"
-      iconPosition="start"
+    <Button 
+      icon="drive" 
+      label="Start (right-to-left)" 
+      iconPosition="start" 
       direction="rtl" />
-    <Button
-      icon="drive"
-      label="End (right-to-left)"
-      iconPosition="end"
+    <Button 
+      icon="drive" 
+      label="End (right-to-left)" 
+      iconPosition="end" 
       direction="rtl" />
   </HStack>
 </App>
@@ -181,7 +181,7 @@ Available values:
     <Button label="Button" themeColor="secondary" />
     <Button label="Button" themeColor="attention" />
   </HStack>
-</App>
+</App>  
 ```
 
 ### `type (default: "button")` [#type-default-button]
@@ -238,8 +238,8 @@ This event is triggered when the Button has received the focus.
 ```xmlui-pg copy display name="Example: gotFocus"
 <App var.text="No event" >
   <HStack verticalAlignment="center" >
-    <Button label="First, click me!"
-      onGotFocus="text = 'Focus received'"
+    <Button label="First, click me!" 
+      onGotFocus="text = 'Focus received'" 
       onLostFocus="text = 'Focus lost'" />
     <Text value="Then, me!"/>
   </HStack>

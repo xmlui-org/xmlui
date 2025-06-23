@@ -2,7 +2,12 @@ import type React from "react";
 
 import styles from "./Stack.module.scss";
 
-import { type ComponentDef, ComponentPropertyMetadata, createMetadata, d } from "../../abstractions/ComponentDefs";
+import {
+  type ComponentDef,
+  ComponentPropertyMetadata,
+  createMetadata,
+  d,
+} from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
@@ -30,7 +35,11 @@ const VERTICAL_ALIGNMENT: ComponentPropertyMetadata = {
 };
 
 const stackMd = createMetadata({
-  description: `\`Stack\` is a layout container displaying children in a horizontal or vertical stack.`,
+  description:
+    "`Stack` is the fundamental layout container that organizes child elements in " +
+    "configurable horizontal or vertical arrangements. As the most versatile building " +
+    "block in XMLUI's layout system, it provides comprehensive alignment, spacing, " +
+    "and flow control options that serve as the foundation for all specialized stack variants.",
   props: {
     gap: {
       description: "Optional size value indicating the gap between child elements.",
@@ -50,8 +59,9 @@ const stackMd = createMetadata({
       defaultValue: false,
     },
     orientation: {
-      description: "An optional property that governs the Stack's orientation (whether " + 
-      "the Stack lays out its children in a row or a column).",
+      description:
+        "An optional property that governs the Stack's orientation (whether " +
+        "the Stack lays out its children in a row or a column).",
       availableValues: ["horizontal", "vertical"],
       valueType: "string",
       defaultValue: defaultProps.orientation,

@@ -56,7 +56,7 @@ The `gap` property defines the gap between items in the same row and between row
   </FlowLayout>
 </App>
 ---desc
-In this markup, only four items fit in a single row.
+In this markup, only four items fit in a single row. 
 The `gap` property sets the same gaps within and between rows.
 ```
 

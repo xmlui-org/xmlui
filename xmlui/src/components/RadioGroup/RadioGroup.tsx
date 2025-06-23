@@ -26,9 +26,10 @@ const RGOption = `RadioGroupOption`;
 
 export const RadioGroupMd = createMetadata({
   description:
-    `The \`${COMP}\` input component is a group of radio buttons ` +
-    `([\`RadioGroupOption\`](./RadioGroupOption.mdx) components) that allow users to select ` +
-    `only one option from the group at a time.`,
+    "`RadioGroup` creates a mutually exclusive selection interface where users can " +
+    "choose only one option from a group of radio buttons. It manages the selection " +
+    "state and ensures that selecting one option automatically deselects all others in " +
+    "the group.",
   props: {
     initialValue: {
       ...dInitialValue(),

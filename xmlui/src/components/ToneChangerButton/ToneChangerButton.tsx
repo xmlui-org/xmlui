@@ -10,12 +10,12 @@ const DARK_TO_LIGHT_ICON = "darkToLight:ToneChangerButton";
 
 export const defaultProps = {
   lightToDarkIcon: LIGHT_TO_DARK_ICON,
-  darkToLightIcon: DARK_TO_LIGHT_ICON
+  darkToLightIcon: DARK_TO_LIGHT_ICON,
 };
 
 export const ToneChangerButtonMd = createMetadata({
   status: "stable",
-  description: `The \`${COMP}\` component is a component that allows the user to change the tone of the app.`,
+  description: "`ToneChangerButton` enables the user to switch between light and dark modes.",
   props: {
     lightToDarkIcon: {
       description:
@@ -36,7 +36,7 @@ export const ToneChangerButtonMd = createMetadata({
 
 export function ToneChangerButton({
   lightToDarkIcon = defaultProps.lightToDarkIcon,
-  darkToLightIcon = defaultProps.darkToLightIcon
+  darkToLightIcon = defaultProps.darkToLightIcon,
 }) {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
 
@@ -64,9 +64,11 @@ export const toneChangerButtonComponentRenderer = createComponentRenderer(
   COMP,
   ToneChangerButtonMd,
   ({ node, extractValue }) => {
-    return <ToneChangerButton
-      lightToDarkIcon={extractValue.asOptionalString(node.props.lightToDarkIcon)}
-      darkToLightIcon={extractValue.asOptionalString(node.props.darkToLightIcon)}
-    />;
+    return (
+      <ToneChangerButton
+        lightToDarkIcon={extractValue.asOptionalString(node.props.lightToDarkIcon)}
+        darkToLightIcon={extractValue.asOptionalString(node.props.darkToLightIcon)}
+      />
+    );
   },
 );

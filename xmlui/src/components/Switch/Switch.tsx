@@ -27,10 +27,7 @@ import { defaultProps, Toggle } from "../Toggle/Toggle";
 const COMP = "Switch";
 
 export const SwitchMd = createMetadata({
-  description:
-    `The \`${COMP}\` component is a user interface element that allows users to toggle between two states: ` +
-    `on and off. It consists of a small rectangular or circular button that can be moved left or right to ` +
-    `change its state.`,
+  description: "`Switch` enables users to toggle between two states: on and off.",
   props: {
     indeterminate: dIndeterminate(defaultProps.indeterminate),
     label: dLabel(),

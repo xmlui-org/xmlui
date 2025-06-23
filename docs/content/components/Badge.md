@@ -6,6 +6,7 @@
 - **Dynamic color mapping**: Automatically applies colors based on the badge value (e.g., status states)
 - **Two shape variants**: Choose between `badge` (rounded corners) or `pill` (fully rounded)
 - **Flexible color control**: Set just background color or customize both background and text colors
+
 ## Properties [#properties]
 
 ### `colorMap` [#colormap]
@@ -25,9 +26,9 @@ Provide the component with a list or key-value pairs in two ways:
 2. Change the background and label color
 
 ```xmlui-pg copy display {2-5} name="Example: background and label color"
-<App
-  var.simpleColorMap="{{
-    important: { label: 'red', background: 'pink' },
+<App 
+  var.simpleColorMap="{{ 
+    important: { label: 'red', background: 'pink' }, 
     unimportant: { label: 'black', background: 'gray' }
   }}">
   <Badge value="important" colorMap="{simpleColorMap}" />
@@ -40,10 +41,10 @@ Provide the component with a list or key-value pairs in two ways:
 
 The text that the component displays. If this is not defined, the component renders its children as the content of the badge. If neither text nor any child is defined, the component renders a single frame for the badge with a non-breakable space.
 
-```xmlui-pg copy display name="Example: value"
+```xmlui-pg copy display name="Example: value" 
 <App>
   <Badge value="Example badge" />
-</App>
+</App>  
 ```
 
 ### `variant (default: "badge")` [#variant-default-badge]

@@ -1,3 +1,11 @@
+%-DESC-START
+
+**Key features:**
+- **Simple iteration**: Maps data arrays to components using `$item`, `$itemIndex`, `$isFirst`, and `$isLast` context
+- **Layout agnostic**: No built-in styling or container—children determine the visual presentation
+- **Reverse ordering**: Optional `reverse` property to display data in opposite order
+- **Performance**: Lightweight alternative to `List` when you don't need virtualization or grouping
+
 # Items [#component-items]
 
 The `Items` component maps sequential data items into component instances, representing each data item as a particular component.
@@ -73,19 +81,10 @@ In the following example, the two Items are functionally the same:
 </App>
 ```
 
-## Properties
+%-DESC-END
 
-### `data`
 
-This property contains the list of data items (obtained from a data source) this component renders.
-
-### `itemTemplate`
-
-The component template to display a single item
-
-### `reverse`
-
-This property reverses the order in which data is mapped to template components.
+%-PROP-START reverse
 
 ```xmlui-pg copy {4} display name="Example: reverse"
 <App>
@@ -103,16 +102,12 @@ This property reverses the order in which data is mapped to template components.
 </App>
 ```
 
-## Events
+%-PROP-END
 
-This component does not have any events.
-
-## Exposed Methods
-
-This component does not expose any methods.
-
-## Styling
+%-STYLE-START
 
 The `Items` component does not support styling.
 You should style the container component that wraps `Items`.
 You can also style the individual items via specifying a template component.
+
+%-STYLE-END

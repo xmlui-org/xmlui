@@ -2,12 +2,6 @@
 
 `Queue` manages sequential processing of items in FIFO (first-in, first-out) order. It is a non-visual component but provides UI progress reporting and result display.
 
-**Context variables**:
-
-- `$completedItems`
-- `$queuedItems`
-
-
 ## Using Queue [#using-queue]
 
 As its name suggests, the `Queue` component keeps a queue of items to process. You can add items to the queue with the `enqueueItem` (or `enqueueItems`) method. Once the queue has some items to process, the engine reads them one by one (in FIFO order) and processes an item with the `process` event handler.
@@ -52,6 +46,11 @@ A `ChangeListener` instance observes queue length changes and stores the actual 
 ```
 
 Try the app by clicking the button several times. Check how the queue processes the items and displays feedback.
+
+**Context variables available during execution:**
+
+- `$completedItems`: A list containing the queue items that have been completed (fully processed).
+- `$queuedItems`: A list containing the items waiting in the queue, icluding the completed items.
 
 ## Properties [#properties]
 
@@ -245,7 +244,7 @@ The following example stores and displays this item when a new item is put into 
   <Button
     label="Add a new item to the queue"
     onClick="{
-      const itemId = myQueue.enqueueItem(Math.random());
+      const itemId = myQueue.enqueueItem(Math.random()); 
       itemIds += itemId + ', '; queued++;
     }" />
   <Queue id="myQueue" onProcess="processing => {}" />
@@ -302,8 +301,8 @@ The following example emulates a file-processing application. When a file is abo
     onProcessError="(error, processing) => {
       if (error.message === 'Conflict') {
         console.log(error);
-        const result = confirm('Do you want to overwrite?',
-          'File ' + processing.item.file + ' already exists',
+        const result = confirm('Do you want to overwrite?', 
+          'File ' + processing.item.file + ' already exists', 
           'Overwrite');
         $this.remove(processing.actionItemId);
         if (result) {

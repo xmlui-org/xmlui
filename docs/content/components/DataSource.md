@@ -8,6 +8,17 @@
 - **Polling support**: Automatically refetch data at specified intervals
 - **Data transformation**: Process and filter responses before components use the data
 
+## Preventing the `DataSource` from Executing [#preventing-the-datasource-from-executing]
+
+Prevent the `DataSource` from executing until the specified condition in the `when` attribute is true.
+
+```xmlui
+<DataSource
+  id="userProfile"
+  url="/api/users/{selectedUserId}/profile"
+  when="{selectedUserId}" />
+```
+
 ## Structural Sharing [#structural-sharing]
 
 `DataSource` uses a technique called "structural sharing" to ensure that as many data references as possible will be kept intact and not cause extra UI refresh. If data is fetched from an API endpoint, you'll usually get a completely new reference by json parsing the response. However, `DataSource` will keep the original reference if *nothing* has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts.
@@ -199,17 +210,6 @@ Set an optional function to perform a final transformation of the response data.
 ### `url (required)` [#url-required]
 
 Set the URL.
-
-### `when` [#when]
-
-Prevent the `DataSource` from executing until the specified condition is true.
-
-```xmlui
-<DataSource
-  id="userProfile"
-  url="/api/users/{selectedUserId}/profile"
-  when="{selectedUserId}" />
-```
 
 ## Events [#events]
 

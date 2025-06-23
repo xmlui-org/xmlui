@@ -30,8 +30,10 @@ export interface ApiActionComponent extends ComponentDef {
 
 export const APICallMd = createMetadata({
   description:
-    `\`${COMP}\` is used to mutate (create, update or delete) some data on the backend. It ` +
-    `is similar in nature to the \`DataSource\` component which retrieves data from the backend.`,
+    "`APICall` creates, updates or deletes data on the backend, versus [`DataSource`]" +
+    "(/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't " +
+    "automatically execute - you must trigger it manually with the `execute()` method, " +
+    "typically from form submissions or button clicks.",
   props: {
     method: {
       description: "The method of data manipulation can be done via setting this property.",
@@ -54,10 +56,9 @@ export const APICallMd = createMetadata({
     },
     body: {
       description:
-        "This optional property sets the request body. The object you pass here will be serialized to " +
-        "JSON when sending the request. Use the \`rawBody\` property to send another request " +
-        "body using its native format. When you define \`body\` and \`rawBody\`, the latest " +
-        "one prevails.",
+        "This optional property sets the request body. Use to pass an object that will be " +
+        "serialized as a JSON string. If you have an object that is already serialized as " +
+        "a JSON string, use `rawBody` instead.",
       valueType: "string",
     },
     queryParams: {
@@ -129,15 +130,13 @@ export const APICallMd = createMetadata({
     progress: dInternal(),
   },
   contextVars: {
-    $param: d(
-      "This value represents the first parameters passed to the \`execute()\` method to " +
-        "display the modal dialog.",
-    ),
+    $param: d("The first parameter passed to `execute()` method"),
     $params: d(
-      "This value represents the array of parameters passed to the \`execute()\` method. " +
-        "You can use \`$params[0]\` to access the first and \`$params[1]\` to access the " +
-        "second (and so on) parameters. \`$param\` is the same as \`$params[0]\`.",
+      "Array of all parameters passed to `execute()` method (access with " +
+        "`$params[0]`, `$params[1]`, etc.)",
     ),
+    $result: d("Response data (available in `completedNotificationMessage` and `success` event)"),
+    $error: d("Error details (available in `errorNotificationMessage` and `error` event)"),
   },
   apis: {
     execute: d(
