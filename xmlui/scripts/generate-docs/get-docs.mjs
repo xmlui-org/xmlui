@@ -75,15 +75,14 @@ async function generateExtenionPackages(metadata) {
     const indexFile = join(packageFolder, `${summaryFileName}.md`);
     deleteFileIfExists(indexFile);
 
+    await extensionGenerator.exportMetadataToJson("extensions", packageName);
+
     componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
     await extensionGenerator.generatePackageDescription(
       metadata[packageName].description,
       `# ${fromKebabtoReadable(packageName)} Package`,
       indexFile,
     );
-
-    // Create summary and index file for extension package
-    await extensionGenerator.generateComponentsSummary(`## Package Components`, indexFile, false);
 
     // Generate a _meta.json for the files in the extension
     extensionGenerator.writeMetaSummary(componentsAndFileNames, packageFolder);
@@ -101,7 +100,7 @@ async function generateExtenionPackages(metadata) {
         }),
     );
 
-    // Do not include the summary file
+    // Do not include the summary file in the _meta.json
     deleteFileIfExists(extensionPackagesMetafile);
     await writeFile(extensionPackagesMetafile, JSON.stringify(folderNames, null, 2));
   } catch (e) {
@@ -133,16 +132,9 @@ async function generateComponents(metadata) {
 
   let componentsAndFileNames = metadataGenerator.generateDocs();
 
-  if (componentsConfig?.exportToJson) {
-    await metadataGenerator.exportMetadataToJson();
-  }
-
   const summaryTitle = "Components Overview";
   const summaryFileName = "_overview";
-  await metadataGenerator.generateComponentsSummary(
-    `# ${summaryTitle}`,
-    join(outputFolder, `${summaryFileName}.md`),
-  );
+  await metadataGenerator.exportMetadataToJson("components");
   componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
 
   metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
@@ -162,10 +154,7 @@ async function generateHtmlTagComponents(metadata) {
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
-  await metadataGenerator.generateComponentsSummary(
-    "# HtmlTag Components",
-    join(FOLDERS.pages, "html-tag-components.md"),
-  );
+  
 }
 
 async function cleanFolder(folderToClean) {
