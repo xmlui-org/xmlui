@@ -133,3 +133,47 @@ When the handles move, the slider's `onDidChange` event updates `startDate` and 
 
 The slider's `valueFormat` property uses the same function to report the new `startDate` and `endDate`.
 
+## A custom Slider
+
+The Invoices app encapsulates this behavior in a custom component called `DateRangeSlider`.
+
+```xmlui /updateState/
+<Component name="DateRangeSlider">
+  <variable name="originalStartDate" value="{ $props.minDate }"/>
+  <variable name="maxEndDate" value="{ $props.maxDate }"/>
+  <variable name="startDate" value="{ originalStartDate }"/>
+  <variable name="endDate" value="{ maxEndDate }"/>
+  <variable name="totalDays" value="{ window.daysBetween(originalStartDate, maxEndDate)}"/>
+
+  <ChangeListener
+    listenTo="{slider.value}"
+    onDidChange="{() => {
+      console.log('slider values:', slider.value[0], slider.value[1]);
+      // Update the start and end dates based on slider values
+      updateState({
+        value: {
+          startDate: window.sliderValueToDate(slider.value[0], originalStartDate),
+          endDate: window.sliderValueToDate(slider.value[1], originalStartDate)
+        }
+      });
+      console.log('Date range:', startDate, 'to', endDate);
+    }}"
+  />
+
+  <Slider
+    id="slider"
+    label="dateRange"
+    minValue="{0}"
+    maxValue="{ totalDays }"
+    initialValue="{ [0, totalDays] }"
+    step="10"
+    valueFormat="{ (value) => {
+            const date = window.sliderValueToDate(value, originalStartDate);
+            return date;
+            }
+        }"
+  />
+</Component>
+```
+
+The `updateState` method, available in all components, is a merge operation that can set multiple variables.

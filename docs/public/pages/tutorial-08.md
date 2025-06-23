@@ -130,17 +130,6 @@ Here's the `Create Invoice` form, using cached data for clients and products. Th
 
 The `CreateInvoice` component encapsulates all the form logic. Let's review the key points.
 
-## Data sources
-
-As with `Invoices` we are again using stored data, the real API endpoints are `/clients` and `/products`.
-
-```xmlui
-<Component name="CreateInvoice">
-  <DataSource id="clients" url="/resources/files/clients.json" method="GET" />
-  <DataSource id="products" url="/resources/files/products.json" method="GET" />
-```
-
-
 ## The Form tag
 
 This [Form](/components/Form) contains a dropdown menu of products, two date pickers, and an expandable set of lineitems. These parts separately feed into the form's `$data` [context variable](/context-variables) which accumulates the JSON payload sent to the server on submit with successful validation.
@@ -177,81 +166,80 @@ There is a top-level `FormItem` for `client`, `issue_date`, `due_date`, and `lin
 Nested within `lineItems` there is a `FormItem` for `product`, `quantity`, `price`, and `amount`. Their `bindTo` attributes name and define slots in an array of `lineItems` that's dynamically built on each click of the `Add Item` button.
 
 ```xmlui /<FormItem/
-<Card>
-  <H1>Create New Invoice</H1>
+    <Card title="Create New Invoice">
+      <FlowLayout>
+        <FormItem
+          width="50%"
+          type="select"
+          placeholder="select client"
+          bindTo="client"
+          label="Client"
+          required="true"
+        >
+          <Items data="/api/clients">
+            <Option value="{$item.name}" label="{$item.name}"/>
+          </Items>
+        </FormItem>
 
-  <FlowLayout>
+        <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday() }"
+                  bindTo="issueDate" label="Issue date" width="25%"/>
 
-  <Card border="none" width="50%" padding="0">
-    <FormItem
-      type="select"
-      placeholder="select client"
-      bindTo="client"
-      label="Client"
-      required="true"
-    >
-      <Items data="{clients}">
-        <Option value="{$item.name}" label="{$item.name}" />
-      </Items>
-    </FormItem>
-  </Card>
+        <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday(30) }"
+                  bindTo="dueDate" label="Due date" width="25%"/>
+      </FlowLayout>
 
-  <Card border="none" width="25%" padding="0">
-    <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday() }"
-      bindTo="issueDate" label="Issue date" />
-  </Card>
+      <H2>Line Items</H2>
+      <FlowLayout fontWeight="bold" backgroundColor="$color-surface-100" padding="$space-2">
+        <Text width="20%">Product/Service</Text>
+        <Text width="20%">Description</Text>
+        <Text width="20%">Quantity</Text>
+        <Text width="20%">Price</Text>
+        <Text width="20%">Amount</Text>
+      </FlowLayout>
 
-  <Card border="none" width="25%" padding="0">
-    <FormItem type="datePicker" dateFormat="yyyy-MM-dd" initialValue="{ formatToday(30) }"
-      bindTo="dueDate" label="Due date" />
-  </Card>
-
-</FlowLayout>
-
-<H2>Line Items</H2>
-<FlowLayout fontWeight="bold" backgroundColor="$color-surface-100" padding="$space-2">
-  <Text width="20%">Product/Service</Text>
-  <Text width="20%">Description</Text>
-  <Text width="20%">Quantity</Text>
-  <Text width="20%">Price</Text>
-  <Text width="20%">Amount</Text>
-</FlowLayout>
-
- <FormItem
-  bindTo="lineItems"
-  type="items"
-  id="lineItemsForm"
-  required="true"
-  onValidate="(value) => Array.isArray(value) && value.length > 0 &&
-    value.every(item => item.product)"
-  requiredInvalidMessage="At least one line item is required."
->
-  <FlowLayout width="100%"
-    verticalAlignment="center">
-    <DataSource
-      id="productDetails"
-      url="/resources/files/products.json"
-      when="{$item.product != null}"
-      method="GET"
-      transformResult="{(data) => data.filter(product => product.name === $item.product)}"
-    />
-    <FormItem
-      bindTo="product"
-      type="select"
-      placeholder="select product"
-      width="20%"
-    >
-      <Items data="{products}">
-        <Option value="{$item.name}" label="{$item.name}" />
-      </Items>
-    </FormItem>
-    <Text width="20%">{ productDetails.value[0].description }</Text>
-    <FormItem width="20%" bindTo="quantity" type="number" initialValue="1" minValue="1" />
-    <FormItem width="20%" bindTo="price"  startText="$" initialValue="{ productDetails.value[0].price }" />
-    <FormItem width="13%" bindTo="amount" startText="$" enabled="false" initialValue="{ $item.price ? $item.quantity * $item.price : '' } " />
-    <Button width="2rem" onClick="lineItemsForm.removeItem($itemIndex)">X</Button>
-  </FlowLayout>
-</FormItem>
+      <FormItem
+        bindTo="lineItems"
+        type="items"
+        id="lineItemsForm"
+        required="true"
+        requiredInvalidMessage="At least one line item is required."
+      >
+        <FlowLayout width="100%">
+          <DataSource
+            id="productDetails"
+            url="/api/products/byname/{$item.product}"
+            when="{$item.product != null}"
+            method="GET"
+          />
+          <FormItem
+            bindTo="product"
+            type="select"
+            placeholder="select product"
+            width="20%"
+            required="true"
+          >
+            <Items data="/api/products">
+              <Option value="{$item.name}" label="{$item.name}"/>
+            </Items>
+          </FormItem>
+          <Text width="20%">{ productDetails.value[0].description }</Text>
+          <FormItem width="20%" bindTo="quantity" type="number" initialValue="1" minValue="1"/>
+          <FormItem width="20%" bindTo="price" startText="$" initialValue="{ productDetails.value[0].price }"/>
+          <FormItem width="13%" bindTo="amount" startText="$" enabled="false"
+                    initialValue="{ $item.price ? $item.quantity * $item.price : '' } "/>
+          <Button width="2rem" onClick="lineItemsForm.removeItem($itemIndex)">X</Button>
+        </FlowLayout>
+      </FormItem>
+      <HStack>
+        <Button onClick="lineItemsForm.addItem()">
+          Add Item
+        </Button>
+        <SpaceFiller/>
+        <Text>
+          Total: ${ window.lineItemTotal($data.lineItems) }
+        </Text>
+      </HStack>
+    </Card>
 ```
 
 ## Total for lineItems

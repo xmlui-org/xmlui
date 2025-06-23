@@ -39,7 +39,9 @@ Let's explore a subset of the app's navigation.
 </Component>
 ```
 
-That's `vertical`, here's `horizontal`.
+## Horizontal
+
+We've seen `vertical`, here's `horizontal`.
 
 ```xmlui-pg
 ---app
