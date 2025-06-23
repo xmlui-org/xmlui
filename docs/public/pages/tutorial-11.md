@@ -2,6 +2,8 @@
 
 The `ImportProducts` component uses [DataSource](/components/DataSource) with `dataType="csv"` to source data from a CSV file.
 
+> [!INFO]
+> When running the demo, look for `products.csv` in the `resources` folder.
 
 ```xmlui /dataType="csv/
 <DataSource

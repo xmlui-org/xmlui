@@ -119,6 +119,9 @@
             <Page url="/tutorial-11">
                 <DocumentPage url="/pages/tutorial-11.md" />
             </Page>
+            <Page url="/tutorial-12">
+                <DocumentPage url="/pages/tutorial-12.md" />
+            </Page>
             <Page url="/app-structure">
                 <DocumentPage url="/pages/app-structure.md"/>
             </Page>
