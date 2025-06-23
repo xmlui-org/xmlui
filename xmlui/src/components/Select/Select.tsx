@@ -32,7 +32,7 @@ const COMP = "Select";
 
 export const SelectMd = createMetadata({
   description: "Provides a dropdown with a list of options to choose from.",
-  status: "experimental",
+  status: "stable",
   props: {
     placeholder: {
       ...dPlaceholder(),

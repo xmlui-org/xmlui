@@ -31,7 +31,7 @@ const filteredValidationSeverityValues = validationSeverityValues.filter(
 );
 
 export const FormItemMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
     `A \`${COMP}\` component represents a single input element within a \`Form\`. The value within ` +
     `the \`${COMP}\` may be associated with a particular property within the encapsulating \`Form\` ` +

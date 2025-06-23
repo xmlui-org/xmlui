@@ -11,7 +11,7 @@ import { ListNative, MemoizedSection, defaultProps } from "./ListNative";
 const COMP = "List";
 
 export const ListMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
     `The \`${COMP}\` component is a robust layout container that renders associated data items ` +
     `as a list of components. \`${COMP}\` is virtualized; it renders only items that are visible ` +

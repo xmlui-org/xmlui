@@ -5,7 +5,7 @@ import { Logo, defaultProps } from "./LogoNative";
 const COMP = "Logo";
 
 export const LogoMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
     `The \`${COMP}\` component represents a logo or a brand symbol. Usually, you use ` +
     `this component in the [\`AppHeader\`](./AppHeader.mdx#logotemplate).`,

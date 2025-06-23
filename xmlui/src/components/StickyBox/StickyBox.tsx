@@ -8,7 +8,7 @@ import { StickyBox, defaultProps } from "./StickyBoxNative";
 const COMP = "StickyBox";
 
 export const StickyBoxMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
     `The \`${COMP}\` is a component that "sticks" or remains fixed at the top or bottom ` +
     `position on the screen as the user scrolls.`,

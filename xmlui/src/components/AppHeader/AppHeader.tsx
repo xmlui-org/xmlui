@@ -11,7 +11,7 @@ import { AppContextAwareAppHeader, defaultProps } from "./AppHeaderNative";
 const COMP = "AppHeader";
 
 export const AppHeaderMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description: `\`${COMP}\` is a placeholder within \`App\` to define a custom application header.`,
   props: {
     profileMenuTemplate: dComponent(

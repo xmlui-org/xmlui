@@ -14,7 +14,7 @@ export const defaultProps = {
 };
 
 export const ToneChangerButtonMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description: `The \`${COMP}\` component is a component that allows the user to change the tone of the app.`,
   props: {
     lightToDarkIcon: {

@@ -7,7 +7,7 @@ import Icon from "./IconNative";
 const COMP = "Icon";
 
 export const IconMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description: `This component is the representation of an icon.`,
   props: {
     name: d(
