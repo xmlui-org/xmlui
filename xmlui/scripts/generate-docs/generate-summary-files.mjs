@@ -1,6 +1,6 @@
 import * as fs from "fs";
-import { FOLDERS } from "./folders.mjs";
 import * as path from "path";
+import { FOLDERS } from "./folders.mjs";
 import { createTable, getSectionBeforeAndAfter } from "./utils.mjs";
 import { processError } from "./logger.mjs";
 
@@ -8,26 +8,42 @@ const ACCEPTED_STATUSES = ["stable", "experimental", "deprecated", "in progress"
 const DEFAULT_STATUS = "stable";
 
 // components
-const componentsMetaFolder = path.join(FOLDERS.script, "components");
-const outFolder = path.join(FOLDERS.docsRoot, "content", "components");
+const componentsMetaFolder = path.join(FOLDERS.script, "metadata", "components");
+const componentsOutFolder = path.join(FOLDERS.docsRoot, "content", "components");
 generateComponentsSummary(
-  path.join(componentsMetaFolder, "components-metadata.json"),
+  path.join(componentsMetaFolder, "metadata.json"),
   "components",
-  outFolder,
+  componentsOutFolder,
   "_overview.md",
   "# Components Overview",
 );
 
-// NOTE: this does not work yet, since we don't generate docs for html tags
+// NOTE: Unused
+// extensions
+// const extensionsMetaFolder = path.join(FOLDERS.script, "metadata", "extensions");
+// fs.readdirSync(extensionsMetaFolder).forEach((file) => {
+//   if (path.extname(file) === ".json") {
+
+//     let extensionName = path.basename(file, ".json");
+//     extensionName = extensionName.replace("-metadata", "");
+//     const extensionOutFolder = path.join(FOLDERS.docsRoot, "content", "extensions", extensionName);
+
+//     generateComponentsSummary(
+//       path.join(extensionsMetaFolder, file),
+//       `extensions/${extensionName}`,
+//       extensionOutFolder,
+//       `_overview.md`,
+//       "## Package Components",
+//     );
+//   }
+// });
+
+// NOTE: this does not work because we don't generate html tag docs
 // html tags
 // generateComponentsSummary(
 //   "# HtmlTag Components",
 //   join(FOLDERS.pages, "html-tag-components.md"),
 // );
-
-// NOTE: this does not work yet, since we don't generate docs for extension packages
-// extensions
-//generateComponentsSummary(`## Package Components`, indexFile, false);
 
 // ---
 

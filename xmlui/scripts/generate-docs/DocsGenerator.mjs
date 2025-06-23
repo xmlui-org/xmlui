@@ -1,6 +1,6 @@
 import { basename, extname, join } from "path";
 import { existsSync, writeFileSync } from "fs";
-import { unlink, readFile, writeFile, readdir } from "fs/promises";
+import { unlink, readFile, writeFile, readdir, mkdir } from "fs/promises";
 import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import { MetadataProcessor } from "./MetadataProcessor.mjs";
 import { getSectionBeforeAndAfter, strBufferToLines, toHeadingPath } from "./utils.mjs";
@@ -47,13 +47,14 @@ export class DocsGenerator {
           folderPath: componentFolder,
         };
 
-        const entries = addDescriptionRef(extendedComponentData, [
+        /* const entries = addDescriptionRef(extendedComponentData, [
           "props",
           "events",
           "apis",
           "contextVars",
-        ]);
-        return { ...extendedComponentData, ...entries };
+        ]); */
+        //return { ...extendedComponentData, ...entries };
+        return extendedComponentData;
       });
   }
 
@@ -76,15 +77,15 @@ export class DocsGenerator {
     }
   }
 
-  async exportMetadataToJson(folderName) {
+  async exportMetadataToJson(folderName, filename) {
     logger.info("Exporting metadata to JSON");
     try {
-      const outPath = join(FOLDERS.script, folderName ?? "");
+      const outPath = join(FOLDERS.script, "metadata", folderName ?? "");
       if (!existsSync(outPath)) {
         await mkdir(outPath, { recursive: true });
       }
       await writeFile(
-        join(outPath, "metadata.json"),
+        join(outPath, `${filename ? `${filename}-` : ""}metadata.json`),
         JSON.stringify(this.metadata, null, 2),
       );
     } catch (error) {

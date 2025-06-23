@@ -20,7 +20,7 @@ const [components, htmlTagComponents] = partitionMetadata(
 await generateComponents(components);
 
 // --- Temporarily disabled
-//const packagesMetadata = await dynamicallyLoadExtensionPackages();
+// const packagesMetadata = await dynamicallyLoadExtensionPackages();
 // await generateExtenionPackages(packagesMetadata);
 
 // --- Helpers
@@ -75,6 +75,8 @@ async function generateExtenionPackages(metadata) {
     const indexFile = join(packageFolder, `${summaryFileName}.md`);
     deleteFileIfExists(indexFile);
 
+    await extensionGenerator.exportMetadataToJson("extensions", packageName);
+
     componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
     await extensionGenerator.generatePackageDescription(
       metadata[packageName].description,
@@ -98,7 +100,7 @@ async function generateExtenionPackages(metadata) {
         }),
     );
 
-    // Do not include the summary file
+    // Do not include the summary file in the _meta.json
     deleteFileIfExists(extensionPackagesMetafile);
     await writeFile(extensionPackagesMetafile, JSON.stringify(folderNames, null, 2));
   } catch (e) {
@@ -132,7 +134,7 @@ async function generateComponents(metadata) {
 
   const summaryTitle = "Components Overview";
   const summaryFileName = "_overview";
-  await metadataGenerator.exportMetadataToJson();  
+  await metadataGenerator.exportMetadataToJson("components");
   componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
 
   metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
