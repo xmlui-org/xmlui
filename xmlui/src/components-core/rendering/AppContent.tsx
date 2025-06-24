@@ -202,8 +202,8 @@ export function AppContent({
   const isViewportLargeDesktop = useMediaQuery(
     `(min-width: ${maxWidthDesktop}) and (max-width: ${maxWidthLargeDesktopLower})`,
   );
-  let vpSize: MediaBreakpointType = "xs";
-  let vpSizeIndex = 0;
+  let vpSize;
+  let vpSizeIndex;
   const isViewportXlDesktop = useMediaQuery(`(min-width: ${maxWidthLargeDesktop})`);
   if (isViewportXlDesktop) {
     vpSize = "xxl";
@@ -220,6 +220,9 @@ export function AppContent({
   } else if (isViewportLandscapePhone) {
     vpSize = "sm";
     vpSizeIndex = 1;
+  } else if (isViewportPhone) {
+    vpSize = "xs";
+    vpSizeIndex = 0;
   }
 
   // --- Collect information about the current environment
