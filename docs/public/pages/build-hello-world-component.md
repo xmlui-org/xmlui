@@ -46,10 +46,9 @@ All XMLUI components follow this structure with the component name as the direct
 Create `xmlui/src/components/HelloWorld/HelloWorldNative.tsx`:
 
 ```xmlui copy
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import classnames from "classnames";
 import styles from "./HelloWorld.module.scss";
-import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 type Props = {
   id?: string;
@@ -142,12 +141,11 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 - **Event Handlers**: Standard React click handlers for interactivity
 - **Classnames**: Uses the `classnames` library for conditional CSS classes
 
-
+## Step 3: Create Component Styles with XMLUI Theming
 
 Create `xmlui/src/components/HelloWorld/HelloWorld.module.scss`:
 
 ```xmlui copy
-
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
@@ -174,7 +172,6 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
   @include t.textVars($themeVars, $component);
 
   border-radius: createThemeVar("borderRadius-#{$component}");
-
   font-family: system-ui, -apple-system, sans-serif;
   transition: all 0.2s ease-in-out;
   max-width: 400px;
@@ -327,7 +324,6 @@ export const HelloWorldMd = createMetadata({
         { value: "default", description: "Default theme" },
         { value: "success", description: "Success theme (green)" },
       ],
-      defaultValue: defaultProps.theme,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
