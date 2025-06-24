@@ -50,31 +50,30 @@ export const HelloWorld = React.forwardRef<HelloWorldRef, Props>(
     const innerRef = useRef<HTMLDivElement>(null);
     const [clickCount, setClickCount] = useState(0);
 
-    const apiRef = useRef<HelloWorldRef>({
-      reset: () => {
-        setClickCount(0);
-        onReset?.();
-      },
-      getClickCount: () => clickCount,
-    });
+    // Temporarily removed for Edge compatibility testing
+    // const apiRef = useRef<HelloWorldRef>({
+    //   reset: () => {
+    //     setClickCount(0);
+    //     onReset?.();
+    //   },
+    //   getClickCount: () => clickCount,
+    // });
 
-    // Update the API ref when clickCount changes
-    apiRef.current.getClickCount = () => clickCount;
+    // // Update the API ref when clickCount changes
+    // apiRef.current.getClickCount = () => clickCount;
 
-    useImperativeHandle(ref, () => apiRef.current);
+    // useImperativeHandle(ref, () => apiRef.current);
 
-    // Register the API with XMLUI when component mounts
-    React.useEffect(() => {
-      if (registerComponentApi) {
-        registerComponentApi({
-          reset: () => {
-            setClickCount(0);
-            onReset?.();
-          },
-          getClickCount: () => clickCount,
-        });
-      }
-    }, [registerComponentApi, clickCount, onReset]);
+    // // Register the API with XMLUI when component mounts
+    // React.useEffect(() => {
+    //   // Temporarily disabled for Edge compatibility testing
+    //   // if (registerComponentApi) {
+    //   //   registerComponentApi({
+    //   //     reset: () => setClickCount(0),
+    //   //     getClickCount: () => clickCount,
+    //   //   });
+    //   // }
+    // }, [registerComponentApi]);
 
     const handleClick = () => {
       const newCount = clickCount + 1;
