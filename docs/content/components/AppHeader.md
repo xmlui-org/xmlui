@@ -96,8 +96,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-AppHeader | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-AppHeader | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-AppHeader | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
@@ -111,8 +111,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-AppHeader | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-AppHeader | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-AppHeader | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-AppHeader | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-AppHeader | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |

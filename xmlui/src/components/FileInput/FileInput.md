@@ -123,7 +123,7 @@ Write in the input field and see how the `Text` underneath it is updated in acco
 <App var.field="">
   <FileInput onDidChange="(file) => field = file[0]?.name" />
   <Text value="{field}" />
-</App>`
+</App>
 ```
 
 %-EVENT-END

@@ -242,8 +242,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-NavLink | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-NavLink | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-NavLink | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
@@ -258,8 +258,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-NavLink | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-NavLink | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-NavLink | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-NavLink | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-NavLink | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-NavLink | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-NavLink | *none* | *none* |

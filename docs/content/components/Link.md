@@ -112,8 +112,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-Link | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-Link | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Link | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-Link | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-Link | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Link | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Link | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-Link | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-Link | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Link | *none* | *none* |
@@ -126,8 +126,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-Link | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-Link | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-Link | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-Link | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-Link | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Link | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Link | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Link | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-Link | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-Link | *none* | *none* |
@@ -138,7 +138,7 @@ This component does not expose any methods.
 | [borderVerticalStyle](../styles-and-themes/common-units/#border-style)-Link | *none* | *none* |
 | [borderVerticalWidth](../styles-and-themes/common-units/#size)-Link | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-Link | *none* | *none* |
-| direction-Link | *none* | *none* |
+| [direction](../styles-and-themes/layout-props#direction)-Link | *none* | *none* |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-Link | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-Link | inherit | inherit |
 | [fontStretch](../styles-and-themes/common-units/#fontStretch)-Link | *none* | *none* |

@@ -155,8 +155,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-Card | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Card | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-Card | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-Card | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Card | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Card | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-Card | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-Card | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Card | *none* | *none* |
@@ -170,8 +170,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-Card | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-Card | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-Card | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-Card | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Card | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Card | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Card | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-Card | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-Card | *none* | *none* |

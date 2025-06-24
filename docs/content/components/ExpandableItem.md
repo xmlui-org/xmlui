@@ -76,8 +76,8 @@ This method toggles the expandable item's expanded state.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-ExpandableItem | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-ExpandableItem | 1px | 1px |
 | [borderColor](../styles-and-themes/common-units/#color)-ExpandableItem | $borderColor | $borderColor |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-ExpandableItem | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-ExpandableItem | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-ExpandableItem | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-ExpandableItem | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-ExpandableItem | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-ExpandableItem | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-ExpandableItem | *none* | *none* |
@@ -91,8 +91,8 @@ This method toggles the expandable item's expanded state.
 | [color](../styles-and-themes/common-units/#color)-ExpandableItem | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-ExpandableItem | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-ExpandableItem | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-ExpandableItem | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-ExpandableItem | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-ExpandableItem | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-ExpandableItem | solid | solid |
 | [borderTop](../styles-and-themes/common-units/#border)-ExpandableItem | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-ExpandableItem | *none* | *none* |

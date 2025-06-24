@@ -216,8 +216,8 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete-warning | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-AutoComplete-warning--hover | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-menu-AutoComplete | $borderColor | $borderColor |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-AutoComplete | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-AutoComplete | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
@@ -236,8 +236,8 @@ You can query the component's value. If no value is set, it will retrieve `undef
 | [color](../styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-AutoComplete | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-AutoComplete | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-AutoComplete | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-AutoComplete-default | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-AutoComplete-error | *none* | *none* |
