@@ -1,6 +1,8 @@
 # Build a Hello World Component
 
-This guide will walk you through creating a complete React-based component for XMLUI, from initial setup to registration and testing. We'll build a functional HelloWorld component that demonstrates all the key patterns for XMLUI component development.
+
+This guide will walk you through creating a complete React-based component for XMLUI, from initial setup to registration and testing. We'll build a functional HelloWorld component that demonstrates the core patterns for XMLUI component development.
+
 
 ## What You'll Build
 
@@ -8,9 +10,8 @@ By the end of this guide, you'll have created a HelloWorld component that:
 
 - Displays a customizable greeting message
 - Features an interactive click counter
-- Supports multiple visual themes (default, success, warning, error)
-- Handles events (onClick, onReset)
-- Exposes component APIs (reset(), getClickCount())
+- Supports theme variants (default, success)
+- Uses XMLUI's standard theming system
 - Supports nested children content
 - Follows all XMLUI patterns and conventions
 
@@ -19,7 +20,7 @@ By the end of this guide, you'll have created a HelloWorld component that:
 XMLUI components consist of three main parts:
 
 1. **Native React Component** (`HelloWorldNative.tsx`) - The actual React implementation
-2. **Component Metadata** (`HelloWorld.tsx`) - Describes props, events, APIs, and theme variables
+2. **Component Metadata** (`HelloWorld.tsx`) - Describes props and integrates with XMLUI
 3. **Component Registration** (`ComponentProvider.tsx`) - Registers the component with XMLUI
 
 This separation allows XMLUI to understand your component's interface while maintaining clean React code.
@@ -45,98 +46,56 @@ All XMLUI components follow this structure with the component name as the direct
 Create `xmlui/src/components/HelloWorld/HelloWorldNative.tsx`:
 
 ```xmlui copy
-import React, { useRef, useImperativeHandle, useState } from "react";
+import React, { useRef, useState } from "react";
 import classnames from "classnames";
 import styles from "./HelloWorld.module.scss";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 type Props = {
   id?: string;
   message?: string;
-  theme?: "default" | "success" | "warning" | "error";
-  showCounter?: boolean;
+  theme?: "default" | "success";
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
-  // Event handlers
-  onClick?: (clickCount: number) => void;
-  onReset?: () => void;
-  // XMLUI API registration
-  registerComponentApi?: (api: HelloWorldRef) => void;
 };
-
-// Define the ref interface for exposed methods
-export interface HelloWorldRef {
-  reset: () => void;
-  getClickCount: () => number;
-}
 
 export const defaultProps: Partial<Props> = {
   message: "Hello, World!",
   theme: "default",
-  showCounter: true,
 };
 
-export const HelloWorld = React.forwardRef<HelloWorldRef, Props>(
+export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
   function HelloWorld(
     {
       id,
       message = defaultProps.message,
       theme = defaultProps.theme,
-      showCounter = defaultProps.showCounter,
       children,
       style,
       className,
-      onClick,
-      onReset,
-      registerComponentApi,
       ...rest
     },
     ref
   ) {
-    const innerRef = useRef<HTMLDivElement>(null);
     const [clickCount, setClickCount] = useState(0);
-
-    const apiRef = useRef<HelloWorldRef>({
-      reset: () => {
-        setClickCount(0);
-        onReset?.();
-      },
-      getClickCount: () => clickCount,
-    });
-
-    // Update the API ref when clickCount changes
-    apiRef.current.getClickCount = () => clickCount;
-
-    useImperativeHandle(ref, () => apiRef.current);
-
-    // Register the API with XMLUI when component mounts
-    React.useEffect(() => {
-      if (registerComponentApi) {
-        registerComponentApi(apiRef.current);
-      }
-    }, [registerComponentApi]);
 
     const handleClick = () => {
       const newCount = clickCount + 1;
       setClickCount(newCount);
-      onClick?.(newCount);
     };
 
     const handleReset = () => {
       setClickCount(0);
-      onReset?.();
     };
 
     return (
       <div
         {...rest}
         id={id}
-        ref={innerRef}
+        ref={ref}
         className={classnames(className, styles.helloWorld, {
           [styles.success]: theme === "success",
-          [styles.warning]: theme === "warning",
-          [styles.error]: theme === "error",
-          [styles.default]: theme === "default",
         })}
         style={style}
       >
@@ -155,11 +114,9 @@ export const HelloWorld = React.forwardRef<HelloWorldRef, Props>(
               Click me!
             </button>
 
-            {showCounter && (
-              <div className={styles.counter}>
-                Clicks: <span className={styles.count}>{clickCount}</span>
-              </div>
-            )}
+            <div className={styles.counter}>
+              Clicks: <span className={styles.count}>{clickCount}</span>
+            </div>
 
             {clickCount > 0 && (
               <button
@@ -179,48 +136,52 @@ export const HelloWorld = React.forwardRef<HelloWorldRef, Props>(
 
 ### Key Patterns in the Native Component:
 
-- **Props Interface**: Defines all component properties including XMLUI-specific ones
-- **Ref Interface**: Exposes methods that can be called from XMLUI
-- **forwardRef**: Required for XMLUI component APIs
-- **registerComponentApi**: Pattern for exposing methods to XMLUI
-- **Event Handlers**: Call parent-provided functions with relevant data
+- **Props Interface**: Defines all component properties that XMLUI can set
+- **forwardRef**: Allows XMLUI to get a reference to the DOM element
+- **React State**: Uses `useState` for interactive behavior
+- **Event Handlers**: Standard React click handlers for interactivity
+- **Classnames**: Uses the `classnames` library for conditional CSS classes
 
-## Step 3: Create Component Styles
+
 
 Create `xmlui/src/components/HelloWorld/HelloWorld.module.scss`:
 
 ```xmlui copy
-// Export theme variables for XMLUI's theming system
-:export {
-  themeVars: backgroundColor-HelloWorld borderColor-HelloWorld borderRadius-HelloWorld padding-HelloWorld textColor-HelloWorld backgroundColor-HelloWorld-success borderColor-HelloWorld-success textColor-HelloWorld-success backgroundColor-HelloWorld-warning borderColor-HelloWorld-warning textColor-HelloWorld-warning backgroundColor-HelloWorld-error borderColor-HelloWorld-error textColor-HelloWorld-error backgroundColor-button-HelloWorld textColor-button-HelloWorld backgroundColor-button-HelloWorld--hover;
+
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$component: "HelloWorld";
+
+// Compose standard theme variable sets
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composeTextVars($themeVars, $component, $component);
+
+// Add success theme variant
+$themeVars: t.composeBorderVars($themeVars, "#{$component}-success");
+$themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
+
 .helloWorld {
-  background-color: var(--backgroundColor-HelloWorld, #fafafa);
-  border: 2px solid var(--borderColor-HelloWorld, #e5e7eb);
-  border-radius: var(--borderRadius-HelloWorld, 8px);
-  padding: var(--padding-HelloWorld, 24px);
-  color: var(--textColor-HelloWorld, #111827);
+  @include t.paddingVars($themeVars, $component);
+  @include t.borderVars($themeVars, $component);
+  @include t.textVars($themeVars, $component);
+
+  border-radius: createThemeVar("borderRadius-#{$component}");
+
   font-family: system-ui, -apple-system, sans-serif;
   transition: all 0.2s ease-in-out;
   max-width: 400px;
 
   &.success {
-    background-color: var(--backgroundColor-HelloWorld-success, #f0fdf4);
-    border-color: var(--borderColor-HelloWorld-success, #bbf7d0);
-    color: var(--textColor-HelloWorld-success, #166534);
-  }
-
-  &.warning {
-    background-color: var(--backgroundColor-HelloWorld-warning, #fefce8);
-    border-color: var(--borderColor-HelloWorld-warning, #fde047);
-    color: var(--textColor-HelloWorld-warning, #ca8a04);
-  }
-
-  &.error {
-    background-color: var(--backgroundColor-HelloWorld-error, #fef2f2);
-    border-color: var(--borderColor-HelloWorld-error, #fecaca);
-    color: var(--textColor-HelloWorld-error, #dc2626);
+    @include t.borderVars($themeVars, "#{$component}-success");
+    @include t.textVars($themeVars, "#{$component}-success");
   }
 }
 
@@ -250,8 +211,8 @@ Create `xmlui/src/components/HelloWorld/HelloWorld.module.scss`:
 }
 
 .clickButton {
-  background-color: var(--backgroundColor-button-HelloWorld, #3b82f6);
-  color: var(--textColor-button-HelloWorld, white);
+  background-color: #3b82f6;
+  color: white;
   border: none;
   border-radius: 6px;
   padding: 12px 24px;
@@ -261,7 +222,7 @@ Create `xmlui/src/components/HelloWorld/HelloWorld.module.scss`:
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: var(--backgroundColor-button-HelloWorld--hover, #2563eb);
+    background-color: #2563eb;
   }
 
   &:active {
@@ -299,14 +260,37 @@ Create `xmlui/src/components/HelloWorld/HelloWorld.module.scss`:
     background-color: #4b5563;
   }
 }
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
 ```
 
-### Key Styling Patterns:
+### Key XMLUI Theming Patterns:
 
-- **`:export` block**: Required for XMLUI theme integration
-- **CSS Variables**: Enable runtime theming
-- **Fallback values**: Provide defaults when theme variables aren't set
-- **Theme variants**: Different styles for success/warning/error states
+**XMLUI uses a standardized theming system that all components must follow:**
+
+- **`@use "../../components-core/theming/themes" as t;`** - Import the XMLUI theming system
+- **`$themeVars: ();`** - Initialize the theme variables collection
+- **`createThemeVar()` function** - Helper to create individual theme variables
+- **`t.compose*Vars()` functions** - Generate complete sets of related theme variables:
+  - `composePaddingVars()` - Creates padding variables (top, bottom, left, right, horizontal, vertical)
+  - `composeBorderVars()` - Creates border variables (color, width, style, radius)
+  - `composeTextVars()` - Creates text variables (color, font-family, font-size, background-color, etc.)
+- **`@include t.*Vars()` mixins** - Apply the theme variables to CSS properties
+- **`:export { themeVars: t.json-stringify($themeVars); }`** - Export variables for XMLUI's runtime system
+
+**Theme Variants:**
+- Create variants by composing additional theme variable sets (e.g., `"#{$component}-success"`)
+- Apply variants using SCSS classes and mixins
+- This ensures consistent theming across all component states
+
+**Why This Approach:**
+- **Consistency** - All XMLUI components use the same theming patterns
+- **Completeness** - Automatically generates comprehensive theme variable sets
+- **Performance** - Programmatic generation is more efficient than manual string parsing
+- **Browser Compatibility** - Works reliably across all browsers including Edge
 
 ## Step 4: Create Component Metadata and Renderer
 
@@ -317,15 +301,14 @@ import styles from "./HelloWorld.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { HelloWorld, defaultProps, HelloWorldRef } from "./HelloWorldNative";
+import { HelloWorld, defaultProps } from "./HelloWorldNative";
 
 const COMP = "HelloWorld";
 
 export const HelloWorldMd = createMetadata({
   description:
     "`HelloWorld` is a demonstration component that shows basic XMLUI patterns. " +
-    "It displays a customizable greeting message with an interactive click counter " +
-    "and supports different visual themes.",
+    "It displays a customizable greeting message with an interactive click counter.",
   status: "experimental",
   props: {
     id: {
@@ -339,98 +322,42 @@ export const HelloWorldMd = createMetadata({
     },
     theme: {
       description: "Sets the visual theme of the component.",
-      isRequired: false,
       type: "string",
       availableValues: [
         { value: "default", description: "Default theme" },
         { value: "success", description: "Success theme (green)" },
-        { value: "warning", description: "Warning theme (yellow)" },
-        { value: "error", description: "Error theme (red)" },
       ],
       defaultValue: defaultProps.theme,
-    },
-    showCounter: {
-      description: "Whether to show the click counter.",
-      type: "boolean",
-      defaultValue: defaultProps.showCounter,
-    },
-  },
-  events: {
-    click: {
-      description: `This event is triggered when the ${COMP} button is clicked. Receives the current click count as a parameter.`,
-    },
-    reset: {
-      description: `This event is triggered when the reset button is clicked.`,
-    },
-  },
-  apis: {
-    reset: {
-      description: `Resets the click counter to zero.`,
-    },
-    getClickCount: {
-      description: `Returns the current click count.`,
-      returnType: "number",
     },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    // Standard HelloWorld theme variables using XMLUI semantic tokens
     [`backgroundColor-${COMP}`]: "$color-surface-50",
     [`borderColor-${COMP}`]: "$color-surface-200",
+    [`borderWidth-${COMP}`]: "$space-2",
+    [`borderStyle-${COMP}`]: "solid",
     [`borderRadius-${COMP}`]: "$borderRadius",
-    [`padding-${COMP}`]: "$space-6",
-    [`textColor-${COMP}`]: "$color-surface-900",
+    [`padding-${COMP}`]: "$space-4",
+    [`textColor-${COMP}`]: "$color-primary",
 
-    // Theme colors
+    // Success theme variant
     [`backgroundColor-${COMP}-success`]: "$color-success-50",
     [`borderColor-${COMP}-success`]: "$color-success-200",
     [`textColor-${COMP}-success`]: "$color-success-800",
-
-    [`backgroundColor-${COMP}-warning`]: "$color-warning-50",
-    [`borderColor-${COMP}-warning`]: "$color-warning-200",
-    [`textColor-${COMP}-warning`]: "$color-warning-800",
-
-    [`backgroundColor-${COMP}-error`]: "$color-danger-50",
-    [`borderColor-${COMP}-error`]: "$color-danger-200",
-    [`textColor-${COMP}-error`]: "$color-danger-800",
-
-    // Button styles
-    [`backgroundColor-button-${COMP}`]: "$color-primary-500",
-    [`textColor-button-${COMP}`]: "$color-surface-50",
-    [`backgroundColor-button-${COMP}--hover`]: "$color-primary-600",
   },
 });
 
 export const helloWorldComponentRenderer = createComponentRenderer(
   COMP,
   HelloWorldMd,
-  ({
-    node,
-    extractValue,
-    renderChild,
-    lookupEventHandler,
-    layoutCss,
-    registerComponentApi
-  }) => {
+  ({ node, extractValue, renderChild, layoutCss }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
         message={extractValue.asOptionalString(node.props.message)}
         theme={extractValue.asOptionalString(node.props.theme)}
-        showCounter={extractValue.asOptionalBoolean(node.props.showCounter)}
         style={layoutCss}
-        onClick={(clickCount) => {
-          const handler = lookupEventHandler("click");
-          if (handler) {
-            handler({ clickCount });
-          }
-        }}
-        onReset={() => {
-          const handler = lookupEventHandler("reset");
-          if (handler) {
-            handler();
-          }
-        }}
-        registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children)}
       </HelloWorld>
@@ -443,17 +370,15 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 
 - **`createMetadata`**: Describes the component interface to XMLUI
 - **Props definition**: Type-safe property descriptions with defaults
-- **Events**: Describes what events the component can trigger
-- **APIs**: Exposes methods that can be called from XMLUI
-- **Theme variables**: Integrates with XMLUI's theming system
-- **`createComponentRenderer`**: Bridges XMLUI markup to React component
+- **Status**: Indicates component maturity (experimental, stable, deprecated)
+- **Theme integration**: `themeVars` and `defaultThemeVars` enable theming support
 
 ### Renderer Patterns:
 
+- **`createComponentRenderer`**: Bridges XMLUI markup to React component
 - **`extractValue`**: Safely extracts prop values from XMLUI nodes
-- **`lookupEventHandler`**: Gets event handlers from XMLUI
 - **`renderChild`**: Renders nested XMLUI content
-- **`registerComponentApi`**: Exposes component methods to XMLUI
+- **`layoutCss`**: Provides XMLUI layout styling
 
 ## Step 5: Register the Component
 
@@ -492,144 +417,183 @@ You can now use your HelloWorld component in XMLUI markup:
 
 Try these examples in the XMLUI playground:
 
-```xmlui-pg
+```xmlui-pg display
 <App>
   <VStack spacing="4">
-    <!-- Basic usage -->
-    <HelloWorld />
-
-    <!-- Custom message and theme -->
-    <HelloWorld
-      message="Welcome to XMLUI!"
-      theme="success"
-    />
-
-    <!-- With event handling -->
-    <HelloWorld
-      message="Click me!"
-      theme="warning"
-      onClick="toast(`You clicked ${clickCount} times!`)"
-      onReset="toast('Counter reset!')"
-    />
+    <!-- Custom message -->
+    <HelloWorld message="Hello World!" />
 
     <!-- With nested content -->
-    <HelloWorld
-      message="I have children:"
-      theme="error"
-    >
-      <Text>This is nested content!</Text>
-      <Text>Pretty cool, right?</Text>
+    <HelloWorld message="Nested content">
+      <Text>Nested text</Text>
     </HelloWorld>
 
-    <!-- Without counter -->
-    <HelloWorld
-      message="Clean version"
-      showCounter="false"
-    />
+    <!-- Theme variant -->
+    <HelloWorld message="Success theme" theme="success" />
+
+
   </VStack>
 </App>
 ```
 
-### Component APIs Example
-
-```xmlui-pg
-<App var.message="Hello">
-  <VStack spacing="4">
-    <HelloWorld id="myHello" message="{message}" />
-
-    <HStack spacing="2">
-      <Button
-        label="Reset Counter"
-        onClick="myHello.reset()"
-      />
-      <Button
-        label="Show Count"
-        onClick="toast(`Current count: ${myHello.getClickCount()}`)"
-      />
-      <Button
-        label="Change Message"
-        onClick="message = message === 'Hello' ? 'Goodbye' : 'Hello'"
-      />
-    </HStack>
-  </VStack>
-</App>
-```
 
 ## Common Patterns Explained
 
 ### Value Extraction
 Use the appropriate `extractValue` methods in your renderer:
 
-- `extractValue.asString()` - Required string
-- `extractValue.asOptionalString()` - Optional string
-- `extractValue.asOptionalBoolean()` - Optional boolean with default
-- `extractValue.asDisplayText()` - For display text with formatting
+- `extractValue.asString()` - Required string value
+- `extractValue.asOptionalString()` - Optional string value (returns undefined if not set)
+- `extractValue.asNumber()` - Required number value
+- `extractValue.asOptionalNumber()` - Optional number value
+- `extractValue.asBoolean()` - Required boolean value
+- `extractValue.asOptionalBoolean()` - Optional boolean value
+
+### State Management
+Use standard React hooks for component state:
+
+```tsx
+const [clickCount, setClickCount] = useState(0);
+```
 
 ### Event Handling
-Always use `lookupEventHandler()` to get event handlers:
+Handle events with standard React patterns:
 
 ```tsx
-onClick={(clickCount) => {
-  const handler = lookupEventHandler("click");
-  if (handler) {
-    handler({ clickCount });
-  }
-}}
+const handleClick = () => {
+  setClickCount(clickCount + 1);
+};
 ```
 
-### Child Rendering
-Use `renderChild()` for nested XMLUI content:
+### Conditional Rendering
+Use React conditional rendering for dynamic content:
 
 ```tsx
-{renderChild(node.children)}
-// Or with default container:
-{renderChild(node.children, { type: "Stack", orientation: "horizontal" })}
+{clickCount > 0 && (
+  <button onClick={handleReset}>Reset</button>
+)}
 ```
 
-### Component APIs
-For components that expose methods, use the `registerComponentApi` prop pattern:
+## Advanced Theming Patterns
 
-```tsx
-// In native component
-React.useEffect(() => {
-  if (registerComponentApi) {
-    registerComponentApi(apiRef.current);
-  }
-}, [registerComponentApi]);
+### Understanding XMLUI's Theming System
 
-// In renderer
-registerComponentApi={registerComponentApi}
+XMLUI uses a sophisticated theming system that automatically generates comprehensive CSS custom properties for consistent styling across all components. This system provides several key benefits:
+
+**Automatic Variable Generation**: Instead of manually defining individual CSS variables, XMLUI's theme functions generate complete sets of related variables. For example, `composePaddingVars()` creates all padding-related variables including `padding-{component}`, `paddingTop-{component}`, `paddingBottom-{component}`, etc.
+
+**Semantic Token Integration**: Theme variables reference semantic design tokens like `$color-surface-50` and `$space-4`, ensuring consistent design across your application.
+
+**Runtime Customization**: The exported theme variables enable runtime theming and customization through XMLUI's theming API.
+
+### Theme Variable Composition Functions
+
+XMLUI provides several composition functions for common styling patterns:
+
+#### Padding Variables
+```scss
+$themeVars: t.composePaddingVars($themeVars, $component);
 ```
+Generates: `padding-{component}`, `paddingTop-{component}`, `paddingBottom-{component}`, `paddingLeft-{component}`, `paddingRight-{component}`, `paddingHorizontal-{component}`, `paddingVertical-{component}`
 
-### Theme Integration
-Always prefix theme variables with your component name and use the `:export` pattern:
+#### Border Variables
+```scss
+$themeVars: t.composeBorderVars($themeVars, $component);
+```
+Generates: `borderColor-{component}`, `borderWidth-{component}`, `borderStyle-{component}`, `borderRadius-{component}`, plus variants for each side (Top, Bottom, Left, Right)
+
+#### Text Variables
+```scss
+$themeVars: t.composeTextVars($themeVars, $component, $component);
+```
+Generates: `textColor-{component}`, `backgroundColor-{component}`, `fontSize-{component}`, `fontFamily-{component}`, `fontWeight-{component}`, `lineHeight-{component}`, `textAlign-{component}`
+
+### Creating Theme Variants
+
+To create theme variants (like our "success" theme), compose additional variable sets with variant names:
 
 ```scss
-:export {
-  themeVars: backgroundColor-HelloWorld borderColor-HelloWorld textColor-HelloWorld;
-}
+// Standard variables
+$themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composeTextVars($themeVars, $component, $component);
 
+// Success variant
+$themeVars: t.composeBorderVars($themeVars, "#{$component}-success");
+$themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
+```
+
+Then apply them conditionally in your styles:
+
+```scss
 .helloWorld {
-  background-color: var(--backgroundColor-HelloWorld, #defaultValue);
+  @include t.borderVars($themeVars, $component);
+  @include t.textVars($themeVars, $component);
+
+  &.success {
+    @include t.borderVars($themeVars, "#{$component}-success");
+    @include t.textVars($themeVars, "#{$component}-success");
+  }
 }
 ```
 
-## Common Pitfalls to Avoid
+### Default Theme Variables
 
-1. **Infinite Render Loops**: Don't call `updateState` unnecessarily in event handlers
-2. **Ref Callback Issues**: Use the `registerComponentApi` prop pattern instead of ref callbacks
-3. **Missing Theme Export**: Always include the `:export` block in SCSS
-4. **Incorrect Value Extraction**: Use the right `extractValue` method for each prop type
-5. **Event Handler Errors**: Always check if handlers exist before calling them
+In your component metadata, provide sensible defaults using XMLUI's semantic tokens:
 
-## Next Steps
+```tsx
+defaultThemeVars: {
+  // Use semantic color tokens
+  [`backgroundColor-${COMP}`]: "$color-surface-50",
+  [`borderColor-${COMP}`]: "$color-surface-200",
+  [`textColor-${COMP}`]: "$color-primary",
 
-Now that you understand the basics, you can:
+  // Use spacing tokens
+  [`padding-${COMP}`]: "$space-4",
+  [`borderWidth-${COMP}`]: "$space-2",
 
-- Add more complex props and validation
-- Implement advanced theming with light/dark mode support
-- Create compound components with multiple child components
-- Add form integration capabilities
-- Build more sophisticated state management
+  // Use design tokens
+  [`borderRadius-${COMP}`]: "$borderRadius",
+  [`borderStyle-${COMP}`]: "solid",
 
-This HelloWorld component demonstrates all the essential patterns for building XMLUI components. Use it as a reference when creating your own components!
+  // Variant defaults
+  [`backgroundColor-${COMP}-success`]: "$color-success-50",
+  [`borderColor-${COMP}-success`]: "$color-success-200",
+  [`textColor-${COMP}-success`]: "$color-success-800",
+}
+```
+
+### Why This Theming Approach?
+
+**Consistency**: All XMLUI components follow the same theming patterns, ensuring a cohesive design system.
+
+**Completeness**: The composition functions generate comprehensive variable sets, so you don't miss important styling properties.
+
+**Performance**: Programmatic generation is more efficient than parsing strings at runtime.
+
+**Maintainability**: Centralized theming functions make it easy to update theming patterns across all components.
+
+**Browser Compatibility**: This approach works reliably across all browsers, including older versions of Edge.
+
+### Common Testing Scenarios
+
+1. **Default State**: Verify the component renders correctly with no props
+2. **Custom Props**: Test each prop individually and in combination
+3. **Theme Variants**: Ensure all theme variants render correctly
+4. **Children Content**: Test with various types of nested content
+5. **Interactive Behavior**: Test all interactive features (clicks, state changes)
+6. **Edge Cases**: Test with empty strings, very long text, etc.
+
+
+## Summary
+
+You've successfully created a complete XMLUI component that demonstrates:
+
+- **React Integration**: Clean separation between React implementation and XMLUI integration
+- **Theming System**: Full integration with XMLUI's standardized theming approach
+- **Interactive Features**: State management and event handling
+- **Component Metadata**: Type-safe prop definitions and documentation
+- **Theme Variants**: Multiple visual styles using XMLUI theming patterns
+- **Children Support**: Rendering nested XMLUI content
+
+This foundation will serve you well as you build more complex XMLUI components. The patterns demonstrated here scale to components of any complexity while maintaining consistency with the broader XMLUI ecosystem.
+

@@ -1,34 +1,37 @@
-// Export theme variables for XMLUI's theming system
-:export {
-  themeVars: backgroundColor-HelloWorld borderColor-HelloWorld borderRadius-HelloWorld padding-HelloWorld textColor-HelloWorld backgroundColor-HelloWorld-success borderColor-HelloWorld-success textColor-HelloWorld-success backgroundColor-HelloWorld-warning borderColor-HelloWorld-warning textColor-HelloWorld-warning backgroundColor-HelloWorld-error borderColor-HelloWorld-error textColor-HelloWorld-error backgroundColor-button-HelloWorld textColor-button-HelloWorld backgroundColor-button-HelloWorld--hover;
+
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$component: "HelloWorld";
+
+// Compose standard theme variable sets
+$themeVars: t.composePaddingVars($themeVars, $component);
+$themeVars: t.composeBorderVars($themeVars, $component);
+$themeVars: t.composeTextVars($themeVars, $component, $component);
+
+// Add success theme variant
+$themeVars: t.composeBorderVars($themeVars, "#{$component}-success");
+$themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
+
 .helloWorld {
-  background-color: var(--backgroundColor-HelloWorld, #fafafa);
-  border: 2px solid var(--borderColor-HelloWorld, #e5e7eb);
-  border-radius: var(--borderRadius-HelloWorld, 8px);
-  padding: var(--padding-HelloWorld, 24px);
-  color: var(--textColor-HelloWorld, #111827);
+  @include t.paddingVars($themeVars, $component);
+  @include t.borderVars($themeVars, $component);
+  @include t.textVars($themeVars, $component);
+  
+  border-radius: createThemeVar("borderRadius-#{$component}");
   font-family: system-ui, -apple-system, sans-serif;
   transition: all 0.2s ease-in-out;
   max-width: 400px;
 
   &.success {
-    background-color: var(--backgroundColor-HelloWorld-success, #f0fdf4);
-    border-color: var(--borderColor-HelloWorld-success, #bbf7d0);
-    color: var(--textColor-HelloWorld-success, #166534);
-  }
-
-  &.warning {
-    background-color: var(--backgroundColor-HelloWorld-warning, #fefce8);
-    border-color: var(--borderColor-HelloWorld-warning, #fde047);
-    color: var(--textColor-HelloWorld-warning, #ca8a04);
-  }
-
-  &.error {
-    background-color: var(--backgroundColor-HelloWorld-error, #fef2f2);
-    border-color: var(--borderColor-HelloWorld-error, #fecaca);
-    color: var(--textColor-HelloWorld-error, #dc2626);
+    @include t.borderVars($themeVars, "#{$component}-success");
+    @include t.textVars($themeVars, "#{$component}-success");
   }
 }
 
@@ -58,8 +61,8 @@
 }
 
 .clickButton {
-  background-color: var(--backgroundColor-button-HelloWorld, #3b82f6);
-  color: var(--textColor-button-HelloWorld, white);
+  background-color: #3b82f6;
+  color: white;
   border: none;
   border-radius: 6px;
   padding: 12px 24px;
@@ -69,7 +72,7 @@
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: var(--backgroundColor-button-HelloWorld--hover, #2563eb);
+    background-color: #2563eb;
   }
 
   &:active {
@@ -107,3 +110,9 @@
     background-color: #4b5563;
   }
 }
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
+
