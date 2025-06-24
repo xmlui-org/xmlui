@@ -33,7 +33,7 @@ jobs:
           # Extract pending changes from .changeset files
           if [ -d .changeset ]; then
             CHANGES=$(find .changeset -name "*.md" -not -name "README.md" -exec cat {} \; | grep -v "^---" | grep -v "^$" | sort -u)
-            echo "CHANGES<<EOF" >> $GITHUB_ENV
+            echo "changes<<EOF" >> $GITHUB_ENV
             echo "$CHANGES" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV
             
@@ -56,6 +56,8 @@ jobs:
 
       - name: Enhance PR Description with Changes
         if: steps.changesets_pr.outputs.pullRequestUrl
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=$(echo "${{ steps.changesets_pr.outputs.pullRequestUrl }}" | awk -F/ '{print $NF}')
           
@@ -63,21 +65,21 @@ jobs:
           PR_DESCRIPTION=$(gh pr view $PR_NUMBER --json body -q .body)
           
           # Get the changes found earlier
-          CHANGES="${{ env.CHANGES }}"
+          CHANGES='${{ env.changes }}'
           
           if [ ! -z "$CHANGES" ]; then
-            # Enhance PR description with detailed changes
-            NEW_DESCRIPTION="$PR_DESCRIPTION
+            # Create a file with the new description to avoid shell escaping issues
+            cat > pr_description.md << EOL
+          $PR_DESCRIPTION
 
-### Detailed Changes
-$CHANGES"
+          ### Detailed Changes
+          $CHANGES
+          EOL
             
-            # Update PR description
-            gh pr edit $PR_NUMBER --body "$NEW_DESCRIPTION"
+            # Update PR description using the file
+            gh pr edit $PR_NUMBER --body-file pr_description.md
             
             echo "Enhanced PR description with detailed changes"
           else
             echo "No changes to add to PR description"
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
