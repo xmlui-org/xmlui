@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.60
+
+### Patch Changes
+
+- 498b1ef: Experiment with automatic changelog generation #3
+
 ## 0.9.59
 
 ### Patch Changes
