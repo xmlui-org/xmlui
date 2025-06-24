@@ -1,6 +1,8 @@
 # Build a Hello World Component
 
+
 This guide will walk you through creating a complete React-based component for XMLUI, from initial setup to registration and testing. We'll build a functional HelloWorld component that demonstrates the core patterns for XMLUI component development.
+
 
 ## What You'll Build
 
@@ -140,11 +142,12 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 - **Event Handlers**: Standard React click handlers for interactivity
 - **Classnames**: Uses the `classnames` library for conditional CSS classes
 
-## Step 3: Create Component Styles with XMLUI Theming
+
 
 Create `xmlui/src/components/HelloWorld/HelloWorld.module.scss`:
 
 ```xmlui copy
+
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
@@ -171,6 +174,7 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
   @include t.textVars($themeVars, $component);
 
   border-radius: createThemeVar("borderRadius-#{$component}");
+
   font-family: system-ui, -apple-system, sans-serif;
   transition: all 0.2s ease-in-out;
   max-width: 400px;
@@ -426,6 +430,7 @@ Try these examples in the XMLUI playground:
 
     <!-- Theme variant -->
     <HelloWorld message="Success theme" theme="success" />
+
 
   </VStack>
 </App>

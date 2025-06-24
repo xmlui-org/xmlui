@@ -1,3 +1,4 @@
+
 @use "../../components-core/theming/themes" as t;
 
 // --- This code snippet is required to collect the theme variables used in this module
@@ -114,3 +115,4 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
 :export {
   themeVars: t.json-stringify($themeVars);
 }
+
