@@ -1,15 +1,6 @@
 import { SyntaxKind } from "./syntax-kind";
 import { findTokenAtPos } from "./utils";
 
-interface NodeRaw {
-  readonly kind: SyntaxKind;
-  readonly start: number;
-  readonly pos: number;
-  readonly end: number;
-  readonly triviaBefore?: Node[];
-  readonly children?: Node[];
-}
-
 export class Node {
    public readonly kind: SyntaxKind;
    /** Start position of the node including it's trivia */

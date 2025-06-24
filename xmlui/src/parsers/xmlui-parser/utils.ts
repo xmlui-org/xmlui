@@ -1,5 +1,5 @@
 import type { Node } from "./syntax-node";
-import { GetText } from "./parser";
+import type { GetText } from "./parser";
 import { SyntaxKind, getSyntaxKindStrRepr, isInnerNode } from "./syntax-kind";
 
 export function toDbgString(
@@ -61,7 +61,6 @@ export type FindTokenSuccess =
 
 export function findTokenAtPos(node: Node, position: number): FindTokenSuccess | undefined {
   const chain: Node[] = [node];
-  let chainBeforePos: Node[];
   let sharedParents: number;
 
   if (node.start > position || position > node.end) {
