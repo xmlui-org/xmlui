@@ -19,6 +19,7 @@
     ]
   },
   "devDependencies": {
+    "@octokit/rest": "^22.0.0",
     "remark-parse": "11.0.0",
     "strip-markdown": "6.0.0",
     "unified": "11.0.5"
