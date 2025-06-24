@@ -18,14 +18,14 @@ export const DonutChartMd = createMetadata({
     data: {
       description: "The data to be displayed in the chart. Needs to be an array of objects.",
     },
-    dataKeys: {
-      description:
-        "This property specifies the keys in the data objects that should be used for rendering the bars.",
-      valueType: "string",
-    },
     nameKey: {
       description:
         "Specifies the key in the data objects that will be used to label the different data series.",
+      valueType: "string",
+    },
+    dataKey: {
+      description:
+        "This property specifies the key in the data objects that will be used to render the chart.",
       valueType: "string",
     },
     showLabel: {
@@ -58,7 +58,7 @@ export const DonutChartMd = createMetadata({
 export const donutChartComponentRenderer = createComponentRenderer(
   COMP,
   DonutChartMd,
-  ({ extractValue, node, layoutCss, renderChild }: any) => {
+  ({ extractValue, node, layoutCss, renderChild }) => {
     return (
       <PieChart
         showLabelList={extractValue.asOptionalBoolean(
