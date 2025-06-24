@@ -186,7 +186,7 @@ This component does not expose any methods.
 | [gap](../styles-and-themes/common-units/#size)-avatar-Card | $gap-normal | $gap-normal |
 | [gap](../styles-and-themes/common-units/#size)-Card | var(--stack-gap-default) | var(--stack-gap-default) |
 | [gap](../styles-and-themes/common-units/#size)-title-Card | $gap-normal | $gap-normal |
-| horizontalAlignment-title-Card | *none* | *none* |
+| [horizontalAlignment](../styles-and-themes/common-units/#alignment)-title-Card | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Card | $space-4 | $space-4 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
@@ -194,7 +194,7 @@ This component does not expose any methods.
 | [paddingRight](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)ment-title-Card | center | center |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-title-Card | center | center |
 
 ### Variable Explanations [#variable-explanations]
 

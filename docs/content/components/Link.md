@@ -143,12 +143,12 @@ This component does not expose any methods.
 | [fontSize](../styles-and-themes/common-units/#size)-Link | inherit | inherit |
 | [fontStretch](../styles-and-themes/common-units/#fontStretch)-Link | *none* | *none* |
 | [fontStyle](../styles-and-themes/common-units/#fontStyle)-Link | *none* | *none* |
-| fontVariant-Link | *none* | *none* |
+| [fontVariant](../styles-and-themes/common-units/#font-variant)-Link | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Link | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-Link--active | $fontWeight-bold | $fontWeight-bold |
 | [gap](../styles-and-themes/common-units/#size)-icon-Link | $gap-tight | $gap-tight |
 | [letterSpacing](../styles-and-themes/common-units/#size)-Link | *none* | *none* |
-| lineBreak-Link | *none* | *none* |
+| [lineBreak](../styles-and-themes/common-units/#line-break)-Link | *none* | *none* |
 | [lineHeight](../styles-and-themes/common-units/#size)-Link | *none* | *none* |
 | [outlineColor](../styles-and-themes/common-units/#color)-Link--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineOffset](../styles-and-themes/common-units/#size)-Link--focus | $outlineOffset--focus | $outlineOffset--focus |
@@ -168,8 +168,8 @@ This component does not expose any methods.
 | [paddingTop](../styles-and-themes/common-units/#size)-Link | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-icon-Link | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Link | *none* | *none* |
-| textAlign-Link | *none* | *none* |
-| textAlignLast-Link | *none* | *none* |
+| [textAlign](../styles-and-themes/common-units/#text-align)-Link | *none* | *none* |
+| [textAlignLast](../styles-and-themes/common-units/#text-align)-Link | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Link | $color-primary-500 | $color-primary-500 |
 | [textColor](../styles-and-themes/common-units/#color)-Link--active | $color-primary-400 | $color-primary-400 |
 | [textColor](../styles-and-themes/common-units/#color)-Link--hover | $color-primary-400 | $color-primary-400 |
@@ -180,14 +180,14 @@ This component does not expose any methods.
 | [textDecorationLine](../styles-and-themes/common-units/#textDecoration)-Link | underline | underline |
 | [textDecorationStyle](../styles-and-themes/common-units/#textDecoration)-Link | solid | solid |
 | [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-Link | *none* | *none* |
-| textIndent-Link | *none* | *none* |
-| textShadow-Link | *none* | *none* |
+| [textIndent](../styles-and-themes/common-units/#text-indent)-Link | *none* | *none* |
+| [textShadow](../styles-and-themes/common-units/#text-shadow)-Link | *none* | *none* |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Link | *none* | *none* |
 | [textUnderlineOffset](../styles-and-themes/common-units/#size)-Link | $space-1 | $space-1 |
-| wordBreak-Link | *none* | *none* |
-| wordSpacing-Link | *none* | *none* |
-| wordWrap-Link | *none* | *none* |
-| writingMode-Link | *none* | *none* |
+| [wordBreak](../styles-and-themes/common-units/#word-break)-Link | *none* | *none* |
+| [wordSpacing](../styles-and-themes/common-units/#word-spacing)-Link | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-Link | *none* | *none* |
+| [writingMode](../styles-and-themes/common-units/#writing-mode)-Link | *none* | *none* |
 
 ### Variable Explanations [#variable-explanations]
 

@@ -92,7 +92,7 @@ This component does not expose any methods.
 | [borderWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel-vertical | 4px 0 4px 0 rgb(0 0 0 / 10%) | 4px 0 4px 0 rgb(0 0 0 / 10%) |
-| horizontalAlignment-logo-NavPanel | center | center |
+| [horizontalAlignment](../styles-and-themes/common-units/#alignment)-logo-NavPanel | center | center |
 | [marginBottom](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
 | [padding](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |

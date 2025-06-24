@@ -298,7 +298,7 @@ This component does not expose any methods.
 | [textColor](../styles-and-themes/common-units/#color)-NavLink--pressed | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-NavLink--pressed--active | *none* | *none* |
 | [thickness](../styles-and-themes/common-units/#size)-indicator-NavLink | $space-0_5 | $space-0_5 |
-| wordWrap-NavLink | *none* | *none* |
+| [wordWrap](../styles-and-themes/common-units/#word-wrap)-NavLink | *none* | *none* |
 
 ### Variable Explanations [#variable-explanations]
 

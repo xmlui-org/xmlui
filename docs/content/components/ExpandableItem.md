@@ -105,9 +105,6 @@ This method toggles the expandable item's expanded state.
 | [borderWidth](../styles-and-themes/common-units/#size)-ExpandableItem | 0 | 0 |
 | [color](../styles-and-themes/common-units/#color)-ExpandableItem | $textColor-primary | $textColor-primary |
 | [color](../styles-and-themes/common-units/#color)-ExpandableItem--disabled | $textColor--disabled | $textColor--disabled |
-| contentPaddingLeft-ExpandableItem | $space-3 | $space-3 |
-| contentPaddingRight-ExpandableItem | $space-3 | $space-3 |
-| contentPaddingVertical-ExpandableItem | $space-2 | $space-2 |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-ExpandableItem | $fontFamily | $fontFamily |
 | [fontSize](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-ExpandableItem | *none* | *none* |
@@ -119,13 +116,13 @@ This method toggles the expandable item's expanded state.
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-ExpandableItem-summary | *none* | *none* |
-| [paddingLeft](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-content-ExpandableItem | $space-3 | $space-3 |
 | [paddingLeft](../styles-and-themes/common-units/#size)-ExpandableItem | $space-0 | $space-0 |
-| [paddingRight](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-content-ExpandableItem | $space-3 | $space-3 |
 | [paddingRight](../styles-and-themes/common-units/#size)-ExpandableItem | $space-0 | $space-0 |
 | [paddingTop](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-ExpandableItem | $space-2 | $space-2 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-content-ExpandableItem | $space-2 | $space-2 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-ExpandableItem-summary | *none* | *none* |
-| transition-ExpandableItem | 0.2s ease | 0.2s ease |
+| [transition](../styles-and-themes/common-units/#transition)-ExpandableItem | 0.2s ease | 0.2s ease |

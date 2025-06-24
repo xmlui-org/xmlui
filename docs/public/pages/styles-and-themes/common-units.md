@@ -710,16 +710,37 @@ This value sets whether lines of text are laid out horizontally or vertically, a
   <FlowLayout gap="24px">
     <VStack width="150px" height="200px" border="1px solid gray" padding="8px">
       <Text>horizontal-tb</Text>
-      <Text writingMode="horizontal-tb">This is text in horizontal writing mode</Text>
+      <Text writingMode="horizontal-tb">Horizontal writing mode</Text>
     </VStack>
     <VStack width="150px" height="200px" border="1px solid gray" padding="8px">
       <Text>vertical-rl</Text>
-      <Text writingMode="vertical-rl">This is text in vertical writing mode</Text>
+      <Text writingMode="vertical-rl">Vertical/right-to-left</Text>
     </VStack>
     <VStack width="150px" height="200px" border="1px solid gray" padding="8px">
       <Text>vertical-lr</Text>
-      <Text writingMode="vertical-lr">This is text in vertical left-to-right mode</Text>
+      <Text writingMode="vertical-lr">Vertical/left-to-right</Text>
     </VStack>
   </FlowLayout>
 </App>
 ```
+
+## Transition Values [#transition]
+
+This value specifies the CSS property to animate, the duration of the transition effect, the timing function, and the delay before the transition starts. It creates smooth animations between property value changes.
+
+A transition value can include up to four parts (in any order):
+- **Property name**: Specifies the CSS property to transition (e.g., `opacity`, `color`, `width`)
+- **Duration**: How long the transition takes (e.g., `0.5s`, `300ms`)
+- **Timing function**: How the transition progresses over time (e.g., `ease`, `linear`)
+- **Delay**: How long to wait before starting the transition (e.g., `0s`, `200ms`)
+
+You can specify multiple transitions by separating them with commas.
+
+| Timing Function Values | Description |
+| --------------------- | ----------- |
+| `ease`                | Starts slow, becomes fast, then ends slowly. This is the default value. |
+| `linear`              | Same speed from start to end. |
+| `ease-in`             | Starts slowly and accelerates. |
+| `ease-out`            | Starts quickly and decelerates. |
+| `ease-in-out`         | Starts slowly, speeds up in the middle, and ends slowly. |
+| `cubic-bezier(n,n,n,n)` | Define your own timing function with four values. |

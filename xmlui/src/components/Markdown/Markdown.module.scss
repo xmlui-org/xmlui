@@ -15,8 +15,8 @@ $backgroundColor-MarkDown: createThemeVar("backgroundColor-Markdown");
 
 $themeVars: t.composePaddingVars($themeVars, "Blockquote");
 $themeVars: t.composeBorderVars($themeVars, "Blockquote");
-$accentColor-Blockquote: createThemeVar("accentColor-Blockquote");
-$accentWidth-Blockquote: createThemeVar("accentWidth-Blockquote");
+$color-accent-Blockquote: createThemeVar("color-accent-Blockquote");
+$width-accent-Blockquote: createThemeVar("width-accent-Blockquote");
 $backgroundColor-Blockquote: createThemeVar("backgroundColor-Blockquote");
 $paddingLeft-Blockquote: createThemeVar("paddingLeft-Blockquote");
 $borderRadius-Blockquote: createThemeVar("borderRadius-Blockquote");
@@ -27,7 +27,7 @@ $themeVars: t.composePaddingVars($themeVars, "Admonition");
 $themeVars: t.composeBorderVars($themeVars, "Admonition");
 $backgroundColor-Admonition: createThemeVar("backgroundColor-Admonition");
 $borderRadius-Admonition: createThemeVar("borderRadius-Admonition");
-$iconSize-Admonition: createThemeVar("iconSize-Admonition");
+$size-icon-Admonition: createThemeVar("size-icon-Admonition");
 $marginTop-Admonition: createThemeVar("marginTop-Admonition");
 $marginBottom-Admonition: createThemeVar("marginBottom-Admonition");
 $marginLeft-Admonition-content: createThemeVar("marginLeft-Admonition-content");
@@ -92,14 +92,14 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
     background-color: $backgroundColor-Blockquote;
 
     &::before {
-      background-color: $accentColor-Blockquote;
+      background-color: $color-accent-Blockquote;
       position: absolute;
       top: 0;
       left: 0;
       display: block;
       content: "";
       height: 100%;
-      width: $accentWidth-Blockquote;
+      width: $width-accent-Blockquote;
     }
   }
 
@@ -145,7 +145,7 @@ $marginBottom-HtmlVideo: createThemeVar("marginBottom-HtmlVideo");
   }
 
   .admonitionIcon {
-    font-size: $iconSize-Admonition;
+    font-size: $size-icon-Admonition;
     line-height: 1;
   }
 

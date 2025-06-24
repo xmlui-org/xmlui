@@ -417,10 +417,10 @@ This component does not expose any methods.
 | [textDecorationThickness](../styles-and-themes/common-units/#textDecoration)-Text-inserted | *none* | *none* |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-abbr | uppercase | uppercase |
 | [textTransform](../styles-and-themes/common-units/#textTransform)-Text-subheading | uppercase | uppercase |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-code | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-codefence | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-markdown | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-small | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Text-sup | super | super |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-code | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-codefence | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-markdown | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-small | *none* | *none* |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Text-sup | super | super |

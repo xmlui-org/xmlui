@@ -433,6 +433,9 @@ export type LayoutProps = {
   cursor?: string;
   zoom?: string | number;
   whiteSpace?: string;
+
+  // --- Animation
+  transition?: string;
 };
 
 // The properties constituting a component's layout
@@ -542,4 +545,7 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   outlineColor: [],
   outlineStyle: [],
   outlineOffset: [],
+
+  // --- Animation
+  transition: [],
 };

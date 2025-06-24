@@ -77,9 +77,9 @@ export const TextMd = createMetadata({
     [`fontFamily-${COMP}-sample`]: "$fontFamily-monospace",
     [`fontSize-${COMP}-sample`]: "$fontSize-small",
     [`fontSize-${COMP}-sup`]: "$fontSize-smaller",
-    [`verticalAlign-${COMP}-sup`]: "super",
+    [`verticalAlignment-${COMP}-sup`]: "super",
     [`fontSize-${COMP}-sub`]: "$fontSize-smaller",
-    [`verticalAlign-${COMP}-sub`]: "sub",
+    [`verticalAlignment-${COMP}-sub`]: "sub",
     [`fontStyle-${COMP}-var`]: "italic",
     [`fontStyle-${COMP}-em`]: "italic",
     [`fontFamily-${COMP}-mono`]: "$fontFamily-monospace",
@@ -134,6 +134,8 @@ export const textComponentRenderer = createComponentRenderer(
         .filter(([key, _]) => VariantPropsKeys.includes(key as any))
         .map(([key, value]) => [key, extractValue(value)]),
     );
+
+    console.log("Text", layoutCss);
 
     return (
       <Text

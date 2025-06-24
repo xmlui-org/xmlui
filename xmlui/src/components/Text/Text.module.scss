@@ -20,7 +20,7 @@ $component: "Text";
   margin-bottom: createThemeVar("marginBottom-#{$variantName}");
   margin-left: createThemeVar("marginLeft-#{$variantName}");
   margin-right: createThemeVar("marginRight-#{$variantName}");
-  vertical-align: createThemeVar("verticalAlign-#{$variantName}");
+  vertical-align: createThemeVar("verticalAlignment-#{$variantName}");
 }
 
 .text {
@@ -226,12 +226,12 @@ $component: "Text";
 
   &.sup {
     font-size: createThemeVar("fontSize-#{$component}-sup");
-    vertical-align: createThemeVar("verticalAlign-#{$component}-sup");
+    vertical-align: createThemeVar("verticalAlignment-#{$component}-sup");
   }
 
   &.sub {
     font-size: createThemeVar("fontSize-#{$component}-sub");
-    vertical-align: createThemeVar("verticalAlign-#{$component}-sub");
+    vertical-align: createThemeVar("verticalAlignment-#{$component}-sub");
   }
 
   &.var {

@@ -65,4 +65,4 @@ This component does not expose any methods.
 | [paddingTop](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Footer | $textColor-secondary | $textColor-secondary |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Footer | center | center |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Footer | center | center |

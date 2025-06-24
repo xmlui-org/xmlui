@@ -294,6 +294,10 @@ The [value](/styles-and-themes/common-units#text-wrap) of this property controls
 
 Sets the [top](/styles-and-themes/common-units#size) position of the component to the specified value.
 
+## `transition`
+
+This property is a shorthand for [transition effects](/styles-and-themes/common-units#transition) that specify the CSS property to which a transition effect should be applied, the duration and timing of the transition, and any delay.
+
 ## `userSelect`
 
 This property controls whether the [user can select](/styles-and-themes/common-units#user-select) text.

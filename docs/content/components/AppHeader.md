@@ -88,7 +88,7 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| align-content-AppHeader | *none* | *none* |
+| [alignment](../styles-and-themes/common-units/#alignment)-content-AppHeader | *none* | *none* |
 | [backgroundColor](../styles-and-themes/common-units/#color)-AppHeader | $color-surface-raised | $color-surface-raised |
 | [border](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
 | [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | 1px solid $borderColor | 1px solid $borderColor |
