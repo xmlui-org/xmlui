@@ -123,3 +123,80 @@ jobs:
           files: "tools/vscode/*.vsix"
           tag_name: ${{ steps.xmlui_vscode_info.outputs.tag }}
           fail_on_unmatched_files: true
+
+      - name: Update releases.json
+        if: steps.changesets_publish.outputs.published == 'true'
+        run: |
+          # Extract changes from PR description
+          CHANGES=""
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            CHANGES=$(echo '${{ github.event.pull_request.body }}' | grep -v "This PR was created by the \[changesets release\]" | grep -v "^$" | tr '\n' ' ' | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
+          fi
+
+          # Get file size of standalone JS if it exists
+          FILE_SIZE=""
+          if [ ! -z "$STANDALONE_FILENAME" ]; then
+            FILE_SIZE=$(ls -l "$STANDALONE_FILENAME" | awk '{print $5}')
+          fi
+
+          # Get current timestamp
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Read the current releases.json file
+          RELEASES_JSON=$(cat releases.json)
+          
+          # Initialize new releases array
+          NEW_RELEASES=[]
+          
+          # Add the new release info for the main xmlui package if it was published
+          if [ ! -z "$XMLUI_VERSION" ]; then
+            NEW_RELEASE="{\"name\":\"xmlui@$XMLUI_VERSION\",\"version\":\"$XMLUI_VERSION\",\"timestamp\":\"$TIMESTAMP\",\"changes\":\"$CHANGES\",\"fileSize\":\"$FILE_SIZE\"}"
+            NEW_RELEASES=$(echo $NEW_RELEASES | jq ". += [$NEW_RELEASE]")
+          fi
+          
+          # Add release info for all other published packages
+          if [ "${{ steps.changesets_publish.outputs.published }}" == "true" ]; then
+            PUBLISHED_PACKAGES='${{ steps.changesets_publish.outputs.publishedPackages }}'
+            
+            # Loop through each published package
+            for pkg in $(echo $PUBLISHED_PACKAGES | jq -r '.[] | @base64'); do
+              PKG_INFO=$(echo $pkg | base64 --decode)
+              PKG_NAME=$(echo $PKG_INFO | jq -r '.name')
+              PKG_VERSION=$(echo $PKG_INFO | jq -r '.version')
+              
+              # Skip if it's the main xmlui package (already added above)
+              if [ "$PKG_NAME" != "xmlui" ]; then
+                NEW_RELEASE="{\"name\":\"$PKG_NAME@$PKG_VERSION\",\"version\":\"$PKG_VERSION\",\"timestamp\":\"$TIMESTAMP\",\"changes\":\"$CHANGES\"}"
+                NEW_RELEASES=$(echo $NEW_RELEASES | jq ". += [$NEW_RELEASE]")
+              fi
+            done
+          fi
+          
+          # Add VSCode extension info if it was published
+          if [ "${{ steps.xmlui_vscode_info.outputs.tagExists }}" == "false" ]; then
+            VSCODE_VERSION="${{ steps.xmlui_vscode_info.outputs.tag }}"
+            if [ ! -z "$VSCODE_VERSION" ]; then
+              VSCODE_VERSION_NUMBER=$(echo $VSCODE_VERSION | sed 's/xmlui-vscode@//')
+              NEW_RELEASE="{\"name\":\"$VSCODE_VERSION\",\"version\":\"$VSCODE_VERSION_NUMBER\",\"timestamp\":\"$TIMESTAMP\",\"changes\":\"$CHANGES\"}"
+              NEW_RELEASES=$(echo $NEW_RELEASES | jq ". += [$NEW_RELEASE]")
+            fi
+          fi
+          
+          # Combine existing releases with new ones
+          COMBINED_RELEASES=$(echo $RELEASES_JSON | jq ".releases += $NEW_RELEASES")
+          
+          # Write back to releases.json
+          echo $COMBINED_RELEASES | jq . > releases.json
+          
+          # Print the updated file for logging
+          echo "Updated releases.json with new release information:"
+          cat releases.json
+          
+      - name: Commit and push releases.json
+        if: steps.changesets_publish.outputs.published == 'true'
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add releases.json
+          git commit -m "chore: update releases.json with latest release info [skip ci]"
+          git push

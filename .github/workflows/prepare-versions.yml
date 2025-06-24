@@ -27,6 +27,22 @@ jobs:
       - name: Install Dependencies
         run: npm ci --prefer-offline
 
+      - name: Extract Pending Changes
+        id: extract_changes
+        run: |
+          # Extract pending changes from .changeset files
+          if [ -d .changeset ]; then
+            CHANGES=$(find .changeset -name "*.md" -not -name "README.md" -exec cat {} \; | grep -v "^---" | grep -v "^$" | sort -u)
+            echo "CHANGES<<EOF" >> $GITHUB_ENV
+            echo "$CHANGES" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+            
+            echo "Found pending changes in changesets:"
+            echo "$CHANGES"
+          else
+            echo "No .changeset directory found"
+          fi
+
       - name: Create Version PR
         id: changesets_pr
         uses: changesets/action@v1
@@ -38,7 +54,30 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Output Changeset PR URL
+      - name: Enhance PR Description with Changes
         if: steps.changesets_pr.outputs.pullRequestUrl
         run: |
-          echo "Version PR created: ${{ steps.changesets_pr.outputs.pullRequestUrl }}"
+          PR_NUMBER=$(echo "${{ steps.changesets_pr.outputs.pullRequestUrl }}" | awk -F/ '{print $NF}')
+          
+          # Get current PR description
+          PR_DESCRIPTION=$(gh pr view $PR_NUMBER --json body -q .body)
+          
+          # Get the changes found earlier
+          CHANGES="${{ env.CHANGES }}"
+          
+          if [ ! -z "$CHANGES" ]; then
+            # Enhance PR description with detailed changes
+            NEW_DESCRIPTION="$PR_DESCRIPTION
+
+### Detailed Changes
+$CHANGES"
+            
+            # Update PR description
+            gh pr edit $PR_NUMBER --body "$NEW_DESCRIPTION"
+            
+            echo "Enhanced PR description with detailed changes"
+          else
+            echo "No changes to add to PR description"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
