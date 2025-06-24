@@ -228,6 +228,7 @@ type Props = {
   onSubmit?: OnSubmit;
   onCancel?: OnCancel;
   onReset?: OnReset;
+  onSuccess?: (result: any)=>void;
   buttonRow?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   itemLabelBreak?: boolean;
@@ -283,6 +284,7 @@ const Form = forwardRef(function (
     onSubmit,
     onCancel,
     onReset,
+    onSuccess,
     buttonRow,
     id,
     registerComponentApi,
@@ -351,10 +353,11 @@ const Form = forwardRef(function (
     try {
       const filteredSubject = cleanUpSubject(formState.subject);
 
-      await onSubmit?.(filteredSubject, {
-        passAsDefaultBody: true,
+      const result = await onSubmit?.(filteredSubject, {
+        passAsDefaultBody: true
       });
       dispatch(formSubmitted());
+      await onSuccess?.(result);
 
       if (!keepModalOpenOnSubmit) {
         requestModalFormClose();
@@ -563,6 +566,13 @@ export function FormWithContextVar({
   const initialValue = extractValue(node.props.data);
   const submitMethod =
     extractValue.asOptionalString(node.props.submitMethod) || (initialValue ? "put" : "post");
+  const inProgressNotificationMessage =
+    extractValue.asOptionalString(node.props.inProgressNotificationMessage) || "";
+  const completedNotificationMessage =
+    extractValue.asOptionalString(node.props.completedNotificationMessage) || "";
+  const errorNotificationMessage =
+    extractValue.asOptionalString(node.props.errorNotificationMessage) || "";
+
   const submitUrl =
     extractValue.asOptionalString(node.props.submitUrl) ||
     extractValue.asOptionalString(node.props._data_url);
@@ -583,7 +593,7 @@ export function FormWithContextVar({
       swapCancelAndSave={extractValue.asOptionalBoolean(node.props.swapCancelAndSave, false)}
       onSubmit={lookupEventHandler("submit", {
         defaultHandler: submitUrl
-          ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs })`
+          ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs, inProgressNotificationMessage: "${inProgressNotificationMessage}", completedNotificationMessage: "${completedNotificationMessage}", errorNotificationMessage: "${errorNotificationMessage}" })`
           : undefined,
         context: {
           $data,
@@ -595,6 +605,11 @@ export function FormWithContextVar({
         },
       })}
       onReset={lookupEventHandler("reset", {
+        context: {
+          $data,
+        },
+      })}
+      onSuccess={lookupEventHandler("success", {
         context: {
           $data,
         },

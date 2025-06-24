@@ -85,6 +85,9 @@ export const FormMd = createMetadata({
         "This property sets the HTTP method to use when submitting the form data. If not " +
         "defined, `put` is used when the form has initial data; otherwise, `post`.",
     },
+    inProgressNotificationMessage: d("This property sets the message to display when the form is being submitted."),
+    completedNotificationMessage: d("This property sets the message to display when the form is submitted successfully."),
+    errorNotificationMessage: d("This property sets the message to display when the form submission fails."),
     enabled: dEnabled(),
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
   },
@@ -93,6 +96,7 @@ export const FormMd = createMetadata({
       `The form infrastructure fires this event when the form is submitted. The event argument ` +
         `is the current \`data\` value to save.`,
     ),
+    success: d("The form infrastructure fires this event when the form is submitted successfully."),
     cancel: d(`The form infrastructure fires this event when the form is canceled.`),
     reset: d(`The form infrastructure fires this event when the form is reset.`),
   },
