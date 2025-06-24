@@ -15,6 +15,7 @@ logger.info("Components summary");
 
 const componentsMetaFolder = path.join(FOLDERS.script, "metadata", "components");
 const componentsOutFolder = path.join(FOLDERS.docsRoot, "content", "components");
+
 generateComponentsSummary(
   path.join(componentsMetaFolder, "metadata.json"),
   "components",
@@ -109,7 +110,7 @@ function generateComponentsSummary(
  * @param {boolean?} hasRowNums should the table have numbered rows
  * @returns stringified markdown table
  */
-function createSummary(metadata, urlPath, filePath, hasRowNums = true) {
+function createSummary(metadata, urlPath, filePath, hasRowNums = false) {
   const headers = [{ value: "Component", style: "center" }, "Description"];
   const rows = metadata
     .sort((a, b) => a.displayName.localeCompare(b.displayName))
