@@ -20,13 +20,13 @@
   "scripts": {
     "changeset:add": "changeset add",
     "changeset:version": "changeset version",
-    "changeset:publish": "changeset publish",
+    "changeset:publish": "changeset publish --force",
     "build-xmlui": "turbo run build:xmlui-all",
     "build-vscode-extension": "turbo run xmlui-vscode#build:vsix",
     "test-xmlui:ci": "CI=true npm run test-xmlui",
     "test-xmlui": "turbo run build:xmlui-all test:xmlui-all",
     "test-xmlui-smoke": "turbo run build:xmlui-all test:xmlui-smoke",
-    "publish-packages": "turbo run build:xmlui-all test:xmlui-all && npm run changeset:publish",
+    "publish-packages": "npm cache clean --force && turbo run build:xmlui-all test:xmlui-all && npm run changeset:publish",
     "build-extensions": "turbo run build:extension",
     "build-docs": "turbo run build:xmlui-all build:docs"
   }
