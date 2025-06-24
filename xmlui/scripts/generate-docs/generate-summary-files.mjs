@@ -79,6 +79,12 @@ function generateComponentsSummary(
   hasRowNums,
 ) {
   try {
+    if (!fs.existsSync(metadataFile)) {
+      throw new Error(
+        `Metadata file does not exist: ${metadataFile}. Please run generate-docs first.`,
+      );
+    }
+    
     const outFile = path.join(outFolder, summaryFile ?? `_overview.md`);
     if (!fs.existsSync(outFile)) {
       fs.writeFileSync(outFile, "");

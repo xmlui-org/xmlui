@@ -1,4 +1,4 @@
-import React, { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
+import React, { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -149,7 +149,7 @@ export const ModalDialog = React.forwardRef(
                             Code
                           </Button>
                           <div className={styles.actions}>
-                            <Tooltip label={"Edit code in new window"}>
+                            <Tooltip label={"View and edit in new full-width window"}>
                               <Button
                                 onClick={popupPlayground}
                                 size={"xs"}
