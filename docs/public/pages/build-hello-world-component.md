@@ -7,7 +7,7 @@ This guide will walk you through creating a complete React-based component for X
 By the end of this guide, you'll have created a HelloWorld component that:
 
 - Displays a customizable greeting message
-- Features an interactive click counter  
+- Features an interactive click counter
 - Supports theme variants (default, success)
 - Uses XMLUI's standard theming system
 - Supports nested children content
@@ -169,7 +169,7 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
   @include t.paddingVars($themeVars, $component);
   @include t.borderVars($themeVars, $component);
   @include t.textVars($themeVars, $component);
-  
+
   border-radius: createThemeVar("borderRadius-#{$component}");
   font-family: system-ui, -apple-system, sans-serif;
   transition: all 0.2s ease-in-out;
@@ -336,7 +336,7 @@ export const HelloWorldMd = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`padding-${COMP}`]: "$space-4",
     [`textColor-${COMP}`]: "$color-primary",
-    
+
     // Success theme variant
     [`backgroundColor-${COMP}-success`]: "$color-success-50",
     [`borderColor-${COMP}-success`]: "$color-success-200",
@@ -413,18 +413,18 @@ You can now use your HelloWorld component in XMLUI markup:
 
 Try these examples in the XMLUI playground:
 
-```xmlui-pg
+```xmlui-pg display
 <App>
   <VStack spacing="4">
     <!-- Custom message -->
     <HelloWorld message="Hello World!" />
 
     <!-- With nested content -->
-    <HelloWorld message="I have children:">
-      <Text>This is nested content inside HelloWorld!</Text>
-      <Text>Pretty cool, right?</Text>
+    <HelloWorld message="Nested content">
+      <Text>Nested text</Text>
     </HelloWorld>
 
+    <!-- Theme variant -->
     <HelloWorld message="Success theme" theme="success" />
 
   </VStack>
@@ -539,17 +539,17 @@ In your component metadata, provide sensible defaults using XMLUI's semantic tok
 defaultThemeVars: {
   // Use semantic color tokens
   [`backgroundColor-${COMP}`]: "$color-surface-50",
-  [`borderColor-${COMP}`]: "$color-surface-200", 
+  [`borderColor-${COMP}`]: "$color-surface-200",
   [`textColor-${COMP}`]: "$color-primary",
-  
+
   // Use spacing tokens
   [`padding-${COMP}`]: "$space-4",
   [`borderWidth-${COMP}`]: "$space-2",
-  
+
   // Use design tokens
   [`borderRadius-${COMP}`]: "$borderRadius",
   [`borderStyle-${COMP}`]: "solid",
-  
+
   // Variant defaults
   [`backgroundColor-${COMP}-success`]: "$color-success-50",
   [`borderColor-${COMP}-success`]: "$color-success-200",
@@ -569,36 +569,6 @@ defaultThemeVars: {
 
 **Browser Compatibility**: This approach works reliably across all browsers, including older versions of Edge.
 
-## Testing Your Component
-
-### Interactive Testing
-
-Test your component thoroughly in the XMLUI playground:
-
-```xmlui-pg
-<App>
-  <VStack spacing="4">
-    <!-- Test default props -->
-    <HelloWorld />
-    
-    <!-- Test custom message -->
-    <HelloWorld message="Custom greeting!" />
-    
-    <!-- Test theme variants -->
-    <HelloWorld message="Success theme" theme="success" />
-    
-    <!-- Test with children -->
-    <HelloWorld message="With nested content:">
-      <Text>Nested text content</Text>
-      <Button>Nested button</Button>
-    </HelloWorld>
-    
-    <!-- Test interactivity -->
-    <HelloWorld message="Click the button multiple times" />
-  </VStack>
-</App>
-```
-
 ### Common Testing Scenarios
 
 1. **Default State**: Verify the component renders correctly with no props
@@ -608,15 +578,6 @@ Test your component thoroughly in the XMLUI playground:
 5. **Interactive Behavior**: Test all interactive features (clicks, state changes)
 6. **Edge Cases**: Test with empty strings, very long text, etc.
 
-## Next Steps
-
-Now that you've built a complete HelloWorld component, you can:
-
-1. **Explore Other Components**: Study existing XMLUI components for more advanced patterns
-2. **Add More Features**: Extend your component with additional props and functionality
-3. **Create Custom Themes**: Build custom theme variants for your specific use cases
-4. **Build Complex Components**: Apply these patterns to create more sophisticated components
-5. **Contribute Back**: Consider contributing your components to the XMLUI library
 
 ## Summary
 
