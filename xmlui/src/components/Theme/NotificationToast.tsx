@@ -1,4 +1,4 @@
-import { CSSProperties } from "react";
+import { CSSProperties, useEffect, useState } from "react";
 import toast, { ToastBar, Toaster } from "react-hot-toast";
 
 const TOASTER_CONTAINER_STYLE: CSSProperties = {
@@ -14,7 +14,19 @@ type NotificationToastProps = {
   toastDuration?: number;
 };
 
+let toasterMounted = false;
+
 export const NotificationToast = ({ toastDuration }: NotificationToastProps) => {
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (!toasterMounted) {
+      toasterMounted = true;
+      setShouldRender(true);
+    }
+  }, []);
+
+  if (!shouldRender) return null;
   return (
     <Toaster
       position={"top-right"}
