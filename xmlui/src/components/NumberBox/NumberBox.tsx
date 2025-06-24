@@ -123,12 +123,12 @@ export const numberBoxComponentRenderer = createComponentRenderer(
     updateState,
     lookupEventHandler,
     extractValue,
-    layoutCss,
+    className,
     registerComponentApi,
   }) => {
     return (
       <NumberBox
-        style={layoutCss}
+        className={className}
         value={state?.value}
         initialValue={extractValue.asOptionalString(node.props.initialValue)}
         step={extractValue(node.props.step)}

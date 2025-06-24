@@ -142,6 +142,17 @@ export const NavGroup = forwardRef(function NavGroup(
   );
 });
 
+type ExpandableNavGroupProps = {
+  style?: CSSProperties;
+  label: string;
+  icon: ReactNode;  
+  node: NavGroupComponentDef;
+  renderChild: RenderChildFn;
+  to?: string;
+  initiallyExpanded?: boolean;
+  disabled?: boolean;
+};
+
 const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   {
     style = EMPTY_OBJECT,
@@ -152,16 +163,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     to,
     initiallyExpanded = false,
     disabled = false,
-  }: {
-    style?: CSSProperties;
-    label: string;
-    icon: ReactNode;
-    node: NavGroupComponentDef;
-    renderChild: RenderChildFn;
-    to?: string;
-    initiallyExpanded?: boolean;
-    disabled?: boolean;
-  },
+  }: ExpandableNavGroupProps,
   ref,
 ) {
   const { level, iconVerticalCollapsed, iconVerticalExpanded } = useContext(NavGroupContext);
@@ -210,7 +212,6 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 
 const DropDownNavGroup = forwardRef(function DropDownNavGroup(
   {
-    style,
     label,
     icon,
     renderChild,

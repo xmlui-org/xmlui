@@ -21,7 +21,7 @@ export const LogoMd = createMetadata({
 export const logoComponentRenderer = createComponentRenderer(
   COMP,
   LogoMd,
-  ({ node, layoutCss, extractValue }) => {
-    return <Logo style={layoutCss} />;
+  ({ className }) => {
+    return <Logo className={className} />;
   },
 );

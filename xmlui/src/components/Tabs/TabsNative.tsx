@@ -83,7 +83,7 @@ export const Tabs = forwardRef(function Tabs(
     <TabContext.Provider value={tabContextValue}>
       <RTabs.Root
         ref={forwardedRef}
-        className={classnames(styles.tabs, className)}
+        className={classnames(className, styles.tabs)}
         value={`${currentTab}`}
         onValueChange={(tab) => {
           const newIndex = tabItems.findIndex((item) => item.id === tab);

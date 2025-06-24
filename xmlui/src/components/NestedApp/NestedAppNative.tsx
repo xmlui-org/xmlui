@@ -33,7 +33,6 @@ type NestedAppProps = {
   height?: string | number;
   allowPlaygroundPopup?: boolean;
   withFrame?: boolean;
-  playgroundId?: string;
 };
 
 export function LazyNestedApp(props) {
@@ -68,7 +67,6 @@ export function NestedApp({
   height,
   allowPlaygroundPopup = defaultProps.allowPlaygroundPopup,
   withFrame = defaultProps.withFrame,
-  playgroundId,
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);

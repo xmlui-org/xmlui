@@ -20,87 +20,88 @@ $thickness-resizer-Splitter: createThemeVar("thickness-resizer-#{$component}");
 $cursor-resizer-horizontal-Splitter: createThemeVar("cursor-resizer-horizontal-#{$component}");
 $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-#{$component}");
 
-.splitter {
-  overflow: hidden;
-  position: relative;
-  flex-wrap: nowrap;
-  display: flex;
-  height: 100%;
-  width: 100%;
-  box-shadow: $boxShadow-Splitter;
-  background-color: $backgroundColor-Splitter;
-  border-radius: $borderRadius-Splitter;
-  border: $border-Splitter $borderStyle-Splitter $borderColor-Splitter;
-  user-select: none;
-
-  &.vertical {
-    flex-direction: column;
-  }
-
-  &.horizontal {
-    flex-direction: row;
-  }
-}
-
-.panel {
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.primaryPanel {
-  flex-shrink: 0;
-  flex-grow: 0;
-  overflow: auto;
-  order: 1;
-}
-
-.secondaryPanel {
-  flex: 1;
-  overflow: auto;
-  order: 3;
-}
-
-.resizer {
-  order: 2;
-  overflow: hidden;
-  background-color: t.useVar($backgroundColor-resizer-Splitter, transparent);
-
-  &.vertical {
-    cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);
-    height: t.useVar($thickness-resizer-Splitter, 5px);
-  }
-
-  &.horizontal {
-    cursor: t.useVar($cursor-resizer-horizontal-Splitter, ew-resize);
-    width: t.useVar($thickness-resizer-Splitter, 5px);
-  }
-}
-
-.floatingResizer {
-  position: absolute;
-  z-index: 1000;
-  opacity: 0;
-  overflow: hidden;
-  transition: opacity 0.2s;
-  background-color: t.useVar($backgroundColor-resizer-Splitter, transparent);
-
-  &.vertical {
-    cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);
-    width: 100%;
-    height: t.useVar($thickness-resizer-Splitter, 5px);
-    transform: translateY(-50%);
-  }
-
-  &.horizontal {
-    cursor: t.useVar($cursor-resizer-horizontal-Splitter, ew-resize);
-    width: t.useVar($thickness-resizer-Splitter, 5px);
+@layer components {
+  .splitter {
+    overflow: hidden;
+    position: relative;
+    flex-wrap: nowrap;
+    display: flex;
     height: 100%;
-    transform: translateX(-50%);
+    width: 100%;
+    box-shadow: $boxShadow-Splitter;
+    background-color: $backgroundColor-Splitter;
+    border-radius: $borderRadius-Splitter;
+    border: $border-Splitter $borderStyle-Splitter $borderColor-Splitter;
+    user-select: none;
+
+    &.vertical {
+      flex-direction: column;
+    }
+
+    &.horizontal {
+      flex-direction: row;
+    }
+  }
+
+  .panel {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .primaryPanel {
+    flex-shrink: 0;
+    flex-grow: 0;
+    overflow: auto;
+    order: 1;
+  }
+
+  .secondaryPanel {
+    flex: 1;
+    overflow: auto;
+    order: 3;
+  }
+
+  .resizer {
+    order: 2;
+    overflow: hidden;
+    background-color: t.useVar($backgroundColor-resizer-Splitter, transparent);
+
+    &.vertical {
+      cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);
+      height: t.useVar($thickness-resizer-Splitter, 5px);
+    }
+
+    &.horizontal {
+      cursor: t.useVar($cursor-resizer-horizontal-Splitter, ew-resize);
+      width: t.useVar($thickness-resizer-Splitter, 5px);
+    }
+  }
+
+  .floatingResizer {
+    position: absolute;
+    z-index: 1000;
+    opacity: 0;
+    overflow: hidden;
+    transition: opacity 0.2s;
+    background-color: t.useVar($backgroundColor-resizer-Splitter, transparent);
+
+    &.vertical {
+      cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);
+      width: 100%;
+      height: t.useVar($thickness-resizer-Splitter, 5px);
+      transform: translateY(-50%);
+    }
+
+    &.horizontal {
+      cursor: t.useVar($cursor-resizer-horizontal-Splitter, ew-resize);
+      width: t.useVar($thickness-resizer-Splitter, 5px);
+      height: 100%;
+      transform: translateX(-50%);
+    }
   }
 }
-
 
 // --- We export the theme variables to add them to the component renderer
 :export {

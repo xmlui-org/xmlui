@@ -54,12 +54,12 @@ export const LineChartMd = createMetadata({
 export const lineChartComponentRenderer = createComponentRenderer(
   COMP,
   LineChartMd,
-  ({ extractValue, node, layoutCss, lookupSyncCallback, renderChild }: any) => {
+  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
     return (
       <LineChart
         tickFormatter={lookupSyncCallback(node.props?.tickFormatter)}
         data={extractValue(node.props?.data)}
-        style={layoutCss}
+        className={className}
         dataKeys={extractValue(node.props?.dataKeys)}
         nameKey={extractValue(node.props?.nameKey)}
         hideX={extractValue(node.props?.hideX)}

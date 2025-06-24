@@ -3,6 +3,7 @@ import { createContext, useContext } from "react";
 
 export type OurColumnMetadata = {
   style?: CSSProperties;
+  className?: string;
   header: string;
   accessorKey?: string;
   id?: string;

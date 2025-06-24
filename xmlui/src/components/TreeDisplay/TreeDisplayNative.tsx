@@ -1,4 +1,5 @@
 import { type CSSProperties, type ForwardedRef, forwardRef, type ReactNode, useMemo } from "react";
+import classnames from "classnames";
 
 import styles from "./TreeDisplay.module.scss";
 
@@ -11,6 +12,7 @@ type TreeNode = {
 
 type Props = {
   style?: CSSProperties;
+  className?: string;
   children?: ReactNode;
   content?: string;
   itemHeight?: number;
@@ -217,7 +219,7 @@ const renderTreeNode = (
 };
 
 export const TreeDisplay = forwardRef(function TreeDisplay(
-  { style, children, content = defaultProps.content, itemHeight = defaultProps.itemHeight }: Props,
+  { style, className, children, content = defaultProps.content, itemHeight = defaultProps.itemHeight }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const contentString = (content || children?.toString() || "").toString();
@@ -225,7 +227,7 @@ export const TreeDisplay = forwardRef(function TreeDisplay(
   const treeNodes = useMemo(() => parseTreeContent(contentString), [contentString]);
 
   return (
-    <div className={styles.treeDisplay} style={style} ref={forwardedRef}>
+    <div className={classnames(styles.treeDisplay, className)} style={style} ref={forwardedRef}>
       <div className={styles.content}>
         {treeNodes.map((node, index) => renderTreeNode(node, index, itemHeight, 0, []))}
       </div>

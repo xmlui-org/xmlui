@@ -31,7 +31,7 @@ export const Backdrop = forwardRef(function Backdrop(
   const styleWithoutDims = { ...style, width: undefined };
   return (
     <div
-      className={classNames(className, styles.backdropContainer)}
+      className={classNames(styles.backdropContainer, className)}
       style={{ width: style.width ?? "fit-content" }}
       ref={forwardedRef}
     >

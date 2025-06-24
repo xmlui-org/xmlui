@@ -34,6 +34,7 @@ type OnOpen = (...args: any[]) => void;
 type ModalProps = {
   isInitiallyOpen?: boolean;
   style?: CSSProperties;
+  className?: string;
   onClose?: OnClose;
   onOpen?: OnOpen;
   children?: ReactNode;
@@ -124,6 +125,7 @@ export const ModalDialog = React.forwardRef(
     {
       children,
       style,
+      className,
       isInitiallyOpen,
       fullScreen = defaultProps.fullScreen,
       title,
@@ -191,7 +193,7 @@ export const ModalDialog = React.forwardRef(
             })}
           >
             <Dialog.Content
-              className={classnames(styles.content)}
+              className={classnames(styles.content, className)}
               onPointerDownOutside={(event) => {
                 if (
                   event.target instanceof Element &&

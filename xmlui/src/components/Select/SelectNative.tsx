@@ -68,6 +68,7 @@ type SelectProps = {
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   emptyListTemplate?: ReactNode;
   style?: CSSProperties;
+  className?: string;
   onDidChange?: (newValue: ValueType) => void;
   dropdownHeight?: CSSProperties["height"];
   validationStatus?: ValidationStatus;
@@ -227,6 +228,7 @@ export const Select = forwardRef(function Select(
     optionRenderer,
     valueRenderer,
     style,
+    className,
     dropdownHeight,
     children,
     autoFocus = defaultProps.autoFocus,
@@ -388,6 +390,7 @@ export const Select = forwardRef(function Select(
             onFocus={onFocus}
             onBlur={onBlur}
             style={style}
+            className={className}
           >
             {searchable || multiSelect ? (
               <Popover open={open} onOpenChange={setOpen} modal={false}>

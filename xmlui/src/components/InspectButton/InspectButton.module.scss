@@ -7,21 +7,23 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.icon {
-  font-size: t.$fontSize-normal;
-}
+@layer components {
+  .icon {
+    font-size: t.$fontSize-normal;
+  }
 
-.inspectButton {
-  display: flex;
-  gap: t.$space-1;
-  justify-content: center;
-}
+  .inspectButton {
+    display: flex;
+    gap: t.$space-1;
+    justify-content: center;
+  }
 
-.active {
-  background: t.$color-primary-500;
-}
+  .active {
+    background: t.$color-primary-500;
+  }
 
-// --- We export the theme variables to add them to the component renderer
-:export {
-  themeVars: t.json-stringify($themeVars)
+  // --- We export the theme variables to add them to the component renderer
+  :export {
+    themeVars: t.json-stringify($themeVars);
+  }
 }

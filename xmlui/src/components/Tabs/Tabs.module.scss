@@ -24,120 +24,121 @@ $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
 $borderRadius-list-Tabs: createThemeVar("borderRadius-list-Tabs");
 $border-list-Tabs: createThemeVar("border-list-Tabs");
 
-.tabs {
-  display: flex;
-  width: 100%;
-  background-color: $backgroundColor-Tabs;
-  overflow: hidden;
-  &[data-orientation='vertical'] {
-    flex-direction: row;
+@layer components {
+  .tabs {
+    display: flex;
+    width: 100%;
+    background-color: $backgroundColor-Tabs;
+    overflow: hidden;
+    &[data-orientation="vertical"] {
+      flex-direction: row;
+    }
+
+    &[data-orientation="horizontal"] {
+      flex-direction: column;
+    }
   }
 
-  &[data-orientation='horizontal'] {
-    flex-direction: column;
-  }
-}
-
-.filler {
-  flex: 1 1 auto;
-
-  &[data-orientation='vertical'] {
-    border-right-width: $borderWidth-Tabs;
-    border-right-style: solid;
-    border-right-color: $borderColor-Tabs;
-  }
-
-  &[data-orientation='horizontal'] {
-    border-bottom-width: $borderWidth-Tabs;
-    border-bottom-style: solid;
-    border-bottom-color: $borderColor-Tabs;
-  }
-}
-
-
-.tabTrigger {
-  @include t.paddingVars($themeVars, "trigger-Tabs");
-  &.distributeEvenly{
+  .filler {
     flex: 1 1 auto;
-  }
 
-  color: $textColor-trigger-Tabs;
-  background-color: $backgroundColor-trigger-Tabs;
-  border-radius: $borderRadius-trigger-Tabs;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: t.$fontSize-normal;
-  line-height: 1;
-  user-select: none;
-  //border-color: transparent;
-  border: $border-trigger-Tabs;
-
-  &:hover {
-    background-color: $backgroundColor-trigger-Tabs--hover;
-  }
-
-  &[data-orientation='vertical'] {
-    border-right-width: $borderWidth-Tabs;
-    border-right-style: solid;
-    border-right-color: $borderColor-Tabs;
-
-    &[data-state='active'] {
+    &[data-orientation="vertical"] {
       border-right-width: $borderWidth-Tabs;
       border-right-style: solid;
-      border-right-color: $borderColor-active-Tabs;
-      background-color: $backgroundColor-trigger-Tabs--active;
+      border-right-color: $borderColor-Tabs;
     }
-  }
 
-  &[data-orientation='horizontal'] {
-    border-bottom-width: $borderWidth-Tabs;
-    border-bottom-style: solid;
-    border-bottom-color: $borderColor-Tabs;
-
-    &[data-state='active'] {
+    &[data-orientation="horizontal"] {
       border-bottom-width: $borderWidth-Tabs;
       border-bottom-style: solid;
-      border-bottom-color: $borderColor-active-Tabs;
-      background-color: $backgroundColor-trigger-Tabs--active;
+      border-bottom-color: $borderColor-Tabs;
     }
   }
 
-  &:hover {
-    cursor: pointer;
+  .tabTrigger {
+    @include t.paddingVars($themeVars, "trigger-Tabs");
+    &.distributeEvenly {
+      flex: 1 1 auto;
+    }
+
+    color: $textColor-trigger-Tabs;
+    background-color: $backgroundColor-trigger-Tabs;
+    border-radius: $borderRadius-trigger-Tabs;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: t.$fontSize-normal;
+    line-height: 1;
+    user-select: none;
+    //border-color: transparent;
+    border: $border-trigger-Tabs;
+
+    &:hover {
+      background-color: $backgroundColor-trigger-Tabs--hover;
+    }
+
+    &[data-orientation="vertical"] {
+      border-right-width: $borderWidth-Tabs;
+      border-right-style: solid;
+      border-right-color: $borderColor-Tabs;
+
+      &[data-state="active"] {
+        border-right-width: $borderWidth-Tabs;
+        border-right-style: solid;
+        border-right-color: $borderColor-active-Tabs;
+        background-color: $backgroundColor-trigger-Tabs--active;
+      }
+    }
+
+    &[data-orientation="horizontal"] {
+      border-bottom-width: $borderWidth-Tabs;
+      border-bottom-style: solid;
+      border-bottom-color: $borderColor-Tabs;
+
+      &[data-state="active"] {
+        border-bottom-width: $borderWidth-Tabs;
+        border-bottom-style: solid;
+        border-bottom-color: $borderColor-active-Tabs;
+        background-color: $backgroundColor-trigger-Tabs--active;
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
   }
-}
 
-.tabsList {
-  background-color: $backgroundColor-list-Tabs;
-  border-radius: $borderRadius-list-Tabs;
-  border: $border-list-Tabs;
-  position: relative;
-  z-index: 99;
-  overflow: hidden;
-  display: flex;
-  flex-shrink: 0;
-  scrollbar-width: thin;
+  .tabsList {
+    background-color: $backgroundColor-list-Tabs;
+    border-radius: $borderRadius-list-Tabs;
+    border: $border-list-Tabs;
+    position: relative;
+    z-index: 99;
+    overflow: hidden;
+    display: flex;
+    flex-shrink: 0;
+    scrollbar-width: thin;
 
-  &[data-orientation='vertical'] {
-    flex-direction: column;
+    &[data-orientation="vertical"] {
+      flex-direction: column;
+    }
+
+    &[data-orientation="horizontal"] {
+      flex-direction: row;
+    }
   }
 
-  &[data-orientation='horizontal'] {
-    flex-direction: row;
+  .tabsList:hover {
+    overflow: auto;
   }
-}
 
-.tabsList:hover {
-  overflow: auto;
-}
-
-.tabsContent {
-  flex-grow: 1;
-  outline: none;
+  .tabsContent {
+    flex-grow: 1;
+    outline: none;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer
 :export {
-  themeVars: t.json-stringify($themeVars)
+  themeVars: t.json-stringify($themeVars);
 }

@@ -152,13 +152,17 @@ export const Toggle = forwardRef(function Toggle(
         onChange={onInputChange}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
-        className={classnames(styles.resetAppearance, className, {
-          [styles.checkbox]: variant === "checkbox",
-          [styles.switch]: variant === "switch",
-          [styles.error]: validationStatus === "error",
-          [styles.warning]: validationStatus === "warning",
-          [styles.valid]: validationStatus === "valid",
-        })}
+        className={classnames(
+          styles.resetAppearance,
+          {
+            [styles.checkbox]: variant === "checkbox",
+            [styles.switch]: variant === "switch",
+            [styles.error]: validationStatus === "error",
+            [styles.warning]: validationStatus === "warning",
+            [styles.valid]: validationStatus === "valid",
+          },
+          className,
+        )}
       />
     ),
     [

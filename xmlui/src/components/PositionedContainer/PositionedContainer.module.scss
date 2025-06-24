@@ -7,21 +7,23 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.wrapper{
-  position: absolute;
+@layer components {
+  .wrapper {
+    position: absolute;
 
-  &.visibleOnHover{
-    transition: opacity .1s;
-    opacity: 0;
+    &.visibleOnHover {
+      transition: opacity 0.1s;
+      opacity: 0;
+    }
   }
-}
 
-:has(>.wrapper){
-  position: relative;
+  :has(> .wrapper) {
+    position: relative;
 
-  &:hover{
-    .wrapper.visibleOnHover {
-      opacity: 1;
+    &:hover {
+      .wrapper.visibleOnHover {
+        opacity: 1;
+      }
     }
   }
 }

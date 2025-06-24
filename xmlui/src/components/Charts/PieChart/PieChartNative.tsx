@@ -22,6 +22,7 @@ export type PieChartProps = {
   dataKey: string;
   nameKey: string;
   style?: CSSProperties;
+  className?: string;
   showLabel?: boolean;
   showLabelList?: boolean;
   labelListPosition?: LabelPosition;
@@ -114,6 +115,7 @@ export function PieChart({
   dataKey,
   nameKey,
   style,
+  className,
   showLabel = defaultProps.showLabel,
   showLabelList = defaultProps.showLabelList,
   labelListPosition = defaultProps.labelListPosition,
@@ -180,7 +182,7 @@ export function PieChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style} width={width} height={height}>
+      <ResponsiveContainer style={style} className={className} width={width} height={height}>
         <RPieChart>
           <Tooltip content={<TooltipContent />} />
           <Pie

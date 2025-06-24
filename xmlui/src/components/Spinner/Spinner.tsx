@@ -34,16 +34,17 @@ export const SpinnerMd = createMetadata({
 export const spinnerComponentRenderer = createComponentRenderer(
   COMP,
   SpinnerMd,
-  ({ node, layoutCss, extractValue }) => {
-    delete layoutCss.width;
-    delete layoutCss.minWidth;
-    delete layoutCss.maxWidth;
-    delete layoutCss.height;
-    delete layoutCss.minHeight;
-    delete layoutCss.maxHeight;
+  ({ node, className, extractValue }) => {
+    // TODO: Remove this once the SpinnerNative is updated to use CSS variables
+    // delete layoutCss.width;
+    // delete layoutCss.minWidth;
+    // delete layoutCss.maxWidth;
+    // delete layoutCss.height;
+    // delete layoutCss.minHeight;
+    // delete layoutCss.maxHeight;
     return (
       <Spinner
-        style={layoutCss}
+        className={className}
         delay={extractValue.asOptionalNumber(node.props.delay)}
         fullScreen={extractValue.asOptionalBoolean(node.props.fullScreen)}
       />

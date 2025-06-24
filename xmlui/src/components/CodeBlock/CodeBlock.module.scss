@@ -14,72 +14,78 @@ $color-CodeBlock-headerSeparator: createThemeVar("color-CodeBlock-headerSeparato
 $marginTop-CodeBlock: createThemeVar("marginTop-CodeBlock");
 $marginBottom-CodeBlock: createThemeVar("marginBottom-CodeBlock");
 $backgroundColor-CodeBlock-highlightRow: createThemeVar("backgroundColor-CodeBlock-highlightRow");
-$backgroundColor-CodeBlock-highlightString: createThemeVar("backgroundColor-CodeBlock-highlightString");
-$borderColor-CodeBlock-highlightString-emphasis: createThemeVar("borderColor-CodeBlock-highlightString-emphasis");
+$backgroundColor-CodeBlock-highlightString: createThemeVar(
+  "backgroundColor-CodeBlock-highlightString"
+);
+$borderColor-CodeBlock-highlightString-emphasis: createThemeVar(
+  "borderColor-CodeBlock-highlightString-emphasis"
+);
 
-.codeBlock {
-  @include t.borderVars($themeVars, "CodeBlock");
-  @include t.paddingVars($themeVars, "CodeBlock");
-  margin-top: $marginTop-CodeBlock;
-  margin-bottom: $marginBottom-CodeBlock;
-  background-color: $backgroundColor-CodeBlock;
-}
-
-.copyButton {
-  opacity:  0.7;
-  &:hover{
-    opacity: 1;
-  }
-}
-
-.codeBlockHeader {
-  padding: t.$space-1;
-  padding-left: t.$space-3;
-  background-color: $backgroundColor-CodeBlock-header;
-  border-bottom: $color-CodeBlock-headerSeparator solid 2px;
-  font-size: t.$fontSize-small;
-  border-start-start-radius: t.getThemeVar($themeVars, "borderStartStartRadius-CodeBlock");
-  border-start-end-radius: t.getThemeVar($themeVars, "borderStartEndRadius-CodeBlock");
-}
-
-.codeBlockContent {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 48px;
-
-  .codeBlockCopyButton {
-    position: absolute;
-    top: t.$space-1_5;
-    right: t.$space-1_5;
-    z-index: 1;
-    display: none;
+@layer components {
+  .codeBlock {
+    @include t.borderVars($themeVars, "CodeBlock");
+    @include t.paddingVars($themeVars, "CodeBlock");
+    margin-top: $marginTop-CodeBlock;
+    margin-bottom: $marginBottom-CodeBlock;
     background-color: $backgroundColor-CodeBlock;
   }
 
-  &:hover {
-    .codeBlockCopyButton {
-      display: block;
+  .copyButton {
+    opacity: 0.7;
+    &:hover {
+      opacity: 1;
     }
   }
 
-  pre {
-    flex-grow: 1;
+  .codeBlockHeader {
+    padding: t.$space-1;
+    padding-left: t.$space-3;
+    background-color: $backgroundColor-CodeBlock-header;
+    border-bottom: $color-CodeBlock-headerSeparator solid 2px;
+    font-size: t.$fontSize-small;
+    border-start-start-radius: t.getThemeVar($themeVars, "borderStartStartRadius-CodeBlock");
+    border-start-end-radius: t.getThemeVar($themeVars, "borderStartEndRadius-CodeBlock");
   }
-}
 
-:global {
-  .codeBlockHighlightRow {
-    background-color: $backgroundColor-CodeBlock-highlightRow;
+  .codeBlockContent {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+
+    .codeBlockCopyButton {
+      position: absolute;
+      top: t.$space-1_5;
+      right: t.$space-1_5;
+      z-index: 1;
+      display: none;
+      background-color: $backgroundColor-CodeBlock;
+    }
+
+    &:hover {
+      .codeBlockCopyButton {
+        display: block;
+      }
+    }
+
+    pre {
+      flex-grow: 1;
+    }
   }
-  .codeBlockHighlightString {
-    background-color: $backgroundColor-CodeBlock-highlightString;
-    padding: 1px;
-  }
-  .codeBlockHighlightStringEmphasis {
-    border: 2px solid $borderColor-CodeBlock-highlightString-emphasis;
-    border-radius: 2px;
-    padding: 1px;
+
+  :global {
+    .codeBlockHighlightRow {
+      background-color: $backgroundColor-CodeBlock-highlightRow;
+    }
+    .codeBlockHighlightString {
+      background-color: $backgroundColor-CodeBlock-highlightString;
+      padding: 1px;
+    }
+    .codeBlockHighlightStringEmphasis {
+      border: 2px solid $borderColor-CodeBlock-highlightString-emphasis;
+      border-radius: 2px;
+      padding: 1px;
+    }
   }
 }
 

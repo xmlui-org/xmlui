@@ -12,52 +12,54 @@ $backgroundColor-dropdown-NavGroup: createThemeVar("backgroundColor-dropdown-Nav
 $boxShadow-dropdown-NavGroup: createThemeVar("boxShadow-dropdown-NavGroup");
 $borderRadius-dropdown-NavGroup: createThemeVar("borderRadius-dropdown-NavGroup");
 
-.dropdownList {
-  padding: 0;
-  margin: 0;
-  left: 0;
-  top: 0;
-  position: absolute;
-  overflow-y: hidden;
-  background: $backgroundColor-dropdown-NavGroup;
-  list-style: none;
-  height: fit-content;
-  transition: height 0.2s ease;
-  box-shadow: $boxShadow-dropdown-NavGroup;
-  min-width: 11rem;
-  border-radius: $borderRadius-dropdown-NavGroup;
+@layer components {
+  .dropdownList {
+    padding: 0;
+    margin: 0;
+    left: 0;
+    top: 0;
+    position: absolute;
+    overflow-y: hidden;
+    background: $backgroundColor-dropdown-NavGroup;
+    list-style: none;
+    height: fit-content;
+    transition: height 0.2s ease;
+    box-shadow: $boxShadow-dropdown-NavGroup;
+    min-width: 11rem;
+    border-radius: $borderRadius-dropdown-NavGroup;
 
-  &:focus,
-  &:focus-visible {
-    outline: none;
-  }
-}
-
-.groupContent{
-  /* The core of the grid animation technique */
-  display: grid;
-  grid-template-rows: 0fr; /* Initially the content row has 0 height */
-  will-change: grid-template-rows;
-  transition: grid-template-rows $time cubic-bezier(0.4, 0, 0.2, 1);
-  .groupContentInner{
-    will-change: opacity;
-    opacity: 0;
-  }
-  &.expanded {
-    .groupContentInner{
-      opacity: 1;
-      overflow: hidden;
+    &:focus,
+    &:focus-visible {
+      outline: none;
     }
-    grid-template-rows: 1fr;
   }
-}
 
-.groupContentInner{
-  transition: opacity $time ease-out;
-  /* This is the grid item. Its content determines the 'auto' height. */
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  .groupContent {
+    /* The core of the grid animation technique */
+    display: grid;
+    grid-template-rows: 0fr; /* Initially the content row has 0 height */
+    will-change: grid-template-rows;
+    transition: grid-template-rows $time cubic-bezier(0.4, 0, 0.2, 1);
+    .groupContentInner {
+      will-change: opacity;
+      opacity: 0;
+    }
+    &.expanded {
+      .groupContentInner {
+        opacity: 1;
+        overflow: hidden;
+      }
+      grid-template-rows: 1fr;
+    }
+  }
+
+  .groupContentInner {
+    transition: opacity $time ease-out;
+    /* This is the grid item. Its content determines the 'auto' height. */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

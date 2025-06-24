@@ -1,10 +1,12 @@
 @use "../../components-core/theming/themes" as t;
 
-.wrapper {
-  display: flex;
-  gap: t.$space-2;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: t.$textColor-subtitle;
+@layer components {
+  .wrapper {
+    display: flex;
+    gap: t.$space-2;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: t.$textColor-subtitle;
+  }
 }

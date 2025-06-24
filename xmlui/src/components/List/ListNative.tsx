@@ -215,6 +215,7 @@ type DynamicHeightListProps = {
   pageInfo?: PageInfo;
   idKey?: string;
   style?: CSSProperties;
+  className?: string;
   emptyListPlaceholder?: ReactNode;
   groupsInitiallyExpanded?: boolean;
   defaultGroups: Array<string>;
@@ -290,6 +291,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
     pageInfo,
     idKey = defaultProps.idKey,
     style,
+    className,
     emptyListPlaceholder,
     groupsInitiallyExpanded = true,
     defaultGroups = EMPTY_ARRAY,
@@ -302,7 +304,6 @@ export const ListNative = forwardRef(function DynamicHeightList(
   const scrollRef = useContext(ScrollContext);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
-
 
   const hasOutsideScroll =
     scrollRef &&
@@ -478,9 +479,13 @@ export const ListNative = forwardRef(function DynamicHeightList(
         <div
           ref={rootRef}
           style={style}
-          className={classnames(styles.outerWrapper, {
-            [styles.hasOutsideScroll]: hasOutsideScroll,
-          })}
+          className={classnames(
+            styles.outerWrapper,
+            {
+              [styles.hasOutsideScroll]: hasOutsideScroll,
+            },
+            className,
+          )}
         >
           {loading && rows.length === 0 && (
             <div className={styles.loadingWrapper}>
@@ -518,9 +523,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                   switch (row._row_type) {
                     case RowType.SECTION:
                       return (
-                        <Fragment key={key}>
-                          {sectionRenderer?.(row, key) || <div />}
-                        </Fragment>
+                        <Fragment key={key}>{sectionRenderer?.(row, key) || <div />}</Fragment>
                       );
                     case RowType.SECTION_FOOTER:
                       return (

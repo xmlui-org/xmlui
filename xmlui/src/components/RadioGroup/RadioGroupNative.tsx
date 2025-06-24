@@ -42,6 +42,7 @@ type RadioGroupProps = {
   value?: string;
   enabled?: boolean;
   style?: CSSProperties;
+  className?: string;
   validationStatus?: ValidationStatus;
   label?: string;
   labelPosition?: string;
@@ -75,6 +76,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
     children,
     registerComponentApi,
     style,
+    className
   }: RadioGroupProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -140,6 +142,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      className={className}
     >
       <OptionTypeProvider Component={RadioGroupOption}>
         <RadioGroupValidationStatusContext.Provider value={contextValue}>
