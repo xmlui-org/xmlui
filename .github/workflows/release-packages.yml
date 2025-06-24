@@ -6,7 +6,7 @@ on:
     types:
       - closed
     branches:
-      - main
+      - dotneteer/exp-with-release
 
 permissions:
   contents: write
