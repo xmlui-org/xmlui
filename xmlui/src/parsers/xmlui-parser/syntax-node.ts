@@ -27,9 +27,9 @@ export class Node {
     this.children = children;
 
     if (triviaBefore){
-      this.start = triviaBefore[0].start;
+      this.start = triviaBefore[0]?.start ?? pos;
     } else if (children){
-      this.start = children[0].start;
+      this.start = children[0]?.start ?? pos;
     } else {
       this.start = pos;
     }

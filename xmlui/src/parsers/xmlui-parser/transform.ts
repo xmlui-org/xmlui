@@ -1,6 +1,6 @@
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
-import type { Node } from "./syntax-node";
+import { Node } from "./syntax-node";
 import type { ErrorCodes } from "./ParserError";
 import { SyntaxKind } from "./syntax-kind";
 import { ParserError, errorMessages } from "./ParserError";
@@ -1185,14 +1185,18 @@ function withNewChildNodes(node: Node, newChildren: Node[]) {
   if (childrenListIdx === undefined || childrenListIdx === -1) {
     return node;
   }
-  return {
-    ...node,
-    children: [
+  const contentListChild = node.children![childrenListIdx];
+  return new Node(
+    node.kind,
+    node.pos ?? 0,
+    node.end ?? 0,
+    node.triviaBefore,
+    [
       ...node.children!.slice(0, childrenListIdx),
-      { ...node.children![childrenListIdx], children: newChildren },
+      new Node(contentListChild.kind, contentListChild.pos ?? 0, contentListChild.end ?? 0, undefined, newChildren),
       ...node.children!.slice(childrenListIdx),
-    ],
-  };
+    ]
+  );
 }
 
 function desugarKeyOnlyAttrs(attrs: Node[]) {
