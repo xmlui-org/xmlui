@@ -1,4 +1,4 @@
-import type { Node } from "./syntax-node";
+import { Node } from "./syntax-node";
 import type { ScannerErrorCallback } from "./scanner";
 import type { ScannerDiagnosticMessage, GeneralDiagnosticMessage , DiagnosticCategory} from "./diagnostics";
 import { CharacterCodes } from "./CharacterCodes";
@@ -149,7 +149,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
       case SyntaxKind.NodeEnd:{
         bumpAny();
-        parseContentList();
+      parseContentList();
         parseClosingTag(openTagName, errInName);
         completeNode(SyntaxKind.ElementNode);
         return;
@@ -480,7 +480,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       end = scanner.getTokenEnd();
     }
 
-    peekedToken = { kind, start, pos, end, triviaBefore };
+    peekedToken = new Node(kind, pos, end, triviaBefore);
     return peekedToken;
   }
 
@@ -546,22 +546,17 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         }
 
         const pos = scanner.getTokenStart();
-        const token = {
-          kind,
-          start,
-          pos,
-          end: scanner.getTokenEnd(),
-          triviaBefore: triviaCollected.length > 0 ? triviaCollected : undefined,
-        };
+        const triviaBefore = triviaCollected.length > 0 ? triviaCollected : undefined;
 
         triviaCollected = [];
         if (inContent && err.code === ErrCodes.invalidChar) {
           errFromScanner = undefined;
-          return token;
+          return new Node(kind, pos, scanner.getTokenEnd(), triviaBefore);
         }
 
         const badPrefixEnd = pos + errFromScanner.prefixLength;
-        token.end = badPrefixEnd;
+        const token = new Node(kind, pos, badPrefixEnd, triviaBefore);
+
         scanner.resetTokenState(badPrefixEnd);
         startNode();
         node.children!.push(token);
@@ -571,26 +566,16 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         errFromScanner = undefined;
         return collectToken(inContent);
       }
+
       switch (kind) {
         case SyntaxKind.CommentTrivia:
         case SyntaxKind.NewLineTrivia:
         case SyntaxKind.WhitespaceTrivia:
-          triviaCollected.push({
-            kind,
-            start,
-            pos: scanner.getTokenStart(),
-            end: scanner.getTokenEnd(),
-          });
+          triviaCollected.push(new Node(kind, scanner.getTokenStart(), scanner.getTokenEnd()));
           break;
 
         default:
-          return {
-            kind,
-            start,
-            pos: scanner.getTokenStart(),
-            end: scanner.getTokenEnd(),
-            triviaBefore: triviaCollected.length > 0 ? triviaCollected : undefined,
-          };
+          return new Node(kind, scanner.getTokenStart(), scanner.getTokenEnd(), triviaCollected.length > 0 ? triviaCollected : undefined)
       }
     }
   }
@@ -607,11 +592,5 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 function createNode(kind: SyntaxKind, children: Node[]): Node {
   const firstChild = children[0];
   const lastChild = children[children.length - 1];
-  return {
-    kind,
-    start: firstChild.start,
-    pos: firstChild.pos,
-    end: lastChild.end,
-    children,
-  };
+  return new Node(kind, firstChild.pos, lastChild.end, undefined, children);
 }
