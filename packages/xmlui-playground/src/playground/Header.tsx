@@ -82,7 +82,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           {!options.previewMode && show && (
             <>
               {!standalone && (
-                <Tooltip label="Edit code in new window">
+                <Tooltip label="View and edit in new full-width window">
                   <Button variant="ghost" onClick={() => openStandaloneApp(false)}>
                     <RxOpenInNewWindow />
                   </Button>

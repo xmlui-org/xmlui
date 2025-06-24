@@ -222,7 +222,7 @@ export function NestedApp({
                       <RxOpenInNewWindow />
                     </button>
                   }
-                  label="Edit code in new window"
+                  label="View and edit in new full-width window"
                 />
               )}
               <Tooltip
