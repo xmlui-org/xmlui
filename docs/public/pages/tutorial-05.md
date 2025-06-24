@@ -15,39 +15,30 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 - `nameKey`: The object key whose value is the data label.
 
 ```xmlui /data/ /dataKey/ /nameKey/
-<Component
-    name="Statuses"
->
+<Component name="Statuses">
   <DataSource id="dashboardStats" url="/api/dashboard/stats" method="GET" />
-
-    <VStack width="{$props.width}">
-        <H1>{$props.title}</H1>
-
-        <Card height="400px">
-            <DonutChart
-                layout="horizontal"
-                data="{
-                  [
-                    {
-                      name: 'sent',
-                      value: dashboardStats.value[0].sent_invoices
-                    },
-                    {
-                      name: 'draft',
-                      value: dashboardStats.value[0].draft_invoices
-                    },
-                    {
-                      name: 'paid',
-                      value: dashboardStats.value[0].paid_invoices
-                    },
-                  ]
-        }"
-                dataKey="value" nameKey="name"
-            />
-        </Card>
-
-    </VStack>
-
+  <Card title="Statuses" height="400px" width="{$props.width}">
+    <DonutChart
+      data="{
+        [
+          {
+            name: 'sent',
+            value: dashboardStats.value[0].sent_invoices
+          },
+          {
+            name: 'draft',
+            value: dashboardStats.value[0].draft_invoices
+          },
+          {
+            name: 'paid',
+            value: dashboardStats.value[0].paid_invoices
+          },
+        ]
+      }"
+      dataKey="value"
+      nameKey="name"
+    />
+  </Card>
 </Component>
 ```
 
@@ -58,37 +49,29 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 </App>
 ---comp
 <Component name="Statuses">
-
   <DataSource id="dashboardStats" url="/resources/files/dashboard-stats.json" method="GET" />
-
-    <VStack width="{$props.width}">
-        <H1>{$props.title}</H1>
-
-        <Card title="Statuses" height="400px">
-            <DonutChart
-                layout="horizontal"
-                data="{
-                  [
-                    {
-                      name: 'sent',
-                      value: dashboardStats.value[0].sent_invoices
-                    },
-                    {
-                      name: 'draft',
-                      value: dashboardStats.value[0].draft_invoices
-                    },
-                    {
-                      name: 'paid',
-                      value: dashboardStats.value[0].paid_invoices
-                    },
-                  ]
-        }"
-                dataKey="value" nameKey="name"
-            />
-        </Card>
-
-    </VStack>
-
+  <Card title="Statuses" height="400px" width="{$props.width}">
+    <DonutChart
+      data="{
+        [
+          {
+            name: 'sent',
+            value: dashboardStats.value[0].sent_invoices
+          },
+          {
+            name: 'draft',
+            value: dashboardStats.value[0].draft_invoices
+          },
+          {
+            name: 'paid',
+            value: dashboardStats.value[0].paid_invoices
+          },
+        ]
+      }"
+      dataKey="value"
+      nameKey="name"
+    />
+  </Card>
 </Component>
 ```
 

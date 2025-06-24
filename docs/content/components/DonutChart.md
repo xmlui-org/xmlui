@@ -1,6 +1,6 @@
 # DonutChart [#donutchart]
 
-A derivative of [PieChart](/components/PieChart) with a hollow center.
+A derivative of [PieChart](/components/PieChart) with a hollow center. Note that the height of the component or its parent needs to be set explicitly.
 
 ## Properties [#properties]
 
@@ -8,9 +8,9 @@ A derivative of [PieChart](/components/PieChart) with a hollow center.
 
 The data to be displayed in the chart. Needs to be an array of objects.
 
-### `dataKeys` [#datakeys]
+### `dataKey` [#datakey]
 
-This property specifies the keys in the data objects that should be used for rendering the bars.
+This property specifies the key in the data objects that will be used to render the chart.
 
 ### `innerRadius (default: 60)` [#innerradius-default-60]
 

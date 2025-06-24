@@ -135,8 +135,6 @@ export const textComponentRenderer = createComponentRenderer(
         .map(([key, value]) => [key, extractValue(value)]),
     );
 
-    console.log("Text", layoutCss);
-
     return (
       <Text
         variant={extractValue(variant)}
