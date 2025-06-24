@@ -138,12 +138,17 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 Create `xmlui/src/components/HelloWorld/HelloWorld.module.scss`:
 
 ```xmlui copy
+// Export theme variables for XMLUI's theming system
+:export {
+  themeVars: backgroundColor-HelloWorld borderColor-HelloWorld borderRadius-HelloWorld padding-HelloWorld textColor-HelloWorld;
+}
+
 .helloWorld {
-  background-color: #fafafa;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 24px;
-  color: #111827;
+  background-color: var(--backgroundColor-HelloWorld, #fafafa);
+  border: 2px solid var(--borderColor-HelloWorld, #e5e7eb);
+  border-radius: var(--borderRadius-HelloWorld, 8px);
+  padding: var(--padding-HelloWorld, 24px);
+  color: var(--textColor-HelloWorld, #111827);
   font-family: system-ui, -apple-system, sans-serif;
   transition: all 0.2s ease-in-out;
   max-width: 400px;
@@ -228,10 +233,11 @@ Create `xmlui/src/components/HelloWorld/HelloWorld.module.scss`:
 
 ### Key Styling Patterns:
 
+- **`:export` block**: Required for XMLUI theme integration - exports theme variable names
+- **CSS Variables**: Enable runtime theming with `var(--variableName, fallback)`
+- **Fallback values**: Provide defaults when theme variables aren't set
 - **SCSS Modules**: Scoped styles that prevent CSS conflicts
 - **BEM-like naming**: Clear, descriptive class names
-- **Modern CSS**: Uses flexbox, CSS transitions, and hover effects
-- **Hardcoded colors**: Simple approach for getting started (we'll add theming later)
 
 ## Step 4: Create Component Metadata and Renderer
 
@@ -241,6 +247,7 @@ Create `xmlui/src/components/HelloWorld/HelloWorld.tsx`:
 import styles from "./HelloWorld.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
 
 const COMP = "HelloWorld";
@@ -260,6 +267,14 @@ export const HelloWorldMd = createMetadata({
       type: "string",
       defaultValue: defaultProps.message,
     },
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`backgroundColor-${COMP}`]: "$color-surface-50",
+    [`borderColor-${COMP}`]: "$color-surface-200",
+    [`borderRadius-${COMP}`]: "$borderRadius",
+    [`padding-${COMP}`]: "$space-6",
+    [`textColor-${COMP}`]: "$color-surface-900",
   },
 });
 
@@ -285,6 +300,7 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 - **`createMetadata`**: Describes the component interface to XMLUI
 - **Props definition**: Type-safe property descriptions with defaults
 - **Status**: Indicates component maturity (experimental, stable, deprecated)
+- **Theme integration**: `themeVars` and `defaultThemeVars` enable theming support
 
 ### Renderer Patterns:
 
