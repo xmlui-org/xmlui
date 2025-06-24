@@ -557,3 +557,190 @@ The value of the `zoom` property controls the magnification level of a component
   </HStack>
 </App>
 ```
+
+## Font Variant Values [#font-variant]
+
+This value controls the usage of alternate glyphs in a font. These alternates include things like stylistic variants (such as small caps), ligatures, and more.
+
+| Value        | Description                                                                                                           |
+| ------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `normal`     | Specifies a normal font face; none of the features below are activated.                                               |
+| `small-caps` | Specifies a font that is specifically designed with capital letters at the size of lowercase letters.                  |
+
+```xmlui-pg name="Font variant values"
+<App>
+  <FlowLayout gap="16px">
+    <Text fontSize="18px" fontVariant="normal">This text uses normal font variant</Text>
+    <Text fontSize="18px" fontVariant="small-caps">This text uses small-caps font variant</Text>
+  </FlowLayout>
+</App>
+```
+
+## Line Break Values [#line-break]
+
+This value determines how line breaking works for languages that use a text wrapping system other than the standard space-based approach.
+
+| Value     | Description                                                                                                        |
+| --------- | ------------------------------------------------------------------------------------------------------------------ |
+| `auto`    | Uses the default line break rule.                                                                                  |
+| `loose`   | Relaxes the line-breaking rules, allowing more opportunities for a break.                                          |
+| `normal`  | Uses standard line break rules.                                                                                    |
+| `strict`  | Tightens the line-breaking rules, reducing the number of break opportunities.                                      |
+| `anywhere`| Allows a line break to be inserted between any character.                                                           |
+
+## Text Shadow Values [#text-shadow]
+
+This value adds shadows to text. It accepts a comma-separated list of shadows to be applied to the text and any of its decorations.
+
+A shadow is described by:
+- Horizontal offset (required)
+- Vertical offset (required)
+- Blur radius (optional)
+- Color (optional)
+
+```xmlui-pg name="Text shadow examples"
+<App>
+  <VStack gap="16px">
+    <Text fontSize="20px" textShadow="2px 2px">Simple shadow (black)</Text>
+    <Text fontSize="20px" textShadow="2px 2px 5px red">Shadow with blur</Text>
+    <Text fontSize="20px" textShadow="2px 2px blue, 4px 4px 10px red">Multiple shadows</Text>
+    <Text fontSize="20px" color="white" textShadow="1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue">Glow effect</Text>
+  </VStack>
+</App>
+```
+
+## Text Indent Values [#text-indent]
+
+This value specifies the amount of indentation (empty space) that should be left before the first line of the text content of a block element.
+
+```xmlui-pg name="Text indent examples"
+<App>
+  <VStack gap="16px" width="100%">
+    <Text textIndent="0px">This paragraph has no text indent. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
+    <Text textIndent="30px">This paragraph has a 30px text indent. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
+    <Text textIndent="10%">This paragraph has a 10% text indent. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor.</Text>
+  </VStack>
+</App>
+```
+
+## Word Break Values [#word-break]
+
+This value specifies how words should break when reaching the end of a line.
+
+| Value     | Description                                                                                        |
+| --------- | -------------------------------------------------------------------------------------------------- |
+| `normal`  | Uses default line break rules.                                                                     |
+| `break-all`| May break between any two characters to prevent overflow.                                         |
+| `keep-all`| Prevents breaks for Chinese, Japanese, and Korean (CJK) text. Non-CJK text behavior is set to normal. |
+| `break-word`| Allows unbreakable words to be broken at arbitrary points if there are no acceptable break points. |
+
+```xmlui-pg name="Word break examples"
+<App>
+  <FlowLayout gap="16px">
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-break: normal</Text>
+      <Text wordBreak="normal">This is a very long text with a verylongwordthatdoesnotbreak normally</Text>
+    </VStack>
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-break: break-all</Text>
+      <Text wordBreak="break-all">This is a very long text with a verylongwordthatbreaks anywhere</Text>
+    </VStack>
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-break: keep-all</Text>
+      <Text wordBreak="keep-all">This is a very long text with a verylongwordthatdoesnotbreak normally</Text>
+    </VStack>
+  </FlowLayout>
+</App>
+```
+
+## Word Spacing Values [#word-spacing]
+
+This value sets the length of white space between words and between tags. Positive values increase the space between words, while negative values bring them closer together.
+
+```xmlui-pg name="Word spacing examples"
+<App>
+  <VStack gap="16px">
+    <Text wordSpacing="normal">This text has normal word spacing.</Text>
+    <Text wordSpacing="5px">This text has 5px word spacing.</Text>
+    <Text wordSpacing="10px">This text has 10px word spacing.</Text>
+    <Text wordSpacing="-2px">This text has -2px word spacing.</Text>
+  </VStack>
+</App>
+```
+
+## Word Wrap Values [#word-wrap]
+
+This value determines whether the browser should break lines within words when they would otherwise overflow the container.
+
+| Value         | Description                                                                            |
+| ------------- | -------------------------------------------------------------------------------------- |
+| `normal`      | Lines may only break at normal break points (such as spaces between words).            |
+| `break-word`  | To prevent overflow, an otherwise unbreakable word may be broken at arbitrary points.  |
+| `anywhere`    | To prevent overflow, the browser may break between any two characters.                 |
+
+```xmlui-pg name="Word wrap examples"
+<App>
+  <FlowLayout gap="16px">
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-wrap: normal</Text>
+      <Text wordWrap="normal">This is a very long text with a verylongwordthatdoesnotbreak normally</Text>
+    </VStack>
+    <VStack width="150px" border="1px solid gray" padding="8px">
+      <Text>word-wrap: break-word</Text>
+      <Text wordWrap="break-word">This is a very long text with a verylongwordthatbreaks when needed</Text>
+    </VStack>
+  </FlowLayout>
+</App>
+```
+
+## Writing Mode Values [#writing-mode]
+
+This value sets whether lines of text are laid out horizontally or vertically, as well as the direction in which blocks progress.
+
+| Value                  | Description                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------------- |
+| `horizontal-tb`        | Content flows horizontally from left to right, vertically from top to bottom.                |
+| `vertical-rl`          | Content flows vertically from top to bottom, horizontally from right to left.                |
+| `vertical-lr`          | Content flows vertically from top to bottom, horizontally from left to right.                |
+| `sideways-rl`          | Content flows vertically from top to bottom and all glyphs are set sideways toward the right.|
+| `sideways-lr`          | Content flows vertically from top to bottom and all glyphs are set sideways toward the left. |
+
+```xmlui-pg name="Writing mode examples"
+<App>
+  <FlowLayout gap="24px">
+    <VStack width="150px" height="200px" border="1px solid gray" padding="8px">
+      <Text>horizontal-tb</Text>
+      <Text writingMode="horizontal-tb">Horizontal writing mode</Text>
+    </VStack>
+    <VStack width="150px" height="200px" border="1px solid gray" padding="8px">
+      <Text>vertical-rl</Text>
+      <Text writingMode="vertical-rl">Vertical/right-to-left</Text>
+    </VStack>
+    <VStack width="150px" height="200px" border="1px solid gray" padding="8px">
+      <Text>vertical-lr</Text>
+      <Text writingMode="vertical-lr">Vertical/left-to-right</Text>
+    </VStack>
+  </FlowLayout>
+</App>
+```
+
+## Transition Values [#transition]
+
+This value specifies the CSS property to animate, the duration of the transition effect, the timing function, and the delay before the transition starts. It creates smooth animations between property value changes.
+
+A transition value can include up to four parts (in any order):
+- **Property name**: Specifies the CSS property to transition (e.g., `opacity`, `color`, `width`)
+- **Duration**: How long the transition takes (e.g., `0.5s`, `300ms`)
+- **Timing function**: How the transition progresses over time (e.g., `ease`, `linear`)
+- **Delay**: How long to wait before starting the transition (e.g., `0s`, `200ms`)
+
+You can specify multiple transitions by separating them with commas.
+
+| Timing Function Values | Description |
+| --------------------- | ----------- |
+| `ease`                | Starts slow, becomes fast, then ends slowly. This is the default value. |
+| `linear`              | Same speed from start to end. |
+| `ease-in`             | Starts slowly and accelerates. |
+| `ease-out`            | Starts quickly and decelerates. |
+| `ease-in-out`         | Starts slowly, speeds up in the middle, and ends slowly. |
+| `cubic-bezier(n,n,n,n)` | Define your own timing function with four values. |

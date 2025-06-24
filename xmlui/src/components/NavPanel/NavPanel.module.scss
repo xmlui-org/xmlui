@@ -20,7 +20,7 @@ $maxWidth-content-NavPanel: createThemeVar("maxWidth-content-App");
 
 $height-NavPanel: createThemeVar("height-AppHeader");
 $paddingVertical-AppHeader: createThemeVar("paddingVertical-AppHeader");
-$align-content-AppHeader: createThemeVar("align-content-AppHeader");
+$alignment-content-AppHeader: createThemeVar("alignment-content-AppHeader");
 
 .wrapper {
   --footer-height: 0;     //temp solution, it's because of callbackDrive, settings stickyBox to the bottom (we'll have to introduce a smarter stickyBox)
@@ -53,7 +53,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
     &:not(.condensed){
       .wrapperInner{
         padding-inline: createThemeVar("paddingHorizontal-#{$component}");
-        justify-content: $align-content-AppHeader;
+        justify-content: $alignment-content-AppHeader;
       }
     }
     .wrapperInner{
@@ -63,7 +63,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
       //align-items: center;
       width: 100%;
       margin: 0 auto;
-      justify-content: $align-content-AppHeader;
+      justify-content: $alignment-content-AppHeader;
     }
   }
 }
@@ -71,7 +71,7 @@ $align-content-AppHeader: createThemeVar("align-content-AppHeader");
 .wrapperInner{
   display: flex;
   flex-direction: column;
-  justify-content: $align-content-AppHeader;
+  justify-content: $alignment-content-AppHeader;
 }
 
 

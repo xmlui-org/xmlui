@@ -27,8 +27,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Footer | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-Footer | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-Footer | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-Footer | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-Footer | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
@@ -41,8 +41,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-Footer | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-Footer | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-Footer | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Footer | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Footer | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-Footer | 1px solid $borderColor | 1px solid $borderColor |
 | [borderTopColor](../styles-and-themes/common-units/#color)-Footer | *none* | *none* |
@@ -65,4 +65,4 @@ This component does not expose any methods.
 | [paddingTop](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Footer | *none* | *none* |
 | [textColor](../styles-and-themes/common-units/#color)-Footer | $textColor-secondary | $textColor-secondary |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)-Footer | center | center |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-Footer | center | center |

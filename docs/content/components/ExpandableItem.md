@@ -76,8 +76,8 @@ This method toggles the expandable item's expanded state.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-ExpandableItem | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-ExpandableItem | 1px | 1px |
 | [borderColor](../styles-and-themes/common-units/#color)-ExpandableItem | $borderColor | $borderColor |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-ExpandableItem | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-ExpandableItem | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-ExpandableItem | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-ExpandableItem | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-ExpandableItem | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-ExpandableItem | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-ExpandableItem | *none* | *none* |
@@ -91,8 +91,8 @@ This method toggles the expandable item's expanded state.
 | [color](../styles-and-themes/common-units/#color)-ExpandableItem | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-ExpandableItem | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-ExpandableItem | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-ExpandableItem | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-ExpandableItem | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-ExpandableItem | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-ExpandableItem | solid | solid |
 | [borderTop](../styles-and-themes/common-units/#border)-ExpandableItem | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-ExpandableItem | *none* | *none* |
@@ -105,9 +105,6 @@ This method toggles the expandable item's expanded state.
 | [borderWidth](../styles-and-themes/common-units/#size)-ExpandableItem | 0 | 0 |
 | [color](../styles-and-themes/common-units/#color)-ExpandableItem | $textColor-primary | $textColor-primary |
 | [color](../styles-and-themes/common-units/#color)-ExpandableItem--disabled | $textColor--disabled | $textColor--disabled |
-| contentPaddingLeft-ExpandableItem | $space-3 | $space-3 |
-| contentPaddingRight-ExpandableItem | $space-3 | $space-3 |
-| contentPaddingVertical-ExpandableItem | $space-2 | $space-2 |
 | [fontFamily](../styles-and-themes/common-units/#fontFamily)-ExpandableItem | $fontFamily | $fontFamily |
 | [fontSize](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-ExpandableItem | *none* | *none* |
@@ -119,13 +116,13 @@ This method toggles the expandable item's expanded state.
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-ExpandableItem-summary | *none* | *none* |
-| [paddingLeft](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
+| [paddingLeft](../styles-and-themes/common-units/#size)-content-ExpandableItem | $space-3 | $space-3 |
 | [paddingLeft](../styles-and-themes/common-units/#size)-ExpandableItem | $space-0 | $space-0 |
-| [paddingRight](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
+| [paddingRight](../styles-and-themes/common-units/#size)-content-ExpandableItem | $space-3 | $space-3 |
 | [paddingRight](../styles-and-themes/common-units/#size)-ExpandableItem | $space-0 | $space-0 |
 | [paddingTop](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-ExpandableItem | $space-2 | $space-2 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-content-ExpandableItem | *none* | *none* |
+| [paddingVertical](../styles-and-themes/common-units/#size)-content-ExpandableItem | $space-2 | $space-2 |
 | [paddingVertical](../styles-and-themes/common-units/#size)-ExpandableItem | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-ExpandableItem-summary | *none* | *none* |
-| transition-ExpandableItem | 0.2s ease | 0.2s ease |
+| [transition](../styles-and-themes/common-units/#transition)-ExpandableItem | 0.2s ease | 0.2s ease |

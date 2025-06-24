@@ -64,8 +64,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-NavPanel | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-NavPanel | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-NavPanel | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-NavPanel | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-NavPanel | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
@@ -78,8 +78,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-NavPanel | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-NavPanel | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-NavPanel | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-NavPanel | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-NavPanel | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-NavPanel | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-NavPanel | *none* | *none* |
@@ -92,7 +92,7 @@ This component does not expose any methods.
 | [borderWidth](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel | *none* | *none* |
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-NavPanel-vertical | 4px 0 4px 0 rgb(0 0 0 / 10%) | 4px 0 4px 0 rgb(0 0 0 / 10%) |
-| horizontalAlignment-logo-NavPanel | center | center |
+| [horizontalAlignment](../styles-and-themes/common-units/#alignment)-logo-NavPanel | center | center |
 | [marginBottom](../styles-and-themes/common-units/#size)-logo-NavPanel | $space-4 | $space-4 |
 | [padding](../styles-and-themes/common-units/#size)-logo-NavPanel | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-NavPanel | *none* | *none* |

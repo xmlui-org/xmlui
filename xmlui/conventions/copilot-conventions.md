@@ -137,3 +137,196 @@ When GitHub Copilot summarizes the conversation context for the XMLUI project, i
    - Maintain a list of components or tasks still pending review or updates.
 
 This convention ensures continuity in long-running tasks and helps maintain a consistent approach to code modifications across the XMLUI project.
+
+## Layout Properties Convention
+
+### Overview
+
+XMLUI has a comprehensive system for handling layout properties that affect component styling and positioning. These properties need to be consistently defined, documented, and integrated throughout the codebase. This convention ensures that any new layout property is properly added to all relevant parts of the system.
+
+### Convention Rules
+
+1. **Layout Property Definition**:
+   - All layout properties must be added to the `layoutOptionKeys` array in `descriptorHelper.ts`.
+   - Properties should be added in alphabetical order within their logical grouping.
+
+2. **Layout Resolver Integration**:
+   - Add the property to the `LayoutProps` type definition in `layout-resolver.ts`.
+   - Include the property in the `layoutPatterns` object with appropriate pattern validation.
+   - Group properties logically (Dimensions, Typography, Animations, etc.) with clear comments.
+
+3. **Documentation Requirements**:
+   - Each layout property requires documentation in two places:
+     - `layout-props.md`: A concise definition with a link to detailed documentation.
+     - `common-units.md`: Detailed explanation of allowed values, examples, and visual demos.
+
+4. **Theme Keyword Links**:
+   - Add the property to the `themeKeywordLinks` object in `MetadataProcessor.mjs`.
+   - Link format: `"propertyName": "[propertyName](../styles-and-themes/common-units/#anchor-name)"`.
+   - Ensure the anchor name exists in the common-units.md file.
+
+### Implementation Process
+
+When adding a new layout property, follow these steps:
+
+1. **Update Type Definitions**:
+   ```typescript
+   // In layout-resolver.ts
+   export type LayoutProps = {
+     // ...existing properties
+     
+     // Add new property in appropriate section with comment
+     newProperty?: string | number;
+   };
+   ```
+
+2. **Update Layout Patterns**:
+   ```typescript
+   // In layout-resolver.ts - layoutPatterns object
+   const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
+     // ...existing patterns
+     
+     // Add new property (with validation patterns if needed)
+     newProperty: [],
+   };
+   ```
+
+3. **Update Property Keys**:
+   ```typescript
+   // In descriptorHelper.ts
+   export const layoutOptionKeys = [
+     // ...existing keys
+     "newProperty",
+   ];
+   ```
+
+4. **Add Documentation in `layout-props.md`**:
+   ```markdown
+   ## `newProperty`
+
+   This property [describes what it does](/styles-and-themes/common-units#anchor-name).
+   ```
+
+5. **Add Detailed Documentation in `common-units.md`**:
+   ```markdown
+   ## New Property Values [#anchor-name]
+
+   This value [detailed description of what it does and how it works]...
+   
+   | Value | Description |
+   | ----- | ----------- |
+   | `value1` | Description of value1 |
+   | `value2` | Description of value2 |
+   
+   ```xmlui-pg name="Example name"
+   <App>
+     // Example showing the property in use
+   </App>
+   ```
+   ```
+
+6. **Add Theme Keyword Link**:
+   ```javascript
+   // In MetadataProcessor.mjs - themeKeywordLinks object
+   const themeKeywordLinks = {
+     // ...existing links
+     newProperty: "[newProperty](../styles-and-themes/common-units/#anchor-name)",
+   };
+   ```
+
+### Common Patterns for Layout Properties
+
+1. **Size Properties**:
+   - Support standard CSS units (`px`, `rem`, `em`, `%`, etc.)
+   - May support special values like `auto`, `inherit`, etc.
+   - Anchor: `#size`
+
+2. **Color Properties**:
+   - Support color names, hex values, rgb/rgba, hsl/hsla
+   - May support theme variables with `$` prefix
+   - Anchor: `#color`
+
+3. **Style Properties**:
+   - Usually support enumerated string values (`solid`, `dashed`, etc.)
+   - Document all possible values in a table
+   - Create property-specific anchor (e.g., `#border-style`)
+
+4. **Animation Properties**:
+   - Document component parts (duration, timing function, etc.)
+   - Include examples with visual demonstrations
+   - Anchor: specific to property (e.g., `#transition`)
+
+5. **Text and Typography Properties**:
+   - Group related properties together in documentation
+   - Include visual examples showing differences
+   - Anchors: specific to property (e.g., `#text-align`, `#word-spacing`)
+
+### Example Implementation
+
+#### Adding the `transition` Layout Property
+
+1. **Update Layout Properties Type**:
+   ```typescript
+   // In layout-resolver.ts
+   export type LayoutProps = {
+     // ...existing properties
+     
+     // --- Animation
+     transition?: string;
+   };
+   ```
+
+2. **Update Layout Patterns**:
+   ```typescript
+   // In layout-resolver.ts - layoutPatterns object
+   const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
+     // ...existing patterns
+     
+     // --- Animation
+     transition: [],
+   };
+   ```
+
+3. **Update Property Keys**:
+   ```typescript
+   // In descriptorHelper.ts
+   export const layoutOptionKeys = [
+     // ...existing keys
+     "transition",
+   ];
+   ```
+
+4. **Add Property Documentation in `layout-props.md`**:
+   ```markdown
+   ## `transition`
+
+   This property is a shorthand for [transition effects](/styles-and-themes/common-units#transition) that specify the CSS property to which a transition effect should be applied, the duration and timing of the transition, and any delay.
+   ```
+
+5. **Add Detailed Documentation in `common-units.md`** (simplified example):
+   ```markdown
+   ## Transition Values [#transition]
+
+   This value specifies the CSS property to animate, the duration, timing function, and delay...
+   
+   | Timing Function Values | Description |
+   | --------------------- | ----------- |
+   | `ease`                | Starts slow, becomes fast, then ends slowly... |
+   
+   ```xmlui-pg name="Transition examples"
+   <App>
+     // Examples showing transitions
+   </App>
+   ```
+   ```
+
+6. **Add Theme Keyword Link**:
+   ```javascript
+   // In MetadataProcessor.mjs - themeKeywordLinks object
+   const themeKeywordLinks = {
+     // ...existing links
+     transition: "[transition](../styles-and-themes/common-units/#transition)",
+   };
+   ```
+
+By following these conventions, we ensure consistent implementation and documentation of layout properties across the XMLUI codebase, making the system more maintainable and easier to extend.

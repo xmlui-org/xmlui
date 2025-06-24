@@ -131,11 +131,15 @@ export function resolveLayoutProps(
   collectCss("fontSize");
   collectCss("fontWeight");
   collectCss("fontStyle");
+  collectCss("fontVariant");
+  collectCss("lineBreak");
   collectCss("textDecoration");
   collectCss("textDecorationLine");
   collectCss("textDecorationColor");
   collectCss("textDecorationStyle");
   collectCss("textDecorationThickness");
+  collectCss("textIndent");
+  collectCss("textShadow");
   collectCss("textUnderlineOffset");
   collectCss("userSelect");
   collectCss("letterSpacing");
@@ -144,6 +148,10 @@ export function resolveLayoutProps(
   collectCss("textAlign");
   collectCss("textAlignLast");
   collectCss("textWrap");
+  collectCss("wordBreak");
+  collectCss("wordSpacing");
+  collectCss("wordWrap");
+  collectCss("writingMode");
 
   // --- Other
   collectCss("backgroundColor");
@@ -388,11 +396,15 @@ export type LayoutProps = {
   fontSize?: number | string;
   fontWeight?: number | string;
   fontStyle?: string;
+  fontVariant?: string;
+  lineBreak?: string;
   textDecoration?: string;
   textDecorationLine?: string;
   textDecorationColor?: string;
   textDecorationStyle?: string;
   textDecorationThickness?: string;
+  textIndent?: number | string;
+  textShadow?: string;
   textUnderlineOffset?: string;
   userSelect?: string;
   letterSpacing?: string;
@@ -401,6 +413,10 @@ export type LayoutProps = {
   textAlign?: string;
   textWrap?: string;
   textAlignLast?: string;
+  wordBreak?: string;
+  wordSpacing?: string | number;
+  wordWrap?: string;
+  writingMode?: string;
 
   // --- Outline
   outline?: string;
@@ -417,6 +433,9 @@ export type LayoutProps = {
   cursor?: string;
   zoom?: string | number;
   whiteSpace?: string;
+
+  // --- Animation
+  transition?: string;
 };
 
 // The properties constituting a component's layout
@@ -489,6 +508,8 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   fontSize: [],
   fontWeight: [],
   fontStyle: [booleanRegex],
+  fontVariant: [],
+  lineBreak: [],
   textDecoration: [],
   userSelect: [],
   letterSpacing: [],
@@ -497,6 +518,12 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   textAlign: [],
   textWrap: [],
   textAlignLast: [],
+  textIndent: [],
+  textShadow: [],
+  wordBreak: [],
+  wordSpacing: [],
+  wordWrap: [],
+  writingMode: [],
 
   // --- Content rendering
   wrapContent: [],
@@ -518,4 +545,7 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   outlineColor: [],
   outlineStyle: [],
   outlineOffset: [],
+
+  // --- Animation
+  transition: [],
 };

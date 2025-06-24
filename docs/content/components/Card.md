@@ -155,8 +155,8 @@ This component does not expose any methods.
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-Card | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-Card | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-Card | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-Card | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-Card | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-Card | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-Card | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-Card | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-Card | *none* | *none* |
@@ -170,8 +170,8 @@ This component does not expose any methods.
 | [color](../styles-and-themes/common-units/#color)-Card | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-Card | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-Card | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-Card | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-Card | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-Card | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-Card | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-Card | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-Card | *none* | *none* |
@@ -186,7 +186,7 @@ This component does not expose any methods.
 | [gap](../styles-and-themes/common-units/#size)-avatar-Card | $gap-normal | $gap-normal |
 | [gap](../styles-and-themes/common-units/#size)-Card | var(--stack-gap-default) | var(--stack-gap-default) |
 | [gap](../styles-and-themes/common-units/#size)-title-Card | $gap-normal | $gap-normal |
-| horizontalAlignment-title-Card | *none* | *none* |
+| [horizontalAlignment](../styles-and-themes/common-units/#alignment)-title-Card | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Card | $space-4 | $space-4 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
 | [paddingHorizontal](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
@@ -194,7 +194,7 @@ This component does not expose any methods.
 | [paddingRight](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
 | [paddingTop](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
 | [paddingVertical](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
-| [verticalAlign](../styles-and-themes/common-units/#alignment)ment-title-Card | center | center |
+| [verticalAlignment](../styles-and-themes/common-units/#alignment)-title-Card | center | center |
 
 ### Variable Explanations [#variable-explanations]
 

@@ -1484,8 +1484,8 @@ This method selects the row with the specified ID. This method has no effect if 
 | [borderBottomStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
 | [borderBottomWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndEndRadius-cell-Table | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)EndStartRadius-cell-Table | *none* | *none* |
+| [borderEndEndRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
+| [borderEndStartRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
 | [borderHorizontal](../styles-and-themes/common-units/#border)-cell-Table | *none* | *none* |
 | [borderHorizontalColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
 | [borderHorizontalStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
@@ -1498,8 +1498,8 @@ This method selects the row with the specified ID. This method has no effect if 
 | [color](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
 | [borderRightStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
 | [borderRightWidth](../styles-and-themes/common-units/#size)-cell-Table | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartEndRadius-cell-Table | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)StartStartRadius-cell-Table | *none* | *none* |
+| [borderStartEndRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
+| [borderStartStartRadius](../styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
 | [borderStyle](../styles-and-themes/common-units/#border-style)-cell-Table | *none* | *none* |
 | [borderTop](../styles-and-themes/common-units/#border)-cell-Table | *none* | *none* |
 | [borderTopColor](../styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
