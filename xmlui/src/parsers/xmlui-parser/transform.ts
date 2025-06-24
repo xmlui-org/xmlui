@@ -202,7 +202,7 @@ export function nodeToComponentDef(
     if (vars) {
       nestedComponent.vars = { ...nestedComponent.vars, ...vars };
     }
-    if(codeBehind){
+    if (codeBehind) {
       component.codeBehind = codeBehind.value;
     }
 
@@ -1186,17 +1186,17 @@ function withNewChildNodes(node: Node, newChildren: Node[]) {
     return node;
   }
   const contentListChild = node.children![childrenListIdx];
-  return new Node(
-    node.kind,
-    node.pos ?? 0,
-    node.end ?? 0,
-    node.triviaBefore,
-    [
-      ...node.children!.slice(0, childrenListIdx),
-      new Node(contentListChild.kind, contentListChild.pos ?? 0, contentListChild.end ?? 0, undefined, newChildren),
-      ...node.children!.slice(childrenListIdx),
-    ]
-  );
+  return new Node(node.kind, node.pos ?? 0, node.end ?? 0, node.triviaBefore, [
+    ...node.children!.slice(0, childrenListIdx),
+    new Node(
+      contentListChild.kind,
+      contentListChild.pos ?? 0,
+      contentListChild.end ?? 0,
+      undefined,
+      newChildren,
+    ),
+    ...node.children!.slice(childrenListIdx),
+  ]);
 }
 
 function desugarKeyOnlyAttrs(attrs: Node[]) {
@@ -1312,8 +1312,8 @@ function getNamespaceResolvedComponentName(
 }
 
 /**
-* @param name - The name of the event in camelCase, with "on" prefix.
-*/
+ * @param name - The name of the event in camelCase, with "on" prefix.
+ */
 export function stripOnPrefix(name: string) {
   return name[2].toLowerCase() + name.substring(3);
 }
