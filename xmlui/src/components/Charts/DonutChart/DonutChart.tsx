@@ -12,7 +12,8 @@ const defaultPropsDonut = {
 };
 
 export const DonutChartMd = createMetadata({
-  description: "A derivative of [PieChart](/components/PieChart) with a hollow center.",
+  description: "A derivative of [PieChart](/components/PieChart) with a hollow center. " +
+    "Note that the height of the component or its parent needs to be set explicitly.",
   status: "experimental",
   props: {
     data: {

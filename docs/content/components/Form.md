@@ -53,6 +53,10 @@ This example mimics a one-second search and turns off the submit button during t
 
 This property defines the label of the Cancel button.
 
+### `completedNotificationMessage` [#completednotificationmessage]
+
+This property sets the message to display when the form is submitted successfully.
+
 ### `data` [#data]
 
 This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form. If this property isnot set, the form does not have an initial value.
@@ -60,6 +64,14 @@ This property sets the initial value of the form's data structure. The form infr
 ### `enabled (default: true)` [#enabled-default-true]
 
 This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+### `errorNotificationMessage` [#errornotificationmessage]
+
+This property sets the message to display when the form submission fails.
+
+### `inProgressNotificationMessage` [#inprogressnotificationmessage]
+
+This property sets the message to display when the form is being submitted.
 
 ### `itemLabelBreak (default: true)` [#itemlabelbreak-default-true]
 
@@ -133,6 +145,10 @@ The form infrastructure fires this event when the form is submitted. The event a
   </Form>
 </App>  
 ```
+
+### `success` [#success]
+
+The form infrastructure fires this event when the form is submitted successfully.
 
 ## Exposed Methods [#exposed-methods]
 

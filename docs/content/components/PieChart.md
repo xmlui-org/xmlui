@@ -1,6 +1,6 @@
 # PieChart [#piechart]
 
-`PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole.
+`PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole. Note that the height of the component or its parent needs to be set explicitly.
 
 **Key features:**
 - **Proportional visualization**: Displays data segments as slices of a complete circle
@@ -17,13 +17,9 @@ For a variation with a hollow center, see [DonutChart](/components/DonutChart).
 
 The data to be displayed in the chart. Needs to be an array of objects.
 
-### `dataKeys` [#datakeys]
+### `dataKey` [#datakey]
 
-This property specifies the keys in the data objects that should be used for rendering the bars.
-
-### `height` [#height]
-
-The height of the chart
+This property specifies the key in the data objects that will be used to render the chart.
 
 ### `labelListPosition (default: "inside")` [#labellistposition-default-inside]
 
@@ -47,9 +43,9 @@ Toggles whether to show labels (`true`) or not (`false`).
 
 Whether to show labels in a list (`true`) or not (`false`).
 
-### `width` [#width]
+### `showLegend (default: false)` [#showlegend-default-false]
 
-The width of the chart
+Toggles whether to show legend (`true`) or not (`false`).
 
 ## Events [#events]
 

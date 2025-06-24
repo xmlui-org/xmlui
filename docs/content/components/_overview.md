@@ -24,7 +24,7 @@
 | [CVStack](./components/CVStack) | This component represents a stack that renders its contents vertically and aligns that in the center along both axes. |
 | [DataSource](./components/DataSource) | `DataSource` fetches and caches data from API endpoints, versus [`APICall`](/components/APICall) which creates, updates or deletes data. |
 | [DatePicker](./components/DatePicker) | `DatePicker` provides an interactive calendar interface for selecting single dates or date ranges, with customizable formatting and validation options. It displays a text input that opens a calendar popup when clicked, offering both keyboard and mouse interaction. |
-| [DonutChart](./components/DonutChart) | A derivative of [PieChart](/components/PieChart) with a hollow center. |
+| [DonutChart](./components/DonutChart) | A derivative of [PieChart](/components/PieChart) with a hollow center. Note that the height of the component or its parent needs to be set explicitly. |
 | [DropdownMenu](./components/DropdownMenu) | `DropdownMenu` provides a space-efficient way to present multiple options or actions through a collapsible interface. When clicked, the trigger button reveals a menu that can include items, separators, and nested submenus, making it ideal for navigation, action lists, or any situation requiring many options without permanent screen space. |
 | [EmojiSelector](./components/EmojiSelector) | `EmojiSelector` enables users to browse, search and select emojis from their system's native emoji set. |
 | [ExpandableItem](./components/ExpandableItem) | `ExpandableItem` creates expandable/collapsible section, similar to the HTML details disclosure element. When the user clicks on the `summary` the content expands or collapses. |
@@ -68,7 +68,7 @@
 | [PageMetaTitle](./components/PageMetaTitle) | `PageMetaTitle` dynamically sets or updates the browser tab title, enabling pages and components to override the default application name with context-specific titles. |
 | [Pages](./components/Pages) | `Pages` serves as the routing coordinator within an [App](/components/App), managing which [Page](/components/Page)  displays based on the current URL. |
 | [PasswordInput](./components/PasswordInput) | `Password` is a specialized [TextBox](/components/TextBox) that enables users to input and edit passwords. |
-| [PieChart](./components/PieChart) | `PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole. |
+| [PieChart](./components/PieChart) | `PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole. Note that the height of the component or its parent needs to be set explicitly. |
 | [ProgressBar](./components/ProgressBar) | `ProgressBar` provides a visual indicator showing the completion percentage of tasks, processes, or any measurable progress. It displays as a horizontal bar that fills from left to right based on the provided value between 0 (empty) and 1 (complete). |
 | [Queue](./components/Queue) | `Queue` manages sequential processing of items in FIFO (first-in, first-out) order. It is a non-visual component but provides UI progress reporting and result display. |
 | [RadioGroup](./components/RadioGroup) | `RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group. |
