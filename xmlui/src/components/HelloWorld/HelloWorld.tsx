@@ -32,19 +32,18 @@ export const HelloWorldMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    // Standard HelloWorld theme variables
+    // Standard HelloWorld theme variables with visible defaults
     [`backgroundColor-${COMP}`]: "$color-surface-50",
     [`borderColor-${COMP}`]: "$color-surface-200",
-    [`borderWidth-${COMP}`]: "2px",
+    [`borderWidth-${COMP}`]: "$space-2",
     [`borderStyle-${COMP}`]: "solid",
     [`borderRadius-${COMP}`]: "$borderRadius",
-    [`padding-${COMP}`]: "$space-6",
-    [`color-${COMP}`]: "$color-surface-900",
-    
-    // Success theme variant
+    [`padding-${COMP}`]: "$space-4",
+    [`textColor-${COMP}`]: "$color-primary",     // Dark gray text
+
     [`backgroundColor-${COMP}-success`]: "$color-success-50",
     [`borderColor-${COMP}-success`]: "$color-success-200",
-    [`color-${COMP}-success`]: "$color-success-800",
+    [`textColor-${COMP}-success`]: "$color-success-800",
   },
 });
 
