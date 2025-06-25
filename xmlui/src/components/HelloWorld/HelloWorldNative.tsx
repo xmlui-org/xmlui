@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import classnames from "classnames";
+import { useEvent } from "../../components-core/utils/misc";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import styles from "./HelloWorld.module.scss";
 
 type Props = {
@@ -11,6 +13,8 @@ type Props = {
   className?: string;
   onClick?: (event: React.MouseEvent) => void;
   onReset?: (event: React.MouseEvent) => void;
+  registerComponentApi?: RegisterComponentApiFn;
+  updateState?: UpdateStateFn;
 };
 
 export const defaultProps: Partial<Props> = {
@@ -29,21 +33,41 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
       className,
       onClick,
       onReset,
+      registerComponentApi,
+      updateState,
       ...rest
     },
     ref
   ) {
     const [clickCount, setClickCount] = useState(0);
 
+    const setValue = useEvent((newCount: number) => {
+      setClickCount(newCount);
+      updateState?.({ value: newCount });
+    });
+
+    // Sync clickCount with XMLUI state system (like AppState does)
+    useEffect(() => {
+      updateState?.({ value: clickCount });
+    }, [updateState, clickCount]);
+
+    useEffect(() => {
+      registerComponentApi?.({
+        setValue,
+      });
+    }, [registerComponentApi, setValue]);
+
     const handleClick = (event: React.MouseEvent) => {
       const newCount = clickCount + 1;
       setClickCount(newCount);
+      updateState?.({ value: newCount });
       // Call XMLUI event handler if provided
       onClick?.(event);
     };
 
     const handleReset = (event: React.MouseEvent) => {
       setClickCount(0);
+      updateState?.({ value: 0 });
       // Call XMLUI event handler if provided
       onReset?.(event);
     };

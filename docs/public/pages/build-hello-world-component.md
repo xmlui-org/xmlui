@@ -418,20 +418,119 @@ Now you can use the HelloWorld component with event handling:
 
 **Note:** Event handler functions can be defined in your `index.html` file (as shown) or in [code-behind files](/code). See the [Code guide](/code) for more details on organizing JavaScript functions in XMLUI applications.
 
-## Step 6: Register the Component
+## Step 6: Component API (Exposed Methods)
+
+Components can expose methods that allow XMLUI applications to interact with them programmatically. This enables external control of component state and behavior beyond just props and events.
+
+### Add registerComponentApi prop to HelloWorldNative.tsx
+
+First, add the prop to the Props interface:
+```xmlui
+type Props = {
+  // ... existing props
+  registerComponentApi?: (api: any) => void;
+};
+```
+
+Then inside the component function, add useEffect to register the API:
+```xmlui
+import React, { useState, useEffect } from "react";
+
+// Inside the component function:
+useEffect(() => {
+  registerComponentApi?.({
+    get value() {
+      return clickCount;
+    },
+    setValue: (newCount: number) => {
+      setClickCount(newCount);
+    },
+  });
+}, [clickCount, registerComponentApi]);
+```
+
+### Add exposed methods to HelloWorld.tsx metadata
+
+```tsx
+export const HelloWorldMd = createMetadata({
+  // ... existing metadata
+  apis: {
+    value: dValue(),
+    setValue: dSetValueApi(),
+  },
+  // ... rest of metadata
+});
+```
+
+**Update HelloWorld.tsx renderer:**
+```xmlui
+export const helloWorldComponentRenderer = createComponentRenderer(
+  COMP,
+  HelloWorldMd,
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler, registerComponentApi }) => {
+    return (
+      <HelloWorld
+        id={extractValue.asOptionalString(node.props.id)}
+        message={extractValue.asOptionalString(node.props.message)}
+        theme={extractValue.asOptionalString(node.props.theme)}
+        onClick={lookupEventHandler("onClick")}
+        onReset={lookupEventHandler("onReset")}
+        registerComponentApi={registerComponentApi}
+        style={layoutCss}
+      >
+        {renderChild(node.children)}
+      </HelloWorld>
+    );
+  }
+);
+```
+
+This pattern allows XMLUI applications to:
+- Get the current click count: `demo.value` (through XMLUI's built-in state system)
+- Set the click count programmatically: `demo.setValue(5)` (through component API)
+- Control component state from code-behind or other components
+
+**Key insight:** The `updateState({ value: newCount })` calls are what make `demo.value` accessible in XMLUI markup. This syncs the component's internal state with XMLUI's state management system.
+
+**Live example:**
+
+Test the Component API methods with this interactive example:
+
+```xmlui-pg display
+<App>
+  <VStack spacing="4">
+    <HelloWorld id="demo" message="API Demo" />
+
+    <HStack spacing="2">
+      <Button onClick="() => alert('Current count: ' + demo.value)">Get Count</Button>
+      <Button onClick="() => demo.setValue(5)">Set to 5</Button>
+      <Button onClick="() => demo.setValue(0)">Reset</Button>
+    </HStack>
+
+    <Text>Current count: {demo.value}</Text>
+  </VStack>
+</App>
+```
+
+This demonstrates:
+- Getting the current value with `demo.value` (XMLUI's automatic state access)
+- Setting values with `demo.setValue()` (component API method)
+- Reactive updates when the component state changes
+
+## Step 7: Register the Component
 
 Add your component to `xmlui/src/components/ComponentProvider.tsx`.
 
 First, add the import near the top with other component imports:
 
-```tsx
+```xmlui
 import { buttonComponentRenderer } from "./Button/Button";
 import { helloWorldComponentRenderer } from "./HelloWorld/HelloWorld";
 ```
 
 Then register the component in the `ComponentRegistry` constructor:
 
-```tsx
+```xmlui
 if (process.env.VITE_USED_COMPONENTS_Button !== "false") {
   this.registerCoreComponent(buttonComponentRenderer);
 }
@@ -440,7 +539,7 @@ if (process.env.VITE_USED_COMPONENTS_HelloWorld !== "false") {
 }
 ```
 
-## Step 7: Test Your Component
+## Step 8: Test Your Component
 
 You can now use your HelloWorld component in XMLUI markup:
 
@@ -487,7 +586,7 @@ Use the appropriate `extractValue` methods in your renderer:
 ### State Management
 Use standard React hooks for component state:
 
-```tsx
+```xmlui
 const [clickCount, setClickCount] = useState(0);
 ```
 
@@ -495,7 +594,7 @@ const [clickCount, setClickCount] = useState(0);
 XMLUI components can expose events that XMLUI apps can handle. This involves several steps:
 
 **1. Add event props to your component's Props interface:**
-```tsx
+```xmlui
 type Props = {
   // ... other props
   onClick?: string;
@@ -504,7 +603,7 @@ type Props = {
 ```
 
 **2. Use event handler props in your component:**
-```tsx
+```xmlui
 const handleClick = () => {
   const newCount = clickCount + 1;
   setClickCount(newCount);
@@ -520,7 +619,7 @@ const handleReset = () => {
 ```
 
 **3. Declare events in your component metadata:**
-```tsx
+```xmlui
 events: {
   onClick: {
     description: "Triggered when the click button is pressed. Receives the current click count.",
@@ -534,7 +633,7 @@ events: {
 ```
 
 **4. Use lookupEventHandler in the renderer:**
-```tsx
+```xmlui
 // In the renderer function
 return (
   <HelloWorld
@@ -550,7 +649,7 @@ This pattern allows XMLUI apps to handle component events while maintaining the 
 ### Conditional Rendering
 Use React conditional rendering for dynamic content:
 
-```tsx
+```xmlui
 {clickCount > 0 && (
   <button onClick={handleReset}>Reset</button>
 )}
@@ -622,7 +721,7 @@ Then apply them conditionally in your styles:
 
 In your component metadata, provide sensible defaults using XMLUI's semantic tokens:
 
-```tsx
+```xmlui
 defaultThemeVars: {
   // Use semantic color tokens
   [`backgroundColor-${COMP}`]: "$color-surface-50",

@@ -2,6 +2,7 @@ import styles from "./HelloWorld.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { dSetValueApi, dValue } from "../metadata-helpers";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
 
 const COMP = "HelloWorld";
@@ -40,6 +41,10 @@ export const HelloWorldMd = createMetadata({
       type: "function",
     },
   },
+  apis: {
+    value: dValue(),
+    setValue: dSetValueApi(),
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     // Standard HelloWorld theme variables with visible defaults
@@ -60,7 +65,7 @@ export const HelloWorldMd = createMetadata({
 export const helloWorldComponentRenderer = createComponentRenderer(
   COMP,
   HelloWorldMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler, registerComponentApi, updateState }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
@@ -68,6 +73,8 @@ export const helloWorldComponentRenderer = createComponentRenderer(
         theme={extractValue.asOptionalString(node.props.theme)}
         onClick={lookupEventHandler("onClick")}
         onReset={lookupEventHandler("onReset")}
+        registerComponentApi={registerComponentApi}
+        updateState={updateState}
         style={layoutCss}
       >
         {renderChild(node.children)}
