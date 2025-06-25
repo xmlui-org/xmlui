@@ -204,86 +204,84 @@ $themeVars: t.composeTextVars($themeVars, $component, $component);
   @include t.paddingVars($themeVars, $component);
   @include t.borderVars($themeVars, $component);
   @include t.textVars($themeVars, $component);
-
+  
   border-radius: createThemeVar("borderRadius-#{$component}");
-  font-family: system-ui, -apple-system, sans-serif;
-  transition: all 0.2s ease-in-out;
-  max-width: 400px;
+  max-width: createThemeVar("maxWidth-#{$component}");
 }
 
 .content {
-  text-align: center;
+  text-align: createThemeVar("textAlign-#{$component}-content");
 }
 
 .message {
-  margin: 0 0 16px 0;
-  font-size: 1.5rem;
-  font-weight: 600;
+  margin-bottom: createThemeVar("marginBottom-#{$component}-message");
+  font-size: createThemeVar("fontSize-#{$component}-message");
+  font-weight: createThemeVar("fontWeight-#{$component}-message");
 }
 
 .children {
-  margin: 16px 0;
-  padding: 12px;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-  font-style: italic;
+  margin: createThemeVar("margin-#{$component}-children");
+  padding: createThemeVar("padding-#{$component}-children");
+  background-color: createThemeVar("backgroundColor-#{$component}-children");
+  border-radius: createThemeVar("borderRadius-#{$component}-children");
+  font-style: createThemeVar("fontStyle-#{$component}-children");
 }
 
 .interactive {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: createThemeVar("gap-#{$component}-interactive");
 }
 
 .clickButton {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 12px 24px;
-  font-size: 1rem;
-  font-weight: 500;
+  background-color: createThemeVar("backgroundColor-#{$component}-clickButton");
+  color: createThemeVar("textColor-#{$component}-clickButton");
+  border: createThemeVar("border-#{$component}-clickButton");
+  border-radius: createThemeVar("borderRadius-#{$component}-clickButton");
+  padding: createThemeVar("padding-#{$component}-clickButton");
+  font-size: createThemeVar("fontSize-#{$component}-clickButton");
+  font-weight: createThemeVar("fontWeight-#{$component}-clickButton");
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: createThemeVar("transition-#{$component}-clickButton");
 
   &:hover {
-    background-color: #2563eb;
+    background-color: createThemeVar("backgroundColor-#{$component}-clickButton--hover");
   }
 
   &:active {
-    transform: translateY(1px);
+    transform: createThemeVar("transform-#{$component}-clickButton--active");
   }
 }
 
 .counter {
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-size: createThemeVar("fontSize-#{$component}-counter");
+  font-weight: createThemeVar("fontWeight-#{$component}-counter");
 }
 
 .count {
   display: inline-block;
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 700;
-  min-width: 24px;
+  background-color: createThemeVar("backgroundColor-#{$component}-count");
+  color: createThemeVar("textColor-#{$component}-count");
+  padding: createThemeVar("padding-#{$component}-count");
+  border-radius: createThemeVar("borderRadius-#{$component}-count");
+  font-weight: createThemeVar("fontWeight-#{$component}-count");
+  min-width: createThemeVar("minWidth-#{$component}-count");
   text-align: center;
 }
 
 .resetButton {
-  background-color: #6b7280;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-size: 0.875rem;
+  background-color: createThemeVar("backgroundColor-#{$component}-resetButton");
+  color: createThemeVar("textColor-#{$component}-resetButton");
+  border: createThemeVar("border-#{$component}-resetButton");
+  border-radius: createThemeVar("borderRadius-#{$component}-resetButton");
+  padding: createThemeVar("padding-#{$component}-resetButton");
+  font-size: createThemeVar("fontSize-#{$component}-resetButton");
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: createThemeVar("transition-#{$component}-resetButton");
 
   &:hover {
-    background-color: #4b5563;
+    background-color: createThemeVar("backgroundColor-#{$component}-resetButton--hover");
   }
 }
 
@@ -299,13 +297,14 @@ $themeVars: t.composeTextVars($themeVars, $component, $component);
 
 - **`@use "../../components-core/theming/themes" as t;`** - Import the XMLUI theming system
 - **`$themeVars: ();`** - Initialize the theme variables collection
-- **`createThemeVar()` function** - Helper to create individual theme variables
+- **`createThemeVar()` function** - Helper to create individual theme variables with logical names
 - **`t.compose*Vars()` functions** - Generate complete sets of related theme variables:
   - `composePaddingVars()` - Creates padding variables (top, bottom, left, right, horizontal, vertical)
   - `composeBorderVars()` - Creates border variables (color, width, style, radius)
   - `composeTextVars()` - Creates text variables (color, font-family, font-size, background-color, etc.)
 - **`@include t.*Vars()` mixins** - Apply the theme variables to CSS properties
 - **`:export { themeVars: t.json-stringify($themeVars); }`** - Export variables for XMLUI's runtime system
+- **No hardcoded values** - All styling uses `createThemeVar()` with logical names instead of hardcoded values like `#3b82f6` or `16px`
 
 **Theme Variants:**
 - Create variants by wrapping components with `<Theme>` elements and custom theme variables
@@ -315,6 +314,7 @@ $themeVars: t.composeTextVars($themeVars, $component, $component);
 **Why This Approach:**
 - **Consistency** - All XMLUI components use the same theming patterns
 - **Completeness** - Automatically generates comprehensive theme variable sets
+- **Themeable** - Every visual aspect can be customized through theme variables
 - **Performance** - Programmatic generation is more efficient than manual string parsing
 - **Browser Compatibility** - Works reliably across all browsers including Edge
 

@@ -22,14 +22,6 @@ export const HelloWorldMd = createMetadata({
       type: "string",
       defaultValue: defaultProps.message,
     },
-    theme: {
-      description: "Sets the visual theme of the component.",
-      type: "string",
-      availableValues: [
-        { value: "default", description: "Default theme" },
-        { value: "success", description: "Success theme (green)" },
-      ],
-    },
   },
   events: {
     onClick: {
@@ -54,11 +46,60 @@ export const HelloWorldMd = createMetadata({
     [`borderStyle-${COMP}`]: "solid",
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`padding-${COMP}`]: "$space-4",
-    [`textColor-${COMP}`]: "$color-primary",     // Dark gray text
+    [`textColor-${COMP}`]: "$color-primary",
+    [`maxWidth-${COMP}`]: "400px",
 
-    [`backgroundColor-${COMP}-success`]: "$color-success-50",
-    [`borderColor-${COMP}-success`]: "$color-success-200",
-    [`textColor-${COMP}-success`]: "$color-success-800",
+    // Content styling
+    [`textAlign-${COMP}-content`]: "center",
+
+    // Message styling
+    [`marginBottom-${COMP}-message`]: "$space-4",
+    [`fontSize-${COMP}-message`]: "$fontSize-lg",
+    [`fontWeight-${COMP}-message`]: "$fontWeight-semibold",
+
+    // Children styling
+    [`margin-${COMP}-children`]: "$space-4 0",
+    [`padding-${COMP}-children`]: "$space-3",
+    [`backgroundColor-${COMP}-children`]: "$color-surface-100",
+    [`borderRadius-${COMP}-children`]: "$borderRadius-sm",
+    [`fontStyle-${COMP}-children`]: "italic",
+
+    // Interactive container
+    [`gap-${COMP}-interactive`]: "$space-3",
+
+    // Click button styling
+    [`backgroundColor-${COMP}-clickButton`]: "$color-primary-500",
+    [`textColor-${COMP}-clickButton`]: "white",
+    [`border-${COMP}-clickButton`]: "none",
+    [`borderRadius-${COMP}-clickButton`]: "$borderRadius",
+    [`padding-${COMP}-clickButton`]: "$space-3 $space-6",
+    [`fontSize-${COMP}-clickButton`]: "$fontSize-base",
+    [`fontWeight-${COMP}-clickButton`]: "$fontWeight-medium",
+    [`transition-${COMP}-clickButton`]: "background-color 0.2s ease",
+    [`backgroundColor-${COMP}-clickButton--hover`]: "$color-primary-600",
+    [`transform-${COMP}-clickButton--active`]: "translateY(1px)",
+
+    // Counter styling
+    [`fontSize-${COMP}-counter`]: "$fontSize-lg",
+    [`fontWeight-${COMP}-counter`]: "$fontWeight-medium",
+
+    // Count badge styling
+    [`backgroundColor-${COMP}-count`]: "$color-primary-100",
+    [`textColor-${COMP}-count`]: "$color-primary-700",
+    [`padding-${COMP}-count`]: "$space-1 $space-2",
+    [`borderRadius-${COMP}-count`]: "$borderRadius-sm",
+    [`fontWeight-${COMP}-count`]: "$fontWeight-bold",
+    [`minWidth-${COMP}-count`]: "24px",
+
+    // Reset button styling
+    [`backgroundColor-${COMP}-resetButton`]: "$color-surface-400",
+    [`textColor-${COMP}-resetButton`]: "white",
+    [`border-${COMP}-resetButton`]: "none",
+    [`borderRadius-${COMP}-resetButton`]: "$borderRadius-sm",
+    [`padding-${COMP}-resetButton`]: "$space-2 $space-4",
+    [`fontSize-${COMP}-resetButton`]: "$fontSize-sm",
+    [`transition-${COMP}-resetButton`]: "background-color 0.2s ease",
+    [`backgroundColor-${COMP}-resetButton--hover`]: "$color-surface-500",
   },
 });
 
@@ -70,7 +111,6 @@ export const helloWorldComponentRenderer = createComponentRenderer(
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
         message={extractValue.asOptionalString(node.props.message)}
-        theme={extractValue.asOptionalString(node.props.theme)}
         onClick={lookupEventHandler("onClick")}
         onReset={lookupEventHandler("onReset")}
         registerComponentApi={registerComponentApi}
