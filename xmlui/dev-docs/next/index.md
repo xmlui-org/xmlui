@@ -81,3 +81,4 @@ XMLUI is organized as a monorepo containing **12+ buildable artifacts** across m
 - [**Project Structure**](./project-structure.md) - Developer documentation for monorepo structure and build artifacts
 - [**Working with Code**](./working-with-code.md) - Development workflow and common tasks for contributing to XMLUI
 - [**Project Build**](./project-build.md) - Build system documentation using Turborepo for monorepo orchestration
+- [**Generate Component Reference Documentation**](./generating-component-reference.md) - How to generate and maintain component reference documentation
