@@ -167,18 +167,6 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 - **Event Handlers**: Standard React click handlers for interactivity
 - **Classnames**: Uses the `classnames` library for conditional CSS classes
 
-### Test the Basic Component
-
-At this point, you can test the basic component structure:
-
-```xmlui-pg display
-<App>
-  <HelloWorld />
-</App>
-```
-
-This demonstrates the component rendering with its default props and basic interactive functionality.
-
 ## Step 3: Create Component Styles with XMLUI Theming
 
 Create `xmlui/src/components/HelloWorld/HelloWorld.module.scss`:
@@ -318,35 +306,6 @@ $themeVars: t.composeTextVars($themeVars, $component, $component);
 - **Performance** - Programmatic generation is more efficient than manual string parsing
 - **Browser Compatibility** - Works reliably across all browsers including Edge
 
-### Test Theme Variants
-
-With the theming system in place, you can test different themes using XMLUI's `<Theme>` component:
-
-```xmlui-pg display
-<App>
-  <VStack spacing="4">
-      <HelloWorld message="Default theme" />
-
-    <Theme themeId="xmlui-orange">
-      <HelloWorld message="Orange theme" />
-    </Theme>
-
-    <Theme themeId="xmlui-orange"
-      backgroundColor-HelloWorld="$color-success-50"
-      borderColor-HelloWorld="$color-success-200"
-      textColor-HelloWorld="$color-success-800"
-    >
-      <HelloWorld message="Custom success styling" />
-    </Theme>
-  </VStack>
-</App>
-```
-
-This demonstrates the proper XMLUI theming approach:
-- Using `themeId` to switch between built-in themes (xmlui, xmlui-orange)
-- Customizing individual theme variables for specific styling
-- No need for component-specific theme props
-
 ## Step 4: Create Component Metadata and Renderer
 
 Create `xmlui/src/components/HelloWorld/HelloWorld.tsx`:
@@ -441,6 +400,8 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 
 ### Test Props and Children
 
+**Note**: The following examples assume you've completed Step 7 (component registration) to make the HelloWorld component available to XMLUI.
+
 With the metadata and renderer complete, you can test custom props and nested content:
 
 ```xmlui-pg display
@@ -484,6 +445,8 @@ window.handleHelloReset = function(event) {
 ```
 
 ### Use the event handlers
+
+**Note**: This example assumes you've completed Step 7 (component registration).
 
 Now you can use the HelloWorld component with event handling:
 
@@ -603,6 +566,8 @@ This pattern allows XMLUI applications to:
 **Key insight:** The `updateState({ value: newCount })` calls are what make `demo.value` accessible in XMLUI markup. This syncs the component's internal state with XMLUI's state management system.
 
 **Live example:**
+
+**Note**: This example assumes you've completed Step 7 (component registration).
 
 Test the Component API methods with this interactive example:
 
