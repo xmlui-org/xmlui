@@ -29,19 +29,21 @@ $verticalalAlignment-title-Card: createThemeVar("verticalAlignment-title-Card");
   flex-direction: column;
   gap: $gap-Card;
 
-  & .avatarWrapper {
+   .avatarWrapper {
     display: flex;
     flex-direction: row;
     align-items: $verticalalAlignment-title-Card;
     gap: $gap-avatar-Card;
+    min-width: 0;
   }
 
-  & .titleWrapper {
+   .titleWrapper {
     display: flex;
     flex-direction: column;
     align-items: $horizontalAlignment-title-Card;
     width: 100%;
     gap: $gap-title-Card;
+    min-width: 0;
   }
 
   &.horizontal {

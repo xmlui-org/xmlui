@@ -1,4 +1,4 @@
-import { startTransition, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { CSSProperties, startTransition, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import styles from "./NestedApp.module.scss";
@@ -32,6 +32,7 @@ type NestedAppProps = {
   height?: string | number;
   allowPlaygroundPopup?: boolean;
   withFrame?: boolean;
+  style?: CSSProperties
 };
 
 export function LazyNestedApp(props) {
@@ -66,6 +67,7 @@ export function NestedApp({
   height,
   allowPlaygroundPopup = defaultProps.allowPlaygroundPopup,
   withFrame = defaultProps.withFrame,
+  style
 }: NestedAppProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef(null);
@@ -180,9 +182,10 @@ export function NestedApp({
       themeVarReset[key] = "initial";
     });
 
+    console.log(style);
     let nestedAppRoot = (
       <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
-        <div style={{ height, ...themeVarReset }}>
+        <div style={{ height, ...style, ...themeVarReset }} >
           <AppRoot
             key={`app-${nestedAppId}-${refreshVersion}`}
             previewMode={true}
