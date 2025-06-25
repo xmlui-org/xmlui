@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: "--max-old-space-size=8192"
+      TURBO_UI: "false"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
