@@ -46,8 +46,10 @@ All XMLUI components follow this structure with the component name as the direct
 Create `xmlui/src/components/HelloWorld/HelloWorldNative.tsx`:
 
 ```xmlui copy
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import classnames from "classnames";
+import { useEvent } from "../../components-core/utils/misc";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import styles from "./HelloWorld.module.scss";
 
 type Props = {
@@ -57,6 +59,10 @@ type Props = {
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
+  onClick?: (event: React.MouseEvent) => void;
+  onReset?: (event: React.MouseEvent) => void;
+  registerComponentApi?: RegisterComponentApiFn;
+  updateState?: UpdateStateFn;
 };
 
 export const defaultProps: Partial<Props> = {
@@ -73,19 +79,45 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
       children,
       style,
       className,
+      onClick,
+      onReset,
+      registerComponentApi,
+      updateState,
       ...rest
     },
     ref
   ) {
     const [clickCount, setClickCount] = useState(0);
 
-    const handleClick = () => {
+    const setValue = useEvent((newCount: number) => {
+      setClickCount(newCount);
+      updateState?.({ value: newCount });
+    });
+
+    // Sync clickCount with XMLUI state system (like AppState does)
+    useEffect(() => {
+      updateState?.({ value: clickCount });
+    }, [updateState, clickCount]);
+
+    useEffect(() => {
+      registerComponentApi?.({
+        setValue,
+      });
+    }, [registerComponentApi, setValue]);
+
+    const handleClick = (event: React.MouseEvent) => {
       const newCount = clickCount + 1;
       setClickCount(newCount);
+      updateState?.({ value: newCount });
+      // Call XMLUI event handler if provided
+      onClick?.(event);
     };
 
-    const handleReset = () => {
+    const handleReset = (event: React.MouseEvent) => {
       setClickCount(0);
+      updateState?.({ value: 0 });
+      // Call XMLUI event handler if provided
+      onReset?.(event);
     };
 
     return (
@@ -298,6 +330,7 @@ import styles from "./HelloWorld.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { dSetValueApi, dValue } from "../metadata-helpers";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
 
 const COMP = "HelloWorld";
@@ -326,6 +359,20 @@ export const HelloWorldMd = createMetadata({
       ],
     },
   },
+  events: {
+    onClick: {
+      description: "Triggered when the click button is pressed. Receives the current click count.",
+      type: "function",
+    },
+    onReset: {
+      description: "Triggered when the reset button is pressed. Called when count is reset to 0.",
+      type: "function",
+    },
+  },
+  apis: {
+    value: dValue(),
+    setValue: dSetValueApi(),
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     // Standard HelloWorld theme variables using XMLUI semantic tokens
@@ -347,12 +394,16 @@ export const HelloWorldMd = createMetadata({
 export const helloWorldComponentRenderer = createComponentRenderer(
   COMP,
   HelloWorldMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler, registerComponentApi, updateState }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
         message={extractValue.asOptionalString(node.props.message)}
         theme={extractValue.asOptionalString(node.props.theme)}
+        onClick={lookupEventHandler("onClick")}
+        onReset={lookupEventHandler("onReset")}
+        registerComponentApi={registerComponentApi}
+        updateState={updateState}
         style={layoutCss}
       >
         {renderChild(node.children)}
@@ -424,29 +475,52 @@ Components can expose methods that allow XMLUI applications to interact with the
 
 ### Add registerComponentApi prop to HelloWorldNative.tsx
 
-First, add the prop to the Props interface:
-```xmlui
+First, add the required imports:
+```tsx
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { useEvent } from "../../components-core/utils/misc";
+```
+
+Then add the props to the Props interface:
+```tsx
 type Props = {
   // ... existing props
-  registerComponentApi?: (api: any) => void;
+  registerComponentApi?: RegisterComponentApiFn;
+  updateState?: UpdateStateFn;
 };
 ```
 
-Then inside the component function, add useEffect to register the API:
-```xmlui
-import React, { useState, useEffect } from "react";
+Inside the component function, create the setValue method and register the API:
+```tsx
+const setValue = useEvent((newCount: number) => {
+  setClickCount(newCount);
+  updateState?.({ value: newCount });
+});
 
-// Inside the component function:
+// Sync clickCount with XMLUI state system (like AppState does)
+useEffect(() => {
+  updateState?.({ value: clickCount });
+}, [updateState, clickCount]);
+
 useEffect(() => {
   registerComponentApi?.({
-    get value() {
-      return clickCount;
-    },
-    setValue: (newCount: number) => {
-      setClickCount(newCount);
-    },
+    setValue,
   });
-}, [clickCount, registerComponentApi]);
+}, [registerComponentApi, setValue]);
+
+// Update event handlers to sync state:
+const handleClick = (event: React.MouseEvent) => {
+  const newCount = clickCount + 1;
+  setClickCount(newCount);
+  updateState?.({ value: newCount });
+  onClick?.(event);
+};
+
+const handleReset = (event: React.MouseEvent) => {
+  setClickCount(0);
+  updateState?.({ value: 0 });
+  onReset?.(event);
+};
 ```
 
 ### Add exposed methods to HelloWorld.tsx metadata
@@ -463,11 +537,11 @@ export const HelloWorldMd = createMetadata({
 ```
 
 **Update HelloWorld.tsx renderer:**
-```xmlui
+```tsx
 export const helloWorldComponentRenderer = createComponentRenderer(
   COMP,
   HelloWorldMd,
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler, registerComponentApi, updateState }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
@@ -476,6 +550,7 @@ export const helloWorldComponentRenderer = createComponentRenderer(
         onClick={lookupEventHandler("onClick")}
         onReset={lookupEventHandler("onReset")}
         registerComponentApi={registerComponentApi}
+        updateState={updateState}
         style={layoutCss}
       >
         {renderChild(node.children)}
@@ -498,17 +573,17 @@ Test the Component API methods with this interactive example:
 
 ```xmlui-pg display
 <App>
-  <VStack spacing="4">
-    <HelloWorld id="demo" message="API Demo" />
+<VStack spacing="4">
+<HelloWorld id="demo" message="API Demo" />
 
-    <HStack spacing="2">
-      <Button onClick="() => alert('Current count: ' + demo.value)">Get Count</Button>
-      <Button onClick="() => demo.setValue(5)">Set to 5</Button>
-      <Button onClick="() => demo.setValue(0)">Reset</Button>
-    </HStack>
+<HStack spacing="2">
+<Button onClick="{ console.log('demo.value', demo.value) }">Get Count</Button>
+<Button onClick="{ demo.setValue(5) }">Set to 5</Button>
+<Button onClick="{ demo.setValue(0) }">Reset</Button>
+</HStack>
 
-    <Text>Current count: {demo.value}</Text>
-  </VStack>
+<Text>Current count: {demo.value}</Text>
+</VStack>
 </App>
 ```
 
