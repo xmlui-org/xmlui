@@ -5,6 +5,7 @@
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
+    "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
     "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && xmlui zip-dist --target=dist/ui.zip"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     ]
   },
   "devDependencies": {
+    "@octokit/rest": "^22.0.0",
     "remark-parse": "11.0.0",
     "strip-markdown": "6.0.0",
     "unified": "11.0.5"

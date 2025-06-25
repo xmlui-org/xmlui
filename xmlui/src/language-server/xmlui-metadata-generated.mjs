@@ -1773,12 +1773,12 @@ export default {
         ]
       },
       "collapsedIcon": {
-        "description": "This property is the name of the icon that is displayed when the accordion is collapsed.",
+        "description": "This property is the name of the icon that is displayed when the accordion is collapsed. This property is the name of the icon that is displayed when the accordion is expanded. If not provided, a chevron-down icon is used.",
         "valueType": "string",
         "defaultValue": "chevrondown"
       },
       "expandedIcon": {
-        "description": "This property is the name of the icon that is displayed when the accordion is expanded.",
+        "description": "This property is the name of the icon that is displayed when the accordion is expanded. If not provided, a chevron-up icon is used.",
         "valueType": "string"
       },
       "hideIcon": {
@@ -1889,7 +1889,7 @@ export default {
     }
   },
   "APICall": {
-    "description": "`APICall` is used to mutate (create, update or delete) some data on the backend. It is similar in nature to the `DataSource` component which retrieves data from the backend.",
+    "description": "`APICall` creates, updates or deletes data on the backend, versus [`DataSource`](/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't automatically execute - you must trigger it manually with the `execute()` method, typically from form submissions or button clicks.",
     "props": {
       "method": {
         "description": "The method of data manipulation can be done via setting this property.",
@@ -1908,23 +1908,23 @@ export default {
         "defaultValue": "get"
       },
       "url": {
-        "description": "Use this property to set the URL to send data to.",
+        "description": "Use this property to set the URL to which data will be sent. If not provided, an empty URL is used.",
         "isRequired": true,
         "valueType": "string"
       },
       "rawBody": {
-        "description": "This property sets the request body to the value provided here without any conversion. Use the * `body` property if you want the object sent in JSON. When you define `body` and `rawBody`, the latest one prevails.",
+        "description": "This optional property sets the request body to the value provided here without any conversion. Use the * `body` property if you want the object sent in JSON. When you define `body` and `rawBody`, the latest one prevails.",
         "valueType": "string"
       },
       "body": {
-        "description": "This property sets the request body. The object you pass here will be serialized to JSON when sending the request. Use the `rawBody` property to send another request body using its native format. When you define `body` and `rawBody`, the latest one prevails.",
+        "description": "This optional property sets the request body. Use to pass an object that will be serialized as a JSON string. If you have an object that is already serialized as a JSON string, use `rawBody` instead.",
         "valueType": "string"
       },
       "queryParams": {
-        "description": "This property sets the query parameters for the request. The object you pass here will be serialized to a query string and appended to the request URL. You can specify key and value pairs where the key is the name of a particular query parameter and the value is that parameter's value."
+        "description": "This optional property sets the query parameters for the request. The object you pass here will be serialized to a query string and appended to the request URL. You can specify key and value pairs where the key is the name of a particular query parameter and the value is that parameter's value."
       },
       "headers": {
-        "description": "You can define request header values as key and value pairs, where the key is the ID of the particular header and the value is that header's value."
+        "description": "You can optionally define request header values as key-value pairs, where the key is the ID of the particular header and the value is that header's corresponding value."
       },
       "confirmTitle": {
         "description": "This optional string sets the title in the confirmation dialog that is displayed before the `APICall` is executed.",
@@ -1939,15 +1939,15 @@ export default {
         "valueType": "string"
       },
       "inProgressNotificationMessage": {
-        "description": "This property customizes the message that is displayed in a toast while the API operation is in progress.",
+        "description": "This property customizes the message that is displayed in a toast while the API operation is in progress. If not defined, no progress message is displayed.",
         "valueType": "string"
       },
       "errorNotificationMessage": {
-        "description": "This property defines the message to display automatically when the operation results in an error.",
+        "description": "This property defines the message to display automatically when the operation results in an error. You can use the `$error` context value in an expression to refer to the original error message.",
         "valueType": "string"
       },
       "completedNotificationMessage": {
-        "description": "This property defines the message to display automatically when the operation has been completed.",
+        "description": "This property defines the message to display automatically when the operation has been completed. When this property is not defined, the completion does not display any message.",
         "valueType": "string"
       },
       "payloadType": {
@@ -1988,10 +1988,16 @@ export default {
     },
     "contextVars": {
       "$param": {
-        "description": "This value represents the first parameters passed to the `execute()` method to display the modal dialog."
+        "description": "The first parameter passed to `execute()` method"
       },
       "$params": {
-        "description": "This value represents the array of parameters passed to the `execute()` method. You can use `$params[0]` to access the first and `$params[1]` to access the second (and so on) parameters. `$param` is the same as `$params[0]`."
+        "description": "Array of all parameters passed to `execute()` method (access with `$params[0]`, `$params[1]`, etc.)"
+      },
+      "$result": {
+        "description": "Response data (available in `completedNotificationMessage` and `success` event)"
+      },
+      "$error": {
+        "description": "Error details (available in `errorNotificationMessage` and `error` event)"
       }
     },
     "apis": {
@@ -2002,7 +2008,7 @@ export default {
   },
   "App": {
     "status": "stable",
-    "description": "The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.",
+    "description": "The `App` component is the root container that defines your application's overall structure and layout. It provides a complete UI framework with built-in navigation, header, footer, and content areas that work together seamlessly.",
     "props": {
       "layout": {
         "description": "This property sets the layout template of the app. This setting determines the position and size of the app parts (such as header, navigation bar, footer, etc.) and the app's scroll behavior.",
@@ -2038,7 +2044,7 @@ export default {
         ]
       },
       "loggedInUser": {
-        "description": "Stores information about the currently logged in user.",
+        "description": "Stores information about the currently logged-in user. By not defining this property, you can indicate that no user is logged in.",
         "valueType": "string"
       },
       "logoTemplate": {
@@ -2058,7 +2064,7 @@ export default {
         "valueType": "string"
       },
       "name": {
-        "description": "Optional application name (visible in the browser tab)",
+        "description": "Optional application name (visible in the browser tab). When you do not define this property, the tab name falls back to the one defined in the app's configuration. If the name is not configured, \"XMLUI App\" is displayed in the tab.",
         "valueType": "string"
       },
       "scrollWholePage": {
@@ -2102,19 +2108,22 @@ export default {
       "maxWidth-App": "var(--xmlui-maxWidth-App)",
       "backgroundColor-AppHeader": "var(--xmlui-backgroundColor-AppHeader)",
       "borderBottom-AppHeader": "var(--xmlui-borderBottom-AppHeader)",
-      "scroll-padding-block-Pages": "var(--xmlui-scroll-padding-block-Pages)"
+      "scroll-padding-block-Pages": "var(--xmlui-scroll-padding-block-Pages)",
+      "maxWidth-Drawer": "var(--xmlui-maxWidth-Drawer)"
     },
+    "limitThemeVarsToComponent": true,
     "themeVarDescriptions": {
-      "maxWidth‑content‑App": "This theme variable defines the maximum width of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size.",
+      "maxWidth-content-App": "This theme variable defines the maximum width of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size.",
       "boxShadow‑header‑App": "This theme variable sets the shadow of the app's header section.",
       "boxShadow‑navPanel‑App": "This theme variable sets the shadow of the app's navigation panel section (visible only in vertical layouts).",
       "width‑navPanel‑App": "This theme variable sets the width of the navigation panel when the app is displayed with one of the vertical layouts."
     },
     "defaultThemeVars": {
+      "maxWidth-Drawer": "20rem",
       "width-navPanel-App": "$space-64",
       "backgroundColor-navPanel-App": "$backgroundColor",
       "maxWidth-content-App": "$maxWidth-content",
-      "boxShadow-header-App": "$boxShadow-spread",
+      "boxShadow-header-App": "none",
       "boxShadow-navPanel-App": "$boxShadow-spread",
       "scroll-padding-block-Pages": "$space-4",
       "backgroundColor-content-App": "$backgroundColor",
@@ -2123,8 +2132,8 @@ export default {
     }
   },
   "AppHeader": {
-    "status": "experimental",
-    "description": "`AppHeader` is a placeholder within `App` to define a custom application header.",
+    "status": "stable",
+    "description": "`AppHeader` defines the top navigation bar of your application within the [`App`](/components/App) component. It automatically handles logo placement, application title, and user profile areas with built-in responsive behavior.",
     "props": {
       "profileMenuTemplate": {
         "description": "This property makes the profile menu slot of the `AppHeader` component customizable.",
@@ -2200,13 +2209,15 @@ export default {
       "height-AppHeader": "var(--xmlui-height-AppHeader)",
       "backgroundColor-AppHeader": "var(--xmlui-backgroundColor-AppHeader)",
       "maxWidth-content-AppHeader": "var(--xmlui-maxWidth-content-AppHeader)",
-      "maxWidth-AppHeader": "var(--xmlui-maxWidth-AppHeader)"
+      "maxWidth-AppHeader": "var(--xmlui-maxWidth-AppHeader)",
+      "padding-drawerToggle-AppHeader": "var(--xmlui-padding-drawerToggle-AppHeader)"
     },
     "themeVarDescriptions": {
       "padding‑logo‑AppHeader": "This theme variable sets the padding of the logo in the app header (including all `padding` variants, such as `paddingLeft-logo-AppHeader` and others).",
       "width‑logo‑AppHeader": "Sets the width of the displayed logo"
     },
     "defaultThemeVars": {
+      "padding-drawerToggle-AppHeader": "$space-0_5",
       "height-AppHeader": "$space-14",
       "maxWidth-content-AppHeader": "$maxWidth-content-App",
       "maxWidth-AppHeader": "$maxWidth-App",
@@ -2230,7 +2241,7 @@ export default {
     }
   },
   "AppState": {
-    "description": "AppState is a functional component (without a visible user interface) that helps store and manage the app's state.",
+    "description": "`AppState` is an invisible component that provides global state management across your entire application. Unlike component variables that are scoped locally, AppState allows any component to access and update shared state without prop drilling.",
     "props": {
       "bucket": {
         "description": "This property is the identifier of the bucket to which the `AppState` instance is bound. Multiple `AppState` instances with the same bucket will share the same state object: any of them updating the state will cause the other instances to view the new, updated state.",
@@ -2238,7 +2249,7 @@ export default {
         "defaultValue": "default"
       },
       "initialValue": {
-        "description": "This property contains the initial state value. Though you can use multiple `AppState`component instances for the same bucket with their `initialValue` set, it may result in faulty app logic. When xmlui instantiates an `AppState` with an explicit initial value, that value is immediately set. Multiple initial values may result in undesired initialization."
+        "description": "This property contains the initial state value. Though you can use multiple `AppState`component instances for the same bucket with their `initialValue` set, it may result in faulty app logic. When xmlui instantiates an `AppState` with an explicit initial value, that value is immediately set. Multiple initial values may result in undesired initialization. By default, the bucked's initial state is undefined."
       }
     },
     "apis": {
@@ -2249,11 +2260,11 @@ export default {
     "nonVisual": true
   },
   "AutoComplete": {
-    "description": "This component is a dropdown with a list of options. According to the `multi` property, the user can select one or more items.",
+    "description": "`AutoComplete` is a searchable dropdown input that allows users to type and filter through options, with support for single or multiple selections. Unlike a basic [`Select`](/components/Select), it provides type-ahead functionality and can allow users to create new options.",
     "status": "experimental",
     "props": {
       "placeholder": {
-        "description": "A placeholder text that is visible in the input field when its empty.",
+        "description": "An optional placeholder text that is visible in the input field when its empty.",
         "valueType": "string"
       },
       "initialValue": {
@@ -2270,7 +2281,8 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "readOnly": {
         "description": "Set this property to `true` to disallow changing the component value.",
@@ -2283,7 +2295,10 @@ export default {
         "defaultValue": true
       },
       "creatable": {
-        "description": "This property allows the user to create new items that are not present in the list of options."
+        "description": "This property allows the user to create new items that are not present in the list of options.",
+        "availableValues": null,
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "validationStatus": {
         "description": "This property allows you to set the validation status of the input component.",
@@ -2304,7 +2319,7 @@ export default {
         "defaultValue": "none"
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -2326,14 +2341,13 @@ export default {
             "value": "bottom",
             "description": "The bottom of the input"
           }
-        ],
-        "defaultValue": "top"
+        ]
       },
       "labelWidth": {
-        "description": "This property sets the width of the `AutoComplete`."
+        "description": "This property sets the width of the `AutoComplete` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `AutoComplete` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `AutoComplete` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -2510,7 +2524,7 @@ export default {
     }
   },
   "Avatar": {
-    "description": "The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials.",
+    "description": "`Avatar` displays a user or entity's profile picture as a circular image, with automatic fallback to initials when no image is provided. It's commonly used in headers, user lists, comments, and anywhere you need to represent a person or organization.",
     "props": {
       "size": {
         "description": "This property defines the display size of the Avatar.",
@@ -2536,11 +2550,11 @@ export default {
         "defaultValue": "sm"
       },
       "name": {
-        "description": "This property sets the name value the Avatar uses to display initials.",
+        "description": "This property sets the name value the Avatar uses to display initials. If neither this property nor `url` is defined, an empty avatar is displayed.",
         "valueType": "string"
       },
       "url": {
-        "description": "This property specifies the URL of the image to display in the Avatar.",
+        "description": "This property specifies the URL of the image to display in the Avatar. If neither this property nor `name` is defined, an empty avatar is displayed.",
         "valueType": "string"
       }
     },
@@ -2611,18 +2625,18 @@ export default {
       },
       "opacity": {
         "description": "The opacity of the backdrop.",
-        "valueType": "number",
-        "defaultValue": 0.1
+        "valueType": "string",
+        "defaultValue": "0.1"
       }
     },
     "themeVars": []
   },
   "Badge": {
     "status": "stable",
-    "description": "The `Badge` is a text label that accepts a color map to define its background color and, optionally, its label color.",
+    "description": "`Badge` displays small text labels with colored backgrounds, commonly used for status indicators, categories, tags, and counts. It supports dynamic color mapping based on content values, useful for status systems and data categorization.",
     "props": {
       "value": {
-        "description": "The text that the component displays",
+        "description": "The text that the component displays. If this is not defined, the component renders its children as the content of the badge. If neither text nor any child is defined, the component renders a single frame for the badge with a non-breakable space.",
         "type": "string",
         "isRequired": true
       },
@@ -2636,7 +2650,7 @@ export default {
         "defaultValue": "badge"
       },
       "colorMap": {
-        "description": "The `Badge` component supports the mapping of a list of colors using the `value` prop as the key. Provide the component with a list or key-value pairs in two ways:"
+        "description": "The `Badge` component supports the mapping of a list of colors using the `value` prop as the key. If this property is not set, no color mapping is used."
       },
       "themeColor": {
         "description": "(**NOT IMPLEMENTED YET**) The theme color of the component.",
@@ -2799,7 +2813,7 @@ export default {
       "borderRadius-Badge": "4px",
       "fontSize-Badge": "0.8em",
       "fontSize-Badge-pill": "0.8em",
-      "backgroundColor-Badge": "rgba($color-secondary-500-rgb, .6)",
+      "backgroundColor-Badge": "rgb(from $color-secondary-500 r g b / 0.6)",
       "textColor-Badge": "$const-color-surface-0"
     }
   },
@@ -2808,7 +2822,7 @@ export default {
     "opaque": true,
     "props": {
       "uid": {
-        "description": "The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location.",
+        "description": "The unique identifier of the bookmark. You can use this identifier in links to navigate to this component's location. If this identifier is not set, you cannot programmatically visit this bookmark.",
         "valueType": "string"
       },
       "level": {
@@ -2831,7 +2845,7 @@ export default {
     "description": "The `Breakout` component creates a breakout section. It allows its child to occupy the entire width of the UI even if the app or the parent container constrains the maximum content width."
   },
   "Button": {
-    "description": "Button is an interactive element that triggers an action when clicked.",
+    "description": "`Button` is the primary interactive component for triggering actions like form submissions, navigation, opening modals, and API calls. It supports multiple visual styles and sizes to match different UI contexts and importance levels.",
     "status": "stable",
     "props": {
       "autoFocus": {
@@ -3263,14 +3277,14 @@ export default {
     }
   },
   "Card": {
-    "description": "The `Card` component is a container for cohesive elements, often rendered visually as a card.",
+    "description": "`Card` is a versatile container that groups related content with a visual boundary, typically featuring background color, padding, borders, and rounded corners. It's ideal for organizing information, creating sections, and establishing visual hierarchy in your interface.",
     "props": {
       "avatarUrl": {
-        "description": "Show the avatar (`true`) or not (`false`). If not specified, the Card will show the first letters of the [`title`](#title).",
+        "description": "The url for an avarar image. If not specified, but [`showAvatar`](#showAvatar) is true, Card will show the first letters of the [`title`](#title).",
         "type": "string"
       },
       "showAvatar": {
-        "description": "Indicates whether the Card should be displayed",
+        "description": "Indicates whether the avatar should be displayed",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -3285,15 +3299,15 @@ export default {
         "valueType": "string"
       },
       "title": {
-        "description": "This prop sets the prestyled title.",
+        "description": "This prop sets the pre-styled title. If the property is not set, no title is displayed in the Card.",
         "valueType": "string"
       },
       "subtitle": {
-        "description": "This prop sets the prestyled subtitle.",
+        "description": "This prop sets the pre-styled subtitle. If the property is not set, no subtitle is displayed in the Card.",
         "valueType": "string"
       },
       "linkTo": {
-        "description": "This property wraps the title in a `Link` component that is clickable to navigate.",
+        "description": "This optional property wraps the title in a `Link` component that is clickable to navigate.",
         "valueType": "string"
       },
       "orientation": {
@@ -3530,10 +3544,10 @@ export default {
     }
   },
   "ChangeListener": {
-    "description": "`ChangeListener` is a functional component (it renders no UI) to trigger an action when a particular value (component property, state, etc.) changes.",
+    "description": "`ChangeListener` is an invisible component that watches for changes in values and triggers actions in response. It's essential for creating reactive behavior when you need to respond to data changes, state updates, or component property modifications outside of normal event handlers.",
     "props": {
       "listenTo": {
-        "description": "Value to the changes of which this component listens.",
+        "description": "Value to the changes of which this component listens. If this property is not set, the `ChangeListener` is inactive.",
         "valueType": "any"
       },
       "throttleWaitInMs": {
@@ -3550,14 +3564,14 @@ export default {
   },
   "Checkbox": {
     "status": "stable",
-    "description": "The `Checkbox` component allows users to make binary choices, typically between checked or unchecked. It consists of a small box that can be toggled on or off by clicking on it.",
+    "description": "`Checkbox` allows users to make binary choices with a clickable box that shows checked/unchecked states. It's essential for settings, preferences, multi-select lists, and accepting terms or conditions.",
     "props": {
       "indeterminate": {
         "description": "The `true` value of this property signals that the component is in an _intedeterminate state_.",
         "defaultValue": false
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -3583,16 +3597,17 @@ export default {
         "defaultValue": "end"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `Checkbox`."
+        "description": "This property sets the width of the `Checkbox` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `Checkbox` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `Checkbox` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "initialValue": {
         "description": "This property sets the component's initial value.",
@@ -3723,6 +3738,7 @@ export default {
       "Input:outlineOffset-Switch--focus": "var(--xmlui-outlineOffset-Switch--focus)",
       "backgroundColor-indicator-checked-Switch": "var(--xmlui-backgroundColor-indicator-checked-Switch)"
     },
+    "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
       "borderColor-checked-Checkbox-error": "$borderColor-Checkbox-error",
       "backgroundColor-checked-Checkbox-error": "$borderColor-Checkbox-error",
@@ -3742,13 +3758,13 @@ export default {
     "isHtmlTag": true
   },
   "ColorPicker": {
-    "description": "This component allows the user to select a color with the browser's default color picker control.",
+    "description": "`ColorPicker` enables users to choose colors by specifying RGB, HSL, or HEX values.",
     "props": {
       "initialValue": {
         "description": "This property sets the component's initial value."
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -3774,10 +3790,10 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `ColorPicker`."
+        "description": "This property sets the width of the `ColorPicker` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `ColorPicker` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `ColorPicker` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -3793,7 +3809,8 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "readOnly": {
         "description": "Set this property to `true` to disallow changing the component value.",
@@ -3882,18 +3899,18 @@ export default {
     }
   },
   "Column": {
-    "description": "The `Column` component can be used within a `Table` to define a particular table column's visual properties and data bindings.",
+    "description": "`Column` defines the structure and behavior of individual table columns within a [`Table`](/components/Table) component. Each Column controls data binding, header display, sorting capabilities, sizing, and can contain any XMLUI components for rich cell content.",
     "props": {
       "bindTo": {
-        "description": "Indicates what part of the data to lay out in the column.",
+        "description": "Indicates the name of the current row item's property, the value of which to lay out in the column. If this property is not defined, the column is not sortable.",
         "valueType": "string"
       },
       "header": {
-        "description": "Adds a label for a particular column.",
+        "description": "This property defines a label for a particular column. If not set, the `bindTo` property value is used for the label.",
         "valueType": "string"
       },
       "width": {
-        "description": "This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*`, `2*`, etc.). You will get an error if you use any other unit (or value).",
+        "description": "This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*`, `2*`, etc.). You will get an error if you use any other unit (or value).If not defined, the component will use a width according to the column values and the available space.",
         "valueType": "any"
       },
       "minWidth": {
@@ -3905,11 +3922,12 @@ export default {
         "valueType": "any"
       },
       "canSort": {
-        "description": "This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`).",
+        "description": "This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`). If the `bindTo` property is not defined, the column is not sortable.",
+        "defaultValue": true,
         "valueType": "boolean"
       },
       "pinTo": {
-        "description": "This property allows the column to be pinned to the `left` (left-to-right writing style) or `right` (left-to-right writing style) edge of the table. If the writing style is right-to-left, the locations are switched.",
+        "description": "This property allows the column to be pinned to the `left` (left-to-right writing style) or `right` (left-to-right writing style) edge of the table. If the writing style is right-to-left, the locations are switched. If this property is not set, the column is not pinned to any edge.",
         "availableValues": [
           "left",
           "right"
@@ -3918,35 +3936,36 @@ export default {
       },
       "canResize": {
         "description": "This property indicates whether the user can resize the column. If set to `true`, the column can be resized by dragging the column border. If set to `false`, the column cannot be resized. Double-clicking the column border resets to the original size.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": true
       }
     },
     "contextVars": {
       "$item": {
-        "description": "The data item being rendered."
-      },
-      "$row": {
-        "description": "The data item being rendered (the same as `$item`)."
-      },
-      "$itemIndex": {
-        "description": "The index of the data item being rendered."
-      },
-      "$rowIndex": {
-        "description": "The index of the data item being rendered (the same as `$itemIndex`)."
-      },
-      "$colIndex": {
-        "description": "The index of the column being rendered."
+        "description": "The complete data row object being rendered"
       },
       "$cell": {
-        "description": "The value of the cell being rendered."
+        "description": "The specific cell value for this column"
+      },
+      "$itemIndex": {
+        "description": "Zero-based row index"
+      },
+      "$colIndex": {
+        "description": "Zero-based column index"
+      },
+      "$row": {
+        "description": "The complete data row object being rendered (the same as `$item`)."
+      },
+      "$rowIndex": {
+        "description": "Zero-based row index (the same as `$itemIndex`)."
       }
     }
   },
   "ContentSeparator": {
-    "description": "A `ContentSeparator` is a component that divides or separates content visually within a layout. It serves as a visual cue to distinguish between different sections or groups of content, helping to improve readability and organization.",
+    "description": "`ContentSeparator` creates visual dividers between content sections using horizontal or vertical lines. It's essential for improving readability by breaking up dense content, separating list items, or creating clear boundaries between different UI sections.",
     "props": {
       "size": {
-        "description": "This property defines the component's height (if the `orientation` is horizontal) or the width (if the `orientation` is vertical).",
+        "description": "This property defines the component's height (if the `orientation` is horizontal) or the width (if the `orientation` is vertical). If not defined, the component uses the entire available width or height.",
         "valueType": "any"
       },
       "orientation": {
@@ -3970,7 +3989,7 @@ export default {
       "size-ContentSeparator": "var(--xmlui-size-ContentSeparator)"
     },
     "defaultThemeVars": {
-      "backgroundColor-ContentSeparator": "$borderColor",
+      "backgroundColor-ContentSeparator": "$color-surface-200",
       "size-ContentSeparator": "1px",
       "light": {},
       "dark": {}
@@ -3978,7 +3997,7 @@ export default {
   },
   "DataSource": {
     "status": "stable",
-    "description": "The `DataSource` component manages fetching data from an API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component.",
+    "description": "`DataSource` fetches and caches data from API endpoints, versus [`APICall`](/components/APICall) which creates, updates or deletes data.",
     "props": {
       "method": {
         "description": "Set the HTTP method.",
@@ -3996,7 +4015,7 @@ export default {
         ]
       },
       "id": {
-        "description": "Set the ID used by other components to access the retrieved data in the `value`property of a `DataSource`, or status info in the `loaded` and `error` properties.",
+        "description": "Set the ID used by other components to access the retrieved data in the `value`property of a `DataSource`, or status info in the `loaded` and `error` properties.When no `id` is set, the component cannot be used programmatically.",
         "isRequired": true,
         "valueType": "string"
       },
@@ -4006,7 +4025,7 @@ export default {
         "valueType": "string"
       },
       "body": {
-        "description": "Set the request body. The object you pass is serialized as a JSON string.",
+        "description": "Set the optional request body. The object you pass is serialized as a JSON string.",
         "valueType": "any"
       },
       "rawBody": {
@@ -4014,7 +4033,7 @@ export default {
         "valueType": "string"
       },
       "queryParams": {
-        "description": "Append key/value pairs to the URL.",
+        "description": "Append optional key-value pairs to the URL.",
         "valueType": "any"
       },
       "headers": {
@@ -4022,27 +4041,27 @@ export default {
         "valueType": "any"
       },
       "pollIntervalInSeconds": {
-        "description": "Set the interval for periodic data fetching. If the data changes on refresh, XMLUI will re-render components that refer directly or indirectly to the `DataSource`. ",
+        "description": "Set the interval for periodic data fetching. If the data changes on refresh, XMLUI will re-render components that refer directly or indirectly to the `DataSource`. If not set or set to zero, the component does not poll for data.",
         "valueType": "number"
       },
       "inProgressNotificationMessage": {
-        "description": "Set the message to display when the data fetch is in progress.",
+        "description": "Set the message to display when the data fetch is in progress. If the property value is not set, no progress message is displayed.",
         "valueType": "string"
       },
       "completedNotificationMessage": {
-        "description": "Set the message to display when the data fetch completes.",
+        "description": "Set the message to display when the data fetch completes.If the property value is not set, no completion message is displayed.",
         "valueType": "string"
       },
       "errorNotificationMessage": {
-        "description": "Set the message to display when the there is an error.",
+        "description": "Set the message to display when the there is an error. You can use the `$error` context value in an expression to refer to the original error message.",
         "valueType": "string"
       },
       "resultSelector": {
-        "description": "Set an object key to extract a subset of the response data.",
+        "description": "Set an optional object key to extract a subset of the response data. If this value is not set, the entire response body is considered the result.",
         "valueType": "string"
       },
       "transformResult": {
-        "description": "Set a function to perform a final transformation of the response data."
+        "description": "Set an optional function to perform a final transformation of the response data. If this value is not set, the result is not transformed."
       },
       "prevPageSelector": {
         "description": "When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the previous page information from the response deserialized to an object."
@@ -4051,7 +4070,7 @@ export default {
         "description": "When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the next page information from the response deserialized to an object."
       },
       "structuralSharing": {
-        "description": "This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.",
+        "description": "This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.",
         "defaultValue": "true"
       }
     },
@@ -4083,10 +4102,10 @@ export default {
   },
   "DatePicker": {
     "status": "experimental",
-    "description": "A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.",
+    "description": "`DatePicker` provides an interactive calendar interface for selecting single dates or date ranges, with customizable formatting and validation options. It displays a text input that opens a calendar popup when clicked, offering both keyboard and mouse interaction.",
     "props": {
       "placeholder": {
-        "description": "A placeholder text that is visible in the input field when its empty.",
+        "description": "An optional placeholder text that is visible in the input field when its empty.",
         "valueType": "string"
       },
       "initialValue": {
@@ -4126,7 +4145,7 @@ export default {
         "defaultValue": "none"
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -4152,10 +4171,10 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `DatePicker`."
+        "description": "This property sets the width of the `DatePicker` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `DatePicker` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `DatePicker` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -4224,15 +4243,15 @@ export default {
         ]
       },
       "minValue": {
-        "description": "The start date of the range of selectable dates",
+        "description": "The optional start date of the selectable date range. If not defined, the range allows any dates in the past.",
         "valueType": "string"
       },
       "maxValue": {
-        "description": "The end date of the range of selectable dates",
+        "description": "The optional end date of the selectable date range. If not defined, the range allows any future dates.",
         "valueType": "string"
       },
       "disabledDates": {
-        "description": "An array of dates that are disabled",
+        "description": "An optional array of dates that are disabled",
         "valueType": "any"
       },
       "inline": {
@@ -4241,19 +4260,19 @@ export default {
         "defaultValue": false
       },
       "startText": {
-        "description": "This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "startIcon": {
-        "description": "This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "endText": {
-        "description": "This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "endIcon": {
-        "description": "This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       }
     },
@@ -4376,10 +4395,10 @@ export default {
     }
   },
   "DropdownMenu": {
-    "description": "This component represents a dropdown menu with a trigger. When the user clicks the trigger, the dropdown menu displays its items.",
+    "description": "`DropdownMenu` provides a space-efficient way to present multiple options or actions through a collapsible interface. When clicked, the trigger button reveals a menu that can include items, separators, and nested submenus, making it ideal for navigation, action lists, or any situation requiring many options without permanent screen space.",
     "props": {
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "triggerTemplate": {
@@ -4507,6 +4526,7 @@ export default {
       "height-MenuSeparator": "var(--xmlui-height-MenuSeparator)",
       "color-MenuSeparator": "var(--xmlui-color-MenuSeparator)"
     },
+    "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
       "backgroundColor-DropdownMenu": "$color-surface-raised",
       "minWidth-DropdownMenu": "160px",
@@ -4521,11 +4541,11 @@ export default {
     "isHtmlTag": true
   },
   "Fragment": {
-    "description": "The `Fragment` component encloses multiple child components into a single root component, so it can be used where only a single component definition is allowed.",
+    "description": "`Fragment` provides conditional rendering and grouping of components. It's often used to hide components until their dependent variables are available.",
     "opaque": true
   },
   "MenuItem": {
-    "description": "This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action.",
+    "description": "`MenuItem` represents individual clickable items within dropdown menus and other menu components. Each menu item can display text, icons, and respond to clicks with either navigation or custom actions, making it the building block for interactive menu systems.",
     "docFolder": "DropdownMenu",
     "props": {
       "iconPosition": {
@@ -4548,7 +4568,7 @@ export default {
         "valueType": "string"
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "to": {
@@ -4599,6 +4619,7 @@ export default {
       "height-MenuSeparator": "var(--xmlui-height-MenuSeparator)",
       "color-MenuSeparator": "var(--xmlui-color-MenuSeparator)"
     },
+    "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
       "backgroundColor-MenuItem": "$backgroundColor-dropdown-item",
       "color-MenuItem": "$textColor-primary",
@@ -4617,11 +4638,11 @@ export default {
     }
   },
   "SubMenuItem": {
-    "description": "This component represents a nested menu item within another menu or menu item.",
+    "description": "`SubMenuItem` creates hierarchical menu structures by acting as both a menu item and a container for nested menu items. When clicked or hovered, it reveals a submenu containing additional [MenuItem](/components/MenuItem), [MenuSeparator](/components/MenuSeparator), or other [SubMenuItem](/components/SubMenuItems) components, enabling complex multi-level navigation and action organization.",
     "docFolder": "DropdownMenu",
     "props": {
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "triggerTemplate": {
@@ -4632,7 +4653,7 @@ export default {
   },
   "EmojiSelector": {
     "status": "experimental",
-    "description": "The `EmojiSelector` component provides users with a graphical interface to browse, search and select emojis to insert into text fields, messages, or other forms of communication.",
+    "description": "`EmojiSelector` enables users to browse, search and select emojis from their system's native emoji set.",
     "props": {
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -4646,12 +4667,159 @@ export default {
       }
     }
   },
+  "ExpandableItem": {
+    "description": "`ExpandableItem` creates expandable/collapsible section, similar to the HTML details disclosure element. When the user clicks on the `summary` the content expands or collapses.",
+    "props": {
+      "summary": {
+        "description": "The summary content that is always visible and acts as the trigger.",
+        "valueType": "ComponentDef"
+      },
+      "initiallyExpanded": {
+        "description": "Determines if the component is initially expanded when rendered.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "enabled": {
+        "description": "When true, the expandable item can be opened and closed. When false, it cannot be toggled.",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "iconCollapsed": {
+        "description": "The icon to display when the item is collapsed.",
+        "valueType": "string",
+        "defaultValue": "chevronright"
+      },
+      "iconExpanded": {
+        "description": "The icon to display when the item is expanded.",
+        "valueType": "string",
+        "defaultValue": "chevrondown"
+      },
+      "iconPosition": {
+        "description": "Determines the position of the icon (start or end).",
+        "valueType": "string",
+        "availableValues": [
+          {
+            "value": "start",
+            "description": "The icon will appear at the start (left side when the left-to-right direction is set)"
+          },
+          {
+            "value": "end",
+            "description": "The icon will appear at the end (right side when the left-to-right direction is set)"
+          }
+        ],
+        "defaultValue": "end"
+      },
+      "withSwitch": {
+        "description": "When true, a switch is used instead of an icon to toggle the expanded state.",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    },
+    "events": {
+      "expandedChange": {
+        "description": "This event fires when the expandable item is expanded or collapsed. It provides a boolean value indicating the new state."
+      }
+    },
+    "apis": {
+      "expand": {
+        "description": "This method expands the expandable item."
+      },
+      "collapse": {
+        "description": "This method collapses the expandable item."
+      },
+      "toggle": {
+        "description": "This method toggles the expandable item's expanded state."
+      },
+      "isExpanded": {
+        "description": "This method returns a boolean indicating whether the expandable item is currently expanded."
+      }
+    },
+    "themeVars": {
+      "border-ExpandableItem": "var(--xmlui-border-ExpandableItem)",
+      "borderHorizontal-ExpandableItem": "var(--xmlui-borderHorizontal-ExpandableItem, var(--xmlui-border-ExpandableItem))",
+      "borderVertical-ExpandableItem": "var(--xmlui-borderVertical-ExpandableItem, var(--xmlui-border-ExpandableItem))",
+      "borderLeft-ExpandableItem": "var(--xmlui-borderLeft-ExpandableItem, var(--xmlui-borderHorizontal-ExpandableItem, var(--xmlui-border-ExpandableItem)))",
+      "borderRight-ExpandableItem": "var(--xmlui-borderRight-ExpandableItem, var(--xmlui-borderHorizontal-ExpandableItem, var(--xmlui-border-ExpandableItem)))",
+      "borderTop-ExpandableItem": "var(--xmlui-borderTop-ExpandableItem, var(--xmlui-borderVertical-ExpandableItem, var(--xmlui-border-ExpandableItem)))",
+      "borderBottom-ExpandableItem": "var(--xmlui-borderBottom-ExpandableItem, var(--xmlui-borderVertical-ExpandableItem, var(--xmlui-border-ExpandableItem)))",
+      "borderWidth-ExpandableItem": "var(--xmlui-borderWidth-ExpandableItem)",
+      "borderHorizontalWidth-ExpandableItem": "var(--xmlui-borderHorizontalWidth-ExpandableItem, var(--xmlui-borderWidth-ExpandableItem))",
+      "borderLeftWidth-ExpandableItem": "var(--xmlui-borderLeftWidth-ExpandableItem, var(--xmlui-borderHorizontalWidth-ExpandableItem, var(--xmlui-borderWidth-ExpandableItem)))",
+      "borderRightWidth-ExpandableItem": "var(--xmlui-borderRightWidth-ExpandableItem, var(--xmlui-borderHorizontalWidth-ExpandableItem, var(--xmlui-borderWidth-ExpandableItem)))",
+      "borderVerticalWidth-ExpandableItem": "var(--xmlui-borderVerticalWidth-ExpandableItem, var(--xmlui-borderWidth-ExpandableItem))",
+      "borderTopWidth-ExpandableItem": "var(--xmlui-borderTopWidth-ExpandableItem, var(--xmlui-borderVerticalWidth-ExpandableItem, var(--xmlui-borderWidth-ExpandableItem)))",
+      "borderBottomWidth-ExpandableItem": "var(--xmlui-borderBottomWidth-ExpandableItem, var(--xmlui-borderVerticalWidth-ExpandableItem, var(--xmlui-borderWidth-ExpandableItem)))",
+      "borderStyle-ExpandableItem": "var(--xmlui-borderStyle-ExpandableItem)",
+      "borderHorizontalStyle-ExpandableItem": "var(--xmlui-borderHorizontalStyle-ExpandableItem, var(--xmlui-borderStyle-ExpandableItem))",
+      "borderLeftStyle-ExpandableItem": "var(--xmlui-borderLeftStyle-ExpandableItem, var(--xmlui-borderHorizontalStyle-ExpandableItem, var(--xmlui-borderStyle-ExpandableItem)))",
+      "borderRightStyle-ExpandableItem": "var(--xmlui-borderRightStyle-ExpandableItem, var(--xmlui-borderHorizontalStyle-ExpandableItem, var(--xmlui-borderStyle-ExpandableItem)))",
+      "borderVerticalStyle-ExpandableItem": "var(--xmlui-borderVerticalStyle-ExpandableItem, var(--xmlui-borderStyle-ExpandableItem))",
+      "borderTopStyle-ExpandableItem": "var(--xmlui-borderTopStyle-ExpandableItem, var(--xmlui-borderVerticalStyle-ExpandableItem, var(--xmlui-borderStyle-ExpandableItem)))",
+      "borderBottomStyle-ExpandableItem": "var(--xmlui-borderBottomStyle-ExpandableItem, var(--xmlui-borderVerticalStyle-ExpandableItem, var(--xmlui-borderStyle-ExpandableItem)))",
+      "borderColor-ExpandableItem": "var(--xmlui-borderColor-ExpandableItem)",
+      "borderHorizontalColor-ExpandableItem": "var(--xmlui-borderHorizontalColor-ExpandableItem, var(--xmlui-borderColor-ExpandableItem))",
+      "borderLeftColor-ExpandableItem": "var(--xmlui-borderLeftColor-ExpandableItem, var(--xmlui-borderHorizontalColor-ExpandableItem, var(--xmlui-borderColor-ExpandableItem)))",
+      "borderRightColor-ExpandableItem": "var(--xmlui-borderRightColor-ExpandableItem, var(--xmlui-borderHorizontalColor-ExpandableItem, var(--xmlui-borderColor-ExpandableItem)))",
+      "borderVerticalColor-ExpandableItem": "var(--xmlui-borderVerticalColor-ExpandableItem, var(--xmlui-borderColor-ExpandableItem))",
+      "borderTopColor-ExpandableItem": "var(--xmlui-borderTopColor-ExpandableItem, var(--xmlui-borderVerticalColor-ExpandableItem, var(--xmlui-borderColor-ExpandableItem)))",
+      "borderBottomColor-ExpandableItem": "var(--xmlui-borderBottomColor-ExpandableItem, var(--xmlui-borderVerticalColor-ExpandableItem, var(--xmlui-borderColor-ExpandableItem)))",
+      "borderStartStartRadius-ExpandableItem": "var(--xmlui-borderStartStartRadius-ExpandableItem, var(--xmlui-borderRadius-ExpandableItem))",
+      "borderStartEndRadius-ExpandableItem": "var(--xmlui-borderStartEndRadius-ExpandableItem, var(--xmlui-borderRadius-ExpandableItem))",
+      "borderEndStartRadius-ExpandableItem": "var(--xmlui-borderEndStartRadius-ExpandableItem, var(--xmlui-borderRadius-ExpandableItem))",
+      "borderEndEndRadius-ExpandableItem": "var(--xmlui-borderEndEndRadius-ExpandableItem, var(--xmlui-borderRadius-ExpandableItem))",
+      "padding-ExpandableItem": "var(--xmlui-padding-ExpandableItem)",
+      "paddingHorizontal-ExpandableItem": "var(--xmlui-paddingHorizontal-ExpandableItem, var(--xmlui-padding-ExpandableItem))",
+      "paddingVertical-ExpandableItem": "var(--xmlui-paddingVertical-ExpandableItem, var(--xmlui-padding-ExpandableItem))",
+      "paddingLeft-ExpandableItem": "var(--xmlui-paddingLeft-ExpandableItem, var(--xmlui-paddingHorizontal-ExpandableItem, var(--xmlui-padding-ExpandableItem)))",
+      "paddingRight-ExpandableItem": "var(--xmlui-paddingRight-ExpandableItem, var(--xmlui-paddingHorizontal-ExpandableItem, var(--xmlui-padding-ExpandableItem)))",
+      "paddingTop-ExpandableItem": "var(--xmlui-paddingTop-ExpandableItem, var(--xmlui-paddingVertical-ExpandableItem, var(--xmlui-padding-ExpandableItem)))",
+      "paddingBottom-ExpandableItem": "var(--xmlui-paddingBottom-ExpandableItem, var(--xmlui-paddingVertical-ExpandableItem, var(--xmlui-padding-ExpandableItem)))",
+      "padding-content-ExpandableItem": "var(--xmlui-padding-content-ExpandableItem)",
+      "paddingHorizontal-content-ExpandableItem": "var(--xmlui-paddingHorizontal-content-ExpandableItem, var(--xmlui-padding-content-ExpandableItem))",
+      "paddingVertical-content-ExpandableItem": "var(--xmlui-paddingVertical-content-ExpandableItem, var(--xmlui-padding-content-ExpandableItem))",
+      "paddingLeft-content-ExpandableItem": "var(--xmlui-paddingLeft-content-ExpandableItem, var(--xmlui-paddingHorizontal-content-ExpandableItem, var(--xmlui-padding-content-ExpandableItem)))",
+      "paddingRight-content-ExpandableItem": "var(--xmlui-paddingRight-content-ExpandableItem, var(--xmlui-paddingHorizontal-content-ExpandableItem, var(--xmlui-padding-content-ExpandableItem)))",
+      "paddingTop-content-ExpandableItem": "var(--xmlui-paddingTop-content-ExpandableItem, var(--xmlui-paddingVertical-content-ExpandableItem, var(--xmlui-padding-content-ExpandableItem)))",
+      "paddingBottom-content-ExpandableItem": "var(--xmlui-paddingBottom-content-ExpandableItem, var(--xmlui-paddingVertical-content-ExpandableItem, var(--xmlui-padding-content-ExpandableItem)))",
+      "backgroundColor-ExpandableItem": "var(--xmlui-backgroundColor-ExpandableItem)",
+      "color-ExpandableItem": "var(--xmlui-color-ExpandableItem)",
+      "color-ExpandableItem--disabled": "var(--xmlui-color-ExpandableItem--disabled)",
+      "fontFamily-ExpandableItem": "var(--xmlui-fontFamily-ExpandableItem)",
+      "fontSize-ExpandableItem": "var(--xmlui-fontSize-ExpandableItem)",
+      "fontWeight-ExpandableItem": "var(--xmlui-fontWeight-ExpandableItem)",
+      "paddingVertical-ExpandableItem-summary": "var(--xmlui-paddingVertical-ExpandableItem-summary)",
+      "paddingHorizontal-ExpandableItem-summary": "var(--xmlui-paddingHorizontal-ExpandableItem-summary)",
+      "gap-ExpandableItem": "var(--xmlui-gap-ExpandableItem)",
+      "transition-ExpandableItem": "var(--xmlui-transition-ExpandableItem)"
+    },
+    "limitThemeVarsToComponent": true,
+    "defaultThemeVars": {
+      "backgroundColor-ExpandableItem": "transparent",
+      "color-ExpandableItem": "$textColor-primary",
+      "color-ExpandableItem--disabled": "$textColor--disabled",
+      "fontFamily-ExpandableItem": "$fontFamily",
+      "borderColor-ExpandableItem": "$borderColor",
+      "borderWidth-ExpandableItem": "0",
+      "borderBottomWidth-ExpandableItem": "1px",
+      "borderStyle-ExpandableItem": "solid",
+      "borderRadius-ExpandableItem": "0",
+      "paddingTop-ExpandableItem": "$space-2",
+      "paddingBottom-ExpandableItem": "$space-2",
+      "paddingLeft-ExpandableItem": "$space-0",
+      "paddingRight-ExpandableItem": "$space-0",
+      "gap-ExpandableItem": "$space-2",
+      "contentPaddingLeft-ExpandableItem": "$space-3",
+      "contentPaddingRight-ExpandableItem": "$space-3",
+      "contentPaddingVertical-ExpandableItem": "$space-2",
+      "transition-ExpandableItem": "0.2s ease"
+    }
+  },
   "FileInput": {
-    "description": "The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise).",
-    "status": "experimental",
+    "status": "stable",
+    "description": "`FileInput` enables users to select files from their device's file system for upload or processing. It combines a text field displaying selected files with a customizable button that opens the system file browser. Use it for forms, media uploads, and document processing workflows.",
     "props": {
       "placeholder": {
-        "description": "A placeholder text that is visible in the input field when its empty.",
+        "description": "An optional placeholder text that is visible in the input field when its empty.",
         "valueType": "string"
       },
       "initialValue": {
@@ -4664,7 +4832,8 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "readOnly": {
         "description": "Set this property to `true` to disallow changing the component value.",
@@ -4695,7 +4864,7 @@ export default {
         "defaultValue": "none"
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -4721,10 +4890,10 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `FileInput`."
+        "description": "This property sets the width of the `FileInput` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `FileInput` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `FileInput` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -4747,10 +4916,12 @@ export default {
         "availableValues": [
           "start",
           "end"
-        ]
+        ],
+        "valueType": "string",
+        "defaultValue": "start"
       },
       "acceptsFileType": {
-        "description": "A list of file types the input controls accepts provided as a string array."
+        "description": "An optional list of file types the input controls accepts provided as a string array."
       },
       "multiple": {
         "description": "This boolean property enables to add not just one (`false`), but multiple files to the field (`true`). This is done either by dragging onto the field or by selecting multiple files in the browser menu after clicking the input field button.",
@@ -4765,11 +4936,12 @@ export default {
         "defaultValue": false
       },
       "buttonPosition": {
-        "description": "This property determines the position of the button relative to the input field. The default is \"end\".",
+        "description": "This property determines the position of the button relative to the input field.",
         "availableValues": [
           "start",
           "end"
-        ]
+        ],
+        "defaultValue": "end"
       },
       "buttonSize": {
         "description": "The size of the button (small, medium, large)",
@@ -4798,7 +4970,9 @@ export default {
           "attention",
           "primary",
           "secondary"
-        ]
+        ],
+        "valueType": "string",
+        "defaultValue": "primary"
       }
     },
     "events": {
@@ -4829,7 +5003,7 @@ export default {
     "themeVars": []
   },
   "FileUploadDropZone": {
-    "description": "The `FileUploadDropZone` component allows users to upload files to a web application by dragging and dropping files from their local file system onto a designated area within the UI.",
+    "description": "`FileUploadDropZone` enables users to upload files by dragging and dropping files from their local file system onto a designated area within the UI.",
     "props": {
       "text": {
         "description": "With this property, you can change the default text to display when files are dragged over the drop zone.",
@@ -4869,7 +5043,7 @@ export default {
     }
   },
   "FlowLayout": {
-    "description": "This layout component is used to position content in rows with an auto wrapping feature: if the length of the items exceed the available space the layout will wrap into a new line.",
+    "description": "`FlowLayout` positions content in rows with automatic wrapping. When items exceed the available horizontal space, they automatically wrap to a new line.",
     "props": {
       "gap": {
         "description": "This property defines the gap between items in the same row and between rows. The FlowLayout component creates a new row when an item is about to overflow the current row.",
@@ -4888,7 +5062,7 @@ export default {
     "themeVars": []
   },
   "Footer": {
-    "description": "The `Footer` is a component that acts as a placeholder within `App`.",
+    "description": "`Footer` provides a designated area at the bottom of your application for footer content such as branding, copyright notices, or utility controls like theme toggles.",
     "themeVars": {
       "padding-Footer": "var(--xmlui-padding-Footer)",
       "paddingHorizontal-Footer": "var(--xmlui-paddingHorizontal-Footer, var(--xmlui-padding-Footer))",
@@ -4935,8 +5109,10 @@ export default {
       "fontSize-Footer": "var(--xmlui-fontSize-Footer)",
       "verticalAlign-Footer": "var(--xmlui-verticalAlign-Footer)",
       "maxWidth-content-Footer": "var(--xmlui-maxWidth-content-Footer)",
+      "gap-Footer": "var(--xmlui-gap-Footer)",
       "maxWidth-App": "var(--xmlui-maxWidth-App)"
     },
+    "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
       "backgroundColor-Footer": "$backgroundColor-AppHeader",
       "verticalAlign-Footer": "center",
@@ -4945,13 +5121,14 @@ export default {
       "maxWidth-content-Footer": "$maxWidth-content",
       "borderTop-Footer": "1px solid $borderColor",
       "padding-Footer": "$space-2 $space-4",
+      "gap-Footer": "$space-normal",
       "light": {},
       "dark": {}
     }
   },
   "Form": {
-    "status": "experimental",
-    "description": "A `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing.",
+    "status": "stable",
+    "description": "`Form` provides a structured container for collecting and validating user input, with built-in data binding, validation, and submission handling. It automatically manages form state and provides context for nested form controls to work together.",
     "props": {
       "buttonRowTemplate": {
         "description": "This property allows defining a custom component to display the buttons at the bottom of the form.",
@@ -4981,7 +5158,7 @@ export default {
         "defaultValue": "top"
       },
       "itemLabelWidth": {
-        "description": "This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property.",
+        "description": "This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property. If this property is not set, each form item nested in the form uses its calculated label width. These widths may be different for each item.",
         "type": "string"
       },
       "itemLabelBreak": {
@@ -4995,7 +5172,7 @@ export default {
         "defaultValue": false
       },
       "data": {
-        "description": "This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form."
+        "description": "This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form. If this property isnot set, the form does not have an initial value."
       },
       "cancelLabel": {
         "description": "This property defines the label of the Cancel button.",
@@ -5014,7 +5191,8 @@ export default {
       },
       "swapCancelAndSave": {
         "description": "By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.",
-        "type": "boolean"
+        "type": "boolean",
+        "defaultValue": false
       },
       "submitUrl": {
         "description": "URL to submit the form data."
@@ -5023,7 +5201,9 @@ export default {
         "description": "This property sets the HTTP method to use when submitting the form data. If not defined, `put` is used when the form has initial data; otherwise, `post`."
       },
       "enabled": {
-        "description": "Whether the form is enabled or not. The default value is `true`."
+        "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": true
       },
       "_data_url": {
         "description": "when we have an api bound data prop, we inject the url here",
@@ -5076,11 +5256,11 @@ export default {
     }
   },
   "FormItem": {
-    "status": "experimental",
-    "description": "A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data.",
+    "status": "stable",
+    "description": "`FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically.",
     "props": {
       "bindTo": {
-        "description": "This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name."
+        "description": "This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name. If the property is not set, the input will be bound to an internal data field but not submitted."
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -5088,7 +5268,7 @@ export default {
         "defaultValue": false
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -5114,7 +5294,7 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the item label."
+        "description": "This property sets the width of the `FormItem` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
         "description": "This boolean value indicates if the label can be split into multiple lines if it would overflow the available label width.",
@@ -5191,7 +5371,7 @@ export default {
           },
           {
             "value": "custom",
-            "description": "Custom control specified in children"
+            "description": "A custom control specified in children. If `type` is not specified but the `FormItem` has children, it considers the control a custom one."
           }
         ],
         "defaultValue": "text",
@@ -5225,22 +5405,23 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "requiredInvalidMessage": {
-        "description": "This optional string property is used to customize the message that is displayed if the field is not filled in.",
+        "description": "This optional string property is used to customize the message that is displayed if the field is not filled in. If not defined, the default message is used.",
         "valueType": "string"
       },
       "minLength": {
-        "description": "Checks whether the input has a minimum length of a specified value.",
+        "description": "This property sets the minimum length of the input value. If the value is not set, no minimum length check is done.",
         "valueType": "number"
       },
       "maxLength": {
-        "description": "Checks whether the input has a maximum length of a specified value.",
+        "description": "This property sets the maximum length of the input value. If the value is not set, no maximum length check is done.",
         "valueType": "number"
       },
       "maxTextLength": {
-        "description": "The maximum length of the text in the input field",
+        "description": "The maximum length of the text in the input field. If this value is not set, no maximum length constraint is set for the input field.",
         "valueType": "number"
       },
       "lengthInvalidMessage": {
@@ -5258,11 +5439,11 @@ export default {
         "defaultValue": "error"
       },
       "minValue": {
-        "description": "Checks whether the input has the minimum specified value.",
+        "description": "The minimum value of the input. If this value is not specified, no minimum value check is done.",
         "valueType": "number"
       },
       "maxValue": {
-        "description": "Checks whether the input has the maximum specified value.",
+        "description": "The maximum value of the input. If this value is not specified, no maximum value check is done.",
         "valueType": "number"
       },
       "rangeInvalidMessage": {
@@ -5280,7 +5461,7 @@ export default {
         "defaultValue": "error"
       },
       "pattern": {
-        "description": "Checks whether the input fits a predefined regular expression.",
+        "description": "This value specifies a predefined regular expression to test the input value. If this value is not set, no pattern check is done.",
         "valueType": "string"
       },
       "patternInvalidMessage": {
@@ -5298,7 +5479,7 @@ export default {
         "defaultValue": "error"
       },
       "regex": {
-        "description": "Checks whether the input fits the provided regular expression.",
+        "description": "This value specifies a custom regular expression to test the input value. If this value is not set, no regular expression pattern check is done.",
         "valueType": "string"
       },
       "regexInvalidMessage": {
@@ -5319,7 +5500,9 @@ export default {
         "description": "This property is used to define a custom input template."
       },
       "gap": {
-        "description": "This property defines the gap between the adornments and the input area."
+        "description": "This property defines the gap between the adornments and the input area.",
+        "valueType": "string",
+        "defaultValue": "0"
       }
     },
     "events": {
@@ -5327,15 +5510,23 @@ export default {
         "description": "This event is used to define a custom validation function."
       }
     },
+    "apis": {
+      "addItem": {
+        "description": "Adds a new item to the `FormItem` data where the particular form item holds a list. The function has a single parameter, the data to add to the `FormItem`. The new item is appended to the end of the list."
+      },
+      "removeItem": {
+        "description": "Removes the item specified by its index from the list held by the FormItem. The function has a single argument, the index to remove."
+      }
+    },
     "contextVars": {
       "$value": {
-        "description": "The context variable represents the current value of the `FormItem`. It can be used in expressions and code snippets within the `FormItem` instance."
+        "description": "Current value of the FormItem, accessible in expressions and code snippets"
       },
       "$setValue": {
-        "description": "This function can be invoked to set the `FormItem` instance's value. The function has a single argument, the new value to set."
+        "description": "Function to set the FormItem's value programmatically"
       },
       "$validationResult": {
-        "description": "This variable represents the result of the latest validation of the `FormItem` instance."
+        "description": "Current validation state and error messages for this field"
       }
     },
     "themeVars": {
@@ -5363,10 +5554,10 @@ export default {
   },
   "FormSection": {
     "status": "experimental",
-    "description": "The `FormSection` is a component that groups cohesive elements together within a `Form`. This grouping is indicated visually: the child components of the `FormSection` are placed in a [`FlowLayout`](./FlowLayout.mdx) component."
+    "description": "`FormSection` groups elements within a `Form`. Child components are placed in a [FlowLayout](/components/FlowLayout)."
   },
   "Heading": {
-    "description": "Represents a heading text",
+    "description": "`Heading` displays hierarchical text headings with semantic importance levels from H1 to H6, following HTML heading standards. It provides text overflow handling, anchor link generation, and integrates with [TableOfContents](/components/TableOfContents).",
     "props": {
       "value": {
         "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
@@ -5384,7 +5575,7 @@ export default {
         "defaultValue": "h1"
       },
       "maxLines": {
-        "description": "This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
       },
       "ellipses": {
         "description": "This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).",
@@ -5392,12 +5583,18 @@ export default {
         "defaultValue": true
       },
       "preserveLinebreaks": {
-        "description": "This property indicates whether linebreaks should be preserved when displaying text."
+        "description": "This property indicates whether linebreaks should be preserved when displaying text.",
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
         "type": "boolean",
         "defaultValue": false
+      },
+      "showAnchor": {
+        "description": "This property indicates whether an anchor link should be displayed next to the heading. If set to `true`, an anchor link will be displayed on hover next to the heading.",
+        "type": "boolean"
       }
     },
     "themeVars": {
@@ -5861,6 +6058,7 @@ export default {
       "Heading:textDecorationThickness-H6": "var(--xmlui-textDecorationThickness-H6)",
       "Heading:textUnderlineOffset-H6": "var(--xmlui-textUnderlineOffset-H6)"
     },
+    "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
       "fontFamily-Heading": "$fontFamily",
       "textColor-Heading": "inherit",
@@ -5881,7 +6079,7 @@ export default {
         "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
       },
       "maxLines": {
-        "description": "This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
       },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
@@ -6369,7 +6567,7 @@ export default {
         "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
       },
       "maxLines": {
-        "description": "This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
       },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
@@ -6856,7 +7054,7 @@ export default {
         "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
       },
       "maxLines": {
-        "description": "This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
       },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
@@ -7343,7 +7541,7 @@ export default {
         "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
       },
       "maxLines": {
-        "description": "This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
       },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
@@ -7830,7 +8028,7 @@ export default {
         "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
       },
       "maxLines": {
-        "description": "This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
       },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
@@ -8317,7 +8515,7 @@ export default {
         "description": "This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed."
       },
       "maxLines": {
-        "description": "This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified."
+        "description": "This optional property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified. If the value is not specified, there is no limit on the number of displayed lines."
       },
       "omitFromToc": {
         "description": "If true, this heading will be excluded from the table of contents.",
@@ -8807,14 +9005,14 @@ export default {
     }
   },
   "Icon": {
-    "status": "experimental",
-    "description": "This component is the representation of an icon.",
+    "status": "stable",
+    "description": "`Icon` displays scalable vector icons from XMLUI's built-in icon registry using simple name references. Icons are commonly used in buttons, navigation elements, and status indicators.",
     "props": {
       "name": {
-        "description": "This string property specifies the name of the icon to display. All icons have unique names and identifying the name is case-sensitive."
+        "description": "This string property specifies the name of the icon to display. All icons have unique, case-sensitive names identifying them. If the icon name is not set, the `fallback` value is used."
       },
       "size": {
-        "description": "This property defines the size of the `Icon`. Note that setting the `height` and/or the `width` of the component will override this property.",
+        "description": "This property defines the size of the `Icon`. Note that setting the `height` and/or the `width` of the component will override this property. You can use az explicit size value (e.g., 32px) or one of these predefined values: `xs`, `sm`, `md`, `lg`.",
         "availableValues": [
           "xs",
           "sm",
@@ -8823,7 +9021,12 @@ export default {
         ]
       },
       "fallback": {
-        "description": "This optional property provides a way to handle situations when the provided [icon name](#name) is not found in the registry."
+        "description": "This optional property provides a way to handle situations when the icon with the provided [icon name](#name) name does not exist. If the icon cannot be found, no icon is displayed."
+      }
+    },
+    "events": {
+      "click": {
+        "description": "This event is triggered when the icon is clicked."
       }
     },
     "themeVars": {
@@ -8834,13 +9037,13 @@ export default {
     }
   },
   "Image": {
-    "description": "The `Image` component represents or depicts an object, scene, idea, or other concept with a picture.",
+    "description": "`Image` displays pictures from URLs or local sources with built-in responsive sizing, aspect ratio control, and accessibility features. It handles different image formats and provides options for lazy loading and click interactions.",
     "props": {
       "src": {
-        "description": "This property is used to indicate the source (path) of the image to display."
+        "description": "This property is used to indicate the source (path) of the image to display. When not defined, no image is displayed."
       },
       "alt": {
-        "description": "This property specifies an alternate text for the image."
+        "description": "This optional property specifies an alternate text for the image."
       },
       "fit": {
         "description": "This property sets how the image content should be resized to fit its container.",
@@ -8848,16 +9051,21 @@ export default {
         "defaultValue": "contain"
       },
       "lazyLoad": {
-        "description": "Lazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it). The default value is eager (`false`)."
+        "description": "Lazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it).",
+        "type": "boolean",
+        "defaultValue": false
       },
       "aspectRatio": {
-        "description": "This property sets a preferred aspect ratio for the image, which will be used in the calculation of auto sizes and some other layout functions."
+        "description": "This property sets a preferred aspect ratio for the image, which will be used in calculating auto sizes and other layout functions. If this value is not used, the original aspect ratio is kept. The value can be a number of a string (such as \"16/9\")."
       },
       "inline": {
-        "description": "When set to true, the image will be displayed as an inline element instead of a block element."
+        "description": "When set to true, the image will be displayed as an inline element instead of a block element.",
+        "type": "boolean",
+        "defaultValue": false
       },
       "animation": {
-        "description": "The animation object to be applied to the component"
+        "description": "The optional animation object to be applied to the component",
+        "isInternal": true
       }
     },
     "events": {
@@ -8868,7 +9076,7 @@ export default {
     "themeVars": []
   },
   "Items": {
-    "description": "The `Items` component maps sequential data items into component instances, representing each data item as a particular component.",
+    "description": "`Items` renders data arrays without built-in layout or styling, providing a lightweight alternative to `List`. Unlike `List`, it provides no virtualization, grouping, or visual formatting — just pure data iteration.",
     "props": {
       "items": {
         "description": "This property contains the list of data items this component renders.",
@@ -8878,7 +9086,9 @@ export default {
         "description": "This property contains the list of data items (obtained from a data source) this component renders."
       },
       "reverse": {
-        "description": "This property reverses the order in which data is mapped to template components."
+        "description": "This property reverses the order in which data is mapped to template components.",
+        "type": "boolean",
+        "defaultValue": false
       },
       "itemTemplate": {
         "description": "The component template to display a single item",
@@ -8888,29 +9098,29 @@ export default {
     "childrenAsTemplate": "itemTemplate",
     "contextVars": {
       "$item": {
-        "description": "This value represents the current iteration item while the component renders its children.",
+        "description": "Current data item being rendered",
         "valueType": "ComponentDef"
       },
       "$itemIndex": {
-        "description": "This integer value represents the current iteration index (zero-based) while rendering children.",
+        "description": "Zero-based index of current item",
         "valueType": "ComponentDef"
       },
       "$isFirst": {
-        "description": "This boolean value indicates if the component renders its first item.",
+        "description": "Boolean indicating if this is the first item",
         "valueType": "ComponentDef"
       },
       "$isLast": {
-        "description": "This boolean value indicates if the component renders its last item.",
+        "description": "Boolean indicating if this is the last item",
         "valueType": "ComponentDef"
       }
     },
     "opaque": true
   },
   "Link": {
-    "description": "A `Link` component represents a navigation target within the app or a reference to an external web URL.",
+    "description": "`Link` creates clickable navigation elements for internal app routes or external URLs. You can use the `label` and `icon` properties for simple text links, or embed custom components like buttons, cards, or complex layouts for rich interactive link presentations.",
     "props": {
       "to": {
-        "description": "This property defines the URL of the link."
+        "description": "This property defines the URL of the link. If the value is not defined, the link cannot be activated."
       },
       "enabled": {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
@@ -8946,15 +9156,14 @@ export default {
             "description": "Allows embedded fenced frames to navigate the top-level frame, i.e. traversing beyond the root of the fenced frame."
           }
         ],
-        "type": "string",
-        "defaultValue": "_self"
+        "type": "string"
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "icon": {
-        "description": "This property allows you to add an icon (specify the icon's name) to the link."
+        "description": "This property allows you to add an optional icon (specify the icon's name) to the link."
       }
     },
     "themeVars": {
@@ -9035,6 +9244,8 @@ export default {
       "textColor-Link--hover--active": "var(--xmlui-textColor-Link--hover--active)",
       "fontWeight-Link--active": "var(--xmlui-fontWeight-Link--active)",
       "gap-icon-Link": "var(--xmlui-gap-icon-Link)",
+      "textDecorationColor-Link--hover": "var(--xmlui-textDecorationColor-Link--hover)",
+      "textDecorationColor-Link--active": "var(--xmlui-textDecorationColor-Link--active)",
       "outlineWidth-Link--focus": "var(--xmlui-outlineWidth-Link--focus)",
       "outlineColor-Link--focus": "var(--xmlui-outlineColor-Link--focus)",
       "outlineStyle-Link--focus": "var(--xmlui-outlineStyle-Link--focus)",
@@ -9045,12 +9256,13 @@ export default {
     },
     "defaultThemeVars": {
       "border-Link": "0px solid $borderColor",
-      "textColor-Link--hover--active": "$textColor-Link--active",
-      "textDecorationColor-Link--hover": "$color-primary-400",
+      "textColor-Link": "$color-primary-500",
+      "textDecorationColor-Link": "$color-primary-500",
       "textColor-Link--hover": "$color-primary-400",
-      "textDecorationColor-Link--active": "$color-primary-200",
-      "fontWeight-Link--active": "$fontWeight-bold",
-      "textDecorationColor-Link": "$color-primary-400",
+      "textDecorationColor-Link--hover": "$color-primary-400",
+      "textColor-Link--active": "$color-primary-400",
+      "textDecorationColor-Link--active": "$color-primary-400",
+      "textColor-Link--hover--active": "$textColor-Link--active",
       "textUnderlineOffset-Link": "$space-1",
       "textDecorationLine-Link": "underline",
       "textDecorationStyle-Link": "solid",
@@ -9059,15 +9271,14 @@ export default {
       "outlineStyle-Link--focus": "$outlineStyle--focus",
       "outlineOffset-Link--focus": "$outlineOffset--focus",
       "fontSize-Link": "inherit",
+      "fontWeight-Link--active": "$fontWeight-bold",
       "gap-icon-Link": "$gap-tight",
-      "padding-icon-Link": "$space-0_5",
-      "textColor-Link": "$color-primary-500",
-      "textColor-Link--active": "$color-primary-500"
+      "padding-icon-Link": "$space-0_5"
     }
   },
   "List": {
-    "status": "experimental",
-    "description": "The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport.",
+    "status": "stable",
+    "description": "`List` is a high-performance, virtualized container for rendering large datasets with built-in grouping, sorting, and visual formatting. It only renders visible items in the viewport, making it ideal for displaying thousands of records while maintaining smooth scrolling performance.",
     "props": {
       "data": {
         "description": "The component receives data via this property. The `data` property is a list of items that the `List` can display."
@@ -9080,7 +9291,7 @@ export default {
         "description": "This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property."
       },
       "limit": {
-        "description": "This property limits the number of items displayed in the `List`."
+        "description": "This property limits the number of items displayed in the `List`. If not set, all items are displayed."
       },
       "scrollAnchor": {
         "description": "This property pins the scroll position to a specified location of the list. Available values are shown below.",
@@ -9092,13 +9303,13 @@ export default {
         "defaultValue": "top"
       },
       "groupBy": {
-        "description": "This property sets which attribute of the data is used to group the list items. If the attribute does not appear in the data, it will be ignored."
+        "description": "This property sets which data item property is used to group the list items. If not set, no grouping is done."
       },
       "orderBy": {
-        "description": "This property enables the ordering of list items by specifying an attribute in the data."
+        "description": "This optioanl property enables the ordering of list items by specifying an attribute in the data."
       },
       "availableGroups": {
-        "description": "This property is an array of group names that the `List` will display."
+        "description": "This property is an array of group names that the `List` will display. If not set, all groups in the data are displayed."
       },
       "groupHeaderTemplate": {
         "description": "Enables the customization of how the groups are displayed, similarly to the [`itemTemplate`](#itemtemplate). You can use the `$item` context variable to access an item group and map its individual attributes.",
@@ -9125,10 +9336,12 @@ export default {
         "defaultValue": "id"
       },
       "groupsInitiallyExpanded": {
-        "description": "This Boolean property defines whether the list groups are initially expanded."
+        "description": "This Boolean property defines whether the list groups are initially expanded.",
+        "valueType": "boolean",
+        "defaultValue": true
       },
       "defaultGroups": {
-        "description": "This property adds a list of default groups for the `List` and displays the group headers in the specified order. If the data contains group headers not in this list, those headers are also displayed (after the ones in this list); however, their order is not deterministic."
+        "description": "This property adds an optional list of default groups for the `List` and displays the group headers in the specified order. If the data contains group headers not in this list, those headers are also displayed (after the ones in this list); however, their order is not deterministic."
       },
       "hideEmptyGroups": {
         "description": "This boolean property indicates if empty groups should be hidden (no header and footer are displayed).",
@@ -9158,30 +9371,67 @@ export default {
     },
     "contextVars": {
       "$item": {
-        "description": "This property represents the value of an item in the data list."
+        "description": "Current data item being rendered"
       },
       "$itemIndex": {
-        "description": "This integer value represents the current row index (zero-based) while rendering children.",
+        "description": "Zero-based index of current item",
         "valueType": "ComponentDef"
       },
       "$isFirst": {
-        "description": "This boolean value indicates if the component renders its first item.",
+        "description": "Boolean indicating if this is the first item",
         "valueType": "ComponentDef"
       },
       "$isLast": {
-        "description": "This boolean value indicates if the component renders its last item.",
+        "description": "Boolean indicating if this is the last item",
+        "valueType": "ComponentDef"
+      },
+      "$group": {
+        "description": "Group information when using `groupBy` (available in group templates)",
         "valueType": "ComponentDef"
       }
     },
     "themeVars": []
   },
   "Logo": {
-    "status": "experimental",
-    "description": "The `Logo` component represents a logo or a brand symbol. Usually, you use this component in the [`AppHeader`](./AppHeader.mdx#logotemplate)."
+    "status": "stable",
+    "description": "`Logo` displays your application's brand symbol by automatically loading logo images defined in the app manifest. While logos are typically configured using App-level properties (`logo`, `logo-dark`), this component provides direct control when you need custom logo placement or templating.",
+    "props": {
+      "alt": {
+        "description": "Alternative text for the logo image for accessibility.",
+        "type": "string",
+        "defaultValue": "Logo"
+      }
+    }
   },
   "Markdown": {
-    "description": "`Markdown` displays plain text styled using markdown syntax.",
+    "description": "`Markdown` renders formatted text using markdown syntax. Use [Text](/working-with-text) for simple, styled text content, and `Markdown` when you need [rich formatting](/working-with-markdown).",
     "themeVars": {
+      "textColor-Text": "var(--xmlui-textColor-Text)",
+      "fontFamily-Text": "var(--xmlui-fontFamily-Text)",
+      "fontSize-Text": "var(--xmlui-fontSize-Text)",
+      "fontStyle-Text": "var(--xmlui-fontStyle-Text)",
+      "fontVariant-Text": "var(--xmlui-fontVariant-Text)",
+      "fontWeight-Text": "var(--xmlui-fontWeight-Text)",
+      "fontStretch-Text": "var(--xmlui-fontStretch-Text)",
+      "textDecorationLine-Text": "var(--xmlui-textDecorationLine-Text)",
+      "textDecorationColor-Text": "var(--xmlui-textDecorationColor-Text)",
+      "textDecorationStyle-Text": "var(--xmlui-textDecorationStyle-Text)",
+      "textDecorationThickness-Text": "var(--xmlui-textDecorationThickness-Text)",
+      "textUnderlineOffset-Text": "var(--xmlui-textUnderlineOffset-Text)",
+      "lineHeight-Text": "var(--xmlui-lineHeight-Text)",
+      "backgroundColor-Text": "var(--xmlui-backgroundColor-Text)",
+      "textTransform-Text": "var(--xmlui-textTransform-Text)",
+      "letterSpacing-Text": "var(--xmlui-letterSpacing-Text)",
+      "wordSpacing-Text": "var(--xmlui-wordSpacing-Text)",
+      "textShadow-Text": "var(--xmlui-textShadow-Text)",
+      "textIndent-Text": "var(--xmlui-textIndent-Text)",
+      "textAlign-Text": "var(--xmlui-textAlign-Text)",
+      "textAlignLast-Text": "var(--xmlui-textAlignLast-Text)",
+      "wordBreak-Text": "var(--xmlui-wordBreak-Text)",
+      "wordWrap-Text": "var(--xmlui-wordWrap-Text)",
+      "direction-Text": "var(--xmlui-direction-Text)",
+      "writingMode-Text": "var(--xmlui-writingMode-Text)",
+      "lineBreak-Text": "var(--xmlui-lineBreak-Text)",
       "paddingTop-Markdown": "var(--xmlui-paddingTop-Markdown)",
       "paddingBottom-Markdown": "var(--xmlui-paddingBottom-Markdown)",
       "backgroundColor-Markdown": "var(--xmlui-backgroundColor-Markdown)",
@@ -9290,6 +9540,10 @@ export default {
       "marginBottom-H5-markdown": "var(--xmlui-marginBottom-H5-markdown)",
       "marginTop-H6-markdown": "var(--xmlui-marginTop-H6-markdown)",
       "marginBottom-H6-markdown": "var(--xmlui-marginBottom-H6-markdown)",
+      "marginTop-Image-markdown": "var(--xmlui-marginTop-Image-markdown)",
+      "marginBottom-Image-markdown": "var(--xmlui-marginBottom-Image-markdown)",
+      "marginLeft-Image-markdown": "var(--xmlui-marginLeft-Image-markdown)",
+      "marginRight-Image-markdown": "var(--xmlui-marginRight-Image-markdown)",
       "backgroundColor-Admonition-info": "var(--xmlui-backgroundColor-Admonition-info)",
       "borderColor-Admonition-info": "var(--xmlui-borderColor-Admonition-info)",
       "backgroundColor-Admonition-warning": "var(--xmlui-backgroundColor-Admonition-warning)",
@@ -9306,7 +9560,7 @@ export default {
     },
     "props": {
       "content": {
-        "description": "This property sets the markdown content to display."
+        "description": "This property sets the markdown content to display. Alternatively, you can nest the markdown content as a child in a CDATA section. In neither this property value nor any child is defined, empty content is displayed."
       },
       "codeHighlighter": {
         "description": "This property sets the code highlighter to use.",
@@ -9319,8 +9573,7 @@ export default {
       },
       "showHeadingAnchors": {
         "description": "This boolean property specifies whether heading anchors should be displayed. If set to `true`, heading anchors will be displayed on hover next to headings.",
-        "valueType": "boolean",
-        "defaultValue": false
+        "valueType": "boolean"
       }
     },
     "defaultThemeVars": {
@@ -9349,6 +9602,10 @@ export default {
       "accentColor-Blockquote": "$color-surface-500",
       "marginTop-HtmlLi": "$space-2_5",
       "marginBottom-HtmlLi": "$space-2_5",
+      "marginTop-Image-markdown": "$space-4",
+      "marginBottom-Image-markdown": "$space-4",
+      "marginLeft-Image-markdown": "$space-0",
+      "marginRight-Image-markdown": "$space-0",
       "light": {},
       "dark": {
         "backgroundColor-Blockquote": "$color-surface-50",
@@ -9357,7 +9614,7 @@ export default {
     }
   },
   "MenuSeparator": {
-    "description": "This component displays a separator line between menu items.",
+    "description": "`MenuSeparator` displays a separator line between menu items to group related menu options within `DropdownMenu`.",
     "docFolder": "DropdownMenu",
     "themeVars": {
       "backgroundColor-DropdownMenu": "var(--xmlui-backgroundColor-DropdownMenu)",
@@ -9387,6 +9644,7 @@ export default {
       "height-MenuSeparator": "var(--xmlui-height-MenuSeparator)",
       "color-MenuSeparator": "var(--xmlui-color-MenuSeparator)"
     },
+    "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
       "marginTop-MenuSeparator": "$space-1",
       "marginBottom-MenuSeparator": "$space-1",
@@ -9397,7 +9655,7 @@ export default {
     }
   },
   "ModalDialog": {
-    "description": "The `ModalDialog` component defines a modal dialog UI element that can be displayed over the existing UI - triggered by some action.",
+    "description": "`ModalDialog` creates overlay dialogs that appear on top of the main interface, ideal for forms, confirmations, detailed views, or any content that requires focused user attention. Dialogs are programmatically opened using the `open()` method and can receive parameters for dynamic content.",
     "props": {
       "fullScreen": {
         "description": "Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).",
@@ -9431,10 +9689,10 @@ export default {
     },
     "contextVars": {
       "$param": {
-        "description": "This value represents the first parameters passed to the `open()` method to display the modal dialog."
+        "description": "First parameter passed to the `open()` method"
       },
       "$params": {
-        "description": "This value represents the array of parameters passed to the `open()` method. You can use `$params[0]` to access the first and `$params[1]` to access the second (and so on) parameters. `$param` is the same as `$params[0]`."
+        "description": "Array of all parameters passed to `open()` method (access with `$params[0]`, `$params[1]`, etc.)"
       }
     },
     "themeVars": {
@@ -9479,14 +9737,14 @@ export default {
     }
   },
   "NavGroup": {
-    "description": "The `NavGroup` component is a container for grouping related navigation targets (`NavLink` components). It can be displayed as a submenu in the App's UI.",
+    "description": "`NavGroup` creates collapsible containers for organizing related navigation items into hierarchical menu structures. It groups `NavLink` components and other `NavGroup` components, providing expandable submenus with customizable icons and states.",
     "props": {
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "initiallyExpanded": {
-        "description": "This property defines whether the group is initially expanded or collapsed."
+        "description": "This property defines whether the group is initially expanded or collapsed. If not defined, the group is collapsed by default."
       },
       "enabled": {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
@@ -9534,7 +9792,7 @@ export default {
     }
   },
   "NavLink": {
-    "description": "The `NavLink` component defines a navigation target (app navigation menu item) within the app; it is associated with a particular in-app navigation target (or an external link).",
+    "description": "`NavLink` creates interactive navigation items that connect users to different destinations within an app or external URLs. It automatically indicates active states, supports custom icons and labels, and can execute custom actions instead of navigation when needed.",
     "props": {
       "to": {
         "description": "This property defines the URL of the link."
@@ -9550,7 +9808,7 @@ export default {
         "defaultValue": false
       },
       "target": {
-        "description": "This property specifies how to open the clicked link.",
+        "description": "This optionally property specifies how to open the clicked link.",
         "availableValues": [
           {
             "value": "_self",
@@ -9573,17 +9831,15 @@ export default {
             "description": "Allows embedded fenced frames to navigate the top-level frame, i.e. traversing beyond the root of the fenced frame."
           }
         ],
-        "type": "string",
-        "defaultValue": "_self"
+        "type": "string"
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "vertical": {
-        "description": "This property sets how the active status is displayed on the `NavLink` component. If set to true, the indicator is displayed on the side which lends itself to a vertically aligned navigation menu.",
-        "valueType": "boolean",
-        "defaultValue": false
+        "description": "This property sets how the active status is displayed on the `NavLink` component. If set to true, the indicator is displayed on the side which lends itself to a vertically aligned navigation menu. By default, it displays a horizontal indicator.",
+        "valueType": "boolean"
       },
       "displayActive": {
         "description": "This Boolean property indicates if the active state of a link should have a visual indication. Setting it to `false` removes the visual indication of an active link.",
@@ -9591,7 +9847,7 @@ export default {
         "defaultValue": true
       },
       "icon": {
-        "description": "This property allows you to add an icon (specify the icon's name) to the navigation link."
+        "description": "This property allows you to add an optional icon (specify the icon's name) to the navigation link."
       }
     },
     "events": {
@@ -9696,11 +9952,16 @@ export default {
     }
   },
   "NavPanel": {
-    "description": "`NavPanel` is a placeholder within `App` to define the app's navigation (menu) structure.",
+    "description": "`NavPanel` defines the navigation structure within an App, serving as a container for NavLink and NavGroup components that create your application's primary navigation menu. Its appearance and behavior automatically adapt based on the App's layout configuration.",
     "props": {
       "logoTemplate": {
         "description": "This property defines the logo template to display in the navigation panel with the `vertical` and `vertical-sticky` layout.",
         "valueType": "ComponentDef"
+      },
+      "inDrawer": {
+        "description": "This property determines if the navigation panel is displayed in a drawer.",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "themeVars": {
@@ -9737,6 +9998,7 @@ export default {
       "borderEndStartRadius-NavPanel": "var(--xmlui-borderEndStartRadius-NavPanel, var(--xmlui-borderRadius-NavPanel))",
       "borderEndEndRadius-NavPanel": "var(--xmlui-borderEndEndRadius-NavPanel, var(--xmlui-borderRadius-NavPanel))",
       "backgroundColor-NavPanel": "var(--xmlui-backgroundColor-NavPanel)",
+      "backgroundColor-NavPanel-horizontal": "var(--xmlui-backgroundColor-NavPanel-horizontal)",
       "boxShadow-NavPanel": "var(--xmlui-boxShadow-NavPanel)",
       "padding-NavPanel": "var(--xmlui-padding-NavPanel)",
       "paddingHorizontal-NavPanel": "var(--xmlui-paddingHorizontal-NavPanel)",
@@ -9756,10 +10018,14 @@ export default {
       "maxWidth-content-App": "var(--xmlui-maxWidth-content-App)",
       "height-AppHeader": "var(--xmlui-height-AppHeader)",
       "paddingVertical-AppHeader": "var(--xmlui-paddingVertical-AppHeader)",
-      "align-content-AppHeader": "var(--xmlui-align-content-AppHeader)"
+      "align-content-AppHeader": "var(--xmlui-align-content-AppHeader)",
+      "horizontalAlignment-logo-NavPanel": "var(--xmlui-horizontalAlignment-logo-NavPanel)"
     },
+    "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
+      "horizontalAlignment-logo-NavPanel": "center",
       "backgroundColor-NavPanel": "$backgroundColor",
+      "backgroundColor-NavPanel-horizontal": "$backgroundColor-AppHeader",
       "border-NavPanel": "0px solid $borderColor",
       "paddingHorizontal-NavPanel": "0",
       "paddingVertical-logo-NavPanel": "$space-4",
@@ -9769,19 +10035,21 @@ export default {
     }
   },
   "NoResult": {
-    "description": "`NoResult` is a component that displays a visual indication that some data query (search) resulted in no (zero) items.",
+    "description": "`NoResult` displays a visual indication that a query or search returned nothing.",
     "props": {
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "icon": {
-        "description": "This property defines the icon to display with the component."
+        "description": "This property defines the icon to display with the component.",
+        "valueType": "string",
+        "defaultValue": "noresult"
       },
       "hideIcon": {
         "description": "This boolean property indicates if the icon should be hidden.",
         "valueType": "boolean",
-        "defaultValue": "false"
+        "defaultValue": false
       }
     },
     "themeVars": {
@@ -9837,18 +10105,18 @@ export default {
     }
   },
   "NumberBox": {
-    "status": "experimental",
-    "description": "A `NumberBox` component allows users to input numeric values: either integer or floating point numbers. It also accepts empty values, where the stored value will be of type `null`.",
+    "status": "stable",
+    "description": "`NumberBox` provides a specialized input field for numeric values with built-in validation, spinner buttons, and flexible formatting options. It supports both integer and floating-point numbers, handles empty states as null values, and integrates seamlessly with form validation.",
     "props": {
       "placeholder": {
-        "description": "A placeholder text that is visible in the input field when its empty.",
+        "description": "An optional placeholder text that is visible in the input field when its empty.",
         "valueType": "string"
       },
       "initialValue": {
         "description": "This property sets the component's initial value."
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -9874,10 +10142,10 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `NumberBox`."
+        "description": "This property sets the width of the `NumberBox` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `NumberBox` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `NumberBox` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -9892,7 +10160,8 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "readOnly": {
         "description": "Set this property to `true` to disallow changing the component value.",
@@ -9923,19 +10192,19 @@ export default {
         "defaultValue": "none"
       },
       "startText": {
-        "description": "This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "startIcon": {
-        "description": "This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "endText": {
-        "description": "This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "endIcon": {
-        "description": "This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "gap": {
@@ -9947,10 +10216,10 @@ export default {
         "defaultValue": true
       },
       "spinnerUpIcon": {
-        "description": "Allows setting the icon displayed in the NumberBox spinner for incrementing values. You can change the default icon for all NumberBox instances with the \"icon.spinnerUp:NumberBox\" declaration in the app configuration file."
+        "description": "Allows setting an alternate icon displayed in the NumberBox spinner for incrementing values. You can change the default icon for all NumberBox instances with the \"icon.spinnerUp:NumberBox\" declaration in the app configuration file."
       },
       "spinnerDownIcon": {
-        "description": "Allows setting the icon displayed in the NumberBox spinner for decrementing values. You can change the default icon for all NumberBox instances with the \"icon.spinnerDown:NumberBox\" declaration in the app configuration file."
+        "description": "Allows setting an alternate icon displayed in the NumberBox spinner for decrementing values. You can change the default icon for all NumberBox instances with the \"icon.spinnerDown:NumberBox\" declaration in the app configuration file."
       },
       "step": {
         "description": "This prop governs how big the step when clicking on the spinner of the field.",
@@ -9968,10 +10237,10 @@ export default {
         "defaultValue": false
       },
       "minValue": {
-        "description": "The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer."
+        "description": "The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no minimum value check is done."
       },
       "maxValue": {
-        "description": "The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer."
+        "description": "The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.If not set, no maximum value check is done."
       }
     },
     "events": {
@@ -10092,16 +10361,16 @@ export default {
     }
   },
   "Option": {
-    "description": "`Option` is a non-visual component describing a selection option. Other components (such as `Select`, `AutoComplete`, and others) may use nested `Option` instances from which the user can select.",
+    "description": "`Option` defines selectable items for choice-based components, providing both the underlying value and display text for selection interfaces. It serves as a non-visual data structure that describes individual choices within [Select](/components/Select), [AutoComplete](/components/AutoComplete), and other selection components.",
     "props": {
       "label": {
         "description": "This property defines the text to display for the option. If `label` is not defined, `Option` will use the `value` as the label."
       },
       "value": {
-        "description": "This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value."
+        "description": "This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value. If neither is defined, the option is not displayed."
       },
       "enabled": {
-        "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
+        "description": "This boolean property indicates whether the option is enabled or disabled.",
         "valueType": "boolean",
         "defaultValue": true
       },
@@ -10112,31 +10381,34 @@ export default {
     "childrenAsTemplate": "optionTemplate"
   },
   "PageMetaTitle": {
-    "description": "A PageMetaTitle component allows setting up (or changing) the app title to display with the current browser tab.",
+    "description": "`PageMetaTitle` dynamically sets or updates the browser tab title, enabling pages and components to override the default application name with context-specific titles.",
     "props": {
       "value": {
-        "description": "This property sets the page's title to display in the browser tab."
+        "description": "This property sets the page's title to display in the browser tab.",
+        "defaultValue": "XMLUI Application"
       }
     }
   },
   "Page": {
     "status": "stable",
-    "docFolder": "Page",
-    "description": "The `Page` component defines what content is displayed when the user navigates to a particular URL that is associated with the page.",
+    "docFolder": "Pages",
+    "description": "`Page` defines route endpoints within an application, mapping specific URL patterns to content that displays when users navigate to those routes. Each Page represents a distinct view or screen in your single-page application's routing system.",
     "props": {
       "url": {
-        "description": "The URL of the route associated with the content."
+        "description": "The URL of the route associated with the content. If not set, the page is not available."
       },
       "navLabel": {
-        "description": "The label of the page that is displayed in the navigation panel. If provided, the a new entry will be added to the navigation panel."
+        "description": "The label of the page that is displayed in the navigation panel. If provided, the a new entry will be added to the navigation panel.",
+        "isInternal": true
       }
     }
   },
   "Pages": {
-    "description": "The `Pages` component is used as a container for [`Page`](/components/Page) components within an [`App`](/components/App).",
+    "description": "`Pages` serves as the routing coordinator within an [App](/components/App), managing which [Page](/components/Page)  displays based on the current URL.",
     "props": {
       "defaultRoute": {
-        "description": "The default route when displaying the app"
+        "description": "The default route when displaying the app",
+        "defaultValue": "/"
       }
     }
   },
@@ -10151,7 +10423,7 @@ export default {
     "themeVars": []
   },
   "ProgressBar": {
-    "description": "A `ProgressBar` component visually represents the progress of a task or process.",
+    "description": "`ProgressBar` provides a visual indicator showing the completion percentage of tasks, processes, or any measurable progress. It displays as a horizontal bar that fills from left to right based on the provided value between 0 (empty) and 1 (complete).",
     "props": {
       "value": {
         "description": "This property defines the progress value with a number between 0 and 1.",
@@ -10175,16 +10447,17 @@ export default {
     }
   },
   "Queue": {
-    "description": "The `Queue` component provides an API to enqueue elements and defines events to process queued elements in a FIFO order.",
+    "description": "`Queue` manages sequential processing of items in FIFO (first-in, first-out) order. It is a non-visual component but provides UI progress reporting and result display.",
     "props": {
       "progressFeedback": {
-        "description": "This property defines the component template of the UI that displays progress information whenever, the queue's `progressReport` function in invoked."
+        "description": "This property defines the component template of the UI that displays progress information whenever, the queue's `progressReport` function in invoked. If not set, no progress feedback is displayed."
       },
       "resultFeedback": {
-        "description": "This property defines the component template of the UI that displays result information when the queue becomes empty after processing all queued items."
+        "description": "This property defines the component template of the UI that displays result information when the queue becomes empty after processing all queued items. If not set, no result feedback is displayed."
       },
       "clearAfterFinish": {
-        "description": "This property indicates the completed items (successful or error) should be removed from the queue after completion."
+        "description": "This property indicates the completed items (successful or error) should be removed from the queue after completion.",
+        "defaultValue": false
       }
     },
     "nonVisual": true,
@@ -10232,10 +10505,11 @@ export default {
     }
   },
   "RadioGroup": {
-    "description": "The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](./RadioGroupOption.mdx) components) that allow users to select only one option from the group at a time.",
+    "description": "`RadioGroup` creates a mutually exclusive selection interface where users can choose only one option from a group of radio buttons. It manages the selection state and ensures that selecting one option automatically deselects all others in the group.",
     "props": {
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "defaultValue": ""
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -10244,7 +10518,8 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "readOnly": {
         "description": "Set this property to `true` to disallow changing the component value.",
@@ -10275,10 +10550,11 @@ export default {
         "defaultValue": "none"
       },
       "orientation": {
-        "description": "(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the options within the radio group."
+        "description": "(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the options within the radio group.",
+        "isInternal": true
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -10304,10 +10580,10 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `RadioGroup`."
+        "description": "This property sets the width of the `RadioGroup` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `RadioGroup` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `RadioGroup` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       }
@@ -10373,10 +10649,11 @@ export default {
   },
   "RealTimeAdapter": {
     "status": "experimental",
-    "description": "`RealTimeAdapter` is a non-visual component that listens to real-time events through long-polling.",
+    "description": "`RealTimeAdapter` is a non-visual component that listens to real-time events.",
     "props": {
       "url": {
-        "description": "This property specifies the URL to use for long-polling."
+        "description": "This property specifies the URL to use for long-polling.",
+        "defaultValue": ""
       }
     },
     "events": {
@@ -10386,20 +10663,22 @@ export default {
     }
   },
   "Redirect": {
-    "description": "`Redirect` is a component that immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). The redirection works only within the app.",
+    "description": "`Redirect` immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). It works only within [App](/components/App), not externally.",
     "props": {
       "to": {
-        "description": "This property defines the URL to which this component is about to redirect requests."
+        "description": "This property defines the URL to which this component is about to redirect requests.",
+        "defaultValue": ""
       }
     }
   },
   "Select": {
-    "description": "Provides a dropdown with a list of options to choose from.",
-    "status": "experimental",
+    "description": "`Select` provides a dropdown interface for choosing from a list of options, supporting both single and multiple selection modes. It offers extensive customization capabilities including search functionality, custom templates, and comprehensive form integration.",
+    "status": "stable",
     "props": {
       "placeholder": {
-        "description": "A placeholder text that is visible in the input field when its empty.",
-        "valueType": "string"
+        "description": "An optional placeholder text that is visible in the input field when its empty.",
+        "valueType": "string",
+        "defaultValue": ""
       },
       "initialValue": {
         "description": "This property sets the component's initial value."
@@ -10411,7 +10690,8 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "readOnly": {
         "description": "Set this property to `true` to disallow changing the component value.",
@@ -10442,7 +10722,7 @@ export default {
         "defaultValue": "none"
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -10468,10 +10748,10 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `Select`."
+        "description": "This property sets the width of the `Select` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `Select` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `Select` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -10488,7 +10768,7 @@ export default {
         "valueType": "ComponentDef"
       },
       "dropdownHeight": {
-        "description": "This property sets the height of the dropdown list."
+        "description": "This property sets the height of the dropdown list. If not set, the height is determined automatically."
       },
       "emptyListTemplate": {
         "description": "This optional property provides the ability to customize what is displayed when the list of options is empty."
@@ -10499,13 +10779,16 @@ export default {
         "defaultValue": false
       },
       "searchable": {
-        "description": "This property enables the search functionality in the dropdown list."
+        "description": "This property enables the search functionality in the dropdown list.",
+        "defaultValue": false
       },
       "inProgress": {
-        "description": "This property indicates whether the component is in progress. It can be used to show a loading message."
+        "description": "This property indicates whether the component is in progress. It can be used to show a loading message.",
+        "defaultValue": false
       },
       "inProgressNotificationMessage": {
-        "description": "This property indicates the message to display when the component is in progress."
+        "description": "This property indicates the message to display when the component is in progress.",
+        "defaultValue": ""
       }
     },
     "events": {
@@ -10535,10 +10818,10 @@ export default {
     },
     "contextVars": {
       "$item": {
-        "description": "This property represents the value of an item in the dropdown list."
+        "description": "Represents the current option's data (label and value properties)"
       },
       "$itemContext": {
-        "description": "This property provides a `removeItem` method to delete the particular value from the selection."
+        "description": "Provides utility methods like `removeItem()` for multi-select scenarios"
       }
     },
     "themeVars": {
@@ -10649,9 +10932,6 @@ export default {
       "borderRadius-menu-Select": "$borderRadius",
       "borderWidth-menu-Select": "1px",
       "borderColor-menu-Select": "$borderColor",
-      "backgroundColor-item-Select": "$backgroundColor-dropdown-item",
-      "backgroundColor-item-Select--hover": "$backgroundColor-dropdown-item--active",
-      "backgroundColor-item-Select--active": "$backgroundColor-dropdown-item--active",
       "minHeight-Input": "39px",
       "backgroundColor-Select-badge": "$color-primary-500",
       "fontSize-Select-badge": "$fontSize-small",
@@ -10664,7 +10944,10 @@ export default {
       "backgroundColor-Select-badge--hover": "$color-primary-400",
       "backgroundColor-Select-badge--active": "$color-primary-500",
       "textColor-item-Select--disabled": "$color-surface-200",
-      "textColor-Select-badge": "$color-surface-50"
+      "textColor-Select-badge": "$color-surface-50",
+      "backgroundColor-item-Select": "$backgroundColor-dropdown-item",
+      "backgroundColor-item-Select--hover": "$backgroundColor-dropdown-item--hover",
+      "backgroundColor-item-Select--active": "$backgroundColor-dropdown-item--active"
     }
   },
   "SelectionStore": {
@@ -10672,19 +10955,20 @@ export default {
     "description": "The `SelectionStore` is a non-visual component that may wrap components (items) and manage their selection state to accommodate the usage of other actions.",
     "props": {
       "idKey": {
-        "description": "The selected items in the selection store needs to have a unique ID to use as an unambiguous key for that particular item. This property uniquely identifies the selected object item via a given property. By default, the key attribute is `\"id\"`."
+        "description": "The selected items in the selection store needs to have a unique ID to use as an unambiguous key for that particular item. This property uniquely identifies the selected object item via a given property. By default, the key attribute is `\"id\"`.",
+        "defaultValue": "id"
       }
     }
   },
   "Slider": {
-    "status": "experimental",
-    "description": "The `Slider` component allows you to select a numeric value between a range specified by minimum and maximum values.",
+    "status": "stable",
+    "description": "`Slider` provides an interactive control for selecting numeric values within a defined range, supporting both single value selection and range selection with multiple thumbs. It offers precise control through customizable steps and visual feedback with formatted value display.",
     "props": {
       "initialValue": {
         "description": "This property sets the component's initial value."
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -10710,30 +10994,31 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `Slider`."
+        "description": "This property sets the width of the `Slider` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `Slider` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `Slider` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
       "minValue": {
         "description": "This property specifies the minimum value of the allowed input range.",
-        "availableValues": null,
         "valueType": "number",
         "defaultValue": 0
       },
       "maxValue": {
         "description": "This property specifies the maximum value of the allowed input range.",
-        "availableValues": null,
         "valueType": "number",
         "defaultValue": 10
       },
       "step": {
-        "description": "This property defines the increment value for the slider, determining the allowed intervals between selectable values."
+        "description": "This property defines the increment value for the slider, determining the allowed intervals between selectable values.",
+        "defaultValue": 1
       },
       "minStepsBetweenThumbs": {
-        "description": "This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance."
+        "description": "This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.",
+        "valueType": "number",
+        "defaultValue": 1
       },
       "enabled": {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
@@ -10747,7 +11032,8 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "readOnly": {
         "description": "Set this property to `true` to disallow changing the component value.",
@@ -10773,21 +11059,20 @@ export default {
         "defaultValue": "none"
       },
       "rangeStyle": {
-        "description": "This property allows you to apply custom styles to the range element of the slider."
+        "description": "This optional property allows you to apply custom styles to the range element of the slider."
       },
       "thumbStyle": {
-        "description": "This property allows you to apply custom styles to the thumb elements of the slider."
+        "description": "This optional property allows you to apply custom styles to the thumb elements of the slider."
       },
       "showValues": {
         "description": "This property controls whether the slider shows the current values of the thumbs.",
-        "availableValues": null,
         "valueType": "boolean",
         "defaultValue": true
       },
       "valueFormat": {
         "description": "This property allows you to customize how the values are displayed.",
-        "availableValues": null,
-        "valueType": "any"
+        "valueType": "any",
+        "defaultValue": "(value) => value.toString()"
       }
     },
     "events": {
@@ -10889,11 +11174,11 @@ export default {
     }
   },
   "SpaceFiller": {
-    "description": "The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. Its behavior depends on the layout container in which it is used.",
+    "description": "`SpaceFiller` works well in layout containers to fill remaining (unused) space. Its behavior depends on the layout container in which it is used.",
     "themeVars": []
   },
   "Spinner": {
-    "description": "The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value.",
+    "description": "`Spinner` is an animated indicator that represents an action in progress with no deterministic progress value.",
     "props": {
       "delay": {
         "description": "The delay in milliseconds before the spinner is displayed.",
@@ -10918,7 +11203,7 @@ export default {
     }
   },
   "Splitter": {
-    "description": "The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.",
+    "description": "`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them.",
     "props": {
       "swapped": {
         "description": "This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.",
@@ -10985,7 +11270,7 @@ export default {
     }
   },
   "HSplitter": {
-    "description": "The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.",
+    "description": "`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them.",
     "props": {
       "swapped": {
         "description": "This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.",
@@ -11053,7 +11338,7 @@ export default {
     "specializedFrom": "Splitter"
   },
   "VSplitter": {
-    "description": "The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.",
+    "description": "`Splitter` component divides a container into two resizable sections. These are are identified by their names: primary and secondary. They have a draggable bar between them.",
     "props": {
       "swapped": {
         "description": "This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.",
@@ -11121,7 +11406,7 @@ export default {
     "specializedFrom": "Splitter"
   },
   "Stack": {
-    "description": "`Stack` is a layout container displaying children in a horizontal or vertical stack.",
+    "description": "`Stack` is the fundamental layout container that organizes child elements in configurable horizontal or vertical arrangements. As the most versatile building block in XMLUI's layout system, it provides comprehensive alignment, spacing, and flow control options that serve as the foundation for all specialized stack variants.",
     "props": {
       "gap": {
         "description": "Optional size value indicating the gap between child elements.",
@@ -11169,11 +11454,13 @@ export default {
       },
       "hoverContainer": {
         "description": "Reserved for future use",
-        "isInternal": true
+        "isInternal": true,
+        "defaultValue": false
       },
       "visibleOnHover": {
         "description": "Reserved for future use",
-        "isInternal": true
+        "isInternal": true,
+        "defaultValue": false
       }
     },
     "events": {
@@ -11236,11 +11523,13 @@ export default {
       },
       "hoverContainer": {
         "description": "Reserved for future use",
-        "isInternal": true
+        "isInternal": true,
+        "defaultValue": false
       },
       "visibleOnHover": {
         "description": "Reserved for future use",
-        "isInternal": true
+        "isInternal": true,
+        "defaultValue": false
       }
     },
     "events": {
@@ -11304,11 +11593,13 @@ export default {
       },
       "hoverContainer": {
         "description": "Reserved for future use",
-        "isInternal": true
+        "isInternal": true,
+        "defaultValue": false
       },
       "visibleOnHover": {
         "description": "Reserved for future use",
-        "isInternal": true
+        "isInternal": true,
+        "defaultValue": false
       }
     },
     "events": {
@@ -11372,11 +11663,13 @@ export default {
       },
       "hoverContainer": {
         "description": "Reserved for future use",
-        "isInternal": true
+        "isInternal": true,
+        "defaultValue": false
       },
       "visibleOnHover": {
         "description": "Reserved for future use",
-        "isInternal": true
+        "isInternal": true,
+        "defaultValue": false
       }
     },
     "events": {
@@ -11440,11 +11733,13 @@ export default {
       },
       "hoverContainer": {
         "description": "Reserved for future use",
-        "isInternal": true
+        "isInternal": true,
+        "defaultValue": false
       },
       "visibleOnHover": {
         "description": "Reserved for future use",
-        "isInternal": true
+        "isInternal": true,
+        "defaultValue": false
       }
     },
     "events": {
@@ -11460,8 +11755,8 @@ export default {
     "specializedFrom": "Stack"
   },
   "StickyBox": {
-    "status": "experimental",
-    "description": "The `StickyBox` is a component that \"sticks\" or remains fixed at the top or bottom position on the screen as the user scrolls.",
+    "status": "stable",
+    "description": "`StickyBox` remains fixed at the top or bottom of the screen as the user scrolls.",
     "props": {
       "to": {
         "description": "This property determines whether the StickyBox should be anchored to the `top` or `bottom`.",
@@ -11479,14 +11774,14 @@ export default {
     }
   },
   "Switch": {
-    "description": "The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state.",
+    "description": "`Switch` enables users to toggle between two states: on and off.",
     "props": {
       "indeterminate": {
         "description": "The `true` value of this property signals that the component is in an _intedeterminate state_.",
         "defaultValue": false
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -11512,16 +11807,17 @@ export default {
         "defaultValue": "end"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `Switch`."
+        "description": "This property sets the width of the `Switch` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `Switch` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `Switch` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "initialValue": {
         "description": "This property sets the component's initial value.",
@@ -11648,6 +11944,7 @@ export default {
       "Input:outlineOffset-Switch--focus": "var(--xmlui-outlineOffset-Switch--focus)",
       "backgroundColor-indicator-checked-Switch": "var(--xmlui-backgroundColor-indicator-checked-Switch)"
     },
+    "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
       "borderColor-checked-Switch-error": "$borderColor-Switch-error",
       "backgroundColor-checked-Switch-error": "$borderColor-Switch-error",
@@ -11666,7 +11963,7 @@ export default {
     }
   },
   "Table": {
-    "description": "`Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells.",
+    "description": "`Table` presents structured data for viewing, sorting, selection, and interaction.",
     "props": {
       "items": {
         "description": "You can use `items` as an alias for the `data` property. When you bind the table to a data source (e.g. an API endpoint), the `data` acts as the property that accepts a URL to fetch information from an API. When both `items` and `data` are used, `items` has priority.",
@@ -11700,10 +11997,10 @@ export default {
         "valueType": "ComponentDef"
       },
       "sortBy": {
-        "description": "This property is used to determine which data attributes to sort by."
+        "description": "This property is used to determine which data property to sort by. If not defined, the data is not sorted"
       },
       "sortDirection": {
-        "description": "This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set."
+        "description": "This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set. By default ascending order is used."
       },
       "autoFocus": {
         "description": "If this property is set to `true`, the component gets the focus automatically when displayed.",
@@ -11716,13 +12013,13 @@ export default {
         "defaultValue": false
       },
       "iconNoSort": {
-        "description": "Allows setting the icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the \"icon.nosort:Table\" declaration in the app configuration file."
+        "description": "Allows setting an alternate icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the \"icon.nosort:Table\" declaration in the app configuration file."
       },
       "iconSortAsc": {
-        "description": "Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order. You can change the default icon for all Table instances with the \"icon.sortasc:Table\" declaration in the app configuration file."
+        "description": "Allows setting an alernate icon displayed in the Table column header when sorting is enabled, and the column is sorted in ascending order. You can change the default icon for all Table instances with the \"icon.sortasc:Table\" declaration in the app configuration file."
       },
       "iconSortDesc": {
-        "description": "Allows setting the icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order. You can change the default icon for all Table instances with the \"icon.sortdesc:Table\" declaration in the app configuration file."
+        "description": "Allows setting an alternate icon displayed in the Table column header when sorting is enabled, and the column is sorted in descending order. You can change the default icon for all Table instances with the \"icon.sortdesc:Table\" declaration in the app configuration file."
       },
       "enableMultiRowSelection": {
         "description": "This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.",
@@ -11840,11 +12137,10 @@ export default {
       "outlineOffset-heading-Table--focus": "var(--xmlui-outlineOffset-heading-Table--focus)"
     },
     "defaultThemeVars": {
-      "padding-heading-Table": "$space-2",
-      "paddingHorizontal-cell-Table": "$space-2",
+      "padding-heading-Table": "$space-2 $space-0 $space-2 $space-2",
+      "padding-cell-Table": "$space-2 $space-0 $space-2 $space-2",
       "paddingHorizontal-cell-first-Table": "$space-5",
-      "paddingHorizontal-cell-last-Table": "$space-5",
-      "paddingVertical-cell-Table": "$space-2",
+      "paddingHorizontal-cell-last-Table": "$space-0",
       "border-cell-Table": "1px solid $borderColor",
       "outlineWidth-heading-Table--focus": "$outlineWidth--focus",
       "outlineStyle-heading-Table--focus": "$outlineStyle--focus",
@@ -11867,17 +12163,17 @@ export default {
   },
   "TableOfContents": {
     "status": "experimental",
-    "description": "The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position.",
+    "description": "`TableOfContents` component collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree.",
     "props": {
       "smoothScrolling": {
         "description": "This property indicates that smooth scrolling is used while scrolling the selected table of contents items into view.",
         "valueType": "boolean",
-        "defaultValue": "false"
+        "defaultValue": false
       },
       "maxHeadingLevel": {
         "description": "Defines the maximum heading level (1 to 6) to include in the table of contents. For example, if it is 2, then `H1` and `H2` are displayed, but lower levels (`H3` to `H6`) are not.",
         "valueType": "number",
-        "defaultValue": "6"
+        "defaultValue": 6
       }
     },
     "themeVars": {
@@ -12278,27 +12574,37 @@ export default {
       "fontSize-TableOfContentsItem": "$fontSize-small",
       "wordWrap-TableOfContentsItem": "break-word",
       "paddingVertical-TableOfContentsItem": "$space-1",
-      "paddingHorizontal-TableOfContentsItem": "$space-1",
+      "paddingLeft-TableOfContentsItem": "$space-1",
+      "paddingLeft-TableOfContentsItem-level-2": "$space-3",
+      "paddingLeft-TableOfContentsItem-level-3": "$space-5",
+      "paddingLeft-TableOfContentsItem-level-4": "$space-6",
+      "paddingLeft-TableOfContentsItem-level-5": "$space-6",
+      "paddingLeft-TableOfContentsItem-level-6": "$space-6",
       "fontWeight-TableOfContentsItem": "$fontWeight-bold",
+      "fontWeight-TableOfContentsItem-level-3": "normal",
+      "fontWeight-TableOfContentsItem-level-4": "normal",
+      "fontWeight-TableOfContentsItem-level-5": "normal",
+      "fontWeight-TableOfContentsItem-level-6": "normal",
       "fontStyle-TableOfContentsItem-level-6": "italic",
       "color-TableOfContentsItem--active": "$color-primary-500"
     }
   },
   "TabItem": {
-    "description": "`TabItem` is a non-visual component describing a tab. Tabs component may use nested TabItem instances from which the user can select.",
+    "description": "`TabItem` defines individual tabs within a [Tabs](/components/Tabs) component, providing both the tab header label and the content that displays when the tab is selected. As a non-visual structural component, it serves as a container that organizes content into distinct, switchable sections.",
+    "docFolder": "Tabs",
     "props": {
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       }
     }
   },
   "Tabs": {
     "status": "experimental",
-    "description": "The `Tabs` component provides a tabbed layout where each tab has a clickable label and content.",
+    "description": "`Tabs` enables users to switch among content panels using clickable tab headers. It provides an efficient way to present multiple related sections in a single interface area, with each tab containing distinct content defined by [TabItem](/components/TabItem) components.",
     "props": {
       "activeTab": {
-        "description": "This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab."
+        "description": "This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab. If not set, the first tab is selected by default."
       },
       "orientation": {
         "description": "This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top.",
@@ -12306,7 +12612,7 @@ export default {
           "horizontal",
           "vertical"
         ],
-        "defaultValue": "vertical",
+        "defaultValue": "horizontal",
         "valueType": "string"
       },
       "tabTemplate": {
@@ -12388,6 +12694,10 @@ export default {
             "description": "Marks text to stress emphasis"
           },
           {
+            "value": "inherit",
+            "description": "Represents text that inherits the style from its parent element"
+          },
+          {
             "value": "inserted",
             "description": "Represents a range of text that has been added to a document"
           },
@@ -12463,40 +12773,29 @@ export default {
       "preserveLinebreaks": {
         "description": "This property indicates if linebreaks should be preserved when displaying text.",
         "valueType": "boolean",
-        "defaultValue": "false"
+        "defaultValue": false
       },
       "ellipses": {
         "description": "This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).",
         "valueType": "boolean",
-        "defaultValue": false
+        "defaultValue": true
       }
     },
     "themeVars": {
-      "marginTop-Text-default": "var(--xmlui-marginTop-Text-default)",
-      "marginBottom-Text-default": "var(--xmlui-marginBottom-Text-default)",
-      "marginLeft-Text-default": "var(--xmlui-marginLeft-Text-default)",
-      "marginRight-Text-default": "var(--xmlui-marginRight-Text-default)",
-      "verticalAlign-Text-default": "var(--xmlui-verticalAlign-Text-default)",
+      "marginTop-Text": "var(--xmlui-marginTop-Text)",
+      "marginBottom-Text": "var(--xmlui-marginBottom-Text)",
+      "marginLeft-Text": "var(--xmlui-marginLeft-Text)",
+      "marginRight-Text": "var(--xmlui-marginRight-Text)",
+      "verticalAlign-Text": "var(--xmlui-verticalAlign-Text)",
       "marginTop-Text-markdown": "var(--xmlui-marginTop-Text-markdown)",
       "marginBottom-Text-markdown": "var(--xmlui-marginBottom-Text-markdown)",
       "marginLeft-Text-markdown": "var(--xmlui-marginLeft-Text-markdown)",
       "marginRight-Text-markdown": "var(--xmlui-marginRight-Text-markdown)",
       "verticalAlign-Text-markdown": "var(--xmlui-verticalAlign-Text-markdown)",
-      "marginTop-Text-abbr": "var(--xmlui-marginTop-Text-abbr)",
-      "marginBottom-Text-abbr": "var(--xmlui-marginBottom-Text-abbr)",
-      "marginLeft-Text-abbr": "var(--xmlui-marginLeft-Text-abbr)",
-      "marginRight-Text-abbr": "var(--xmlui-marginRight-Text-abbr)",
-      "verticalAlign-Text-abbr": "var(--xmlui-verticalAlign-Text-abbr)",
-      "marginTop-Text-cite": "var(--xmlui-marginTop-Text-cite)",
-      "marginBottom-Text-cite": "var(--xmlui-marginBottom-Text-cite)",
-      "marginLeft-Text-cite": "var(--xmlui-marginLeft-Text-cite)",
-      "marginRight-Text-cite": "var(--xmlui-marginRight-Text-cite)",
-      "verticalAlign-Text-cite": "var(--xmlui-verticalAlign-Text-cite)",
-      "marginTop-Text-em": "var(--xmlui-marginTop-Text-em)",
-      "marginBottom-Text-em": "var(--xmlui-marginBottom-Text-em)",
-      "marginLeft-Text-em": "var(--xmlui-marginLeft-Text-em)",
-      "marginRight-Text-em": "var(--xmlui-marginRight-Text-em)",
-      "verticalAlign-Text-em": "var(--xmlui-verticalAlign-Text-em)",
+      "fontWeight-Text-abbr": "var(--xmlui-fontWeight-Text-abbr)",
+      "textTransform-Text-abbr": "var(--xmlui-textTransform-Text-abbr)",
+      "fontStyle-Text-cite": "var(--xmlui-fontStyle-Text-cite)",
+      "fontStyle-Text-em": "var(--xmlui-fontStyle-Text-em)",
       "marginTop-Text-codefence": "var(--xmlui-marginTop-Text-codefence)",
       "marginBottom-Text-codefence": "var(--xmlui-marginBottom-Text-codefence)",
       "marginTop-Text-code": "var(--xmlui-marginTop-Text-code)",
@@ -12507,102 +12806,71 @@ export default {
       "marginLeft-Text-codefence": "var(--xmlui-marginLeft-Text-codefence)",
       "marginRight-Text-codefence": "var(--xmlui-marginRight-Text-codefence)",
       "verticalAlign-Text-codefence": "var(--xmlui-verticalAlign-Text-codefence)",
-      "marginTop-Text-deleted": "var(--xmlui-marginTop-Text-deleted)",
-      "marginBottom-Text-deleted": "var(--xmlui-marginBottom-Text-deleted)",
-      "marginLeft-Text-deleted": "var(--xmlui-marginLeft-Text-deleted)",
-      "marginRight-Text-deleted": "var(--xmlui-marginRight-Text-deleted)",
-      "verticalAlign-Text-deleted": "var(--xmlui-verticalAlign-Text-deleted)",
-      "marginTop-Text-inserted": "var(--xmlui-marginTop-Text-inserted)",
-      "marginBottom-Text-inserted": "var(--xmlui-marginBottom-Text-inserted)",
-      "marginLeft-Text-inserted": "var(--xmlui-marginLeft-Text-inserted)",
-      "marginRight-Text-inserted": "var(--xmlui-marginRight-Text-inserted)",
-      "verticalAlign-Text-inserted": "var(--xmlui-verticalAlign-Text-inserted)",
-      "marginTop-Text-keyboard": "var(--xmlui-marginTop-Text-keyboard)",
-      "marginBottom-Text-keyboard": "var(--xmlui-marginBottom-Text-keyboard)",
-      "marginLeft-Text-keyboard": "var(--xmlui-marginLeft-Text-keyboard)",
-      "marginRight-Text-keyboard": "var(--xmlui-marginRight-Text-keyboard)",
-      "verticalAlign-Text-keyboard": "var(--xmlui-verticalAlign-Text-keyboard)",
-      "marginTop-Text-marked": "var(--xmlui-marginTop-Text-marked)",
-      "marginBottom-Text-marked": "var(--xmlui-marginBottom-Text-marked)",
-      "marginLeft-Text-marked": "var(--xmlui-marginLeft-Text-marked)",
-      "marginRight-Text-marked": "var(--xmlui-marginRight-Text-marked)",
-      "verticalAlign-Text-marked": "var(--xmlui-verticalAlign-Text-marked)",
-      "marginTop-Text-mono": "var(--xmlui-marginTop-Text-mono)",
-      "marginBottom-Text-mono": "var(--xmlui-marginBottom-Text-mono)",
-      "marginLeft-Text-mono": "var(--xmlui-marginLeft-Text-mono)",
-      "marginRight-Text-mono": "var(--xmlui-marginRight-Text-mono)",
-      "verticalAlign-Text-mono": "var(--xmlui-verticalAlign-Text-mono)",
-      "marginTop-Text-sample": "var(--xmlui-marginTop-Text-sample)",
-      "marginBottom-Text-sample": "var(--xmlui-marginBottom-Text-sample)",
-      "marginLeft-Text-sample": "var(--xmlui-marginLeft-Text-sample)",
-      "marginRight-Text-sample": "var(--xmlui-marginRight-Text-sample)",
-      "verticalAlign-Text-sample": "var(--xmlui-verticalAlign-Text-sample)",
-      "marginTop-Text-sup": "var(--xmlui-marginTop-Text-sup)",
-      "marginBottom-Text-sup": "var(--xmlui-marginBottom-Text-sup)",
-      "marginLeft-Text-sup": "var(--xmlui-marginLeft-Text-sup)",
-      "marginRight-Text-sup": "var(--xmlui-marginRight-Text-sup)",
+      "fontFamily-Text-codefence": "var(--xmlui-fontFamily-Text-codefence)",
+      "textDecorationLine-Text-deleted": "var(--xmlui-textDecorationLine-Text-deleted)",
+      "textDecorationColor-Text-deleted": "var(--xmlui-textDecorationColor-Text-deleted)",
+      "textDecorationStyle-Text-deleted": "var(--xmlui-textDecorationStyle-Text-deleted)",
+      "textDecorationThickness-Text-deleted": "var(--xmlui-textDecorationThickness-Text-deleted)",
+      "textDecorationLine-Text-inserted": "var(--xmlui-textDecorationLine-Text-inserted)",
+      "textDecorationColor-Text-inserted": "var(--xmlui-textDecorationColor-Text-inserted)",
+      "textDecorationStyle-Text-inserted": "var(--xmlui-textDecorationStyle-Text-inserted)",
+      "textDecorationThickness-Text-inserted": "var(--xmlui-textDecorationThickness-Text-inserted)",
+      "backgroundColor-Text-keyboard": "var(--xmlui-backgroundColor-Text-keyboard)",
+      "fontFamily-Text-keyboard": "var(--xmlui-fontFamily-Text-keyboard)",
+      "fontWeight-Text-keyboard": "var(--xmlui-fontWeight-Text-keyboard)",
+      "fontSize-Text-keyboard": "var(--xmlui-fontSize-Text-keyboard)",
+      "borderWidth-Text-keyboard": "var(--xmlui-borderWidth-Text-keyboard)",
+      "borderColor-Text-keyboard": "var(--xmlui-borderColor-Text-keyboard)",
+      "borderStyle-Text-keyboard": "var(--xmlui-borderStyle-Text-keyboard)",
+      "borderRadius-Text-keyboard": "var(--xmlui-borderRadius-Text-keyboard)",
+      "paddingHorizontal-Text-keyboard": "var(--xmlui-paddingHorizontal-Text-keyboard)",
+      "backgroundColor-Text-marked": "var(--xmlui-backgroundColor-Text-marked)",
+      "color-Text-marked": "var(--xmlui-color-Text-marked)",
+      "fontWeight-Text-marked": "var(--xmlui-fontWeight-Text-marked)",
+      "fontStyle-Text-marked": "var(--xmlui-fontStyle-Text-marked)",
+      "lineHeight-Text-marked": "var(--xmlui-lineHeight-Text-marked)",
+      "fontFamily-Text-mono": "var(--xmlui-fontFamily-Text-mono)",
+      "fontFamily-Text-sample": "var(--xmlui-fontFamily-Text-sample)",
+      "fontSize-Text-sample": "var(--xmlui-fontSize-Text-sample)",
+      "fontSize-Text-sup": "var(--xmlui-fontSize-Text-sup)",
       "verticalAlign-Text-sup": "var(--xmlui-verticalAlign-Text-sup)",
-      "marginTop-Text-sub": "var(--xmlui-marginTop-Text-sub)",
-      "marginBottom-Text-sub": "var(--xmlui-marginBottom-Text-sub)",
-      "marginLeft-Text-sub": "var(--xmlui-marginLeft-Text-sub)",
-      "marginRight-Text-sub": "var(--xmlui-marginRight-Text-sub)",
+      "fontSize-Text-sub": "var(--xmlui-fontSize-Text-sub)",
       "verticalAlign-Text-sub": "var(--xmlui-verticalAlign-Text-sub)",
-      "marginTop-Text-var": "var(--xmlui-marginTop-Text-var)",
-      "marginBottom-Text-var": "var(--xmlui-marginBottom-Text-var)",
-      "marginLeft-Text-var": "var(--xmlui-marginLeft-Text-var)",
-      "marginRight-Text-var": "var(--xmlui-marginRight-Text-var)",
-      "verticalAlign-Text-var": "var(--xmlui-verticalAlign-Text-var)",
-      "marginTop-Text-title": "var(--xmlui-marginTop-Text-title)",
-      "marginBottom-Text-title": "var(--xmlui-marginBottom-Text-title)",
-      "marginLeft-Text-title": "var(--xmlui-marginLeft-Text-title)",
-      "marginRight-Text-title": "var(--xmlui-marginRight-Text-title)",
-      "verticalAlign-Text-title": "var(--xmlui-verticalAlign-Text-title)",
-      "marginTop-Text-subtitle": "var(--xmlui-marginTop-Text-subtitle)",
-      "marginBottom-Text-subtitle": "var(--xmlui-marginBottom-Text-subtitle)",
-      "marginLeft-Text-subtitle": "var(--xmlui-marginLeft-Text-subtitle)",
-      "marginRight-Text-subtitle": "var(--xmlui-marginRight-Text-subtitle)",
-      "verticalAlign-Text-subtitle": "var(--xmlui-verticalAlign-Text-subtitle)",
+      "fontStyle-Text-var": "var(--xmlui-fontStyle-Text-var)",
+      "fontSize-Text-title": "var(--xmlui-fontSize-Text-title)",
+      "fontSize-Text-subtitle": "var(--xmlui-fontSize-Text-subtitle)",
       "marginTop-Text-small": "var(--xmlui-marginTop-Text-small)",
       "marginBottom-Text-small": "var(--xmlui-marginBottom-Text-small)",
       "marginLeft-Text-small": "var(--xmlui-marginLeft-Text-small)",
       "marginRight-Text-small": "var(--xmlui-marginRight-Text-small)",
       "verticalAlign-Text-small": "var(--xmlui-verticalAlign-Text-small)",
-      "marginTop-Text-caption": "var(--xmlui-marginTop-Text-caption)",
-      "marginBottom-Text-caption": "var(--xmlui-marginBottom-Text-caption)",
-      "marginLeft-Text-caption": "var(--xmlui-marginLeft-Text-caption)",
-      "marginRight-Text-caption": "var(--xmlui-marginRight-Text-caption)",
-      "verticalAlign-Text-caption": "var(--xmlui-verticalAlign-Text-caption)",
-      "marginTop-Text-placeholder": "var(--xmlui-marginTop-Text-placeholder)",
-      "marginBottom-Text-placeholder": "var(--xmlui-marginBottom-Text-placeholder)",
-      "marginLeft-Text-placeholder": "var(--xmlui-marginLeft-Text-placeholder)",
-      "marginRight-Text-placeholder": "var(--xmlui-marginRight-Text-placeholder)",
-      "verticalAlign-Text-placeholder": "var(--xmlui-verticalAlign-Text-placeholder)",
-      "marginTop-Text-paragraph": "var(--xmlui-marginTop-Text-paragraph)",
-      "marginBottom-Text-paragraph": "var(--xmlui-marginBottom-Text-paragraph)",
-      "marginLeft-Text-paragraph": "var(--xmlui-marginLeft-Text-paragraph)",
-      "marginRight-Text-paragraph": "var(--xmlui-marginRight-Text-paragraph)",
-      "verticalAlign-Text-paragraph": "var(--xmlui-verticalAlign-Text-paragraph)",
-      "marginTop-Text-subheading": "var(--xmlui-marginTop-Text-subheading)",
-      "marginBottom-Text-subheading": "var(--xmlui-marginBottom-Text-subheading)",
-      "marginLeft-Text-subheading": "var(--xmlui-marginLeft-Text-subheading)",
-      "marginRight-Text-subheading": "var(--xmlui-marginRight-Text-subheading)",
-      "verticalAlign-Text-subheading": "var(--xmlui-verticalAlign-Text-subheading)",
+      "letterSpacing-Text-caption": "var(--xmlui-letterSpacing-Text-caption)",
+      "color-Text-placeholder": "var(--xmlui-color-Text-placeholder)",
+      "fontStyle-Text-placeholder": "var(--xmlui-fontStyle-Text-placeholder)",
+      "fontWeight-Text-placeholder": "var(--xmlui-fontWeight-Text-placeholder)",
+      "fontSize-Text-placeholder": "var(--xmlui-fontSize-Text-placeholder)",
+      "fontSize-Text-paragraph": "var(--xmlui-fontSize-Text-paragraph)",
+      "paddingVertical-Text-paragraph": "var(--xmlui-paddingVertical-Text-paragraph)",
+      "fontSize-Text-subheading": "var(--xmlui-fontSize-Text-subheading)",
+      "fontWeight-Text-subheading": "var(--xmlui-fontWeight-Text-subheading)",
+      "fontStyle-Text-subheading": "var(--xmlui-fontStyle-Text-subheading)",
+      "letterSpacing-Text-subheading": "var(--xmlui-letterSpacing-Text-subheading)",
+      "textTransform-Text-subheading": "var(--xmlui-textTransform-Text-subheading)",
+      "color-Text-subheading": "var(--xmlui-color-Text-subheading)",
       "marginTop-Text-tableheading": "var(--xmlui-marginTop-Text-tableheading)",
       "marginBottom-Text-tableheading": "var(--xmlui-marginBottom-Text-tableheading)",
-      "marginLeft-Text-tableheading": "var(--xmlui-marginLeft-Text-tableheading)",
-      "marginRight-Text-tableheading": "var(--xmlui-marginRight-Text-tableheading)",
-      "verticalAlign-Text-tableheading": "var(--xmlui-verticalAlign-Text-tableheading)",
-      "marginTop-Text-secondary": "var(--xmlui-marginTop-Text-secondary)",
-      "marginBottom-Text-secondary": "var(--xmlui-marginBottom-Text-secondary)",
-      "marginLeft-Text-secondary": "var(--xmlui-marginLeft-Text-secondary)",
-      "marginRight-Text-secondary": "var(--xmlui-marginRight-Text-secondary)",
-      "verticalAlign-Text-secondary": "var(--xmlui-verticalAlign-Text-secondary)"
+      "paddingHorizontal-Text-tableheading": "var(--xmlui-paddingHorizontal-Text-tableheading)",
+      "fontSize-Text-tableheading": "var(--xmlui-fontSize-Text-tableheading)",
+      "fontWeight-Text-tableheading": "var(--xmlui-fontWeight-Text-tableheading)",
+      "fontSize-Text-secondary": "var(--xmlui-fontSize-Text-secondary)",
+      "color-Text-secondary": "var(--xmlui-color-Text-secondary)"
     },
     "defaultThemeVars": {
       "borderRadius-Text": "$borderRadius",
       "borderStyle-Text": "solid",
       "fontSize-Text": "$fontSize-small",
       "borderWidth-Text": "$space-0",
+      "lineHeight-Text-codefence": "1.5",
       "fontWeight-Text-abbr": "$fontWeight-bold",
       "textTransform-Text-abbr": "uppercase",
       "fontSize-Text-secondary": "$fontSize-small",
@@ -12610,13 +12878,13 @@ export default {
       "textColor-Text": "$textColor-primary",
       "fontFamily-Text": "$fontFamily",
       "fontWeight-Text": "$fontWeight-normal",
-      "fontSize-Text-codefence": "$fontSize-small",
+      "fontSize-Text-codefence": "$fontSize-code",
       "fontFamily-Text-code": "$fontFamily-monospace",
       "fontSize-Text-code": "$fontSize-small",
       "borderWidth-Text-code": "1px",
       "borderStyle-Text-code": "solid",
       "borderRadius-Text-code": "4px",
-      "paddingHorizontal-Text-code": "$space-1",
+      "paddingHorizontal-Text-code": "$space-0_5",
       "paddingBottom-Text-code": "2px",
       "textDecorationLine-Text-deleted": "line-through",
       "textDecorationLine-Text-inserted": "underline",
@@ -12639,7 +12907,7 @@ export default {
       "fontSize-Text-small": "$fontSize-small",
       "lineHeight-Text-small": "$lineHeight-tight",
       "letterSpacing-Text-caption": "0.05rem",
-      "fontSize-Text-placeholder": "$fontSize-small",
+      "fontSize-Text-placeholder": "$fontSize-smaller",
       "fontFamily-Text-codefence": "$fontFamily-monospace",
       "paddingHorizontal-Text-codefence": "$space-3",
       "paddingVertical-Text-codefence": "$space-2",
@@ -12651,24 +12919,27 @@ export default {
       "marginTop-Text-tableheading": "$space-1",
       "marginBottom-Text-tableheading": "$space-4",
       "paddingHorizontal-Text-tableheading": "$space-1",
+      "fontSize-Text-tableheading": "$fontSize-H6",
       "fontWeight-Text-tableheading": "$fontWeight-bold",
       "marginTop-Text-markdown": "$space-3",
       "marginBottom-Text-markdown": "$space-6",
-      "fontSize-Text-markdown": "$fontSize-normal",
-      "backgroundColor-Text-code": "rgba($color-surface-100-rgb, .4)",
-      "borderColor-Text-code": "$color-surface-300",
-      "backgroundColor-Text-keyboard": "rgba($color-surface-100-rgb, .4)",
+      "backgroundColor-Text-code": "rgb(from $color-surface-100 r g b / 0.4)",
+      "borderColor-Text-code": "$color-surface-100",
+      "backgroundColor-Text-keyboard": "rgb(from $color-surface-100 r g b / 0.4)",
       "borderColor-Text-keyboard": "$color-surface-300",
-      "backgroundColor-Text-marked": "yellow",
+      "backgroundColor-Text-marked": "rgb(from $color-primary-200 r g b / 0.4)",
       "color-Text-placeholder": "$color-surface-500",
       "color-Text-codefence": "$color-surface-900",
       "color-Text-subheading": "$textColor-secondary",
-      "color-Text-secondary": "$textColor-secondary"
+      "color-Text-secondary": "$textColor-secondary",
+      "dark": {
+        "backgroundColor-Text-marked": "rgb(from $color-primary-400 r g b / 0.4)"
+      }
     }
   },
   "TextArea": {
-    "status": "experimental",
-    "description": "`TextArea` is a component that provides a multiline text input area.",
+    "status": "stable",
+    "description": "`TextArea` provides a multiline text input area.",
     "props": {
       "enterSubmits": {
         "description": "This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.",
@@ -12681,10 +12952,10 @@ export default {
         "defaultValue": false
       },
       "maxRows": {
-        "description": "This optional property sets the maximum number of text rows the `TextArea` can grow."
+        "description": "This optional property sets the maximum number of text rows the `TextArea` can grow. If not set, the number of rows is unlimited."
       },
       "minRows": {
-        "description": "This optional property sets the minimum number of text rows the `TextArea` can shrink."
+        "description": "This optional property sets the minimum number of text rows the `TextArea` can shrink. If not set, the minimum number of rows is 1."
       },
       "rows": {
         "description": "Specifies the number of rows the component initially has.",
@@ -12697,14 +12968,14 @@ export default {
         "defaultValue": false
       },
       "placeholder": {
-        "description": "A placeholder text that is visible in the input field when its empty.",
+        "description": "An optional placeholder text that is visible in the input field when its empty.",
         "valueType": "string"
       },
       "initialValue": {
         "description": "This property sets the component's initial value."
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -12730,10 +13001,10 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `TextArea`."
+        "description": "This property sets the width of the `TextArea` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `TextArea` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `TextArea` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -12748,7 +13019,8 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "readOnly": {
         "description": "Set this property to `true` to disallow changing the component value.",
@@ -12845,6 +13117,7 @@ export default {
       "Input:outlineStyle-Textarea-default--focus": "var(--xmlui-outlineStyle-Textarea-default--focus)",
       "Input:outlineOffset-Textarea-default--focus": "var(--xmlui-outlineOffset-Textarea-default--focus)",
       "Input:color-placeholder-Textarea-default": "var(--xmlui-color-placeholder-Textarea-default)",
+      "Input:fontSize-placeholder-Textarea-default": "var(--xmlui-fontSize-placeholder-Textarea-default)",
       "Input:borderRadius-Textarea-error": "var(--xmlui-borderRadius-Textarea-error)",
       "Input:borderColor-Textarea-error": "var(--xmlui-borderColor-Textarea-error)",
       "Input:borderWidth-Textarea-error": "var(--xmlui-borderWidth-Textarea-error)",
@@ -12867,6 +13140,7 @@ export default {
       "Input:outlineStyle-Textarea-error--focus": "var(--xmlui-outlineStyle-Textarea-error--focus)",
       "Input:outlineOffset-Textarea-error--focus": "var(--xmlui-outlineOffset-Textarea-error--focus)",
       "Input:color-placeholder-Textarea-error": "var(--xmlui-color-placeholder-Textarea-error)",
+      "Input:fontSize-placeholder-Textarea-error": "var(--xmlui-fontSize-placeholder-Textarea-error)",
       "Input:borderRadius-Textarea-warning": "var(--xmlui-borderRadius-Textarea-warning)",
       "Input:borderColor-Textarea-warning": "var(--xmlui-borderColor-Textarea-warning)",
       "Input:borderWidth-Textarea-warning": "var(--xmlui-borderWidth-Textarea-warning)",
@@ -12889,6 +13163,7 @@ export default {
       "Input:outlineStyle-Textarea-warning--focus": "var(--xmlui-outlineStyle-Textarea-warning--focus)",
       "Input:outlineOffset-Textarea-warning--focus": "var(--xmlui-outlineOffset-Textarea-warning--focus)",
       "Input:color-placeholder-Textarea-warning": "var(--xmlui-color-placeholder-Textarea-warning)",
+      "Input:fontSize-placeholder-Textarea-warning": "var(--xmlui-fontSize-placeholder-Textarea-warning)",
       "Input:borderRadius-Textarea-success": "var(--xmlui-borderRadius-Textarea-success)",
       "Input:borderColor-Textarea-success": "var(--xmlui-borderColor-Textarea-success)",
       "Input:borderWidth-Textarea-success": "var(--xmlui-borderWidth-Textarea-success)",
@@ -12911,24 +13186,26 @@ export default {
       "Input:outlineStyle-Textarea-success--focus": "var(--xmlui-outlineStyle-Textarea-success--focus)",
       "Input:outlineOffset-Textarea-success--focus": "var(--xmlui-outlineOffset-Textarea-success--focus)",
       "Input:color-placeholder-Textarea-success": "var(--xmlui-color-placeholder-Textarea-success)",
+      "Input:fontSize-placeholder-Textarea-success": "var(--xmlui-fontSize-placeholder-Textarea-success)",
       "Input:backgroundColor-Textarea--disabled": "var(--xmlui-backgroundColor-Textarea--disabled)",
       "Input:textColor-Textarea--disabled": "var(--xmlui-textColor-Textarea--disabled)",
       "Input:borderColor-Textarea--disabled": "var(--xmlui-borderColor-Textarea--disabled)"
     }
   },
   "TextBox": {
-    "status": "experimental",
-    "description": "The `TextBox` is an input component that allows users to input and edit textual data.",
+    "status": "stable",
+    "description": "`TextBox` captures user text input for forms, search fields, and data entry with support for validation, icons, and formatting hints.",
     "props": {
       "placeholder": {
-        "description": "A placeholder text that is visible in the input field when its empty.",
+        "description": "An optional placeholder text that is visible in the input field when its empty.",
         "valueType": "string"
       },
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "defaultValue": ""
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -12954,10 +13231,10 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `TextBox`."
+        "description": "This property sets the width of the `TextBox` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `TextBox` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `TextBox` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -12972,7 +13249,8 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "readOnly": {
         "description": "Set this property to `true` to disallow changing the component value.",
@@ -13003,23 +13281,23 @@ export default {
         "defaultValue": "none"
       },
       "startText": {
-        "description": "This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "startIcon": {
-        "description": "This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "endText": {
-        "description": "This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "endIcon": {
-        "description": "This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "gap": {
-        "description": "This property defines the gap between the adornments and the input area."
+        "description": "This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used."
       }
     },
     "events": {
@@ -13068,6 +13346,7 @@ export default {
       "Input:outlineStyle-TextBox-default--focus": "var(--xmlui-outlineStyle-TextBox-default--focus)",
       "Input:outlineOffset-TextBox-default--focus": "var(--xmlui-outlineOffset-TextBox-default--focus)",
       "Input:color-placeholder-TextBox-default": "var(--xmlui-color-placeholder-TextBox-default)",
+      "Input:fontSize-placeholder-TextBox-default": "var(--xmlui-fontSize-placeholder-TextBox-default)",
       "Input:color-adornment-TextBox-default": "var(--xmlui-color-adornment-TextBox-default)",
       "Input:borderRadius-TextBox-error": "var(--xmlui-borderRadius-TextBox-error)",
       "Input:borderColor-TextBox-error": "var(--xmlui-borderColor-TextBox-error)",
@@ -13091,6 +13370,7 @@ export default {
       "Input:outlineStyle-TextBox-error--focus": "var(--xmlui-outlineStyle-TextBox-error--focus)",
       "Input:outlineOffset-TextBox-error--focus": "var(--xmlui-outlineOffset-TextBox-error--focus)",
       "Input:color-placeholder-TextBox-error": "var(--xmlui-color-placeholder-TextBox-error)",
+      "Input:fontSize-placeholder-TextBox-error": "var(--xmlui-fontSize-placeholder-TextBox-error)",
       "Input:color-adornment-TextBox-error": "var(--xmlui-color-adornment-TextBox-error)",
       "Input:borderRadius-TextBox-warning": "var(--xmlui-borderRadius-TextBox-warning)",
       "Input:borderColor-TextBox-warning": "var(--xmlui-borderColor-TextBox-warning)",
@@ -13114,6 +13394,7 @@ export default {
       "Input:outlineStyle-TextBox-warning--focus": "var(--xmlui-outlineStyle-TextBox-warning--focus)",
       "Input:outlineOffset-TextBox-warning--focus": "var(--xmlui-outlineOffset-TextBox-warning--focus)",
       "Input:color-placeholder-TextBox-warning": "var(--xmlui-color-placeholder-TextBox-warning)",
+      "Input:fontSize-placeholder-TextBox-warning": "var(--xmlui-fontSize-placeholder-TextBox-warning)",
       "Input:color-adornment-TextBox-warning": "var(--xmlui-color-adornment-TextBox-warning)",
       "Input:borderRadius-TextBox-success": "var(--xmlui-borderRadius-TextBox-success)",
       "Input:borderColor-TextBox-success": "var(--xmlui-borderColor-TextBox-success)",
@@ -13137,6 +13418,7 @@ export default {
       "Input:outlineStyle-TextBox-success--focus": "var(--xmlui-outlineStyle-TextBox-success--focus)",
       "Input:outlineOffset-TextBox-success--focus": "var(--xmlui-outlineOffset-TextBox-success--focus)",
       "Input:color-placeholder-TextBox-success": "var(--xmlui-color-placeholder-TextBox-success)",
+      "Input:fontSize-placeholder-TextBox-success": "var(--xmlui-fontSize-placeholder-TextBox-success)",
       "Input:color-adornment-TextBox-success": "var(--xmlui-color-adornment-TextBox-success)",
       "Input:backgroundColor-TextBox--disabled": "var(--xmlui-backgroundColor-TextBox--disabled)",
       "Input:textColor-TextBox--disabled": "var(--xmlui-textColor-TextBox--disabled)",
@@ -13167,18 +13449,19 @@ export default {
     }
   },
   "PasswordInput": {
-    "status": "experimental",
-    "description": "The `Password` component is a specialized version of the `TextBox` component that allows users to input and edit passwords.",
+    "status": "stable",
+    "description": "`Password` is a specialized [TextBox](/components/TextBox) that enables users to input and edit passwords.",
     "props": {
       "placeholder": {
-        "description": "A placeholder text that is visible in the input field when its empty.",
+        "description": "An optional placeholder text that is visible in the input field when its empty.",
         "valueType": "string"
       },
       "initialValue": {
-        "description": "This property sets the component's initial value."
+        "description": "This property sets the component's initial value.",
+        "defaultValue": ""
       },
       "label": {
-        "description": "This property sets the label of the component.",
+        "description": "This property sets the label of the component.  If not set, the component will not display a label.",
         "valueType": "string"
       },
       "labelPosition": {
@@ -13204,10 +13487,10 @@ export default {
         "defaultValue": "top"
       },
       "labelWidth": {
-        "description": "This property sets the width of the `TextBox`."
+        "description": "This property sets the width of the `TextBox` component's label. If not defined, the label's width will be determined by its content and the available space."
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the `TextBox` labels can be split into multiple lines if it would overflow the available label width.",
+        "description": "This boolean value indicates if the `TextBox` label can be split into multiple lines if it would overflow the available label width.",
         "valueType": "boolean",
         "defaultValue": false
       },
@@ -13222,7 +13505,8 @@ export default {
       },
       "required": {
         "description": "Set this property to `true` to indicate it must have a value before submitting the containing form.",
-        "valueType": "boolean"
+        "valueType": "boolean",
+        "defaultValue": false
       },
       "readOnly": {
         "description": "Set this property to `true` to disallow changing the component value.",
@@ -13253,23 +13537,23 @@ export default {
         "defaultValue": "none"
       },
       "startText": {
-        "description": "This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "startIcon": {
-        "description": "This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "endText": {
-        "description": "This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional text to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "endIcon": {
-        "description": "This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.",
+        "description": "This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.",
         "valueType": "string"
       },
       "gap": {
-        "description": "This property defines the gap between the adornments and the input area."
+        "description": "This property defines the gap between the adornments and the input area. If not set, the gap declared by the current theme is used."
       }
     },
     "events": {
@@ -13318,6 +13602,7 @@ export default {
       "Input:outlineStyle-TextBox-default--focus": "var(--xmlui-outlineStyle-TextBox-default--focus)",
       "Input:outlineOffset-TextBox-default--focus": "var(--xmlui-outlineOffset-TextBox-default--focus)",
       "Input:color-placeholder-TextBox-default": "var(--xmlui-color-placeholder-TextBox-default)",
+      "Input:fontSize-placeholder-TextBox-default": "var(--xmlui-fontSize-placeholder-TextBox-default)",
       "Input:color-adornment-TextBox-default": "var(--xmlui-color-adornment-TextBox-default)",
       "Input:borderRadius-TextBox-error": "var(--xmlui-borderRadius-TextBox-error)",
       "Input:borderColor-TextBox-error": "var(--xmlui-borderColor-TextBox-error)",
@@ -13341,6 +13626,7 @@ export default {
       "Input:outlineStyle-TextBox-error--focus": "var(--xmlui-outlineStyle-TextBox-error--focus)",
       "Input:outlineOffset-TextBox-error--focus": "var(--xmlui-outlineOffset-TextBox-error--focus)",
       "Input:color-placeholder-TextBox-error": "var(--xmlui-color-placeholder-TextBox-error)",
+      "Input:fontSize-placeholder-TextBox-error": "var(--xmlui-fontSize-placeholder-TextBox-error)",
       "Input:color-adornment-TextBox-error": "var(--xmlui-color-adornment-TextBox-error)",
       "Input:borderRadius-TextBox-warning": "var(--xmlui-borderRadius-TextBox-warning)",
       "Input:borderColor-TextBox-warning": "var(--xmlui-borderColor-TextBox-warning)",
@@ -13364,6 +13650,7 @@ export default {
       "Input:outlineStyle-TextBox-warning--focus": "var(--xmlui-outlineStyle-TextBox-warning--focus)",
       "Input:outlineOffset-TextBox-warning--focus": "var(--xmlui-outlineOffset-TextBox-warning--focus)",
       "Input:color-placeholder-TextBox-warning": "var(--xmlui-color-placeholder-TextBox-warning)",
+      "Input:fontSize-placeholder-TextBox-warning": "var(--xmlui-fontSize-placeholder-TextBox-warning)",
       "Input:color-adornment-TextBox-warning": "var(--xmlui-color-adornment-TextBox-warning)",
       "Input:borderRadius-TextBox-success": "var(--xmlui-borderRadius-TextBox-success)",
       "Input:borderColor-TextBox-success": "var(--xmlui-borderColor-TextBox-success)",
@@ -13387,6 +13674,7 @@ export default {
       "Input:outlineStyle-TextBox-success--focus": "var(--xmlui-outlineStyle-TextBox-success--focus)",
       "Input:outlineOffset-TextBox-success--focus": "var(--xmlui-outlineOffset-TextBox-success--focus)",
       "Input:color-placeholder-TextBox-success": "var(--xmlui-color-placeholder-TextBox-success)",
+      "Input:fontSize-placeholder-TextBox-success": "var(--xmlui-fontSize-placeholder-TextBox-success)",
       "Input:color-adornment-TextBox-success": "var(--xmlui-color-adornment-TextBox-success)",
       "Input:backgroundColor-TextBox--disabled": "var(--xmlui-backgroundColor-TextBox--disabled)",
       "Input:textColor-TextBox--disabled": "var(--xmlui-textColor-TextBox--disabled)",
@@ -13417,7 +13705,7 @@ export default {
     }
   },
   "Theme": {
-    "description": "The `Theme` component provides a way to define a particular theming context for its nested components. The XMLUI framework uses `Theme` to define the default theming context for all of its child components. Theme variables and theme settings only work in this context.",
+    "description": "`Theme` creates styling contexts to customize the appearance of nested components without using CSS.",
     "allowArbitraryProps": true,
     "props": {
       "themeId": {
@@ -13433,20 +13721,24 @@ export default {
         "defaultValue": "light"
       },
       "root": {
-        "description": "This property indicates whether the component is at the root of the application."
+        "description": "This property indicates whether the component is at the root of the application.",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "opaque": true
   },
   "ToneChangerButton": {
-    "status": "experimental",
-    "description": "The `ToneChangerButton` component is a component that allows the user to change the tone of the app.",
+    "status": "stable",
+    "description": "`ToneChangerButton` enables the user to switch between light and dark modes.",
     "props": {
       "lightToDarkIcon": {
-        "description": "The icon displayed when the theme is in light mode and will switch to dark. You can change the default icon for all ToneChangerButton instances with the \"icon.lightToDark:ToneChangerButton\" declaration in the app configuration file."
+        "description": "The icon displayed when the theme is in light mode and will switch to dark. You can change the default icon for all ToneChangerButton instances with the \"icon.lightToDark:ToneChangerButton\" declaration in the app configuration file.",
+        "defaultValue": "lightToDark:ToneChangerButton"
       },
       "darkToLightIcon": {
-        "description": "The icon displayed when the theme is in dark mode and will switch to light. You can change the default icon for all ToneChangerButton instances with the \"icon.darkToLight:ToneChangerButton\" declaration in the app configuration file."
+        "description": "The icon displayed when the theme is in dark mode and will switch to light. You can change the default icon for all ToneChangerButton instances with the \"icon.darkToLight:ToneChangerButton\" declaration in the app configuration file.",
+        "defaultValue": "darkToLight:ToneChangerButton"
       }
     }
   },
@@ -13465,6 +13757,293 @@ export default {
         "description": "The template for each item in the tree.",
         "valueType": "ComponentDef"
       }
+    }
+  },
+  "BarChart": {
+    "description": "`BarChart` displays data as horizontal or vertical bars, supporting both grouped and stacked layouts. It's ideal for comparing values across categories, showing revenue trends, or displaying any quantitative data over time or categories.",
+    "status": "experimental",
+    "docFolder": "Charts/BarChart",
+    "props": {
+      "data": {
+        "description": "This property is used to provide the component with data to display.The data needs to be an array of objects."
+      },
+      "dataKeys": {
+        "description": "This property specifies the keys in the data objects that should be used for rendering the bars.E.g. 'id' or 'key'.",
+        "valueType": "string"
+      },
+      "stacked": {
+        "description": "This property determines how the bars are laid out.If set to `true`, bars with the same category will be stacked on top of each other rather than placed side by side.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "layout": {
+        "description": "This property determines the orientation of the bar chart. The `vertical` variant specifies the horizontal axis as the primary and lays out the bars from left to right. The `horizontal` variant specifies the vertical axis as the primary and has the bars spread from top to bottom.",
+        "valueType": "string",
+        "availableValues": [
+          "horizontal",
+          "vertical"
+        ],
+        "defaultValue": "vertical"
+      },
+      "nameKey": {
+        "description": "Specifies the key in the data objects that will be used to label the different data series.",
+        "valueType": "string"
+      },
+      "hideX": {
+        "description": "Determines whether the X-axis should be hidden. If set to `true`, the axis will not be rendered.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "hideY": {
+        "description": "Determines whether the Y-axis should be hidden. If set to `true`, the axis will not be rendered.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "hideTickX": {
+        "description": "Controls the visibility of the X-axis ticks. If set to `true`, tick labels on the X-axis will be hidden.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "hideTickY": {
+        "description": "Controls the visibility of the Y-axis ticks. If set to `true`, tick labels on the Y-axis will be hidden.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "tickFormatter": {
+        "description": "A function that formats the axis tick labels. It receives a tick value and returns a formatted string."
+      },
+      "showLegend": {
+        "description": "Determines whether the legend should be displayed.",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    }
+  },
+  "DonutChart": {
+    "description": "A derivative of [PieChart](/components/PieChart) with a hollow center.",
+    "status": "experimental",
+    "props": {
+      "data": {
+        "description": "The data to be displayed in the chart. Needs to be an array of objects."
+      },
+      "dataKeys": {
+        "description": "This property specifies the keys in the data objects that should be used for rendering the bars.",
+        "valueType": "string"
+      },
+      "nameKey": {
+        "description": "Specifies the key in the data objects that will be used to label the different data series.",
+        "valueType": "string"
+      },
+      "showLabel": {
+        "description": "Toggles whether to show labels (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "innerRadius": {
+        "description": "Sets the inner radius of the donut chart.",
+        "valueType": "number",
+        "defaultValue": 60
+      },
+      "showLabelList": {
+        "description": "Whether to show labels in a list (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "showLegend": {
+        "description": "Whether to show a legend (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": false
+      }
+    },
+    "themeVars": [],
+    "defaultThemeVars": {
+      "textColor-labelList-PieChart": "$textColor-primary"
+    }
+  },
+  "LabelList": {
+    "description": "`LabelList` adds custom data labels to chart components when automatic labeling isn't sufficient. It's a specialized component for advanced chart customization scenarios where you need precise control over label positioning and appearance.",
+    "status": "experimental",
+    "props": {
+      "key": {
+        "description": "The key that needs to be matched to the data series.",
+        "valueType": "string"
+      },
+      "position": {
+        "description": "The position of the label list",
+        "valueType": "string",
+        "availableValues": [
+          "top",
+          "left",
+          "right",
+          "bottom",
+          "inside",
+          "outside",
+          "insideLeft",
+          "insideRight",
+          "insideTop",
+          "insideBottom",
+          "insideTopLeft",
+          "insideBottomLeft",
+          "insideTopRight",
+          "insideBottomRight",
+          "insideStart",
+          "insideEnd",
+          "end",
+          "center",
+          "centerTop",
+          "centerBottom",
+          "middle"
+        ],
+        "defaultValue": "inside"
+      }
+    },
+    "themeVars": {
+      "textColor-LabelList": "var(--xmlui-textColor-LabelList)"
+    },
+    "defaultThemeVars": {
+      "textColor-LabelList": "$textColor-primary"
+    }
+  },
+  "Legend": {
+    "description": "`Legend` provides a standalone legend for chart components when you need custom positioning or styling beyond the chart's built-in `showLegend` property. Most charts can display legends automatically, but this component offers precise control over legend placement and alignment.",
+    "status": "experimental",
+    "props": {
+      "align": {
+        "description": "The alignment of the legend",
+        "valueType": "string",
+        "availableValues": [
+          "left",
+          "right",
+          "center"
+        ],
+        "defaultValue": "center"
+      },
+      "verticalAlign": {
+        "description": "The vertical alignment of the legend",
+        "valueType": "string",
+        "availableValues": [
+          "top",
+          "bottom",
+          "middle"
+        ],
+        "defaultValue": "bottom"
+      }
+    }
+  },
+  "LineChart": {
+    "description": "`LineChart` displays data as connected points over a continuous axis, ideal for showing trends, changes over time, or relationships between variables. Use it time series data, progress tracking, and comparing multiple data series on the same scale.",
+    "status": "experimental",
+    "props": {
+      "data": {
+        "description": "The data to be displayed in the line chart.It needs to be an array of objects, where each object represents a data point."
+      },
+      "dataKeys": {
+        "description": "This property specifies the keys in the data objects that should be used for rendering the lines.",
+        "valueType": "string"
+      },
+      "nameKey": {
+        "description": "The key in the data objects used for labeling different data series.",
+        "valueType": "string"
+      },
+      "hideX": {
+        "description": "Determines whether the X-axis should be hidden. If set to (`true`), the axis will not be displayed.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "hideTooltip": {
+        "description": "Determines whether the tooltip should be hidden.If set to (`true`), no tooltip will be shown when hovering over data points.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "tickFormatter": {
+        "description": "A function that formats the axis tick labels. It receives a tick value and returns a formatted string."
+      },
+      "showLegend": {
+        "description": "Determines whether the legend should be displayed.",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "marginTop": {
+        "description": "The top margin of the chart"
+      },
+      "marginRight": {
+        "description": "The right margin of the chart"
+      },
+      "marginBottom": {
+        "description": "The bottom margin of the chart"
+      },
+      "marginLeft": {
+        "description": "The left margin of the chart"
+      }
+    }
+  },
+  "PieChart": {
+    "description": "`PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole.",
+    "status": "experimental",
+    "docFolder": "Charts/PieChart",
+    "props": {
+      "data": {
+        "description": "The data to be displayed in the chart. Needs to be an array of objects."
+      },
+      "dataKeys": {
+        "description": "This property specifies the keys in the data objects that should be used for rendering the bars.",
+        "valueType": "string"
+      },
+      "nameKey": {
+        "description": "Specifies the key in the data objects that will be used to label the different data series.",
+        "valueType": "string"
+      },
+      "showLabel": {
+        "description": "Toggles whether to show labels (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": true
+      },
+      "showLabelList": {
+        "description": "Whether to show labels in a list (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": false
+      },
+      "labelListPosition": {
+        "description": "The position of the label list.",
+        "valueType": "string",
+        "defaultValue": "inside",
+        "availableValues": [
+          "top",
+          "left",
+          "right",
+          "bottom",
+          "inside",
+          "outside",
+          "insideLeft",
+          "insideRight",
+          "insideTop",
+          "insideBottom",
+          "insideTopLeft",
+          "insideBottomLeft",
+          "insideTopRight",
+          "insideBottomRight",
+          "insideStart",
+          "insideEnd",
+          "end",
+          "center",
+          "centerTop",
+          "centerBottom",
+          "middle"
+        ]
+      },
+      "width": {
+        "description": "The width of the chart"
+      },
+      "height": {
+        "description": "The height of the chart"
+      },
+      "outerRadius": {
+        "description": "The outer radius of the pie chart, can be a number or a string (e.g., '100%')."
+      }
+    },
+    "themeVars": [],
+    "defaultThemeVars": {
+      "textColor-labelList-PieChart": "$textColor-primary"
     }
   }
 };
