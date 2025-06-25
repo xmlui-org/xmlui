@@ -5,124 +5,101 @@ This document describes how to generate and maintain component reference documen
 ## Overview
 
 XMLUI component reference documentation is generated from multiple sources:
-- **Component Metadata** - TypeScript interfaces, JSDoc comments, and component definitions
-- **Component Documentation Files** - Markdown files with directive-based content injection
+- **Component Metadata** - The XMLUI framework has a particular metadata structure that describes an XMLUI component including its properties, events, exposed methods, and other component traits. Each component must define its metadata.
+- **Component Documentation Files** - Markdown files with directive-based content injection. These files can declare additional metadata content in markdown format, such as code samples, tables, additional explanations, etc. While the component metadata is available within the framework and its tools (and also for external tools), the content in component documentation files is just for generating the reference documentation of components.
+
+## Documentation Generation Workflow
+
+1. **Build component metadata** (`npm run prepare-docs-data`) - Export component metadata to a JSON file
+2. **Start merging script** (`npm run generate-docs`) - Merge component metadata with component documentation files
+3. **Generate individual documentation** - Script processes components one by one to create complete documentation
+4. **Output to docs folder** - Place generated documents into `docs/content/components/`
+5. **Create overview document** - Generate a components overview document and save it to `docs/content/components/`
+
+> **Note**
+> The `npm run generate-docs-with-refresh` command extracts the metadata and runs the generator script in a single command.
+
+## Sample Component Folder Structure
+
+```bash
+xmlui/src/components/
+├── ...
+├── Button/
+│   ├── Button.tsx              # Component implementation (includes metadata) 📖 used for docs
+│   ├── ButtonNative.tsx        # Underlying React component
+│   ├── Button.md               # Component documentation file 📖 used for docs
+│   ├── Button.module.scss      # Component styles
+│   ├── Button.spec.ts          # Component tests
+│   └── Button-style.spec.ts    # Style-specific tests
+├── ...
+├── Text/
+│   ├── Text.tsx                # Component implementation (includes metadata) 📖 used for docs
+│   ├── TextNative.tsx          # Underlying React component
+│   ├── Text.md                 # Component documentation file 📖 used for docs
+│   ├── Text.module.scss        # Component styles
+│   └── Text.spec.ts            # Component tests
+└── ...
+```
 
 The system uses a sophisticated multi-stage process involving npm scripts and Node.js modules to automatically generate comprehensive component documentation.
 
-## Component Documentation Sources
+## Sample Component Metadata
 
-### Core Framework Components
-
-Component metadata is collected from:
-```bash
-xmlui/src/components/collectedComponentMetadata.ts
-```
-
-This file imports and aggregates metadata from individual component files:
 ```typescript
-// Example component metadata structure
-export const collectedComponentMetadata = {
-  Button: ButtonMd,
-  Text: TextMd,
-  Stack: StackMd,
-  // ... all other components
-};
-```
-
-### Extension Package Components
-
-Extension packages define their metadata in:
-```bash
-packages/*/meta/componentsMetadata.ts
-```
-
-Example structure:
-```typescript
-export const componentMetadata = {
-  name: "AnimationPackage",
-  description: "Animation components with React Spring integration",
-  state: "experimental", // or "stable", "deprecated", "internal"
-  metadata: {
-    FadeIn: FadeInMd,
-    SlideOut: SlideOutMd,
-    // ... extension components
+export const AvatarMd = createMetadata({
+  description:
+    "`Avatar` displays a user or entity's profile picture as a circular image, " +
+    "with automatic fallback to initials when no image is provided. It's commonly " +
+    "used in headers, user lists, comments, and anywhere you need to represent a " +
+    "person or organization.",
+  props: {
+    size: {
+      description: `This property defines the display size of the Avatar.`,
+      availableValues: sizeMd,
+      valueType: "string",
+      defaultValue: defaultProps.size,
+    },
+    name: {
+      description:
+        `This property sets the name value the Avatar uses to display initials. If neither ` +
+        "this property nor \`url\` is defined, an empty avatar is displayed.",
+      valueType: "string",
+    },
+    url: {
+      description:
+        `This property specifies the URL of the image to display in the Avatar. ` +
+        "If neither this property nor \`name\` is defined, an empty avatar is displayed.",
+      valueType: "string",
+    },
   },
-};
+  events: {
+    click: d("This event is triggered when the avatar is clicked."),
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`borderRadius-Avatar`]: "4px",
+    [`boxShadow-Avatar`]: "inset 0 0 0 1px rgba(4,32,69,0.1)",
+    [`textColor-Avatar`]: "$textColor-secondary",
+    [`fontWeight-Avatar`]: "$fontWeight-bold",
+    [`border-Avatar`]: "0px solid $color-surface-400A80",
+    [`backgroundColor-Avatar`]: "$color-surface-100",
+  },
+});
 ```
 
-## Documentation Generation Process
+This metadata structure includes:
 
-### NPM Scripts Overview
+- **`description`** - A comprehensive description of the component's purpose and usage
+- **`props`** - Component properties with descriptions, value types, available values, and default values
+- **`events`** - Event handlers the component supports (e.g., click events)
+- **`themeVars`** - Theme variables extracted from the component's SCSS module
+- **`defaultThemeVars`** - Default values for theme variables used for styling customization
 
-The documentation generation involves several coordinated npm scripts:
+The metadata is created using the `createMetadata()` function and exported so it can be collected and processed during documentation generation.
 
-```bash
-# 1. Build metadata from TypeScript definitions
-npm run prepare-docs-data
-# → npm run build:xmlui-metadata (Vite build --mode metadata)
+## Component Documentation File Directives
 
-# 2. Generate component documentation
-npm run generate-docs
-# → node scripts/generate-docs/get-docs.mjs && npm run generate-docs-summaries
-
-# 3. Complete refresh cycle
-npm run generate-docs-with-refresh
-# → npm run prepare-docs-data && npm run generate-docs
-
-# 4. Full documentation build including extensions
-npm run generate-all-docs
-# → npm run build:xmlui-metadata && npm run build:ext-meta && npm run generate-docs
-```
-
-### Metadata Build Process
-
-**Step 1: TypeScript Metadata Extraction**
-```bash
-npm run build:xmlui-metadata
-```
-
-This command uses Vite with `--mode metadata` to:
-- Compile `src/components/collectedComponentMetadata.ts`
-- Extract TypeScript interface definitions
-- Process JSDoc comments and annotations
-- Generate `dist/metadata/xmlui-metadata.mjs`
-
-**Step 2: Extension Metadata Build**
-```bash
-npm run build:ext-meta
-```
-
-Processes extension packages by:
-- Scanning `packages/*/meta/componentsMetadata.ts`
-- Building metadata for each extension package
-- Creating unified metadata structure
-
-### Documentation Generation Pipeline
-
-**Main Entry Point: `get-docs.mjs`**
-
-The script performs these operations:
-1. **Load metadata** from `dist/metadata/xmlui-metadata.mjs`
-2. **Filter components** by properties (e.g., exclude HTML tags)
-3. **Process each component** through `DocsGenerator` class
-4. **Generate summary files** for component collections
-
-**Core Classes:**
-
-**`DocsGenerator` Class:**
-- Orchestrates the documentation generation process
-- Manages metadata expansion and filtering
-- Excludes components by status (e.g., "in progress", "deprecated")
-
-**`MetadataProcessor` Class:**
-- Processes individual component documentation
-- Handles directive-based content injection
-- Manages file I/O and markdown generation
-
-### Directive-Based Documentation System
-
-The system uses special directive markers in markdown files to inject generated content:
+Component documentation files (e.g., `Button.md`) use special directive markers to inject auto-generated content from the component metadata. These directives allow manual documentation to be seamlessly merged with extracted metadata.
 
 **Directive Format:**
 ```markdown
@@ -132,125 +109,74 @@ Content goes here
 ```
 
 **Available Directives:**
-- `%-IMPORT-START` / `%-IMPORT-END` - Import statements
-- `%-DESC-START` / `%-DESC-END` - Component description
-- `%-PROP-START propName` / `%-PROP-END` - Specific property documentation
-- `%-EVENT-START eventName` / `%-EVENT-END` - Event documentation
-- `%-API-START apiName` / `%-API-END` - API method documentation
-- `%-STYLE-START` / `%-STYLE-END` - Styling information
-- `%-CONTEXT_VAR-START` / `%-CONTEXT_VAR-END` - Context variables
 
-**Component Documentation Structure:**
+- **`%-DESC-START` / `%-DESC-END`** - Component description from metadata
+- **`%-PROP-START propName` / `%-PROP-END`** - Specific property documentation with details from metadata
+- **`%-EVENT-START eventName` / `%-EVENT-END`** - Event documentation from metadata
+- **`%-API-START apiName` / `%-API-END`** - API method documentation from metadata
+- **`%-STYLE-START` / `%-STYLE-END`** - Styling information and theme variables
 
-Generated markdown includes these sections:
-1. **Imports** - Import statements with transformed paths
-2. **Component Title** - With anchor ID
-3. **Status Disclaimers** - For experimental/deprecated components
-4. **Parent/Sibling Links** - Component hierarchy navigation
-5. **Description** - From metadata or markdown files
-6. **Context Variables** - Available during execution
-7. **Children Template** - If component supports template children
-8. **Properties** - Auto-generated from TypeScript interfaces
-9. **Events** - Component event handlers
-10. **APIs** - Exposed component methods
-11. **Styling** - Theme variables and style information
+**Example Usage:**
 
-### File Structure and Output
+Here's the actual content from `Avatar.md` showing how directives are used:
 
-**Source Documentation Files:**
-```bash
-docs/content/components/
-├── Button/
-│   ├── Button.md              # Main documentation with directives
-│   └── doc-resources/         # Assets (images, examples)
-└── Text/
-    ├── Text.md
-    └── doc-resources/
+````text
+%-DESC-START
+
+**Key features:**
+- **Automatic fallback**: Shows initials when no image URL is provided or image fails to load
+- **Multiple sizes**: From `xs` (extra small) to `lg` (large) to fit different contexts
+- **Clickable**: Supports click events for profile actions, modals, or navigation
+- **Accessible**: Automatically generates appropriate alt text from the name
+
+%-DESC-END
+
+%-PROP-START name
+
+```xmlui-pg copy display name="Example: name"
+<App>
+  <Avatar name="John, Doe" />
+</App>
+```
+%-PROP-END
+
+%-PROP-START size
+
+```xmlui-pg copy display name="Example: size"
+<App>
+  <HStack>
+    <Avatar name="Dorothy Ellen Fuller" />
+    <Avatar name="Xavier Schiller" size="xs" />
+    <Avatar name="Sebastien Moore" size="sm" />
+    <Avatar name="Molly Dough" size="md" />
+    <Avatar name="Lynn Gilbert" size="lg" />
+  </HStack>
+</App>
 ```
 
-**Generated Output:**
-```bash
-docs/pages/components/
-├── Button.md                  # Complete generated documentation
-├── Text.md
-└── _overview.md              # Component summary/index
+%-PROP-END
+
+%-PROP-START url
+
+```xmlui-pg copy display name="Example: url"
+<App>
+  <Avatar url="https://i.pravatar.cc/100" size="md" />
+</App>
 ```
 
-### Configuration Files
+%-PROP-END
 
-**Component Configuration:**
-```bash
-scripts/generate-docs/components-config.json
-```
-```json
-{
-  "excludeComponentStatuses": ["in progress", "deprecated"],
-  "cleanFolder": true
-}
-```
+%-EVENT-START click
 
-**Folder Paths:**
-```bash
-scripts/generate-docs/folders.mjs
-```
-Defines all paths used in the generation process.
-
-### Advanced Features
-
-**Import Path Transformation:**
-- Automatically processes import statements in documentation
-- Transforms relative paths for generated files
-- Copies referenced assets to appropriate locations
-
-**Theme Variable Documentation:**
-- Extracts CSS custom properties from component styles
-- Auto-generates theme variable tables
-- Links to styling documentation
-
-**Component Hierarchy:**
-- Processes `specializedFrom` relationships
-- Generates parent/child component links
-- Creates component family navigation
-
-**Status-Based Filtering:**
-- Excludes components by development status
-- Supports: "stable", "experimental", "deprecated", "in progress", "internal"
-
-### Example Component Metadata
-
-```typescript
-export const ButtonMd = createMetadata({
-  description: "A versatile button component for user interactions",
-  status: "stable",
-  props: {
-    variant: {
-      description: "Visual style variant",
-      valueType: "string",
-      availableValues: ["default", "primary", "secondary", "danger"],
-      defaultValue: "default",
-    },
-    disabled: {
-      description: "Whether button is disabled",
-      valueType: "boolean", 
-      defaultValue: false,
-    },
-    onClick: {
-      description: "Click event handler",
-      valueType: "function",
-    },
-  },
-  events: {
-    click: {
-      description: "Fired when button is clicked",
-    },
-  },
-  apis: {
-    focus: {
-      description: "Programmatically focus the button",
-    },
-  },
-});
+```xmlui-pg copy display name="Example: click"
+<App>
+  <HStack verticalAlignment="center">
+    <Avatar name="Molly Dough" size="md" onClick="toast('Avatar clicked')" />
+    Click the avatar!
+  </HStack>
+</App>
 ```
 
-This comprehensive system ensures that component documentation stays synchronized with the codebase while allowing for rich, manually-authored content through the directive system.
+%-EVENT-END
+````
 
