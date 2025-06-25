@@ -376,7 +376,49 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 - **`renderChild`**: Renders nested XMLUI content
 - **`layoutCss`**: Provides XMLUI layout styling
 
-## Step 5: Register the Component
+## Step 5: Add Event Handling
+
+To demonstrate event handling, you need to define the event handler functions first. These functions can live in your `index.html` file or in [code-behind files](/code). For this documentation site, we define them in `index.html` as we do for other global functions.
+
+### Add event handlers
+
+The XMLUI documentation site already includes these functions in its `index.html`:
+
+```javascript
+window.handleHelloClick = function(event) {
+  console.log('Hello World clicked!', event);
+  alert('Button clicked!');
+};
+
+window.handleHelloReset = function(event) {
+  console.log('Hello World reset!', event);
+  alert('Counter was reset!');
+};
+```
+
+### Use the event handlers
+
+Now you can use the HelloWorld component with event handling:
+
+```xmlui-pg display
+<App>
+  <HelloWorld
+    message="Event handling example"
+    onClick="handleHelloClick"
+    onReset="handleHelloReset"
+  />
+</App>
+```
+
+**What happens:**
+- Clicking the button triggers `handleHelloClick` with the DOM event
+- Clicking reset triggers `handleHelloReset` with the DOM event
+- Both functions show alerts and log to console
+- The component's internal state still works (counter increments/resets)
+
+**Note:** Event handler functions can be defined in your `index.html` file (as shown) or in [code-behind files](/code). See the [Code guide](/code) for more details on organizing JavaScript functions in XMLUI applications.
+
+## Step 6: Register the Component
 
 Add your component to `xmlui/src/components/ComponentProvider.tsx`.
 
@@ -398,7 +440,7 @@ if (process.env.VITE_USED_COMPONENTS_HelloWorld !== "false") {
 }
 ```
 
-## Step 6: Test Your Component
+## Step 7: Test Your Component
 
 You can now use your HelloWorld component in XMLUI markup:
 
@@ -427,12 +469,9 @@ Try these examples in the XMLUI playground:
     <!-- Theme variant -->
     <HelloWorld message="Success theme" theme="success" />
 
-
   </VStack>
 </App>
 ```
-
-
 ## Common Patterns Explained
 
 ### Value Extraction
@@ -453,13 +492,60 @@ const [clickCount, setClickCount] = useState(0);
 ```
 
 ### Event Handling
-Handle events with standard React patterns:
+XMLUI components can expose events that XMLUI apps can handle. This involves several steps:
 
+**1. Add event props to your component's Props interface:**
 ```tsx
-const handleClick = () => {
-  setClickCount(clickCount + 1);
+type Props = {
+  // ... other props
+  onClick?: string;
+  onReset?: string;
 };
 ```
+
+**2. Use event handler props in your component:**
+```tsx
+const handleClick = () => {
+  const newCount = clickCount + 1;
+  setClickCount(newCount);
+  // Call XMLUI event handler if provided
+  onClick?.();
+};
+
+const handleReset = () => {
+  setClickCount(0);
+  // Call XMLUI event handler if provided
+  onReset?.();
+};
+```
+
+**3. Declare events in your component metadata:**
+```tsx
+events: {
+  onClick: {
+    description: "Triggered when the click button is pressed. Receives the current click count.",
+    type: "function",
+  },
+  onReset: {
+    description: "Triggered when the reset button is pressed. Called when count is reset to 0.",
+    type: "function",
+  },
+},
+```
+
+**4. Use lookupEventHandler in the renderer:**
+```tsx
+// In the renderer function
+return (
+  <HelloWorld
+    onClick={lookupEventHandler("onClick")}
+    onReset={lookupEventHandler("onReset")}
+    // ... other props
+  />
+);
+```
+
+This pattern allows XMLUI apps to handle component events while maintaining the component's internal behavior.
 
 ### Conditional Rendering
 Use React conditional rendering for dynamic content:

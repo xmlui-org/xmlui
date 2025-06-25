@@ -170,6 +170,16 @@
       return results;
     }
 
+    window.handleHelloClick = function(event) {
+      console.log('Hello World clicked!', event);
+      alert('Button clicked!');
+    };
+
+    window.handleHelloReset = function(event) {
+      console.log('Hello World reset!', event);
+      alert('Counter was reset!');
+    };
+
   </script>
 </body>
 

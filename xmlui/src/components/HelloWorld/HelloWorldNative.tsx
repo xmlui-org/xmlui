@@ -9,6 +9,8 @@ type Props = {
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
+  onClick?: (event: React.MouseEvent) => void;
+  onReset?: (event: React.MouseEvent) => void;
 };
 
 export const defaultProps: Partial<Props> = {
@@ -25,19 +27,25 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
       children,
       style,
       className,
+      onClick,
+      onReset,
       ...rest
     },
     ref
   ) {
     const [clickCount, setClickCount] = useState(0);
 
-    const handleClick = () => {
+    const handleClick = (event: React.MouseEvent) => {
       const newCount = clickCount + 1;
       setClickCount(newCount);
+      // Call XMLUI event handler if provided
+      onClick?.(event);
     };
 
-    const handleReset = () => {
+    const handleReset = (event: React.MouseEvent) => {
       setClickCount(0);
+      // Call XMLUI event handler if provided
+      onReset?.(event);
     };
 
     return (

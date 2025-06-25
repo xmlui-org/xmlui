@@ -30,6 +30,16 @@ export const HelloWorldMd = createMetadata({
       ],
     },
   },
+  events: {
+    onClick: {
+      description: "Triggered when the click button is pressed. Receives the current click count.",
+      type: "function",
+    },
+    onReset: {
+      description: "Triggered when the reset button is pressed. Called when count is reset to 0.",
+      type: "function",
+    },
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     // Standard HelloWorld theme variables with visible defaults
@@ -50,12 +60,14 @@ export const HelloWorldMd = createMetadata({
 export const helloWorldComponentRenderer = createComponentRenderer(
   COMP,
   HelloWorldMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
         message={extractValue.asOptionalString(node.props.message)}
         theme={extractValue.asOptionalString(node.props.theme)}
+        onClick={lookupEventHandler("onClick")}
+        onReset={lookupEventHandler("onReset")}
         style={layoutCss}
       >
         {renderChild(node.children)}
