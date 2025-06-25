@@ -5,13 +5,13 @@
         </H1>
         <Markdown>
             <![CDATA[
-We've seen how XMLUI enables reactive data binding without requiring you to master React's complexity. The same principle applies to layout and style: XMLUI's theme system ensures that your apps look good and behave gracefully without requiring you to master the complexity of CSS (Cascading Style Sheets). We are using a custom theme called `earthtone`. Use the dropdown to switch to the default theme. Then use the [ToneChangerButton](/components/ToneChangerButton) to switch between light and dark modes.
+We've seen how XMLUI enables reactive data binding without requiring you to master React's complexity. The same principle applies to layout and style: XMLUI's theme system ensures that your apps look good and behave gracefully without requiring you to master the complexity of CSS (Cascading Style Sheets). You can use the dropdown to switch from the default theme (`xmlui`) to one called `earthtone`. Then use the [ToneChangerButton](/components/ToneChangerButton) to switch between light and dark modes.
 ]]>
         </Markdown>
         <HStack>
-            <Select id="pickTheme" width="30%" initialValue="default" onDidChange="{ (newTheme) => setTheme(newTheme) }">
+            <Select id="pickTheme" width="30%" initialValue="xmlui" onDidChange="{ (newTheme) => setTheme(newTheme) }">
                 <Option value="earthtone" label="earthtone"/>
-                <Option value="default" label="xmlui"/>
+                <Option value="xmlui" label="xmlui"/>
             </Select>
             <ToneChangerButton/>
         </HStack>
@@ -89,7 +89,7 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
                 </Theme>
             </Stack>
             <Stack width="*">
-                <Theme themeId="default">
+                <Theme themeId="xmlui">
                     <Card>
                         <Badge variant="pill">
                             xmlui

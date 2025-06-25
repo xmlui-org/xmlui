@@ -12,6 +12,7 @@ import html from "@shikijs/langs/html";
 import xmluiGrammar from "./syntax/grammar.tmLanguage.json";
 import xmluiThemeLight from "./syntax/textMate/xmlui-light.json";
 import xmluiThemeDark from "./syntax/textMate/xmlui-dark.json";
+import EarthtoneTheme from "./themes/earthtone";
 
 import { unified } from "unified";
 import remarkParse from "remark-parse";
@@ -259,7 +260,8 @@ function buildTreeFromPathsAndMeta(
 const groupedNavPanelContent = buildTreeFromPathsAndMeta(navPanelContent, metaJsons);
 const App: StandaloneAppDescription = {
   name: "XMLUI docs",
-  defaultTheme: "default",
+  defaultTheme: "xmlui",
+  themes: [EarthtoneTheme],
   resources: {
     logo: "/resources/logo.svg",
     "logo-dark": "/resources/logo-dark.svg",

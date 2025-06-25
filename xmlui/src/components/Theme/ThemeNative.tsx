@@ -69,9 +69,20 @@ export function Theme({
   const { activeTheme, activeThemeTone } = useTheme();
   const themeTone = tone || activeThemeTone;
   const currentTheme: ThemeDefinition = useMemo(() => {
+    if (id === "default") {
+      console.error('Theme "default" requested - call stack:', new Error().stack);
+      console.error('Theme debugging - id prop value:', id);
+      console.error('Available themes:', themes.map(t => t.id));
+    }
     const themeToExtend = id ? themes.find((theme) => theme.id === id)! : activeTheme;
     if (!themeToExtend) {
-      throw new Error("Theme not found");
+      console.error('Theme debugging info:', {
+        requestedThemeId: id,
+        availableThemes: themes.map(t => t.id),
+        activeTheme: activeTheme?.id,
+        themesCount: themes.length
+      });
+      throw new Error(`Theme not found: requested="${id}", available=[${themes.map(t => t.id).join(', ')}]`);
     }
     const foundTheme = {
       ...themeToExtend,
@@ -122,15 +133,15 @@ export function Theme({
       @media (min-width: calc(${maxWidthLandscapePhone} + 1px)) {
           --screenSize: 2;
       }
-  
+
       @media (min-width: calc(${maxWidthTablet} + 1px)) {
           --screenSize: 3;
       }
-  
+
       @media (min-width: calc(${maxWidthDesktop} + 1px)) {
           --screenSize: 4;
       }
-  
+
       @media (min-width: calc(${maxWidthLargeDesktop} + 1px)) {
           --screenSize: 5;
       }

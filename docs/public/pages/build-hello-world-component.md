@@ -10,7 +10,6 @@ By the end of this guide, you'll have created a HelloWorld component that:
 
 - Displays a customizable greeting message
 - Features an interactive click counter
-- Supports theme variants (default, success)
 - Uses XMLUI's standard theming system
 - Supports nested children content
 - Follows all XMLUI patterns and conventions
@@ -55,7 +54,6 @@ import styles from "./HelloWorld.module.scss";
 type Props = {
   id?: string;
   message?: string;
-  theme?: "default" | "success";
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
@@ -67,7 +65,6 @@ type Props = {
 
 export const defaultProps: Partial<Props> = {
   message: "Hello, World!",
-  theme: "default",
 };
 
 export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
@@ -75,7 +72,6 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
     {
       id,
       message = defaultProps.message,
-      theme = defaultProps.theme,
       children,
       style,
       className,
@@ -125,9 +121,7 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
         {...rest}
         id={id}
         ref={ref}
-        className={classnames(className, styles.helloWorld, {
-          [styles.success]: theme === "success",
-        })}
+        className={classnames(className, styles.helloWorld)}
         style={style}
       >
         <div className={styles.content}>
@@ -206,10 +200,6 @@ $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composeTextVars($themeVars, $component, $component);
 
-// Add success theme variant
-$themeVars: t.composeBorderVars($themeVars, "#{$component}-success");
-$themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
-
 .helloWorld {
   @include t.paddingVars($themeVars, $component);
   @include t.borderVars($themeVars, $component);
@@ -219,11 +209,6 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
   font-family: system-ui, -apple-system, sans-serif;
   transition: all 0.2s ease-in-out;
   max-width: 400px;
-
-  &.success {
-    @include t.borderVars($themeVars, "#{$component}-success");
-    @include t.textVars($themeVars, "#{$component}-success");
-  }
 }
 
 .content {
@@ -323,9 +308,9 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
 - **`:export { themeVars: t.json-stringify($themeVars); }`** - Export variables for XMLUI's runtime system
 
 **Theme Variants:**
-- Create variants by composing additional theme variable sets (e.g., `"#{$component}-success"`)
-- Apply variants using SCSS classes and mixins
-- This ensures consistent theming across all component states
+- Create variants by wrapping components with `<Theme>` elements and custom theme variables
+- Use XMLUI's built-in theme system rather than component-specific props
+- This ensures consistent theming across all components
 
 **Why This Approach:**
 - **Consistency** - All XMLUI components use the same theming patterns
@@ -335,18 +320,32 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
 
 ### Test Theme Variants
 
-With the theming system in place, you can test the theme variants:
+With the theming system in place, you can test different themes using XMLUI's `<Theme>` component:
 
 ```xmlui-pg display
 <App>
   <VStack spacing="4">
-    <HelloWorld message="Default theme" />
-    <HelloWorld message="Success theme" theme="success" />
+      <HelloWorld message="Default theme" />
+
+    <Theme themeId="earthtone">
+      <HelloWorld message="Earthtone theme" />
+    </Theme>
+
+    <Theme themeId="earthtone"
+      backgroundColor-HelloWorld="$color-success-50"
+      borderColor-HelloWorld="$color-success-200"
+      textColor-HelloWorld="$color-success-800"
+    >
+      <HelloWorld message="Custom success styling" />
+    </Theme>
   </VStack>
 </App>
 ```
 
-This demonstrates how the theme variants change the visual appearance using the XMLUI theming system.
+This demonstrates the proper XMLUI theming approach:
+- Using `themeId` to switch between built-in themes (xmlui, earthtone)
+- Customizing individual theme variables for specific styling
+- No need for component-specific theme props
 
 ## Step 4: Create Component Metadata and Renderer
 
@@ -377,14 +376,6 @@ export const HelloWorldMd = createMetadata({
       type: "string",
       defaultValue: defaultProps.message,
     },
-    theme: {
-      description: "Sets the visual theme of the component.",
-      type: "string",
-      availableValues: [
-        { value: "default", description: "Default theme" },
-        { value: "success", description: "Success theme (green)" },
-      ],
-    },
   },
   events: {
     onClick: {
@@ -410,11 +401,6 @@ export const HelloWorldMd = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`padding-${COMP}`]: "$space-4",
     [`textColor-${COMP}`]: "$color-primary",
-
-    // Success theme variant
-    [`backgroundColor-${COMP}-success`]: "$color-success-50",
-    [`borderColor-${COMP}-success`]: "$color-success-200",
-    [`textColor-${COMP}-success`]: "$color-success-800",
   },
 });
 
@@ -426,7 +412,6 @@ export const helloWorldComponentRenderer = createComponentRenderer(
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
         message={extractValue.asOptionalString(node.props.message)}
-        theme={extractValue.asOptionalString(node.props.theme)}
         onClick={lookupEventHandler("onClick")}
         onReset={lookupEventHandler("onReset")}
         registerComponentApi={registerComponentApi}
@@ -597,7 +582,6 @@ export const helloWorldComponentRenderer = createComponentRenderer(
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
         message={extractValue.asOptionalString(node.props.message)}
-        theme={extractValue.asOptionalString(node.props.theme)}
         onClick={lookupEventHandler("onClick")}
         onReset={lookupEventHandler("onReset")}
         registerComponentApi={registerComponentApi}
@@ -795,31 +779,22 @@ Generates: `textColor-{component}`, `backgroundColor-{component}`, `fontSize-{co
 
 ### Creating Theme Variants
 
-To create theme variants (like our "success" theme), compose additional variable sets with variant names:
+To create different visual styles, use XMLUI's `<Theme>` component with custom theme variables:
 
-```scss
-// Standard variables
-$themeVars: t.composeBorderVars($themeVars, $component);
-$themeVars: t.composeTextVars($themeVars, $component, $component);
-
-// Success variant
-$themeVars: t.composeBorderVars($themeVars, "#{$component}-success");
-$themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
+```xmlui
+<Theme
+  backgroundColor-HelloWorld="$color-success-50"
+  borderColor-HelloWorld="$color-success-200"
+  textColor-HelloWorld="$color-success-800"
+>
+  <HelloWorld message="Success styling" />
+</Theme>
 ```
 
-Then apply them conditionally in your styles:
-
-```scss
-.helloWorld {
-  @include t.borderVars($themeVars, $component);
-  @include t.textVars($themeVars, $component);
-
-  &.success {
-    @include t.borderVars($themeVars, "#{$component}-success");
-    @include t.textVars($themeVars, "#{$component}-success");
-  }
-}
-```
+This approach:
+- Uses XMLUI's built-in theming system
+- Allows unlimited customization without component changes
+- Maintains consistency with other XMLUI components
 
 ### Default Theme Variables
 
@@ -839,11 +814,6 @@ defaultThemeVars: {
   // Use design tokens
   [`borderRadius-${COMP}`]: "$borderRadius",
   [`borderStyle-${COMP}`]: "solid",
-
-  // Variant defaults
-  [`backgroundColor-${COMP}-success`]: "$color-success-50",
-  [`borderColor-${COMP}-success`]: "$color-success-200",
-  [`textColor-${COMP}-success`]: "$color-success-800",
 }
 ```
 
@@ -863,7 +833,7 @@ defaultThemeVars: {
 
 1. **Default State**: Verify the component renders correctly with no props
 2. **Custom Props**: Test each prop individually and in combination
-3. **Theme Variants**: Ensure all theme variants render correctly
+3. **Theme Customization**: Test with different `<Theme>` wrappers and theme variables
 4. **Children Content**: Test with various types of nested content
 5. **Interactive Behavior**: Test all interactive features (clicks, state changes)
 6. **Edge Cases**: Test with empty strings, very long text, etc.
@@ -877,7 +847,7 @@ You've successfully created a complete XMLUI component that demonstrates:
 - **Theming System**: Full integration with XMLUI's standardized theming approach
 - **Interactive Features**: State management and event handling
 - **Component Metadata**: Type-safe prop definitions and documentation
-- **Theme Variants**: Multiple visual styles using XMLUI theming patterns
+- **Theme Customization**: Using XMLUI's `<Theme>` component for visual styling
 - **Children Support**: Rendering nested XMLUI content
 
 This foundation will serve you well as you build more complex XMLUI components. The patterns demonstrated here scale to components of any complexity while maintaining consistency with the broader XMLUI ecosystem.
