@@ -1,7 +1,7 @@
 import { basename, join, extname, relative } from "path";
 import { lstatSync } from "fs";
-import { unlink, readdir, readFile, mkdir, writeFile, rm } from "fs/promises";
-import { ErrorWithSeverity, logger, LOGGER_LEVELS, processError } from "./logger.mjs";
+import { unlink, readdir, mkdir, writeFile, rm } from "fs/promises";
+import { ErrorWithSeverity, LOGGER_LEVELS } from "./logger.mjs";
 import { winPathToPosix, deleteFileIfExists, fromKebabtoReadable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.mjs";
@@ -12,25 +12,21 @@ import {
   COMPONENT_STATES,
   FILE_EXTENSIONS,
   FOLDER_NAMES,
-  CONFIG_FILES,
   SUMMARY_CONFIG,
   PACKAGE_PATTERNS,
-  FILE_NAMES,
-  LOG_MESSAGES,
-  ERROR_MESSAGES,
   METADATA_PROPERTIES,
   TEMPLATE_STRINGS,
-  ERROR_HANDLING
+  ERROR_HANDLING,
+  URL_REFERENCES
 } from "./constants.mjs";
-import { handleFatalError, handleNonFatalError, withErrorHandling } from "./error-handling.mjs";
+import { handleNonFatalError, withErrorHandling } from "./error-handling.mjs";
 import { createScopedLogger } from "./logging-standards.mjs";
-import loadConfig from "./input-handler.mjs";
 
 // --- Main
 
 // Prefilter metadata by isHtmlTag
 const filterByProps = { [METADATA_PROPERTIES.IS_HTML_TAG]: true };
-const [components, htmlTagComponents] = partitionMetadata(
+const [components, ] = partitionMetadata(
   collectedComponentMetadata,
   filterByProps,
 );
@@ -160,6 +156,8 @@ async function generateComponents(metadata) {
   metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
 
   await metadataGenerator.generatePermalinksForHeaders();
+
+  await metadataGenerator.createMetadataJsonForLanding(URL_REFERENCES.DOCS, "components");
 }
 
 // NOTE: Unused - we are not generating Html component docs
