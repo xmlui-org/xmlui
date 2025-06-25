@@ -71,6 +71,10 @@ class Logger {
 
   info(...args) {}
   warning(...args) {}
+  warn(...args) {
+    // Alias for warning() for consistency
+    this.warning(...args);
+  }
   error(...args) {}
 
   _logInfo(...args) {

@@ -2,13 +2,16 @@ import { join, dirname } from "path";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { collectedThemes, collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.mjs";
-import { logger } from "./logger.mjs";
 import { ERROR_HANDLING, ERROR_MESSAGES } from "./constants.mjs";
 import { handleFatalError, validateDependencies, withFileErrorHandling } from "./error-handling.mjs";
+import { createScopedLogger } from "./logging-standards.mjs";
 
 const OUTPUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../../dist/themes");
+const logger = createScopedLogger("ThemeGenerator");
 
 async function generateThemeFiles() {
+  logger.operationStart("theme file generation");
+  
   try {
     // --- Create the output folder
     if (!existsSync(OUTPUT_DIR)) {
@@ -38,7 +41,7 @@ async function generateThemeFiles() {
         const component = collectedComponentMetadata[key];
         const { themeVars, defaultThemeVars } = component;
 
-        logger.info(`Processing component: ${key}`);
+        logger.componentProcessing(key);
 
         if (themeVars) {
           // --- Component-specific theme variables
@@ -104,7 +107,7 @@ async function generateThemeFiles() {
         2,
       );
 
-      logger.info(`Writing theme file: ${themePath}`);
+      logger.fileWritten(themePath);
 
       await withFileErrorHandling(
         () => writeFileSync(themePath, themeContent),
@@ -113,6 +116,8 @@ async function generateThemeFiles() {
       );
     }
 
+    logger.operationComplete("theme file generation");
+    
   } catch (error) {
     handleFatalError(error, ERROR_HANDLING.EXIT_CODES.GENERAL_ERROR, "theme file generation");
   }

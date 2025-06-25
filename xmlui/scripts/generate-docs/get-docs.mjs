@@ -22,6 +22,7 @@ import {
   ERROR_HANDLING
 } from "./constants.mjs";
 import { handleFatalError, handleNonFatalError, withErrorHandling } from "./error-handling.mjs";
+import { createScopedLogger } from "./logging-standards.mjs";
 import loadConfig from "./input-handler.mjs";
 
 // --- Main
@@ -39,10 +40,12 @@ await generateComponents(components);
 // const packagesMetadata = await dynamicallyLoadExtensionPackages();
 // await generateExtenionPackages(packagesMetadata);
 
+const mainLogger = createScopedLogger("DocsGenerator");
+
 // --- Helpers
 
 async function generateExtenionPackages(metadata) {
-  logger.info(LOG_MESSAGES.GENERATING_EXTENSION_DOCS);
+  mainLogger.operationStart("extension documentation generation");
 
   const extensionsConfig = await loadConfig(join(FOLDERS.script, CONFIG_FILES.EXTENSIONS));
   const outputFolder = join(FOLDERS.docsRoot, FOLDER_NAMES.CONTENT, FOLDER_NAMES.EXTENSIONS);
@@ -172,7 +175,8 @@ async function generateHtmlTagComponents(metadata) {
 }
 
 async function cleanFolder(folderToClean) {
-  logger.info(LOG_MESSAGES.CLEANING_FOLDER(basename(folderToClean)));
+  const cleanLogger = createScopedLogger("FolderCleaner");
+  cleanLogger.operationStart(`cleaning folder: ${basename(folderToClean)}`);
 
   if (!existsSync(folderToClean)) return;
 
@@ -188,7 +192,7 @@ async function cleanFolder(folderToClean) {
 
     await Promise.all(unlinkPromises)
       .then(() => {
-        logger.info(LOG_MESSAGES.FILES_DELETED_SUCCESS);
+        cleanLogger.operationComplete("file deletion");
       })
       .catch((err) => {
         throw new ErrorWithSeverity(err.message, LOGGER_LEVELS.error);
@@ -207,7 +211,8 @@ async function cleanFolder(folderToClean) {
  * >>} imported metadata
  */
 async function dynamicallyLoadExtensionPackages() {
-  logger.info(LOG_MESSAGES.LOADING_EXTENSION_PACKAGES);
+  const packageLogger = createScopedLogger("PackageLoader");
+  packageLogger.operationStart("loading extension packages");
 
   const defaultPackageState = COMPONENT_STATES.EXPERIMENTAL;
 
@@ -230,7 +235,7 @@ async function dynamicallyLoadExtensionPackages() {
     try {
       const packageFolderDist = join(dir, FOLDER_NAMES.DIST);
       if (!existsSync(packageFolderDist)) {
-        logger.warning(LOG_MESSAGES.NO_DIST_FOLDER(dir));
+        packageLogger.warn(`No dist folder found for package: ${dir}`);
         continue;
       }
       const distContents = await readdir(packageFolderDist);
@@ -240,15 +245,11 @@ async function dynamicallyLoadExtensionPackages() {
           filePath = winPathToPosix(relative(FOLDERS.script, filePath));
           const { componentMetadata } = await import(filePath);
           if (!componentMetadata) {
-            logger.warning(
-              LOG_MESSAGES.NO_METADATA_OBJECT(basename(dir))
-            );
+            packageLogger.warn(`No metadata object found for package: ${basename(dir)}`);
             continue;
           }
           if (!componentMetadata.metadata) {
-            logger.warning(
-              LOG_MESSAGES.NO_COMPONENT_METADATA(basename(dir))
-            );
+            packageLogger.warn(`No component metadata found for package: ${basename(dir)}`);
             continue;
           }
 
@@ -259,10 +260,10 @@ async function dynamicallyLoadExtensionPackages() {
       }
       // Ignore internal packages
       if (extensionPackage.state === COMPONENT_STATES.INTERNAL) {
-        logger.info(LOG_MESSAGES.SKIPPING_INTERNAL_PACKAGE, dir);
+        packageLogger.packageSkipped(dir, "internal package");
         continue;
       }
-      logger.info(LOG_MESSAGES.LOADED_EXTENSION_PACKAGE, basename(dir));
+      packageLogger.packageLoaded(basename(dir));
       importedMetadata[basename(dir)] = extensionPackage;
     } catch (error) {
       handleNonFatalError(error, `loading extension package: ${basename(dir)}`);

@@ -1,7 +1,7 @@
 import { writeFileSync, statSync } from "fs";
 import { basename, extname } from "path";
 import { gatherAndRemoveDuplicates, toNormalizedUpperCase, traverseDirectory } from "./utils.mjs";
-import { logger } from "./logger.mjs";
+import { createScopedLogger } from "./logging-standards.mjs";
 import { DOWNLOADS_MAP_CONFIG } from "./constants.mjs";
 
 const baseUrlCutoff = DOWNLOADS_MAP_CONFIG.BASE_URL_CUTOFF;
@@ -13,6 +13,8 @@ const includedFileExtensions = DOWNLOADS_MAP_CONFIG.INCLUDED_FILE_EXTENSIONS;
  * @param {string} outFilePathAndName The path and name of the output file (use UNIX delimiters)
  */
 export function buildDownloadsMap(downloadsFolder, outFilePathAndName) {
+  const logger = createScopedLogger("DownloadsMapBuilder");
+  logger.operationStart("building downloads map");
   const downloads = [];
   traverseDirectory({ name: "", path: downloadsFolder }, (item, _) => {
     /**
@@ -37,9 +39,9 @@ export function buildDownloadsMap(downloadsFolder, outFilePathAndName) {
 
   const { filtered, duplicates } = gatherAndRemoveDuplicates(downloads);
   if (duplicates.length) {
-    logger.warning(`Duplicate entries found when collecting download IDs and paths:`);
+    logger.warn(`Duplicate entries found when collecting download IDs and paths:`);
     duplicates.forEach((item) => {
-      logger.warning(`Removed duplicate ID: ${item.id} - Path: ${item.path}`);
+      logger.warn(`Removed duplicate ID: ${item.id} - Path: ${item.path}`);
     });
   }
 
