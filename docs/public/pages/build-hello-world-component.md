@@ -10,7 +10,6 @@ By the end of this guide, you'll have created a HelloWorld component that:
 
 - Displays a customizable greeting message
 - Features an interactive click counter
-- Supports theme variants (default, success)
 - Uses XMLUI's standard theming system
 - Supports nested children content
 - Follows all XMLUI patterns and conventions
@@ -46,22 +45,26 @@ All XMLUI components follow this structure with the component name as the direct
 Create `xmlui/src/components/HelloWorld/HelloWorldNative.tsx`:
 
 ```xmlui copy
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import classnames from "classnames";
+import { useEvent } from "../../components-core/utils/misc";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import styles from "./HelloWorld.module.scss";
 
 type Props = {
   id?: string;
   message?: string;
-  theme?: "default" | "success";
   children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
+  onClick?: (event: React.MouseEvent) => void;
+  onReset?: (event: React.MouseEvent) => void;
+  registerComponentApi?: RegisterComponentApiFn;
+  updateState?: UpdateStateFn;
 };
 
 export const defaultProps: Partial<Props> = {
   message: "Hello, World!",
-  theme: "default",
 };
 
 export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
@@ -69,23 +72,48 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
     {
       id,
       message = defaultProps.message,
-      theme = defaultProps.theme,
       children,
       style,
       className,
+      onClick,
+      onReset,
+      registerComponentApi,
+      updateState,
       ...rest
     },
     ref
   ) {
     const [clickCount, setClickCount] = useState(0);
 
-    const handleClick = () => {
+    const setValue = useEvent((newCount: number) => {
+      setClickCount(newCount);
+      updateState?.({ value: newCount });
+    });
+
+    // Sync clickCount with XMLUI state system (like AppState does)
+    useEffect(() => {
+      updateState?.({ value: clickCount });
+    }, [updateState, clickCount]);
+
+    useEffect(() => {
+      registerComponentApi?.({
+        setValue,
+      });
+    }, [registerComponentApi, setValue]);
+
+    const handleClick = (event: React.MouseEvent) => {
       const newCount = clickCount + 1;
       setClickCount(newCount);
+      updateState?.({ value: newCount });
+      // Call XMLUI event handler if provided
+      onClick?.(event);
     };
 
-    const handleReset = () => {
+    const handleReset = (event: React.MouseEvent) => {
       setClickCount(0);
+      updateState?.({ value: 0 });
+      // Call XMLUI event handler if provided
+      onReset?.(event);
     };
 
     return (
@@ -93,9 +121,7 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
         {...rest}
         id={id}
         ref={ref}
-        className={classnames(className, styles.helloWorld, {
-          [styles.success]: theme === "success",
-        })}
+        className={classnames(className, styles.helloWorld)}
         style={style}
       >
         <div className={styles.content}>
@@ -162,99 +188,88 @@ $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composeBorderVars($themeVars, $component);
 $themeVars: t.composeTextVars($themeVars, $component, $component);
 
-// Add success theme variant
-$themeVars: t.composeBorderVars($themeVars, "#{$component}-success");
-$themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
-
 .helloWorld {
   @include t.paddingVars($themeVars, $component);
   @include t.borderVars($themeVars, $component);
   @include t.textVars($themeVars, $component);
-
+  
   border-radius: createThemeVar("borderRadius-#{$component}");
-  font-family: system-ui, -apple-system, sans-serif;
-  transition: all 0.2s ease-in-out;
-  max-width: 400px;
-
-  &.success {
-    @include t.borderVars($themeVars, "#{$component}-success");
-    @include t.textVars($themeVars, "#{$component}-success");
-  }
+  max-width: createThemeVar("maxWidth-#{$component}");
 }
 
 .content {
-  text-align: center;
+  text-align: createThemeVar("textAlign-#{$component}-content");
 }
 
 .message {
-  margin: 0 0 16px 0;
-  font-size: 1.5rem;
-  font-weight: 600;
+  margin-bottom: createThemeVar("marginBottom-#{$component}-message");
+  font-size: createThemeVar("fontSize-#{$component}-message");
+  font-weight: createThemeVar("fontWeight-#{$component}-message");
 }
 
 .children {
-  margin: 16px 0;
-  padding: 12px;
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-  font-style: italic;
+  margin: createThemeVar("margin-#{$component}-children");
+  padding: createThemeVar("padding-#{$component}-children");
+  background-color: createThemeVar("backgroundColor-#{$component}-children");
+  border-radius: createThemeVar("borderRadius-#{$component}-children");
+  font-style: createThemeVar("fontStyle-#{$component}-children");
 }
 
 .interactive {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: createThemeVar("gap-#{$component}-interactive");
 }
 
 .clickButton {
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 12px 24px;
-  font-size: 1rem;
-  font-weight: 500;
+  background-color: createThemeVar("backgroundColor-#{$component}-clickButton");
+  color: createThemeVar("textColor-#{$component}-clickButton");
+  border: createThemeVar("border-#{$component}-clickButton");
+  border-radius: createThemeVar("borderRadius-#{$component}-clickButton");
+  padding: createThemeVar("padding-#{$component}-clickButton");
+  font-size: createThemeVar("fontSize-#{$component}-clickButton");
+  font-weight: createThemeVar("fontWeight-#{$component}-clickButton");
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: createThemeVar("transition-#{$component}-clickButton");
 
   &:hover {
-    background-color: #2563eb;
+    background-color: createThemeVar("backgroundColor-#{$component}-clickButton--hover");
   }
 
   &:active {
-    transform: translateY(1px);
+    transform: createThemeVar("transform-#{$component}-clickButton--active");
   }
 }
 
 .counter {
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-size: createThemeVar("fontSize-#{$component}-counter");
+  font-weight: createThemeVar("fontWeight-#{$component}-counter");
 }
 
 .count {
   display: inline-block;
-  background-color: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 700;
-  min-width: 24px;
+  background-color: createThemeVar("backgroundColor-#{$component}-count");
+  color: createThemeVar("textColor-#{$component}-count");
+  padding: createThemeVar("padding-#{$component}-count");
+  border-radius: createThemeVar("borderRadius-#{$component}-count");
+  font-weight: createThemeVar("fontWeight-#{$component}-count");
+  min-width: createThemeVar("minWidth-#{$component}-count");
   text-align: center;
 }
 
 .resetButton {
-  background-color: #6b7280;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-size: 0.875rem;
+  background-color: createThemeVar("backgroundColor-#{$component}-resetButton");
+  color: createThemeVar("textColor-#{$component}-resetButton");
+  border: createThemeVar("border-#{$component}-resetButton");
+  border-radius: createThemeVar("borderRadius-#{$component}-resetButton");
+  padding: createThemeVar("padding-#{$component}-resetButton");
+  font-size: createThemeVar("fontSize-#{$component}-resetButton");
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: createThemeVar("transition-#{$component}-resetButton");
 
   &:hover {
-    background-color: #4b5563;
+    background-color: createThemeVar("backgroundColor-#{$component}-resetButton--hover");
   }
 }
 
@@ -270,22 +285,24 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
 
 - **`@use "../../components-core/theming/themes" as t;`** - Import the XMLUI theming system
 - **`$themeVars: ();`** - Initialize the theme variables collection
-- **`createThemeVar()` function** - Helper to create individual theme variables
+- **`createThemeVar()` function** - Helper to create individual theme variables with logical names
 - **`t.compose*Vars()` functions** - Generate complete sets of related theme variables:
   - `composePaddingVars()` - Creates padding variables (top, bottom, left, right, horizontal, vertical)
   - `composeBorderVars()` - Creates border variables (color, width, style, radius)
   - `composeTextVars()` - Creates text variables (color, font-family, font-size, background-color, etc.)
 - **`@include t.*Vars()` mixins** - Apply the theme variables to CSS properties
 - **`:export { themeVars: t.json-stringify($themeVars); }`** - Export variables for XMLUI's runtime system
+- **No hardcoded values** - All styling uses `createThemeVar()` with logical names instead of hardcoded values like `#3b82f6` or `16px`
 
 **Theme Variants:**
-- Create variants by composing additional theme variable sets (e.g., `"#{$component}-success"`)
-- Apply variants using SCSS classes and mixins
-- This ensures consistent theming across all component states
+- Create variants by wrapping components with `<Theme>` elements and custom theme variables
+- Use XMLUI's built-in theme system rather than component-specific props
+- This ensures consistent theming across all components
 
 **Why This Approach:**
 - **Consistency** - All XMLUI components use the same theming patterns
 - **Completeness** - Automatically generates comprehensive theme variable sets
+- **Themeable** - Every visual aspect can be customized through theme variables
 - **Performance** - Programmatic generation is more efficient than manual string parsing
 - **Browser Compatibility** - Works reliably across all browsers including Edge
 
@@ -298,6 +315,7 @@ import styles from "./HelloWorld.module.scss";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { dSetValueApi, dValue } from "../metadata-helpers";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
 
 const COMP = "HelloWorld";
@@ -317,14 +335,20 @@ export const HelloWorldMd = createMetadata({
       type: "string",
       defaultValue: defaultProps.message,
     },
-    theme: {
-      description: "Sets the visual theme of the component.",
-      type: "string",
-      availableValues: [
-        { value: "default", description: "Default theme" },
-        { value: "success", description: "Success theme (green)" },
-      ],
+  },
+  events: {
+    onClick: {
+      description: "Triggered when the click button is pressed. Receives the current click count.",
+      type: "function",
     },
+    onReset: {
+      description: "Triggered when the reset button is pressed. Called when count is reset to 0.",
+      type: "function",
+    },
+  },
+  apis: {
+    value: dValue(),
+    setValue: dSetValueApi(),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -336,23 +360,21 @@ export const HelloWorldMd = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`padding-${COMP}`]: "$space-4",
     [`textColor-${COMP}`]: "$color-primary",
-
-    // Success theme variant
-    [`backgroundColor-${COMP}-success`]: "$color-success-50",
-    [`borderColor-${COMP}-success`]: "$color-success-200",
-    [`textColor-${COMP}-success`]: "$color-success-800",
   },
 });
 
 export const helloWorldComponentRenderer = createComponentRenderer(
   COMP,
   HelloWorldMd,
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler, registerComponentApi, updateState }) => {
     return (
       <HelloWorld
         id={extractValue.asOptionalString(node.props.id)}
         message={extractValue.asOptionalString(node.props.message)}
-        theme={extractValue.asOptionalString(node.props.theme)}
+        onClick={lookupEventHandler("onClick")}
+        onReset={lookupEventHandler("onReset")}
+        registerComponentApi={registerComponentApi}
+        updateState={updateState}
         style={layoutCss}
       >
         {renderChild(node.children)}
@@ -376,20 +398,216 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 - **`renderChild`**: Renders nested XMLUI content
 - **`layoutCss`**: Provides XMLUI layout styling
 
-## Step 5: Register the Component
+### Test Props and Children
+
+**Note**: The following examples assume you've completed Step 7 (component registration) to make the HelloWorld component available to XMLUI.
+
+With the metadata and renderer complete, you can test custom props and nested content:
+
+```xmlui-pg display
+<App>
+  <VStack spacing="4">
+    <!-- Custom message prop -->
+    <HelloWorld message="Custom greeting message!" />
+
+    <!-- With nested content -->
+    <HelloWorld message="With nested content">
+      <Text>This text is nested inside the HelloWorld component</Text>
+      <Text>Multiple children are supported</Text>
+    </HelloWorld>
+  </VStack>
+</App>
+```
+
+This demonstrates:
+- How the `message` prop customizes the greeting text
+- How `renderChild` processes nested XMLUI content
+- How the component handles multiple children elements
+
+## Step 5: Add Event Handling
+
+To demonstrate event handling, you need to define the event handler functions first. These functions can live in your `index.html` file or in [code-behind files](/code). For this documentation site, we define them in `index.html` as we do for other global functions.
+
+### Add event handlers
+
+The XMLUI documentation site already includes these functions in its `index.html`:
+
+```javascript
+window.handleHelloClick = function(event) {
+  console.log('Hello World clicked!', event);
+  alert('Button clicked!');
+};
+
+window.handleHelloReset = function(event) {
+  console.log('Hello World reset!', event);
+  alert('Counter was reset!');
+};
+```
+
+### Use the event handlers
+
+**Note**: This example assumes you've completed Step 7 (component registration).
+
+Now you can use the HelloWorld component with event handling:
+
+```xmlui-pg display
+<App>
+  <HelloWorld
+    message="Event handling example"
+    onClick="handleHelloClick"
+    onReset="handleHelloReset"
+  />
+</App>
+```
+
+**What happens:**
+- Clicking the button triggers `handleHelloClick` with the DOM event
+- Clicking reset triggers `handleHelloReset` with the DOM event
+- Both functions show alerts and log to console
+- The component's internal state still works (counter increments/resets)
+
+**Note:** Event handler functions can be defined in your `index.html` file (as shown) or in [code-behind files](/code). See the [Code guide](/code) for more details on organizing JavaScript functions in XMLUI applications.
+
+## Step 6: Component API (Exposed Methods)
+
+Components can expose methods that allow XMLUI applications to interact with them programmatically. This enables external control of component state and behavior beyond just props and events.
+
+### Add registerComponentApi prop to HelloWorldNative.tsx
+
+First, add the required imports:
+```tsx
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { useEvent } from "../../components-core/utils/misc";
+```
+
+Then add the props to the Props interface:
+```tsx
+type Props = {
+  // ... existing props
+  registerComponentApi?: RegisterComponentApiFn;
+  updateState?: UpdateStateFn;
+};
+```
+
+Inside the component function, create the setValue method and register the API:
+```tsx
+const setValue = useEvent((newCount: number) => {
+  setClickCount(newCount);
+  updateState?.({ value: newCount });
+});
+
+// Sync clickCount with XMLUI state system (like AppState does)
+useEffect(() => {
+  updateState?.({ value: clickCount });
+}, [updateState, clickCount]);
+
+useEffect(() => {
+  registerComponentApi?.({
+    setValue,
+  });
+}, [registerComponentApi, setValue]);
+
+// Update event handlers to sync state:
+const handleClick = (event: React.MouseEvent) => {
+  const newCount = clickCount + 1;
+  setClickCount(newCount);
+  updateState?.({ value: newCount });
+  onClick?.(event);
+};
+
+const handleReset = (event: React.MouseEvent) => {
+  setClickCount(0);
+  updateState?.({ value: 0 });
+  onReset?.(event);
+};
+```
+
+### Add exposed methods to HelloWorld.tsx metadata
+
+```tsx
+export const HelloWorldMd = createMetadata({
+  // ... existing metadata
+  apis: {
+    value: dValue(),
+    setValue: dSetValueApi(),
+  },
+  // ... rest of metadata
+});
+```
+
+**Update HelloWorld.tsx renderer:**
+```tsx
+export const helloWorldComponentRenderer = createComponentRenderer(
+  COMP,
+  HelloWorldMd,
+  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler, registerComponentApi, updateState }) => {
+    return (
+      <HelloWorld
+        id={extractValue.asOptionalString(node.props.id)}
+        message={extractValue.asOptionalString(node.props.message)}
+        onClick={lookupEventHandler("onClick")}
+        onReset={lookupEventHandler("onReset")}
+        registerComponentApi={registerComponentApi}
+        updateState={updateState}
+        style={layoutCss}
+      >
+        {renderChild(node.children)}
+      </HelloWorld>
+    );
+  }
+);
+```
+
+This pattern allows XMLUI applications to:
+- Get the current click count: `demo.value` (through XMLUI's built-in state system)
+- Set the click count programmatically: `demo.setValue(5)` (through component API)
+- Control component state from code-behind or other components
+
+**Key insight:** The `updateState({ value: newCount })` calls are what make `demo.value` accessible in XMLUI markup. This syncs the component's internal state with XMLUI's state management system.
+
+**Live example:**
+
+**Note**: This example assumes you've completed Step 7 (component registration).
+
+Test the Component API methods with this interactive example:
+
+```xmlui-pg display
+<App>
+<VStack spacing="4">
+<HelloWorld id="demo" message="API Demo" />
+
+<HStack spacing="2">
+<Button onClick="{ console.log('demo.value', demo.value) }">Get Count</Button>
+<Button onClick="{ demo.setValue(5) }">Set to 5</Button>
+<Button onClick="{ demo.setValue(0) }">Reset</Button>
+</HStack>
+
+<Text>Current count: {demo.value}</Text>
+</VStack>
+</App>
+```
+
+This demonstrates:
+- Getting the current value with `demo.value` (XMLUI's automatic state access)
+- Setting values with `demo.setValue()` (component API method)
+- Reactive updates when the component state changes
+
+## Step 7: Register the Component
+
+Once your component is built and tested, you need to register it with XMLUI's component system. This makes the component available for use in XMLUI markup throughout your application.
 
 Add your component to `xmlui/src/components/ComponentProvider.tsx`.
 
 First, add the import near the top with other component imports:
 
-```tsx
+```xmlui
 import { buttonComponentRenderer } from "./Button/Button";
 import { helloWorldComponentRenderer } from "./HelloWorld/HelloWorld";
 ```
 
 Then register the component in the `ComponentRegistry` constructor:
 
-```tsx
+```xmlui
 if (process.env.VITE_USED_COMPONENTS_Button !== "false") {
   this.registerCoreComponent(buttonComponentRenderer);
 }
@@ -398,40 +616,13 @@ if (process.env.VITE_USED_COMPONENTS_HelloWorld !== "false") {
 }
 ```
 
-## Step 6: Test Your Component
+### Understanding Component Registration
 
-You can now use your HelloWorld component in XMLUI markup:
+The registration process connects your component to XMLUI's rendering engine:
 
-### Basic Usage
-```xml
-<App>
-  <HelloWorld />
-</App>
-```
-
-### Interactive Examples
-
-Try these examples in the XMLUI playground:
-
-```xmlui-pg display
-<App>
-  <VStack spacing="4">
-    <!-- Custom message -->
-    <HelloWorld message="Hello World!" />
-
-    <!-- With nested content -->
-    <HelloWorld message="Nested content">
-      <Text>Nested text</Text>
-    </HelloWorld>
-
-    <!-- Theme variant -->
-    <HelloWorld message="Success theme" theme="success" />
-
-
-  </VStack>
-</App>
-```
-
+- **Environment Variable Check**: The `process.env.VITE_USED_COMPONENTS_HelloWorld` check allows for conditional component inclusion, enabling tree-shaking for production builds
+- **registerCoreComponent()**: Adds your component renderer to XMLUI's component registry, making it available for use in markup
+- **Import Pattern**: Always import the renderer (not the native component) for registration
 
 ## Common Patterns Explained
 
@@ -448,23 +639,70 @@ Use the appropriate `extractValue` methods in your renderer:
 ### State Management
 Use standard React hooks for component state:
 
-```tsx
+```xmlui
 const [clickCount, setClickCount] = useState(0);
 ```
 
 ### Event Handling
-Handle events with standard React patterns:
+XMLUI components can expose events that XMLUI apps can handle. This involves several steps:
 
-```tsx
-const handleClick = () => {
-  setClickCount(clickCount + 1);
+**1. Add event props to your component's Props interface:**
+```xmlui
+type Props = {
+  // ... other props
+  onClick?: string;
+  onReset?: string;
 };
 ```
+
+**2. Use event handler props in your component:**
+```xmlui
+const handleClick = () => {
+  const newCount = clickCount + 1;
+  setClickCount(newCount);
+  // Call XMLUI event handler if provided
+  onClick?.();
+};
+
+const handleReset = () => {
+  setClickCount(0);
+  // Call XMLUI event handler if provided
+  onReset?.();
+};
+```
+
+**3. Declare events in your component metadata:**
+```xmlui
+events: {
+  onClick: {
+    description: "Triggered when the click button is pressed. Receives the current click count.",
+    type: "function",
+  },
+  onReset: {
+    description: "Triggered when the reset button is pressed. Called when count is reset to 0.",
+    type: "function",
+  },
+},
+```
+
+**4. Use lookupEventHandler in the renderer:**
+```xmlui
+// In the renderer function
+return (
+  <HelloWorld
+    onClick={lookupEventHandler("onClick")}
+    onReset={lookupEventHandler("onReset")}
+    // ... other props
+  />
+);
+```
+
+This pattern allows XMLUI apps to handle component events while maintaining the component's internal behavior.
 
 ### Conditional Rendering
 Use React conditional rendering for dynamic content:
 
-```tsx
+```xmlui
 {clickCount > 0 && (
   <button onClick={handleReset}>Reset</button>
 )}
@@ -506,37 +744,28 @@ Generates: `textColor-{component}`, `backgroundColor-{component}`, `fontSize-{co
 
 ### Creating Theme Variants
 
-To create theme variants (like our "success" theme), compose additional variable sets with variant names:
+To create different visual styles, use XMLUI's `<Theme>` component with custom theme variables:
 
-```scss
-// Standard variables
-$themeVars: t.composeBorderVars($themeVars, $component);
-$themeVars: t.composeTextVars($themeVars, $component, $component);
-
-// Success variant
-$themeVars: t.composeBorderVars($themeVars, "#{$component}-success");
-$themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
+```xmlui
+<Theme
+  backgroundColor-HelloWorld="$color-success-50"
+  borderColor-HelloWorld="$color-success-200"
+  textColor-HelloWorld="$color-success-800"
+>
+  <HelloWorld message="Success styling" />
+</Theme>
 ```
 
-Then apply them conditionally in your styles:
-
-```scss
-.helloWorld {
-  @include t.borderVars($themeVars, $component);
-  @include t.textVars($themeVars, $component);
-
-  &.success {
-    @include t.borderVars($themeVars, "#{$component}-success");
-    @include t.textVars($themeVars, "#{$component}-success");
-  }
-}
-```
+This approach:
+- Uses XMLUI's built-in theming system
+- Allows unlimited customization without component changes
+- Maintains consistency with other XMLUI components
 
 ### Default Theme Variables
 
 In your component metadata, provide sensible defaults using XMLUI's semantic tokens:
 
-```tsx
+```xmlui
 defaultThemeVars: {
   // Use semantic color tokens
   [`backgroundColor-${COMP}`]: "$color-surface-50",
@@ -550,11 +779,6 @@ defaultThemeVars: {
   // Use design tokens
   [`borderRadius-${COMP}`]: "$borderRadius",
   [`borderStyle-${COMP}`]: "solid",
-
-  // Variant defaults
-  [`backgroundColor-${COMP}-success`]: "$color-success-50",
-  [`borderColor-${COMP}-success`]: "$color-success-200",
-  [`textColor-${COMP}-success`]: "$color-success-800",
 }
 ```
 
@@ -574,7 +798,7 @@ defaultThemeVars: {
 
 1. **Default State**: Verify the component renders correctly with no props
 2. **Custom Props**: Test each prop individually and in combination
-3. **Theme Variants**: Ensure all theme variants render correctly
+3. **Theme Customization**: Test with different `<Theme>` wrappers and theme variables
 4. **Children Content**: Test with various types of nested content
 5. **Interactive Behavior**: Test all interactive features (clicks, state changes)
 6. **Edge Cases**: Test with empty strings, very long text, etc.
@@ -588,7 +812,7 @@ You've successfully created a complete XMLUI component that demonstrates:
 - **Theming System**: Full integration with XMLUI's standardized theming approach
 - **Interactive Features**: State management and event handling
 - **Component Metadata**: Type-safe prop definitions and documentation
-- **Theme Variants**: Multiple visual styles using XMLUI theming patterns
+- **Theme Customization**: Using XMLUI's `<Theme>` component for visual styling
 - **Children Support**: Rendering nested XMLUI content
 
 This foundation will serve you well as you build more complex XMLUI components. The patterns demonstrated here scale to components of any complexity while maintaining consistency with the broader XMLUI ecosystem.

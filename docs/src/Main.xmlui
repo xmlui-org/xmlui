@@ -68,6 +68,7 @@
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
+                <NavLink label="Build HelloWorld Component" to="/build-hello-world-component"/>
             </NavGroup>
             <NavLink label="Change Log" to="/change-log"/>
             <NavLink label="MCP (experimental)" to="/mcp"/>
@@ -188,6 +189,9 @@
             </Page>
             <Page url="/glossary">
                 <DocumentPage hideToc="true" url="/pages/glossary.md" />
+            </Page>
+            <Page url="/build-hello-world-component">
+                <DocumentPage url="/pages/build-hello-world-component.md" />
             </Page>
             <Page url="/change-log">
                 <ChangeLog />

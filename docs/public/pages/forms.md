@@ -25,7 +25,7 @@ This example demonstrates the core elements: [Form](/components/Form) and [FormI
 
 ## Form Layouts
 
-You can any of XMLUI's layout mechanisms with a `Form`. Here is a single-column format using `FlowLayout`.
+You can use any of XMLUI's layout mechanisms with a `Form`. Here is a single-column format using `FlowLayout`.
 
 ```xmlui-pg display
 <App>
@@ -527,7 +527,7 @@ The `onSubmit` accepts either a block of code or function. When you use a functi
 </App>
 ```
 
-To submit via an `APICall`, use the `event` helper tag to bridge between the form and the API. The `Form`s `data` attribute maps to the `APICall`'s `$param` context variable. A `Toast` popup reports success or error.
+To submit via an `APICall`, use the `event` helper tag to bridge between the form and the API. The `Form`s `data` attribute maps to the `APICall`'s `$param` [context variable](/context-variables). A `Toast` popup reports success or error.
 
 ```xmlui
 <App>
