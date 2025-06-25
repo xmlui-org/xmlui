@@ -39,7 +39,7 @@ export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps)
       )}
       <div className={styles.codeBlockContent}>
         {children}
-        <div className={styles.codeBlockCopyButton}>
+        {meta.copy !== false && <div className={styles.codeBlockCopyButton}>
           <Button
             variant="ghost"
             size="xs"
@@ -51,7 +51,7 @@ export function CodeBlock({ children, meta, textToCopy, style }: CodeBlockProps)
               toast.success("Code copied!");
             }}
           ></Button>
-        </div>
+        </div>}
       </div>
     </div>
   );
