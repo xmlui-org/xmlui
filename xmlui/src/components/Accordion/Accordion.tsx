@@ -72,7 +72,7 @@ export const AccordionMd = createMetadata({
   defaultThemeVars: {
     [`paddingHorizontal-header-${COMP}`]: "$space-3",
     [`paddingVertical-header-${COMP}`]: "$space-3",
-    [`verticalAlign-header-${COMP}`]: "center",
+    [`verticalAlignment-header-${COMP}`]: "center",
     [`fontSize-header-${COMP}`]: "$fontSize-normal",
     [`fontWeight-header-${COMP}`]: "$fontWeight-normal",
     [`fontFamily-header-${COMP}`]: "$fontFamily",

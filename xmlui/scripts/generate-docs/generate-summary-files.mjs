@@ -3,9 +3,14 @@ import * as path from "path";
 import { FOLDERS } from "./folders.mjs";
 import { createTable, getSectionBeforeAndAfter } from "./utils.mjs";
 import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
+import {
+  COMPONENT_STATUS_CONFIG,
+  SUMMARY_FILE_CONFIG,
+  OUTPUT_FILES
+} from "./constants.mjs";
 
-const ACCEPTED_STATUSES = ["stable", "experimental", "deprecated", "in progress"];
-const DEFAULT_STATUS = "stable";
+const ACCEPTED_STATUSES = COMPONENT_STATUS_CONFIG.ACCEPTED_STATUSES;
+const DEFAULT_STATUS = COMPONENT_STATUS_CONFIG.DEFAULT_STATUS;
 
 logger.setLevels(LOGGER_LEVELS.warning, LOGGER_LEVELS.error);
 logger.info("Generating summary files...");
@@ -17,11 +22,11 @@ const componentsMetaFolder = path.join(FOLDERS.script, "metadata", "components")
 const componentsOutFolder = path.join(FOLDERS.docsRoot, "content", "components");
 
 generateComponentsSummary(
-  path.join(componentsMetaFolder, "metadata.json"),
+  path.join(componentsMetaFolder, OUTPUT_FILES.METADATA_JSON),
   "components",
   componentsOutFolder,
   "_overview.md",
-  "# Components Overview [#components-overview]",
+  SUMMARY_FILE_CONFIG.COMPONENTS_OVERVIEW_HEADER,
 );
 
 logger.info("Components summary DONE");
@@ -43,19 +48,12 @@ logger.info("Components summary DONE");
 //       `extensions/${extensionName}`,
 //       extensionOutFolder,
 //       `_overview.md`,
-//       "## Package Components",
+//       SUMMARY_FILE_CONFIG.PACKAGE_COMPONENTS_HEADER,
 //     );
 //   }
 // });
 
 // logger.info("Extensions summary DONE");
-
-// NOTE: this does not work because we don't generate html tag docs
-// html tags
-// generateComponentsSummary(
-//   "# HtmlTag Components",
-//   join(FOLDERS.pages, "html-tag-components.md"),
-// );
 
 // ---
 
@@ -65,7 +63,7 @@ logger.info("Components summary DONE");
  * otherwise it appends one to the end of the file.
  * @param {string} metadataFile The path & name of the file containing the component metadata
  * @param {string} urlPath the path that is used to point to the generated component article in the docs
- * @param {string} outFolder
+ * @param {string} outFolder The folder to add the summary to
  * @param {string} summaryFile The name of the file (with extesion) to add the summary to
  * @param {string} summarySectionName The section to look for and add the summary to
  * @param {boolean?} hasRowNums Whether to add row numbers to the summary table
@@ -92,7 +90,7 @@ function generateComponentsSummary(
 
     const metadata = JSON.parse(fs.readFileSync(metadataFile, "utf8"));
 
-    const table = createSummary(metadata, urlPath, outFolder, hasRowNums);
+    const table = createSummaryTable(metadata, urlPath, outFolder, hasRowNums);
 
     const fileContents = fs.readFileSync(outFile, "utf8");
     let { beforeSection, afterSection } = getSectionBeforeAndAfter(
@@ -116,7 +114,7 @@ function generateComponentsSummary(
  * @param {boolean?} hasRowNums should the table have numbered rows
  * @returns stringified markdown table
  */
-function createSummary(metadata, urlPath, filePath, hasRowNums = false) {
+function createSummaryTable(metadata, urlPath, filePath, hasRowNums = false) {
   const headers = [{ value: "Component", style: "center" }, "Description"];
   const rows = metadata
     .sort((a, b) => a.displayName.localeCompare(b.displayName))

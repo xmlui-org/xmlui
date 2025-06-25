@@ -49,6 +49,7 @@
                 <NavLink label="Forms" to="/forms"/>
                 <NavLink label="Modal Dialogs" to="/modal-dialogs"/>
                 <NavLink label="User-defined Components" to="/user-defined-components"/>
+                <NavLink label="Build a Hello World component" to="/hello-world-component"/>
             </NavGroup>
             <NavGroup label="Reference">
                 <RecursiveNavTree
@@ -156,6 +157,9 @@
             <Page url="/user-defined-components">
                 <UserDefinedComponents />
             </Page>
+            <Page url="/hello-world-component">
+                <DocumentPage url="/pages/build-hello-world-component.md"/>
+            </Page>
             <Page url="/styles-and-themes/layout-props">
                 <DocumentPage url="/pages/styles-and-themes/layout-props.md"/>
             </Page>
@@ -179,9 +183,6 @@
             </Page>
             <Page url="/template-properties">
                 <DocumentPage url="pages/template-properties.md" />
-            </Page>
-            <Page url="/glossary">
-                <DocumentPage hideToc="true" url="/pages/glossary.md" />
             </Page>
             <Page url="/icons">
                 <Icons/>

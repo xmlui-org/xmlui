@@ -46,14 +46,14 @@ export type ThemeScope = {
 
   /**
    * This hash object stores the CSS theme variable names with their CSS values definition,
-   * like "--xmlui-verticalAlign-Text-sub": "sub";
+   * like "--xmlui-verticalAlignment-Text-sub": "sub";
    * "--xmlui-backgroundColor": "var(--xmlui-color-surface-50)"
    */
   themeStyles: Record<string, string>;
 
   /**
    * This hash object stores the theme variable names with their CSS values definition, like
-   * "verticalAlign-Text-sub": "sub"; "backgroundColor": "var(--xmlui-color-surface-50)".
+   * "verticalAlignment-Text-sub": "sub"; "backgroundColor": "var(--xmlui-color-surface-50)".
    */
   themeVars: Record<string, string>;
 

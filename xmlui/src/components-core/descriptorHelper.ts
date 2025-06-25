@@ -80,4 +80,13 @@ export const layoutOptionKeys = [
   "outlineColor",
   "outlineStyle",
   "outlineOffset",
+  "fontVariant",
+  "lineBreak",
+  "textIndent",
+  "textShadow",
+  "wordBreak",
+  "wordSpacing",
+  "wordWrap",
+  "writingMode",
+  "transition",
 ];

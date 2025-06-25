@@ -45,6 +45,7 @@ $transition: color 0.1s, background-color 0.1s;
       content: "";
       width: calc(var(--nav-link-level) * 1em);
       display: block;
+      flex-shrink: 0;
     }
     @include t.borderVars($themeVars, $component);
     @include t.paddingVars($themeVars, $component);
@@ -194,6 +195,8 @@ $transition: color 0.1s, background-color 0.1s;
   align-items: center;
   gap: t.$space-2;
   flex: 1;
+  white-space: break-spaces;
+  overflow-wrap: anywhere;
 }
 
 // --- We export the theme variables to add them to the component renderer

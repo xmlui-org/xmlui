@@ -51,7 +51,7 @@ $borderRadius: createThemeVar("borderRadius-#{$component}");
   font-family: inherit;
   flex: 1;
   display: inline-flex;
-  align-items: createThemeVar("verticalAlign-header-#{$component}");
+  align-items: createThemeVar("verticalAlignment-header-#{$component}");
   justify-content: space-between;
   line-height: 1;
   box-sizing: border-box;

@@ -71,7 +71,7 @@ export const CardMd = createMetadata({
     [`boxShadow-${COMP}`]: "none",
     [`backgroundColor-${COMP}`]: "$color-surface-raised",
     [`gap-${COMP}`]: "var(--stack-gap-default)",
-    [`gap-title-${COMP}`]: "$gap-normal",
+    [`gap-title-${COMP}`]: "$gap-none",
     [`gap-avatar-${COMP}`]: "$gap-normal",
     [`verticalAlignment-title-${COMP}`]: "center",
   },

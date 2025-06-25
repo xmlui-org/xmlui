@@ -4,7 +4,7 @@ This document summarizes the layout properties you can use for UI Engine compone
 
 ## `background`
 
-Sets the background color [color value!](/styles-and-themes/common-units#color) of a component (shortcut to `backgroundColor`).
+Sets the background [color value](/styles-and-themes/common-units#color) of a component (shortcut to `backgroundColor`).
 
 ## `backgroundColor`
 
@@ -110,6 +110,10 @@ Sets the [weight (or boldness)](/styles-and-themes/common-units#font-weight) of 
 
 This property sets whether a font should be styled with a normal, italic, or oblique face from its font family.
 
+## `fontVariant`
+
+This property controls the usage of alternate glyphs in a font. These alternates include things like stylistic variants (such as [small caps](/styles-and-themes/common-units#font-variant)), ligatures, and language-specific glyph variants.
+
 ## `gap`
 
 Layout components use this property to define the [size](/styles-and-themes/common-units#size) of space separating child components.
@@ -125,6 +129,10 @@ Sets the [left](/styles-and-themes/common-units#size) position of the component 
 ## `letterSpacing`
 
 This property sets the horizontal [spacing](/styles-and-themes/common-units#size) behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together.
+
+## `lineBreak`
+
+This property determines how [line breaking](/styles-and-themes/common-units#line-break) works for languages that use a text wrapping system other than the standard space-based approach, such as Chinese, Japanese, and Korean.
 
 ## `lineHeight`
 
@@ -262,6 +270,14 @@ This property sets the style of the lines specified by `textDecorationLine`. The
 
 This property sets sets the stroke thickness of the decoration line that is used on text in an element, such as a line-through, underline, or overline.
 
+## `textIndent`
+
+This property specifies the amount of [indentation](/styles-and-themes/common-units#text-indent) (empty space) that should be left before the first line of the text content of a block element.
+
+## `textShadow`
+
+This property adds [shadows](/styles-and-themes/common-units#text-shadow) to text. It accepts a comma-separated list of shadows to be applied to the text and any of its decorations.
+
 ## `textTransform`
 
 This property specifies how to [capitalize](/styles-and-themes/common-units#text-transform) an element's text.
@@ -278,6 +294,10 @@ The [value](/styles-and-themes/common-units#text-wrap) of this property controls
 
 Sets the [top](/styles-and-themes/common-units#size) position of the component to the specified value.
 
+## `transition`
+
+This property is a shorthand for [transition effects](/styles-and-themes/common-units#transition) that specify the CSS property to which a transition effect should be applied, the duration and timing of the transition, and any delay.
+
 ## `userSelect`
 
 This property controls whether the [user can select](/styles-and-themes/common-units#user-select) text.
@@ -290,6 +310,18 @@ This property sets how white space inside an element is handled. Available val
 
 Specifies the [width](/styles-and-themes/common-units#size) (horizontal dimension) of the component.
 
+## `wordBreak`
+
+This property specifies how [words should break](/styles-and-themes/common-units#word-break) when reaching the end of a line. It determines whether to break lines within words or to maintain words intact.
+
+## `wordSpacing`
+
+This property sets the length of [white space](/styles-and-themes/common-units#word-spacing) between words and between tags. Positive values increase the space between words, while negative values bring them closer together.
+
+## `wordWrap`
+
+This property determines whether the browser should [break lines within words](/styles-and-themes/common-units#word-wrap) when they would otherwise overflow the container. Also known as "overflow-wrap".
+
 ## `wrapContent`
 
 This boolean property indicates if a layout container can wrap its content into multiple lines.
@@ -297,6 +329,10 @@ This boolean property indicates if a layout container can wrap its content into 
 ## `zIndex`
 
 This layout property sets the z-order of a positioned component and its children. Overlapping components with a larger z-index cover those with a smaller one.
+
+## `writingMode`
+
+This property sets whether [lines of text](/styles-and-themes/common-units#writing-mode) are laid out horizontally or vertically, as well as the direction in which blocks progress. Use this for vertical languages, such as Chinese, Japanese, and Korean.
 
 ## `zoom`
 

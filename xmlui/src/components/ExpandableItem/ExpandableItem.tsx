@@ -79,9 +79,9 @@ export const ExpandableItemMd = createMetadata({
     [`paddingLeft-${COMP}`]: "$space-0",
     [`paddingRight-${COMP}`]: "$space-0",
     [`gap-${COMP}`]: "$space-2",
-    [`contentPaddingLeft-${COMP}`]: "$space-3",
-    [`contentPaddingRight-${COMP}`]: "$space-3",
-    [`contentPaddingVertical-${COMP}`]: "$space-2",
+    [`paddingLeft-content-${COMP}`]: "$space-3",
+    [`paddingRight-content-${COMP}`]: "$space-3",
+    [`paddingVertical-content-${COMP}`]: "$space-2",
     [`transition-${COMP}`]: "0.2s ease",
   },
 });
