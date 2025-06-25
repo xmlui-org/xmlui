@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, statSync, unlinkSync } from "fs";
 import { posix } from "path";
+import { TABLE_CONFIG } from "./constants.mjs";
 
 /**
  * Creates a markdown table.
@@ -19,7 +20,7 @@ export function createTable({ headers = [], rows = [], rowNums = false }) {
   }
 
   if (rowNums) {
-    headers.unshift({ value: "Num", style: "center" });
+    headers.unshift(TABLE_CONFIG.DEFAULT_ROW_NUM_HEADER);
   }
 
   table +=
@@ -36,10 +37,10 @@ export function createTable({ headers = [], rows = [], rowNums = false }) {
     "| " +
     headers
       .map((h) => {
-        if (typeof h === "object" && h.style === "left") return ":---";
-        if (typeof h === "object" && h.style === "center") return ":---:";
-        if (typeof h === "object" && h.style === "right") return "---:";
-        return "---";
+        if (typeof h === "object" && h.style === TABLE_CONFIG.STYLES.LEFT) return TABLE_CONFIG.MARKDOWN_ALIGNMENTS.LEFT;
+        if (typeof h === "object" && h.style === TABLE_CONFIG.STYLES.CENTER) return TABLE_CONFIG.MARKDOWN_ALIGNMENTS.CENTER;
+        if (typeof h === "object" && h.style === TABLE_CONFIG.STYLES.RIGHT) return TABLE_CONFIG.MARKDOWN_ALIGNMENTS.RIGHT;
+        return TABLE_CONFIG.MARKDOWN_ALIGNMENTS.DEFAULT;
       })
       .join(" | ") +
     " |\n";
