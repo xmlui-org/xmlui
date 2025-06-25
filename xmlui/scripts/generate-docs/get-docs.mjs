@@ -7,6 +7,7 @@ import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.mjs";
 import { FOLDERS } from "./folders.mjs";
 import { existsSync } from "fs";
+import { configManager, pathResolver } from "./configuration-management.mjs";
 import {
   COMPONENT_STATES,
   FILE_EXTENSIONS,
@@ -47,8 +48,9 @@ const mainLogger = createScopedLogger("DocsGenerator");
 async function generateExtenionPackages(metadata) {
   mainLogger.operationStart("extension documentation generation");
 
-  const extensionsConfig = await loadConfig(join(FOLDERS.script, CONFIG_FILES.EXTENSIONS));
-  const outputFolder = join(FOLDERS.docsRoot, FOLDER_NAMES.CONTENT, FOLDER_NAMES.EXTENSIONS);
+  const extensionsConfig = await configManager.loadExtensionsConfig();
+  const outputPaths = pathResolver.getOutputPaths();
+  const outputFolder = outputPaths.extensions;
   const extensionsFolder = outputFolder;
 
   const unlistedFolders = [];
@@ -126,17 +128,18 @@ async function generateExtenionPackages(metadata) {
 }
 
 async function generateComponents(metadata) {
-  const componentsConfig = await loadConfig(join(FOLDERS.script, CONFIG_FILES.COMPONENTS));
-  const outputFolder = join(FOLDERS.docsRoot, FOLDER_NAMES.CONTENT, FOLDER_NAMES.COMPONENTS);
+  const componentsConfig = await configManager.loadComponentsConfig();
+  const outputPaths = pathResolver.getOutputPaths();
+  const outputFolder = outputPaths.components;
 
   const metadataGenerator = new DocsGenerator(
     metadata,
     {
-      sourceFolder: join(FOLDERS.projectRoot, "xmlui", FOLDER_NAMES.SRC, FOLDER_NAMES.COMPONENTS),
+      sourceFolder: pathResolver.resolvePath("xmlui/src/components", "workspace"),
       // --- CHANGE: Now documents are generated in the a new folder, outside of pages
       outFolder: outputFolder,
       // outFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.PAGES, FOLDER_NAMES.COMPONENTS),
-      examplesFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.COMPONENT_SAMPLES),
+      examplesFolder: pathResolver.resolvePath("docs/component-samples", "workspace"),
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
@@ -161,13 +164,14 @@ async function generateComponents(metadata) {
 
 // NOTE: Unused - we are not generating Html component docs
 async function generateHtmlTagComponents(metadata) {
-  const componentsConfig = await loadConfig(join(FOLDERS.script, CONFIG_FILES.COMPONENTS));
+  const componentsConfig = await configManager.loadComponentsConfig();
+  const outputPaths = pathResolver.getOutputPaths();
   const metadataGenerator = new DocsGenerator(
     metadata,
     {
-      sourceFolder: join(FOLDERS.projectRoot, "xmlui", FOLDER_NAMES.SRC, FOLDER_NAMES.COMPONENTS),
-      outFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.PAGES, FOLDER_NAMES.COMPONENTS),
-      examplesFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.COMPONENT_SAMPLES),
+      sourceFolder: pathResolver.resolvePath("xmlui/src/components", "project"),
+      outFolder: outputPaths.pages + "/components",
+      examplesFolder: pathResolver.resolvePath("docs/component-samples", "project"),
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );

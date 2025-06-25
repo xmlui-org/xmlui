@@ -5,13 +5,14 @@ import { collectedThemes, collectedComponentMetadata } from "../../dist/metadata
 import { ERROR_HANDLING, ERROR_MESSAGES } from "./constants.mjs";
 import { handleFatalError, validateDependencies } from "./error-handling.mjs";
 import { createScopedLogger } from "./logging-standards.mjs";
+import { pathResolver } from "./configuration-management.mjs";
 import { 
   processComponentThemeVars, 
   iterateObjectEntries,
   writeFileWithLogging 
 } from "./pattern-utilities.mjs";
 
-const OUTPUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../../dist/themes");
+const OUTPUT_DIR = pathResolver.getOutputPaths().themes;
 const logger = createScopedLogger("ThemeGenerator");
 
 async function generateThemeFiles() {
