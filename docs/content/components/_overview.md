@@ -35,7 +35,7 @@
 | [Form](./components/Form) | `Form` provides a structured container for collecting and validating user input, with built-in data binding, validation, and submission handling. It automatically manages form state and provides context for nested form controls to work together. |
 | [FormItem](./components/FormItem) | `FormItem` wraps individual input controls within a `Form`, providing data binding, validation, labeling, and layout functionality. It connects form controls to the parent form's data model and handles validation feedback automatically. |
 | [FormSection](./components/FormSection) | `FormSection` groups elements within a `Form`. Child components are placed in a [FlowLayout](/components/FlowLayout). |
-| [Fragment](./components/Fragment) | `Fragment` provides conditional rendering and grouping of components. It's often used to hide components until their dependent variables are available. |
+| [Fragment](./components/Fragment) | `Fragment` provides conditional rendering. You can use `when=` on any component to render it conditionally, use `Fragment` to apply `when` to a group of components. |
 | [H1](./components/H1) | Represents a heading level 1 text |
 | [H2](./components/H2) | Represents a heading level 2 text |
 | [H3](./components/H3) | Represents a heading level 3 text |

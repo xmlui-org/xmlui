@@ -8,16 +8,32 @@ XMLUI component reference documentation is generated from multiple sources:
 - **Component Metadata** - The XMLUI framework has a particular metadata structure that describes an XMLUI component including its properties, events, exposed methods, and other component traits. Each component must define its metadata.
 - **Component Documentation Files** - Markdown files with directive-based content injection. These files can declare additional metadata content in markdown format, such as code samples, tables, additional explanations, etc. While the component metadata is available within the framework and its tools (and also for external tools), the content in component documentation files is just for generating the reference documentation of components.
 
+## Prerequisites
+
+All documentation generation commands should be run from the `xmlui` subfolder:
+
+```bash
+cd xmlui
+npm run generate-all-docs
+```
+
 ## Documentation Generation Workflow
 
-1. **Build component metadata** (`npm run prepare-docs-data`) - Export component metadata to a JSON file
-2. **Start merging script** (`npm run generate-docs`) - Merge component metadata with component documentation files
-3. **Generate individual documentation** - Script processes components one by one to create complete documentation
-4. **Output to docs folder** - Place generated documents into `docs/content/components/`
-5. **Create overview document** - Generate a components overview document and save it to `docs/content/components/`
+1. **Build component metadata** (`npm run build:xmlui-metadata`) - Export component metadata to a JSON file using Vite's metadata build mode
+2. **Build extension metadata** (`npm run build:ext-meta`) - Process extension package metadata 
+3. **Generate component docs** (`npm run generate-docs`) - Merge component metadata with component documentation files using the DocsGenerator
+4. **Generate summary files** (`npm run generate-docs-summaries`) - Create overview documents and metadata files
+5. **Output to docs folder** - Place generated documents into `docs/content/components/`
 
 > **Note**
-> The `npm run generate-docs-with-refresh` command extracts the metadata and runs the generator script in a single command.
+> The `npm run generate-all-docs` command runs the complete pipeline in the correct order: metadata extraction, extension processing, documentation generation, and summary creation.
+
+### Available Scripts
+
+- `npm run build:xmlui-metadata` - Extract component metadata only
+- `npm run generate-docs` - Generate docs from existing metadata
+- `npm run generate-docs-summaries` - Generate overview and meta files
+- `npm run generate-all-docs` - Complete documentation generation pipeline (recommended)
 
 ## Sample Component Folder Structure
 
@@ -96,6 +112,17 @@ This metadata structure includes:
 - **`defaultThemeVars`** - Default values for theme variables used for styling customization
 
 The metadata is created using the `createMetadata()` function and exported so it can be collected and processed during documentation generation.
+
+## Technical Implementation
+
+The documentation generation system consists of several key components:
+
+- **Metadata Extraction**: Uses Vite in metadata mode to extract component metadata from TypeScript files
+- **DocsGenerator Class**: Processes component metadata and documentation files to create final docs
+- **Directive Processing**: Merges manual content with auto-generated metadata using special markers
+- **Output Management**: Handles file cleanup, organization, and metadata file generation
+
+The main entry point is `scripts/generate-docs/get-docs.mjs`, which orchestrates the entire process.
 
 ## Component Documentation File Directives
 
