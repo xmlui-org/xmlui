@@ -8,6 +8,10 @@ import {
   traverseDirectory,
 } from "./utils.mjs";
 import { createScopedLogger } from "./logging-standards.mjs";
+import { 
+  generateExportStatements, 
+  processDuplicatesWithLogging 
+} from "./pattern-utilities.mjs";
 import { PAGES_MAP_CONFIG } from "./constants.mjs";
 
 const pathCutoff = PAGES_MAP_CONFIG.PATH_CUTOFF;
@@ -43,17 +47,12 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
   });
 
   const { filtered: filteredPages, duplicates } = gatherAndRemoveDuplicates(pages);
-  if (duplicates.length) {
-    logger.warn(`Duplicate entries found when collecting article IDs and paths:`);
-    duplicates.forEach((item) => {
-      logger.warn(`Removed duplicate ID: ${item.id} - Path: ${item.path}`);
-    });
-  }
+  
+  // Process duplicates with standardized logging
+  processDuplicatesWithLogging(duplicates, logger, "article IDs and paths");
 
-  const pagesStr = filteredPages.reduce((acc, curr) => {
-    acc += `export const ${curr.id} = "${curr.path}";\n`;
-    return acc;
-  }, "");
+  // Generate export statements using utility
+  const pagesStr = generateExportStatements(filteredPages);
 
   writeFileSync(outFilePathAndName, pagesStr);
 }

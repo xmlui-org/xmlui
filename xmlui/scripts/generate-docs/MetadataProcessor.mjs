@@ -11,6 +11,10 @@ import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, LOGGER_LEVELS, processError, ErrorWithSeverity } from "./logger.mjs";
 import { createTable, strBufferToLines, removeAdjacentNewlines } from "./utils.mjs";
+import { 
+  iterateObjectEntries, 
+  processComponentSection 
+} from "./pattern-utilities.mjs";
 import {
   METADATA_SECTIONS,
   DIRECTIVE_CONFIG,
@@ -122,12 +126,15 @@ export class MetadataProcessor {
       if (component.contextVars && Object.keys(component.contextVars ?? {}).length > 0) {
         result += "\n\n**Context variables available during execution:**";
         result += "\n\n";
-        Object.entries(component.contextVars)
-          .sort()
-          .forEach(([contextVarName, contextVar]) => {
-            if (contextVar.isInternal || !contextVar.description) return;
+        
+        // Use pattern utility for processing context variables
+        processComponentSection(component.contextVars, (contextVarName, contextVar) => {
+          if (contextVar.description) {
             result += `- \`${contextVarName}\`: ${contextVar.description}\n`;
-          });
+          }
+        }, { 
+          filter: (name, contextVar) => !contextVar.isInternal && contextVar.description 
+        });
       }
       
       result += "\n\n";
@@ -247,22 +254,20 @@ function addPropsSection(data, component) {
   if (!component.props || Object.keys(component.props ?? {}).length === 0) {
     return buffer + "This component does not have any properties.";
   }
-  Object.entries(component.props)
-    .sort()
-    .forEach(([propName, prop]) => {
-      if (prop.isInternal) return;
-      // prop is component
-      const isRequired = prop.isRequired === true ? "(required)" : "";
-      const defaultValue =
-        prop.defaultValue !== undefined
-          ? `(default: ${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue})`
-          : "";
-      const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
-      buffer += `### \`${propName}${propModifier}\`\n\n`;
+  
+  // Use pattern utility for processing props
+  processComponentSection(component.props, (propName, prop) => {
+    const isRequired = prop.isRequired === true ? "(required)" : "";
+    const defaultValue =
+      prop.defaultValue !== undefined
+        ? `(default: ${typeof prop.defaultValue === "string" ? `"${prop.defaultValue}"` : prop.defaultValue})`
+        : "";
+    const propModifier = isRequired || defaultValue ? ` ${isRequired || defaultValue}` : "";
+    buffer += `### \`${propName}${propModifier}\`\n\n`;
 
-      buffer += combineDescriptionAndDescriptionRef(data, prop, METADATA_SECTIONS.PROPS);
-      buffer += "\n\n";
-    });
+    buffer += combineDescriptionAndDescriptionRef(data, prop, METADATA_SECTIONS.PROPS);
+    buffer += "\n\n";
+  });
 
   // Remove last newline
   buffer = buffer.slice(0, -2);
@@ -276,15 +281,13 @@ function addApisSection(data, component) {
   if (!component.apis || Object.keys(component.apis ?? {}).length === 0) {
     return buffer + "This component does not expose any methods.";
   }
-  Object.entries(component.apis)
-    .sort()
-    .forEach(([apiName, api]) => {
-      if (api.isInternal) return;
-      buffer += `### \`${apiName}\`\n\n`;
-      
-      buffer += combineDescriptionAndDescriptionRef(data, api, METADATA_SECTIONS.API);
-      buffer += "\n\n";
-    });
+  
+  // Use pattern utility for processing APIs
+  processComponentSection(component.apis, (apiName, api) => {
+    buffer += `### \`${apiName}\`\n\n`;
+    buffer += combineDescriptionAndDescriptionRef(data, api, METADATA_SECTIONS.API);
+    buffer += "\n\n";
+  });
 
   // Remove last newline
   buffer = buffer.slice(0, -2);
@@ -298,14 +301,13 @@ function addEventsSection(data, component) {
   if (!component.events || Object.keys(component.events ?? {}).length === 0) {
     return buffer + "This component does not have any events.";
   }
-  Object.entries(component.events)
-    .sort()
-    .forEach(([eventName, event]) => {
-      if (event.isInternal) return;
-      buffer += `### \`${eventName}\`\n\n`;
-      buffer += combineDescriptionAndDescriptionRef(data, event, METADATA_SECTIONS.EVENTS);
-      buffer += "\n\n";
-    });
+  
+  // Use pattern utility for processing events
+  processComponentSection(component.events, (eventName, event) => {
+    buffer += `### \`${eventName}\`\n\n`;
+    buffer += combineDescriptionAndDescriptionRef(data, event, METADATA_SECTIONS.EVENTS);
+    buffer += "\n\n";
+  });
 
   // Remove last newline
   buffer = buffer.slice(0, -2);

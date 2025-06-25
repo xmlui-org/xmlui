@@ -3,6 +3,10 @@ import { basename, extname } from "path";
 import { gatherAndRemoveDuplicates, toNormalizedUpperCase, traverseDirectory } from "./utils.mjs";
 import { createScopedLogger } from "./logging-standards.mjs";
 import { DOWNLOADS_MAP_CONFIG } from "./constants.mjs";
+import { 
+  generateExportStatements, 
+  processDuplicatesWithLogging 
+} from "./pattern-utilities.mjs";
 
 const baseUrlCutoff = DOWNLOADS_MAP_CONFIG.BASE_URL_CUTOFF;
 const includedFileExtensions = DOWNLOADS_MAP_CONFIG.INCLUDED_FILE_EXTENSIONS;
@@ -38,17 +42,12 @@ export function buildDownloadsMap(downloadsFolder, outFilePathAndName) {
   });
 
   const { filtered, duplicates } = gatherAndRemoveDuplicates(downloads);
-  if (duplicates.length) {
-    logger.warn(`Duplicate entries found when collecting download IDs and paths:`);
-    duplicates.forEach((item) => {
-      logger.warn(`Removed duplicate ID: ${item.id} - Path: ${item.path}`);
-    });
-  }
+  
+  // Process duplicates with standardized logging
+  processDuplicatesWithLogging(duplicates, logger, "download IDs and paths");
 
-  const outStr = filtered.reduce((acc, curr) => {
-    acc += `export const ${curr.id} = "${curr.path}";\n`;
-    return acc;
-  }, "");
+  // Generate export statements using utility
+  const outStr = generateExportStatements(filtered);
 
   writeFileSync(outFilePathAndName, outStr);
 }

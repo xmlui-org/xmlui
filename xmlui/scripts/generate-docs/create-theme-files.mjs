@@ -1,10 +1,15 @@
 import { join, dirname } from "path";
-import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { collectedThemes, collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.mjs";
 import { ERROR_HANDLING, ERROR_MESSAGES } from "./constants.mjs";
-import { handleFatalError, validateDependencies, withFileErrorHandling } from "./error-handling.mjs";
+import { handleFatalError, validateDependencies } from "./error-handling.mjs";
 import { createScopedLogger } from "./logging-standards.mjs";
+import { 
+  processComponentThemeVars, 
+  iterateObjectEntries,
+  writeFileWithLogging 
+} from "./pattern-utilities.mjs";
 
 const OUTPUT_DIR = join(dirname(fileURLToPath(import.meta.url)), "../../dist/themes");
 const logger = createScopedLogger("ThemeGenerator");
@@ -26,67 +31,13 @@ async function generateThemeFiles() {
 
     const rootTheme = collectedThemes.root;
 
-    // --- Extract theme variable information from components
-    let themeVarsData = {};
-    let light = {};
-    let dark = {};
-
-    // --- Obtain theme variables from components
-
-    // --- Obtain theme variables from components
-    Object.keys(collectedComponentMetadata)
-      //.toSorted() <- Not supported in Node versions under 20
-      .slice().sort()
-      .forEach((key) => {
-        const component = collectedComponentMetadata[key];
-        const { themeVars, defaultThemeVars } = component;
-
-        logger.componentProcessing(key);
-
-        if (themeVars) {
-          // --- Component-specific theme variables
-
-          // --- Get the theme variable keys
-          const themeVarKeys = [...Object.keys(themeVars), ...Object.keys(defaultThemeVars ?? {})];
-          const themeVarKeysWithoutTones = themeVarKeys.filter(
-            (key) => ["light", "dark"].indexOf(key) === -1,
-          );
-
-          // --- Iterate through the component-specific theme variables
-          let compThemeVars = {};
-          themeVarKeysWithoutTones.forEach((themeVarKey) => {
-            // --- Get the theme variable values
-            compThemeVars[themeVarKey] = defaultThemeVars?.[themeVarKey] ?? null;
-          });
-          themeVarsData = {...themeVarsData, ...compThemeVars};
-          
-          // --- Iterate through the component-specific light theme variables
-          let compLight = {};
-          const lightKeys = [...Object.keys(defaultThemeVars?.light ?? {})];
-          lightKeys.forEach((themeVarKey) => {
-            // --- Get the theme variable values
-            compLight[themeVarKey] = defaultThemeVars?.light?.[themeVarKey] ?? null;
-          });
-          light = {...light, ...compLight};
-
-          // --- Iterate through the component-specific dark theme variables
-          let compDark = {};
-          const darkKeys = [...Object.keys(defaultThemeVars?.dark ?? {})];
-          darkKeys.forEach((themeVarKey) => {
-            // --- Get the theme variable values
-            compDark[themeVarKey] = defaultThemeVars?.dark?.[themeVarKey] ?? null;
-          });
-          dark = {...dark, ...compDark};
-        }
-      });
-
-    themeVarsData.light = light;
-    themeVarsData.dark = dark;
+    // Extract theme variable information from components using utility
+    const themeVarsData = processComponentThemeVars(collectedComponentMetadata, logger);
 
     // Write theme files with error handling
-    for (const [themeName, themeData] of Object.entries(collectedThemes)) {
-      // --- No output for the abstract root theme
-      if (themeName === "root") continue;
+    await iterateObjectEntries(collectedThemes, async (themeName, themeData) => {
+      // Skip the abstract root theme
+      if (themeName === "root") return;
 
       const themePath = join(OUTPUT_DIR, `${themeName}.json`);
       const themeContent = JSON.stringify(
@@ -98,7 +49,7 @@ async function generateThemeFiles() {
             "--- App-bound theme-specific variables": "",
             ...themeData.themeVars,
             "--- Component-bound theme variables": "",
-            ...themeVarsData,
+            ...themeVarsData.base,
             light: { ...themeData.themeVars.light, ...themeVarsData.light },
             dark: { ...themeData.themeVars.dark, ...themeVarsData.dark },
           },
@@ -107,14 +58,8 @@ async function generateThemeFiles() {
         2,
       );
 
-      logger.fileWritten(themePath);
-
-      await withFileErrorHandling(
-        () => writeFileSync(themePath, themeContent),
-        themePath,
-        "write"
-      );
-    }
+      await writeFileWithLogging(themePath, themeContent, logger);
+    }, { async: true });
 
     logger.operationComplete("theme file generation");
     

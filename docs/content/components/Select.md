@@ -104,14 +104,6 @@ This boolean property value indicates whether the component responds to user eve
 </App>
 ```
 
-### `inProgress (default: false)` [#inprogress-default-false]
-
-This property indicates whether the component is in progress. It can be used to show a loading message.
-
-### `inProgressNotificationMessage (default: "")` [#inprogressnotificationmessage-default-]
-
-This property indicates the message to display when the component is in progress.
-
 ### `initialValue` [#initialvalue]
 
 This property sets the component's initial value.
@@ -125,6 +117,14 @@ This property sets the component's initial value.
   </Select>
 </App>
 ```
+
+### `inProgress (default: false)` [#inprogress-default-false]
+
+This property indicates whether the component is in progress. It can be used to show a loading message.
+
+### `inProgressNotificationMessage (default: "")` [#inprogressnotificationmessage-default-]
+
+This property indicates the message to display when the component is in progress.
 
 ### `label` [#label]
 

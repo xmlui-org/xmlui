@@ -257,10 +257,6 @@ The following example stores and displays this item when a new item is put into 
 
 This method enqueues the array of items passed in the method parameter. The new items will be processed after the current queue items have been handled. The method retrieves an array of unique IDs, one for each new item. An item ID can be used later in other methods, such as `remove`.
 
-### `getQueueLength` [#getqueuelength]
-
-This method retrieves the current queue length. The queue contains only those items that are not fully processed yet.
-
 ### `getQueuedItems` [#getqueueditems]
 
 You can use this method to return the items in the queue. These items contain all entries not removed from the queue yet, including pending, in-progress, and completed items.
@@ -274,6 +270,10 @@ This method returns the items currently in the queue with their entire context. 
 - `result`: The optional value the `process` event handler returns.
 
 > **Note**: When all items are processed, the queue removes the items and fires the `complete` event. When the event handler runs, the queue is empty, and `getQueuedItems` returns an empty list.
+
+### `getQueueLength` [#getqueuelength]
+
+This method retrieves the current queue length. The queue contains only those items that are not fully processed yet.
 
 ### `remove` [#remove]
 

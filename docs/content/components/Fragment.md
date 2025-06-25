@@ -1,6 +1,6 @@
 # Fragment [#fragment]
 
-!!!`Fragment` provides conditional rendering and grouping of components. It's often used to hide components until their dependent variables are available.
+`Fragment` provides conditional rendering and grouping of components. It's often used to hide components until their dependent variables are available.
 
 ## Properties [#properties]
 
