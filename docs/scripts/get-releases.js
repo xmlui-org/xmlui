@@ -4,6 +4,7 @@ const { Octokit } = require("@octokit/rest");
 const { createOAuthAppAuth } = require("@octokit/auth-oauth-app");
 const fs = require("fs").promises;
 const path = require("path");
+const { exit } = require("process");
 
 // Parse CLI arguments
 const args = process.argv.slice(2);
@@ -52,23 +53,21 @@ function initializeOctokit() {
     });
   } else {
     console.error(
-      "No GitHub token provided. To access GitHub API, please set the GITHUB_TOKEN environment variable (it can be your Personal Access Token as well).",
+      `No GitHub token provided. Skipping updating releases.
+If you want to update the info about the releases, set the GITHUB_TOKEN environment variable to your Personal Access Token`,
     );
-    return null;
+    exit(0);
   }
 }
 
 async function getXmluiReleases() {
   try {
-    const releaseStr = await fs.readFile(path.join(__dirname, "..", "releases.json"));
-    const releases = JSON.parse(releaseStr);
-    //
-    // temporarily disabled, in favor of the 2 lines above but will be enabled when I'm done with the rest of the work
-    // const octokit = initializeOctokit();
-    // const { data: releases } = await octokit.rest.repos.listReleases({
-    //   owner: OWNER,
-    //   repo: REPO,
-    // });
+    const octokit = initializeOctokit();
+    console.error("Fetching releases from GitHub API...");
+    const { data: releases } = await octokit.rest.repos.listReleases({
+      owner: OWNER,
+      repo: REPO,
+    });
 
     const xmluiReleases = releases.filter((release) => release.tag_name.startsWith("xmlui@"));
 
@@ -97,33 +96,32 @@ async function getXmluiReleases() {
   } catch (error) {
     console.error("Error fetching xmlui releases:", error.message);
     if (error.status === 401) {
-      console.error("Authentication failed. Please check your GitHub token or OAuth credentials.");
+      console.error("Authentication failed. Please check your GitHub token");
     } else if (error.status === 403) {
       console.error("Rate limit exceeded or insufficient permissions.");
     }
-    return [];
+    return null;
   }
 }
 
 async function writeReleases() {
   try {
-    console.error("Fetching releases from GitHub API...");
-
     const releases = await getXmluiReleases();
 
-    const downloadsData = releases;
-
     console.error(`Found ${releases.length} xmlui releases`);
-
+    if (releases === null) {
+      console.error("Failed to fetch xmlui releases. Exiting with code 1.");
+      process.exit(1);
+    }
     if (outputFile === null || args.includes("--stdout")) {
-      console.log(JSON.stringify(downloadsData, null, 2));
+      console.log(JSON.stringify(releases, null, 2));
     } else {
       // Ensure output directory exists
       const outputDir = path.dirname(outputFile);
       await fs.mkdir(outputDir, { recursive: true });
 
       // Write to file
-      await fs.writeFile(outputFile, JSON.stringify(downloadsData, null, 2), "utf8");
+      await fs.writeFile(outputFile, JSON.stringify(releases, null, 2), "utf8");
       console.error(`Successfully updated ${outputFile}`);
     }
   } catch (error) {

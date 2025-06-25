@@ -17,11 +17,10 @@
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "prepublishOnly": "clean-package",
     "postpublish": "clean-package restore",
-    "prepare-docs-data": "npm run build:xmlui-metadata",
     "generate-docs-summaries": "node scripts/generate-docs/generate-summary-files.mjs",
-    "generate-docs": "node scripts/generate-docs/get-docs.mjs && npm run generate-docs-summaries",
-    "generate-all-docs": "npm run build:xmlui-metadata && npm run build:ext-meta && npm run generate-docs",
-    "export-themes": "npm run prepare-docs-data && node scripts/generate-docs/create-theme-files.mjs",
+    "generate-docs": "node scripts/generate-docs/get-docs.mjs",
+    "generate-all-docs": "npm run build:xmlui-metadata && npm un build:ext-meta && npm run generate-docs",
+    "export-themes": "npm run build:xmlui-metadata && node scripts/generate-docs/create-theme-files.mjs",
     "gen:langserver-metadata": "node scripts/get-langserver-metadata.mjs > src/language-server/xmlui-metadata-generated.mjs"
   },
   "dependencies": {
