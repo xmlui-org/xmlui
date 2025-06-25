@@ -173,6 +173,18 @@ export const HelloWorld = React.forwardRef<HTMLDivElement, Props>(
 - **Event Handlers**: Standard React click handlers for interactivity
 - **Classnames**: Uses the `classnames` library for conditional CSS classes
 
+### Test the Basic Component
+
+At this point, you can test the basic component structure:
+
+```xmlui-pg display
+<App>
+  <HelloWorld />
+</App>
+```
+
+This demonstrates the component rendering with its default props and basic interactive functionality.
+
 ## Step 3: Create Component Styles with XMLUI Theming
 
 Create `xmlui/src/components/HelloWorld/HelloWorld.module.scss`:
@@ -321,6 +333,21 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-success", $component);
 - **Performance** - Programmatic generation is more efficient than manual string parsing
 - **Browser Compatibility** - Works reliably across all browsers including Edge
 
+### Test Theme Variants
+
+With the theming system in place, you can test the theme variants:
+
+```xmlui-pg display
+<App>
+  <VStack spacing="4">
+    <HelloWorld message="Default theme" />
+    <HelloWorld message="Success theme" theme="success" />
+  </VStack>
+</App>
+```
+
+This demonstrates how the theme variants change the visual appearance using the XMLUI theming system.
+
 ## Step 4: Create Component Metadata and Renderer
 
 Create `xmlui/src/components/HelloWorld/HelloWorld.tsx`:
@@ -426,6 +453,30 @@ export const helloWorldComponentRenderer = createComponentRenderer(
 - **`extractValue`**: Safely extracts prop values from XMLUI nodes
 - **`renderChild`**: Renders nested XMLUI content
 - **`layoutCss`**: Provides XMLUI layout styling
+
+### Test Props and Children
+
+With the metadata and renderer complete, you can test custom props and nested content:
+
+```xmlui-pg display
+<App>
+  <VStack spacing="4">
+    <!-- Custom message prop -->
+    <HelloWorld message="Custom greeting message!" />
+
+    <!-- With nested content -->
+    <HelloWorld message="With nested content">
+      <Text>This text is nested inside the HelloWorld component</Text>
+      <Text>Multiple children are supported</Text>
+    </HelloWorld>
+  </VStack>
+</App>
+```
+
+This demonstrates:
+- How the `message` prop customizes the greeting text
+- How `renderChild` processes nested XMLUI content
+- How the component handles multiple children elements
 
 ## Step 5: Add Event Handling
 
@@ -594,6 +645,8 @@ This demonstrates:
 
 ## Step 7: Register the Component
 
+Once your component is built and tested, you need to register it with XMLUI's component system. This makes the component available for use in XMLUI markup throughout your application.
+
 Add your component to `xmlui/src/components/ComponentProvider.tsx`.
 
 First, add the import near the top with other component imports:
@@ -614,38 +667,14 @@ if (process.env.VITE_USED_COMPONENTS_HelloWorld !== "false") {
 }
 ```
 
-## Step 8: Test Your Component
+### Understanding Component Registration
 
-You can now use your HelloWorld component in XMLUI markup:
+The registration process connects your component to XMLUI's rendering engine:
 
-### Basic Usage
-```xml
-<App>
-  <HelloWorld />
-</App>
-```
+- **Environment Variable Check**: The `process.env.VITE_USED_COMPONENTS_HelloWorld` check allows for conditional component inclusion, enabling tree-shaking for production builds
+- **registerCoreComponent()**: Adds your component renderer to XMLUI's component registry, making it available for use in markup
+- **Import Pattern**: Always import the renderer (not the native component) for registration
 
-### Interactive Examples
-
-Try these examples in the XMLUI playground:
-
-```xmlui-pg display
-<App>
-  <VStack spacing="4">
-    <!-- Custom message -->
-    <HelloWorld message="Hello World!" />
-
-    <!-- With nested content -->
-    <HelloWorld message="Nested content">
-      <Text>Nested text</Text>
-    </HelloWorld>
-
-    <!-- Theme variant -->
-    <HelloWorld message="Success theme" theme="success" />
-
-  </VStack>
-</App>
-```
 ## Common Patterns Explained
 
 ### Value Extraction
