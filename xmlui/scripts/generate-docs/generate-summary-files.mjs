@@ -55,13 +55,6 @@ logger.info("Components summary DONE");
 
 // logger.info("Extensions summary DONE");
 
-// NOTE: this does not work because we don't generate html tag docs
-// html tags
-// generateComponentsSummary(
-//   "# HtmlTag Components",
-//   join(FOLDERS.pages, "html-tag-components.md"),
-// );
-
 // ---
 
 /**
@@ -70,7 +63,7 @@ logger.info("Components summary DONE");
  * otherwise it appends one to the end of the file.
  * @param {string} metadataFile The path & name of the file containing the component metadata
  * @param {string} urlPath the path that is used to point to the generated component article in the docs
- * @param {string} outFolder
+ * @param {string} outFolder The folder to add the summary to
  * @param {string} summaryFile The name of the file (with extesion) to add the summary to
  * @param {string} summarySectionName The section to look for and add the summary to
  * @param {boolean?} hasRowNums Whether to add row numbers to the summary table
@@ -97,7 +90,7 @@ function generateComponentsSummary(
 
     const metadata = JSON.parse(fs.readFileSync(metadataFile, "utf8"));
 
-    const table = createSummary(metadata, urlPath, outFolder, hasRowNums);
+    const table = createSummaryTable(metadata, urlPath, outFolder, hasRowNums);
 
     const fileContents = fs.readFileSync(outFile, "utf8");
     let { beforeSection, afterSection } = getSectionBeforeAndAfter(
@@ -121,7 +114,7 @@ function generateComponentsSummary(
  * @param {boolean?} hasRowNums should the table have numbered rows
  * @returns stringified markdown table
  */
-function createSummary(metadata, urlPath, filePath, hasRowNums = false) {
+function createSummaryTable(metadata, urlPath, filePath, hasRowNums = false) {
   const headers = [{ value: "Component", style: "center" }, "Description"];
   const rows = metadata
     .sort((a, b) => a.displayName.localeCompare(b.displayName))

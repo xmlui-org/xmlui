@@ -101,8 +101,13 @@ export const TEMPLATE_STRINGS = {
 // From DocsGenerator.mjs
 export const OUTPUT_FILES = {
   METADATA_JSON: "metadata.json",
+  LANDING_METADATA_JSON: "landing-metadata.json",
   PAGES_MAP: "pages.js",
   DOWNLOADS_MAP: "downloads.js"
+};
+
+export const URL_REFERENCES = {
+  DOCS: "https://docs.xmlui.com/",
 };
 
 // From MetadataProcessor.mjs

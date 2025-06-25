@@ -98,6 +98,33 @@ export class DocsGenerator {
   }
 
   /**
+   * Creates the metadata JSON for the landing page to link components to the documentation.
+   * @param {string} docsUrl docs site base URL
+   * @param {string} pathToEndpoint the path that leads to the component articles on the site
+   */
+  async createMetadataJsonForLanding(docsUrl, pathToEndpoint) {
+    logger.info("Creating metadata JSON for landing page");
+    try {
+      const dataForLanding = this.metadata.map((component) => ({
+        displayName: component.displayName,
+        description: component.description,
+        docFileLink: new URL(`${pathToEndpoint}/${component.displayName}`, docsUrl).href,
+      }));
+      const distMetaFolder = join(FOLDERS.xmluiDist, "metadata");
+      if (!existsSync(distMetaFolder)) {
+        await mkdir(distMetaFolder, { recursive: true });
+      }
+
+      await writeFile(
+        join(distMetaFolder, OUTPUT_FILES.LANDING_METADATA_JSON),
+        JSON.stringify(dataForLanding, null, 2),
+      );
+    } catch (error) {
+      processError(error);
+    }
+  }
+
+  /**
    * Generates the package description section in a specified file for a given Extension package.
    * @param {string} packageDescription The data to add to the file
    * @param {string} sectionHeading Name & level of the section to (re)generate
