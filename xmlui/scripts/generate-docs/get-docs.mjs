@@ -18,8 +18,11 @@ import {
   LOG_MESSAGES,
   ERROR_MESSAGES,
   METADATA_PROPERTIES,
-  TEMPLATE_STRINGS
+  TEMPLATE_STRINGS,
+  ERROR_HANDLING
 } from "./constants.mjs";
+import { handleFatalError, handleNonFatalError, withErrorHandling } from "./error-handling.mjs";
+import loadConfig from "./input-handler.mjs";
 
 // --- Main
 
@@ -102,7 +105,7 @@ async function generateExtenionPackages(metadata) {
   }
 
   // generate a _meta.json for the folder names
-  try {
+  await withErrorHandling(async () => {
     const extensionPackagesMetafile = join(extensionsFolder, FILE_EXTENSIONS.METADATA);
 
     const folderNames = Object.fromEntries(
@@ -116,9 +119,7 @@ async function generateExtenionPackages(metadata) {
     // Do not include the summary file in the _meta.json
     deleteFileIfExists(extensionPackagesMetafile);
     await writeFile(extensionPackagesMetafile, JSON.stringify(folderNames, null, 2));
-  } catch (e) {
-    logger.error(ERROR_MESSAGES.WRITE_META_FILE_ERROR, e?.message || ERROR_MESSAGES.UNKNOWN_ERROR);
-  }
+  }, "extension packages metadata generation", ERROR_HANDLING.EXIT_CODES.FILE_NOT_FOUND);
 }
 
 async function generateComponents(metadata) {
@@ -178,7 +179,8 @@ async function cleanFolder(folderToClean) {
   // NOTE: This is the important part: we only delete .mdx and .md files and the _meta.json
   const cleanCondition = (file) =>
     FILE_EXTENSIONS.MARKDOWN.includes(extname(file)) || basename(file) === FILE_EXTENSIONS.METADATA;
-  try {
+  
+  await withErrorHandling(async () => {
     const files = await readdir(folderToClean);
     const unlinkPromises = files
       .filter(cleanCondition)
@@ -191,30 +193,7 @@ async function cleanFolder(folderToClean) {
       .catch((err) => {
         throw new ErrorWithSeverity(err.message, LOGGER_LEVELS.error);
       });
-  } catch (error) {
-    processError(error);
-    throw error;
-  }
-}
-
-async function loadConfig(configPath) {
-  if (!configPath) return;
-
-  logger.info(LOG_MESSAGES.LOADING_CONFIG);
-  try {
-    if (!configPath) {
-      throw new ErrorWithSeverity(ERROR_MESSAGES.NO_CONFIG_PATH, LOGGER_LEVELS.error);
-    }
-    const fileContents = await readFile(configPath, "utf8");
-    const { excludeComponentStatuses, ...data } = JSON.parse(fileContents);
-    return {
-      excludeComponentStatuses: excludeComponentStatuses.map((status) => status.toLowerCase()),
-      ...data,
-    };
-  } catch (error) {
-    processError("Error reading JSON file:", error);
-    throw error;
-  }
+  }, "folder cleanup", ERROR_HANDLING.EXIT_CODES.FILE_NOT_FOUND);
 }
 
 // TODO: We assume a lot here, need to make all the folders and filenames transparent
@@ -286,7 +265,7 @@ async function dynamicallyLoadExtensionPackages() {
       logger.info(LOG_MESSAGES.LOADED_EXTENSION_PACKAGE, basename(dir));
       importedMetadata[basename(dir)] = extensionPackage;
     } catch (error) {
-      processError(error);
+      handleNonFatalError(error, `loading extension package: ${basename(dir)}`);
     }
   }
   return importedMetadata;

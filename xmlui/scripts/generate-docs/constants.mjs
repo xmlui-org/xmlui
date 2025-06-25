@@ -81,7 +81,13 @@ export const LOG_MESSAGES = {
 export const ERROR_MESSAGES = {
   NO_CONFIG_PATH: "No config path provided",
   WRITE_META_FILE_ERROR: "Could not write _meta file: ",
-  UNKNOWN_ERROR: "unknown error"
+  UNKNOWN_ERROR: "unknown error",
+  NO_THEME_INFO: "No theme information found. Please run the metadata build first.",
+  NO_COMPONENT_METADATA: "No component metadata found. Please run the metadata build first.",
+  FILE_WRITE_ERROR: "Failed to write file",
+  DIRECTORY_CREATE_ERROR: "Failed to create directory",
+  METADATA_LOAD_ERROR: "Failed to load metadata",
+  CONFIG_VALIDATION_ERROR: "Configuration validation failed"
 };
 
 export const METADATA_PROPERTIES = {
@@ -190,4 +196,16 @@ export const PAGES_MAP_CONFIG = {
 export const DOWNLOADS_MAP_CONFIG = {
   BASE_URL_CUTOFF: "files",
   INCLUDED_FILE_EXTENSIONS: [".zip"]
+};
+
+// Error handling utilities
+export const ERROR_HANDLING = {
+  EXIT_CODES: {
+    SUCCESS: 0,
+    GENERAL_ERROR: 1,
+    INVALID_CONFIG: 2,
+    FILE_NOT_FOUND: 3,
+    METADATA_ERROR: 4
+  },
+  DEFAULT_EXIT_CODE: 1
 };
