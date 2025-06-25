@@ -7,6 +7,12 @@ import { getSectionBeforeAndAfter, strBufferToLines, toHeadingPath } from "./uti
 import { buildPagesMap } from "./build-pages-map.mjs";
 import { buildDownloadsMap } from "./build-downloads-map.mjs";
 import { FOLDERS } from "./folders.mjs";
+import { 
+  FILE_EXTENSIONS, 
+  OUTPUT_FILES, 
+  ERROR_MESSAGES,
+  METADATA_SECTIONS
+} from "./constants.mjs";
 
 logger.setLevels(LOGGER_LEVELS.warning, LOGGER_LEVELS.error);
 
@@ -47,10 +53,10 @@ export class DocsGenerator {
         };
 
         const entries = addDescriptionRef(extendedComponentData, [
-          "props",
-          "events",
-          "apis",
-          "contextVars",
+          METADATA_SECTIONS.PROPS,
+          METADATA_SECTIONS.EVENTS,
+          METADATA_SECTIONS.API,
+          METADATA_SECTIONS.CONTEXT_VARS,
         ]);
         return { ...extendedComponentData, ...entries };
       });
@@ -69,9 +75,9 @@ export class DocsGenerator {
    */
   writeMetaSummary(metaFileContents, outputFolder) {
     try {
-      writeFileSync(join(outputFolder, "_meta.json"), JSON.stringify(metaFileContents, null, 2));
+      writeFileSync(join(outputFolder, FILE_EXTENSIONS.METADATA), JSON.stringify(metaFileContents, null, 2));
     } catch (e) {
-      logger.error("Could not write _meta file: ", e?.message || "unknown error");
+      logger.error(ERROR_MESSAGES.WRITE_META_FILE_ERROR, e?.message || ERROR_MESSAGES.UNKNOWN_ERROR);
     }
   }
 
@@ -83,7 +89,7 @@ export class DocsGenerator {
         await mkdir(outPath, { recursive: true });
       }
       await writeFile(
-        join(outPath, `${filename ? `${filename}-` : ""}metadata.json`),
+        join(outPath, `${filename ? `${filename}-` : ""}${OUTPUT_FILES.METADATA_JSON}`),
         JSON.stringify(this.metadata, null, 2),
       );
     } catch (error) {
@@ -121,7 +127,7 @@ export class DocsGenerator {
     logger.info("Generating permalinks for file headings");
 
     const docFiles = existsSync(this.folders.outFolder)
-      ? (await readdir(this.folders.outFolder)).filter((file) => extname(file) === ".md")
+      ? (await readdir(this.folders.outFolder)).filter((file) => extname(file) === FILE_EXTENSIONS.MARKDOWN[0])
       : [];
 
     for (const file of docFiles) {
@@ -135,7 +141,7 @@ export class DocsGenerator {
 
   async generateArticleAndDownloadsLinks() {
     try {
-      const pagesMapFile = join(FOLDERS.docsMeta, "pages.js");
+      const pagesMapFile = join(FOLDERS.docsMeta, OUTPUT_FILES.PAGES_MAP);
       if (existsSync(pagesMapFile)) {
         await unlink(pagesMapFile);
         await writeFile(pagesMapFile, "");
@@ -144,7 +150,7 @@ export class DocsGenerator {
       logger.info("Generating link IDs for article headings");
       buildPagesMap(FOLDERS.pages, pagesMapFile);
 
-      const downloadsMapFile = join(FOLDERS.docsMeta, "downloads.js");
+      const downloadsMapFile = join(FOLDERS.docsMeta, OUTPUT_FILES.DOWNLOADS_MAP);
       if (existsSync(downloadsMapFile)) {
         await unlink(downloadsMapFile);
         await writeFile(downloadsMapFile, "");

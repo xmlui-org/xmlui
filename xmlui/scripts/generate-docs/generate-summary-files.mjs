@@ -3,9 +3,14 @@ import * as path from "path";
 import { FOLDERS } from "./folders.mjs";
 import { createTable, getSectionBeforeAndAfter } from "./utils.mjs";
 import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
+import {
+  COMPONENT_STATUS_CONFIG,
+  SUMMARY_FILE_CONFIG,
+  OUTPUT_FILES
+} from "./constants.mjs";
 
-const ACCEPTED_STATUSES = ["stable", "experimental", "deprecated", "in progress"];
-const DEFAULT_STATUS = "stable";
+const ACCEPTED_STATUSES = COMPONENT_STATUS_CONFIG.ACCEPTED_STATUSES;
+const DEFAULT_STATUS = COMPONENT_STATUS_CONFIG.DEFAULT_STATUS;
 
 logger.setLevels(LOGGER_LEVELS.warning, LOGGER_LEVELS.error);
 logger.info("Generating summary files...");
@@ -17,11 +22,11 @@ const componentsMetaFolder = path.join(FOLDERS.script, "metadata", "components")
 const componentsOutFolder = path.join(FOLDERS.docsRoot, "content", "components");
 
 generateComponentsSummary(
-  path.join(componentsMetaFolder, "metadata.json"),
+  path.join(componentsMetaFolder, OUTPUT_FILES.METADATA_JSON),
   "components",
   componentsOutFolder,
   "_overview.md",
-  "# Components Overview [#components-overview]",
+  SUMMARY_FILE_CONFIG.COMPONENTS_OVERVIEW_HEADER,
 );
 
 logger.info("Components summary DONE");
@@ -43,7 +48,7 @@ logger.info("Components summary DONE");
 //       `extensions/${extensionName}`,
 //       extensionOutFolder,
 //       `_overview.md`,
-//       "## Package Components",
+//       SUMMARY_FILE_CONFIG.PACKAGE_COMPONENTS_HEADER,
 //     );
 //   }
 // });

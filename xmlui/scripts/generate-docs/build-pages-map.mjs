@@ -8,9 +8,10 @@ import {
   traverseDirectory,
 } from "./utils.mjs";
 import { logger } from "./logger.mjs";
+import { PAGES_MAP_CONFIG } from "./constants.mjs";
 
-const pathCutoff = "pages";
-const includedFileExtensions = [".mdx", ".md"];
+const pathCutoff = PAGES_MAP_CONFIG.PATH_CUTOFF;
+const includedFileExtensions = PAGES_MAP_CONFIG.INCLUDED_FILE_EXTENSIONS;
 
 /**
  * Creates a file containing link constant variables to components/articles in the pages folder.

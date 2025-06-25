@@ -2,9 +2,10 @@ import { writeFileSync, statSync } from "fs";
 import { basename, extname } from "path";
 import { gatherAndRemoveDuplicates, toNormalizedUpperCase, traverseDirectory } from "./utils.mjs";
 import { logger } from "./logger.mjs";
+import { DOWNLOADS_MAP_CONFIG } from "./constants.mjs";
 
-const baseUrlCutoff = "files";
-const includedFileExtensions = [".zip"];
+const baseUrlCutoff = DOWNLOADS_MAP_CONFIG.BASE_URL_CUTOFF;
+const includedFileExtensions = DOWNLOADS_MAP_CONFIG.INCLUDED_FILE_EXTENSIONS;
 
 /**
  * Creates a file containing download link constants for downloadable files.

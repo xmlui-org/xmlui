@@ -7,11 +7,24 @@ import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.mjs";
 import { FOLDERS } from "./folders.mjs";
 import { existsSync } from "fs";
+import {
+  COMPONENT_STATES,
+  FILE_EXTENSIONS,
+  FOLDER_NAMES,
+  CONFIG_FILES,
+  SUMMARY_CONFIG,
+  PACKAGE_PATTERNS,
+  FILE_NAMES,
+  LOG_MESSAGES,
+  ERROR_MESSAGES,
+  METADATA_PROPERTIES,
+  TEMPLATE_STRINGS
+} from "./constants.mjs";
 
 // --- Main
 
 // Prefilter metadata by isHtmlTag
-const filterByProps = { isHtmlTag: true };
+const filterByProps = { [METADATA_PROPERTIES.IS_HTML_TAG]: true };
 const [components, htmlTagComponents] = partitionMetadata(
   collectedComponentMetadata,
   filterByProps,
@@ -26,16 +39,16 @@ await generateComponents(components);
 // --- Helpers
 
 async function generateExtenionPackages(metadata) {
-  logger.info(`Generating extension package docs`);
+  logger.info(LOG_MESSAGES.GENERATING_EXTENSION_DOCS);
 
-  const extensionsConfig = await loadConfig(join(FOLDERS.script, "extensions-config.json"));
-  const outputFolder = join(FOLDERS.docsRoot, "content", "extensions");
+  const extensionsConfig = await loadConfig(join(FOLDERS.script, CONFIG_FILES.EXTENSIONS));
+  const outputFolder = join(FOLDERS.docsRoot, FOLDER_NAMES.CONTENT, FOLDER_NAMES.EXTENSIONS);
   const extensionsFolder = outputFolder;
 
   const unlistedFolders = [];
   for (const packageName in metadata) {
     // Just to be sure we don't generate anything internal
-    if (metadata[packageName].state === "internal") {
+    if (metadata[packageName].state === COMPONENT_STATES.INTERNAL) {
       continue;
     }
 
@@ -50,7 +63,7 @@ async function generateExtenionPackages(metadata) {
       {
         sourceFolder: metadata[packageName].sourceFolder,
         outFolder: packageFolder,
-        examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
+        examplesFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.COMPONENT_SAMPLES),
       },
       { excludeComponentStatuses: extensionsConfig?.excludeComponentStatuses },
     );
@@ -68,19 +81,19 @@ async function generateExtenionPackages(metadata) {
       continue;
     }
 
-    const summaryTitle = "Extension Overview";
-    const summaryFileName = "_overview";
+    const summaryTitle = SUMMARY_CONFIG.EXTENSIONS.title;
+    const summaryFileName = SUMMARY_CONFIG.EXTENSIONS.fileName;
 
     // In both of these cases, we are writing to the same file
     const indexFile = join(packageFolder, `${summaryFileName}.md`);
     deleteFileIfExists(indexFile);
 
-    await extensionGenerator.exportMetadataToJson("extensions", packageName);
+    await extensionGenerator.exportMetadataToJson(FOLDER_NAMES.EXTENSIONS, packageName);
 
     componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
     await extensionGenerator.generatePackageDescription(
       metadata[packageName].description,
-      `# ${fromKebabtoReadable(packageName)} Package`,
+      TEMPLATE_STRINGS.PACKAGE_HEADER(packageName),
       indexFile,
     );
 
@@ -90,7 +103,7 @@ async function generateExtenionPackages(metadata) {
 
   // generate a _meta.json for the folder names
   try {
-    const extensionPackagesMetafile = join(extensionsFolder, "_meta.json");
+    const extensionPackagesMetafile = join(extensionsFolder, FILE_EXTENSIONS.METADATA);
 
     const folderNames = Object.fromEntries(
       Object.keys(metadata)
@@ -104,37 +117,37 @@ async function generateExtenionPackages(metadata) {
     deleteFileIfExists(extensionPackagesMetafile);
     await writeFile(extensionPackagesMetafile, JSON.stringify(folderNames, null, 2));
   } catch (e) {
-    logger.error("Could not write _meta file: ", e?.message || "unknown error");
+    logger.error(ERROR_MESSAGES.WRITE_META_FILE_ERROR, e?.message || ERROR_MESSAGES.UNKNOWN_ERROR);
   }
 }
 
 async function generateComponents(metadata) {
-  const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
-  const outputFolder = join(FOLDERS.docsRoot, "content", "components");
+  const componentsConfig = await loadConfig(join(FOLDERS.script, CONFIG_FILES.COMPONENTS));
+  const outputFolder = join(FOLDERS.docsRoot, FOLDER_NAMES.CONTENT, FOLDER_NAMES.COMPONENTS);
 
   const metadataGenerator = new DocsGenerator(
     metadata,
     {
-      sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
+      sourceFolder: join(FOLDERS.projectRoot, "xmlui", FOLDER_NAMES.SRC, FOLDER_NAMES.COMPONENTS),
       // --- CHANGE: Now documents are generated in the a new folder, outside of pages
       outFolder: outputFolder,
-      // outFolder: join(FOLDERS.docsRoot, "pages", "components"),
-      examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
+      // outFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.PAGES, FOLDER_NAMES.COMPONENTS),
+      examplesFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.COMPONENT_SAMPLES),
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
 
   if (componentsConfig?.cleanFolder) {
     // --- CHANGE: Now documents are generated in the a new folder, outside of pages
-    // await cleanFolder(join(FOLDERS.pages, "components"));
+    // await cleanFolder(join(FOLDERS.pages, FOLDER_NAMES.COMPONENTS));
     await cleanFolder(outputFolder);
   }
 
   let componentsAndFileNames = metadataGenerator.generateDocs();
 
-  const summaryTitle = "Components Overview";
-  const summaryFileName = "_overview";
-  await metadataGenerator.exportMetadataToJson("components");
+  const summaryTitle = SUMMARY_CONFIG.COMPONENTS.title;
+  const summaryFileName = SUMMARY_CONFIG.COMPONENTS.fileName;
+  await metadataGenerator.exportMetadataToJson(FOLDER_NAMES.COMPONENTS);
   componentsAndFileNames = insertKeyAt(summaryFileName, summaryTitle, componentsAndFileNames, 0);
 
   metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
@@ -144,13 +157,13 @@ async function generateComponents(metadata) {
 
 // NOTE: Unused - we are not generating Html component docs
 async function generateHtmlTagComponents(metadata) {
-  const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
+  const componentsConfig = await loadConfig(join(FOLDERS.script, CONFIG_FILES.COMPONENTS));
   const metadataGenerator = new DocsGenerator(
     metadata,
     {
-      sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
-      outFolder: join(FOLDERS.docsRoot, "pages", "components"),
-      examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
+      sourceFolder: join(FOLDERS.projectRoot, "xmlui", FOLDER_NAMES.SRC, FOLDER_NAMES.COMPONENTS),
+      outFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.PAGES, FOLDER_NAMES.COMPONENTS),
+      examplesFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.COMPONENT_SAMPLES),
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
@@ -158,13 +171,13 @@ async function generateHtmlTagComponents(metadata) {
 }
 
 async function cleanFolder(folderToClean) {
-  logger.info(`Cleaning ${basename(folderToClean)} by removing previous doc files`);
+  logger.info(LOG_MESSAGES.CLEANING_FOLDER(basename(folderToClean)));
 
   if (!existsSync(folderToClean)) return;
 
   // NOTE: This is the important part: we only delete .mdx and .md files and the _meta.json
   const cleanCondition = (file) =>
-    extname(file) === ".mdx" || extname(file) === ".md" || basename(file) === "_meta.json";
+    FILE_EXTENSIONS.MARKDOWN.includes(extname(file)) || basename(file) === FILE_EXTENSIONS.METADATA;
   try {
     const files = await readdir(folderToClean);
     const unlinkPromises = files
@@ -173,7 +186,7 @@ async function cleanFolder(folderToClean) {
 
     await Promise.all(unlinkPromises)
       .then(() => {
-        logger.info("All files have been successfully deleted");
+        logger.info(LOG_MESSAGES.FILES_DELETED_SUCCESS);
       })
       .catch((err) => {
         throw new ErrorWithSeverity(err.message, LOGGER_LEVELS.error);
@@ -187,10 +200,10 @@ async function cleanFolder(folderToClean) {
 async function loadConfig(configPath) {
   if (!configPath) return;
 
-  logger.info("Loading config");
+  logger.info(LOG_MESSAGES.LOADING_CONFIG);
   try {
     if (!configPath) {
-      throw new ErrorWithSeverity("No config path provided", LOGGER_LEVELS.error);
+      throw new ErrorWithSeverity(ERROR_MESSAGES.NO_CONFIG_PATH, LOGGER_LEVELS.error);
     }
     const fileContents = await readFile(configPath, "utf8");
     const { excludeComponentStatuses, ...data } = JSON.parse(fileContents);
@@ -215,14 +228,14 @@ async function loadConfig(configPath) {
  * >>} imported metadata
  */
 async function dynamicallyLoadExtensionPackages() {
-  logger.info(`Loading extension packages`);
+  logger.info(LOG_MESSAGES.LOADING_EXTENSION_PACKAGES);
 
-  const defaultPackageState = "experimental";
+  const defaultPackageState = COMPONENT_STATES.EXPERIMENTAL;
 
   const extendedPackagesFolder = join(FOLDERS.projectRoot, "packages");
   const packageDirectories = (await readdir(extendedPackagesFolder)).filter((entry) => {
     return (
-      entry.startsWith("xmlui-") && lstatSync(join(extendedPackagesFolder, entry)).isDirectory()
+      entry.startsWith(PACKAGE_PATTERNS.XMLUI_PREFIX) && lstatSync(join(extendedPackagesFolder, entry)).isDirectory()
     );
   });
 
@@ -236,27 +249,26 @@ async function dynamicallyLoadExtensionPackages() {
     };
     dir = join(extendedPackagesFolder, dir);
     try {
-      const packageFolderDist = join(dir, "dist");
+      const packageFolderDist = join(dir, FOLDER_NAMES.DIST);
       if (!existsSync(packageFolderDist)) {
-        logger.warning(`No dist folder found for ${dir}`);
+        logger.warning(LOG_MESSAGES.NO_DIST_FOLDER(dir));
         continue;
       }
       const distContents = await readdir(packageFolderDist);
       for (const file of distContents) {
         let filePath = join(packageFolderDist, file);
-        if (filePath.endsWith(`${basename(dir)}-metadata.js`) && existsSync(filePath)) {
+        if (filePath.endsWith(`${basename(dir)}${PACKAGE_PATTERNS.METADATA_SUFFIX}`) && existsSync(filePath)) {
           filePath = winPathToPosix(relative(FOLDERS.script, filePath));
           const { componentMetadata } = await import(filePath);
           if (!componentMetadata) {
             logger.warning(
-              `No meta object found for package: ${basename(dir)}.\n Have you built the package?`,
+              LOG_MESSAGES.NO_METADATA_OBJECT(basename(dir))
             );
             continue;
           }
           if (!componentMetadata.metadata) {
             logger.warning(
-              `No component metadata found in meta object for package: ${basename(dir)}. `
-                + `Check the "meta/componentsMetadata.ts" file.`,
+              LOG_MESSAGES.NO_COMPONENT_METADATA(basename(dir))
             );
             continue;
           }
@@ -267,11 +279,11 @@ async function dynamicallyLoadExtensionPackages() {
         }
       }
       // Ignore internal packages
-      if (extensionPackage.state === "internal") {
-        logger.info("Skipping internal extension package:", dir);
+      if (extensionPackage.state === COMPONENT_STATES.INTERNAL) {
+        logger.info(LOG_MESSAGES.SKIPPING_INTERNAL_PACKAGE, dir);
         continue;
       }
-      logger.info("Loaded extension package:", basename(dir));
+      logger.info(LOG_MESSAGES.LOADED_EXTENSION_PACKAGE, basename(dir));
       importedMetadata[basename(dir)] = extensionPackage;
     } catch (error) {
       processError(error);
