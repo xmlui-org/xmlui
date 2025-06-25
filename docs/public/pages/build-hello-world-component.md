@@ -327,11 +327,11 @@ With the theming system in place, you can test different themes using XMLUI's `<
   <VStack spacing="4">
       <HelloWorld message="Default theme" />
 
-    <Theme themeId="earthtone">
-      <HelloWorld message="Earthtone theme" />
+    <Theme themeId="xmlui-orange">
+      <HelloWorld message="Orange theme" />
     </Theme>
 
-    <Theme themeId="earthtone"
+    <Theme themeId="xmlui-orange"
       backgroundColor-HelloWorld="$color-success-50"
       borderColor-HelloWorld="$color-success-200"
       textColor-HelloWorld="$color-success-800"
@@ -343,7 +343,7 @@ With the theming system in place, you can test different themes using XMLUI's `<
 ```
 
 This demonstrates the proper XMLUI theming approach:
-- Using `themeId` to switch between built-in themes (xmlui, earthtone)
+- Using `themeId` to switch between built-in themes (xmlui, xmlui-orange)
 - Customizing individual theme variables for specific styling
 - No need for component-specific theme props
 
