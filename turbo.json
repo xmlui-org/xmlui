@@ -1,6 +1,7 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "globalEnv": ["CI"],
+  "ui": "tui",
   "tasks": {
     "build:bin": {
       "outputs": ["dist/scripts/**"]
@@ -41,20 +42,19 @@
       ],
       "outputs": ["dist/**"]
     },
+    "xmlui-docs#gen:releases": {
+      "outputs": ["public/resources/files/releases.json"]
+    },
     "build:docs": {
-      "dependsOn": ["^build:extension", "^build:xmlui"],
+      "dependsOn": ["^build:extension", "^build:xmlui", "xmlui-docs#gen:releases"],
       "outputs": ["dist/**"]
     },
     "build:xmlui-test-bed": {
-      "dependsOn": [
-        "build:extension"
-      ],
+      "dependsOn": ["build:extension"],
       "outputs": ["src/testing/infrastructure/dist/**"]
     },
     "build:test-bed": {
-      "dependsOn": [
-        "build:extension"
-      ],
+      "dependsOn": ["build:extension"],
       "outputs": ["dist/**"]
     },
     "test:unit": {

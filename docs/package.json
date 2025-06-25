@@ -5,6 +5,7 @@
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
+    "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
     "build:docs": "xmlui build --buildMode=INLINE_ALL --withMock && xmlui zip-dist --target=dist/ui.zip"
   },
   "dependencies": {

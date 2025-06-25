@@ -1,0 +1,112 @@
+[
+  {
+    "tag_name": "xmlui@0.9.60",
+    "body": "### Patch Changes\n\n-   498b1ef: Experiment with automatic changelog generation #3\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.60.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.60/xmlui-0.9.60.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.57",
+    "body": "### Patch Changes\n\n-   93a1e70: fix: NavPanel - use layoutCss\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.57.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.57/xmlui-0.9.57.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.56",
+    "body": "### Patch Changes\n\n-   9a3c3b6: feat: xmlui-devtools - start dialog animation from the click, use exit animation as well\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.56.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.56/xmlui-0.9.56.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.55",
+    "body": "### Patch Changes\n\n-   d507ea8: Add AppWithCodeView component to display code and running app side-by-side\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.55.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.55/xmlui-0.9.55.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.54",
+    "body": "### Patch Changes\n\n-   2688a95: Change TreeDisplay theme variable defaults\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.54.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.54/xmlui-0.9.54.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.53",
+    "body": "### Patch Changes\n\n-   c64fa25: Allow turning on/off heading anchors in appGlobals\n-   73c2c21: wip: code inspector buttons - label change, devtools - animation update\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.53.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.53/xmlui-0.9.53.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.52",
+    "body": "### Patch Changes\n\n-   d079208: The Footer component no provides a themeable gap between its children.\n-   2a461d8: feat: NestedApp works with ApiInterceptor\n-   ad6d81e: fix NestedApp apiUrl overwrite\n-   f5b9f15: feat: xmlui-devtools - use it in a modal dialog\n-   88e4741: fix: Table columns do not allow (and indicate) sorting when bindTo is not set\n-   7af4b4e: change default borderColor\n-   851ae21: fix table styling\n-   7872ed0: Default theme variables changed for App, NestedApp, TableOfContents, and Text\n-   bf00dce: enhance xmlui parser error tolerance, recovering from unclosed tags\n-   38180ce: merge xmlui-charts into core\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.52.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.52/xmlui-0.9.52.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.51",
+    "body": "### Patch Changes\n\n-   ef7add9: Added theme variable for setting the horizontal alignment of the logo in the NavPanel.\n-   ba2b5cd: Moved Drawer logo position to left.\n-   96273bf: fix: Slider - min/max value validation\n-   1a81bcf: fix: Markdown renders inline/block images correclty\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.51.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.51/xmlui-0.9.51.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.50",
+    "body": "### Patch Changes\n\n-   e6c3b39: standalone usage: explicit codeBehind reference\n-   85031c8: Make the \"marked\" Text variant have lighter background color in dark mode.\n-   d349036: Tweaked Search dropdown panel styles. Corrected Link component text and decoration hover and active colors\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.50.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.50/xmlui-0.9.50.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.49",
+    "body": "### Patch Changes\n\n-   9afd588: fix: XmluiCodeHighlighter - update token colorizing (light/dark tone)\n-   Updated dependencies [3b5e820]\n    -   xmlui-charts@0.1.23\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.49.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.49/xmlui-0.9.49.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.9.48",
+    "body": "### Patch Changes\n\n-   b5104b0: feat: Icon component now handles the click event\n-   30d5c58: feat: Badge supports theme variable names in colormap\n-   2e7f51f: change: the canSort property of Column defaults to true\n-   4dd6d7f: feat: chart extension included by default\n-   f7f0571: fix theme component\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.48.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.48/xmlui-0.9.48.js"
+      }
+    ]
+  }
+]

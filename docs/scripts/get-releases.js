@@ -7,6 +7,35 @@ const path = require("path");
 
 // Parse CLI arguments
 const args = process.argv.slice(2);
+// Handle --help or -h flag
+if (args.includes("--help") || args.includes("-h")) {
+  const helpMessage = `
+Fetches xmlui release information from GitHub and outputs it in JSON format.
+This script relies on the GITHUB_TOKEN environment variable for authentication
+when fetching data directly from the GitHub API.
+
+Usage:
+  ./get-releases.js [options]
+
+Options:
+  --output <file>    Specify the path to the output JSON file.
+                     If this option is not provided the output will be directed to standard output.
+  --stdout           Force the JSON output to standard output.
+  --help, -h         Display this help message and exit.
+
+Environment Variables:
+  GITHUB_TOKEN        Required for fetching data from the GitHub API.
+                      A GitHub Personal Access Token with 'repo' scope (or at least
+                      permissions to read repository releases).
+                      The script will fail if this is not set
+                      and API access is attempted.
+  GITHUB_REPOSITORY   Optional. The 'owner/repo' string.
+                      Defaults to "xmlui-org/xmlui".
+`;
+  console.log(helpMessage.trimStart().trimEnd());
+  process.exit(0);
+}
+
 const outputFileIndex = args.indexOf("--output");
 const outputFile =
   outputFileIndex !== -1 && args[outputFileIndex + 1] ? args[outputFileIndex + 1] : null;
@@ -33,6 +62,7 @@ async function getXmluiReleases() {
   try {
     const releaseStr = await fs.readFile(path.join(__dirname, "..", "releases.json"));
     const releases = JSON.parse(releaseStr);
+    //
     // temporarily disabled, in favor of the 2 lines above but will be enabled when I'm done with the rest of the work
     // const octokit = initializeOctokit();
     // const { data: releases } = await octokit.rest.repos.listReleases({
@@ -97,7 +127,7 @@ async function writeReleases() {
       console.error(`Successfully updated ${outputFile}`);
     }
   } catch (error) {
-    console.error("Error updating downloads.json:", error);
+    console.error("Error writing release info:", error);
     process.exit(1);
   }
 }
