@@ -1,5 +1,13 @@
 # xmlui-playground
 
+## 0.1.6
+
+### Patch Changes
+
+- 7d255a9: Changed open in new window button tooltip label for all occurrences.
+- Updated dependencies [7d255a9]
+  - xmlui-devtools@0.1.18
+
 ## 0.1.5
 
 ### Patch Changes
