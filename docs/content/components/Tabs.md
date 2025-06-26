@@ -72,29 +72,6 @@ Available values: `horizontal` **(default)**, `vertical`
 </App>
 ```
 
-### `tabTemplate` [#tabtemplate]
-
-This property declares the template for the clickable tab area.
-
-```xmlui-pg copy {2-4} display name="Example: tabTemplate" height="200px"
-<App>
-  <Tabs>
-    <property name="tabTemplate">
-      <Card title="{$item.label}" />
-    </property>
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
-</App>
-```
-
 ## Events [#events]
 
 This component does not have any events.

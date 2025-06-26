@@ -5,6 +5,8 @@ import {RenderPropSticky} from "react-sticky-el";
 import styles from "./StickyBox.module.scss";
 import {useRealBackground, useScrollParent} from "../../components-core/utils/hooks";
 
+// --- NOTE: React.StrictMode produces error logs using this component. Deployed apps are okay.
+// See here: https://github.com/gm0t/react-sticky-el/issues/82 
 
 // =====================================================================================================================
 // React StickyBox component implementation

@@ -34,8 +34,8 @@ export const defaultProps: Pick<
   Props,
   "initialValue" | "value" | "enabled" | "validationStatus"
 > = {
-  initialValue: "",
-  value: "",
+  initialValue: "#000000",
+  value: "#000000",
   enabled: true,
   validationStatus: "none",
 };
