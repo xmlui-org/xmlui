@@ -169,10 +169,5 @@ Another way to keep your markup clean: rely on XMLUI's layout and style engine t
 
 ]]>
     </Markdown>
-    <DocumentLinks
-      prevLink="/reactive-intro"
-      prevTitle="Reactive Data"
-      nextLink="/themes-intro"
-      nextTitle="Themes"/>
   </DocumentPage>
 </Component>

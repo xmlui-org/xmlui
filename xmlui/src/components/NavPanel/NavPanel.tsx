@@ -4,7 +4,7 @@ import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dComponent } from "../metadata-helpers";
-import { NavPanel, defaultProps } from "./NavPanelNative";
+import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
 
 const COMP = "NavPanel";
 
@@ -43,7 +43,8 @@ export const NavPanelMd = createMetadata({
 export const navPanelRenderer = createComponentRenderer(
   COMP,
   NavPanelMd,
-  ({ node, renderChild, layoutCss, layoutContext }) => {
+  ({ node, renderChild, layoutCss, layoutContext, extractValue }) => {
+    const navLinks = buildNavHierarchy(node.children, extractValue);
     return (
       <NavPanel
         style={layoutCss}
@@ -51,6 +52,7 @@ export const navPanelRenderer = createComponentRenderer(
         className={layoutContext?.themeClassName}
         inDrawer={layoutContext?.inDrawer}
         renderChild={renderChild}
+        navLinks={navLinks}
       >
         {renderChild(node.children)}
       </NavPanel>

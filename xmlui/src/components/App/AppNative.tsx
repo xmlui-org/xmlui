@@ -27,6 +27,7 @@ import { AppContextAwareAppHeader } from "../../components/AppHeader/AppHeaderNa
 import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
 import { AppLayoutContext } from "./AppLayoutContext";
 import { SearchContextProvider } from "./SearchContext";
+import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 
 type Props = {
   children: ReactNode;
@@ -90,7 +91,7 @@ export function App({
   const safeLayout = layoutWithDefaultValue
     ?.trim()
     .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
-  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll } = useAppContext();
+  const { setLoggedInUser, mediaSize, forceRefreshAnchorScroll, appGlobals } = useAppContext();
   const hasRegisteredHeader = header !== undefined;
   const hasRegisteredNavPanel = navPanelDef !== undefined;
 
@@ -212,8 +213,14 @@ export function App({
   }, [forceRefreshAnchorScroll]);
 
   const [subNavPanelSlot, setSubNavPanelSlot] = useState(null);
+  const [linkMap, setLinkMap] = useState<Map<string, NavHierarchyNode>>(new Map());
+  
   const registerSubNavPanelSlot = useCallback((element) => {
     setSubNavPanelSlot(element);
+  }, []);
+
+  const registerLinkMap = useCallback((newLinkMap: Map<string, NavHierarchyNode>) => {
+    setLinkMap(newLinkMap);
   }, []);
 
   const layoutContextValue = useMemo<IAppLayoutContext>(() => {
@@ -237,6 +244,9 @@ export function App({
       logoContentDef,
       registerSubNavPanelSlot,
       subNavPanelSlot,
+      isNested: appGlobals?.isNested || false,
+      linkMap,
+      registerLinkMap,
     };
   }, [
     hasRegisteredNavPanel,
@@ -252,6 +262,9 @@ export function App({
     logoContentDef,
     registerSubNavPanelSlot,
     subNavPanelSlot,
+    appGlobals?.isNested,
+    linkMap,
+    registerLinkMap,
   ]);
 
   useEffect(() => {

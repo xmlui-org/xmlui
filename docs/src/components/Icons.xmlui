@@ -35,9 +35,4 @@
             </VStack>
         </Items>
     </FlowLayout>
-    <DocumentLinks 
-        prevLink="/palettes" 
-        prevTitle="Palettes" 
-        nextLink="/glossary" 
-        nextTitle="Glossary"/>
 </Component>
