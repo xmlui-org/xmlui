@@ -9,7 +9,7 @@ import {
   Legend as RLegend,
 } from "recharts";
 
-import type { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
 import { useMemo } from "react";
 import { useTheme } from "xmlui";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
@@ -126,10 +126,75 @@ export function BarChart({
 
   const chartContextValue = useChartContextValue({ dataKeys, nameKey });
 
+  const containerRef = useRef(null);
+  const labelsRef = useRef<HTMLDivElement>(null);
+  const [interval, setIntervalState] = useState(0);
+  const [rotate, setRotate] = useState(0);
+  const [xAxisHeight, setXAxisHeight] = useState(50);
+  const [fontSize, setFontSize] = useState(12);
+
+  useEffect(() => {
+    const calc = () => {
+      const width = containerRef.current?.offsetWidth || 800;
+      const spans = labelsRef.current?.querySelectorAll('span') || [];
+      let maxWidth = Array.from(spans).reduce((mx, s) => Math.max(mx, s.offsetWidth), 50);
+
+      let newFontSize = 12;
+      if (data.length * maxWidth > width * 2.5) newFontSize = 9;
+      else if (data.length * maxWidth > width * 2.0) newFontSize = 10;
+      else if (data.length * maxWidth > width * 1.5) newFontSize = 11;
+      setFontSize(newFontSize);
+
+      maxWidth = maxWidth * (newFontSize / 12);
+
+      const maxTicks = Math.floor(width / maxWidth) || 1;
+      const inter = Math.max(1, Math.round(data.length / maxTicks));
+      setIntervalState(inter);
+
+      const allWidthNoRotate = data.length * maxWidth;
+      const allWidth45 = data.length * (maxWidth * Math.cos(45 * Math.PI / 180));
+
+      let angle = 0;
+      if (allWidthNoRotate <= width) {
+        angle = 0;
+      } else if (allWidth45 <= width) {
+        angle = -45;
+      } else {
+        angle = -50;
+      }
+      setRotate(angle);
+
+      let height: number;
+      if (angle === 0) height = newFontSize * 2.5;
+      else if (angle === -45) height = newFontSize * 4.5;
+      else height = newFontSize * 6.5;
+      setXAxisHeight(Math.ceil(height));
+    };
+
+    calc();
+    window.addEventListener('resize', calc);
+    return () => window.removeEventListener('resize', calc);
+  }, [data]);
+
+
+  useEffect(() => {
+    console.log("BarChart: interval", interval, "rotate", rotate);
+  }, [rotate, interval]);
+
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <ResponsiveContainer style={style} width="100%" height="100%">
+      <div
+        ref={labelsRef}
+        style={{ position: 'absolute', visibility: 'hidden', height: 0, overflow: 'hidden' }}
+      >
+        {data.map(d => d[nameKey]).map((label, idx) => (
+          <span key={idx} style={{ fontSize: 12, whiteSpace: 'nowrap' }}>
+            {label}
+          </span>
+        ))}
+      </div>
+      <ResponsiveContainer style={style} width="100%" height="100%" ref={containerRef}>
         <RBarChart
           accessibilityLayer
           data={data}
@@ -155,12 +220,14 @@ export function BarChart({
               <XAxis
                 dataKey={nameKey}
                 type="category"
-                interval={"equidistantPreserveStart"}
+                interval={interval}
                 tickLine={false}
+                angle={rotate}
+                textAnchor={rotate ? 'end' : 'middle'}
                 tickFormatter={tickFormatter}
-                height={hideX ? 0 : 30}
+                height={hideX ? 0 : xAxisHeight}
                 hide={hideX}
-                tick={!hideTickX && { fill: "currentColor" }}
+                tick={!hideTickX && { fill: "currentColor", fontSize }}
               />
               <YAxis
                 type="number"
