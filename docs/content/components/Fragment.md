@@ -1,6 +1,6 @@
 # Fragment [#fragment]
 
-`Fragment` provides conditional rendering. You can use `when=` on any component to render it conditionally, use `Fragment` to apply `when` to a group of components.
+`Fragment` provides conditional rendering and grouping of components. It's often used to hide components until their dependent variables are available.
 
 ## Properties [#properties]
 

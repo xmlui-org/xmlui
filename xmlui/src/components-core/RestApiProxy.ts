@@ -55,7 +55,7 @@ function isAxiosResponse(response: AxiosResponse | Response): response is AxiosR
   return "data" in response;
 }
 
-async function parseResponseJson(response: AxiosResponse | Response) {
+async function parseResponseJson(response: AxiosResponse | Response, logError = false) {
   let resp: any;
   if (isAxiosResponse(response)) {
     resp = response.data;
@@ -66,7 +66,9 @@ async function parseResponseJson(response: AxiosResponse | Response) {
       try {
         resp = await response.clone().text();
       } catch (e) {
-        console.error("Failed to parse response as text or JSON", response.body);
+        if (logError) {
+          console.error("Failed to parse response as text or JSON", response.body);
+        }
       }
     }
   }
@@ -123,7 +125,7 @@ export default class RestApiProxy {
       //     "X-XSRF-TOKEN": readCookie("XSRF-TOKEN"),
       //   }
       // :
-        {};
+      {};
     this.config = {
       apiUrl,
       errorResponseTransform,
@@ -371,7 +373,7 @@ export default class RestApiProxy {
     headers?: Record<string, string>;
     payloadType?: "form" | "multipart-form" | "json";
     onUploadProgress?: OnProgressFn;
-    parseResponse?: (response: Response | AxiosResponse) => any;
+    parseResponse?: (response: Response | AxiosResponse, logError: boolean) => any;
     transactionId: string;
     resolveBindingExpressions: boolean;
   }) => {
@@ -425,7 +427,10 @@ export default class RestApiProxy {
           data: options.body,
           onUploadProgress,
         });
-        return await parseResponse(response);
+        return await parseResponse(
+          response,
+          this.appContext?.appGlobals?.logRestApiErrors ?? false,
+        );
       } catch (error) {
         if (axios.isAxiosError(error) && error.response) {
           throw await this.raiseError(error.response);
@@ -438,13 +443,16 @@ export default class RestApiProxy {
       if (!response.clone().ok) {
         throw await this.raiseError(response);
       }
-      const parsedResponse = await parseResponse(response.clone());
+      const parsedResponse = await parseResponse(
+        response.clone(),
+        this.appContext?.appGlobals?.logRestApiErrors ?? false,
+      );
       return parsedResponse;
     }
   };
 
-  private tryParseResponse = async (response: Response | AxiosResponse) => {
-    return await parseResponseJson(response);
+  private tryParseResponse = async (response: Response | AxiosResponse, logError = false) => {
+    return await parseResponseJson(response, logError);
   };
 
   private generateFullApiUrl(relativePath: string, queryParams: Record<string, any> | undefined) {

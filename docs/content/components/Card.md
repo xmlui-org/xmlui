@@ -185,7 +185,7 @@ This component does not expose any methods.
 | [boxShadow](../styles-and-themes/common-units/#boxShadow)-Card | none | none |
 | [gap](../styles-and-themes/common-units/#size)-avatar-Card | $gap-normal | $gap-normal |
 | [gap](../styles-and-themes/common-units/#size)-Card | var(--stack-gap-default) | var(--stack-gap-default) |
-| [gap](../styles-and-themes/common-units/#size)-title-Card | $gap-none | $gap-none |
+| [gap](../styles-and-themes/common-units/#size)-title-Card | $gap-normal | $gap-normal |
 | [horizontalAlignment](../styles-and-themes/common-units/#alignment)-title-Card | *none* | *none* |
 | [padding](../styles-and-themes/common-units/#size)-Card | $space-4 | $space-4 |
 | [paddingBottom](../styles-and-themes/common-units/#size)-Card | *none* | *none* |
