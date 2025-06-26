@@ -57,9 +57,9 @@ and sets several theme variables to style the `ProgressBar` component:
       <ProgressBar value="0.6"/>
     </VStack>
   </Theme>
-  <Theme themeId="solid">
+  <Theme themeId="xmlui-red">
     <VStack backgroundColor="$backgroundColor-primary">
-      <H3>Use the 'solid' theme:</H3>
+      <H3>Use the 'xmlui-red' theme:</H3>
       <ProgressBar value="0"/>
       <ProgressBar value="0.6"/>
     </VStack>

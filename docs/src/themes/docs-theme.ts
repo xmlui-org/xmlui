@@ -2,7 +2,7 @@ import type { ThemeDefinition } from "xmlui";
 
 export const DefaultDocsTheme: ThemeDefinition = {
   name: "XMLUI Documentation Theme",
-  id: "default",
+  id: "docs-theme",
   extends: ["xmlui"],
   themeVars: {
 

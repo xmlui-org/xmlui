@@ -69,20 +69,11 @@ export function Theme({
   const { activeTheme, activeThemeTone } = useTheme();
   const themeTone = tone || activeThemeTone;
   const currentTheme: ThemeDefinition = useMemo(() => {
-    if (id === "default") {
-      console.error('Theme "default" requested - call stack:', new Error().stack);
-      console.error('Theme debugging - id prop value:', id);
-      console.error('Available themes:', themes.map(t => t.id));
-    }
     const themeToExtend = id ? themes.find((theme) => theme.id === id)! : activeTheme;
     if (!themeToExtend) {
-      console.error('Theme debugging info:', {
-        requestedThemeId: id,
-        availableThemes: themes.map(t => t.id),
-        activeTheme: activeTheme?.id,
-        themesCount: themes.length
-      });
-      throw new Error(`Theme not found: requested="${id}", available=[${themes.map(t => t.id).join(', ')}]`);
+      throw new Error(
+        `Theme not found: requested="${id}", available=[${themes.map((t) => t.id).join(", ")}]`,
+      );
     }
     const foundTheme = {
       ...themeToExtend,
