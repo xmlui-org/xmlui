@@ -31,7 +31,11 @@ export const TabsMd = createMetadata({
       defaultValue: defaultProps.orientation,
       valueType: "string",
     },
-    tabTemplate: dComponent(`This property declares the template for the clickable tab area.`),
+    tabTemplate: {
+      description: `This property declares the template for the clickable tab area.`,
+      valueType: "ComponentDef",
+      isInternal: true,
+    },
   },
   apis: {
     next: d(`This method selects the next tab.`),

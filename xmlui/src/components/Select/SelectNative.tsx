@@ -530,9 +530,9 @@ export const Select = forwardRef(function Select(
                 height={dropdownHeight}
               >
                 {options.size > 0
-                  ? Array.from(options).map((option) => (
+                  ? Array.from(options).map((option, idx) => (
                       <SelectOption
-                        key={option.value}
+                        key={`${option.value}-${idx}`}
                         value={option.value}
                         label={option.label}
                         enabled={option.enabled}
