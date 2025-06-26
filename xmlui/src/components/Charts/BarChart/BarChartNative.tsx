@@ -160,7 +160,7 @@ export function BarChart({
       } else if (allWidth45 <= width) {
         angle = -45;
       } else {
-        angle = -50;
+        angle = -60;
       }
       setRotate(angle);
 
@@ -212,7 +212,7 @@ export function BarChart({
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
                 tickFormatter={tickFormatter}
-                tick={{ fill: "currentColor" }}
+                tick={{ fill: "currentColor", fontSize }}
               />
             </>
           ) : (
@@ -232,7 +232,7 @@ export function BarChart({
               <YAxis
                 type="number"
                 axisLine={false}
-                tick={!hideTickY && { fill: "currentColor" }}
+                tick={!hideTickY && { fill: "currentColor", fontSize }}
                 hide={hideY}
                 width={hideY ? 0 : 60}
               />
