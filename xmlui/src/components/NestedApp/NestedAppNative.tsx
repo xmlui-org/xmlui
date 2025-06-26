@@ -105,8 +105,6 @@ export function NestedApp({
     };
   }, [api]);
 
-  //console.log("mock", mock);
-
   const useHashBasedRouting = appGlobals?.useHashBasedRouting || true;
   const openPlayground = useCallback(async () => {
     const data = {
@@ -182,7 +180,6 @@ export function NestedApp({
       themeVarReset[key] = "initial";
     });
 
-    console.log(style);
     let nestedAppRoot = (
       <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
         <div style={{ height, ...style, ...themeVarReset }} >
