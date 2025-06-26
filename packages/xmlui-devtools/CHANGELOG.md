@@ -1,5 +1,11 @@
 # xmlui-devtools
 
+## 0.1.18
+
+### Patch Changes
+
+- 7d255a9: Changed open in new window button tooltip label for all occurrences.
+
 ## 0.1.17
 
 ### Patch Changes

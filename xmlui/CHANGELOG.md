@@ -1,5 +1,18 @@
 # xmlui
 
+## 0.9.58
+
+### Patch Changes
+
+- dc43275: Fixed Pie- & DonutChart height property.
+- f9562b5: make flowLayout auto-responsive behavior a bit smarter
+- 1af11af: fix: eliminating the duplication of toast messages
+- de570c2: Fixed number of small issues: Colorpicker now gets correct initial value, Options in Select now get correct keys, removed Tabs tabTemplate prop because of a bigger bug.
+- 7d255a9: Changed open in new window button tooltip label for all occurrences.
+- 69a7a1f: Fixed NavLink label break if overflowing available space.
+- 873348c: new form properties: onSuccess, inProgressNotificationMessage, completedNotificationMessage, errorNotificationMessage
+- 46bfe72: default style tweaks
+
 ## 0.9.57
 
 ### Patch Changes
