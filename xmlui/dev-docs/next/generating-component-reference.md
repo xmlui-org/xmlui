@@ -59,6 +59,57 @@ xmlui/src/components/
 
 The system uses a sophisticated multi-stage process involving npm scripts and Node.js modules to automatically generate comprehensive component documentation.
 
+## Component Documentation Patterns: Metadata-Driven vs. Markdown-Driven
+
+XMLUI supports two main patterns for generating component reference documentation, depending on where the component is located in the codebase:
+
+### 1. Metadata-Driven Documentation (`components-core`)
+
+- Components in `xmlui/src/components-core/` (such as `Fragment`) define their documentation primarily through metadata in their TypeScript source files.
+- The metadata is created using the `createMetadata()` function, which includes descriptions, property definitions, events, and more.
+- Example (in `Fragment.tsx`):
+  ```ts
+  export const FragmentMd = createMetadata({
+    description: "...",
+    props: {
+      when: {
+        description: "...",
+        valueType: "boolean | expression"
+      }
+    }
+  });
+  ```
+- The documentation generator uses this metadata to produce the reference docs. If a Markdown file exists for the component, it will merge in any matching %-PROP-START/END blocks, but only for properties present in the metadata.
+
+### 2. Markdown-Driven Documentation (`components`)
+
+- Components in `xmlui/src/components/` (such as `Image`) have a dedicated Markdown file (e.g., `Image.md`) located alongside the component source.
+- This Markdown file contains detailed documentation, examples, and property/event explanations using directive blocks:
+  ```
+  %-PROP-START propertyName
+  ...documentation and examples...
+  %-PROP-END
+  ```
+- The documentation generator merges the Markdown content with the component’s metadata, allowing for rich, user-friendly docs.
+
+### Key Differences
+
+- **Location**:  
+  - `components-core`: Metadata-driven, TypeScript source is primary.
+  - `components`: Markdown-driven, `.md` file is primary.
+- **Customization**:  
+  - `components-core`: Customization is limited to what’s in the metadata unless a Markdown file is added.
+  - `components`: Full Markdown flexibility for examples, tables, and extended explanations.
+- **Doc Generation**:  
+  - In both cases, the doc generator merges metadata and Markdown, but only properties/events present in the metadata will be documented.
+
+### Best Practices
+
+- For new user-facing components, prefer the Markdown-driven approach for richer documentation.
+- For foundational or internal components, metadata-driven docs may be sufficient, but you can always add a Markdown file for more detail.
+- Always ensure that any property or event you want documented in Markdown is also present in the component’s metadata.
+
+
 ## Sample Component Metadata
 
 ```typescript

@@ -4,7 +4,9 @@
 
 ## Properties [#properties]
 
-This component does not have any properties.
+### `when` [#when]
+
+Enables conditional rendering. If the expression evaluates to true, the component or group is rendered; otherwise, it is omitted. If omitted, the component is always rendered (equivalent to when={true}).
 
 ## Events [#events]
 
