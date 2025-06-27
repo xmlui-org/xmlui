@@ -396,6 +396,9 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_HelloWorld !== "false") {
       this.registerCoreComponent(helloWorldComponentRenderer);
     }
+    if (process.env.VITE_USED_COMPONENTS_Editor !== "false") {
+      this.registerCoreComponent(editorComponentRenderer);
+    }
     if (process.env.VITE_USED_COMPONENTS_Checkbox !== "false") {
       this.registerCoreComponent(checkboxComponentRenderer);
     }
