@@ -8,7 +8,6 @@
             >
                 <H1>Change Log</H1>
                 <VStack gap="$space-2" marginBottom="$space-4">
-                    <H2>Engine</H2>
                     <Items items="{downloads.value}">
                         <Card>
                             <H2>{$item.tag_name}</H2>
