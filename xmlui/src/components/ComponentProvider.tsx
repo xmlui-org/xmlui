@@ -250,6 +250,7 @@ import { labelListComponentRenderer } from "./Charts/LabelList/LabelList";
 import { legendComponentRenderer } from "./Charts/Legend/Legend";
 import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
 import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
+import { editorComponentRenderer } from "./Editor/Editor";
 
 /**
  * The framework has a specialized component concept, the "property holder
