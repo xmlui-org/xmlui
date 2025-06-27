@@ -68,7 +68,6 @@ Here is a simplified version of that mechanism. Try using both slider handles to
       }"
       valueFormat="{ (value) => {
         const result = window.sliderValueToDate(value);
-        console.log('valueFormat result:', result);
         return result;
         }
       }"
@@ -117,7 +116,6 @@ Here's `SliderDemo`.
       }"
       valueFormat="{ (value) => {
         const result = window.sliderValueToDate(value);
-        console.log('valueFormat result:', result);
         return result;
         }
       }"
@@ -148,7 +146,6 @@ The Invoices app encapsulates this behavior in a custom component called `DateRa
   <ChangeListener
     listenTo="{slider.value}"
     onDidChange="{() => {
-      console.log('slider values:', slider.value[0], slider.value[1]);
       // Update the start and end dates based on slider values
       updateState({
         value: {
@@ -156,7 +153,6 @@ The Invoices app encapsulates this behavior in a custom component called `DateRa
           endDate: window.sliderValueToDate(slider.value[1], originalStartDate)
         }
       });
-      console.log('Date range:', startDate, 'to', endDate);
     }}"
   />
 
