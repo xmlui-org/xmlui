@@ -74,6 +74,8 @@ type StandaloneAppProps = {
 
   // --- The object responsible for managing the standalone components
   extensionManager?: StandaloneExtensionManager;
+
+  waitForApiInterceptor?: boolean;
 };
 
 /**
@@ -89,6 +91,7 @@ function StandaloneApp({
   appDef,
   decorateComponentsWithTestId,
   debugEnabled = false,
+  waitForApiInterceptor = false,
   runtime,
   extensionManager,
 }: StandaloneAppProps) {
@@ -135,7 +138,7 @@ function StandaloneApp({
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
 
   return (
-    <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
+    <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting} waitForApiInterceptor={waitForApiInterceptor}>
       <AppRoot
         projectCompilation={projectCompilation}
         decorateComponentsWithTestId={shouldDecorateWithTestId}

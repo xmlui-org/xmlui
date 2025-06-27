@@ -14,6 +14,7 @@ function TestBed({ extensionManager }: { extensionManager: StandaloneExtensionMa
     return <div>Missing test env</div>;
   }
   return <StandaloneApp appDef={window.TEST_ENV} decorateComponentsWithTestId={true}
+                        waitForApiInterceptor={true}
                         extensionManager={extensionManager} />;
 }
 
