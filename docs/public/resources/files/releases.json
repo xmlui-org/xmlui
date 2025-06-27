@@ -1,5 +1,15 @@
 [
   {
+    "tag_name": "xmlui@0.9.58",
+    "body": "### Patch Changes\n\n-   dc43275: Fixed Pie- & DonutChart height property.\n-   f9562b5: make flowLayout auto-responsive behavior a bit smarter\n-   1af11af: fix: eliminating the duplication of toast messages\n-   de570c2: Fixed number of small issues: Colorpicker now gets correct initial value, Options in Select now get correct keys, removed Tabs tabTemplate prop because of a bigger bug.\n-   7d255a9: Changed open in new window button tooltip label for all occurrences.\n-   69a7a1f: Fixed NavLink label break if overflowing available space.\n-   873348c: new form properties: onSuccess, inProgressNotificationMessage, completedNotificationMessage, errorNotificationMessage\n-   46bfe72: default style tweaks\n",
+    "assets": [
+      {
+        "name": "xmlui-0.9.58.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.58/xmlui-0.9.58.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.9.60",
     "body": "### Patch Changes\n\n-   498b1ef: Experiment with automatic changelog generation #3\n",
     "assets": [
@@ -86,26 +96,6 @@
       {
         "name": "xmlui-0.9.50.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.50/xmlui-0.9.50.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.49",
-    "body": "### Patch Changes\n\n-   9afd588: fix: XmluiCodeHighlighter - update token colorizing (light/dark tone)\n-   Updated dependencies [3b5e820]\n    -   xmlui-charts@0.1.23\n",
-    "assets": [
-      {
-        "name": "xmlui-0.9.49.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.49/xmlui-0.9.49.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.9.48",
-    "body": "### Patch Changes\n\n-   b5104b0: feat: Icon component now handles the click event\n-   30d5c58: feat: Badge supports theme variable names in colormap\n-   2e7f51f: change: the canSort property of Column defaults to true\n-   4dd6d7f: feat: chart extension included by default\n-   f7f0571: fix theme component\n",
-    "assets": [
-      {
-        "name": "xmlui-0.9.48.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.9.48/xmlui-0.9.48.js"
       }
     ]
   }

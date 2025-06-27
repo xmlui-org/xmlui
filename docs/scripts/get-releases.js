@@ -23,10 +23,12 @@ If you want to update the info about the releases, set the GITHUB_TOKEN environm
   const githubToken = process.env.GITHUB_TOKEN;
   const owner = process.env.GITHUB_REPOSITORY?.split("/")[0] || "xmlui-org";
   const repo = process.env.GITHUB_REPOSITORY?.split("/")[1] || "xmlui";
+  const maxReleases = process.env.DOCS_XMLUI_MAX_RELEASES_LENGTH;
   return {
     owner,
     repo,
     githubToken,
+    maxReleases,
   };
 }
 
@@ -38,7 +40,8 @@ function processOptions(args) {
 
   const outputFile = getOptionValue(args, "--output");
 
-  const maxReleasesStr = getOptionValue(args, "--maxReleases") ?? DEF_MAX_RELEASES_STR;
+  const maxReleasesStr =
+    getOptionValue(args, "--maxReleases") ?? envVars.maxReleases ?? DEF_MAX_RELEASES_STR;
   const maxReleasesParse = parseInt(maxReleasesStr);
   const maxReleases = Number.isNaN(maxReleasesParse)
     ? parseInt(DEF_MAX_RELEASES_STR)
@@ -161,13 +164,16 @@ function handleHelpOption(args) {
     --help, -h         Display this help message and exit.
 
   Environment Variables:
-    GITHUB_TOKEN        Required for fetching data from the GitHub API.
-                        A GitHub Personal Access Token with 'repo' scope (or at least
-                        permissions to read repository releases).
-                        The script will fail if this is not set
-                        and API access is attempted.
-    GITHUB_REPOSITORY   Optional. The 'owner/repo' string.
-                        Defaults to "xmlui-org/xmlui".
+    GITHUB_TOKEN                    Required for fetching data from the GitHub API.
+                                    A GitHub Personal Access Token with 'repo' scope (or at least
+                                    permissions to read repository releases).
+                                    The script will fail if this is not set
+                                    and API access is attempted.
+    GITHUB_REPOSITORY               Optional. The 'owner/repo' string.
+                                    Defaults to "xmlui-org/xmlui".
+    DOCS_XMLUI_MAX_RELEASES_LENGTH  Optional. The maximum number of xmlui releases to include.
+                                    Can be overridden by the --maxReleases command line option.
+                                    Defaults to ${DEF_MAX_RELEASES_STR}.
   `;
     console.log(helpMessage.trimStart().trimEnd());
     process.exit(0);
