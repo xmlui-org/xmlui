@@ -8,6 +8,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { dComponent } from "../../components/metadata-helpers";
 import { appLayoutMd } from "./AppLayoutContext";
 import { App, defaultProps } from "./AppNative";
+import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { PageMd } from "../Pages/Pages";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
@@ -389,7 +390,7 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
   );
 }
 
-const HIDDEN_STYLE = {
+const HIDDEN_STYLE: CSSProperties = {
   position: "absolute",
   top: "-9999px",
   display: "none",
@@ -397,7 +398,8 @@ const HIDDEN_STYLE = {
 
 const indexerContextValue = {
   indexing: true,
-}
+};
+
 function SearchIndexCollector({ Pages, renderChild }) {
   const appContext = useAppContext();
   const setIndexing = useSearchContextSetIndexing();
@@ -460,14 +462,14 @@ function SearchIndexCollector({ Pages, renderChild }) {
   return (
     <IndexerContext.Provider value={indexerContextValue}>
       {createPortal(
-      <div style={HIDDEN_STYLE} aria-hidden="true">
-        {/* Render only one PageIndexer at a time */}
-        <PageIndexer
-          Page={currentPageToProcess}
-          renderChild={renderChild}
-          onIndexed={handlePageIndexed}
-          key={currentPageToProcess.props?.url || currentIndex} // Key ensures re-mount
-        />
+        <div style={HIDDEN_STYLE} aria-hidden="true">
+          {/* Render only one PageIndexer at a time */}
+          <PageIndexer
+            Page={currentPageToProcess}
+            renderChild={renderChild}
+            onIndexed={handlePageIndexed}
+            key={currentPageToProcess.props?.url || currentIndex} // Key ensures re-mount
+          />
         </div>,
         document.body,
       )}
