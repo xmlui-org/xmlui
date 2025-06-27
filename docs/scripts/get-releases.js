@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 const { Octokit } = require("@octokit/rest");
-const { createOAuthAppAuth } = require("@octokit/auth-oauth-app");
 const fs = require("fs").promises;
 const path = require("path");
 const { exit } = require("process");
