@@ -1,41 +1,18 @@
 # Import
 
-The `ImportProducts` component uses [DataSource](/components/DataSource) with `dataType="csv"` to source data from a CSV file.
-
-> [!INFO]
-> When running the demo, look for `products.csv` in the `resources` folder.
-
-```xmlui /dataType="csv/
-<DataSource
-  id="csv"
-  dataType="csv"
-  url="{filename}"
-  transformResult="{(data) => data.map((row, index) => ({...row, id: `${index}`}))}"
-/>
-```
-
-We also need to know what products we already have, in order to avoid duplication.
-
-```xmlui
-<DataSource
-  id="existingProducts"
-  url="/api/products"
-  method="GET"
-/>
-```
+The `ImportProducts` component uses [FileInput](/components/FileInput) to acquire a CSV file, [Table](/components/Table) to display records as selectable rows, and [Queue](/components/Queue) to import selected rows.
 
 ## Using FileInput
 
-To exercise XMLUI Invoice's import feature when running the demo app, you'll use [FileInput](/components/FileInput) to navigate to `products.csv` in the app's root folder.
+To exercise XMLUI Invoice's import feature when running the demo app, you'll use `FileInput` to navigate to `products.csv` in the app's root folder.
 
 ```xmlui
 <FileInput
   id="fileInput"
   acceptsFileType="{['.csv']}"
   onDidChange="{ (val) => {
-    filename = val[0]?.name;
-    productsFromCsv.clearSelection();
-  }}"
+      parsedCsv = window.parseCsv(val[0]).map((item, idx) => { return {...item, id: idx};});
+    }}"
 />
 ```
 
@@ -49,120 +26,65 @@ It uses `rowDisabledPredicate` to disable a row if the name of any existing prod
 ```xmlui /isDuplicate/
 <Table
   id="productsFromCsv"
-  data="{ csv }"
+  data="{ parsedCsv }"
   rowsSelectable="true"
   rowDisabledPredicate="{(row) => isDuplicate(row.name)}"
-  onSelectionDidChange="(selection) => {
-    selectedProducts = selection;
-  }"
 >
   <Column header="Name">
     <Text color="{isDuplicate($item.name) ? '$color-danger-500' : '$textColor-primary'}">
       {$item.name} {isDuplicate($item.name) ? '(duplicate)' : ''}
     </Text>
   </Column>
-  <Column bindTo="description" />
-  <Column bindTo="price" />
+  <Column bindTo="description"/>
+  <Column bindTo="price"/>
 </Table>
 ```
 
-## Using code-behind
+We define `isDuplicate()` using a `<script>` [helper tag](/helper-tags).
 
-That function, along with others, is defined in `ImportProducts.xmlui.xs`.
-
-```js /isDuplicate(name)/ /startImport(products)/ /importNextProduct()/ /processNextProduct()/
-function isDuplicate(name) {
-    return existingProducts && existingProducts.value && existingProducts.value.some(p => p.name === name);
-}
-
-function startImport(products) {
-    console.log('startImport', products);
-    // Process first item directly with the known products array
-    if (products.length > 0) {
-        const product = products[0];
-
-        productToImport = JSON.stringify({
-            name: product.name,
-            description: product.description,
-            price: parseFloat(product.price) || 0
-        });
-
-        // Set queue to remaining items
-        importQueue = products.slice(1);
+```
+<Component name="ImportProducts">
+  <script>
+    function isDuplicate(name) {
+      return existingProducts.value.some(p => p.name === name);
     }
-}
-
-function importNextProduct() {
-    console.log('importNextProduct', importQueue.length);
-    if (importQueue && importQueue.length > 0) {
-        const product = importQueue[0];
-
-        productToImport = JSON.stringify({
-            name: product.name,
-            description: product.description,
-            price: parseFloat(product.price) || 0
-        });
-
-        importQueue = importQueue.slice(1);
-    }
-}
-
-function processNextProduct() {
-    console.log('processNextProduct', importQueue.length);
-    if (importQueue && importQueue.length > 0) {
-        delay(200, () => importNextProduct());
-    } else {
-        // Import completed, navigate to products page
-        delay(500, () => navigate('/products'));
-    }
-}
+  </script>
+  ...
 ```
 
-We use a code-behind file so these functions live in the same namespace as the component and can work with its declared variables.
+## Using Queue
 
-```xmlui
-<Component
-  name="ImportProducts"
-  var.filename=""
-  var.selectedProducts=""
-  var.productToImport=""
-  var.importQueue=""
->
-```
+The API doesn't support batch update so we use `Queue` to iterate over the selected rows and make an [APICall](/components/APICall) for each.
 
-The functions work with `APICall` and `ChangeListener`.
-
-```xmlui
+```xmlui /pluralize/
+<Queue id="importQueue" clearAfterFinish="true">
+  <property name="progressFeedback">
+    <Text value="Importing {pluralize(importQueue.getQueuedItems().length, 'product', 'products')}"/>
+  </property>
+  <property name="resultFeedback">
+    <Text value="Imported {pluralize($completedItems.length, 'product', 'products')}"/>
+  </property>
+  <event name="process">
     <APICall
-      id="importProduct"
       url="/api/products"
-      method="POST"
-      onSuccess="{processNextProduct()}"
-      onError="(error) => console.error('Import error:', error)"
-      rawBody="{productToImport}"
+      method="post"
+      body="{$param.item}"
     />
-
-    <ChangeListener
-      listenTo="{productToImport}"
-      onDidChange="{() => {
-        importProduct.execute();
-      }}"
-    />
+  </event>
+  <event name="complete" value="productsFromCsv.clearSelection()"/>
+</Queue>
 ```
 
-## Data flow
+> [!INFO]
+> `pluralize` is a [global helper function](/globals#pluralize).
 
-- **CSV Upload**: `FileInput` sets filename.
-- **CSV Parsing**: `DataSource` with `dataType="csv"` converts file to data array.
-- **Selection**: User selects rows, populating `selectedProducts` array.
-- **Queue setup**: `startImport()` takes first product, sets `productToImport` (JSON string), creates `importQueue` with remaining items
+The import button uses the queue's `enqueueItems` method to populate the queue with the result of the table's `getSelectedItems` method.
 
-## Control flow
-
-- **Click Import**: Calls `startImport(selectedProducts)`.
-- **Reactive chain**: `ChangeListener` detects `productToImport` changed, calls `importProduct.execute()`.
-- **API success**: `onSuccess` triggers `processNextProduct()`.
-- **Queue processing**: `processNextProduct()` moves next item from `importQueue` to `productToImport`.
-- **Loop**: Repeat until queue is empty
-- **Completion**: Navigate to products page
+```xmlui
+<Button
+  label="Import"
+  onClick="{ importQueue.enqueueItems(productsFromCsv.getSelectedItems())}"
+  enabled="{productsFromCsv.getSelectedItems().length}"
+/>
+```
 
