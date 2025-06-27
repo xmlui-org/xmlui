@@ -73,7 +73,7 @@
 
         </NavPanel>
 
-        <Pages>
+        <Pages defaultRoute="/404">
             <Page url="/">
                 <DocumentPage hideToc="true" url="/pages/intro.md" />
             </Page>
@@ -205,7 +205,7 @@
                 <DocumentPage when="{content}" content="{content}" />
                 <PageNotFound when="{!content}" />
             </Page>
-            <Page url="*">
+            <Page url="/404">
                 <PageNotFound />
             </Page>
         </Pages>
