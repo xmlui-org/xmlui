@@ -7,7 +7,7 @@ const { exit } = require("process");
 
 const XMLUI_STANDALONE_PATTERN = /xmlui-\d+\.\d+\.\d+\w*\.js/;
 const DEF_MAX_RELEASES_STR = "10";
-
+const MD_HEADING_PATTERN = /^#{1,6} \S/;
 if (require.main === module) {
   main();
 }
@@ -79,11 +79,18 @@ async function getXmluiReleases(options) {
       const xmluiStandaloneAsset = release.assets.find((asset) =>
         XMLUI_STANDALONE_PATTERN.test(asset.name),
       );
+      const bodyWithoutHeading = release.body
+        ? release.body
+            .split("\n")
+            .filter((line) => !MD_HEADING_PATTERN.test(line))
+            .join("\n")
+            .trim()
+        : "";
 
       if (xmluiStandaloneAsset) {
         availableVersions.push({
           tag_name: release.tag_name,
-          body: release.body,
+          body: bodyWithoutHeading,
           assets: [
             {
               name: xmluiStandaloneAsset.name,
