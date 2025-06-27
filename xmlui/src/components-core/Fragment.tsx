@@ -9,10 +9,7 @@ export const FragmentMd = createMetadata({
     "component to render it conditionally, use `Fragment` to apply `when` to a group of components.",
   opaque: true,
   props: {
-    when: {
-      description: "Enables conditional rendering. If the expression evaluates to true, the component or group is rendered; otherwise, it is omitted. If omitted, the component is always rendered (equivalent to when={true}).",
-      valueType: "boolean | expression"
-    },
+    // Note: 'when' is a universal property defined in ComponentDefCore, no need to redefine it here
   },
 });
 
