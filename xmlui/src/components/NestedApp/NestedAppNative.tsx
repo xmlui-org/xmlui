@@ -184,6 +184,7 @@ export function NestedApp({
       <ApiInterceptorProvider interceptor={mock} apiWorker={interceptorWorker}>
         <div style={{ height, ...style, ...themeVarReset }} >
           <AppRoot
+            isNested={true}
             key={`app-${nestedAppId}-${refreshVersion}`}
             previewMode={true}
             standalone={true}

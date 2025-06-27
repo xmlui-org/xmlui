@@ -1,5 +1,5 @@
 import { CSSProperties, ReactNode, useContext, useMemo } from "react";
-import { Navigate, Route, Routes, useParams } from "@remix-run/react";
+import { Navigate, Route, Routes, useLocation, useParams, useResolvedPath } from "@remix-run/react";
 import classnames from "classnames";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -7,6 +7,7 @@ import type { LayoutContext, RenderChildFn, ValueExtractor } from "../../abstrac
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { PageMd } from "./Pages";
 import styles from "./Pages.module.scss";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
 
 // Default props for Pages component
 export const defaultProps = {
@@ -31,7 +32,10 @@ export function RouteWrapper({
   uid,
 }: RouteWrapperProps) {
   const params = useParams();
-
+  const location = useLocation();
+  const appLayoutContext = useAppLayoutContext();
+  const linkInfo = appLayoutContext?.linkMap?.get(location.pathname) || {};
+  
   //we need to wrap the child route in a container to make sure the route params are available.
   // we do this wrapping by providing an empty object to vars.
   // this way it becomes an 'implicit' container (vars/state inside this container is propagated to the parent)

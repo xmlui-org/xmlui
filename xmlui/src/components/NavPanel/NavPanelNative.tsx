@@ -1,4 +1,4 @@
-import React, { forwardRef, type ReactNode, useRef } from "react";
+import React, { forwardRef, type ReactNode, useRef, useEffect } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -9,6 +9,141 @@ import { ScrollContext } from "../../components-core/ScrollContext";
 import { Logo } from "../Logo/LogoNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
+
+// Define navigation hierarchy node structure
+export interface NavHierarchyNode {
+  type: "NavLink" | "NavGroup";
+  label: string;
+  to?: string;
+  children?: NavHierarchyNode[];
+  prevLink?: NavHierarchyNode;
+  nextLink?: NavHierarchyNode;
+  firstLink?: boolean;
+  lastLink?: boolean;
+}
+
+// Function to build navigation hierarchy from component children
+export function buildNavHierarchy(
+  children: any[] | undefined,
+  extractValue: any
+): NavHierarchyNode[] {
+  if (!children) return [];
+
+  const hierarchy: NavHierarchyNode[] = [];
+
+  children.forEach((child) => {
+    if (child.type === "NavLink") {
+      const label = extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
+      const to = extractValue.asOptionalString?.(child.props?.to) || extractValue(child.props?.to);
+
+      // Handle case where label might not be in props but in children as text
+      let finalLabel = label;
+      if (!finalLabel && child.children?.length === 1 && child.children[0].type === "TextNode") {
+        finalLabel = extractValue(child.children[0].props?.value);
+      }
+
+      // Only include NavLinks that have both label and to values
+      if (finalLabel && to) {
+        hierarchy.push({
+          type: "NavLink",
+          label: finalLabel,
+          to: to
+        });
+      }
+    } else if (child.type === "NavGroup") {
+      const label = extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
+
+      // NavGroups only need a label, no "to" value required
+      if (label) {
+        const groupNode: NavHierarchyNode = {
+          type: "NavGroup",
+          label: label,
+          children: buildNavHierarchy(child.children, extractValue)
+        };
+
+        hierarchy.push(groupNode);
+      } else if (child.children && child.children.length > 0) {
+        // If no label but has children, process them at the current level
+        hierarchy.push(...buildNavHierarchy(child.children, extractValue));
+      }
+    }
+  });
+
+  // Set navigation properties after building the hierarchy
+  setNavigationProperties(hierarchy);
+
+  return hierarchy;
+}
+
+// Helper function to set navigation properties (prevLink, nextLink, firstLink, lastLink)
+function setNavigationProperties(hierarchy: NavHierarchyNode[]) {
+  // Collect all NavLinks in traversal order
+  const allNavLinks: NavHierarchyNode[] = [];
+  
+  function collectNavLinks(nodes: NavHierarchyNode[]) {
+    nodes.forEach(node => {
+      if (node.type === "NavLink") {
+        allNavLinks.push(node);
+      }
+      if (node.children) {
+        collectNavLinks(node.children);
+      }
+    });
+  }
+  
+  collectNavLinks(hierarchy);
+  
+  // Set prevLink and nextLink for all NavLinks
+  allNavLinks.forEach((link, index) => {
+    if (index > 0) {
+      link.prevLink = allNavLinks[index - 1];
+    }
+    if (index < allNavLinks.length - 1) {
+      link.nextLink = allNavLinks[index + 1];
+    }
+  });
+  
+  // Set firstLink and lastLink properties
+  function setFirstLastProperties(nodes: NavHierarchyNode[]) {
+    const navLinks = nodes.filter(node => node.type === "NavLink");
+    
+    if (navLinks.length > 0) {
+      navLinks[0].firstLink = true;
+      navLinks[navLinks.length - 1].lastLink = true;
+    }
+    
+    // Recursively process children
+    nodes.forEach(node => {
+      if (node.children) {
+        setFirstLastProperties(node.children);
+      }
+    });
+  }
+  
+  setFirstLastProperties(hierarchy);
+}
+
+// Function to build a map of NavLinks by their "to" property
+export function buildLinkMap(navLinks: NavHierarchyNode[] | undefined): Map<string, NavHierarchyNode> {
+  const linkMap = new Map<string, NavHierarchyNode>();
+  
+  if (!navLinks) return linkMap;
+  
+  function processNodes(nodes: NavHierarchyNode[]) {
+    nodes.forEach(node => {
+      if (node.type === "NavLink" && node.to) {
+        // If multiple items use the same "to" value, the last wins
+        linkMap.set(node.to, node);
+      }
+      if (node.children) {
+        processNodes(node.children);
+      }
+    });
+  }
+  
+  processNodes(navLinks);
+  return linkMap;
+}
 
 // Default props for NavPanel component
 export const defaultProps = {
@@ -30,11 +165,13 @@ function DrawerNavPanel({
   children,
   className,
   style,
+  navLinks,
 }: {
   children: ReactNode;
   className?: string;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
+  navLinks?: NavHierarchyNode[];
 }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   return (
@@ -61,10 +198,11 @@ type Props = {
   logoContent?: ReactNode;
   inDrawer?: boolean;
   renderChild: RenderChildFn;
+  navLinks?: NavHierarchyNode[];
 };
 
 export const NavPanel = forwardRef(function NavPanel(
-  { children, style, logoContent, className, inDrawer = defaultProps.inDrawer, renderChild }: Props,
+  { children, style, logoContent, className, inDrawer = defaultProps.inDrawer, renderChild, navLinks }: Props,
   forwardedRef,
 ) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -77,9 +215,17 @@ export const NavPanel = forwardRef(function NavPanel(
   const vertical = appLayoutContext?.layout?.startsWith("vertical");
   const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
 
+  // Register the linkMap when navLinks change
+  useEffect(() => {
+    if (appLayoutContext?.registerLinkMap && navLinks) {
+      const linkMap = buildLinkMap(navLinks);
+      appLayoutContext.registerLinkMap(linkMap);
+    }
+  }, [navLinks, appLayoutContext?.registerLinkMap]);
+
   if (inDrawer) {
     return (
-      <DrawerNavPanel style={style} logoContent={safeLogoContent} className={className}>
+      <DrawerNavPanel style={style} logoContent={safeLogoContent} className={className} navLinks={navLinks}>
         {children}
       </DrawerNavPanel>
     );
