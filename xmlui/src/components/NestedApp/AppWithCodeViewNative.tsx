@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import styles from "./AppWithCodeView.module.scss";
 import classnames from "classnames";
-import { NestedApp } from "./NestedAppNative";
+import { IndexAwareNestedApp } from "./NestedAppNative";
 import { Markdown } from "../Markdown/Markdown";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { Stack } from "../Stack/StackNative";
@@ -56,7 +56,7 @@ export function AppWithCodeViewNative({
         <Markdown>{markdown}</Markdown>
       </div>
       <div className={classnames({ [styles.column]: sideBySide })}>
-        <NestedApp
+        <IndexAwareNestedApp
           app={app}
           api={api}
           components={components}

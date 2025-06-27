@@ -390,12 +390,16 @@ function AppNode({ node, extractValue, renderChild, style, lookupEventHandler })
 }
 
 const HIDDEN_STYLE = {
+  position: "absolute",
+  top: "-9999px",
   display: "none",
 };
 
+const indexerContextValue = {
+  indexing: true,
+}
 function SearchIndexCollector({ Pages, renderChild }) {
   const appContext = useAppContext();
-  const indexerContextValue = useMemo(() => ({ indexing: true }), []);
   const setIndexing = useSearchContextSetIndexing();
 
   const [isClient, setIsClient] = useState(false);
@@ -456,14 +460,14 @@ function SearchIndexCollector({ Pages, renderChild }) {
   return (
     <IndexerContext.Provider value={indexerContextValue}>
       {createPortal(
-        <div style={HIDDEN_STYLE} aria-hidden="true">
-          {/* Render only one PageIndexer at a time */}
-          <PageIndexer
-            Page={currentPageToProcess}
-            renderChild={renderChild}
-            onIndexed={handlePageIndexed}
-            key={currentPageToProcess.props?.url || currentIndex} // Key ensures re-mount
-          />
+      <div style={HIDDEN_STYLE} aria-hidden="true">
+        {/* Render only one PageIndexer at a time */}
+        <PageIndexer
+          Page={currentPageToProcess}
+          renderChild={renderChild}
+          onIndexed={handlePageIndexed}
+          key={currentPageToProcess.props?.url || currentIndex} // Key ensures re-mount
+        />
         </div>,
         document.body,
       )}

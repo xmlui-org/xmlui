@@ -76,6 +76,8 @@ const searchOptions: IFuseOptions<SearchItemData> = {
   keys,
 };
 
+const fuse = new Fuse<SearchItemData>([], searchOptions);
+
 export const Search = ({
   id,
   data,
@@ -124,9 +126,8 @@ export const Search = ({
     return [...dataFromMd, ...Object.values(content ?? {})];
   }, [content, dataFromMd]);
 
-  const fuse = useMemo(() => {
-    // console.log("Creating Fuse instance with data length:", mergedData.length);
-    return new Fuse<SearchItemData>(mergedData, searchOptions);
+  useEffect(()=>{
+    fuse.setCollection(mergedData);
   }, [mergedData]);
 
   // --- Step 3: Execute search & post-process results
@@ -142,7 +143,7 @@ export const Search = ({
 
     if (mapped.length > 0) setShow(true);
     return mapped;
-  }, [debouncedValue, fuse, limit]);
+  }, [debouncedValue, limit]);
 
   const onClick = useCallback(() => {
     setInputValue("");
