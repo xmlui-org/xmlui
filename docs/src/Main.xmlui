@@ -53,8 +53,6 @@
             <NavGroup label="Reference">
                 <RecursiveNavTree
                     items="{ appGlobals.navPanelContent.filter(item => item.name === 'components') }"/>
-                <RecursiveNavTree
-                    items="{ appGlobals.navPanelContent.filter(item => item.name === 'extensions') }"/>
                 <NavGroup label="Themes">
                     <NavLink label="Layout Properties" to="/styles-and-themes/layout-props"/>
                     <NavLink label="Theme Variables" to="/styles-and-themes/theme-variables"/>
@@ -199,8 +197,16 @@
             <Page url="/mcp">
                 <DocumentPage hideToc="true" url="/pages/mcp.md" />
             </Page>
-            <Page url="/*">
-                <DocumentPage content="{ appGlobals.content[$routeParams['*']] }"/>
+            <Page url="/components/*">
+                <script>
+                  var contentKey = 'components/' + $routeParams['*'];
+                  var content = appGlobals.content[contentKey];
+                </script>
+                <DocumentPage when="{content}" content="{content}" />
+                <PageNotFound when="{!content}" />
+            </Page>
+            <Page url="*">
+                <PageNotFound />
             </Page>
         </Pages>
     </App>

@@ -1,0 +1,7 @@
+<Component name="PageNotFound">
+  <H1>Page Not Found</H1>
+  <Text>
+      The page you are looking for does not exist. Please check the URL or return to the home page.
+  </Text>
+  <Link to="/">Return to Home</Link>
+</Component>

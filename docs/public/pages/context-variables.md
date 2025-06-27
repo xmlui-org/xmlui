@@ -2,20 +2,18 @@
 
 These are the key context variables available in XMLUI forms and components.
 
-| Variable         | Scope/Context                | What it Represents                        |
-|------------------|------------------------------|-------------------------------------------|
-| `$data`          | Inside `<Form>`              | The form's current data object            |
-| `$item`          | Inside iterators             | The current item in a list/array          |
-| `$param`           | In event handlers            | The event's payload (e.g., form data)   |
-| `$itemIndex`     | Inside iterators             | The current index in a list/array         |
-| `$validationResult` | In FormItem               | Result of latest validation               |
-| `$setValue`      | In FormItem                  | Function to set the value                 |
-| `$value`         | In FormItem                  | The current value                         |
-| `$routeParams`   | In Page                      | Capture values from route placeholders    |
-| `var.myVar`      | Declared in markup           | A scoped variable                         |
-| `myComponentId`  | Component with `id`          | Reference to the component instance       |
-
-
+| Variable            | Scope/Context       | What it Represents                     |
+| ------------------- | ------------------- | -------------------------------------- |
+| `$data`             | Inside `<Form>`     | The form's current data object         |
+| `$item`             | Inside iterators    | The current item in a list/array       |
+| `$param`            | In event handlers   | The event's payload (e.g., form data)  |
+| `$itemIndex`        | Inside iterators    | The current index in a list/array      |
+| `$validationResult` | In FormItem         | Result of latest validation            |
+| `$setValue`         | In FormItem         | Function to set the value              |
+| `$value`            | In FormItem         | The current value                      |
+| `$routeParams`      | In Page             | Capture values from route placeholders |
+| `var.myVar`         | Declared in markup  | A scoped variable                      |
+| `myComponentId`     | Component with `id` | Reference to the component instance    |
 
 ## `$data`
 
@@ -27,7 +25,6 @@ These are the key context variables available in XMLUI forms and components.
   ```xmlui
   <Text value="{JSON.stringify($data)}" />
   ```
-
 
 ## `$item`
 
@@ -47,6 +44,7 @@ These are the key context variables available in XMLUI forms and components.
 In forms:
 
 ## `$validationResult`
+
 - **Scope:** Inside a `FormItem`.
 - **What it is:** The result of the latest validation for the field.
 - **Example:**
@@ -57,6 +55,7 @@ In forms:
   ```
 
 ## `$setValue`
+
 - **Scope:** Inside a `FormItem`.
 - **What it is:** A function to set the value of the field.
 - **Example:**
@@ -65,6 +64,7 @@ In forms:
   ```
 
 ## `$value`
+
 - **Scope:** Inside a `FormItem`.
 - **What it is:** The current value of the field.
 - **Example:**
@@ -77,6 +77,7 @@ In forms:
 In iterators:
 
 ## `$itemIndex`
+
 - **Scope:** Inside iterators (e.g., `<Items>`, `<Table>`, or FormItem of type "items").
 - **What it is:** The current index in the array.
 - **Example:**
@@ -96,6 +97,7 @@ In event handlers:
 In components:
 
 ## `var.myVar`
+
 - **Scope:** Declared in markup with `var.` prefix; available in the declaring component and its children.
 - **What it is:** A scoped variable.
 - **Example:**
@@ -127,8 +129,8 @@ In Pages:
 </App>
 ```
 
-
 ## `myComponentId`
+
 - **Scope:** Any component with an `id` attribute.
 - **What it is:** Reference to the component instance, allowing access to its properties and methods.
 - **Example:**
@@ -137,5 +139,3 @@ In Pages:
   <Button onClick="myTextBox.setValue('Hello!')" label="Set Value" />
   <Text value="{myTextBox.value}" />
   ```
-
-
