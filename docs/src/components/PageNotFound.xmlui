@@ -1,7 +1,10 @@
 <Component name="PageNotFound">
-  <H1>Page Not Found</H1>
-  <Text>
-      The page you are looking for does not exist. Please check the URL or return to the home page.
-  </Text>
-  <Link to="/">Return to Home</Link>
+  <CVStack>
+    <Text fontSize="$fontSize-gigantic" fontWeight="bold" color="$color-primary-800">404</Text>
+    <Text fontSize="$fontSize-large" fontWeight="bold" color="$color-primary-800">Page not found</Text>
+    <Text>
+      The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+    </Text>
+    <Button onClick="Actions.navigate('/')">Go to Homepage</Button>
+  </CVStack>
 </Component>
