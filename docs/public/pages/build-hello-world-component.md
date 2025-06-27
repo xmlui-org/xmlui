@@ -192,7 +192,7 @@ $themeVars: t.composeTextVars($themeVars, $component, $component);
   @include t.paddingVars($themeVars, $component);
   @include t.borderVars($themeVars, $component);
   @include t.textVars($themeVars, $component);
-  
+
   border-radius: createThemeVar("borderRadius-#{$component}");
   max-width: createThemeVar("maxWidth-#{$component}");
 }
@@ -623,6 +623,8 @@ The registration process connects your component to XMLUI's rendering engine:
 - **Environment Variable Check**: The `process.env.VITE_USED_COMPONENTS_HelloWorld` check allows for conditional component inclusion, enabling tree-shaking for production builds
 - **registerCoreComponent()**: Adds your component renderer to XMLUI's component registry, making it available for use in markup
 - **Import Pattern**: Always import the renderer (not the native component) for registration
+
+> **Note:** By default, if the environment variable `VITE_USED_COMPONENTS_HelloWorld` is not set, the component will be registered. The component is only excluded if you explicitly set `VITE_USED_COMPONENTS_HelloWorld=false` in your environment (for example, in a `.env` file or your shell). This pattern allows you to selectively exclude components from production builds, but you do not need to set the variable to `true` for the component to work during development.
 
 ## Common Patterns Explained
 
