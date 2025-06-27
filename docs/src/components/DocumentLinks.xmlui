@@ -6,7 +6,7 @@
     backgroundColor-ContentSeparator="$backgroundColor-separator-DocumentLinks">
     <ContentSeparator 
       marginVertical="$space-6" 
-      when="{$props.prevLink || $props.nextLink}"/>
+      when="{$linkInfo.prevLink || $linkInfo.nextLink}"/>
     <HStack verticalAlignment="center" gap="$space-2">
       <Link when="{$linkInfo.prevLink}" to="{$linkInfo.prevLink.to}">
         <Icon name="chevronleft"/>

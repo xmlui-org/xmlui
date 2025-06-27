@@ -44,7 +44,7 @@ export const navPanelRenderer = createComponentRenderer(
   COMP,
   NavPanelMd,
   ({ node, renderChild, layoutCss, layoutContext, extractValue }) => {
-    const navLinks = buildNavHierarchy(node.children, extractValue);
+    const navLinks = buildNavHierarchy(node.children, extractValue, undefined, []);
     return (
       <NavPanel
         style={layoutCss}

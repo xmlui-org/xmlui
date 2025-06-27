@@ -12,20 +12,43 @@ import { getAppLayoutOrientation } from "../App/AppNative";
 
 // Define navigation hierarchy node structure
 export interface NavHierarchyNode {
+  /** The type of navigation node - either a clickable link or a grouping container */
   type: "NavLink" | "NavGroup";
+
+  /** The display label/text for this navigation item */
   label: string;
+
+  /** The URL/route path for navigation (only present for NavLink types) */
   to?: string;
+
+  /** Child navigation nodes nested under this node (only present for NavGroup types) */
   children?: NavHierarchyNode[];
+
+  /** Reference to the immediate parent node in the hierarchy (undefined for root-level nodes) */
+  parent?: NavHierarchyNode;
+
+  /** Array of ancestor nodes from root to this node, excluding this node itself (empty for root-level nodes) */
+  pathSegments?: NavHierarchyNode[];
+
+  /** Reference to the previous NavLink in the flattened navigation order */
   prevLink?: NavHierarchyNode;
+
+  /** Reference to the next NavLink in the flattened navigation order */
   nextLink?: NavHierarchyNode;
+
+  /** True if this is the first NavLink within its immediate parent container */
   firstLink?: boolean;
+
+  /** True if this is the last NavLink within its immediate parent container */
   lastLink?: boolean;
 }
 
 // Function to build navigation hierarchy from component children
 export function buildNavHierarchy(
   children: any[] | undefined,
-  extractValue: any
+  extractValue: any,
+  parent?: NavHierarchyNode,
+  pathSegments: NavHierarchyNode[] = [],
 ): NavHierarchyNode[] {
   if (!children) return [];
 
@@ -33,7 +56,8 @@ export function buildNavHierarchy(
 
   children.forEach((child) => {
     if (child.type === "NavLink") {
-      const label = extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
+      const label =
+        extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
       const to = extractValue.asOptionalString?.(child.props?.to) || extractValue(child.props?.to);
 
       // Handle case where label might not be in props but in children as text
@@ -44,27 +68,41 @@ export function buildNavHierarchy(
 
       // Only include NavLinks that have both label and to values
       if (finalLabel && to) {
-        hierarchy.push({
+        const node: NavHierarchyNode = {
           type: "NavLink",
           label: finalLabel,
-          to: to
-        });
+          to: to,
+          parent: parent,
+          pathSegments: [...pathSegments],
+        };
+        hierarchy.push(node);
       }
     } else if (child.type === "NavGroup") {
-      const label = extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
+      const label =
+        extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
 
       // NavGroups only need a label, no "to" value required
       if (label) {
         const groupNode: NavHierarchyNode = {
           type: "NavGroup",
           label: label,
-          children: buildNavHierarchy(child.children, extractValue)
+          parent: parent,
+          pathSegments: [...pathSegments],
+          children: [],
         };
 
+        // Build children with this groupNode as parent and updated path
+        const newPathSegments = [...pathSegments, groupNode];
+        groupNode.children = buildNavHierarchy(
+          child.children,
+          extractValue,
+          groupNode,
+          newPathSegments,
+        );
         hierarchy.push(groupNode);
       } else if (child.children && child.children.length > 0) {
-        // If no label but has children, process them at the current level
-        hierarchy.push(...buildNavHierarchy(child.children, extractValue));
+        // If no label but has children, process them at the current level with same parent and path
+        hierarchy.push(...buildNavHierarchy(child.children, extractValue, parent, pathSegments));
       }
     }
   });
@@ -79,9 +117,9 @@ export function buildNavHierarchy(
 function setNavigationProperties(hierarchy: NavHierarchyNode[]) {
   // Collect all NavLinks in traversal order
   const allNavLinks: NavHierarchyNode[] = [];
-  
+
   function collectNavLinks(nodes: NavHierarchyNode[]) {
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       if (node.type === "NavLink") {
         allNavLinks.push(node);
       }
@@ -90,9 +128,9 @@ function setNavigationProperties(hierarchy: NavHierarchyNode[]) {
       }
     });
   }
-  
+
   collectNavLinks(hierarchy);
-  
+
   // Set prevLink and nextLink for all NavLinks
   allNavLinks.forEach((link, index) => {
     if (index > 0) {
@@ -102,35 +140,37 @@ function setNavigationProperties(hierarchy: NavHierarchyNode[]) {
       link.nextLink = allNavLinks[index + 1];
     }
   });
-  
+
   // Set firstLink and lastLink properties
   function setFirstLastProperties(nodes: NavHierarchyNode[]) {
-    const navLinks = nodes.filter(node => node.type === "NavLink");
-    
+    const navLinks = nodes.filter((node) => node.type === "NavLink");
+
     if (navLinks.length > 0) {
       navLinks[0].firstLink = true;
       navLinks[navLinks.length - 1].lastLink = true;
     }
-    
+
     // Recursively process children
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       if (node.children) {
         setFirstLastProperties(node.children);
       }
     });
   }
-  
+
   setFirstLastProperties(hierarchy);
 }
 
 // Function to build a map of NavLinks by their "to" property
-export function buildLinkMap(navLinks: NavHierarchyNode[] | undefined): Map<string, NavHierarchyNode> {
+export function buildLinkMap(
+  navLinks: NavHierarchyNode[] | undefined,
+): Map<string, NavHierarchyNode> {
   const linkMap = new Map<string, NavHierarchyNode>();
-  
+
   if (!navLinks) return linkMap;
-  
+
   function processNodes(nodes: NavHierarchyNode[]) {
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       if (node.type === "NavLink" && node.to) {
         // If multiple items use the same "to" value, the last wins
         linkMap.set(node.to, node);
@@ -140,7 +180,7 @@ export function buildLinkMap(navLinks: NavHierarchyNode[] | undefined): Map<stri
       }
     });
   }
-  
+
   processNodes(navLinks);
   return linkMap;
 }
@@ -190,7 +230,6 @@ function DrawerNavPanel({
   );
 }
 
-
 type Props = {
   children: ReactNode;
   className?: string;
@@ -202,7 +241,15 @@ type Props = {
 };
 
 export const NavPanel = forwardRef(function NavPanel(
-  { children, style, logoContent, className, inDrawer = defaultProps.inDrawer, renderChild, navLinks }: Props,
+  {
+    children,
+    style,
+    logoContent,
+    className,
+    inDrawer = defaultProps.inDrawer,
+    renderChild,
+    navLinks,
+  }: Props,
   forwardedRef,
 ) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -225,7 +272,12 @@ export const NavPanel = forwardRef(function NavPanel(
 
   if (inDrawer) {
     return (
-      <DrawerNavPanel style={style} logoContent={safeLogoContent} className={className} navLinks={navLinks}>
+      <DrawerNavPanel
+        style={style}
+        logoContent={safeLogoContent}
+        className={className}
+        navLinks={navLinks}
+      >
         {children}
       </DrawerNavPanel>
     );

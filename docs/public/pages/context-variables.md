@@ -2,18 +2,21 @@
 
 These are the key context variables available in XMLUI forms and components.
 
-| Variable            | Scope/Context       | What it Represents                     |
-| ------------------- | ------------------- | -------------------------------------- |
-| `$data`             | Inside `<Form>`     | The form's current data object         |
-| `$item`             | Inside iterators    | The current item in a list/array       |
-| `$param`            | In event handlers   | The event's payload (e.g., form data)  |
-| `$itemIndex`        | Inside iterators    | The current index in a list/array      |
-| `$validationResult` | In FormItem         | Result of latest validation            |
-| `$setValue`         | In FormItem         | Function to set the value              |
-| `$value`            | In FormItem         | The current value                      |
-| `$routeParams`      | In Page             | Capture values from route placeholders |
-| `var.myVar`         | Declared in markup  | A scoped variable                      |
-| `myComponentId`     | Component with `id` | Reference to the component instance    |
+| Variable            | Scope/Context       | What it Represents                            |
+| ------------------- | ------------------- | --------------------------------------------- |
+| `$data`             | Inside `<Form>`     | The form's current data object                |
+| `$item`             | Inside iterators    | The current item in a list/array              |
+| `$param`            | In event handlers   | The event's payload (e.g., form data)         |
+| `$itemIndex`        | Inside iterators    | The current index in a list/array             |
+| `$validationResult` | In FormItem         | Result of latest validation                   |
+| `$setValue`         | In FormItem         | Function to set the value                     |
+| `$value`            | In FormItem         | The current value                             |
+| `$pathname`         | In Page             | Gets the path part of the route               |
+| `$routeParams`      | In Page             | Capture values from route placeholders        |
+| `$queryParams`      | In Page             | Capture values from route's search parameters |
+| `$linkInfo`         | In Page             | Information about the previous and next links |
+| `var.myVar`         | Declared in markup  | A scoped variable                             |
+| `myComponentId`     | Component with `id` | Reference to the component instance           |
 
 ## `$data`
 
