@@ -52,6 +52,26 @@ XMLUI uses Markdown as the source of truth for all documentation and rich text c
 - How should we handle features/extensions that are not supported by XMLUI Markdown?
 - What is the best UX for switching between plain and rich modes?
 
+## Focused Scope for Tiptap/TableEditor Exercise
+
+### Motivation
+The primary motivation for the Tiptap exercise is to demonstrate, in developer documentation, how to wrap a real, useful component in XMLUI. The chosen example is a TableEditor, which addresses a common pain point: creating and editing Markdown tables for documentation.
+
+### Scope and Workflow
+- The TableEditor provides a spreadsheet-like UI for editing tables.
+- Users can switch to a code view to see the generated Markdown table.
+- The workflow is: edit your table visually, copy the Markdown, and paste it into your documentation (e.g., in VSCode).
+- There is no need to solve file persistence, in-situ editing, or live site integration for this exercise.
+- This mirrors the current workflow where developers use external tools to generate Markdown tables, but brings the experience into the XMLUI/React context.
+
+### Rationale
+- This approach is practical and developer-focused, providing immediate utility without overcomplicating the implementation.
+- It showcases XMLUI's extensibility and ability to integrate rich, interactive components.
+- The TableEditor can be demonstrated as a standalone tool or as a Tiptap node/component, but the main value is in Markdown table generation.
+
+### Next Step
+The next step is to rename the Editor component to TableEditor to reflect this focused scope.
+
 ---
 
 *This document is a living record of design considerations for Tiptap/Markdown interop in XMLUI. Update as the implementation evolves.*
