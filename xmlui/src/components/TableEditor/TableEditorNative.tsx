@@ -37,5 +37,16 @@ export function TableEditor() {
     `,
   });
 
-  return <EditorContent editor={editor} />;
+  return (
+    <div>
+      <button
+        onClick={() => editor && editor.commands.addRowAfter()}
+        disabled={!editor}
+        style={{ marginBottom: 8 }}
+      >
+        Insert Row
+      </button>
+      <EditorContent editor={editor} />
+    </div>
+  );
 }

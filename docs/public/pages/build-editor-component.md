@@ -7,9 +7,10 @@ This guide walks you through building a TableEditor component for XMLUI, using t
 By the end of this guide, you'll have created a TableEditor component that:
 
 - Renders a visual table editor using Tiptap's table features
+- Includes a button to insert new rows interactively
 - Is fully integrated with XMLUI's component system
 - Outputs Markdown tables for easy use in documentation
-- Can be extended with props, events, and theming (in future steps)
+- Can be extended with more controls, props, events, and theming
 
 ## XMLUI Component Architecture
 
@@ -43,7 +44,19 @@ Create `xmlui/src/components/TableEditor/TableEditorNative.tsx` with:
 import React from "react";
 
 export function TableEditor() {
-  return <div>TableEditor placeholder</div>;
+  // ...
+  return (
+    <div>
+      <button
+        onClick={() => editor && editor.commands.addRowAfter()}
+        disabled={!editor}
+        style={{ marginBottom: 8 }}
+      >
+        Insert Row
+      </button>
+      <EditorContent editor={editor} />
+    </div>
+  );
 }
 ```
 
@@ -81,29 +94,3 @@ Add minimal XMLUI markup in the docs testbed:
 
 Confirm that the TableEditor placeholder renders in the docs app.
 
-## Step 5: Minimal Tiptap Integration
-
-Replace the placeholder with a minimal Tiptap table editor in `TableEditorNative.tsx`:
-
-```tsx
-import React from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-
-export function TableEditor() {
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: "<p>Hello, Tiptap Table!</p>",
-  });
-
-  return <EditorContent editor={editor} />;
-}
-```
-
-Install dependencies:
-
-```bash
-npm install @tiptap/react @tiptap/starter-kit
-```
-
-Rebuild and confirm the Tiptap TableEditor renders in the docs app.
