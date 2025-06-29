@@ -96,5 +96,51 @@ export function TableEditor() {
 
 ![](/resources/devdocs/table-editor-02.png)
 
-Note: We have not defined any theming specific to `TableEditor`.
+## Step 5: Show the HTML
+
+Tiptap works natively with HTML, not Markdown. We'll eventually show Markdown but first let's show HTML.
+
+```
+    // Expose the getHtmlSource API method
+  React.useEffect(() => {
+    if (registerComponentApi && editor) {
+      console.log("Registering TableEditor API");
+      registerComponentApi({
+        getHtmlSource: () => {
+          const html = editor.getHTML();
+          //console.log("getHtmlSource called, returning:", html);
+          return html;
+        },
+      });
+    }
+  }, [registerComponentApi, editor]);
+```
+
+```xmlui
+<App var.showHtml="{false}">
+  <TableEditor id="tableEditor" />
+  <Button onClick="{() => showHtml = !showHtml}">
+    {showHtml ? "Hide HTML Source" : "Show HTML Source"}
+  </Button>
+  <Text when="{showHtml}" >
+  { tableEditor.getHtmlSource() }
+  </Text>
+</App>
+```
+
+![](/resources/devdocs/table-editor-03.png)
+
+## Current
+
+```xmlui-pg
+<App var.showHtml="{false}">
+  <TableEditor id="tableEditor" />
+  <Button onClick="{() => showHtml = !showHtml}">
+    {showHtml ? "Hide HTML Source" : "Show HTML Source"}
+  </Button>
+  <Text when="{showHtml}" >
+  { tableEditor.getHtmlSource() }
+  </Text>
+</App>
+```
 
