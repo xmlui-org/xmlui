@@ -1,32 +1,6 @@
 # Build a TableEditor Component
 
-This guide walks you through building a TableEditor component for XMLUI, using the Tiptap editor as a foundation. The TableEditor is focused on providing a visual and Markdown-friendly way to create and edit tables for documentation. We'll follow the same patterns as the HelloWorld guide, from setup to registration and testing.
-
-## What You'll Build
-
-By the end of this guide, you'll have created a TableEditor component that:
-
-- Renders a visual table editor using Tiptap's table features
-- Includes a button to insert new rows interactively
-- Is fully integrated with XMLUI's component system
-- Outputs Markdown tables for easy use in documentation
-- Can be extended with more controls, props, events, and theming
-
-## XMLUI Component Architecture
-
-XMLUI components consist of three main parts:
-
-1. **Native React Component** (`TableEditorNative.tsx`) – The actual React/Tiptap implementation
-2. **Component Metadata** (`TableEditor.tsx`) – Describes props and integrates with XMLUI
-3. **Component Registration** (`ComponentProvider.tsx`) – Registers the component with XMLUI
-
-This separation allows XMLUI to understand your component's interface while keeping the React code clean.
-
-## Prerequisites
-
-- Familiarity with React and TypeScript
-- Basic understanding of XMLUI markup
-- A working XMLUI development environment
+This guide walks you through building a TableEditor component for XMLUI, using the Tiptap editor as a foundation. The TableEditor will provide a visual and Markdown-friendly way to create and edit tables for use in XMLUI-powered documentation.
 
 ## Step 1: Create the Component Directory
 
@@ -36,31 +10,7 @@ Create:
 mkdir -p xmlui/src/components/TableEditor
 ```
 
-## Step 2: Add a Placeholder Native Component
-
-Create `xmlui/src/components/TableEditor/TableEditorNative.tsx` with:
-
-```tsx
-import React from "react";
-
-export function TableEditor() {
-  // ...
-  return (
-    <div>
-      <button
-        onClick={() => editor && editor.commands.addRowAfter()}
-        disabled={!editor}
-        style={{ marginBottom: 8 }}
-      >
-        Insert Row
-      </button>
-      <EditorContent editor={editor} />
-    </div>
-  );
-}
-```
-
-## Step 3: Register the Component
+## Step 2: Register the Component
 
 - Export a minimal renderer from `TableEditor.tsx`:
 
@@ -81,16 +31,70 @@ if (process.env.VITE_USED_COMPONENTS_TableEditor !== "false") {
 }
 ```
 
-## Step 4: Testbed and Verification
+## Step 3: Add a Placeholder Native Component
 
-Add minimal XMLUI markup in the docs testbed:
+Create `xmlui/src/components/TableEditor/TableEditorNative.tsx` with:
 
-```xmlui-pg display
+```tsx
+import React from "react";
+
+export function TableEditor() {
+  // ...
+  return (
+    <div>
+      <button
+        onClick={() => editor && editor.commands.addRowAfter()}
+      >
+        Insert Row
+      </button>
+      <EditorContent editor={editor} />
+    </div>
+  );
+}
+```
+
+This is the raw component using a native HTML `<button>`. Try it in a test environment.
+
+```xmlui
 <App>
-  TableEditor!
+  <TableEditor />
+</App>
+
+```
+
+![](/resources/devdocs/table-editor-01.png)
+
+We can edit the existing cells, and use `Insert Row` to add rows. The button has no style. Instead of writing CSS to style it we will instead switch to an XMLUI [Button](/components/Button) that inherits theming.
+
+## Step 4: Use XMLUI Button
+
+Import and using the XMLUI `Button` component instead of a native HTML button.
+
+```tsx
+import { Button } from "../Button/ButtonNative";
+
+export function TableEditor() {
+  // ...
+  return (
+    <div>
+      <Button
+        onClick={() => editor && editor.commands.addRowAfter()}
+      >
+        Insert Row
+      </Button>
+      <EditorContent editor={editor} />
+    </div>
+  );
+}
+```
+
+```xmlui
+<App>
   <TableEditor />
 </App>
 ```
 
-Confirm that the TableEditor placeholder renders in the docs app.
+![](/resources/devdocs/table-editor-02.png)
+
+Note: We have not defined any theming specific to `TableEditor`.
 
