@@ -10,7 +10,15 @@
                 <VStack gap="$space-2" marginBottom="$space-4">
                     <Items items="{downloads.value}">
                         <Card>
+                            <HStack>
                             <H2>{$item.tag_name}</H2>
+                            <CHStack>
+                                <Theme backgroundColor-Badge="$color-primary-300">
+                                    <Badge variant="pill" when="{$isFirst}" value="Latest"/>
+                                    <Badge variant="pill" value="{formatDate($item.published_at)}, {formatTimeWithoutSeconds($item.published_at)}"/>
+                                </Theme>
+                            </CHStack>
+                            </HStack>
                             <Markdown content="{$item.body}"/>
                             <Card backgroundColor="$backgroundColor-DownloadSection"
                                 padding="$space-2" marginTop="$space-2">
@@ -20,7 +28,7 @@
                                         {$item.assets[0].name}
                                     </Link>
                                     <SpaceFiller />
-                                    
+
                                     <Button variant="ghost" themeColor="primary" icon="download" padding="$space-2"
                                             >
                                     <Link active="true" to="{$item.assets[0].browser_download_url}">
