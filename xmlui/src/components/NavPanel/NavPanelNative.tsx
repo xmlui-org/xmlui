@@ -54,7 +54,8 @@ export function buildNavHierarchy(
 
   const hierarchy: NavHierarchyNode[] = [];
 
-  children.forEach((child) => {
+  // Skip non-object children
+  children.filter(child => child && typeof child === 'object').forEach((child) => {
     if (child.type === "NavLink") {
       const label =
         extractValue.asOptionalString?.(child.props?.label) || extractValue(child.props?.label);
@@ -104,12 +105,18 @@ export function buildNavHierarchy(
         // If no label but has children, process them at the current level with same parent and path
         hierarchy.push(...buildNavHierarchy(child.children, extractValue, parent, pathSegments));
       }
+    } else if (child.children && child.children.length > 0) {
+      console.log("CN", child.children);
+      // Process any children that might contain NavGroup and NavLink components recursively
+      const nestedNodes = buildNavHierarchy(child.children, extractValue, parent, pathSegments);
+      if (nestedNodes.length > 0) {
+        hierarchy.push(...nestedNodes);
+      }
     }
   });
 
   // Set navigation properties after building the hierarchy
   setNavigationProperties(hierarchy);
-
   return hierarchy;
 }
 
@@ -269,6 +276,10 @@ export const NavPanel = forwardRef(function NavPanel(
       appLayoutContext.registerLinkMap(linkMap);
     }
   }, [navLinks, appLayoutContext?.registerLinkMap]);
+
+  if (appLayoutContext && !appLayoutContext?.isNested) {
+    console.log(navLinks);
+  }
 
   if (inDrawer) {
     return (
