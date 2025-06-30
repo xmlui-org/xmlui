@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 16" width="48" height="48" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Grid outline -->
+  <rect x="2" y="2" width="12" height="10" rx="1" />
+  <!-- Row dividers -->
+  <line x1="2" y1="6" x2="14" y2="6" />
+  <line x1="2" y1="9" x2="14" y2="9" />
+  <!-- Centered plus sign to the right of the grid -->
+  <line x1="19" y1="5" x2="19" y2="9" />
+  <line x1="17" y1="7" x2="21" y2="7" />
+</svg>
