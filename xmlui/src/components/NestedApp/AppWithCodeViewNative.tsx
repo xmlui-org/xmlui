@@ -1,10 +1,9 @@
-import { type ReactNode } from "react";
-import styles from "./AppWithCodeView.module.scss";
-import classnames from "classnames";
+import { useState, type ReactNode } from "react";
 import { IndexAwareNestedApp } from "./NestedAppNative";
 import { Markdown } from "../Markdown/Markdown";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { Stack } from "../Stack/StackNative";
+import { Button } from "../Button/ButtonNative";
 
 type AppWithCodeViewNativeProps = {
   /**
@@ -15,7 +14,7 @@ type AppWithCodeViewNativeProps = {
    * Display layout in side-by-side mode (horizontal) when true,
    * or stacked (vertical) when false or undefined
    */
-  sideBySide?: boolean;
+  splitView?: boolean;
   api?: any;
   app: string;
   components?: any[];
@@ -33,7 +32,7 @@ type AppWithCodeViewNativeProps = {
  */
 export function AppWithCodeViewNative({
   markdown,
-  sideBySide,
+  splitView,
   app,
   api,
   components = [],
@@ -43,19 +42,48 @@ export function AppWithCodeViewNative({
   title,
   height,
   allowPlaygroundPopup,
-  withFrame,
 }: AppWithCodeViewNativeProps): ReactNode {
+  const [showCode, setShowCode] = useState(false);
+  if (splitView) {
+    return (
+      <div style={{ backgroundColor: "yellow", padding: "1rem" }}>
+        <Stack orientation="horizontal">
+          <Button onClick={() => setShowCode(true)}>Show Code</Button>
+          <Button onClick={() => setShowCode(false)}>Show App</Button>
+          { /* Add the pop-out and reset icons with tooltips here */}
+        </Stack>
+        <div style={{height}}>
+          {showCode && (
+            <div>
+              <Markdown>{markdown}</Markdown>
+            </div>
+          )}
+          {!showCode && (
+            <div>
+              <IndexAwareNestedApp
+                app={app}
+                api={api}
+                components={components}
+                config={config}
+                activeTone={activeTone}
+                activeTheme={activeTheme}
+                title={title}
+                height={height}
+                allowPlaygroundPopup={allowPlaygroundPopup}
+                withFrame={false}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
   return (
-    <div
-      className={classnames(styles.container, {
-        [styles.horizontal]: sideBySide,
-        [styles.vertical]: !sideBySide,
-      })}
-    >
-      <div className={classnames({ [styles.column]: sideBySide })}>
+    <>
+      <div>
         <Markdown>{markdown}</Markdown>
       </div>
-      <div className={classnames({ [styles.column]: sideBySide })}>
+      <div>
         <IndexAwareNestedApp
           app={app}
           api={api}
@@ -66,10 +94,10 @@ export function AppWithCodeViewNative({
           title={title}
           height={height}
           allowPlaygroundPopup={allowPlaygroundPopup}
-          withFrame={sideBySide ? false : withFrame}
+          withFrame={true}
         />
       </div>
-    </div>
+    </>
   );
 }
 
