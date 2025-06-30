@@ -1,5 +1,51 @@
 # Build a TableEditor Component
 
+## Current
+
+```xmlui-pg
+<App var.showHtml="{false}" var.showMarkdown="{false}">
+
+  <TableEditor
+    id="tableEditor"
+    themeColor="primary"
+    size="lg"
+  />
+
+    <TableEditor
+    id="tableEditor"
+    themeColor="attention"
+    size="sm"
+  />
+
+
+  <HStack>
+    <Button
+      onClick="{() => { showHtml = !showHtml; if (showHtml) showMarkdown = false; }}"
+      disabled="{showMarkdown}"
+    >
+      {showHtml ? "Hide HTML Source" : "Show HTML Source"}
+    </Button>
+
+    <Button
+      onClick="{() => { showMarkdown = !showMarkdown; if (showMarkdown) showHtml = false; }}"
+      disabled="{showHtml}"
+    >
+      {showMarkdown ? "Hide Markdown Source" : "Show Markdown Source"}
+    </Button>
+  </HStack>
+
+  <Text when="{showHtml}">
+    { tableEditor.getHtmlSource() }
+  </Text>
+
+  <Text when="{showMarkdown}" variant="codefence" preserveLinebreaks="true">
+    { tableEditor.getMarkdownSource() }
+  </Text>
+</App>
+```
+
+
+
 This guide walks you through building a TableEditor component for XMLUI, using the Tiptap editor as a foundation. The TableEditor will provide a visual and Markdown-friendly way to create and edit tables for use in XMLUI-powered documentation.
 
 > [!INFO]
@@ -268,36 +314,4 @@ return (
 
 - **XMLUI Stack Component**: We import and use `Stack` from `../Stack/StackNative`. Note that `HStack` is not available as a native component, so we can't use that shortcut.
 - **React Fragment (`<>...</>`)**: A component must return a single element. This groups the buttons into an anonymous container.
-
-## Current
-
-```xmlui-pg
-<App var.showHtml="{false}" var.showMarkdown="{false}">
-  <TableEditor id="tableEditor" />
-
-  <HStack>
-    <Button
-      onClick="{() => { showHtml = !showHtml; if (showHtml) showMarkdown = false; }}"
-      disabled="{showMarkdown}"
-    >
-      {showHtml ? "Hide HTML Source" : "Show HTML Source"}
-    </Button>
-
-    <Button
-      onClick="{() => { showMarkdown = !showMarkdown; if (showMarkdown) showHtml = false; }}"
-      disabled="{showHtml}"
-    >
-      {showMarkdown ? "Hide Markdown Source" : "Show Markdown Source"}
-    </Button>
-  </HStack>
-
-  <Text when="{showHtml}">
-    { tableEditor.getHtmlSource() }
-  </Text>
-
-  <Text when="{showMarkdown}" variant="codefence" preserveLinebreaks="true">
-    { tableEditor.getMarkdownSource() }
-  </Text>
-</App>
-```
 
