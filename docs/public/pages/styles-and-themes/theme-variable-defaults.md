@@ -2300,7 +2300,7 @@ XMLUI declares thousands of theme variables. Here's an export of the default the
     "Input:outlineStyle-RadioGroupOption--focus": null,
     "Input:outlineOffset-RadioGroupOption--focus": null,
     "backgroundColor-checked-RadioGroupOption-indicator": "$backgroundColor-primary",
-    "backgroundColor-checked-RadioGroupOption--disabled]": "$borderColor-RadioGroupOption--disabled",
+    "backgroundColor-checked-RadioGroupOption--disabled": "$borderColor-RadioGroupOption--disabled",
     "fontSize-RadioGroupOption": "$fontSize-small",
     "fontWeight-RadioGroupOption": "$fontWeight-bold",
     "textColor-RadioGroupOption-error": "$borderColor-RadioGroupOption-error",
