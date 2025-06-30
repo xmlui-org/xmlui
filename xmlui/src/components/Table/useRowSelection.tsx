@@ -91,12 +91,14 @@ export default function useRowSelection({
   visibleItems = items,
   rowsSelectable,
   enableMultiRowSelection,
+  rowDisabledPredicate,
   onSelectionDidChange,
 }: {
   items: Item[];
   visibleItems: Item[];
   rowsSelectable: boolean;
   enableMultiRowSelection: boolean;
+  rowDisabledPredicate?: (item: any) => boolean;
   onSelectionDidChange?: (newSelection: Item[]) => Promise<void>;
 }): RowSelectionOperations {
   // --- The focused index in the row source (if there is any)
@@ -169,10 +171,10 @@ export default function useRowSelection({
       } else {
         if (shiftKey) {
           // --- SHIFT is pressed, extend the current selection
-          let normalizedFromIdx;
-          let normalizedToIdx;
-          let from;
-          let to;
+          let normalizedFromIdx: number;
+          let normalizedToIdx: number;
+          let from: string;
+          let to: string;
 
           if (selectionInterval) {
             // --- Get the selection boundaries and normalize them (from is less than or equal than to)
@@ -296,7 +298,13 @@ export default function useRowSelection({
     if (!enableMultiRowSelection && checked) {
       return;
     }
-    setSelectedRowIds(checked ? items.map((item) => item[idKey]) : []);
+    setSelectedRowIds(
+      checked
+        ? items
+            .filter((item) => (rowDisabledPredicate ? !rowDisabledPredicate(item) : true))
+            .map((item) => item[idKey])
+        : [],
+    );
   });
 
   /**

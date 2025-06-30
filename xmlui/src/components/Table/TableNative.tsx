@@ -225,6 +225,7 @@ export const Table = forwardRef(
       visibleItems,
       rowsSelectable,
       enableMultiRowSelection,
+      rowDisabledPredicate,
       onSelectionDidChange,
     });
 
@@ -372,8 +373,11 @@ export const Table = forwardRef(
                 }),
                 value: table.getIsAllRowsSelected(),
                 indeterminate: table.getIsSomeRowsSelected(),
-                onDidChange: (checked: any) => {
-                  checkAllRows(checked);
+                onDidChange: () => {
+                  const allSelected = table
+                    .getRowModel()
+                    .rows.every((row) => rowDisabledPredicate(row.original) || row.getIsSelected());
+                  checkAllRows(!allSelected);
                 },
               }}
             />
@@ -745,9 +749,9 @@ export const Table = forwardRef(
                             {cellRenderer
                               ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
                               : (flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              ) as ReactNode)}
+                                  cell.column.columnDef.cell,
+                                  cell.getContext(),
+                                ) as ReactNode)}
                           </div>
                         </td>
                       );
