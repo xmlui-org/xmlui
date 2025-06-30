@@ -1,71 +1,58 @@
 # Build a TableEditor Component
 
-## Current
 
-```xmlui-pg
-<App var.showHtml="{false}" var.showMarkdown="{false}">
-
-  <TableEditor
-    id="tableEditor"
-    themeColor="primary"
-    size="lg"
-  />
-
-    <TableEditor
-    id="tableEditor"
-    themeColor="attention"
-    size="sm"
-  />
-
-
-  <HStack>
-    <Button
-      onClick="{() => { showHtml = !showHtml; if (showHtml) showMarkdown = false; }}"
-      disabled="{showMarkdown}"
-    >
-      {showHtml ? "Hide HTML Source" : "Show HTML Source"}
-    </Button>
-
-    <Button
-      onClick="{() => { showMarkdown = !showMarkdown; if (showMarkdown) showHtml = false; }}"
-      disabled="{showHtml}"
-    >
-      {showMarkdown ? "Hide Markdown Source" : "Show Markdown Source"}
-    </Button>
-  </HStack>
-
-  <Text when="{showHtml}">
-    { tableEditor.getHtmlSource() }
-  </Text>
-
-  <Text when="{showMarkdown}" variant="codefence" preserveLinebreaks="true">
-    { tableEditor.getMarkdownSource() }
-  </Text>
-</App>
-```
-
-
-
-This guide walks you through building a TableEditor component for XMLUI, using the Tiptap editor as a foundation. The TableEditor will provide a visual and Markdown-friendly way to create and edit tables for use in XMLUI-powered documentation.
+This guide walks you through building a `TableEditor` component for XMLUI, using the [Tiptap](https://tiptap.dev) editor as a foundation. It will provide a visual and Markdown-friendly way to create and edit tables for use in XMLUI-powered documentation.
 
 > [!INFO]
 > If you operate in the [XMLUI](https://github.com/xmlui-org/xmlui) repo you can test your work live. Follow the instructions in `dev-docs/next/generating-component-reference.md` to build the XMLUI docs site, then load localhost:5173. When you edit `.tsx` files they will automatically recompile, so you can iterate rapidly as you develop your component. And you can add a test page to the site in order to use your evolving component
 
-## Step 1: Create the Component Directory
-
-Create:
+## Step 1: Create the subdirectory
 
 ```bash
 mkdir -p xmlui/src/components/TableEditor
 ```
 
-## Step 2: Register the Component
+## Step 2: Register the component
 
 - Export a minimal renderer from `TableEditor.tsx`:
 
 ```tsx
 import { TableEditor } from "./TableEditorNative";
+```
 
+```tsx
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
+    ],
+    content: `
+      <table>
+        <thead>
+          <tr>
+            <th>Fruit</th>
+            <th>Color</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apple</td>
+            <td>Red</td>
+          </tr>
+          <tr>
+            <td>Banana</td>
+            <td>Yellow</td>
+          </tr>
+        </tbody>
+      </table>
+    `,
+  });
+```
+
+```
 export const editorComponentRenderer = {
   type: "TableEditor",
   renderer: (props: any) => <TableEditor />
@@ -80,7 +67,7 @@ if (process.env.VITE_USED_COMPONENTS_TableEditor !== "false") {
 }
 ```
 
-## Step 3: Add a Placeholder Native Component
+## Step 3: Add a placeholder native component
 
 Create `xmlui/src/components/TableEditor/TableEditorNative.tsx` with:
 
@@ -115,9 +102,9 @@ This is the raw component using a native HTML `<button>`. Try it in a test envir
 
 We can edit the existing cells, and use `Insert Row` to add rows. The button has no style. Instead of writing CSS to style it we will instead switch to an XMLUI [Button](/components/Button) that inherits theming.
 
-## Step 4: Use XMLUI Button
+## Step 4: Use XMLUI's Button
 
-Import and using the XMLUI `Button` component instead of a native HTML button.
+Import and use the XMLUI `Button` component instead of a native HTML button.
 
 ```tsx
 import { Button } from "../Button/ButtonNative";
@@ -268,7 +255,7 @@ Rendered in XMLUI Markdown:
 
 <Image src="/resources/devdocs/table-editor-05.png" width="200px"/>
 
-## Step 7: Add Controls
+## Step 7: Add controls
 
 We can improve the TableEditor by adding more table editing controls like Insert Column, Delete Row, and Delete Column. But where should these controls live?
 
@@ -314,4 +301,187 @@ return (
 
 - **XMLUI Stack Component**: We import and use `Stack` from `../Stack/StackNative`. Note that `HStack` is not available as a native component, so we can't use that shortcut.
 - **React Fragment (`<>...</>`)**: A component must return a single element. This groups the buttons into an anonymous container.
+
+## Step 8: Theme the buttons
+
+Our TableEditor component currently uses hardcoded button styling. To make TableEditor behave like a proper XMLUI component, we need to add theme support.
+
+Try adding different theme props to your TableEditor:
+
+```xml
+<TableEditor themeColor="secondary" variant="outlined" size="lg" />
+```
+
+The buttons remain blue and solid. This happens because XMLUI doesn't know which props are valid for custom components. Without proper metadata, theme attributes are filtered out.
+
+XMLUI components need metadata to define their allowed props. Let's look at how the Button component does this, then apply the same pattern to TableEditor.
+
+First, add the necessary imports to `TableEditor.tsx`:
+
+```tsx
+import { createMetadata } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
+```
+
+Modify the TableEditor function to accept theme props:
+
+```tsx
+export function TableEditor({
+  registerComponentApi,
+  themeColor = "primary",
+  variant = "solid",
+  size = "sm",
+}: {
+  registerComponentApi?: (api: any) => void;
+  themeColor?: "primary" | "secondary" | "attention";
+  variant?: "solid" | "outlined" | "ghost";
+  size?: "xs" | "sm" | "md" | "lg";
+}) {
+  // ... existing logic
+}
+```
+
+Then forward these props to all Button components:
+
+```tsx
+<Button
+  onClick={() => editor && editor.commands.addRowAfter()}
+  disabled={!editor}
+  themeColor={themeColor}
+  variant={variant}
+  size={size}
+>
+  Insert Row
+</Button>
+```
+
+After the TableEditor function, add metadata that defines the allowed props:
+
+```tsx
+export const TableEditorMd = createMetadata({
+  description:
+    "`TableEditor` provides an interactive table editing interface with controls for adding and deleting rows and columns. It supports theme customization and exports table data in HTML and Markdown formats.",
+  status: "stable",
+  props: {
+    themeColor: {
+      description: "Sets the color scheme for all editor buttons.",
+      isRequired: false,
+      type: "string",
+      availableValues: buttonThemeMd,
+      defaultValue: "primary",
+    },
+    variant: {
+      description: "Sets the visual style for all editor buttons.",
+      isRequired: false,
+      type: "string",
+      availableValues: buttonVariantMd,
+      defaultValue: "solid",
+    },
+    size: {
+      description: "Sets the size for all editor buttons.",
+      isRequired: false,
+      type: "string",
+      availableValues: sizeMd,
+      defaultValue: "sm",
+    },
+  },
+  events: {},
+});
+```
+
+Replace the simple renderer with a proper one that uses metadata:
+
+```tsx
+export const editorComponentRenderer = createComponentRenderer(
+  "TableEditor",
+  TableEditorMd,
+  ({ node, extractValue, registerComponentApi }) => {
+    return (
+      <TableEditor
+        themeColor={extractValue.asOptionalString(node.props.themeColor)}
+        variant={extractValue.asOptionalString(node.props.variant)}
+        size={extractValue.asOptionalString(node.props.size)}
+        registerComponentApi={registerComponentApi}
+      />
+    );
+  },
+);
+```
+
+Button size affects padding but not icon size. To make icons scale with button size, add a size mapping function:
+
+```tsx
+// Map button size to icon size
+const getIconSize = (size: string) => {
+  switch (size) {
+    case 'xs': return '14px';
+    case 'sm': return '18px';
+    case 'md': return '22px';
+    case 'lg': return '26px';
+    default: return '18px';
+  }
+};
+
+const iconSize = getIconSize(size);
+```
+
+Then add SVG icons to buttons using the calculated size:
+
+```tsx
+<Button
+  onClick={() => editor && editor.commands.addRowAfter()}
+  disabled={!editor}
+  themeColor={themeColor}
+  variant={variant}
+  size={size}
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 16"
+    width={iconSize}
+    height={iconSize}
+    stroke="currentColor"
+    fill="none"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="2" y="2" width="12" height="10" rx="1" />
+    <line x1="2" y1="6" x2="14" y2="6" />
+    <line x1="2" y1="9" x2="14" y2="9" />
+    <line x1="19" y1="5" x2="19" y2="9" />
+    <line x1="17" y1="7" x2="21" y2="7" />
+  </svg>
+  Insert Row
+</Button>
+```
+
+Now TableEditor supports full theme customization.
+
+```xmlui
+  <TableEditor
+    id="tableEditor"
+  />
+
+  <TableEditor
+    id="tableEditor2"
+    themeColor="primary"
+    size="lg"
+    variant="outlined"
+  />
+
+    <TableEditor
+    id="tableEditor2"
+    themeColor="attention"
+    variant="ghost"
+    size="sm"
+  />
+```
+
+![](/resources/devdocs/table-editor-07.png)
+
+The component now behaves like a native XMLUI component with automatic responsive design. Note that buttons collapse to icon-only mode on narrow screens.
+
+<Image src="/resources/devdocs/table-editor-08.png" width="400px"/>
 

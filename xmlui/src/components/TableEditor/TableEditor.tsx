@@ -151,6 +151,23 @@ export function TableEditor({
           variant={variant}
           size={size}
         >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 16"
+            width={iconSize}
+            height={iconSize}
+            stroke="currentColor"
+            fill="none"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="2" y="2" width="12" height="10" rx="1" />
+            <line x1="2" y1="6" x2="14" y2="6" />
+            <line x1="2" y1="9" x2="14" y2="9" />
+            <line x1="17" y1="5" x2="21" y2="9" />
+            <line x1="21" y1="5" x2="17" y2="9" />
+          </svg>
           Delete Row
         </Button>
         <Button
@@ -160,6 +177,23 @@ export function TableEditor({
           variant={variant}
           size={size}
         >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 16"
+            width={iconSize}
+            height={iconSize}
+            stroke="currentColor"
+            fill="none"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="2" y="2" width="12" height="10" rx="1" />
+            <line x1="6" y1="2" x2="6" y2="12" />
+            <line x1="10" y1="2" x2="10" y2="12" />
+            <line x1="19" y1="5" x2="19" y2="9" />
+            <line x1="17" y1="7" x2="21" y2="7" />
+          </svg>
           Insert Column
         </Button>
         <Button
@@ -169,6 +203,23 @@ export function TableEditor({
           variant={variant}
           size={size}
         >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 16"
+            width={iconSize}
+            height={iconSize}
+            stroke="currentColor"
+            fill="none"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="2" y="2" width="12" height="10" rx="1" />
+            <line x1="6" y1="2" x2="6" y2="12" />
+            <line x1="10" y1="2" x2="10" y2="12" />
+            <line x1="17" y1="5" x2="21" y2="9" />
+            <line x1="21" y1="5" x2="17" y2="9" />
+          </svg>
           Delete Column
         </Button>
       </Stack>
