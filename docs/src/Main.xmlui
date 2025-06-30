@@ -65,6 +65,7 @@
                 <NavLink label="Context Variables" to="/context-variables"/>
                 <NavLink label="Globals" to="/globals"/>
                 <NavLink label="Helper Tags" to="/helper-tags"/>
+                <NavLink label="Universal Properties" to="/universal-properties"/>
                 <NavLink label="Template Properties" to="/template-properties"/>
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Icons" to="/icons"/>
@@ -178,6 +179,9 @@
             </Page>
             <Page url="/helper-tags">
                 <DocumentPage url="pages/helper-tags.md" />
+            </Page>
+            <Page url="/universal-properties">
+                <DocumentPage url="pages/universal-properties.md" />
             </Page>
             <Page url="/template-properties">
                 <DocumentPage url="pages/template-properties.md" />
