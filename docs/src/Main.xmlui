@@ -70,8 +70,8 @@
                 <NavLink label="Palettes" to="/palettes"/>
                 <NavLink label="Icons" to="/icons"/>
                 <NavLink label="Glossary" to="/glossary"/>
-                <NavLink label="Build HelloWorld Component" to="/build-hello-world-component"/>
-                <NavLink label="Build Editor Component" to="/build-editor-component"/>
+                <NavLink label="Build a HelloWorld Component" to="/build-hello-world-component"/>
+                <NavLink label="Build a TableEditor Component" to="/build-editor-component"/>
             </NavGroup>
             <NavLink label="Change Log" to="/change-log"/>
             <NavLink label="MCP (experimental)" to="/mcp"/>

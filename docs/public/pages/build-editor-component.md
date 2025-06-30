@@ -132,7 +132,7 @@ Tiptap works natively with HTML, not Markdown. We'll eventually show Markdown bu
 
 ## Step 6: Show the Markdown
 
-Tiptap does not provide a converter. We'll start with a basic one called `turndown`.
+Tiptap does not provide an HTML-to-Markdown  converter. We'll start with a basic one called `turndown`.
 
 ```xmlui  {1} {7-22} {31-36}
 import TurndownService from "turndown";
@@ -206,7 +206,21 @@ import TurndownService from "turndown";
 </App>
 ```
 
-![](/resources/devdocs/table-editor-04.png)
+Exported Markdown:
+
+```
+| Fruit | Color |
+| --- | --- |
+| Apple | Red |
+| Banana | Yellow |
+```
+
+Rendered in XMLUI Markdown
+
+| Fruit | Color |
+| --- | --- |
+| Apple | Red |
+| Banana | Yellow |
 
 ## Current
 
