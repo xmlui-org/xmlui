@@ -6,8 +6,10 @@ const path = require("path");
 const { exit } = require("process");
 
 const XMLUI_STANDALONE_PATTERN = /xmlui-\d+\.\d+\.\d+\w*\.js/;
-const DEF_MAX_RELEASES_STR = "10";
 const MD_HEADING_PATTERN = /^#{1,6} \S/;
+const MD_LIST_COMMIT_SHA_PATTERN = /^-\s*[a-f0-9]{6,40}:\s*/;
+
+const DEF_MAX_RELEASES_STR = "10";
 if (require.main === module) {
   main();
 }
@@ -67,10 +69,8 @@ async function getXmluiReleases(options) {
     });
 
     const xmluiReleases = releases.filter((release) => release.tag_name.startsWith("xmlui@"));
-    xmluiReleases.sort((a, b) => {
-      // 2013-02-27T19:35:32Z
-      return new Date(b.created_at) - new Date(a.created_at);
-    });
+
+    xmluiReleases.sort(sortByVersion);
     const releasesToProcess = xmluiReleases.slice(0, options.maxReleases);
 
     const availableVersions = [];
@@ -79,18 +79,13 @@ async function getXmluiReleases(options) {
       const xmluiStandaloneAsset = release.assets.find((asset) =>
         XMLUI_STANDALONE_PATTERN.test(asset.name),
       );
-      const bodyWithoutHeading = release.body
-        ? release.body
-            .split("\n")
-            .filter((line) => !MD_HEADING_PATTERN.test(line))
-            .join("\n")
-            .trim()
-        : "";
+      const body = release.body ? simplifyBodyContent(release.body) : "";
 
       if (xmluiStandaloneAsset) {
         availableVersions.push({
           tag_name: release.tag_name,
-          body: bodyWithoutHeading,
+          published_at: release.published_at,
+          body: body,
           assets: [
             {
               name: xmluiStandaloneAsset.name,
@@ -185,4 +180,38 @@ function handleHelpOption(args) {
     console.log(helpMessage.trimStart().trimEnd());
     process.exit(0);
   }
+}
+
+/**
+ *
+ * @param {string} body leading commit sha will be stripped, if exists
+ * @returns {string}
+ */
+function simplifyBodyContent(body) {
+  return body
+    .split("\n")
+    .filter((line) => !MD_HEADING_PATTERN.test(line))
+    .map((line) => line.replace(MD_LIST_COMMIT_SHA_PATTERN, "- "))
+    .join("\n")
+    .trim();
+}
+
+function sortByVersion(a, b) {
+  /** @type {string} */
+  const versionStrA = a.tag_name.split("@")[1];
+  /** @type {string} */
+  const versionStrB = b.tag_name.split("@")[1];
+
+  const [majorA, minorA, patchA] = versionStrA.split(".").map(Number);
+  const [majorB, minorB, patchB] = versionStrB.split(".").map(Number);
+
+  if (majorB !== majorA) {
+    return majorB - majorA;
+  }
+
+  if (minorB !== minorA) {
+    return minorB - minorA;
+  }
+
+  return patchB - patchA;
 }
