@@ -2,6 +2,9 @@
 
 This guide walks you through building a TableEditor component for XMLUI, using the Tiptap editor as a foundation. The TableEditor will provide a visual and Markdown-friendly way to create and edit tables for use in XMLUI-powered documentation.
 
+> [!INFO]
+> If you operate in the [XMLUI](https://github.com/xmlui-org/xmlui) repo you can test your work live. Follow the instructions in `dev-docs/next/generating-component-reference.md` to build the XMLUI docs site, then load localhost:5173. When you edit `.tsx` files they will automatically recompile, so you can iterate rapidly as you develop your component. And you can add a test page to the site in order to use your evolving component
+
 ## Step 1: Create the Component Directory
 
 Create:
@@ -215,12 +218,56 @@ Exported Markdown:
 | Banana | Yellow |
 ```
 
-Rendered in XMLUI Markdown
+Rendered in XMLUI Markdown:
 
-| Fruit | Color |
-| --- | --- |
-| Apple | Red |
-| Banana | Yellow |
+<Image src="/resources/devdocs/table-editor-05.png" width="200px"/>
+
+## Step 7: Add Controls
+
+We can improve the TableEditor by adding more table editing controls like Insert Column, Delete Row, and Delete Column. But where should these controls live?
+
+1. **TableEditorNative.tsx** (lowest level)
+   - Pros: Closest to the editor instance
+   - Cons: Not idiomatic for XMLUI; the "native" component should be minimal
+2. **TableEditor.tsx** (middle level)
+   - Pros: Provides a good default "batteries included" experience; keeps the native component minimal; still allows advanced users to build custom controls if needed
+   - Cons: Slightly less flexible than fully user-defined controls
+3. **User-defined component** (highest level)
+   - Pros: Maximum flexibility for users
+   - Cons: Every user has to reimplement the same basic controls; not user-friendly
+
+We chose to implement the controls in `TableEditor.tsx` because it provides the best balance of usability and flexibility. Users get a working table editor with sensible controls out of the box, while advanced users can still build custom UIs using the exposed API if needed.
+
+```tsx
+import { Stack } from "../Stack/StackNative";
+```
+
+```tsx
+return (
+  <>
+    <Stack orientation="horizontal">
+      <Button onClick={() => editor && editor.commands.addRowAfter()} disabled={!editor}>
+        Insert Row
+      </Button>
+      <Button onClick={() => editor && editor.commands.deleteRow()} disabled={!editor}>
+        Delete Row
+      </Button>
+      <Button onClick={() => editor && editor.commands.addColumnAfter()} disabled={!editor}>
+        Insert Column
+      </Button>
+      <Button onClick={() => editor && editor.commands.deleteColumn()} disabled={!editor}>
+        Delete Column
+      </Button>
+    </Stack>
+    <TableEditorNative editor={editor} />
+  </>
+);
+```
+
+![](/resources/devdocs/table-editor-06.png)
+
+- **XMLUI Stack Component**: We import and use `Stack` from `../Stack/StackNative`. Note that `HStack` is not available as a native component, so we can't use that shortcut.
+- **React Fragment (`<>...</>`)**: A component must return a single element. This groups the buttons into an anonymous container.
 
 ## Current
 
