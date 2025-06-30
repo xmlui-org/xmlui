@@ -13,7 +13,7 @@
             <Search data="{appGlobals.plainTextContent}" when="{mediaSize.sizeIndex > 2}" />
             <ToneChangerButton/>
             <Link to="https://github.com/xmlui-org/xmlui">
-               <Icon name="github" />
+                <Button variant="ghost" icon="github" />
             </Link>
         </AppHeader>
 
