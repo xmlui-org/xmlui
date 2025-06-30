@@ -11,7 +11,7 @@
 
 %-PROP-START name
 
-The engine looks up the icon in its [registry]() and determines which icon is associated with the name that the component will show.
+The engine looks up the icon in its registry and determines which icon is associated with the name that the component will show.
 Nothing is displayed if the icon name is not found in the registry.
 
 ```xmlui-pg copy display name="Example: name"
