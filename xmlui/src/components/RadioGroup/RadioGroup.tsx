@@ -66,24 +66,30 @@ export const RadioGroupMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`gap-${RGOption}`]: "$space-1_5",
-    [`borderWidth-${RGOption}`]: "2px",
-    [`backgroundColor-${RGOption}--disabled`]: "$backgroundColor--disabled",
-    [`backgroundColor-checked-${RGOption}-default`]: "$color-primary-500",
-    [`backgroundColor-checked-${RGOption}-indicator`]: `$backgroundColor-primary`,
-    [`backgroundColor-checked-${RGOption}-indicator--disabled`]: `$textColor--disabled`,
-    [`backgroundColor-${RGOption}-indicator--disabled`]: "$textColor--disabled",
-    [`backgroundColor-checked-${RGOption}--disabled`]: `$borderColor--disabled`,
-    [`backgroundColor-checked-${RGOption}-error`]: `$borderColor-error`,
-    [`backgroundColor-checked-${RGOption}-warning`]: `$borderColor-warning`,
-    [`backgroundColor-checked-${RGOption}-success`]: `$borderColor-success`,
-    [`fontSize-${RGOption}`]: "$fontSize-small",
-    [`fontWeight-${RGOption}`]: "$fontWeight-bold",
-    [`textColor-${RGOption}-error`]: `$borderColor-${RGOption}-error`,
-    [`textColor-${RGOption}-warning`]: `$borderColor-${RGOption}-warning`,
-    [`textColor-${RGOption}-success`]: `$borderColor-${RGOption}-success`,
+    [`borderWidth-${RGOption}`]: "1px",
+    [`borderWidth-RadioGroupOption-validation`]: `2px`,
+
     [`borderColor-${RGOption}-default`]: "$color-surface-500",
     [`borderColor-${RGOption}-default--hover`]: "$color-surface-700",
     [`borderColor-${RGOption}-default--active`]: "$color-primary-500",
+
+    [`backgroundColor-RadioGroupOption--disabled`]: "$backgroundColor--disabled",
+
+    [`backgroundColor-RadioGroupOption-checked`]: "$color-primary-500",
+    [`backgroundColor-RadioGroupOption-checked--disabled`]: `$textColor--disabled`,
+    [`backgroundColor-RadioGroupOption-checked-indicator`]: `transparent`,
+    [`backgroundColor-RadioGroupOption-checked-indicator--disabled`]: `transparent`,
+
+    [`backgroundColor-checked-${RGOption}-error`]: `$borderColor-error`,
+    [`backgroundColor-checked-${RGOption}-warning`]: `$borderColor-warning`,
+    [`backgroundColor-checked-${RGOption}-success`]: `$borderColor-success`,
+    
+    [`fontSize-${RGOption}`]: "$fontSize-small",
+    [`fontWeight-${RGOption}`]: "$fontWeight-bold",
+    
+    [`textColor-${RGOption}-error`]: `$borderColor-${RGOption}-error`,
+    [`textColor-${RGOption}-warning`]: `$borderColor-${RGOption}-warning`,
+    [`textColor-${RGOption}-success`]: `$borderColor-${RGOption}-success`,
   },
 });
 
