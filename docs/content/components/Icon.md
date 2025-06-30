@@ -24,7 +24,7 @@ This optional property provides a way to handle situations when the icon with th
 
 This string property specifies the name of the icon to display. All icons have unique, case-sensitive names identifying them. If the icon name is not set, the `fallback` value is used.
 
-The engine looks up the icon in its [registry]() and determines which icon is associated with the name that the component will show.
+The engine looks up the icon in its registry and determines which icon is associated with the name that the component will show.
 Nothing is displayed if the icon name is not found in the registry.
 
 ```xmlui-pg copy display name="Example: name"
