@@ -1201,7 +1201,7 @@ export default {
       "backgroundColor-HtmlTbody": "var(--xmlui-backgroundColor-HtmlTbody)",
       "textColor-HtmlTbody": "var(--xmlui-textColor-HtmlTbody)",
       "textAlign-HtmlTbody": "var(--xmlui-textAlign-HtmlTbody)",
-      "verticalAlign-HtmlTbody": "var(--xmlui-verticalAlign-HtmlTbody)",
+      "verticalAlignment-HtmlTbody": "var(--xmlui-verticalAlignment-HtmlTbody)",
       "textTransform-HtmlTbody": "var(--xmlui-textTransform-HtmlTbody)"
     }
   },
@@ -1241,7 +1241,7 @@ export default {
     "themeVars": {
       "backgroundColor-HtmlTd": "var(--xmlui-backgroundColor-HtmlTd)",
       "text-align-HtmlTd": "var(--xmlui-text-align-HtmlTd)",
-      "verticalAlign-HtmlTd": "var(--xmlui-verticalAlign-HtmlTd)",
+      "verticalAlignment-HtmlTd": "var(--xmlui-verticalAlignment-HtmlTd)",
       "fontSize-HtmlTd": "var(--xmlui-fontSize-HtmlTd)",
       "fontWeight-HtmlTd": "var(--xmlui-fontWeight-HtmlTd)",
       "border-HtmlTd": "var(--xmlui-border-HtmlTd)",
@@ -1855,7 +1855,7 @@ export default {
       "paddingTop-Accordion": "var(--xmlui-paddingTop-Accordion, var(--xmlui-paddingVertical-Accordion, var(--xmlui-padding-Accordion)))",
       "paddingBottom-Accordion": "var(--xmlui-paddingBottom-Accordion, var(--xmlui-paddingVertical-Accordion, var(--xmlui-padding-Accordion)))",
       "borderRadius-Accordion": "var(--xmlui-borderRadius-Accordion)",
-      "verticalAlign-header-Accordion": "var(--xmlui-verticalAlign-header-Accordion)",
+      "verticalAlignment-header-Accordion": "var(--xmlui-verticalAlignment-header-Accordion)",
       "fontSize-header-Accordion": "var(--xmlui-fontSize-header-Accordion)",
       "fontWeight-header-Accordion": "var(--xmlui-fontWeight-header-Accordion)",
       "fontStyle-header-Accordion": "var(--xmlui-fontStyle-header-Accordion)",
@@ -1873,7 +1873,7 @@ export default {
     "defaultThemeVars": {
       "paddingHorizontal-header-Accordion": "$space-3",
       "paddingVertical-header-Accordion": "$space-3",
-      "verticalAlign-header-Accordion": "center",
+      "verticalAlignment-header-Accordion": "center",
       "fontSize-header-Accordion": "$fontSize-normal",
       "fontWeight-header-Accordion": "$fontWeight-normal",
       "fontFamily-header-Accordion": "$fontFamily",
@@ -2205,7 +2205,7 @@ export default {
       "borderEndStartRadius-AppHeader": "var(--xmlui-borderEndStartRadius-AppHeader, var(--xmlui-borderRadius-AppHeader))",
       "borderEndEndRadius-AppHeader": "var(--xmlui-borderEndEndRadius-AppHeader, var(--xmlui-borderRadius-AppHeader))",
       "width-logo-AppHeader": "var(--xmlui-width-logo-AppHeader)",
-      "align-content-AppHeader": "var(--xmlui-align-content-AppHeader)",
+      "alignment-content-AppHeader": "var(--xmlui-alignment-content-AppHeader)",
       "height-AppHeader": "var(--xmlui-height-AppHeader)",
       "backgroundColor-AppHeader": "var(--xmlui-backgroundColor-AppHeader)",
       "maxWidth-content-AppHeader": "var(--xmlui-maxWidth-content-AppHeader)",
@@ -3387,7 +3387,7 @@ export default {
       "boxShadow-Card": "none",
       "backgroundColor-Card": "$color-surface-raised",
       "gap-Card": "var(--stack-gap-default)",
-      "gap-title-Card": "$gap-normal",
+      "gap-title-Card": "$gap-none",
       "gap-avatar-Card": "$gap-normal",
       "verticalAlignment-title-Card": "center"
     },
@@ -4541,8 +4541,9 @@ export default {
     "isHtmlTag": true
   },
   "Fragment": {
-    "description": "`Fragment` provides conditional rendering and grouping of components. It's often used to hide components until their dependent variables are available.",
-    "opaque": true
+    "description": "`Fragment` provides conditional rendering. You can use `when=` on any component to render it conditionally, use `Fragment` to apply `when` to a group of components.",
+    "opaque": true,
+    "props": {}
   },
   "MenuItem": {
     "description": "`MenuItem` represents individual clickable items within dropdown menus and other menu components. Each menu item can display text, icons, and respond to clicks with either navigation or custom actions, making it the building block for interactive menu systems.",
@@ -4808,9 +4809,9 @@ export default {
       "paddingLeft-ExpandableItem": "$space-0",
       "paddingRight-ExpandableItem": "$space-0",
       "gap-ExpandableItem": "$space-2",
-      "contentPaddingLeft-ExpandableItem": "$space-3",
-      "contentPaddingRight-ExpandableItem": "$space-3",
-      "contentPaddingVertical-ExpandableItem": "$space-2",
+      "paddingLeft-content-ExpandableItem": "$space-3",
+      "paddingRight-content-ExpandableItem": "$space-3",
+      "paddingVertical-content-ExpandableItem": "$space-2",
       "transition-ExpandableItem": "0.2s ease"
     }
   },
@@ -5107,7 +5108,7 @@ export default {
       "textColor-Footer": "var(--xmlui-textColor-Footer)",
       "height-Footer": "var(--xmlui-height-Footer)",
       "fontSize-Footer": "var(--xmlui-fontSize-Footer)",
-      "verticalAlign-Footer": "var(--xmlui-verticalAlign-Footer)",
+      "verticalAlignment-Footer": "var(--xmlui-verticalAlignment-Footer)",
       "maxWidth-content-Footer": "var(--xmlui-maxWidth-content-Footer)",
       "gap-Footer": "var(--xmlui-gap-Footer)",
       "maxWidth-App": "var(--xmlui-maxWidth-App)"
@@ -5115,7 +5116,7 @@ export default {
     "limitThemeVarsToComponent": true,
     "defaultThemeVars": {
       "backgroundColor-Footer": "$backgroundColor-AppHeader",
-      "verticalAlign-Footer": "center",
+      "verticalAlignment-Footer": "center",
       "fontSize-Footer": "$fontSize-small",
       "textColor-Footer": "$textColor-secondary",
       "maxWidth-content-Footer": "$maxWidth-content",
@@ -5200,6 +5201,15 @@ export default {
       "submitMethod": {
         "description": "This property sets the HTTP method to use when submitting the form data. If not defined, `put` is used when the form has initial data; otherwise, `post`."
       },
+      "inProgressNotificationMessage": {
+        "description": "This property sets the message to display when the form is being submitted."
+      },
+      "completedNotificationMessage": {
+        "description": "This property sets the message to display when the form is submitted successfully."
+      },
+      "errorNotificationMessage": {
+        "description": "This property sets the message to display when the form submission fails."
+      },
       "enabled": {
         "description": "This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).",
         "valueType": "boolean",
@@ -5213,6 +5223,9 @@ export default {
     "events": {
       "submit": {
         "description": "The form infrastructure fires this event when the form is submitted. The event argument is the current `data` value to save."
+      },
+      "success": {
+        "description": "The form infrastructure fires this event when the form is submitted successfully."
       },
       "cancel": {
         "description": "The form infrastructure fires this event when the form is canceled."
@@ -9474,8 +9487,8 @@ export default {
       "borderStartEndRadius-Blockquote": "var(--xmlui-borderStartEndRadius-Blockquote, var(--xmlui-borderRadius-Blockquote))",
       "borderEndStartRadius-Blockquote": "var(--xmlui-borderEndStartRadius-Blockquote, var(--xmlui-borderRadius-Blockquote))",
       "borderEndEndRadius-Blockquote": "var(--xmlui-borderEndEndRadius-Blockquote, var(--xmlui-borderRadius-Blockquote))",
-      "accentColor-Blockquote": "var(--xmlui-accentColor-Blockquote)",
-      "accentWidth-Blockquote": "var(--xmlui-accentWidth-Blockquote)",
+      "color-accent-Blockquote": "var(--xmlui-color-accent-Blockquote)",
+      "width-accent-Blockquote": "var(--xmlui-width-accent-Blockquote)",
       "backgroundColor-Blockquote": "var(--xmlui-backgroundColor-Blockquote)",
       "borderRadius-Blockquote": "var(--xmlui-borderRadius-Blockquote)",
       "marginTop-Blockquote": "var(--xmlui-marginTop-Blockquote)",
@@ -9521,7 +9534,7 @@ export default {
       "borderEndEndRadius-Admonition": "var(--xmlui-borderEndEndRadius-Admonition, var(--xmlui-borderRadius-Admonition))",
       "backgroundColor-Admonition": "var(--xmlui-backgroundColor-Admonition)",
       "borderRadius-Admonition": "var(--xmlui-borderRadius-Admonition)",
-      "iconSize-Admonition": "var(--xmlui-iconSize-Admonition)",
+      "size-icon-Admonition": "var(--xmlui-size-icon-Admonition)",
       "marginTop-Admonition": "var(--xmlui-marginTop-Admonition)",
       "marginBottom-Admonition": "var(--xmlui-marginBottom-Admonition)",
       "marginLeft-Admonition-content": "var(--xmlui-marginLeft-Admonition-content)",
@@ -9584,7 +9597,7 @@ export default {
       "backgroundColor-Admonition-danger": "$color-danger-100",
       "borderColor-Admonition-danger": "$color-danger-300",
       "borderRadius-Admonition": "$space-2",
-      "iconSize-Admonition": "$space-5",
+      "size-icon-Admonition": "$space-5",
       "paddingLeft-Admonition": "$space-2",
       "paddingRight-Admonition": "$space-6",
       "paddingTop-Admonition": "$space-3",
@@ -9598,8 +9611,8 @@ export default {
       "paddingTop-Blockquote": "$space-3",
       "paddingBottom-Blockquote": "$space-2_5",
       "backgroundColor-Blockquote": "$color-surface-100",
-      "accentWidth-Blockquote": "3px",
-      "accentColor-Blockquote": "$color-surface-500",
+      "width-accent-Blockquote": "3px",
+      "color-accent-Blockquote": "$color-surface-500",
       "marginTop-HtmlLi": "$space-2_5",
       "marginBottom-HtmlLi": "$space-2_5",
       "marginTop-Image-markdown": "$space-4",
@@ -10018,7 +10031,7 @@ export default {
       "maxWidth-content-App": "var(--xmlui-maxWidth-content-App)",
       "height-AppHeader": "var(--xmlui-height-AppHeader)",
       "paddingVertical-AppHeader": "var(--xmlui-paddingVertical-AppHeader)",
-      "align-content-AppHeader": "var(--xmlui-align-content-AppHeader)",
+      "alignment-content-AppHeader": "var(--xmlui-alignment-content-AppHeader)",
       "horizontalAlignment-logo-NavPanel": "var(--xmlui-horizontalAlignment-logo-NavPanel)"
     },
     "limitThemeVarsToComponent": true,
@@ -12617,7 +12630,8 @@ export default {
       },
       "tabTemplate": {
         "description": "This property declares the template for the clickable tab area.",
-        "valueType": "ComponentDef"
+        "valueType": "ComponentDef",
+        "isInternal": true
       }
     },
     "apis": {
@@ -12786,12 +12800,12 @@ export default {
       "marginBottom-Text": "var(--xmlui-marginBottom-Text)",
       "marginLeft-Text": "var(--xmlui-marginLeft-Text)",
       "marginRight-Text": "var(--xmlui-marginRight-Text)",
-      "verticalAlign-Text": "var(--xmlui-verticalAlign-Text)",
+      "verticalAlignment-Text": "var(--xmlui-verticalAlignment-Text)",
       "marginTop-Text-markdown": "var(--xmlui-marginTop-Text-markdown)",
       "marginBottom-Text-markdown": "var(--xmlui-marginBottom-Text-markdown)",
       "marginLeft-Text-markdown": "var(--xmlui-marginLeft-Text-markdown)",
       "marginRight-Text-markdown": "var(--xmlui-marginRight-Text-markdown)",
-      "verticalAlign-Text-markdown": "var(--xmlui-verticalAlign-Text-markdown)",
+      "verticalAlignment-Text-markdown": "var(--xmlui-verticalAlignment-Text-markdown)",
       "fontWeight-Text-abbr": "var(--xmlui-fontWeight-Text-abbr)",
       "textTransform-Text-abbr": "var(--xmlui-textTransform-Text-abbr)",
       "fontStyle-Text-cite": "var(--xmlui-fontStyle-Text-cite)",
@@ -12802,10 +12816,10 @@ export default {
       "marginBottom-Text-code": "var(--xmlui-marginBottom-Text-code)",
       "marginLeft-Text-code": "var(--xmlui-marginLeft-Text-code)",
       "marginRight-Text-code": "var(--xmlui-marginRight-Text-code)",
-      "verticalAlign-Text-code": "var(--xmlui-verticalAlign-Text-code)",
+      "verticalAlignment-Text-code": "var(--xmlui-verticalAlignment-Text-code)",
       "marginLeft-Text-codefence": "var(--xmlui-marginLeft-Text-codefence)",
       "marginRight-Text-codefence": "var(--xmlui-marginRight-Text-codefence)",
-      "verticalAlign-Text-codefence": "var(--xmlui-verticalAlign-Text-codefence)",
+      "verticalAlignment-Text-codefence": "var(--xmlui-verticalAlignment-Text-codefence)",
       "fontFamily-Text-codefence": "var(--xmlui-fontFamily-Text-codefence)",
       "textDecorationLine-Text-deleted": "var(--xmlui-textDecorationLine-Text-deleted)",
       "textDecorationColor-Text-deleted": "var(--xmlui-textDecorationColor-Text-deleted)",
@@ -12833,9 +12847,9 @@ export default {
       "fontFamily-Text-sample": "var(--xmlui-fontFamily-Text-sample)",
       "fontSize-Text-sample": "var(--xmlui-fontSize-Text-sample)",
       "fontSize-Text-sup": "var(--xmlui-fontSize-Text-sup)",
-      "verticalAlign-Text-sup": "var(--xmlui-verticalAlign-Text-sup)",
+      "verticalAlignment-Text-sup": "var(--xmlui-verticalAlignment-Text-sup)",
       "fontSize-Text-sub": "var(--xmlui-fontSize-Text-sub)",
-      "verticalAlign-Text-sub": "var(--xmlui-verticalAlign-Text-sub)",
+      "verticalAlignment-Text-sub": "var(--xmlui-verticalAlignment-Text-sub)",
       "fontStyle-Text-var": "var(--xmlui-fontStyle-Text-var)",
       "fontSize-Text-title": "var(--xmlui-fontSize-Text-title)",
       "fontSize-Text-subtitle": "var(--xmlui-fontSize-Text-subtitle)",
@@ -12843,7 +12857,7 @@ export default {
       "marginBottom-Text-small": "var(--xmlui-marginBottom-Text-small)",
       "marginLeft-Text-small": "var(--xmlui-marginLeft-Text-small)",
       "marginRight-Text-small": "var(--xmlui-marginRight-Text-small)",
-      "verticalAlign-Text-small": "var(--xmlui-verticalAlign-Text-small)",
+      "verticalAlignment-Text-small": "var(--xmlui-verticalAlignment-Text-small)",
       "letterSpacing-Text-caption": "var(--xmlui-letterSpacing-Text-caption)",
       "color-Text-placeholder": "var(--xmlui-color-Text-placeholder)",
       "fontStyle-Text-placeholder": "var(--xmlui-fontStyle-Text-placeholder)",
@@ -12896,9 +12910,9 @@ export default {
       "fontFamily-Text-sample": "$fontFamily-monospace",
       "fontSize-Text-sample": "$fontSize-small",
       "fontSize-Text-sup": "$fontSize-smaller",
-      "verticalAlign-Text-sup": "super",
+      "verticalAlignment-Text-sup": "super",
       "fontSize-Text-sub": "$fontSize-smaller",
-      "verticalAlign-Text-sub": "sub",
+      "verticalAlignment-Text-sub": "sub",
       "fontStyle-Text-var": "italic",
       "fontStyle-Text-em": "italic",
       "fontFamily-Text-mono": "$fontFamily-monospace",
@@ -13820,18 +13834,18 @@ export default {
     }
   },
   "DonutChart": {
-    "description": "A derivative of [PieChart](/components/PieChart) with a hollow center.",
+    "description": "A derivative of [PieChart](/components/PieChart) with a hollow center. Note that the height of the component or its parent needs to be set explicitly.",
     "status": "experimental",
     "props": {
       "data": {
         "description": "The data to be displayed in the chart. Needs to be an array of objects."
       },
-      "dataKeys": {
-        "description": "This property specifies the keys in the data objects that should be used for rendering the bars.",
-        "valueType": "string"
-      },
       "nameKey": {
         "description": "Specifies the key in the data objects that will be used to label the different data series.",
+        "valueType": "string"
+      },
+      "dataKey": {
+        "description": "This property specifies the key in the data objects that will be used to render the chart.",
         "valueType": "string"
       },
       "showLabel": {
@@ -13978,19 +13992,19 @@ export default {
     }
   },
   "PieChart": {
-    "description": "`PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole.",
+    "description": "`PieChart` visualizes proportional data as circular segments; each slice represents a percentage of the whole. Note that the height of the component or its parent needs to be set explicitly.",
     "status": "experimental",
     "docFolder": "Charts/PieChart",
     "props": {
       "data": {
         "description": "The data to be displayed in the chart. Needs to be an array of objects."
       },
-      "dataKeys": {
-        "description": "This property specifies the keys in the data objects that should be used for rendering the bars.",
-        "valueType": "string"
-      },
       "nameKey": {
         "description": "Specifies the key in the data objects that will be used to label the different data series.",
+        "valueType": "string"
+      },
+      "dataKey": {
+        "description": "This property specifies the key in the data objects that will be used to render the chart.",
         "valueType": "string"
       },
       "showLabel": {
@@ -14031,14 +14045,13 @@ export default {
           "middle"
         ]
       },
-      "width": {
-        "description": "The width of the chart"
-      },
-      "height": {
-        "description": "The height of the chart"
-      },
       "outerRadius": {
         "description": "The outer radius of the pie chart, can be a number or a string (e.g., '100%')."
+      },
+      "showLegend": {
+        "description": "Toggles whether to show legend (`true`) or not (`false`).",
+        "valueType": "boolean",
+        "defaultValue": false
       }
     },
     "themeVars": [],
