@@ -1,5 +1,16 @@
 # xmlui
 
+## 0.9.59
+
+### Patch Changes
+
+- 2a07157: Rename Pages property 'defaultRoute' to 'fallbackPath'
+- 97b3241: improve: expanding the styles of the components responsible for code display with new theme variables.
+- c4abb20: Fixed RadioGroup disabled and validation indicator states. Also fixed an issue where the checked indicator was not aligned to center if the RadioGroup Option was resized in some way.
+- f19720c: Added 0 min width to PieChart, Fixed focus error when one checkbox's state change depended on another
+- 66c2288: Fixed NavLink indentation in horizontal App layout, if in a nested NavGroup in the NavPanel
+- 2d27204: Fixed a number of color & visual state representations of the components: DatePicker, Switch, Select, TextBox, TextArea, NumberBox, AutoComplete
+
 ## 0.9.58
 
 ### Patch Changes
