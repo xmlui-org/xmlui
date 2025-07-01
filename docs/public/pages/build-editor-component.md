@@ -11,7 +11,9 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 ````xmlui-pg
 <App>
 
-  <TableEditor2 />
+  <TableEditor2 id="tableEditor" />
+
+  <Text> { tableEditor.getHtmlSource() } </Text>
 
 </App>
 ```
@@ -168,19 +170,52 @@ You can now edit the cells in the table.
 ![](/resources/devdocs/table_editor_02.png)
 
 
-## Step 4: Add a placeholder native component
-
-Create `xmlui/src/components/TableEditor/TableEditorNative.tsx` with:
+## Step 4: Add an Insert Row button
 
 ```tsx
-import React from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
 
 export function TableEditor() {
-  // ...
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
+    ],
+    content: `
+      <table>
+        <thead>
+          <tr>
+            <th>Fruit</th>
+            <th>Color</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apple</td>
+            <td>Red</td>
+          </tr>
+          <tr>
+            <td>Banana</td>
+            <td>Yellow</td>
+          </tr>
+        </tbody>
+      </table>
+    `,
+  });
+
   return (
     <div>
       <button
         onClick={() => editor && editor.commands.addRowAfter()}
+        disabled={!editor}
       >
         Insert Row
       </button>
@@ -188,9 +223,14 @@ export function TableEditor() {
     </div>
   );
 }
+
+export const editorComponentRenderer = {
+  type: "TableEditor",
+  renderer: (props: any) => <TableEditor {...props} />
+};
 ```
 
-This is the raw component using a native HTML `<button>`. Try it in a test environment.
+Use the same XMLUI markup.
 
 ```xmlui
 <App>
@@ -198,85 +238,178 @@ This is the raw component using a native HTML `<button>`. Try it in a test envir
 </App>
 ```
 
-![](/resources/devdocs/table_editor_02.png)
+You can now insert rows.
 
-We can edit the existing cells, and use `Insert Row` to add rows. The button has no style. Instead of writing CSS to style it we will instead switch to an XMLUI [Button](/components/Button) that inherits theming.
+![](/resources/devdocs/table_editor_03.png)
 
-## Step 4: Use XMLUI's Button
+## Step 5: Use XMLUI's Button
 
-Import and use the XMLUI `Button` component instead of a native HTML button.
+Import and use `Button`.
+
 
 ```tsx
-import { Button } from "../Button/ButtonNative";
+   import { useEditor, EditorContent } from "@tiptap/react";
+   import StarterKit from "@tiptap/starter-kit";
+   import Table from "@tiptap/extension-table";
+   import TableRow from "@tiptap/extension-table-row";
+   import TableCell from "@tiptap/extension-table-cell";
+   import TableHeader from "@tiptap/extension-table-header";
+   import { Button } from "../Button/ButtonNative";
 
-export function TableEditor() {
-  // ...
-  return (
-    <div>
-      <Button
-        onClick={() => editor && editor.commands.addRowAfter()}
-      >
-        Insert Row
-      </Button>
-      <EditorContent editor={editor} />
-    </div>
-  );
+   export function TableEditor() {
+     const editor = useEditor({
+       extensions: [
+         StarterKit,
+         Table.configure({ resizable: true }),
+         TableRow,
+         TableHeader,
+         TableCell,
+       ],
+       content: `
+         <table>
+           <thead>
+             <tr>
+               <th>Fruit</th>
+               <th>Color</th>
+             </tr>
+           </thead>
+           <tbody>
+             <tr>
+               <td>Apple</td>
+               <td>Red</td>
+             </tr>
+             <tr>
+               <td>Banana</td>
+               <td>Yellow</td>
+             </tr>
+           </tbody>
+         </table>
+       `,
+     });
+
+     return (
+       <div>
+         <Button
+           onClick={() => editor && editor.commands.addRowAfter()}
+           disabled={!editor}
+         >
+           Insert Row
+         </Button>
+         <EditorContent editor={editor} />
+       </div>
+     );
+   }
+
+   export const editorComponentRenderer = {
+     type: "TableEditor",
+     renderer: (props: any) => <TableEditor {...props} />
+   };
+```
+
+You now have a proper themed XMLUI button.
+
+![](/resources/devdocs/table_editor_04.png)
+
+## Step 6: Show the HTML
+
+Tiptap works natively with HTML, not Markdown. We'll eventually show Markdown but first let's add a method to show the HTML.
+
+To keep our code modular, we’ll separate the editor’s rendering logic into a minimal presentational component. This makes it easy to reuse the editor UI in different contexts.
+
+Create `TableEditorNative.tsx` alongside `TableEditor.tsx`.
+
+```tsx
+import { EditorContent } from "@tiptap/react";
+
+export function TableEditorNative({ editor }: { editor: any }) {
+  return <EditorContent editor={editor} />;
 }
 ```
 
+This component simply renders the Tiptap editor UI for a given editor instance.
+
+Now, let’s expose a method to get the current HTML from the editor. Add this to `TableEditor.tsx`.
+
+```tsx
+React.useEffect(() => {
+  if (registerComponentApi && editor) {
+    registerComponentApi({
+      getHtmlSource: () => editor.getHTML(),
+    });
+  }
+}, [registerComponentApi, editor]);
+```
+
+Now we can show the HTML using this markup.
+
 ```xmlui
 <App>
-  <TableEditor />
+
+  <TableEditor2 id="tableEditor" />
+
+  <Text> { tableEditor.getHtmlSource() } </Text>
+
 </App>
 ```
 
-![](/resources/devdocs/table-editor-02.png)
+![](/resources/devdocs/table_editor_05.png)
 
-## Step 5: Show the HTML
 
-Tiptap works natively with HTML, not Markdown. We'll eventually show Markdown but first let's show HTML.
+## Step 7: Show the Markdown
+
+Tiptap does not provide an HTML-to-Markdown  converter. We'll start with a basic one called `turndown`. First install it.
 
 ```
-    // Expose the getHtmlSource API method
-  React.useEffect(() => {
-    if (registerComponentApi && editor) {
-      console.log("Registering TableEditor API");
-      registerComponentApi({
-        getHtmlSource: () => {
-          const html = editor.getHTML();
-          //console.log("getHtmlSource called, returning:", html);
-          return html;
-        },
-      });
-    }
-  }, [registerComponentApi, editor]);
+npm install turndown
 ```
 
-```xmlui
-<App var.showHtml="{false}">
-  <TableEditor id="tableEditor" />
-  <Button onClick="{() => showHtml = !showHtml}">
-    {showHtml ? "Hide HTML Source" : "Show HTML Source"}
-  </Button>
-  <Text when="{showHtml}" >
-  { tableEditor.getHtmlSource() }
-  </Text>
-</App>
-```
+Then update `TableEditor.tsx` to use it.
 
-![](/resources/devdocs/table-editor-03.png)
-
-## Step 6: Show the Markdown
-
-Tiptap does not provide an HTML-to-Markdown  converter. We'll start with a basic one called `turndown`.
-
-```xmlui  {1} {7-22} {31-36}
+```tsx
+import React from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import { Button } from "../Button/ButtonNative";
 import TurndownService from "turndown";
+
+export function TableEditor({ registerComponentApi }: { registerComponentApi?: (api: any) => void }) {
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
+    ],
+    content: `
+      <table>
+        <thead>
+          <tr>
+            <th>Fruit</th>
+            <th>Color</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apple</td>
+            <td>Red</td>
+          </tr>
+          <tr>
+            <td>Banana</td>
+            <td>Yellow</td>
+          </tr>
+        </tbody>
+      </table>
+    `,
+  });
 
   React.useEffect(() => {
     if (registerComponentApi && editor) {
       const turndownService = new TurndownService();
-
       turndownService.addRule('table', {
         filter: 'table',
         replacement: function (content, node) {
@@ -293,103 +426,56 @@ import TurndownService from "turndown";
           return rows.join('\n') + '\n';
         }
       });
-
-      console.log("Registering TableEditor API");
       registerComponentApi({
-        getHtmlSource: () => {
-          const html = editor.getHTML();
-          //console.log("getHtmlSource called, returning:", html);
-          return html;
-        },
-        getMarkdownSource: () => {
-          const html = editor.getHTML();
-          const md = turndownService.turndown(html);
-          console.log("getMarkdownSource called, returning:", md);
-          return md
-        }
+        getHtmlSource: () => editor.getHTML(),
+        getMarkdownSource: () => turndownService.turndown(editor.getHTML()),
       });
     }
   }, [registerComponentApi, editor]);
+
+  return (
+    <div>
+      <Button
+        onClick={() => editor && editor.commands.addRowAfter()}
+        disabled={!editor}
+      >
+        Insert Row
+      </Button>
+      <EditorContent editor={editor} />
+    </div>
+  );
+}
+
+export const editorComponentRenderer2 = {
+  type: "TableEditor",
+  renderer: ({ registerComponentApi, ...props }: any) => (
+    <TableEditor {...props} registerComponentApi={registerComponentApi} />
+  ),
+};
 ```
 
+Now we can show the Markdown.
+
 ```xmlui
-<App var.showHtml="{false}" var.showMarkdown="{false}">
-  <TableEditor id="tableEditor" />
+<App>
 
-  <HStack>
-    <Button
-      onClick="{() => { showHtml = !showHtml; if (showHtml) showMarkdown = false; }}"
-      disabled="{showMarkdown}"
-    >
-      {showHtml ? "Hide HTML Source" : "Show HTML Source"}
-    </Button>
+  <TableEditor2 id="tableEditor" />
 
-    <Button
-      onClick="{() => { showMarkdown = !showMarkdown; if (showMarkdown) showHtml = false; }}"
-      disabled="{showHtml}"
-    >
-      {showMarkdown ? "Hide Markdown Source" : "Show Markdown Source"}
-    </Button>
-  </HStack>
-
-  <Text when="{showHtml}">
-    { tableEditor.getHtmlSource() }
-  </Text>
-
-  <Text when="{showMarkdown}" variant="codefence" preserveLinebreaks="true">
+  <Text variant="codefence" preserveLinebreaks="{true}">
     { tableEditor.getMarkdownSource() }
   </Text>
+
 </App>
 ```
 
-Exported Markdown:
-
-```
-| Fruit | Color |
-| --- | --- |
-| Apple | Red |
-| Banana | Yellow |
-```
+![](/resources/devdocs/table_editor_06.png)
 
 Rendered in XMLUI Markdown:
 
 <Image src="/resources/devdocs/table-editor-05.png" width="200px"/>
 
-## Interlude: Understanding the layers
 
-When working with TableEditor (and XMLUI components in general), it's important to understand the difference between referencing the component's API in XMLUI markup and in React/TSX code.
-
-| Context         | How to reference TableEditor API         | How to get Markdown?                |
-|-----------------|-----------------------------------------|-------------------------------------|
-| XMLUI Markup    | Use `id` and `{ tableEditor.method() }`  | `{ tableEditor.getMarkdownSource() }` |
-| React/TSX       | Use `ref` and `ref.current.method()`     | `tableEditorRef.current?.getMarkdownSource()` |
-
-In XMLUI markup, assign an `id` to your TableEditor. The XMLUI runtime creates a variable with that name, allowing you to call registered API methods in markup expressions.
-
-  ```xmlui
-  <TableEditor id="tableEditor" />
-  <Text>
-    { tableEditor.getMarkdownSource() }
-  </Text>
-  ```
-
-In React/TSX the `id` prop does **not** create a variable in your scope. To access the API, use a React `ref`:
-
-  ```tsx
-  const tableEditorRef = useRef();
-  <TableEditor ref={tableEditorRef} />
-  <Text>
-    {tableEditorRef.current?.getMarkdownSource()}
-  </Text>
-  ```
-
-> [!INFO]
-> If you need to support both XMLUI and React/TSX usage, ensure your component exposes its API via both `registerComponentApi` (for XMLUI) and `useImperativeHandle` (for React refs).
-
-> [!INFO]
-> The `{ tableEditor.getMarkdownSource() }` syntax works in XMLUI markup because the `id` attribute creates a reference variable. In React/TSX, use a ref to access the API.
-
-## Step 7: Add controls
+## Step 8: Add controls
 
 We can improve the TableEditor by adding more table editing controls like Insert Column, Delete Row, and Delete Column. But where should these controls live?
 
@@ -668,3 +754,36 @@ For decorative icons, use `aria-hidden="true"` to hide the icon from assistive t
 
 
 
+## Interlude: Understanding the layers
+
+When working with TableEditor (and XMLUI components in general), it's important to understand the difference between referencing the component's API in XMLUI markup and in React/TSX code.
+
+| Context         | How to reference TableEditor API         | How to get Markdown?                |
+|-----------------|-----------------------------------------|-------------------------------------|
+| XMLUI Markup    | Use `id` and `{ tableEditor.method() }`  | `{ tableEditor.getMarkdownSource() }` |
+| React/TSX       | Use `ref` and `ref.current.method()`     | `tableEditorRef.current?.getMarkdownSource()` |
+
+In XMLUI markup, assign an `id` to your TableEditor. The XMLUI runtime creates a variable with that name, allowing you to call registered API methods in markup expressions.
+
+  ```xmlui
+  <TableEditor id="tableEditor" />
+  <Text>
+    { tableEditor.getMarkdownSource() }
+  </Text>
+  ```
+
+In React/TSX the `id` prop does **not** create a variable in your scope. To access the API, use a React `ref`:
+
+  ```tsx
+  const tableEditorRef = useRef();
+  <TableEditor ref={tableEditorRef} />
+  <Text>
+    {tableEditorRef.current?.getMarkdownSource()}
+  </Text>
+  ```
+
+> [!INFO]
+> If you need to support both XMLUI and React/TSX usage, ensure your component exposes its API via both `registerComponentApi` (for XMLUI) and `useImperativeHandle` (for React refs).
+
+> [!INFO]
+> The `{ tableEditor.getMarkdownSource() }` syntax works in XMLUI markup because the `id` attribute creates a reference variable. In React/TSX, use a ref to access the API.
