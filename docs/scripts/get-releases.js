@@ -79,13 +79,13 @@ async function getXmluiReleases(options) {
       const xmluiStandaloneAsset = release.assets.find((asset) =>
         XMLUI_STANDALONE_PATTERN.test(asset.name),
       );
-      const body = release.body ? simplifyBodyContent(release.body) : "";
+      const changes = release.body ? parseBodyIntoChanges(release.body) : [];
 
       if (xmluiStandaloneAsset) {
         availableVersions.push({
           tag_name: release.tag_name,
           published_at: release.published_at,
-          body: body,
+          changes: changes,
           assets: [
             {
               name: xmluiStandaloneAsset.name,
@@ -183,17 +183,45 @@ function handleHelpOption(args) {
 }
 
 /**
- *
- * @param {string} body leading commit sha will be stripped, if exists
- * @returns {string}
+ * Parse markdown body into individual changes with commit SHA and description
+ * @param {string} body
+ * @returns {Array<{description: string, commit_sha: string}>}
  */
-function simplifyBodyContent(body) {
-  return body
-    .split("\n")
-    .filter((line) => !MD_HEADING_PATTERN.test(line))
-    .map((line) => line.replace(MD_LIST_COMMIT_SHA_PATTERN, "- "))
-    .join("\n")
-    .trim();
+function parseBodyIntoChanges(body) {
+  const changes = [];
+  const lines = body.split("\n");
+
+  for (const line of lines) {
+    // Skip markdown headings
+    if (MD_HEADING_PATTERN.test(line)) {
+      continue;
+    }
+
+    // Process list items that may contain commit SHA
+    if (line.startsWith("- ")) {
+      const match = line.match(MD_LIST_COMMIT_SHA_PATTERN);
+      if (match) {
+        // Extract commit SHA and description
+        const commitSha = match[0].match(/[a-f0-9]{6,40}/)[0];
+        const description = line.replace(MD_LIST_COMMIT_SHA_PATTERN, "").trim();
+        changes.push({
+          description: description,
+          commit_sha: commitSha,
+        });
+      } else {
+        // List item without commit SHA
+        const description = line.substring(2).trim(); // Remove "- " prefix
+        if (description) {
+          changes.push({
+            description: description,
+            commit_sha: null, // No commit SHA available
+          });
+        }
+      }
+    }
+  }
+
+  return changes;
 }
 
 function sortByVersion(a, b) {

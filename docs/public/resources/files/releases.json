@@ -2,7 +2,12 @@
   {
     "tag_name": "xmlui@0.9.60",
     "published_at": "2025-06-24T06:16:48Z",
-    "body": "- Experiment with automatic changelog generation #3",
+    "changes": [
+      {
+        "description": "Experiment with automatic changelog generation #3",
+        "commit_sha": "498b1ef"
+      }
+    ],
     "assets": [
       {
         "name": "xmlui-0.9.60.js",
@@ -13,7 +18,40 @@
   {
     "tag_name": "xmlui@0.9.58",
     "published_at": "2025-06-26T16:54:01Z",
-    "body": "- Fixed Pie- & DonutChart height property.\n- make flowLayout auto-responsive behavior a bit smarter\n- fix: eliminating the duplication of toast messages\n- Fixed number of small issues: Colorpicker now gets correct initial value, Options in Select now get correct keys, removed Tabs tabTemplate prop because of a bigger bug.\n- Changed open in new window button tooltip label for all occurrences.\n- Fixed NavLink label break if overflowing available space.\n- new form properties: onSuccess, inProgressNotificationMessage, completedNotificationMessage, errorNotificationMessage\n- default style tweaks",
+    "changes": [
+      {
+        "description": "Fixed Pie- & DonutChart height property.",
+        "commit_sha": "dc43275"
+      },
+      {
+        "description": "make flowLayout auto-responsive behavior a bit smarter",
+        "commit_sha": "f9562b5"
+      },
+      {
+        "description": "fix: eliminating the duplication of toast messages",
+        "commit_sha": "1af11af"
+      },
+      {
+        "description": "Fixed number of small issues: Colorpicker now gets correct initial value, Options in Select now get correct keys, removed Tabs tabTemplate prop because of a bigger bug.",
+        "commit_sha": "de570c2"
+      },
+      {
+        "description": "Changed open in new window button tooltip label for all occurrences.",
+        "commit_sha": "7d255a9"
+      },
+      {
+        "description": "Fixed NavLink label break if overflowing available space.",
+        "commit_sha": "69a7a1f"
+      },
+      {
+        "description": "new form properties: onSuccess, inProgressNotificationMessage, completedNotificationMessage, errorNotificationMessage",
+        "commit_sha": "873348c"
+      },
+      {
+        "description": "default style tweaks",
+        "commit_sha": "46bfe72"
+      }
+    ],
     "assets": [
       {
         "name": "xmlui-0.9.58.js",
@@ -24,7 +62,12 @@
   {
     "tag_name": "xmlui@0.9.57",
     "published_at": "2025-06-23T12:55:00Z",
-    "body": "- fix: NavPanel - use layoutCss",
+    "changes": [
+      {
+        "description": "fix: NavPanel - use layoutCss",
+        "commit_sha": "93a1e70"
+      }
+    ],
     "assets": [
       {
         "name": "xmlui-0.9.57.js",
@@ -35,7 +78,12 @@
   {
     "tag_name": "xmlui@0.9.56",
     "published_at": "2025-06-21T13:16:53Z",
-    "body": "- feat: xmlui-devtools - start dialog animation from the click, use exit animation as well",
+    "changes": [
+      {
+        "description": "feat: xmlui-devtools - start dialog animation from the click, use exit animation as well",
+        "commit_sha": "9a3c3b6"
+      }
+    ],
     "assets": [
       {
         "name": "xmlui-0.9.56.js",
@@ -46,7 +94,12 @@
   {
     "tag_name": "xmlui@0.9.55",
     "published_at": "2025-06-20T13:07:23Z",
-    "body": "- Add AppWithCodeView component to display code and running app side-by-side",
+    "changes": [
+      {
+        "description": "Add AppWithCodeView component to display code and running app side-by-side",
+        "commit_sha": "d507ea8"
+      }
+    ],
     "assets": [
       {
         "name": "xmlui-0.9.55.js",
@@ -57,7 +110,12 @@
   {
     "tag_name": "xmlui@0.9.54",
     "published_at": "2025-06-20T08:55:52Z",
-    "body": "- Change TreeDisplay theme variable defaults",
+    "changes": [
+      {
+        "description": "Change TreeDisplay theme variable defaults",
+        "commit_sha": "2688a95"
+      }
+    ],
     "assets": [
       {
         "name": "xmlui-0.9.54.js",
@@ -68,7 +126,16 @@
   {
     "tag_name": "xmlui@0.9.53",
     "published_at": "2025-06-19T13:48:59Z",
-    "body": "- Allow turning on/off heading anchors in appGlobals\n- wip: code inspector buttons - label change, devtools - animation update",
+    "changes": [
+      {
+        "description": "Allow turning on/off heading anchors in appGlobals",
+        "commit_sha": "c64fa25"
+      },
+      {
+        "description": "wip: code inspector buttons - label change, devtools - animation update",
+        "commit_sha": "73c2c21"
+      }
+    ],
     "assets": [
       {
         "name": "xmlui-0.9.53.js",
@@ -79,7 +146,48 @@
   {
     "tag_name": "xmlui@0.9.52",
     "published_at": "2025-06-18T15:58:14Z",
-    "body": "- The Footer component no provides a themeable gap between its children.\n- feat: NestedApp works with ApiInterceptor\n- fix NestedApp apiUrl overwrite\n- feat: xmlui-devtools - use it in a modal dialog\n- fix: Table columns do not allow (and indicate) sorting when bindTo is not set\n- change default borderColor\n- fix table styling\n- Default theme variables changed for App, NestedApp, TableOfContents, and Text\n- enhance xmlui parser error tolerance, recovering from unclosed tags\n- merge xmlui-charts into core",
+    "changes": [
+      {
+        "description": "The Footer component no provides a themeable gap between its children.",
+        "commit_sha": "d079208"
+      },
+      {
+        "description": "feat: NestedApp works with ApiInterceptor",
+        "commit_sha": "2a461d8"
+      },
+      {
+        "description": "fix NestedApp apiUrl overwrite",
+        "commit_sha": "ad6d81e"
+      },
+      {
+        "description": "feat: xmlui-devtools - use it in a modal dialog",
+        "commit_sha": "f5b9f15"
+      },
+      {
+        "description": "fix: Table columns do not allow (and indicate) sorting when bindTo is not set",
+        "commit_sha": "88e4741"
+      },
+      {
+        "description": "change default borderColor",
+        "commit_sha": "7af4b4e"
+      },
+      {
+        "description": "fix table styling",
+        "commit_sha": "851ae21"
+      },
+      {
+        "description": "Default theme variables changed for App, NestedApp, TableOfContents, and Text",
+        "commit_sha": "7872ed0"
+      },
+      {
+        "description": "enhance xmlui parser error tolerance, recovering from unclosed tags",
+        "commit_sha": "bf00dce"
+      },
+      {
+        "description": "merge xmlui-charts into core",
+        "commit_sha": "38180ce"
+      }
+    ],
     "assets": [
       {
         "name": "xmlui-0.9.52.js",
@@ -90,7 +198,24 @@
   {
     "tag_name": "xmlui@0.9.51",
     "published_at": "2025-06-12T20:12:02Z",
-    "body": "- Added theme variable for setting the horizontal alignment of the logo in the NavPanel.\n- Moved Drawer logo position to left.\n- fix: Slider - min/max value validation\n- fix: Markdown renders inline/block images correclty",
+    "changes": [
+      {
+        "description": "Added theme variable for setting the horizontal alignment of the logo in the NavPanel.",
+        "commit_sha": "ef7add9"
+      },
+      {
+        "description": "Moved Drawer logo position to left.",
+        "commit_sha": "ba2b5cd"
+      },
+      {
+        "description": "fix: Slider - min/max value validation",
+        "commit_sha": "96273bf"
+      },
+      {
+        "description": "fix: Markdown renders inline/block images correclty",
+        "commit_sha": "1a81bcf"
+      }
+    ],
     "assets": [
       {
         "name": "xmlui-0.9.51.js",
@@ -101,7 +226,20 @@
   {
     "tag_name": "xmlui@0.9.50",
     "published_at": "2025-06-12T08:48:06Z",
-    "body": "- standalone usage: explicit codeBehind reference\n- Make the \"marked\" Text variant have lighter background color in dark mode.\n- Tweaked Search dropdown panel styles. Corrected Link component text and decoration hover and active colors",
+    "changes": [
+      {
+        "description": "standalone usage: explicit codeBehind reference",
+        "commit_sha": "e6c3b39"
+      },
+      {
+        "description": "Make the \"marked\" Text variant have lighter background color in dark mode.",
+        "commit_sha": "85031c8"
+      },
+      {
+        "description": "Tweaked Search dropdown panel styles. Corrected Link component text and decoration hover and active colors",
+        "commit_sha": "d349036"
+      }
+    ],
     "assets": [
       {
         "name": "xmlui-0.9.50.js",

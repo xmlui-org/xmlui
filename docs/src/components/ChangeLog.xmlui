@@ -20,7 +20,14 @@
                                     <Badge variant="pill">Latest</Badge>
                                 </Fragment>
                             </HStack>
-                            <Markdown content="{$item.body}"/>
+                            <Items items="{$item.changes}">
+                                <HStack verticalAlignment="start">
+                                    <Link to="https://github.com/xmlui-org/xmlui/commit/{$item.commit_sha}">
+                                        <Icon name="new-window" />
+                                    </Link>
+                                    {$item.description}
+                                </HStack>
+                            </Items>
                             <Card backgroundColor="$backgroundColor-DownloadSection"
                                 padding="$space-2" marginTop="$space-2">
                                 <HStack verticalAlignment="center" padding="0">
