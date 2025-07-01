@@ -74,3 +74,75 @@ export function isDateYesterday (date: string | Date) {
 export function isDateTomorrow (date: string | Date) {
   return isTomorrow(new Date(date));
 }
+
+/**
+ * Formats a date into a human-readable elapsed time string.
+ * Returns strings like "now", "12 seconds ago", "3 hours ago", "today", "yesterday", "3 weeks ago", etc.
+ * 
+ * @param date The date to format
+ * @returns A human-readable elapsed time string
+ */
+export function formatHumanElapsedTime(date: string | Date): string {
+  const now = new Date();
+  const inputDate = new Date(date);
+  
+  // Calculate time difference in milliseconds
+  const diffMs = now.getTime() - inputDate.getTime();
+  
+  // Handle future dates
+  if (diffMs < 0) {
+    return formatDate(date);
+  }
+  
+  // Convert to seconds, minutes, hours, days, weeks
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+  const diffWeeks = Math.floor(diffDays / 7);
+  const diffMonths = Math.floor(diffDays / 30);
+  const diffYears = Math.floor(diffDays / 365);
+  
+  // Just now (within 10 seconds)
+  if (diffSeconds < 10) {
+    return "now";
+  }
+  
+  // Seconds ago (up to 1 minute)
+  if (diffSeconds < 60) {
+    return `${diffSeconds} second${diffSeconds === 1 ? "" : "s"} ago`;
+  }
+  
+  // Minutes ago (up to 1 hour)
+  if (diffMinutes < 60) {
+    return `${diffMinutes} minute${diffMinutes === 1 ? "" : "s"} ago`;
+  }
+  
+  // Hours ago (up to today)
+  if (isToday(inputDate)) {
+    return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+  }
+  
+  // Yesterday
+  if (isYesterday(inputDate)) {
+    return "yesterday";
+  }
+  
+  // Days ago (up to 1 week)
+  if (diffDays < 7) {
+    return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+  }
+  
+  // Weeks ago (up to 4 weeks / 1 month)
+  if (diffWeeks < 4) {
+    return `${diffWeeks} week${diffWeeks === 1 ? "" : "s"} ago`;
+  }
+  
+  // Months ago (up to 12 months / 1 year)
+  if (diffMonths < 12) {
+    return `${diffMonths} month${diffMonths === 1 ? "" : "s"} ago`;
+  }
+  
+  // Years ago
+  return `${diffYears} year${diffYears === 1 ? "" : "s"} ago`;
+}

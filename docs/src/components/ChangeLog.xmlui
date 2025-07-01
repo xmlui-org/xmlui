@@ -11,13 +11,14 @@
                     <Items items="{downloads.value}">
                         <Card>
                             <HStack>
-                            <H2>{$item.tag_name}</H2>
-                            <CHStack>
-                                <Theme backgroundColor-Badge="$color-primary-300">
-                                    <Badge variant="pill" when="{$isFirst}" value="Latest"/>
-                                    <Badge variant="pill" value="{formatDate($item.published_at)}, {formatTimeWithoutSeconds($item.published_at)}"/>
-                                </Theme>
-                            </CHStack>
+                                <HStack verticalAlignment="baseline">
+                                    <H2>{$item.tag_name}</H2>
+                                    <Text value="{formatHumanElapsedTime($item.published_at)}"/>
+                                </HStack>
+                                <Fragment when="{$isFirst}">
+                                    <SpaceFiller />
+                                    <Badge variant="pill">Latest</Badge>
+                                </Fragment>
                             </HStack>
                             <Markdown content="{$item.body}"/>
                             <Card backgroundColor="$backgroundColor-DownloadSection"

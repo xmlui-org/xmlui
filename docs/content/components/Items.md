@@ -8,17 +8,6 @@
 - **Reverse ordering**: Optional `reverse` property to display data in opposite order
 - **Performance**: Lightweight alternative to `List` when you don't need virtualization or grouping
 
-# Items [#component-items]
-
-The `Items` component maps sequential data items into component instances, representing each data item as a particular component.
-
-The component provides context values with which you can access some internal properties:
-
-- `$isFirst`: This boolean value indicates if the component renders its first item.
-- `$isLast`: This boolean value indicates if the component renders its last item.
-- `$item`: This value represents the current iteration item while the component renders its children.
-- `$itemIndex`: This integer value represents the current iteration index (zero-based) while rendering children.
-
 >[!INFO]
 > `Items` is not a container! It does not wrap its items into a container; it merely renders its children.
 
@@ -60,26 +49,6 @@ You can use also API bindings to display data:
       <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
     </Items>
   </VStack>
-</App>
-```
-
-## Use children as Content Template [#use-children-as-content-template]
-
-The [itemTemplate](#itemtemplate) property can be replaced by setting the item template component directly as the Items's child.
-In the following example, the two Items are functionally the same:
-
-```xmlui copy
-<App>
-  <!-- This is the same -->
-  <Items>
-    <property name="itemTemplate">
-      <Text>Template</Text>
-    </property>
-  </Items>
-  <!-- As this -->
-  <Items>
-    <Text>Template</Text>
-  </Items>
 </App>
 ```
 
