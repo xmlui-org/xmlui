@@ -121,11 +121,11 @@ export function TableEditor({
   strokeLinecap="round"
   strokeLinejoin="round"
 >
-  <rect x="2" y="2" width="12" height="10" rx="1" />
-  <line x1="2" y1="5.5" x2="14" y2="5.5" />
-  <line x1="2" y1="9.5" x2="14" y2="9.5" />
-  <line x1="19" y1="6.5" x2="19" y2="9.5" />
-  <line x1="17.5" y1="8" x2="20.5" y2="8" />
+  <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
+  <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" />
+  <line x1="1.5" y1="9.5" x2="14.5" y2="9.5" />
+  <line x1="19" y1="6" x2="19" y2="10" />
+  <line x1="17" y1="8" x2="21" y2="8" />
 </svg>
           Insert Row
         </Button>
@@ -144,12 +144,11 @@ export function TableEditor({
   strokeLinecap="round"
   strokeLinejoin="round"
 >
-  <rect x="2" y="2" width="12" height="10" rx="1" />
-  <line x1="2" y1="6" x2="14" y2="6" />
-  <line x1="2" y1="9" x2="14" y2="9" />
-  {/* X mark with moderate spacing, centered vertically */}
-  <line x1="17.5" y1="5" x2="20.5" y2="11" />
-  <line x1="20.5" y1="5" x2="17.5" y2="11" />
+  <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
+  <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" />
+  <line x1="1.5" y1="9.5" x2="14.5" y2="9.5" />
+  {/* Minus sign for delete */}
+  <line x1="17" y1="8" x2="21" y2="8" />
 </svg>
           Delete Row
         </Button>
@@ -194,9 +193,8 @@ export function TableEditor({
   <rect x="2.5" y="3" width="11" height="9" rx="1" />
   <line x1="5.5" y1="3.5" x2="5.5" y2="11.5" />
   <line x1="9" y1="3.5" x2="9" y2="11.5" />
-  {/* X mark centered and scaled */}
-  <line x1="17.5" y1="5" x2="20.5" y2="11" />
-  <line x1="20.5" y1="5" x2="17.5" y2="11" />
+  {/* Minus sign for delete */}
+  <line x1="17" y1="8" x2="21" y2="8" />
 </svg>
           Delete Column
         </Button>
