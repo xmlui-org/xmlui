@@ -64,7 +64,7 @@ export const NestedAppMd = createMetadata({
     [`border-${COMP}`]: "1px solid $color-surface-100",
     [`borderRadius-${COMP}`]: "$space-4",
     [`backgroundColor-frame-${COMP}`]: "$color-primary-50",
-    [`gap-frame-${COMP}`]: "$space-4",
+    [`gap-frame-${COMP}`]: "$space-2",
     [`fontWeight-header-${COMP}`]: "$fontWeight-bold",
     [`boxShadow-${COMP}`]: "$boxShadow-md",
     [`backgroundColor-viewControls-${COMP}`]: "$color-surface-200",

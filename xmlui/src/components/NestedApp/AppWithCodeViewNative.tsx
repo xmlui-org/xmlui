@@ -98,11 +98,10 @@ export function AppWithCodeViewNative({
                 style={{
                   backgroundColor: !showCode ? "transparent" : "",
                   padding: "4px 6px",
-                  fontSize: 14,
-                  width: 100,
+                  width: 80,
                 }}
               >
-                Code
+                XML
               </Button>
               <Button
                 onClick={() => setShowCode(false)}
@@ -110,11 +109,10 @@ export function AppWithCodeViewNative({
                 style={{
                   backgroundColor: showCode ? "transparent" : "",
                   padding: "4px 6px",
-                  fontSize: 14,
-                  width: 100,
+                  width: 80,
                 }}
               >
-                App
+                UI
               </Button>
             </div>
             <div>
