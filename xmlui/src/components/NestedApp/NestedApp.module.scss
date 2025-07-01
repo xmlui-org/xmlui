@@ -16,11 +16,20 @@ $gap-frame-NestedApp: createThemeVar("gap-frame-#{$component}");
 $marginTop-NestedApp: createThemeVar("marginTop-#{$component}");
 $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
 $boxShadow-NestedApp: createThemeVar("boxShadow-#{$component}");
-$backgroundColor-viewControls-NestedApp: createThemeVar("backgroundColor-viewControls-#{$component}");
+$backgroundColor-viewControls-NestedApp: createThemeVar(
+  "backgroundColor-viewControls-#{$component}"
+);
 $bordRadius-viewControls-NestedApp: createThemeVar("borderRadius-viewControls-#{$component}");
 $padding-viewControls-NestedApp: createThemeVar("padding-viewControls-#{$component}");
-$paddingVertical-viewControls-button-NestedApp: createThemeVar("paddingVertical-viewControls-button-#{$component}");
-$paddingHorizontal-viewControls-button-NestedApp: createThemeVar("paddingHorizontal-viewControls-button-#{$component}");
+$paddingVertical-viewControls-button-NestedApp: createThemeVar(
+  "paddingVertical-viewControls-button-#{$component}"
+);
+$paddingHorizontal-viewControls-button-NestedApp: createThemeVar(
+  "paddingHorizontal-viewControls-button-#{$component}"
+);
+$padding-button-splitView-NestedApp: createThemeVar("padding-button-splitView-#{$component}");
+$width-button-splitView-NestedApp: createThemeVar("width-button-splitView-#{$component}");
+
 // --- End of theme variables collection
 
 .nestedAppContainer {
@@ -56,7 +65,7 @@ $paddingHorizontal-viewControls-button-NestedApp: createThemeVar("paddingHorizon
     }
 
     .headerButton {
-      padding: 0.5rem 1rem;
+      padding: t.$space-2 t.$space-3;
     }
 
     .spacer {
@@ -64,11 +73,19 @@ $paddingHorizontal-viewControls-button-NestedApp: createThemeVar("paddingHorizon
       place-self: stretch;
     }
   }
+
+  .contentContainer {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    display: flex;
+    align-items: center;
+  }
 }
 
-:is(html[class~=dark]) {
+:is(html[class~="dark"]) {
   .preview {
-    border: 1px solid #33404F;
+    border: 1px solid #33404f;
   }
 }
 
@@ -91,11 +108,16 @@ $paddingHorizontal-viewControls-button-NestedApp: createThemeVar("paddingHorizon
 }
 
 .header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.splitViewButton {
+  padding: $padding-button-splitView-NestedApp !important;
+  width: $width-button-splitView-NestedApp !important;
 }
 
 // --- We export the theme variables to add them to the component renderer

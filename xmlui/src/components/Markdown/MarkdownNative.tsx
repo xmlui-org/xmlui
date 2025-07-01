@@ -357,6 +357,7 @@ export const Markdown = memo(function Markdown({
                 allowPlaygroundPopup={!appProps.noPopup}
                 withFrame={appProps.noFrame ? false : true}
                 splitView={appProps.splitView ?? false}
+                initiallyShowCode={appProps.initiallyShowCode ?? false}
               />
             );
           },
