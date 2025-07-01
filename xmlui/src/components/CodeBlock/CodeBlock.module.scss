@@ -16,6 +16,10 @@ $marginBottom-CodeBlock: createThemeVar("marginBottom-CodeBlock");
 $backgroundColor-CodeBlock-highlightRow: createThemeVar("backgroundColor-CodeBlock-highlightRow");
 $backgroundColor-CodeBlock-highlightString: createThemeVar("backgroundColor-CodeBlock-highlightString");
 $borderColor-CodeBlock-highlightString-emphasis: createThemeVar("borderColor-CodeBlock-highlightString-emphasis");
+$borderRadius-CodeBlock: createThemeVar("borderRadius-CodeBlock");
+$border-CodeBlock: createThemeVar("border-CodeBlock");
+$boxShadow-CodeBlock: createThemeVar("boxShadow-CodeBlock");
+$height-CodeBlock: createThemeVar("height-CodeBlock");
 
 .codeBlock {
   @include t.borderVars($themeVars, "CodeBlock");
@@ -23,7 +27,11 @@ $borderColor-CodeBlock-highlightString-emphasis: createThemeVar("borderColor-Cod
   margin-top: $marginTop-CodeBlock;
   margin-bottom: $marginBottom-CodeBlock;
   background-color: $backgroundColor-CodeBlock;
-  height: 100%;
+  height: $height-CodeBlock;
+  border-radius: $borderRadius-CodeBlock;
+  //overflow: hidden;
+  border: $border-CodeBlock;
+  box-shadow: $boxShadow-CodeBlock;
 }
 
 .copyButton {
@@ -48,6 +56,8 @@ $borderColor-CodeBlock-highlightString-emphasis: createThemeVar("borderColor-Cod
   display: flex;
   align-items: center;
   min-height: 48px;
+  height: 100%;
+  overflow: hidden;
 
   .codeBlockCopyButton {
     position: absolute;

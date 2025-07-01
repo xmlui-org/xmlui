@@ -64,6 +64,7 @@ $component: "Text";
     display: block;
     margin-top: createThemeVar("marginTop-#{$component}-codefence");
     margin-bottom: createThemeVar("marginBottom-#{$component}-codefence");
+    height: 100%;
   }
 
   // For inline code
