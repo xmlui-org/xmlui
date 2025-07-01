@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useImperativeHandle, forwardRef } from "react";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Table from "@tiptap/extension-table";
@@ -14,18 +14,19 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
 import Icon from "../Icon/IconNative";
 
-export function TableEditor({
-  registerComponentApi,
-  themeColor = "primary",
-  variant = "solid",
-  size = "sm",
-}: {
+type TableEditorProps = {
   registerComponentApi?: (api: any) => void;
   themeColor?: "primary" | "secondary" | "attention";
   variant?: "solid" | "outlined" | "ghost";
   size?: "xs" | "sm" | "md" | "lg";
-}) {
+};
 
+const TableEditor = forwardRef<unknown, TableEditorProps>(function TableEditor({
+  registerComponentApi,
+  themeColor = "primary",
+  variant = "solid",
+  size = "sm",
+}, ref) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -55,50 +56,44 @@ export function TableEditor({
       </table>
     `,
   });
-  // Expose the getHtmlSource API method
+
+  const turndownService = new TurndownService();
+  turndownService.addRule("table", {
+    filter: "table",
+    replacement: function (content, node) {
+      let rows = [];
+      for (let row of (node as Element).querySelectorAll("tr")) {
+        let cells = Array.from(row.children).map(
+          (cell) => (cell as Element).textContent?.trim() ?? "",
+        );
+        rows.push("| " + cells.join(" | ") + " |");
+      }
+      if (rows.length > 1) {
+        // Add a separator after the header row
+        const headerSep =
+          "| " +
+          rows[0]
+            .split("|")
+            .slice(1, -1)
+            .map(() => "---")
+            .join(" | ") +
+          " |";
+        rows.splice(1, 0, headerSep);
+      }
+      return rows.join("\n") + "\n";
+    },
+  });
+
+  useImperativeHandle(ref, () => ({
+    getMarkdownSource: () => turndownService.turndown(editor?.getHTML?.() ?? ""),
+    getHtmlSource: () => editor?.getHTML?.() ?? "",
+  }), [editor]);
+
   React.useEffect(() => {
     if (registerComponentApi && editor) {
-      const turndownService = new TurndownService();
-
-      turndownService.addRule("table", {
-        filter: "table",
-        replacement: function (content, node) {
-          let rows = [];
-          for (let row of (node as Element).querySelectorAll("tr")) {
-            let cells = Array.from(row.children).map(
-              (cell) => (cell as Element).textContent?.trim() ?? "",
-            );
-            rows.push("| " + cells.join(" | ") + " |");
-          }
-          if (rows.length > 1) {
-            // Add a separator after the header row
-            const headerSep =
-              "| " +
-              rows[0]
-                .split("|")
-                .slice(1, -1)
-                .map(() => "---")
-                .join(" | ") +
-              " |";
-            rows.splice(1, 0, headerSep);
-          }
-          return rows.join("\n") + "\n";
-        },
-      });
-
-      console.log("Registering TableEditor API");
       registerComponentApi({
-        getHtmlSource: () => {
-          const html = editor.getHTML();
-          //console.log("getHtmlSource called, returning:", html);
-          return html;
-        },
-        getMarkdownSource: () => {
-          const html = editor.getHTML();
-          const md = turndownService.turndown(html);
-          console.log("getMarkdownSource called, returning:", md);
-          return md;
-        },
+        getHtmlSource: () => editor.getHTML(),
+        getMarkdownSource: () => turndownService.turndown(editor.getHTML()),
       });
     }
   }, [registerComponentApi, editor]);
@@ -106,7 +101,7 @@ export function TableEditor({
   return (
     <>
       <Stack orientation="horizontal">
-      <Button
+        <Button
           onClick={() => editor && editor.commands.addRowAfter()}
           disabled={!editor}
           themeColor={themeColor}
@@ -154,7 +149,9 @@ export function TableEditor({
       <TableEditorNative editor={editor} />
     </>
   );
-}
+});
+
+export default TableEditor;
 
 // Create metadata for TableEditor that defines allowed props
 export const TableEditorMd = createMetadata({
