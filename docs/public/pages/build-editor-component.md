@@ -6,9 +6,17 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 > [!INFO]
 > If you operate in the [XMLUI](https://github.com/xmlui-org/xmlui) repo you can test your work live. Follow the instructions in `dev-docs/next/generating-component-reference.md` to build the XMLUI docs site, then load localhost:5173. When you edit `.tsx` files they will automatically recompile, so you can iterate rapidly as you develop your component. And you can add a test page to the site in order to use your evolving component
 
-# Build a TableEditor Component
+## Latest test version
 
-## Latest version
+````xmlui-pg
+<App>
+
+  <TableEditor2 />
+
+</App>
+```
+
+## Latest official version
 
 ```xmlui-pg
 <App>
@@ -24,21 +32,89 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 </App>
 ```
 
-## Step 1: Create the subdirectory
+## Step 1: Create the folder.
 
 ```bash
 mkdir -p xmlui/src/components/TableEditor
 ```
 
-## Step 2: Register the component
+## Step 2: Create a minimal renderer
 
-- Export a minimal renderer from `TableEditor.tsx`:
+Add `TableEditor.tsx` in that folder.
 
-```tsx
-import { TableEditor } from "./TableEditorNative";
+```
+export function TableEditor() {
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Fruit</th>
+          <th>Color</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Apple</td>
+          <td>Red</td>
+        </tr>
+        <tr>
+          <td>Banana</td>
+          <td>Yellow</td>
+        </tr>
+      </tbody>
+    </table>
+  );
+}
+
+export const editorComponentRenderer = {
+  type: "TableEditor",
+  renderer: (props: any) => <TableEditor {...props} />
+};
 ```
 
+Register it in `ComponentProvider.tsx`.
+
 ```tsx
+import { editorComponentRenderer as TableEditorRenderer } from "./components/TableEditor/TableEditor";
+
+if (process.env.VITE_USED_COMPONENTS_TableEditor !== "false") {
+  this.registerCoreComponent(TableEditorRenderer);
+}
+```
+
+You can now use this XMLUI markup.
+
+```xmlui
+<App>
+  <TableEditor />
+</App>
+```
+
+![](/resources/devdocs/table_editor_01.png)
+
+We are just rendering an HTML table at this point, with no XMLUI theme support and no editing capability.
+
+## Step 3: Make the table editable with Tiptap
+
+Install Tiptap dependencies.
+
+```
+ npm install @tiptap/react @tiptap/starter-kit \
+   @tiptap/extension-table @tiptap/extension-table-row \
+   @tiptap/extension-table-cell @tiptap/extension-table-header
+```
+
+Update `TableEditor.tsx`.
+
+```
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+
+export function TableEditor() {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -68,24 +144,31 @@ import { TableEditor } from "./TableEditorNative";
       </table>
     `,
   });
-```
 
-```
+  return <EditorContent editor={editor} />;
+}
+
 export const editorComponentRenderer = {
   type: "TableEditor",
-  renderer: (props: any) => <TableEditor />
+  renderer: (props: any) => <TableEditor {...props} />
 };
 ```
 
-- Register in `ComponentProvider.tsx`:
+Use the same XMLUI markup.
 
-```tsx
-if (process.env.VITE_USED_COMPONENTS_TableEditor !== "false") {
-  this.registerCoreComponent(editorComponentRenderer);
-}
+```xmlui
+<App>
+  <TableEditor />
+</App>
 ```
 
-## Step 3: Add a placeholder native component
+You can now edit the cells in the table.
+
+
+![](/resources/devdocs/table_editor_01.png)
+
+
+## Step 4: Add a placeholder native component
 
 Create `xmlui/src/components/TableEditor/TableEditorNative.tsx` with:
 

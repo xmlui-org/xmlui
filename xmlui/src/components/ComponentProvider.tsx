@@ -250,7 +250,10 @@ import { labelListComponentRenderer } from "./Charts/LabelList/LabelList";
 import { legendComponentRenderer } from "./Charts/Legend/Legend";
 import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
 import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
+
 import { editorComponentRenderer } from "./TableEditor/TableEditor";
+import { editorComponentRenderer2 } from "./TableEditor2/TableEditor2";
+
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -396,8 +399,11 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_HelloWorld !== "false") {
       this.registerCoreComponent(helloWorldComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Editor !== "false") {
+    if (process.env.VITE_USED_COMPONENTS_TableEditor !== "false") {
       this.registerCoreComponent(editorComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_TableEditor2 !== "false") {
+      this.registerCoreComponent(editorComponentRenderer2);
     }
     if (process.env.VITE_USED_COMPONENTS_Checkbox !== "false") {
       this.registerCoreComponent(checkboxComponentRenderer);
