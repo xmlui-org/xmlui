@@ -29,7 +29,7 @@ $component: "Text";
   margin: 0;
   padding: 0;
   min-height: fit-content;
-  
+
   &.default {
     @include textVariant("");
   }
@@ -40,8 +40,9 @@ $component: "Text";
 
   &.markdown {
     @include textVariant("markdown");
+    overflow: visible;
   }
-  
+
   &.abbr {
     font-weight: createThemeVar("fontWeight-#{$component}-abbr");
     text-transform: createThemeVar("textTransform-#{$component}-abbr");

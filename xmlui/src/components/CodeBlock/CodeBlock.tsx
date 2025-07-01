@@ -19,7 +19,7 @@ export const CodeBlockMd = createMetadata({
     "marginBottom-CodeBlock": "$space-5",
     "backgroundColor-CodeBlock-highlightRow": "rgb(from $color-primary-200 r g b / 0.25)",
     "backgroundColor-CodeBlock-highlightString": "rgb(from $color-primary-200 r g b / 0.5)",
-    "borderRadius-CodeBlock": "$space-2",
+    "borderRadius-CodeBlock": "0 0 $space-1 $space-1",
 
     "borderColor-CodeBlock-highlightString-emphasis": "$color-attention",
 

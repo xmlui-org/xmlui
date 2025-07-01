@@ -23,6 +23,7 @@ $borderColor-CodeBlock-highlightString-emphasis: createThemeVar("borderColor-Cod
   margin-top: $marginTop-CodeBlock;
   margin-bottom: $marginBottom-CodeBlock;
   background-color: $backgroundColor-CodeBlock;
+  height: 100%;
 }
 
 .copyButton {
