@@ -77,7 +77,7 @@
 
         </NavPanel>
 
-        <Pages defaultRoute="/404">
+        <Pages fallbackPath="/404">
             <Page url="/">
                 <DocumentPage hideToc="true" url="/pages/intro.md" />
             </Page>

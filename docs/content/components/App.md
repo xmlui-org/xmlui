@@ -3,6 +3,7 @@
 The `App` component is the root container that defines your application's overall structure and layout. It provides a complete UI framework with built-in navigation, header, footer, and content areas that work together seamlessly.
 
 **Essential features:**
+
 - **Layout templates**: Choose from 7 predefined layouts (horizontal, vertical, condensed, etc.) with sticky navigation options
 - **Routing**: Built-in page routing via the [Pages](/components/Pages) component
 
@@ -24,15 +25,15 @@ This property sets the layout template of the app. This setting determines the p
 
 Available values:
 
-| Value | Description |
-| --- | --- |
-| `vertical` | This layout puts the navigation bar on the left side and displays its items vertically. The main content is aligned to the right (including the header and the footer), and its content is a single scroll container; every part of it moves as you scroll the page. This layout does not display the logo in the app header. |
-| `vertical-sticky` | Similar to `vertical`, the header and the navigation bar dock to the top of the main content's viewport, while the footer sticks to the bottom. This layout does not display the logo in the app header. |
-| `vertical-full-header` | Similar to `vertical-sticky`. However, the header and the navigation bar dock to the top of the app's window, while the footer sticks to the bottom. |
-| `condensed` | Similar to `horizontal`. However, the header and the navigation bar are in a single header block. (default) |
-| `condensed-sticky` | However, the header and the navigation bar are in a single header block. |
-| `horizontal` | This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page. |
-| `horizontal-sticky` | Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom. |
+| Value                  | Description                                                                                                                                                                                                                                                                                                                   |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vertical`             | This layout puts the navigation bar on the left side and displays its items vertically. The main content is aligned to the right (including the header and the footer), and its content is a single scroll container; every part of it moves as you scroll the page. This layout does not display the logo in the app header. |
+| `vertical-sticky`      | Similar to `vertical`, the header and the navigation bar dock to the top of the main content's viewport, while the footer sticks to the bottom. This layout does not display the logo in the app header.                                                                                                                      |
+| `vertical-full-header` | Similar to `vertical-sticky`. However, the header and the navigation bar dock to the top of the app's window, while the footer sticks to the bottom.                                                                                                                                                                          |
+| `condensed`            | Similar to `horizontal`. However, the header and the navigation bar are in a single header block. (default)                                                                                                                                                                                                                   |
+| `condensed-sticky`     | However, the header and the navigation bar are in a single header block.                                                                                                                                                                                                                                                      |
+| `horizontal`           | This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page.                                                                                                             |
+| `horizontal-sticky`    | Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom.                                                                                                                                                                                            |
 
 Here are a few samples demonstrating the usage of the `layout` property. All samples use this markup, except the value of `App`'s layout and a few marked code snippets:
 
@@ -49,7 +50,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
     <NavLink label="Page 1" to="/page1"/>
     <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <List data="https://api.spacexdata.com/v3/history">
         <property name="itemTemplate">
@@ -82,7 +83,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -115,7 +116,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -146,7 +147,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -177,7 +178,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -208,7 +209,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
     <NavLink label="Page 1" to="/page1"/>
     <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -239,7 +240,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -272,7 +273,7 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
       <NavLink label="Page 1" to="/page1"/>
       <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
@@ -305,7 +306,7 @@ Currently, there is no restriction on what the user data must look like.
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text value="User name: {loggedInUser.name}" />
       <Text value="User token: {loggedInUser.token}" />
@@ -350,7 +351,7 @@ The default value is `true`.
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -387,24 +388,24 @@ This component does not expose any methods.
 
 ### Theme Variables [#theme-variables]
 
-| Variable | Default Value (Light) | Default Value (Dark) |
-| --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-content-App | $backgroundColor | $backgroundColor |
-| [backgroundColor](../styles-and-themes/common-units/#color)-navPanel-App | $backgroundColor | $backgroundColor |
-| [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
-| [borderLeft](../styles-and-themes/common-units/#border)-content-App | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | none | none |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | $boxShadow-spread | $boxShadow-spread |
-| [maxWidth](../styles-and-themes/common-units/#size)-App | *none* | *none* |
-| [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
-| [width](../styles-and-themes/common-units/#size)-navPanel-App | $space-64 | $space-64 |
+| Variable                                                                 | Default Value (Light) | Default Value (Dark) |
+| ------------------------------------------------------------------------ | --------------------- | -------------------- |
+| [backgroundColor](../styles-and-themes/common-units/#color)-AppHeader    | _none_                | _none_               |
+| [backgroundColor](../styles-and-themes/common-units/#color)-content-App  | $backgroundColor      | $backgroundColor     |
+| [backgroundColor](../styles-and-themes/common-units/#color)-navPanel-App | $backgroundColor      | $backgroundColor     |
+| [borderBottom](../styles-and-themes/common-units/#border)-AppHeader      | _none_                | _none_               |
+| [borderLeft](../styles-and-themes/common-units/#border)-content-App      | _none_                | _none_               |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App     | none                  | none                 |
+| [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App   | $boxShadow-spread     | $boxShadow-spread    |
+| [maxWidth](../styles-and-themes/common-units/#size)-App                  | _none_                | _none_               |
+| [maxWidth-content](../styles-and-themes/common-units/#size)-App          | $maxWidth-content     | $maxWidth-content    |
+| [width](../styles-and-themes/common-units/#size)-navPanel-App            | $space-64             | $space-64            |
 
 ### Variable Explanations [#variable-explanations]
 
-| Theme Variable | Description |
-| --- | --- |
-| **`maxWidth-content-App`** | This theme variable defines the maximum width of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size. |
-| **`boxShadow‑header‑App`** | This theme variable sets the shadow of the app's header section. |
-| **`boxShadow‑navPanel‑App`** | This theme variable sets the shadow of the app's navigation panel section (visible only in vertical layouts). |
-| **`width‑navPanel‑App`** | This theme variable sets the width of the navigation panel when the app is displayed with one of the vertical layouts. |
+| Theme Variable               | Description                                                                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`maxWidth-content-App`**   | This theme variable defines the maximum width of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size. |
+| **`boxShadow‑header‑App`**   | This theme variable sets the shadow of the app's header section.                                                                                              |
+| **`boxShadow‑navPanel‑App`** | This theme variable sets the shadow of the app's navigation panel section (visible only in vertical layouts).                                                 |
+| **`width‑navPanel‑App`**     | This theme variable sets the width of the navigation panel when the app is displayed with one of the vertical layouts.                                        |
