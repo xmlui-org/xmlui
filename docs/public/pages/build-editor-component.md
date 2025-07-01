@@ -339,7 +339,67 @@ return (
 - **XMLUI Stack Component**: We import and use `Stack` from `../Stack/StackNative`. Note that `HStack` is not available as a native component, so we can't use that shortcut.
 - **React Fragment (`<>...</>`)**: A component must return a single element. This groups the buttons into an anonymous container.
 
-## Step 8: Theme the buttons
+## Step 8: Add custom icons
+
+The table editor buttons currently use only text labels. Let's add custom SVG icons to make them more visually intuitive and professional.
+
+XMLUI components often use inline SVG icons rather than icon fonts or external libraries. This approach ensures:
+- **No external dependencies**: Icons are self-contained within the component
+- **Theme integration**: SVG `stroke="currentColor"` inherits the button's text color automatically
+- **Scalability**: Vector graphics scale perfectly at any size
+- **Customization**: Easy to modify or replace individual icons
+
+Let's add appropriate icons for each table operation:
+
+```tsx
+// Map button size to icon size for proper scaling
+const getIconSize = (size: string) => {
+  switch (size) {
+    case 'xs': return '14px';
+    case 'sm': return '18px';
+    case 'md': return '22px';
+    case 'lg': return '26px';
+    default: return '18px';
+  }
+};
+
+const iconSize = getIconSize(size);
+```
+
+Then update each button to include an SVG icon:
+
+```tsx
+<Button onClick={() => editor && editor.commands.addRowAfter()} disabled={!editor}>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 16"
+    width={iconSize}
+    height={iconSize}
+    stroke="currentColor"
+    fill="none"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="2" y="2" width="12" height="10" rx="1" />
+    <line x1="2" y1="6" x2="14" y2="6" />
+    <line x1="2" y1="9" x2="14" y2="9" />
+    <line x1="19" y1="5" x2="19" y2="9" />
+    <line x1="17" y1="7" x2="21" y2="7" />
+  </svg>
+  Insert Row
+</Button>
+```
+
+Repeat this pattern for the other buttons with appropriate icons:
+- **Insert Row**: Table with a plus sign
+- **Delete Row**: Table with a minus sign  
+- **Insert Column**: Table with vertical plus
+- **Delete Column**: Table with vertical minus
+
+The icons automatically inherit the button's theme colors through `stroke="currentColor"` and scale appropriately with the `iconSize` calculation.
+
+## Step 9: Theme the buttons
 
 Our TableEditor component currently uses hardcoded button styling. To make TableEditor behave like a proper XMLUI component, we need to add theme support.
 
