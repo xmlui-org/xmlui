@@ -505,11 +505,67 @@ Now TableEditor supports full theme customization.
 
 <Image src="/resources/devdocs/table-editor-08.png" />
 
+## Step 10: Register the icons
 
-Note that buttons collapse to label-only mode on narrow screens.
+> [!INFO]
+> Registering icons is optional if you only use them inline within your component, but it is strongly recommended for reusability, maintainability, and accessibility.
 
-<Image src="/resources/devdocs/table-editor-09.png" width="400px" />
+- **Global usage:** Registered icons can be referenced anywhere in your app or docs by name (e.g., `<Icon name="table-insert-row" />` or as a Button's `icon` prop).
+- **Accessibility:** Using the `<Icon />` component or Button's `icon` prop helps ensure ARIA attributes and accessible labeling are handled consistently.
 
-That is a limitation of our use of inline SVGs. The proper behavior would be to collapse to the icon, not the label. To achieve that we'll need to register the icon.
+To make your custom icon usable in XMLUI, wrap your SVG markup in a React component. This allows the icon to inherit color, size, and accessibility props from its parent.
+
+```tsx
+// File: xmlui/src/components/Icon/TableInsertRowIcon.tsx
+import React from "react";
+
+export default function TableInsertRowIcon(props) {
+  return (
+    <svg
+      viewBox="0 0 24 16"
+      stroke="currentColor"
+      fill="none"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}  // Enables theming, sizing, and accessibility
+    >
+      <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
+      <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" />
+      <line x1="1.5" y1="9.5" x2="14.5" y2="9.5" />
+      <line x1="19" y1="6" x2="19" y2="10" />
+      <line x1="17" y1="8" x2="21" y2="8" />
+    </svg>
+  );
+}
+```
+
+> [!INFO]
+> The `{...props}` spread is essential—it lets XMLUI pass color, size, and ARIA attributes to your icon automatically.
+
+Register the icon in `IconProvider.tsx`.
+
+   ```tsx
+   import TableInsertRowIcon from "./Icon/TableInsertRowIcon";
+
+   registerIconRenderer("table-insert-row", (props) => <TableInsertRowIcon {...props} />);
+   ```
+
+
+For icon-only buttons, use the `contextualLabel` prop to provide an accessible name.
+
+  ```xmlui
+  <Button icon="table-insert-row" contextualLabel="Insert a new row" />
+  ```
+  This ensures screen readers announce the button's purpose, even if only the icon is visible.
+
+
+For decorative icons, use `aria-hidden="true"` to hide the icon from assistive technology.
+
+  ```xmlui
+  <Icon name="table-insert-row" aria-hidden="true" />
+  ```
+
+
 
 
