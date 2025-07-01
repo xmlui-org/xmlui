@@ -1,6 +1,7 @@
 %-DESC-START
 
 **Key features:**
+
 - **Logo customization**: Use `logoTemplate` to create rich logo designs beyond simple images
 - **Profile menu**: Add user authentication displays, settings menus, or action buttons via `profileMenuTemplate`
 - **Layout integration**: Automatically positioned and styled based on your App's `layout` property
@@ -26,7 +27,7 @@ With this property, you can construct your custom logo instead of using a single
     <NavLink label="Home" to="/" icon="home"/>
     <NavLink label="Page 1" to="/page1"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text value="Home" />
     </Page>

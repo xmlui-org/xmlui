@@ -11,7 +11,7 @@ import { useAppLayoutContext } from "../App/AppLayoutContext";
 
 // Default props for Pages component
 export const defaultProps = {
-  defaultRoute: "/"
+  fallbackPath: "/",
 };
 
 // --- We need this component to make sure all the child routes are wrapped in a
@@ -22,7 +22,7 @@ type RouteWrapperProps = {
   layoutContext?: LayoutContext;
   style?: CSSProperties;
   uid?: string;
-}
+};
 
 export function RouteWrapper({
   childRoute = EMPTY_ARRAY,
@@ -35,7 +35,7 @@ export function RouteWrapper({
   const location = useLocation();
   const appLayoutContext = useAppLayoutContext();
   const linkInfo = appLayoutContext?.linkMap?.get(location.pathname) || {};
-  
+
   //we need to wrap the child route in a container to make sure the route params are available.
   // we do this wrapping by providing an empty object to vars.
   // this way it becomes an 'implicit' container (vars/state inside this container is propagated to the parent)
@@ -81,14 +81,14 @@ export function RouteWrapper({
 type PageComponentDef = ComponentDef<typeof PageMd>;
 
 type PagesProps = {
-  defaultRoute?: string;
+  fallbackPath?: string;
   node?: ComponentDef;
   renderChild: RenderChildFn;
   extractValue: ValueExtractor;
   children?: ReactNode;
 };
 
-export function Pages({ node, renderChild, extractValue, defaultRoute }: PagesProps) {
+export function Pages({ node, renderChild, extractValue, fallbackPath }: PagesProps) {
   const routes: Array<PageComponentDef> = [];
   const restChildren: Array<ComponentDef> = [];
   node.children?.forEach((child) => {
@@ -106,7 +106,7 @@ export function Pages({ node, renderChild, extractValue, defaultRoute }: PagesPr
             <Route path={extractValue(child.props.url)} key={i} element={renderChild(child)} />
           );
         })}
-        {!!defaultRoute && <Route path="*" element={<Navigate to={defaultRoute} replace />} />}
+        {!!fallbackPath && <Route path="*" element={<Navigate to={fallbackPath} replace />} />}
       </Routes>
       {renderChild(restChildren)}
     </>

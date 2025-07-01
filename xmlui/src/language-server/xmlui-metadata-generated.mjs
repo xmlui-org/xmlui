@@ -10419,8 +10419,8 @@ export default {
   "Pages": {
     "description": "`Pages` serves as the routing coordinator within an [App](/components/App), managing which [Page](/components/Page)  displays based on the current URL.",
     "props": {
-      "defaultRoute": {
-        "description": "The default route when displaying the app",
+      "fallbackPath": {
+        "description": "The fallback path when the current URL does not match any of the paths of the pages.",
         "defaultValue": "/"
       }
     }
