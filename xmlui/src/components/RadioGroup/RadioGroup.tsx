@@ -67,18 +67,19 @@ export const RadioGroupMd = createMetadata({
   defaultThemeVars: {
     [`gap-${RGOption}`]: "$space-1_5",
     [`borderWidth-${RGOption}`]: "1px",
-    [`borderWidth-RadioGroupOption-validation`]: `2px`,
+    [`borderWidth-${RGOption}-validation`]: `2px`,
 
     [`borderColor-${RGOption}-default`]: "$color-surface-500",
+    [`borderColor-checked-${RGOption}`]: "$color-primary-500",
     [`borderColor-${RGOption}-default--hover`]: "$color-surface-700",
     [`borderColor-${RGOption}-default--active`]: "$color-primary-500",
 
-    [`backgroundColor-RadioGroupOption--disabled`]: "$backgroundColor--disabled",
+    [`backgroundColor-${RGOption}--disabled`]: "$backgroundColor--disabled",
 
-    [`backgroundColor-RadioGroupOption-checked`]: "$color-primary-500",
-    [`backgroundColor-RadioGroupOption-checked--disabled`]: `$textColor--disabled`,
-    [`backgroundColor-RadioGroupOption-checked-indicator`]: `transparent`,
-    [`backgroundColor-RadioGroupOption-checked-indicator--disabled`]: `transparent`,
+    [`backgroundColor-checked-${RGOption}`]: "$color-primary-500",
+    [`backgroundColor-${RGOption}-checked--disabled`]: `$textColor--disabled`,
+    [`backgroundColor-checked-indicator-${RGOption}`]: `transparent`,
+    [`backgroundColor-${RGOption}-checked-indicator--disabled`]: `transparent`,
 
     [`backgroundColor-checked-${RGOption}-error`]: `$borderColor-error`,
     [`backgroundColor-checked-${RGOption}-warning`]: `$borderColor-warning`,
