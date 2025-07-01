@@ -27,11 +27,16 @@ export function TableEditor({
   // Map button size to icon size
   const getIconSize = (size: string) => {
     switch (size) {
-      case 'xs': return '18px';
-      case 'sm': return '22px';
-      case 'md': return '26px';
-      case 'lg': return '30px';
-      default: return '22px';
+      case "xs":
+        return "18px";
+      case "sm":
+        return "22px";
+      case "md":
+        return "26px";
+      case "lg":
+        return "30px";
+      default:
+        return "22px";
     }
   };
 
@@ -125,24 +130,22 @@ export function TableEditor({
           size={size}
           orientation="horizontal"
         >
-
-<svg
-  viewBox="0 0 24 16"
-  stroke="currentColor"
-  fill="none"
-  strokeWidth="1.5"
-  strokeLinecap="round"
-  strokeLinejoin="round"
->
-  {/* Table grid */}
-  <rect x="2" y="2" width="12" height="10" rx="1" />
-  <line x1="2" y1="6" x2="14" y2="6" />
-  <line x1="2" y1="9" x2="14" y2="9" />
-  {/* + sign shifted right and up */}
-  <line x1="18" y1="4.5" x2="18" y2="7.5" />
-  <line x1="16.5" y1="6" x2="19.5" y2="6" />
-</svg>
-
+          <svg
+            viewBox="0 0 24 16"
+            stroke="currentColor"
+            fill="none"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            {/* Table grid */}
+            <rect x="2" y="2" width="12" height="10" rx="1" />
+            <line x1="2" y1="6" x2="14" y2="6" />
+            <line x1="2" y1="9" x2="14" y2="9" />
+            {/* + sign with more right spacing, centered at y=8 */}
+            <line x1="19" y1="6.5" x2="19" y2="9.5" />
+            <line x1="17.5" y1="8" x2="20.5" y2="8" />
+          </svg>
           Insert Row
         </Button>
         <Button
@@ -152,24 +155,21 @@ export function TableEditor({
           variant={variant}
           size={size}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 16"
-            width={iconSize}
-            height={iconSize}
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="2" y="2" width="12" height="10" rx="1" />
-            <line x1="2" y1="6" x2="14" y2="6" />
-            <line x1="2" y1="9" x2="14" y2="9" />
-            {/* X mark with MAXIMUM spacing - far right edge */}
-            <line x1="19" y1="2" x2="24" y2="12" />
-            <line x1="24" y1="2" x2="19" y2="12" />
-          </svg>
+<svg
+  viewBox="0 0 24 16"
+  stroke="currentColor"
+  fill="none"
+  strokeWidth="1.5"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+>
+  <rect x="2" y="2" width="12" height="10" rx="1" />
+  <line x1="2" y1="6" x2="14" y2="6" />
+  <line x1="2" y1="9" x2="14" y2="9" />
+  {/* X mark with moderate spacing, centered vertically */}
+  <line x1="17.5" y1="5" x2="20.5" y2="11" />
+  <line x1="20.5" y1="5" x2="17.5" y2="11" />
+</svg>
           Delete Row
         </Button>
         <Button
@@ -179,24 +179,21 @@ export function TableEditor({
           variant={variant}
           size={size}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 16"
-            width={iconSize}
-            height={iconSize}
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="2" y="2" width="12" height="10" rx="1" />
-            <line x1="6" y1="2" x2="6" y2="12" />
-            <line x1="10" y1="2" x2="10" y2="12" />
-            {/* + sign with MAXIMUM spacing - far right edge */}
-            <line x1="21" y1="2" x2="21" y2="12" />
-            <line x1="15" y1="7" x2="24" y2="7" />
-          </svg>
+<svg
+  viewBox="0 0 24 16"
+  stroke="currentColor"
+  fill="none"
+  strokeWidth="1.5"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+>
+  <rect x="2" y="2" width="12" height="10" rx="1" />
+  <line x1="6" y1="2" x2="6" y2="12" />
+  <line x1="10" y1="2" x2="10" y2="12" />
+  {/* + sign positioned with equal vertical and horizontal spacing */}
+  <line x1="19" y1="6.5" x2="19" y2="9.5" />
+  <line x1="17.5" y1="8" x2="20.5" y2="8" />
+</svg>
           Insert Column
         </Button>
         <Button
@@ -206,24 +203,21 @@ export function TableEditor({
           variant={variant}
           size={size}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 16"
-            width={iconSize}
-            height={iconSize}
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="2" y="2" width="12" height="10" rx="1" />
-            <line x1="6" y1="2" x2="6" y2="12" />
-            <line x1="10" y1="2" x2="10" y2="12" />
-            {/* X mark with MAXIMUM spacing - far right edge */}
-            <line x1="19" y1="2" x2="24" y2="12" />
-            <line x1="24" y1="2" x2="19" y2="12" />
-          </svg>
+<svg
+  viewBox="0 0 24 16"
+  stroke="currentColor"
+  fill="none"
+  strokeWidth="1.5"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+>
+  <rect x="2" y="2" width="12" height="10" rx="1" />
+  <line x1="6" y1="2" x2="6" y2="12" />
+  <line x1="10" y1="2" x2="10" y2="12" />
+  {/* X mark spaced and centered */}
+  <line x1="17.5" y1="5" x2="20.5" y2="11" />
+  <line x1="20.5" y1="5" x2="17.5" y2="11" />
+</svg>
           Delete Column
         </Button>
       </Stack>
