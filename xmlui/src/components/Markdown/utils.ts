@@ -4,6 +4,7 @@ export type SegmentProps = {
   noPopup?: boolean;
   noFrame?: boolean;
   sideBySide?: boolean;
+  splitView?: boolean;
   highlights?: (number | [number, number])[];
   filename?: string;
   name?: string;
@@ -84,6 +85,11 @@ export function parseSegmentProps(input: string): SegmentProps {
   // --- Match the "sideBySide" flag
   if (/\bsideBySide\b/.test(input)) {
     segment.sideBySide = true;
+  }
+  
+  // --- Match the "splitView" flag
+  if (/\bsplitView\b/.test(input)) {
+    segment.splitView = true;
   }
 
   // Match the "highlights" pattern
@@ -262,7 +268,8 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
   const pgContent: any = { 
     noPopup: pattern.default?.noPopup, 
     noFrame: pattern.default?.noFrame,
-    sideBySide: pattern.default?.sideBySide 
+    sideBySide: pattern.default?.sideBySide,
+    splitView: pattern.default?.splitView 
   };
 
   // --- Extract optional playground attributes
