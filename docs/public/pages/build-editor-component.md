@@ -165,7 +165,7 @@ Use the same XMLUI markup.
 You can now edit the cells in the table.
 
 
-![](/resources/devdocs/table_editor_01.png)
+![](/resources/devdocs/table_editor_02.png)
 
 
 ## Step 4: Add a placeholder native component
@@ -196,10 +196,9 @@ This is the raw component using a native HTML `<button>`. Try it in a test envir
 <App>
   <TableEditor />
 </App>
-
 ```
 
-![](/resources/devdocs/table-editor-01.png)
+![](/resources/devdocs/table_editor_02.png)
 
 We can edit the existing cells, and use `Insert Row` to add rows. The button has no style. Instead of writing CSS to style it we will instead switch to an XMLUI [Button](/components/Button) that inherits theming.
 
