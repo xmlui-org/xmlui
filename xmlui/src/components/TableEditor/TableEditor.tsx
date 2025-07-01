@@ -27,11 +27,11 @@ export function TableEditor({
   // Map button size to icon size
   const getIconSize = (size: string) => {
     switch (size) {
-      case 'xs': return '14px';
-      case 'sm': return '18px';
-      case 'md': return '22px';
-      case 'lg': return '26px';
-      default: return '18px';
+      case 'xs': return '18px';
+      case 'sm': return '22px';
+      case 'md': return '26px';
+      case 'lg': return '30px';
+      default: return '22px';
     }
   };
 
@@ -123,6 +123,8 @@ export function TableEditor({
           themeColor={themeColor}
           variant={variant}
           size={size}
+          width="48px"
+          height="48px"
           orientation="horizontal"
         >
           <svg
@@ -139,6 +141,7 @@ export function TableEditor({
             <rect x="2" y="2" width="12" height="10" rx="1" />
             <line x1="2" y1="6" x2="14" y2="6" />
             <line x1="2" y1="9" x2="14" y2="9" />
+            {/* + sign back to original proportions */}
             <line x1="19" y1="5" x2="19" y2="9" />
             <line x1="17" y1="7" x2="21" y2="7" />
           </svg>
@@ -165,8 +168,9 @@ export function TableEditor({
             <rect x="2" y="2" width="12" height="10" rx="1" />
             <line x1="2" y1="6" x2="14" y2="6" />
             <line x1="2" y1="9" x2="14" y2="9" />
-            <line x1="17" y1="5" x2="21" y2="9" />
-            <line x1="21" y1="5" x2="17" y2="9" />
+            {/* X mark with MAXIMUM spacing - far right edge */}
+            <line x1="19" y1="2" x2="24" y2="12" />
+            <line x1="24" y1="2" x2="19" y2="12" />
           </svg>
           Delete Row
         </Button>
@@ -191,8 +195,9 @@ export function TableEditor({
             <rect x="2" y="2" width="12" height="10" rx="1" />
             <line x1="6" y1="2" x2="6" y2="12" />
             <line x1="10" y1="2" x2="10" y2="12" />
-            <line x1="19" y1="5" x2="19" y2="9" />
-            <line x1="17" y1="7" x2="21" y2="7" />
+            {/* + sign with MAXIMUM spacing - far right edge */}
+            <line x1="21" y1="2" x2="21" y2="12" />
+            <line x1="15" y1="7" x2="24" y2="7" />
           </svg>
           Insert Column
         </Button>
@@ -217,8 +222,9 @@ export function TableEditor({
             <rect x="2" y="2" width="12" height="10" rx="1" />
             <line x1="6" y1="2" x2="6" y2="12" />
             <line x1="10" y1="2" x2="10" y2="12" />
-            <line x1="17" y1="5" x2="21" y2="9" />
-            <line x1="21" y1="5" x2="17" y2="9" />
+            {/* X mark with MAXIMUM spacing - far right edge */}
+            <line x1="19" y1="2" x2="24" y2="12" />
+            <line x1="24" y1="2" x2="19" y2="12" />
           </svg>
           Delete Column
         </Button>

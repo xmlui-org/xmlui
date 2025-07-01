@@ -6,6 +6,43 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 > [!INFO]
 > If you operate in the [XMLUI](https://github.com/xmlui-org/xmlui) repo you can test your work live. Follow the instructions in `dev-docs/next/generating-component-reference.md` to build the XMLUI docs site, then load localhost:5173. When you edit `.tsx` files they will automatically recompile, so you can iterate rapidly as you develop your component. And you can add a test page to the site in order to use your evolving component
 
+# Build a TableEditor Component
+
+## Latest version
+
+```xmlui-pg
+<App var.showHtml="{false}" var.showMarkdown="{false}">
+
+  <TableEditor
+    id="tableEditor"
+    size="xs"
+  />
+
+    <TableEditor
+    id="tableEditor2"
+    size="sm"
+  />
+
+      <TableEditor
+    id="tableEditor3"
+    size="md"
+  />
+
+        <TableEditor
+    id="tableEditor4"
+    size="lg"
+  />
+
+
+
+
+  <Text variant="codefence" preserveLinebreaks="true">
+    { tableEditor.getMarkdownSource() }
+  </Text>
+
+</App>
+```
+
 ## Step 1: Create the subdirectory
 
 ```bash
@@ -472,7 +509,7 @@ Now TableEditor supports full theme customization.
   />
 
     <TableEditor
-    id="tableEditor2"
+    id="tableEditor3"
     themeColor="attention"
     variant="ghost"
     size="sm"
