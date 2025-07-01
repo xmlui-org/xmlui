@@ -16,7 +16,7 @@ import {
   T_ARRAY_LITERAL,
   T_UNARY_EXPRESSION,
   T_OBJECT_LITERAL,
-} from "../../../src/abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 import { tokenTraits } from "../../../src/parsers/scripting/TokenTrait";
 import { TokenType } from "../../../src/parsers/scripting/TokenType";
 

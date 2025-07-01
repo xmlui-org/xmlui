@@ -8,7 +8,7 @@ import {
   T_IDENTIFIER,
   T_BINARY_EXPRESSION,
   T_LITERAL,
-} from "../../../src/abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Parser - assignment expressions", () => {
   it("Assignment with binary expression", () => {

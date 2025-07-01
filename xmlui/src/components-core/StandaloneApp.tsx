@@ -8,7 +8,7 @@ import type {
   ComponentLike,
   CompoundComponentDef,
 } from "../abstractions/ComponentDefs";
-import type { CollectedDeclarations } from "../abstractions/scripting/ScriptingSourceTree";
+import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 
 import "../index.scss";
 import { AppRoot } from "./rendering/AppRoot";

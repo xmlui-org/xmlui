@@ -12,7 +12,7 @@ import { ParserError } from "../parsers/xmlui-parser/ParserError";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import { Node } from "../parsers/xmlui-parser/syntax-node";
 import { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
-import { ModuleErrors } from "../abstractions/scripting/ScriptingSourceTree";
+import { ModuleErrors } from "./script-runner/ScriptingSourceTree";
 
 interface ErrorWithLineColInfo extends ParseError {
   line: number;

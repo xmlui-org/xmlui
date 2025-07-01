@@ -12,7 +12,7 @@ import type {
 } from "../abstractions/ActionDefs";
 
 import { useComponentRegistry } from "../components/ComponentRegistryContext";
-import { ContainerActionKind } from "./abstractions/containers";
+import { ContainerActionKind } from "./rendering/containers";
 import { createValueExtractor } from "./rendering/valueExtractor";
 import { useReferenceTrackedApi } from "./utils/hooks";
 import { AppContextObject } from "../abstractions/AppContextDefs";

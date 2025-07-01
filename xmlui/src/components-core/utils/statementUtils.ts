@@ -19,7 +19,7 @@ import {
   type FunctionInvocationExpression,
   type Identifier,
   type Statement,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "../script-runner/ScriptingSourceTree";
 import type { QueueInfo } from "../script-runner/statement-queue";
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";

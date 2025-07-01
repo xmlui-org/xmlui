@@ -1,4 +1,4 @@
-import type { Statement } from "../../abstractions/scripting/ScriptingSourceTree";
+import type { Statement } from "./ScriptingSourceTree";
 
 export type StatementRunTimeInfo = {
   guard?: boolean;

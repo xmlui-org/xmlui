@@ -23,7 +23,7 @@ import { useComponentRegistry } from "../../components/ComponentRegistryContext"
 import { ApiBoundComponent } from "../ApiBoundComponent";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
 import type { InnerRendererContext } from "../abstractions/ComponentRenderer";
-import { ContainerActionKind } from "../abstractions/containers";
+import { ContainerActionKind } from "./containers";
 import { useInspector } from "../InspectorContext";
 import { SlotItem } from "../../components/SlotItem";
 import { layoutOptionKeys } from "../descriptorHelper";

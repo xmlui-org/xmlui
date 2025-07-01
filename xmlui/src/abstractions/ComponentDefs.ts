@@ -1,6 +1,6 @@
 import type { RenderChildFn } from "./RendererDefs";
-import type { CollectedDeclarations } from "./scripting/ScriptingSourceTree";
-import { DefaultThemeVars } from "./ThemingDefs";
+import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
+import type { DefaultThemeVars } from "./ThemingDefs";
 
 /**
  * This interface represents the core properties of a component definition (independent

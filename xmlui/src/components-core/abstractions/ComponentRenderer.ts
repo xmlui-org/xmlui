@@ -2,7 +2,7 @@ import type { Dispatch, MutableRefObject, RefObject } from "react";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { LookupAsyncFnInner, LookupSyncFnInner } from "../../abstractions/ActionDefs";
-import type { CodeDeclaration } from "../../abstractions/scripting/ScriptingSourceTree";
+import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentMetadata, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type { ComponentRendererContextBase } from "../../abstractions/RendererDefs";
 import type {
@@ -10,7 +10,7 @@ import type {
   ContainerState,
   RegisterComponentApiFnInner,
 } from "../rendering/ContainerWrapper";
-import type { ContainerAction } from "./containers";
+import type { ContainerAction } from "../rendering/containers";
 
 /**
  * This interface defines the renderer context for the XMLUI core framework components. Its implementations

@@ -1,7 +1,7 @@
 import type { BlockScope } from "./BlockScope";
 import type { LoopScope } from "./LoopScope";
 import type { TryScope } from "./TryScopeExp";
-import type { Expression } from "./ScriptingSourceTree";
+import type { Expression } from "../../components-core/script-runner/ScriptingSourceTree";
 
 // Result of evaluating a binding expression
 export type ValueResult = {

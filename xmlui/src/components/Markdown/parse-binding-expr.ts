@@ -1,5 +1,5 @@
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { T_ARROW_EXPRESSION } from "../../abstractions/scripting/ScriptingSourceTree";
+import { T_ARROW_EXPRESSION } from "../../components-core/script-runner/ScriptingSourceTree";
 
 /**
  * Finds and evaluates given binding expressions in markdown text.

@@ -24,7 +24,7 @@ import type {
   RenderChildFn,
   ValueExtractor,
 } from "../../abstractions/RendererDefs";
-import type { ContainerAction } from "../../components-core/abstractions/containers";
+import type { ContainerAction } from "../../components-core/rendering/containers";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import type { GenericBackendError } from "../../components-core/EngineError";
 import { useEvent } from "../../components-core/utils/misc";
