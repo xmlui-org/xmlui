@@ -24,24 +24,7 @@ export function TableEditor({
   variant?: "solid" | "outlined" | "ghost";
   size?: "xs" | "sm" | "md" | "lg";
 }) {
-  // Map button size to icon size
-  const getIconSize = (size: string) => {
-    switch (size) {
-      case "xs":
-        return "18px";
-      case "sm":
-        return "22px";
-      case "md":
-        return "26px";
-      case "lg":
-        return "30px";
-      default:
-        return "22px";
-    }
-  };
-
-  const iconSize = getIconSize(size);
-
+  
   const editor = useEditor({
     extensions: [
       StarterKit,
