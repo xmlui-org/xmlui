@@ -123,28 +123,26 @@ export function TableEditor({
           themeColor={themeColor}
           variant={variant}
           size={size}
-          width="48px"
-          height="48px"
           orientation="horizontal"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 16"
-            width={iconSize}
-            height={iconSize}
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect x="2" y="2" width="12" height="10" rx="1" />
-            <line x1="2" y1="6" x2="14" y2="6" />
-            <line x1="2" y1="9" x2="14" y2="9" />
-            {/* + sign back to original proportions */}
-            <line x1="19" y1="5" x2="19" y2="9" />
-            <line x1="17" y1="7" x2="21" y2="7" />
-          </svg>
+
+<svg
+  viewBox="0 0 24 16"
+  stroke="currentColor"
+  fill="none"
+  strokeWidth="1.5"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+>
+  {/* Table grid */}
+  <rect x="2" y="2" width="12" height="10" rx="1" />
+  <line x1="2" y1="6" x2="14" y2="6" />
+  <line x1="2" y1="9" x2="14" y2="9" />
+  {/* + sign shifted right and up */}
+  <line x1="18" y1="4.5" x2="18" y2="7.5" />
+  <line x1="16.5" y1="6" x2="19.5" y2="6" />
+</svg>
+
           Insert Row
         </Button>
         <Button
