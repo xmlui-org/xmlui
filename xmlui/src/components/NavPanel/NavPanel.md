@@ -1,6 +1,7 @@
 %-DESC-START
 
 **Key features:**
+
 - **Layout adaptation**: Automatically positions navigation horizontally or vertically based on App layout
 - **Navigation organization**: Contains NavLink and NavGroup components to build structured menus
 - **Logo integration**: Supports custom logo templates in vertical layouts via logoTemplate property
@@ -23,7 +24,7 @@
     <NavLink label="Home" to="/" icon="home"/>
     <NavLink label="Page 1" to="/page1"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <Text value="Home" />
     </Page>

@@ -7,7 +7,7 @@
     <NavLink label="Page 1" to="/page1"/>
     <NavLink label="Page 2" to="/page2"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
       <Page url="/">
         <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">

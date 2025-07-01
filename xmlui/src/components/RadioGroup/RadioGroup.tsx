@@ -67,20 +67,26 @@ export const RadioGroupMd = createMetadata({
   defaultThemeVars: {
     [`gap-${RGOption}`]: "$space-1_5",
     [`borderWidth-${RGOption}`]: "1px",
-    [`backgroundColor-checked-${RGOption}-indicator`]: `$backgroundColor-primary`,
-    [`backgroundColor-checked-${RGOption}--disabled]`]: `$borderColor-${RGOption}--disabled`,
-    [`backgroundColor-checked-${RGOption}-error`]: `$borderColor-${RGOption}-error`,
-    [`backgroundColor-checked-${RGOption}-warning`]: `$borderColor-${RGOption}-warning`,
-    [`backgroundColor-checked-${RGOption}-success`]: `$borderColor-${RGOption}-success`,
-    [`fontSize-${RGOption}`]: "$fontSize-small",
-    [`fontWeight-${RGOption}`]: "$fontWeight-bold",
-    [`textColor-${RGOption}-error`]: `$borderColor-${RGOption}-error`,
-    [`textColor-${RGOption}-warning`]: `$borderColor-${RGOption}-warning`,
-    [`textColor-${RGOption}-success`]: `$borderColor-${RGOption}-success`,
-    [`backgroundColor-checked-${RGOption}-default`]: "$color-primary-500",
+    [`borderWidth-${RGOption}-validation`]: `2px`,
+
     [`borderColor-${RGOption}-default`]: "$color-surface-500",
+    [`borderColor-checked-${RGOption}`]: "$color-primary-500",
     [`borderColor-${RGOption}-default--hover`]: "$color-surface-700",
     [`borderColor-${RGOption}-default--active`]: "$color-primary-500",
+
+    [`backgroundColor-${RGOption}--disabled`]: "$backgroundColor--disabled",
+
+    [`backgroundColor-checked-${RGOption}`]: "$color-primary-500",
+    [`backgroundColor-${RGOption}-checked--disabled`]: `$textColor--disabled`,
+    [`backgroundColor-checked-indicator-${RGOption}`]: `transparent`,
+    [`backgroundColor-${RGOption}-checked-indicator--disabled`]: `transparent`,
+
+    [`backgroundColor-checked-${RGOption}-error`]: `$borderColor-error`,
+    [`backgroundColor-checked-${RGOption}-warning`]: `$borderColor-warning`,
+    [`backgroundColor-checked-${RGOption}-success`]: `$borderColor-success`,
+    
+    [`fontSize-${RGOption}`]: "$fontSize-small",
+    [`fontWeight-${RGOption}`]: "$fontWeight-bold",
   },
 });
 

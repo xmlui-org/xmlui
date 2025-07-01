@@ -40,7 +40,7 @@ It also uses the `Logo` component within the template definition:
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
   </NavPanel>
-  <Pages defaultRoute="/">
+  <Pages fallbackPath="/">
     <Page url="/">
       <CHStack>
         (Sample content)
