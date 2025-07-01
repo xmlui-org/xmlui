@@ -1,5 +1,5 @@
 
-import { ThemeDefinition } from "../../../abstractions/ThemingDefs";
+import type { ThemeDefinition } from "../../../abstractions/ThemingDefs";
 import { palette } from "./palette";
 
 const {
@@ -275,6 +275,10 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- Input is an abstract component, so we define its default theme variables here
     "backgroundColor-Input-default": $colorSurface0,
+    "backgroundColor-Input-success": $colorSurface0,
+    "backgroundColor-Input-warning": $colorSurface0,
+    "backgroundColor-Input-error": $colorSurface0,
+
     "borderColor-Input-default": $colorSurface200,
     "borderColor-Input-default--hover": $colorSurface600,
     "borderColor-Input-default--focus": $colorSurface600,

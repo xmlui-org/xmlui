@@ -30,6 +30,7 @@ $themeVars: t.composeBorderVars($themeVars, $component);
 
   &::placeholder {
     color: createThemeVar("Input:textColor-placeholder-#{$component}-#{$variantName}");
+    font-size: createThemeVar("Input:fontSize-placeholder-#{$component}-#{$variantName}");
   }
 }
 
