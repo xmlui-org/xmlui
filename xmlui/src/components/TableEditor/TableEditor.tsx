@@ -12,6 +12,7 @@ import TurndownService from "turndown";
 import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
+import Icon from "../Icon/IconNative";
 
 export function TableEditor({
   registerComponentApi,
@@ -112,21 +113,8 @@ export function TableEditor({
           variant={variant}
           size={size}
           orientation="horizontal"
+          icon={<Icon name="table-insert-row" aria-hidden />}
         >
-<svg
-  viewBox="0 0 24 16"
-  stroke="currentColor"
-  fill="none"
-  strokeWidth="1.5"
-  strokeLinecap="round"
-  strokeLinejoin="round"
->
-  <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
-  <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" />
-  <line x1="1.5" y1="9.5" x2="14.5" y2="9.5" />
-  <line x1="19" y1="6" x2="19" y2="10" />
-  <line x1="17" y1="8" x2="21" y2="8" />
-</svg>
           Insert Row
         </Button>
         <Button

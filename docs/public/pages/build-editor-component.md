@@ -13,6 +13,14 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 ```xmlui-pg
 <App var.showHtml="{false}" var.showMarkdown="{false}">
 
+<Icon name="table-insert-row" />
+
+<Icon name="drive" />
+
+<Button icon="drive" label="drive" />
+
+<Button icon="table-insert-row" label="insert row" />
+
   <TableEditor
     id="tableEditor"
   />

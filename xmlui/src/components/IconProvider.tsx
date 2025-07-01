@@ -115,6 +115,7 @@ import { AdmonitionWarningIcon } from "./Icon/AdmonitionWarning";
 import { AdmonitionDangerIcon } from "./Icon/AdmonitionDanger";
 import { AdmonitionNoteIcon } from "./Icon/AdmonitionNote";
 import { AdmonitionTipIcon } from "./Icon/AdmonitionTip";
+import TableInsertRowIcon from "./Icon/TableInsertRowIcon";
 
 type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
 
@@ -284,6 +285,8 @@ registerIconRenderer("arrowdown", (props: IconBaseProps) => <BsArrowDownShort {.
 registerIconRenderer("square", (props: IconBaseProps) => <BsSquare {...props} />);
 registerIconRenderer("squarehalf", (props: IconBaseProps) => <BsSquareHalf {...props} />);
 registerIconRenderer("squarefill", (props: IconBaseProps) => <BsSquareFill {...props} />);
+
+registerIconRenderer("table-insert-row", (props) => <TableInsertRowIcon {...props} />);
 
 export function IconProvider({ children }: { children: ReactNode }) {
   const getRegisteredIconNames = useCallback(() => {
