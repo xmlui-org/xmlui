@@ -128,7 +128,6 @@ export const SelectMd = createMetadata({
     [`borderRadius-menu-${COMP}`]: "$borderRadius",
     [`borderWidth-menu-${COMP}`]: "1px",
     [`borderColor-menu-${COMP}`]: "$borderColor",
-    [`minHeight-Input`]: "39px",
     [`backgroundColor-${COMP}-badge`]: "$color-primary-500",
     [`fontSize-${COMP}-badge`]: "$fontSize-small",
     [`paddingHorizontal-${COMP}-badge`]: "$space-1",
@@ -144,6 +143,8 @@ export const SelectMd = createMetadata({
     [`backgroundColor-item-${COMP}`]: "$backgroundColor-dropdown-item",
     [`backgroundColor-item-${COMP}--hover`]: "$backgroundColor-dropdown-item--hover",
     [`backgroundColor-item-${COMP}--active`]: "$backgroundColor-dropdown-item--active",
+    // Default borderColor-Input--disabled is too light so the disabled component is barely visible
+    [`borderColor-${COMP}--disabled`]: "initial",
   },
 });
 

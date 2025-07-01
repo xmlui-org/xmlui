@@ -98,7 +98,7 @@ export const TextBoxMd = createMetadata({
     "borderColor-Input-error": "$borderColor-Input-default--error",
     "borderColor-Input-warning": "$borderColor-Input-default--warning",
     "borderColor-Input-success": "$borderColor-Input-default--success",
-    "color-placeholder-Input": "$textColor-subtitle",
+    "textColor-placeholder-Input": "$textColor-subtitle",
     "color-adornment-Input": "$textColor-subtitle",
 
     "outlineColor-Input--focus": "$outlineColor--focus",

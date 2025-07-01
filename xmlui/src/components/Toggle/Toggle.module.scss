@@ -80,6 +80,8 @@ $themeVars: ();
   height: 0;
 }
 
+// --------------- Checkbox ---------------
+
 .checkbox {
   display: grid;
   place-content: center;
@@ -141,8 +143,9 @@ $themeVars: ();
     clip-path: circle(30.0% at 50% 50%);
     transform: scale(1);
   }
-  // ---
 }
+
+// --------------- Switch ---------------
 
 .switch {
   border: 1px solid createThemeVar("Input:borderColor-Switch");
@@ -167,6 +170,12 @@ $themeVars: ();
 
   &.valid {
     border-color: createThemeVar("Input:borderColor-Switch-success");
+  }
+
+  &:disabled {
+    &::before {
+      background-color: createThemeVar("backgroundColor-Switch-indicator--disabled");
+    }
   }
 
   &::before {
