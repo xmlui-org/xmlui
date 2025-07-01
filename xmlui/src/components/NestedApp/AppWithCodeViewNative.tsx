@@ -10,6 +10,7 @@ import { RxOpenInNewWindow } from "react-icons/rx";
 import { LiaUndoAltSolid } from "react-icons/lia";
 import { createQueryString } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
+import classnames from "classnames";
 
 type AppWithCodeViewNativeProps = {
   /**
@@ -21,6 +22,10 @@ type AppWithCodeViewNativeProps = {
    * or stacked (vertical) when false or undefined
    */
   splitView?: boolean;
+  /**
+   * Indicates that the split view should initially show the code
+   */
+  initiallyShowCode?: boolean;
   api?: any;
   app: string;
   components?: any[];
@@ -39,6 +44,7 @@ type AppWithCodeViewNativeProps = {
 export function AppWithCodeViewNative({
   markdown,
   splitView,
+  initiallyShowCode = false,
   app,
   api,
   components = [],
@@ -49,7 +55,7 @@ export function AppWithCodeViewNative({
   height,
   allowPlaygroundPopup,
 }: AppWithCodeViewNativeProps): ReactNode {
-  const [showCode, setShowCode] = useState(false);
+  const [showCode, setShowCode] = useState(initiallyShowCode);
   const logoUrl = useLogoUrl();
   const { appGlobals } = useAppContext();
   const [refreshVersion, setRefreshVersion] = useState(0);
@@ -89,82 +95,79 @@ export function AppWithCodeViewNative({
   if (splitView) {
     return (
       <div className={styles.nestedAppContainer} style={{ height }}>
-          <div className={styles.header}>
-            <img src={logoUrl} className={styles.logo} alt="Logo" />
-            <div className={styles.viewControls}>
-              <Button
-                onClick={() => setShowCode(true)}
-                variant={showCode ? "solid" : "ghost"}
-                style={{
-                  backgroundColor: !showCode ? "transparent" : "",
-                  padding: "4px 6px",
-                  width: 80,
-                }}
-              >
-                XML
-              </Button>
-              <Button
-                onClick={() => setShowCode(false)}
-                variant={showCode ? "ghost" : "solid"}
-                style={{
-                  backgroundColor: showCode ? "transparent" : "",
-                  padding: "4px 6px",
-                  width: 80,
-                }}
-              >
-                UI
-              </Button>
-            </div>
-            <div>
-              {allowPlaygroundPopup && (
-                <Tooltip
-                  trigger={
-                    <button
-                      className={styles.headerButton}
-                      onClick={() => {
-                        openPlayground();
-                      }}
-                    >
-                      <RxOpenInNewWindow />
-                    </button>
-                  }
-                  label="View and edit in new full-width window"
-                />
-              )}
+        <div className={styles.header}>
+          <img src={logoUrl} className={styles.logo} alt="Logo" />
+          <div className={styles.viewControls}>
+            <Button
+              onClick={() => setShowCode(true)}
+              variant={showCode ? "solid" : "ghost"}
+              className={classnames(styles.splitViewButton)}
+              style={{
+                backgroundColor: !showCode ? "transparent" : "",
+              }}
+            >
+              XML
+            </Button>
+            <Button
+              onClick={() => setShowCode(false)}
+              variant={showCode ? "ghost" : "solid"}
+              className={classnames(styles.splitViewButton)}
+              style={{
+                backgroundColor: showCode ? "transparent" : "",
+              }}
+            >
+              UI
+            </Button>
+          </div>
+          <div>
+            {allowPlaygroundPopup && (
               <Tooltip
                 trigger={
                   <button
                     className={styles.headerButton}
                     onClick={() => {
-                      setRefreshVersion(refreshVersion + 1);
+                      openPlayground();
                     }}
                   >
-                    <LiaUndoAltSolid />
+                    <RxOpenInNewWindow />
                   </button>
                 }
-                label="Reset the app"
+                label="View and edit in new full-width window"
               />
-            </div>
-          </div>
-          <div style={{width: "100%", height: "100%", overflow: "auto"}}>
-            {showCode && (
-                <Markdown>{markdown}</Markdown>
             )}
-            {!showCode && (
-                <IndexAwareNestedApp
-                  refVersion={refreshVersion}
-                  app={app}
-                  api={api}
-                  components={components}
-                  config={config}
-                  activeTone={activeTone}
-                  activeTheme={activeTheme}
-                  title={title}
-                  allowPlaygroundPopup={allowPlaygroundPopup}
-                  withFrame={false}
-                />
-            )}
+            <Tooltip
+              trigger={
+                <button
+                  className={styles.headerButton}
+                  onClick={() => {
+                    setShowCode(false);
+                    setRefreshVersion(refreshVersion + 1);
+                  }}
+                >
+                  <LiaUndoAltSolid />
+                </button>
+              }
+              label="Reset the app"
+            />
           </div>
+        </div>
+        <div className={styles.contentContainer}>
+          {showCode && <Markdown>{markdown}</Markdown>}
+          {!showCode && (
+            <IndexAwareNestedApp
+              refVersion={refreshVersion}
+              app={app}
+              api={api}
+              components={components}
+              config={config}
+              activeTone={activeTone}
+              activeTheme={activeTheme}
+              title={title}
+              allowPlaygroundPopup={allowPlaygroundPopup}
+              withFrame={false}
+            />
+          )}
+        </div>
       </div>
     );
   }

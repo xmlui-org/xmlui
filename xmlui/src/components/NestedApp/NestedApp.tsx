@@ -72,7 +72,8 @@ export const NestedAppMd = createMetadata({
     [`padding-viewControls-${COMP}`]: "$space-1",
     [`paddingVertical-viewControls-button-${COMP}`]: "$space-1_5",
     [`paddingHorizontal-viewControls-button-${COMP}`]: "$space-1",
-
+    [`padding-button-splitView-${COMP}`]: "4px 6px",
+    [`width-button-splitView-${COMP}`]: "60px",
   },
 });
 
