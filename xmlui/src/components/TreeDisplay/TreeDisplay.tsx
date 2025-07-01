@@ -36,7 +36,9 @@ export const TreeDisplayMd = createMetadata({
     [`fontWeight-${COMP}`]: "$fontWeight-normal",
     [`fontFamily-${COMP}`]: "$fontFamily-monospace",
     [`color-${COMP}`]: "$textColor-primary",
-    [`color-connect-${COMP}`]: "$color-surface-200", 
+    [`color-connect-${COMP}`]: "$color-surface-200",
+    [`boxShadow-${COMP}`]: "none",
+    [`border-${COMP}`]: "0.5px solid $borderColor",
   },
 });
 

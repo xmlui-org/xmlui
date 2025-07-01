@@ -17,18 +17,20 @@ $marginTop-NestedApp: createThemeVar("marginTop-#{$component}");
 $marginBottom-NestedApp: createThemeVar("marginBottom-#{$component}");
 $boxShadow-NestedApp: createThemeVar("boxShadow-#{$component}");
 $backgroundColor-viewControls-NestedApp: createThemeVar(
-  "backgroundColor-viewControls-#{$component}"
+                "backgroundColor-viewControls-#{$component}"
 );
 $bordRadius-viewControls-NestedApp: createThemeVar("borderRadius-viewControls-#{$component}");
 $padding-viewControls-NestedApp: createThemeVar("padding-viewControls-#{$component}");
 $paddingVertical-viewControls-button-NestedApp: createThemeVar(
-  "paddingVertical-viewControls-button-#{$component}"
+                "paddingVertical-viewControls-button-#{$component}"
 );
 $paddingHorizontal-viewControls-button-NestedApp: createThemeVar(
-  "paddingHorizontal-viewControls-button-#{$component}"
+                "paddingHorizontal-viewControls-button-#{$component}"
 );
 $padding-button-splitView-NestedApp: createThemeVar("padding-button-splitView-#{$component}");
 $width-button-splitView-NestedApp: createThemeVar("width-button-splitView-#{$component}");
+$bordRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
+$borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component}");
 
 // --- End of theme variables collection
 
@@ -48,31 +50,13 @@ $width-button-splitView-NestedApp: createThemeVar("width-button-splitView-#{$com
   width: 100%;
   height: fit-content;
   display: flex;
+  border-radius: $bordRadius-NestedApp;
   flex-direction: column;
   gap: $gap-frame-NestedApp;
   background-color: $backgroundColor-frame-NestedApp;
   align-content: center;
   box-shadow: $boxShadow-NestedApp;
   overflow: hidden;
-
-  .header {
-    width: 100%;
-    display: flex;
-    align-content: center;
-
-    .headerText {
-      @include t.textVars($themeVars, "header-#{$component}");
-    }
-
-    .headerButton {
-      padding: t.$space-2 t.$space-3;
-    }
-
-    .spacer {
-      flex: 1 1 0 !important;
-      place-self: stretch;
-    }
-  }
 
   .contentContainer {
     width: 100%;
@@ -103,21 +87,35 @@ $width-button-splitView-NestedApp: createThemeVar("width-button-splitView-#{$com
 }
 
 .logo {
-  width: 4rem;
-  height: 2rem;
-}
-
-.header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+  width: 1.6rem;
+  height: 1.6rem;
 }
 
 .splitViewButton {
   padding: $padding-button-splitView-NestedApp !important;
   width: $width-button-splitView-NestedApp !important;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-content: center;
+  padding: t.$space-2;
+  border-bottom: $borderBottom-header-NestedApp;
+  justify-content: space-between;
+
+  .headerText {
+    @include t.textVars($themeVars, "header-#{$component}");
+  }
+
+  .headerButton {
+    padding: t.$space-2 t.$space-3;
+  }
+
+  .spacer {
+    flex: 1 1 0 !important;
+    place-self: stretch;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer

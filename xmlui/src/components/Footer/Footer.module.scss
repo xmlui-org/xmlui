@@ -21,6 +21,7 @@ $verticalAlignment-Footer: createThemeVar("verticalAlignment-#{$component}");
 $maxWidth-content-Footer: createThemeVar("maxWidth-content-#{$component}");
 $gap-Footer: createThemeVar("gap-#{$component}");
 $maxWidth-App: createThemeVar("maxWidth-App");
+$margin-Footer: createThemeVar("margin-#{$component}");
 
 .outerWrapper{
   @include t.borderVars($themeVars, $component);
@@ -40,7 +41,7 @@ $maxWidth-App: createThemeVar("maxWidth-App");
   align-items: $verticalAlignment-Footer;
   max-width: $maxWidth-content-Footer;
   color: $textColor-Footer;
-  margin: 0 auto;
+  margin: $margin-Footer;
 
   &.full{
     max-width: $maxWidth-App;

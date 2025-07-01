@@ -11,6 +11,7 @@ import { LiaUndoAltSolid } from "react-icons/lia";
 import { createQueryString } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
 import classnames from "classnames";
+import Logo from "./logo.svg?react";
 
 type AppWithCodeViewNativeProps = {
   /**
@@ -96,7 +97,7 @@ export function AppWithCodeViewNative({
     return (
       <div className={styles.nestedAppContainer} style={{ height }}>
         <div className={styles.header}>
-          <img src={logoUrl} className={styles.logo} alt="Logo" />
+          <Logo className={styles.logo} />
           <div className={styles.viewControls}>
             <Button
               onClick={() => setShowCode(true)}
@@ -152,7 +153,7 @@ export function AppWithCodeViewNative({
           </div>
         </div>
         <div className={styles.contentContainer}>
-          {showCode && <Markdown>{markdown}</Markdown>}
+          {showCode && <Markdown style={{height: "100%"}}>{markdown}</Markdown>}
           {!showCode && (
             <IndexAwareNestedApp
               refVersion={refreshVersion}
