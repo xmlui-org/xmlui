@@ -9,7 +9,7 @@ import type {
   LoaderLoadedFn,
   TransformResultFn,
 } from "../abstractions/LoaderRenderer";
-import { ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import type { LoaderDirections } from "../loader/PageableLoader";
 import { createLoaderRenderer } from "../renderers";
@@ -21,6 +21,7 @@ import { Loader } from "../loader/Loader";
 import { useAppContext } from "../AppContext";
 import { useShallowCompareMemoize } from "../utils/hooks";
 import { useIndexerContext } from "../../components/App/IndexerContext";
+import { createMetadata, d } from "../../components/metadata-helpers";
 
 type LoaderProps = {
   loader: DataLoaderDef;

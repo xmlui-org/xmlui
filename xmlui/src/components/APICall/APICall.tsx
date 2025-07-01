@@ -1,7 +1,7 @@
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import type { ApiOperationDef } from "../../components-core/RestApiProxy";
-import { dInternal } from "../../components/metadata-helpers";
+import { createMetadata, d, dInternal } from "../../components/metadata-helpers";
 import { httpMethodNames } from "../abstractions";
 import { APICallNative, defaultProps } from "./APICallNative";
 

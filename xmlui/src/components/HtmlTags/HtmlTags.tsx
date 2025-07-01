@@ -1,4 +1,3 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./HtmlTags.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -6,6 +5,7 @@ import { LinkNative } from "../Link/LinkNative";
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { PropsTrasform } from "../../components-core/utils/extractParam";
+import { createMetadata, d } from "../metadata-helpers";
 
 export const HtmlAMd = createMetadata({
   status: "experimental",

@@ -199,11 +199,11 @@ interface Scriptable {
   scriptError?: any;
 }
 
-type PropertyValueType = "boolean" | "string" | "number" | "any" | "ComponentDef";
+export type PropertyValueType = "boolean" | "string" | "number" | "any" | "ComponentDef";
 
 // --- A generic validation function that retrieves either a hint (the
 // --- validation argument has issues) or undefined (the argument is valid).
-type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
+export type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
 
 /**
  * This type represents the description of a property value, which can be a string, a number,
@@ -337,31 +337,6 @@ export type ComponentMetadata<
   // Indicates that the component represent an HTML tag
   isHtmlTag?: boolean;
 };
-
-export function createMetadata<
-  TProps extends Record<string, ComponentPropertyMetadata>,
-  TEvents extends Record<string, ComponentPropertyMetadata>,
-  TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
-  TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
->(metadata: ComponentMetadata<TProps, TEvents, TContextVars, TApis>): ComponentMetadata<
-  TProps,
-  TEvents,
-  TContextVars,
-  TApis
-> {
-  return metadata;
-}
-
-export function d(
-  description: string,
-  availableValues?: readonly PropertyValueDescription[],
-  valueType?: PropertyValueType,
-  defaultValue?: any,
-  isValid?: IsValidFunction<any>,
-  isRequired?: boolean,
-): ComponentPropertyMetadata {
-  return { description, isRequired, availableValues, valueType, defaultValue, isValid };
-}
 
 export interface ParentRenderContext {
   renderChild: RenderChildFn;

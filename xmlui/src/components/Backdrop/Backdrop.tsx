@@ -1,9 +1,8 @@
 import styles from "./Backdrop.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dComponent } from "../../components/metadata-helpers";
+import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { Backdrop, defaultProps } from "./BackdropNative";
 
 const COMP = "Backdrop";

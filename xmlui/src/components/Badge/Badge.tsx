@@ -1,6 +1,5 @@
 import styles from "./Badge.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
@@ -10,7 +9,7 @@ import {
   isBadgeColors,
   type BadgeColors,
 } from "./BadgeNative";
-import { dInternal } from "../metadata-helpers";
+import { createMetadata, dInternal } from "../metadata-helpers";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 
 const COMP = "Badge";

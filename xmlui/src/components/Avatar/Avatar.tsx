@@ -1,10 +1,10 @@
 import styles from "./Avatar.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { sizeMd } from "../../components/abstractions";
 import { Avatar, defaultProps } from "./AvatarNative";
+import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "Avatar";
 

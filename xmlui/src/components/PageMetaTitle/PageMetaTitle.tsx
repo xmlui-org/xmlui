@@ -1,5 +1,5 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata } from "../metadata-helpers";
 import { PageMetaTitle, defaultProps } from "./PageMetaTilteNative";
 
 const COMP = "PageMetaTitle";

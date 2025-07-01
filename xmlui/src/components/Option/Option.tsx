@@ -1,8 +1,6 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import type { Option } from "../abstractions";
-import { dEnabled } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
+import { createMetadata, d } from "../metadata-helpers";
 import { OptionNative, defaultProps } from "./OptionNative";
 
 const COMP = "Option";

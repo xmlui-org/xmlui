@@ -1,10 +1,9 @@
 import styles from "./DropdownMenu.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { alignmentOptionMd, buttonThemeMd, buttonVariantMd, iconPositionMd } from "../abstractions";
-import { dClick, dEnabled, dLabel, dTriggerTemplate } from "../metadata-helpers";
+import { createMetadata, d, dClick, dEnabled, dLabel, dTriggerTemplate } from "../metadata-helpers";
 import { Icon } from "../Icon/IconNative";
 import {
   defaultDropdownMenuProps,

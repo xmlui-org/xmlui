@@ -1,19 +1,9 @@
 import type { Dispatch, SetStateAction } from "react";
 
 /**
- * Each theme can have a light or a dark tone.
- */
-export const ThemeToneKeys = ["light", "dark"] as const;
-
-/**
  * This type describes one the available theme tones.
  */
-export type ThemeTone = (typeof ThemeToneKeys)[number];
-
-/**
- * Initial theme tone value. Easier to modify if needed
- */
-export const INITIAL_THEME_TONE: ThemeTone = "light";
+export type ThemeTone = "light" | "dark";
 
 /**
  * When rendering any part of an XMLUI app, the styles to apply are enclosed in a theme scope.

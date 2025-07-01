@@ -1,9 +1,9 @@
 import type { To } from "react-router-dom";
 import { Navigate } from "@remix-run/react";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createUrlWithQueryParams } from "../component-utils";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "Redirect";
 

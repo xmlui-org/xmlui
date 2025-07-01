@@ -1,5 +1,5 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { httpMethodNames } from "../abstractions";
+import { createMetadata, d } from "../metadata-helpers";
 
 // NOTE: Original component this is based on is the `Loader` component
 

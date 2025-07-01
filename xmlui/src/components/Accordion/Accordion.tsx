@@ -1,9 +1,10 @@
 import styles from "./Accordion.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
+  d,
   dCollapse,
   dDidChange,
   dExpand,

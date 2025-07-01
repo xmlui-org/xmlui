@@ -1,6 +1,5 @@
 import styles from "../../components/AutoComplete/AutoComplete.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
@@ -24,6 +23,8 @@ import {
   dLabelPosition,
   dLabelWidth,
   dLabelBreak,
+  createMetadata,
+  d,
 } from "../metadata-helpers";
 import { AutoComplete, defaultProps } from "./AutoCompleteNative";
 

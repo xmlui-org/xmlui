@@ -1,10 +1,10 @@
 import styles from "./Text.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { variantOptionsMd, type VariantProps, VariantPropsKeys } from "../abstractions";
 import { Text, defaultProps } from "./TextNative";
+import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "Text";
 

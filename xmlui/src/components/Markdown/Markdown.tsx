@@ -1,6 +1,5 @@
 import styles from "./Markdown.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown, defaultProps } from "./MarkdownNative";
@@ -15,6 +14,7 @@ import {
   observePlaygroundPattern,
   observeTreeDisplay,
 } from "./utils";
+import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "Markdown";
 

@@ -1,6 +1,6 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
+import { createMetadata, d } from "../metadata-helpers";
 import { Queue, defaultProps } from "./QueueNative";
 
 const COMP = "Queue";

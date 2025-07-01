@@ -1,6 +1,5 @@
 import styles from "./Button.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import {
   buttonThemeMd,
   alignmentOptionMd,
@@ -11,7 +10,7 @@ import {
 } from "../abstractions";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dClick, dGotFocus, dLostFocus, dOrientation } from "../../components/metadata-helpers";
+import { createMetadata, dClick, dGotFocus, dLostFocus, dOrientation } from "../../components/metadata-helpers";
 import { Icon } from "../Icon/IconNative";
 import { Button, defaultProps } from "./ButtonNative";
 

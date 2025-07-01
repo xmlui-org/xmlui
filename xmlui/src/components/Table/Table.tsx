@@ -4,11 +4,10 @@ import produce from "immer";
 import styles from "./Table.module.scss";
 
 import "./react-table-config.d.ts";
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
-import { dAutoFocus, dComponent, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dAutoFocus, dComponent, dInternal } from "../metadata-helpers";
 import type { OurColumnMetadata } from "../Column/TableContext";
 import { TableContext } from "../Column/TableContext";
 import {
