@@ -123,21 +123,9 @@ export function TableEditor({
           themeColor={themeColor}
           variant={variant}
           size={size}
+          orientation="horizontal"
+          icon={<Icon name="table-delete-row" aria-hidden />}
         >
-<svg
-  viewBox="0 0 24 16"
-  stroke="currentColor"
-  fill="none"
-  strokeWidth="1.5"
-  strokeLinecap="round"
-  strokeLinejoin="round"
->
-  <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
-  <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" />
-  <line x1="1.5" y1="9.5" x2="14.5" y2="9.5" />
-  {/* Minus sign for delete */}
-  <line x1="17" y1="8" x2="21" y2="8" />
-</svg>
           Delete Row
         </Button>
         <Button
@@ -146,21 +134,9 @@ export function TableEditor({
           themeColor={themeColor}
           variant={variant}
           size={size}
+          orientation="horizontal"
+          icon={<Icon name="table-insert-column" aria-hidden />}
         >
-<svg
-  viewBox="0 0 24 16"
-  stroke="currentColor"
-  fill="none"
-  strokeWidth="1.25"
-  strokeLinecap="round"
-  strokeLinejoin="round"
->
-  <rect x="2.5" y="3" width="11" height="9" rx="1" />
-  <line x1="5.5" y1="3.5" x2="5.5" y2="11.5" />
-  <line x1="9" y1="3.5" x2="9" y2="11.5" />
-  <line x1="19" y1="6.5" x2="19" y2="9.5" />
-  <line x1="17.5" y1="8" x2="20.5" y2="8" />
-</svg>
           Insert Column
         </Button>
         <Button
@@ -169,21 +145,9 @@ export function TableEditor({
           themeColor={themeColor}
           variant={variant}
           size={size}
+          orientation="horizontal"
+          icon={<Icon name="table-delete-column" aria-hidden />}
         >
-<svg
-  viewBox="0 0 24 16"
-  stroke="currentColor"
-  fill="none"
-  strokeWidth="1.25"
-  strokeLinecap="round"
-  strokeLinejoin="round"
->
-  <rect x="2.5" y="3" width="11" height="9" rx="1" />
-  <line x1="5.5" y1="3.5" x2="5.5" y2="11.5" />
-  <line x1="9" y1="3.5" x2="9" y2="11.5" />
-  {/* Minus sign for delete */}
-  <line x1="17" y1="8" x2="21" y2="8" />
-</svg>
           Delete Column
         </Button>
       </Stack>
