@@ -197,6 +197,14 @@ export type AppContextObject = {
    */
   isThisYear: (date: Date | number) => boolean;
 
+  /**
+   * Formats a date into a human-readable elapsed time string.
+   * @param date Date to format
+   * @returns Returns strings like "now", "12 seconds ago", "3 hours ago", 
+   * "today", "yesterday", "3 weeks ago", etc.
+   */
+  formatHumanElapsedTime: (date: string | Date) => string;
+
   // ==============================================================================================
   // Math Utilities
 
@@ -350,7 +358,7 @@ export type AppContextObject = {
   findByField: (arr: any[], field: string, value: any) => any;
   readonly embed: { isInIFrame: boolean };
   distinct: (arr: any[]) => any[];
-  forceRefreshAnchorScroll: ()=>void;
+  forceRefreshAnchorScroll: () => void;
 };
 
 export type MediaBreakpointType = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";

@@ -106,7 +106,6 @@ export function buildNavHierarchy(
         hierarchy.push(...buildNavHierarchy(child.children, extractValue, parent, pathSegments));
       }
     } else if (child.children && child.children.length > 0) {
-      console.log("CN", child.children);
       // Process any children that might contain NavGroup and NavLink components recursively
       const nestedNodes = buildNavHierarchy(child.children, extractValue, parent, pathSegments);
       if (nestedNodes.length > 0) {
@@ -276,10 +275,6 @@ export const NavPanel = forwardRef(function NavPanel(
       appLayoutContext.registerLinkMap(linkMap);
     }
   }, [navLinks, appLayoutContext?.registerLinkMap]);
-
-  if (appLayoutContext && !appLayoutContext?.isNested) {
-    console.log(navLinks);
-  }
 
   if (inDrawer) {
     return (
