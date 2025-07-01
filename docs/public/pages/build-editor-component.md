@@ -273,6 +273,40 @@ Rendered in XMLUI Markdown:
 
 <Image src="/resources/devdocs/table-editor-05.png" width="200px"/>
 
+## Interlude: Understanding the layers
+
+When working with TableEditor (and XMLUI components in general), it's important to understand the difference between referencing the component's API in XMLUI markup and in React/TSX code.
+
+| Context         | How to reference TableEditor API         | How to get Markdown?                |
+|-----------------|-----------------------------------------|-------------------------------------|
+| XMLUI Markup    | Use `id` and `{ tableEditor.method() }`  | `{ tableEditor.getMarkdownSource() }` |
+| React/TSX       | Use `ref` and `ref.current.method()`     | `tableEditorRef.current?.getMarkdownSource()` |
+
+In XMLUI markup, assign an `id` to your TableEditor. The XMLUI runtime creates a variable with that name, allowing you to call registered API methods in markup expressions.
+
+  ```xmlui
+  <TableEditor id="tableEditor" />
+  <Text>
+    { tableEditor.getMarkdownSource() }
+  </Text>
+  ```
+
+In React/TSX the `id` prop does **not** create a variable in your scope. To access the API, use a React `ref`:
+
+  ```tsx
+  const tableEditorRef = useRef();
+  <TableEditor ref={tableEditorRef} />
+  <Text>
+    {tableEditorRef.current?.getMarkdownSource()}
+  </Text>
+  ```
+
+> [!INFO]
+> If you need to support both XMLUI and React/TSX usage, ensure your component exposes its API via both `registerComponentApi` (for XMLUI) and `useImperativeHandle` (for React refs).
+
+> [!INFO]
+> The `{ tableEditor.getMarkdownSource() }` syntax works in XMLUI markup because the `id` attribute creates a reference variable. In React/TSX, use a ref to access the API.
+
 ## Step 7: Add controls
 
 We can improve the TableEditor by adding more table editing controls like Insert Column, Delete Row, and Delete Column. But where should these controls live?
