@@ -499,10 +499,10 @@ Now TableEditor supports full theme customization.
 <Image src="/resources/devdocs/table-editor-08.png" />
 
 
-The component now behaves like a native XMLUI component with automatic responsive design. Note that buttons collapse to icon-only mode on narrow screens.
+Note that buttons collapse to label-only mode on narrow screens.
 
 <Image src="/resources/devdocs/table-editor-09.png" width="400px" />
 
-
+That is a limitation of our use of inline SVGs. The proper behavior would be to collapse to the icon, not the label. To achieve that we'll need to register the icon.
 
 
