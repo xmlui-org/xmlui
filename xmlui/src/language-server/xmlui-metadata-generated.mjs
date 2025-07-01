@@ -10645,7 +10645,7 @@ export default {
       "gap-RadioGroupOption": "$space-1_5",
       "borderWidth-RadioGroupOption": "1px",
       "backgroundColor-checked-RadioGroupOption-indicator": "$backgroundColor-primary",
-      "backgroundColor-checked-RadioGroupOption--disabled]": "$borderColor-RadioGroupOption--disabled",
+      "backgroundColor-checked-RadioGroupOption--disabled": "$borderColor-RadioGroupOption--disabled",
       "backgroundColor-checked-RadioGroupOption-error": "$borderColor-RadioGroupOption-error",
       "backgroundColor-checked-RadioGroupOption-warning": "$borderColor-RadioGroupOption-warning",
       "backgroundColor-checked-RadioGroupOption-success": "$borderColor-RadioGroupOption-success",

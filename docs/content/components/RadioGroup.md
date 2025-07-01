@@ -167,15 +167,20 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled] | $borderColor-RadioGroupOption--disabled | $borderColor-RadioGroupOption--disabled |
-| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-default | $color-primary-500 | $color-primary-500 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-error | $borderColor-RadioGroupOption-error | $borderColor-RadioGroupOption-error |
-| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-indicator | $backgroundColor-primary | $backgroundColor-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-indicator | $backgroundColor-primary | $backgroundColor-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-success | $borderColor-RadioGroupOption-success | $borderColor-RadioGroupOption-success |
-| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-indicator-RadioGroupOption | transparent | transparent |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-indicator-RadioGroupOption | transparent | transparent |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-error | $borderColor-error | $borderColor-error |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-success | $borderColor-success | $borderColor-success |
+| [backgroundColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-warning | $borderColor-warning | $borderColor-warning |
+| [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $backgroundColor--disabled | $backgroundColor--disabled |
+| [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption-checked--disabled | $textColor--disabled | $textColor--disabled |
+| [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption-checked-indicator--disabled | transparent | transparent |
 | [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | *none* | *none* |
+| [backgroundColor](../styles-and-themes/common-units/#color)-RadioGroupOption-indicator--disabled | *none* | *none* |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
+| [borderColor](../styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | $color-surface-500 | $color-surface-500 |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | $color-surface-500 | $color-surface-500 |
@@ -187,11 +192,8 @@ This component does not expose any methods.
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-success | *none* | *none* |
 | [borderColor](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | *none* | *none* |
 | [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption | 1px | 1px |
+| [borderWidth](../styles-and-themes/common-units/#size)-RadioGroupOption-validation | 2px | 2px |
 | [color](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-default | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-error | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-success | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | *none* | *none* |
 | [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-small | $fontSize-small |
 | [fontSize](../styles-and-themes/common-units/#size)-RadioGroupOption | $fontSize-small | $fontSize-small |
 | [fontWeight](../styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
@@ -201,6 +203,10 @@ This component does not expose any methods.
 | [outlineOffset](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | *none* | *none* |
 | [outlineStyle](../styles-and-themes/common-units/#border)-RadioGroupOption--focus | *none* | *none* |
 | [outlineWidth](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-default | *none* | *none* |
+| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-error | $borderColor-RadioGroupOption-error | $borderColor-RadioGroupOption-error |
 | [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-error | $borderColor-RadioGroupOption-error | $borderColor-RadioGroupOption-error |
 | [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-success | $borderColor-RadioGroupOption-success | $borderColor-RadioGroupOption-success |
+| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-success | $borderColor-RadioGroupOption-success | $borderColor-RadioGroupOption-success |
+| [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning |
 | [textColor](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning | $borderColor-RadioGroupOption-warning |
