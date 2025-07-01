@@ -24,7 +24,7 @@ export function TableEditor({
   variant?: "solid" | "outlined" | "ghost";
   size?: "xs" | "sm" | "md" | "lg";
 }) {
-  
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -105,7 +105,7 @@ export function TableEditor({
   return (
     <>
       <Stack orientation="horizontal">
-        <Button
+      <Button
           onClick={() => editor && editor.commands.addRowAfter()}
           disabled={!editor}
           themeColor={themeColor}

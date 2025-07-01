@@ -15,30 +15,21 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 
   <TableEditor
     id="tableEditor"
+  />
+
+  <TableEditor
+    id="tableEditor2"
+    themeColor="secondary"
     size="xs"
+    variant="outlined"
   />
 
     <TableEditor
-    id="tableEditor2"
-    size="sm"
-  />
-
-      <TableEditor
     id="tableEditor3"
+    themeColor="attention"
+    variant="ghost"
     size="md"
   />
-
-        <TableEditor
-    id="tableEditor4"
-    size="lg"
-  />
-
-
-
-
-  <Text variant="codefence" preserveLinebreaks="true">
-    { tableEditor.getMarkdownSource() }
-  </Text>
 
 </App>
 ```
@@ -341,63 +332,38 @@ return (
 
 ## Step 8: Add custom icons
 
-The table editor buttons currently use only text labels. Let's add custom SVG icons to make them more visually intuitive and professional.
+The table editor buttons currently use only text labels. Let's add custom SVG icons.
 
-XMLUI components often use inline SVG icons rather than icon fonts or external libraries. This approach ensures:
-- **No external dependencies**: Icons are self-contained within the component
-- **Theme integration**: SVG `stroke="currentColor"` inherits the button's text color automatically
-- **Scalability**: Vector graphics scale perfectly at any size
-- **Customization**: Easy to modify or replace individual icons
-
-Let's add appropriate icons for each table operation:
-
-```tsx
-// Map button size to icon size for proper scaling
-const getIconSize = (size: string) => {
-  switch (size) {
-    case 'xs': return '14px';
-    case 'sm': return '18px';
-    case 'md': return '22px';
-    case 'lg': return '26px';
-    default: return '18px';
-  }
-};
-
-const iconSize = getIconSize(size);
-```
-
-Then update each button to include an SVG icon:
-
-```tsx
-<Button onClick={() => editor && editor.commands.addRowAfter()} disabled={!editor}>
+```xmlui
+<Button
+  onClick={() => editor && editor.commands.addRowAfter()}
+  disabled={!editor}
+  themeColor={themeColor}
+  variant={variant}
+  size={size}
+  orientation="horizontal"
+>
   <svg
-    xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 16"
-    width={iconSize}
-    height={iconSize}
     stroke="currentColor"
     fill="none"
     strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
   >
-    <rect x="2" y="2" width="12" height="10" rx="1" />
-    <line x1="2" y1="6" x2="14" y2="6" />
-    <line x1="2" y1="9" x2="14" y2="9" />
-    <line x1="19" y1="5" x2="19" y2="9" />
-    <line x1="17" y1="7" x2="21" y2="7" />
+    <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
+    <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" />
+    <line x1="1.5" y1="9.5" x2="14.5" y2="9.5" />
+    <line x1="19" y1="6" x2="19" y2="10" />
+    <line x1="17" y1="8" x2="21" y2="8" />
   </svg>
   Insert Row
 </Button>
 ```
 
-Repeat this pattern for the other buttons with appropriate icons:
-- **Insert Row**: Table with a plus sign
-- **Delete Row**: Table with a minus sign  
-- **Insert Column**: Table with vertical plus
-- **Delete Column**: Table with vertical minus
+We'll repeat this pattern for the other buttons.
 
-The icons automatically inherit the button's theme colors through `stroke="currentColor"` and scale appropriately with the `iconSize` calculation.
+<Image src="/resources/devdocs/table-editor-07.png" width="600px"/>
 
 ## Step 9: Theme the buttons
 
@@ -506,52 +472,6 @@ export const editorComponentRenderer = createComponentRenderer(
 );
 ```
 
-Button size affects padding but not icon size. To make icons scale with button size, add a size mapping function:
-
-```tsx
-// Map button size to icon size
-const getIconSize = (size: string) => {
-  switch (size) {
-    case 'xs': return '14px';
-    case 'sm': return '18px';
-    case 'md': return '22px';
-    case 'lg': return '26px';
-    default: return '18px';
-  }
-};
-
-const iconSize = getIconSize(size);
-```
-
-Then add SVG icons to buttons using the calculated size:
-
-```tsx
-<Button
-  onClick={() => editor && editor.commands.addRowAfter()}
-  disabled={!editor}
-  themeColor={themeColor}
-  variant={variant}
-  size={size}
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 16"
-    width={iconSize}
-    height={iconSize}
-    stroke="currentColor"
-    fill="none"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="2" y="2" width="12" height="10" rx="1" />
-    <line x1="2" y1="6" x2="14" y2="6" />
-    <line x1="2" y1="9" x2="14" y2="9" />
-    <line x1="19" y1="5" x2="19" y2="9" />
-    <line x1="17" y1="7" x2="21" y2="7" />
-  </svg>
-  Insert Row
-</Button>
 ```
 
 Now TableEditor supports full theme customization.
@@ -576,9 +496,13 @@ Now TableEditor supports full theme customization.
   />
 ```
 
-![](/resources/devdocs/table-editor-07.png)
+<Image src="/resources/devdocs/table-editor-08.png" />
+
 
 The component now behaves like a native XMLUI component with automatic responsive design. Note that buttons collapse to icon-only mode on narrow screens.
 
-<Image src="/resources/devdocs/table-editor-08.png" width="400px"/>
+<Image src="/resources/devdocs/table-editor-09.png" width="400px" />
+
+
+
 
