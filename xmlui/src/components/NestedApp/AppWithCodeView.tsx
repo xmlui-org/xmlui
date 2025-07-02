@@ -1,10 +1,10 @@
 import styles from "./AppWithCodeView.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { AppWithCodeViewNative } from "./AppWithCodeViewNative";
 import { defaultProps } from "./defaultProps";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "AppWithCodeView";
 

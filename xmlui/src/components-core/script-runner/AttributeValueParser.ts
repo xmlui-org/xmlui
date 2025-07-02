@@ -1,5 +1,5 @@
 import { ParsedPropertyValue } from "../../abstractions/scripting/Compilation";
-import { Expression } from "../../abstractions/scripting/ScriptingSourceTree";
+import { Expression } from "./ScriptingSourceTree";
 import { Parser } from "../../parsers/scripting/Parser";
 
 let lastParseId = 0;

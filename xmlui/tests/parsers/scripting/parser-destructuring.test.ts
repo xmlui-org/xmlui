@@ -3,7 +3,7 @@ import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   ConstStatement,
   LetStatement,
-} from "../../../src/abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Parser - destructuring", () => {
   it("let, object, empty", () => {

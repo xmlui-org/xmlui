@@ -3,7 +3,7 @@ import { isArray, isEmpty, isNumber } from "lodash-es";
 
 import { asyncThrottle } from "../../components-core/utils/misc";
 import { EMPTY_OBJECT } from "../../components-core/constants";
-import type { ContainerAction } from "../../components-core/abstractions/containers";
+import type { ContainerAction } from "../../components-core/rendering/containers";
 import {
   defaultValidationMode,
   useFormContextPart,

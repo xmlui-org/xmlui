@@ -1,6 +1,6 @@
-import { ComponentDef, CompoundComponentDef } from "../ComponentDefs";
-import { ThemeDefinition } from "../ThemingDefs";
-import { Expression, Statement } from "./ScriptingSourceTree";
+import type { ComponentDef, CompoundComponentDef } from "../ComponentDefs";
+import type { ThemeDefinition } from "../ThemingDefs";
+import type { Expression, Statement } from "../../components-core/script-runner/ScriptingSourceTree";
 
 /** Contains the compilation result of a project */
 export type ProjectCompilation = {

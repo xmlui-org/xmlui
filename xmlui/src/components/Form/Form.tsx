@@ -1,9 +1,8 @@
 import styles from "./Form.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dComponent, dEnabled, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dComponent, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd } from "../abstractions";
 import { FormWithContextVar, defaultProps } from "./FormNative";
 

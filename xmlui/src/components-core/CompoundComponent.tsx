@@ -3,7 +3,7 @@ import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { ComponentDef } from "../abstractions/ComponentDefs";
 import type { ContainerWrapperDef } from "./rendering/ContainerWrapper";
-import type { CollectedDeclarations } from "../abstractions/scripting/ScriptingSourceTree";
+import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import type { RendererContext } from "../abstractions/RendererDefs";
 
 import { useEvent } from "./utils/misc";

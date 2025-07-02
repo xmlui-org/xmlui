@@ -1,5 +1,5 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata, d } from "../metadata-helpers";
 import { RealTimeAdapter, defaultProps } from "./RealTimeAdapterNative";
 
 const COMP = "RealTimeAdapter";

@@ -2,12 +2,7 @@ import type React from "react";
 
 import styles from "./Stack.module.scss";
 
-import {
-  type ComponentDef,
-  ComponentPropertyMetadata,
-  createMetadata,
-  d,
-} from "../../abstractions/ComponentDefs";
+import { type ComponentDef, ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
@@ -15,7 +10,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dClick, dInternal } from "../metadata-helpers";
+import { createMetadata, dClick, dInternal } from "../metadata-helpers";
 import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
 

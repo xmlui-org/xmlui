@@ -1,11 +1,11 @@
 import styles from "./App.module.scss";
 import drawerStyles from "./Sheet.module.scss";
 
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 
-import { dComponent } from "../../components/metadata-helpers";
+import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { appLayoutMd } from "./AppLayoutContext";
 import { App, defaultProps } from "./AppNative";
 import type { CSSProperties } from "react";
@@ -93,7 +93,9 @@ export const AppMd = createMetadata({
     },
   },
   events: {
-    ready: d(`This event fires when the \`${COMP}\` component finishes rendering on the page.`),
+    ready: {
+      description: `This event fires when the \`${COMP}\` component finishes rendering on the page.`
+    },
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,

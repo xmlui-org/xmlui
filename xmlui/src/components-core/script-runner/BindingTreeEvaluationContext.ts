@@ -1,6 +1,6 @@
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
-import type { ArrowExpression, Statement } from "../../abstractions/scripting/ScriptingSourceTree";
+import type { ArrowExpression, Statement } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
 /**

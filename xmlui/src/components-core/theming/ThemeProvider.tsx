@@ -33,8 +33,8 @@ import {
   ThemeDefinition,
   ThemeScope,
   ThemeTone,
-  ThemeToneKeys,
 } from "../../abstractions/ThemingDefs";
+import { ThemeToneKeys } from "./utils";
 
 export function useCompiledTheme(
   activeTheme: ThemeDefinition | undefined,

@@ -33,9 +33,9 @@ import {
   Statement,
   T_ARROW_EXPRESSION_STATEMENT,
   T_ARROW_EXPRESSION,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "../script-runner/ScriptingSourceTree";
 import { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
-import { ContainerActionKind } from "../abstractions/containers";
+import { ContainerActionKind } from "./containers";
 import { useAppContext } from "../AppContext";
 import { buildProxy } from "../rendering/buildProxy";
 import { StatePartChangedFn } from "./ContainerWrapper";

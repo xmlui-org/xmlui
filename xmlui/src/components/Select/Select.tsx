@@ -1,6 +1,5 @@
 import styles from "../Select/Select.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
@@ -23,6 +22,8 @@ import {
   dLabelBreak,
   dValue,
   dComponent,
+  createMetadata,
+  d,
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
 import { Select, defaultProps } from "./SelectNative";

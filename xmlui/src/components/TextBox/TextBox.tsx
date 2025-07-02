@@ -3,10 +3,12 @@ import styles from "./TextBox.module.scss";
 import type { RegisterComponentApiFn, ValueExtractor } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { LookupActionOptions } from "../../abstractions/ActionDefs";
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
+  d,
   dAutoFocus,
   dDidChange,
   dEnabled,

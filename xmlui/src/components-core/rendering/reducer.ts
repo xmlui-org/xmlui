@@ -2,7 +2,7 @@ import produce from "immer";
 import { cloneDeep, isPlainObject, keyBy, setWith, unset } from "lodash-es";
 
 import { ContainerState } from "../../abstractions/ContainerDefs";
-import { ContainerAction, ContainerActionKind } from "../abstractions/containers";
+import { ContainerAction, ContainerActionKind } from "./containers";
 import { IDebugViewContext } from "../DebugViewProvider";
 
 const MAX_STATE_TRANSITION_LENGTH = 100;

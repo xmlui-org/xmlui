@@ -1,9 +1,11 @@
 import styles from "./TextArea.module.scss";
 
-import { createMetadata, d, type PropertyValueDescription } from "../../abstractions/ComponentDefs";
+import { type PropertyValueDescription } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
+  createMetadata,
+  d,
   dAutoFocus,
   dDidChange,
   dEnabled,

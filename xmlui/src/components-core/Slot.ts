@@ -1,4 +1,4 @@
-import { createMetadata, d } from "../abstractions/ComponentDefs";
+import { createMetadata, d } from "../components/metadata-helpers";
 import { createPropHolderComponent } from "./renderers";
 
 const COMP = "Slot";

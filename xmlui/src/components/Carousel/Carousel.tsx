@@ -1,9 +1,8 @@
 import styles from "./Carousel.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dDidChange } from "../metadata-helpers";
+import { createMetadata, d, dDidChange } from "../metadata-helpers";
 import { CarouselComponent, defaultProps } from "./CarouselNative";
 import { orientationOptionMd } from "../abstractions";
 

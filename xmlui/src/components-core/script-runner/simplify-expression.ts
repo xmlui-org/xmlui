@@ -48,7 +48,7 @@ import {
   T_SWITCH_STATEMENT,
   T_FUNCTION_DECLARATION,
   T_LITERAL,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "./ScriptingSourceTree";
 
 export function simplifyExpression(expr?: Expression): Expression | undefined {
   let orig = expr;

@@ -1,9 +1,8 @@
 import styles from "./NavLink.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dClick, dEnabled, dLabel } from "../metadata-helpers";
+import { createMetadata, d, dClick, dEnabled, dLabel } from "../metadata-helpers";
 import { Icon } from "../Icon/IconNative";
 import { NavLink, defaultProps } from "./NavLinkNative";
 import { LinkTargetMd } from "../abstractions";

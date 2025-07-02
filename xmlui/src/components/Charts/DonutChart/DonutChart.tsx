@@ -1,8 +1,8 @@
-import { createMetadata } from "../../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../../components-core/renderers";
 import styles from "../PieChart/PieChartNative.module.scss";
 import { defaultProps, PieChart } from "../PieChart/PieChartNative";
 import { parseScssVar } from "../../../components-core/theming/themeVars";
+import { createMetadata } from "../../metadata-helpers";
 
 const COMP = "DonutChart";
 

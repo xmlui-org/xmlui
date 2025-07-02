@@ -1,9 +1,9 @@
 import styles from "./TreeDisplay.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TreeDisplay, defaultProps } from "./TreeDisplayNative";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "TreeDisplay";
 

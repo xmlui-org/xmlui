@@ -1,7 +1,7 @@
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { ColorPicker, defaultProps } from "./ColorPickerNative";
 import {
+  createMetadata,
   dAutoFocus,
   dDidChange,
   dEnabled,

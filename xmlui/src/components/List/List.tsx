@@ -1,10 +1,9 @@
 import styles from "./List.module.scss";
 
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
-import { dComponent, dInternal } from "../metadata-helpers";
+import { createMetadata, d, dComponent, dInternal } from "../metadata-helpers";
 import { scrollAnchoringValues } from "../abstractions";
 import { ListNative, MemoizedSection, defaultProps } from "./ListNative";
 

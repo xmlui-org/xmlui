@@ -6,7 +6,7 @@ import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEv
 import {
   T_ARROW_EXPRESSION_STATEMENT,
   type ArrowExpressionStatement,
-} from "../abstractions/scripting/ScriptingSourceTree";
+} from "./script-runner/ScriptingSourceTree";
 
 import { extractParam } from "./utils/extractParam";
 import { randomUUID, readCookie } from "./utils/misc";

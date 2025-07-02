@@ -1,5 +1,33 @@
-import type { ComponentPropertyMetadata } from "../abstractions/ComponentDefs";
+import type {
+  ComponentMetadata,
+  ComponentPropertyMetadata,
+  IsValidFunction,
+  PropertyValueDescription,
+  PropertyValueType,
+} from "../abstractions/ComponentDefs";
 import { labelPositionMd, orientationOptionMd, validationStatusMd } from "./abstractions";
+
+export function createMetadata<
+  TProps extends Record<string, ComponentPropertyMetadata>,
+  TEvents extends Record<string, ComponentPropertyMetadata>,
+  TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+>(
+  metadata: ComponentMetadata<TProps, TEvents, TContextVars, TApis>,
+): ComponentMetadata<TProps, TEvents, TContextVars, TApis> {
+  return metadata;
+}
+
+export function d(
+  description: string,
+  availableValues?: readonly PropertyValueDescription[],
+  valueType?: PropertyValueType,
+  defaultValue?: any,
+  isValid?: IsValidFunction<any>,
+  isRequired?: boolean,
+): ComponentPropertyMetadata {
+  return { description, isRequired, availableValues, valueType, defaultValue, isValid };
+}
 
 export function dInternal(description?: string): ComponentPropertyMetadata {
   return {

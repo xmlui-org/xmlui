@@ -1,3 +1,8 @@
+/**
+ * Each theme can have a light or a dark tone.
+ */
+export const ThemeToneKeys = ["light", "dark"] as const;
+
 export const SizeScaleKeys = {
   // small scale
   none: "none",

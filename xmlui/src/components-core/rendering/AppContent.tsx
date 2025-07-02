@@ -41,8 +41,8 @@ import type { GlobalProps} from "./AppRoot";
 import { queryClient } from "./AppRoot";
 import type { ContainerWrapperDef } from "./ContainerWrapper";
 import { useLocation, useNavigate } from "@remix-run/react";
-import { ThemeToneKeys } from "../../abstractions/ThemingDefs";
 import type { TrackContainerHeight } from "./AppWrapper";
+import { ThemeToneKeys } from "../theming/utils";
 
 // --- The properties of the AppContent component
 type AppContentProps = {

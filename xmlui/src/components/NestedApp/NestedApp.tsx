@@ -1,10 +1,10 @@
 import styles from "./NestedApp.module.scss";
 
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { IndexAwareNestedApp } from "./NestedAppNative";
 import { defaultProps } from "./defaultProps";
+import { createMetadata } from "../metadata-helpers";
 
 const COMP = "NestedApp";
 

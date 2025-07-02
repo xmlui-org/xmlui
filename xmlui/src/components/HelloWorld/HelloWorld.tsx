@@ -1,8 +1,7 @@
 import styles from "./HelloWorld.module.scss";
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { dSetValueApi, dValue } from "../metadata-helpers";
+import { createMetadata, dSetValueApi, dValue } from "../metadata-helpers";
 import { HelloWorld, defaultProps } from "./HelloWorldNative";
 
 const COMP = "HelloWorld";

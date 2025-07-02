@@ -41,7 +41,7 @@ import {
   type Statement,
   type UnaryExpression,
   type VarDeclaration,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import { createXmlUiTreeNodeId, Parser } from "../../parsers/scripting/Parser";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";

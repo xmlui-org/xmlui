@@ -1,5 +1,5 @@
-import { createMetadata } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata } from "../metadata-helpers";
 import { Logo, defaultProps } from "./LogoNative";
 
 const COMP = "Logo";

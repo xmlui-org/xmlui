@@ -1,6 +1,6 @@
-import { createMetadata, d } from "../../../abstractions/ComponentDefs";
 import { defaultProps, LineChart } from "./LineChartNative";
 import { createComponentRenderer } from "../../../components-core/renderers";
+import { createMetadata, d } from "../../metadata-helpers";
 
 const COMP = "LineChart";
 

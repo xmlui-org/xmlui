@@ -9,7 +9,7 @@ import {
   type LoopStatement,
   type Statement,
   type TryStatement,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "./ScriptingSourceTree";
 import type { TryScope } from "../../abstractions/scripting/TryScopeExp";
 
 import { obtainClosures } from "./eval-tree-common";

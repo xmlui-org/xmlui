@@ -32,7 +32,7 @@ import {
   type ObjectDestructure,
   type Statement,
   type VarDeclaration,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "./ScriptingSourceTree";
 import { reportEngineError } from "../reportEngineError";
 import { StatementExecutionError, ThrowStatementError } from "../EngineError";
 import {
