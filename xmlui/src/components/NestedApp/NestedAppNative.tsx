@@ -40,6 +40,7 @@ type NestedAppProps = {
   title?: string;
   height?: string | number;
   allowPlaygroundPopup?: boolean;
+  popOutUrl?: string;
   withFrame?: boolean;
   style?: CSSProperties;
   splitView?: boolean;
@@ -77,6 +78,7 @@ export function NestedApp({
   title,
   height,
   allowPlaygroundPopup = defaultProps.allowPlaygroundPopup,
+  popOutUrl,
   withFrame = defaultProps.withFrame,
   style,
   refVersion = 0,
@@ -147,7 +149,9 @@ export function NestedApp({
     };
     const appQueryString = await createQueryString(JSON.stringify(data));
     window.open(
-      useHashBasedRouting ? `/#/playground#${appQueryString}` : `/playground#${appQueryString}`,
+      useHashBasedRouting
+        ? `${popOutUrl ?? ""}/#/playground#${appQueryString}`
+        : `${popOutUrl ?? ""}/playground#${appQueryString}`,
       "_blank",
     );
   }, [app, components, title, activeTheme, api, activeTone, useHashBasedRouting]);

@@ -118,7 +118,6 @@ export const Markdown = memo(function Markdown({
         rehypePlugins={[rehypeRaw]}
         components={{
           details({ children, node, ...props }) {
-            console.log("details", children);
             return (
               <details className={htmlTagStyles.htmlDetails} {...props}>
                 {children}
@@ -358,6 +357,7 @@ export const Markdown = memo(function Markdown({
                 withFrame={appProps.noFrame ? false : true}
                 splitView={appProps.splitView ?? false}
                 initiallyShowCode={appProps.initiallyShowCode ?? false}
+                popOutUrl={appProps.popOutUrl}
               />
             );
           },

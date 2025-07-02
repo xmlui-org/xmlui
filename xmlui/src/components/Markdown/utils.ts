@@ -9,6 +9,7 @@ export type SegmentProps = {
   filename?: string;
   name?: string;
   height?: string;
+  popOutUrl?: string;
   content?: string;
   order?: number;
   patterns?: string[];
@@ -121,6 +122,12 @@ export function parseSegmentProps(input: string): SegmentProps {
   const heightMatch = input.match(/\bheight="([^"]+)"/);
   if (heightMatch) {
     segment.height = heightMatch[1];
+  }
+
+  // Match the "popOutUrl" property
+  const popOutUrlMatch = input.match(/\bpopOutUrl="([^"]+)"/);
+  if (popOutUrlMatch) {
+    segment.popOutUrl = popOutUrlMatch[1];
   }
 
   // Match patterns enclosed in /pattern/ format
@@ -270,6 +277,7 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
     noFrame: pattern.default?.noFrame,
     splitView: pattern.default?.splitView,
     initiallyShowCode: pattern.default?.initiallyShowCode,
+    popOutUrl: pattern.default?.popOutUrl,
   };
 
   // --- Extract optional playground attributes
@@ -278,6 +286,9 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
   }
   if (pattern.default.name) {
     pgContent.name = pattern.default.name;
+  }
+  if (pattern.default.popOutUrl) {
+    pgContent.popOutUrl = pattern.default.popOutUrl;
   }
 
   // --- Iterate through segments
@@ -317,7 +328,8 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
     let segmentAttrs =
       `${segment.copy ? "copy" : ""} ` +
       `${segment.filename ? `filename="${segment.filename}"` : ""} ` +
-      `${segment.name ? `name="${segment.name}"` : ""}`;
+      `${segment.name ? `name="${segment.name}"` : ""} ` +
+      `${segment.popOutUrl ? `popOutUrl="${segment.popOutUrl}"` : ""}`;
     if (segment.highlights && segment.highlights.length > 0) {
       const highlights = segment.highlights
         .map((highlight) =>
