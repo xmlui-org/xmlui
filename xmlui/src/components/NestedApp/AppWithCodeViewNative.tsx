@@ -14,19 +14,15 @@ import classnames from "classnames";
 import Logo from "./logo.svg?react";
 
 type AppWithCodeViewNativeProps = {
-  /**
-   * Markdown content to display in the left column
-   */
+  // Markdown content to display in the left column
   markdown: string;
-  /**
-   * Display layout in side-by-side mode (horizontal) when true,
-   * or stacked (vertical) when false or undefined
-   */
+  // Display layout in side-by-side mode (horizontal) when true,
+  // or stacked (vertical) when false or undefined
   splitView?: boolean;
-  /**
-   * Indicates that the split view should initially show the code
-   */
+  // Indicates that the split view should initially show the code
   initiallyShowCode?: boolean;
+  // Optional URL for the playground pop-out
+  popOutUrl?: string; 
   api?: any;
   app: string;
   components?: any[];
@@ -46,6 +42,7 @@ export function AppWithCodeViewNative({
   markdown,
   splitView,
   initiallyShowCode = false,
+  popOutUrl,
   app,
   api,
   components = [],
@@ -57,7 +54,6 @@ export function AppWithCodeViewNative({
   allowPlaygroundPopup,
 }: AppWithCodeViewNativeProps): ReactNode {
   const [showCode, setShowCode] = useState(initiallyShowCode);
-  const logoUrl = useLogoUrl();
   const { appGlobals } = useAppContext();
   const [refreshVersion, setRefreshVersion] = useState(0);
 
@@ -166,6 +162,7 @@ export function AppWithCodeViewNative({
               title={title}
               allowPlaygroundPopup={allowPlaygroundPopup}
               withFrame={false}
+              popOutUrl={popOutUrl}
             />
           )}
         </div>
@@ -189,6 +186,7 @@ export function AppWithCodeViewNative({
           height={height}
           allowPlaygroundPopup={allowPlaygroundPopup}
           withFrame={true}
+          popOutUrl={popOutUrl}
         />
       </div>
     </>
