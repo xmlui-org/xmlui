@@ -19,6 +19,7 @@ type TableEditorProps = {
   themeColor?: "primary" | "secondary" | "attention";
   variant?: "solid" | "outlined" | "ghost";
   size?: "xs" | "sm" | "md" | "lg";
+  onDidChange?: (payload: { html: string; markdown: string }) => void;
 };
 
 const TableEditor = forwardRef<unknown, TableEditorProps>(function TableEditor({
@@ -26,6 +27,7 @@ const TableEditor = forwardRef<unknown, TableEditorProps>(function TableEditor({
   themeColor = "primary",
   variant = "solid",
   size = "sm",
+  onDidChange = () => {},
 }, ref) {
   const editor = useEditor({
     extensions: [
@@ -97,6 +99,23 @@ const TableEditor = forwardRef<unknown, TableEditorProps>(function TableEditor({
       });
     }
   }, [registerComponentApi, editor]);
+
+  // Emit onDidChange whenever the editor content changes
+  React.useEffect(() => {
+    if (!editor) return;
+    const handler = () => {
+      const html = editor.getHTML();
+      const markdown = turndownService.turndown(html);
+      //console.log("[TableEditor] onDidChange about to fire", { html, markdown, onDidChange });
+      onDidChange({ html, markdown });
+    };
+    editor.on("update", handler);
+    // Emit once on mount
+    handler();
+    return () => {
+      editor.off("update", handler);
+    };
+  }, [editor, onDidChange]);
 
   return (
     <>
@@ -181,19 +200,28 @@ export const TableEditorMd = createMetadata({
       defaultValue: "sm",
     },
   },
-  events: {},
+  events: {
+    didChange: {
+      description: "Fired whenever the table content changes. Payload: { html, markdown }.",
+      isRequired: false,
+      type: "function",
+    },
+  },
 });
 
 export const editorComponentRenderer = createComponentRenderer(
   "TableEditor",
   TableEditorMd,
-  ({ node, extractValue, registerComponentApi }) => {
+  ({ node, extractValue, registerComponentApi, lookupEventHandler }) => {
+    const handler = lookupEventHandler?.("didChange");
+    //console.log("[TableEditor renderer] didChange handler:", handler);
     return (
       <TableEditor
         themeColor={extractValue.asOptionalString(node.props.themeColor)}
         variant={extractValue.asOptionalString(node.props.variant)}
         size={extractValue.asOptionalString(node.props.size)}
         registerComponentApi={registerComponentApi}
+        onDidChange={handler}
       />
     );
   },

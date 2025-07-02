@@ -14,11 +14,14 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 
   <TableEditor
     id="tableEditor"
+    onDidChange="{(e) => { console.log('changed', e) }}"
   />
 
-  <Text variant="codefence" preserveLinebreaks="true">
-    { tableEditor.getMarkdownSource() }
-  </Text>
+  <Card>
+    <Text variant="codefence" preserveLinebreaks="true">
+      { tableEditor.getMarkdownSource() }
+    </Text>
+  </Card>
 </App>
 ```
 
@@ -1202,6 +1205,8 @@ For decorative icons, use `aria-hidden="true"` to hide the icon from assistive t
   ```xmlui
   <Icon name="table-insert-row" aria-hidden="true" />
   ```
+
+## Step 12: Make the Markdown reactive
 
 <!--
 
