@@ -31,6 +31,8 @@ $padding-button-splitView-NestedApp: createThemeVar("padding-button-splitView-#{
 $width-button-splitView-NestedApp: createThemeVar("width-button-splitView-#{$component}");
 $bordRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
 $borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component}");
+$height-logo-splitView-NestedApp: createThemeVar("height-logo-splitView-#{$component}");
+$width-logo-splitView-NestedApp: createThemeVar("width-logo-splitView-#{$component}");
 
 // --- End of theme variables collection
 
@@ -87,8 +89,8 @@ $borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component
 }
 
 .logo {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: $width-logo-splitView-NestedApp;
+  height: $height-logo-splitView-NestedApp;
 }
 
 .splitViewButton {

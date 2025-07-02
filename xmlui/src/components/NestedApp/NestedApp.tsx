@@ -70,9 +70,12 @@ export const NestedAppMd = createMetadata({
     [`backgroundColor-viewControls-${COMP}`]: "$color-primary-100",
     [`borderRadius-viewControls-${COMP}`]: "5px",
     [`padding-viewControls-${COMP}`]: "$space-0_5",
+    [`borderBottom-header-${COMP}`]: "0.5px solid $borderColor",
+    // --- Split view styles
     [`padding-button-splitView-${COMP}`]: "4px 6px",
     [`width-button-splitView-${COMP}`]: "60px",
-    [`borderBottom-header-${COMP}`]: "0.5px solid $borderColor",
+    [`width-logo-splitView-${COMP}`]: "2rem",
+    [`height-logo-splitView-${COMP}`]: "2rem",
   },
 });
 
