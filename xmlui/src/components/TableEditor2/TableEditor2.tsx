@@ -9,7 +9,7 @@ import { Button } from "../Button/ButtonNative";
 import { Stack } from "../Stack/StackNative";
 import TurndownService from "turndown";
 import { TableEditorNative2 } from "./TableEditorNative2";
-import { createMetadata } from "../../abstractions/ComponentDefs";
+import { createMetadata } from "../metadata-helpers";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
 import Icon from "../Icon/IconNative";
