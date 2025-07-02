@@ -10,12 +10,12 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 ## Latest official version
 
 ```xmlui-pg
-
 <App var.markdown="">
 
   <Card>
     <TableEditor
       id="tableEditor"
+      size="xs"
       onDidChange="{(e) => { markdown = e.markdown }}"
     />
   </Card>
@@ -1210,6 +1210,132 @@ For decorative icons, use `aria-hidden="true"` to hide the icon from assistive t
   ```
 
 ## Step 12: Make the Markdown reactive
+
+We want the Markdown display to update when changes happen in the editor. Make this change in `TableEditor.tsx`.
+
+```xmlui {6} {8-13}
+React.useEffect(() => {
+  if (!editor) return;
+  const handler = () => {
+    const html = editor.getHTML();
+    const markdown = turndownService.turndown(html);
+    onDidChange({ html, markdown });
+  };
+  editor.on("update", handler);
+  // Emit once on mount
+  handler();
+  return () => {
+    editor.off("update", handler);
+  };
+}, [editor, onDidChange]);
+```
+
+Replace `events: {}` with this snippet.
+
+```xmlui
+  events: {
+    didChange: {
+      description: "Fired whenever the table content changes. Payload: { html, markdown }.",
+      isRequired: false,
+      type: "function",
+    },
+  },
+```
+
+And do this.
+
+```xmlui {4-5} {12}
+ export const editorComponentRenderer = createComponentRenderer(
+   "TableEditor",
+   TableEditorMd,
+  ({ node, extractValue, registerComponentApi, lookupEventHandler }) => {
+    const handler = lookupEventHandler?.("didChange");
+     return (
+       <TableEditor
+         themeColor={extractValue.asOptionalString(node.props.themeColor)}
+         variant={extractValue.asOptionalString(node.props.variant)}
+         size={extractValue.asOptionalString(node.props.size)}
+         registerComponentApi={registerComponentApi}
+        onDidChange={handler}
+       />
+     );
+   },
+```
+
+Now the Markdown updates as you change the table.
+
+<Image src="/resources/devdocs/table_editor_09.png" />
+
+## Step 13: Style the editor
+
+We'll want to control the editor's style with XMLUI theme variables, but first let's add basic styling in `TableEditor.scss`.
+
+```xmlui
+.table-editor-root {
+  padding: 8px;
+  overflow-x: auto;
+}
+
+.ProseMirror {
+  outline: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 100px;
+}
+
+.ProseMirror table {
+  border-collapse: collapse;
+}
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid #ccc;
+  padding: 4px;
+}
+
+.button-stack {
+  margin-bottom: 16px;
+}
+```
+
+Use the styles in `TableEditor.tsx`.
+
+```xlmui
+return (
+  <div className="table-editor-root">
+    <div className="button-stack">
+      <Stack orientation="horizontal">
+      ...
+      </Stack>
+    </div>
+    <TableEditorNative editor={editor} />
+  </div>
+);
+```
+
+Use this XMLUI markup.
+
+```xmlui
+<App var.markdown="">
+
+  <Card>
+    <TableEditor
+      id="tableEditor"
+      size="xs"
+      onDidChange="{(e) => { markdown = e.markdown }}"
+    />
+  </Card>
+
+  <Card>
+    <Text variant="codefence" preserverLinebreaks="{true}">
+      { markdown }
+    </Text>
+  </Card>
+</App>
+```
+
+Here is the result.
+
+<Image src="/resources/devdocs/table_editor_10.png" />
 
 <!--
 

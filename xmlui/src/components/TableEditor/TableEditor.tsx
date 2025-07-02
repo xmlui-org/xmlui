@@ -13,6 +13,7 @@ import { createMetadata } from "../metadata-helpers";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
 import Icon from "../Icon/IconNative";
+import "./TableEditor.scss";
 
 type TableEditorProps = {
   registerComponentApi?: (api: any) => void;
@@ -118,55 +119,57 @@ const TableEditor = forwardRef<unknown, TableEditorProps>(function TableEditor({
   }, [editor, onDidChange]);
 
   return (
-    <>
-      <Stack orientation="horizontal">
-        <Button
-          onClick={() => editor && editor.commands.addRowAfter()}
-          disabled={!editor}
-          themeColor={themeColor}
-          variant={variant}
-          size={size}
-          orientation="horizontal"
-          icon={<Icon name="table-insert-row" aria-hidden />}
-        >
-          Insert Row
-        </Button>
-        <Button
-          onClick={() => editor && editor.commands.deleteRow()}
-          disabled={!editor}
-          themeColor={themeColor}
-          variant={variant}
-          size={size}
-          orientation="horizontal"
-          icon={<Icon name="table-delete-row" aria-hidden />}
-        >
-          Delete Row
-        </Button>
-        <Button
-          onClick={() => editor && editor.commands.addColumnAfter()}
-          disabled={!editor}
-          themeColor={themeColor}
-          variant={variant}
-          size={size}
-          orientation="horizontal"
-          icon={<Icon name="table-insert-column" aria-hidden />}
-        >
-          Insert Column
-        </Button>
-        <Button
-          onClick={() => editor && editor.commands.deleteColumn()}
-          disabled={!editor}
-          themeColor={themeColor}
-          variant={variant}
-          size={size}
-          orientation="horizontal"
-          icon={<Icon name="table-delete-column" aria-hidden />}
-        >
-          Delete Column
-        </Button>
-      </Stack>
+    <div className="table-editor-root">
+      <div className="button-stack">
+        <Stack orientation="horizontal">
+          <Button
+            onClick={() => editor && editor.commands.addRowAfter()}
+            disabled={!editor}
+            themeColor={themeColor}
+            variant={variant}
+            size={size}
+            orientation="horizontal"
+            icon={<Icon name="table-insert-row" aria-hidden />}
+          >
+            Insert Row
+          </Button>
+          <Button
+            onClick={() => editor && editor.commands.deleteRow()}
+            disabled={!editor}
+            themeColor={themeColor}
+            variant={variant}
+            size={size}
+            orientation="horizontal"
+            icon={<Icon name="table-delete-row" aria-hidden />}
+          >
+            Delete Row
+          </Button>
+          <Button
+            onClick={() => editor && editor.commands.addColumnAfter()}
+            disabled={!editor}
+            themeColor={themeColor}
+            variant={variant}
+            size={size}
+            orientation="horizontal"
+            icon={<Icon name="table-insert-column" aria-hidden />}
+          >
+            Insert Column
+          </Button>
+          <Button
+            onClick={() => editor && editor.commands.deleteColumn()}
+            disabled={!editor}
+            themeColor={themeColor}
+            variant={variant}
+            size={size}
+            orientation="horizontal"
+            icon={<Icon name="table-delete-column" aria-hidden />}
+          >
+            Delete Column
+          </Button>
+        </Stack>
+      </div>
       <TableEditorNative editor={editor} />
-    </>
+    </div>
   );
 });
 
