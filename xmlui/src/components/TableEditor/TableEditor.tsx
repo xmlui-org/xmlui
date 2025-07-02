@@ -13,7 +13,8 @@ import { createMetadata } from "../metadata-helpers";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
 import Icon from "../Icon/IconNative";
-import "./TableEditor.scss";
+import styles from "./TableEditor.module.scss";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 
 type TableEditorProps = {
   registerComponentApi?: (api: any) => void;
@@ -210,6 +211,7 @@ export const TableEditorMd = createMetadata({
       type: "function",
     },
   },
+  themeVars: parseScssVar(styles.themeVars),
 });
 
 export const editorComponentRenderer = createComponentRenderer(

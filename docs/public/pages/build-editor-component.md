@@ -1268,7 +1268,7 @@ Now the Markdown updates as you change the table.
 
 ## Step 13: Style the editor
 
-We'll want to control the editor's style with XMLUI theme variables, but first let's add basic styling in `TableEditor.scss`.
+We'll want to control the editor's style with XMLUI theme variables, but first let's add basic styling in `TableEditor.module.scss`.
 
 ```xmlui
 .table-editor-root {

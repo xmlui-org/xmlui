@@ -1,0 +1,65 @@
+@use "../../components-core/theming/themes" as t;
+$componentName: "TableEditor";
+
+$backgroundColorHeadingTable: createThemeVar("backgroundColor-heading-Table");
+$borderCellTable: createThemeVar("border-cell-Table");
+$fontSizeHeadingTable: createThemeVar("fontSize-heading-Table");
+$fontSizeRowTable: createThemeVar("fontSize-row-Table");
+$fontWeightHeadingTable: createThemeVar("fontWeight-heading-Table");
+$fontWeightRowTable: createThemeVar("fontWeight-row-Table");
+$paddingCellTable: createThemeVar("padding-cell-Table");
+$paddingHeadingTable: createThemeVar("padding-heading-Table");
+$textColorHeadingTable: createThemeVar("textColor-heading-Table");
+$textColorPaginationTable: createThemeVar("textColor-pagination-Table");
+
+.button-stack {
+  margin-bottom: 16px;
+}
+
+.table-editor-root {
+  padding: 8px;
+  overflow-x: auto;
+}
+
+.ProseMirror {
+  outline: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 100px;
+}
+
+.ProseMirror table {
+  border-collapse: collapse;
+}
+
+.ProseMirror th {
+  background-color: $backgroundColorHeadingTable;
+  font-size: $fontSizeHeadingTable;
+  font-weight: $fontWeightHeadingTable;
+  padding: $paddingHeadingTable;
+  color: $textColorHeadingTable;
+}
+
+.ProseMirror td {
+  font-size: $fontSizeRowTable;
+  font-weight: $fontWeightRowTable;
+  padding: $paddingCellTable;
+  border: $borderCellTable;
+}
+
+.pagination {
+  color: $textColorPaginationTable;
+}
+
+:export {
+  backgroundColorHeadingTable: $backgroundColorHeadingTable;
+  borderCellTable: $borderCellTable;
+  fontSizeHeadingTable: $fontSizeHeadingTable;
+  fontSizeRowTable: $fontSizeRowTable;
+  fontWeightHeadingTable: $fontWeightHeadingTable;
+  fontWeightRowTable: $fontWeightRowTable;
+  paddingCellTable: $paddingCellTable;
+  paddingHeadingTable: $paddingHeadingTable;
+  textColorHeadingTable: $textColorHeadingTable;
+  textColorPaginationTable: $textColorPaginationTable;
+}
