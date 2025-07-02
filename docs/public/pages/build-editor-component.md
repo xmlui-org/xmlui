@@ -8,12 +8,14 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 
 ## Latest test version
 
-````xmlui-pg
+```xmlui-pg
 <App>
 
   <TableEditor2 id="tableEditor" />
 
-  <Text> { tableEditor.getHtmlSource() } </Text>
+  <Text variant="codefence" preserveLinebreaks="true">
+    { tableEditor.getMarkdownSource() }
+  </Text>
 
 </App>
 ```
@@ -472,7 +474,7 @@ Now we can show the Markdown.
 
 Rendered in XMLUI Markdown:
 
-<Image src="/resources/devdocs/table-editor-05.png" width="200px"/>
+<Image src="/resources/devdocs/xmlui-rendering-of-tiptap-markdown.png" width="200px"/>
 
 
 ## Step 8: Add controls
@@ -492,37 +494,128 @@ We can improve the TableEditor by adding more table editing controls like Insert
 We chose to implement the controls in `TableEditor.tsx` because it provides the best balance of usability and flexibility. Users get a working table editor with sensible controls out of the box, while advanced users can still build custom UIs using the exposed API if needed.
 
 ```tsx
+import React from "react";
+import { useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import { Button } from "../Button/ButtonNative";
 import { Stack } from "../Stack/StackNative";
+import TurndownService from "turndown";
+import { TableEditorNative } from "./TableEditorNative";
+
+export function TableEditor({ registerComponentApi }: { registerComponentApi?: (api: any) => void }) {
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
+    ],
+    content: `
+      <table>
+        <thead>
+          <tr>
+            <th>Fruit</th>
+            <th>Color</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apple</td>
+            <td>Red</td>
+          </tr>
+          <tr>
+            <td>Banana</td>
+            <td>Yellow</td>
+          </tr>
+        </tbody>
+      </table>
+    `,
+  });
+
+  React.useEffect(() => {
+    if (registerComponentApi && editor) {
+      const turndownService = new TurndownService();
+      turndownService.addRule('table', {
+        filter: 'table',
+        replacement: function (content, node) {
+          let rows = [];
+          for (let row of node.querySelectorAll('tr')) {
+            let cells = Array.from(row.children).map(cell => (cell as HTMLElement).textContent?.trim() ?? "");
+            rows.push('| ' + cells.join(' | ') + ' |');
+          }
+          if (rows.length > 1) {
+            // Add a separator after the header row
+            const headerSep = '| ' + rows[0].split('|').slice(1, -1).map(() => '---').join(' | ') + ' |';
+            rows.splice(1, 0, headerSep);
+          }
+          return rows.join('\n') + '\n';
+        }
+      });
+      registerComponentApi({
+        getHtmlSource: () => editor.getHTML(),
+        getMarkdownSource: () => turndownService.turndown(editor.getHTML()),
+      });
+    }
+  }, [registerComponentApi, editor]);
+
+  return (
+    <>
+      <Stack orientation="horizontal">
+        <Button onClick={() => editor && editor.commands.addRowAfter()} disabled={!editor}>
+          Insert Row
+        </Button>
+        <Button onClick={() => editor && editor.commands.deleteRow()} disabled={!editor}>
+          Delete Row
+        </Button>
+        <Button onClick={() => editor && editor.commands.addColumnAfter()} disabled={!editor}>
+          Insert Column
+        </Button>
+        <Button onClick={() => editor && editor.commands.deleteColumn()} disabled={!editor}>
+          Delete Column
+        </Button>
+      </Stack>
+      <TableEditorNative editor={editor} />
+    </>
+  );
+}
+
+export const editorComponentRenderer = {
+  type: "TableEditor",
+  renderer: ({ registerComponentApi, ...props }: any) => (
+    <TableEditor {...props} registerComponentApi={registerComponentApi} />
+  ),
+};
 ```
 
-```tsx
-return (
-  <>
-    <Stack orientation="horizontal">
-      <Button onClick={() => editor && editor.commands.addRowAfter()} disabled={!editor}>
-        Insert Row
-      </Button>
-      <Button onClick={() => editor && editor.commands.deleteRow()} disabled={!editor}>
-        Delete Row
-      </Button>
-      <Button onClick={() => editor && editor.commands.addColumnAfter()} disabled={!editor}>
-        Insert Column
-      </Button>
-      <Button onClick={() => editor && editor.commands.deleteColumn()} disabled={!editor}>
-        Delete Column
-      </Button>
-    </Stack>
-    <TableEditorNative editor={editor} />
-  </>
-);
+We import and use `Stack` from `../Stack/StackNative`. Note that `HStack` is not available as a native component, so we can't use that shortcut.
+
+A component must return a single element. We use a React Fragment (`<>...</>`) to group the buttons into an anonymous container.
+
+Now we have this result.
+
+```xmlui
+<App>
+
+  <TableEditor id="tableEditor" />
+
+  <Text variant="codefence" preserveLinebreaks="{true}">
+    { tableEditor.getMarkdownSource() }
+  </Text>
+
+</App>
 ```
 
-![](/resources/devdocs/table-editor-06.png)
+![](/resources/devdocs/table_editor_07.png)
 
-- **XMLUI Stack Component**: We import and use `Stack` from `../Stack/StackNative`. Note that `HStack` is not available as a native component, so we can't use that shortcut.
-- **React Fragment (`<>...</>`)**: A component must return a single element. This groups the buttons into an anonymous container.
 
-## Step 8: Add custom icons
+
+
+## Step 9: Add custom icons
 
 The table editor buttons currently use only text labels. Let's add custom SVG icons.
 
@@ -557,7 +650,7 @@ We'll repeat this pattern for the other buttons.
 
 <Image src="/resources/devdocs/table-editor-07.png" width="600px"/>
 
-## Step 9: Theme the buttons
+## Step 10: Theme the buttons
 
 Our TableEditor component currently uses hardcoded button styling. To make TableEditor behave like a proper XMLUI component, we need to add theme support.
 
