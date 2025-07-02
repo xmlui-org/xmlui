@@ -10,16 +10,19 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 ## Latest official version
 
 ```xmlui-pg
-<App>
 
-  <TableEditor
-    id="tableEditor"
-    onDidChange="{(e) => { console.log('changed', e) }}"
-  />
+<App var.markdown="">
 
   <Card>
-    <Text variant="codefence" preserveLinebreaks="true">
-      { tableEditor.getMarkdownSource() }
+    <TableEditor
+      id="tableEditor"
+      onDidChange="{(e) => { markdown = e.markdown }}"
+    />
+  </Card>
+
+  <Card>
+    <Text variant="codefence" preserverLinebreaks="{true}">
+      { markdown }
     </Text>
   </Card>
 </App>
