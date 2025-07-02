@@ -153,6 +153,7 @@ export function AppWithCodeViewNative({
           {showCode && <Markdown style={{height: "100%"}}>{markdown}</Markdown>}
           {!showCode && (
             <IndexAwareNestedApp
+              height={"100%"}
               refVersion={refreshVersion}
               app={app}
               api={api}
