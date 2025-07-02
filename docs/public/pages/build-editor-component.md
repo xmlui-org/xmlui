@@ -7,32 +7,6 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 > If you operate in the [XMLUI](https://github.com/xmlui-org/xmlui) repo you can test your work live. Follow the instructions in `dev-docs/next/generating-component-reference.md` to build the XMLUI docs site, then load localhost:5173. When you edit `.tsx` files they will automatically recompile, so you can iterate rapidly as you develop your component. And you can add a test page to the site in order to use your evolving component
 
 
-## Latest official version
-
-```xmlui-pg
-<App var.markdown="">
-
-  <Card>
-    <TableEditor
-      id="tableEditor"
-      size="xs"
-      onDidChange="{(e) => { markdown = e.markdown }}"
-    />
-  </Card>
-
-  <Card>
-    <Text variant="codefence" preserverLinebreaks="{true}">
-      { markdown }
-    </Text>
-  </Card>
-</App>
-```
-
-| Fruit | Color |
-| --- | --- |
-| Apple | Red |
-| Banana | Yellow |
-
 ## Step 1: Create the folder.
 
 ```bash
@@ -313,7 +287,7 @@ You now have a proper themed XMLUI button.
 
 Tiptap works natively with HTML, not Markdown. We'll eventually show Markdown but first let's add a method to show the HTML.
 
-To keep our code modular, we’ll separate the editor’s rendering logic into a minimal presentational component. This makes it easy to reuse the editor UI in different contexts.
+To keep our code modular, we'll separate the editor's rendering logic into a minimal presentational component. This makes it easy to reuse the editor UI in different contexts.
 
 Create `TableEditorNative.tsx` alongside `TableEditor.tsx`.
 
@@ -327,7 +301,7 @@ export function TableEditorNative({ editor }: { editor: any }) {
 
 This component simply renders the Tiptap editor UI for a given editor instance.
 
-Now, let’s expose a method to get the current HTML from the editor. Add this to `TableEditor.tsx`.
+Now, let's expose a method to get the current HTML from the editor. Add this to `TableEditor.tsx`.
 
 ```xmlui
 React.useEffect(() => {
@@ -1342,40 +1316,106 @@ Here is the result.
 
 <Image src="/resources/devdocs/table_editor_10.png" />
 
+## Step 14: Theme the editor
+
+Now let's make `TableEditor` visually consistent with [Table](/components/Table) by reusing XMLUI theme variables for header, cell, and spacing styles. Here is the new `TableEditor.module.css`.
+
+```xmlui
+@use "../../components-core/theming/themes" as t;
+$componentName: "TableEditor";
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// Reuse Table theme variables
+$backgroundColorHeadingTable: createThemeVar("backgroundColor-heading-Table");
+$borderCellTable: createThemeVar("border-cell-Table");
+$fontSizeHeadingTable: createThemeVar("fontSize-heading-Table");
+$fontWeightHeadingTable: createThemeVar("fontWeight-heading-Table");
+$fontSizeRowTable: createThemeVar("fontSize-row-Table");
+$fontWeightRowTable: createThemeVar("fontWeight-row-Table");
+$paddingCellTable: createThemeVar("padding-cell-Table");
+$paddingHeadingTable: createThemeVar("padding-heading-Table");
+$textColorHeadingTable: createThemeVar("textColor-heading-Table");
+$textColorPaginationTable: createThemeVar("textColor-pagination-Table");
+$buttonStackSpacing: createThemeVar("spacing-buttonStack-Table");
+$textTransformHeadingTable: createThemeVar("textTransform-heading-Table");
+$tableMarginTop: t.$space-4;
+$paddingHtmlTd: createThemeVar("padding-HtmlTd");
+$paddingHtmlTh: createThemeVar("padding-HtmlTh");
+
+.editor {
+  :global(.ProseMirror) {
+    outline: none;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 100px;
+    table {
+      border-collapse: collapse;
+      margin-top: $tableMarginTop;
+    }
+    th {
+      background-color: $backgroundColorHeadingTable;
+      font-size: $fontSizeHeadingTable;
+      font-weight: $fontWeightHeadingTable;
+      padding: $paddingHtmlTh;
+      color: $textColorHeadingTable;
+      text-transform: $textTransformHeadingTable;
+    }
+    td {
+      font-size: $fontSizeRowTable;
+      font-weight: $fontWeightRowTable;
+      padding: $paddingHtmlTd;
+      border: $borderCellTable;
+    }
+  }
+}
+
+.button-stack {
+  margin-bottom: $buttonStackSpacing;
+}
+
+.table-editor-root {
+  padding: 8px;
+  overflow-x: auto;
+}
+
+.pagination {
+  color: $textColorPaginationTable;
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
+```
+
+Now the editor matches the look of XMLUI tables rendered directly using `Table` or indirectly when tables appear in a XMLUI `Markdown` context. Try it!
+
+```xmlui-pg display
+<App var.markdown="">
+
+  <Card>
+    <TableEditor
+      id="tableEditor"
+      size="xs"
+      onDidChange="{(e) => { markdown = e.markdown }}"
+    />
+  </Card>
+
+  <Card>
+    <Text variant="codefence" preserverLinebreaks="{true}">
+      { markdown }
+    </Text>
+  </Card>
+
+</App>
+```
+
 <!--
-
-
-## Interlude: Understanding the layers
-
-When working with TableEditor (and XMLUI components in general), it's important to understand the difference between referencing the component's API in XMLUI markup and in React/TSX code.
-
-| Context         | How to reference TableEditor API         | How to get Markdown?                |
-|-----------------|-----------------------------------------|-------------------------------------|
-| XMLUI Markup    | Use `id` and `{ tableEditor.method() }`  | `{ tableEditor.getMarkdownSource() }` |
-| React/TSX       | Use `ref` and `ref.current.method()`     | `tableEditorRef.current?.getMarkdownSource()` |
-
-In XMLUI markup, assign an `id` to your TableEditor. The XMLUI runtime creates a variable with that name, allowing you to call registered API methods in markup expressions.
-
-  ```xmlui
-  <TableEditor id="tableEditor" />
-  <Text>
-    { tableEditor.getMarkdownSource() }
-  </Text>
-  ```
-
-In React/TSX the `id` prop does **not** create a variable in your scope. To access the API, use a React `ref`:
-
-  ```tsx
-  const tableEditorRef = useRef();
-  <TableEditor ref={tableEditorRef} />
-  <Text>
-    {tableEditorRef.current?.getMarkdownSource()}
-  </Text>
-  ```
-
-> [!INFO]
-> If you need to support both XMLUI and React/TSX usage, ensure your component exposes its API via both `registerComponentApi` (for XMLUI) and `useImperativeHandle` (for React refs).
-
-> [!INFO]
-> The `{ tableEditor.getMarkdownSource() }` syntax works in XMLUI markup because the `id` attribute creates a reference variable. In React/TSX, use a ref to access the API.
+<Image src="/resources/devdocs/table_editor_11.png" />
 -->
+
+
