@@ -22,8 +22,11 @@
                             </HStack>
                             <Items items="{$item.changes}">
                                 <HStack verticalAlignment="start">
-                                    <Link to="https://github.com/xmlui-org/xmlui/commit/{$item.commit_sha}">
-                                        <Icon name="new-window" />
+                                    <Link 
+                                        to="https://github.com/xmlui-org/xmlui/commit/{$item.commit_sha}"
+                                        paddingTop="$space-1_5"
+                                        target="_blank">
+                                        <Icon name="new-window" size="1rem" />
                                     </Link>
                                     {$item.description}
                                 </HStack>
