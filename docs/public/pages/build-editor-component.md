@@ -6,31 +6,6 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 > [!INFO]
 > If you operate in the [XMLUI](https://github.com/xmlui-org/xmlui) repo you can test your work live. Follow the instructions in `dev-docs/next/generating-component-reference.md` to build the XMLUI docs site, then load localhost:5173. When you edit `.tsx` files they will automatically recompile, so you can iterate rapidly as you develop your component. And you can add a test page to the site in order to use your evolving component
 
-## Latest test version
-
-```xmlui-pg
-<App>
-
-  <TableEditor2
-    id="tableEditor"
-  />
-
-  <TableEditor2
-    id="tableEditor2"
-    themeColor="primary"
-    size="lg"
-    variant="outlined"
-  />
-
-    <TableEditor2
-    id="tableEditor3"
-    themeColor="attention"
-    variant="ghost"
-    size="sm"
-  />
-
-</App>
-```
 
 ## Latest official version
 
@@ -41,24 +16,9 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
     id="tableEditor"
   />
 
-  <TableEditor
-    id="tableEditor2"
-    themeColor="primary"
-    size="lg"
-    variant="outlined"
-  />
-
-    <TableEditor
-    id="tableEditor3"
-    themeColor="attention"
-    variant="ghost"
-    size="sm"
-  />
-
   <Text variant="codefence" preserveLinebreaks="true">
     { tableEditor.getMarkdownSource() }
   </Text>
-
 </App>
 ```
 
@@ -72,7 +32,7 @@ mkdir -p xmlui/src/components/TableEditor
 
 Add `TableEditor.tsx` in that folder.
 
-```
+```xmlui
 export function TableEditor() {
   return (
     <table>
@@ -104,7 +64,7 @@ export const editorComponentRenderer = {
 
 Register it in `ComponentProvider.tsx`.
 
-```tsx
+```xmlui
 import { editorComponentRenderer as TableEditorRenderer } from "./components/TableEditor/TableEditor";
 
 if (process.env.VITE_USED_COMPONENTS_TableEditor !== "false") {
@@ -200,7 +160,7 @@ You can now edit the cells in the table.
 
 ## Step 4: Add an Insert Row button
 
-```tsx
+```xmlui {41-46}
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Table from "@tiptap/extension-table";
@@ -275,7 +235,7 @@ You can now insert rows.
 Import and use `Button`.
 
 
-```tsx
+```xmlui /Button/
    import { useEditor, EditorContent } from "@tiptap/react";
    import StarterKit from "@tiptap/starter-kit";
    import Table from "@tiptap/extension-table";
@@ -346,7 +306,7 @@ To keep our code modular, we’ll separate the editor’s rendering logic into a
 
 Create `TableEditorNative.tsx` alongside `TableEditor.tsx`.
 
-```tsx
+```xmlui
 import { EditorContent } from "@tiptap/react";
 
 export function TableEditorNative({ editor }: { editor: any }) {
@@ -358,7 +318,7 @@ This component simply renders the Tiptap editor UI for a given editor instance.
 
 Now, let’s expose a method to get the current HTML from the editor. Add this to `TableEditor.tsx`.
 
-```tsx
+```xmlui
 React.useEffect(() => {
   if (registerComponentApi && editor) {
     registerComponentApi({
@@ -373,7 +333,7 @@ Now we can show the HTML using this markup.
 ```xmlui
 <App>
 
-  <TableEditor2 id="tableEditor" />
+  <TableEditor id="tableEditor" />
 
   <Text> { tableEditor.getHtmlSource() } </Text>
 
@@ -393,7 +353,7 @@ npm install turndown
 
 Then update `TableEditor.tsx` to use it.
 
-```tsx
+```xmlui /turndown/ {42-60}
 import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -487,7 +447,7 @@ Now we can show the Markdown.
 ```xmlui
 <App>
 
-  <TableEditor2 id="tableEditor" />
+  <TableEditor id="tableEditor" />
 
   <Text variant="codefence" preserveLinebreaks="{true}">
     { tableEditor.getMarkdownSource() }
@@ -519,7 +479,7 @@ We can improve the TableEditor by adding more table editing controls like Insert
 
 We chose to implement the controls in `TableEditor.tsx` because it provides the best balance of usability and flexibility. Users get a working table editor with sensible controls out of the box, while advanced users can still build custom UIs using the exposed API if needed.
 
-```tsx
+```xmlui {71-87}
 import React from "react";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -690,7 +650,7 @@ The buttons remain blue and solid. This happens because XMLUI doesn't know which
 
 XMLUI components need metadata to define their allowed props.
 
-```tsx
+```xmlui {12-15} /TableEditorMd/
 import React from "react";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -856,7 +816,7 @@ export function TableEditor({
           Delete Column
         </Button>
       </Stack>
-      <TableEditorNative2 editor={editor} />
+      <TableEditorNative editor={editor} />
     </>
   );
 }
@@ -891,9 +851,9 @@ export const TableEditorMd = createMetadata({
   events: {},
 });
 
-export const editorComponentRenderer2 = createComponentRenderer(
+export const editorComponentRenderer = createComponentRenderer(
   "TableEditor",
-  TableEditor2Md,
+  TableEditorMd,
   ({ node, extractValue, registerComponentApi }) => (
     <TableEditor
       themeColor={extractValue.asOptionalString(node.props.themeColor)}
@@ -1027,8 +987,9 @@ Now TableEditor supports full theme customization.
 > [!INFO]
 > Registering icons is optional if you only use them inline within your component, but it is strongly recommended for reusability, maintainability, and accessibility.
 
-- **Global usage:** Registered icons can be referenced anywhere in your app or docs by name (e.g., `<Icon name="table-insert-row" />` or as a Button's `icon` prop).
-- **Accessibility:** Using the `<Icon />` component or Button's `icon` prop helps ensure ARIA attributes and accessible labeling are handled consistently.
+**Global usage.** Registered icons can be referenced anywhere in your app or docs by name (e.g., `<Icon name="table-insert-row" />` or as a Button's `icon` prop).
+
+**Accessibility.** Using the `<Icon />` component or Button's `icon` prop helps ensure ARIA attributes and accessible labeling are handled consistently.
 
 To make your custom icon usable in XMLUI, wrap your SVG markup in a React component. This allows the icon to inherit color, size, and accessibility props from its parent.
 
@@ -1087,7 +1048,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
 import Icon from "../Icon/IconNative";
 
-export function TableEditor2({
+export function TableEditor({
   registerComponentApi,
   themeColor = "primary",
   variant = "solid",
@@ -1175,9 +1136,9 @@ export function TableEditor2({
   );
 }
 
-export const TableEditor2Md = createMetadata({
+export const TableEditorMd = createMetadata({
   description:
-    "`TableEditor2` provides an interactive table editing interface with controls for adding and deleting rows and columns. It supports theme customization and exports table data in HTML and Markdown formats.",
+    "`TableEditor` provides an interactive table editing interface with controls for adding and deleting rows and columns. It supports theme customization and exports table data in HTML and Markdown formats.",
   status: "experimental",
   props: {
     themeColor: {
@@ -1205,9 +1166,9 @@ export const TableEditor2Md = createMetadata({
   events: {},
 });
 
-export const editorComponentRenderer2 = createComponentRenderer(
-  "TableEditor2",
-  TableEditor2Md,
+export const editorComponentRenderer = createComponentRenderer(
+  "TableEditor",
+  TableEditorMd,
   ({ node, extractValue, registerComponentApi }) => (
     <TableEditor2
       themeColor={extractValue.asOptionalString(node.props.themeColor)}
