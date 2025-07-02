@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.9.61
+
+### Patch Changes
+
+- 4ef5f3f: This version does not contain any real changes; it's just for bumping the version number.
+
 ## 0.9.60
 
 ### Patch Changes
