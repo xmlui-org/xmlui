@@ -4,7 +4,6 @@ import { Markdown } from "../Markdown/Markdown";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { Button } from "../Button/ButtonNative";
 import styles from "./NestedApp.module.scss";
-import { useLogoUrl } from "../AppHeader/AppHeaderNative";
 import { Tooltip } from "./Tooltip";
 import { RxOpenInNewWindow } from "react-icons/rx";
 import { LiaUndoAltSolid } from "react-icons/lia";
@@ -22,7 +21,7 @@ type AppWithCodeViewNativeProps = {
   // Indicates that the split view should initially show the code
   initiallyShowCode?: boolean;
   // Optional URL for the playground pop-out
-  popOutUrl?: string; 
+  popOutUrl?: string;
   api?: any;
   app: string;
   components?: any[];
@@ -93,7 +92,9 @@ export function AppWithCodeViewNative({
     return (
       <div className={styles.nestedAppContainer} style={{ height }}>
         <div className={styles.header}>
-          <Logo className={styles.logo} />
+          <div className={styles.wrapper}>
+            <Logo className={styles.logo} />
+          </div>
           <div className={styles.viewControls}>
             <Button
               onClick={() => setShowCode(true)}
@@ -116,7 +117,7 @@ export function AppWithCodeViewNative({
               UI
             </Button>
           </div>
-          <div>
+          <div className={styles.wrapper}>
             {allowPlaygroundPopup && (
               <Tooltip
                 trigger={

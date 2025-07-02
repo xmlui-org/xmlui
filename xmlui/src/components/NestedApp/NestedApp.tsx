@@ -76,6 +76,7 @@ export const NestedAppMd = createMetadata({
     [`width-button-splitView-${COMP}`]: "60px",
     [`width-logo-splitView-${COMP}`]: "2rem",
     [`height-logo-splitView-${COMP}`]: "2rem",
+    [`width-controls-${COMP}`]: "76px",
   },
 });
 
