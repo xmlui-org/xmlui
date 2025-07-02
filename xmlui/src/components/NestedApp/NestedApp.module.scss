@@ -33,6 +33,7 @@ $bordRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
 $borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component}");
 $height-logo-splitView-NestedApp: createThemeVar("height-logo-splitView-#{$component}");
 $width-logo-splitView-NestedApp: createThemeVar("width-logo-splitView-#{$component}");
+$width-controls-NestedApp: createThemeVar("width-controls-#{$component}");
 
 // --- End of theme variables collection
 
@@ -118,6 +119,10 @@ $width-logo-splitView-NestedApp: createThemeVar("width-logo-splitView-#{$compone
     flex: 1 1 0 !important;
     place-self: stretch;
   }
+}
+
+.wrapper {
+  width: $width-controls-NestedApp;
 }
 
 // --- We export the theme variables to add them to the component renderer
