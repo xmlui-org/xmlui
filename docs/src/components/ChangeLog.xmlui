@@ -20,17 +20,19 @@
                                     <Badge variant="pill">Latest</Badge>
                                 </Fragment>
                             </HStack>
-                            <Items items="{$item.changes}">
-                                <HStack verticalAlignment="start">
-                                    <Link 
-                                        to="https://github.com/xmlui-org/xmlui/commit/{$item.commit_sha}"
-                                        paddingTop="$space-1_5"
-                                        target="_blank">
-                                        <Icon name="new-window" size="1rem" />
-                                    </Link>
-                                    {$item.description}
-                                </HStack>
-                            </Items>
+                            <VStack paddingLeft="$padding-normal">
+                                <Items items="{$item.changes}">
+                                    <HStack verticalAlignment="start">
+                                        <Link 
+                                            to="https://github.com/xmlui-org/xmlui/commit/{$item.commit_sha}"
+                                            paddingTop="$space-1_5"
+                                            target="_blank">
+                                            <Icon name="new-window" size="1rem" />
+                                        </Link>
+                                        {$item.description}
+                                    </HStack>
+                                </Items>
+                            </VStack>
                             <Card backgroundColor="$backgroundColor-DownloadSection"
                                 padding="$space-2" marginTop="$space-2">
                                 <HStack verticalAlignment="center" padding="0">
