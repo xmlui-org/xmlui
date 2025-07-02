@@ -1031,7 +1031,7 @@ Register the icon in `IconProvider.tsx`.
 
 Update `TableEditor.tsx`.
 
-```tsx
+```xmlui /<Icon/
 import React from "react";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -1118,16 +1118,25 @@ export function TableEditor({
   return (
     <>
       <Stack orientation="horizontal">
-        <Button onClick={() => editor && editor.commands.addRowAfter()} disabled={!editor} themeColor={themeColor} variant={variant} size={size} icon={<Icon name="table-insert-row" aria-hidden />} contextualLabel="Insert Row">
+        <Button onClick={() => editor && editor.commands.addRowAfter()} disabled={!editor}
+          themeColor={themeColor} variant={variant} size={size}
+          icon={<Icon name="table-insert-row" aria-hidden />} contextualLabel="Insert Row"
+        >
           Insert Row
         </Button>
-        <Button onClick={() => editor && editor.commands.deleteRow()} disabled={!editor} themeColor={themeColor} variant={variant} size={size} icon={<Icon name="table-delete-row" aria-hidden />} contextualLabel="Delete Row">
+        <Button onClick={() => editor && editor.commands.deleteRow()} disabled={!editor}
+          themeColor={themeColor} variant={variant} size={size}
+          icon={<Icon name="table-delete-row" aria-hidden />} contextualLabel="Delete Row">
           Delete Row
         </Button>
-        <Button onClick={() => editor && editor.commands.addColumnAfter()} disabled={!editor} themeColor={themeColor} variant={variant} size={size} icon={<Icon name="table-insert-column" aria-hidden />} contextualLabel="Insert Column">
+        <Button onClick={() => editor && editor.commands.addColumnAfter()} disabled={!editor}
+          themeColor={themeColor} variant={variant} size={size}
+          icon={<Icon name="table-insert-column" aria-hidden />} contextualLabel="Insert Column">
           Insert Column
         </Button>
-        <Button onClick={() => editor && editor.commands.deleteColumn()} disabled={!editor} themeColor={themeColor} variant={variant} size={size} icon={<Icon name="table-delete-column" aria-hidden />} contextualLabel="Delete Column">
+        <Button onClick={() => editor && editor.commands.deleteColumn()} disabled={!editor}
+          themeColor={themeColor} variant={variant} size={size}
+          icon={<Icon name="table-delete-column" aria-hidden />} contextualLabel="Delete Column">
           Delete Column
         </Button>
       </Stack>
