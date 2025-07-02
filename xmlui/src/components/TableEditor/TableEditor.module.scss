@@ -7,16 +7,22 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+// Reuse Table theme variables
 $backgroundColorHeadingTable: createThemeVar("backgroundColor-heading-Table");
 $borderCellTable: createThemeVar("border-cell-Table");
 $fontSizeHeadingTable: createThemeVar("fontSize-heading-Table");
-$fontSizeRowTable: createThemeVar("fontSize-row-Table");
 $fontWeightHeadingTable: createThemeVar("fontWeight-heading-Table");
+$fontSizeRowTable: createThemeVar("fontSize-row-Table");
 $fontWeightRowTable: createThemeVar("fontWeight-row-Table");
 $paddingCellTable: createThemeVar("padding-cell-Table");
 $paddingHeadingTable: createThemeVar("padding-heading-Table");
 $textColorHeadingTable: createThemeVar("textColor-heading-Table");
 $textColorPaginationTable: createThemeVar("textColor-pagination-Table");
+$buttonStackSpacing: createThemeVar("spacing-buttonStack-Table");
+$textTransformHeadingTable: createThemeVar("textTransform-heading-Table");
+$tableMarginTop: t.$space-4;
+$paddingHtmlTd: createThemeVar("padding-HtmlTd");
+$paddingHtmlTh: createThemeVar("padding-HtmlTh");
 
 .editor {
   :global(.ProseMirror) {
@@ -26,25 +32,27 @@ $textColorPaginationTable: createThemeVar("textColor-pagination-Table");
     min-height: 100px;
     table {
       border-collapse: collapse;
+      margin-top: $tableMarginTop;
     }
     th {
       background-color: $backgroundColorHeadingTable;
       font-size: $fontSizeHeadingTable;
       font-weight: $fontWeightHeadingTable;
-      padding: $paddingHeadingTable;
+      padding: $paddingHtmlTh;
       color: $textColorHeadingTable;
+      text-transform: $textTransformHeadingTable;
     }
     td {
       font-size: $fontSizeRowTable;
       font-weight: $fontWeightRowTable;
-      padding: $paddingCellTable;
+      padding: $paddingHtmlTd;
       border: $borderCellTable;
     }
   }
 }
 
 .button-stack {
-  margin-bottom: 16px;
+  margin-bottom: $buttonStackSpacing;
 }
 
 .table-editor-root {

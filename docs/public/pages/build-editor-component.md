@@ -28,6 +28,11 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 </App>
 ```
 
+| Fruit | Color |
+| --- | --- |
+| Apple | Red |
+| Banana | Yellow |
+
 ## Step 1: Create the folder.
 
 ```bash
