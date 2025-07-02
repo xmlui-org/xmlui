@@ -169,7 +169,7 @@ const TableEditor = forwardRef<unknown, TableEditorProps>(function TableEditor({
           </Button>
         </Stack>
       </div>
-      <TableEditorNative editor={editor} />
+      <TableEditorNative editor={editor} className={styles.editor} />
     </div>
   );
 });

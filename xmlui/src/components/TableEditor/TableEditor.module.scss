@@ -12,6 +12,31 @@ $paddingHeadingTable: createThemeVar("padding-heading-Table");
 $textColorHeadingTable: createThemeVar("textColor-heading-Table");
 $textColorPaginationTable: createThemeVar("textColor-pagination-Table");
 
+.editor {
+  :global(.ProseMirror) {
+    outline: none;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 100px;
+    table {
+      border-collapse: collapse;
+    }
+    th {
+      background-color: $backgroundColorHeadingTable;
+      font-size: $fontSizeHeadingTable;
+      font-weight: $fontWeightHeadingTable;
+      padding: $paddingHeadingTable;
+      color: $textColorHeadingTable;
+    }
+    td {
+      font-size: $fontSizeRowTable;
+      font-weight: $fontWeightRowTable;
+      padding: $paddingCellTable;
+      border: $borderCellTable;
+    }
+  }
+}
+
 .button-stack {
   margin-bottom: 16px;
 }
@@ -19,32 +44,6 @@ $textColorPaginationTable: createThemeVar("textColor-pagination-Table");
 .table-editor-root {
   padding: 8px;
   overflow-x: auto;
-}
-
-.ProseMirror {
-  outline: none;
-  white-space: pre-wrap;
-  word-break: break-word;
-  min-height: 100px;
-}
-
-.ProseMirror table {
-  border-collapse: collapse;
-}
-
-.ProseMirror th {
-  background-color: $backgroundColorHeadingTable;
-  font-size: $fontSizeHeadingTable;
-  font-weight: $fontWeightHeadingTable;
-  padding: $paddingHeadingTable;
-  color: $textColorHeadingTable;
-}
-
-.ProseMirror td {
-  font-size: $fontSizeRowTable;
-  font-weight: $fontWeightRowTable;
-  padding: $paddingCellTable;
-  border: $borderCellTable;
 }
 
 .pagination {
