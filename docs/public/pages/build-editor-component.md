@@ -11,11 +11,23 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 ```xmlui-pg
 <App>
 
-  <TableEditor2 id="tableEditor" />
+  <TableEditor2
+    id="tableEditor"
+  />
 
-  <Text variant="codefence" preserveLinebreaks="true">
-    { tableEditor.getMarkdownSource() }
-  </Text>
+  <TableEditor2
+    id="tableEditor2"
+    themeColor="primary"
+    size="lg"
+    variant="outlined"
+  />
+
+    <TableEditor2
+    id="tableEditor3"
+    themeColor="attention"
+    variant="ghost"
+    size="sm"
+  />
 
 </App>
 ```
@@ -25,14 +37,23 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 ```xmlui-pg
 <App>
 
-  <TableEditor size="xs" id="tableEditor"  />
+  <TableEditor
+    id="tableEditor"
+  />
 
-  <TableEditor size="sm" id="tableEditor"  />
+  <TableEditor
+    id="tableEditor2"
+    themeColor="primary"
+    size="lg"
+    variant="outlined"
+  />
 
-  <TableEditor size="md" id="tableEditor"  />
-
-  <TableEditor size="lg" id="tableEditor"  />
-
+    <TableEditor
+    id="tableEditor3"
+    themeColor="attention"
+    variant="ghost"
+    size="sm"
+  />
 
   <Text variant="codefence" preserveLinebreaks="true">
     { tableEditor.getMarkdownSource() }
@@ -667,9 +688,224 @@ Try adding different theme props to your TableEditor:
 
 The buttons remain blue and solid. This happens because XMLUI doesn't know which props are valid for custom components. Without proper metadata, theme attributes are filtered out.
 
-XMLUI components need metadata to define their allowed props. Let's look at how the Button component does this, then apply the same pattern to TableEditor.
+XMLUI components need metadata to define their allowed props.
 
-First, add the necessary imports to `TableEditor.tsx`:
+```tsx
+import React from "react";
+import { useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Table from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import { Button } from "../Button/ButtonNative";
+import { Stack } from "../Stack/StackNative";
+import TurndownService from "turndown";
+import { TableEditorNative } from "./TableEditorNative";
+import { createMetadata } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
+
+export function TableEditor({
+  registerComponentApi,
+  themeColor = "primary",
+  variant = "solid",
+  size = "sm",
+}: {
+  registerComponentApi?: (api: any) => void;
+  themeColor?: "primary" | "secondary" | "attention";
+  variant?: "solid" | "outlined" | "ghost";
+  size?: "xs" | "sm" | "md" | "lg";
+}) {
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Table.configure({ resizable: true }),
+      TableRow,
+      TableHeader,
+      TableCell,
+    ],
+    content: `
+      <table>
+        <thead>
+          <tr>
+            <th>Fruit</th>
+            <th>Color</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Apple</td>
+            <td>Red</td>
+          </tr>
+          <tr>
+            <td>Banana</td>
+            <td>Yellow</td>
+          </tr>
+        </tbody>
+      </table>
+    `,
+  });
+
+  React.useEffect(() => {
+    if (registerComponentApi && editor) {
+      const turndownService = new TurndownService();
+      turndownService.addRule('table', {
+        filter: 'table',
+        replacement: function (content, node) {
+          let rows = [];
+          for (let row of node.querySelectorAll('tr')) {
+            let cells = Array.from(row.children).map(cell => (cell as HTMLElement).textContent?.trim() ?? "");
+            rows.push('| ' + cells.join(' | ') + ' |');
+          }
+          if (rows.length > 1) {
+            // Add a separator after the header row
+            const headerSep = '| ' + rows[0].split('|').slice(1, -1).map(() => '---').join(' | ') + ' |';
+            rows.splice(1, 0, headerSep);
+          }
+          return rows.join('\n') + '\n';
+        }
+      });
+      registerComponentApi({
+        getHtmlSource: () => editor.getHTML(),
+        getMarkdownSource: () => turndownService.turndown(editor.getHTML()),
+      });
+    }
+  }, [registerComponentApi, editor]);
+
+  return (
+    <>
+      <Stack orientation="horizontal">
+        <Button onClick={() => editor && editor.commands.addRowAfter()} disabled={!editor} themeColor={themeColor} variant={variant} size={size}>
+          <svg
+            viewBox="0 0 24 16"
+            stroke="currentColor"
+            fill="none"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            width="20"
+            height="16"
+            style={{ marginRight: 4 }}
+          >
+            <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
+            <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" />
+            <line x1="1.5" y1="9.5" x2="14.5" y2="9.5" />
+            <line x1="19" y1="6" x2="19" y2="10" />
+            <line x1="17" y1="8" x2="21" y2="8" />
+          </svg>
+          Insert Row
+        </Button>
+        <Button onClick={() => editor && editor.commands.deleteRow()} disabled={!editor} themeColor={themeColor} variant={variant} size={size}>
+          <svg
+            viewBox="0 0 24 16"
+            stroke="currentColor"
+            fill="none"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            width="20"
+            height="16"
+            style={{ marginRight: 4 }}
+          >
+            <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
+            <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" />
+            <line x1="1.5" y1="9.5" x2="14.5" y2="9.5" />
+            <line x1="17" y1="8" x2="21" y2="8" />
+          </svg>
+          Delete Row
+        </Button>
+        <Button onClick={() => editor && editor.commands.addColumnAfter()} disabled={!editor} themeColor={themeColor} variant={variant} size={size}>
+          <svg
+            viewBox="0 0 24 16"
+            stroke="currentColor"
+            fill="none"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            width="24"
+            height="16"
+            style={{ marginRight: 4 }}
+          >
+            <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
+            <line x1="5.5" y1="3.5" x2="5.5" y2="11.5" />
+            <line x1="9" y1="3.5" x2="9" y2="11.5" />
+            <line x1="19" y1="6.5" x2="19" y2="9.5" />
+            <line x1="17.5" y1="8" x2="20.5" y2="8" />
+          </svg>
+          Insert Column
+        </Button>
+        <Button onClick={() => editor && editor.commands.deleteColumn()} disabled={!editor} themeColor={themeColor} variant={variant} size={size}>
+          <svg
+            viewBox="0 0 24 16"
+            stroke="currentColor"
+            fill="none"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            width="24"
+            height="16"
+            style={{ marginRight: 4 }}
+          >
+            <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
+            <line x1="5.5" y1="3.5" x2="5.5" y2="11.5" />
+            <line x1="9" y1="3.5" x2="9" y2="11.5" />
+            {/* Minus sign for delete */}
+            <line x1="17" y1="8" x2="21" y2="8" />
+          </svg>
+          Delete Column
+        </Button>
+      </Stack>
+      <TableEditorNative2 editor={editor} />
+    </>
+  );
+}
+
+export const TableEditorMd = createMetadata({
+  description:
+    "`TableEditor` provides an interactive table editing interface with controls for adding and deleting rows and columns. It supports theme customization and exports table data in HTML and Markdown formats.",
+  status: "experimental",
+  props: {
+    themeColor: {
+      description: "Sets the color scheme for all editor buttons.",
+      isRequired: false,
+      type: "string",
+      availableValues: buttonThemeMd,
+      defaultValue: "primary",
+    },
+    variant: {
+      description: "Sets the visual style for all editor buttons.",
+      isRequired: false,
+      type: "string",
+      availableValues: buttonVariantMd,
+      defaultValue: "solid",
+    },
+    size: {
+      description: "Sets the size for all editor buttons.",
+      isRequired: false,
+      type: "string",
+      availableValues: sizeMd,
+      defaultValue: "sm",
+    },
+  },
+  events: {},
+});
+
+export const editorComponentRenderer2 = createComponentRenderer(
+  "TableEditor",
+  TableEditor2Md,
+  ({ node, extractValue, registerComponentApi }) => (
+    <TableEditor
+      themeColor={extractValue.asOptionalString(node.props.themeColor)}
+      variant={extractValue.asOptionalString(node.props.variant)}
+      size={extractValue.asOptionalString(node.props.size)}
+      registerComponentApi={registerComponentApi}
+    />
+  ),
+);
+```
+
+We add the necessary imports to `TableEditor.tsx`.
 
 ```tsx
 import { createMetadata } from "../../abstractions/ComponentDefs";
@@ -677,7 +913,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
 ```
 
-Modify the TableEditor function to accept theme props:
+We modify the TableEditor function to accept theme props.
 
 ```tsx
 export function TableEditor({
@@ -695,7 +931,7 @@ export function TableEditor({
 }
 ```
 
-Then forward these props to all Button components:
+We forward these props to all Button components.
 
 ```tsx
 <Button
@@ -709,7 +945,7 @@ Then forward these props to all Button components:
 </Button>
 ```
 
-After the TableEditor function, add metadata that defines the allowed props:
+We add metadata that defines the allowed props:
 
 ```tsx
 export const TableEditorMd = createMetadata({
@@ -743,7 +979,7 @@ export const TableEditorMd = createMetadata({
 });
 ```
 
-Replace the simple renderer with a proper one that uses metadata:
+We replace the simple renderer with a proper one that uses metadata:
 
 ```tsx
 export const editorComponentRenderer = createComponentRenderer(
@@ -760,8 +996,6 @@ export const editorComponentRenderer = createComponentRenderer(
     );
   },
 );
-```
-
 ```
 
 Now TableEditor supports full theme customization.
@@ -786,9 +1020,9 @@ Now TableEditor supports full theme customization.
   />
 ```
 
-<Image src="/resources/devdocs/table-editor-08.png" />
+<Image src="/resources/devdocs/table_editor_08.png" />
 
-## Step 10: Register the icons
+## Step 11: Register the icons
 
 > [!INFO]
 > Registering icons is optional if you only use them inline within your component, but it is strongly recommended for reusability, maintainability, and accessibility.

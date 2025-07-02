@@ -9,8 +9,22 @@ import { Button } from "../Button/ButtonNative";
 import { Stack } from "../Stack/StackNative";
 import TurndownService from "turndown";
 import { TableEditorNative2 } from "./TableEditorNative2";
+import { createMetadata } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { buttonThemeMd, buttonVariantMd, sizeMd } from "../abstractions";
+import Icon from "../Icon/IconNative";
 
-export function TableEditor2({ registerComponentApi }: { registerComponentApi?: (api: any) => void }) {
+export function TableEditor2({
+  registerComponentApi,
+  themeColor = "primary",
+  variant = "solid",
+  size = "sm",
+}: {
+  registerComponentApi?: (api: any) => void;
+  themeColor?: "primary" | "secondary" | "attention";
+  variant?: "solid" | "outlined" | "ghost";
+  size?: "xs" | "sm" | "md" | "lg";
+}) {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -70,83 +84,16 @@ export function TableEditor2({ registerComponentApi }: { registerComponentApi?: 
   return (
     <>
       <Stack orientation="horizontal">
-        <Button onClick={() => editor && editor.commands.addRowAfter()} disabled={!editor}>
-          <svg
-            viewBox="0 0 24 16"
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            width="20"
-            height="16"
-            style={{ marginRight: 4 }}
-          >
-            <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
-            <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" />
-            <line x1="1.5" y1="9.5" x2="14.5" y2="9.5" />
-            <line x1="19" y1="6" x2="19" y2="10" />
-            <line x1="17" y1="8" x2="21" y2="8" />
-          </svg>
+        <Button onClick={() => editor && editor.commands.addRowAfter()} disabled={!editor} themeColor={themeColor} variant={variant} size={size} icon={<Icon name="table-insert-row" aria-hidden />} contextualLabel="Insert Row">
           Insert Row
         </Button>
-        <Button onClick={() => editor && editor.commands.deleteRow()} disabled={!editor}>
-          <svg
-            viewBox="0 0 24 16"
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            width="20"
-            height="16"
-            style={{ marginRight: 4 }}
-          >
-            <rect x="1.5" y="1.5" width="13" height="11" rx="1" />
-            <line x1="1.5" y1="5.5" x2="14.5" y2="5.5" />
-            <line x1="1.5" y1="9.5" x2="14.5" y2="9.5" />
-            <line x1="17" y1="8" x2="21" y2="8" />
-          </svg>
+        <Button onClick={() => editor && editor.commands.deleteRow()} disabled={!editor} themeColor={themeColor} variant={variant} size={size} icon={<Icon name="table-delete-row" aria-hidden />} contextualLabel="Delete Row">
           Delete Row
         </Button>
-        <Button onClick={() => editor && editor.commands.addColumnAfter()} disabled={!editor}>
-          <svg
-            viewBox="0 0 24 16"
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="1.25"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            width="24"
-            height="16"
-            style={{ marginRight: 4 }}
-          >
-            <rect x="2.5" y="3" width="11" height="9" rx="1" />
-            <line x1="5.5" y1="3.5" x2="5.5" y2="11.5" />
-            <line x1="9" y1="3.5" x2="9" y2="11.5" />
-            <line x1="19" y1="6.5" x2="19" y2="9.5" />
-            <line x1="17.5" y1="8" x2="20.5" y2="8" />
-          </svg>
+        <Button onClick={() => editor && editor.commands.addColumnAfter()} disabled={!editor} themeColor={themeColor} variant={variant} size={size} icon={<Icon name="table-insert-column" aria-hidden />} contextualLabel="Insert Column">
           Insert Column
         </Button>
-        <Button onClick={() => editor && editor.commands.deleteColumn()} disabled={!editor}>
-          <svg
-            viewBox="0 0 24 16"
-            stroke="currentColor"
-            fill="none"
-            strokeWidth="1.25"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            width="24"
-            height="16"
-            style={{ marginRight: 4 }}
-          >
-            <rect x="2.5" y="3" width="11" height="9" rx="1" />
-            <line x1="5.5" y1="3.5" x2="5.5" y2="11.5" />
-            <line x1="9" y1="3.5" x2="9" y2="11.5" />
-            {/* Minus sign for delete */}
-            <line x1="17" y1="8" x2="21" y2="8" />
-          </svg>
+        <Button onClick={() => editor && editor.commands.deleteColumn()} disabled={!editor} themeColor={themeColor} variant={variant} size={size} icon={<Icon name="table-delete-column" aria-hidden />} contextualLabel="Delete Column">
           Delete Column
         </Button>
       </Stack>
@@ -155,9 +102,45 @@ export function TableEditor2({ registerComponentApi }: { registerComponentApi?: 
   );
 }
 
-export const editorComponentRenderer2 = {
-  type: "TableEditor2",
-  renderer: ({ registerComponentApi, ...props }: any) => (
-    <TableEditor2 {...props} registerComponentApi={registerComponentApi} />
+export const TableEditor2Md = createMetadata({
+  description:
+    "`TableEditor2` provides an interactive table editing interface with controls for adding and deleting rows and columns. It supports theme customization and exports table data in HTML and Markdown formats.",
+  status: "experimental",
+  props: {
+    themeColor: {
+      description: "Sets the color scheme for all editor buttons.",
+      isRequired: false,
+      type: "string",
+      availableValues: buttonThemeMd,
+      defaultValue: "primary",
+    },
+    variant: {
+      description: "Sets the visual style for all editor buttons.",
+      isRequired: false,
+      type: "string",
+      availableValues: buttonVariantMd,
+      defaultValue: "solid",
+    },
+    size: {
+      description: "Sets the size for all editor buttons.",
+      isRequired: false,
+      type: "string",
+      availableValues: sizeMd,
+      defaultValue: "sm",
+    },
+  },
+  events: {},
+});
+
+export const editorComponentRenderer2 = createComponentRenderer(
+  "TableEditor2",
+  TableEditor2Md,
+  ({ node, extractValue, registerComponentApi }) => (
+    <TableEditor2
+      themeColor={extractValue.asOptionalString(node.props.themeColor)}
+      variant={extractValue.asOptionalString(node.props.variant)}
+      size={extractValue.asOptionalString(node.props.size)}
+      registerComponentApi={registerComponentApi}
+    />
   ),
-};
+);
