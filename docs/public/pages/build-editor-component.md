@@ -25,9 +25,14 @@ This guide walks you through building a `TableEditor` component for XMLUI, using
 ```xmlui-pg
 <App>
 
-  <TableEditor
-    id="tableEditor"
-  />
+  <TableEditor size="xs" id="tableEditor"  />
+
+  <TableEditor size="sm" id="tableEditor"  />
+
+  <TableEditor size="md" id="tableEditor"  />
+
+  <TableEditor size="lg" id="tableEditor"  />
+
 
   <Text variant="codefence" preserveLinebreaks="true">
     { tableEditor.getMarkdownSource() }
