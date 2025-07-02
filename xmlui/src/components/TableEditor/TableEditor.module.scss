@@ -1,6 +1,12 @@
 @use "../../components-core/theming/themes" as t;
 $componentName: "TableEditor";
 
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
 $backgroundColorHeadingTable: createThemeVar("backgroundColor-heading-Table");
 $borderCellTable: createThemeVar("border-cell-Table");
 $fontSizeHeadingTable: createThemeVar("fontSize-heading-Table");
@@ -51,14 +57,5 @@ $textColorPaginationTable: createThemeVar("textColor-pagination-Table");
 }
 
 :export {
-  backgroundColorHeadingTable: $backgroundColorHeadingTable;
-  borderCellTable: $borderCellTable;
-  fontSizeHeadingTable: $fontSizeHeadingTable;
-  fontSizeRowTable: $fontSizeRowTable;
-  fontWeightHeadingTable: $fontWeightHeadingTable;
-  fontWeightRowTable: $fontWeightRowTable;
-  paddingCellTable: $paddingCellTable;
-  paddingHeadingTable: $paddingHeadingTable;
-  textColorHeadingTable: $textColorHeadingTable;
-  textColorPaginationTable: $textColorPaginationTable;
+  themeVars: t.json-stringify($themeVars);
 }
