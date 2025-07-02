@@ -1,5 +1,13 @@
 # xmlui
 
+## 0.9.60
+
+### Patch Changes
+
+- f37ed8c: Fine tune AppWithCodeView header
+- 736dbc8: improve: AppWithCode - center the XML/UI buttons
+- e2a6e1a: Add a popOutUrl="<url>" option to xmlui-pg to allow pop out to a custom playground location
+
 ## 0.9.59
 
 ### Patch Changes
